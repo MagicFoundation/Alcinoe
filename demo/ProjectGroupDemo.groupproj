@@ -1,0 +1,174 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{906acaec-fc88-48ec-90e6-efed2dfbd50e}</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Projects Include="ALButton\ALButtonDemo.dproj" />
+    <Projects Include="ALComboBox\ALComboBoxDemo.dproj" />
+    <Projects Include="ALEdit\ALEditDemo.dproj" />
+    <Projects Include="ALFBXDemo\ALFBXDemo.dproj" />
+    <Projects Include="ALHintBalloon\ALHintBalloonDemo.dproj" />
+    <Projects Include="ALListBox\ALListBoxDemo.dproj" />
+    <Projects Include="ALMemo\ALMemoDemo.dproj" />
+    <Projects Include="ALNNTPClient\ALNNTPClientDemo.dproj" />
+    <Projects Include="ALPhpRunner\ALPhpRunnerDemo.dproj" />
+    <Projects Include="ALSMTPClient\ALSMTPClientDemo.dproj" />
+    <Projects Include="AlStringBenchmark\ALStringBenchmark.dproj" />
+    <Projects Include="ALWebSpider\ALWebSpiderDemo.dproj" />
+    <Projects Include="ALWinHTTPClient\ALWinHTTPClientDemo.dproj" />
+    <Projects Include="ALWinInetHTTPClient\ALWinInetHTTPClientDemo.dproj" />
+    <Projects Include="ALXmlDoc\AlXmlDocDemo.dproj" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <Borland.Personality>Default.Personality</Borland.Personality>
+    <Borland.ProjectType />
+    <BorlandProject>
+  <BorlandProject xmlns=""> <Default.Personality> </Default.Personality> </BorlandProject></BorlandProject>
+  </ProjectExtensions>
+  <Target Name="ALButtonDemo">
+    <MSBuild Projects="ALButton\ALButtonDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALButtonDemo:Clean">
+    <MSBuild Projects="ALButton\ALButtonDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALButtonDemo:Make">
+    <MSBuild Projects="ALButton\ALButtonDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALComboBoxDemo">
+    <MSBuild Projects="ALComboBox\ALComboBoxDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALComboBoxDemo:Clean">
+    <MSBuild Projects="ALComboBox\ALComboBoxDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALComboBoxDemo:Make">
+    <MSBuild Projects="ALComboBox\ALComboBoxDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALEditDemo">
+    <MSBuild Projects="ALEdit\ALEditDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALEditDemo:Clean">
+    <MSBuild Projects="ALEdit\ALEditDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALEditDemo:Make">
+    <MSBuild Projects="ALEdit\ALEditDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALHintBalloonDemo">
+    <MSBuild Projects="ALHintBalloon\ALHintBalloonDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALHintBalloonDemo:Clean">
+    <MSBuild Projects="ALHintBalloon\ALHintBalloonDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALHintBalloonDemo:Make">
+    <MSBuild Projects="ALHintBalloon\ALHintBalloonDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALListBoxDemo">
+    <MSBuild Projects="ALListBox\ALListBoxDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALListBoxDemo:Clean">
+    <MSBuild Projects="ALListBox\ALListBoxDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALListBoxDemo:Make">
+    <MSBuild Projects="ALListBox\ALListBoxDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALMemoDemo">
+    <MSBuild Projects="ALMemo\ALMemoDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALMemoDemo:Clean">
+    <MSBuild Projects="ALMemo\ALMemoDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALMemoDemo:Make">
+    <MSBuild Projects="ALMemo\ALMemoDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALSMTPClientDemo">
+    <MSBuild Projects="ALSMTPClient\ALSMTPClientDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALSMTPClientDemo:Clean">
+    <MSBuild Projects="ALSMTPClient\ALSMTPClientDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALSMTPClientDemo:Make">
+    <MSBuild Projects="ALSMTPClient\ALSMTPClientDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALWebSpiderDemo">
+    <MSBuild Projects="ALWebSpider\ALWebSpiderDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALWebSpiderDemo:Clean">
+    <MSBuild Projects="ALWebSpider\ALWebSpiderDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALWebSpiderDemo:Make">
+    <MSBuild Projects="ALWebSpider\ALWebSpiderDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALWinHTTPClientDemo">
+    <MSBuild Projects="ALWinHTTPClient\ALWinHTTPClientDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALWinHTTPClientDemo:Clean">
+    <MSBuild Projects="ALWinHTTPClient\ALWinHTTPClientDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALWinHTTPClientDemo:Make">
+    <MSBuild Projects="ALWinHTTPClient\ALWinHTTPClientDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALWinInetHTTPClientDemo">
+    <MSBuild Projects="ALWinInetHTTPClient\ALWinInetHTTPClientDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALWinInetHTTPClientDemo:Clean">
+    <MSBuild Projects="ALWinInetHTTPClient\ALWinInetHTTPClientDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALWinInetHTTPClientDemo:Make">
+    <MSBuild Projects="ALWinInetHTTPClient\ALWinInetHTTPClientDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="AlXmlDocDemo">
+    <MSBuild Projects="ALXmlDoc\AlXmlDocDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="AlXmlDocDemo:Clean">
+    <MSBuild Projects="ALXmlDoc\AlXmlDocDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="AlXmlDocDemo:Make">
+    <MSBuild Projects="ALXmlDoc\AlXmlDocDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALStringBenchmark">
+    <MSBuild Projects="AlStringBenchmark\ALStringBenchmark.dproj" Targets="" />
+  </Target>
+  <Target Name="ALStringBenchmark:Clean">
+    <MSBuild Projects="AlStringBenchmark\ALStringBenchmark.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALStringBenchmark:Make">
+    <MSBuild Projects="AlStringBenchmark\ALStringBenchmark.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALFBXDemo">
+    <MSBuild Projects="ALFBXDemo\ALFBXDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALFBXDemo:Clean">
+    <MSBuild Projects="ALFBXDemo\ALFBXDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALFBXDemo:Make">
+    <MSBuild Projects="ALFBXDemo\ALFBXDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALNNTPClientDemo">
+    <MSBuild Projects="ALNNTPClient\ALNNTPClientDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALNNTPClientDemo:Clean">
+    <MSBuild Projects="ALNNTPClient\ALNNTPClientDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALNNTPClientDemo:Make">
+    <MSBuild Projects="ALNNTPClient\ALNNTPClientDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALPhpRunnerDemo">
+    <MSBuild Projects="ALPhpRunner\ALPhpRunnerDemo.dproj" Targets="" />
+  </Target>
+  <Target Name="ALPhpRunnerDemo:Clean">
+    <MSBuild Projects="ALPhpRunner\ALPhpRunnerDemo.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALPhpRunnerDemo:Make">
+    <MSBuild Projects="ALPhpRunner\ALPhpRunnerDemo.dproj" Targets="Make" />
+  </Target>
+  <Target Name="Build">
+    <CallTarget Targets="ALButtonDemo;ALComboBoxDemo;ALEditDemo;ALHintBalloonDemo;ALListBoxDemo;ALMemoDemo;ALSMTPClientDemo;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALStringBenchmark;ALFBXDemo;ALNNTPClientDemo;ALPhpRunnerDemo" />
+  </Target>
+  <Target Name="Clean">
+    <CallTarget Targets="ALButtonDemo:Clean;ALComboBoxDemo:Clean;ALEditDemo:Clean;ALHintBalloonDemo:Clean;ALListBoxDemo:Clean;ALMemoDemo:Clean;ALSMTPClientDemo:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALStringBenchmark:Clean;ALFBXDemo:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean" />
+  </Target>
+  <Target Name="Make">
+    <CallTarget Targets="ALButtonDemo:Make;ALComboBoxDemo:Make;ALEditDemo:Make;ALHintBalloonDemo:Make;ALListBoxDemo:Make;ALMemoDemo:Make;ALSMTPClientDemo:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALStringBenchmark:Make;ALFBXDemo:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make" />
+  </Target>
+  <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
+</Project>

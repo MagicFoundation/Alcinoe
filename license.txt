@@ -1,0 +1,21 @@
+All files included in the archive are 
+Copyright (C) 1999-2009 by Arkadia Software Engineering
+
+The component is fully free. You can use it any kind of 
+software. But you must point to original author in your 
+program about window or in help file.
+
+Alcinoe component License Agreement.
+
+Use and distribution of the component is permitted provided 
+that all of the following terms are accepted: 
+
+The component is provided "as-is," without any express or 
+implied warranty. In no event shall the Author be held liable 
+for any damages arising from the use of the Software.
+
+You can modify and redistribute source code as you wish.
+
+If you do not agree to all of the above terms, you are not 
+permitted to use the Software in any way, and all copies 
+of it must be deleted from your system(s).

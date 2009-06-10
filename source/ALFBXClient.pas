@@ -562,21 +562,13 @@ Var ResultCurrentPos: Integer;
     end;
 
 begin
-  try
-    {some init}
-    ResultCurrentLength := BuffSize;
-    SetLength(Result,ResultCurrentLength);
-    ResultCurrentPos := 1;
-    InternalMoveStr2Result('<root>');
-    InternalExecQuery;
-    InternalMoveStr2Result('</root>');
-  except
-    On E: Exception do
-     raise Exception.Create(
-                             'SelectData Error - ' + E.Message + #13#10#13#10 +
-                             'SQL Request => ' + #13#10 + trim(Sql)
-                            );
-  end;
+  ResultCurrentLength := BuffSize;
+  SetLength(Result,ResultCurrentLength);
+  ResultCurrentPos := 1;
+  InternalMoveStr2Result('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10'<root>');
+  InternalExecQuery;
+  InternalMoveStr2Result('</root>');
+  SetLength(Result,ResultCurrentPos-1);
 end;
 
 {********************************************}

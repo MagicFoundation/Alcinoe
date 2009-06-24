@@ -319,6 +319,14 @@ procedure ALHTTPEncodeParamNameValues(ParamValues: TStrings);
 procedure ALExtractHTTPFields(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; StripQuotes: Boolean = False);
 Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: String): String;
+Function  AlInternetCrackUrl(aUrl: String;
+                             Var SchemeName,
+                                 HostName,
+                                 UserName,
+                                 Password,
+                                 UrlPath,
+                                 ExtraInfo: String;
+                             var PortNumber: integer): Boolean;
 Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
 function  AlCombineUrl(RelativeUrl, BaseUrl: String): String;
@@ -1117,10 +1125,56 @@ var URLComp: TURLComponents;
 begin
   FillChar(URLComp, SizeOf(URLComp), 0);
   URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwHostNameLength := 1;
+  URLComp.dwHostNameLength := INTERNET_MAX_HOST_NAME_LENGTH;
   P := PChar(aUrl);
   if InternetCrackUrl(P, 0, 0, URLComp) then Result := AlCopyStr(aUrl, URLComp.lpszHostName - P + 1, URLComp.dwHostNameLength) // www.mysite.com
   else result := '';
+end;
+
+{***************************************}
+Function AlInternetCrackUrl(aUrl: String;
+                            Var SchemeName,
+                                HostName,
+                                UserName,
+                                Password,
+                                UrlPath,
+                                ExtraInfo: String;
+                            var PortNumber: integer): Boolean;
+var URLComp: TURLComponents;
+    P: PChar;
+begin
+  FillChar(URLComp, SizeOf(URLComp), 0);
+  URLComp.dwStructSize := SizeOf(URLComp);
+  URLComp.dwHostNameLength := 1;
+  URLComp.dwSchemeLength := INTERNET_MAX_SCHEME_LENGTH;
+  URLComp.dwHostNameLength := INTERNET_MAX_HOST_NAME_LENGTH;
+  URLComp.dwUserNameLength := INTERNET_MAX_USER_NAME_LENGTH;
+  URLComp.dwPasswordLength := INTERNET_MAX_PASSWORD_LENGTH;
+  URLComp.dwUrlPathLength := INTERNET_MAX_PATH_LENGTH;
+  URLComp.dwExtraInfoLength := INTERNET_MAX_PATH_LENGTH;
+  P := PChar(aUrl);
+  if InternetCrackUrl(P, 0, 0, URLComp) then begin
+    Result := True;
+    with URLComp do begin
+      SchemeName := AlCopyStr(lpszScheme, 1, dwSchemeLength);
+      HostName := AlCopyStr(lpszHostName, 1, dwHostNameLength);
+      PortNumber := nPort;
+      UserName := AlCopyStr(lpszUserName, 1, dwUserNameLength);
+      Password := AlCopyStr(lpszPassword, 1, dwPasswordLength);
+      UrlPath := AlCopyStr(lpszUrlPath, 1, dwUrlPathLength);
+      ExtraInfo := AlCopyStr(lpszExtraInfo, 1, dwExtraInfoLength);
+    end;
+  end
+  else begin
+    Result := False;
+    SchemeName := '';
+    HostName := '';
+    PortNumber := 0;
+    UserName := '';
+    Password := '';
+    UrlPath := '';
+    ExtraInfo := '';
+  end;
 end;
 
 {**********************************************************************************}

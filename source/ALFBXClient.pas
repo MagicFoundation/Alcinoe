@@ -437,7 +437,7 @@ Begin
     //SQL_INT64       =    580;
     //SQL_DATE        =    SQL_TIMESTAMP;}
     Case aSQLDA.SQLType[aIndex] of
-      SQL_TIMESTAMP : Result := datetostr(aSQLDA.AsDateTime[aIndex], aFormatSettings);
+      SQL_TIMESTAMP : Result := datetimetostr(aSQLDA.AsDateTime[aIndex], aFormatSettings);
       SQL_TYPE_TIME : Result := Timetostr(aSQLDA.AsTime[aIndex], aFormatSettings);
       SQL_TYPE_DATE : Result := Datetostr(aSQLDA.AsDate[aIndex], aFormatSettings);
       SQL_DOUBLE    : Result := Floattostr(aSQLDA.AsDouble[aIndex], aFormatSettings);

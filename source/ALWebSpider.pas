@@ -71,6 +71,7 @@ interface
 
 uses Windows,
      classes,
+     AlAvlBinaryTree,
      AlHTTPCommon,
      AlHTTPClient;
 
@@ -110,6 +111,16 @@ Type
   {----------------------------------------------------------------}
   TAlWebSpiderCrawlEndEvent = Procedure (Sender: TObject) of object;
 
+  {----------------------------------------------------------------------------------------}
+  TAlWebSpiderCrawlBeforeDownloadEvent = Procedure (Sender: TObject; Url: String) of object;
+
+  {---------------------------------------------------------------}
+  TAlWebSpiderCrawlAfterDownloadEvent = Procedure (Sender: TObject;
+                                                   Url: String;
+                                                   HTTPResponseHeader: TALHTTPResponseHeader;
+                                                   HttpResponseContent: TStream;
+                                                   Var StopCrawling: Boolean) of object;
+
   {-----------------------------------------------------------------------------}
   TAlWebSpiderUpdateLinkToLocalPathGetNextFileEvent = procedure (Sender: TObject;
                                                                  Var FileName: String;
@@ -138,11 +149,15 @@ Type
     fOnCrawlGetNextLink: TAlWebSpiderCrawlGetNextLinkEvent;
     FOnCrawlEnd: TAlWebSpiderCrawlEndEvent;
     FHttpClient: TalHttpClient;
+    fOnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent;
+    fOnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent;
   Protected
   Public
     Procedure Crawl; {Launch the Crawling of the page}
     Procedure UpdateLinkToLocalPath; {Update the link of downloaded page to local path}
   published
+    Property  OnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent read fOnCrawlBeforeDownload write fOnCrawlBeforeDownload; {When a page is successfully downloaded}
+    Property  OnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent read fOnCrawlAfterDownload write fOnCrawlAfterDownload; {When a page is successfully downloaded}
     Property  OnCrawlDownloadSuccess: TAlWebSpiderCrawlDownloadSuccessEvent read fOnCrawlDownloadSuccess write fOnCrawlDownloadSuccess; {When a page is successfully downloaded}
     Property  OnCrawlDownloadRedirect: TAlWebSpiderCrawlDownloadRedirectEvent read fOnCrawlDownloadRedirect write fOnCrawlDownloadRedirect; {When a page is redirected}
     Property  OnCrawlDownloadError: TAlWebSpiderCrawlDownloadErrorEvent read fOnCrawlDownloadError write fOnCrawlDownloadError; {When the download of a page encounter an error}
@@ -155,6 +170,81 @@ Type
     Property  HttpClient: TalHttpClient Read FHttpClient write FHttpClient; {http client use to crawl the web}
   end;
 
+  {---------------------------------------------------------------------------------------------------------------------------------------}
+  TAlTrivialWebSpiderCrawlProgressEvent = Procedure (Sender: TObject; UrltoDownload, UrlDownloaded: Integer; CurrentUrl: String) of object;
+
+  {---------------------------------------------------------------------------------------------------------------}
+  TAlTrivialWebSpiderUpdateLinkToLocalPathProgressEvent = Procedure (Sender: TObject; aFileName: String) of object;
+
+  {----------------------------------}
+  TAlTrivialWebSpider = Class(Tobject)
+  Private
+    FWebSpider: TalWebSpider;
+    fStartUrl: String;
+    fLstUrlCrawled: Tstrings;
+    fLstErrorEncountered: Tstrings;
+    FPageDownloadedBinTree: TAlStringKeyAVLBinaryTree;
+    FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
+    FCurrentDeepLevel: Integer;
+    FCurrentLocalFileNameIndex: Integer;
+    fMaxDeepLevel: Integer;
+    fOnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent;
+    fUpdateLinkToLocalPath: boolean;
+    fExcludeMask: String;
+    fStayInStartDomain: Boolean;
+    fSaveDirectory: String;
+    fSplitDirectoryAmount: integer;
+    FHttpClient: TalHttpClient;
+    fIncludeMask: String;
+    fOnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent;
+    fDownloadImage: Boolean;
+    fOnUpdateLinkToLocalPathProgress: TAlTrivialWebSpiderUpdateLinkToLocalPathProgressEvent;
+    fOnCrawlProgress: TAlTrivialWebSpiderCrawlProgressEvent;
+    procedure WebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: String; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure WebSpiderCrawlDownloadRedirect(Sender: TObject; Url, RedirectedTo: String; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure WebSpiderCrawlDownloadSuccess(Sender: TObject; Url: String; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
+    procedure WebSpiderCrawlFindLink(Sender: TObject; HtmlTagString: String; HtmlTagParams: TStrings; URL: String);
+    procedure WebSpiderCrawlGetNextLink(Sender: TObject; var Url: String);
+    procedure WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: String; HtmlTagParams: TStrings; URL: String; var LocalPath: String);
+    procedure WebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: String);
+    function GetNextLocalFileName(aContentType: String): String;
+  Protected
+  Public
+    Constructor Create;
+    Destructor Destroy; override;
+    Procedure Crawl(aUrl: String); overload; {Launch the Crawling of the page}
+    procedure Crawl(aUrl: String; LstUrlCrawled: Tstrings; LstErrorEncountered: Tstrings); overload;
+    Property HttpClient: TalHttpClient Read FHttpClient write FHttpClient;
+    Property DownloadImage: Boolean read fDownloadImage write fDownloadImage default false;
+    Property StayInStartDomain: Boolean read fStayInStartDomain write fStayInStartDomain default true;
+    Property UpdateLinkToLocalPath: boolean read fUpdateLinkToLocalPath write fUpdateLinkToLocalPath default True;
+    Property MaxDeepLevel: Integer read fMaxDeepLevel write fMaxDeepLevel default -1;
+    Property ExcludeMask: String read fExcludeMask write fExcludeMask;
+    Property IncludeMask: String read fIncludeMask write fIncludeMask;
+    Property SaveDirectory: String read fSaveDirectory write fSaveDirectory;
+    Property SplitDirectoryAmount: integer read fSplitDirectoryAmount write fSplitDirectoryAmount default 5000;
+    Property OnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent read fOnCrawlBeforeDownload write fOnCrawlBeforeDownload; {When a page is successfully downloaded}
+    Property OnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent read fOnCrawlAfterDownload write fOnCrawlAfterDownload; {When a page is successfully downloaded}
+    Property OnCrawlProgress: TAlTrivialWebSpiderCrawlProgressEvent read fOnCrawlProgress write fOnCrawlProgress;
+    Property OnUpdateLinkToLocalPathProgress: TAlTrivialWebSpiderUpdateLinkToLocalPathProgressEvent read fOnUpdateLinkToLocalPathProgress write fOnUpdateLinkToLocalPathProgress;
+  end;
+
+  {----------------------------------------------------------------------------------}
+  TAlTrivialWebSpider_PageDownloadedBinTreeNode = Class(TALStringKeyAVLBinaryTreeNode)
+  Private
+  Protected
+  Public
+    Data: String;
+  end;
+
+  {----------------------------------------------------------------------------------------}
+  TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode = Class(TALStringKeyAVLBinaryTreeNode)
+  Private
+  Protected
+  Public
+    DeepLevel: Integer;
+  end;
+
 procedure Register;
 
 implementation
@@ -164,6 +254,7 @@ implementation
 uses sysutils,
      WinInet,
      UrlMon,
+     Masks,
      AlFcnHTML,
      AlFcnMime,
      AlFcnString;
@@ -485,12 +576,19 @@ Begin
 
         Try
 
-          {download the page}
-          FHttpClient.Get(
-                         CurrentURL,
-                         CurrentHttpResponseContent,
-                         CurrentHttpResponseHeader
-                        );
+          {the onbeforedownloadevent}
+          if assigned(fOnCrawlBeforeDownload) then fOnCrawlBeforeDownload(Self,CurrentURL);
+          Try
+            {download the page}
+            FHttpClient.Get(
+                            CurrentURL,
+                            CurrentHttpResponseContent,
+                            CurrentHttpResponseHeader
+                           );
+          Finally
+            {the onAfterdownloadevent}
+            if assigned(fOnCrawlAfterDownload) then fOnCrawlAfterDownload(Self,CurrentURL, CurrentHttpResponseHeader, CurrentHttpResponseContent, StopCrawling);
+          End;
 
         except
           on E: Exception do begin
@@ -659,5 +757,470 @@ Begin
   end;
 end;
 
+
+
+///////////////////////////////
+///// TAlTrivialWebSpider /////
+///////////////////////////////
+
+{************************************************}
+procedure TAlTrivialWebSpider.Crawl(aUrl: String);
+begin
+  Crawl(aUrl, nil, nil);
+end;
+
+{********************************************************************************************************}
+procedure TAlTrivialWebSpider.Crawl(aUrl: String; LstUrlCrawled: Tstrings; LstErrorEncountered: Tstrings);
+Var aNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
+Begin
+  {check the SaveDirectory}
+  if (SaveDirectory <> '') and not directoryExists(SaveDirectory) then Raise Exception.Create('The directory: '+ SaveDirectory + ' not exist!');
+  if fHttpClient = nil then Raise Exception.Create('The HttpClient cannot be empty!');
+  
+  {init private var}
+  fStartUrl := trim(aUrl);
+  FCurrentDeepLevel := 0;
+  FCurrentLocalFileNameIndex := 0;
+  fLstUrlCrawled := LstUrlCrawled;
+  fLstErrorEncountered := LstErrorEncountered;
+  FPageDownloadedBinTree:= TAlStringKeyAVLBinaryTree.Create;
+  FPageNotYetDownloadedBinTree:= TAlStringKeyAVLBinaryTree.Create;
+  Try
+
+    {add editURL2Crawl.text to the fPageNotYetDownloadedBinTree}
+    aNode:= TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode.Create;
+    aNode.ID := fStartUrl;
+    aNode.DeepLevel := 0;
+    FPageNotYetDownloadedBinTree.AddNode(aNode);
+
+    {start the crawl}
+    fWebSpider.HttpClient := fHttpClient;
+    FWebSpider.onCrawlBeforeDownload := onCrawlBeforeDownload;
+    FWebSpider.onCrawlAfterDownload := onCrawlAfterDownload;
+    fWebSpider.Crawl;
+
+    {update the link on downloaded page to local path}
+    if fUpdateLinkToLocalPath then fWebSpider.UpdateLinkToLocalPath;
+
+  finally
+    FPageDownloadedBinTree.Free;
+    FPageNotYetDownloadedBinTree.Free;
+    fStartUrl := '';
+    FCurrentDeepLevel := 0;
+    FCurrentLocalFileNameIndex := 0;
+    fLstUrlCrawled := nil;
+    fLstErrorEncountered := nil;
+    fWebSpider.HttpClient := nil;
+  end;
+end;
+
+{*************************************}
+constructor TAlTrivialWebSpider.Create;
+begin
+  FWebSpider := TalWebSpider.Create(nil);
+  fStartUrl := '';
+  fLstUrlCrawled := nil;
+  fLstErrorEncountered := nil;
+  FPageDownloadedBinTree := nil;
+  FPageNotYetDownloadedBinTree := nil;
+  FCurrentDeepLevel := 0;
+  FCurrentLocalFileNameIndex := 0;
+  fMaxDeepLevel := -1;
+  fOnCrawlBeforeDownload := nil;
+  fUpdateLinkToLocalPath := True;
+  fExcludeMask := '';
+  fStayInStartDomain := True;
+  fSaveDirectory := '';
+  fSplitDirectoryAmount := 5000;
+  FHttpClient := nil;
+  fIncludeMask := '*';
+  fOnCrawlAfterDownload := nil;
+  fDownloadImage := False;
+  fOnUpdateLinkToLocalPathProgress:=nil;
+  fOnCrawlProgress:=nil;
+
+  FWebSpider.onCrawlDownloadError := WebSpiderCrawlDownloadError;
+  FWebSpider.onCrawlDownloadRedirect := WebSpiderCrawlDownloadRedirect;
+  FWebSpider.onCrawlDownloadSuccess := WebSpiderCrawlDownloadSuccess;
+  FWebSpider.onCrawlFindLink := WebSpiderCrawlFindLink;
+  FWebSpider.onCrawlGetNextLink := WebSpiderCrawlGetNextLink;
+  FWebSpider.onUpdateLinkToLocalPathFindLink := WebSpiderUpdateLinkToLocalPathFindLink;
+  FWebSpider.onUpdateLinkToLocalPathGetNextFile := WebSpiderUpdateLinkToLocalPathGetNextFile;
+end;
+
+{*************************************}
+destructor TAlTrivialWebSpider.Destroy;
+begin
+  FWebSpider.Free;
+  inherited;
+end;
+
+{******************************************************************************}
+function TAlTrivialWebSpider.GetNextLocalFileName(aContentType: String): String;
+Var aExt: String;
+
+  {-------------------------------------}
+  Function SplitPathMakeFilename: String;
+  begin
+    Result := fSaveDirectory + inttostr((FCurrentLocalFileNameIndex div fSplitDirectoryAmount) * fSplitDirectoryAmount + fSplitDirectoryAmount) + '\';
+    If (not DirectoryExists(Result)) and (not createDir(Result)) then raise exception.Create('cannot create dir: ' + Result);
+    Result := Result + inttostr(FCurrentLocalFileNameIndex) + aExt;
+    inc(FCurrentLocalFileNameIndex);
+  end;
+
+Begin
+  if fSaveDirectory = '' then result := ''
+  else begin
+    aExt := ALlowercase(ALGetDefaultFileExtFromMimeContentType(aContentType)); // '.htm'
+
+    If FCurrentLocalFileNameIndex = 0 then Begin
+      result := fSaveDirectory + 'Start' + aExt;
+      inc(FCurrentLocalFileNameIndex);
+    end
+    else result := SplitPathMakeFilename;
+  end;
+end;
+
+{************************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderCrawlDownloadError(Sender: TObject;
+                                                          URL, ErrorMessage: String;
+                                                          HTTPResponseHeader: TALHTTPResponseHeader;
+                                                          var StopCrawling: Boolean);
+Var aNode: TAlTrivialWebSpider_PageDownloadedBinTreeNode;
+begin
+  {add the url to downloaded list}
+  aNode:= TAlTrivialWebSpider_PageDownloadedBinTreeNode.Create;
+  aNode.ID := Url;
+  aNode.data := '!';
+  If not FPageDownloadedBinTree.AddNode(aNode) then aNode.Free;
+
+  {delete the url from the not yet downloaded list}
+  FPageNotYetDownloadedBinTree.DeleteNode(url);
+
+  {update label}
+  if assigned(fLstErrorEncountered) then fLstErrorEncountered.Add(ErrorMessage);
+  if assigned(fOnCrawlProgress) then fOnCrawlProgress(self,FPageNotYetDownloadedBinTree.nodeCount,FPageDownloadedBinTree.nodeCount, Url);
+end;
+
+{***************************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderCrawlDownloadRedirect(Sender: TObject;
+                                                             Url, RedirectedTo: String;
+                                                             HTTPResponseHeader: TALHTTPResponseHeader;
+                                                             var StopCrawling: Boolean);
+Var aNode: TALStringKeyAVLBinaryTreeNode;
+begin
+  {add the url to downloaded list}
+  aNode:= TAlTrivialWebSpider_PageDownloadedBinTreeNode.Create;
+  aNode.ID := Url;
+  TAlTrivialWebSpider_PageDownloadedBinTreeNode(aNode).data := '=>'+RedirectedTo;
+  If not FPageDownloadedBinTree.AddNode(aNode) then aNode.Free;
+
+  {delete the url from the not yet downloaded list}
+  FPageNotYetDownloadedBinTree.DeleteNode(url);
+
+  {Stay in start site}
+  If not fStayInStartDomain or
+     (ALlowercase(AlExtractHostNameFromUrl(trim(fStartUrl))) = ALlowercase(AlExtractHostNameFromUrl(RedirectedTo))) then begin
+
+    {remove the anchor}
+    RedirectedTo := AlRemoveAnchorFromUrl(RedirectedTo);
+
+    {add the redirectTo url to the not yet downloaded list}
+    If FPageDownloadedBinTree.FindNode(RedirectedTo) = nil then begin
+      aNode:= TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode.Create;
+      aNode.ID := RedirectedTo;
+      TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode(aNode).DeepLevel := FCurrentDeepLevel;
+      If not FPageNotYetDownloadedBinTree.AddNode(aNode) then aNode.Free;
+    end;
+
+  end;
+
+  {update label}
+  if assigned(fOnCrawlProgress) then fOnCrawlProgress(self,FPageNotYetDownloadedBinTree.nodeCount,FPageDownloadedBinTree.nodeCount, Url);
+end;
+
+
+{**************************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderCrawlDownloadSuccess(Sender: TObject;
+                                                            Url: String;
+                                                            HTTPResponseHeader: TALHTTPResponseHeader;
+                                                            HttpResponseContent: TStream;
+                                                            var StopCrawling: Boolean);
+Var aNode: TAlTrivialWebSpider_PageDownloadedBinTreeNode;
+    Str: String;
+    AFileName: String;
+    pMimeTypeFromData: LPWSTR;
+begin
+
+  {put the content in str}
+  HttpResponseContent.Position := 0;
+  SetLength(Str, HttpResponseContent.size);
+  HttpResponseContent.ReadBuffer(Str[1],HttpResponseContent.Size);
+
+  {we add a check here to be sure that the file is an http file (text file}
+  {Some server send image with text/htm content type}
+  IF (FindMimeFromData(
+                       nil, // bind context - can be nil
+                       nil, // url - can be nil
+                       pchar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
+                       length(str), // size of buffer
+                       PWidechar(WideString(HTTPResponseHeader.ContentType)), // proposed mime if - can be nil
+                       0, // will be defined
+                       pMimeTypeFromData, // the suggested mime
+                       0 // must be 0
+                      ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(HTTPResponseHeader.ContentType));
+
+  {Get the FileName where to save the responseContent}
+  aFileName := GetNextLocalFileName(pMimeTypeFromData);
+
+  {If html then add <!-- saved from '+ URL +' -->' at the top of the file}
+  if aFileName <> '' then begin
+    If sametext(pMimeTypeFromData,'text/html') then begin
+      Str := '<!-- saved from '+ URL+' -->' +#13#10 + Str;
+      AlSaveStringToFile(str,aFileName);
+    end
+    {Else Save the file without any change}
+    else TmemoryStream(HttpResponseContent).SaveToFile(aFileName);
+  end;
+
+  {delete the Url from the PageNotYetDownloadedBinTree}
+  FPageNotYetDownloadedBinTree.DeleteNode(Url);
+
+  {add the url to the PageDownloadedBinTree}
+  aNode:= TAlTrivialWebSpider_PageDownloadedBinTreeNode.Create;
+  aNode.ID := Url;
+  aNode.data := AlCopyStr(AFileName,length(fSaveDirectory) + 1,maxint);
+  If not FPageDownloadedBinTree.AddNode(aNode) then aNode.Free;
+
+  {update label}
+  if assigned(fLstUrlCrawled) then fLstUrlCrawled.add(Url);
+  if assigned(fOnCrawlProgress) then fOnCrawlProgress(self,FPageNotYetDownloadedBinTree.nodeCount,FPageDownloadedBinTree.nodeCount, Url);
+end;
+
+{*******************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderCrawlFindLink(Sender: TObject;
+                                                     HtmlTagString: String;
+                                                     HtmlTagParams: TStrings;
+                                                     URL: String);
+Var aNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
+    Lst: TstringList;
+    I: integer;
+    Flag1 : Boolean;
+    S1: String;
+begin
+  {If Check BoxDownload Image}
+  IF not fDownloadImage and
+     (
+      sametext(HtmlTagString,'img') or
+      (
+       sametext(HtmlTagString,'input') and
+       sametext(Trim(HtmlTagParams.Values['type']),'image')
+      )
+     )
+    then Exit;
+
+  {Stay in start site}
+  If fStayInStartDomain and
+     (ALlowercase(AlExtractHostNameFromUrl(trim(fStartUrl))) <> ALlowercase(AlExtractHostNameFromUrl(Url))) then exit;
+
+  {DeepLevel}
+  If (fMaxDeepLevel >= 0) and (FCurrentDeepLevel + 1 > fMaxDeepLevel) then exit;
+
+  {include link(s)}
+  If fIncludeMask <> '' then begin
+    Lst := TstringList.Create;
+    Try
+      Lst.Text := Trim(AlStringReplace(FIncludeMask,';',#13#10,[RfReplaceall]));
+      Flag1 := True;
+      For i := 0 to Lst.Count - 1 do begin
+        S1 := Trim(Lst[i]);
+        If S1 <> '' then begin
+          Flag1 := MatchesMask(URL, S1);
+          If Flag1 then Break;
+        end;
+      end;
+      If not flag1 then Exit;
+    Finally
+      Lst.Free;
+    end;
+  end;
+
+  {Exclude link(s)}
+  If fExcludeMask <> '' then begin
+    Lst := TstringList.Create;
+    Try
+      Lst.Text := Trim(AlStringReplace(fExcludeMask,';',#13#10,[RfReplaceall]));
+      Flag1 := False;
+      For i := 0 to Lst.Count - 1 do begin
+        S1 := Trim(Lst[i]);
+        If S1 <> '' then begin
+          Flag1 := MatchesMask(URL, S1);
+          If Flag1 then Break;
+        end;
+      end;
+      If flag1 then Exit;
+    Finally
+      Lst.Free;
+    end;
+  end;
+
+  {remove the anchor}
+  URL := AlRemoveAnchorFromUrl(URL);
+
+  {If the link not already downloaded then add it to the FPageNotYetDownloadedBinTree}
+  If FPageDownloadedBinTree.FindNode(url) = nil then begin
+    aNode:= TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode.Create;
+    aNode.ID := Url;
+    aNode.DeepLevel := FCurrentDeepLevel + 1;
+    If not FPageNotYetDownloadedBinTree.AddNode(aNode) then aNode.Free;
+  end;
+end;
+
+{****************************************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderCrawlGetNextLink(Sender: TObject; var Url: String);
+
+    {-----------------------------------------------------------------------------}
+    function InternalfindNextUrlToDownload(aNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
+                                           alowDeepLevel: Integer): TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
+    Var aTmpNode1, aTmpNode2: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
+    Begin
+      If (not assigned(Anode)) or (aNode.DeepLevel <= alowDeepLevel) then result := aNode
+      else begin
+
+        if aNode.ChildNodes[true] <> nil then begin
+          aTmpNode1 := InternalfindNextUrlToDownload(TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode(aNode.ChildNodes[true]), alowDeepLevel);
+          If (assigned(aTmpNode1)) and (aTmpNode1.DeepLevel <= alowDeepLevel) then begin
+            result := aTmpNode1;
+            exit;
+          end;
+        end
+        else aTmpNode1 := nil;
+
+        if aNode.ChildNodes[false] <> nil then begin
+          aTmpNode2 := InternalfindNextUrlToDownload(TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode(aNode.ChildNodes[false]), alowDeepLevel);
+          If (assigned(aTmpNode2)) and (aTmpNode2.DeepLevel <= alowDeepLevel) then begin
+            result := aTmpNode2;
+            exit;
+          end;
+        end
+        else aTmpNode2 := nil;
+
+        result := aNode;
+        If assigned(aTmpNode1) and (result.deepLevel > aTmpNode1.deeplevel) then result := aTmpNode1;
+        If assigned(aTmpNode2) and (result.deepLevel > aTmpNode2.deeplevel) then result := aTmpNode2;
+
+      end;
+    end;
+
+Var aNode: TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode;
+begin
+  {If theire is more url to download}
+  IF FPageNotYetDownloadedBinTree.NodeCount > 0 then begin
+
+    {Find next url with deeplevel closer to FCurrentDeepLevel}
+    If fMaxDeepLevel >= 0 then aNode := InternalfindNextUrlToDownload(
+                                                                      TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode(FPageNotYetDownloadedBinTree.head),
+                                                                      FCurrentDeepLevel
+                                                                     )
+
+    {Find next url without take care of FCurrentDeepLevel}
+    else aNode := TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode(FPageNotYetDownloadedBinTree.head);
+
+    Url := aNode.ID;
+    FCurrentDeepLevel := TAlTrivialWebSpider_PageNotYetDownloadedBinTreeNode(aNode).DeepLevel;
+  end
+
+  {If their is no more url to download then exit}
+  else begin
+    Url := '';
+    FCurrentDeepLevel := -1;
+  end;
+end;
+
+
+{***********************************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
+                                                                     HtmlTagString: String;
+                                                                     HtmlTagParams: TStrings;
+                                                                     URL: String;
+                                                                     var LocalPath: String);
+Var aNode: TALStringKeyAVLBinaryTreeNode;
+    aAnchorValue: String;
+begin
+  LocalPath := '';
+
+  If Url <> '' then begin
+
+    {Find the local Path}
+    While True Do begin
+      Url := AlRemoveAnchorFromUrl(Url, aAnchorValue);
+      aNode := FPageDownloadedBinTree.FindNode(URL);
+      If (aNode <> nil) then begin
+        LocalPath := TAlTrivialWebSpider_PageDownloadedBinTreeNode(aNode).Data;
+        If AlPos('=>',LocalPath) = 1 then Begin
+          Url := AlCopyStr(LocalPath,3,MaxInt);
+          LocalPath := '';
+        end
+        else Break;
+      end
+      else Break;
+    end;
+
+    If LocalPath = '!' then localpath := ''
+    else If LocalPath <> '' then begin
+      LocalPath := AlStringReplace(
+                                   LocalPath,
+                                   '\',
+                                   '/',
+                                   [RfReplaceall]
+                                  ) + aAnchorValue;
+      If (FCurrentLocalFileNameIndex >= 0) then LocalPath := '../' + LocalPath;
+    end;
+  end;
+end;
+
+{**************************************************************************************}
+procedure TAlTrivialWebSpider.WebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject;
+                                                                        var FileName, BaseHref: String);
+  {-------------------------------------}
+  Function SplitPathMakeFilename: String;
+  begin
+    If FCurrentLocalFileNameIndex < 0 then result := ''
+    else If FCurrentLocalFileNameIndex = 0 then result := fSaveDirectory + 'Start.htm'
+    else Result := fSaveDirectory + inttostr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\' + inttostr(FCurrentLocalFileNameIndex) + '.htm';
+    dec(FCurrentLocalFileNameIndex);
+  end;
+
+Begin
+  if fSaveDirectory = '' then FileName := ''
+  else begin
+
+    {Find FileName}
+    FileName := SplitPathMakeFilename;
+    While (FileName <> '') and not fileExists(FileName) do
+      Filename := SplitPathMakeFilename;
+
+  end;
+
+  {if filename found}
+  If FileName <> '' then Begin
+
+    {Extract the Base Href}
+    BaseHref := AlGetStringFromFile(FileName);
+    BaseHref := Trim(
+                     AlCopyStr(
+                               BaseHref,
+                               17,                        // '<!-- saved from ' + URL
+                               AlPos(#13,BaseHref) - 21    // URL + ' -->' +#13#10
+                              )
+                    );
+
+    {update label}
+    if assigned(fOnUpdateLinkToLocalPathProgress) then fOnUpdateLinkToLocalPathProgress(self, FileName);
+
+  end
+  else BaseHref := '';
+
+end;
 
 end.

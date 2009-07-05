@@ -55,7 +55,8 @@ unit ALStringList;
 
 interface
 
-Uses Classes,
+Uses Windows,
+     Classes,
      sysutils;
 
 Type

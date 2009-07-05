@@ -61,6 +61,8 @@ Please send all your feedback to svanderclock@arkadia.com
 
 unit ALFBXError;
 
+{$I ALFBX.inc}
+
 interface
 
 //***********************/
@@ -88,6 +90,9 @@ const
   isc_arg_netware      = 16; (* NetWare error code *)
   isc_arg_win32        = 17; (* Win32 error code *)
   isc_arg_warning      = 18; (* warning argument *)
+{$IFDEF IB7_UP}
+  isc_arg_sql          = 19;
+{$ENDIF IB7_UP}
 
   isc_arith_except                      = 335544321;
   isc_bad_dbkey                         = 335544322;
@@ -584,13 +589,15 @@ const
   isc_optimizer_between_err             = 335544813;
   isc_service_not_supported             = 335544814;
 
+{$IFDEF FB102ORYF867}
   isc_generator_name                    = 335544815;
   isc_udf_name                          = 335544816;
   isc_bad_limit_param                   = 335544817;
   isc_bad_skip_param                    = 335544818;
   isc_io_32bit_exceeded_err             = 335544819;
+{$ENDIF FB102ORYF867}
 
-{FB15_UP}
+{$IFDEF FB15_UP}
   isc_invalid_savepoint                 = 335544820;
   isc_dsql_column_pos_err               = 335544821;
   isc_dsql_agg_where_err                = 335544822;
@@ -603,9 +610,9 @@ const
   isc_exec_sql_invalid_var              = 335544829;
   isc_exec_sql_max_call_exceeded        = 335544830;
   isc_conf_access_denied                = 335544831;
-{FB15_UP}
+{$ENDIF FB15_UP}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_wrong_backup_state               = 335544832;
   isc_wal_backup_err                   = 335544833;
   isc_cursor_not_open                  = 335544834;
@@ -640,7 +647,34 @@ const
   isc_partner_idx_not_found            = 335544863;
   isc_tra_num_exc                      = 335544864;
   isc_field_disappeared                = 335544865;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF FB21_UP}
+  isc_met_wrong_gtt_scope              = 335544866;
+  isc_subtype_for_internal_use         = 335544867;
+  isc_illegal_prc_type                 = 335544868;
+  isc_invalid_sort_datatype            = 335544869;
+  isc_collation_name                   = 335544870;
+  isc_domain_name                      = 335544871;
+  isc_domnotdef                        = 335544872;
+  isc_array_max_dimensions             = 335544873;
+  isc_max_db_per_trans_allowed         = 335544874;
+  isc_bad_debug_format                 = 335544875;
+  isc_bad_proc_BLR                     = 335544876;
+  isc_key_too_big                      = 335544877;
+  isc_concurrent_transaction           = 335544878;
+  isc_not_valid_for_var                = 335544879;
+  isc_not_valid_for                    = 335544880;
+  isc_need_difference                  = 335544881;
+  isc_long_login                       = 335544882;
+  isc_fldnotdef2                       = 335544883;
+{$ENDIF FB21_UP}
+
+{$IFDEF IB71_UP}
+  isc_savepoint_err                     = 335544815;
+  isc_generator_name                    = 335544816;
+  isc_udf_name                          = 335544817;
+{$ENDIF IB71_UP}
 
   isc_gfix_db_name                      = 335740929;
   isc_gfix_invalid_sw                   = 335740930;
@@ -670,9 +704,12 @@ const
   isc_gfix_trn_unknown                  = 335741036;
   isc_gfix_mode_req                     = 335741038;
   isc_gfix_opt_SQL_dialect              = 335741039;
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_gfix_pzval_req                    = 335741042;
-{FB20_UP}
+{$ENDIF}
+{$IFDEF IB7_UP}
+  isc_gfix_commits_opt                  = 335741041;
+{$ENDIF IB7_UP}
   isc_dsql_dbkey_from_non_table         = 336003074;
   isc_dsql_transitional_numeric         = 336003075;
   isc_dsql_dialect_warning_expr         = 336003076;
@@ -684,15 +721,17 @@ const
   isc_dsql_warn_precision_ambiguous1    = 336003083;
   isc_dsql_warn_precision_ambiguous2    = 336003084;
 
+{$IFDEF FB102ORYF867}
   isc_dsql_ambiguous_field_name         = 336003085;
   isc_dsql_udf_return_pos_err           = 336003086;
+{$ENDIF FB102ORYF867}
 
-{FB15_UP}
+{$IFDEF FB15_UP}
   isc_dsql_invalid_label                = 336003087;
   isc_dsql_datatypes_not_comparable     = 336003088;
-{FB15_UP}
+{$ENDIF}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_dsql_cursor_invalid              = 336003089;
   isc_dsql_cursor_redefined            = 336003090;
   isc_dsql_cursor_not_found            = 336003091;
@@ -701,7 +740,33 @@ const
   isc_dsql_cursor_rel_not_found        = 336003094;
   isc_dsql_cursor_not_open             = 336003095;
   isc_dsql_type_not_supp_ext_tab       = 336003096;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF FB21_UP}
+  isc_dsql_feature_not_supported_ods   = 336003097;
+  isc_primary_key_required             = 336003098;
+  isc_upd_ins_doesnt_match_pk          = 336003099;
+  isc_upd_ins_doesnt_match_matching    = 336003100;
+  isc_upd_ins_with_complex_view        = 336003101;
+  isc_dsql_incompatible_trigger_type   = 336003102;
+  isc_dsql_db_trigger_type_cant_change = 336003103;
+{$ENDIF}
+
+{$IFDEF IB65_UP}
+  isc_dsql_rows_ties_err                = 336003085;
+{$ENDIF FB15_UP}
+
+{$IFDEF IB75_UP}
+  isc_dsql_cursor_stmt_err             = 336003086;
+  isc_dsql_on_commit_invalid           = 336003087;
+  isc_dsql_gen_cnstrnt_ref_temp        = 336003088;
+  isc_dsql_persist_cnstrnt_ref_temp    = 336003089;
+  isc_dsql_temp_cnstrnt_ref_persist    = 336003090;
+  isc_dsql_persist_refs_temp           = 336003091;
+  isc_dsql_temp_refs_persist           = 336003092;
+  isc_dsql_temp_refs_mismatch          = 336003093;
+  isc_dsql_usrname_lower               = 336003094;
+{$ENDIF}
 
   isc_dyn_role_does_not_exist           = 336068796;
   isc_dyn_no_grant_admin_opt            = 336068797;
@@ -720,7 +785,28 @@ const
   isc_dyn_invalid_dtype_conversion      = 336068817;
   isc_dyn_dtype_conv_invalid            = 336068818;
 
+{$IFDEF FB102ORYF867}
   isc_dyn_zero_len_id                   = 336068820;
+{$ENDIF FB102ORYF867}
+
+{$IFDEF FB21_UP}
+  isc_max_coll_per_charset             = 336068829;
+  isc_invalid_coll_attr                = 336068830;
+  isc_dyn_wrong_gtt_scope              = 336068840;
+  isc_dyn_scale_too_big                = 336068852;
+  isc_dyn_precision_too_small          = 336068853;
+  isc_dyn_miss_priv_warning            = 336068855;
+  isc_dyn_ods_not_supp_feature         = 336068856;
+{$ENDIF FB21_UP}
+
+{$IFDEF IB71_UP}
+  isc_dyn_gen_does_not_exist            = 336068820;
+  isc_dyn_delete_generator_failed       = 336068821;
+{$ENDIF IB71_UP}
+
+{$IFDEF IB75_UP}
+  isc_dyn_drop_db_owner                = 336068836;
+{$ENDIF}
 
   isc_gbak_unknown_switch               = 336330753;
   isc_gbak_page_size_missing            = 336330754;
@@ -805,10 +891,12 @@ const
   isc_gbak_not_ownr                     = 336331026;
   isc_gbak_mode_req                     = 336331031;
 
+{$IFDEF FB102ORYF867}
   isc_gbak_just_data                    = 336331033;
   isc_gbak_data_only                    = 336331034;
+{$ENDIF FB102ORYF867}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_dsql_too_old_ods                 = 336397205;
   isc_dsql_table_not_found             = 336397206;
   isc_dsql_view_not_found              = 336397207;
@@ -816,7 +904,39 @@ const
   isc_dsql_unknown_pos                 = 336397209;
   isc_dsql_no_dup_name                 = 336397210;
   isc_dsql_too_many_values             = 336397211;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF FB21_UP}
+  isc_dsql_no_array_computed           = 336397212;
+  isc_dsql_implicit_domain_name        = 336397213;
+  isc_dsql_only_can_subscript_array    = 336397214;
+  isc_dsql_max_sort_items              = 336397215;
+  isc_dsql_max_group_items             = 336397216;
+  isc_dsql_conflicting_sort_field      = 336397217;
+  isc_dsql_derived_table_more_columns  = 336397218;
+  isc_dsql_derived_table_less_columns  = 336397219;
+  isc_dsql_derived_field_unnamed       = 336397220;
+  isc_dsql_derived_field_dup_name      = 336397221;
+  isc_dsql_derived_alias_select        = 336397222;
+  isc_dsql_derived_alias_field         = 336397223;
+  isc_dsql_auto_field_bad_pos          = 336397224;
+  isc_dsql_cte_wrong_reference         = 336397225;
+  isc_dsql_cte_cycle                   = 336397226;
+  isc_dsql_cte_outer_join              = 336397227;
+  isc_dsql_cte_mult_references         = 336397228;
+  isc_dsql_cte_not_a_union             = 336397229;
+  isc_dsql_cte_nonrecurs_after_recurs  = 336397230;
+  isc_dsql_cte_wrong_clause            = 336397231;
+  isc_dsql_cte_union_all               = 336397232;
+  isc_dsql_cte_miss_nonrecursive       = 336397233;
+  isc_dsql_cte_nested_with             = 336397234;
+  isc_dsql_col_more_than_once_using    = 336397235;
+  isc_dsql_unsupp_feature_dialect      = 336397236;
+{$ENDIF}
+
+{$IFDEF IB71_UP}
+  isc_gbak_validate_restore             = 336331034;
+{$ENDIF IB71_UP}
 
   isc_gsec_cant_open_db                 = 336723983;
   isc_gsec_switches_error               = 336723984;
@@ -870,6 +990,20 @@ const
   isc_license_svc_err_add               = 336789540;
   isc_license_svc_err_remove            = 336789541;
   isc_license_eval_exists               = 336789563;
+{$IFDEF IB7_UP}
+  isc_smp_cpu_license                   = 336789570;
+  isc_node_locked_full_unlimited_serve  = 336789571;
+  isc_dev_only_full_server_licenses     = 336789572;
+{$ENDIF IB7_UP}
+
+{$IFDEF IB75_UP}
+  isc_license_not_registered           = 336789573;
+  isc_license_library_unloadable       = 336789574;
+  isc_license_registration_file        = 336789575;
+  isc_license_expire_limit             = 336789576;
+  isc_license_bad_reg_file             = 336789577;
+  isc_license_bad_lic_file             = 336789578;
+{$ENDIF}
 
   isc_gstat_unknown_switch              = 336920577;
   isc_gstat_retry                       = 336920578;
@@ -879,10 +1013,62 @@ const
   isc_gstat_read_err                    = 336920606;
   isc_gstat_sysmemex                    = 336920607;
 
-  isc_err_max_FB102                     = 699;
-  isc_err_max_FB103                     = 699;
-  isc_err_max_FB15                      = 713;
-  isc_err_max_FB20                      = 763;
+{$IFDEF FB21_UP}
+  isc_fbsvcmgr_bad_am                  = 336986113;
+  isc_fbsvcmgr_bad_wm                  = 336986114;
+  isc_fbsvcmgr_bad_rs                  = 336986115;
+  isc_fbsvcmgr_info_err                = 336986116;
+  isc_fbsvcmgr_query_err               = 336986117;
+  isc_fbsvcmgr_switch_unknown          = 336986118;
+{$ENDIF}
+
+{$IFDEF FB102}
+  isc_err_max                           = 699;
+{$ENDIF FB102}
+
+{$IFDEF FB103}
+  isc_err_max                           = 699;
+{$ENDIF FB103}
+
+{$IFDEF FB15}
+  isc_err_max                           = 713;
+{$ENDIF FB15}
+
+{$IFDEF FB20}
+  isc_err_max                           = 763;
+{$ENDIF FB20}
+
+{$IFDEF FB21}
+  isc_err_max                           = 826;
+{$ENDIF FB20}
+
+{$IFDEF YF867}
+  isc_err_max                           = 699;
+{$ENDIF YF867}
+
+{$IFDEF IB601}
+  isc_err_max                           = 689;
+{$ENDIF IB601}
+
+{$IFDEF IB602}
+  isc_err_max                           = 689;
+{$ENDIF IB602}
+
+{$IFDEF IB65}
+  isc_err_max                           = 690;
+{$ENDIF IB65}
+
+{$IFDEF IB7}
+  isc_err_max                           = 694;
+{$ENDIF IB7}
+
+{$IFDEF IB71}
+  isc_err_max                           = 700;
+{$ENDIF IB71}
+
+{$IFDEF IB75}
+  isc_err_max                           = 716;
+{$ENDIF}
 
 implementation
 

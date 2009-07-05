@@ -73,9 +73,9 @@ Type
     function GetInTransaction: Boolean;
   Protected
   Public
-    Constructor Create(ApiVer: TALFBXVersion_API; const lib: string = GDS32DLL); virtual;
+    Constructor Create(const lib: string = GDS32DLL); virtual;
     Destructor Destroy; Override;
-    function GetFieldValue(aSQLDA:TALFBXSQLResult;
+    function GetFieldValue(aSQLDA:TSQLResult;
                            aDBHandle: IscDbHandle;
                            aTraHandle: IscTrHandle;
                            aIndex: Integer;
@@ -112,11 +112,11 @@ uses AlFcnString,
      AlFcnHTML;
 
 {***************************************************************************************}
-constructor TAlFBXClient.Create(ApiVer: TALFBXVersion_API; const lib: string = GDS32DLL);
+constructor TAlFBXClient.Create(const lib: string = GDS32DLL);
 begin
   fDBHandle := nil;
   fTraHandle := nil;
-  FLibrary := TALFBXLibrary.Create(ApiVer);
+  FLibrary := TALFBXLibrary.Create;
   fLibrary.Load(lib);
   GetLocaleFormatSettings(1033, fdefaultFormatSettings);
   fNullString := '';
@@ -397,8 +397,8 @@ begin
   end;
 end;
 
-{*********************************************************}
-function TAlFBXClient.GetFieldValue(aSQLDA:TALFBXSQLResult;
+{****************************************************}
+function TAlFBXClient.GetFieldValue(aSQLDA:TSQLResult;
                                     aDBHandle: IscDbHandle;
                                     aTraHandle: IscTrHandle;
                                     aIndex: Integer;
@@ -462,14 +462,14 @@ Var NewRec: TalXMLNode;
     ViewRec: TalXMLNode;
     i: integer;
     aStmtHandle: IscStmtHandle;
-    aSqlda: TALFBXSQLResult;
+    aSqlda: TSQLResult;
 begin
   {init}
   XMLDATA.ChildNodes.Clear;
   ViewRec := XMLdata;
 
   {load the data}
-  aSqlda := TALFBXSQLResult.Create;
+  aSqlda := TSQLResult.Create;
   Try
     aStmtHandle := nil;
     Flibrary.DSQLAllocateStatement(fDBHandle, aStmtHandle);
@@ -530,9 +530,9 @@ Var ResultCurrentPos: Integer;
     Procedure InternalExecQuery;
     Var i: integer;
         aStmtHandle: IscStmtHandle;
-        aSqlda: TALFBXSQLResult;
+        aSqlda: TSQLResult;
     Begin
-      aSqlda := TALFBXSQLResult.Create;
+      aSqlda := TSQLResult.Create;
       Try
         aStmtHandle := nil;
         Flibrary.DSQLAllocateStatement(fDBHandle, aStmtHandle);
@@ -588,7 +588,7 @@ end;
 
 {****************************************************************************}
 procedure TAlFBXClient.UpdateData(SQL: string; const Blobs: array of Tstream);
-Var aSqlpa: TALFBXSQLParams;
+Var aSqlpa: TSQLParams;
     aBlobhandle: IscBlobHandle;
     CurReqBlobsIndex: integer;
 begin
@@ -596,7 +596,7 @@ begin
   if not assigned(fTraHandle) then raise exception.Create('No active transaction!');
   if SQL = '' then raise exception.Create('Empty SQL in UpdateData!');
   if length(Blobs) > 0 then begin
-    aSqlpa := TALFBXSQLParams.Create;
+    aSqlpa := TSQLParams.Create;
     try
       for CurReqBlobsIndex := 0 to length(Blobs) - 1 do begin
         aSqlpa.AddFieldType('',uftBlob);

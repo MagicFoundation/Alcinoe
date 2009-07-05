@@ -92,7 +92,8 @@ contains
   ALMultiPartAlternativeParser in 'ALMultiPartAlternativeParser.pas',
   ALIsapiHTTP in 'ALIsapiHTTP.pas',
   ALPhpRunner in 'ALPhpRunner.pas',
-  ALFBXClient in 'ALFBXClient.pas';
+  ALFBXClient in 'ALFBXClient.pas',
+  ALFBXKeywords in 'ALFBXKeywords.pas';
 
 end.
 

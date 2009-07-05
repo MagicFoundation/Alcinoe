@@ -14,7 +14,7 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXBase
-Version:      3.50
+Version:      3.51
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
@@ -61,24 +61,68 @@ Link :        http://www.progdigy.com/modules.php?name=UIB
 Please send all your feedback to svanderclock@arkadia.com
 **************************************************************}
 
-{$ALIGN ON}
-{$MINENUMSIZE 4}
+{$I ALFBX.inc}
+
+{$IFNDEF CPU64}
+  {$ALIGN ON}
+  {$MINENUMSIZE 4}
+{$ENDIF}
 
 unit ALFBXBase;
 
 interface
 uses
+{$IFDEF MSWINDOWS}
   Windows,
+{$ENDIF MSWINDOWS}
+{$IFDEF UNIX}
+{$IFDEF FPC}
+  dl,
+{$ELSE}
+  libc,
+{$ENDIF FPC}
+{$ENDIF UNIX}
+{$IFDEF ALFBXTHREADSAFE}
+  SyncObjs,
+{$ENDIF ALFBXTHREADSAFE}
   SysUtils;
 
 (* Basic data types *)
 type
-  UCHAR = Char;
-  USHORT = Word;
-  ULONG = Cardinal;
-  SCHAR = Char;
-  SSHORT = Smallint;
-  SLONG = Integer;
+
+{$ifndef FPC}
+  PtrInt = type Longint;
+{$endif}
+
+{$IFNDEF COMPILER6_UP}
+{$IFNDEF FPC}
+  PPointer = ^Pointer;
+  PPAnsiChar = ^PAnsiChar;
+
+  PCardinal = ^Cardinal;
+  PSmallInt = ^Smallint;
+  PInteger = ^Integer;
+  PDouble = ^Double;
+  PSingle = ^Single;
+{$ENDIF FPC}
+{$ELSE}
+{$IFDEF BCB}
+  PPointer = ^Pointer;
+{$ENDIF BCB}
+{$ENDIF COMPILER6_UP}
+
+  UCHAR = {$IFDEF TYPE_IDENTITY} type {$ENDIF} AnsiChar;
+  {$IFNDEF FPC}{$NODEFINE UCHAR}{$ENDIF}
+  USHORT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Word;
+  {$IFNDEF FPC}{$NODEFINE USHORT}{$ENDIF}
+  ULONG = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Cardinal;
+  {$IFNDEF FPC}{$NODEFINE ULONG}{$ENDIF}
+  SCHAR = {$IFDEF TYPE_IDENTITY} type {$ENDIF} AnsiChar;
+  {$IFNDEF FPC}{$NODEFINE SCHAR}{$ENDIF}
+  SSHORT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Smallint;
+  {$IFNDEF FPC}{$NODEFINE SSHORT}{$ENDIF}
+  SLONG = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Integer;
+  {$IFNDEF FPC}{$NODEFINE SLONG}{$ENDIF}
 
   SQUAD = record
     high: SLONG;
@@ -103,11 +147,11 @@ type
   PVary = ^TVary;
   vary = record
     vary_length: USHORT;
-    vary_string: array [0..0] of Char;
+    vary_string: array [0..0] of AnsiChar;
   end;
   TVary = vary;
 
-  {FB15_UP}
+  {$IFDEF FB15_UP}
   PLString = ^TLString;
   lstring = record
     lstr_length: ULONG;
@@ -115,33 +159,42 @@ type
     lstr_address: ^UCHAR;
   end;
   TLString = lstring;
-  {FB15_UP}
+  {$ENDIF FB15_UP}
 
-  TEXT = Char; (* To be expunged over time *)
-  STEXT = Char; (* Signed text - very rare *)
-  UTEXT = Char; (* Unsigned text - common *)
-  SBYTE = Byte; (* Signed byte - rare usage *)
-  STATUS = Longint;
-  IPTR = Longint;
-  U_IPTR = Cardinal;
-  RCRD_OFFSET = Cardinal;
-  FLD_LENGTH = Word;
+{$IFNDEF FPC}
+  TEXT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} AnsiChar; (* To be expunged over time *)
+{$ENDIF FPC}
+  STEXT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} AnsiChar; (* Signed text - very rare *)
+  UTEXT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} AnsiChar; (* Unsigned text - common *)
+  SBYTE = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Byte; (* Signed byte - rare usage *)
+  {$IFNDEF FPC}{$NODEFINE SBYTE}{$ENDIF}
+  STATUS = {$IFDEF TYPE_IDENTITY} type  {$ENDIF} Longint;
+  IPTR = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Longint;
+  U_IPTR = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Cardinal;
+  RCRD_OFFSET = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Cardinal;
+  FLD_LENGTH = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Word;
 
 //typedef void (*FPTR_VOID) ();
 //typedef void (*FPTR_VOID_PTR) (void *);
 //typedef int (*FPTR_INT) ();
 //typedef int (*FPTR_INT_VOID_PTR) (void *);
 
-  TALFBXVersion_API = (FB102, FB103, FB15, FB20);
-
 const
 (* Number of elements in an arry *)
 
-{FB15_UP}
+{$IFDEF FB15_UP}
 { TODO -oHG : TRANSLATE }
 //#define FB_NELEM(x) ((int)(sizeof(x) / sizeof(x[0])))
 //#define FB_ALIGN(n,b) ((n+b-1)&~(b-1))
-{FB15_UP}
+{$ENDIF}
+
+{$IFDEF FB15}
+  FB_API_VER = 15;
+{$ENDIF FB15}
+
+{$IFDEF FB20}
+  FB_API_VER = 20;
+{$ENDIF FB20}
 
   GDS_TRUE = 1;
   GDS_FALSE = 0;
@@ -158,28 +211,34 @@ const
   ISC_FALSE = 0;
 
 type
-  ISC_LONG = Integer;
+  ISC_LONG = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Integer;
   ISCLong = ISC_LONG;
   PISCLong = ^ISCLong;
 
-  ISC_ULONG = Cardinal;
+  ISC_ULONG = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Cardinal;
   ISCULong = ISC_ULONG;
   PISCULong = ^ISCULong;
 
-  ISC_SHORT = Smallint;
+  {$IFDEF IB7_UP}
+  ISC_BOOLEAN = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Smallint;
+  ISCBoolean = ISC_BOOLEAN;
+  PISCBoolean = ^ISCBoolean;
+  {$ENDIF IB7_UP}
+
+  ISC_SHORT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Smallint;
   ISCShort = ISC_SHORT;
   PISCShort = ^ISCShort;
 
-  ISC_USHORT = Word;
+  ISC_USHORT = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Word;
   ISCUShort = ISC_USHORT;
   PISCUShort = ^ISCUShort;
 
-  ISC_STATUS = Longint;
+  ISC_STATUS = {$IFDEF TYPE_IDENTITY} type {$ENDIF} PtrInt;
   ISCStatus = ISC_STATUS;
   PISCStatus = ^ISCStatus;
   PPISCStatus = ^PISCStatus;
 
-  ISC_UCHAR = Char;
+  ISC_UCHAR = {$IFDEF TYPE_IDENTITY} type {$ENDIF} AnsiChar;
   ISCUChar = ISC_UCHAR;
   PISCUChar = ^ISCUChar;
 
@@ -187,28 +246,49 @@ const
   DSQL_close = 1;
   DSQL_drop = 2;
 
+  {$IFDEF IB65ORYF867}
+  DSQL_cancel = 4;
+  {$ENDIF IB65ORYF867}
+
+  {$IFDEF IB7_UP}
+  METADATALENGTH = 68;
+  {$ELSE}
   METADATALENGTH = 32;
+  {$ENDIF IB7_UP}
 
 (******************************************************************
  * Define type, export and other stuff based on c/c++ and Windows *
  ******************************************************************)
 
 type
-  ISC_INT64 = Int64;
+  ISC_INT64 = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Int64;
   ISCInt64 = ISC_INT64;
 
-  ISC_UINT64 = Int64;
+  ISC_UINT64 = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Int64;
   ISCUInt64 = ISC_UINT64;
+
+  {$DEFINE ISC_INT64_DEFINED}
+
+(*******************************************************************
+ * 64 bit Integers                                                 *
+ *******************************************************************)
+
+  {$IFDEF ISC_INT64_DEFINED}
+  {$UNDEF ISC_INT64_DEFINED}
+  {$ELSE}
+  ISC_INT64 = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Int64;
+  ISC_UINT64 = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Int64;
+  {$ENDIF ISC_INT64_DEFINED}
 
 (*******************************************************************
  * Time & Date Support                                             *
  *******************************************************************)
 
-  ISC_DATE = Longint;
+  ISC_DATE = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Longint;
   ISCDate = ISC_DATE;
   PISCDate = ^ISCDate;
 
-  ISC_TIME = Cardinal;
+  ISC_TIME = {$IFDEF TYPE_IDENTITY} type {$ENDIF} Cardinal;
   ISCTime = ISC_TIME;
   PISCTime = ^ISCTime;
 
@@ -218,6 +298,7 @@ type
     timestamp_time: ISC_TIME;
   end;
   TISCTimeStamp = ISC_TIMESTAMP;
+  {$DEFINE ISC_TIMESTAMP_DEFINED}
 
 const
   ISC_TIME_SECONDS_PRECISION = 10000;
@@ -229,7 +310,7 @@ const
 
 type
   ISC_QUAD = GDS_QUAD;
-  TISCQuad = ISC_QUAD;
+  TISCQuad = {$IFDEF TYPE_IDENTITY} type {$ENDIF} ISC_QUAD;
   PISCQuad = ^TISCQuad;
 
   PISCArrayBound = ^TISCArrayBound;
@@ -239,29 +320,68 @@ type
   end;
   TISCArrayBound = ISC_ARRAY_BOUND;
 
+{$IFDEF IB7_UP}
+  PISCArrayDescV2 = ^TISCArrayDescV2;
+  ISC_ARRAY_DESC_V2 = record
+    array_desc_version: Smallint;
+    array_desc_dtype: byte;
+    array_desc_subtype: byte;
+    array_desc_scale: byte;
+    array_desc_length: Word;
+    array_desc_field_name: array [0..METADATALENGTH - 1] of AnsiChar;
+    array_desc_relation_name: array [0..METADATALENGTH - 1] of AnsiChar;
+    array_desc_dimensions: Smallint;
+    array_desc_flags: Smallint;
+    array_desc_bounds: array [0..15] of TISCArrayBound;
+  end;
+  TISCArrayDescV2 = ISC_ARRAY_DESC_V2;
+
+const
+  ARR_DESC_VERSION2 = 2;
+
+  ARR_DESC_CURRENT_VERSION = ARR_DESC_VERSION2;
+
+type
+  PISCBlobDescV2 = ^TISCBlobDescV2;
+  ISC_BLOB_DESC_V2 = record
+    blob_desc_version: Smallint;
+    blob_desc_subtype: Smallint;
+    blob_desc_charset: Smallint;
+    blob_desc_segment_size: Smallint;
+    blob_desc_field_name: array [0..METADATALENGTH - 1] of AnsiChar;
+    blob_desc_relation_name: array [0..METADATALENGTH - 1] of AnsiChar;
+  end;
+  TISCBlobDescV2 = ISC_BLOB_DESC_V2;
+
+const
+  BLB_DESC_VERSION2 = 2;
+  BLB_DESC_CURRENT_VERSION = BLB_DESC_VERSION2;
+
+{$ENDIF IB7_UP}
+
 type
   PISCArrayDesc = ^TISCArrayDesc;
   ISC_ARRAY_DESC = record
     array_desc_dtype: byte;
     array_desc_scale: byte;
     array_desc_length: Word;
-    array_desc_field_name: array [0..METADATALENGTH - 1] of Char;
-    array_desc_relation_name: array [0..METADATALENGTH - 1] of Char;
+    array_desc_field_name: array [0..METADATALENGTH - 1] of AnsiChar;
+    array_desc_relation_name: array [0..METADATALENGTH - 1] of AnsiChar;
     array_desc_dimensions: Smallint;
     array_desc_flags: Smallint;
     array_desc_bounds: array [0..15] of TISCArrayBound;
   end;
-  TISCArrayDesc = ISC_ARRAY_DESC;
+  TISCArrayDesc = {$IFDEF TYPE_IDENTITY} type {$ENDIF} ISC_ARRAY_DESC;
 
   PISCBlobDesc = ^TISCBlobDesc;
   ISC_BLOB_DESC = record
     blob_desc_subtype: Smallint;
     blob_desc_charset: Smallint;
     blob_desc_segment_size: Smallint;
-    blob_desc_field_name: array [0..METADATALENGTH - 1] of Char;
-    blob_desc_relation_name: array [0..METADATALENGTH - 1] of Char;
+    blob_desc_field_name: array [0..METADATALENGTH - 1] of AnsiChar;
+    blob_desc_relation_name: array [0..METADATALENGTH - 1] of AnsiChar;
   end;
-  TISCBlobDesc = ISC_BLOB_DESC;
+  TISCBlobDesc = {$IFDEF TYPE_IDENTITY} type {$ENDIF} ISC_BLOB_DESC;
 
 (***************************
  * Blob control structure  *
@@ -277,8 +397,8 @@ type
     ctl_buffer_length: Word;           // Length of buffer
     ctl_segment_length: Word;          // Length of current segment
     ctl_bpb_length: Word;              // Length of blob parameter  block
-    ctl_bpb: PChar;                    // Address of blob parameter block
-    ctl_buffer: PChar;                 // Address of segment buffer
+    ctl_bpb: PAnsiChar;                // Address of blob parameter block
+    ctl_buffer: PAnsiChar;             // Address of segment buffer
     ctl_max_segment: ISCLong;          // Length of longest segment
     ctl_number_segments: ISCLong;      // Total number of segments
     ctl_total_length: ISCLong;         // Total length of blob
@@ -293,12 +413,12 @@ type
 
   PBStream = ^TBStream;
   BSTREAM = record
-    bstr_blob: PPointer;   // Blob handle
-    bstr_buffer: PChar;    // Address of buffer
-    bstr_ptr: PChar;       // Next character
-    bstr_length: Smallint; // Length of buffer
-    bstr_cnt: Smallint;    // Characters in buffer
-    bstr_mode: Char;       // (mode) ? OUTPUT : INPUT
+    bstr_blob: PPointer;    // Blob handle
+    bstr_buffer: PAnsiChar; // Address of buffer
+    bstr_ptr: PAnsiChar;    // Next character
+    bstr_length: Smallint;  // Length of buffer
+    bstr_cnt: Smallint;     // Characters in buffer
+    bstr_mode: AnsiChar;    // (mode) ? OUTPUT : INPUT
   end;
   TBStream = BSTREAM;
 
@@ -316,27 +436,31 @@ type
 
 (* Blob passing structure *)
 
+{$IFDEF FB102ORYF867}
 const
   (* This enum applies to parameter "mode" in blob_lseek *)
   blb_seek_relative = 1;
   blb_seek_from_tail = 2;
+{$ENDIF FB102ORYF867}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   (* This enum applies to the value returned by blob_get_segment *)
   blb_got_fragment = -1;
   blb_got_eof = 0;
   blb_got_full_segment = 1;
-{FB20_UP}
+{$ENDIF FB20_UP}
 
 type
 
-  TBlobGetSegmentFn = function(hnd: Pointer; buffer: PChar; buf_size: ISCUShort;
+  TBlobGetSegmentFn = function(hnd: Pointer; buffer: PAnsiChar; buf_size: ISCUShort;
     var result_len: ISCUShort): Smallint; cdecl;
 
-  TBlobPutSegmentFn = procedure(hnd: PPointer; buffer: PChar;
+  TBlobPutSegmentFn = procedure(hnd: PPointer; buffer: PAnsiChar;
     buf_size: ISCUShort); cdecl;
 
   TBlobLSeekFn = function(hnd: PPointer; mode: ISCUShort; offset: ISCLong): ISCLong; cdecl;
+
+{$IFDEF FB102ORYF867}
 
   PBlobCallBack = ^TBlobCallBack;
   BLOBCALLBACK = record
@@ -364,12 +488,12 @@ type
 
   PParamDsc = ^TParamDsc;
   PARAMDSC = record
-    dsc_dtype: Char;
+    dsc_dtype: byte;
     dsc_scale: Shortint;
     dsc_length: ISCUShort;
     dsc_sub_type: Smallint;
     dsc_flags: ISCUShort;
-    dsc_address: PChar;
+    dsc_address: PAnsiChar;
   end;
   TParamDsc = PARAMDSC;
 
@@ -378,7 +502,7 @@ type
   PParamVary = ^TParamVary;
   PARAMVARY = record
     vary_length: ISCUShort;
-    vary_string: array [0..0] of Char;
+    vary_string: array [0..0] of AnsiChar;
   end;
   TParamVary = PARAMVARY;
 
@@ -395,10 +519,11 @@ const
 (* Note that dtype_null actually means that we do not yet know the
    dtype for this descriptor.  A nice cleanup item would be to globally
    change it to dtype_unknown.  --chrisj 1999-02-17 *)
-{FB20_UP}
+{$IFDEF FB20_UP}
   dtype_unknown = 0;
-{FB20_UP}
+{$ELSE}
   dtype_null = 0;
+{$ENDIF}
   dtype_text = 1;
   dtype_cstring = 2;
   dtype_varying = 3;
@@ -418,6 +543,7 @@ const
   dtype_array = 18;
   dtype_int64 = 19;
   DTYPE_TYPE_MAX = 20;
+{$ENDIF FB102ORYF867}
 
 (***************************
  * Dynamic SQL definitions *
@@ -427,6 +553,57 @@ const
  * Declare the extended SQLDA *
  ******************************)
 
+ {$IFDEF IB7_UP}
+
+(***********************************************************************
+ * Older and obsolete XSQLVAR, ISC_BLOB_DESC, ISC_ARRAY_DESC strucutres.
+ * NOTE:These structure will no longer be available in future releases.
+ * This is kept only for backward  compatability.
+ * Please refrain from  using these old structures.
+ * It is strongly  recomended  to use the newer SQLDA version
+ * and related XSQLVAR, ISC_BLOB_DESC, ISC_ARRAY_DESC structures.
+ ***********************************************************************)
+type
+  PXSQLVarV1 = ^TXSQLVarV1;
+  XSQLVAR_V1 = record
+    sqltype: Smallint; // datatype of field
+    sqlscale: Smallint; // scale factor
+    sqlsubtype: Smallint; // datatype subtype
+    sqllen: Smallint; // length of data area
+    sqldata: PAnsiChar; // address of data
+    sqlind: PSmallInt; // address of indicator variable
+    sqlname_length: Smallint; // length of sqlname field
+    sqlname: array [0..METADATALENGTH - 1] of AnsiChar; // name of field, name length + space for NULL
+    relname_length: Smallint; // length of relation name
+    relname: array [0..METADATALENGTH - 1] of AnsiChar; // field's relation name + space for NULL
+    ownname_length: Smallint; // length of owner name
+    ownname: array [0..METADATALENGTH - 1] of AnsiChar; // relation's owner name + space for NULL
+    aliasname_length: Smallint; // length of alias name
+    aliasname: array [0..METADATALENGTH - 1] of AnsiChar; // relation's alias name + space for  NULL
+  end;
+  TXSQLVarV1 = XSQLVAR_V1;
+
+  PXSQLVar = ^TXSQLVar;
+  XSQLVAR = record
+    sqltype: Smallint; // datatype of field
+    sqlscale: Smallint; // scale factor
+    sqlprecision: Smallint; // precision : Reserved for future
+    sqlsubtype: Smallint; // datatype subtype
+    sqllen: Smallint; // length of data area
+    sqldata: PAnsiChar; // address of data
+    sqlind: PSmallint; // address of indicator variable
+    sqlname_length: Smallint; // length of sqlname field
+    sqlname: array [0..METADATALENGTH - 1] of AnsiChar; // name of field, name length + space  for NULL
+    relname_length: Smallint; // length of relation name
+    relname: array [0..METADATALENGTH - 1] of AnsiChar; // field's relation name + space for NULL
+    ownname_length: Smallint; // length of owner name
+    ownname: array [0..METADATALENGTH - 1] of AnsiChar; // relation's owner name + space for  NULL
+    aliasname_length: Smallint; // length of alias name
+    aliasname: array [0..METADATALENGTH - 1] of AnsiChar; // relation's alias name + space for NULL
+  end;
+
+{$ELSE}
+
 type
   PXSQLVar = ^TXSQLVar;
   XSQLVAR = record
@@ -434,24 +611,26 @@ type
     sqlscale: Smallint; // scale factor
     sqlsubtype: Smallint; // datatype subtype - BLOBs & Text types only
     sqllen: Smallint; // length of data area
-    sqldata: PChar; // address of data
+    sqldata: PAnsiChar; // address of data
     sqlind: PSmallint; // address of indicator variable
     sqlname_length: Smallint; // length of sqlname field
-    sqlname: array [0..METADATALENGTH - 1] of Char; // name of field, name length + space for NULL
+    sqlname: array [0..METADATALENGTH - 1] of AnsiChar; // name of field, name length + space for NULL
     relname_length: Smallint; // length of relation name
-    relname: array [0..METADATALENGTH - 1] of Char; // field's relation name + space for NULL
+    relname: array [0..METADATALENGTH - 1] of AnsiChar; // field's relation name + space for NULL
     ownname_length: Smallint; // length of owner name
-    ownname: array [0..METADATALENGTH - 1] of Char; // relation's owner name + space for  NULL
+    ownname: array [0..METADATALENGTH - 1] of AnsiChar; // relation's owner name + space for  NULL
     aliasname_length: Smallint; // length of alias name
-    aliasname: array [0..METADATALENGTH - 1] of Char; // relation's alias name + space for NULL
+    aliasname: array [0..METADATALENGTH - 1] of AnsiChar; // relation's alias name + space for NULL
   end;
 
-  TXSQLVar = XSQLVAR;
+{$ENDIF IB7_UP}
+
+  TXSQLVar = {$IFDEF TYPE_IDENTITY} type {$ENDIF} XSQLVAR;
 
   PXSQLDA = ^TXSQLDA;
   XSQLDA = record
     version: Smallint; // version of this XSQLDA
-    sqldaid: array [0..7] of Char; // XSQLDA name field          ->  RESERVED
+    sqldaid: array [0..7] of AnsiChar; // XSQLDA name field          ->  RESERVED
     sqldabc: ISCLong; // length in bytes of SQLDA   ->  RESERVED
     sqln: Smallint; // number of fields allocated
     sqld: Smallint; // actual number of fields
@@ -464,8 +643,16 @@ function XSQLDA_LENGTH(n: Integer): Integer;
 const
   SQLDA_VERSION1 = 1;
 
+  {$IFDEF IB7_UP}
+  SQLDA_VERSION2 = 2;
+  {$ENDIF IB7_UP}
+
+  {$IFDEF IB7_UP}
+  SQLDA_CURRENT_VERSION = SQLDA_VERSION2;
+  {$ELSE}
   SQLDA_CURRENT_VERSION = SQLDA_VERSION1;
   {.$EXTERNALSYM SQLDA_CURRENT_VERSION}
+  {$ENDIF IB7_UP}
 
   SQL_DIALECT_V5 = 1; (* meaning is same as DIALECT_xsqlda. *)
   SQL_DIALECT_V6_TRANSITION = 2; (* flagging anything that is delimited
@@ -483,39 +670,39 @@ const
  ********************************)
 type
   isc_att_handle = PPointer;
-  IscAttHandle = isc_att_handle;
+  IscAttHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_att_handle;
   PIscAttHandle = ^IscAttHandle;
 
   isc_blob_handle = PPointer;
-  IscBlobHandle = isc_blob_handle;
+  IscBlobHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_blob_handle;
   PIscBlobHandle = ^IscBlobHandle;
 
   isc_db_handle = PPointer;
-  IscDbHandle = isc_db_handle;
+  IscDbHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_db_handle;
   PIscDbHandle = ^IscDbHandle;
 
   isc_form_handle = PPointer;
-  IscFormHandle = isc_form_handle;
+  IscFormHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_form_handle;
   PIscFormHandle = ^IscFormHandle;
 
   isc_req_handle = PPointer;
-  IscReqHandle = isc_req_handle;
+  IscReqHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_req_handle;
   PIscReqHandle = ^IscReqHandle;
 
   isc_stmt_handle = PPointer;
-  IscStmtHandle = isc_stmt_handle;
+  IscStmtHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_stmt_handle;
   PIscStmtHandle = ^IscStmtHandle;
 
   isc_svc_handle = PPointer;
-  IscSvcHandle = isc_svc_handle;
+  IscSvcHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_svc_handle;
   PIscSvcHandle = ^IscSvcHandle;
 
   isc_tr_handle = PPointer;
-  IscTrHandle = isc_tr_handle;
+  IscTrHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_tr_handle;
   PIscTrHandle = ^IscTrHandle;
 
   isc_win_handle = PPointer;
-  IscWinHandle = isc_win_handle;
+  IscWinHandle = {$IFDEF TYPE_IDENTITY} type {$ENDIF} isc_win_handle;
   PIscWinHandle = ^IscWinHandle;
 
   isc_callback = procedure;
@@ -532,10 +719,10 @@ type
 type
   // Parameter for transaction on multiple Database, see
   PISCTEB = ^TISCTEB;
-  TISCTEB = packed record
+  TISCTEB = record
     Handle: PIscDbHandle;
     Len: Integer;
-    Address: PChar;
+    Address: PAnsiChar;
   end;
 
 (*************************************
@@ -556,6 +743,12 @@ const
   sec_protocol_tcpip = 1;
   sec_protocol_netbeui = 2;
 
+{$IFNDEF FIREBIRD}
+{$IFNDEF FB15_UP}
+  sec_protocol_spx = 3;
+{$ENDIF FB15_UP}
+{$ENDIF FIREBIRD}
+
   sec_protocol_local = 4;
 
 type
@@ -565,15 +758,15 @@ type
     uid: Integer; // the user's id
     gid: Integer; // the user's group id
     protocol: Integer; // protocol to use for connection
-    server: PChar; // server to administer
-    user_name: PChar; // the user's name
-    password: PChar; // the user's password
-    group_name: PChar; // the group name
-    first_name: PChar; // the user's first name
-    middle_name: PChar; // the user's middle name
-    last_name: PChar; // the user's last name
-    dba_user_name: PChar; // the dba user name
-    dba_password: PChar; // the dba password
+    server: PAnsiChar; // server to administer
+    user_name: PAnsiChar; // the user's name
+    password: PAnsiChar; // the user's password
+    group_name: PAnsiChar; // the group name
+    first_name: PAnsiChar; // the user's first name
+    middle_name: PAnsiChar; // the user's middle name
+    last_name: PAnsiChar; // the user's last name
+    dba_user_name: PAnsiChar; // the dba user name
+    dba_password: PAnsiChar; // the dba password
   end;
   TUserSecData = USER_SEC_DATA;
 
@@ -581,8 +774,8 @@ type
  * Service manager functions             *
  *****************************************)
 
-procedure ADD_SPB_LENGTH(var p: PChar; length: Integer);
-procedure ADD_SPB_NUMERIC(var p: PChar; data: Integer);
+procedure ADD_SPB_LENGTH(var p: PAnsiChar; length: Integer);
+procedure ADD_SPB_NUMERIC(var p: PAnsiChar; data: Integer);
 
 (***************************************************
  * Actions to pass to the blob filter (ctl_source) *
@@ -619,9 +812,22 @@ const
   blr_sql_date = 12;
   blr_sql_time = 13;
   blr_int64 = 16;
-{FB20_UP}
+{$IFDEF FB20_UP}
   blr_blob2 = 17;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF FB21_UP}
+  blr_domain_name = 18;
+  blr_domain_name2 = 19;
+  blr_not_nullable = 20;
+
+  blr_domain_type_of = 0;
+  blr_domain_full = 1;
+{$ENDIF}
+
+{$IFDEF IB7_UP}
+  blr_boolean_dtype = 17;
+{$ENDIF}
 
   (* Historical alias for pre V6 applications *)
   blr_date = blr_timestamp;
@@ -692,9 +898,9 @@ const
   blr_user_name = 44; // added from gds.h
   blr_null = 45;
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   blr_equiv	= 46;
-{FB20_UP}
+{$ENDIF}
   blr_eql = 47;
   blr_neq = 48;
   blr_gtr = 49;
@@ -712,8 +918,10 @@ const
   blr_missing = 61;
   blr_unique = 62;
   blr_like = 63;
+{$IFNDEF FB20_UP}
   blr_stream = 65; // added from gds.h
   blr_set_index = 66; // added from gds.h
+{$ENDIF}
   blr_rse = 67;
   blr_first = 68;
   blr_project = 69;
@@ -728,6 +936,15 @@ const
   blr_group_by = 78;
   blr_aggregate = 79;
   blr_join_type = 80;
+
+{$IFDEF IB65ORYF867}
+  blr_rows = 81;
+
+  (* sub parameters for blr_rows *)
+
+  blr_ties = 0;
+  blr_percent = 1;
+{$ENDIF}
 
   blr_agg_count = 83;
   blr_agg_max = 84;
@@ -753,11 +970,15 @@ const
   blr_matching2 = 106;
   blr_index = 107;
   blr_ansi_like = 108;
+{$IFNDEF FB20_UP}
   blr_bookmark = 109;
   blr_crack = 110;
   blr_force_crack = 111;
+{$ENDIF}
   blr_seek = 112;
+{$IFNDEF FB20_UP}
   blr_find = 113;
+{$ENDIF}
 
   (* these indicate directions for blr_seek and blr_find *)
 
@@ -766,16 +987,20 @@ const
   blr_backward = 2;
   blr_bof_forward = 3;
   blr_eof_backward = 4;
+{$IFNDEF FB20_UP}
   blr_lock_relation = 114;
   blr_lock_record = 115;
   blr_set_bookmark = 116;
   blr_get_bookmark = 117;
+{$ENDIF}
   blr_run_count = 118; // changed from 88 to avoid conflict with blr_parameter3
   blr_rs_stream = 119;
   blr_exec_proc = 120;
+{$IFNDEF FB20_UP}
   blr_begin_range = 121;
   blr_end_range = 122;
   blr_delete_range = 123;
+{$ENDIF}
   blr_procedure = 124;
   blr_pid = 125;
   blr_exec_pid = 126;
@@ -785,13 +1010,17 @@ const
   blr_error_handler = 130;
 
   blr_cast = 131;
+{$IFNDEF FB20_UP}
   blr_release_lock = 132;
   blr_release_locks = 133;
+{$ENDIF}
   blr_start_savepoint = 134;
   blr_end_savepoint = 135;
+{$IFNDEF FB20_UP}
   blr_find_dbkey = 136;
   blr_range_relation = 137;
   blr_delete_ranges = 138;
+{$ENDIF}
 
   blr_plan = 139; // access plan items
   blr_merge = 140;
@@ -803,20 +1032,26 @@ const
 
   blr_relation2 = 146;
   blr_rid2 = 147;
+{$IFNDEF FB20_UP}
   blr_reset_stream = 148;
   blr_release_bookmark = 149;
+{$ENDIF}
 
   blr_set_generator = 150;
 
   blr_ansi_any = 151; // required for NULL handling
   blr_exists = 152; // required for NULL handling
+{$IFNDEF FB20_UP}
   blr_cardinality = 153;
+{$ENDIF}
 
   blr_record_version = 154; // get tid of record
   blr_stall = 155; // fake server stall
 
+{$IFNDEF FB20_UP}
   blr_seek_no_warn = 156;
   blr_find_dbkey_version = 157; // find dbkey with record version
+{$ENDIF}  
   blr_ansi_all = 158; // required for NULL handling
 
   blr_extract = 159;
@@ -831,25 +1066,65 @@ const
   blr_extract_second = 5;
   blr_extract_weekday = 6;
   blr_extract_yearday = 7;
+{$IFDEF FB21_UP}
+  blr_extract_millisecond = 8;
+  blr_extract_week = 9;
+{$ENDIF}
+
 
   blr_current_date = 160;
   blr_current_timestamp = 161;
   blr_current_time = 162;
 
+{$IFDEF FB15_UP}
+  (* This codes reuse BLR code space *)
+  blr_post_arg = 163;
+  blr_exec_into	= 164;
+  blr_user_savepoint = 165;
+{$ENDIF FB15_UP}
+
+{$IFDEF FB20_UP}
+  blr_dcl_cursor = 166;
+  blr_cursor_stmt	=	167;
+  blr_current_timestamp2 = 168;
+  blr_current_time2 = 169;
+{$ENDIF FB20_UP}
+
+{$IFDEF FB21_UP}
+  blr_agg_list = 170;
+  blr_agg_list_distinct = 171;
+  blr_modify2 = 172;
+{$ENDIF}
+
+{$IFDEF FB102ORYF867}
   (* FB1 specific BLR *)
   blr_current_role = 174;
   blr_skip = 175;
+{$ENDIF FB102ORYF867}
 
-{FB15_UP}
+{$IFDEF IB7_UP}
+  (* These verbs were added in 7.0 for BOOLEAN dtype support *)
+  blr_boolean_true = 174;
+  blr_boolean_false = 175;
+{$ENDIF IB7_UP}
+
+{$IFDEF IB71_UP}
+  (* These verbs were added in 7.1 for SQL savepoint support *)
+  blr_start_savepoint2 = 176;
+  blr_release_savepoint = 177;
+  blr_rollback_savepoint = 178;
+{$ENDIF IB71_UP}
+
+{$IFDEF FB15_UP}
   (* FB 1.5 specific BLR *)
   blr_exec_sql = 176;
   blr_internal_info = 177;
   blr_nullsfirst = 178;
   blr_writelock = 179;
   blr_nullslast = 180;
-{FB15_UP}
+{$ENDIF FB15_UP}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   blr_lowcase = 181;
   blr_strlen = 182;
 
@@ -865,34 +1140,27 @@ const
 
   blr_trim_spaces = 0;
   blr_trim_characters = 1;
-{FB20_UP}
-
-{FB15_UP}
-  (* This codes reuse BLR code space *)
-  blr_post_arg = 163;
-  blr_exec_into	= 164;
-  blr_user_savepoint = 165;
-{FB15_UP}
-{FB20_UP}
-  blr_dcl_cursor = 166;
-  blr_cursor_stmt	=	167;
-  blr_current_timestamp2 = 168;
-  blr_current_time2 = 169;
-{FB20_UP}
+{$ENDIF}
 
   (* These codes are actions for user-defined savepoints *)
-{FB15_UP}
+{$IFDEF FB15_UP}
   blr_savepoint_set = 0;
   blr_savepoint_release = 1;
   blr_savepoint_undo = 2;
   blr_savepoint_release_single = 3;
-{FB15_UP}
+{$ENDIF FB15_UP}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   blr_cursor_open	 = 0;
   blr_cursor_close = 1;
   blr_cursor_fetch = 2;
-{FB20_UP}
+{$ENDIF FB20_UP}
+
+{$IFDEF FB21_UP}
+  blr_init_variable = 184;
+  blr_recurse = 185;
+  blr_sys_function = 186;
+{$ENDIF}
 
 (**********************************
  * Database parameter block stuff *
@@ -967,18 +1235,89 @@ const
   isc_dpb_gfix_attach = 66;
   isc_dpb_gstat_attach = 67;
 
-{FB103_UP}
+{$IFDEF FB103_UP}
   isc_dpb_set_db_charset = 68;
-{FB103_UP}
+{$ENDIF FB103_UP}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_dpb_gsec_attach = 69;
   isc_dpb_address_path = 70;
-{FB20_UP}
+{$ENDIF}
 
+{$IFDEF FB21_UP}
+  isc_dpb_process_id = 71;
+  isc_dpb_no_db_triggers = 72;
+  isc_dpb_trusted_auth = 73;
+  isc_dpb_process_name = 74;
+{$ENDIF}
+
+{$IFDEF IB65ORYF867}
+  isc_dpb_gbak_ods_version = 68;
+  isc_dpb_gbak_ods_minor_version = 69;
+{$ENDIF IB65ORYF867}
+
+{$IFDEF YF867_UP}
+  isc_dpb_numeric_scale_reduction = 70;
+
+  isc_dpb_sec_flags = 91;
+  isc_dpb_sec_type = 92;
+  isc_dpb_sec_principal = 93;
+  isc_dpb_sec_srv_name = 94;
+{$ENDIF YF867_UP}
+
+{$IFDEF IB7_UP}
+  isc_dpb_set_group_commit = 70;
+{$ENDIF IB7_UP}
+
+{$IFDEF IB71_UP}
+  isc_dpb_gbak_validate = 71;
+{$ENDIF IB71_UP}
+
+{$IFDEF IB75_UP}
+  isc_dpb_client_interbase_var	 = 72;
+  isc_dpb_admin_option           = 73;
+  isc_dpb_flush_interval         = 74;
+{$ENDIF}
+
+{$IFDEF IB65}
+  isc_dpb_Max_Value = 69;
+{$ELSE}
+{$IFDEF IB7}
   isc_dpb_Max_Value = 70;
+{$ELSE}
+{$IFDEF IB71}
+  isc_dpb_Max_Value = 71;
+{$ELSE}
+{$IFDEF IB75}
+  isc_dpb_Max_Value = 71;
+{$ELSE}
+{$IFDEF FB21}
+  isc_dpb_Max_Value = 74;
+{$ELSE}
+{$IFDEF FB20}
+  isc_dpb_Max_Value = 70;
+{$ELSE}
+{$IFDEF FB15}
+  isc_dpb_Max_Value = 68;
+{$ELSE}
+{$IFDEF FB103}
+  isc_dpb_Max_Value = 68;
+{$ELSE}
+{$IFDEF YF867}
+  isc_dpb_Max_Value = 70;
+{$ELSE}
+  isc_dpb_Max_Value = 67;
+{$ENDIF YF867}
+{$ENDIF FB103}
+{$ENDIF FB15}
+{$ENDIF FB20}
+{$ENDIF FB21}
+{$ENDIF IB75}
+{$ENDIF IB71}
+{$ENDIF IB7}
+{$ENDIF IB65}
 
-{FB20_UP}
+{$IFDEF FB20_UP}
 (**************************************************)
 (* clumplet tags used inside isc_dpb_address_path *)
 (**************************************************)
@@ -1022,7 +1361,7 @@ const
 
   isc_dpb_addr_protocol = 1;
   isc_dpb_addr_endpoint = 2;
-{FB20_UP}
+{$ENDIF}
 
   (*********************************
    * isc_dpb_verify specific flags *
@@ -1044,7 +1383,7 @@ const
   isc_dpb_shut_attachment   = $2;
   isc_dpb_shut_transaction  = $4;
   isc_dpb_shut_force        = $8;
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_dpb_shut_mode_mask    = $70;
 
   isc_dpb_shut_default      = $00;
@@ -1052,7 +1391,22 @@ const
   isc_dpb_shut_multi        = $20;
   isc_dpb_shut_single       = $30;
   isc_dpb_shut_full         = $40;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF YF867_UP}
+  (************************************
+   * isc_dpb_sec_flags specific flags *
+   ************************************)
+
+  isc_dpb_sec_delegation = 1;
+  isc_dpb_sec_mutual_auth = 2;
+  isc_dpb_sec_replay = 4;
+  isc_dpb_sec_sequence = 8;
+  isc_dpb_sec_confidentiality = 16;
+  isc_dpb_sec_integrity = 32;
+  isc_dpb_sec_anonymous = 64;
+  isc_dpb_sec_transport = $08000000; // use transport security if supported by underlying protocol
+{$ENDIF YF867_UP}
 
   (**************************************
    * Bit assignments in RDB$SYSTEM_FLAG *
@@ -1064,14 +1418,15 @@ const
   (*************************************
    * Transaction parameter block stuff *
    *************************************)
-
   isc_tpb_version1 = #1;
   isc_tpb_version3 = #3;
   isc_tpb_consistency = #1;
   isc_tpb_concurrency = #2;
+{$IFNDEF FB_21UP}
   isc_tpb_shared = #3;
   isc_tpb_protected = #4;
   isc_tpb_exclusive = #5;
+{$ENDIF}
   isc_tpb_wait = #6;
   isc_tpb_nowait = #7;
   isc_tpb_read = #8;
@@ -1087,9 +1442,9 @@ const
   isc_tpb_no_rec_version = #18;
   isc_tpb_restart_requests = #19;
   isc_tpb_no_auto_undo = #20;
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_tpb_lock_timeout = #21;
-{FB20_UP}
+{$ENDIF}
 
   (************************
    * Blob Parameter Block *
@@ -1104,33 +1459,50 @@ const
   isc_bpb_source_interp = #4;
   isc_bpb_target_interp = #5;
   isc_bpb_filter_parameter = #6;
+{$IFDEF FB21_UP}
+  isc_bpb_storage = #7;
+{$ENDIF}
 
   isc_bpb_type_segmented = #0;
   isc_bpb_type_stream = #1;
+
+{$IFDEF FB21_UP}
+  isc_bpb_storage_main = #0;
+  isc_bpb_storage_temp = #2;
+{$ENDIF}
 
   (*********************************
    * Service parameter block stuff *
    *********************************)
 
-  isc_spb_version1 = #1;
-  isc_spb_current_version = #2;
+  isc_spb_version1 = AnsiChar(#1);
+  isc_spb_current_version = AnsiChar(#2);
   isc_spb_version = isc_spb_current_version;
-  isc_spb_user_name = Char(isc_dpb_user_name);
-  isc_spb_sys_user_name = Char(isc_dpb_sys_user_name);
-  isc_spb_sys_user_name_enc = Char(isc_dpb_sys_user_name_enc);
-  isc_spb_password = Char(isc_dpb_password);
-  isc_spb_password_enc = Char(isc_dpb_password_enc);
-  isc_spb_command_line = #105;
-  isc_spb_dbname = #106;
-  isc_spb_verbose = #107;
-  isc_spb_options = #108;
-{FB20_UP}
-  isc_spb_address_path = #109;
-{FB20_UP}
+  isc_spb_user_name = AnsiChar(isc_dpb_user_name);
+  isc_spb_sys_user_name = AnsiChar(isc_dpb_sys_user_name);
+  isc_spb_sys_user_name_enc = AnsiChar(isc_dpb_sys_user_name_enc);
+  isc_spb_password = AnsiChar(isc_dpb_password);
+  isc_spb_password_enc = AnsiChar(isc_dpb_password_enc);
+  isc_spb_command_line = AnsiChar(#105);
+  isc_spb_dbname = AnsiChar(#106);
+  isc_spb_verbose = AnsiChar(#107);
+  isc_spb_options = AnsiChar(#108);
+{$IFDEF IB75_UP}
+  isc_spb_user_dbname = AnsiChar(#109);
+{$ENDIF}
+{$IFDEF FB20_UP}
+  isc_spb_address_path = AnsiChar(#109);
+{$ENDIF}
 
-  isc_spb_connect_timeout = Char(isc_dpb_connect_timeout);
-  isc_spb_dummy_packet_interval = Char(isc_dpb_dummy_packet_interval);
-  isc_spb_sql_role_name = Char(isc_dpb_sql_role_name);
+{$IFDEF FB21_UP}
+  isc_spb_process_id = AnsiChar(#110);
+  isc_spb_trusted_auth = AnsiChar(#111);
+  isc_spb_process_name = AnsiChar(#112);
+{$ENDIF}
+
+  isc_spb_connect_timeout = AnsiChar(isc_dpb_connect_timeout);
+  isc_spb_dummy_packet_interval = AnsiChar(isc_dpb_dummy_packet_interval);
+  isc_spb_sql_role_name = AnsiChar(isc_dpb_sql_role_name);
 
   (*********************************
    * Information call declarations *
@@ -1144,6 +1516,9 @@ const
   isc_info_truncated = 2;
   isc_info_error = 3;
   isc_info_data_not_ready = 4;
+{$IFDEF FB21_UP}
+  isc_info_length = 126;
+{$ENDIF}
   isc_info_flag_end = 127;
 
   (******************************
@@ -1159,6 +1534,10 @@ const
   isc_info_implementation = 11;
   isc_info_isc_version = 12;
   isc_info_base_level = 13;
+
+{$IFDEF IB71_UP}
+  isc_info_svr_maj_ver = isc_info_base_level;
+{$ENDIF IB71_UP}
 
   isc_info_page_size = 14;
   isc_info_num_buffers = 15;
@@ -1216,6 +1595,25 @@ const
   isc_info_db_read_only = 63;
   isc_info_db_size_in_pages = 64;
 
+{$IFDEF IB7_UP}
+  isc_info_db_reads = 65;
+  isc_info_db_writes = 66;
+  isc_info_db_fetches = 67;
+  isc_info_db_marks = 68;
+  isc_info_db_group_commit = 69;
+{$ENDIF}
+
+{$IFDEF IB71_UP}
+  isc_info_att_charset = 70;
+  isc_info_svr_min_ver = 71;
+{$ENDIF IB71_UP}
+
+{$IFDEF IB75_UP}
+  isc_info_ib_env_var              = 72;
+  isc_info_server_tcp_port         = 73;
+{$ENDIF}
+
+{$IFDEF FB102ORYF867}
   frb_info_att_charset = 101;
   isc_info_db_class = 102;
   isc_info_firebird_version = 103;
@@ -1225,10 +1623,14 @@ const
   isc_info_next_transaction = 107;
   isc_info_db_provider = 108;
   isc_info_active_transactions = 109;
-{FB20_UP}
+{$ENDIF FB102ORYF867}
+{$IFDEF FB20_UP}
   isc_info_active_tran_count = 110;
   isc_info_creation_date = 111;
-{FB20_UP}
+{$ENDIF}
+{$IFDEF FB21_UP}
+  isc_info_db_file_size = 112;
+{$ENDIF}
 
   isc_info_version = isc_info_isc_version;
 
@@ -1269,6 +1671,11 @@ const
   isc_info_db_impl_isc_delta = 45;
   isc_info_db_impl_isc_next = 46;
   isc_info_db_impl_isc_dos = 47;
+{$IFDEF IB65_UP}
+  isc_info_db_impl_isc_winnt = 48;
+  isc_info_db_impl_isc_epson = 49;
+{$ENDIF IB65_UP}
+{$IFDEF FB102ORYF867}
   isc_info_db_impl_m88K = 48;
   isc_info_db_impl_unixware = 49;
   isc_info_db_impl_isc_winnt_x86 = 50;
@@ -1286,18 +1693,27 @@ const
 
   isc_info_db_impl_freebsd = 61;
   isc_info_db_impl_netbsd = 62;
-  isc_info_db_impl_darwin = 63;
+  isc_info_db_impl_darwin_ppc = 63;
+{$ENDIF FB102ORYF867}
+{$IFDEF FB102_UP}
   isc_info_db_impl_sinixz = 64;
+{$ENDIF FB102_UP}
 
-{FB15_UP}
+{$IFDEF FB15_UP}
   isc_info_db_impl_linux_sparc = 65;
   isc_info_db_impl_linux_amd64 = 66; // FB151
-{FB15_UP}
-{FB20_UP}
+{$ENDIF FB15_UP}
+{$IFDEF FB20_UP}
   isc_info_db_impl_freebsd_amd64 = 67;
   isc_info_db_impl_winnt_amd64 = 68;
   isc_info_db_impl_linux_ppc = 69;
-{FB20_UP}
+  isc_info_db_impl_darwin_x86 = 70;
+{$ENDIF}
+{$IFDEF FB21_UP}
+  isc_info_db_impl_linux_mipsel = 71;
+  isc_info_db_impl_linux_mips = 72;
+  isc_info_db_impl_darwin_x64 = 73;
+{$ENDIF}
 
   isc_info_db_impl_isc_a = isc_info_db_impl_isc_apl_68K;
   isc_info_db_impl_isc_u = isc_info_db_impl_isc_vax_ultr;
@@ -1319,11 +1735,14 @@ type
     isc_info_db_class_sam_srvr,
     isc_info_db_class_gateway,
     isc_info_db_class_cache,
+  {$IFDEF FB102ORYF867}
     isc_info_db_class_classic_access,
     isc_info_db_class_server_access,
+  {$ENDIF FB102ORYF867}
     isc_info_db_class_last_value (* Leave this LAST! *)
     );
 
+{$IFDEF FB102ORYF867}
   info_db_provider = (
     isc_info_db_code_INVALID_0,
     isc_info_db_code_rdb_eln,
@@ -1332,6 +1751,7 @@ type
     isc_info_db_code_firebird,
     isc_info_db_code_last_value (* Leave this LAST! *)
     );
+{$ENDIF FB102ORYF867}
 
 (*****************************
  * Request information items *
@@ -1386,9 +1806,13 @@ const
   isc_info_rsb_sim_cross = 19;
   isc_info_rsb_once = 20;
   isc_info_rsb_procedure = 21;
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_info_rsb_skip = 22;
-{FB20_UP}
+{$ENDIF}
+{$IFDEF FB21_UP}
+  isc_info_rsb_virt_sequential = 23;
+  isc_info_rsb_recursive = 24;
+{$ENDIF}
 
   (**********************
    * Bitmap expressions *
@@ -1420,7 +1844,7 @@ const
    *********************************)
 
   isc_info_tra_id = 4;
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_info_tra_oldest_interesting = 5;
   isc_info_tra_oldest_snapshot    = 6;
   isc_info_tra_oldest_active      = 7;
@@ -1437,7 +1861,7 @@ const
 
   isc_info_tra_readonly           = 0;
   isc_info_tra_readwrite          = 1;
-{FB20_UP}
+{$ENDIF}
   (*****************************
    * Service action items      *
    *****************************)
@@ -1454,9 +1878,9 @@ const
   isc_action_svc_remove_license = #10; // Removes a license from the license file
   isc_action_svc_db_stats = #11; // Retrieves database statistics
   isc_action_svc_get_ib_log = #12; // Retrieves the InterBase log file from the server
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_action_svc_get_fb_log = #12;	// Retrieves the Firebird log file from the server
-{FB20_UP}
+{$ENDIF}
 
   (*****************************
    * Service information items *
@@ -1626,6 +2050,10 @@ const
   isc_spb_res_create = $2000;
   isc_spb_res_use_all_space = $4000;
 
+{$IFDEF IB71_UP}
+  isc_spb_res_validate = $8000;
+{$ENDIF IB71_UP}
+
   (******************************************
    * Parameters for isc_spb_res_access_mode *
    ******************************************)
@@ -1651,14 +2079,24 @@ const
   isc_spb_sts_idx_pages = $08;
   isc_spb_sts_sys_relations = $10;
 
-{FB15_UP}
+{$IFDEF IB7}
   isc_spb_sts_record_versions = $20;
   isc_spb_sts_table = $40;
-{FB15_UP}
+{$ELSE}
+{$IFDEF IB65ORYF867}
+  isc_spb_sts_record_versions = $12;
+  isc_spb_sts_table = $14;
+{$ENDIF IB65ORYF867}
+{$ENDIF IB7}
 
-{FB20_UP}
+{$IFDEF FB15_UP}
+  isc_spb_sts_record_versions = $20;
+  isc_spb_sts_table = $40;
+{$ENDIF FB15_UP}
+
+{$IFDEF FB20_UP}
   isc_spb_sts_nocreation		= $80;
-{FB20_UP}
+{$ENDIF}
 
   (*************************
    * SQL information items *
@@ -1686,9 +2124,13 @@ const
   isc_info_sql_records = 23;
   isc_info_sql_batch_fetch = 24;
 
-{FB20_UP}
+{$IFDEF FB20_UP}
   isc_info_sql_relation_alias = 25;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF IB71_UP}
+  isc_info_sql_precision = 25;
+{$ENDIF IB71_UP}
 
   (*********************************
    * SQL information return values *
@@ -1707,14 +2149,15 @@ const
   isc_info_sql_stmt_rollback = 11;
   isc_info_sql_stmt_select_for_upd = 12;
   isc_info_sql_stmt_set_generator = 13;
-{FB15_UP}
+{$IFDEF FB15_UP}
   isc_info_sql_stmt_savepoint = 14;
-{FB15_UP}
+{$ENDIF FB15_UP}
 
   (***********************************
    * Server configuration key values *
    ***********************************)
 
+{$IFNDEF FB15_UP}
   ISCCFG_LOCKMEM_KEY = 0;
   ISCCFG_LOCKSEM_KEY = 1;
   ISCCFG_LOCKSIG_KEY = 2;
@@ -1736,8 +2179,59 @@ const
   ISCCFG_DUMMY_INTRVL_KEY = 18;
   ISCCFG_TRACE_POOLS_KEY = 19; // Internal Use only
   ISCCFG_REMOTE_BUFFER_KEY = 20;
-  ISCCFG_CPU_AFFINITY_KEY = 21;
 
+{$IFDEF FB102_UP}
+{$IFDEF SET_TCP_NO_DELAY}
+  ISCCFG_NO_NAGLE_KEY = 21;
+{$ENDIF SET_TCP_NO_DELAY}
+
+{$IFDEF MSWINDOWS}
+{$IFDEF SET_TCP_NO_DELAY}
+{$MESSAGE Fatal 'Currently unsupported configuration.'}
+{$ENDIF SET_TCP_NO_DELAY}
+  ISCCFG_CPU_AFFINITY_KEY = 21;
+{$ENDIF MSWINDOWS}
+{$ENDIF FB102_UP}
+
+{$ENDIF FB15_UP}
+
+{$IFDEF IB65_UP}
+  ISCCFG_CPU_AFFINITY_KEY = 21;
+  ISCCFG_SWEEP_QUANTUM_KEY = 22;
+  ISCCFG_USER_QUANTUM_KEY = 23;
+  ISCCFG_SLEEP_TIME_KEY = 24;
+{$ENDIF IB65_UP}
+
+{$IFDEF IB7_UP}
+  ISCCFG_MAX_THREADS_KEY = 25;
+  ISCCFG_ADMIN_DB_KEY = 26;
+{$ENDIF IB7_UP}
+
+{$IFDEF IB71_UP}
+  ISCCFG_USE_SANCTUARY_KEY = 27;
+  ISCCFG_ENABLE_HT_KEY = 28;
+{$ENDIF IB71_UP}
+
+{$IFDEF IB75_UP}
+  ISCCFG_USE_ROUTER_KEY	= 29;
+  ISCCFG_SORTMEM_BUFFER_SIZE_KEY	= 30;
+{$ENDIF}
+
+{$IFDEF YF867_UP}
+  ISCCFG_CPU_AFFINITY_KEY = 21;
+  ISCCFG_SWEEP_QUANTUM_KEY = 22;
+  ISCCFG_USER_QUANTUM_KEY = 23;
+  ISCCFG_REJECT_AMBIGUITY_KEY = 24;
+  ISCCFG_SQZ_BLOCK_KEY = 25;
+  ISCCFG_LOCK_TIMEOUT_KEY = 26;
+  ISCCFG_YAFFIL_ODS_KEY = 27;
+  ISCCFG_CONSTRAINT_INDEX_NAME_KEY = 28;
+  ISCCFG_NO_NAGLE_KEY = 29;
+  ISCCFG_WIN32_DISABLEFILECACHE_KEY = 30;
+  ISCCFG_LOCKMEM_RES_KEY = 31;
+  ISCCFG_FORCERESHEDULE_KEY = 32;
+  ISCCFG_LEGACY_DIALECT1_KEY = 33;
+{$ENDIF YF867_UP}
 
   (**********************************************
    * Dynamic Data Definition Language operators *
@@ -1774,6 +2268,9 @@ const
   isc_dyn_def_shadow = 34;
   isc_dyn_def_trigger_msg = 17;
   isc_dyn_def_file = 36;
+{$IFDEF IB75_UP}
+  isc_dyn_def_user = 225;
+{$ENDIF}
   isc_dyn_mod_database = 39;
   isc_dyn_mod_rel = 11;
   isc_dyn_mod_global_fld = 13;
@@ -1784,6 +2281,9 @@ const
   isc_dyn_mod_security_class = 122;
   isc_dyn_mod_trigger = 113;
   isc_dyn_mod_trigger_msg = 28;
+{$IFDEF IB75_UP}
+  isc_dyn_mod_user = 226;
+{$ENDIF}
   isc_dyn_delete_database = 18;
   isc_dyn_delete_rel = 19;
   isc_dyn_delete_global_fld = 20;
@@ -1803,7 +2303,7 @@ const
   // FB20_UP + IB71_UP
   isc_dyn_delete_generator = 217;
 
-{FB20_UP}
+{$IFDEF FB20_UP}
 // New for comments in objects.
   isc_dyn_mod_function = 224;
   isc_dyn_mod_filter = 225;
@@ -1823,9 +2323,15 @@ const
   isc_dyn_coll_specific_attributes_charset = 235;
   isc_dyn_coll_specific_attributes = 236;
   isc_dyn_del_collation = 237;
-{FB20_UP}
+{$ENDIF}
+{$IFDEF FB21_UP}
+  isc_dyn_coll_from_external = 239;
+{$ENDIF}
 
   isc_dyn_delete_shadow = 35;
+{$IFDEF IB75_UP}
+  isc_dyn_delete_user = 227;
+{$ENDIF}
   isc_dyn_grant = 30;
   isc_dyn_revoke = 31;
   isc_dyn_def_primary_key = 37;
@@ -1836,22 +2342,30 @@ const
   isc_dyn_def_parameter = 135;
   isc_dyn_delete_parameter = 136;
   isc_dyn_mod_procedure = 175;
+{$IFNDEF FB20_UP}
   // deprecated
   isc_dyn_def_log_file = 176;
   isc_dyn_def_cache_file = 180;
+{$ENDIF}
   isc_dyn_def_exception = 181;
   isc_dyn_mod_exception = 182;
   isc_dyn_del_exception = 183;
+{$IFNDEF FB20_UP}
   // deprecated
   isc_dyn_drop_log = 194;
   isc_dyn_drop_cache = 195;
   isc_dyn_def_default_log = 202;
-{FB20_UP}
+{$ENDIF}
+{$IFDEF FB20_UP}
   isc_dyn_def_difference = 220;
   isc_dyn_drop_difference = 221;
   isc_dyn_begin_backup = 222;
   isc_dyn_end_backup = 223;
-{FB20_UP}
+{$ENDIF}
+
+{$IFDEF FB21_UP}
+  isc_dyn_debug_info = 240;
+{$ENDIF}
 
   (***********************
    * View specific stuff *
@@ -1879,6 +2393,9 @@ const
   isc_dyn_prm_name = 137;
   isc_dyn_sql_object = 196;
   isc_dyn_fld_character_set_name = 174;
+{$IFDEF IB75_UP}
+  isc_dyn_restrict_or_cascade = 220;
+{$ENDIF}
 
   (********************************
    * Relation specific attributes *
@@ -1895,10 +2412,19 @@ const
   isc_dyn_rel_sql_protection = 69;
   isc_dyn_rel_constraint = 162;
   isc_dyn_delete_rel_constraint = 163;
+{$IFDEF IB75_UP}
+  isc_dyn_rel_sql_scope = 218;
+  isc_dyn_rel_sql_on_commit = 219;
+{$ENDIF}
 
   (************************************
    * Global field specific attributes *
    ************************************)
+{$IFDEF FB21_UP}
+  isc_dyn_rel_temporary = 238;
+  isc_dyn_rel_temp_global_preserve = 1;
+  isc_dyn_rel_temp_global_delete = 2;
+{$ENDIF}
 
   isc_dyn_fld_type = 70;
   isc_dyn_fld_length = 71;
@@ -1969,8 +2495,10 @@ const
   isc_dyn_grant_view = 188;
   isc_dyn_grant_options = 132;
   isc_dyn_grant_user_group = 205;
+{$IFDEF FB102ORYF867}
   isc_dyn_grant_role = 218;
   isc_dyn_grant_user_explicit = 219;
+{$ENDIF}
 
   (**********************************
    * Dimension specific information *
@@ -1993,21 +2521,25 @@ const
   (********************************
    * Log file specific attributes *
    ********************************)
+{$IFNDEF FB20_UP}
   // deprecated
   isc_dyn_log_file_sequence = 177;
   isc_dyn_log_file_partitions = 178;
   isc_dyn_log_file_serial = 179;
   isc_dyn_log_file_overflow = 200;
   isc_dyn_log_file_raw = 201;
+{$ENDIF}
   (***************************
    * Log specific attributes *
    ***************************)
 
+{$IFNDEF FB20_UP}
   // deprecated
   isc_dyn_log_group_commit_wait = 189;
   isc_dyn_log_buffer_size = 190;
   isc_dyn_log_check_point_length = 191;
   isc_dyn_log_num_of_buffers = 192;
+{$ENDIF}
 
   (********************************
    * Function specific attributes *
@@ -2053,6 +2585,12 @@ const
   (*********************************
    * Parameter specific attributes *
    *********************************)
+{$IFDEF FB21_UP}
+  isc_dyn_prc_type = 239;
+
+  isc_dyn_prc_t_selectable = 1;
+  isc_dyn_prc_t_executable = 2;
+{$ENDIF}
 
   isc_dyn_prm_number = 138;
   isc_dyn_prm_type = 139;
@@ -2060,6 +2598,9 @@ const
   (********************************
    * Relation specific attributes *
    ********************************)
+{$IFDEF FB21_UP}
+  isc_dyn_prm_mechanism = 241;
+{$ENDIF}
 
   isc_dyn_xcp_msg = 185;
 
@@ -2087,29 +2628,84 @@ const
   (**********************************************
    * Generators again                           *
    **********************************************)
-{FB15_UP}
+{$IFDEF FB15ORYF867}
   gds_dyn_delete_generator = 217;
-{FB15_UP}
+{$ENDIF FB15ORYF867}
+
+{$IFDEF IB75_UP}
+(***********************)
+(* ADMIN OPTION values *)
+(***********************)
+  isc_dyn_add_admin                 = 221;
+  isc_dyn_drop_admin                = 222;
+  isc_dyn_admin_active              = 223;
+  isc_dyn_admin_inactive            = 224;
+
+(****************************)
+(* User specific attributes *)
+(****************************)
+  isc_dyn_user_sys_name             = 11;
+  isc_dyn_user_grp_name             = 12;
+  isc_dyn_user_uid                  = 13;
+  isc_dyn_user_gid                  = 14;
+  isc_dyn_user_password             = 15;
+  isc_dyn_user_active               = 16;
+  isc_dyn_user_inactive             = 17;
+  isc_dyn_user_description          = 18;
+  isc_dyn_user_first_name           = 19;
+  isc_dyn_user_middle_name          = 20;
+  isc_dyn_user_last_name            = 21;
+  isc_dyn_user_default_role         = 22;
+
+(****************************)
+(* Database specific attributes *)
+(****************************)
+  isc_dyn_db_page_cache             = 41;
+  isc_dyn_db_proc_cache             = 42;
+  isc_dyn_db_rel_cache              = 43;
+  isc_dyn_db_trig_cache             = 44;
+  isc_dyn_db_flush_int              = 45;
+  isc_dyn_db_linger_int             = 46;
+  isc_dyn_db_reclaim_int            = 47;
+  isc_dyn_db_sweep_int              = 48;
+  isc_dyn_db_group_commit           = 49;
+{$ENDIF}
 
   (****************************
    * Last $dyn value assigned *
    ****************************)
 
-{FB20}
-  isc_dyn_last_dyn_value_FB20 = 223;
-{FB20}
+{$IFDEF FB21}
+  isc_dyn_last_dyn_value = 242;
+{$ENDIF FB20}
+   
+{$IFDEF FB20}
+  isc_dyn_last_dyn_value = 227;
+{$ENDIF FB20}
 
-{FB15}
-  isc_dyn_last_dyn_value_FB15 = 219;
-{FB15}
+{$IFDEF FB15}
+  isc_dyn_last_dyn_value = 219;
+{$ENDIF FB15}
 
-{FB103}
-  isc_dyn_last_dyn_value_FB103 = 219;
-{FB103}
+{$IFDEF FB103}
+  isc_dyn_last_dyn_value = 219;
+{$ENDIF FB103}
 
-{FB102}
-  isc_dyn_last_dyn_value_FB102 = 219;
-{FB102}
+{$IFDEF FB102}
+  isc_dyn_last_dyn_value = 219;
+{$ENDIF FB102}
+
+{$IFDEF IB65}
+  isc_dyn_last_dyn_value = 216;
+{$ENDIF IB65}
+
+{$IFDEF IB71}
+  isc_dyn_last_dyn_value = 217;
+{$ENDIF IB71}
+
+{$IFDEF IB75}
+  isc_dyn_last_dyn_value = 227;
+{$ENDIF}
 
   (******************************************
    * Array slice description language (SDL) *
@@ -2180,6 +2776,10 @@ const
   SQL_TYPE_DATE = 570;
   SQL_INT64 = 580;
 
+{$IFDEF IB7_UP}
+  SQL_BOOLEAN = 590;
+{$ENDIF IB7_UP}
+
   (* Historical alias for pre V6 applications *)
   SQL_DATE = SQL_TIMESTAMP;
 
@@ -2201,9 +2801,10 @@ const
   isc_blob_format                   = 6;
   isc_blob_tra                      = 7;
   isc_blob_extfile                  = 8;
-{FB20_UP}
-  isc_blob_max_predefined_subtype   = 9;
-{FB20_UP}
+{$IFDEF FB21_UP}
+  isc_blob_debug_info               = 9;
+  isc_blob_max_predefined_subtype   = 10;
+{$ENDIF}
 
   (* the range 20-30 is reserved for dBASE and Paradox types *)
 
@@ -2213,177 +2814,548 @@ const
   isc_blob_dbase_ole = 23;
   isc_blob_typed_binary = 24;
 
+{$IFDEF FB21_UP}
+  fb_dbg_version = 1;
+  fb_dbg_end = 255;
+  fb_dbg_map_src2blr = 2;
+  fb_dbg_map_varname = 3;
+  fb_dbg_map_argument = 4;
+
+  fb_dbg_arg_input = 0;
+  fb_dbg_arg_output = 1;
+{$ENDIF}
+
 (*******************************************************************************
  *    LINK LIBRARY                                                             *
  *******************************************************************************)
 
 const
+{$IFDEF MSWINDOWS}
+{$IFDEF FB15_UP}
+{$IFDEF FBEMBED}
+  GDS32DLL = 'fbembed.dll';
+{$ELSE}
   GDS32DLL = 'fbclient.dll';
+{$ENDIF FBEMBED}
+{$ELSE}
+  GDS32DLL = 'gds32.dll';
+{$ENDIF FB15_UP}
+{$ENDIF MSWINDOWS}
+
+{$IFDEF UNIX}
+  {$IFDEF FREEBSD}
+    GDS32DLL = 'libgds.so';
+  {$ELSE}
+    {$IFDEF Darwin}
+      GDS32DLL = 'libfbclient.dylib';
+    {$ELSE}
+      {$IFDEF FB15_UP}
+        {$IFDEF FBEMBED}
+          GDS32DLL = 'libfbembed.so';
+        {$ELSE}
+          GDS32DLL = 'libfbclient.so';
+        {$ENDIF FBEMBED}
+        {$ELSE}
+          GDS32DLL = 'libfbclient.so';
+      {$ENDIF FB15_UP}
+    {$ENDIF}
+  {$ENDIF FREEBSD}
+{$ENDIF UNIX}
 
 type
-  TALFBXBaseLibrary = class(TObject)
+  TALFBXaseLibrary = class(TObject)
   private
+  {$IFDEF MSWINDOWS}
     FGDS32Lib: THandle;
-    FVersion_API: TALFBXVersion_API;
+  {$ENDIF MSWINDOWS}
+  {$IFDEF UNIX}
+    FCryptLib: Pointer;
+    FGDS32Lib: Pointer;
+  {$ENDIF UNIX}
+  {$IFDEF ALFBXTHREADSAFE}
   protected
-    BLOB_close: function(Stream: PBStream): Integer; stdcall;
-    BLOB_display: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; field_name: PChar): Integer; stdcall;
-    BLOB_dump: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; file_name: PChar): Integer; stdcall;
-    BLOB_edit: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; field_name: PChar): Integer; stdcall;
-    BLOB_get: function(Stream: PBStream): Integer; stdcall;
-    BLOB_load: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; file_name: PChar): Integer; stdcall;
-    BLOB_open: function(blob: IscBlobHandle; buffer: PChar; length: Integer): PBStream; stdcall;
-    BLOB_put: function(x: Char; Stream: PBStream): Integer; stdcall;
-    BLOB_text_dump: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; file_name: PChar): Integer; stdcall;
-    BLOB_text_load: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; file_name: PChar): Integer; stdcall;
-    Bopen: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle; mode: PChar): PBStream; stdcall;
-    isc_add_user: function(status: PISCStatus; user_data: PUserSecData): Integer; stdcall;
-    isc_array_gen_sdl: function(status: PISCStatus; desc: PISCArrayDesc; sdl_buffer_length: PSmallInt; sdl_buffer: PChar; sdl_length: PSmallInt): ISCStatus; stdcall;
-    isc_array_get_slice: function(status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; array_id: PISCQuad; desc: PISCArrayDesc; array_: PPointer; slice_length: PISCLong): ISCStatus; stdcall;
-    isc_array_lookup_bounds: function(status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; relation_name, field_name: PChar; desc: PISCArrayDesc): ISCStatus; stdcall;
-    isc_array_lookup_desc: function(status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; relation_name, field_name: PChar; desc: PISCArrayDesc): ISCStatus; stdcall;
-    isc_array_put_slice: function(status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; array_id: PISCQuad; desc: PISCArrayDesc; array_: PPointer; slice_length: PISCLong): ISCStatus; stdcall;
-    isc_array_set_desc: function(status: PISCStatus; relation_name, field_name: PChar; sql_dtype, sql_length, dimensions: PSmallint; desc: PISCArrayDesc): ISCStatus; stdcall;
-    isc_attach_database: function(user_status: PISCStatus; file_length: Smallint; file_name: PChar; handle: PIscDbHandle; dpb_length: Smallint; dpb: PChar): ISCStatus; stdcall;
-    isc_blob_default_desc: procedure(desc: PISCBlobDesc; relation_name, field_name: PChar); stdcall;
-    isc_blob_gen_bpb: function(status: PISCStatus; to_desc, from_desc: PISCBlobDesc; bpb_buffer_length: Word; bpb_buffer: PChar; bpb_length: PWord): ISCStatus; stdcall;
-    isc_blob_info: function(user_status: PISCStatus; blob_handle: PIscBlobHandle; item_length: Smallint; items: PChar; buffer_length: Smallint; buffer: PChar): ISCStatus; stdcall;
-    isc_blob_lookup_desc: function(status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; relation_name, field_name: PChar; desc: PISCBlobDesc; global: PChar): ISCStatus; stdcall;
-    isc_blob_set_desc: function(status: PISCStatus; relation_name, field_name: PChar; subtype, charset, segment_size: Smallint; desc: PISCBlobDesc): ISCStatus; stdcall;
-    isc_cancel_blob: function(user_status: PISCStatus; blob_handle: PIscBlobHandle): ISCStatus; stdcall;
-    isc_cancel_events: function(user_status: PISCStatus; handle: PIscDbHandle; id: PISCLong): ISCStatus; stdcall;
-    isc_close: function(user_status: PISCStatus; name: PChar): ISCStatus; stdcall;
-    isc_close_blob: function(user_status: PISCStatus; blob_handle: PIscBlobHandle): ISCStatus; stdcall;
-    isc_commit_retaining: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISCStatus; stdcall;
-    isc_commit_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISCStatus; stdcall;
-    isc_compile_request: function(user_status: PISCStatus; db_handle: PIscDbHandle; req_handle: PIscReqHandle; blr_length: Smallint; blr: PChar): ISCStatus; stdcall;
-    isc_compile_request2: function(user_status: PISCStatus; db_handle: PIscDbHandle; req_handle: PIscReqHandle; blr_length: Smallint; blr: PChar): ISCStatus; stdcall;
-    isc_create_blob: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad): ISCStatus; stdcall;
-    isc_create_blob2: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad; bpb_length: Smallint; bpb: PChar): ISCStatus; stdcall;
-    isc_create_database: function(user_status: PISCStatus; file_length: Smallint; file_name: PChar; handle: PIscDbHandle; dpb_length: Smallint; dpb: PChar; db_type: Smallint): ISCStatus; stdcall;
-    isc_database_info: function(user_status: PISCStatus; handle: PIscDbHandle; item_length: Smallint; items: PChar; buffer_length: Smallint; buffer: PChar): ISCStatus; stdcall;
-    isc_ddl: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; length: Smallint; ddl: PChar): ISCStatus; stdcall;
-    isc_declare: function(user_status: PISCStatus; statement, cursor: PChar): ISCStatus; stdcall;
-    isc_decode_date: procedure(date: PISCQuad; times: PPointer); stdcall;
-    isc_decode_sql_date: procedure(date: PISCDate; times_arg: PPointer); stdcall;
-    isc_decode_sql_time: procedure(sql_time: PISCTime; times_arg: PPointer); stdcall;
-    isc_decode_timestamp: procedure(date: PISCTimeStamp; times_arg: PPointer); stdcall;
-    isc_delete_user: function(status: PISCStatus; user_data: PUserSecData): Integer; stdcall;
-    isc_describe: function(user_status: PISCStatus; name: PChar; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_describe_bind: function(user_status: PISCStatus; name: PChar; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_detach_database: function(user_status: PISCStatus; handle: PIscDbHandle): ISCStatus; stdcall;
-    isc_drop_database: function(user_status: PISCStatus; handle: PIscDbHandle): ISCStatus; stdcall;
-    isc_dsql_alloc_statement2: function(user_status: PISCStatus; db_handle: PIscDbHandle; stmt_handle: PIscStmtHandle): ISCStatus; stdcall;
-    isc_dsql_allocate_statement: function(user_status: PISCStatus; db_handle: PIscDbHandle; stmt_handle: PIscStmtHandle): ISCStatus; stdcall;
-    isc_dsql_describe: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_describe_bind: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_exec_immed2: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; length: Word; string_: PChar; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_exec_immed3_m: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; Length: Word; string_: PChar; dialect, in_blr_length: Word; in_blr: PChar; in_msg_type, in_msg_length: Word; in_msg: PChar; out_blr_length: Word; out_blr: PChar; out_msg_type, out_msg_length: Word; out_msg: PChar): ISCStatus; stdcall;
-    isc_dsql_execute: function(user_status: PISCStatus; tra_handle: PIscTrHandle; stmt_handle: PIscStmtHandle; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_execute_immediate: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; length: Word; string_: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_execute_immediate_m: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; length: Word; string_: PChar; dialect, blr_length: Word; blr: PChar; msg_type, msg_length: Word; msg: PChar): ISCStatus; stdcall;
-    isc_dsql_execute_m: function(user_status: PISCStatus; tra_handle: PIscTrHandle; stmt_handle: PIscStmtHandle; blr_length: Word; blr: PChar; msg_type, msg_length: Word; msg: PChar): ISCStatus; stdcall;
-    isc_dsql_execute2: function(user_status: PISCStatus; tra_handle: PIscTrHandle; stmt_handle: PIscStmtHandle; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_execute2_m: function(user_status: PISCStatus; tra_handle: PIscTrHandle; stmt_handle: PIscStmtHandle; in_blr_length: Word; in_blr: PChar; in_msg_type, in_msg_length: Word; in_msg: PChar; out_blr_length: Word; out_blr: PChar; out_msg_type, out_msg_length: Word; out_msg: PChar): ISCStatus; stdcall;
-    isc_dsql_fetch: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_fetch_m: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; blr_length: Word; blr: PChar; msg_type, msg_length: Word; msg: PChar): ISCStatus; stdcall;
-    isc_dsql_finish: function(db_handle: PIscDbHandle): ISCStatus; stdcall;
-    isc_dsql_free_statement: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; option: Word): ISCStatus; stdcall;
-    isc_dsql_insert: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_insert_m: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; blr_length: Word; blr: PChar; msg_type, msg_length: Word; msg: PChar): ISCStatus; stdcall;
-    isc_dsql_prepare: function(user_status: PISCStatus; tra_handle: PIscTrHandle; stmt_handle: PIscStmtHandle; length: Word; string_: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_dsql_prepare_m: function(user_status: PISCStatus; tra_handle: PIscTrHandle; stmt_handle: PIscStmtHandle; length: Word; string_: PChar; dialect, item_length: Word; items: PChar; buffer_length: Word; buffer: PChar): ISCStatus; stdcall;
-    isc_dsql_release: function(user_status: PISCStatus; name: PChar): ISCStatus; stdcall;
-    isc_dsql_set_cursor_name: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; cursor: PChar; type_: Word): ISCStatus; stdcall;
-    isc_dsql_sql_info: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle; item_length: Smallint; items: PChar; buffer_length: Smallint; buffer: PChar): ISCStatus; stdcall;
-    isc_embed_dsql_close: function(user_status: PISCStatus; name: PChar): ISCStatus; stdcall;
-    isc_embed_dsql_declare: function(user_status: PISCStatus; stmt_name, cursor: PChar): ISCStatus; stdcall;
-    isc_embed_dsql_describe: function(user_status: PISCStatus; stmt_name: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_describe_bind: function(user_status: PISCStatus; stmt_name: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_execute: function(user_status: PISCStatus; trans_handle: PIscTrHandle; stmt_name: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_execute_immed: function(user_status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; length: Word; string_: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_execute2: function(user_status: PISCStatus; trans_handle: PIscTrHandle; stmt_name: PChar; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_fetch: function(user_status: PISCStatus; cursor_name: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_insert: function(user_status: PISCStatus; cursor_name: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_open: function(user_status: PISCStatus; trans_handle: PIscTrHandle; cursor_name: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_open2: function(user_status: PISCStatus; trans_handle: PIscTrHandle; cursor_name: PChar; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_prepare: function(user_status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; stmt_name: PChar; length: Word; string_: PChar; dialect: Word; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_embed_dsql_release: function(user_status: PISCStatus; stmt_name: PChar): ISCStatus; stdcall;
-    isc_encode_date: procedure(times: PPointer; date: PISCQuad); stdcall;
-    isc_encode_sql_date: procedure(times_arg: PPointer; date: PISCDate); stdcall;
-    isc_encode_sql_time: procedure(times_arg: PPointer; isc_time: PISCTime); stdcall;
-    isc_encode_timestamp: procedure(times_arg: PPointer; date: PISCTimeStamp); stdcall;
-    isc_event_block: function(event_buffer, result_buffer: PPChar; count: Smallint; v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15: PChar): ISCLong; cdecl;
-    isc_event_counts: procedure(ser_status: PISCStatus; buffer_length: Smallint; event_buffer, result_buffer: PChar); stdcall;
-    isc_execute: function(user_status: PISCStatus; trans_handle: PIscTrHandle; name: PChar; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_execute_immediate: function(user_status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; length: PSmallint; string_: PChar): ISCStatus; stdcall;
-    isc_expand_dpb: procedure(dpb: PPChar; dpb_size: PSmallint; name_buffer: PPChar); cdecl;
-    isc_fetch: function(user_status: PISCStatus; name: PChar; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_free: function(blk: PChar): ISCLong; stdcall;
-    isc_ftof: function(string_: PChar; length1: Word; field: PChar; length2: Word): ISCStatus; stdcall;
-    isc_get_segment: function(user_status: PISCStatus; blob_handle: PIscBlobHandle; length: PWord; buffer_length: Word; buffer: PChar): ISCStatus; stdcall;
-    isc_get_slice: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; array_id: PISCQuad; sdl_length: Smallint; sdl: PChar; param_length: Smallint; param: PISCLong; slice_length: ISCLong; slice: PPointer; return_length: PISCLong): ISCStatus; stdcall;
-    isc_interprete: function(buffer: PChar; status_vector: PPISCStatus): ISCStatus; stdcall;
-  {FB20_UP}
-    fb_interpret: function(buffer: PChar; v: integer; status_vector: PPISCStatus): ISCStatus; stdcall;
-  {FB20_UP}
-    isc_modify_dpb: function(dpb: PPChar; dpb_length: PSmallint; type_: Word; str: PChar; str_len: Smallint): Integer; stdcall;
-    isc_modify_user: function(status: PISCStatus; user_data: PUserSecData): Integer; stdcall;
-    isc_open: function(user_status: PISCStatus; trans_handle: PIscTrHandle; name: PChar; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_open_blob: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad): ISCStatus; stdcall;
-    isc_open_blob2: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad; bpb_length: Word; bpb: PChar): ISCStatus; stdcall;
-    isc_portable_integer: function(ptr: PChar; length: Smallint): ISCInt64; stdcall;
-    isc_prepare: function(user_status: PISCStatus; db_handle: PIscDbHandle; trans_handle: PIscTrHandle; name: PChar; length: PSmallint; string_: PChar; sqlda: PXSQLDA): ISCStatus; stdcall;
-    isc_prepare_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISCStatus; stdcall;
-    isc_prepare_transaction2: function(user_status: PISCStatus; tra_handle: PIscTrHandle; msg_length: ISCUShort; msg: PISCUChar): ISCStatus; stdcall;
-    isc_print_blr: function(blr: PChar; callback: IscCallback; callback_argument: PPointer; language: Smallint): ISCStatus; stdcall;
-    isc_print_sqlerror: procedure(sqlcode: ISCShort; status_vector: PISCStatus); stdcall;
-    isc_print_status: function(status_vector: PISCStatus): ISCStatus; stdcall;
-    isc_put_segment: function(user_status: PISCStatus; blob_handle: PIscBlobHandle; buffer_length: Word; buffer: PChar): ISCStatus; stdcall;
-    isc_put_slice: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; array_id: PISCQuad; sdl_length: Smallint; sdl: PChar; param_length: Smallint; param: PISCLong; slice_length: ISCLong; slice: PPointer): ISCStatus; stdcall;
-    isc_qtoq: procedure(quad1, quad2: PISCQuad); stdcall;
-    isc_que_events: function(user_status: PISCStatus; handle: PIscDbHandle; id: PISCLong; length: ISCUShort; events: PChar; ast: IscCallback; arg: PPointer): ISCStatus; stdcall;
-    isc_receive: function(user_status: PISCStatus; req_handle: PIscReqHandle; msg_type, msg_length: Smallint; msg: PPointer; level: Smallint): ISCStatus; stdcall;
-    isc_reconnect_transaction: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; length: Smallint; id: PChar): ISCStatus; stdcall;
-    isc_release_request: function(user_status: PISCStatus; req_handle: PIscReqHandle): ISCStatus; stdcall;
-    isc_request_info: function(user_status: PISCStatus; req_handle: PIscReqHandle; level, item_length: Smallint; items: PChar; buffer_length: Smallint; buffer: PChar): ISCStatus; stdcall;
-    isc_rollback_retaining: function(status_vector: PISCStatus; trans_handle: PIscTrHandle): ISCStatus; stdcall;
-    isc_rollback_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISCStatus; stdcall;
-    isc_seek_blob: function(user_status: PISCStatus; blob_handle: PIscBlobHandle; mode: Smallint; offset: ISCLong; Result_: PISCLong): ISCStatus; stdcall;
-    isc_send: function(user_status: PISCStatus; req_handle: PIscReqHandle; msg_type, msg_length: Smallint; msg: PPointer; level: Smallint): ISCStatus; stdcall;
-    isc_service_attach: function(status_vector: PISCStatus; service_length: Word; service_name: PChar; handle: PIscSvcHandle; spb_length: Word; spb: PChar): ISCStatus; stdcall;
-    isc_service_detach: function(status_vector: PISCStatus; handle: PIscSvcHandle): ISCStatus; stdcall;
-    isc_service_query: function(status_vector: PISCStatus; svc_handle: PIscSvcHandle; reserved: PIscResvHandle; send_spb_length: Word; send_spb: PChar; request_spb_length: Word; request_spb: PChar; buffer_length: Word; buffer: PChar): ISCStatus; stdcall;
-    isc_service_start: function(status_vector: PISCStatus; svc_handle: PIscSvcHandle; reserved: PIscResvHandle; spb_length: Word; spb: PChar): ISCStatus; stdcall;
-    isc_set_debug: procedure(flag: Integer); stdcall;
-    isc_sql_interprete: procedure(SQLCODE: Smallint; buffer: PChar; buffer_length: Smallint); stdcall;
-    isc_sqlcode: function(user_status: PISCStatus): ISCLong; stdcall;
-    isc_start_and_send: function(user_status: PISCStatus; req_handle: PIscReqHandle; tra_handle: PIscTrHandle; msg_type, msg_length: Smallint; msg: PPointer; level: Smallint): ISCStatus; stdcall;
-    isc_start_multiple: function(user_status: PISCStatus; tra_handle: PIscTrHandle; count: Smallint; vector: PISCTEB): ISCStatus; stdcall;
-    isc_start_request: function(user_status: PISCStatus; req_handle: PIscReqHandle; tra_handle: PIscTrHandle; level: Smallint): ISCStatus; stdcall;
-    isc_start_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle; count: Smallint; db_handle: PIscDbHandle; tpb_length: ISCUShort; tpb_ad: PChar): ISCStatus; cdecl;
-    isc_transact_request: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle; blr_length: Word; blr: PChar; in_msg_length: Word; in_msg: PChar; out_msg_length: Word; out_msg: PChar): ISCStatus; stdcall;
-    isc_transaction_info: function(user_status: PISCStatus; tra_handle: PIscTrHandle; item_length: Smallint; items: PChar; buffer_length: Smallint; buffer: PChar): ISCStatus; stdcall;
-    isc_unwind_request: function(user_status: PISCStatus; req_handle: PIscTrHandle; level: Smallint): ISCStatus; stdcall;
-    isc_vax_integer: function(ptr: PChar; length: Smallint): ISCLong; stdcall;
-    isc_version: function(db_handle: PIscDbHandle; callback: IscCallback; callback_argument: PPointer): Integer; stdcall;
-    isc_vtof: procedure(string1, string2: PChar; length: Word); stdcall;
-    isc_vtov: procedure(string1, string2: PChar; length: Smallint); stdcall;
-    isc_wait_for_event: function(user_status: PISCStatus; handle: PIscDbHandle; length: Smallint; events, buffer: PChar): ISCStatus; stdcall;
-    {FB15_UP}
+    FLIBCritSec: TCriticalSection;
+  {$ENDIF ALFBXTHREADSAFE}
+  protected
+    BLOB_close: function(Stream: PBStream): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+  {$IFDEF INTERBASEORFIREBIRD}
+    BLOB_display: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      field_name: PAnsiChar): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+  {$ENDIF INTERBASEORFIREBIRD}
+    BLOB_dump: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      file_name: PAnsiChar): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_edit: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      field_name: PAnsiChar): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_get: function(Stream: PBStream): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_load: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      file_name: PAnsiChar): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_open: function(blob: IscBlobHandle; buffer: PAnsiChar; length: Integer): PBStream;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_put: function(x: AnsiChar; Stream: PBStream): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_text_dump: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      file_name: PAnsiChar): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    BLOB_text_load: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      file_name: PAnsiChar): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    Bopen: function(blob_id: PISCQuad; database: IscDbHandle; transaction: IscTrHandle;
+      mode: PAnsiChar): PBStream;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_add_user: function(status: PISCStatus; user_data: PUserSecData): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_gen_sdl: function(status: PISCStatus; desc: PISCArrayDesc; sdl_buffer_length: PSmallInt;
+      sdl_buffer: PAnsiChar; sdl_length: PSmallInt): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_get_slice: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; array_id: PISCQuad; desc: PISCArrayDesc; array_: PPointer;
+      slice_length: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_lookup_bounds: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; relation_name, field_name: PAnsiChar;
+      desc: PISCArrayDesc): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_lookup_desc: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; relation_name, field_name: PAnsiChar;
+      desc: PISCArrayDesc): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_put_slice: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; array_id: PISCQuad; desc: PISCArrayDesc; array_: PPointer;
+      slice_length: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_set_desc: function(status: PISCStatus; relation_name, field_name: PAnsiChar;
+      sql_dtype, sql_length, dimensions: PSmallint; desc: PISCArrayDesc): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_attach_database: function(user_status: PISCStatus; file_length: Smallint;
+      file_name: PAnsiChar; handle: PIscDbHandle; dpb_length: Smallint; dpb: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_default_desc: procedure(desc: PISCBlobDesc; relation_name, field_name: PAnsiChar);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_gen_bpb: function(status: PISCStatus; to_desc, from_desc: PISCBlobDesc;
+      bpb_buffer_length: Word; bpb_buffer: PAnsiChar; bpb_length: PWord): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_info: function(user_status: PISCStatus; blob_handle: PIscBlobHandle;
+      item_length: Smallint; items: PAnsiChar; buffer_length: Smallint; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_lookup_desc: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; relation_name, field_name: PAnsiChar; desc: PISCBlobDesc;
+      global: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_set_desc: function(status: PISCStatus; relation_name, field_name: PAnsiChar;
+      subtype, charset, segment_size: Smallint; desc: PISCBlobDesc): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_cancel_blob: function(user_status: PISCStatus; blob_handle: PIscBlobHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_cancel_events: function(user_status: PISCStatus; handle: PIscDbHandle;
+      id: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_close: function(user_status: PISCStatus; name: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_close_blob: function(user_status: PISCStatus;
+      blob_handle: PIscBlobHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_commit_retaining: function(user_status: PISCStatus;
+      tra_handle: PIscTrHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_commit_transaction: function(user_status: PISCStatus;
+      tra_handle: PIscTrHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_compile_request: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      req_handle: PIscReqHandle; blr_length: Smallint;
+      blr: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_compile_request2: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      req_handle: PIscReqHandle; blr_length: Smallint;
+      blr: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_create_blob: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle;
+      blob_id: PISCQuad): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_create_blob2: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad;
+      bpb_length: Smallint; bpb: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_create_database: function(user_status: PISCStatus; file_length: Smallint;
+      file_name: PAnsiChar; handle: PIscDbHandle; dpb_length: Smallint; dpb: PAnsiChar;
+      db_type: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_database_info: function(user_status: PISCStatus; handle: PIscDbHandle;
+      item_length: Smallint; items: PAnsiChar; buffer_length: Smallint;
+      buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_ddl: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle;
+      length: Smallint; ddl: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_declare: function(user_status: PISCStatus; statement,
+      cursor: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_decode_date: procedure(date: PISCQuad; times: PPointer);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_decode_sql_date: procedure(date: PISCDate; times_arg: PPointer);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_decode_sql_time: procedure(sql_time: PISCTime; times_arg: PPointer);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_decode_timestamp: procedure(date: PISCTimeStamp; times_arg: PPointer);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_delete_user: function(status: PISCStatus; user_data: PUserSecData): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_describe: function(user_status: PISCStatus; name: PAnsiChar; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_describe_bind: function(user_status: PISCStatus; name: PAnsiChar; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_detach_database: function(user_status: PISCStatus; handle: PIscDbHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_drop_database: function(user_status: PISCStatus; handle: PIscDbHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_alloc_statement2: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      stmt_handle: PIscStmtHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_allocate_statement: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      stmt_handle: PIscStmtHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_describe: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_describe_bind: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_exec_immed2: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; length: Word; string_: PAnsiChar; dialect: Word; in_sqlda,
+      out_sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_exec_immed3_m: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; Length: Word; string_: PAnsiChar; dialect, in_blr_length: Word;
+      in_blr: PAnsiChar; in_msg_type, in_msg_length: Word; in_msg: PAnsiChar; out_blr_length: Word;
+      out_blr: PAnsiChar; out_msg_type, out_msg_length: Word; out_msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_execute: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      stmt_handle: PIscStmtHandle; dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_execute_immediate: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; length: Word; string_: PAnsiChar; dialect: Word;
+      sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_execute_immediate_m: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; length: Word; string_: PAnsiChar; dialect, blr_length: Word;
+      blr: PAnsiChar; msg_type, msg_length: Word; msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_execute_m: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      stmt_handle: PIscStmtHandle; blr_length: Word; blr: PAnsiChar; msg_type, msg_length: Word;
+      msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_execute2: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      stmt_handle: PIscStmtHandle; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_execute2_m: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      stmt_handle: PIscStmtHandle; in_blr_length: Word; in_blr: PAnsiChar; in_msg_type,
+      in_msg_length: Word; in_msg: PAnsiChar; out_blr_length: Word; out_blr: PAnsiChar;
+      out_msg_type, out_msg_length: Word; out_msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_fetch: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_fetch_m: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      blr_length: Word; blr: PAnsiChar; msg_type, msg_length: Word; msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_finish: function(db_handle: PIscDbHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_free_statement: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      option: Word): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_insert: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_insert_m: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      blr_length: Word; blr: PAnsiChar; msg_type, msg_length: Word; msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_prepare: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      stmt_handle: PIscStmtHandle; length: Word; string_: PAnsiChar; dialect: Word;
+      sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_prepare_m: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      stmt_handle: PIscStmtHandle; length: Word; string_: PAnsiChar; dialect, item_length: Word;
+      items: PAnsiChar; buffer_length: Word; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_release: function(user_status: PISCStatus; name: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_set_cursor_name: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      cursor: PAnsiChar; type_: Word): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_dsql_sql_info: function(user_status: PISCStatus; stmt_handle: PIscStmtHandle;
+      item_length: Smallint; items: PAnsiChar; buffer_length: Smallint; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_close: function(user_status: PISCStatus; name: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_declare: function(user_status: PISCStatus; stmt_name, cursor: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_describe: function(user_status: PISCStatus; stmt_name: PAnsiChar;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_describe_bind: function(user_status: PISCStatus; stmt_name: PAnsiChar;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_execute: function(user_status: PISCStatus; trans_handle: PIscTrHandle;
+      stmt_name: PAnsiChar; dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_execute_immed: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; length: Word; string_: PAnsiChar; dialect: Word;
+      sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_execute2: function(user_status: PISCStatus; trans_handle: PIscTrHandle;
+      stmt_name: PAnsiChar; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_fetch: function(user_status: PISCStatus; cursor_name: PAnsiChar;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_insert: function(user_status: PISCStatus; cursor_name: PAnsiChar;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_open: function(user_status: PISCStatus; trans_handle: PIscTrHandle;
+      cursor_name: PAnsiChar; dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_open2: function(user_status: PISCStatus; trans_handle: PIscTrHandle;
+      cursor_name: PAnsiChar; dialect: Word; in_sqlda, out_sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_prepare: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; stmt_name: PAnsiChar; length: Word; string_: PAnsiChar;
+      dialect: Word; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_embed_dsql_release: function(user_status: PISCStatus; stmt_name: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_encode_date: procedure(times: PPointer; date: PISCQuad);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_encode_sql_date: procedure(times_arg: PPointer; date: PISCDate);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_encode_sql_time: procedure(times_arg: PPointer; isc_time: PISCTime);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_encode_timestamp: procedure(times_arg: PPointer; date: PISCTimeStamp);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_event_block: function(event_buffer, result_buffer: PPAnsiChar; count: Word;
+      v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15: PAnsiChar): ISCLong; cdecl;
+{$IFDEF FB21_UP}
+    isc_event_block_a: function(event_buffer, result_buffer: PPAnsiChar; count: Word; name_buffer: PPAnsiChar): Word;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+{$ENDIF}
+    isc_event_counts: procedure(ser_status: PISCStatus; buffer_length: Smallint;
+      event_buffer, result_buffer: PAnsiChar);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_execute: function(user_status: PISCStatus; trans_handle: PIscTrHandle;
+      name: PAnsiChar; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_execute_immediate: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; length: PSmallint; string_: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_expand_dpb: procedure(dpb: PPAnsiChar; dpb_size: PSmallint; name_buffer: PPAnsiChar); cdecl;
+    isc_fetch: function(user_status: PISCStatus; name: PAnsiChar; sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_free: function(blk: PAnsiChar): ISCLong;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_ftof: function(string_: PAnsiChar; length1: Word; field: PAnsiChar; length2: Word): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_get_segment: function(user_status: PISCStatus; blob_handle: PIscBlobHandle; length: PWord;
+      buffer_length: Word; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_get_slice: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle;
+      array_id: PISCQuad; sdl_length: Smallint; sdl: PAnsiChar; param_length: Smallint; param: PISCLong;
+      slice_length: ISCLong; slice: PPointer; return_length: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_interprete: function(buffer: PAnsiChar; status_vector: PPISCStatus): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+  {$IFDEF FB20_UP}
+    fb_interpret: function(buffer: PAnsiChar; v: integer; status_vector: PPISCStatus): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+  {$ENDIF}
+    isc_modify_dpb: function(dpb: PPAnsiChar; dpb_length: PSmallint; type_: Word;
+      str: PAnsiChar; str_len: Smallint): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_modify_user: function(status: PISCStatus; user_data: PUserSecData): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_open: function(user_status: PISCStatus; trans_handle: PIscTrHandle; name: PAnsiChar;
+      sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_open_blob: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_open_blob2: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; blob_handle: PIscBlobHandle; blob_id: PISCQuad; bpb_length: Word;
+      bpb: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_portable_integer: function(ptr: PAnsiChar; length: Smallint): ISCInt64;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_prepare: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; name: PAnsiChar; length: PSmallint; string_: PAnsiChar;
+      sqlda: PXSQLDA): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_prepare_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_prepare_transaction2: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      msg_length: ISCUShort; msg: PISCUChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_print_blr: function(blr: PAnsiChar; callback: IscCallback; callback_argument: PPointer;
+      language: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_print_sqlerror: procedure(sqlcode: ISCShort; status_vector: PISCStatus);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_print_status: function(status_vector: PISCStatus): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_put_segment: function(user_status: PISCStatus; blob_handle: PIscBlobHandle;
+      buffer_length: Word; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_put_slice: function(user_status: PISCStatus; db_handle: PIscDbHandle; tra_handle: PIscTrHandle;
+      array_id: PISCQuad; sdl_length: Smallint; sdl: PAnsiChar; param_length: Smallint; param: PISCLong;
+      slice_length: ISCLong; slice: PPointer): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_qtoq: procedure(quad1, quad2: PISCQuad);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_que_events: function(user_status: PISCStatus; handle: PIscDbHandle; id: PISCLong;
+      length: ISCUShort; events: PAnsiChar; ast: IscCallback; arg: PPointer): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_receive: function(user_status: PISCStatus; req_handle: PIscReqHandle; msg_type,
+      msg_length: Smallint; msg: PPointer; level: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_reconnect_transaction: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; length: Smallint; id: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_release_request: function(user_status: PISCStatus; req_handle: PIscReqHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_request_info: function(user_status: PISCStatus; req_handle: PIscReqHandle; level,
+      item_length: Smallint; items: PAnsiChar; buffer_length: Smallint; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_rollback_retaining: function(status_vector: PISCStatus; trans_handle: PIscTrHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_rollback_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_seek_blob: function(user_status: PISCStatus; blob_handle: PIscBlobHandle; mode: Smallint;
+      offset: ISCLong; Result_: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_send: function(user_status: PISCStatus; req_handle: PIscReqHandle; msg_type,
+      msg_length: Smallint; msg: PPointer; level: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_service_attach: function(status_vector: PISCStatus; service_length: Word;
+      service_name: PAnsiChar; handle: PIscSvcHandle; spb_length: Word; spb: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_service_detach: function(status_vector: PISCStatus; handle: PIscSvcHandle): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_service_query: function(status_vector: PISCStatus; svc_handle: PIscSvcHandle;
+      reserved: PIscResvHandle; send_spb_length: Word; send_spb: PAnsiChar; request_spb_length: Word;
+      request_spb: PAnsiChar; buffer_length: Word; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_service_start: function(status_vector: PISCStatus; svc_handle: PIscSvcHandle;
+      reserved: PIscResvHandle; spb_length: Word; spb: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    {$IFDEF INTERBASEORFIREBIRD}
+    isc_set_debug: procedure(flag: Integer);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    {$ENDIF INTERBASEORFIREBIRD}
+    isc_sql_interprete: procedure(SQLCODE: Smallint; buffer: PAnsiChar; buffer_length: Smallint);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_sqlcode: function(user_status: PISCStatus): ISCLong;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_start_and_send: function(user_status: PISCStatus; req_handle: PIscReqHandle;
+      tra_handle: PIscTrHandle; msg_type, msg_length: Smallint; msg: PPointer;
+      level: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_start_multiple: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
+      count: Smallint; vector: PISCTEB): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_start_request: function(user_status: PISCStatus; req_handle: PIscReqHandle;
+      tra_handle: PIscTrHandle; level: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_start_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle; count: Smallint;
+      db_handle: PIscDbHandle; tpb_length: ISCUShort; tpb_ad: PAnsiChar): ISCStatus; cdecl;
+    isc_transact_request: function(user_status: PISCStatus; db_handle: PIscDbHandle;
+      tra_handle: PIscTrHandle; blr_length: Word; blr: PAnsiChar; in_msg_length: Word; in_msg: PAnsiChar;
+      out_msg_length: Word; out_msg: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_transaction_info: function(user_status: PISCStatus; tra_handle: PIscTrHandle; item_length: Smallint;
+      items: PAnsiChar; buffer_length: Smallint; buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_unwind_request: function(user_status: PISCStatus; req_handle: PIscTrHandle;
+      level: Smallint): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_vax_integer: function(ptr: PAnsiChar; length: Smallint): ISCLong;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_version: function(db_handle: PIscDbHandle; callback: IscCallback;
+      callback_argument: PPointer): Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_vtof: procedure(string1, string2: PAnsiChar; length: Word);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_vtov: procedure(string1, string2: PAnsiChar; length: Smallint);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_wait_for_event: function(user_status: PISCStatus; handle: PIscDbHandle;
+      length: Smallint; events, buffer: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    {$IFDEF FB15_UP}{$IFNDEF UNIX}
     isc_reset_fpe: function(fpe_status: Word): ISCLong; stdcall;
-    isc_get_client_version: procedure(version: PChar); stdcall;
-    isc_get_client_major_version: function: Integer; stdcall;
-    isc_get_client_minor_version: function: Integer; stdcall;
-    {FB15_UP}
+    {$ENDIF}{$ENDIF FB15_UP}
+    {$IFDEF IB7_UP}
+    isc_array_gen_sdl2: function(status: PISCStatus; desc: PISCArrayDescV2;
+      sdl_buffer_length: PSmallInt; sdl_buffer: PAnsiChar; sdl_length: PSmallInt): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_get_slice2: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; array_id: PISCQuad; desc: PISCArrayDescV2; array_: PPointer;
+      slice_length: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_lookup_bounds2: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; relation_name, field_name: PAnsiChar; desc: PISCArrayDescV2): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_lookup_desc2: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; relation_name, field_name: PAnsiChar;
+      desc: PISCArrayDescV2): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_put_slice2: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; array_id: PISCQuad; desc: PISCArrayDescV2; array_: PPointer;
+      slice_length: PISCLong): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_array_set_desc2: function(status: PISCStatus; relation_name, field_name: PAnsiChar;
+      sql_dtype, sql_length, dimensions: PSmallint; desc: PISCArrayDescV2): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_default_desc2: procedure(desc: PISCBlobDescV2; relation_name,
+      field_name: PAnsiChar);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_gen_bpb2: function(status: PISCStatus; to_desc, from_desc: PISCBlobDescV2;
+      bpb_buffer_length: Word; bpb_buffer: PAnsiChar; bpb_length: PWord): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_lookup_desc2: function(status: PISCStatus; db_handle: PIscDbHandle;
+      trans_handle: PIscTrHandle; relation_name, field_name: PAnsiChar; desc: PISCBlobDescV2;
+      global: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_blob_set_desc2: function(status: PISCStatus; relation_name, field_name: PAnsiChar; subtype, charset,
+      segment_size: Smallint; desc: PISCBlobDescV2): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    {$ENDIF IB7_UP}
+    {$IFDEF IB7ORFB15}
+    isc_get_client_version: procedure(version: PAnsiChar);
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_get_client_major_version: function: Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_get_client_minor_version: function: Integer;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    {$ENDIF IB7ORFB15}
+    {$IFDEF IB71_UP}
+    isc_release_savepoint: function(status: PISCStatus; TrHandle: PIscTrHandle;
+      name: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_rollback_savepoint: function(status: PISCStatus; TrHandle: PIscTrHandle;
+      name: PAnsiChar; Option: Word): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    isc_start_savepoint: function(status: PISCStatus; TrHandle: PIscTrHandle;
+      name: PAnsiChar): ISCStatus;
+      {$IFDEF UNIX} cdecl; {$ELSE} stdcall; {$ENDIF}
+    {$ENDIF IB71_UP}
   public
-    constructor Create(ApiVer: TALFBXVersion_Api); virtual;
+    constructor Create; virtual;
     destructor Destroy; override;
-    Function Version_Api_Is_FB15_Up: Boolean;
-    Function Version_Api_Is_FB20_Up: Boolean;
-    function getb(p: PBStream): Char;
-    function putb(x: Char; p: PBStream): Integer;
-    function putbx(x: Char; p: PBStream): Integer;
+    function getb(p: PBStream): AnsiChar;
+    function putb(x: AnsiChar; p: PBStream): Integer;
+    function putbx(x: AnsiChar; p: PBStream): Integer;
     function Loaded: Boolean; virtual;
     function Unload: Boolean; virtual;
     function Load(const lib: string = GDS32DLL): Boolean; virtual;
@@ -2392,7 +3364,7 @@ type
 implementation
 
 uses
-  ALFBXConst;
+  ALFBXconst;
 
 (*******************************************************************************
  *    MACROS                                                                   *
@@ -2403,96 +3375,115 @@ begin
   Result := SizeOf(TXSQLDA) + ((n - 1) * SizeOf(TXSQLVAR));
 end;
 
-procedure ADD_SPB_LENGTH(var p: PChar; length: Integer);
+procedure ADD_SPB_LENGTH(var p: PAnsiChar; length: Integer);
 begin
-  p^ := Char(length);
+  p^ := AnsiChar(length);
   Inc(p);
-  p^ := Char(length shr 8);
+  p^ := AnsiChar(length shr 8);
   Inc(p);
 end;
 
-procedure ADD_SPB_NUMERIC(var p: PChar; data: Integer);
+procedure ADD_SPB_NUMERIC(var p: PAnsiChar; data: Integer);
 begin
-  p^ := Char(data);
+  p^ := AnsiChar(data);
   Inc(p);
-  p^ := Char(data shr 8);
+  p^ := AnsiChar(data shr 8);
   Inc(p);
-  p^ := Char(data shr 16);
+  p^ := AnsiChar(data shr 16);
   Inc(p);
-  p^ := Char(data shr 24);
+  p^ := AnsiChar(data shr 24);
   Inc(p);
 end;
 
-{ TALFBXBaseLibrary }
+{ TALFBXLibrary }
 
-Function TALFBXBaseLibrary.Version_Api_Is_FB15_Up: Boolean;
-Begin
-  Result := FVersion_Api in [FB15, FB20];
-end;
-
-Function TALFBXBaseLibrary.Version_Api_Is_FB20_Up: Boolean;
-Begin
-  Result := FVersion_Api in [FB20];
-end;
-
-constructor TALFBXBaseLibrary.Create(ApiVer: TALFBXVersion_Api);
+constructor TALFBXaseLibrary.Create;
 begin
+{$IFDEF ALFBXTHREADSAFE}
+  FLIBCritSec := TCriticalSection.Create;
+{$ENDIF ALFBXTHREADSAFE}
+{$IFDEF MSWINDOWS}
   FGDS32Lib := 0;
-  FVersion_API := ApiVer;
+{$ENDIF MSWINDOWS}
+{$IFDEF UNIX}
+  FCryptLib := nil;
+  FGDS32Lib := nil;
+{$ENDIF UNIX}
 end;
 
-function TALFBXBaseLibrary.getb(p: PBStream): Char;
+function TALFBXaseLibrary.getb(p: PBStream): AnsiChar;
 begin
   Dec(p^.bstr_cnt);
   if p^.bstr_cnt >= 0 then
   begin
-    Result := Char(Integer(p^.bstr_ptr^) and $FF);
+    Result := AnsiChar(Integer(p^.bstr_ptr^) and $FF);
     Inc(p^.bstr_ptr);
   end
   else
-    Result := Char(BLOB_get(p));
+    Result := AnsiChar(BLOB_get(p));
 end;
 
-function TALFBXBaseLibrary.putb(x: Char; p: PBStream): Integer;
+function TALFBXaseLibrary.putb(x: AnsiChar; p: PBStream): Integer;
 begin
   Dec(p^.bstr_cnt);
   if (x = #10) or (p^.bstr_cnt = 0) then
     Result := BLOB_put(x, p)
   else
   begin
-    p^.bstr_ptr^ := Char(x);
+    p^.bstr_ptr^ := AnsiChar(x);
     Inc(p^.bstr_ptr);
     Result := Cardinal(x);
   end;
 end;
 
-function TALFBXBaseLibrary.putbx(x: Char; p: PBStream): Integer;
+function TALFBXaseLibrary.putbx(x: AnsiChar; p: PBStream): Integer;
 begin
   Dec(p^.bstr_cnt);
   if p^.bstr_cnt = 0 then
     Result := BLOB_put(x, p)
   else
   begin
-    p^.bstr_ptr^ := Char(x);
+    p^.bstr_ptr^ := AnsiChar(x);
     Inc(p^.bstr_ptr);
     Result := Cardinal(x);
   end;
 end;
 
-function TALFBXBaseLibrary.Loaded: Boolean;
+function TALFBXaseLibrary.Loaded: Boolean;
 begin
+{$IFDEF MSWINDOWS}
   Result := FGDS32Lib > HINSTANCE_ERROR;
+{$ENDIF MSWINDOWS}
+{$IFDEF UNIX}
+  Result := FGDS32Lib <> nil;
+{$ENDIF UNIX}
 end;
 
-function TALFBXBaseLibrary.Unload: Boolean;
+function TALFBXaseLibrary.Unload: Boolean;
 begin
+{$IFDEF ALFBXTHREADSAFE}
+  FLIBCritSec.Enter;
+  try
+{$ENDIF ALFBXTHREADSAFE}
     Result := True;
     if Loaded then
     begin
+    {$IFDEF MSWINDOWS}
       Result := Boolean(FreeLibrary(FGDS32Lib));
       FGDS32Lib := 0;
+    {$ENDIF MSWINDOWS}
+    {$IFDEF UNIX}
+      FGDS32Lib := nil;
+      if FCryptLib <> nil then
+      begin
+        dlclose(FCryptLib);
+        FCryptLib := nil;
+      end;
+    {$ENDIF UNIX}
       BLOB_close := nil;
+    {$IFDEF INTERBASEORFIREBIRD}
       BLOB_display := nil;
+    {$ENDIF INTERBASEORFIREBIRD}
       BLOB_dump := nil;
       BLOB_edit := nil;
       BLOB_get := nil;
@@ -2579,6 +3570,9 @@ begin
       isc_encode_sql_time := nil;
       isc_encode_timestamp := nil;
       isc_event_block := nil;
+{$IFDEF FB21_UP}
+      isc_event_block_a := nil;
+{$ENDIF}
       isc_event_counts := nil;
       isc_execute := nil;
       isc_execute_immediate := nil;
@@ -2617,7 +3611,9 @@ begin
       isc_service_detach := nil;
       isc_service_query := nil;
       isc_service_start := nil;
+    {$IFDEF INTERBASEORFIREBIRD}
       isc_set_debug := nil;
+    {$ENDIF INTERBASEORFIREBIRD}
       isc_sql_interprete := nil;
       isc_sqlcode := nil;
       isc_start_and_send := nil;
@@ -2632,29 +3628,80 @@ begin
       isc_vtof := nil;
       isc_vtov := nil;
       isc_wait_for_event := nil;
-    {FB15_UP}
+    {$IFDEF FB15_UP}{$IFNDEF UNIX}
       isc_reset_fpe := nil;
+    {$ENDIF}{$ENDIF FB15_UP}
+    {$IFDEF IB7_UP}
+      isc_array_gen_sdl2 := nil;
+      isc_array_gen_sdl2 := nil;
+      isc_array_get_slice2 := nil;
+      isc_array_lookup_bounds2 := nil;
+      isc_array_lookup_desc2 := nil;
+      isc_array_put_slice2 := nil;
+      isc_array_set_desc2 := nil;
+      isc_blob_default_desc2 := nil;
+      isc_blob_gen_bpb2 := nil;
+      isc_blob_lookup_desc2 := nil;
+      isc_blob_set_desc2 := nil;
+    {$ENDIF IB7_UP}
+    {$IFDEF IB7ORFB15}
       isc_get_client_version := nil;
       isc_get_client_major_version := nil;
       isc_get_client_minor_version := nil;
-    {FB15_UP}
-    {FB20_UP}
+    {$ENDIF IB7ORFB15}
+    {$IFDEF IB71_UP}
+      isc_release_savepoint := nil;
+      isc_rollback_savepoint := nil;
+      isc_start_savepoint := nil;
+    {$ENDIF IB71_UP}
+    {$IFDEF FB20_UP}
       fb_interpret := nil;
-    {FB20_UP}
+    {$ENDIF}
     end;
+{$IFDEF ALFBXTHREADSAFE}
+  finally
+    FLIBCritSec.Leave;
+  end;
+{$ENDIF ALFBXTHREADSAFE}
 end;
 
-function TALFBXBaseLibrary.Load(const lib: string = GDS32DLL): Boolean;
+{$IFDEF FPC}
+{$IFDEF UNIX}
+const
+  RTLD_GLOBAL = $101;
+{$ENDIF UNIX}
+{$ENDIF FPC}
+
+function TALFBXaseLibrary.Load(const lib: string = GDS32DLL): Boolean;
+
+{$IFDEF UNIX}
+function GetProcAddress(Lib: Pointer; Name: PAnsiChar): Pointer;
+begin
+  Result := dlsym(Lib, Name);
+end;
+{$ENDIF UNIX}
 
 begin
+{$IFDEF ALFBXTHREADSAFE}
+  FLIBCritSec.Enter;
+  try
+{$ENDIF ALFBXTHREADSAFE}
     Result := Loaded;
     if not Result then
     begin
+    {$IFDEF MSWINDOWS}
       FGDS32Lib := LoadLibrary(PChar(lib));
+    {$ENDIF MSWINDOWS}
+    {$IFDEF UNIX}
+      FCryptLib := dlopen('libcrypt.so', RTLD_GLOBAL); // Service
+      FGDS32Lib := dlopen(PChar(lib), RTLD_GLOBAL);
+    {$ENDIF UNIX}
       if Loaded then
       begin
         BLOB_close := GetProcAddress(FGDS32Lib, 'BLOB_close');
+      {$IFDEF INTERBASEORFIREBIRD}
         BLOB_display := GetProcAddress(FGDS32Lib, 'BLOB_display');
+      {$ENDIF INTERBASEORFIREBIRD}
         BLOB_dump := GetProcAddress(FGDS32Lib, 'BLOB_dump');
         BLOB_edit := GetProcAddress(FGDS32Lib, 'BLOB_edit');
         BLOB_get := GetProcAddress(FGDS32Lib, 'BLOB_get');
@@ -2741,6 +3788,9 @@ begin
         isc_encode_sql_time := GetProcAddress(FGDS32Lib, 'isc_encode_sql_time');
         isc_encode_timestamp := GetProcAddress(FGDS32Lib, 'isc_encode_timestamp');
         isc_event_block := GetProcAddress(FGDS32Lib, 'isc_event_block');
+{$IFDEF FB21_UP}
+        isc_event_block_a := GetProcAddress(FGDS32Lib, 'isc_event_block_a');
+{$ENDIF}
         isc_event_counts := GetProcAddress(FGDS32Lib, 'isc_event_counts');
         isc_execute := GetProcAddress(FGDS32Lib, 'isc_execute');
         isc_execute_immediate := GetProcAddress(FGDS32Lib, 'isc_execute_immediate');
@@ -2779,7 +3829,9 @@ begin
         isc_service_detach := GetProcAddress(FGDS32Lib, 'isc_service_detach');
         isc_service_query := GetProcAddress(FGDS32Lib, 'isc_service_query');
         isc_service_start := GetProcAddress(FGDS32Lib, 'isc_service_start');
+      {$IFDEF INTERBASEORFIREBIRD}
         isc_set_debug := GetProcAddress(FGDS32Lib, 'isc_set_debug');
+      {$ENDIF INTERBASEORFIREBIRD}
         isc_sql_interprete := GetProcAddress(FGDS32Lib, 'isc_sql_interprete');
         isc_sqlcode := GetProcAddress(FGDS32Lib, 'isc_sqlcode');
         isc_start_and_send := GetProcAddress(FGDS32Lib, 'isc_start_and_send');
@@ -2795,29 +3847,34 @@ begin
         isc_vtov := GetProcAddress(FGDS32Lib, 'isc_vtov');
         isc_wait_for_event := GetProcAddress(FGDS32Lib, 'isc_wait_for_event');
 
-      {FB15_UP}
-      if Version_api_IS_FB15_UP then begin
+      {$IFDEF FB15_UP}{$IFNDEF UNIX}
         isc_reset_fpe := GetProcAddress(FGDS32Lib, 'isc_reset_fpe');
+      {$ENDIF}{$ENDIF FB15_UP}
+      {$IFDEF IB7_UP}
+        isc_array_gen_sdl2 := GetProcAddress(FGDS32Lib, 'isc_array_gen_sdl2');
+        isc_array_get_slice2 := GetProcAddress(FGDS32Lib, 'isc_array_get_slice2');
+        isc_array_lookup_bounds2 := GetProcAddress(FGDS32Lib, 'isc_array_lookup_bounds2');
+        isc_array_lookup_desc2 := GetProcAddress(FGDS32Lib, 'isc_array_lookup_desc2');
+        isc_array_put_slice2 := GetProcAddress(FGDS32Lib, 'isc_array_put_slice2');
+        isc_array_set_desc2 := GetProcAddress(FGDS32Lib, 'isc_array_set_desc2');
+        isc_blob_default_desc2 := GetProcAddress(FGDS32Lib, 'isc_blob_default_desc2');
+        isc_blob_gen_bpb2 := GetProcAddress(FGDS32Lib, 'isc_blob_gen_bpb2');
+        isc_blob_lookup_desc2 := GetProcAddress(FGDS32Lib, 'isc_blob_lookup_desc2');
+        isc_blob_set_desc2 := GetProcAddress(FGDS32Lib, 'isc_blob_set_desc2');
+      {$ENDIF IB7_UP}
+      {$IFDEF IB7ORFB15}
         isc_get_client_version := GetProcAddress(FGDS32Lib, 'isc_get_client_version');
         isc_get_client_major_version := GetProcAddress(FGDS32Lib, 'isc_get_client_major_version');
         isc_get_client_minor_version := GetProcAddress(FGDS32Lib, 'isc_get_client_minor_version');
-      end
-      else begin
-        isc_reset_fpe := nil;
-        isc_get_client_version := nil;
-        isc_get_client_major_version := nil;
-        isc_get_client_minor_version := nil;
-      end;
-      {FB15_UP}
-
-      {FB20_UP}
-      if Version_api_IS_FB20_UP then begin
+      {$ENDIF IB7ORFB15}
+      {$IFDEF IB71_UP}
+        isc_release_savepoint := GetProcAddress(FGDS32Lib, 'isc_release_savepoint');
+        isc_rollback_savepoint := GetProcAddress(FGDS32Lib, 'isc_rollback_savepoint');
+        isc_start_savepoint := GetProcAddress(FGDS32Lib, 'isc_start_savepoint');
+      {$ENDIF IB71_UP}
+      {$IFDEF FB20_UP}
         fb_interpret := GetProcAddress(FGDS32Lib, 'fb_interpret');
-      end
-      else begin
-        fb_interpret := nil;
-      end;
-      {FB20_UP}
+      {$ENDIF}
 
         Result := Assigned(BLOB_close) and Assigned(BLOB_dump) and
           Assigned(BLOB_edit) and Assigned(BLOB_get) and Assigned(BLOB_load) and
@@ -2859,7 +3916,11 @@ begin
           Assigned(isc_embed_dsql_prepare) and Assigned(isc_embed_dsql_release) and
           Assigned(isc_encode_date) and Assigned(isc_encode_sql_date) and
           Assigned(isc_encode_sql_time) and Assigned(isc_encode_timestamp) and
-          Assigned(isc_event_block) and Assigned(isc_event_counts) and Assigned(isc_execute) and
+          Assigned(isc_event_block)
+{$IFDEF FB21_UP}
+          and Assigned(isc_event_block_a)
+{$ENDIF}
+          and Assigned(isc_event_counts) and Assigned(isc_execute) and
           Assigned(isc_execute_immediate) and Assigned(isc_expand_dpb) and
           Assigned(isc_free) and Assigned(isc_ftof) and Assigned(isc_get_segment) and
           Assigned(isc_fetch) and Assigned(isc_get_slice) and Assigned(isc_interprete) and
@@ -2881,38 +3942,53 @@ begin
           Assigned(isc_unwind_request) and Assigned(isc_vax_integer) and
           Assigned(isc_version) and Assigned(isc_vtof) and Assigned(isc_vtov) and
           Assigned(isc_wait_for_event)
+        {$IFDEF INTERBASEORFIREBIRD}
           and Assigned(isc_set_debug) and Assigned(BLOB_display)
-        {FB15_UP}
-        and (
-             (not Version_api_IS_FB15_UP) or
-             (
-              Assigned(isc_reset_fpe) and
-              Assigned(isc_get_client_version) and Assigned(isc_get_client_major_version) and
-              Assigned(isc_get_client_minor_version)
-             )
-            )
-        {FB15_UP}
-        {FB20_UP}
-        and (
-             (not Version_api_IS_FB20_UP) or
-             assigned(fb_interpret)
-            )
-        {FB20_UP}
+        {$ENDIF INTERBASEORFIREBIRD}
+        {$IFDEF FB15_UP}{$IFNDEF UNIX}
+          and Assigned(isc_reset_fpe)
+        {$ENDIF}{$ENDIF FB15_UP}
+        {$IFDEF IB7_UP}
+          and Assigned(isc_array_gen_sdl2) and Assigned(isc_array_get_slice2)
+          and Assigned(isc_array_lookup_bounds2) and Assigned(isc_array_lookup_desc2)
+          and Assigned(isc_array_put_slice2) and Assigned(isc_array_set_desc2)
+          and Assigned(isc_blob_default_desc2) and Assigned(isc_blob_gen_bpb2)
+          and Assigned(isc_blob_lookup_desc2) and Assigned(isc_blob_set_desc2)
+        {$ENDIF IB7_UP}
+        {$IFDEF IB7ORFB15}
+          and Assigned(isc_get_client_version) and Assigned(isc_get_client_major_version)
+          and Assigned(isc_get_client_minor_version)
+        {$ENDIF IB7ORFB15}
+        {$IFDEF IB71_UP}
+          and Assigned(isc_release_savepoint) and Assigned(isc_rollback_savepoint)
+          and Assigned(isc_start_savepoint)
+        {$ENDIF IB71_UP}
+        {$IFDEF FB20_UP}
+          and assigned(fb_interpret)
+        {$ENDIF}
         ;
         if not Result then
         begin
           Unload;
-          raise Exception.Create(cALFBX_INVALIDEIBVERSION);
+          raise Exception.Create(EALFBX_INVALIDEIBVERSION);
         end;
       end
       else
-        raise Exception.CreateFmt(cALFBX_CANTLOADLIB, [lib]);
+        raise Exception.CreateFmt(EALFBX_CANTLOADLIB, [lib]);
     end;
+{$IFDEF ALFBXTHREADSAFE}
+  finally
+    FLIBCritSec.Leave;
+  end;
+{$ENDIF ALFBXTHREADSAFE}
 end;
 
-destructor TALFBXBaseLibrary.Destroy;
+destructor TALFBXaseLibrary.Destroy;
 begin
   Unload;
+{$IFDEF ALFBXTHREADSAFE}
+  FLIBCritSec.Free;
+{$ENDIF ALFBXTHREADSAFE}
   inherited Destroy;
 end;
 

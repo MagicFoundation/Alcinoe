@@ -82,7 +82,7 @@ Var ResultCurrentPos: Integer;
         aStmtHandle: IscStmtHandle;
         aSqlda: TALFbxSQLResult;
     Begin
-      aSqlda := TALFBXSQLResult.Create;
+      aSqlda := TALFBXSQLResult.Create(ALFBXStrToCharacterSet(Memo_DatabaseParams.Lines.Values['lc_ctype']));
       Try
         aStmtHandle := nil;
         alibrary.DSQLAllocateStatement(aDBHandle, aStmtHandle);

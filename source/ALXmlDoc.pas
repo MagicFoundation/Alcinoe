@@ -4,7 +4,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALXmlDocument
-Version:      3.55
+Version:      3.56
 
 Description:  TALXmlDocument is exactly like Delphi TXmlDocument (Same functions 
               and procedures) but 10 to 100 times more fastly (see demo) and can 
@@ -781,6 +781,15 @@ type
     property OnParseComment: TAlXMLParseTextEvent read FonParseComment Write FonParseComment; // [added from TXMLDocument]
     property OnParseCData: TAlXMLParseTextEvent read FonParseCData Write FonParseCData; // [added from TXMLDocument]
   end;
+
+{misc constante}
+Const cAlXMLUTF8EncodingStr = 'UTF-8';
+      cALXmlUTF8HeaderStr = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
+
+{misc function}
+Function  ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
+procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const EncodingStr: String = cAlXMLUTF8EncodingStr);
+Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode; AttributeName, AttributeValue : string): TalxmlNode;
 
 procedure Register;
 
@@ -3809,6 +3818,50 @@ begin
   if NewCount > FCount then FillChar(FList^[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
   else for I := FCount - 1 downto NewCount do Delete(I);
   FCount := NewCount;
+end;
+
+
+
+/////////////////////////////////
+//////////Misc function//////////
+/////////////////////////////////
+
+{****************************************************************}
+Function ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
+begin
+  Result := TAlXMLDocument.Create(nil);
+  with result do begin
+    Options := [];
+    ParseOptions := [];
+  end;
+  ALClearXMLDocument(rootname,Result);
+End;
+
+{***********************************************************************************************************************}
+procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const EncodingStr: String = cAlXMLUTF8EncodingStr);
+begin
+  with xmlDoc do begin
+    Active := False;
+    XML.clear;
+    FileName := '';
+    Active := true;
+    version := '1.0';
+    standalone := 'yes';
+    Encoding := EncodingStr;
+  end;
+  If RootName <> '' then XMLDoc.AddChild(rootname);
+End;
+
+{*******************************************************************************************************}
+Function ALFindXmlNodeByAttribute(xmlrec:TalxmlNode; AttributeName, AttributeValue : string): TalxmlNode;
+var i : integer;
+Begin
+  result := nil;
+  for i := 0 to xmlrec.ChildNodes.Count - 1 do
+    If sametext(xmlrec.ChildNodes[i].AttributesAsString[AttributeName],AttributeValue) then begin
+      result := xmlrec.ChildNodes[i];
+      break;
+    end;
 end;
 
 end.

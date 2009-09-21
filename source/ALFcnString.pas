@@ -72,7 +72,8 @@ History:      11/05/2005: Remove the bug in alFastTagReplace that raise
                           for alPos, AlPosEx, AlCompareText, AlLowerCase,
                           AlUpperCase, AlMove because they are all taken from
                           the fastcode project
-
+              01/09/2009: Change ALFastTagReplace to launch again ALFastTagReplace
+                          on the result of FastTagReplaceProc
 Link :
 
 Please send all your feedback to svanderclock@arkadia.com
@@ -108,11 +109,31 @@ function ALCharPosEX(const SearchCharacter: Char; const SourceString: AnsiString
 function ALCharPosEX(const SearchCharacter: Char; const SourceString: AnsiString; StartPos: Integer = 1): Integer; overload;
 
 {Alcinoe}
-function  ALFastTagReplace(Const SourceString, TagStart, TagEnd: string; FastTagReplaceProc: TALHandleTagFunct; ReplaceStrParamName, ReplaceWith: String; AStripParamQuotes: Boolean; Flags: TReplaceFlags; ExtData: Pointer): string; overload;
-function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string; ReplaceStrParamName: String; AStripParamQuotes: Boolean; const Flags: TReplaceFlags=[rfreplaceall]): string; overload;
-function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string; FastTagReplaceProc: TALHandleTagFunct; AStripParamQuotes: Boolean; ExtData: Pointer; Const flags: TReplaceFlags = [rfreplaceall]): string; overload;
-function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string; ReplaceWith: string; const Flags: TReplaceFlags=[rfreplaceall] ): string; overload;
-function  ALExtractTagParams(const SourceString, TagStart, TagEnd: string; AStripParamQuotes: Boolean; TagParams: TStrings; IgnoreCase: Boolean): Boolean;
+function ALFastTagReplace(Const SourceString, TagStart, TagEnd: string;
+                          FastTagReplaceProc: TALHandleTagFunct;
+                          ReplaceStrParamName,
+                          ReplaceWith: String;
+                          AStripParamQuotes: Boolean;
+                          Flags: TReplaceFlags;
+                          ExtData: Pointer;
+                          const ReProcessReplaceProcResult: Boolean = False): string; overload;
+function ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
+                          ReplaceWith: string;
+                          const Flags: TReplaceFlags=[rfreplaceall] ): string; overload;
+function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
+                           ReplaceStrParamName: string;
+                           AStripParamQuotes: Boolean;
+                           const Flags: TReplaceFlags=[rfreplaceall] ): string; overload;
+function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
+                           FastTagReplaceProc: TALHandleTagFunct;
+                           AStripParamQuotes: Boolean;
+                           ExtData: Pointer;
+                           Const flags: TReplaceFlags=[rfreplaceall];
+                           const ReProcessReplaceProcResult: Boolean = False): string; overload;
+function  ALExtractTagParams(Const SourceString, TagStart, TagEnd: string;
+                             AStripParamQuotes: Boolean;
+                             TagParams: TStrings;
+                             IgnoreCase: Boolean): Boolean;
 function  ALCopyStr(const aSourceString: string; aStart, aLength: Integer): string;
 function  ALRandomStr(aLength: Longint): string;
 function  ALNEVExtractName(const S: string): string;
@@ -673,7 +694,8 @@ function ALFastTagReplace(Const SourceString, TagStart, TagEnd: string;
                           ReplaceWith: String;
                           AStripParamQuotes: Boolean;
                           Flags: TReplaceFlags;
-                          ExtData: Pointer): string;
+                          ExtData: Pointer;
+                          const ReProcessReplaceProcResult: Boolean = False): string;
 var  i: integer;
      ReplaceString: String;
      Token, FirstTagEndChar: Char;
@@ -784,14 +806,29 @@ begin
       ParamList := TStringList.Create;
       try
         ALExtractHeaderFieldsWithQuoteEscaped([' ', #9], [' ', #9], PChar(ParamStr), ParamList, False, AStripParamQuotes);
-        If assigned(FastTagReplaceProc) then ReplaceString := FastTagReplaceProc(TokenStr, ParamList, ExtData, TagHandled)
+        If assigned(FastTagReplaceProc) then begin
+          ReplaceString := FastTagReplaceProc(TokenStr, ParamList, ExtData, TagHandled);
+          if TagHandled and
+             ReProcessReplaceProcResult and
+             (rfreplaceAll in flags) then ReplaceString := ALFastTagReplace(
+                                                                            ReplaceString,
+                                                                            TagStart,
+                                                                            TagEnd,
+                                                                            FastTagReplaceProc,
+                                                                            ReplaceStrParamName,
+                                                                            ReplaceWith,
+                                                                            AStripParamQuotes,
+                                                                            Flags,
+                                                                            ExtData,
+                                                                            ReProcessReplaceProcResult
+                                                                           );
+        end
         else ReplaceString := ParamList.Values[ReplaceStrParamName];
       finally
         ParamList.Free;
       end;
     end
     else ReplaceString := ReplaceWith;
-
 
     If tagHandled then MoveStr2Result(AlcopyStr(SourceString,i,T1 - i) + ReplaceString)
     else MoveStr2Result(AlcopyStr(SourceString,i,T2 + TagEndLength - i));
@@ -831,7 +868,7 @@ function ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
                           ReplaceWith: string;
                           const Flags: TReplaceFlags=[rfreplaceall] ): string;
 Begin
-  Result := ALFastTagReplace(SourceString, TagStart, TagEnd, nil, '', ReplaceWith, True, flags, nil);
+  Result := ALFastTagReplace(SourceString, TagStart, TagEnd, nil, '', ReplaceWith, True, flags, nil, false);
 end;
 
 {*********************************************************************}
@@ -840,7 +877,7 @@ function ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
                           AStripParamQuotes: Boolean;
                           const Flags: TReplaceFlags=[rfreplaceall] ): string;
 Begin
-  Result := ALFastTagReplace(SourceString, TagStart, TagEnd, nil, ReplaceStrParamName, '', AStripParamQuotes, flags, nil);
+  Result := ALFastTagReplace(SourceString, TagStart, TagEnd, nil, ReplaceStrParamName, '', AStripParamQuotes, flags, nil, false);
 end;
 
 {*********************************************************************}
@@ -848,9 +885,10 @@ function ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
                           FastTagReplaceProc: TALHandleTagFunct;
                           AStripParamQuotes: Boolean;
                           ExtData: Pointer;
-                          Const flags: TReplaceFlags=[rfreplaceall]): string;
+                          Const flags: TReplaceFlags=[rfreplaceall];
+                          const ReProcessReplaceProcResult: Boolean = False): string;
 Begin
-  result := ALFastTagReplace(SourceString, TagStart, TagEnd, FastTagReplaceProc, '', '', AStripParamQuotes, flags, extdata);
+  result := ALFastTagReplace(SourceString, TagStart, TagEnd, FastTagReplaceProc, '', '', AStripParamQuotes, flags, extdata, ReProcessReplaceProcResult);
 end;
 
 {***********************************************************************}

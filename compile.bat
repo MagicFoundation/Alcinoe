@@ -25,17 +25,18 @@ IF ERRORLEVEL 1 goto ERROR
 del *.ini /s
 IF ERRORLEVEL 1 goto ERROR
 
-del *.htm /s
-IF ERRORLEVEL 1 goto ERROR
-
 del *.html /s
 IF ERRORLEVEL 1 goto ERROR
 
 MSBuild source\PCK_ALCINOE.dproj /t:build /p:Configuration=RELEASE
 IF ERRORLEVEL 1 goto ERROR
 
+pause
+
 MSBuild demo\ProjectGroupDemo.groupproj /t:build /p:Configuration=RELEASE
 IF ERRORLEVEL 1 goto ERROR
+
+pause
 
 del release\Alcinoe.rar
 

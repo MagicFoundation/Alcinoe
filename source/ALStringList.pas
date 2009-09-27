@@ -9,6 +9,9 @@ Version:      3.50
 Description:  TALStringList in inherited from Delphi TstringList.
               It's allow to search a name=value using a quicksort
               algorithm when the list is sorted.
+              TALAVLStringList it's a TStringlist Like, but use
+              internaly an AVL binary Tree to handle big indexed
+              list
 
 Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
 
@@ -45,7 +48,8 @@ Know bug :
 
 History :     27/10/2007 add ForceValues and ForceValueFromIndex
                          that do not delete an entry when we do
-                         ForceValue[name] := ''   
+                         ForceValue[name] := ''
+              26/01/2009 add TALAVLStringList
 
 Link :
 
@@ -57,7 +61,9 @@ interface
 
 Uses Windows,
      Classes,
-     sysutils;
+     sysutils,
+     Contnrs,
+     AlAvlBinaryTRee;
 
 Type
 
@@ -78,21 +84,114 @@ Type
     property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;
   end;
 
+  {-----------------------}
+  TALAVLStringList = class;
+  TALAVLStringListSortCompare = function(List: TALAVLStringList; Index1, Index2: Integer): Integer;
+
+  {-------------------------------------------------------------------}
+  TALAVLStringListBinaryTreeNode = class(TALStringKeyAVLBinaryTreeNode)
+  Private
+  Protected
+  Public
+    Val: String;  // Value
+    Obj: Tobject; // Object
+    Idx: integer; // Index in the NodeList
+    Nvs: Boolean; // if NameValueSeparator was present
+    Constructor Create; Override;
+  end;
+
+  {-----------------------------------------------------------}
+  TALAVLStringListBinaryTree = class(TALStringKeyAVLBinaryTree)
+  private
+    FEmptyNode: TALAVLStringListBinaryTreeNode; // we use this because inherited Tstring.setvalue use i := add('') following by put(i, avalue)
+  protected
+    Procedure InternalClear; override;
+  public
+    Constructor Create; override;
+    function    AddNode(aNode: TALAVLStringListBinaryTreeNode): Boolean; reintroduce; virtual;
+    function    DeleteNode(idVal: String): boolean; override;
+    function    FindNode(idVal: String): TALAVLStringListBinaryTreeNode; Reintroduce; virtual;
+  end;
+
+  {-----------------------------------------------------}
+  TALAVLStringListBinaryTreeNodeList = class(TObjectList)
+  private
+  protected
+    function GetItem(Index: Integer): TALAVLStringListBinaryTreeNode;
+    procedure SetItem(Index: Integer; AObject: TALAVLStringListBinaryTreeNode);
+  public
+    property Items[Index: Integer]: TALAVLStringListBinaryTreeNode read GetItem write SetItem; default;
+  end;
+
+  {--------------------------------}
+  TALAVLStringList = class(TStrings)
+  private
+    FNodeList: TALAVLStringListBinaryTreeNodeList;
+    FAVLBinTree: TALAVLStringListBinaryTree;
+    FOnChange: TNotifyEvent;
+    FOnChanging: TNotifyEvent;
+    procedure ExchangeItems(Index1, Index2: Integer);
+    procedure QuickSort(L, R: Integer; SCompare: TALAVLStringListSortCompare);
+    procedure SetCaseSensitive(const Value: Boolean);
+    function GetCaseSensitive: Boolean;
+    Function ExtractNameValue(S: String; var Name, Value: String): Boolean;
+    function GetForceValue(const Name: string): string;
+    function GetForceValueFromIndex(Index: Integer): string;
+    procedure SetForceValue(const Name, Value: string);
+    procedure SetForceValueFromIndex(Index: Integer; const Value: string);
+  protected
+    procedure Changed; virtual;
+    procedure Changing; virtual;
+    function Get(Index: Integer): string; override;
+    function GetCount: Integer; override;
+    function GetObject(Index: Integer): TObject; override;
+    procedure Put(Index: Integer; const S: string); override;
+    procedure PutObject(Index: Integer; AObject: TObject); override;
+    procedure SetUpdateState(Updating: Boolean); override;
+    procedure InsertItem(Index: Integer; const S: string; AObject: TObject); virtual;
+  public
+    Constructor Create; Virtual;
+    destructor Destroy; override;
+    function Add(const S: string): Integer; override;
+    function AddObject(const S: string; AObject: TObject): Integer; override;
+    procedure Clear; override;
+    procedure Delete(Index: Integer); override;
+    procedure Exchange(Index1, Index2: Integer); override;
+    function IndexOf(const S: string): Integer; override;
+    function IndexOfName(const Name: string): Integer; override;
+    procedure Insert(Index: Integer; const S: string); override;
+    procedure InsertObject(Index: Integer; const S: string; AObject: TObject); override;
+    procedure CustomSort(Compare: TALAVLStringListSortCompare); virtual;
+    property CaseSensitive: Boolean read GetCaseSensitive write SetCaseSensitive;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
+    property ForceValues[const Name: string]: string read GetForceValue write SetForceValue;
+    property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;    
+  end;
+
 implementation
 
-Uses AlFcnString;
+Uses RTLConsts,
+     AlFcnString;
+
+/////////////////////////
+///// TALStringList /////
+/////////////////////////
 
 {*******************************************************************}
 function TALStringList.CompareStrings(const S1, S2: string): Integer;
 begin
-  if CaseSensitive then Result := AnsiCompareStr(
-                                                 AlStringReplace(S1,'=',' ',[]),
-                                                 AlStringReplace(S2,'=',' ',[])
-                                                )
-  else Result := AnsiCompareText(
-                                 AlStringReplace(S1,'=',' ',[]),
-                                 AlStringReplace(S2,'=',' ',[])
-                                );
+  //the difference between TALStringList and TStringList is that
+  //TstringList use ansiCompareStr or ansiCompareText that are
+  //dependant from the local
+  if CaseSensitive then Result := CompareStr(
+                                             AlStringReplace(S1,NameValueSeparator,#1,[]),
+                                             AlStringReplace(S2,NameValueSeparator,#1,[])
+                                            )
+  else Result := CompareText(
+                             AlStringReplace(S1,NameValueSeparator,#1,[]),
+                             AlStringReplace(S2,NameValueSeparator,#1,[])
+                            );
 end;
 
 {****************************************************************************}
@@ -106,7 +205,6 @@ function TALStringList.FindName(const S: string; var Index: Integer): Boolean;
     P := AlCharPos(NameValueSeparator, Result);
     if P <> 0 then SetLength(Result, P-1);
   end;
-
 
 var L, H, I, C: Integer;
 begin
@@ -159,15 +257,455 @@ procedure TALStringList.SetForceValue(const Name, Value: string);
 var I: Integer;
 begin
   I := IndexOfName(Name);
-  if I < 0 then I := Add('');
-  Put(I, Name + NameValueSeparator + Value);
+  if I < 0 then Add(Name + NameValueSeparator + Value)
+  else Put(I, Name + NameValueSeparator + Value);
 end;
 
 {**********************************************************************************}
 procedure TALStringList.SetForceValueFromIndex(Index: Integer; const Value: string);
 begin
-  if Index < 0 then Index := Add('');
-  Put(Index, Names[Index] + NameValueSeparator + Value);
+  if Index < 0 then Add(NameValueSeparator + Value)
+  else Put(Index, Names[Index] + NameValueSeparator + Value);
+end;
+
+
+
+
+////////////////////////////
+///// TALAVLStringList /////
+////////////////////////////
+
+{**********************************}
+constructor TALAVLStringList.Create;
+begin
+  FAVLBinTree:= TALAVLStringListBinaryTree.Create;
+  FAVLBinTree.CaseSensitive := False;
+  FNodeList := TALAVLStringListBinaryTreeNodeList.Create(False);
+  FOnChange := nil;
+  FOnChanging := nil;
+end;
+
+{**********************************}
+destructor TALAVLStringList.Destroy;
+begin
+  FOnChange := nil;
+  FOnChanging := nil;
+  FAVLBinTree.free;
+  FNodeList.free;
+  inherited Destroy;
+end;
+
+{******************************************************}
+function TALAVLStringList.Add(const S: string): Integer;
+begin
+  Result := AddObject(S, nil);
+end;
+
+{******************************************************************************}
+function TALAVLStringList.AddObject(const S: string; AObject: TObject): Integer;
+begin
+  Result := Count;
+  InsertItem(Result, S, AObject);
+end;
+
+{*********************************}
+procedure TALAVLStringList.Changed;
+begin
+  if (UpdateCount = 0) and Assigned(FOnChange) then FOnChange(Self);
+end;
+
+{**********************************}
+procedure TALAVLStringList.Changing;
+begin
+  if (UpdateCount = 0) and Assigned(FOnChanging) then FOnChanging(Self);
+end;
+
+{*******************************}
+procedure TALAVLStringList.Clear;
+begin
+  if Count <> 0 then begin
+    Changing;
+    FnodeList.Clear;
+    FAVLBinTree.Clear;
+    Changed;
+  end;
+end;
+
+{************************************************}
+procedure TALAVLStringList.Delete(Index: Integer);
+var i: integer;
+begin
+  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  Changing;
+  FAVLBinTree.DeleteNode(FNodelist[Index].ID);
+  FNodelist.Delete(Index);
+  for i := Index to FNodeList.Count - 1 do
+    dec(FNodelist[i].Idx);
+  Changed;
+end;
+
+{***********************************************************}
+procedure TALAVLStringList.Exchange(Index1, Index2: Integer);
+begin
+  if (Index1 < 0) or (Index1 >= Count) then Error(@SListIndexError, Index1);
+  if (Index2 < 0) or (Index2 >= Count) then Error(@SListIndexError, Index2);
+  Changing;
+  ExchangeItems(Index1, Index2);
+  Changed;
+end;
+
+{****************************************************************}
+procedure TALAVLStringList.ExchangeItems(Index1, Index2: Integer);
+var Item1, Item2: TALAVLStringListBinaryTreeNode;
+begin
+  Item1 := FNodelist[Index1];
+  Item2 := FNodelist[Index2];
+  FNodeList.Exchange(Index1,Index2);
+  Item1.idx := Index2;
+  Item2.idx := Index1;
+end;
+
+{****************************************************}
+function TALAVLStringList.Get(Index: Integer): string;
+begin
+  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  with FNodelist[Index] do begin
+    if Nvs then Result := ID + NameValueSeparator + Val
+    else Result := ID;
+  end;
+end;
+
+{******************************************}
+function TALAVLStringList.GetCount: Integer;
+begin
+  Result := FNodeList.Count;
+end;
+
+{******************************************************************}
+function TALAVLStringList.GetForceValue(const Name: string): string;
+begin
+  Result := Values[Name];
+end;
+
+{***********************************************************************}
+function TALAVLStringList.GetForceValueFromIndex(Index: Integer): string;
+begin
+  Result := ValueFromIndex[Index];
+end;
+
+{******************************************************************}
+procedure TALAVLStringList.SetForceValue(const Name, Value: string);
+var I: Integer;
+begin
+  I := IndexOfName(Name);
+  if I < 0 then Add(Name + NameValueSeparator + Value)
+  else Put(I, Name + NameValueSeparator + Value);
+end;
+
+{*************************************************************************************}
+procedure TALAVLStringList.SetForceValueFromIndex(Index: Integer; const Value: string);
+begin
+  if Index < 0 then Add(NameValueSeparator + Value)
+  else Put(Index, Names[Index] + NameValueSeparator + Value);
+end;
+
+{***********************************************************}
+function TALAVLStringList.GetObject(Index: Integer): TObject;
+begin
+  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  Result := FNodelist[Index].Obj;
+end;
+
+{**********************************************************}
+function TALAVLStringList.IndexOf(const S: string): Integer;
+Var aName, aValue: String;
+    aNode: TALAVLStringListBinaryTreeNode;
+begin
+  if ExtractNameValue(S, aName, aValue) then begin
+    aNode := FAVLBinTree.FindNode(aName);
+    if (not assigned(aNode)) or
+       (
+        CaseSensitive and
+        (aNode.Val <> aValue)
+       ) or
+       (
+        (not CaseSensitive) and
+        (not sametext(aNode.Val, aValue))
+       )
+    then result := -1
+    else result := aNode.idx;
+  end
+  else begin
+    aNode := FAVLBinTree.FindNode(S);
+    if (not assigned(aNode)) or (aNode.Nvs) then result := -1
+    else result := aNode.idx;
+  end;
+end;
+
+{*****************************************************************}
+function TALAVLStringList.IndexOfName(const Name: string): Integer;
+Var aNode: TALAVLStringListBinaryTreeNode;
+begin
+  aNode := FAVLBinTree.FindNode(Name);
+  if assigned(aNode) and aNode.Nvs then result := aNode.Idx
+  else result := -1;
+end;
+
+{*****************************************************************}
+procedure TALAVLStringList.Insert(Index: Integer; const S: string);
+begin
+  InsertObject(Index, S, nil);
+end;
+
+{**********************************************************************}
+procedure TALAVLStringList.InsertObject(Index: Integer; const S: string;
+  AObject: TObject);
+begin
+  if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
+  InsertItem(Index, S, AObject);
+end;
+
+{***************************************************************************************}
+procedure TALAVLStringList.InsertItem(Index: Integer; const S: string; AObject: TObject);
+Var aName, AValue: String;
+    aNvs: Boolean;
+    aNode: TALAVLStringListBinaryTreeNode;
+    i: integer;
+begin
+  Changing;
+
+  if ExtractNameValue(S, aName, aValue) then aNvs := True
+  else begin
+    aName := S;
+    aNvs := False;
+  end;
+
+  aNode := TALAVLStringListBinaryTreeNode.Create;
+  aNode.Idx := Index;
+  aNode.ID := aName;
+  aNode.Val := aValue;
+  aNode.Nvs := aNvs;
+  aNode.Obj := AObject;
+  if not FAVLBinTree.AddNode(aNode) then begin
+    aNode.free;
+    Raise Exception.create('List does not allow duplicate Names');
+  end;
+  FNodeList.Insert(Index, aNode);
+  for i := Index + 1 to FNodeList.Count - 1 do
+    inc(FNodelist[i].Idx);
+
+  Changed;
+end;
+
+{**************************************************************}
+procedure TALAVLStringList.Put(Index: Integer; const S: string);
+Var aNewName, aNewValue: String;
+    aNewNvs: Boolean;
+    aNewNode, aOldNode: TALAVLStringListBinaryTreeNode;
+begin
+  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  Changing;
+
+  if ExtractNameValue(S, aNewName, aNewValue) then aNewNvs := True
+  else begin
+    aNewName := S;
+    aNewNvs := False;
+  end;
+
+  aOldNode := FNodeList[index];
+
+  if (CaseSensitive and (aOldNode.ID <> aNewName)) or
+     ((not CaseSensitive) and (not sametext(aOldNode.ID, aNewName))) then begin
+    aNewNode := TALAVLStringListBinaryTreeNode.Create;
+    aNewNode.Idx := Index;
+    aNewNode.ID := aNewName;
+    aNewNode.Val := ANewValue;
+    aNewNode.NVS := aNewNvs;
+    aNewNode.Obj := aOldNode.Obj;
+    if not FAVLBinTree.AddNode(aNewNode) then begin
+      aNewNode.free;
+      Raise Exception.create('List does not allow duplicate Names');
+    end
+    else FNodeList[Index] := aNewNode;
+    FAVLBinTree.DeleteNode(aOldNode.ID);
+  end
+  else begin
+    aOldNode.Val := aNewValue;
+    aOldNode.NVS := aNewNVS;
+  end;
+
+  Changed;
+end;
+
+{*********************************************************************}
+procedure TALAVLStringList.PutObject(Index: Integer; AObject: TObject);
+begin
+  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  Changing;
+  FNodeList[Index].Obj := AObject;
+  Changed;
+end;
+
+{*****************************************************************************************}
+procedure TALAVLStringList.QuickSort(L, R: Integer; SCompare: TALAVLStringListSortCompare);
+var I, J, P: Integer;
+begin
+  repeat
+    I := L;
+    J := R;
+    P := (L + R) shr 1;
+    repeat
+      while SCompare(Self, I, P) < 0 do Inc(I);
+      while SCompare(Self, J, P) > 0 do Dec(J);
+      if I <= J then begin
+        ExchangeItems(I, J);
+        if P = I then P := J
+        else if P = J then P := I;
+        Inc(I);
+        Dec(J);
+      end;
+    until I > J;
+    if L < J then QuickSort(L, J, SCompare);
+    L := I;
+  until I >= R;
+end;
+
+{***********************************************************}
+procedure TALAVLStringList.SetUpdateState(Updating: Boolean);
+begin
+  if Updating then Changing
+  else Changed;
+end;
+
+{**************************************************************************}
+procedure TALAVLStringList.CustomSort(Compare: TALAVLStringListSortCompare);
+begin
+  if (Count > 1) then begin
+    Changing;
+    QuickSort(0, Count - 1, Compare);
+    Changed;
+  end;
+end;
+
+{**************************************************}
+function TALAVLStringList.GetCaseSensitive: Boolean;
+begin
+  result := FAVLBinTree.CaseSensitive;
+end;
+
+{****************************************************************}
+procedure TALAVLStringList.SetCaseSensitive(const Value: Boolean);
+begin
+  FAVLBinTree.CaseSensitive := Value;
+end;
+
+{**************************************************************************************}
+Function TALAVLStringList.ExtractNameValue(S: String; var Name, Value: String): Boolean;
+Var P1: Integer;
+begin
+  P1 := AlPos(NameValueSeparator,S);
+  if P1 > 0 then begin
+    result := True;
+    Name := AlCopyStr(S,1,P1-1);
+    Value := AlCopyStr(S,P1+1, maxint);
+  end
+  else begin
+    Result := False;
+    Name := '';
+    Value := '';
+  end;
+end;
+
+
+
+
+////////////////////////////////
+///// TALAVLStringListNode /////
+////////////////////////////////
+
+{************************************************}
+constructor TALAVLStringListBinaryTreeNode.Create;
+begin
+  inherited;
+  Val := '';
+  Obj := nil;
+  idx := -1;
+  NVS := False;
+end;
+
+
+
+
+//////////////////////////////////////
+///// TALAVLStringListBinaryTree /////
+//////////////////////////////////////
+
+{********************************************}
+constructor TALAVLStringListBinaryTree.Create;
+begin
+  inherited;
+  FEmptyNode := nil;
+end;
+
+{******************************************************************************************}
+function TALAVLStringListBinaryTree.AddNode(aNode: TALAVLStringListBinaryTreeNode): Boolean;
+begin
+  if (aNode.ID = '') then begin
+    Result := not Assigned(fEmptyNode);
+    if Result then FemptyNode := aNode;
+  end
+  else Result := inherited addNode(aNode);
+end;
+
+{*********************************************************************}
+function TALAVLStringListBinaryTree.DeleteNode(idVal: String): boolean;
+begin
+  if (IDVal = '') then begin
+    Result := Assigned(fEmptyNode);
+    if result then FreeAndNil(fEmptyNode);
+  end
+  else result := inherited DeleteNode(idVal);
+end;
+
+{******************************************************************************************}
+function TALAVLStringListBinaryTree.FindNode(idVal: String): TALAVLStringListBinaryTreeNode;
+var aNode: TALStringKeyAVLBinaryTreeNode;
+begin
+  if (IDVal = '') then result := FEmptyNode
+  else begin
+    aNode := Inherited FindNode(IdVal);
+    if assigned(aNode) then result := TALAVLStringListBinaryTreeNode(aNode)
+    else result := nil;
+  end;
+end;
+
+{*************************************************}
+procedure TALAVLStringListBinaryTree.InternalClear;
+begin
+  inherited;
+  if assigned(FEmptyNode) then FreeAndNil(FEmptyNode);
+end;
+
+
+
+
+//////////////////////////////////////////////
+///// TALAVLStringListBinaryTreeNodeList /////
+//////////////////////////////////////////////
+
+{**************************************************************************************************}
+function TALAVLStringListBinaryTreeNodeList.GetItem(Index: Integer): TALAVLStringListBinaryTreeNode;
+begin
+  Result := TALAVLStringListBinaryTreeNode(inherited Items[Index]);
+end;
+
+{************************************************************************************************************}
+procedure TALAVLStringListBinaryTreeNodeList.SetItem(Index: Integer; AObject: TALAVLStringListBinaryTreeNode);
+begin
+  inherited Items[Index] := AObject;
 end;
 
 end.
+
+
+

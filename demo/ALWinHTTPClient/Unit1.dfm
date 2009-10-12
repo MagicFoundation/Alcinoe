@@ -48,7 +48,7 @@ object Form1: TForm1
         Left = 8
         Top = 8
         Width = 777
-        Height = 193
+        Height = 194
         Caption = 'REQUEST'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -142,7 +142,7 @@ object Form1: TForm1
           Left = 8
           Top = 88
           Width = 375
-          Height = 89
+          Height = 73
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -230,6 +230,20 @@ object Form1: TForm1
             ParentFont = False
             WordWrap = True
           end
+        end
+        object CheckBoxEncodeParams: TCheckBox
+          Left = 11
+          Top = 167
+          Width = 150
+          Height = 17
+          Caption = 'Encode Post Data Strings'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 6
         end
       end
       object GroupBox10: TGroupBox

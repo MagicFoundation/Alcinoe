@@ -100,6 +100,7 @@ type
     ButtonOpenInExplorer: TButton;
     Panel1: TPanel;
     Label9: TLabel;
+    CheckBoxEncodeParams: TCheckBox;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -313,6 +314,7 @@ Var AHTTPResponseHeader: TALHTTPResponseHeader;
     AHTTPResponseStream: TStringStream;
     AMultiPartFormDataFile: TALMultiPartFormDataContent;
     AMultiPartFormDataFiles: TALMultiPartFormDataContents;
+    aTmpPostDataString: TStrings;
     i: Integer;
 begin
   MainStatusBar.Panels[0].Text := '';
@@ -324,8 +326,12 @@ begin
   AHTTPResponseHeader := TALHTTPResponseHeader.Create;
   AHTTPResponseStream := TstringStream.Create('');
   AMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
+  aTmpPostDataString := TstringList.Create;
   try
     Try
+
+      aTmpPostDataString.Assign(MemoPostDataStrings.lines);
+
       For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
         if MemoPostDataFiles.Lines[i] <> '' then begin
           AMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
@@ -338,18 +344,19 @@ begin
       if AMultiPartFormDataFiles.Count > 0 then
         FWinInetHttpClient.PostMultiPartFormData(
                                                  editURL.Text,
-                                                 MemoPostDataStrings.lines,
+                                                 aTmpPostDataString,
                                                  AMultiPartFormDataFiles,
                                                  AHTTPResponseStream,
                                                  AHTTPResponseHeader
                                                 )
 
-      else if MemoPostDataStrings.Lines.Count > 0 then
+      else if aTmpPostDataString.Count > 0 then
         FWinInetHttpClient.PostURLEncoded(
                                           editURL.Text,
-                                          MemoPostDataStrings.lines,
+                                          aTmpPostDataString,
                                           AHTTPResponseStream,
-                                          AHTTPResponseHeader
+                                          AHTTPResponseHeader,
+                                          CheckBoxEncodeParams.Checked
                                          )
 
       else FWinInetHttpClient.Post(
@@ -369,6 +376,7 @@ begin
     AHTTPResponseHeader.Free;
     AHTTPResponseStream.Free;
     AMultiPartFormDataFiles.Free;
+    aTmpPostDataString.free;
   end;
 end;
 

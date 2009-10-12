@@ -166,7 +166,7 @@ Type
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
     property ForceValues[const Name: string]: string read GetForceValue write SetForceValue;
-    property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;    
+    property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;
   end;
 
 implementation
@@ -457,9 +457,8 @@ begin
   InsertObject(Index, S, nil);
 end;
 
-{**********************************************************************}
-procedure TALAVLStringList.InsertObject(Index: Integer; const S: string;
-  AObject: TObject);
+{*****************************************************************************************}
+procedure TALAVLStringList.InsertObject(Index: Integer; const S: string; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
   InsertItem(Index, S, AObject);
@@ -525,8 +524,8 @@ begin
     if not FAVLBinTree.AddNode(aNewNode) then begin
       aNewNode.free;
       Raise Exception.create('List does not allow duplicate Names');
-    end
-    else FNodeList[Index] := aNewNode;
+    end;
+    FNodeList[Index] := aNewNode;
     FAVLBinTree.DeleteNode(aOldNode.ID);
   end
   else begin

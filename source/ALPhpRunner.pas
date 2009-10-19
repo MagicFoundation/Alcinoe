@@ -6,12 +6,12 @@ Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 product:      ALPhpRunner
 Version:      3.54
 
-Description:  TALPHPRunnerEngine is a simple but useful component for
+Description:  ALPHPRunnerEngine is a simple but useful component for
               easily use php (any version) as a scripting language
-              in Delphi applications. TALPhpRunnerEngine allows to
+              in Delphi applications. ALPhpRunnerEngine allows to
               execute the PHP scripts within the Delphi program without
-              a WebServer. TALPHPRunnerEngine use the ISAPI DLL
-              interface of PHP (php5isapi.dll) or the FastCGI
+              a WebServer. ALPHPRunnerEngine use the ISAPI DLL
+              interface of PHP (php5isapi.dll) or the CGI/FastCGI
               interface (php-cgi.exe) of PHP to communicate with PHP engine.
 
 Legal issues: Copyright (C) 1999-2007 by Arkadia Software Engineering
@@ -45,7 +45,7 @@ Legal issues: Copyright (C) 1999-2007 by Arkadia Software Engineering
                  your name, street address, EMail address and any
                  comment you like to say.
 
-Note :        If you use fastCGI interface, you will need to start
+Note :        If you use fastCGI (Socket) interface, you will need to start
               php-cgi separatly:
 
               php-cgi.exe -b host:port
@@ -68,6 +68,7 @@ Note :        If you use fastCGI interface, you will need to start
               variables that can be set before running the PHP binary:
 
               PHP_FCGI_CHILDREN  (default value: 0)
+              !!! NOT WORK ON WINDOWS !!!
 
               This controls how many child processes the PHP process spawns. When the
               fastcgi starts, it creates a number of child processes which handle one
@@ -86,6 +87,7 @@ Note :        If you use fastCGI interface, you will need to start
               long-running PHP scripts, then you may need to increase this further.
 
               PHP_FCGI_MAX_REQUESTS (default value: 500)
+              !!! set MaxRequestCount of TALPhpRunnerEngine < PHP_FCGI_MAX_REQUESTS !!!
 
               This controls how many requests each child process will handle before
               exitting. When one process exits, another will be created. This tuning is
@@ -114,6 +116,8 @@ uses Windows,
      ISAPI2,
      HttpApp,
      WinSock,
+     Contnrs,
+     SyncObjs,
      ALHttpCommon,
      ALIsapiHttp;
 
@@ -153,7 +157,7 @@ type
 Below the list of some server variables.
 It's important to init them correctly
 before to call the execute methode of
-the TALPhpRunnerEngine because they
+the ALPhpRunnerEngine because they
 give to the engine all the neccessary
 params
 
@@ -272,29 +276,15 @@ code of Php5Isapi.dll
   URL
 ###############################################################################}
 
-  {----------------------------------------}
-  TALPhpFastCgiRunnerEngine = class(Tobject)
+  {---------------------------------}
+  TALPhpRunnerEngine = class(Tobject)
   private
-    FWSAData : TWSAData;
-    Fconnected: Boolean;
-    FSocketDescriptor: Integer;
-    Ftimeout: integer;
-    procedure Settimeout(const Value: integer);
   protected
-    procedure CheckError(Error: Boolean);
-    Function  SocketWrite(Var Buffer; Count: Longint): Longint; Virtual;
-    Function  SocketRead(var Buffer; Count: Longint): Longint; Virtual;
-    Procedure SendRequest(aRequest:String); virtual;
-    function  ReadResponse: String;
   public
-    constructor Create; virtual;
-    destructor  Destroy; override;
-    Procedure Connect(aHost: String; APort: integer);
-    Procedure Disconnect; virtual;
     procedure Execute(ServerVariables: Tstrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
-                      ResponseHeader: TALHTTPResponseHeader); overload; virtual;
+                      ResponseHeader: TALHTTPResponseHeader); overload; virtual; abstract;
     function  Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String; overload; virtual;
     procedure Execute(ServerVariables: Tstrings;
                       RequestContentString: String;
@@ -309,12 +299,124 @@ code of Php5Isapi.dll
     function  ExecutePostUrlEncoded(ServerVariables: Tstrings;
                                     PostDataStrings: TStrings;
                                     Const EncodeParams: Boolean=True): String; overload; virtual;
+  end;
+
+  {---------------------------------------------------}
+  TALPhpFastCgiRunnerEngine = class(TALPhpRunnerEngine)
+  private
+  protected
+    procedure CheckError(Error: Boolean); virtual; abstract;
+    Function  IOWrite(Var Buffer; Count: Longint): Longint; virtual; abstract;
+    Function  IORead(var Buffer; Count: Longint): Longint; virtual; abstract;
+    Procedure SendRequest(aRequest:String); virtual;
+    function  ReadResponse: String; virtual;
+  public
+    procedure Execute(ServerVariables: Tstrings;
+                      RequestContentStream: Tstream;
+                      ResponseContentStream: Tstream;
+                      ResponseHeader: TALHTTPResponseHeader); override;
+  end;
+
+  {----------------------------------------------------------------}
+  TALPhpSocketFastCgiRunnerEngine = class(TALPhpFastCgiRunnerEngine)
+  private
+    FWSAData : TWSAData;
+    Fconnected: Boolean;
+    FSocketDescriptor: Integer;
+    Ftimeout: integer;
+    procedure Settimeout(const Value: integer);
+  protected
+    procedure CheckError(Error: Boolean); override;
+    Function  IOWrite(Var Buffer; Count: Longint): Longint; override;
+    Function  IORead(var Buffer; Count: Longint): Longint; override;
+  public
+    constructor Create; overload; virtual;
+    constructor Create(aHost: String; APort: integer); overload; virtual;
+    destructor  Destroy; override;
+    Procedure Connect(aHost: String; APort: integer); virtual;
+    Procedure Disconnect; virtual;
     property Connected: Boolean read FConnected;
     Property Timeout: integer read Ftimeout write Settimeout default 60000;
   end;
 
-  {--------------------------------------}
-  TALPhpIsapiRunnerEngine = class(Tobject)
+  {-------------------------------------------------------------------}
+  TALPhpNamedPipeFastCgiRunnerEngine = class(TALPhpFastCgiRunnerEngine)
+  private
+    FServerPipe: Thandle;
+    fServerterminationEvent: Thandle;
+    fServerProcessInformation: TProcessInformation;
+    FClientPipe: Thandle;
+    FPipePath: String;
+    Fconnected: Boolean;
+    FRequestCount: Integer;
+    FMaxRequestCount: Integer;
+    fPhpInterpreterFileName: String;
+    Ftimeout: integer;
+  protected
+    procedure CheckError(Error: Boolean); override;
+    Function  IOWrite(Var Buffer; Count: Longint): Longint; override;
+    Function  IORead(var Buffer; Count: Longint): Longint; override;
+    Property  RequestCount: Integer read FRequestCount;
+  public
+    constructor Create; overload; virtual;
+    constructor Create(aPhpInterpreterFilename: String); overload; virtual;
+    destructor  Destroy; override;
+    Procedure Connect(aPhpInterpreterFilename: String); virtual;
+    Procedure Disconnect; virtual;
+    procedure Execute(ServerVariables: Tstrings;
+                      RequestContentStream: Tstream;
+                      ResponseContentStream: Tstream;
+                      ResponseHeader: TALHTTPResponseHeader); override;
+    property Connected: Boolean read FConnected;
+    Property Timeout: integer read Ftimeout write Ftimeout default 60000;
+    Property MaxRequestCount: Integer read FMaxRequestCount write FMaxRequestCount Default 450;
+  end;
+
+  {-------------------------------------------------------}
+  TALPhpNamedPipeFastCgiManager = class(TALPhpRunnerEngine)
+  private
+    fCriticalSection: TCriticalSection;
+    fPhpInterpreterFilename: String;
+    FWorkingPhpRunnerEngineCount: integer;
+    FAvailablePhpRunnerengineLst: TobjectList;
+    fProcessPoolSize: integer;
+    fIsDestroying: Boolean;
+    FMaxRequestCount: Integer;
+    Ftimeout: integer;
+  protected
+    Function  AcquirePHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine;
+    Procedure ReleasePHPRunnerEngine(aPHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine);
+  public
+    constructor Create; overload; virtual;
+    constructor Create(aPhpInterpreter: String); overload; virtual;
+    destructor  Destroy; override;
+    procedure Execute(ServerVariables: Tstrings;
+                      RequestContentStream: Tstream;
+                      ResponseContentStream: Tstream;
+                      ResponseHeader: TALHTTPResponseHeader); override;
+    Property PhpInterpreter: String read fPhpInterpreterFilename write fPhpInterpreterFilename;
+    Property ProcessPoolSize: integer read fProcessPoolSize write fProcessPoolSize default 8;
+    Property MaxRequestCount: Integer read FMaxRequestCount write FMaxRequestCount Default 450;
+    Property Timeout: integer read Ftimeout write Ftimeout default 60000;
+  end;
+
+  {-----------------------------------------------}
+  TALPhpCgiRunnerEngine = class(TALPhpRunnerEngine)
+  private
+    fPhpInterpreterFilename: String;
+  protected
+  public
+    constructor Create; overload; virtual;
+    constructor Create(aPhpInterpreter: String); overload; virtual;
+    procedure Execute(ServerVariables: Tstrings;
+                      RequestContentStream: Tstream;
+                      ResponseContentStream: Tstream;
+                      ResponseHeader: TALHTTPResponseHeader); override;
+    property PhpInterpreter: string read fPhpInterpreterFilename write fPhpInterpreterFilename;
+  end;
+
+  {-------------------------------------------------}
+  TALPhpIsapiRunnerEngine = class(TALPhpRunnerEngine)
   private
     fConnectionCount: Integer;
     fDLLhandle: THandle;
@@ -323,7 +425,8 @@ code of Php5Isapi.dll
   protected
     procedure CheckError(Error: Boolean);
   public
-    constructor Create; virtual;
+    constructor Create; overload; virtual;
+    constructor Create(const DLLFileName: String); overload; virtual;
     destructor  Destroy; override;
     procedure LoadDLL(const DLLFileName: String); virtual;
     Procedure UnloadDLL; virtual;
@@ -334,21 +437,7 @@ code of Php5Isapi.dll
     procedure Execute(ServerVariables: Tstrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
-                      ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String; overload; virtual;
-    procedure Execute(ServerVariables: Tstrings;
-                      RequestContentString: String;
-                      ResponseContentStream: Tstream;
-                      ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(ServerVariables: Tstrings; RequestContentString: String): String; overload; virtual;
-    procedure ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                    PostDataStrings: TStrings;
-                                    ResponseContentStream: Tstream;
-                                    ResponseHeader: TALHTTPResponseHeader;
-                                    Const EncodeParams: Boolean=True); overload; virtual;
-    function  ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                    PostDataStrings: TStrings;
-                                    Const EncodeParams: Boolean=True): String; overload; virtual;
+                      ResponseHeader: TALHTTPResponseHeader); overload; override;
     Property  DLLLoaded: Boolean read GetDllLoaded;
     property  Dllhandle: THandle read fDLLhandle;
   end;
@@ -388,7 +477,895 @@ function ALPhpIsapiRunnerECBServerSupportFunction(hConn: HCONN; HSERRequest: DWO
 implementation
 
 uses ALFcnWinSock,
-     AlFcnString;
+     AlFcnString,
+     AlFcnExecute,
+     AlFcnMisc,
+     AlFcnCGI;
+
+//////////////////////////////
+///// TALPhpRunnerEngine /////
+//////////////////////////////
+
+{***************************************************************************}
+procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
+                                                   PostDataStrings: TStrings;
+                                                   ResponseContentStream: Tstream;
+                                                   ResponseHeader: TALHTTPResponseHeader;
+                                                   Const EncodeParams: Boolean=True);
+Var aURLEncodedContentStream: TstringStream;
+    I: Integer;
+begin
+  aURLEncodedContentStream := TstringStream.create('');
+  try
+
+    if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
+    With PostDataStrings do
+      for i := 0 to Count - 1 do
+        If i < Count - 1 then aURLEncodedContentStream.WriteString(Strings[i] + '&')
+        else aURLEncodedContentStream.WriteString(Strings[i]);
+
+    ServerVariables.Values['REQUEST_METHOD'] := 'POST';
+    ServerVariables.Values['CONTENT_TYPE'] := 'application/x-www-form-urlencoded';
+
+    Execute(
+            ServerVariables,
+            aURLEncodedContentStream,
+            ResponseContentStream,
+            ResponseHeader
+           );
+  finally
+    aURLEncodedContentStream.free;
+  end;
+end;
+
+{***************************************************************************************************}
+function TALPhpRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentString: String): String;
+var ResponseContentStream: TStringStream;
+    ResponseHeader: TALHTTPResponseHeader;
+    RequestContentStream: TstringStream;
+begin
+  RequestContentStream := TStringStream.Create(RequestContentString);
+  ResponseContentStream := TStringStream.Create('');
+  ResponseHeader := TALHTTPResponseHeader.Create;
+  Try
+    Execute(
+            ServerVariables,
+            RequestContentStream,
+            ResponseContentStream,
+            ResponseHeader
+           );
+    Result := ResponseContentStream.DataString;
+  finally
+    ResponseContentStream.Free;
+    ResponseHeader.Free;
+    RequestContentStream.Free;
+  end;
+end;
+
+{*************************************************************}
+procedure TALPhpRunnerEngine.Execute(ServerVariables: Tstrings;
+                                     RequestContentString: String;
+                                     ResponseContentStream: Tstream;
+                                     ResponseHeader: TALHTTPResponseHeader);
+var RequestContentStream: TstringStream;
+begin
+  RequestContentStream := TStringStream.Create(RequestContentString);
+  Try
+    Execute(
+            ServerVariables,
+            RequestContentStream,
+            ResponseContentStream,
+            ResponseHeader
+           );
+  finally
+    RequestContentStream.Free;
+  end;
+end;
+
+{****************************************************************************************************}
+function TALPhpRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String;
+var ResponseContentStream: TStringStream;
+    ResponseHeader: TALHTTPResponseHeader;
+begin
+  ResponseContentStream := TStringStream.Create('');
+  ResponseHeader := TALHTTPResponseHeader.Create;
+  Try
+    Execute(
+            ServerVariables,
+            RequestContentStream,
+            ResponseContentStream,
+            ResponseHeader
+           );
+    Result := ResponseContentStream.DataString;
+  finally
+    ResponseContentStream.Free;
+    ResponseHeader.Free;
+  end;
+end;
+
+{**************************************************************************}
+function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
+                                                  PostDataStrings: TStrings;
+                                                  Const EncodeParams: Boolean=True): String;
+var ResponseContentStream: TStringStream;
+    ResponseHeader: TALHTTPResponseHeader;
+begin
+  ResponseContentStream := TStringStream.Create('');
+  ResponseHeader := TALHTTPResponseHeader.Create;
+  Try
+    ExecutePostUrlEncoded(
+                          ServerVariables,
+                          PostDataStrings,
+                          ResponseContentStream,
+                          ResponseHeader
+                         );
+    Result := ResponseContentStream.DataString;
+  finally
+    ResponseContentStream.Free;
+    ResponseHeader.Free;
+  end;
+end;
+
+
+
+
+/////////////////////////////////////
+///// TALPhpFastCgiRunnerEngine /////
+/////////////////////////////////////
+
+{****************************************************************}
+procedure TALPhpFastCgiRunnerEngine.SendRequest(aRequest: String);
+Var P: Pchar;
+    L: Integer;
+    ByteSent: integer;
+begin
+  p:=@aRequest[1]; // pchar
+  l:=length(aRequest);
+  while l>0 do begin
+    ByteSent:=IOWrite(p^,l);
+    if ByteSent<=0 then raise Exception.Create('Connection close gracefully!');
+    inc(p,ByteSent);
+    dec(l,ByteSent);
+  end;
+end;
+
+{******************************************************}
+function TALPhpFastCgiRunnerEngine.ReadResponse: String;
+
+  {--------------------------------------------------------}
+  Procedure InternalRead(var aStr: String; aCount: Longint);
+  var aBuffStr: String;
+      aBuffStrLength: Integer;
+  Begin
+    if aCount <= 0 then exit;
+    Setlength(aBuffStr,8192); // use a 8 ko buffer
+                              // we can also use IOCtlSocket(Socket, FIONREAD, @Tam) Use to determine the amount of
+                              // data pending in the network's input buffer that can be read from socket
+
+    while aCount > 0 do begin
+      aBuffStrLength := IORead(aBuffStr[1], length(aBuffStr));
+      If aBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
+      aStr := aStr + AlCopyStr(aBuffStr,1,aBuffStrLength);
+      dec(aCount,aBuffStrLength);
+    end;
+  End;
+
+Var ErrMsg: String;
+    CurrMsgStr: String;
+    CurrMsgContentlength: integer;
+    CurrMsgPaddingLength: integer;
+begin
+  {init the result and local var}
+  Result := '';
+  ErrMsg := '';
+  CurrMsgStr := '';
+
+  {loop throught all message}
+  While True do begin
+
+    //msg is of the form :
+    //version#type#requestIdB1#requestIdB0#contentLengthB1#contentLengthB0#paddingLength#reserved#contentData[contentLength]#paddingData[paddingLength];
+    //   [1]  [2]    [3]           [4]          [5]              [6]            [7]        [8]           [9]
+
+    {first read enalf of the message to know his size}
+    while length(CurrMsgStr) < 7 do InternalRead(CurrMsgStr, 1);
+
+    {first read enalf of the message to know the size}
+    CurrMsgContentlength := (byte(CurrMsgStr[5]) shl 8) + byte(CurrMsgStr[6]);
+                            //contentLengthB1             contentLengthB0
+    CurrMsgPaddingLength := byte(CurrMsgStr[7]);
+                            //paddingLength
+
+    {put the full message in CurrMsgStr}
+    InternalRead(CurrMsgStr, CurrMsgContentlength + CurrMsgPaddingLength + 8 - length(CurrMsgStr));
+
+    {if message = FCGI_END_REQUEST}
+    if CurrMsgStr[2] = #3 then Begin
+
+      //The contentData component of a FCGI_END_REQUEST record has the form:
+      //appStatusB3#appStatusB2#appStatusB1#appStatusB0#protocolStatus#reserved[3]
+      //  [9]           [10]        [11]        [12]          [13]          [14]
+
+      if ErrMsg <> '' then raise Exception.Create(ErrMsg)
+      else if (length(CurrMsgStr) < 13) or (CurrMsgStr[13] <> #0 {FCGI_REQUEST_COMPLETE}) then raise Exception.Create('The Php has encountered an error while processing the request!')
+      else exit; // ok, everything is ok so exit;
+
+    End
+
+    {else if message = FCGI_STDOUT}
+    else if CurrMsgStr[2] = #6 then begin
+      Result := Result + AlcopyStr(CurrMsgStr, 9, CurrMsgContentlength);
+      CurrMsgStr := AlCopyStr(CurrMsgStr,9+CurrMsgContentlength+CurrMsgPaddingLength, Maxint);
+    end
+
+    {else if message = FCGI_STDERR}
+    else if CurrMsgStr[2] = #7 then begin
+      ErrMsg := ErrMsg + AlcopyStr(CurrMsgStr, 9, CurrMsgContentlength);
+      CurrMsgStr := AlCopyStr(CurrMsgStr,9+CurrMsgContentlength+CurrMsgPaddingLength, Maxint);
+    end;
+
+    //else not possible, not in the fcgi spec, so skip the message,
+
+  end;
+
+end;
+
+{********************************************************************}
+procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
+                                            RequestContentStream: Tstream;
+                                            ResponseContentStream: Tstream;
+                                            ResponseHeader: TALHTTPResponseHeader);
+
+  {-------------------------------------------------------------------}
+  {i not understand why in FCGI_PARAMS we need to specify te contentlength
+   to max 65535 and in name value pair we can specify a length up to 17 Mo!
+   anyway a content length of 65535 for the server variable seam to be suffisant}
+  procedure InternalAddParam(var aStr : string; aName, aValue: string);
+  var I, J   : integer;
+      Len    : array[0..1] of integer;
+      Format : array[0..1] of integer;
+      Tam    : word;
+  begin
+
+    {----------}
+    Len[0] := length(aName);
+    if Len[0] <= 127 then Format[0] := 1
+    else Format[0] := 4;
+    {----------}
+    Len[1] := length(aValue);
+    if Len[1] <= 127 then Format[1] := 1
+    else Format[1] := 4;
+    {----------}
+    Tam := Len[0] + Format[0] + Len[1] + Format[1];
+    aStr := aStr +#1             +#4          +#0          +#1          +chr(hi(Tam))    +chr(lo(Tam))    +#0            +#0;
+    //           +FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
+    J := length(aStr);
+    SetLength(aStr, J + Tam);
+    inc(J);
+    for I := 0 to 1 do begin
+      if Format[I] = 1 then aStr[J] := char(Len[I])
+      else begin
+        aStr[J]   := char(((Len[I] shr  24) and $FF) + $80);
+        aStr[J+1] := char( (Len[I] shr  16) and $FF);
+        aStr[J+2] := char( (Len[I] shr   8) and $FF);
+        aStr[J+3] := char(  Len[I] and $FF);
+      end;
+      inc(J, Format[I]);
+    end;
+    move(aName[1], aStr[J], Len[0]);
+    move(aValue[1], aStr[J + Len[0]], Len[1]);
+
+    //the content data of the name value pair look like :
+    //nameLengthB0#valueLengthB0#nameData[nameLength]#valueData[valueLength]
+    //nameLengthB0#valueLengthB3#valueLengthB2#valueLengthB1#valueLengthB0#nameData[nameLength]#valueData[valueLength]
+    //nameLengthB3#nameLengthB2#nameLengthB1#nameLengthB0#valueLengthB0#nameData[nameLength]#valueData[valueLength]
+    //nameLengthB3#nameLengthB2#nameLengthB1#nameLengthB0#valueLengthB3#valueLengthB2#valueLengthB1#valueLengthB0#nameData[nameLength]#valueData[valueLength]
+
+  end;
+
+  {------------------------------------------}
+  function InternalAddServerVariables: string;
+  var aValue : string;
+      I : integer;
+  begin
+
+    {build result}
+    Result := '';
+    for I := 0 to ServerVariables.Count - 1 do begin
+      aValue := ServerVariables.ValueFromIndex[i];
+      if aValue <> '' then InternalAddParam(Result, ServerVariables.Names[I], aValue);
+    end;
+
+    {finalize Result with an empty FCGI_PARAMS}
+    Result := Result +#1             +#4          +#0          +#1          +#0              +#0              +#0            +#0;
+                    //FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
+
+  end;
+
+var aResponseStr: String;
+    aFormatedRequestStr : string;
+    Tam : word;
+    P1: integer;
+    S1 : String;
+begin
+
+  {init aFormatedRequestStr from aRequestStr}
+  aFormatedRequestStr := '';
+  if assigned(RequestContentStream) then begin
+    P1 := 1;
+    setlength(S1, 8184);
+    RequestContentStream.Position := 0;
+    while P1 <= RequestContentStream.Size do begin
+      Tam := RequestContentStream.Read(S1[1], 8184); // ok i decide to plit the message in 8ko, because php send me in FCGI_STDOUT message split in 8ko (including 8 bytes of header)
+      inc(P1, Tam);
+      aFormatedRequestStr := aFormatedRequestStr + #1             +#5         +#0          +#1          +chr(hi(Tam))    +chr(lo(Tam))    +#0            +#0       +AlCopyStr(S1,1,Tam);
+                                                 //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +contentData[contentLength]
+    end;
+
+    {For securty issue... if content_length badly set then cpu can go to 100%}
+    ServerVariables.Values['CONTENT_LENGTH']  := inttostr(RequestContentStream.Size);
+
+  end
+
+  {For securty issue... if content_length badly set then cpu can go to 100%}
+  else ServerVariables.Values['CONTENT_LENGTH']  := '0';
+
+  {finalize the aFormatedRequestStr with an empty FCGI_STDIN}
+  aFormatedRequestStr :=  aFormatedRequestStr + #1             +#5         +#0          +#1          +#0              +#0              +#0            +#0;
+                                              //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
+
+  SendRequest(
+              #1             +#1                 +#0          +#1          +#0              +#8              +#0            +#0       +#0     +#1             +#1             +#0       +#0       +#0       +#0       +#0      +
+            //FCGI_VERSION_1 +FCGI_BEGIN_REQUEST +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +roleB1 +FCGI_RESPONDER +FCGI_KEEP_CONN +reserved +reserved +reserved +reserved +reserved
+                                                                                                                                     //contentData[contentLength]-----------------------------------------------------
+              InternalAddServerVariables +
+              aFormatedRequestStr
+             );
+
+  {----------}
+  aResponseStr := ReadResponse;
+  P1 := AlPos(#13#10#13#10,aResponseStr);
+  if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');
+  ResponseHeader.RawHeaderText := AlCopyStr(aResponseStr,1,P1-1);
+  ResponseContentStream.Write(aResponseStr[P1 + 4], length(aResponseStr) - P1 - 3);
+
+end;
+
+
+
+
+///////////////////////////////////////////
+///// TALPhpSocketFastCgiRunnerEngine /////
+///////////////////////////////////////////
+
+{********************************************************************************}
+constructor TALPhpSocketFastCgiRunnerEngine.Create(aHost: String; APort: integer);
+Begin
+  create;
+  Connect(aHost, APort);
+End;
+
+{*************************************************}
+constructor TALPhpSocketFastCgiRunnerEngine.Create;
+begin
+  FWSAData.wVersion := 0;
+  Fconnected:= False;
+  FSocketDescriptor:= INVALID_SOCKET;
+  Ftimeout:= 60000;
+end;
+
+{*************************************************}
+destructor TALPhpSocketFastCgiRunnerEngine.Destroy;
+begin
+  If Fconnected then Disconnect;
+  inherited;
+end;
+
+{*******************************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.Connect(aHost: String; APort: integer);
+
+  {---------------------------------------------}
+  procedure CallServer(Server:string; Port:word);
+  var SockAddr:Sockaddr_in;
+      IP: String;
+  begin
+    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
+    CheckError(FSocketDescriptor=INVALID_SOCKET);
+    FillChar(SockAddr,SizeOf(SockAddr),0);
+    SockAddr.sin_family:=AF_INET;
+    SockAddr.sin_port:=swap(Port);
+    SockAddr.sin_addr.S_addr:=inet_addr(Pchar(Server));
+    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+      checkError(ALHostToIP(Server, IP));
+      SockAddr.sin_addr.S_addr:=inet_addr(Pchar(IP));
+    end;
+    CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
+  end;
+
+begin
+
+  if FConnected then raise Exception.Create('Already connected');
+
+  Try
+
+    WSAStartup (MAKEWORD(2,2), FWSAData);
+    CallServer(aHost,aPort);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    Fconnected := True;
+
+  Except
+    Disconnect;
+    raise;
+  end;
+
+end;
+
+{***************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.Disconnect;
+begin
+  If Fconnected then begin
+    ShutDown(FSocketDescriptor,SD_BOTH);
+    CloseSocket(FSocketDescriptor);
+    FSocketDescriptor := INVALID_SOCKET;
+    if FWSAData.wVersion = 2 then WSACleanup;
+    FWSAData.wVersion := 0;
+    Fconnected := False;
+  end;
+end;
+
+{*******************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.CheckError(Error: Boolean);
+begin
+  if Error then RaiseLastOSError;
+end;
+
+{*************************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.Settimeout(const Value: integer);
+begin
+  If Value <> Ftimeout then begin
+    if FConnected then begin
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    end;
+    Ftimeout := Value;
+  end;
+end;
+
+{***********************************************************************************}
+function TALPhpSocketFastCgiRunnerEngine.IORead(var Buffer; Count: Longint): Longint;
+begin
+  Result := Recv(FSocketDescriptor,Buffer,Count,0);
+  CheckError(Result = SOCKET_ERROR);
+end;
+
+{************************************************************************************}
+function TALPhpSocketFastCgiRunnerEngine.IOWrite(Var Buffer; Count: Longint): Longint;
+begin
+  Result := Send(FSocketDescriptor,Buffer,Count,0);
+  CheckError(Result =  SOCKET_ERROR);
+end;
+
+
+
+
+//////////////////////////////////////////////
+///// TALPhpNamedPipeFastCgiRunnerEngine /////
+//////////////////////////////////////////////
+
+{*************************************************************************************}
+constructor TALPhpNamedPipeFastCgiRunnerEngine.Create(aPhpInterpreterFilename: String);
+begin
+  Create;
+  Connect(aPhpInterpreterFilename);
+end;
+
+{****************************************************}
+constructor TALPhpNamedPipeFastCgiRunnerEngine.Create;
+begin
+  FServerPipe := INVALID_HANDLE_VALUE;
+  FClientPipe := INVALID_HANDLE_VALUE;
+  fServerterminationEvent := INVALID_HANDLE_VALUE;
+  fServerProcessInformation.hProcess := INVALID_HANDLE_VALUE;
+  fServerProcessInformation.hThread := INVALID_HANDLE_VALUE;
+  fServerProcessInformation.dwProcessId := 0;
+  fServerProcessInformation.dwThreadId := 0;
+  FRequestCount := 0;
+  FMaxRequestCount := 450;
+  fPhpInterpreterFileName := 'php-cgi.exe';
+  Fconnected:= False;
+  Ftimeout := 60000;
+end;
+
+{****************************************************}
+destructor TALPhpNamedPipeFastCgiRunnerEngine.Destroy;
+begin
+  if connected then disconnect;
+  inherited;
+end;
+
+{************************************************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Connect(aPhpInterpreterFilename: String);
+Var aStartupInfo: TStartupInfo;
+    aEnvironment: String;
+begin
+  if FConnected then raise Exception.Create('Already connected');
+
+  //create the pipepath here because if we do it in the oncreate the
+  //fpipepath can survive few seconds after the disconnection, making
+  //some trouble in the next execute loop (pipe has been ended)
+  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALMakeKeyStrByGUID;
+
+  //create the server pipe
+  FServerPipe := CreateNamedPipe(
+                                 Pchar(fpipePath),                                  //lpName
+                      		       PIPE_ACCESS_DUPLEX,                                //dwOpenMode
+		                             PIPE_TYPE_BYTE or PIPE_WAIT or PIPE_READMODE_BYTE, //dwPipeMode
+                     		         PIPE_UNLIMITED_INSTANCES,                          //nMaxInstances
+                     		         4096,                                              //nOutBufferSize
+                                 4096,                                              //nInBufferSize
+                                 0,                                                 //nDefaultTimeOut
+                                 NiL                                                //lpSecurityAttributes
+                                );
+  checkerror(FServerPipe = INVALID_HANDLE_VALUE);
+  try
+
+    //Make FServerPipe inheritable.
+    checkerror(not SetHandleInformation(FServerPipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
+
+		//create the termination event
+		fServerterminationEvent := CreateEvent(
+                                           NiL,   //lpEventAttributes
+                                           TRUE,  //bManualReset
+                                           FALSE, //bInitialState
+                                           NiL    //lpName
+                                          );
+    CheckError(fServerterminationEvent = INVALID_HANDLE_VALUE);
+    Try
+
+  		checkerror(not SetHandleInformation(fServerterminationEvent, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
+      aEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + inttostr(fServerterminationEvent) + #0#0;
+
+      // Set up the start up info struct.
+      ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
+      aStartupInfo.cb := sizeof(TStartupInfo);
+      aStartupInfo.lpReserved := nil;
+      aStartupInfo.lpReserved2 := nil;
+      aStartupInfo.cbReserved2 := 0;
+      aStartupInfo.lpDesktop := nil;
+      aStartupInfo.dwFlags := STARTF_USESTDHANDLES;
+      //FastCGI on NT will set the listener pipe HANDLE in the stdin of
+      //the new process.  The fact that there is a stdin and NULL handles
+      //for stdout and stderr tells the FastCGI process that this is a
+      //FastCGI process and not a CGI process.
+      aStartupInfo.hStdInput  := FServerPipe;
+      aStartupInfo.hStdOutput := INVALID_HANDLE_VALUE;
+      aStartupInfo.hStdError  := INVALID_HANDLE_VALUE;
+
+      //Make the listener socket inheritable.
+      checkerror(not SetHandleInformation(aStartupInfo.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
+
+      // Launch the process that you want to redirect.
+      CheckError(Not CreateProcess(
+                                   PChar(aPhpInterpreterFilename),   // pointer to name of executable module
+                                   nil,                              // pointer to command line string
+                                   nil,                              // pointer to process security attributes
+                                   NiL,                              // pointer to thread security attributes
+                                   TrUE,                             // handle inheritance flag
+                                   CREATE_NO_WINDOW,                 // creation flags
+                                   Pchar(aEnvironment),              // pointer to new environment block
+                                   nil,                              // pointer to current directory name
+                                   aStartupInfo,                     // pointer to STARTUPINFO
+                                   fServerProcessInformation         // pointer to PROCESS_INFORMATION
+                                  ));
+
+      CheckError(not WaitNamedPipe(Pchar(fPipePath), fTimeout));
+      FClientPipe := CreateFile(
+                                Pchar(fPipePath),                                   //lpFileName
+                                GENERIC_WRITE or GENERIC_READ,                      //dwDesiredAccess
+                                FILE_SHARE_READ or FILE_SHARE_WRITE,                //dwShareMode
+                                nil,                                                //lpSecurityAttributes
+                                OPEN_EXISTING,                                      //dwCreationDisposition
+                                0,                                                  //dwFlagsAndAttributes
+                                0                                                   //hTemplateFile
+                               );
+      CheckError(FClientPipe = INVALID_HANDLE_VALUE);
+
+    Except
+      CloseHandle(fServerterminationEvent);
+      fServerterminationEvent := INVALID_HANDLE_VALUE;
+      Raise;
+    End;
+
+  Except
+    Closehandle(FServerPipe);
+    FServerPipe := INVALID_HANDLE_VALUE;
+    raise;
+  end;
+  FConnected := True;
+  FRequestCount := 0;
+  fPhpInterpreterFileName := aPhpInterpreterFilename;
+end;
+
+{******************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Disconnect;
+var lpExitCode: DWORD;
+begin
+  If Fconnected then begin
+
+    //Send The Signal Shutdown, but it's seam than
+    //php-cgi not handle it, it's simply set a flag in_shutdown
+    //to 1 and not close the application
+		SetEvent(fServerterminationEvent);
+
+    //Force terminate the server is still active
+		GetExitCodeProcess(fServerProcessInformation.hProcess,  lpExitCode);
+		if (lpExitCode = STILL_ACTIVE) then TerminateProcess(fServerProcessInformation.hProcess, 1);
+
+    //close all the handle
+    CloseHandle(fServerProcessInformation.hProcess);
+    fServerProcessInformation.hProcess := INVALID_HANDLE_VALUE;
+    CloseHandle(fServerProcessInformation.hThread);
+    fServerProcessInformation.hThread := INVALID_HANDLE_VALUE;
+    fServerProcessInformation.dwProcessId := 0;
+    fServerProcessInformation.dwThreadId := 0;
+    CloseHandle(FClientPipe);
+    FClientPipe := INVALID_HANDLE_VALUE;
+    CloseHandle(fServerPipe);
+    fServerPipe := INVALID_HANDLE_VALUE;
+    CloseHandle(fServerterminationEvent);
+    fServerterminationEvent := INVALID_HANDLE_VALUE;
+
+    //set connected to false
+    Fconnected := False;
+    FRequestCount := 0;
+
+  end;
+end;
+
+{**********************************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.CheckError(Error: Boolean);
+begin
+  if Error then RaiseLastOSError
+end;
+
+{**************************************************************************************}
+function TALPhpNamedPipeFastCgiRunnerEngine.IORead(var Buffer; Count: Longint): Longint;
+Var lpNumberOfBytesRead: DWORD;
+    StartTickCount: DWORD;
+begin
+  //Ok i don't found any other way than this loop to do a timeout !
+  //timeout are neccessary if the php-cgi.exe dead suddenly for exemple
+  //in the way without timout the readfile will never return freezing the application
+  StartTickCount := GetTickCount;
+  Repeat
+    CheckError(
+               not PeekNamedPipe(
+                                 FClientPipe,            // handle to pipe to copy from
+                                 nil,                    // pointer to data buffer
+                                 0,                      // size, in bytes, of data buffer
+                                 nil,                    // pointer to number of bytes read
+                                 @lpNumberOfBytesRead,   // pointer to total number of bytes available
+                                 nil                     // pointer to unread bytes in this message
+                                )
+              );
+    if lpNumberOfBytesRead > 0 then begin
+      CheckError(not ReadFile(FClientPipe,Buffer,count,lpNumberOfBytesRead,nil));
+      result := lpNumberOfBytesRead;
+      break;
+    end
+    else result := 0;
+    sleep(0);
+  Until GetTickCount - StartTickCount > Dword(fTimeout);
+end;
+
+{***************************************************************************************}
+function TALPhpNamedPipeFastCgiRunnerEngine.IOWrite(Var Buffer; Count: Longint): Longint;
+Var lpNumberOfBytesWritten: DWORD;
+begin
+  CheckError(not WriteFile(FClientPipe,Buffer,Count,lpNumberOfBytesWritten,nil));
+  result := lpNumberOfBytesWritten;
+end;
+
+{*****************************************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
+                                                     RequestContentStream: Tstream;
+                                                     ResponseContentStream: Tstream;
+                                                     ResponseHeader: TALHTTPResponseHeader);
+begin
+  if (FMaxRequestCount > 0) and (FRequestCount >= FMaxRequestCount) then begin
+    Disconnect;
+    Connect(fPhpInterpreterFileName);
+  end;
+  inc(FRequestCount);
+
+  inherited Execute(
+                    ServerVariables,
+                    RequestContentStream,
+                    ResponseContentStream,
+                    ResponseHeader
+                   );
+end;
+
+
+
+
+////////////////////////////////////////////////
+///// TALPhpConcurrencyFastCgiRunnerEngine /////
+////////////////////////////////////////////////
+
+
+{***********************************************}
+constructor TALPhpNamedPipeFastCgiManager.Create;
+begin
+  fCriticalSection := TCriticalSection.create;
+  fPhpInterpreterFilename := 'php-cgi.exe';
+  FIsDestroying := False;
+  FWorkingPhpRunnerEngineCount := 0;
+  FAvailablePhpRunnerengineLst := TobjectList.Create(False);
+  fProcessPoolSize := 8;
+  FMaxRequestCount := 450;
+  Ftimeout := 60000;
+end;
+
+{************************************************************************}
+constructor TALPhpNamedPipeFastCgiManager.Create(aPhpInterpreter: String);
+begin
+  create;
+  fPhpInterpreterFilename := aPhpInterpreter;
+end;
+
+{***********************************************}
+destructor TALPhpNamedPipeFastCgiManager.Destroy;
+Var i: integer;
+begin
+
+  {we do this to forbid any new thread to create a new transaction}
+  fCriticalSection.Acquire;
+  Try
+    FIsDestroying := True;
+  finally
+    fCriticalSection.Release;
+  end;
+
+  {wait that all transaction are finished}
+  while true do begin
+    fCriticalSection.Acquire;
+    Try
+      if FWorkingPhpRunnerEngineCount <= 0 then break;
+    finally
+      fCriticalSection.Release;
+    end;
+    sleep(0);
+  end;
+
+  {free all object}
+  for i := 0 to FAvailablePhpRunnerengineLst.Count - 1 do
+    FAvailablePhpRunnerengineLst[i].Free;
+  FAvailablePhpRunnerengineLst.free;
+  fCriticalSection.free;
+
+  inherited;
+end;
+
+{************************************************************************************************}
+function TALPhpNamedPipeFastCgiManager.AcquirePHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine;
+begin
+  fCriticalSection.Acquire;
+  Try
+
+    //for a stupid warning (D2007)
+    Result := nil;
+
+    //raise an exception if the object is destroying
+    if FIsDestroying then raise exception.Create('Manager is destroying!');
+
+    //Extract one engine
+    If FAvailablePHPRunnerEngineLst.Count > 0 then begin
+      Result := TALPhpNamedPipeFastCgiRunnerEngine(FAvailablePHPRunnerEngineLst[(FAvailablePHPRunnerEngineLst.count - 1)]);
+      FAvailablePHPRunnerEngineLst.Delete(FAvailablePHPRunnerEngineLst.count - 1);
+    end
+    else begin
+      Result := TALPhpNamedPipeFastCgiRunnerEngine.Create(fPhpInterpreterFilename);
+      result.MaxRequestCount := FMaxRequestCount;
+      result.Timeout := fTimeout;
+    end;
+
+    //increase the number of Working PHPRunnerEngine
+    inc(FWorkingPHPRunnerEngineCount);
+
+  finally
+    fCriticalSection.Release;
+  end;
+end;
+
+{*********************************************$*********************************************************************}
+Procedure TALPhpNamedPipeFastCgiManager.ReleasePHPRunnerEngine(aPHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine);
+begin
+  fCriticalSection.Acquire;
+  Try
+
+    //decrease the number of Working PHPRunnerEngine
+    Dec(FWorkingPHPRunnerEngineCount);
+    if assigned(aPHPRunnerEngine) then begin
+      If (FAvailablePHPRunnerEngineLst.Count < fProcessPoolSize) then FAvailablePHPRunnerEngineLst.Add(aPHPRunnerEngine)
+      else aPHPRunnerEngine.free;
+    end;
+
+  finally
+    fCriticalSection.Release;
+  end;
+end;
+
+{************************************************************************}
+procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: Tstrings;
+                                                RequestContentStream: Tstream;
+                                                ResponseContentStream: Tstream;
+                                                ResponseHeader: TALHTTPResponseHeader);
+Var aPhpRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine;
+begin
+  aPhpRunnerEngine := AcquirePHPRunnerEngine;
+  try
+
+    try
+
+      aPhpRunnerEngine.Execute(
+                               ServerVariables,
+                               RequestContentStream,
+                               ResponseContentStream,
+                               ResponseHeader
+                              );
+
+    Except
+      freeandnil(aPhpRunnerEngine);
+      raise;
+    end;
+
+  finally
+    ReleasePHPRunnerEngine(aPhpRunnerEngine)
+  end;
+end;
+
+
+
+
+/////////////////////////////////
+///// TALPhpCgiRunnerEngine /////
+/////////////////////////////////
+
+{****************************************************************}
+constructor TALPhpCgiRunnerEngine.Create(aPhpInterpreter: String);
+begin
+  fPhpInterpreterFilename := aPhpInterpreter;
+end;
+
+{***************************************}
+constructor TALPhpCgiRunnerEngine.Create;
+begin
+  Create('php-cgi.exe');
+end;
+
+{****************************************************************}
+procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: Tstrings;
+                                        RequestContentStream: Tstream;
+                                        ResponseContentStream: Tstream;
+                                        ResponseHeader: TALHTTPResponseHeader);
+begin
+  AlCGIExec(
+            fPhpInterpreterFilename,
+            ServerVariables,
+            RequestContentStream,
+            ResponseContentStream,
+            ResponseHeader
+           );
+end;
+
+
+
+
+//////////////////////////////////////////////
+/////ALPhpIsapiRunnerECBGetServerVariable/////
+//////////////////////////////////////////////
 
 {*********************************************************************************************************************************}
 function ALPhpIsapiRunnerECBGetServerVariable(hConn: HCONN; VariableName: PChar; Buffer: Pointer; var Size: DWORD ): BOOL; stdcall;
@@ -526,6 +1503,13 @@ begin
   fHttpExtensionProcFunct := nil;
 end;
 
+{********************************************************************}
+constructor TALPhpIsapiRunnerEngine.Create(const DLLFileName: String);
+begin
+  Create;
+  loadDll(DLLFileName);
+end;
+
 {*****************************************}
 destructor TALPhpIsapiRunnerEngine.Destroy;
 begin
@@ -565,7 +1549,7 @@ procedure TALPhpIsapiRunnerEngine.UnloadDLL;
 Var TerminateExtensionFunct : TTerminateExtension;
 begin
   If DLLLoaded then Begin
-    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(100);
+    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(0);
     @TerminateExtensionFunct := GetProcAddress(fDLLHandle, 'TerminateExtension');
     If assigned(TerminateExtensionFunct) then TerminateExtensionFunct(HSE_TERM_MUST_UNLOAD);
     CheckError(not FreeLibrary(fDLLHandle));
@@ -715,125 +1699,7 @@ begin
   end;
 end;
 
-{*********************************************************************************************************}
-function TALPhpIsapiRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-begin
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    Execute(
-            ServerVariables,
-            RequestContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-  end;
-end;
 
-{******************************************************************}
-procedure TALPhpIsapiRunnerEngine.Execute(ServerVariables: Tstrings;
-                                          RequestContentString: String;
-                                          ResponseContentStream: Tstream;
-                                          ResponseHeader: TALHTTPResponseHeader);
-var RequestContentStream: TstringStream;
-begin
-  RequestContentStream := TStringStream.Create(RequestContentString);
-  Try
-    Execute(
-            ServerVariables,
-            RequestContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-  finally
-    RequestContentStream.Free;
-  end;
-end;
-
-{********************************************************************************************************}
-function TALPhpIsapiRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentString: String): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-    RequestContentStream: TstringStream;
-begin
-  RequestContentStream := TStringStream.Create(RequestContentString);
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    Execute(
-            ServerVariables,
-            RequestContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-    RequestContentStream.Free;
-  end;
-end;
-
-{********************************************************************************}
-procedure TALPhpIsapiRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                                        PostDataStrings: TStrings;
-                                                        ResponseContentStream: Tstream;
-                                                        ResponseHeader: TALHTTPResponseHeader;
-                                                        const EncodeParams: Boolean=True);
-Var aURLEncodedContentStream: TstringStream;
-    I: Integer;
-begin
-  aURLEncodedContentStream := TstringStream.create('');
-  try
-
-    if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
-    With PostDataStrings do
-      for i := 0 to Count - 1 do
-        If i < Count - 1 then aURLEncodedContentStream.WriteString(Strings[i] + '&')
-        else aURLEncodedContentStream.WriteString(Strings[i]);
-
-    ServerVariables.Values['REQUEST_METHOD'] := 'POST';
-    ServerVariables.Values['CONTENT_TYPE'] := 'application/x-www-form-urlencoded';
-
-    Execute(
-            ServerVariables,
-            aURLEncodedContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-  finally
-    aURLEncodedContentStream.free;
-  end;
-end;
-
-{*******************************************************************************}
-function TALPhpIsapiRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                                       PostDataStrings: TStrings;
-                                                       const EncodeParams: Boolean= True): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-begin
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    ExecutePostUrlEncoded(
-                          ServerVariables,
-                          PostDataStrings,
-                          ResponseContentStream,
-                          ResponseHeader
-                         );
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-  end;
-end;
 
 
 ////////////////////////////////
@@ -896,512 +1762,6 @@ end;
 function TALPhpIsapiRunnerTstringsECB.GetServerVariableValue(aName: String): String;
 begin
   Result := ServerVariablesObj.Values[aName];
-end;
-
-
-
-
-/////////////////////////////////////
-///// TALPhpFastCgiRunnerEngine /////
-/////////////////////////////////////
-
-{*******************************************}
-constructor TALPhpFastCgiRunnerEngine.Create;
-begin
-  FWSAData.wVersion := 0;
-  Fconnected:= False;
-  FSocketDescriptor:= INVALID_SOCKET;
-  Ftimeout:= 60000;
-end;
-
-{*******************************************}
-destructor TALPhpFastCgiRunnerEngine.Destroy;
-begin
-  If Fconnected then Disconnect;
-  inherited;
-end;
-
-{*************************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Connect(aHost: String; APort: integer);
-
-  {---------------------------------------------}
-  procedure CallServer(Server:string; Port:word);
-  var SockAddr:Sockaddr_in;
-      IP: String;
-  begin
-    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
-    CheckError(FSocketDescriptor=INVALID_SOCKET);
-    FillChar(SockAddr,SizeOf(SockAddr),0);
-    SockAddr.sin_family:=AF_INET;
-    SockAddr.sin_port:=swap(Port);
-    SockAddr.sin_addr.S_addr:=inet_addr(Pchar(Server));
-    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-      checkError(ALHostToIP(Server, IP));
-      SockAddr.sin_addr.S_addr:=inet_addr(Pchar(IP));
-    end;
-    CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-  end;
-
-begin
-  if FConnected then raise Exception.Create('Already connected');
-
-  Try
-
-    WSAStartup (MAKEWORD(2,2), FWSAData);
-    CallServer(aHost,aPort);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    Fconnected := True;
-
-  Except
-    Disconnect;
-    raise;
-  end;
-
-end;
-
-{*********************************************}
-procedure TALPhpFastCgiRunnerEngine.Disconnect;
-begin
-  If Fconnected then begin
-    ShutDown(FSocketDescriptor,SD_BOTH);
-    CloseSocket(FSocketDescriptor);
-    FSocketDescriptor := INVALID_SOCKET;
-    if FWSAData.wVersion = 2 then WSACleanup;
-    FWSAData.wVersion := 0;
-    Fconnected := False;
-  end;
-end;
-
-{*************************************************************}
-procedure TALPhpFastCgiRunnerEngine.CheckError(Error: Boolean);
-var ErrCode: Integer;
-    S: string;
-begin
-  ErrCode := WSAGetLastError;
-  if Error and (ErrCode <> 0) then begin
-    Case ErrCode Of
-      WSAEINTR: S := 'Interrupted function call';
-      WSAEACCES: S := 'Permission denied';
-      WSAEFAULT: S := 'Bad address';
-      WSAEINVAL: S := 'Invalid argument';
-      WSAEMFILE: S := 'Too many open files';
-      WSAEWOULDBLOCK: S := 'Resource temporarily unavailable';
-      WSAEINPROGRESS: S := 'Operation now in progress';
-      WSAEALREADY: S := 'Operation already in progress';
-      WSAENOTSOCK: S := 'Socket operation on nonsocket';
-      WSAEDESTADDRREQ: S := 'Destination address required';
-      WSAEMSGSIZE: S := 'Message too long';
-      WSAEPROTOTYPE: S := 'Protocol wrong type for socket';
-      WSAENOPROTOOPT: S := 'Bad protocol option';
-      WSAEPROTONOSUPPORT: S := 'Protocol not supported';
-      WSAESOCKTNOSUPPORT: S := 'Socket type not supported';
-      WSAEOPNOTSUPP: S := 'Operation not supported';
-      WSAEPFNOSUPPORT: S := 'Protocol family not supported';
-      WSAEAFNOSUPPORT: S := 'Address family not supported by protocol family';
-      WSAEADDRINUSE: S := 'Address already in use';
-      WSAEADDRNOTAVAIL: S := 'Cannot assign requested address';
-      WSAENETDOWN: S := 'Network is down';
-      WSAENETUNREACH: S := 'Network is unreachable';
-      WSAENETRESET: S := 'Network dropped connection on reset';
-      WSAECONNABORTED: S := 'Software caused connection abort';
-      WSAECONNRESET: S := 'Connection reset by peer';
-      WSAENOBUFS: S := 'No buffer space available';
-      WSAEISCONN: S := 'Socket is already connected';
-      WSAENOTCONN: S := 'Socket is not connected';
-      WSAESHUTDOWN: S := 'Cannot send after socket shutdown';
-      WSAETIMEDOUT: S := 'Connection timed out';
-      WSAECONNREFUSED: S := 'Connection refused';
-      WSAEHOSTDOWN: S := 'Host is down';
-      WSAEHOSTUNREACH: S := 'No route to host';
-      WSAEPROCLIM: S := 'Too many processes';
-      WSASYSNOTREADY: S := 'Network subsystem is unavailable';
-      WSAVERNOTSUPPORTED: S := 'Winsock.dll version out of range';
-      WSANOTINITIALISED: S := 'Successful WSAStartup not yet performed';
-      WSAEDISCON: S := 'Graceful shutdown in progress';
-      WSAHOST_NOT_FOUND: S := 'Host not found';
-      WSATRY_AGAIN: S := 'Nonauthoritative host not found';
-      WSANO_RECOVERY: S := 'This is a nonrecoverable error';
-      WSANO_DATA: S := 'Valid name, no data record of requested type';
-      else Begin
-        SetLength(S, 256);
-        FormatMessage(
-                      FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
-                      Pointer(GetModuleHandle('wsock32.dll')),
-                      ErrCode,
-                      0,
-                      PChar(S),
-                      Length(S),
-                      nil
-                     );
-        SetLength(S, StrLen(PChar(S)));
-        while (Length(S) > 0) and (S[Length(S)] in [#10, #13]) do SetLength(S, Length(S) - 1);
-      end;
-    end;
-    raise Exception.CreateFmt('%s (Error code:%s)', [S, inttostr(ErrCode)]);      { Do not localize }
-  end;
-end;
-
-{*******************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Settimeout(const Value: integer);
-begin
-  If Value <> Ftimeout then begin
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    Ftimeout := Value;
-  end;
-end;
-
-{*********************************************************************************}
-function TALPhpFastCgiRunnerEngine.SocketRead(var Buffer; Count: Longint): Longint;
-begin
-  Result := Recv(FSocketDescriptor,Buffer,Count,0);
-  CheckError(Result = SOCKET_ERROR);
-end;
-
-{**********************************************************************************}
-function TALPhpFastCgiRunnerEngine.SocketWrite(Var Buffer; Count: Longint): Longint;
-begin
-  Result := Send(FSocketDescriptor,Buffer,Count,0);
-  CheckError(Result =  SOCKET_ERROR);
-end;
-
-{****************************************************************}
-procedure TALPhpFastCgiRunnerEngine.SendRequest(aRequest: String);
-Var P: Pchar;
-    L: Integer;
-    ByteSent: integer;
-begin
-  p:=@aRequest[1]; // pchar
-  l:=length(aRequest);
-  while l>0 do begin
-    ByteSent:=SocketWrite(p^,l);
-    if ByteSent<=0 then raise Exception.Create('Connection close gracefully!');
-    inc(p,ByteSent);
-    dec(l,ByteSent);
-  end;
-end;
-
-{******************************************************}
-function TALPhpFastCgiRunnerEngine.ReadResponse: String;
-
-  {--------------------------------------------------------}
-  Procedure InternalRead(var aStr: String; aCount: Longint);
-  var aBuffStr: String;
-      aBuffStrLength: Integer;
-  Begin
-    if aCount <= 0 then exit;
-    Setlength(aBuffStr,16384); // use a 16 ko buffer
-                               // we can also use IOCtlSocket(Socket, FIONREAD, @Tam) Use to determine the amount of
-                               // data pending in the network's input buffer that can be read from socket
-
-    while aCount > 0 do begin
-      aBuffStrLength := SocketRead(aBuffStr[1], length(aBuffStr));
-      If aBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
-      aStr := aStr + AlCopyStr(aBuffStr,1,aBuffStrLength);
-      dec(aCount,aBuffStrLength);
-    end;
-  End;
-
-Var ErrMsg: String;
-    CurrMsgStr: String;
-    CurrMsgContentlength: integer;
-    CurrMsgPaddingLength: integer;
-begin
-  {init the result and local var}
-  Result := '';
-  ErrMsg := '';
-  CurrMsgStr := '';
-
-  {loop throught all message}
-  While True do begin
-
-    //msg is of the form :
-    //version#type#requestIdB1#requestIdB0#contentLengthB1#contentLengthB0#paddingLength#reserved#contentData[contentLength]#paddingData[paddingLength];
-    //   [1]  [2]    [3]           [4]          [5]              [6]            [7]        [8]           [9]
-
-    {first read enalf of the message to know his size}
-    while length(CurrMsgStr) < 7 do InternalRead(CurrMsgStr, 1);
-
-    {first read enalf of the message to know the size}
-    CurrMsgContentlength := (byte(CurrMsgStr[5]) shl 8) + byte(CurrMsgStr[6]);
-                            //contentLengthB1             contentLengthB0
-    CurrMsgPaddingLength := byte(CurrMsgStr[7]);
-                            //paddingLength
-
-    {put the full message in CurrMsgStr}
-    InternalRead(CurrMsgStr, CurrMsgContentlength + CurrMsgPaddingLength + 8 - length(CurrMsgStr));
-
-    {if message = FCGI_END_REQUEST}
-    if CurrMsgStr[2] = #3 then Begin
-
-      //The contentData component of a FCGI_END_REQUEST record has the form:
-      //appStatusB3#appStatusB2#appStatusB1#appStatusB0#protocolStatus#reserved[3]
-      //  [9]           [10]        [11]        [12]          [13]          [14]
-
-      if ErrMsg <> '' then raise Exception.Create(ErrMsg)
-      else if (length(CurrMsgStr) < 13) or (CurrMsgStr[13] <> #0 {FCGI_REQUEST_COMPLETE}) then raise Exception.Create('The Php has encountered an error while processing the request!')
-      else exit; // ok, everything is ok so exit;
-
-    End
-
-    {else if message = FCGI_STDOUT}
-    else if CurrMsgStr[2] = #6 then begin
-      Result := Result + AlcopyStr(CurrMsgStr, 9, CurrMsgContentlength);
-      CurrMsgStr := AlCopyStr(CurrMsgStr,9+CurrMsgContentlength+CurrMsgPaddingLength, Maxint);
-    end
-
-    {else if message = FCGI_STDERR}
-    else if CurrMsgStr[2] = #7 then begin
-      ErrMsg := ErrMsg + AlcopyStr(CurrMsgStr, 9, CurrMsgContentlength);
-      CurrMsgStr := AlCopyStr(CurrMsgStr,9+CurrMsgContentlength+CurrMsgPaddingLength, Maxint);
-    end;
-
-    //else not possible, not in the fcgi spec, so skip the message,
-
-  end;
-
-end;
-
-{*********************************************************************************}
-procedure TALPhpFastCgiRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                                          PostDataStrings: TStrings;
-                                                          ResponseContentStream: Tstream;
-                                                          ResponseHeader: TALHTTPResponseHeader;
-                                                          Const EncodeParams: Boolean=True);
-Var aURLEncodedContentStream: TstringStream;
-    I: Integer;
-begin
-  aURLEncodedContentStream := TstringStream.create('');
-  try
-
-    if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
-    With PostDataStrings do
-      for i := 0 to Count - 1 do
-        If i < Count - 1 then aURLEncodedContentStream.WriteString(Strings[i] + '&')
-        else aURLEncodedContentStream.WriteString(Strings[i]);
-
-    ServerVariables.Values['REQUEST_METHOD'] := 'POST';
-    ServerVariables.Values['CONTENT_TYPE'] := 'application/x-www-form-urlencoded';
-
-    Execute(
-            ServerVariables,
-            aURLEncodedContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-  finally
-    aURLEncodedContentStream.free;
-  end;
-end;
-
-{********************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
-                                            RequestContentStream: Tstream;
-                                            ResponseContentStream: Tstream;
-                                            ResponseHeader: TALHTTPResponseHeader);
-
-  {-------------------------------------------------------------------}
-  {i not understand why in FCGI_PARAMS we need to specify te contentlength
-   to max 65535 and in name value pair we can specify a length up to 17 Mo!
-   anyway a content length of 65535 for the server variable seam to be suffisant}
-  procedure InternalAddParam(var aStr : string; aName, aValue: string);
-  var I, J   : integer;
-      Len    : array[0..1] of integer;
-      Format : array[0..1] of integer;
-      Tam    : word;
-  begin
-
-    {----------}
-    Len[0] := length(aName);
-    if Len[0] <= 127 then Format[0] := 1
-    else Format[0] := 4;
-    {----------}
-    Len[1] := length(aValue);
-    if Len[1] <= 127 then Format[1] := 1
-    else Format[1] := 4;
-    {----------}
-    Tam := Len[0] + Format[0] + Len[1] + Format[1];
-    aStr := aStr +#1             +#4          +#0          +#1          +chr(hi(Tam))    +chr(lo(Tam))    +#0            +#0;
-    //           +FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
-    J := length(aStr);
-    SetLength(aStr, J + Tam);
-    inc(J);
-    for I := 0 to 1 do begin
-      if Format[I] = 1 then aStr[J] := char(Len[I])
-      else begin
-        aStr[J]   := char(((Len[I] shr  24) and $FF) + $80);
-        aStr[J+1] := char( (Len[I] shr  16) and $FF);
-        aStr[J+2] := char( (Len[I] shr   8) and $FF);
-        aStr[J+3] := char(  Len[I] and $FF);
-      end;
-      inc(J, Format[I]);
-    end;
-    move(aName[1], aStr[J], Len[0]);
-    move(aValue[1], aStr[J + Len[0]], Len[1]);
-
-    //the content data of the name value pair look like :
-    //nameLengthB0#valueLengthB0#nameData[nameLength]#valueData[valueLength]
-    //nameLengthB0#valueLengthB3#valueLengthB2#valueLengthB1#valueLengthB0#nameData[nameLength]#valueData[valueLength]
-    //nameLengthB3#nameLengthB2#nameLengthB1#nameLengthB0#valueLengthB0#nameData[nameLength]#valueData[valueLength]
-    //nameLengthB3#nameLengthB2#nameLengthB1#nameLengthB0#valueLengthB3#valueLengthB2#valueLengthB1#valueLengthB0#nameData[nameLength]#valueData[valueLength]
-
-  end;
-
-  {------------------------------------------}
-  function InternalAddServerVariables: string;
-  var aValue : string;
-      I : integer;
-  begin
-
-    {build result}
-    Result := '';
-    for I := 0 to ServerVariables.Count - 1 do begin
-      aValue := ServerVariables.ValueFromIndex[i];
-      if aValue <> '' then InternalAddParam(Result, ServerVariables.Names[I], aValue);
-    end;
-
-    {finalize Result with an empty FCGI_PARAMS}
-    Result := Result +#1             +#4          +#0          +#1          +#0              +#0              +#0            +#0;
-                    //FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
-
-  end;
-
-var aResponseStr: String;
-    aFormatedRequestStr : string;
-    Tam : word;
-    P1: integer;
-    S1 : String;
-begin
-
-  {init aFormatedRequestStr from aRequestStr}
-  aFormatedRequestStr := '';
-  if assigned(RequestContentStream) then begin
-    P1 := 1;
-    setlength(S1, 8184);
-    RequestContentStream.Position := 0;
-    while P1 <= RequestContentStream.Size do begin
-      Tam := RequestContentStream.Read(S1[1], 8184); // ok i decide to plit the message in 8ko, because php send me in FCGI_STDOUT message split in 8ko (including 8 bytes of header)
-      inc(P1, Tam);
-      aFormatedRequestStr := aFormatedRequestStr + #1             +#5         +#0          +#1          +chr(hi(Tam))    +chr(lo(Tam))    +#0            +#0       +AlCopyStr(S1,1,Tam);
-                                                 //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +contentData[contentLength]
-    end;
-
-    {For securty issue... if content_length badly set then cpu can go to 100%}
-    ServerVariables.Values['CONTENT_LENGTH']  := inttostr(RequestContentStream.Size);
-
-  end
-
-  {For securty issue... if content_length badly set then cpu can go to 100%}
-  else ServerVariables.Values['CONTENT_LENGTH']  := '0';
-
-  {finalize the aFormatedRequestStr with an empty FCGI_STDIN}
-  aFormatedRequestStr :=  aFormatedRequestStr + #1             +#5         +#0          +#1          +#0              +#0              +#0            +#0;
-                                              //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
-
-  SendRequest(
-              #1             +#1                 +#0          +#1          +#0              +#8              +#0            +#0       +#0     +#1             +#0    +#0       +#0       +#0       +#0       +#0      +
-            //FCGI_VERSION_1 +FCGI_BEGIN_REQUEST +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +roleB1 +FCGI_RESPONDER +flags +reserved +reserved +reserved +reserved +reserved
-                                                                                                                                     //contentData[contentLength]-----------------------------------------------------
-              InternalAddServerVariables +
-              aFormatedRequestStr
-             );
-
-  {----------}
-  aResponseStr := ReadResponse;
-  P1 := AlPos(#13#10#13#10,aResponseStr);
-  if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');
-  ResponseHeader.RawHeaderText := AlCopyStr(aResponseStr,1,P1-1);
-  ResponseContentStream.Write(aResponseStr[P1 + 4], length(aResponseStr) - P1 - 3);
-
-end;
-
-{**********************************************************************************************************}
-function TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentString: String): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-    RequestContentStream: TstringStream;
-begin
-  RequestContentStream := TStringStream.Create(RequestContentString);
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    Execute(
-            ServerVariables,
-            RequestContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-    RequestContentStream.Free;
-  end;
-end;
-
-{********************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
-                                            RequestContentString: String;
-                                            ResponseContentStream: Tstream;
-                                            ResponseHeader: TALHTTPResponseHeader);
-var RequestContentStream: TstringStream;
-begin
-  RequestContentStream := TStringStream.Create(RequestContentString);
-  Try
-    Execute(
-            ServerVariables,
-            RequestContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-  finally
-    RequestContentStream.Free;
-  end;
-end;
-
-{***********************************************************************************************************}
-function TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-begin
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    Execute(
-            ServerVariables,
-            RequestContentStream,
-            ResponseContentStream,
-            ResponseHeader
-           );
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-  end;
-end;
-
-{*********************************************************************************}
-function TALPhpFastCgiRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                                         PostDataStrings: TStrings;
-                                                         Const EncodeParams: Boolean=True): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-begin
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    ExecutePostUrlEncoded(
-                          ServerVariables,
-                          PostDataStrings,
-                          ResponseContentStream,
-                          ResponseHeader
-                         );
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-  end;
 end;
 
 end.

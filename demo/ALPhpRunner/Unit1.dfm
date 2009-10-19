@@ -3,8 +3,8 @@ object Form1: TForm1
   Top = 351
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'TALWinHttpClient test'
-  ClientHeight = 600
+  Caption = 'TALPHPRunner'
+  ClientHeight = 696
   ClientWidth = 800
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,46 +14,37 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object MainStatusBar: TStatusBar
     Left = 0
-    Top = 581
+    Top = 677
     Width = 800
     Height = 19
     Panels = <
       item
         Width = 300
-      end
-      item
-        Width = 250
-      end
-      item
-        Width = 50
       end>
+    ExplicitTop = 581
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 0
     Width = 800
-    Height = 581
+    Height = 677
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 1
+    ExplicitHeight = 581
     object TabSheet1: TTabSheet
       Caption = 'Main'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 553
       object GroupBox9: TGroupBox
-        Left = 8
-        Top = 8
+        Left = 3
+        Top = 123
         Width = 777
-        Height = 193
-        Caption = 'REQUEST'
+        Height = 166
+        Caption = 'PARAMS'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
@@ -146,7 +137,7 @@ object Form1: TForm1
           Left = 8
           Top = 88
           Width = 337
-          Height = 96
+          Height = 65
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -160,8 +151,8 @@ object Form1: TForm1
           WordWrap = False
         end
         object ButtonInitAndPost: TButton
-          Left = 428
-          Top = 21
+          Left = 432
+          Top = 17
           Width = 75
           Height = 25
           Caption = 'Init && Post'
@@ -175,8 +166,8 @@ object Form1: TForm1
           OnClick = ButtonInitAndPostClick
         end
         object ButtonInitAndGet: TButton
-          Left = 350
-          Top = 21
+          Left = 351
+          Top = 17
           Width = 75
           Height = 25
           Caption = 'Init && Get'
@@ -189,40 +180,11 @@ object Form1: TForm1
           TabOrder = 3
           OnClick = ButtonInitAndGetClick
         end
-        object Panel1: TPanel
-          Left = 567
-          Top = 12
-          Width = 200
-          Height = 70
-          BevelOuter = bvNone
-          BorderStyle = bsSingle
-          Ctl3D = False
-          ParentColor = True
-          ParentCtl3D = False
-          TabOrder = 4
-          object Label9: TLabel
-            Left = 5
-            Top = 8
-            Width = 189
-            Height = 52
-            Caption = 
-              'Please add in your website a link to http://www.arkadia.com or s' +
-              'end me an email to svanderclock@arkadia.com if you like this com' +
-              'ponent!'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clTeal
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = []
-            ParentFont = False
-            WordWrap = True
-          end
-        end
         object MemoServerVariables: TMemo
           Left = 370
           Top = 87
           Width = 398
-          Height = 96
+          Height = 66
           BevelInner = bvNone
           BevelOuter = bvNone
           Ctl3D = False
@@ -239,30 +201,49 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           ScrollBars = ssVertical
-          TabOrder = 5
+          TabOrder = 4
           WordWrap = False
         end
-        object ButtonExecute: TButton
-          Left = 507
-          Top = 21
-          Width = 51
-          Height = 25
-          Caption = 'Execute'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
+        object RadioButtonPHPCGIRunnerEngineKind: TRadioButton
+          Left = 529
+          Top = 17
+          Width = 48
+          Height = 17
+          Caption = 'CGI'
+          Checked = True
+          TabOrder = 5
+          TabStop = True
+        end
+        object RadioButtonPHPNamedPipeFastCGIRunnerEngineKind: TRadioButton
+          Left = 599
+          Top = 17
+          Width = 138
+          Height = 17
+          Caption = 'NamedPipe FastCGI'
           TabOrder = 6
-          OnClick = ButtonExecuteClick
+        end
+        object RadioButtonPHPSocketFastCGIRunnerEngineKind: TRadioButton
+          Left = 599
+          Top = 40
+          Width = 138
+          Height = 17
+          Caption = 'Socket FastCGI'
+          TabOrder = 7
+        end
+        object RadioButtonPHPISAPIRunnerEngineKind: TRadioButton
+          Left = 529
+          Top = 40
+          Width = 64
+          Height = 17
+          Caption = 'ISAPI'
+          TabOrder = 8
         end
       end
       object GroupBox10: TGroupBox
-        Left = 8
-        Top = 208
+        Left = 3
+        Top = 295
         Width = 777
-        Height = 338
+        Height = 226
         Caption = 'RESPONSE'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -301,7 +282,7 @@ object Form1: TForm1
           Left = 8
           Top = 37
           Width = 289
-          Height = 290
+          Height = 180
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -319,7 +300,7 @@ object Form1: TForm1
           Left = 304
           Top = 37
           Width = 465
-          Height = 290
+          Height = 180
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -347,6 +328,283 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 2
           OnClick = ButtonOpenInExplorerClick
+        end
+      end
+      object GroupBox1: TGroupBox
+        Left = 3
+        Top = 3
+        Width = 777
+        Height = 114
+        Caption = 'INTERPRETER'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 2
+        object Label11: TLabel
+          Left = 8
+          Top = 27
+          Width = 105
+          Height = 13
+          Caption = 'PHP-CGI.exe Path'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label8: TLabel
+          Left = 8
+          Top = 52
+          Width = 102
+          Height = 13
+          Caption = 'php5isapi.dll Path'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label9: TLabel
+          Left = 8
+          Top = 77
+          Width = 73
+          Height = 13
+          Caption = 'FastCgi Host'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label10: TLabel
+          Left = 317
+          Top = 77
+          Width = 70
+          Height = 13
+          Caption = 'FastCgi Port'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label12: TLabel
+          Left = 119
+          Top = 96
+          Width = 142
+          Height = 13
+          Caption = 'php-cgi.exe -b 127.0.0.1:9000'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object EditPhpCGIPath: TEdit
+          Left = 119
+          Top = 25
+          Width = 384
+          Height = 19
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 0
+          Text = 'c:\program files\php\php-cgi.exe'
+        end
+        object Panel2: TPanel
+          Left = 551
+          Top = 28
+          Width = 200
+          Height = 61
+          BevelOuter = bvNone
+          BorderStyle = bsSingle
+          Ctl3D = False
+          ParentColor = True
+          ParentCtl3D = False
+          TabOrder = 1
+          object Label14: TLabel
+            Left = 5
+            Top = 0
+            Width = 189
+            Height = 52
+            Caption = 
+              'Please add in your website a link to http://www.arkadia.com or s' +
+              'end me an email to svanderclock@arkadia.com if you like this com' +
+              'ponent!'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clTeal
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            WordWrap = True
+          end
+        end
+        object EditPhpIsapiDllPath: TEdit
+          Left = 119
+          Top = 50
+          Width = 384
+          Height = 19
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 2
+          Text = 'c:\program files\php\php5isapi.dll'
+        end
+        object EditPhpFastCgiHost: TEdit
+          Left = 119
+          Top = 75
+          Width = 194
+          Height = 19
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 3
+          Text = '127.0.0.1'
+        end
+        object EditPhpFastCgiPort: TEdit
+          Left = 393
+          Top = 75
+          Width = 110
+          Height = 19
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 4
+          Text = '9000'
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 3
+        Top = 519
+        Width = 777
+        Height = 122
+        Caption = 'BENCH'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 3
+        object Label13: TLabel
+          Left = 8
+          Top = 91
+          Width = 92
+          Height = 13
+          Caption = 'Cycles / Thread'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object Label15: TLabel
+          Left = 8
+          Top = 64
+          Width = 41
+          Height = 13
+          Caption = 'Thread'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+        end
+        object ButtonBench: TButton
+          Left = 8
+          Top = 25
+          Width = 148
+          Height = 25
+          Caption = 'Bench'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 0
+          OnClick = ButtonBenchClick
+        end
+        object EditThreadCount: TEdit
+          Left = 106
+          Top = 64
+          Width = 50
+          Height = 19
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 1
+          Text = '12'
+        end
+        object EditCycleCount: TEdit
+          Left = 106
+          Top = 89
+          Width = 50
+          Height = 19
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          TabOrder = 2
+          Text = '1000'
+        end
+        object MemoBenchResult: TMemo
+          Left = 176
+          Top = 14
+          Width = 592
+          Height = 99
+          Ctl3D = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentCtl3D = False
+          ParentFont = False
+          ReadOnly = True
+          ScrollBars = ssVertical
+          TabOrder = 3
+          WordWrap = False
         end
       end
     end

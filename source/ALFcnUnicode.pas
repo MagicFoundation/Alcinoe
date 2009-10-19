@@ -91,6 +91,12 @@ Function ALGetCodePageFromLCID(aLCID:Integer): Word;
 Function ALUTF8ISO91995CyrillicToLatin(aCyrillicText: UTF8String): UTF8String;
 Function ALUTF8BGNPCGN1947CyrillicToLatin(aCyrillicText: UTF8String): UTF8String;
 
+Const cAlUTF8Bom = #$EF#$BB#$BF;
+      cAlUTF16LittleEndianBom = #$FF#$FE;
+      cAlUTF16bigEndianBom = #$FE#$FF;
+      cAlUTF32LittleEndianBom = #$FF#$FE#$00#$00;
+      cAlUTF32BigEndianBom = #$00#$00#$FE#$FF;
+
 implementation
 
 uses SysUtils,

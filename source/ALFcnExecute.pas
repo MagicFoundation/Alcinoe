@@ -56,12 +56,43 @@ uses windows,
      sysutils,
      messages;
 
+Function AlGetEnvironmentString: string;
 function ALWinExec32(const FileName, CurrentDirectory, Environment: string; InputStream: Tstream; OutputStream: TStream): Dword; overload;
 function ALWinExec32(const FileName: string; InputStream: Tstream; OutputStream: TStream): Dword; overload;
 function ALWinExecAndWait32(FileName:String; Visibility : integer):DWORD;
 Function ALWinExecAndWait32V2(FileName: String; Visibility: integer): DWORD;
 
 implementation
+
+uses AlFcnString;
+
+{**************************************}
+Function AlGetEnvironmentString: string;
+var P, Q : PChar;
+    I : Integer;
+begin
+  P := PChar(Windows.GetEnvironmentStrings);
+  try
+
+    I := 0;
+    Q := P;
+    if Q^ <> #0 then begin
+      Repeat
+        While Q^ <> #0 do begin
+         Inc(Q);
+         Inc(I);
+        end;
+        Inc(Q);
+        Inc(I);
+      Until Q^ = #0;
+    end;
+    SetLength(Result, I);
+    if I > 0 then ALMove(P^, Pointer(Result)^, I);
+
+  finally
+    FreeEnvironmentStrings(P);
+  end;
+end;
 
 {**********************************}
 function ALWinExec32(const FileName,
@@ -70,20 +101,13 @@ function ALWinExec32(const FileName,
                      InputStream: Tstream;
                      OutputStream: TStream): Dword;
 
-Const AstrBufferSize: Dword = 4096;
-
-Var aProcessInformation: TProcessInformation;
-    aStartupInfo: TStartupInfo;
-    aSecurityAttributes: TSecurityAttributes;
-    aOutputReadPipe,aOutputWritePipe: THANDLE;
+var aOutputReadPipe,aOutputWritePipe: THANDLE;
     aInputReadPipe,aInputWritePipe: THANDLE;
-    aStrBuffer: String;
-    aPEnvironment: Pointer;
-    aPCurrentDirectory: Pointer;
 
   {-----------------------------}
   procedure InternalProcessInput;
   var aBytesWritten: Dword;
+      aStrBuffer: String;
   begin
     If InputStream.size > 0 then begin
       SetLength(aStrBuffer,InputStream.size);
@@ -108,7 +132,10 @@ Var aProcessInformation: TProcessInformation;
   procedure InternalProcessOutput;
   var aBytesInPipe: Cardinal;
       aBytesRead: Dword;
+      aStrBuffer: String;
+  Const AstrBufferSize: Dword = 8192;
   begin
+    SetLength(aStrBuffer,AstrBufferSize);
     While true do begin
       If not PeekNamedPipe(
                            aOutputReadPipe, // handle to pipe to copy from
@@ -118,24 +145,25 @@ Var aProcessInformation: TProcessInformation;
                            @aBytesInPipe,   // pointer to total number of bytes available
                            nil              // pointer to unread bytes in this message
                           ) then break;
-
-      If aBytesInPipe > 0 then begin
-        If aBytesInPipe < AstrBufferSize then aBytesInPipe := AstrBufferSize;
-
-        ReadFile(
-                 aOutputReadPipe, // handle of file to read
-                 aStrBuffer[1],   // address of buffer that receives data
-                 AstrBufferSize,  // number of bytes to read
-                 aBytesRead,      // address of number of bytes read
-                 nil              // address of structure for data
-                );
-
+      if aBytesInPipe > 0 then begin
+        if not ReadFile(
+                        aOutputReadPipe, // handle of file to read
+                        aStrBuffer[1],   // address of buffer that receives data
+                        AstrBufferSize,  // number of bytes to read
+                        aBytesRead,      // address of number of bytes read
+                        nil              // address of structure for data
+                       ) then RaiseLastOSError;
         If aBytesRead > 0 then OutputStream.Write(aStrBuffer[1], aBytesRead);
       end
       else break;
     end;
   end;
 
+Var aProcessInformation: TProcessInformation;
+    aStartupInfo: TStartupInfo;
+    aSecurityAttributes: TSecurityAttributes;
+    aPEnvironment: Pointer;
+    aPCurrentDirectory: Pointer;
 
 begin
 
@@ -165,8 +193,7 @@ begin
       // Set up the start up info struct.
       ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
       aStartupInfo.cb := sizeof(TStartupInfo);
-      aStartupInfo.dwFlags := STARTF_USESTDHANDLES or STARTF_USESHOWWINDOW;
-      aStartupInfo.wShowWindow := SW_HIDE;
+      aStartupInfo.dwFlags := STARTF_USESTDHANDLES;
       aStartupInfo.hStdOutput := aOutputWritePipe;
       aStartupInfo.hStdInput  := aInputReadPipe;
       aStartupInfo.hStdError  := aOutputWritePipe;
@@ -184,7 +211,7 @@ begin
                            @aSecurityAttributes,    // pointer to process security attributes
                            NiL,                     // pointer to thread security attributes
                            TrUE,                    // handle inheritance flag
-                           CREATE_NEW_CONSOLE,      // creation flags
+                           CREATE_NO_WINDOW,        // creation flags
                            aPEnvironment,           // pointer to new environment block
                            aPCurrentDirectory,      // pointer to current directory name
                            aStartupInfo,            // pointer to STARTUPINFO
@@ -194,24 +221,23 @@ begin
 
         InputStream.Position := 0;
         InternalProcessInput;
-        SetLength(aStrBuffer,AstrBufferSize);
         while (WaitForSingleObject(aProcessInformation.hProcess, 0) = WAIT_TIMEOUT) do InternalProcessOutput;
         InternalProcessOutput;
         GetExitCodeProcess(aProcessInformation.hProcess, Cardinal(Result));
 
       finally
-        If not CloseHandle(aProcessInformation.hThread) then RaiseLastOSError;
-        If not CloseHandle(aProcessInformation.hProcess) then RaiseLastOSError;
+        CloseHandle(aProcessInformation.hThread);
+        CloseHandle(aProcessInformation.hProcess);
       end;
 
     Finally
-      If not CloseHandle(aInputReadPipe) then RaiseLastOSError;
-      If not CloseHandle(aInputWritePipe) then RaiseLastOSError;
+      CloseHandle(aInputReadPipe);
+      CloseHandle(aInputWritePipe);
     end;
 
   Finally
-    If not CloseHandle(aOutputReadPipe) then RaiseLastOSError;
-    If not CloseHandle(aOutputWritePipe) then RaiseLastOSError;
+    CloseHandle(aOutputReadPipe);
+    CloseHandle(aOutputWritePipe);
   end;
 end;
 

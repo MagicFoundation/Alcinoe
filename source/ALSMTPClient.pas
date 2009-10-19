@@ -159,71 +159,8 @@ end;
 
 {*************************************************}
 procedure TAlSmtpClient.CheckError(Error: Boolean);
-var ErrCode: Integer;
-    S: string;
 begin
-  ErrCode := WSAGetLastError;
-  if Error and (ErrCode <> 0) then begin
-    Case ErrCode Of
-      WSAEINTR: S := 'Interrupted function call';
-      WSAEACCES: S := 'Permission denied';
-      WSAEFAULT: S := 'Bad address';
-      WSAEINVAL: S := 'Invalid argument';
-      WSAEMFILE: S := 'Too many open files';
-      WSAEWOULDBLOCK: S := 'Resource temporarily unavailable';
-      WSAEINPROGRESS: S := 'Operation now in progress';
-      WSAEALREADY: S := 'Operation already in progress';
-      WSAENOTSOCK: S := 'Socket operation on nonsocket';
-      WSAEDESTADDRREQ: S := 'Destination address required';
-      WSAEMSGSIZE: S := 'Message too long';
-      WSAEPROTOTYPE: S := 'Protocol wrong type for socket';
-      WSAENOPROTOOPT: S := 'Bad protocol option';
-      WSAEPROTONOSUPPORT: S := 'Protocol not supported';
-      WSAESOCKTNOSUPPORT: S := 'Socket type not supported';
-      WSAEOPNOTSUPP: S := 'Operation not supported';
-      WSAEPFNOSUPPORT: S := 'Protocol family not supported';
-      WSAEAFNOSUPPORT: S := 'Address family not supported by protocol family';
-      WSAEADDRINUSE: S := 'Address already in use';
-      WSAEADDRNOTAVAIL: S := 'Cannot assign requested address';
-      WSAENETDOWN: S := 'Network is down';
-      WSAENETUNREACH: S := 'Network is unreachable';
-      WSAENETRESET: S := 'Network dropped connection on reset';
-      WSAECONNABORTED: S := 'Software caused connection abort';
-      WSAECONNRESET: S := 'Connection reset by peer';
-      WSAENOBUFS: S := 'No buffer space available';
-      WSAEISCONN: S := 'Socket is already connected';
-      WSAENOTCONN: S := 'Socket is not connected';
-      WSAESHUTDOWN: S := 'Cannot send after socket shutdown';
-      WSAETIMEDOUT: S := 'Connection timed out';
-      WSAECONNREFUSED: S := 'Connection refused';
-      WSAEHOSTDOWN: S := 'Host is down';
-      WSAEHOSTUNREACH: S := 'No route to host';
-      WSAEPROCLIM: S := 'Too many processes';
-      WSASYSNOTREADY: S := 'Network subsystem is unavailable';
-      WSAVERNOTSUPPORTED: S := 'Winsock.dll version out of range';
-      WSANOTINITIALISED: S := 'Successful WSAStartup not yet performed';
-      WSAEDISCON: S := 'Graceful shutdown in progress';
-      WSAHOST_NOT_FOUND: S := 'Host not found';
-      WSATRY_AGAIN: S := 'Nonauthoritative host not found';
-      WSANO_RECOVERY: S := 'This is a nonrecoverable error';
-      WSANO_DATA: S := 'Valid name, no data record of requested type';
-      else Begin
-        SetLength(S, 256);
-        FormatMessage(
-                      FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
-                      Pointer(GetModuleHandle('wsock32.dll')),
-                      ErrCode,
-                      0,
-                      PChar(S),
-                      Length(S),
-                      nil
-                     );
-        SetLength(S, StrLen(PChar(S)));
-        while (Length(S) > 0) and (S[Length(S)] in [#10, #13]) do SetLength(S, Length(S) - 1);
-      end;
-    end;
-    raise Exception.CreateFmt('%s (Error code:%s)', [S, inttostr(ErrCode)]);      { Do not localize }
-  end;
+  if Error then RaiseLastOSError;
 end;
 
 {********************************************************************}
@@ -248,6 +185,7 @@ Function TAlSmtpClient.Connect(aHost: String; APort: integer): String;
   end;
 
 begin
+
   if FConnected then raise Exception.Create('SMTP component already connected');
 
   Try
@@ -810,8 +748,10 @@ end;
 procedure TAlSmtpClient.Settimeout(const Value: integer);
 begin
   If Value <> Ftimeout then begin
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    if FConnected then begin
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    end;
     Ftimeout := Value;
   end;
 end;

@@ -15,6 +15,7 @@ uses Windows,
      shellapi,
      ExtCtrls,
      ComCtrls,
+     SyncObjs,
      AlPhpRunner;
 
 type
@@ -36,25 +37,55 @@ type
     ButtonInitAndPost: TButton;
     ButtonInitAndGet: TButton;
     ButtonOpenInExplorer: TButton;
-    Panel1: TPanel;
-    Label9: TLabel;
     MemoServerVariables: TMemo;
-    ButtonExecute: TButton;
     Label5: TLabel;
     Label7: TLabel;
+    GroupBox1: TGroupBox;
+    Label11: TLabel;
+    EditPhpCGIPath: TEdit;
+    Panel2: TPanel;
+    Label14: TLabel;
+    EditPhpIsapiDllPath: TEdit;
+    Label8: TLabel;
+    Label9: TLabel;
+    EditPhpFastCgiHost: TEdit;
+    EditPhpFastCgiPort: TEdit;
+    Label10: TLabel;
+    RadioButtonPHPCGIRunnerEngineKind: TRadioButton;
+    RadioButtonPHPNamedPipeFastCGIRunnerEngineKind: TRadioButton;
+    RadioButtonPHPSocketFastCGIRunnerEngineKind: TRadioButton;
+    RadioButtonPHPISAPIRunnerEngineKind: TRadioButton;
+    GroupBox2: TGroupBox;
+    ButtonBench: TButton;
+    Label12: TLabel;
+    EditThreadCount: TEdit;
+    EditCycleCount: TEdit;
+    Label13: TLabel;
+    Label15: TLabel;
+    MemoBenchResult: TMemo;
     procedure ButtonInitAndGetClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure ButtonOpenInExplorerClick(Sender: TObject);
     procedure ButtonInitAndPostClick(Sender: TObject);
-    procedure ButtonExecuteClick(Sender: TObject);
+    procedure ButtonBenchClick(Sender: TObject);
   private
-    FPhpRunnerEngine: TAlPhpRunnerEngine;
+    FThreadCount: Integer;
+    FstartTime: dWord;
   public
   end;
 
+  TBenchThread = Class(TThread)
+  Public
+    PhpRunnerEngine: TAlPHPRunnerEngine;
+    NbCycle: Integer;
+    serverVariable: Tstrings;
+    Destructor Destroy; override;
+    procedure Execute; override;
+  end;
+
+
 var
   Form1: TForm1;
+  CS: TcriticalSection;
 
 implementation
 
@@ -65,11 +96,11 @@ Uses ALMultiPartFormDataParser,
      AlHttpCommon;
 
 {$R *.dfm}
-
-{***********************************************}
+{******************************************************}
 procedure TForm1.ButtonInitAndGetClick(Sender: TObject);
 Var AResponseHeader: TALHTTPResponseHeader;
     AResponseStream: TStringStream;
+var aPhpRunnerEngine: TalPhpRunnerEngine;
 begin
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
@@ -83,12 +114,20 @@ begin
       MemoServerVariables.Lines.Values['SCRIPT_NAME'] := MemoServerVariables.Lines.Values['PATH_INFO'];
       MemoServerVariables.Lines.Values['SCRIPT_FILENAME'] := MemoServerVariables.Lines.Values['PATH_TRANSLATED'];
       MemoServerVariables.Lines.Values['DOCUMENT_ROOT'] := ExtractFilePath(editScriptFileName.Text);
-      FPhpRunnerEngine.Execute(
-                               MemoServerVariables.Lines,
-                               nil,
-                               AResponseStream,
-                               AResponseHeader
-                              );
+      if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpNamedPipeFastCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(EditPhpFastCgiHost.Text, strtoint(EditPhpFastCgiPort.text))
+      else aPhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(EditPhpIsapiDllPath.text);
+      Try
+        aPhpRunnerEngine.Execute(
+                                 MemoServerVariables.Lines,
+                                 nil,
+                                 AResponseStream,
+                                 AResponseHeader
+                                );
+      Finally
+        aPhpRunnerEngine.Free;
+      End;
       MemoContentBody.Lines.Text := AResponseStream.DataString;
       MemoResponseRawHeader.Lines.Text := AResponseHeader.RawHeaderText;
 
@@ -101,19 +140,6 @@ begin
     AResponseHeader.Free;
     AResponseStream.Free;
   end;
-end;
-
-{********************************************}
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  FPhpRunnerEngine.Free;
-end;
-
-{*******************************************}
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  FPhpRunnerEngine := TALPhpRunnerEngine.Create();
-  FPhpRunnerEngine.LoadDLL('c:\program files\php\php5isapi.dll');
 end;
 
 {**********************************************************}
@@ -129,6 +155,7 @@ end;
 procedure TForm1.ButtonInitAndPostClick(Sender: TObject);
 Var AResponseHeader: TALHTTPResponseHeader;
     AResponseStream: TStringStream;
+    aPhpRunnerEngine: TalPhpRunnerEngine;
 begin
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
@@ -143,21 +170,28 @@ begin
       MemoServerVariables.Lines.Values['SCRIPT_NAME'] := MemoServerVariables.Lines.Values['PATH_INFO'];
       MemoServerVariables.Lines.Values['SCRIPT_FILENAME'] := MemoServerVariables.Lines.Values['PATH_TRANSLATED'];
       MemoServerVariables.Lines.Values['DOCUMENT_ROOT'] := ExtractFilePath(editScriptFileName.Text);
-
-      if MemoPostDataStrings.Lines.Count > 0 then
-        FPhpRunnerEngine.ExecutePostURLEncoded(
-                                               MemoServerVariables.Lines,
-                                               MemoPostDataStrings.Lines,
-                                               AResponseStream,
-                                               AResponseHeader,
-                                               True
-                                              )
-      else FPhpRunnerEngine.Execute(
-                                    MemoServerVariables.Lines,
-                                    nil,
-                                    AResponseStream,
-                                    AResponseHeader
-                                   );
+      if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpNamedPipeFastCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(EditPhpFastCgiHost.Text, strtoint(EditPhpFastCgiPort.text))
+      else aPhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(EditPhpIsapiDllPath.text);
+      try
+        if MemoPostDataStrings.Lines.Count > 0 then
+          aPhpRunnerEngine.ExecutePostURLEncoded(
+                                                 MemoServerVariables.Lines,
+                                                 MemoPostDataStrings.Lines,
+                                                 AResponseStream,
+                                                 AResponseHeader,
+                                                 True
+                                                )
+        else aPhpRunnerEngine.Execute(
+                                      MemoServerVariables.Lines,
+                                      nil,
+                                      AResponseStream,
+                                      AResponseHeader
+                                     );
+      finally
+        aPhpRunnerEngine.free;
+      end;
 
       MemoContentBody.Lines.Text := AResponseStream.DataString;
       MemoResponseRawHeader.Lines.Text := AResponseHeader.RawHeaderText;
@@ -173,34 +207,133 @@ begin
   end;
 end;
 
-{***************************************************}
-procedure TForm1.ButtonExecuteClick(Sender: TObject);
+{*************************************************}
+procedure TForm1.ButtonBenchClick(Sender: TObject);
+Var i: Integer;
+    aBenchThread: TBenchThread;
+    aPhpNamedPipeFastCgiManager: TalPhpNamedPipeFastCgiManager;
+begin
+  MemoServerVariables.Lines.Values['REQUEST_METHOD'] := 'GET';
+  MemoServerVariables.Lines.Values['PATH_INFO'] := '/' + ExtractFileName(editScriptFileName.Text);
+  MemoServerVariables.Lines.Values['PATH_TRANSLATED'] := ExpandFileName(editScriptFileName.Text);
+  MemoServerVariables.Lines.Values['SCRIPT_NAME'] := MemoServerVariables.Lines.Values['PATH_INFO'];
+  MemoServerVariables.Lines.Values['SCRIPT_FILENAME'] := MemoServerVariables.Lines.Values['PATH_TRANSLATED'];
+  MemoServerVariables.Lines.Values['DOCUMENT_ROOT'] := ExtractFilePath(editScriptFileName.Text);
+
+  FThreadCount := strtoint(EditThreadCount.text);
+  if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then begin
+    aPhpNamedPipeFastCgiManager := TalPhpNamedPipeFastCgiManager.Create(EditPhpCGIPath.Text);
+    aPhpNamedPipeFastCgiManager.ProcessPoolSize := 8;
+    aPhpNamedPipeFastCgiManager.MaxRequestCount := 450;
+    aPhpNamedPipeFastCgiManager.Timeout := 10000;
+  end
+  else aPhpNamedPipeFastCgiManager := nil;
+  Form1.MainStatusBar.Panels[0].Text := '0';
+  application.ProcessMessages;
+  FstartTime := GetTickCount;
+  for i := 1 to FThreadCount do begin
+    aBenchThread := TBenchThread.Create(true);
+    try
+      if RadioButtonPhpCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := TalPhpCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := aPhpNamedPipeFastCgiManager
+      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(EditPhpFastCgiHost.Text, strtoint(EditPhpFastCgiPort.text))
+      else aBenchThread.PhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(EditPhpIsapiDllPath.text);
+      aBenChThread.serverVariable := TstringList.Create;
+      aBenChThread.serverVariable.Assign(MemoServerVariables.Lines);
+      aBenchThread.NbCycle := strtoint(EditCycleCount.Text);
+      aBenchThread.FreeOnTerminate := True;
+      aBenchThread.Resume;
+    Except
+      aBenchThread.Free;
+      raise;
+    end;
+  end;
+  Form1.Enabled := False;
+end;
+
+
+{ TBenchThread }
+
+{******************************}
+destructor TBenchThread.Destroy;
+begin
+  serverVariable.free;
+  inherited;
+end;
+
+{*****************************}
+procedure TBenchThread.Execute;
 Var AResponseHeader: TALHTTPResponseHeader;
     AResponseStream: TStringStream;
+    i: integer;
 begin
-  MemoContentBody.Lines.Clear;
-  MemoResponseRawHeader.Lines.Clear;
-  AResponseHeader := TALHTTPResponseHeader.Create;
-  AResponseStream := TstringStream.Create('');
-  try
-    try
-      FPhpRunnerEngine.Execute(
-                               MemoServerVariables.Lines,
-                               nil,
-                               AResponseStream,
-                               AResponseHeader
-                              );
-      MemoContentBody.Lines.Text := AResponseStream.DataString;
-      MemoResponseRawHeader.Lines.Text := AResponseHeader.RawHeaderText;
-    except
-      MemoContentBody.Lines.Text := AResponseStream.DataString;
-      MemoResponseRawHeader.Lines.Text := AResponseHeader.RawHeaderText;
-      Raise;
+  Try
+
+    for i := 1 to NbCycle do begin
+
+      Try
+
+        AResponseHeader := TALHTTPResponseHeader.Create;
+        AResponseStream := TstringStream.Create('');
+        try
+          PhpRunnerEngine.Execute(
+                                  serverVariable,
+                                  nil,
+                                  AResponseStream,
+                                  AResponseHeader
+                                 );
+        finally
+          AResponseHeader.Free;
+          AResponseStream.Free;
+        end;
+
+        if (i mod 100) = 0 then begin
+          CS.Acquire;
+          try
+            Form1.MainStatusBar.Panels[0].Text := inttostr(strtoint(Form1.MainStatusBar.Panels[0].Text) + 100);
+          finally
+            cs.release;
+          end;
+        end;
+
+      Except
+        On e: Exception do begin
+          CS.Acquire;
+          try
+            Form1.MemoBenchResult.Lines.Add(E.Message);
+          finally
+            cs.release;
+          end;
+          Break;
+        end;
+      End;
+
     end;
-  finally
-    AResponseHeader.Free;
-    AResponseStream.Free;
-  end;
+
+  Finally
+
+    CS.Acquire;
+    try
+      Dec(Form1.FThreadCount);
+      if Form1.FThreadCount = 0 then begin
+        Form1.MemoBenchResult.Lines.Add(PhpRunnerEngine.ClassName  + ': ' + inttostr(strtoint(Form1.EditCycleCount.Text) * strtoint(Form1.EditThreadCount.text)) + ' requests in ' + inttostr(GetTickCount - Form1.FstartTime) + ' ms ('+ formatFloat('0.##',(strtoint(Form1.EditCycleCount.Text) * strtoint(Form1.EditThreadCount.text)) / ((GetTickCount - Form1.FstartTime) / 1000)) +' request/second)');
+        Form1.Enabled := True;
+        PhpRunnerEngine.free;
+      end
+      else if not (PhpRunnerEngine is TalPhpNamedPipeFastCgiManager) then PhpRunnerEngine.free;
+
+    finally
+      cs.release;
+    end;
+
+  End;
 end;
+
+initialization
+  ReportMemoryLeaksOnShutdown := True;
+  CS := TcriticalSection.create;
+
+finalization
+  CS.free;
 
 end.

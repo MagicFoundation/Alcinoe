@@ -155,12 +155,111 @@ uses AlHTTPCommon,
 //////////ALPosEx //////////
 ////////////////////////////
 
-{**********************************}
-{Now all the fastcode function are use in delphi by default}
-{we use the default delphi function}
+{$IFNDEF VER180}
+{*************************************************************************}
+function alPosEx_D7(const SubStr, S: string; Offset: Integer = 1): Integer;
+asm
+       test  eax, eax
+       jz    @Nil
+       test  edx, edx
+       jz    @Nil
+       dec   ecx
+       jl    @Nil
+
+       push  esi
+       push  ebx
+
+       mov   esi, [edx-4]  //Length(Str)
+       mov   ebx, [eax-4]  //Length(Substr)
+       sub   esi, ecx      //effective length of Str
+       add   edx, ecx      //addr of the first char at starting position
+       cmp   esi, ebx
+       jl    @Past         //jump if EffectiveLength(Str)<Length(Substr)
+       test  ebx, ebx
+       jle   @Past         //jump if Length(Substr)<=0
+
+       add   esp, -12
+       add   ebx, -1       //Length(Substr)-1
+       add   esi, edx      //addr of the terminator
+       add   edx, ebx      //addr of the last char at starting position
+       mov   [esp+8], esi  //save addr of the terminator
+       add   eax, ebx      //addr of the last char of Substr
+       sub   ecx, edx      //-@Str[Length(Substr)]
+       neg   ebx           //-(Length(Substr)-1)
+       mov   [esp+4], ecx  //save -@Str[Length(Substr)]
+       mov   [esp], ebx    //save -(Length(Substr)-1)
+       movzx ecx, byte ptr [eax] //the last char of Substr
+
+@Loop:
+       cmp   cl, [edx]
+       jz    @Test0
+@AfterTest0:
+       cmp   cl, [edx+1]
+       jz    @TestT
+@AfterTestT:
+       add   edx, 4
+       cmp   edx, [esp+8]
+       jb   @Continue
+@EndLoop:
+       add   edx, -2
+       cmp   edx, [esp+8]
+       jb    @Loop
+@Exit:
+       add   esp, 12
+@Past:
+       pop   ebx
+       pop   esi
+@Nil:
+       xor   eax, eax
+       ret
+@Continue:
+       cmp   cl, [edx-2]
+       jz    @Test2
+       cmp   cl, [edx-1]
+       jnz   @Loop
+@Test1:
+       add   edx,  1
+@Test2:
+       add   edx, -2
+@Test0:
+       add   edx, -1
+@TestT:
+       mov   esi, [esp]
+       test  esi, esi
+       jz    @Found
+@String:
+       movzx ebx, word ptr [esi+eax]
+       cmp   bx, word ptr [esi+edx+1]
+       jnz   @AfterTestT
+       cmp   esi, -2
+       jge   @Found
+       movzx ebx, word ptr [esi+eax+2]
+       cmp   bx, word ptr [esi+edx+3]
+       jnz   @AfterTestT
+       add   esi, 4
+       jl    @String
+@Found:
+       mov   eax, [esp+4]
+       add   edx, 2
+
+       cmp   edx, [esp+8]
+       ja    @Exit
+
+       add   esp, 12
+       add   eax, edx
+       pop   ebx
+       pop   esi
+end;
+{$ENDIF}
+
+{*************************}
 procedure ALInitPosExFunct;
 begin
-  AlPosEx := PosEx;
+  {$IFDEF VER180}
+    AlPosEx := PosEx; //use the default delphi function after D2007 (they already use FastCode)
+  {$ELSE}
+    AlPosEx := AlPosEx_D7;
+  {$ENDIF}
 end;
 
 
@@ -311,10 +410,8 @@ end; {AnsiPosExIC}
 
 {******************************************************************************************************}
 function ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
-type
-  TPosEx = function(const SubStr, S: Ansistring; Offset: Integer): Integer;
-const
-  StaticBufferSize = 16;
+type TPosEx = function(const SubStr, S: Ansistring; Offset: Integer): Integer;
+const StaticBufferSize = 16;
 var
   SrcLen, OldLen, NewLen, Found, Count, Start, Match, Matches, BufSize,
   Remainder    : Integer;
@@ -472,12 +569,134 @@ end;
 //////////AlMove//////////
 //////////////////////////
 
-{**********************************************************}
-{Now all the fastcode function are use in delphi by default}
-{we use the default delphi function}
+{$IFNDEF VER180}
+{***********************************************************}
+procedure AlMove_D7(const Source; var Dest; count : Integer);
+asm
+  cmp     eax, edx
+  je      @@Exit {Source = Dest}
+  cmp     ecx, 32
+  ja      @@LargeMove {Count > 32 or Count < 0}
+  sub     ecx, 8
+  jg      @@SmallMove
+@@TinyMove: {0..8 Byte Move}
+  jmp     dword ptr [@@JumpTable+32+ecx*4]
+@@SmallMove: {9..32 Byte Move}
+  fild    qword ptr [eax+ecx] {Load Last 8}
+  fild    qword ptr [eax] {Load First 8}
+  cmp     ecx, 8
+  jle     @@Small16
+  fild    qword ptr [eax+8] {Load Second 8}
+  cmp     ecx, 16
+  jle     @@Small24
+  fild    qword ptr [eax+16] {Load Third 8}
+  fistp   qword ptr [edx+16] {Save Third 8}
+@@Small24:
+  fistp   qword ptr [edx+8] {Save Second 8}
+@@Small16:
+  fistp   qword ptr [edx] {Save First 8}
+  fistp   qword ptr [edx+ecx] {Save Last 8}
+@@Exit:
+  ret
+  nop {4-Byte Align JumpTable}
+  nop
+@@JumpTable: {4-Byte Aligned}
+  dd      @@Exit, @@M01, @@M02, @@M03, @@M04, @@M05, @@M06, @@M07, @@M08
+@@LargeForwardMove: {4-Byte Aligned}
+  push    edx
+  fild    qword ptr [eax] {First 8}
+  lea     eax, [eax+ecx-8]
+  lea     ecx, [ecx+edx-8]
+  fild    qword ptr [eax] {Last 8}
+  push    ecx
+  neg     ecx
+  and     edx, -8 {8-Byte Align Writes}
+  lea     ecx, [ecx+edx+8]
+  pop     edx
+@FwdLoop:
+  fild    qword ptr [eax+ecx]
+  fistp   qword ptr [edx+ecx]
+  add     ecx, 8
+  jl      @FwdLoop
+  fistp   qword ptr [edx] {Last 8}
+  pop     edx
+  fistp   qword ptr [edx] {First 8}
+  ret
+@@LargeMove:
+  jng     @@LargeDone {Count < 0}
+  cmp     eax, edx
+  ja      @@LargeForwardMove
+  sub     edx, ecx
+  cmp     eax, edx
+  lea     edx, [edx+ecx]
+  jna     @@LargeForwardMove
+  sub     ecx, 8 {Backward Move}
+  push    ecx
+  fild    qword ptr [eax+ecx] {Last 8}
+  fild    qword ptr [eax] {First 8}
+  add     ecx, edx
+  and     ecx, -8 {8-Byte Align Writes}
+  sub     ecx, edx
+@BwdLoop:
+  fild    qword ptr [eax+ecx]
+  fistp   qword ptr [edx+ecx]
+  sub     ecx, 8
+  jg      @BwdLoop
+  pop     ecx
+  fistp   qword ptr [edx] {First 8}
+  fistp   qword ptr [edx+ecx] {Last 8}
+@@LargeDone:
+  ret
+@@M01:
+  movzx   ecx, [eax]
+  mov     [edx], cl
+  ret
+@@M02:
+  movzx   ecx, word ptr [eax]
+  mov     [edx], cx
+  ret
+@@M03:
+  mov     cx, [eax]
+  mov     al, [eax+2]
+  mov     [edx], cx
+  mov     [edx+2], al
+  ret
+@@M04:
+  mov     ecx, [eax]
+  mov     [edx], ecx
+  ret
+@@M05:
+  mov     ecx, [eax]
+  mov     al, [eax+4]
+  mov     [edx], ecx
+  mov     [edx+4], al
+  ret
+@@M06:
+  mov     ecx, [eax]
+  mov     ax, [eax+4]
+  mov     [edx], ecx
+  mov     [edx+4], ax
+  ret
+@@M07:
+  mov     ecx, [eax]
+  mov     eax, [eax+3]
+  mov     [edx], ecx
+  mov     [edx+3], eax
+  ret
+@@M08:
+  fild    qword ptr [eax]
+  fistp   qword ptr [edx]
+end; 
+{$ENDIF}
+
+{**********************}
 procedure ALInitMovProc;
 begin
-  ALMove := Move;
+  {$IFDEF VER180}
+    ALMove := Move; //use the default delphi function after D2007 (they already use FastCode)
+  {$ELSE}
+    ALMove := AlMove_D7;
+  {$ENDIF}
 end;
 
 
@@ -486,12 +705,181 @@ end;
 //////////ALPos//////////
 /////////////////////////
 
-{**********************************}
-{Now all the fastcode function are use in delphi by default}
-{we use the default delphi function}
+{$IFNDEF VER180}
+{********************************************************}
+function ALPos_D7(const substr, str: AnsiString): Integer;
+asm
+       push  ebx
+       push  esi
+       add   esp, -16
+       test  edx, edx
+       jz    @NotFound
+       test  eax, eax
+       jz    @NotFound
+       mov   esi, [edx-4] //Length(Str)
+       mov   ebx, [eax-4] //Length(Substr)
+       cmp   esi, ebx
+       jl    @NotFound
+       test  ebx, ebx
+       jle   @NotFound
+       dec   ebx
+       add   esi, edx
+       add   edx, ebx
+       mov   [esp+8], esi
+       add   eax, ebx
+       mov   [esp+4], edx
+       neg   ebx
+       movzx ecx, byte ptr [eax]
+       mov   [esp], ebx
+       jnz   @FindString
+
+       sub   esi, 2
+       mov   [esp+12], esi
+
+@FindChar2:
+       cmp   cl, [edx]
+       jz    @Matched0ch
+       cmp   cl, [edx+1]
+       jz    @Matched1ch
+       add   edx, 2
+       cmp   edx, [esp+12]
+       jb    @FindChar4
+       cmp   edx, [esp+8]
+       jb    @FindChar2
+@NotFound:
+       xor   eax, eax
+       jmp   @Exit0ch
+
+@FindChar4:
+       cmp   cl, [edx]
+       jz    @Matched0ch
+       cmp   cl, [edx+1]
+       jz    @Matched1ch
+       cmp   cl, [edx+2]
+       jz    @Matched2ch
+       cmp   cl, [edx+3]
+       jz    @Matched3ch
+       add   edx, 4
+       cmp   edx, [esp+12]
+       jb    @FindChar4
+       cmp   edx, [esp+8]
+       jb    @FindChar2
+       xor   eax, eax
+       jmp   @Exit0ch
+
+@Matched2ch:
+       add   edx, 2
+@Matched0ch:
+       inc   edx
+       mov   eax, edx
+       sub   eax, [esp+4]
+@Exit0ch:
+       add   esp, 16
+       pop   esi
+       pop   ebx
+       ret
+
+@Matched3ch:
+       add   edx, 2
+@Matched1ch:
+       add   edx, 2
+       xor   eax, eax
+       cmp   edx, [esp+8]
+       ja    @Exit1ch
+       mov   eax, edx
+       sub   eax, [esp+4]
+@Exit1ch:
+       add   esp, 16
+       pop   esi
+       pop   ebx
+       ret
+
+@FindString4:
+       cmp   cl, [edx]
+       jz    @Test0
+       cmp   cl, [edx+1]
+       jz    @Test1
+       cmp   cl, [edx+2]
+       jz    @Test2
+       cmp   cl, [edx+3]
+       jz    @Test3
+       add   edx, 4
+       cmp   edx, [esp+12]
+       jb    @FindString4
+       cmp   edx, [esp+8]
+       jb    @FindString2
+       xor   eax, eax
+       jmp   @Exit1
+
+@FindString:
+       sub   esi, 2
+       mov   [esp+12], esi
+@FindString2:
+       cmp   cl, [edx]
+       jz    @Test0
+@AfterTest0:
+       cmp   cl, [edx+1]
+       jz    @Test1
+@AfterTest1:
+       add   edx, 2
+       cmp   edx, [esp+12]
+       jb    @FindString4
+       cmp   edx, [esp+8]
+       jb    @FindString2
+       xor   eax, eax
+       jmp   @Exit1
+
+@Test3:
+       add   edx, 2
+@Test1:
+       mov   esi, [esp]
+@Loop1:
+       movzx ebx, word ptr [esi+eax]
+       cmp   bx, word ptr [esi+edx+1]
+       jnz   @AfterTest1
+       add   esi, 2
+       jl    @Loop1
+       add   edx, 2
+       xor   eax, eax
+       cmp   edx, [esp+8]
+       ja    @Exit1
+@RetCode1:
+       mov   eax, edx
+       sub   eax, [esp+4]
+@Exit1:
+       add   esp, 16
+       pop   esi
+       pop   ebx
+       ret
+
+@Test2:
+       add   edx,2
+@Test0:
+       mov   esi, [esp]
+@Loop0:
+       movzx ebx, word ptr [esi+eax]
+       cmp   bx, word ptr [esi+edx]
+       jnz   @AfterTest0
+       add   esi, 2
+       jl    @Loop0
+       inc   edx
+@RetCode0:
+       mov   eax, edx
+       sub   eax, [esp+4]
+       add   esp, 16
+       pop   esi
+       pop   ebx
+end;
+{$ENDIF}
+
+{***********************}
 procedure ALInitPosFunct;
 begin
-  Alpos := Pos;
+  {$IFDEF VER180}
+    Alpos := Pos; //use the default delphi function after D2007 (they already use FastCode)
+  {$ELSE}
+    Alpos := ALPos_D7;
+  {$ENDIF}
 end;
 
 
@@ -598,12 +986,102 @@ end;
 //////////ALCompareText//////////
 /////////////////////////////////
 
-{**********************************}
-{Now all the fastcode function are use in delphi by default}
-{we use the default delphi function}
+{$IFNDEF VER180}
+{*******************************************************}
+function ALCompareText_D7(const S1, S2: string): Integer;
+asm
+        TEST   EAX, EAX
+        JNZ    @@CheckS2
+        TEST   EDX, EDX
+        JZ     @@Ret
+        MOV    EAX, [EDX-4]
+        NEG    EAX
+@@Ret:
+        RET
+@@CheckS2:
+        TEST   EDX, EDX
+        JNZ    @@Compare
+        MOV    EAX, [EAX-4]
+        RET
+@@Compare:
+        PUSH   EBX
+        PUSH   EBP
+        PUSH   ESI
+        MOV    EBP, [EAX-4]     // length(S1)
+        MOV    EBX, [EDX-4]     // length(S2)
+        SUB    EBP, EBX         // Result if All Compared Characters Match
+        SBB    ECX, ECX
+        AND    ECX, EBP
+        ADD    ECX, EBX         // min(length(S1),length(S2)) = Compare Length
+        LEA    ESI, [EAX+ECX]   // Last Compare Position in S1
+        ADD    EDX, ECX         // Last Compare Position in S2
+        NEG    ECX
+        JZ     @@SetResult      // Exit if Smallest Length = 0
+@@Loop:                         // Load Next 2 Chars from S1 and S2
+                                // May Include Null Terminator}
+        MOVZX  EAX, WORD PTR [ESI+ECX]
+        MOVZX  EBX, WORD PTR [EDX+ECX]
+        CMP    EAX, EBX
+        JE     @@Next           // Next 2 Chars Match
+        CMP    AL, BL
+        JE     @@SecondPair     // First Char Matches
+        MOV    AH, 0
+        MOV    BH, 0
+        CMP    AL, 'a'
+        JL     @@UC1
+        CMP    AL, 'z'
+        JG     @@UC1
+        SUB    EAX, 'a'-'A'
+@@UC1:
+        CMP    BL, 'a'
+        JL     @@UC2
+        CMP    BL, 'z'
+        JG     @@UC2
+        SUB    EBX, 'a'-'A'
+@@UC2:
+        SUB    EAX, EBX         // Compare Both Uppercase Chars
+        JNE    @@Done           // Exit with Result in EAX if Not Equal
+        MOVZX  EAX, WORD PTR [ESI+ECX] // Reload Same 2 Chars from S1
+        MOVZX  EBX, WORD PTR [EDX+ECX] // Reload Same 2 Chars from S2
+        CMP    AH, BH
+        JE     @@Next           // Second Char Matches
+@@SecondPair:
+        SHR    EAX, 8
+        SHR    EBX, 8
+        CMP    AL, 'a'
+        JL     @@UC3
+        CMP    AL, 'z'
+        JG     @@UC3
+        SUB    EAX, 'a'-'A'
+@@UC3:
+        CMP    BL, 'a'
+        JL     @@UC4
+        CMP    BL, 'z'
+        JG     @@UC4
+        SUB    EBX, 'a'-'A'
+@@UC4:
+        SUB    EAX, EBX         // Compare Both Uppercase Chars
+        JNE    @@Done           // Exit with Result in EAX if Not Equal
+@@Next:
+        ADD    ECX, 2
+        JL     @@Loop           // Loop until All required Chars Compared
+@@SetResult:
+        MOV    EAX, EBP         // All Matched, Set Result from Lengths
+@@Done:
+        POP    ESI
+        POP    EBP
+        POP    EBX
+end;
+{$ENDIF}
+
+{*******************************}
 procedure ALInitCompareTextFunct;
 begin
-  ALCompareText := CompareText;
+  {$IFDEF VER180}
+    ALCompareText := CompareText; //use the default delphi function after D2007 (they already use FastCode)
+  {$ELSE}
+    ALCompareText := ALCompareText_D7;
+  {$ENDIF}
 end;
 
 
@@ -613,12 +1091,73 @@ end;
 ////////////////////////ALLowerCase/////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-{**********************************}
-{Now all the fastcode function are use in delphi by default}
-{we use the default delphi function}
+{$IFNDEF VER180}
+function alLowerCase_D7(const S: string): string;
+asm {Size = 134 Bytes}
+  push    ebx
+  push    edi
+  push    esi
+  test    eax, eax               {Test for S = NIL}
+  mov     esi, eax               {@S}
+  mov     edi, edx               {@Result}
+  mov     eax, edx               {@Result}
+  jz      @@Null                 {S = NIL}
+  mov     edx, [esi-4]           {Length(S)}
+  test    edx, edx
+  je      @@Null                 {Length(S) = 0}
+  mov     ebx, edx
+  call    system.@LStrSetLength  {Create Result String}
+  mov     edi, [edi]             {@Result}
+  mov     eax, [esi+ebx-4]       {Convert the Last 4 Characters of String}
+  mov     ecx, eax               {4 Original Bytes}
+  or      eax, $80808080         {Set High Bit of each Byte}
+  mov     edx, eax               {Comments Below apply to each Byte...}
+  sub     eax, $5B5B5B5B         {Set High Bit if Original <= Ord('Z')}
+  xor     edx, ecx               {80h if Original < 128 else 00h}
+  or      eax, $80808080         {Set High Bit}
+  sub     eax, $66666666         {Set High Bit if Original >= Ord('A')}
+  and     eax, edx               {80h if Orig in 'A'..'Z' else 00h}
+  shr     eax, 2                 {80h > 20h ('a'-'A')}
+  add     ecx, eax               {Set Bit 5 if Original in 'A'..'Z'}
+  mov     [edi+ebx-4], ecx
+  sub     ebx, 1
+  and     ebx, -4
+  jmp     @@CheckDone
+@@Null:
+  pop     esi
+  pop     edi
+  pop     ebx
+  jmp     System.@LStrClr
+@@Loop:                          {Loop converting 4 Character per Loop}
+  mov     eax, [esi+ebx]
+  mov     ecx, eax               {4 Original Bytes}
+  or      eax, $80808080         {Set High Bit of each Byte}
+  mov     edx, eax               {Comments Below apply to each Byte...}
+  sub     eax, $5B5B5B5B         {Set High Bit if Original <= Ord('Z')}
+  xor     edx, ecx               {80h if Original < 128 else 00h}
+  or      eax, $80808080         {Set High Bit}
+  sub     eax, $66666666         {Set High Bit if Original >= Ord('A')}
+  and     eax, edx               {80h if Orig in 'A'..'Z' else 00h}
+  shr     eax, 2                 {80h > 20h ('a'-'A')}
+  add     ecx, eax               {Set Bit 5 if Original in 'A'..'Z'}
+  mov     [edi+ebx], ecx
+@@CheckDone:
+  sub     ebx, 4
+  jnc     @@Loop
+  pop     esi
+  pop     edi
+  pop     ebx
+end;
+{$ENDIF}
+
+{*****************************}
 procedure ALInitLowerCaseFunct;
 begin
-  AllowerCase := LowerCase;
+  {$IFDEF VER180}
+    AllowerCase := LowerCase; //use the default delphi function after D2007 (they already use FastCode)
+  {$ELSE}
+    AllowerCase := ALLowerCase_D7;
+  {$ENDIF}
 end;
 
 
@@ -628,12 +1167,74 @@ end;
 //////////////////////////ALUpperCase///////////////////////////
 ////////////////////////////////////////////////////////////////
 
-{**********************************}
-{Now all the fastcode function are use in delphi by default}
-{we use the default delphi function}
+{$IFNDEF VER180}
+{***********************************************}
+function ALUpperCase_D7(const S: string): string;
+asm {Size = 134 Bytes}
+  push    ebx
+  push    edi
+  push    esi
+  test    eax, eax               {Test for S = NIL}
+  mov     esi, eax               {@S}
+  mov     edi, edx               {@Result}
+  mov     eax, edx               {@Result}
+  jz      @@Null                 {S = NIL}
+  mov     edx, [esi-4]           {Length(S)}
+  test    edx, edx
+  je      @@Null                 {Length(S) = 0}
+  mov     ebx, edx
+  call    system.@LStrSetLength  {Create Result String}
+  mov     edi, [edi]             {@Result}
+  mov     eax, [esi+ebx-4]       {Convert the Last 4 Characters of String}
+  mov     ecx, eax               {4 Original Bytes}
+  or      eax, $80808080         {Set High Bit of each Byte}
+  mov     edx, eax               {Comments Below apply to each Byte...}
+  sub     eax, $7B7B7B7B         {Set High Bit if Original <= Ord('z')}
+  xor     edx, ecx               {80h if Original < 128 else 00h}
+  or      eax, $80808080         {Set High Bit}
+  sub     eax, $66666666         {Set High Bit if Original >= Ord('a')}
+  and     eax, edx               {80h if Orig in 'a'..'z' else 00h}
+  shr     eax, 2                 {80h > 20h ('a'-'A')}
+  sub     ecx, eax               {Clear Bit 5 if Original in 'a'..'z'}
+  mov     [edi+ebx-4], ecx
+  sub     ebx, 1
+  and     ebx, -4
+  jmp     @@CheckDone
+@@Null:
+  pop     esi
+  pop     edi
+  pop     ebx
+  jmp     System.@LStrClr
+@@Loop:                          {Loop converting 4 Character per Loop}
+  mov     eax, [esi+ebx]
+  mov     ecx, eax               {4 Original Bytes}
+  or      eax, $80808080         {Set High Bit of each Byte}
+  mov     edx, eax               {Comments Below apply to each Byte...}
+  sub     eax, $7B7B7B7B         {Set High Bit if Original <= Ord('z')}
+  xor     edx, ecx               {80h if Original < 128 else 00h}
+  or      eax, $80808080         {Set High Bit}
+  sub     eax, $66666666         {Set High Bit if Original >= Ord('a')}
+  and     eax, edx               {80h if Orig in 'a'..'z' else 00h}
+  shr     eax, 2                 {80h > 20h ('a'-'A')}
+  sub     ecx, eax               {Clear Bit 5 if Original in 'a'..'z'}
+  mov     [edi+ebx], ecx
+@@CheckDone:
+  sub     ebx, 4
+  jnc     @@Loop
+  pop     esi
+  pop     edi
+  pop     ebx
+end;
+{$ENDIF}
+
+{*****************************}
 procedure ALInitUpperCaseFunct;
 begin
-  AlUpperCase := UpperCase;
+  {$IFDEF VER180}
+    AlUpperCase := UpperCase; //use the default delphi function after D2007 (they already use FastCode)
+  {$ELSE}
+    AlUpperCase := ALUpperCase_D7;
+  {$ENDIF}
 end;
 
 
@@ -1241,4 +1842,5 @@ initialization
   ALInitCompareTextFunct;
   ALInitLowerCaseFunct;
   ALInitUpperCaseFunct;
+  
 end.

@@ -178,7 +178,7 @@ Function TAlSmtpClient.Connect(aHost: String; APort: integer): String;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(Pchar(Server));
     If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-      checkError(ALHostToIP(Server, IP));
+      checkError(not ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(Pchar(IP));
     end;
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);

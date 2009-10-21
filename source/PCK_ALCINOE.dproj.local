@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject>
-	<Transactions>
-    <Transaction>2009/07/05 20:50:21.444.inc,C:\dev\Library\Alcinoe\source\ALFBX.inc=</Transaction>
-    <Transaction>2009/07/05 20:50:26.802.pas,C:\dev\Library\Alcinoe\source\ALFBXKeywords.pas=</Transaction>
-    <Transaction>2009/10/12 12:36:37.287.pas,C:\dev\Library\Alcinoe\source\Unit1.pas=C:\dev\Library\Alcinoe\source\ALFcnCGI.pas</Transaction>
-  </Transactions>
-</BorlandProject>

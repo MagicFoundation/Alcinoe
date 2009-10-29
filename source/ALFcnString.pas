@@ -155,7 +155,7 @@ uses AlHTTPCommon,
 //////////ALPosEx //////////
 ////////////////////////////
 
-{$IFNDEF VER180}
+{$IF CompilerVersion < 18.5}
 {*************************************************************************}
 function alPosEx_D7(const SubStr, S: string; Offset: Integer = 1): Integer;
 asm
@@ -250,16 +250,16 @@ asm
        pop   ebx
        pop   esi
 end;
-{$ENDIF}
+{$IFEND}
 
 {*************************}
 procedure ALInitPosExFunct;
 begin
-  {$IFDEF VER180}
+  {$IF CompilerVersion >= 18.5}
     AlPosEx := PosEx; //use the default delphi function after D2007 (they already use FastCode)
   {$ELSE}
     AlPosEx := AlPosEx_D7;
-  {$ENDIF}
+  {$IFEND}
 end;
 
 
@@ -569,7 +569,7 @@ end;
 //////////AlMove//////////
 //////////////////////////
 
-{$IFNDEF VER180}
+{$IF CompilerVersion < 18.5}
 {***********************************************************}
 procedure AlMove_D7(const Source; var Dest; count : Integer);
 asm
@@ -687,16 +687,16 @@ asm
   fild    qword ptr [eax]
   fistp   qword ptr [edx]
 end; 
-{$ENDIF}
+{$IFEND}
 
 {**********************}
 procedure ALInitMovProc;
 begin
-  {$IFDEF VER180}
+  {$IF CompilerVersion >= 18.5}
     ALMove := Move; //use the default delphi function after D2007 (they already use FastCode)
   {$ELSE}
     ALMove := AlMove_D7;
-  {$ENDIF}
+  {$IFEND}
 end;
 
 
@@ -705,7 +705,7 @@ end;
 //////////ALPos//////////
 /////////////////////////
 
-{$IFNDEF VER180}
+{$IF CompilerVersion < 18.5}
 {********************************************************}
 function ALPos_D7(const substr, str: AnsiString): Integer;
 asm
@@ -870,16 +870,16 @@ asm
        pop   esi
        pop   ebx
 end;
-{$ENDIF}
+{$IFEND}
 
 {***********************}
 procedure ALInitPosFunct;
 begin
-  {$IFDEF VER180}
+  {$IF CompilerVersion >= 18.5}
     Alpos := Pos; //use the default delphi function after D2007 (they already use FastCode)
   {$ELSE}
     Alpos := ALPos_D7;
-  {$ENDIF}
+  {$IFEND}
 end;
 
 
@@ -986,7 +986,7 @@ end;
 //////////ALCompareText//////////
 /////////////////////////////////
 
-{$IFNDEF VER180}
+{$IF CompilerVersion < 18.5}
 {*******************************************************}
 function ALCompareText_D7(const S1, S2: string): Integer;
 asm
@@ -1072,16 +1072,16 @@ asm
         POP    EBP
         POP    EBX
 end;
-{$ENDIF}
+{$IFEND}
 
 {*******************************}
 procedure ALInitCompareTextFunct;
 begin
-  {$IFDEF VER180}
+  {$IF CompilerVersion >= 18.5}
     ALCompareText := CompareText; //use the default delphi function after D2007 (they already use FastCode)
   {$ELSE}
     ALCompareText := ALCompareText_D7;
-  {$ENDIF}
+  {$IFEND}
 end;
 
 
@@ -1091,7 +1091,7 @@ end;
 ////////////////////////ALLowerCase/////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-{$IFNDEF VER180}
+{$IF CompilerVersion < 18.5}
 function alLowerCase_D7(const S: string): string;
 asm {Size = 134 Bytes}
   push    ebx
@@ -1148,16 +1148,16 @@ asm {Size = 134 Bytes}
   pop     edi
   pop     ebx
 end;
-{$ENDIF}
+{$IFEND}
 
 {*****************************}
 procedure ALInitLowerCaseFunct;
 begin
-  {$IFDEF VER180}
+  {$IF CompilerVersion >= 18.5}
     AllowerCase := LowerCase; //use the default delphi function after D2007 (they already use FastCode)
   {$ELSE}
     AllowerCase := ALLowerCase_D7;
-  {$ENDIF}
+  {$IFEND}
 end;
 
 
@@ -1167,7 +1167,7 @@ end;
 //////////////////////////ALUpperCase///////////////////////////
 ////////////////////////////////////////////////////////////////
 
-{$IFNDEF VER180}
+{$IF CompilerVersion < 18.5}
 {***********************************************}
 function ALUpperCase_D7(const S: string): string;
 asm {Size = 134 Bytes}
@@ -1225,16 +1225,16 @@ asm {Size = 134 Bytes}
   pop     edi
   pop     ebx
 end;
-{$ENDIF}
+{$IFEND}
 
 {*****************************}
 procedure ALInitUpperCaseFunct;
 begin
-  {$IFDEF VER180}
+  {$IF CompilerVersion >= 18.5}
     AlUpperCase := UpperCase; //use the default delphi function after D2007 (they already use FastCode)
   {$ELSE}
     AlUpperCase := ALUpperCase_D7;
-  {$ENDIF}
+  {$IFEND}
 end;
 
 

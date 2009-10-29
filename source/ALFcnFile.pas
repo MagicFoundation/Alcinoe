@@ -57,6 +57,7 @@ uses Windows,
 Function  AlEmptyDirectory(Directory: String; SubDirectory: Boolean; Const RemoveEmptySubDirectory: Boolean = True; Const FileNameMask: String = '*.*'; Const MinFileAge: TdateTime = 0): Boolean;
 Function  AlCopyDirectory(SrcDirectory, DestDirectory: String; SubDirectory: Boolean; Const FileNameMask: String = '*.*'; Const ErraseIfExist: Boolean = False): Boolean;
 function  ALGetModuleName: string;
+function  ALGetModuleFileNameWithoutExtension: string;
 function  ALGetModulePath: String;
 Function  AlGetFileVersion(const AFileName: string): String;
 Function  ALMakeGoodEndPath(Rep : string):string;
@@ -202,6 +203,15 @@ end;
 Function ALMakeGoodEndPath(Rep : string):string;
 begin
   result :=  IncludeTrailingPathDelimiter(Rep);
+end;
+
+{***************************************************}
+function ALGetModuleFileNameWithoutExtension: string;
+Var Ln: Integer;
+begin
+  result := ExtractFileName(ALGetModuleName);
+  ln := Length(ExtractFileExt(Result));
+  if Ln > 0 then delete(Result,length(Result)-ln+1,ln);  
 end;
 
 {*******************************}

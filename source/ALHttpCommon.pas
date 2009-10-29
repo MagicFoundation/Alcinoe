@@ -314,7 +314,6 @@ Type
 
 {Http Function}
 function  ALHTTPDecode(const AStr: String): String;
-function  ALHTTPEncodeParam(const AStr: String): string;
 procedure ALHTTPEncodeParamNameValues(ParamValues: TStrings);
 procedure ALExtractHTTPFields(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; StripQuotes: Boolean = False);
 Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
@@ -392,7 +391,7 @@ end;
 function TALHTTPResponseCookie.GetHeaderValue: string;
 var aYear, aMonth, aDay: Word;
 begin
-  Result := Format('%s=%s; ', [ALHTTPEncodeParam(FName), ALHTTPEncodeParam(FValue)]);
+  Result := Format('%s=%s; ', [HTTPEncode(FName), HTTPEncode(FValue)]);
   if Domain <> '' then Result := Result + Format('domain=%s; ', [Domain]);
   if Path <> '' then Result := Result + Format('path=%s; ', [Path]);
   if Expires > -1 then begin
@@ -1068,14 +1067,6 @@ begin
   SetLength(Result, Rp - PChar(Result));
 end;
 
-
-{*****************************************************}
-function ALHTTPEncodeParam(const AStr: String): String;
-begin
-  {finally HTTPEncode from HTTP APP is OK}
-  Result := HTTPEncode(AStr);
-end;
-
 {***********************************************************}
 procedure ALHTTPEncodeParamNameValues(ParamValues: TStrings);
 var i: Integer;
@@ -1084,8 +1075,8 @@ var i: Integer;
 begin
   for i := 0 to ParamValues.Count - 1 do begin
     LStr := ParamValues[i];
-    LPos := AlPos('=', LStr);
-    if LPos > 0 then ParamValues[i] := AlCopyStr(LStr, 1, LPos-1) + '=' + ALHTTPEncodeParam(AlCopyStr(LStr, LPos+1, MAXINT));
+    LPos := AlPos(ParamValues.NameValueSeparator, LStr);
+    if LPos > 0 then ParamValues[i] := HTTPEncode(AlCopyStr(LStr, 1, LPos-1)) + '=' + HTTPEncode(AlCopyStr(LStr, LPos+1, MAXINT));
   end;
 end;
 

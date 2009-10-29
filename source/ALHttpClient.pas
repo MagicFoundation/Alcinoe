@@ -170,6 +170,9 @@ ResourceString
 
 implementation
 
+uses HttpApp,
+     AlFcnString;
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////// EALHTTPClientException //////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -336,17 +339,29 @@ procedure TALHTTPClient.PostUrlEncoded(aUrl: String;
                                        Const EncodeParams: Boolean=True);
 Var aURLEncodedContentStream: TstringStream;
     OldRequestContentType: String;
-    I: Integer;
+    Str: string;
+    I, P: Integer;
 begin
   aURLEncodedContentStream := TstringStream.create('');
   OldRequestContentType := FrequestHeader.ContentType;
   try
 
-    if EncodeParams then ALHTTPEncodeParamNameValues(aPostDataStrings);
-    With aPostDataStrings do
-      for i := 0 to Count - 1 do
-        If i < Count - 1 then aURLEncodedContentStream.WriteString(Strings[i] + '&')
-        else aURLEncodedContentStream.WriteString(Strings[i]);
+    if EncodeParams then begin
+      for i := 0 to aPostDataStrings.Count - 1 do begin
+        Str := aPostDataStrings[i];
+        P := AlPos(aPostDataStrings.NameValueSeparator, Str);
+        if P > 0 then Str := HTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + HTTPEncode(AlCopyStr(Str, P+1, MAXINT))
+        else Str := HTTPEncode(Str);
+        If i < aPostDataStrings.Count - 1 then aURLEncodedContentStream.WriteString(Str + '&')
+        else aURLEncodedContentStream.WriteString(Str);
+      end;
+    end
+    else begin
+      for i := 0 to aPostDataStrings.Count - 1 do begin
+        If i < aPostDataStrings.Count - 1 then aURLEncodedContentStream.WriteString(aPostDataStrings[i] + '&')
+        else aURLEncodedContentStream.WriteString(aPostDataStrings[i]);
+      end;
+    end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
     post(
@@ -430,17 +445,29 @@ function TALHTTPClient.PostUrlEncoded(aUrl: String;
                                       Const EncodeParams: Boolean=True): String;
 Var aURLEncodedContentStream: TstringStream;
     OldRequestContentType: String;
-    I: Integer;
+    Str: String;
+    I, P: Integer;
 begin
   aURLEncodedContentStream := TstringStream.create('');
   OldRequestContentType := FrequestHeader.ContentType;
   try
 
-    if EncodeParams then ALHTTPEncodeParamNameValues(aPostDataStrings);
-    With aPostDataStrings do
-      for i := 0 to Count - 1 do
-        If i < Count - 1 then aURLEncodedContentStream.WriteString(Strings[i] + '&')
-        else aURLEncodedContentStream.WriteString(Strings[i]);
+    if EncodeParams then begin
+      for i := 0 to aPostDataStrings.Count - 1 do begin
+        Str := aPostDataStrings[i];
+        P := AlPos(aPostDataStrings.NameValueSeparator, Str);
+        if P > 0 then Str := HTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + HTTPEncode(AlCopyStr(Str, P+1, MAXINT))
+        else Str := HTTPEncode(Str);
+        If i < aPostDataStrings.Count - 1 then aURLEncodedContentStream.WriteString(Str + '&')
+        else aURLEncodedContentStream.WriteString(Str);
+      end;
+    end
+    else begin
+      for i := 0 to aPostDataStrings.Count - 1 do begin
+        If i < aPostDataStrings.Count - 1 then aURLEncodedContentStream.WriteString(aPostDataStrings[i] + '&')
+        else aURLEncodedContentStream.WriteString(aPostDataStrings[i]);
+      end;
+    end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
     Result := post(

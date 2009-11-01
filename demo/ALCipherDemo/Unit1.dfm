@@ -29,9 +29,9 @@ object Form1: TForm1
   object Label2: TLabel
     Left = 24
     Top = 173
-    Width = 89
+    Width = 104
     Height = 13
-    Caption = 'deCrypted Data'
+    Caption = 'Unencrypted Data'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -42,9 +42,9 @@ object Form1: TForm1
   object Label3: TLabel
     Left = 296
     Top = 173
-    Width = 173
+    Width = 187
     Height = 13
-    Caption = 'Crypt Data (BASE64 Encoded)'
+    Caption = 'Crypted Data (BASE64 Encoded)'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -106,8 +106,6 @@ object Form1: TForm1
       item
         Width = 50
       end>
-    ExplicitTop = 444
-    ExplicitWidth = 488
   end
   object ALButton3: TALButton
     Left = 24
@@ -133,7 +131,7 @@ object Form1: TForm1
     Left = 24
     Top = 136
     Width = 266
-    Height = 20
+    Height = 19
     GlyphIndex = 0
     btnFont.Charset = DEFAULT_CHARSET
     btnFont.Color = clWindowText

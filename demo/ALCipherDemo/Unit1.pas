@@ -74,8 +74,8 @@ Var Key: String;
     Str1, Str2: String;
     Counter: integer;
     DataCount: longint;
-    StartTime: Longint;
-    RemoveTime: LongInt;
+    StartTime: DWORD;
+    RemoveTime: DWORD;
 begin
   if (Sender as TALButton).Tag = 1 then begin
     (Sender as TALButton).Tag := 0;
@@ -115,8 +115,8 @@ Var Key: String;
     Str1, Str2: String;
     Counter: integer;
     DataCount: longint;
-    StartTime: Longint;
-    RemoveTime: LongInt;
+    StartTime: DWORD;
+    RemoveTime: DWORD;
 begin
   if (Sender as TALButton).Tag = 1 then begin
     (Sender as TALButton).Tag := 0;
@@ -156,8 +156,8 @@ Var Key: String;
     Str1, Str2: String;
     Counter: integer;
     DataCount: longint;
-    StartTime: Longint;
-    RemoveTime: LongInt;
+    StartTime: DWORD;
+    RemoveTime: DWORD;
 begin
   if (Sender as TALButton).Tag = 1 then begin
     (Sender as TALButton).Tag := 0;
@@ -215,8 +215,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton8Click(Sender: TObject);
-Var data: String;
-    aBinTree: TALStringKeyAVLBinaryTree;
+Var aBinTree: TALStringKeyAVLBinaryTree;
     aNode: TALStringKeyAVLBinaryTreeNode;
     Counter: Integer;
 begin
@@ -251,8 +250,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton9Click(Sender: TObject);
-Var data: String;
-    aBinTree: TALStringKeyAVLBinaryTree;
+Var aBinTree: TALStringKeyAVLBinaryTree;
     aNode: TALStringKeyAVLBinaryTreeNode;
     Counter: Integer;
 begin

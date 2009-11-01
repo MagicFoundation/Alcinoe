@@ -476,6 +476,7 @@ begin
   if ExtractNameValue(S, aName, aValue) then aNvs := True
   else begin
     aName := S;
+    aValue := '';
     aNvs := False;
   end;
 

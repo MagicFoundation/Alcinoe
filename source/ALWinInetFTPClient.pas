@@ -42,7 +42,9 @@ Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     11/01/2009: Add wftpIo_No_cache_write in default because if
+                          not by default the downloaded file are store in
+                          the IE cache and it's not very usefull for FTP !
 
 Link :
 
@@ -201,7 +203,7 @@ type
   published
     property  TransferType: TALWinInetFtpTransferType read FTranferType write FTranferType default wFtpTt_BINARY;
     property  AccessType: TALWinInetFtpInternetOpenAccessType read FAccessType write SetAccessType default wFtpAt_Preconfig;
-    property  InternetOptions: TAlWininetFtpClientInternetOptionSet read FInternetOptions write SetInternetOptions default [];
+    property  InternetOptions: TAlWininetFtpClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wftpIo_No_cache_write];
     property  OnStatusChange: TAlWinInetFtpClientStatusChangeEvent read FOnStatusChange write FOnStatusChange;
   end;
 
@@ -254,7 +256,7 @@ begin
   FConnected := False;
   FAccessType := wftpAt_Preconfig;
   FOnStatusChange := nil;
-  FInternetOptions := [];
+  FInternetOptions := [wftpIo_No_cache_write];
   TransferType := wFtpTt_BINARY;
 end;
 
@@ -347,7 +349,7 @@ begin
   inherited;
 end;
 
-{*************************************}
+{************************************}
 procedure TALWinInetFTPClient.Connect;
 
   {-----------------------------------------}
@@ -841,7 +843,7 @@ begin
            );
 end;
 
-{****************************************}
+{***************************************}
 procedure TALWinInetFTPClient.Disconnect;
 begin
   if Assigned(FInetConnect) then InternetCloseHandle(FInetConnect);
@@ -851,7 +853,7 @@ begin
   FConnected := False;
 end;
 
-{**********************************************************************************************}
+{********************************************************************************************}
 procedure TALWinInetFTPClient.SetAccessType(const Value: TALWinInetFTPInternetOpenAccessType);
 begin
   If (value <> AccessType) then begin
@@ -860,13 +862,13 @@ begin
   end;
 end;
 
-{************************************************************************************************}
+{***********************************************************************************************}
 procedure TALWinInetFTPClient.OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer);
 begin
   if (PropertyIndex = -1) or (PropertyIndex in [0, 1, 2]) then Disconnect; //clear, ProxyBypass, ProxyServer, ProxyPort
 end;
 
-{****************************************************************************************************}
+{**************************************************************************************************}
 procedure TALWinInetFTPClient.SetInternetOptions(const Value: TAlWininetFTPClientInternetOptionSet);
 begin
   If Value <> FInternetOptions then begin

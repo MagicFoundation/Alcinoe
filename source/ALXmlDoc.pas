@@ -1520,7 +1520,7 @@ begin
       FSrcStream := nil;
     end
     else if FFileName <> '' then begin
-      FileStream := TfileStream.Create(FFilename,fmOpenRead);
+      FileStream := TfileStream.Create(FFilename,fmOpenRead or fmShareDenyWrite);
       Try
         InternalParseXml(FileStream, FDocumentNode);
       finally
@@ -2731,7 +2731,7 @@ end;
 procedure TALXMLNode.LoadFromFile(const AFileName: TALXMLString; Const FileContainOnlyChildNode: Boolean=False);
 Var afileStream: TfileStream;
 Begin
-  aFileStream := TfileStream.Create(AFileName,fmOpenRead);
+  aFileStream := TfileStream.Create(AFileName,fmOpenRead or fmShareDenyWrite);
   Try
     LoadFromStream(aFileStream, FileContainOnlyChildNode);
   finally

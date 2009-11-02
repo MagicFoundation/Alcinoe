@@ -126,6 +126,7 @@ begin
 
     Finally
       aFBXClient.disconnect;
+      aFBXClient.free;
     End;
 
   Finally
@@ -185,6 +186,7 @@ begin
 
     Finally
       aMysqlClient.disconnect;
+      aMysqlClient.free;
     End;
 
   Finally

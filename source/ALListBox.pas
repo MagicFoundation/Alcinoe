@@ -73,6 +73,7 @@ interface
 
 Uses Windows,
      Messages,
+     Types,
      SysUtils,
      Classes,
      Graphics,

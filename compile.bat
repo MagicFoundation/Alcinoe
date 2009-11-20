@@ -40,7 +40,10 @@ pause
 
 del release\Alcinoe.rar
 
-C:\Progra~1\WinRAR\RAR.exe a -ep1 -r release\Alcinoe.rar -x*\_svn* -x*\__history* -x*\release\* *.*
+C:\Progra~1\WinRAR\RAR.exe a -ep1 -r release\Alcinoe.rar -x*\_svn* -x*.dcu -x*.bpl -x*\__history* -x*\release\* *.*
+IF ERRORLEVEL 1 goto ERROR
+
+del *.dcu /s
 IF ERRORLEVEL 1 goto ERROR
 
 GOTO END

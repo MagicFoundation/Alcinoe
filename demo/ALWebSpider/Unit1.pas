@@ -2,6 +2,8 @@ unit Unit1;
 
 interface
 
+{$WARN UNIT_PLATFORM OFF}
+
 uses Windows,
      SysUtils,
      dialogs,

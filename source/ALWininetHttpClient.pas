@@ -267,7 +267,12 @@ end;
 ////////// TALWinInetHTTPClient ////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-{*********************************************************************}
+{************************************************************************************}
+{this procedure is deactived because of some strange bug under windows Server 2008 R2}
+{when we download url from a site that is a little "slow" (when the site is fast seam to work ok,
+{sometime we receive an AppCrash here. i thing it's simple a Windows Server 2008 R2 BUG}
+{NB: i see this bug under WINHTTP, i don't know if it's the same under wininet but to be safe
+{i prefere to disconect both}
 procedure ALWininetHTTPCLientStatusCallback(InternetSession: hInternet;
                                             Context,
                                             InternetStatus: DWord;
@@ -319,8 +324,6 @@ end;
 {**************************************}
 destructor TALWinInetHTTPClient.Destroy;
 begin
-  if Assigned(FInetConnect) then InternetSetStatusCallback(FInetConnect, nil);
-  if Assigned(FInetRoot) then InternetSetStatusCallback(FInetRoot, nil);
   Disconnect;
   inherited;
 end;
@@ -443,7 +446,8 @@ const AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (
                                                                              INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
                                                                              INTERNET_OPEN_TYPE_PROXY
                                                                             );
-
+{deactivated: see comment in ALWininetHTTPCLientStatusCallback}
+//var InternetSetStatusCallbackResult: PFNInternetStatusCallback;
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
   { So take advantage of a cached handle, we'll assume that
@@ -454,6 +458,11 @@ begin
   { Also, could switch to new API introduced in IE4/Preview2}
   if InternetAttemptConnect(0) <> ERROR_SUCCESS then SysUtils.Abort;
 
+  {deactivated: see comment in ALWininetHTTPCLientStatusCallback}
+  {set WinHttpSetStatusCallbackResult to WINHTTP_INVALID_STATUS_CALLBACK}
+  //InternetSetStatusCallbackResult := pointer(INTERNET_INVALID_STATUS_CALLBACK);
+
+  {init FInetRoot}
   FInetRoot := InternetOpen(
                             PChar(RequestHeader.UserAgent),
                             AccessTypeArr[FAccessType],
@@ -461,13 +470,16 @@ begin
                             InternalGetProxyBypass,
                             InternalGetInternetOpenFlags
                            );
-
   CheckError(not Assigned(FInetRoot));
 
   try
-    {Register the callback function}
-    InternetSetStatusCallback(FInetRoot, @ALWininetHTTPCLientStatusCallback);
 
+    {deactivated: see comment in ALWininetHTTPCLientStatusCallback}
+    {Register the callback function}
+    //InternetSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetHTTPCLientStatusCallback);
+    //CheckError(InternetSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
+
+    {init FInetConnect}
     FInetConnect := InternetConnect(
                                     FInetRoot,
                                     PChar(FURLHost),
@@ -478,10 +490,15 @@ begin
                                     0,
                                     Dword(Self)
                                    );
-
     CheckError(not Assigned(FInetConnect));
+
+    {Set FConnected to true}
     FConnected := True;
+    
   except
+    {deactivated: see comment in ALWininetHTTPCLientStatusCallback}
+    //if InternetSetStatusCallbackResult <> pointer(INTERNET_INVALID_STATUS_CALLBACK) then
+      //InternetSetStatusCallback(FInetRoot, nil);
     InternetCloseHandle(FInetRoot);
     FInetRoot := nil;
     raise;
@@ -491,6 +508,8 @@ end;
 {****************************************}
 procedure TALWinInetHTTPClient.Disconnect;
 begin
+  {deactivated: see comment in ALWininetHTTPCLientStatusCallback}
+  //if Assigned(FInetRoot) then InternetSetStatusCallback(FInetRoot, nil);
   if Assigned(FInetConnect) then InternetCloseHandle(FInetConnect);
   FInetConnect := nil;
   if Assigned(FInetRoot) then InternetCloseHandle(FInetRoot);
@@ -809,10 +828,8 @@ begin
     try
       Receive(Context, aResponseContentStream, aResponseContentHeader);
     except
-      on Ex: EALHTTPClientException do begin
-        Disconnect;
-        raise;
-      end;
+      Disconnect;
+      raise;
     end;
   finally
     if Context <> 0  then

@@ -260,7 +260,10 @@ end;
 ////////// TALWinHttpClient ////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-{*****************************************************************}
+{************************************************************************************}
+{this procedure is deactived because of some strange bug under windows Server 2008 R2}
+{when we download url from a site that is a little "slow" (when the site is fast seam to work ok,
+{sometime we receive an AppCrash here. i thing it's simple a Windows Server 2008 R2 BUG}
 procedure ALWinHTTPCLientStatusCallback(InternetSession: hInternet;
                                         Context,
                                         InternetStatus: DWord;
@@ -310,8 +313,6 @@ end;
 {**********************************}
 destructor TALWinHttpClient.Destroy;
 begin
-  if Assigned(FInetConnect) then WinHttpSetStatusCallback(FInetConnect, nil, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
-  if Assigned(FInetRoot) then WinHttpSetStatusCallback(FInetRoot, nil, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
   Disconnect;
   inherited;
 end;
@@ -427,7 +428,8 @@ const AccessTypeArr: Array[TALWinHttpClientInternetOpenAccessType] of DWord = (
                                                                                WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
                                                                                WINHTTP_ACCESS_TYPE_NAMED_PROXY
                                                                               );
-
+{deactivated: see comment in ALWinHTTPCLientStatusCallback}
+//var WinHttpSetStatusCallbackResult: PFNWinHttpStatusCallback;
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
   { So take advantage of a cached handle, we'll assume that
@@ -435,6 +437,11 @@ begin
     Host. To that end, SetURL always disconnects }
   if (FConnected) then Exit;
 
+  {deactivated: see comment in ALWinHTTPCLientStatusCallback}
+  {set WinHttpSetStatusCallbackResult to WINHTTP_INVALID_STATUS_CALLBACK}
+  //WinHttpSetStatusCallbackResult := pointer(WINHTTP_INVALID_STATUS_CALLBACK);
+
+  {init FInetRoot}
   FInetRoot := WinHttpOpen(
                            PWideChar(widestring(RequestHeader.UserAgent)),
                            AccessTypeArr[FAccessType],
@@ -442,24 +449,31 @@ begin
                            InternalGetProxyBypass,
                            0
                           );
-
   CheckError(not Assigned(FInetRoot));
 
   try
-    {Register the callback function}
-    WinHttpSetStatusCallback(FInetRoot, @ALWinHTTPCLientStatusCallback, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
 
+    {deactivated: see comment in ALWinHTTPCLientStatusCallback}
+    {Register the callback function}
+    //WinHttpSetStatusCallbackResult := WinHttpSetStatusCallback(FInetRoot, @ALWinHTTPCLientStatusCallback, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
+    //CheckError(WinHttpSetStatusCallbackResult = pointer(WINHTTP_INVALID_STATUS_CALLBACK));
+
+    {init FInetConnect}
     FInetConnect := WinHttpConnect(
                                    FInetRoot,
                                    PWideChar(wideString(FURLHost)),
                                    FURLPort,
                                    0
                                   );
-
-
     CheckError(not Assigned(FInetConnect));
+
+    {Set FConnected to true}
     FConnected := True;
+
   except
+    {deactivated: see comment in ALWinHTTPCLientStatusCallback}
+    //if WinHttpSetStatusCallbackResult <> pointer(WINHTTP_INVALID_STATUS_CALLBACK) then
+      //WinHttpSetStatusCallback(FInetRoot, nil, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
     WinHttpCloseHandle(FInetRoot);
     FInetRoot := nil;
     raise;
@@ -469,6 +483,8 @@ end;
 {************************************}
 procedure TALWinHttpClient.Disconnect;
 begin
+  {deactivated: see comment in ALWinHTTPCLientStatusCallback}
+  //if Assigned(FInetRoot) then WinHttpSetStatusCallback(FInetRoot, nil, WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, 0);
   if Assigned(FInetConnect) then WinHttpCloseHandle(FInetConnect);
   FInetConnect := nil;
   if Assigned(FInetRoot) then WinHttpCloseHandle(FInetRoot);
@@ -768,10 +784,8 @@ begin
     try
       Receive(Context, aResponseContentStream, aResponseContentHeader);
     except
-      on Ex: EALHTTPClientException do begin
-        Disconnect;
-        raise;
-      end;
+      Disconnect;
+      raise;
     end;
   finally
     if Context <> 0  then

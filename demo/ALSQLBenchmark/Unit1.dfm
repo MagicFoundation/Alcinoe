@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 669
+  ClientHeight = 648
   ClientWidth = 733
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
@@ -109,7 +109,7 @@ object Form1: TForm1
     Left = 361
     Top = 32
     Width = 5
-    Height = 361
+    Height = 385
   end
   object Label12: TLabel
     Left = 412
@@ -126,7 +126,7 @@ object Form1: TForm1
   end
   object Label13: TLabel
     Left = 8
-    Top = 397
+    Top = 420
     Width = 37
     Height = 13
     Caption = 'Result'
@@ -242,10 +242,10 @@ object Form1: TForm1
     ParentFont = False
   end
   object Panel1: TPanel
-    Left = 266
-    Top = 592
-    Width = 200
-    Height = 70
+    Left = 8
+    Top = 607
+    Width = 717
+    Height = 34
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Ctl3D = False
@@ -255,8 +255,8 @@ object Form1: TForm1
     object Label5: TLabel
       Left = 5
       Top = 8
-      Width = 189
-      Height = 52
+      Width = 655
+      Height = 13
       Caption = 
         'Please add in your website a link to http://www.arkadia.com or s' +
         'end me an email to svanderclock@arkadia.com if you like this com' +
@@ -270,14 +270,14 @@ object Form1: TForm1
       WordWrap = True
     end
   end
-  object ALButtonFirebird: TALButton
+  object ALButtonSelectFirebird: TALButton
     Left = 8
     Top = 352
     Width = 161
     Height = 25
     Caption = 'Execute SELECT via FireBird'
     TabOrder = 6
-    OnClick = ALButtonFirebirdClick
+    OnClick = ALButtonSelectFirebirdClick
     OnPaint = ALButtonPaint
   end
   object ALEditMySqlHostName: TALEdit
@@ -415,7 +415,7 @@ object Form1: TForm1
   end
   object ALMemoResult: TALMemo
     Left = 8
-    Top = 416
+    Top = 439
     Width = 714
     Height = 162
     OnPaint = ALMemoPaint
@@ -516,6 +516,36 @@ object Form1: TForm1
     btnFont.Style = []
     OnPaint = ALEditPaint
     TabOrder = 1
+  end
+  object ALButtonLoopSelectFirebird: TALButton
+    Left = 175
+    Top = 352
+    Width = 161
+    Height = 25
+    Caption = 'Loop SELECT via FireBird'
+    TabOrder = 18
+    OnClick = ALButtonLoopSelectFirebirdClick
+    OnPaint = ALButtonPaint
+  end
+  object ALButtonUpdateFirebird: TALButton
+    Left = 8
+    Top = 383
+    Width = 161
+    Height = 25
+    Caption = 'Execute UPDATE via FireBird'
+    TabOrder = 19
+    OnClick = ALButtonUpdateFirebirdClick
+    OnPaint = ALButtonPaint
+  end
+  object ALButtonLoopUpdateFirebird: TALButton
+    Left = 175
+    Top = 383
+    Width = 161
+    Height = 25
+    Caption = 'Loop UPDATE via FireBird'
+    TabOrder = 20
+    OnClick = ALButtonLoopUpdateFirebirdClick
+    OnPaint = ALButtonPaint
   end
   object OpenDialog1: TOpenDialog
     Left = 560

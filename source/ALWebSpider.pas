@@ -176,6 +176,13 @@ Type
   {---------------------------------------------------------------------------------------------------------------}
   TAlTrivialWebSpiderUpdateLinkToLocalPathProgressEvent = Procedure (Sender: TObject; aFileName: String) of object;
 
+  {-----------------------------------------------------------------}
+  TAlTrivialWebSpiderCrawlFindLinkEvent = Procedure (Sender: TObject;
+                                                     HtmlTagString: String;
+                                                     HtmlTagParams: TStrings;
+                                                     URL: String;
+                                                     Var Ignore: Boolean) of object;
+
   {----------------------------------}
   TAlTrivialWebSpider = Class(Tobject)
   Private
@@ -197,6 +204,7 @@ Type
     FHttpClient: TalHttpClient;
     fIncludeMask: String;
     fOnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent;
+    fOnCrawlFindLink: TAlTrivialWebSpiderCrawlFindLinkEvent;
     fDownloadImage: Boolean;
     fOnUpdateLinkToLocalPathProgress: TAlTrivialWebSpiderUpdateLinkToLocalPathProgressEvent;
     fOnCrawlProgress: TAlTrivialWebSpiderCrawlProgressEvent;
@@ -225,6 +233,7 @@ Type
     Property SplitDirectoryAmount: integer read fSplitDirectoryAmount write fSplitDirectoryAmount default 5000;
     Property OnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent read fOnCrawlBeforeDownload write fOnCrawlBeforeDownload; {When a page is successfully downloaded}
     Property OnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent read fOnCrawlAfterDownload write fOnCrawlAfterDownload; {When a page is successfully downloaded}
+    Property OnCrawlFindLink: TAlTrivialWebSpiderCrawlFindLinkEvent read fOnCrawlFindLink write fOnCrawlFindLink; {When a a link is found}
     Property OnCrawlProgress: TAlTrivialWebSpiderCrawlProgressEvent read fOnCrawlProgress write fOnCrawlProgress;
     Property OnUpdateLinkToLocalPathProgress: TAlTrivialWebSpiderUpdateLinkToLocalPathProgressEvent read fOnUpdateLinkToLocalPathProgress write fOnUpdateLinkToLocalPathProgress;
   end;
@@ -835,6 +844,7 @@ begin
   FHttpClient := nil;
   fIncludeMask := '*';
   fOnCrawlAfterDownload := nil;
+  fOnCrawlFindLink := nil;
   fDownloadImage := False;
   fOnUpdateLinkToLocalPathProgress:=nil;
   fOnCrawlProgress:=nil;
@@ -1066,6 +1076,17 @@ begin
 
   {remove the anchor}
   URL := AlRemoveAnchorFromUrl(URL);
+
+  {call OnCrawlFindLink}
+  Flag1 := False;
+  if assigned(fOnCrawlFindLink) then fOnCrawlFindLink(
+                                                      Sender,
+                                                      HtmlTagString,
+                                                      HtmlTagParams,
+                                                      URL,
+                                                      Flag1
+                                                     );
+  if Flag1 then exit;
 
   {If the link not already downloaded then add it to the FPageNotYetDownloadedBinTree}
   If FPageDownloadedBinTree.FindNode(url) = nil then begin

@@ -147,7 +147,8 @@ var
 
 implementation
 
-Uses DateUtils,
+Uses Math,
+     DateUtils,
      ALMultiPartFormDataParser,
      AlFcnFile,
      AlFcnMisc,
@@ -409,7 +410,7 @@ begin
     TForm1(Owner).TableViewThread.DataController.SetValue(Rank-1,Tform1(Owner).TableViewThreadRequestCount.Index,FRequestCount);
     TForm1(Owner).TableViewThread.DataController.SetValue(Rank-1,Tform1(Owner).TableViewThreadHttpStatus.Index,FRequestStatus);
     TForm1(Owner).TableViewThread.DataController.SetValue(Rank-1,Tform1(Owner).TableViewThreadBytesReceived.Index,FBytesRead);
-    TForm1(Owner).TableViewThread.DataController.SetValue(Rank-1,Tform1(Owner).TableViewThreadDownloadSpeed.Index,Inttostr(Round((FBytesRead / 1000) /  ((GetTickCount - FDownloadSpeedStartTime) / 1000))) +' KB/s');
+    TForm1(Owner).TableViewThread.DataController.SetValue(Rank-1,Tform1(Owner).TableViewThreadDownloadSpeed.Index,Inttostr(Round((FBytesRead / 1000) /  ((max(GetTickCount - FDownloadSpeedStartTime,1) / 1000)))) +' KB/s');
   finally
     TForm1(Owner).TableViewThread.EndUpdate;
   end;

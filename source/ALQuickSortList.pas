@@ -84,7 +84,7 @@ Type
   public
     Constructor Create;
     destructor Destroy; override;
-    procedure Clear;
+    procedure Clear; virtual;
     procedure Delete(Index: Integer);
     class procedure Error(const Msg: string; Data: Integer); overload;
     class procedure Error(Msg: PResStringRec; Data: Integer); overload;

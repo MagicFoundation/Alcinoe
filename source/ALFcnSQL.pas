@@ -60,6 +60,8 @@ Type
 
   {----------------------------}
   TAlStrSelectSQLClause = record
+    First: integer;
+    Skip: Integer;
     Distinct : Boolean;
     Select: String;
     Where: string;
@@ -76,8 +78,11 @@ Type
     Value: string;
     Where: string;
   end;
-  TAlLstSelectSQLClause = record
-    Distinct : Boolean;
+  TAlLstSelectSQLClause = Class(Tobject)
+  public
+    First: integer;
+    Skip: Integer;
+    Distinct: Boolean;
     Select: TStrings;
     Where: Tstrings;
     From: Tstrings;
@@ -86,21 +91,23 @@ Type
     Having: Tstrings;
     Plan: String;
     OrderBy: TStrings;
+    Constructor Create; Virtual;
+    Destructor Destroy; override;
+    procedure Assign(Source: TAlLstSelectSQLClause); virtual;
   end;
-  TALLstUpdateSQLClause = record
+  TALLstUpdateSQLClause = Class(Tobject)
     Update: Boolean;
     Table: String;
     Value: Tstrings;
     Where: Tstrings;
+    Constructor Create; Virtual;
+    Destructor Destroy; override;
+    procedure Assign(Source: TALLstUpdateSQLClause); virtual;
   end;
 
 {---------------------------------------------------------}
 Function  AlEmptyStrUpdateSqlClause: TAlStrUpdateSQLClause;
-Function  AlEmptyLstUpdateSqlClause: TAlLstUpdateSQLClause;
 Function  AlEmptyStrSelectSqlClause: TAlStrSelectSQLClause;
-Function  AlEmptyLstSelectSqlClause: TAlLstSelectSQLClause;
-Procedure ALFreeLstUpdateSqlClause(Var aLstUpdateSQLClause: TAlLstUpdateSQLClause);
-Procedure ALFreeLstSelectSqlClause(Var aLstSelectSQLClause: TAlLstSelectSQLClause);
 Function  AlSQLFromStrSelectSqlClause(SqlClause: TAlStrSelectSQLClause) :String;
 Function  AlSQLFromLstSelectSqlClause(SqlClause: TAlLstSelectSQLClause) :String;
 Function  AlSQLFromStrUpdateSqlClause(SqlClause: TAlStrUpdateSQLClause): String;
@@ -115,6 +122,8 @@ Function ALEmptyStrSelectSqlClause: TAlStrSelectSQLClause;
 Begin
   with result do begin
     Distinct := False;
+    First := -1;
+    Skip := -1;
     Select:= '';
     Where:= '';
     From:= '';
@@ -137,82 +146,6 @@ Begin
   end;
 end;
 
-{********************************************************}
-Function ALEmptyLstSelectSqlClause: TAlLstSelectSQLClause;
-
-  {------------------------}
-  Function alg001: Tstrings;
-  Begin
-    Result := TstringList.create;
-    with result as TstringList do begin
-      Sorted := True;
-      Duplicates := dupIgnore;
-      Delimiter := ';';
-      QuoteChar := '''';
-    end;
-  end;
-
-Begin
-  with result do begin
-    Distinct := False;
-    Select:= alg001;
-    Where:= alg001;
-    From:= alg001;
-    Join:= alg001;
-    GroupBy:= alg001;
-    Having:= alg001;
-    Plan := '';
-    OrderBy:= alg001;
-  end;
-end;
-
-{********************************************************}
-Function ALEmptyLstUpdateSqlClause: TAlLstUpdateSQLClause;
-
-  {------------------------}
-  Function alg001: Tstrings;
-  Begin
-    Result := TstringList.create;
-    with result as TstringList do begin
-      Sorted := True;
-      Duplicates := dupIgnore;
-      Delimiter := ';';
-      QuoteChar := '''';
-    end;
-  end;
-
-Begin
-  with result do begin
-    Update := False;
-    table:= '';
-    Value:= alg001;
-    Where:= alg001;
-  end;
-end;
-
-{*********************************************************************************}
-Procedure ALFreeLstSelectSqlClause(Var aLstSelectSQLClause: TAlLstSelectSQLClause);
-Begin
-  with aLstSelectSQLClause do begin
-    Select.free;
-    Where.free;
-    From.free;
-    Join.free;
-    GroupBy.free;
-    Having.free;
-    OrderBy.free;
-  end;
-end;
-
-{*********************************************************************************}
-Procedure ALFreeLstUpdateSqlClause(Var aLstUpdateSQLClause: TAlLstUpdateSQLClause);
-Begin
-  with aLstUpdateSQLClause do begin
-    Value.free;
-    Where.free;
-  end;
-end;
-
 {*****************************************************************************}
 Function ALSQLFromStrSelectSqlClause(SqlClause: TAlStrSelectSQLClause) :String;
 Var Lst : TstringList;
@@ -220,13 +153,14 @@ Var Lst : TstringList;
     Flag : Boolean;
     S : String;
 Begin
+
   Result := 'Select ';
+  if SqlClause.First >= 0 then Result := result + 'first ' + inttostr(SqlClause.First) + ' ';
+  if SqlClause.skip >= 0 then Result := result + 'skip ' + inttostr(SqlClause.skip) + ' ';  
   If SqlClause.Distinct then Result := result + 'distinct ';
 
   Lst := TstringList.Create;
   Try
-    Lst.Sorted := True;
-    Lst.Duplicates := dupIgnore;
     Lst.Delimiter := ';';
     Lst.QuoteChar := '''';
 
@@ -309,6 +243,7 @@ Begin
   finally
     Lst.Free;
   end;
+
 end;
 
 {*****************************************************************************}
@@ -317,10 +252,9 @@ Var Lst : TstringList;
     i : integer;
     S1, S2 : String;
 Begin
+
   Lst := TstringList.Create;
   Try
-    Lst.Sorted := True;
-    Lst.Duplicates := dupIgnore;
     Lst.Delimiter := ';';
     Lst.QuoteChar := '''';
     Lst.DelimitedText := trim(SqlClause.Value);
@@ -370,6 +304,7 @@ Begin
   finally
     Lst.Free;
   end;
+
 end;
 
 {*****************************************************************************}
@@ -378,7 +313,10 @@ Var i : integer;
     Flag : Boolean;
     S : String;
 Begin
+
   Result := 'Select ';
+  if SqlClause.First >= 0 then Result := result + 'first ' + inttostr(SqlClause.First) + ' ';
+  if SqlClause.skip >= 0 then Result := result + 'skip ' + inttostr(SqlClause.skip) + ' ';
   If SqlClause.Distinct then Result := result + 'distinct ';
 
   {------------}
@@ -441,6 +379,7 @@ Begin
       Result := Result + ' order by ' + S;
     end;
   end;
+
 end;
 
 {******************************************************************************}
@@ -448,6 +387,7 @@ Function ALSQLFromLstUpdateSqlClause(SqlClause: TAlLstUpdateSQLClause): String;
 var i : integer;
     S1, S2 : String;
 Begin
+
   {----Update------------------}
   If SqlClause.Update then Begin
     Result := '';
@@ -486,6 +426,111 @@ Begin
 
     Result := 'Insert into ' + SqlClause.Table + ' (' + S1 + ') Values (' + s2 + ')';
   end;
+
+end;
+
+
+/////////////////////////////////
+///// TAlLstSelectSQLClause /////
+/////////////////////////////////
+
+{***************************************}
+constructor TAlLstSelectSQLClause.Create;
+
+  {-----------------------------------}
+  Function InternalCreateLst: Tstrings;
+  Begin
+    Result := TstringList.create;
+    with result as TstringList do begin
+      Delimiter := ';';
+      QuoteChar := '''';
+    end;
+  end;
+
+Begin
+  First := -1;
+  Skip := -1;
+  Distinct := False;
+  Select:= InternalCreateLst;
+  Where:= InternalCreateLst;
+  From:= InternalCreateLst;
+  Join:= InternalCreateLst;
+  GroupBy:= InternalCreateLst;
+  Having:= InternalCreateLst;
+  Plan := '';
+  OrderBy:= InternalCreateLst;
+end;
+
+{***************************************}
+destructor TAlLstSelectSQLClause.Destroy;
+begin
+  Select.free;
+  Where.free;
+  From.free;
+  Join.free;
+  GroupBy.free;
+  Having.free;
+  OrderBy.free;
+  inherited;
+end;
+
+{********************************************************************}
+procedure TAlLstSelectSQLClause.Assign(Source: TAlLstSelectSQLClause);
+begin
+  First := Source.First;
+  Skip := Source.Skip;
+  Distinct := source.Distinct;
+  Select.Assign(source.Select);
+  Where.Assign(source.Where);
+  From.Assign(source.From);
+  Join.Assign(source.Join);
+  GroupBy.Assign(source.GroupBy);
+  Having.Assign(source.Having);
+  Plan := source.Plan;
+  OrderBy.Assign(source.OrderBy);
+end;
+
+
+
+/////////////////////////////////
+///// TALLstUpdateSQLClause /////
+/////////////////////////////////
+
+{***************************************}
+constructor TALLstUpdateSQLClause.Create;
+
+  {-----------------------------------}
+  Function InternalCreateLst: Tstrings;
+  Begin
+    Result := TstringList.create;
+    with result as TstringList do begin
+      Delimiter := ';';
+      QuoteChar := '''';
+    end;
+  end;
+
+Begin
+  Update := False;
+  table:= '';
+  Value:= InternalCreateLst;
+  Where:= InternalCreateLst;
+end;
+
+{***************************************}
+destructor TALLstUpdateSQLClause.Destroy;
+begin
+  Value.free;
+  Where.free;
+  inherited;
+end;
+
+{********************************************************************}
+procedure TALLstUpdateSQLClause.Assign(Source: TALLstUpdateSQLClause);
+begin
+  Update := Source.Update;
+  table:= source.Table;
+  Value.Assign(source.Value);
+  Where.Assign(source.Where);
 end;
 
 end.

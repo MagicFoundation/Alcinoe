@@ -4,7 +4,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Misc functions
-Version:      3.51
+Version:      3.52
 
 Description:  Alcinoe Misc Functions
 
@@ -45,6 +45,7 @@ History :     09/01/2005: correct then AlEmptyDirectory function
               25/05/2006: Move some function to AlFcnFile
               25/02/2008: Update AlIsValidEmail
               06/10/3008: Update AlIsValidEmail
+              03/03/2010: add ALIsInt64
 Link :
 
 Please send all your feedback to svanderclock@arkadia.com
@@ -58,6 +59,7 @@ uses Windows,
 
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
+Function ALIsInt64 (const S : String) : Boolean;
 Function ALIsInteger (const S : String) : Boolean;
 Function ALIsSmallInt (const S : String) : Boolean;
 Function AlStrToBool(Value:String):Boolean;
@@ -81,6 +83,13 @@ end;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
+End;
+
+{**********************************************}
+Function ALIsInt64 (const S : String) : Boolean;
+var i : int64;
+Begin
+ Result := tryStrToInt64(S, I);
 End;
 
 {************************************************}

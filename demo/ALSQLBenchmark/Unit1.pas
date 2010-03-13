@@ -81,7 +81,8 @@ uses alFcnSkin,
 {************************************************************}
 procedure TForm1.ALButtonSelectFirebirdClick(Sender: TObject);
 Var aFBXClient: TALFbxClient;
-    aXMLDATA: TalXmlDocument;
+    aXMLDATA1: TalXmlDocument;
+    aXMLDATA2: TalXmlDocument;
     aStartDate: Cardinal;
     aFormatSettings: TFormatSettings;
 begin
@@ -99,16 +100,12 @@ begin
                       );
     Try
 
-      aXMLDATA:= TALXmlDocument.Create(nil);
+      aXMLDATA1 := ALCreateEmptyXMLDocument('root');
+      aXMLDATA2 := ALCreateEmptyXMLDocument('root');
       Try
-        With aXMLDATA Do Begin
+        With aXMLDATA1 Do Begin
           Options := [doNodeAutoIndent];
           ParseOptions := [poPreserveWhiteSpace];
-          Active := true;
-          version := '1.0';
-          standalone := 'yes';
-          Encoding := 'UTF-8';
-          aXMLDATA.AddChild('root');
         end;
 
         aStartDate := GetTickCount;
@@ -117,21 +114,39 @@ begin
           aFBXClient.SelectData(
                                 AlMemoFirebirdQuery.Lines.Text,
                                 'rec',
-                                aXMLDATA.DocumentElement,
+                                aXMLDATA1.DocumentElement,
                                 aFormatSettings
                                );
+
+          AlMemoResult.Lines.Text := 'Time to execute the sql: ' + inttostr(GetTickCount - aStartDate) + ' ms';
+          aFBXClient.SelectData(
+                                'SELECT '+
+                                  'MON$RECORD_IDX_READS as IDX_READS, '+
+                                  'MON$RECORD_SEQ_READS as SEQ_READS '+
+                                'FROM '+
+                                  'MON$RECORD_STATS '+
+                                'JOIN MON$TRANSACTIONS ON MON$TRANSACTIONS.MON$STAT_ID=MON$RECORD_STATS.MON$STAT_ID '+
+                                'WHERE '+
+                                  'MON$TRANSACTIONS.MON$TRANSACTION_ID=current_transaction',
+                                aXMLDATA2.DocumentElement,
+                                aFormatSettings
+                               );
+          AlMemoResult.Lines.add('Indexed Read: ' + aXMLDATA2.DocumentElement.ChildNodes[0].ChildNodes['idx_reads'].Text);
+          AlMemoResult.Lines.add('Non Indexed Read: ' + aXMLDATA2.DocumentElement.ChildNodes[0].ChildNodes['seq_reads'].Text);
         finally
           aFBXClient.TransactionCommit;
         end;
-        if aXMLDATA.DocumentElement.ChildNodes.Count <= 1000 then AlMemoResult.Lines.assign(aXMLDATA.XML)
-        else AlMemoResult.Lines.Text := 'More than 1000 records returned!';
-        AlMemoResult.Lines.Insert(0,'');
-        AlMemoResult.Lines.Insert(0,'**************');
-        AlMemoResult.Lines.Insert(0,'');
-        AlMemoResult.Lines.Insert(0,'Time to load the data: ' + inttostr(GetTickCount - aStartDate) + ' ms');
+        AlMemoResult.Lines.add('');
+        AlMemoResult.Lines.add('');
+        AlMemoResult.Lines.add('**************');
+        AlMemoResult.Lines.add('');
+
+        if aXMLDATA1.DocumentElement.ChildNodes.Count <= 1000 then AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + trim(aXMLDATA1.XML.Text)
+        else AlMemoResult.Lines.Add('More than 1000 records returned!');
 
       Finally
-        aXMLDATA.free;
+        aXMLDATA1.free;
+        aXMLDATA2.free;
       End;
 
     Finally
@@ -176,16 +191,11 @@ begin
 
     while ALButtonLoopSelectFirebird.Tag = 1 do begin
 
-      aXMLDATA:= TALXmlDocument.Create(nil);
+      aXMLDATA := ALCreateEmptyXMLDocument('root');
       Try
         With aXMLDATA Do Begin
           Options := [doNodeAutoIndent];
           ParseOptions := [poPreserveWhiteSpace];
-          Active := true;
-          version := '1.0';
-          standalone := 'yes';
-          Encoding := 'UTF-8';
-          aXMLDATA.AddChild('root');
         end;
 
         aStartDate := GetTickCount;
@@ -223,9 +233,12 @@ procedure TForm1.ALButtonUpdateFirebirdClick(Sender: TObject);
 Var aFBXClient: TALFbxClient;
     aXMLDATA: TalXmlDocument;
     aStartDate: Cardinal;
+    aFormatSettings: TformatSettings;
     S1: String;
 begin
+  GetLocaleFormatSettings(1033, aFormatSettings);
   AlMemoResult.Lines.text := 'Loading...';
+  application.processmessages;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -238,31 +251,44 @@ begin
                       );
     Try
 
-      aXMLDATA:= TALXmlDocument.Create(nil);
+      aXMLDATA:= ALCreateEmptyXMLDocument('root');
       Try
-        With aXMLDATA Do Begin
-          Options := [doNodeAutoIndent];
-          ParseOptions := [poPreserveWhiteSpace];
-          Active := true;
-          version := '1.0';
-          standalone := 'yes';
-          Encoding := 'UTF-8';
-          aXMLDATA.AddChild('root');
-        end;
 
         S1 := AlMemoFirebirdQuery.Lines.Text;
         while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do
           S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
         while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do
-          S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);          
+          S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
         aStartDate := GetTickCount;
         aFBXClient.TransactionStart(False);
         try
           aFBXClient.UpdateData(S1, []);
+          AlMemoResult.Lines.Text := 'Time to execute the sql: ' + inttostr(GetTickCount - aStartDate) + ' ms';
+          aFBXClient.SelectData(
+                                'SELECT '+
+                                  'MON$RECORD_IDX_READS as IDX_READS, '+
+                                  'MON$RECORD_SEQ_READS as SEQ_READS, '+
+                                  'MON$RECORD_INSERTS as INSERTS, '+
+                                  'MON$RECORD_UPDATES as UPDATES, '+
+                                  'MON$RECORD_DELETES as DELETES '+
+                                'FROM '+
+                                  'MON$RECORD_STATS '+
+                                'JOIN MON$TRANSACTIONS ON MON$TRANSACTIONS.MON$STAT_ID=MON$RECORD_STATS.MON$STAT_ID '+
+                                'WHERE '+
+                                  'MON$TRANSACTIONS.MON$TRANSACTION_ID=current_transaction',
+                                aXMLDATA.DocumentElement,
+                                aFormatSettings
+                               );
+          AlMemoResult.Lines.add('Indexed Read: ' + aXMLDATA.DocumentElement.ChildNodes[0].ChildNodes['idx_reads'].Text);
+          AlMemoResult.Lines.add('Non Indexed Read: ' + aXMLDATA.DocumentElement.ChildNodes[0].ChildNodes['seq_reads'].Text);
+          AlMemoResult.Lines.add('Inserts: ' + aXMLDATA.DocumentElement.ChildNodes[0].ChildNodes['inserts'].Text);
+          AlMemoResult.Lines.add('Updates: ' + aXMLDATA.DocumentElement.ChildNodes[0].ChildNodes['updates'].Text);
+          AlMemoResult.Lines.add('Deletes: ' + aXMLDATA.DocumentElement.ChildNodes[0].ChildNodes['deletes'].Text);
+          aStartDate := GetTickCount;
         finally
           aFBXClient.TransactionCommit;
         end;
-        AlMemoResult.Lines.Text := 'Time to update the data: ' + inttostr(GetTickCount - aStartDate) + ' ms';
+        AlMemoResult.Lines.add('Time to commit the data: ' + inttostr(GetTickCount - aStartDate) + ' ms');
 
       Finally
         aXMLDATA.free;
@@ -281,9 +307,10 @@ end;
 {****************************************************************}
 procedure TForm1.ALButtonLoopUpdateFirebirdClick(Sender: TObject);
 Var aFBXClient: TALFbxClient;
-    aXMLDATA: TalXmlDocument;
     aStartDate: Cardinal;
+    aEndDate: Cardinal;
     Count: integer;
+    TotalExecuteTime: Cardinal;
     S1: String;
 begin
   if ALButtonLoopUpdateFirebird.Tag = 1 then begin
@@ -307,40 +334,29 @@ begin
                     );
   Try
 
+    TotalExecuteTime := 0;
+    AlMemoResult.Lines.Text := 'Average time to update the data: 0 ms';
     while ALButtonLoopUpdateFirebird.Tag = 1 do begin
 
-      aXMLDATA:= TALXmlDocument.Create(nil);
-      Try
-        With aXMLDATA Do Begin
-          Options := [doNodeAutoIndent];
-          ParseOptions := [poPreserveWhiteSpace];
-          Active := true;
-          version := '1.0';
-          standalone := 'yes';
-          Encoding := 'UTF-8';
-          aXMLDATA.AddChild('root');
-        end;
-
-        S1 := AlMemoFirebirdQuery.Lines.Text;
-        while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do
-          S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do
-          S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-        aStartDate := GetTickCount;
-        aFBXClient.TransactionStart(False);
-        try
-          aFBXClient.UpdateData(S1, []);
-        finally
-          aFBXClient.TransactionCommit;
-        end;
-        inc(Count);
-        if count mod 100 = 0 then AlMemoResult.Clear;
-        AlMemoResult.Lines.Insert(0,inttostr(Count) + '. Time to update the data: ' + inttostr(GetTickCount - aStartDate) + ' ms');
-        application.ProcessMessages;
-
-      Finally
-        aXMLDATA.free;
-      End;
+      S1 := AlMemoFirebirdQuery.Lines.Text;
+      while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do
+        S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+      while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do
+        S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
+      aStartDate := GetTickCount;
+      aFBXClient.TransactionStart(False);
+      try
+        aFBXClient.UpdateData(S1, []);
+      finally
+        aFBXClient.TransactionCommit;
+      end;
+      aEndDate := GetTickCount;
+      inc(Count);
+      if count mod 100 = 0 then AlMemoResult.Lines.Text := AlMemoResult.Lines[0];
+      AlMemoResult.Lines.Insert(1,inttostr(Count) + '. Time to update the data: ' + inttostr(aEndDate - aStartDate) + ' ms');
+      TotalExecuteTime := TotalExecuteTime + (aEndDate - aStartDate);
+      AlMemoResult.Lines[0] := 'Average time to update the data: '+inttostr(round(TotalExecuteTime/Count))+' ms';
+      application.ProcessMessages;
 
     end;
 
@@ -373,16 +389,11 @@ begin
                         );
     Try
 
-      aXMLDATA:= TALXmlDocument.Create(nil);
+      aXMLDATA := ALCreateEmptyXMLDocument('root');
       Try
         With aXMLDATA Do Begin
           Options := [doNodeAutoIndent];
           ParseOptions := [poPreserveWhiteSpace];
-          Active := true;
-          version := '1.0';
-          standalone := 'yes';
-          Encoding := 'UTF-8';
-          aXMLDATA.AddChild('root');
         end;
 
         aStartDate := GetTickCount;

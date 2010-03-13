@@ -4,7 +4,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBXClient (Alcinoe FireBird Express Client)
-Version:      3.50
+Version:      3.51
 
 Description:  Retrieving Data as XML from Firebird Server.
 
@@ -41,7 +41,7 @@ Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     02/03/2010: add aNumbuffers: Integer to the connect
 
 Link :        http://www.progdigy.com/modules.php?name=UIB
 
@@ -84,7 +84,12 @@ Type
     procedure connect(aDataBaseName,
                       aDataBaseLogin,
                       aDataBasePwd,
-                      aDataBaseCharSet: String);
+                      aDataBaseCharSet: String); overload;
+    procedure connect(aDataBaseName,
+                      aDataBaseLogin,
+                      aDataBasePwd,
+                      aDataBaseCharSet: String;
+                      aNumbuffers: Integer); overload;
     procedure Disconnect;
     Procedure TransactionStart(Readonly: Boolean; const TPB: string = '');
     Procedure TransactionCommit;
@@ -133,8 +138,11 @@ begin
   inherited;
 end;
 
-{****************************************************************************************************}
-procedure TAlFBXClient.connect(aDataBaseName, aDataBaseLogin, aDataBasePwd, aDataBaseCharSet: String);
+{*******************************************}
+procedure TAlFBXClient.connect(aDataBaseName,
+                               aDataBaseLogin,
+                               aDataBasePwd,
+                               aDataBaseCharSet: String);
 begin
   if connected then raise Exception.Create('Already connected!');
   FLibrary.AttachDatabase(
@@ -143,6 +151,25 @@ begin
                           'user_name = '+aDataBaseLogin+'; '+
                           'password = '+aDataBasePwd+'; '+
                           'lc_ctype = '+aDataBaseCharSet
+                         );
+  fCharSet :=  ALFBXStrToCharacterSet(aDataBaseCharSet);
+end;
+
+{*******************************************}
+procedure TAlFBXClient.connect(aDataBaseName,
+                               aDataBaseLogin,
+                               aDataBasePwd,
+                               aDataBaseCharSet: String;
+                               aNumbuffers: Integer);
+begin
+  if connected then raise Exception.Create('Already connected!');
+  FLibrary.AttachDatabase(
+                          aDataBaseName,
+                          fDBHandle,
+                          'user_name = '+aDataBaseLogin+'; '+
+                          'password = '+aDataBasePwd+'; '+
+                          'lc_ctype = '+aDataBaseCharSet+'; '+
+                          'num_buffers = '+inttostr(aNumbuffers)
                          );
   fCharSet :=  ALFBXStrToCharacterSet(aDataBaseCharSet);
 end;

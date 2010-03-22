@@ -58,6 +58,9 @@ uses classes;
 
 Type
 
+  {--------------------------------------------------------------}
+  TALSQLClauseUpdateKind = (alUpdate, AlInsert, AlUpdateOrInsert);
+
   {----------------------------}
   TAlStrSelectSQLClause = record
     First: integer;
@@ -73,7 +76,7 @@ Type
     OrderBy: String;
   end;
   TALStrUpdateSQLClause = record
-    Update: Boolean;
+    Kind: TALSQLClauseUpdateKind;
     Table: string;
     Value: string;
     Where: string;
@@ -96,7 +99,7 @@ Type
     procedure Assign(Source: TAlLstSelectSQLClause); virtual;
   end;
   TALLstUpdateSQLClause = Class(Tobject)
-    Update: Boolean;
+    Kind: TALSQLClauseUpdateKind;
     Table: String;
     Value: Tstrings;
     Where: Tstrings;
@@ -139,7 +142,7 @@ end;
 Function ALEmptyStrUpdateSqlClause: TAlStrUpdateSQLClause;
 Begin
   with result do begin
-    Update := False;
+    Kind := AlInsert;
     table:= '';
     Value:= '';
     Where:= '';
@@ -259,8 +262,8 @@ Begin
     Lst.QuoteChar := '''';
     Lst.DelimitedText := trim(SqlClause.Value);
 
-    {----Update------------------}
-    If SqlClause.Update then Begin
+    {----Update---------------------------}
+    If SqlClause.Kind = AlUpdate then Begin
       Result := '';
       for i := 0 to Lst.Count- 1 do
         If Trim(Lst[i]) <> '' then Result := Result + trim(Lst[i]) + ', ';
@@ -298,7 +301,9 @@ Begin
         exit;
       end;
 
-      Result := 'Insert into ' + SqlClause.Table + ' (' + S1 + ') Values (' + s2 + ')';
+      if SqlClause.kind = ALInsert then Result := 'Insert into '
+      else Result := 'Update or Insert into ';
+      Result := result + SqlClause.Table + ' (' + S1 + ') Values (' + s2 + ')';
     end;
 
   finally
@@ -388,8 +393,8 @@ var i : integer;
     S1, S2 : String;
 Begin
 
-  {----Update------------------}
-  If SqlClause.Update then Begin
+  {----Update---------------------------}
+  If SqlClause.Kind = AlUpdate then Begin
     Result := '';
     for i := 0 to SqlClause.Value.Count- 1 do
       If Trim(SqlClause.Value[i]) <> '' then Result := Result + trim(SqlClause.Value[i]) + ', ';
@@ -424,7 +429,9 @@ Begin
       exit;
     end;
 
-    Result := 'Insert into ' + SqlClause.Table + ' (' + S1 + ') Values (' + s2 + ')';
+    if SqlClause.kind = ALInsert then Result := 'Insert into '
+    else Result := 'Update or Insert into ';
+    Result := Result + SqlClause.Table + ' (' + S1 + ') Values (' + s2 + ')';
   end;
 
 end;
@@ -510,7 +517,7 @@ constructor TALLstUpdateSQLClause.Create;
   end;
 
 Begin
-  Update := False;
+  Kind := AlInsert;
   table:= '';
   Value:= InternalCreateLst;
   Where:= InternalCreateLst;
@@ -527,7 +534,7 @@ end;
 {********************************************************************}
 procedure TALLstUpdateSQLClause.Assign(Source: TALLstUpdateSQLClause);
 begin
-  Update := Source.Update;
+  Kind := Source.Kind;
   table:= source.Table;
   Value.Assign(source.Value);
   Where.Assign(source.Where);

@@ -4,7 +4,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Unicode Functions
-Version:      3.52
+Version:      3.54
 
 Description:  This unit contains a Unicode support library along
               with some additional files to use WideStrings/Unicode
@@ -52,6 +52,10 @@ History :     14/11/2005: Add Function ALStringToWideString,
               20/11/2007: add function ALUTF8ISO91995TransliterationCyrillicToLatin
               12/01/2009: add InternalfoldNonDiacriticChar to ALWideNormalize
                           to fold letter like l with stroke to l without stroke
+              15/03/2010: update ALUTF8LowerCaseFirstCharUpper to return
+                          jean-pierre => Jean-Pierre instead of Jean-pierre
+                          mandelieu la napoule => Mandelieu La Napoule instead of Mandelieu la napoule
+                          arkadia france => Arkadia France instead of Arkadia france
 
 Link :
 
@@ -100,6 +104,7 @@ Const cAlUTF8Bom = #$EF#$BB#$BF;
 implementation
 
 uses SysUtils,
+     StrUtils,
      AlFcnString;
 
 {*******************}
@@ -518,9 +523,23 @@ end;
 {***************************************************************}
 Function ALUTF8LowerCaseFirstCharUpper(s:UTF8string): UTF8String;
 var tmpWideStr: WideString;
+    i: integer;
 begin
   TmpWideStr := UTF8Decode(S);
-  result := utf8encode(WideUpperCase(copy(TmpWideStr,1,1)) + WidelowerCase(copy(TmpWideStr,2,MaxInt)));
+  tmpWideStr := Trim(TmpWideStr);
+  if length(TmpWideStr) = 0 then begin
+    result := '';
+    exit;
+  end;
+  TmpWideStr := WideUpperCase(copy(TmpWideStr,1,1)) + WidelowerCase(copy(TmpWideStr,2,MaxInt));
+  for i:= 2 to length(TmpWideStr) do
+    if (TmpWideStr[i-1] in [WideChar(' '),WideChar('-'),WideChar('''')]) and
+       (
+        (i >= length(TmpWideStr)) or
+        (not (TmpWideStr[i+1] in [WideChar(' '),WideChar('-'),WideChar('''')]))
+       )
+    then TmpWideStr[i] := WideUpperCase(TmpWideStr[i])[1];
+  result := utf8encode(TmpWideStr);
 end;
 
 {****************************************************}

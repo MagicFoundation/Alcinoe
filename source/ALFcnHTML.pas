@@ -64,8 +64,10 @@ interface
 uses Classes;
 
 {Html Tag function}
-procedure ALANSIExtractHTMLText(HtmlContent: String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True);
-procedure ALUTF8ExtractHTMLText(HtmlContent: UTF8String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True);
+procedure ALANSIExtractHTMLText(HtmlContent: String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
+function  ALANSIExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String; overload;
+procedure ALUTF8ExtractHTMLText(HtmlContent: UTF8String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
+function  ALUTF8ExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String; overload;
 function  ALXMLTextElementEncode(Src: string; const useNumericReference: boolean = True): string;
 function  ALUTF8XMLTextElementDecode(Src: Utf8string): Utf8string;
 function  ALANSIXMLTextElementDecode(Src: string): string;
@@ -470,6 +472,28 @@ Begin
   intenalAdd2LstExtractedResourceText(HtmlContent);
 end;
 
+{*****************************************************************************************************}
+function  ALUTF8ExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String;
+Var LstExtractedResourceText: Tstrings;
+Begin
+  LstExtractedResourceText := TstringList.Create;
+  Try
+    ALUTF8ExtractHTMLText(
+                          HtmlContent,
+                          LstExtractedResourceText,
+                          DecodeHTMLText
+                         );
+    Result := AlStringReplace(
+                              LstExtractedResourceText.Text,
+                              #13#10,
+                              ' ',
+                              [rfReplaceAll]
+                             );
+  finally
+    LstExtractedResourceText.free;
+  end;
+end;
+
 {**************************************************}
 procedure ALANSIExtractHTMLText(HtmlContent: String;
                                 LstExtractedResourceText : Tstrings;
@@ -485,6 +509,28 @@ Begin
   For i := 0 to LstExtractedResourceText.count - 1 do
     LstExtractedResourceText[I] := UTF8ToAnsi(LstExtractedResourceText[i]);
 End;
+
+{*****************************************************************************************************}
+function  ALANSIExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String;
+Var LstExtractedResourceText: Tstrings;
+Begin
+  LstExtractedResourceText := TstringList.Create;
+  Try
+    ALANSIExtractHTMLText(
+                          HtmlContent,
+                          LstExtractedResourceText,
+                          DecodeHTMLText
+                         );
+    Result := AlStringReplace(
+                              LstExtractedResourceText.Text,
+                              #13#10,
+                              ' ',
+                              [rfReplaceAll]
+                             );
+  finally
+    LstExtractedResourceText.free;
+  end;
+end;
 
 {**********************************************************************************************}
 {we use useNumericReference by default because it's compatible with XHTML, especially because

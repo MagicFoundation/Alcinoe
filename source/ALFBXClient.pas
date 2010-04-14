@@ -106,7 +106,8 @@ Type
                          Const FormatSettings : TformatSettings); overload;
     Function  SelectData(SQL: string;
                          Const FormatSettings : TformatSettings): string; overload;
-    procedure UpdateData(SQL: string; const Blobs: array of Tstream);
+    procedure UpdateData(SQL: string; const Blobs: array of Tstream); overload;
+    procedure UpdateData(SQLs: Tstrings); overload;
     Property Connected: Boolean Read GetConnected;
     Property InTransaction: Boolean read GetInTransaction;
     Property NullString: String Read fNullString Write fNullString;
@@ -627,6 +628,15 @@ begin
     end;
   end
   else Flibrary.DSQLExecuteImmediate(fDBHandle, fTraHandle, SQL, FSQLDIALECT, nil);
+end;
+
+{************************************************}
+procedure TAlFBXClient.UpdateData(SQLs: Tstrings);
+Var i: integer;
+begin
+  for i:= 0 to SQLs.Count - 1 do
+    if SQLs[i] <> '' then
+      UpdateData(SQLs[i],[]);
 end;
 
 end.

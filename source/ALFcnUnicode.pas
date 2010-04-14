@@ -4,7 +4,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Unicode Functions
-Version:      3.54
+Version:      3.55
 
 Description:  This unit contains a Unicode support library along
               with some additional files to use WideStrings/Unicode
@@ -56,6 +56,9 @@ History :     14/11/2005: Add Function ALStringToWideString,
                           jean-pierre => Jean-Pierre instead of Jean-pierre
                           mandelieu la napoule => Mandelieu La Napoule instead of Mandelieu la napoule
                           arkadia france => Arkadia France instead of Arkadia france
+              05/04/2010: update ALUTF8Trunc to ALUTF8ASCIITrunc and ALUTF8UnicodeTrunc
+                          Where the first just trunc the string to n ascii char and the
+                          second trunc the string to n unicode char
 
 Link :
 
@@ -83,7 +86,8 @@ function AlUTF8DetectBOM(const P: PChar; const Size: Integer): Boolean;
 function ALUTF8CharSize(const P: PChar; const Size: Integer): Integer;
 function ALUTF8CharCount(const P: PChar; const Size: Integer): Integer; overload;
 function ALUTF8CharCount(const S: Utf8String): Integer; overload;
-Function ALUTF8Trunc(s:UTF8string; Count: Integer): UTF8String;
+Function ALUTF8UnicodeTrunc(s:UTF8string; Count: Integer): UTF8String;
+Function ALUTF8AsciiTrunc(s:UTF8string; Count: Integer): UTF8String;
 Function ALUTF8UpperFirstChar(s:UTF8string): UTF8String;
 Function ALUTF8LowerCaseFirstCharUpper(s:UTF8string): UTF8String;
 Function ALStringToWideString(const S: string; aCodePage: Word): WideString;
@@ -485,9 +489,9 @@ begin
   Result := ALUTF8CharCount(Pointer(S), Length(S));
 end;
 
-{******************************}
-{give on how many char are in P}
-Function ALUTF8Trunc(s:UTF8string; Count: Integer): UTF8String;
+{**************************************}
+{Trunc a UTF8string to count ascii char}
+Function ALUTF8AscIITrunc(s:UTF8string; Count: Integer): UTF8String;
 var Q    : PChar;
     L, C, M : Integer;
 begin
@@ -509,6 +513,15 @@ begin
   end;
 
   Result := ALCopyStr(S,1,M);
+end;
+
+{****************************************}
+{Trunc a UTF8string to count unicode char}
+Function ALUTF8UnicodeTrunc(s:UTF8string; Count: Integer): UTF8String;
+var tmpWideStr: WideString;
+begin
+  TmpWideStr := UTF8Decode(S);
+  result := utf8encode(copy(TmpWideStr,1,Count));
 end;
 
 {*****************************}

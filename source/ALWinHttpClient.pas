@@ -527,7 +527,8 @@ begin
   else StrProtocolVersion := 'HTTP/1.0';
 
   if RequestMethod = HTTPrm_Post then StrVerb := 'POST'
-  else StrVerb := 'GET';
+  else if RequestMethod = HTTPrm_Get then StrVerb := 'GET'
+  else StrVerb := 'HEAD';
 
   Request := nil;
   try

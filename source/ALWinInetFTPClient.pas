@@ -190,7 +190,7 @@ type
     Function  FindNext(var F: TALFtpclientSearchRec): Integer; override;
     procedure FindClose(var F: TALFtpclientSearchRec); override;
     Function  GetCurrentDirectory: String; override;
-    Procedure GetFile(RemoteFile: String; LocalFile: String; FailIfExists: Boolean); overload; override;
+    Procedure GetFile(RemoteFile: String; LocalFile: String; FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
     Procedure GetFile(RemoteFile: String; DataStream: Tstream); overload; override;
     Function  GetFileSize(filename: String): Longword; override;
     Procedure PutFile(LocalFile: String; Remotefile: String); overload; override;
@@ -596,6 +596,7 @@ procedure TALWinInetFTPClient.GetFile(RemoteFile: String; DataStream: Tstream);
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here    
   end;
 
 var Size,
@@ -673,6 +674,7 @@ procedure TALWinInetFTPClient.GetFile(RemoteFile, LocalFile: String; FailIfExist
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here
   end;
 
 begin
@@ -703,6 +705,7 @@ function TALWinInetFTPClient.GetFileSize(filename: String): Longword;
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here    
   end;
 
 Var hFile: HINTERNET;
@@ -740,6 +743,7 @@ procedure TALWinInetFTPClient.PutFile(DataStream: TStream; Remotefile: String);
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here
   end;
 
 var RetVal: DWord;
@@ -808,6 +812,7 @@ procedure TALWinInetFTPClient.PutFile(LocalFile, Remotefile: String);
     if wFtpIo_Need_file in InternetOptions then Result := result or INTERNET_FLAG_NEED_FILE;
     if wftpIo_Reload in InternetOptions then Result := result or INTERNET_FLAG_RELOAD;
     if wftpIo_Resynchronize in InternetOptions then Result := result or INTERNET_FLAG_RESYNCHRONIZE;
+    if wftpIo_No_cache_write in InternetOptions then Result := result or INTERNET_FLAG_NO_CACHE_WRITE; //even if the doc of Ms don't say it, we must set this here    
   end;
 
 begin

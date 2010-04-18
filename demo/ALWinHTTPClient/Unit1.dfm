@@ -173,9 +173,9 @@ object Form1: TForm1
           WordWrap = False
         end
         object ButtonPost: TButton
-          Left = 430
+          Left = 407
           Top = 21
-          Width = 75
+          Width = 50
           Height = 25
           Caption = 'Post'
           Font.Charset = DEFAULT_CHARSET
@@ -190,7 +190,7 @@ object Form1: TForm1
         object ButtonGet: TButton
           Left = 352
           Top = 21
-          Width = 75
+          Width = 50
           Height = 25
           Caption = 'Get'
           Font.Charset = DEFAULT_CHARSET
@@ -244,6 +244,21 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 6
+        end
+        object ButtonHead: TButton
+          Left = 462
+          Top = 21
+          Width = 50
+          Height = 25
+          Caption = 'Head'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 7
+          OnClick = ButtonHeadClick
         end
       end
       object GroupBox10: TGroupBox

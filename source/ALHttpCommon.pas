@@ -91,7 +91,8 @@ Type
   {--Request method--}
   TALHTTPRequestMethod = (
                           HTTPrm_Get,
-                          HTTPrm_Post
+                          HTTPrm_Post,
+                          HTTPrm_Head
                          );
 
   {--Request header--}

@@ -101,11 +101,13 @@ type
     Panel1: TPanel;
     Label9: TLabel;
     CheckBoxEncodeParams: TCheckBox;
+    ButtonHead: TButton;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ButtonOpenInExplorerClick(Sender: TObject);
     procedure ButtonPostClick(Sender: TObject);
+    procedure ButtonHeadClick(Sender: TObject);
   private
     FWinInetHttpClient: TalWinInetHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -296,6 +298,35 @@ begin
     OnDownloadProgress := OnHttpDownloadProgress;
     OnUploadProgress := OnHttpUploadProgress;
     MemoRequestRawHeader.Text := RequestHeader.RawHeaderText;
+  end;
+end;
+
+{************************************************}
+procedure TForm1.ButtonHeadClick(Sender: TObject);
+Var AHTTPResponseHeader: TALHTTPResponseHeader;
+    AHTTPResponseStream: TStringStream;
+begin
+  MainStatusBar.Panels[0].Text := '';
+  MainStatusBar.Panels[1].Text := '';
+  MainStatusBar.Panels[2].Text := '';
+  initWinInetHTTP;
+  MemoContentBody.Lines.Clear;
+  MemoResponseRawHeader.Lines.Clear;
+  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  AHTTPResponseStream := TstringStream.Create('');
+  try
+    try
+      FWinInetHttpClient.Head(editURL.Text, AHTTPResponseStream, AHTTPResponseHeader);
+      MemoContentBody.Lines.Text := AHTTPResponseStream.DataString;
+      MemoResponseRawHeader.Lines.Text := AHTTPResponseHeader.RawHeaderText;
+    except
+      MemoContentBody.Lines.Text := AHTTPResponseStream.DataString;
+      MemoResponseRawHeader.Lines.Text := AHTTPResponseHeader.RawHeaderText;
+      Raise;
+    end;
+  finally
+    AHTTPResponseHeader.Free;
+    AHTTPResponseStream.Free;
   end;
 end;
 

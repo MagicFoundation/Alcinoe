@@ -557,6 +557,7 @@ function TALWinInetHTTPClient.Send(const aRequestDataStream: TStream): Integer;
     Case RequestMethod of
       HTTPrm_Get: Result := 'GET';
       HTTPrm_Post: Result := 'POST';
+      HTTPrm_Head: Result := 'HEAD';
       else result := nil;
     end;
   end;

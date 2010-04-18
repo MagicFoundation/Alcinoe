@@ -141,11 +141,13 @@ type
     Procedure Post(aUrl:String; aPostDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Procedure PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader; Const EncodeParams: Boolean=True); overload;
     Procedure PostMultipartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Head(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Function  Get(aUrl:String): String; overload;
     Function  Post(aUrl:String): String; overload;
     Function  Post(aUrl:String; aPostDataStream: TStream): String; overload;
     Function  PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; Const EncodeParams: Boolean=True): String; overload;
     Function  PostMultiPartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents): String; overload;
+    Function  Head(aUrl:String) : String; overload;
   published
     property  URL: string read FURL write SetURL;
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
@@ -376,6 +378,20 @@ begin
   end;
 end;
 
+{***************************************}
+procedure TALHTTPClient.Head(aUrl: String;
+                             aResponseContentStream: TStream;
+                             aResponseContentHeader: TALHTTPResponseHeader);
+begin
+  Url := aURL;
+  RequestMethod := HTTPrm_head;
+  Execute(
+          nil,
+          aResponseContentStream,
+          aResponseContentHeader
+         );
+end;
+
 {***********************************************}
 function TALHTTPClient.Get(aUrl: String): String;
 var aResponseContentStream: TStringStream;
@@ -477,6 +493,23 @@ begin
   finally
     aURLEncodedContentStream.free;
     FrequestHeader.ContentType := OldRequestContentType;
+  end;
+end;
+
+{************************************************}
+function TALHTTPClient.Head(aUrl:String) : String;
+var aResponseContentStream: TStringStream;
+begin
+  aResponseContentStream := TstringStream.Create('');
+  try
+    Head(
+        aUrl,
+        aResponseContentStream,
+        nil
+       );
+    result := aResponseContentStream.DataString;
+  finally
+    aResponseContentStream.Free;
   end;
 end;
 
@@ -595,3 +628,4 @@ begin
 end;
 
 end.
+

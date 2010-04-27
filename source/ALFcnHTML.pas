@@ -68,6 +68,7 @@ procedure ALANSIExtractHTMLText(HtmlContent: String; LstExtractedResourceText : 
 function  ALANSIExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String; overload;
 procedure ALUTF8ExtractHTMLText(HtmlContent: UTF8String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
 function  ALUTF8ExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String; overload;
+function  ALXMLCDataElementEncode(Src: string): string;
 function  ALXMLTextElementEncode(Src: string; const useNumericReference: boolean = True): string;
 function  ALUTF8XMLTextElementDecode(Src: Utf8string): Utf8string;
 function  ALANSIXMLTextElementDecode(Src: string): string;
@@ -532,9 +533,20 @@ Begin
   end;
 end;
 
-{**********************************************************************************************}
-{we use useNumericReference by default because it's compatible with XHTML, especially because
- of the &apos; entity}
+{*****************************************************}
+function  ALXMLCDataElementEncode(Src: string): string;
+Begin
+  //  The preferred approach to using CDATA sections for encoding text that contains the triad "]]>" is to use multiple CDATA sections by splitting each
+  //  occurrence of the triad just before the ">". For example, to encode "]]>" one would write:
+  //  <![CDATA[]]]]><![CDATA[>]]>
+  //  This means that to encode "]]>" in the middle of a CDATA section, replace all occurrences of "]]>" with the following:
+  //  ]]]]><![CDATA[>
+  Result := alStringReplace(Src,']]>',']]]]><![CDATA[>',[rfReplaceAll]);
+End;
+
+{*************************************************}
+{we use useNumericReference by default because it's
+ compatible with XHTML, especially because of the &apos; entity}
 function ALXMLTextElementEncode(Src: string; const useNumericReference: boolean = True): string;
 var i, l: integer;
     Buf, P: PChar;

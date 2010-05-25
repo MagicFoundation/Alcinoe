@@ -4,7 +4,7 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'TALPHPRunner'
-  ClientHeight = 696
+  ClientHeight = 748
   ClientWidth = 800
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,32 +18,33 @@ object Form1: TForm1
   TextHeight = 13
   object MainStatusBar: TStatusBar
     Left = 0
-    Top = 677
+    Top = 729
     Width = 800
     Height = 19
     Panels = <
       item
         Width = 300
       end>
-    ExplicitTop = 581
+    ExplicitTop = 677
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 0
     Width = 800
-    Height = 677
+    Height = 729
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 1
-    ExplicitHeight = 581
+    ExplicitHeight = 677
     object TabSheet1: TTabSheet
       Caption = 'Main'
-      ExplicitHeight = 553
+      ExplicitHeight = 649
       object GroupBox9: TGroupBox
-        Left = 3
-        Top = 123
-        Width = 777
-        Height = 166
+        Left = 0
+        Top = 134
+        Width = 792
+        Height = 192
+        Align = alTop
         Caption = 'PARAMS'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -54,7 +55,7 @@ object Form1: TForm1
         TabOrder = 0
         object Label4: TLabel
           Left = 8
-          Top = 56
+          Top = 85
           Width = 100
           Height = 13
           Caption = 'Post Data Strings'
@@ -67,7 +68,7 @@ object Form1: TForm1
         end
         object Label6: TLabel
           Left = 8
-          Top = 72
+          Top = 101
           Width = 103
           Height = 13
           Caption = 'Format "name=value"'
@@ -93,7 +94,7 @@ object Form1: TForm1
         end
         object Label5: TLabel
           Left = 370
-          Top = 56
+          Top = 85
           Width = 94
           Height = 13
           Caption = 'Server Variables'
@@ -106,7 +107,7 @@ object Form1: TForm1
         end
         object Label7: TLabel
           Left = 370
-          Top = 72
+          Top = 101
           Width = 103
           Height = 13
           Caption = 'Format "name=value"'
@@ -135,7 +136,7 @@ object Form1: TForm1
         end
         object MemoPostDataStrings: TMemo
           Left = 8
-          Top = 88
+          Top = 117
           Width = 337
           Height = 65
           Ctl3D = False
@@ -182,7 +183,7 @@ object Form1: TForm1
         end
         object MemoServerVariables: TMemo
           Left = 370
-          Top = 87
+          Top = 116
           Width = 398
           Height = 66
           BevelInner = bvNone
@@ -238,12 +239,28 @@ object Form1: TForm1
           Caption = 'ISAPI'
           TabOrder = 8
         end
+        object ButtonExecute: TButton
+          Left = 351
+          Top = 48
+          Width = 75
+          Height = 25
+          Caption = 'Custom'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 9
+          OnClick = ButtonExecuteClick
+        end
       end
       object GroupBox10: TGroupBox
-        Left = 3
-        Top = 295
-        Width = 777
-        Height = 226
+        Left = 0
+        Top = 336
+        Width = 792
+        Height = 227
+        Align = alTop
         Caption = 'RESPONSE'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -331,10 +348,11 @@ object Form1: TForm1
         end
       end
       object GroupBox1: TGroupBox
-        Left = 3
-        Top = 3
-        Width = 777
+        Left = 0
+        Top = 10
+        Width = 792
         Height = 114
+        Align = alTop
         Caption = 'INTERPRETER'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -343,6 +361,9 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 2
+        ExplicitLeft = 3
+        ExplicitTop = 3
+        ExplicitWidth = 777
         object Label11: TLabel
           Left = 8
           Top = 27
@@ -503,10 +524,11 @@ object Form1: TForm1
         end
       end
       object GroupBox2: TGroupBox
-        Left = 3
-        Top = 519
-        Width = 777
-        Height = 122
+        Left = 0
+        Top = 573
+        Width = 792
+        Height = 123
+        Align = alTop
         Caption = 'BENCH'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -606,6 +628,49 @@ object Form1: TForm1
           TabOrder = 3
           WordWrap = False
         end
+      end
+      object Panel1: TPanel
+        Left = 0
+        Top = 326
+        Width = 792
+        Height = 10
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 4
+        ExplicitLeft = -3
+        ExplicitTop = 115
+      end
+      object Panel3: TPanel
+        Left = 0
+        Top = 124
+        Width = 792
+        Height = 10
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 5
+        ExplicitLeft = 3
+        ExplicitTop = 71
+      end
+      object Panel4: TPanel
+        Left = 0
+        Top = 563
+        Width = 792
+        Height = 10
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 6
+        ExplicitLeft = -3
+        ExplicitTop = 541
+      end
+      object Panel5: TPanel
+        Left = 0
+        Top = 0
+        Width = 792
+        Height = 10
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 7
+        ExplicitLeft = -3
       end
     end
   end

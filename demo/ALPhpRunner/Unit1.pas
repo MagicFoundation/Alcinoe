@@ -63,10 +63,16 @@ type
     Label13: TLabel;
     Label15: TLabel;
     MemoBenchResult: TMemo;
+    ButtonExecute: TButton;
+    Panel1: TPanel;
+    Panel3: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
     procedure ButtonInitAndGetClick(Sender: TObject);
     procedure ButtonOpenInExplorerClick(Sender: TObject);
     procedure ButtonInitAndPostClick(Sender: TObject);
     procedure ButtonBenchClick(Sender: TObject);
+    procedure ButtonExecuteClick(Sender: TObject);
   private
     FThreadCount: Integer;
     FstartTime: dWord;
@@ -96,6 +102,46 @@ Uses ALMultiPartFormDataParser,
      AlHttpCommon;
 
 {$R *.dfm}
+{***************************************************}
+procedure TForm1.ButtonExecuteClick(Sender: TObject);
+Var AResponseHeader: TALHTTPResponseHeader;
+    AResponseStream: TStringStream;
+var aPhpRunnerEngine: TalPhpRunnerEngine;
+begin
+  MemoContentBody.Lines.Clear;
+  MemoResponseRawHeader.Lines.Clear;
+  AResponseHeader := TALHTTPResponseHeader.Create;
+  AResponseStream := TstringStream.Create('');
+  try
+    try
+      if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpNamedPipeFastCgiRunnerEngine.Create(EditPhpCGIPath.Text)
+      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(EditPhpFastCgiHost.Text, strtoint(EditPhpFastCgiPort.text))
+      else aPhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(EditPhpIsapiDllPath.text);
+      Try
+        aPhpRunnerEngine.Execute(
+                                 MemoServerVariables.Lines,
+                                 nil,
+                                 AResponseStream,
+                                 AResponseHeader
+                                );
+      Finally
+        aPhpRunnerEngine.Free;
+      End;
+      MemoContentBody.Lines.Text := AResponseStream.DataString;
+      MemoResponseRawHeader.Lines.Text := AResponseHeader.RawHeaderText;
+
+    except
+      MemoContentBody.Lines.Text := AResponseStream.DataString;
+      MemoResponseRawHeader.Lines.Text := AResponseHeader.RawHeaderText;
+      Raise;
+    end;
+  finally
+    AResponseHeader.Free;
+    AResponseStream.Free;
+  end;
+end;
+
 {******************************************************}
 procedure TForm1.ButtonInitAndGetClick(Sender: TObject);
 Var AResponseHeader: TALHTTPResponseHeader;

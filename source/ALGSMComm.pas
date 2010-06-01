@@ -31,7 +31,7 @@ Description:  The TAlGSMComm component implements SMS text messaging
               If both of these tests pass, then your phone meets the basic
               requirements.
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -838,25 +838,8 @@ end;
 
 {**********************************************}
 procedure TAlGSMComm.CheckError(Error: Boolean);
-var ErrCode: Integer;
-    S: string;
 begin
-  ErrCode := GetLastError;
-  if Error and (ErrCode <> 0) then begin
-    SetLength(S, 256);
-    FormatMessage(
-                  FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
-                  Pointer(GetModuleHandle('kernel32.dll')),
-                  ErrCode,
-                  0,
-                  PChar(S),
-                  Length(S),
-                  nil
-                 );
-    SetLength(S, StrLen(PChar(S)));
-    while (Length(S) > 0) and (S[Length(S)] in [#10, #13]) do SetLength(S, Length(S) - 1);
-    raise Exception.CreateFmt('%s (Error code:%s)', [S, inttostr(ErrCode)]);      { Do not localize }
-  end;
+  if Error then RaiseLastOSError;
 end;
 
 {*******************************************}

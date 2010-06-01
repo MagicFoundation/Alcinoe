@@ -11,7 +11,7 @@ Description:  SQL function to create easily sql string without
               just add the value in a tstringList like
               fieldname=value and at the end contruct the sql string
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be

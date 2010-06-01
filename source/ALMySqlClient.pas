@@ -9,7 +9,7 @@ Version:      3.53
 Description:  An Object to query MySql Server Version 5 and get
               the Result In Xml Stream
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be

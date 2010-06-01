@@ -16,7 +16,7 @@ Description:  Powerfull stringreplace, Pos, Move, comparetext,
               like <#tagname params1="value1" params2="value2">
               by custom value
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be

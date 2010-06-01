@@ -1474,25 +1474,8 @@ end;
 
 {***********************************************************}
 procedure TALPhpIsapiRunnerEngine.CheckError(Error: Boolean);
-var ErrCode: Integer;
-    S: string;
 begin
-  ErrCode := GetLastError;
-  if Error and (ErrCode <> 0) then begin
-    SetLength(S, 256);
-    FormatMessage(
-                  FORMAT_MESSAGE_FROM_SYSTEM,
-                  nil,
-                  ErrCode,
-                  0,
-                  PChar(S),
-                  Length(S),
-                  nil
-                 );
-    SetLength(S, StrLen(PChar(S)));
-    while (Length(S) > 0) and (S[Length(S)] in [#10, #13]) do SetLength(S, Length(S) - 1);
-    raise Exception.Create(S);
-  end;
+	if Error then RaiseLastOSError;
 end;
 
 {*****************************************}

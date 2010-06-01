@@ -9,7 +9,7 @@ Version:      3.50
 Description:  TALWinInetFTPClient is a is easy to use WinInet-based
               FTP client component.
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -292,7 +292,6 @@ var ErrCode: DWord;
                     nil
                    );
       SetLength(ErrMsg, StrLen(PChar(ErrMsg)));
-      while (Length(ErrMsg) > 0) and (ErrMsg[Length(ErrMsg)] in [#10, #13]) do SetLength(ErrMsg, Length(ErrMsg) - 1);
     end;
 
 begin
@@ -314,13 +313,15 @@ begin
                                       Pchar(ErrMsg),
                                       ErrMsgln
                                      );
+          SetLength(ErrMsg, StrLen(PChar(ErrMsg)));
         end
         else internalFormatMessageFromErrCode;
-      end;
+      end
+      else SetLength(ErrMsg, StrLen(PChar(ErrMsg)));
     end
     else internalFormatMessageFromErrCode;
 
-    raise EALFTPClientException.Create(ErrMsg);
+    raise EALFTPClientException.Create(trim(ErrMsg));
   end;
 end;
 

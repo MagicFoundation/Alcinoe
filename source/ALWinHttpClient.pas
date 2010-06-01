@@ -27,7 +27,7 @@ Description:  Description:  TALWinHttpClient is a is easy to use WinHTTP-based
               or downlevel platform support should still consider
               using WinInet.
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -335,8 +335,7 @@ begin
                   nil
                  );
     SetLength(S, StrLen(PChar(S)));
-    while (Length(S) > 0) and (S[Length(S)] in [#10, #13]) do SetLength(S, Length(S) - 1);
-    raise EALHTTPClientException.CreateFmt('%s - URL:%s', [S, URL]);      { Do not localize }
+    raise EALHTTPClientException.CreateFmt('%s - URL:%s', [trim(S), URL]);      { Do not localize }
   end;
 end;
 

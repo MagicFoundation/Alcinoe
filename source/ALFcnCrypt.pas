@@ -11,7 +11,7 @@ Description:  Toolkit for data encryption. contains routines for use with
               Borland Delphi. provides support for Blowfish, MD5,
               SHA-1, DES, triple- DES, Rijndael.
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be

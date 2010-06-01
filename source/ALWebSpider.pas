@@ -15,7 +15,7 @@ Description:  The function in this unit allows you to download a
               can browse the site from link to link, as if you were viewing it
               online.
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be

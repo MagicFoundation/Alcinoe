@@ -4,12 +4,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALNNTPClient
-Version:      3.51
+Version:      3.52
 
 Description:  TALNNTPClient class implements the NNTP protocol (RFC-977
               and RFC-850) Support authentification (RFC-977 Extension)
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -155,10 +155,14 @@ Uses SysUtils,
 {*************************************************************************}
 Procedure ALNNTPClientSplitResponseLine(aResponse: String; ALst: Tstrings);
 Begin
-  aResponse := Trim(aResponse); //211 111225 12861 362539 nzn.fr.delphi
-  aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]);
-  While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]);
-  aResponse := trim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll]));
+  aResponse := Trim(aResponse); // 211 111225 12861 362539 nzn.fr.delphi
+  aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
+  While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
+  aResponse := trim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll])); // 211
+                                                                           // 111225
+                                                                           // 12861
+                                                                           // 362539
+                                                                           // nzn.fr.delphi
   aLst.Text := aResponse;
 end;
 
@@ -178,6 +182,13 @@ begin
   P := AlPos(#13#10,Result);
   If P > 0 then delete(Result,1,P+1)
   else result := '';
+
+  {If the text contained a period as the first character of the text
+  line in the original, that first period is doubled.  Therefore, the
+  client must examine the first character of each line received, and
+  for those beginning with a period, determine either that this is the
+  end of the text or whether to collapse the doubled period to a single one.}
+  Result := AlStringReplace(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
 end;
 
 {************************************************************************************************}
@@ -240,7 +251,7 @@ Function TAlNNTPClient.Connect(aHost: String; APort: integer): String;
   end;
 
 begin
-  if FConnected then raise Exception.Create('NNTP component already connected');
+  if FConnected then raise Exception.Create('Already connected');
 
   Try
 
@@ -248,8 +259,8 @@ begin
     CallServer(aHost,aPort);
     CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    Result := GetResponse([200, 201]);
     Fconnected := True;
+    Result := GetResponse([200, 201]);
 
   Except
     Disconnect;
@@ -762,17 +773,13 @@ Procedure TAlNNTPClient.Group(NewsGroupName: String;
                                   LastArticleNumber: Integer);
 Var aLst: TstringList;
 Begin
-  EstimatedNumberArticles := -1;
-  FirstArticleNumber := -1;
-  LastArticleNumber := -1;
-
   aLst := TstringList.Create;
   Try
     ALNNTPClientSplitResponseLine(Group(NewsGroupName), aLst);
-    If aLst.Count < 4 then Exit;
-    If not tryStrToInt(aLst[1], EstimatedNumberArticles) then EstimatedNumberArticles := -1; //111225
-    If not tryStrToInt(aLst[2], FirstArticleNumber) then FirstArticleNumber := -1; //12861
-    If not tryStrToInt(aLst[3], LastArticleNumber) then LastArticleNumber := -1; //362539
+    If aLst.Count < 4 then raise Exception.Create('GROUP cmd Error');
+    If not tryStrToInt(aLst[1], EstimatedNumberArticles) then raise Exception.Create('GROUP cmd Error');
+    If not tryStrToInt(aLst[2], FirstArticleNumber) then raise Exception.Create('GROUP cmd Error');
+    If not tryStrToInt(aLst[3], LastArticleNumber) then raise Exception.Create('GROUP cmd Error');
   finally
     aLst.Free;
   end;
@@ -1030,13 +1037,11 @@ end;
 procedure TAlNNTPClient.StatByID(ArticleID: String; var ArticleNumber: integer);
 Var aLst: TstringList;
 Begin
-  ArticleNumber := -1;
-
   aLst := TstringList.Create;
   Try
     ALNNTPClientSplitResponseLine(StatByID(ArticleID), aLst);
-    If aLst.Count < 3 then Exit;
-    If not tryStrToInt(aLst[1], ArticleNumber) then ArticleNumber := -1; //10110
+    If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
+    If not tryStrToInt(aLst[1], ArticleNumber) then raise Exception.Create('STAT cmd Error');
   finally
     aLst.Free;
   end;
@@ -1052,12 +1057,10 @@ end;
 procedure TAlNNTPClient.StatByNumber(ArticleNumber: Integer; var ArticleID: String);
 Var aLst: TstringList;
 Begin
-  ArticleID := '';
-
   aLst := TstringList.Create;
   Try
     ALNNTPClientSplitResponseLine(StatByNumber(ArticleNumber), aLst);
-    If aLst.Count < 3 then Exit;
+    If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
     ArticleID  := aLst[2]; // <23445@sdcsvax.ARPA>
   finally
     aLst.Free;
@@ -1075,14 +1078,11 @@ end;
 procedure TAlNNTPClient.Stat(var ArticleID: String; var ArticleNumber: integer);
 Var aLst: TstringList;
 Begin
-  ArticleID := '';
-  ArticleNumber := -1;
-
   aLst := TstringList.Create;
   Try
     ALNNTPClientSplitResponseLine(Stat, aLst);
-    If aLst.Count < 3 then Exit;
-    If not TryStrToInt(aLst[1],ArticleNumber) then ArticleNumber := -1; // 10110
+    If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
+    If not TryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('STAT cmd Error');
     ArticleID  := aLst[2]; // <23445@sdcsvax.ARPA>
   finally
     aLst.Free;
@@ -1206,14 +1206,11 @@ end;
 procedure TAlNNTPClient.Next(var ArticleNumber: Integer; var ArticleID: String);
 Var aLst: TstringList;
 begin
-  ArticleNumber := -1;
-  ArticleID := '';
-
   aLst := TstringList.Create;
   Try
     ALNNTPClientSplitResponseLine(SendCmd('NEXT',[223], False), aLst);
-    If aLst.Count < 3 then Exit;
-    If not tryStrToInt(aLst[1],ArticleNumber) then ArticleNumber := -1; //10113
+    If aLst.Count < 3 then raise Exception.Create('NEXT cmd Error');
+    If not tryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('NEXT cmd Error');
     ArticleID  := aLst[2]; //<21495@nudebch.uucp>
   finally
     aLst.Free;
@@ -1253,14 +1250,11 @@ end;
 procedure TAlNNTPClient.Last(var ArticleNumber: Integer; var ArticleID: String);
 Var aLst: TstringList;
 begin
-  ArticleNumber := -1;
-  ArticleID := '';
-
   aLst := TstringList.Create;
   Try
     ALNNTPClientSplitResponseLine(SendCmd('LAST',[223], False), aLst);
-    If aLst.Count < 3 then Exit;
-    tryStrToInt(aLst[1],ArticleNumber); //10113
+    If aLst.Count < 3 then raise Exception.Create('LAST cmd Error');
+    if not tryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('LAST cmd Error');
     ArticleID  := aLst[2]; //<21495@nudebch.uucp>
   finally
     aLst.Free;
@@ -1703,6 +1697,7 @@ end;
 {**********************************************************************}
 Function TAlNNTPClient.SocketWrite(Var Buffer; Count: Longint): Longint;
 begin
+  if not FConnected then raise Exception.Create('Not Connected');
   Result := Send(FSocketDescriptor,Buffer,Count,0);
   CheckError(Result =  SOCKET_ERROR);
 end;
@@ -1710,6 +1705,7 @@ end;
 {*********************************************************************}
 function TAlNNTPClient.SocketRead(var Buffer; Count: Longint): Longint;
 begin
+  if not FConnected then raise Exception.Create('Not Connected');
   Result := Recv(FSocketDescriptor,Buffer,Count,0);
   CheckError(Result = SOCKET_ERROR);
 end;
@@ -1718,8 +1714,10 @@ end;
 procedure TAlNNTPClient.Settimeout(const Value: integer);
 begin
   If Value <> Ftimeout then begin
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    if FConnected then begin
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    end;
     Ftimeout := Value;
   end;
 end;

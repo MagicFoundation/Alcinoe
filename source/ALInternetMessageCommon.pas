@@ -9,7 +9,7 @@ Version:      3.51
 Description:  This unit contains utilities to manipulate
               Internet Messages Headers (EMAIL or NEWSNET messages)
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be

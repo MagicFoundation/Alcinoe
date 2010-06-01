@@ -4,13 +4,13 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALSMTPClient
-Version:      3.50
+Version:      3.51
 
 Description:  TALsmtpClient class implements the SMTP protocol (RFC-821)
               Support file attachement using MIME format (RFC-1521, RFC-2045)
               Support authentification (RFC-2104)
 
-Legal issues: Copyright (C) 1999-2009 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -194,9 +194,9 @@ begin
     CallServer(aHost,aPort);
     CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    Result := GetResponse([220]);
-    FAuthTypesSupported := [];
     Fconnected := True;
+    FAuthTypesSupported := [];
+    Result := GetResponse([220]);
 
   Except
     Disconnect;
@@ -733,6 +733,7 @@ end;
 {**********************************************************************}
 Function TAlSmtpClient.SocketWrite(Var Buffer; Count: Longint): Longint;
 begin
+  if not FConnected then raise Exception.Create('Not Connected');
   Result := Send(FSocketDescriptor,Buffer,Count,0);
   CheckError(Result =  SOCKET_ERROR);
 end;
@@ -740,6 +741,7 @@ end;
 {*********************************************************************}
 function TAlSmtpClient.SocketRead(var Buffer; Count: Longint): Longint;
 begin
+  if not FConnected then raise Exception.Create('Not Connected');
   Result := Recv(FSocketDescriptor,Buffer,Count,0);
   CheckError(Result = SOCKET_ERROR);
 end;

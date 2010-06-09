@@ -56,8 +56,7 @@ interface
 uses windows,
      Classes,
      WinSock,
-     ALInternetMessageCommon,
-     ALMultiPartMixedParser;
+     ALInternetMessageCommon;
 
 type
 
@@ -394,7 +393,7 @@ end;
 {*******************************************}
 procedure TAlPOP3Client.List(ALst: Tstrings);
 begin
-  ALst.Text := Trim(ALPOP3ClientExtractTextFromMultilineResponse(List));
+  ALst.Text := Trim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
 
 {*******************************************************}

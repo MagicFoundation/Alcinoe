@@ -4,7 +4,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe HTML Functions
-Version:      3.51
+Version:      3.52
 
 Description:  Functions to work on Html Tag (extract Text, HTML Encode,
               HTML Decode, etc. The function ALHTMLdecode and
@@ -440,7 +440,7 @@ procedure ALUTF8ExtractHTMLText(HtmlContent: UTF8String;
     If s <> '' then LstExtractedResourceText.add(S);
   end;
 
-Var P1: integer;
+Var P1, P2: integer;
 Begin
   ALHideHtmlUnwantedTagForHTMLHandleTagfunct(string(HtmlContent), True);
   HtmlContent := ALFastTagReplace(
@@ -456,21 +456,22 @@ Begin
                                  '<',
                                  [rfreplaceall]
                                 );
+  HtmlContent := HtmlContent + #2;
 
   LstExtractedResourceText.Clear;
-  P1 := ALpos(#2,HtmlContent);
-  While P1 > 0 do begin
-    If P1 > 1 then intenalAdd2LstExtractedResourceText(
-                                                       ALCopyStr(
-                                                                 HtmlContent,
-                                                                 1,
-                                                                 p1-1
-                                                                )
-                                                      );
-    delete(HtmlContent,1,P1);
-    P1 := ALpos(#2,HtmlContent);
+  P1 := 1;
+  P2 := ALpos(#2,HtmlContent);
+  While P2 > 0 do begin
+    If P2 > P1 then intenalAdd2LstExtractedResourceText(
+                                                        ALCopyStr(
+                                                                  HtmlContent,
+                                                                  P1,
+                                                                  p2-P1
+                                                                 )
+                                                       );
+    P1 := P2+1;
+    P2 := ALposEX(#2,HtmlContent, P1);
   end;
-  intenalAdd2LstExtractedResourceText(HtmlContent);
 end;
 
 {*****************************************************************************************************}

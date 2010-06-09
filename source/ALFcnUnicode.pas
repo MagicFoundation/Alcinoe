@@ -82,6 +82,7 @@ Function ALUTF8LowerCaseNoDiacritic(S: UTF8String): UTF8String;
 Function ALUTF8Normalize(S: UTF8String): UTF8String;
 function ALUTF8UpperCase(const s: UTF8String): UTF8String;
 function ALUTF8LowerCase(const s: UTF8String): UTF8String;
+function AlUTF8removeBOM(S: UTF8String): String;
 function AlUTF8DetectBOM(const P: PChar; const Size: Integer): Boolean;
 function ALUTF8CharSize(const P: PChar; const Size: Integer): Integer;
 function ALUTF8CharCount(const P: PChar; const Size: Integer): Integer; overload;
@@ -413,6 +414,13 @@ end;
 function ALUTF8LowerCase(const s: UTF8String): UTF8String;
 begin
   result := utf8encode(WideLowerCase(utf8Decode(s)));
+end;
+
+{**********************************************}
+function AlUTF8removeBOM(S: UTF8String): String;
+begin
+  if AlUTF8DetectBOM(Pchar(S), length(S)) then result := AlCopyStr(S,length(cAlUTF8BOM) + 1,Maxint)
+  else Result := S;
 end;
 
 {*********************************************************************}

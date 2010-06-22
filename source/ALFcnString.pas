@@ -138,8 +138,20 @@ function  ALCopyStr(const aSourceString: string; aStart, aLength: Integer): stri
 function  ALRandomStr(aLength: Longint): string;
 function  ALNEVExtractName(const S: string): string;
 function  ALNEVExtractValue(const s: string): string;
-procedure ALExtractHeaderFields(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; Decode: Boolean; StripQuotes: Boolean = False);
-procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; Decode: Boolean; StripQuotes: Boolean = False);
+procedure ALExtractHeaderFields(Separators,
+                                WhiteSpace,
+                                Quotes: TSysCharSet;
+                                Content: PChar;
+                                Strings: TStrings;
+                                Decode: Boolean;
+                                StripQuotes: Boolean = False);
+procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
+                                                WhiteSpace,
+                                                Quotes: TSysCharSet;
+                                                Content: PChar;
+                                                Strings: TStrings;
+                                                Decode: Boolean;
+                                                StripQuotes: Boolean = False);
 function  ALGetStringFromFile(filename: string): string;
 function  ALGetStringFromFileWithoutUTF8BOM(filename: string): string;
 procedure ALSaveStringtoFile(Str,filename: string);
@@ -1406,7 +1418,15 @@ begin
       ParamStr := ExtractParamsStr;
       ParamList := TStringList.Create;
       try
-        ALExtractHeaderFieldsWithQuoteEscaped([' ', #9], [' ', #9], PChar(ParamStr), ParamList, False, AStripParamQuotes);
+        ALExtractHeaderFieldsWithQuoteEscaped(
+                                              [' ', #9, #13, #10],
+                                              [' ', #9, #13, #10],
+                                              ['"', ''''],
+                                              PChar(ParamStr),
+                                              ParamList,
+                                              False,
+                                              AStripParamQuotes
+                                             );
         If assigned(FastTagReplaceProc) then begin
           ReplaceString := FastTagReplaceProc(TokenStr, ParamList, ExtData, TagHandled);
           if TagHandled and
@@ -1567,10 +1587,9 @@ begin
 
   If (T1 > 0) and (T2 > T1) Then begin
     ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
-
     TokenStr := ExtractTokenStr;
     ParamStr := ExtractParamsStr;
-    ALExtractHeaderFieldsWithQuoteEscaped([' ', #9], [' ', #9], PChar(ParamStr), TagParams, False, AStripParamQuotes);
+    ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10], [' ', #9, #13, #10], ['"', ''''], PChar(ParamStr), TagParams, False, AStripParamQuotes);
     Result := True
   end;
 end;
@@ -1586,15 +1605,21 @@ end;
    before substrings are added to Strings.
  Note:	Characters contained in Separators or WhiteSpace are treated as part of a value substring if the substring is surrounded by single or double quote
  marks. HTTP escape characters are converted using the ALHTTPDecode function.}
-procedure ALExtractHeaderFields(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; Decode: Boolean; StripQuotes: Boolean = False);
-var
-  Head, Tail: PChar;
-  EOS, InQuote, LeadQuote: Boolean;
-  QuoteChar: Char;
-  ExtractedField: string;
-  WhiteSpaceWithCRLF: TSysCharSet;
-  SeparatorsWithCRLF: TSysCharSet;
+procedure ALExtractHeaderFields(Separators,
+                                WhiteSpace,
+                                Quotes: TSysCharSet;
+                                Content: PChar;
+                                Strings: TStrings;
+                                Decode: Boolean;
+                                StripQuotes: Boolean = False);
+var Head, Tail: PChar;
+    EOS, InQuote, LeadQuote: Boolean;
+    QuoteChar: Char;
+    ExtractedField: string;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
 
+  {----------------------------------------------}
   function DoStripQuotes(const S: string): string;
   var I: Integer;
       InStripQuote: Boolean;
@@ -1605,7 +1630,7 @@ var
     StripQuoteChar := #0;
     if StripQuotes then
       for I := Length(Result) downto 1 do
-        if Result[I] in ['''', '"'] then
+        if Result[I] in Quotes then
           if InStripQuote and (StripQuoteChar = Result[I]) then begin
             Delete(Result, I, 1);
             InStripQuote := False;
@@ -1619,18 +1644,18 @@ var
 
 Begin
   if (Content = nil) or (Content^ = #0) then Exit;
-  WhiteSpaceWithCRLF := WhiteSpace + [#13, #10];
-  SeparatorsWithCRLF := Separators + [#0, #13, #10, '"', ''''];
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
   Tail := Content;
   QuoteChar := #0;
   repeat
-    while Tail^ in WhiteSpaceWithCRLF do Inc(Tail);
+    while Tail^ in WhiteSpace do Inc(Tail);
     Head := Tail;
     InQuote := False;
     LeadQuote := False;
     while True do begin
-      while (InQuote and not (Tail^ in [#0, '"', ''''])) or not (Tail^ in SeparatorsWithCRLF) do Inc(Tail);
-      if Tail^ in ['"',''''] then begin
+      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if Tail^ in Quotes then begin
         if (QuoteChar <> #0) and (QuoteChar = Tail^) then QuoteChar := #0
         else If QuoteChar = #0 then begin
           LeadQuote := Head = Tail;
@@ -1642,7 +1667,7 @@ Begin
         else Break;
       end else Break;
     end;
-    if not LeadQuote and (Tail^ <> #0) and (Tail^ in ['"','''']) then Inc(Tail);
+    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
     EOS := Tail^ = #0;
     if Head^ <> #0 then begin
       SetString(ExtractedField, Head, Tail-Head);
@@ -1655,15 +1680,21 @@ end;
 
 {**************************************************************************************}
 {same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
-procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; Decode: Boolean; StripQuotes: Boolean = False);
-var
-  Head, Tail, NextTail: PChar;
-  EOS, InQuote, LeadQuote: Boolean;
-  QuoteChar: Char;
-  ExtractedField: string;
-  WhiteSpaceWithCRLF: TSysCharSet;
-  SeparatorsWithCRLF: TSysCharSet;
+procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
+                                                WhiteSpace,
+                                                Quotes: TSysCharSet;
+                                                Content: PChar;
+                                                Strings: TStrings;
+                                                Decode: Boolean;
+                                                StripQuotes: Boolean = False);
+var Head, Tail, NextTail: PChar;
+    EOS, InQuote, LeadQuote: Boolean;
+    QuoteChar: Char;
+    ExtractedField: string;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
 
+  {----------------------------------------------}
   function DoStripQuotes(const S: string): string;
   var I: Integer;
       InStripQuote: Boolean;
@@ -1675,7 +1706,7 @@ var
     if StripQuotes then begin
       i := Length(Result);
       while i > 0 do begin
-        if Result[I] in ['''', '"'] then begin
+        if Result[I] in Quotes then begin
           if InStripQuote and (StripQuoteChar = Result[I]) then begin
             Delete(Result, I, 1);
             if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
@@ -1694,18 +1725,18 @@ var
 
 Begin
   if (Content = nil) or (Content^ = #0) then Exit;
-  WhiteSpaceWithCRLF := WhiteSpace + [#13, #10];
-  SeparatorsWithCRLF := Separators + [#0, #13, #10, '"', ''''];
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
   Tail := Content;
   QuoteChar := #0;
   repeat
-    while Tail^ in WhiteSpaceWithCRLF do Inc(Tail);
+    while Tail^ in WhiteSpace do Inc(Tail);
     Head := Tail;
     InQuote := False;
     LeadQuote := False;
     while True do begin
-      while (InQuote and not (Tail^ in [#0, '"', ''''])) or not (Tail^ in SeparatorsWithCRLF) do Inc(Tail);
-      if Tail^ in ['"',''''] then begin
+      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if Tail^ in Quotes then begin
         if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
           NextTail := Tail + 1;
           if NextTail^ = Tail^ then inc(tail)
@@ -1721,7 +1752,7 @@ Begin
         else Break;
       end else Break;
     end;
-    if not LeadQuote and (Tail^ <> #0) and (Tail^ in ['"','''']) then Inc(Tail);
+    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
     EOS := Tail^ = #0;
     if Head^ <> #0 then begin
       SetString(ExtractedField, Head, Tail-Head);

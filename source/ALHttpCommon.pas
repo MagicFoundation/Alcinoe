@@ -316,7 +316,12 @@ Type
 {Http Function}
 function  ALHTTPDecode(const AStr: String): String;
 procedure ALHTTPEncodeParamNameValues(ParamValues: TStrings);
-procedure ALExtractHTTPFields(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; StripQuotes: Boolean = False);
+procedure ALExtractHTTPFields(Separators,
+                              WhiteSpace,
+                              Quotes: TSysCharSet;
+                              Content: PChar;
+                              Strings: TStrings;
+                              StripQuotes: Boolean = False);
 Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: String): String;
 Function  AlInternetCrackUrl(aUrl: String;
@@ -939,7 +944,7 @@ begin
     FCookies.clear;
     J := aRawHeaderLst.IndexOfName('Cookie');
     If J >= 0 then begin
-      ALExtractHTTPFields([';'], [' '], PChar(aRawHeaderLst.ValueFromIndex[j]), Cookies, True);
+      ALExtractHTTPFields([';'], [' '], [], PChar(aRawHeaderLst.ValueFromIndex[j]), Cookies, True);
       aRawHeaderLst.Delete(j);
     end;
 
@@ -1092,9 +1097,14 @@ end;
   removed before substrings are added to Strings.
  Note:	Characters contained in Separators or WhiteSpace are treated as part of a value substring if the substring is surrounded by single
  or double quote marks. HTTP escape characters are converted using the HTTPDecode function.}
-procedure ALExtractHTTPFields(Separators, WhiteSpace: TSysCharSet; Content: PChar; Strings: TStrings; StripQuotes: Boolean = False);
+procedure ALExtractHTTPFields(Separators,
+                              WhiteSpace,
+                              Quotes: TSysCharSet;
+                              Content: PChar;
+                              Strings: TStrings;
+                              StripQuotes: Boolean = False);
 begin
-  ALExtractHeaderFields(Separators, WhiteSpace, Content, Strings, True, StripQuotes);
+  ALExtractHeaderFields(Separators, WhiteSpace, Quotes, Content, Strings, True, StripQuotes);
 end;
 
 {************************************************************}

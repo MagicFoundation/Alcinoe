@@ -1357,12 +1357,13 @@ Var RawXmlString: TALXMLString;
       LstParams.Clear;
       If (aContent <> '') then begin
         ALExtractHeaderFields(
-                              [' ', #9],
-                              [' ', #9],
-                              Pchar(aContent),
-                              lstParams,
-                              False,
-                              False
+                              [' ', #9, #13, #10],    //Separators
+                              [' ', #9, #13, #10],    //WhiteSpace
+                              ['"', ''''],            //Quotes
+                              Pchar(aContent),        //Content
+                              lstParams,              //Strings
+                              False,                  //Decode
+                              False                   //StripQuotes
                              );
         CheckAttributes(LstParams);
         For i := 0 to LstParams.Count - 1 do begin

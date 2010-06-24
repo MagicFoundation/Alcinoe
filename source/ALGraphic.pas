@@ -1,10 +1,10 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
+www:          http://sourceforge.net/projects/alcinoe/
 Author(s):    JWB Software
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Graphic Functions
-Version:      3.50
+Version:      3.51
 
 Description:  Procedure ALStrecth to stretch a bitmap using
               lanczos3 (by exemple)
@@ -52,13 +52,6 @@ unit ALGraphic;
 
 interface
 
-// If USE_SCANLINE is defined, Stretch will use the TBitmap.Scanline property
-// instead of TBitmap.Canvas.Pixels to access the bitmap pixels.
-// Use of the Scanline property is 20 to 50 times faster than the Pixels
-// property!
-{$DEFINE USE_SCANLINE}
-
-
 uses Windows,
      SysUtils,
      Classes,
@@ -83,7 +76,8 @@ type
   // filter:	Weight calculation filter
   // fwidth:	Relative sample radius
   procedure ALStrecth(Src, Dst: TBitmap; filter: TALFilterProc; fwidth: single);
-  procedure ALReplaceColor(SrcBitmap: TBitmap; OldColor, NewColor: Tcolor; Tolerance: Real);
+  //tolerance is same value as tolerance in photoshop
+  procedure ALReplaceColor(SrcBitmap: TBitmap; OldColor, NewColor: Tcolor; Tolerance: Integer);
 
 // -----------------------------------------------------------------------------
 //
@@ -105,6 +99,26 @@ const
     (Name: 'Lanczos3';	Filter: ALLanczos3Filter;	Width: 3.0),
     (Name: 'Mitchell';	Filter: ALMitchellFilter;	Width: 2.0)
     );
+
+Const cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.
+                                //No bitmap can be that large (at present), and this effectively turns off
+                                //range checking on Scanline variables.
+
+type pAlRGBTripleArray = ^TAlRGBTripleArray;
+     TAlRGBTripleArray = ARRAY[0..cAlPixelCountMax-1] OF TRGBTriple;
+
+     TALAverageColorMosaicKey = Array of array of Tcolor;
+
+Function AlGetAverageColor(aSrcBmp: TBitmap; aRect: Trect): Tcolor;
+Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap;
+                                    aDestCanvas: Tcanvas;  //can be nil if we don't want to draw the result
+                                    const aMosaicInGrayScale: Boolean = False;
+                                    const aMosaicSquareWidth: integer = -1;
+                                    const aMosaicSquareHeight: integer = -1): TALAverageColorMosaicKey; overload;
+Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap): TALAverageColorMosaicKey; overload;
+
+//tolerance is same value as tolerance in photoshop
+procedure AlTrimImage(Var aSrcBmp: TBitmap; const aTolerance: Integer = 0);
 
 implementation
 
@@ -284,14 +298,12 @@ var
   contrib		: PCListList;
   rgb			: TRGB;
   color			: TColorRGB;
-{$IFDEF USE_SCANLINE}
   SourceLine		,
   DestLine		: PRGBList;
   SourcePixel		,
   DestPixel		: PColorRGB;
   Delta			,
   DestDelta		: integer;
-{$ENDIF}
   SrcWidth		,
   SrcHeight		,
   DstWidth		,
@@ -335,11 +347,9 @@ begin
       yscale:= (DstHeight - 1) / (SrcHeight - 1);
     // This implementation only works on 24-bit images because it uses
     // TBitmap.Scanline
-{$IFDEF USE_SCANLINE}
     Src.PixelFormat := pf24bit;
     Dst.PixelFormat := Src.PixelFormat;
     Work.PixelFormat := Src.PixelFormat;
-{$ENDIF}
 
     // --------------------------------------------
     // Pre-calculate filter contributions for a row
@@ -416,10 +426,8 @@ begin
     // ----------------------------------------------------
     for k := 0 to SrcHeight-1 do
     begin
-{$IFDEF USE_SCANLINE}
       SourceLine := Src.ScanLine[k];
       DestPixel := Work.ScanLine[k];
-{$ENDIF}
       for i := 0 to DstWidth-1 do
       begin
         rgb.r := 0.0;
@@ -427,11 +435,7 @@ begin
         rgb.b := 0.0;
         for j := 0 to contrib^[i].n-1 do
         begin
-{$IFDEF USE_SCANLINE}
           color := SourceLine^[contrib^[i].p^[j].pixel];
-{$ELSE}
-          color := Color2RGB(Src.Canvas.Pixels[contrib^[i].p^[j].pixel, k]);
-{$ENDIF}
           weight := contrib^[i].p^[j].weight;
           if (weight = 0.0) then
             continue;
@@ -457,14 +461,10 @@ begin
           color.b := 0
         else
           color.b := round(rgb.b);
-{$IFDEF USE_SCANLINE}
         // Set new pixel value
         DestPixel^ := color;
         // Move on to next column
         inc(DestPixel);
-{$ELSE}
-        Work.Canvas.Pixels[i, k] := RGB2Color(color);
-{$ENDIF}
       end;
     end;
 
@@ -547,17 +547,13 @@ begin
     // --------------------------------------------------
     // Apply filter to sample vertically from Work to Dst
     // --------------------------------------------------
-{$IFDEF USE_SCANLINE}
     SourceLine := Work.ScanLine[0];
     Delta := integer(Work.ScanLine[1]) - integer(SourceLine);
     DestLine := Dst.ScanLine[0];
     DestDelta := integer(Dst.ScanLine[1]) - integer(DestLine);
-{$ENDIF}
     for k := 0 to DstWidth-1 do
     begin
-{$IFDEF USE_SCANLINE}
       DestPixel := pointer(DestLine);
-{$ENDIF}
       for i := 0 to DstHeight-1 do
       begin
         rgb.r := 0;
@@ -566,11 +562,7 @@ begin
         // weight := 0.0;
         for j := 0 to contrib^[i].n-1 do
         begin
-{$IFDEF USE_SCANLINE}
           color := PColorRGB(integer(SourceLine)+contrib^[i].p^[j].pixel*Delta)^;
-{$ELSE}
-          color := Color2RGB(Work.Canvas.Pixels[k, contrib^[i].p^[j].pixel]);
-{$ENDIF}
           weight := contrib^[i].p^[j].weight;
           if (weight = 0.0) then
             continue;
@@ -596,17 +588,11 @@ begin
           color.b := 0
         else
           color.b := round(rgb.b);
-{$IFDEF USE_SCANLINE}
         DestPixel^ := color;
         inc(integer(DestPixel), DestDelta);
-{$ELSE}
-        Dst.Canvas.Pixels[k, i] := RGB2Color(color);
-{$ENDIF}
       end;
-{$IFDEF USE_SCANLINE}
       Inc(SourceLine, 1);
       Inc(DestLine, 1);
-{$ENDIF}
     end;
 
     // Free the memory allocated for vertical filter weights
@@ -620,8 +606,8 @@ begin
   end;
 end;
 
-{****************************************************************************************}
-procedure ALReplaceColor(SrcBitmap: TBitmap; OldColor, NewColor: Tcolor; Tolerance: Real);
+{*******************************************************************************************}
+procedure ALReplaceColor(SrcBitmap: TBitmap; OldColor, NewColor: Tcolor; Tolerance: Integer);
 Var R1, G1, B1: Integer;
     x, y: integer;
     aColor: Tcolor;
@@ -649,6 +635,294 @@ begin
     SrcBitmap.Canvas.Unlock;
   end;
 end;
+
+{*****************************************************************}
+Function AlGetAverageColor(aSrcBmp: TBitmap; aRect: Trect): Tcolor;
+Var aCount: Integer;
+    aLine : pAlRGBTripleArray;
+    R, G, B: Cardinal;
+    X, Y: integer;
+Begin
+  aCount := 0;
+  R := 0;
+  G := 0;
+  B := 0;
+  aSrcBmp.PixelFormat := pf24bit;
+  for Y := aRect.top to aRect.bottom - 1 do begin
+    aLine := aSrcBmp.Scanline[Y];
+    for X := aRect.left to aRect.right - 1 do begin
+      With aLine[X] do begin
+        R := R + rgbtRed;
+        G := G + rgbtGreen;
+        B := B + rgbtBlue;
+      end;
+      inc(aCount);
+    end;
+  end;
+  R := round(R / aCount);
+  G := round(G / aCount);
+  B := round(B / aCount);
+  Result := RGB(r, g, b);
+End;
+
+{***************************************************}
+Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap;
+                                    aDestCanvas: Tcanvas;
+                                    const aMosaicInGrayScale: Boolean = False;
+                                    const aMosaicSquareWidth: integer = -1;
+                                    const aMosaicSquareHeight: integer = -1): TALAverageColorMosaicKey;
+
+Var aMosaicSquareWidthTmp: Integer;
+    aMosaicSquareHeightTmp: Integer;
+    aColor: Tcolor;
+    aRect: Trect;
+    X1, Y1: integer;
+    X2, Y2: integer;
+    r, g, b: Byte;
+
+Begin
+
+  //init aMosaicSquareWidthTmp and aMosaicSquareHeightTmp  
+  aMosaicSquareWidthTmp := aMosaicSquareWidth;
+  if aMosaicSquareWidthTmp <= 0 then aMosaicSquareWidthTmp := Round(aSrcBmp.Width / 5);
+  aMosaicSquareHeightTmp := aMosaicSquareHeight;
+  if aMosaicSquareHeightTmp <= 0 then aMosaicSquareHeightTmp := Round(aSrcBmp.Height / 5);
+
+  //init Result
+  X2 := trunc(aSrcBmp.Width / aMosaicSquareWidthTmp);
+  if aSrcBmp.Width mod aMosaicSquareWidthTmp <> 0 then inc(X2);
+  Y2 := trunc(aSrcBmp.Height / aMosaicSquareHeightTmp);
+  if aSrcBmp.Height mod aMosaicSquareHeightTmp <> 0 then inc(Y2);
+  SetLength(Result, X2, Y2);
+
+  //start the loop
+  X1 := 0;
+  X2 := 0;
+  while X1 < aSrcBmp.Width do begin
+
+    Y1 := 0;
+    Y2 := 0;
+    while Y1 < aSrcBmp.Height do begin
+
+      //calc the rect
+      aRect := Rect(
+                    X1,
+                    Y1,
+                    Min(X1 + aMosaicSquareWidthTmp, aSrcBmp.Width),
+                    Min(Y1 + aMosaicSquareHeightTmp, aSrcBmp.Height)
+                   );
+
+      //find the average color
+      aColor := AlGetAverageColor(aSrcBmp,aRect);
+
+      //move the color in grayscale
+      if aMosaicInGrayScale then begin
+        // their is 2 Main Solution :
+        //   1/ The luminosity method is a more sophisticated version of the average
+        //      method. It also averages the values, but it forms a weighted average
+        //      to account for human perception. We’re more sensitive to green than
+        //      other colors, so green is weighted most heavily. The formula for luminosity
+        //      is 0.212671 R + 0.715160 G + 0.072169 B.
+        //   2/ The average method simply averages the values: (R + G + B) / 3.
+        // I choose the 1 method because in the second methode only Red color, or only Blue color are converted
+        // to the same grayscale color. see on http://www.johndcook.com/blog/2009/08/24/more-on-colors-and-grayscale/
+        R := round(0.212671 * GetRValue(aColor) + 0.715160 * GetGValue(aColor) + 0.072169 * GetBValue(aColor));
+        G := R;
+        B := R;
+        aColor := RGB(r, g, b);
+      end;
+
+      //fill the result
+      result[X2,Y2] := acolor;
+
+      //draw the result
+      if assigned(aDestCanvas) then begin
+        aDestCanvas.Brush.Color := aColor;
+        aDestCanvas.FillRect(aRect);
+      end;
+
+      //inc Y
+      Y1 := Y1 + aMosaicSquareHeightTmp;
+
+      //inc Y2
+      inc(Y2);
+
+    end;
+
+    //inc X
+    X1 := X1 + aMosaicSquareWidthTmp;
+
+    //inc X2
+    inc(X2);
+
+  end;
+
+End;
+
+{******************************************************************************}
+Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap): TALAverageColorMosaicKey;
+var aResizedBitmap: Tbitmap;
+begin
+
+  aResizedBitmap := Tbitmap.Create;
+  try
+
+    //init the Resizedbitmap
+    aResizedBitmap.PixelFormat := pf24bit;
+    aResizedBitmap.Width:=200;
+    aResizedBitmap.Height:=200;
+
+    //the First Picture
+    ALStrecth(aSrcBmp, aResizedBitmap, ALLanczos3Filter, 3.0);
+    Result := AlGetAverageColorMosaicKey(
+                                         aResizedBitmap,
+                                         nil,
+                                         true,
+                                         40,
+                                         40
+                                        );
+
+  finally
+    aResizedBitmap.free;
+  end;
+
+End;
+
+{*************************************************************************}
+procedure AlTrimImage(Var aSrcBmp: TBitmap; const aTolerance: Integer = 0);
+var aRow: pAlRGBTripleArray;
+    aIsBlack : Integer;
+    aCropRect: Trect;
+    aBackRColor,
+    aBackGColor,
+    aBackBColor: Byte;
+    aTmpBmp: Tbitmap;
+    X, Y: integer;
+begin
+
+  //set the aSrcBmp.pixelformat
+  aSrcBmp.PixelFormat := pf24bit;
+
+  //Retrieve Background Color
+  aBackRColor := GetRvalue(aSrcBmp.Canvas.Pixels[0,0]);
+  aBackGColor := GetGvalue(aSrcBmp.Canvas.Pixels[0,0]);
+  aBackBColor := GetBvalue(aSrcBmp.Canvas.Pixels[0,0]);
+
+  //init a cropRect
+  aCropRect := Rect(MaxInt,MaxInt,0,0);
+
+  //Find Top
+  aCropRect.top := 0;
+  for Y := 0 to aSrcBmp.Height-1 do begin
+    aRow := aSrcBmp.Scanline[Y];
+    aisBlack := 0;
+    for X := 0 to aSrcBmp.Width-1 do begin
+      With aRow[X] do begin
+        if (sqrt(
+                 sqr(rgbtRed - aBackRColor) +
+                 sqr(rgbtGreen - aBackGColor) +
+                 sqr(rgbtBlue - aBackBColor)
+                ) > aTolerance) then begin
+           aIsBlack := 1;
+           break;
+        end;
+      end;
+    end;
+    if aisBlack = 0 then Inc(aCropRect.Top)
+    else break;
+  end;
+
+  //Find bottom
+  aCropRect.Bottom := aSrcBmp.Height;
+  for Y := aSrcBmp.Height-1 Downto 0 do begin
+    aRow := aSrcBmp.Scanline[Y];
+    aisBlack := 0;
+    for X := 0 to aSrcBmp.Width-1 do begin
+      With aRow[X] do begin
+        if (sqrt(
+                 sqr(rgbtRed - aBackRColor) +
+                 sqr(rgbtGreen - aBackGColor) +
+                 sqr(rgbtBlue - aBackBColor)
+                ) > aTolerance) then begin
+           aIsBlack := 1;
+           break;
+        end;
+      end;
+    end;
+    if aisBlack = 0 then Dec(aCropRect.Bottom)
+    else break;
+  end;
+
+  //Find Left
+  aCropRect.Left := aSrcBmp.Width;
+  for Y := 0 to aSrcBmp.Height-1 do begin
+    aRow := aSrcBmp.Scanline[Y];
+    aisBlack := 0;
+    for X := 0 to aSrcBmp.Width-1 do begin
+      With aRow[X] do begin
+        if (sqrt(
+                 sqr(rgbtRed - aBackRColor) +
+                 sqr(rgbtGreen - aBackGColor) +
+                 sqr(rgbtBlue - aBackBColor)
+                ) <= aTolerance) then inc(aisBlack)
+        else break;
+      end;
+    end;
+    aCropRect.Left := Min(aCropRect.Left,aIsBlack);
+  end;
+
+  //Find right
+  aCropRect.Right := 0;
+  for Y := 0 to aSrcBmp.Height-1 do begin
+    aRow := aSrcBmp.Scanline[Y];
+    aisBlack := aSrcBmp.Width;
+    for X := aSrcBmp.Width-1 downto 0 do begin
+      With aRow[X] do begin
+        if (sqrt(
+                 sqr(rgbtRed - aBackRColor) +
+                 sqr(rgbtGreen - aBackGColor) +
+                 sqr(rgbtBlue - aBackBColor)
+                ) <= aTolerance) then dec(aisBlack)
+        else break;
+      end;
+    end;
+    aCropRect.right := Max(aCropRect.right,aIsBlack);
+  end;
+
+
+  //crop the img if necessary
+  if (aCropRect.Top > 0) or
+     (aCropRect.left > 0) or
+     (aCropRect.bottom < aSrcBmp.Height) or
+     (aCropRect.right < aSrcBmp.width) then begin
+
+    aTmpBmp := Tbitmap.Create;
+    Try
+      aTmpbmp.PixelFormat := Pf24Bit;
+      aTmpbmp.Width := aCropRect.right - aCropRect.left;
+      aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
+      BitBlt(
+             aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
+             0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
+             0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
+             aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
+             aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
+             asrcBmp.canvas.Handle,   //[in] Handle to the source device context
+             aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
+             aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
+             SRCCOPY                  //[in] Specifies a raster-operation code
+            );
+      aSrcbmp.Free;
+    Except
+      aTmpBmp.free;
+      raise;
+    End;
+    aSrcBmp := aTmpBmp;
+
+  end;
+
+end;
+
 
 
 end.

@@ -73,9 +73,9 @@ object Form1: TForm1
         object Label6: TLabel
           Left = 8
           Top = 72
-          Width = 103
+          Width = 249
           Height = 13
-          Caption = 'Format "name=value"'
+          Caption = 'Format "name=value" if not Raw Post Data checked'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -234,9 +234,9 @@ object Form1: TForm1
         object CheckBoxEncodeParams: TCheckBox
           Left = 11
           Top = 167
-          Width = 150
+          Width = 110
           Height = 17
-          Caption = 'Encode Post Data Strings'
+          Caption = 'Encode Post Data'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -259,6 +259,20 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 7
           OnClick = ButtonHeadClick
+        end
+        object CheckBoxRawPostData: TCheckBox
+          Left = 135
+          Top = 167
+          Width = 98
+          Height = 17
+          Caption = 'Raw Post Data'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 8
         end
       end
       object GroupBox10: TGroupBox

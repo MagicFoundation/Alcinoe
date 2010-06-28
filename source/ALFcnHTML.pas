@@ -485,12 +485,14 @@ Begin
                           LstExtractedResourceText,
                           DecodeHTMLText
                          );
-    Result := AlStringReplace(
-                              LstExtractedResourceText.Text,
-                              #13#10,
-                              ' ',
-                              [rfReplaceAll]
-                             );
+    Result := trim(
+                   AlStringReplace(
+                                   LstExtractedResourceText.Text,
+                                   #13#10,
+                                   ' ',
+                                   [rfReplaceAll]
+                                  )
+                  );
   finally
     LstExtractedResourceText.free;
   end;

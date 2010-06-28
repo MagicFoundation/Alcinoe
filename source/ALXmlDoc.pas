@@ -789,7 +789,9 @@ Const cAlXMLUTF8EncodingStr = 'UTF-8';
 {misc function}
 Function  ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
 procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const EncodingStr: String = cAlXMLUTF8EncodingStr);
-Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode; AttributeName, AttributeValue : string): TalxmlNode;
+Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
+                                   AttributeName, AttributeValue : string;
+                                   Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
 
 procedure Register;
 
@@ -3853,16 +3855,28 @@ begin
   If RootName <> '' then XMLDoc.AddChild(rootname);
 End;
 
-{*******************************************************************************************************}
-Function ALFindXmlNodeByAttribute(xmlrec:TalxmlNode; AttributeName, AttributeValue : string): TalxmlNode;
+{***************************************************}
+Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
+                                   AttributeName, AttributeValue : string;
+                                   Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+
 var i : integer;
 Begin
   result := nil;
-  for i := 0 to xmlrec.ChildNodes.Count - 1 do
+  if not (xmlrec is TalXmlElementNode) then Exit;
+  for i := 0 to xmlrec.ChildNodes.Count - 1 do begin
     If sametext(xmlrec.ChildNodes[i].AttributesAsString[AttributeName],AttributeValue) then begin
       result := xmlrec.ChildNodes[i];
       break;
     end;
+    if SearchAlsoInChildNodes then begin
+      result := ALFindXmlNodeByAttribute(xmlrec.ChildNodes[i],
+                                         AttributeName,
+                                         AttributeValue,
+                                         SearchAlsoInChildNodes);
+      if assigned(Result) then break;
+    end;
+  end;
 end;
 
 end.

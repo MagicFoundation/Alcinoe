@@ -102,6 +102,7 @@ type
     Label9: TLabel;
     CheckBoxEncodeParams: TCheckBox;
     ButtonHead: TButton;
+    CheckBoxRawPostData: TCheckBox;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -126,6 +127,7 @@ var
 implementation
 
 Uses DateUtils,
+     HttpApp,
      ALMultiPartFormDataParser,
      AlFcnMisc,
      AlFcnFile,
@@ -343,6 +345,7 @@ end;
 procedure TForm1.ButtonPostClick(Sender: TObject);
 Var AHTTPResponseHeader: TALHTTPResponseHeader;
     AHTTPResponseStream: TStringStream;
+    ARawPostDatastream: TStringStream;
     AMultiPartFormDataFile: TALMultiPartFormDataContent;
     AMultiPartFormDataFiles: TALMultiPartFormDataContents;
     aTmpPostDataString: TStrings;
@@ -381,14 +384,33 @@ begin
                                                  AHTTPResponseHeader
                                                 )
 
-      else if aTmpPostDataString.Count > 0 then
-        FWinInetHttpClient.PostURLEncoded(
-                                          editURL.Text,
-                                          aTmpPostDataString,
-                                          AHTTPResponseStream,
-                                          AHTTPResponseHeader,
-                                          CheckBoxEncodeParams.Checked
-                                         )
+      else if aTmpPostDataString.Count > 0 then begin
+        if not CheckBoxRawPostData.Checked then FWinInetHttpClient.PostURLEncoded(
+                                                                                  editURL.Text,
+                                                                                  aTmpPostDataString,
+                                                                                  AHTTPResponseStream,
+                                                                                  AHTTPResponseHeader,
+                                                                                  CheckBoxEncodeParams.Checked
+                                                                                 )
+        else begin
+
+          if CheckBoxEncodeParams.Checked then ARawPostDatastream := TstringStream.create(HTTPEncode(aTmpPostDataString.text))
+          else ARawPostDatastream := TstringStream.create(aTmpPostDataString.text);
+          try
+
+            FWinInetHttpClient.post(
+                                    editURL.Text,
+                                    ARawPostDatastream,
+                                    AHTTPResponseStream,
+                                    AHTTPResponseHeader
+                                   );
+
+          finally
+            ARawPostDatastream.free;
+          end;
+
+        end
+      end
 
       else FWinInetHttpClient.Post(
                                    editURL.Text,

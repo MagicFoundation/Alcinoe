@@ -1,6 +1,7 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+							Dean Mustakinov (dejanm73@gmail.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALXmlDocument

@@ -962,8 +962,8 @@ end;
 procedure ALAppendItem(var AttrStr: TALXmlstring; const AttrName, AttrValue: TALXmlstring);
 begin
   if AttrValue <> '' then begin
-    if AttrStr <> '' then AttrStr := AttrStr + ' ';
-    AttrStr := AttrStr + Format('%s="%s"', [AttrName, AttrValue]);
+    if AttrStr <> '' then AttrStr := AttrStr + ' ' + AttrName + '="' + AttrValue + '"'
+    else AttrStr := AttrStr + AttrName + '="' + AttrValue + '"';
   end;
 end;
 

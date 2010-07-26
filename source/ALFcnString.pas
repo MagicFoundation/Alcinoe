@@ -109,17 +109,17 @@ function ALCharPosEX(const SearchCharacter: Char; const SourceString: AnsiString
 function ALCharPosEX(const SearchCharacter: Char; const SourceString: AnsiString; StartPos: Integer = 1): Integer; overload;
 
 {Alcinoe}
-function ALFastTagReplace(Const SourceString, TagStart, TagEnd: string;
-                          FastTagReplaceProc: TALHandleTagFunct;
-                          ReplaceStrParamName,
-                          ReplaceWith: String;
-                          AStripParamQuotes: Boolean;
-                          Flags: TReplaceFlags;
-                          ExtData: Pointer;
-                          const ReProcessReplaceProcResult: Boolean = False): string; overload;
-function ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
-                          ReplaceWith: string;
-                          const Flags: TReplaceFlags=[rfreplaceall] ): string; overload;
+function  ALFastTagReplace(Const SourceString, TagStart, TagEnd: string;
+                           FastTagReplaceProc: TALHandleTagFunct;
+                           ReplaceStrParamName,
+                           ReplaceWith: String;
+                           AStripParamQuotes: Boolean;
+                           Flags: TReplaceFlags;
+                           ExtData: Pointer;
+                           const ReProcessReplaceProcResult: Boolean = False): string; overload;
+function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
+                           ReplaceWith: string;
+                           const Flags: TReplaceFlags=[rfreplaceall] ): string; overload;
 function  ALFastTagReplace(const SourceString, TagStart, TagEnd: string;
                            ReplaceStrParamName: string;
                            AStripParamQuotes: Boolean;

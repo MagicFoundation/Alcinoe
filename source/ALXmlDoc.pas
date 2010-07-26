@@ -786,6 +786,13 @@ type
 {misc constante}
 Const cAlXMLUTF8EncodingStr = 'UTF-8';
       cALXmlUTF8HeaderStr = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
+      CALNSDelim               = ':';
+      CALXML                   = 'xml';
+      CALVersion               = 'version';
+      CALEncoding              = 'encoding';
+      CALStandalone            = 'standalone';
+      CALDefaultNodeIndent     = '  '; { 2 spaces }
+      CALXmlDocument           = 'DOCUMENT';
 
 {misc function}
 Function  ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
@@ -793,6 +800,8 @@ procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const Enco
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
                                    AttributeName, AttributeValue : string;
                                    Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+function  ALExtractAttrValue(const AttrName, AttrLine: TALXmlstring; const Default: TALXMLString = ''): TALXMLString;
+
 
 procedure Register;
 
@@ -802,15 +811,6 @@ uses Variants,
      Contnrs,
      AlFcnHTML,
      AlFcnString;
-
-const
-  CALNSDelim               = ':';
-  CALXML                   = 'xml';
-  CALVersion               = 'version';
-  CALEncoding              = 'encoding';
-  CALStandalone            = 'standalone';
-  CALDefaultNodeIndent     = '  '; { 2 spaces }
-  CALXmlDocument           = 'DOCUMENT';
 
 {$R ..\resource\ALXmlDoc.dcr}
 

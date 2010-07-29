@@ -134,6 +134,9 @@ function  ALExtractTagParams(Const SourceString, TagStart, TagEnd: string;
                              AStripParamQuotes: Boolean;
                              TagParams: TStrings;
                              IgnoreCase: Boolean): Boolean;
+Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: string;
+                            SplitTextAndTagLst: TStrings;
+                            IgnoreCase: Boolean);
 function  ALCopyStr(const aSourceString: string; aStart, aLength: Integer): string;
 function  ALRandomStr(aLength: Longint): string;
 function  ALNEVExtractName(const S: string): string;
@@ -1309,23 +1312,23 @@ function ALFastTagReplace(Const SourceString, TagStart, TagEnd: string;
                           Flags: TReplaceFlags;
                           ExtData: Pointer;
                           const ReProcessReplaceProcResult: Boolean = False): string;
-var  i: integer;
-     ReplaceString: String;
-     Token, FirstTagEndChar: Char;
-     TokenStr, ParamStr: string;
-     ParamList: TStringList;
-     TagStartLength: integer;
-     TagEndLength: integer;
-     SourceStringLength: Integer;
-     T1,T2: Integer;
-     InDoubleQuote: Boolean;
-     InsingleQuote: Boolean;
-     Work_SourceString: String;
-     Work_TagStart: String;
-     Work_TagEnd: String;
-     TagHandled: Boolean;
-     ResultCurrentPos: integer;
-     ResultCurrentLength: integer;
+var i: integer;
+    ReplaceString: String;
+    Token, FirstTagEndChar: Char;
+    TokenStr, ParamStr: string;
+    ParamList: TStringList;
+    TagStartLength: integer;
+    TagEndLength: integer;
+    SourceStringLength: Integer;
+    T1,T2: Integer;
+    InDoubleQuote: Boolean;
+    InsingleQuote: Boolean;
+    Work_SourceString: String;
+    Work_TagStart: String;
+    Work_TagEnd: String;
+    TagHandled: Boolean;
+    ResultCurrentPos: integer;
+    ResultCurrentLength: integer;
 
 Const ResultBuffSize: integer = 16384;
 
@@ -1512,7 +1515,12 @@ Begin
   result := ALFastTagReplace(SourceString, TagStart, TagEnd, FastTagReplaceProc, '', '', AStripParamQuotes, flags, extdata, ReProcessReplaceProcResult);
 end;
 
-{***********************************************************************}
+{**************************************************}
+//the problem with this function is that if you have
+//<#mytagwww params="xxx"> and
+//<#mytag params="xxx">
+//then the ALExtractTagParams(str, '<#mytag', '>' ... ) will not work like we expect
+//because it's will extract the params of the <#mytagwww
 function ALExtractTagParams(Const SourceString, TagStart, TagEnd: string;
                             AStripParamQuotes: Boolean;
                             TagParams: TStrings;
@@ -1592,6 +1600,109 @@ begin
     ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10], [' ', #9, #13, #10], ['"', ''''], PChar(ParamStr), TagParams, False, AStripParamQuotes);
     Result := True
   end;
+end;
+
+{********************}
+// split the text like
+// blablabla<#tag param="xxx">whouwhouwhou
+// in a list of
+// blablabla
+// <#tag param="xxx">
+// whouwhouwhou
+Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: string;
+                            SplitTextAndTagLst: TStrings;
+                            IgnoreCase: Boolean);
+
+var i: integer;
+    Token, FirstTagEndChar: Char;
+    TagStartLength: integer;
+    TagEndLength: integer;
+    SourceStringLength: Integer;
+    T1,T2: Integer;
+    InDoubleQuote: Boolean;
+    InsingleQuote: Boolean;
+    Work_SourceString: String;
+    Work_TagStart: String;
+    Work_TagEnd: String;
+
+begin
+
+  SplitTextAndTagLst.Clear;
+  if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
+    if SourceString <> '' then SplitTextAndTagLst.Add(SourceString);
+    Exit;
+  end;
+
+  If IgnoreCase then begin
+    Work_SourceString := ALUppercase(SourceString);
+    Work_TagStart := ALuppercase(TagStart);
+    Work_TagEnd := ALUppercase(TagEnd);
+  end
+  Else begin
+    Work_SourceString := SourceString;
+    Work_TagStart := TagStart;
+    Work_TagEnd := TagEnd;
+  end;
+
+  SourceStringLength := length(Work_SourceString);
+  TagStartLength := Length(Work_TagStart);
+  TagEndLength := Length(Work_TagEnd);
+  FirstTagEndChar := Work_TagEnd[1];
+  i := 1;
+
+  T1 := ALPosEx(Work_TagStart,Work_SourceString,i);
+  T2 := T1 + TagStartLength;
+  If (T1 > 0) and (T2 <= SourceStringLength) then begin
+    InDoubleQuote := False;
+    InsingleQuote := False;
+    Token := Work_SourceString[T2];
+    if token = '"' then InDoubleQuote := True
+    else if token = '''' then InSingleQuote := True;
+    While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+      inc(T2);
+      Token := Work_SourceString[T2];
+      If Token = '"' then begin
+        if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+        else inc(t2);
+      end
+      else If Token = '''' then begin
+        if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+        else inc(t2);
+      end;
+    end;
+  end;
+
+
+  While (T1 > 0) and (T2 > T1) do begin
+    SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,i,T1 - i), pointer(0));
+    SplitTextAndTagLst.AddObject(AlCopyStr(SourceString,T1,T2 - T1 + TagEndLength), pointer(1));
+
+    i := T2 + TagEndLength;
+
+    T1 := ALPosEx(Work_TagStart,Work_SourceString,i);
+    T2 := T1 + TagStartLength;
+    If (T1 > 0) and (T2 <= SourceStringLength) then begin
+      InDoubleQuote := False;
+      InsingleQuote := False;
+      Token := Work_SourceString[T2];
+      if token = '"' then InDoubleQuote := True
+      else if token = '''' then InSingleQuote := True;
+      While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+        inc(T2);
+        Token := Work_SourceString[T2];
+        If Token = '"' then begin
+          if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+          else inc(t2);
+        end
+        else If Token = '''' then begin
+          if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+          else inc(t2);
+        end;
+      end;
+    end;
+  end;
+
+  SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,i,maxint), pointer(0));
 end;
 
 {********************************************************}

@@ -110,7 +110,7 @@ type
       Function Ehlo: String; virtual;
       Function Auth(AUserName, APassword: String; aAuthType: TalSmtpClientAuthType): String; virtual;
       Function Vrfy(aUserName: String): String; virtual;
-      Function MailFrom(aFromName: String): String; virtual;
+      Function MailFrom(aSenderEmail: String): String; virtual;
       Function RcptTo(aRcptNameLst: Tstrings): String; virtual;
       Function Data(aMailData: String): String; overload; virtual;
       Function Data(aHeader, aBody: String): String; overload; virtual;
@@ -118,9 +118,9 @@ type
       Function DataMultipartMixed(aHeader: TALEmailHeader; aInlineText, aInlineTextContentType: String; aAttachments: TALMultiPartMixedContents): String; virtual;
       Function Quit: String; virtual;
       Function Rset: String; virtual;
-      procedure SendMail(aHost: String; APort: integer; aFromName: String; aRcptNameLst: Tstrings; AUserName, APassword: String; aAuthType: TalSmtpClientAuthType; aMailData: String); overload; virtual;
-      procedure SendMail(aHost: String; APort: integer; aFromName: String; aRcptNameLst: Tstrings; AUserName, APassword: String; aAuthType: TalSmtpClientAuthType; aHeader, aBody: String); overload; virtual;
-      procedure SendMailMultipartMixed(aHost: String; APort: integer; aFromName: String; aRcptNameLst: Tstrings; AUserName, APassword: String; aAuthType: TalSmtpClientAuthType; aHeader: TALEmailHeader; aInlineText, aInlineTextContentType: String; aAttachments: TALMultiPartMixedContents); virtual;
+      procedure SendMail(aHost: String; APort: integer; aSenderEmail: String; aRcptNameLst: Tstrings; AUserName, APassword: String; aAuthType: TalSmtpClientAuthType; aMailData: String); overload; virtual;
+      procedure SendMail(aHost: String; APort: integer; aSenderEmail: String; aRcptNameLst: Tstrings; AUserName, APassword: String; aAuthType: TalSmtpClientAuthType; aHeader, aBody: String); overload; virtual;
+      procedure SendMailMultipartMixed(aHost: String; APort: integer; aSenderEmail: String; aRcptNameLst: Tstrings; AUserName, APassword: String; aAuthType: TalSmtpClientAuthType; aHeader: TALEmailHeader; aInlineText, aInlineTextContentType: String; aAttachments: TALMultiPartMixedContents); virtual;
       Procedure Disconnect; virtual;
       Function GetAuthTypeFromEhloResponse(EhloResponse: string): TAlSmtpClientAuthTypeSet; virtual;
       property Connected: Boolean read FConnected;
@@ -299,12 +299,12 @@ end;
  messages (for example, undeliverable mail notifications) the reverse-path may be null.
  This command clears the reverse-path buffer, the forward-path buffer, and the mail data
  buffer; and inserts the reverse-path information from this command into the reverse-path buffer.}
-Function TAlSmtpClient.MailFrom(aFromName: String): String;
+Function TAlSmtpClient.MailFrom(aSenderEmail: String): String;
 begin
-  aFromName := trim(aFromName);
-  If aFromName = '' then raise Exception.Create('From name is empty');
-  If AlPos(#13#10,aFromName) > 0 then raise Exception.Create('From name is invalid');
-  Result := SendCmd('MAIL From:<'+aFromName+'>',[250]);
+  aSenderEmail := trim(aSenderEmail);
+  If aSenderEmail = '' then raise Exception.Create('Sender email is empty');
+  If AlPos(#13#10,aSenderEmail) > 0 then raise Exception.Create('Sender email is invalid');
+  Result := SendCmd('MAIL From:<'+aSenderEmail+'>',[250]);
 end;
 
 {**************************************************************************************************}
@@ -492,7 +492,7 @@ end;
 {*********************************************}
 procedure TAlSmtpClient.SendMail(aHost: String;
                                  APort: integer;
-                                 aFromName: String;
+                                 aSenderEmail: String;
                                  aRcptNameLst: Tstrings;
                                  AUserName, APassword: String;
                                  aAuthType: TalSmtpClientAuthType;
@@ -506,7 +506,7 @@ begin
     If aAuthType = AlsmtpClientAuthAutoSelect then ehlo
     else Helo;
     If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
-    mailFrom(aFromName);
+    mailFrom(aSenderEmail);
     RcptTo(aRcptNameLst);
     Data(aMailData);
     Quit;
@@ -519,7 +519,7 @@ end;
 {*********************************************}
 procedure TAlSmtpClient.SendMail(aHost: String;
                                  APort: integer;
-                                 aFromName: String;
+                                 aSenderEmail: String;
                                  aRcptNameLst: Tstrings;
                                  AUserName, APassword: String;
                                  aAuthType: TalSmtpClientAuthType;
@@ -533,7 +533,7 @@ begin
     If aAuthType = AlsmtpClientAuthAutoSelect then ehlo
     else Helo;
     If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
-    mailFrom(aFromName);
+    mailFrom(aSenderEmail);
     RcptTo(aRcptNameLst);
     Data(aHeader, aBody);
     Quit;
@@ -546,7 +546,7 @@ end;
 {***********************************************************}
 procedure TAlSmtpClient.SendMailMultipartMixed(aHost: String;
                                                APort: integer;
-                                               aFromName: String;
+                                               aSenderEmail: String;
                                                aRcptNameLst: Tstrings;
                                                AUserName, APassword: String;
                                                aAuthType: TalSmtpClientAuthType;
@@ -562,7 +562,7 @@ begin
     If aAuthType = AlsmtpClientAuthAutoSelect then ehlo
     else Helo;
     If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
-    mailFrom(aFromName);
+    mailFrom(aSenderEmail);
     RcptTo(aRcptNameLst);
     DataMultipartMixed(
                        aHeader,

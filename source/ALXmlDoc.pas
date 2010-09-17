@@ -800,6 +800,8 @@ procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const Enco
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
                                    AttributeName, AttributeValue : string;
                                    Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
+                                        ChildNodeName, ChildNodeValue : string): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: TALXmlstring; const Default: TALXMLString = ''): TALXMLString;
 
 
@@ -3855,6 +3857,21 @@ begin
   end;
   If RootName <> '' then XMLDoc.AddChild(rootname);
 End;
+
+{********************************************************}
+Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
+                                        ChildNodeName, ChildNodeValue : string): TalxmlNode;
+var i : integer;
+Begin
+  result := nil;
+  if not (xmlrec is TalXmlElementNode) then Exit;
+  for i := 0 to xmlrec.ChildNodes.Count - 1 do begin
+    If sametext(xmlrec.ChildNodes[i].ChildNodes[ChildNodeName].Text,ChildNodeValue) then begin
+      result := xmlrec.ChildNodes[i];
+      break;
+    end;
+  end;
+end;
 
 {***************************************************}
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;

@@ -55,6 +55,32 @@ object Form1: TForm1
         Height = 13
         Caption = 'Max Http Request / Thread'
       end
+      object Label3: TLabel
+        Left = 472
+        Top = 145
+        Width = 117
+        Height = 13
+        Caption = 'Delay between each call'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
+      object Label5: TLabel
+        Left = 662
+        Top = 145
+        Width = 13
+        Height = 13
+        Caption = 'ms'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+      end
       object ButtonStart: TButton
         Left = 368
         Top = 141
@@ -231,6 +257,20 @@ object Form1: TForm1
         ParentCtl3D = False
         TabOrder = 7
         Value = 100
+      end
+      object EditSendDelayBetweenEachSend: TEdit
+        Left = 597
+        Top = 141
+        Width = 60
+        Height = 21
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 8
+        Text = '0'
       end
     end
     object TabSheet2: TTabSheet

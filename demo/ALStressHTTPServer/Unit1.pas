@@ -107,6 +107,9 @@ type
     StatusBar1: TStatusBar;
     EditMaxHttpRequest: TSpinEdit;
     EditNbThread: TSpinEdit;
+    Label3: TLabel;
+    EditSendDelayBetweenEachSend: TEdit;
+    Label5: TLabel;
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -129,6 +132,7 @@ type
   protected
     StopOnError: Boolean;
     DoLikeaSpider: Boolean;
+    DelayBetweenEachCall: integer;
     HttpClient: TalWinHttpClient;
     Owner: TWinControl;
     LstUrl: TAlAVLstringList;
@@ -210,6 +214,7 @@ end;
 {*************************************************}
 procedure TForm1.ButtonStartClick(Sender: TObject);
 Var i: integer;
+    j: integer;
     aStressHttpThread: TStressHttpThread;
 begin
   {init button action}
@@ -239,11 +244,14 @@ begin
     TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aStressHttpThread := TStressHttpThread.Create(True, self, i);
     initWinHTTP(aStressHttpThread.HttpClient);
-    aStressHttpThread.LstUrl.Assign(MemoLstUrl.Lines);
     aStressHttpThread.lstUrl.NameValueSeparator := #1;
+    for J := 0 to MemoLstUrl.Lines.Count - 1 do
+      if trim(MemoLstUrl.Lines[j]) <> '' then
+        aStressHttpThread.LstUrl.Add(MemoLstUrl.Lines[j]);
     aStressHttpThread.MaxHttpRequest := strtoint(EditMaxHttpRequest.Text);
     aStressHttpThread.FreeOnTerminate := True;
     aStressHttpThread.DoLikeaSpider := CheckBoxDoLikeSpider.Checked;
+    aStressHttpThread.DelayBetweenEachCall := strtoint(EditSendDelayBetweenEachSend.text);
     aStressHttpThread.StopOnError := CheckBoxStopOnError.Checked;
     aStressHttpThread.Resume;
     inc(NBActiveThread);
@@ -262,6 +270,7 @@ begin
   inherited Create(CreateSuspended);
   fOn := True;
   doLikeASpider := False;
+  DelayBetweenEachCall := 0;
   Owner := AOwner;
   HttpClient := TaLWinHttpClient.Create(nil);
   with HttpClient do begin
@@ -300,10 +309,16 @@ Var i: integer;
     P1, P2: integer;
     aResponseContentStream: TStream;
     aResponseContentHeader: TALHTTPResponseHeader;
+    aStartDate: TdateTime;
 begin
   for I := 1 to MaxHttpRequest do begin
     if LstUrl.Count = 0 then break;
     fUrl := LstUrl[random(LstUrl.Count)];
+    aStartDate := Now;
+    fUrl := AlStringReplace(FUrl,'<#ganalytics_utmn>',inttostr(int64(int64(1000000000) + int64(random(2147483647)) + int64(random(2147483647)) + int64(random(2147483647)) + int64(random(2147483647)))), [rfIgnoreCase]);
+    fUrl := AlStringReplace(FUrl,'<#ganalytics_utmhid>',inttostr(int64(int64(1000000000) + int64(random(2147483647)) + int64(random(2147483647)) + int64(random(2147483647)) + int64(random(2147483647)))), [rfIgnoreCase]);
+    fUrl := AlStringReplace(FUrl,'<#ganalytics_31bitrand>', inttostr(1 + random(2147483647)), [rfIgnoreCase]);
+    fUrl := AlStringReplace(FUrl,'<#ganalytics_timestamp>', inttostr(DateTimeToUnix(aStartDate)), [rfIgnoreCase, RfReplaceAll]);
     inc(FRequestCount);
     FDownloadSpeedStartTime := GetTickCount;
     FBytesRead := 0;
@@ -319,6 +334,8 @@ begin
         aResponseContentStream.free;
         aResponseContentHeader.free;
       end;
+
+      sleep(DelayBetweenEachCall);
 
       if dolikeaspider then begin
         aLowerCaseBody := AlLowerCase(aBody);

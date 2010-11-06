@@ -875,7 +875,12 @@ begin
   Result := ALWideStringToString(UTF8Decode(S), aCodePage);
 end;
 
-{****************************************************************************}
+{****************************************************************************
+ ISO 9:1995 is the current transliteration standard from ISO. It is based on its predecessor
+ ISO/R 9:1968, which it deprecates; for Russian they only differ in the treatment of five
+ modern letters. It is the first language-independent, univocal system of one character
+ for one character equivalents (by the use of diacritics), which faithfully represents
+ the original and allows for reverse transliteration for Cyrillic text in any contemporary language.}
 Function ALUTF8ISO91995CyrillicToLatin(aCyrillicText: UTF8String): UTF8String;
 Var aCyrillicWideStr: WideString;
     aLatinWideStr: WideString;
@@ -1083,7 +1088,19 @@ Begin
   Result := UTF8Encode(aLatinWideStr);
 End;
 
-{*******************************************************************************}
+{*******************************************************************************
+ The BGN/PCGN system is relatively intuitive for anglophones to read and pronounce.
+ In many publications a simplified form of the system is used to render English versions
+ of Russian names, typically converting ë to yo, simplifying -iy and -yy endings to
+ -y, and omitting apostrophes for ъ and ь. It can be rendered using only the basic
+ letters and punctuation found on English-language keyboards: no diacritics or unusual
+ letters are required, although the Interpunct character (·) can optionally be used to
+ avoid some ambiguity.
+
+ This particular standard is part of the BGN/PCGN romanization system which was developed
+ by the United States Board on Geographic Names and by the Permanent Committee on
+ Geographical Names for British Official Use. The portion of the system pertaining to
+ the Russian language was adopted by BGN in 1944, and by PCGN in 1947}
 Function ALUTF8BGNPCGN1947CyrillicToLatin(aCyrillicText: UTF8String): UTF8String;
 Var aCyrillicWideStr: WideString;
     aLatinWideStr: WideString;

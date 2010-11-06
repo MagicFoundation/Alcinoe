@@ -119,6 +119,7 @@ Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap): TALAverageColorMosaicKey;
 
 //tolerance is same value as tolerance in photoshop
 procedure AlTrimImage(Var aSrcBmp: TBitmap; const aTolerance: Integer = 0);
+procedure AlCropImage(Var aSrcBmp: TBitmap; aCropRect: Trect);
 
 implementation
 
@@ -803,6 +804,10 @@ begin
   //set the aSrcBmp.pixelformat
   aSrcBmp.PixelFormat := pf24bit;
 
+  //security check
+  if (aSrcBmp.Width = 0) or
+     (aSrcBmp.Height = 0) then exit;
+
   //Retrieve Background Color
   aBackRColor := GetRvalue(aSrcBmp.Canvas.Pixels[0,0]);
   aBackGColor := GetGvalue(aSrcBmp.Canvas.Pixels[0,0]);
@@ -923,6 +928,53 @@ begin
 
 end;
 
+{************************************************************}
+procedure AlCropImage(Var aSrcBmp: TBitmap; aCropRect: Trect);
+Var aTmpBmp: Tbitmap;
+begin
 
+  //security check
+  if (aSrcBmp.Width = 0) or
+     (aSrcBmp.Height = 0) then exit;
+
+  //init the aCropRect   
+  if (aCropRect.Top < 0) then aCropRect.Top := 0;
+  if (aCropRect.left < 0) then aCropRect.left := 0;
+  if (aCropRect.bottom > aSrcBmp.Height) then aCropRect.bottom := aSrcBmp.Height;
+  if (aCropRect.right > aSrcBmp.width) then aCropRect.right := aSrcBmp.width;
+
+  //crop the img if necessary
+  if (aCropRect.Top > 0) or
+     (aCropRect.left > 0) or
+     (aCropRect.bottom < aSrcBmp.Height) or
+     (aCropRect.right < aSrcBmp.width) then begin
+
+    aTmpBmp := Tbitmap.Create;
+    Try
+      aSrcBmp.PixelFormat := pf24bit;
+      aTmpbmp.PixelFormat := Pf24Bit;
+      aTmpbmp.Width := aCropRect.right - aCropRect.left;
+      aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
+      BitBlt(
+             aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
+             0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
+             0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
+             aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
+             aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
+             asrcBmp.canvas.Handle,   //[in] Handle to the source device context
+             aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
+             aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
+             SRCCOPY                  //[in] Specifies a raster-operation code
+            );
+      aSrcbmp.Free;
+    Except
+      aTmpBmp.free;
+      raise;
+    End;
+    aSrcBmp := aTmpBmp;
+
+  end;
+
+end;
 
 end.

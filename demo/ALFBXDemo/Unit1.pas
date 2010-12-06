@@ -114,6 +114,7 @@ begin
     1: aFBAPiVersion := FB103;
     2: aFBAPiVersion := FB15;
     3: aFBAPiVersion := FB20;
+    4: aFBAPiVersion := FB25;    
     else aFBAPiVersion := FB102;
   end;
 
@@ -121,43 +122,33 @@ begin
   Try
 
     aLibrary.Load;
-    aLibrary.AttachDatabase(
-                            edt_DataBaseName.text,
+    aLibrary.AttachDatabase(edt_DataBaseName.text,
                             aDBHandle,
-                            AlStringReplace(
-                                            trim(Memo_DatabaseParams.lines.text),
+                            AlStringReplace(trim(Memo_DatabaseParams.lines.text),
                                             #13#10,
                                             ';',
-                                            [rfReplaceAll]
-                                           )
-                           );
+                                            [rfReplaceAll]));
     try
 
       try
 
         {start the transaction}
-        If TPB = '' then alibrary.TransactionStart(
-                                                   aTraHandle,
+        If TPB = '' then alibrary.TransactionStart(aTraHandle,
                                                    aDBHandle,
                                                    isc_tpb_version3 +
                                                    isc_tpb_read +
                                                    isc_tpb_concurrency +
-                                                   isc_tpb_nowait
-                                                  )
-        else alibrary.TransactionStart(
-                                       aTraHandle,
+                                                   isc_tpb_nowait)
+        else alibrary.TransactionStart(aTraHandle,
                                        aDBHandle,
-                                       TPB
-                                      );
+                                       TPB);
 
         {init}
         ResultCurrentLength := BuffSize;
         SetLength(Result,ResultCurrentLength);
         ResultCurrentPos := 1;
-        MoveStr2Result(
-                       '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+#13#10+
-                       '<root>'
-                      );
+        MoveStr2Result('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'+#13#10+
+                       '<root>');
 
         {exec the query}
         InternalExecQuery;
@@ -207,38 +198,30 @@ begin
   Try
 
     aLibrary.Load;
-    aLibrary.AttachDatabase(
-                            edt_DataBaseName.text,
+    aLibrary.AttachDatabase(edt_DataBaseName.text,
                             aDBHandle,
-                            AlStringReplace(
-                                            trim(Memo_DatabaseParams.lines.text),
+                            AlStringReplace(trim(Memo_DatabaseParams.lines.text),
                                             #13#10,
                                             ';',
-                                            [rfReplaceAll]
-                                           )
-                           );
+                                            [rfReplaceAll]));
 
     Try
 
-      If TPB='' then alibrary.TransactionStart(
-                                               aTraHandle,
+      If TPB='' then alibrary.TransactionStart(aTraHandle,
                                                aDBHandle,
                                                isc_tpb_version3 +
                                                isc_tpb_write +
                                                isc_tpb_concurrency +
-                                               isc_tpb_nowait
-                                              )
-      else alibrary.TransactionStart(
-                                     aTraHandle,
+                                               isc_tpb_nowait)
+      else alibrary.TransactionStart(aTraHandle,
                                      aDBHandle,
-                                     TPB
-                                    );
+                                     TPB);
 
       Try
 
         alibrary.DSQLExecuteImmediate(aDBHandle, aTraHandle, Req, aSQLDIALECT, nil);
-
         alibrary.TransactionCommit(aTraHandle);
+
       except
         On E: Exception do begin
           if aTraHandle <> nil then alibrary.TransactionRollback(aTraHandle);

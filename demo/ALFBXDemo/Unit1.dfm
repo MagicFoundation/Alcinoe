@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 613
-  ClientWidth = 377
+  ClientHeight = 671
+  ClientWidth = 386
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -181,14 +181,13 @@ object Form1: TForm1
     OnPaint = ComboBox_apiVerPaint
     Style = csDropDownList
     ItemHeight = 13
-    ItemIndex = 3
     TabOrder = 0
-    Text = 'FB20'
     Items.Strings = (
       'FB102'
       'FB103'
       'FB15'
-      'FB20')
+      'FB20'
+      'FB25')
   end
   object Memo_SelectResult: TALMemo
     Left = 16

@@ -9,6 +9,8 @@
     <Projects Include="ALComboBox\ALComboBoxDemo.dproj" />
     <Projects Include="ALEdit\ALEditDemo.dproj" />
     <Projects Include="ALFBXDemo\ALFBXDemo.dproj" />
+    <Projects Include="ALFBXEvent\ALFBXEvent.dproj" />
+    <Projects Include="ALFBXMonitoringStats\ALFBXMonitoringStats.dproj" />
     <Projects Include="ALHintBalloon\ALHintBalloonDemo.dproj" />
     <Projects Include="ALListBox\ALListBoxDemo.dproj" />
     <Projects Include="ALMemo\ALMemoDemo.dproj" />
@@ -201,14 +203,32 @@
   <Target Name="ALStressHTTPServer:Make">
     <MSBuild Projects="ALStressHTTPServer\ALStressHTTPServer.dproj" Targets="Make" />
   </Target>
+  <Target Name="ALFBXEvent">
+    <MSBuild Projects="ALFBXEvent\ALFBXEvent.dproj" Targets="" />
+  </Target>
+  <Target Name="ALFBXEvent:Clean">
+    <MSBuild Projects="ALFBXEvent\ALFBXEvent.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALFBXEvent:Make">
+    <MSBuild Projects="ALFBXEvent\ALFBXEvent.dproj" Targets="Make" />
+  </Target>
+  <Target Name="ALFBXMonitoringStats">
+    <MSBuild Projects="ALFBXMonitoringStats\ALFBXMonitoringStats.dproj" Targets="" />
+  </Target>
+  <Target Name="ALFBXMonitoringStats:Clean">
+    <MSBuild Projects="ALFBXMonitoringStats\ALFBXMonitoringStats.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="ALFBXMonitoringStats:Make">
+    <MSBuild Projects="ALFBXMonitoringStats\ALFBXMonitoringStats.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="ALButtonDemo;ALComboBoxDemo;ALEditDemo;ALHintBalloonDemo;ALListBoxDemo;ALMemoDemo;ALSMTPClientDemo;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALStringBenchmark;ALFBXDemo;ALNNTPClientDemo;ALPhpRunnerDemo;ALSQLBenchmark;ALStringListBenchmark;ALCipherDemo;ALStressHTTPServer" />
+    <CallTarget Targets="ALButtonDemo;ALComboBoxDemo;ALEditDemo;ALHintBalloonDemo;ALListBoxDemo;ALMemoDemo;ALSMTPClientDemo;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALStringBenchmark;ALFBXDemo;ALNNTPClientDemo;ALPhpRunnerDemo;ALSQLBenchmark;ALStringListBenchmark;ALCipherDemo;ALStressHTTPServer;ALFBXEvent;ALFBXMonitoringStats" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="ALButtonDemo:Clean;ALComboBoxDemo:Clean;ALEditDemo:Clean;ALHintBalloonDemo:Clean;ALListBoxDemo:Clean;ALMemoDemo:Clean;ALSMTPClientDemo:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALStringBenchmark:Clean;ALFBXDemo:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSQLBenchmark:Clean;ALStringListBenchmark:Clean;ALCipherDemo:Clean;ALStressHTTPServer:Clean" />
+    <CallTarget Targets="ALButtonDemo:Clean;ALComboBoxDemo:Clean;ALEditDemo:Clean;ALHintBalloonDemo:Clean;ALListBoxDemo:Clean;ALMemoDemo:Clean;ALSMTPClientDemo:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALStringBenchmark:Clean;ALFBXDemo:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSQLBenchmark:Clean;ALStringListBenchmark:Clean;ALCipherDemo:Clean;ALStressHTTPServer:Clean;ALFBXEvent:Clean;ALFBXMonitoringStats:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="ALButtonDemo:Make;ALComboBoxDemo:Make;ALEditDemo:Make;ALHintBalloonDemo:Make;ALListBoxDemo:Make;ALMemoDemo:Make;ALSMTPClientDemo:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALStringBenchmark:Make;ALFBXDemo:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSQLBenchmark:Make;ALStringListBenchmark:Make;ALCipherDemo:Make;ALStressHTTPServer:Make" />
+    <CallTarget Targets="ALButtonDemo:Make;ALComboBoxDemo:Make;ALEditDemo:Make;ALHintBalloonDemo:Make;ALListBoxDemo:Make;ALMemoDemo:Make;ALSMTPClientDemo:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALStringBenchmark:Make;ALFBXDemo:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSQLBenchmark:Make;ALStringListBenchmark:Make;ALCipherDemo:Make;ALStressHTTPServer:Make;ALFBXEvent:Make;ALFBXMonitoringStats:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

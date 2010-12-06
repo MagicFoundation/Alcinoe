@@ -14,7 +14,7 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXBase
-Version:      3.51
+Version:      3.52
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
@@ -56,7 +56,8 @@ Know bug :
 
 History :
 
-Link :        http://www.progdigy.com/modules.php?name=UIB
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+              http://www.progdigy.com/modules.php?name=UIB
 
 Note :        For the UIB version
                 * remove all the IB support
@@ -101,6 +102,10 @@ type
   end;
   TGDSQuad = GDS_QUAD;
 
+{FB25_UP}
+  FB_SHUTDOWN_CALLBACK = function(const reason, mask: Integer; arg: Pointer): Integer; cdecl;
+{FB25_UP}
+
   // *************************************************
   // TMN: some misc data types from all over the place
   //**************************************************
@@ -141,7 +146,7 @@ type
 //typedef int (*FPTR_INT) ();
 //typedef int (*FPTR_INT_VOID_PTR) (void *);
 
-  TALFBXVersion_API = (FB102, FB103, FB15, FB20, FB21);
+  TALFBXVersion_API = (FB102, FB103, FB15, FB20, FB21, FB25);
 const
 (* Number of elements in an arry *)
 
@@ -158,6 +163,10 @@ const
 {FB20}
 //  FB_API_VER = 20;
 {FB20}
+
+{FB25}
+//  FB_API_VER = 25;
+{FB25}
 
   GDS_TRUE = 1;
   GDS_FALSE = 0;
@@ -200,8 +209,24 @@ type
   PISCUChar = ^ISCUChar;
 
 const
+  ISC_STATUS_LENGTH = 20;
+type
+  ISC_STATUS_ARRAY = array[0..ISC_STATUS_LENGTH - 1] of ISC_STATUS;
+
+{FB25_UP}
+const
+  FB_SQLSTATE_SIZE  = 6;
+type
+  FB_SQLSTATE_STRING = array[0..FB_SQLSTATE_SIZE-1] of AnsiChar;
+{FB25_UP}
+
+const
   DSQL_close = 1;
   DSQL_drop = 2;
+
+{FB25_UP}
+  DSQL_unprepare = 4;
+{FB25_UP}
 
   METADATALENGTH = 32;
 
@@ -440,7 +465,11 @@ const
   dtype_blob = 17;
   dtype_array = 18;
   dtype_int64 = 19;
-  DTYPE_TYPE_MAX = 20;
+{FB25_UP}
+  dtype_dbkey = 20;
+  DTYPE_TYPE_MAX_FB25 = 21;
+{FB25_UP}
+  DTYPE_TYPE_MAX_FB102 = 20;
 
 (***************************
  * Dynamic SQL definitions *
@@ -541,8 +570,12 @@ type
   IscWinHandle =  isc_win_handle;
   PIscWinHandle = ^IscWinHandle;
 
-  isc_callback = procedure;
-  IscCallback = isc_callback;
+//  isc_callback = procedure;
+//  IscCallback = isc_callback;
+
+  ISC_PRINT_CALLBACK = procedure(p: Pointer; v: ISC_SHORT; const c: PAnsiChar); cdecl;
+  ISC_VERSION_CALLBACK = procedure(p: Pointer; const c: PAnsiChar); cdecl;
+  ISC_EVENT_CALLBACK = procedure(user_data: Pointer; length: ISC_USHORT; const updated: PAnsiChar); cdecl;
 
   isc_resv_handle = ISC_LONG;
   IscResvHandle = isc_resv_handle;
@@ -650,6 +683,10 @@ const
   blr_domain_name = 18;
   blr_domain_name2 = 19;
   blr_not_nullable = 20;
+{FB25_UP}
+  blr_column_name  = 21;
+  blr_column_name2 = 22;
+{FB25_UP}
 
   blr_domain_type_of = 0;
   blr_domain_full = 1;
@@ -964,6 +1001,30 @@ const
   blr_sys_function = 186;
 {FB21_UP}
 
+{FB25_UP}
+  blr_auto_trans   = 187;
+  blr_similar      = 188;
+  blr_exec_stmt    = 189;
+
+  blr_exec_stmt_inputs      = 1;
+  blr_exec_stmt_outputs     = 2;
+  blr_exec_stmt_sql         = 3;
+  blr_exec_stmt_proc_block  = 4;
+  blr_exec_stmt_data_src    = 5;
+  blr_exec_stmt_user        = 6;
+  blr_exec_stmt_pwd         = 7;
+  blr_exec_stmt_tran        = 8;
+  blr_exec_stmt_tran_clone  = 9;
+  blr_exec_stmt_privs       = 10;
+  blr_exec_stmt_in_params   = 11;
+  blr_exec_stmt_in_params2  = 12;
+  blr_exec_stmt_out_params  = 13;
+  blr_exec_stmt_role        = 14;
+
+  blr_stmt_expr             = 190;
+  blr_derived_expr          = 191;
+{FB25_UP}
+
 (**********************************
  * Database parameter block stuff *
  **********************************)
@@ -1037,6 +1098,26 @@ const
   isc_dpb_gfix_attach = 66;
   isc_dpb_gstat_attach = 67;
 
+{FB25_UP}
+  fb_shut_confirmation        =  1;
+  fb_shut_preproviders        =  2;
+  fb_shut_postproviders       =  4;
+  fb_shut_finish              =  8;
+
+  fb_shutrsn_svc_stopped      = -1;
+  fb_shutrsn_no_connection    = -2;
+  fb_shutrsn_app_stopped      = -3;
+  fb_shutrsn_device_removed   = -4;
+  fb_shutrsn_signal           = -5;
+  fb_shutrsn_services         = -6;
+  fb_shutrsn_exit_called      = -7;
+
+  fb_cancel_disable           =  1;
+  fb_cancel_enable            =  2;
+  fb_cancel_raise             =  3;
+  fb_cancel_abort             =  4;
+{FB25_UP}
+
 {FB103_UP}
   isc_dpb_set_db_charset = 68;
 {FB103_UP}
@@ -1053,9 +1134,16 @@ const
   isc_dpb_process_name = 74;
 {FB21_UP}
 
-{FB21}
-  isc_dpb_Max_Value = 74;
-{FB21}
+{FB25_UP}
+  isc_dpb_trusted_role = 75;
+  isc_dpb_org_filename = 76;
+  isc_dpb_utf8_filename = 77;
+  isc_dpb_ext_call_depth = 78;
+{FB25_UP}
+
+{FB25}
+  isc_dpb_Max_Value = 78;
+{FB25}
 
 {FB20_UP}
 (**************************************************)
@@ -1222,6 +1310,10 @@ const
   isc_spb_process_name = AnsiChar(#112);
 {FB21_UP}
 
+{FB25_UP}
+   isc_spb_trusted_role = AnsiChar(#113);
+{FB25_UP}
+
   isc_spb_connect_timeout = AnsiChar(isc_dpb_connect_timeout);
   isc_spb_dummy_packet_interval = AnsiChar(isc_dpb_dummy_packet_interval);
   isc_spb_sql_role_name = AnsiChar(isc_dpb_sql_role_name);
@@ -1329,6 +1421,9 @@ const
 {FB21_UP}
   isc_info_db_file_size = 112;
 {FB21_UP}
+{FB25_UP}
+  fb_info_page_contents = 113;
+{FB25_UP}
 
   isc_info_version = isc_info_isc_version;
 
@@ -1406,6 +1501,19 @@ const
   isc_info_db_impl_linux_mips = 72;
   isc_info_db_impl_darwin_x64 = 73;
 {FB21_UP}
+{FB25_UP}
+  isc_info_db_impl_sun_amd64 = 74;
+
+  isc_info_db_impl_linux_arm = 75;
+  isc_info_db_impl_linux_ia64 = 76;
+
+  isc_info_db_impl_darwin_ppc64 = 77;
+  isc_info_db_impl_linux_s390x = 78;
+  isc_info_db_impl_linux_s390 = 79;
+
+  isc_info_db_impl_linux_sh = 80;
+  isc_info_db_impl_linux_sheb = 81;
+{FB25_UP}
 
   isc_info_db_impl_isc_a = isc_info_db_impl_isc_apl_68K;
   isc_info_db_impl_isc_u = isc_info_db_impl_isc_vax_ultr;
@@ -1569,6 +1677,19 @@ const
 {FB20_UP}
   isc_action_svc_get_fb_log = #12;	// Retrieves the Firebird log file from the server
 {FB20_UP}
+{FB25_UP}
+  isc_action_svc_nbak             = #20;
+  isc_action_svc_nrest            = #21;
+  isc_action_svc_trace_start      = #22;
+  isc_action_svc_trace_stop       = #23;
+  isc_action_svc_trace_suspend    = #24;
+  isc_action_svc_trace_resume     = #25;
+  isc_action_svc_trace_list       = #26;
+  isc_action_svc_set_mapping      = #27;
+  isc_action_svc_drop_mapping     = #28;
+  isc_action_svc_display_user_adm = #29;
+  isc_action_svc_last             = #30;
+{FB25_UP}
 
   (*****************************
    * Service information items *
@@ -1625,6 +1746,9 @@ const
   isc_spb_sec_firstname = #10;
   isc_spb_sec_middlename = #11;
   isc_spb_sec_lastname = #12;
+{FB25_UP}
+  isc_spb_sec_admin = #13;
+{FB25_UP}
 
   (*******************************************************
    * Parameters for isc_action_svc_(add|remove)_license, *
@@ -1652,6 +1776,9 @@ const
   isc_spb_bkp_non_transportable = $20;
   isc_spb_bkp_convert = $40;
   isc_spb_bkp_expand = $80;
+{FB25_UP}
+  isc_spb_bkp_no_triggers = $8000;
+{FB25_UP}
 
   (********************************************
    * Parameters for isc_action_svc_properties *
@@ -1668,6 +1795,18 @@ const
   isc_spb_prp_set_sql_dialect = #14;
   isc_spb_prp_activate = $0100;
   isc_spb_prp_db_online = $0200;
+{FB25_UP}
+  isc_spb_prp_force_shutdown              = #41;
+  isc_spb_prp_attachments_shutdown        = #42;
+  isc_spb_prp_transactions_shutdown       = #43;
+  isc_spb_prp_shutdown_mode               = #44;
+  isc_spb_prp_online_mode                 = #45;
+
+  isc_spb_prp_sm_normal          = 0;
+  isc_spb_prp_sm_multi           = 1;
+  isc_spb_prp_sm_single          = 2;
+  isc_spb_prp_sm_full            = 3;
+{FB25_UP}
 
   (********************************************
    * Parameters for isc_spb_prp_reserve_space *
@@ -1730,6 +1869,10 @@ const
   isc_spb_res_page_size = #10;
   isc_spb_res_length = #11;
   isc_spb_res_access_mode = #12;
+{FB25_UP}
+  isc_spb_res_fix_fss_data = #13;
+  isc_spb_res_fix_fss_metadata = #14;
+{FB25_UP}
   isc_spb_res_deactivate_idx = $0100;
   isc_spb_res_no_shadow = $0200;
   isc_spb_res_no_validity = $0400;
@@ -1771,6 +1914,17 @@ const
 {FB20_UP}
   isc_spb_sts_nocreation		= $80;
 {FB20_UP}
+
+{FB25_UP}
+  isc_spb_nbk_level       = 5;
+  isc_spb_nbk_file        = 6;
+  isc_spb_nbk_direct      = 7;
+  isc_spb_nbk_no_triggers = $01;
+
+  isc_spb_trc_id          = 1;
+  isc_spb_trc_name        = 2;
+  isc_spb_trc_cfg         = 3;
+{FB25_UP}
 
   (*************************
    * SQL information items *
@@ -1915,10 +2069,33 @@ const
 {FB21_UP}
   isc_dyn_coll_from_external = 239;
 {FB21_UP}
+{FB25_UP}
+  isc_dyn_mapping        = 243;
+  isc_dyn_map_role       = 1;
+  isc_dyn_unmap_role     = 2;
+  isc_dyn_map_user       = 3;
+  isc_dyn_unmap_user     = 4;
+  isc_dyn_automap_role   = 5;
+  isc_dyn_autounmap_role = 6;
+
+  isc_dyn_user           = 244;
+  isc_dyn_user_add       = 1;
+  isc_dyn_user_mod       = 2;
+  isc_dyn_user_del       = 3;
+  isc_dyn_user_passwd    = 4;
+  isc_dyn_user_first     = 5;
+  isc_dyn_user_middle    = 6;
+  isc_dyn_user_last      = 7;
+  isc_dyn_user_admin     = 8;
+  isc_user_end           = 0;
+{FB25_UP}
 
   isc_dyn_delete_shadow = 35;
   isc_dyn_grant = 30;
   isc_dyn_revoke = 31;
+{FB25_UP}
+  isc_dyn_revoke_all = 246;
+{FB25_UP}
   isc_dyn_def_primary_key = 37;
   isc_dyn_def_foreign_key = 38;
   isc_dyn_def_unique = 40;
@@ -2028,6 +2205,9 @@ const
   isc_dyn_del_validation = 198;
   isc_dyn_single_validation = 199;
   isc_dyn_fld_character_set = 203;
+{FB25_UP}
+  isc_dyn_del_computed = 242;
+{FB25_UP}
 
   (***********************************
    * Local field specific attributes *
@@ -2075,6 +2255,9 @@ const
   isc_dyn_grant_user_group = 205;
   isc_dyn_grant_role = 218;
   isc_dyn_grant_user_explicit = 219;
+{FB25_UP}
+  isc_dyn_grant_grantor = 245;
+{FB25_UP}
 
   (**********************************
    * Dimension specific information *
@@ -2212,6 +2395,10 @@ const
    * Last $dyn value assigned *
    ****************************)
 
+{FB25}
+ isc_dyn_last_dyn_value_FB25 = 247;
+{FB25}
+
 {FB21}
  isc_dyn_last_dyn_value_FB21 = 242;
 {FB21}
@@ -2300,6 +2487,10 @@ const
   SQL_TYPE_TIME = 560;
   SQL_TYPE_DATE = 570;
   SQL_INT64 = 580;
+
+{FB25_UP}
+  SQL_NULL = 32766;
+{FB25_UP}
 
   (* Historical alias for pre V6 applications *)
   SQL_DATE = SQL_TIMESTAMP;
@@ -2678,9 +2869,14 @@ type
     isc_prepare_transaction2: function(user_status: PISCStatus; tra_handle: PIscTrHandle;
       msg_length: ISCUShort; msg: PISCUChar): ISCStatus;
       stdcall;
-    isc_print_blr: function(blr: PAnsiChar; callback: IscCallback; callback_argument: PPointer;
+    isc_print_blr: function(blr: PAnsiChar; callback: ISC_PRINT_CALLBACK; callback_argument: PPointer;
       language: Smallint): ISCStatus;
       stdcall;
+{FB25_UP}
+    fb_print_blr: function(const blr: PAnsiChar; blr_length: ISC_ULONG; routine: ISC_PRINT_CALLBACK;
+			user_arg: Pointer; language: Smallint): Integer;
+      stdcall;
+{FB25_UP}
     isc_print_sqlerror: procedure(sqlcode: ISCShort; status_vector: PISCStatus);
       stdcall;
     isc_print_status: function(status_vector: PISCStatus): ISCStatus;
@@ -2695,7 +2891,7 @@ type
     isc_qtoq: procedure(quad1, quad2: PISCQuad);
       stdcall;
     isc_que_events: function(user_status: PISCStatus; handle: PIscDbHandle; id: PISCLong;
-      length: ISCUShort; events: PAnsiChar; ast: IscCallback; arg: PPointer): ISCStatus;
+      length: ISCUShort; events: PAnsiChar; ast: ISC_EVENT_CALLBACK; arg: PPointer): ISCStatus;
       stdcall;
     isc_receive: function(user_status: PISCStatus; req_handle: PIscReqHandle; msg_type,
       msg_length: Smallint; msg: PPointer; level: Smallint): ISCStatus;
@@ -2730,12 +2926,25 @@ type
     isc_service_start: function(status_vector: PISCStatus; svc_handle: PIscSvcHandle;
       reserved: PIscResvHandle; spb_length: Word; spb: PAnsiChar): ISCStatus;
       stdcall;
+{FB25_UP}
+    fb_shutdown: function(timeout: Cardinal; const reason: Integer): Integer;
+      stdcall;
+    fb_shutdown_callback: function(user_status: PISCStatus; callBack: FB_SHUTDOWN_CALLBACK;
+      const mask: Integer; arg: Pointer): ISC_STATUS;
+      stdcall;
+    fb_cancel_operation: function(user_status: PISCStatus; handle: PIscDbHandle; option: ISC_USHORT): ISC_STATUS;
+      stdcall;
+{FB25_UP}
     isc_set_debug: procedure(flag: Integer);
       stdcall;
     isc_sql_interprete: procedure(SQLCODE: Smallint; buffer: PAnsiChar; buffer_length: Smallint);
       stdcall;
     isc_sqlcode: function(user_status: PISCStatus): ISCLong;
       stdcall;
+{FB25_UP}
+    fb_sqlstate: procedure(buffer: PAnsiChar; const user_status: PISCStatus);
+      stdcall;
+{FB25_UP}
     isc_start_and_send: function(user_status: PISCStatus; req_handle: PIscReqHandle;
       tra_handle: PIscTrHandle; msg_type, msg_length: Smallint; msg: PPointer;
       level: Smallint): ISCStatus;
@@ -2748,6 +2957,10 @@ type
       stdcall;
     isc_start_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle; count: Smallint;
       db_handle: PIscDbHandle; tpb_length: ISCUShort; tpb_ad: PAnsiChar): ISCStatus; cdecl;
+{FB25_UP}
+    fb_disconnect_transaction: function(user_status: PISCStatus; tra_handle: PIscTrHandle): ISC_STATUS;
+      stdcall;
+{FB25_UP}
     isc_transact_request: function(user_status: PISCStatus; db_handle: PIscDbHandle;
       tra_handle: PIscTrHandle; blr_length: Word; blr: PAnsiChar; in_msg_length: Word; in_msg: PAnsiChar;
       out_msg_length: Word; out_msg: PAnsiChar): ISCStatus;
@@ -2760,7 +2973,7 @@ type
       stdcall;
     isc_vax_integer: function(ptr: PAnsiChar; length: Smallint): ISCLong;
       stdcall;
-    isc_version: function(db_handle: PIscDbHandle; callback: IscCallback;
+    isc_version: function(db_handle: PIscDbHandle; callback: ISC_VERSION_CALLBACK;
       callback_argument: PPointer): Integer;
       stdcall;
     isc_vtof: procedure(string1, string2: PAnsiChar; length: Word);
@@ -2787,6 +3000,7 @@ type
     Function Version_Api_Is_FB15_Up: Boolean;
     Function Version_Api_Is_FB20_Up: Boolean;
     Function Version_Api_Is_FB21_Up: Boolean;
+    Function Version_Api_Is_FB25_Up: Boolean;
     function getb(p: PBStream): AnsiChar;
     function putb(x: AnsiChar; p: PBStream): Integer;
     function putbx(x: AnsiChar; p: PBStream): Integer;
@@ -2833,17 +3047,22 @@ end;
 
 Function TALFBXBaseLibrary.Version_Api_Is_FB15_Up: Boolean;
 Begin
-  Result := FVersion_Api in [FB15, FB20, FB21];
+  Result := FVersion_Api in [FB15, FB20, FB21, FB25];
 end;
 
 Function TALFBXBaseLibrary.Version_Api_Is_FB20_Up: Boolean;
 Begin
-  Result := FVersion_Api in [FB20, FB21];
+  Result := FVersion_Api in [FB20, FB21, FB25];
 end;
 
 Function TALFBXBaseLibrary.Version_Api_Is_FB21_Up: Boolean;
 Begin
-  Result := FVersion_Api in [FB21];
+  Result := FVersion_Api in [FB21, FB25];
+end;
+
+Function TALFBXBaseLibrary.Version_Api_Is_FB25_Up: Boolean;
+Begin
+  Result := FVersion_Api in [FB25];
 end;
 
 constructor TALFBXBaseLibrary.Create(ApiVer: TALFBXVersion_Api);
@@ -3054,6 +3273,14 @@ begin
     {FB20_UP}
       fb_interpret := nil;
     {FB20_UP}
+    {FB25_UP}
+      fb_print_blr := nil;
+      fb_shutdown := nil;
+      fb_shutdown_callback := nil;
+      fb_cancel_operation := nil;
+      fb_sqlstate := nil;
+      fb_disconnect_transaction := nil;
+    {FB25_UP}
     end;
 end;
 
@@ -3239,6 +3466,26 @@ begin
         end;
       {FB20_UP}
 
+      {FB25_UP}
+        if Version_api_IS_FB25_UP then begin
+          fb_print_blr := GetProcAddress(FGDS32Lib, 'fb_print_blr');
+          fb_shutdown := GetProcAddress(FGDS32Lib, 'fb_shutdown');
+          fb_shutdown_callback := GetProcAddress(FGDS32Lib, 'fb_shutdown_callback');
+          fb_cancel_operation := GetProcAddress(FGDS32Lib, 'fb_cancel_operation');
+          fb_sqlstate := GetProcAddress(FGDS32Lib, 'fb_sqlstate');
+          fb_disconnect_transaction := GetProcAddress(FGDS32Lib, 'fb_disconnect_transaction');
+        end
+        else begin
+          fb_print_blr := nil;
+          fb_shutdown := nil;
+          fb_shutdown_callback := nil;
+          fb_cancel_operation := nil;
+          fb_sqlstate := nil;
+          fb_disconnect_transaction := nil;
+        end;
+      {FB25_UP}
+
+
         Result := Assigned(BLOB_close) and Assigned(BLOB_dump) and
           Assigned(BLOB_edit) and Assigned(BLOB_get) and Assigned(BLOB_load) and
           Assigned(BLOB_open) and Assigned(BLOB_put) and Assigned(BLOB_text_dump) and
@@ -3322,7 +3569,21 @@ begin
              assigned(fb_interpret)
             )
         {FB20_UP}
+        {FB25_UP}
+        and (
+             (not Version_api_IS_FB25_UP) or
+             (
+              assigned(fb_print_blr)
+              and assigned(fb_shutdown)
+              and assigned(fb_shutdown_callback)
+              and assigned(fb_cancel_operation)
+              and assigned(fb_sqlstate)
+              and assigned(fb_disconnect_transaction)
+             )
+            )
+        {FB25_UP}
         ;
+
         if not Result then
         begin
           Unload;

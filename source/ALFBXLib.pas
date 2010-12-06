@@ -14,7 +14,7 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXLib
-Version:      3.51
+Version:      3.52
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
@@ -56,7 +56,8 @@ Know bug :
 
 History :
 
-Link :        http://www.progdigy.com/modules.php?name=UIB
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+              http://www.progdigy.com/modules.php?name=UIB
 
 NOTE :        Same as the UIB version Except
                 *Remove conditional define
@@ -85,7 +86,8 @@ type
 
   TALFBXFieldType = (uftUnKnown, uftNumeric, uftChar, uftVarchar, uftCstring, uftSmallint,
     uftInteger, uftQuad, uftFloat, uftDoublePrecision, uftTimestamp, uftBlob, uftBlobId,
-    uftDate, uftTime, uftInt64, uftArray);
+    uftDate, uftTime, uftInt64, uftArray
+    {FB25_UP}, uftNull {FB25_UP});
 
   TALFBXScale = 1..15;
 
@@ -99,10 +101,16 @@ type
     FGDSCode: Integer;
     FErrorCode: Integer;
     FSQLCode  : Integer;
+{FB25_UP}
+    FSQLState: RawByteString;
+{FB25_UP}
   public
     property ErrorCode: Integer read FErrorCode;
     property SQLCode: Integer read FSQLCode;
     property GDSCode: Integer read FGDSCode;
+{FB25_UP}
+    property SQLState: RawByteString read FSQLState;
+{FB25_UP}
   end;
 
   EALFBXException = class(EALFBXError)
@@ -151,6 +159,56 @@ type
   ,csCP943C
 {FB21_UP}
   );
+
+  // Transaction parameters
+  TALFBXTransParam = (
+    { prevents a transaction from accessing tables if they are written to by
+      other transactions.}
+    tpConsistency,
+    { allows concurrent transactions to read and write shared data. }
+    tpConcurrency,
+    { Concurrent, shared access of a specified table among all transactions. }
+    tpShared,
+    { Concurrent, restricted access of a specified table. }
+    tpProtected,
+    tpExclusive,
+    { Specifies that the transaction is to wait until the conflicting resource
+      is released before retrying an operation [Default]. }
+    tpWait,
+    { Specifies that the transaction is not to wait for the resource to be
+      released, but instead, should return an update conflict error immediately. }
+    tpNowait,
+    { Read-only access mode that allows a transaction only to select data from tables. }
+    tpRead,
+    { Read-write access mode of that allows a transaction to select, insert,
+      update, and delete table data [Default]. }
+    tpWrite,
+    { Read-only access of a specified table. Use in conjunction with tpShared,
+      tpProtected, and tpExclusive to establish the lock option. }
+    tpLockRead,
+    { Read-write access of a specified table. Use in conjunction with tpShared,
+      tpProtected, and tpExclusive to establish the lock option [Default]. }
+    tpLockWrite,
+    tpVerbTime,
+    tpCommitTime,
+    tpIgnoreLimbo,
+    { Unlike a concurrency transaction, a read committed transaction sees changes
+      made and committed by transactions that were active after this transaction started. }
+    tpReadCommitted,
+    tpAutoCommit,
+    { Enables an tpReadCommitted transaction to read only the latest committed
+      version of a record. }
+    tpRecVersion,
+    tpNoRecVersion,
+    tpRestartRequests,
+    tpNoAutoUndo
+  {FB20_UP}
+    ,tpLockTimeout
+  {FB20_UP}
+  );
+
+  { Set of transaction parameters. }
+  TALFBXTransParams = set of TALFBXTransParam;
 
 const
   cALFBXCharacterSetStr : array[TALFBXCharacterSet] of AnsiString = (
@@ -304,6 +362,8 @@ const
 
   function ALFBXStrToCharacterSet(const CharacterSet: RawByteString): TALFBXCharacterSet;
   function ALFBXCreateDBParams(Params: AnsiString; Delimiter: AnsiChar = ';'): AnsiString;
+
+  function ALFBXCreateTRParams(Options: TALFBXTransParams; const LockRead: string = ''; const LockWrite: string = ''{FB20_UP}; LockTimeout: Word = 0{FB20_UP}): RawByteString;
   function ALFBXCreateBlobParams(Params: AnsiString; Delimiter: AnsiChar = ';'): AnsiString;
 
 //******************************************************************************
@@ -326,8 +386,10 @@ const
   cALFBXMaxParamLength = 125;
 
 type
+  TALFBXParamsFlag = (pfNotInitialized, pfNotNullable);
+  TALFBXParamsFlags = set of TALFBXParamsFlag;
   PALFBXSQLVar = ^TALFBXSQLVar;
-  TALFBXSQLVar = record
+  TALFBXSQLVar = record // size must be 152
     SqlType      : Smallint;
     SqlScale     : Smallint;
     SqlSubType   : Smallint;
@@ -346,8 +408,9 @@ type
           AliasName       : array[0..METADATALENGTH-1] of AnsiChar;
           );
     // TALFBXSQLParam
-    1 : ( Init            : Boolean;
+    1 : ( Flags           : TALFBXParamsFlags;
           ID              : Word;
+          MaxSqlLen       : Smallint;
           ParamNameLength : Smallint;
           ParamName       : array[0..cALFBXMaxParamLength-1] of AnsiChar;
           );
@@ -435,7 +498,7 @@ type
     function GetIsBlob(const Index: Word): boolean;
     function GetIsBlobText(const Index: Word): boolean;
     function GetIsArray(const Index: Word): boolean;
-    function GetIsNullable(const Index: Word): boolean;
+    function GetIsNullable(const Index: Word): boolean; virtual;
 
     function GetIsNull(const Index: Word): boolean;
     function GetAsDouble(const Index: Word): Double;
@@ -510,6 +573,7 @@ type
     constructor Create(aCharacterSet: TALFBXCharacterSet); virtual;
     procedure CheckRange(const Index: Word);
     function GetFieldIndex(const name: AnsiString): Word; virtual;
+    function TryGetFieldIndex(const name: AnsiString; out index: Word): Boolean; virtual;
     property Data: PALFBXSQLDaData read FXSQLDA;
     property IsBlob[const Index: Word]: boolean read GetIsBlob;
     property IsBlobText[const Index: Word]: boolean read GetIsBlobText;
@@ -757,14 +821,16 @@ type
   TALFBXSQLParams = class(TALFBXSQLDA)
   private
     FParamCount: Word;
-    function FindParam(const name: AnsiString; out Index: Word): boolean; overload;
     function GetFieldName(const Index: Word): string;
     procedure AllocateDataBuffer(AInit: boolean = true);
+    function GetMaxSqlLen(const Index: Word): SmallInt;
   protected
     function AddFieldA(const name: AnsiString): Word;
     function AddFieldW(const name: UnicodeString): Word;
     function AddField(const name: string): Word;
     procedure SetFieldType(const Index: Word; Size: Integer; Code: SmallInt; Scale: Smallint);
+
+    function GetIsNullable(const Index: Word): boolean; override;
 
     procedure SetAsDouble(const Index: Word; const Value: Double); override;
     procedure SetAsCurrency(const Index: Word; const Value: Currency); override;
@@ -787,6 +853,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     function Parse(const SQL: string): string;
+    function TryGetFieldIndex(const name: AnsiString; out Index: Word): Boolean; override;
     function GetFieldIndex(const name: AnsiString): Word; override;
     // don't use this method
     procedure AddFieldType(const Name: string; FieldType: TALFBXFieldType;
@@ -795,6 +862,7 @@ type
     property Values[const name: string]: Variant read GetByNameAsVariant; default;
     property FieldName[const Index: Word]: string read GetFieldName;
     property ParamCount : Word read FParamCount;
+    property MaxSqlLen[const Index: Word]: Smallint read GetMaxSqlLen;
 
   end;
 
@@ -815,7 +883,7 @@ type
 
   TALFBXLibrary = class;
 
-  TALFBXStatusVector = array[0..19] of ISCStatus;
+  TALFBXStatusVector = array[0..ISC_STATUS_LENGTH - 1] of ISCStatus;
   PALFBXStatusVector = ^TALFBXStatusVector;
 
   TALFBXOnConnectionLost = procedure(Lib: TALFBXLibrary) of object;
@@ -838,9 +906,15 @@ type
     property RaiseErrors: boolean read FRaiseErrors write FRaiseErrors default True;
 
 
+{FB25_UP}
+    function ServerShutdown(timeout: Cardinal; const reason: Integer): Integer;
+    procedure ServerShutdownCallback(callBack: FB_SHUTDOWN_CALLBACK;
+      const mask: Integer; arg: Pointer);
+{FB25_UP}
+
     {Attaches to an existing database.
      Ex: AttachDatabase('c:\DataBase.gdb', DBHandle, 'user_name=SYSDBA; password=masterkey'); }
-    procedure AttachDatabase(FileName: AnsiString; var DbHandle: IscDbHandle; Params: AnsiString; Sep: AnsiChar = ';');
+    procedure AttachDatabase(const FileName: RawByteString; var DbHandle: IscDbHandle; Params: AnsiString; Sep: AnsiChar = ';');
     {Detaches from a database previously connected with AttachDatabase.}
     procedure DetachDatabase(var DBHandle: IscDbHandle);
     procedure DatabaseInfo(var DBHandle: IscDbHandle; const Items: AnsiString; var Buffer: AnsiString); overload;
@@ -848,15 +922,18 @@ type
     function DatabaseInfoString(var DBHandle: IscDbHandle; item: byte; size: Integer): AnsiString;
     function DatabaseInfoDateTime(var DBHandle: IscDbHandle; item: byte): TDateTime;
     procedure DatabaseDrop(DbHandle: IscDbHandle);
+{FB25_UP}
+    function DatabaseCancelOperation(var DBHandle: IscDbHandle; option: ISC_USHORT): Boolean;
+{FB25_UP}
 
     procedure TransactionStart(var TraHandle: IscTrHandle; var DbHandle: IscDbHandle; const TPB: AnsiString = '');
     procedure TransactionStartMultiple(var TraHandle: IscTrHandle; DBCount: Smallint; Vector: PISCTEB);
     procedure TransactionCommit(var TraHandle: IscTrHandle);
     procedure TransactionRollback(var TraHandle: IscTrHandle);
     procedure TransactionCommitRetaining(var TraHandle: IscTrHandle);
-    function TransactionGetId(var TraHandle: IscTrHandle): Cardinal;
     procedure TransactionPrepare(var TraHandle: IscTrHandle);
     procedure TransactionRollbackRetaining(var TraHandle: IscTrHandle);
+    function TransactionGetId(var TraHandle: IscTrHandle): Cardinal;    
     procedure DSQLExecuteImmediate(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle;
       const Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLDA = nil); overload;
     procedure DSQLExecuteImmediate(const Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLDA = nil); overload;
@@ -881,8 +958,8 @@ type
     procedure DSQLInfo(var StmtHandle: IscStmtHandle; const Items: array of byte; var buffer: AnsiString);
     function  DSQLInfoPlan(var StmtHandle: IscStmtHandle): string;
     function  DSQLInfoStatementType(var StmtHandle: IscStmtHandle): TALFBXStatementType;
-    function  DSQLInfoRowsAffected(var StmtHandle: IscStmtHandle;
-      StatementType: TALFBXStatementType): Cardinal;
+    function  DSQLInfoRowsAffected(var StmtHandle: IscStmtHandle; StatementType: TALFBXStatementType): Cardinal;
+    procedure DSQLInfoRowsAffected2(var StmtHandle: IscStmtHandle; out SelectedRows, InsertedRows, UpdatedRows, DeletedRows: Cardinal);
 
     procedure DDLExecute(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle; const ddl: AnsiString);
 
@@ -904,8 +981,11 @@ type
     procedure ServiceStart(var SvcHandle: IscSvcHandle; const Spb: RawByteString);
 
     function ErrSqlcode(StatusVector: TALFBXStatusVector): ISCLong;
-    function ErrInterprete(StatusVector: TALFBXStatusVector): AnsiString;
+    function ErrInterprete(StatusVector: TALFBXStatusVector): RawByteString;
     function ErrSQLInterprete(SQLCODE: Smallint): RawByteString;
+{FB25_UP}
+    function ErrSqlState(StatusVector: TALFBXStatusVector): FB_SQLSTATE_STRING;
+{FB25_UP}
 
     procedure BlobOpen(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle;
       var BlobHandle: IscBlobHandle; BlobId: TISCQuad; BPB: AnsiString = '');
@@ -941,7 +1021,7 @@ type
     function EventBlock(var EventBuffer, ResultBuffer: PAnsiChar; Count: Smallint;
       v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15: PAnsiChar): Integer;
     procedure EventQueue(var handle: IscDbHandle; var id: Integer; length: Word;
-      events: PAnsiChar; ast: IscCallback; arg: Pointer);
+      events: PAnsiChar; ast: ISC_EVENT_CALLBACK; arg: Pointer);
     procedure EventCounts(var ResultVector: TALFBXStatusVector;
       BufferLength: Smallint; EventBuffer, ResultBuffer: PAnsiChar);
     procedure EventCancel(var DbHandle: IscDbHandle; var id: integer);
@@ -1006,7 +1086,7 @@ const
     (Name: 'dbkey_scope';            ParamType: prCard), // ok
     (Name: 'number_of_users';        ParamType: prIgno), // not implemented
     (Name: 'trace';                  ParamType: prNone), // ok
-    (Name: 'no_garbage_collect';     ParamType: prIgno), // not implemented
+    (Name: 'no_garbage_collect';     ParamType: prNone), // not implemented
     (Name: 'damaged';                ParamType: prNone), // ok
     (Name: 'license';                ParamType: prStrg),
     (Name: 'sys_user_name';          ParamType: prStrg), // ok
@@ -1077,6 +1157,12 @@ const
   ,(Name: 'trusted_auth';           ParamType: prStrg)
   ,(Name: 'process_name';           ParamType: prStrg)
 {FB21_UP}
+{FB25_UP}
+  ,(Name: 'trusted_role';           ParamType: prNone)
+  ,(Name: 'org_filename';           ParamType: prStrg)
+  ,(Name: 'utf8_filename';          ParamType: prNone)
+  ,(Name: 'ext_call_depth';         ParamType: prCard)
+{FB25_UP}
    );
 
 const
@@ -1097,6 +1183,11 @@ const
   cALFBXScaleDivisor: array[-15..-1] of Int64 = (1000000000000000,100000000000000,
     10000000000000,1000000000000,100000000000,10000000000,1000000000,100000000,
     10000000,1000000,100000,10000,1000,100,10);
+
+  cALFBXScaleFormat: array[-15..-1] of string = (
+    '0.0##############', '0.0#############', '0.0############', '0.0###########',
+    '0.0##########', '0.0#########', '0.0########', '0.0#######', '0.0######',
+    '0.0#####', '0.0####', '0.0###', '0.0##', '0.0#', '0.0');
 
   cALFBXCurrencyDivisor: array[-15..-1] of int64 = (100000000000,10000000000,
     1000000000,100000000,10000000,1000000,100000,10000,1000,100,10,1,10,100,
@@ -1260,6 +1351,9 @@ const
         Exception.Message := Exception.Message + string(ErrSQLInterprete(Exception.FSQLCode)) + cALFBXNewLine;
       Exception.FGDSCode := Status;
       Exception.FErrorCode := GETCode(Status);
+{FB25_UP}
+      Exception.FSQLState := ErrSqlState(StatusVector);
+{FB25_UP}
       Exception.Message := Exception.Message + 'Error Code: ' + IntToStr(Exception.FErrorCode);
       raise Exception;
     end;
@@ -1401,7 +1495,11 @@ const
             if (Name = CurStr) then
             begin
               case ParamType of
-                prNone : AddByte(Code);
+                prNone :
+                  begin
+                    AddByte(Code);
+                    AddByte(0);
+                  end;
                 prByte :
                   if TryStrToInt(string(CurValue), AValue) and (AValue >= 0) and (AValue <= 255) then
                   begin
@@ -1428,7 +1526,92 @@ const
     SetLength(Result, FinalSize);
   end;
 
-  procedure TALFBXLibrary.AttachDatabase(FileName: AnsiString; var DbHandle: IscDbHandle;
+  function ALFBXCreateTRParams(Options: TALFBXTransParams; const LockRead, LockWrite: string{FB20_UP}; LockTimeout: Word{FB20_UP}): RawByteString;
+  var
+    tp: TALFBXTransParam;
+    procedure ParseStrOption(const code: AnsiChar; const Value: AnsiString);
+    var
+      P, Start: PAnsiChar;
+      S: AnsiString;
+    begin
+      P := Pointer(Value);
+      if P <> nil then
+        while (P^ <> #0) do
+        begin
+          Start := P;
+          while not (P^ in [#0, ';']) do Inc(P);
+          if (P - Start) > 0 then
+          begin
+            SetString(S, Start, P - Start);
+            Result := Result + code + AnsiChar(P - Start) + S;
+          end;
+          if P^ =';' then inc(P);
+        end;
+    end;
+  const
+    tpc: array[TALFBXTransParam] of AnsiChar = (
+      isc_tpb_consistency,
+      isc_tpb_concurrency,
+      isc_tpb_shared,
+      isc_tpb_protected,
+      isc_tpb_exclusive,
+      isc_tpb_wait,
+      isc_tpb_nowait,
+      isc_tpb_read,
+      isc_tpb_write,
+      isc_tpb_lock_read,
+      isc_tpb_lock_write,
+      isc_tpb_verb_time,
+      isc_tpb_commit_time,
+      isc_tpb_ignore_limbo,
+      isc_tpb_read_committed,
+      isc_tpb_autocommit,
+      isc_tpb_rec_version,
+      isc_tpb_no_rec_version,
+      isc_tpb_restart_requests,
+      isc_tpb_no_auto_undo
+    {FB20_UP}
+      ,isc_tpb_lock_timeout
+    {FB20_UP}
+      );
+
+  begin
+    if Options = [tpConcurrency,tpWait,tpWrite] then
+      result := ''
+    else
+      begin
+        Result := isc_tpb_version3;
+        for tp := Low(TALFBXTransParam) to High(TALFBXTransParam) do
+          if (tp in Options) then
+          begin
+            case tp of
+              tpLockRead    : ParseStrOption(tpc[tp], AnsiString(LockRead));
+              tpLockWrite   : ParseStrOption(tpc[tp], AnsiString(LockWrite));
+            {FB20_UP}
+              tpLockTimeout : Result := Result + tpc[tp] + PAnsiChar(@LockTimeout)[0] + PAnsiChar(LockTimeout)[1];
+            {FB20_UP}
+            else
+              Result := Result + tpc[tp];
+            end;
+          end;
+      end;
+  end;
+
+{FB25_UP}
+  function TALFBXLibrary.ServerShutdown(timeout: Cardinal; const reason: Integer): Integer;
+  begin
+     Result := fb_shutdown(timeout, reason);
+  end;
+
+  procedure TALFBXLibrary.ServerShutdownCallback(callBack: FB_SHUTDOWN_CALLBACK;
+    const mask: Integer; arg: Pointer);
+  var aStatusVector: TALFBXStatusVector;
+  begin
+    CheckFBXApiCall(fb_shutdown_callback(@aStatusVector, callBack, mask, arg), aStatusVector);
+  end;
+{FB25_UP}
+
+  procedure TALFBXLibrary.AttachDatabase(const FileName: RawByteString; var DbHandle: IscDbHandle;
     Params: AnsiString; Sep: AnsiChar = ';');
   var aStatusVector: TALFBXStatusVector;
   begin
@@ -1553,6 +1736,17 @@ const
 
   end;
 
+
+{FB25_UP}
+  function TALFBXLibrary.DatabaseCancelOperation(var DBHandle: IscDbHandle; option: ISC_USHORT): Boolean;
+  var
+    sv: TALFBXStatusVector;
+  begin
+    FillChar(sv, SizeOf(sv), 0);
+    Result := fb_cancel_operation(@sv, @DbHandle, option) = 0;
+  end;
+{FB25_UP}
+
 //******************************************************************************
 // Transaction
 //******************************************************************************
@@ -1635,7 +1829,7 @@ const
 // DSQL
 //******************************************************************************
 
-  function GetSQLDAData(SQLDA: TALFBXSQLDA): Pointer;
+  function ALFBXGetSQLDAData(SQLDA: TALFBXSQLDA): Pointer;
   begin
     if (SQLDA <> nil) then
       Result := SQLDA.FXSQLDA else
@@ -1652,7 +1846,7 @@ const
   begin
 
       CheckFBXApiCall(isc_dsql_execute_immediate(@aStatusVector, @DBHandle, @TraHandle,
-        length(Statement), Pointer(Statement), Dialect, GetSQLDAData(Sqlda)), aStatusVector);
+        length(Statement), Pointer(Statement), Dialect, ALFBXGetSQLDAData(Sqlda)), aStatusVector);
 
   end;
 
@@ -1663,7 +1857,7 @@ const
 
       p := nil;
       CheckFBXApiCall(isc_dsql_execute_immediate(@aStatusVector, @p, @p,
-        length(Statement), Pointer(Statement), Dialect, GetSQLDAData(Sqlda)), aStatusVector);
+        length(Statement), Pointer(Statement), Dialect, ALFBXGetSQLDAData(Sqlda)), aStatusVector);
 
   end;
 
@@ -1689,7 +1883,7 @@ const
   begin
 
 	  CheckFBXApiCall(isc_dsql_prepare(@aStatusVector, @TraHandle, @StmtHandle, Length(Statement),
-        PAnsiChar(Statement), Dialect, GetSQLDAData(Sqlda)), aStatusVector);
+        PAnsiChar(Statement), Dialect, ALFBXGetSQLDAData(Sqlda)), aStatusVector);
       InfoIn := isc_info_sql_stmt_type;
       isc_dsql_sql_info(@aStatusVector, @StmtHandle, 1, @InfoIn, SizeOf(STInfo), @STInfo);
       dec(STInfo.InfoType);
@@ -1713,7 +1907,7 @@ const
   begin
 
       CheckFBXApiCall(isc_dsql_execute(@aStatusVector, @TraHandle, @StmtHandle,
-        Dialect, GetSQLDAData(Sqlda)), aStatusVector);
+        Dialect, ALFBXGetSQLDAData(Sqlda)), aStatusVector);
 
   end;
 
@@ -1723,7 +1917,7 @@ const
   begin
 
       CheckFBXApiCall(isc_dsql_execute2(@aStatusVector, @TraHandle, @StmtHandle, Dialect,
-        GetSQLDAData(InSqlda), GetSQLDAData(OutSQLDA)), aStatusVector);
+        ALFBXGetSQLDAData(InSqlda), ALFBXGetSQLDAData(OutSQLDA)), aStatusVector);
 
   end;
 
@@ -1751,7 +1945,7 @@ const
     if (Sqlda <> nil) then
       Sqlda.FScrollEOF := False;
 
-      Status := isc_dsql_fetch(@aStatusVector, @StmtHandle, Dialect, GetSQLDAData(Sqlda));
+      Status := isc_dsql_fetch(@aStatusVector, @StmtHandle, Dialect, ALFBXGetSQLDAData(Sqlda));
 
 
     case Status of
@@ -1802,7 +1996,7 @@ const
     if (Sqlda <> nil) then
       sqlda.FScrollEOF := False;
 
-      Status := isc_dsql_fetch(@aStatusVector, @StmtHandle, Dialect, GetSQLDAData(Sqlda));
+      Status := isc_dsql_fetch(@aStatusVector, @StmtHandle, Dialect, ALFBXGetSQLDAData(Sqlda));
 
 
     case Status of
@@ -1874,7 +2068,7 @@ const
     aStatusVector: TALFBXStatusVector;  
   begin
 
-	  CheckFBXApiCall(isc_dsql_describe(@aStatusVector, @StmtHandle, Dialect, GetSQLDAData(Sqlda)), aStatusVector);
+	  CheckFBXApiCall(isc_dsql_describe(@aStatusVector, @StmtHandle, Dialect, ALFBXGetSQLDAData(Sqlda)), aStatusVector);
 
     if (Sqlda <> nil) then
     begin
@@ -1921,10 +2115,14 @@ const
           begin
             src := @Sqlda.Data^.sqlvar[i];
             dst := @da^.sqlvar[i];
-            src^.SqlType := dst.sqltype;
-            src^.SqlLen  := dst.sqllen;
-            src^.SqlSubType := dst.sqlsubtype;
-            src^.SqlScale := dst.SqlScale;
+            if dst^.SqlType and 1 = 0 then
+              Include(src^.Flags, pfNotNullable);
+            src^.SqlType := dst^.sqltype or 1;
+            src^.SqlLen  := dst^.sqllen;
+            src^.MaxSqlLen := dst^.sqllen;
+            src^.SqlSubType := dst^.sqlsubtype;
+            src^.SqlScale := dst^.SqlScale;
+            src^.SqlInd^ := -1;
           end;
          Sqlda.AllocateDataBuffer(false); 
       finally
@@ -1947,7 +2145,7 @@ const
   begin
 
       CheckFBXApiCall(isc_dsql_exec_immed2(@aStatusVector, @DBHhandle, @TraHandle, Length(Statement),
-        PAnsiChar(Statement), dialect, GetSQLDAData(InSqlda), GetSQLDAData(OutSQLDA)), aStatusVector);
+        PAnsiChar(Statement), dialect, ALFBXGetSQLDAData(InSqlda), ALFBXGetSQLDAData(OutSQLDA)), aStatusVector);
 
   end;
 
@@ -1998,8 +2196,8 @@ const
     Result := STInfo.InfoType;
   end;
 
-  function TALFBXLibrary.DSQLInfoRowsAffected(var StmtHandle: IscStmtHandle;
-    StatementType: TALFBXStatementType): Cardinal;
+  procedure TALFBXLibrary.DSQLInfoRowsAffected2(var StmtHandle: IscStmtHandle;
+    out SelectedRows, InsertedRows, UpdatedRows, DeletedRows: Cardinal);
   var
     InfoData : packed record
       InfoCode: byte;
@@ -2014,20 +2212,36 @@ const
     Command: byte;
     aStatusVector: TALFBXStatusVector;
   begin
+    Command := isc_info_sql_records;
+    CheckFBXApiCall(isc_dsql_sql_info(@aStatusVector, @StmtHandle, 1, @Command,
+      SizeOf(InfoData), @InfoData), aStatusVector);
+    for command := 0 to 3 do
+      with InfoData.Infos[command] do
+      case InfoCode of
+        isc_info_req_select_count: SelectedRows := Rows;
+        isc_info_req_insert_count: InsertedRows := Rows;
+        isc_info_req_update_count: UpdatedRows := Rows;
+        isc_info_req_delete_count: DeletedRows := Rows;
+      end;
+  end;
+
+  function TALFBXLibrary.DSQLInfoRowsAffected(var StmtHandle: IscStmtHandle;
+    StatementType: TALFBXStatementType): Cardinal;
+  var
+    SelectedRows, InsertedRows, UpdatedRows, DeletedRows: Cardinal;
+  begin
     if not (StatementType in [stUpdate, stDelete, stInsert, stExecProcedure]) then
       Result := 0 else
     begin
-        Command := isc_info_sql_records;
-        CheckFBXApiCall(isc_dsql_sql_info(@aStatusVector, @StmtHandle, 1, @Command,
-          SizeOf(InfoData), @InfoData), aStatusVector);
-        case StatementType of
-          stUpdate: Result := InfoData.Infos[0].Rows;
-          stDelete: Result := InfoData.Infos[1].Rows;
-          stInsert: Result := InfoData.Infos[3].Rows;
-          stExecProcedure: Result := InfoData.Infos[0].Rows + InfoData.Infos[1].Rows + InfoData.Infos[3].Rows;
-        else
-          Result := 0;
-        end;
+      DSQLInfoRowsAffected2(StmtHandle, SelectedRows, InsertedRows, UpdatedRows, DeletedRows);
+      case StatementType of
+        stUpdate: Result := UpdatedRows;
+        stDelete: Result := DeletedRows;
+        stInsert: Result := InsertedRows;
+        stExecProcedure: Result := InsertedRows + UpdatedRows + DeletedRows;
+      else
+        Result := 0;
+      end;
     end;
   end;
 
@@ -2096,7 +2310,7 @@ const
 
   end;
 
-  function TALFBXLibrary.ErrInterprete(StatusVector: TALFBXStatusVector): AnsiString;
+  function TALFBXLibrary.ErrInterprete(StatusVector: TALFBXStatusVector): RawByteString;
   var
     pStatusVector: PALFBXStatusVector;
     len: Integer;
@@ -2128,6 +2342,14 @@ const
     for i := 1 to 255 do if Result[i] = #0 then Break; // Quick trim
     SetLength(Result, i-1);
   end;
+
+{FB25_UP}
+  function TALFBXLibrary.ErrSqlState(StatusVector: TALFBXStatusVector): FB_SQLSTATE_STRING;
+  begin
+    if Version_Api_Is_FB25_Up then fb_sqlstate(@Result, @StatusVector)
+    else result := 'ZZZZZZ';
+  end;
+{FB25_UP}
 
 //******************************************************************************
 // Services
@@ -2622,7 +2844,7 @@ type
   end;
 
   procedure TALFBXLibrary.EventQueue(var handle: IscDbHandle; var id: Integer; length: Word;
-      events: PAnsiChar; ast: IscCallback; arg: Pointer);
+      events: PAnsiChar; ast: ISC_EVENT_CALLBACK; arg: Pointer);
   var aStatusVector: TALFBXStatusVector;
   begin
 
@@ -2841,8 +3063,8 @@ type
   function TALFBXSQLDA.GetIsNull(const Index: Word): boolean;
   begin
     CheckRange(Index);
-    Result := (FXSQLDA.sqlvar[Index].sqlind <> nil) and
-              (FXSQLDA.sqlvar[Index].sqlind^ = -1)
+    with FXSQLDA.sqlvar[Index] do
+      Result := (sqlind <> nil) and (sqlind^ = -1)
   end;
 
   procedure TALFBXSQLDA.CheckRange(const Index: Word);
@@ -2922,7 +3144,9 @@ type
             if sqldata = nil then
               getmem(sqldata, NewLen) else
               ReallocMem(sqldata, NewLen);
-            sqllen := NewLen;
+            if MaxSqlLen <= 0 then
+              sqllen := NewLen else
+              sqllen := Min(NewLen, MaxSqlLen);
             Move(PAnsiChar(str)^, sqldata^, sqllen);
           end;
         end;
@@ -2943,6 +3167,8 @@ type
             if sqldata = nil then
               getmem(sqldata, NewLen+2) else
               ReallocMem(sqldata, NewLen+2);
+            if MaxSqlLen > 0 then
+              NewLen := Min(NewLen, MaxSqlLen);
             sqllen := NewLen + 2;
             PVary(sqldata).vary_length := NewLen;
             Move(PAnsiChar(str)^, PVary(sqldata).vary_string,PVary(sqldata).vary_length);
@@ -3103,7 +3329,8 @@ type
   function TALFBXSQLDA.GetIsNullable(const Index: Word): boolean;
   begin
     CheckRange(Index);
-    Result := (FXSQLDA.sqlvar[Index].sqlind <> nil);
+    with FXSQLDA.sqlvar[Index] do
+      Result := (sqlind <> nil) and (sqltype <> sqltype and not(1));
   end;
 
   function TALFBXSQLDA.GetIsNumeric(const Index: Word): boolean;
@@ -3149,6 +3376,9 @@ type
           SQL_INT64     : Result := PInt64(sqldata)^;
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, Result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, Result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3190,6 +3420,9 @@ type
           SQL_FLOAT     : Result := Trunc(PSingle(sqldata)^);
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, Result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, Result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3231,6 +3464,9 @@ type
           SQL_TYPE_TIME : ; // Result := 0; What else ??
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3272,6 +3508,9 @@ type
           SQL_INT64     : Result := PInt64(sqldata)^;
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3313,6 +3552,9 @@ type
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
           SQL_TYPE_TIME : ; // Result := 0; What else ??
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3343,12 +3585,12 @@ type
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := AnsiString(FloatToStr(PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := AnsiString(FloatToStr(PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+          SQL_SHORT  : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
+          SQL_LONG   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
           SQL_INT64,
-          SQL_QUAD   : Result := AnsiString(FloatToStr(PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+          SQL_QUAD   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := AnsiString(FloatToStr(PDouble(sqldata)^));
+          SQL_DOUBLE : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -3365,6 +3607,9 @@ type
           SQL_FLOAT     : Result := AnsiString(FloatToStr(PSingle(sqldata)^));
           SQL_SHORT     : Result := AnsiString(IntToStr(PSmallint(sqldata)^));
           SQL_INT64     : Result := AnsiString(IntToStr(PInt64(sqldata)^));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3400,12 +3645,12 @@ type
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := RawByteString(FloatToStr(PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := RawByteString(FloatToStr(PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+          SQL_SHORT  : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
+          SQL_LONG   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
           SQL_INT64,
-          SQL_QUAD   : Result := RawByteString(FloatToStr(PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+          SQL_QUAD   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := RawByteString(FloatToStr(PDouble(sqldata)^));
+          SQL_DOUBLE : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -3422,6 +3667,9 @@ type
           SQL_FLOAT     : Result := RawByteString(FloatToStr(PSingle(sqldata)^));
           SQL_SHORT     : Result := RawByteString(IntToStr(PSmallint(sqldata)^));
           SQL_INT64     : Result := RawByteString(IntToStr(PInt64(sqldata)^));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3469,6 +3717,9 @@ type
           SQL_INT64     : Result := PInt64(sqldata)^;
           SQL_TEXT      : Result := DecodeString(SQL_TEXT, Index);
           SQL_VARYING   : Result := DecodeString(SQL_VARYING, Index);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3510,6 +3761,9 @@ type
           SQL_SHORT     : Result := PSmallint(sqldata)^;
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3580,6 +3834,9 @@ type
           SQL_INT64     : Result := PInt64(sqldata)^;
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3618,6 +3875,9 @@ end;
           SQL_FLOAT     : Result := Trunc(PSingle(sqldata)^) <> 0;
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3639,12 +3899,12 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := FloatToStr(PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : Result := FloatToStr(PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
+          SQL_SHORT  : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
+          SQL_LONG   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
           SQL_INT64,
-          SQL_QUAD   : Result := FloatToStr(PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]);
+          SQL_QUAD   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]);
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := FloatToStr(PDouble(sqldata)^);
+          SQL_DOUBLE : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -3661,6 +3921,9 @@ end;
           SQL_FLOAT     : Result := FloatToStr(PSingle(sqldata)^);
           SQL_SHORT     : Result := IntToStr(PSmallint(sqldata)^);
           SQL_INT64     : Result := IntToStr(PInt64(sqldata)^);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3702,6 +3965,9 @@ end;
           SQL_TEXT      : ConvertStringToDate(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertStringToDate(SQL_VARYING, Index, result);
           SQL_TYPE_TIME : Result := 0;
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3743,6 +4009,9 @@ end;
           SQL_TEXT      : ConvertString(SQL_TEXT, Index, result);
           SQL_VARYING   : ConvertString(SQL_VARYING, Index, result);
           SQL_TYPE_DATE : Result := 0;
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3811,6 +4080,9 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(string(Value));
           SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(string(Value));
           SQL_INT64     : PInt64(sqldata)^ := StrToInt64(string(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3852,6 +4124,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateTimeToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateTimeToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3891,6 +4166,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3930,6 +4208,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, TimeToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, TimeToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -3966,6 +4247,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := ord(Value);
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(ord(Value)));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(ord(Value)));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4005,6 +4289,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4044,6 +4331,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4083,6 +4373,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4132,6 +4425,9 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(string(Value));
           SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(string(Value));
           SQL_INT64     : PInt64(sqldata)^ := StrToInt64(string(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4174,6 +4470,9 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(Value);
           SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(Value);
           SQL_INT64     : PInt64(sqldata)^ := StrToInt64(Value);
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4214,6 +4513,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Value;
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4253,6 +4555,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4297,6 +4602,9 @@ end;
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
           SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
           SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+{FB25_UP}
+          SQL_NULL: ;
+{FB25_UP}
         else
           raise EALFBXConvertError.Create(cALFBX_CASTERROR);
         end;
@@ -4317,6 +4625,9 @@ end;
       varCurrency:                       SetAsCurrency(Index, Value);
       varDate:                           SetAsDateTime(Index, Value);
       varOleStr, varString:              SetAsString(Index, Value);
+{$IFDEF UNICODE}
+      varUString:                        SetAsString(Index, Value);
+{$ENDIF}
       varNull, VarEmpty:                 SetIsNull(index, true);
     else
       raise EALFBXConvertError.Create(cALFBX_CASTERROR);
@@ -4327,11 +4638,24 @@ end;
 
   function TALFBXSQLDA.GetFieldIndex(const name: AnsiString): Word;
   begin
-    for Result := 0 to GetAllocatedFields - 1 do
-      if FXSQLDA.sqlvar[Result].AliasNameLength = Length(name) then
-        if StrLIComp(PansiChar(@FXSQLDA.sqlvar[Result].aliasname), PAnsiChar(Name),
-          FXSQLDA.sqlvar[Result].AliasNameLength) = 0 then Exit;
-    raise Exception.CreateFmt(cALFBX_FIELDSTRNOTFOUND, [name]);
+    if not TryGetFieldIndex(name, Result) then
+      raise Exception.CreateFmt(cALFBX_FIELDSTRNOTFOUND, [name]);
+  end;
+
+  function TALFBXSQLDA.TryGetFieldIndex(const name: AnsiString; out index: Word): Boolean;
+  var
+    i: Integer;
+  begin
+    for i := 0 to GetAllocatedFields - 1 do
+      if FXSQLDA.sqlvar[i].AliasNameLength = Length(name) then
+        if StrLIComp(PansiChar(@FXSQLDA.sqlvar[i].aliasname), PAnsiChar(Name),
+          FXSQLDA.sqlvar[i].AliasNameLength) = 0 then
+          begin
+            index := i;
+            Result := True;
+            Exit;
+          end;
+    Result := False;
   end;
 
   function TALFBXSQLDA.GetByNameAsDouble(const Name: string): Double;
@@ -4567,6 +4891,9 @@ end;
       SQL_TYPE_DATE   : Result := uftDate;
       SQL_INT64       : Result := uftInt64;
       SQL_ARRAY       : Result := uftArray;
+{FB25_UP}
+      SQL_NULL        : Result := uftNull;
+{FB25_UP}
     else
       Result := uftUnKnown;
     end;
@@ -5147,12 +5474,12 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := AnsiString(FloatToStr(PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := AnsiString(FloatToStr(PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+          SQL_SHORT  : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
+          SQL_LONG   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
           SQL_INT64,
-          SQL_QUAD   : Result := AnsiString(FloatToStr(PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+          SQL_QUAD   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := AnsiString(FloatToStr(PDouble(sqldata)^));
+          SQL_DOUBLE : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -5192,12 +5519,12 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := RawByteString(FloatToStr(PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := RawByteString(FloatToStr(PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+          SQL_SHORT  : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
+          SQL_LONG   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
           SQL_INT64,
-          SQL_QUAD   : Result := RawByteString(FloatToStr(PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+          SQL_QUAD   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := RawByteString(FloatToStr(PDouble(sqldata)^));
+          SQL_DOUBLE : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -5237,12 +5564,12 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := FloatToStr(PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : Result := FloatToStr(PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
+          SQL_SHORT  : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
+          SQL_LONG   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
           SQL_INT64,
-          SQL_QUAD   : Result := FloatToStr(PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]);
+          SQL_QUAD   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := FloatToStr(PDouble(sqldata)^);
+          SQL_DOUBLE : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -5698,7 +6025,9 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
     for i := 0 to FXSQLDA.sqln - 1 do
       with FXSQLDA.sqlvar[i] do
       begin
-        Init := AInit;
+        if AInit then
+          Include(Flags, pfNotInitialized) else
+          Exclude(Flags, pfNotInitialized);
         if SqlLen > 0 then
           GetMem(sqldata, SqlLen) else
           sqldata := nil;
@@ -5715,9 +6044,9 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
   begin
     CheckRange(Index);
     with FXSQLDA.sqlvar[Index] do
-      if Init then  // need to be set, cf addfield
+      if pfNotInitialized in Flags then  // need to be set, cf addfield
       begin
-        Init := False; // don't need to be set
+        Exclude(Flags, pfNotInitialized); // don't need to be set
         sqltype := Code;
         sqlscale := Scale;
         sqllen := Size;
@@ -5848,20 +6177,32 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
 
   function TALFBXSQLParams.GetFieldType(const Index: Word): TALFBXFieldType;
   begin
-    if IsNull[Index] and FXSQLDA.sqlvar[Index].Init then
+    if IsNull[Index] and (pfNotInitialized in FXSQLDA.sqlvar[Index].Flags) then
       Result := uftUnKnown else
       Result := inherited GetFieldType(Index);
   end;
 
+  function TALFBXSQLParams.GetIsNullable(const Index: Word): boolean;
+  begin
+    CheckRange(Index);
+    Result := not(pfNotNullable in FXSQLDA.sqlvar[Index].Flags);
+  end;
+
+  function TALFBXSQLParams.GetMaxSqlLen(const Index: Word): SmallInt;
+  begin
+    CheckRange(Index);
+    Result := FXSQLDA.sqlvar[Index].MaxSqlLen
+  end;
+
   function TALFBXSQLParams.GetFieldIndex(const name: AnsiString): Word;
   begin
-    if not FindParam(name, Result) then
+    if not TryGetFieldIndex(name, Result) then
       raise Exception.CreateFmt(cALFBX_PARAMSTRNOTFOUND, [name]);
   end;
 
-  function TALFBXSQLParams.FindParam(const name: AnsiString; out Index: Word): boolean;
+  function TALFBXSQLParams.TryGetFieldIndex(const name: AnsiString; out Index: Word): Boolean;
   var
-    Field: Smallint;
+    Field: Integer;
   begin
     for Field := 0 to FXSQLDA.sqln - 1 do
       if FXSQLDA.sqlvar[Field].ParamNameLength = Length(name) then
@@ -5886,7 +6227,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
       raise Exception.CreateFmt(cALFBX_SIZENAME, [Name]);
 
     Result := FXSQLDA.sqln;
-    if (len > 0) and FindParam(Name, num) then
+    if (len > 0) and TryGetFieldIndex(Name, num) then
     begin
       inc(FXSQLDA.sqln);
       inc(FXSQLDA.sqld);
@@ -5899,8 +6240,9 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
       ReallocMem(FXSQLDA, XSQLDA_LENGTH(FXSQLDA.sqln));
       inc(FParamCount);
       p := @FXSQLDA.sqlvar[Result];
-      p^.Init := True;
+      Include(p^.Flags, pfNotInitialized);
       p^.ID := FParamCount;
+      p^.MaxSqlLen := 0;
       p^.ParamNameLength := len;
       if p^.ParamNameLength > 0 then
         Move(PAnsiChar(Name)^, p^.ParamName[0], p^.ParamNameLength);

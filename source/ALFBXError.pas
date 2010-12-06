@@ -54,7 +54,8 @@ Know bug :
 
 History :
 
-Link :        http://www.progdigy.com/modules.php?name=UIB
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+              http://www.progdigy.com/modules.php?name=UIB
 
 Please send all your feedback to svanderclock@arkadia.com
 **************************************************************}
@@ -88,6 +89,9 @@ const
   isc_arg_netware      = 16; (* NetWare error code *)
   isc_arg_win32        = 17; (* Win32 error code *)
   isc_arg_warning      = 18; (* warning argument *)
+{FB25_UP}
+  isc_arg_sql_state    = 19; // SQLSTATE
+{FB25_UP}
 
   isc_arith_except                      = 335544321;
   isc_bad_dbkey                         = 335544322;
@@ -470,6 +474,9 @@ const
   isc_expec_short                       = 335544699;
   isc_expec_long                        = 335544700;
   isc_expec_ushort                      = 335544701;
+{FB25_UP}
+  isc_escape_invalid                    = 335544702;
+{FB25_UP}
   isc_like_escape_invalid               = 335544702;
   isc_svcnoexe                          = 335544703;
   isc_net_lookup_err                    = 335544704;
@@ -663,6 +670,114 @@ const
   isc_fldnotdef2                       = 335544883;
 {FB21_UP}
 
+{FB25_UP}
+  isc_invalid_similar_pattern          = 335544884;
+  isc_bad_teb_form                     = 335544885;
+  isc_tpb_multiple_txn_isolation       = 335544886;
+  isc_tpb_reserv_before_table          = 335544887;
+  isc_tpb_multiple_spec                = 335544888;
+  isc_tpb_option_without_rc            = 335544889;
+  isc_tpb_conflicting_options          = 335544890;
+  isc_tpb_reserv_missing_tlen          = 335544891;
+  isc_tpb_reserv_long_tlen             = 335544892;
+  isc_tpb_reserv_missing_tname         = 335544893;
+  isc_tpb_reserv_corrup_tlen           = 335544894;
+  isc_tpb_reserv_null_tlen             = 335544895;
+  isc_tpb_reserv_relnotfound           = 335544896;
+  isc_tpb_reserv_baserelnotfound       = 335544897;
+  isc_tpb_missing_len                  = 335544898;
+  isc_tpb_missing_value                = 335544899;
+  isc_tpb_corrupt_len                  = 335544900;
+  isc_tpb_null_len                     = 335544901;
+  isc_tpb_overflow_len                 = 335544902;
+  isc_tpb_invalid_value                = 335544903;
+  isc_tpb_reserv_stronger_wng          = 335544904;
+  isc_tpb_reserv_stronger              = 335544905;
+  isc_tpb_reserv_max_recursion         = 335544906;
+  isc_tpb_reserv_virtualtbl            = 335544907;
+  isc_tpb_reserv_systbl                = 335544908;
+  isc_tpb_reserv_temptbl               = 335544909;
+  isc_tpb_readtxn_after_writelock      = 335544910;
+  isc_tpb_writelock_after_readtxn      = 335544911;
+  isc_time_range_exceeded              = 335544912;
+  isc_datetime_range_exceeded          = 335544913;
+  isc_string_truncation                = 335544914;
+  isc_blob_truncation                  = 335544915;
+  isc_numeric_out_of_range             = 335544916;
+  isc_shutdown_timeout                 = 335544917;
+  isc_att_handle_busy                  = 335544918;
+  isc_bad_udf_freeit                   = 335544919;
+  isc_eds_provider_not_found           = 335544920;
+  isc_eds_connection                   = 335544921;
+  isc_eds_preprocess                   = 335544922;
+  isc_eds_stmt_expected                = 335544923;
+  isc_eds_prm_name_expected            = 335544924;
+  isc_eds_unclosed_comment             = 335544925;
+  isc_eds_statement                    = 335544926;
+  isc_eds_input_prm_mismatch           = 335544927;
+  isc_eds_output_prm_mismatch          = 335544928;
+  isc_eds_input_prm_not_set            = 335544929;
+  isc_too_big_blr                      = 335544930;
+  isc_montabexh                        = 335544931;
+  isc_modnotfound                      = 335544932;
+  isc_nothing_to_cancel                = 335544933;
+  isc_ibutil_not_loaded                = 335544934;
+  isc_circular_computed                = 335544935;
+  isc_psw_db_error                     = 335544936;
+  isc_invalid_type_datetime_op         = 335544937;
+  isc_onlycan_add_timetodate           = 335544938;
+  isc_onlycan_add_datetotime           = 335544939;
+  isc_onlycansub_tstampfromtstamp      = 335544940;
+  isc_onlyoneop_mustbe_tstamp          = 335544941;
+  isc_invalid_extractpart_time         = 335544942;
+  isc_invalid_extractpart_date         = 335544943;
+  isc_invalidarg_extract               = 335544944;
+  isc_sysf_argmustbe_exact             = 335544945;
+  isc_sysf_argmustbe_exact_or_fp       = 335544946;
+  isc_sysf_argviolates_uuidtype        = 335544947;
+  isc_sysf_argviolates_uuidlen         = 335544948;
+  isc_sysf_argviolates_uuidfmt         = 335544949;
+  isc_sysf_argviolates_guidigits       = 335544950;
+  isc_sysf_invalid_addpart_time        = 335544951;
+  isc_sysf_invalid_add_datetime        = 335544952;
+  isc_sysf_invalid_addpart_dtime       = 335544953;
+  isc_sysf_invalid_add_dtime_rc        = 335544954;
+  isc_sysf_invalid_diff_dtime          = 335544955;
+  isc_sysf_invalid_timediff            = 335544956;
+  isc_sysf_invalid_tstamptimediff      = 335544957;
+  isc_sysf_invalid_datetimediff        = 335544958;
+  isc_sysf_invalid_diffpart            = 335544959;
+  isc_sysf_argmustbe_positive          = 335544960;
+  isc_sysf_basemustbe_positive         = 335544961;
+  isc_sysf_argnmustbe_nonneg           = 335544962;
+  isc_sysf_argnmustbe_positive         = 335544963;
+  isc_sysf_invalid_zeropowneg          = 335544964;
+  isc_sysf_invalid_negpowfp            = 335544965;
+  isc_sysf_invalid_scale               = 335544966;
+  isc_sysf_argmustbe_nonneg            = 335544967;
+  isc_sysf_binuuid_mustbe_str          = 335544968;
+  isc_sysf_binuuid_wrongsize           = 335544969;
+  isc_missing_required_spb             = 335544970;
+  isc_net_server_shutdown              = 335544971;
+  isc_bad_conn_str                     = 335544972;
+  isc_bad_epb_form                     = 335544973;
+  isc_no_threads                       = 335544974;
+  isc_net_event_connect_timeout        = 335544975;
+  isc_sysf_argmustbe_nonzero           = 335544976;
+  isc_sysf_argmustbe_range_inc1_1      = 335544977;
+  isc_sysf_argmustbe_gteq_one          = 335544978;
+  isc_sysf_argmustbe_range_exc1_1      = 335544979;
+  isc_internal_rejected_params         = 335544980;
+  isc_sysf_fp_overflow                 = 335544981;
+  isc_udf_fp_overflow                  = 335544982;
+  isc_udf_fp_nan                       = 335544983;
+  isc_instance_conflict                = 335544984;
+  isc_out_of_temp_space                = 335544985;
+  isc_eds_expl_tran_ctrl               = 335544986;
+  isc_no_trusted_spb                   = 335544987;
+  isc_async_active                     = 335545017;
+{FB25_UP}
+
   isc_gfix_db_name                      = 335740929;
   isc_gfix_invalid_sw                   = 335740930;
   isc_gfix_incmp_sw                     = 335740932;
@@ -734,6 +849,11 @@ const
   isc_dsql_db_trigger_type_cant_change = 336003103;
 {FB21_UP}
 
+{FB25_UP}
+  isc_dyn_dup_table                    = 336068740;
+  isc_dyn_column_does_not_exist        = 336068784;
+{FB25_UP}
+
   isc_dyn_role_does_not_exist           = 336068796;
   isc_dyn_no_grant_admin_opt            = 336068797;
   isc_dyn_user_not_role_member          = 336068798;
@@ -762,6 +882,12 @@ const
   isc_dyn_miss_priv_warning            = 336068855;
   isc_dyn_ods_not_supp_feature         = 336068856;
 {FB21_UP}
+
+{FB25_UP}
+  isc_dyn_cannot_addrem_computed       = 336068857;
+  isc_dyn_no_empty_pw                  = 336068858;
+  isc_dyn_dup_index                    = 336068859;
+{FB25_UP}
 
   isc_gbak_unknown_switch               = 336330753;
   isc_gbak_page_size_missing            = 336330754;
@@ -849,6 +975,11 @@ const
   isc_gbak_just_data                    = 336331033;
   isc_gbak_data_only                    = 336331034;
 
+{FB25_UP}
+  isc_gbak_invalid_metadata            = 336331093;
+  isc_gbak_invalid_data                = 336331094;
+{FB25_UP}
+
 {FB20_UP}
   isc_dsql_too_old_ods                 = 336397205;
   isc_dsql_table_not_found             = 336397206;
@@ -886,6 +1017,30 @@ const
   isc_dsql_col_more_than_once_using    = 336397235;
   isc_dsql_unsupp_feature_dialect      = 336397236;
 {FB21_UP}
+
+{FB25_UP}
+  isc_dsql_cte_not_used                = 336397237;
+  isc_dsql_col_more_than_once_view     = 336397238;
+  isc_dsql_unsupported_in_auto_trans   = 336397239;
+  isc_dsql_eval_unknode                = 336397240;
+  isc_dsql_agg_wrongarg                = 336397241;
+  isc_dsql_agg2_wrongarg               = 336397242;
+  isc_dsql_nodateortime_pm_string      = 336397243;
+  isc_dsql_invalid_datetime_subtract   = 336397244;
+  isc_dsql_invalid_dateortime_add      = 336397245;
+  isc_dsql_invalid_type_minus_date     = 336397246;
+  isc_dsql_nostring_addsub_dial3       = 336397247;
+  isc_dsql_invalid_type_addsub_dial3   = 336397248;
+  isc_dsql_invalid_type_multip_dial1   = 336397249;
+  isc_dsql_nostring_multip_dial3       = 336397250;
+  isc_dsql_invalid_type_multip_dial3   = 336397251;
+  isc_dsql_mustuse_numeric_div_dial1   = 336397252;
+  isc_dsql_nostring_div_dial3          = 336397253;
+  isc_dsql_invalid_type_div_dial3      = 336397254;
+  isc_dsql_nostring_neg_dial3          = 336397255;
+  isc_dsql_invalid_type_neg            = 336397256;
+  isc_dsql_max_distinct_items          = 336397257;
+{FB25_UP}
 
   isc_gsec_cant_open_db                 = 336723983;
   isc_gsec_switches_error               = 336723984;
@@ -957,6 +1112,15 @@ const
   isc_fbsvcmgr_switch_unknown          = 336986118;
 {FB21_UP}
 
+{FB25_UP}
+  isc_fbsvcmgr_bad_sm                  = 336986159;
+  isc_fbsvcmgr_fp_open                 = 336986160;
+  isc_fbsvcmgr_fp_read                 = 336986161;
+  isc_fbsvcmgr_fp_empty                = 336986162;
+  isc_fbsvcmgr_bad_arg                 = 336986164;
+  isc_utl_trusted_switch               = 337051649;
+{FB25_UP}
+
 {FB102}
   isc_err_max_FB102                           = 699;
 {FB102}
@@ -976,6 +1140,10 @@ const
 {FB21}
   isc_err_max_FB21                           = 826;
 {FB20}
+
+{FB25}
+  isc_err_max_FB25                           = 964;
+{FB25}
 
 implementation
 

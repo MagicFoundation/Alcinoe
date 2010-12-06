@@ -94,7 +94,10 @@ contains
   ALPhpRunner in 'ALPhpRunner.pas',
   ALFBXClient in 'ALFBXClient.pas',
   ALFcnCGI in 'ALFcnCGI.pas',
-  ALPOP3Client in 'ALPOP3Client.pas';
+  ALPOP3Client in 'ALPOP3Client.pas',
+  ALSqlite3Client in 'ALSqlite3Client.pas',
+  ALSqlite3Wrapper in 'ALSqlite3Wrapper.pas',
+  ALWindows in 'ALWindows.pas';
 
 end.
 

@@ -13,7 +13,7 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXConst
-Version:      3.51
+Version:      3.52
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
@@ -55,7 +55,8 @@ Know bug :
 
 History :
 
-Link :        http://www.progdigy.com/modules.php?name=UIB
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+              http://www.progdigy.com/modules.php?name=UIB
 
 Please send all your feedback to svanderclock@arkadia.com
 **************************************************************}
@@ -104,6 +105,7 @@ const
   cALFBX_UNEXPECTEDCASTERROR = 'Unexpected cast error.';
   cALFBX_INVALIDUSERNAME     = 'Invalid user name : "%s".';
   cALFBX_SERVICESPARSING     = 'Error while parsing Services API output.';
+  cALFBX_NOT_NULLABLE        = 'Field "%s" is not nullable.';
 
 implementation
 

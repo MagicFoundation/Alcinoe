@@ -115,7 +115,7 @@ Type
                         StartDate, EndDate: Int64); virtual;
     procedure initObject; virtual;
   Public
-    Constructor Create(const lib: String = 'sqlite3.dll'); overload; virtual;
+    Constructor Create(const lib: String = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
     Constructor Create(lib: TALSqlite3Library); overload; virtual;
     Destructor Destroy; Override;
     procedure config(Option: Integer);
@@ -192,7 +192,8 @@ Type
     Constructor Create(aDataBaseName: String;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
                        const aOpenConnectionPragmaStatements: String = '';
-                       const alib: String = 'sqlite3.dll'); overload; virtual;
+                       const alib: String = 'sqlite3.dll';
+                       const initializeLib: Boolean = True); overload; virtual;
     Constructor Create(aDataBaseName: String;
                        alib: TALSqlite3Library;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
@@ -317,16 +318,16 @@ begin
   fNullString := '';
 end;
 
-{*********************************************************************}
-constructor TalSqlite3Client.Create(const lib: String = 'sqlite3.dll');
+{**********************************************************************************************************}
+constructor TalSqlite3Client.Create(const lib: String = 'sqlite3.dll'; const initializeLib: Boolean = True);
 begin
   fLibrary := TALSqlite3Library.Create;
-  fLibrary.Load(lib);
+  fLibrary.Load(lib, initializeLib);
   FownLibrary := True;
   initObject;
 end;
 
-{*********************************************************}
+{**********************************************************}
 constructor TalSqlite3Client.Create(lib: TALSqlite3Library);
 begin
   fLibrary := lib;
@@ -830,7 +831,6 @@ begin
   FOpenConnectionFlags := aOpenConnectionFlags;
   FOpenConnectionPragmaStatements := TstringList.Create;
   FOpenConnectionPragmaStatements.Text := trim(AlStringReplace(aOpenConnectionPragmaStatements,';',#13#10,[rfReplaceAll]));
-  config(SQLITE_CONFIG_MULTITHREAD);
   FConnectionPool:= TObjectList.Create(True);
   FConnectionPoolCS:= TCriticalSection.create;
   FDatabaseRWCS := TMultiReadExclusiveWriteSynchronizer.Create;
@@ -847,10 +847,13 @@ end;
 constructor TalSqlite3ConnectionPoolClient.Create(aDataBaseName: String;
                                                   const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
                                                   const aOpenConnectionPragmaStatements: String = '';
-                                                  const alib: String = 'sqlite3.dll');
+                                                  const alib: String = 'sqlite3.dll';
+                                                  const initializeLib: Boolean = True);
 begin
   fLibrary := TALSqlite3Library.Create;
-  fLibrary.Load(alib);
+  fLibrary.Load(alib, False);
+  config(SQLITE_CONFIG_MULTITHREAD);
+  if initializeLib then initialize;
   FownLibrary := True;
   initObject(aDataBaseName,
              aOpenConnectionFlags,

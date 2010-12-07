@@ -763,7 +763,7 @@ type
     destructor Destroy; override;
     function Loaded: Boolean; virtual;
     function Unload: Boolean; virtual;
-    function Load(const lib: string = 'sqlite3.dll'): Boolean; virtual;
+    function Load(const lib: string = 'sqlite3.dll'; const initialize: boolean = True): Boolean; virtual;
   end;
 
 implementation
@@ -792,6 +792,9 @@ function TALSqlite3Library.Unload: Boolean;
 begin
   Result := True;
   if Loaded then begin
+    sqlite3_shutdown; // A call to sqlite3_shutdown() is an "effective" call if it is the first call to sqlite3_shutdown()
+                      // since the last sqlite3_initialize(). Only an effective call to sqlite3_shutdown() does any deinitialization.
+                      // All other valid calls to sqlite3_shutdown() are harmless no-ops.
     Result := Boolean(FreeLibrary(Flibsqlite3));
     Flibsqlite3 := 0;
     sqlite3_libversion := nil;
@@ -968,8 +971,8 @@ begin
   end;
 end;
 
-{**********************************************************}
-function TALSqlite3Library.Load(const lib: string): Boolean;
+{************************************************************************************************************}
+function TALSqlite3Library.Load(const lib: string = 'sqlite3.dll'; const initialize: boolean = True): Boolean;
 Begin
   Result := Loaded;
   if not Result then begin
@@ -1323,6 +1326,12 @@ Begin
       if not Result then begin
         Unload;
         raise Exception.Create(cALSqlite3_INVALIDELIBVERSION);
+      end
+      else if initialize then begin
+        if sqlite3_initialize <> SQLITE_OK then begin
+          Unload;
+          raise Exception.CreateFmt(cALSQLite3_CANTLOADLIB, [lib]);
+        end;
       end;
     end
     else raise Exception.CreateFmt(cALSqlite3_CANTLOADLIB, [lib]);

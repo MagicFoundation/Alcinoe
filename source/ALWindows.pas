@@ -7,6 +7,8 @@ uses Windows,
 
 Var ALGetTickCount64: function: int64; stdcall;
 
+const cALINVALID_SET_FILE_POINTER = DWORD(-1);
+
 implementation
 
 {******************************************}

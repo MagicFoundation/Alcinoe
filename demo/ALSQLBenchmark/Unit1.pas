@@ -125,6 +125,7 @@ type
     ALButtonMysqlUpdate: TALButton;
     ALButtonMySqlLoopUpdate: TALButton;
     ALButtonMysqlLoopSelect: TALButton;
+    ALCheckBoxSqlite3ReadUncommited: TALCheckBox;
     procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlClick(Sender: TObject);
@@ -926,8 +927,18 @@ begin
 
     aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
     Try
+
+      //enable or disable the shared cache
+      aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
+
+      //connect
       aSqlite3Client.connect(ALEditSqlite3Database.text);
+
+      //the pragma
       aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
+      aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
+      aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
       aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
@@ -937,17 +948,20 @@ begin
         4: aSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
         5: aSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
       end;
-      case RadioGroupSQLite3Temp_Store.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
-        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
-        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
-      end;
+      aSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
+      If ALCheckBoxSqlite3ReadUncommited.Checked then aSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
       case RadioGroupSqlite3Synhcronous.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
         1: aSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
         2: aSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
       end;
+      case RadioGroupSQLite3Temp_Store.ItemIndex of
+        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
+        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
+        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
+      end;
 
+      //the sql
       aXMLDATA := ALCreateEmptyXMLDocument('root');
       Try
 
@@ -1013,8 +1027,18 @@ begin
     aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
     LstSql := TstringList.Create;
     Try
+
+      //enable or disable the shared cache
+      aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
+
+      //connect
       aSqlite3Client.connect(ALEditSqlite3Database.text);
+
+      //the pragma
       aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
+      aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
+      aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
       aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
@@ -1024,18 +1048,20 @@ begin
         4: aSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
         5: aSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
       end;
-      case RadioGroupSQLite3Temp_Store.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
-        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
-        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
-      end;
+      aSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
+      If ALCheckBoxSqlite3ReadUncommited.Checked then aSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
       case RadioGroupSqlite3Synhcronous.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
         1: aSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
         2: aSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
       end;
+      case RadioGroupSQLite3Temp_Store.ItemIndex of
+        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
+        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
+        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
+      end;
 
-
+      //the sql
       S1 := AlMemoSQLite3Query.Lines.Text;
       while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
       while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
@@ -1046,6 +1072,7 @@ begin
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
       LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
 
+      //do the job
       aStartDate := ALGetTickCount64;
       aSqlite3Client.TransactionStart;
       try
@@ -1059,6 +1086,7 @@ begin
         raise;
       end;
 
+      //init the visual component
       TableViewThread.DataController.RecordCount := 1;
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadRequestCount.Index,1);
@@ -1103,8 +1131,12 @@ begin
   StartTime := ALGetTickCount64;
 
   //init the aPragmaStatements
-  aPragmaStatements := 'PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text + ';';
-  aPragmaStatements := 'PRAGMA page_size = '+ALEditSqlite3Page_Size.Text + ';';
+  aPragmaStatements := '';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA page_size = '+ALEditSqlite3Page_Size.Text+';';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA encoding = "UTF-8";';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA legacy_file_format = 0;';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA auto_vacuum = NONE;';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text+';';
   case RadioGroupSqlite3Journal_Mode.ItemIndex of
     0: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = DELETE;';
     1: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = TRUNCATE;';
@@ -1113,15 +1145,17 @@ begin
     4: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = WAL;';
     5: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = OFF;';
   end;
-  case RadioGroupSQLite3Temp_Store.ItemIndex of
-    0: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = DEFAULT;';
-    1: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = FILE;';
-    2: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = MEMORY;';
-  end;
+  aPragmaStatements := aPragmaStatements + 'PRAGMA locking_mode = NORMAL;';
+  If ALCheckBoxSqlite3ReadUncommited.Checked then aPragmaStatements := aPragmaStatements + 'PRAGMA read_uncommitted = 1;';
   case RadioGroupSqlite3Synhcronous.ItemIndex of
     0: aPragmaStatements := aPragmaStatements + 'PRAGMA synchronous = OFF;';
     1: aPragmaStatements := aPragmaStatements + 'PRAGMA synchronous = NORMAL;';
     2: aPragmaStatements := aPragmaStatements + 'PRAGMA synchronous = FULL;';
+  end;
+  case RadioGroupSQLite3Temp_Store.ItemIndex of
+    0: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = DEFAULT;';
+    1: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = FILE;';
+    2: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = MEMORY;';
   end;
 
   //create the fSqlite3ConnectionPoolClient
@@ -1180,8 +1214,12 @@ begin
   StartTime := ALGetTickCount64;
 
   //init the aPragmaStatements
-  aPragmaStatements := 'PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text + ';';
-  aPragmaStatements := 'PRAGMA page_size = '+ALEditSqlite3Page_Size.Text + ';';
+  aPragmaStatements := '';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA page_size = '+ALEditSqlite3Page_Size.Text+';';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA encoding = "UTF-8";';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA legacy_file_format = 0;';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA auto_vacuum = NONE;';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text+';';
   case RadioGroupSqlite3Journal_Mode.ItemIndex of
     0: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = DELETE;';
     1: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = TRUNCATE;';
@@ -1190,15 +1228,17 @@ begin
     4: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = WAL;';
     5: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = OFF;';
   end;
-  case RadioGroupSQLite3Temp_Store.ItemIndex of
-    0: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = DEFAULT;';
-    1: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = FILE;';
-    2: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = MEMORY;';
-  end;
+  aPragmaStatements := aPragmaStatements + 'PRAGMA locking_mode = NORMAL;';
+  If ALCheckBoxSqlite3ReadUncommited.Checked then aPragmaStatements := aPragmaStatements + 'PRAGMA read_uncommitted = 1;';
   case RadioGroupSqlite3Synhcronous.ItemIndex of
     0: aPragmaStatements := aPragmaStatements + 'PRAGMA synchronous = OFF;';
     1: aPragmaStatements := aPragmaStatements + 'PRAGMA synchronous = NORMAL;';
     2: aPragmaStatements := aPragmaStatements + 'PRAGMA synchronous = FULL;';
+  end;
+  case RadioGroupSQLite3Temp_Store.ItemIndex of
+    0: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = DEFAULT;';
+    1: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = FILE;';
+    2: aPragmaStatements := aPragmaStatements + 'PRAGMA temp_store = MEMORY;';
   end;
 
   //create the fSqlite3ConnectionPoolClient

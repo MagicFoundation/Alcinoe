@@ -1717,7 +1717,7 @@ object Form1: TForm1
       end>
   end
   object ALCheckBoxSqlite3SharedCache: TALCheckBox
-    Left = 1001
+    Left = 856
     Top = 223
     Width = 97
     Height = 19
@@ -2039,6 +2039,21 @@ object Form1: TForm1
     TabOrder = 49
     OnClick = ALButtonMysqlLoopSelectClick
     OnPaint = ALButtonPaint
+  end
+  object ALCheckBoxSqlite3ReadUncommited: TALCheckBox
+    Left = 973
+    Top = 223
+    Width = 124
+    Height = 19
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    Caption = 'read uncommitted'
+    TabOrder = 50
+    OnPaint = ALCheckBoxSqlite3SharedCachePaint
   end
   object OpenDialog1: TOpenDialog
     Left = 536

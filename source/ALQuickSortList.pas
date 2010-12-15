@@ -158,6 +158,7 @@ Type
     property  Items[Index: Integer]: Double read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
   end;
+  
 implementation
 
 uses RTLConsts;

@@ -572,94 +572,42 @@ object Form1: TForm1
     Lines.Strings = (
       '****************************'
       'Exemple step 1 create the database: '
+      '****************************'
+      ''
       'CREATE DATABASE TEST;'
+      ''
       ''
       '****************************'
       'Exemple step 2 create the Table: '
+      '****************************'
+      ''
       'CREATE TABLE HASH('
       '  ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,'
       '  x1_y1 SMALLINT NOT NULL,'
       '  x1_y2 SMALLINT NOT NULL,'
       '  x1_y3 SMALLINT NOT NULL,'
       '  x1_y4 SMALLINT NOT NULL,'
-      '  x1_y5 SMALLINT NOT NULL,'
-      '  x2_y1 SMALLINT NOT NULL,'
-      '  x2_y2 SMALLINT NOT NULL,'
-      '  x2_y3 SMALLINT NOT NULL,'
-      '  x2_y4 SMALLINT NOT NULL,'
-      '  x2_y5 SMALLINT NOT NULL,'
-      '  x3_y1 SMALLINT NOT NULL,'
-      '  x3_y2 SMALLINT NOT NULL,'
-      '  x3_y3 SMALLINT NOT NULL,'
-      '  x3_y4 SMALLINT NOT NULL,'
-      '  x3_y5 SMALLINT NOT NULL,'
-      '  x4_y1 SMALLINT NOT NULL,'
-      '  x4_y2 SMALLINT NOT NULL,'
-      '  x4_y3 SMALLINT NOT NULL,'
-      '  x4_y4 SMALLINT NOT NULL,'
-      '  x4_y5 SMALLINT NOT NULL,'
-      '  x5_y1 SMALLINT NOT NULL,'
-      '  x5_y2 SMALLINT NOT NULL,'
-      '  x5_y3 SMALLINT NOT NULL,'
-      '  x5_y4 SMALLINT NOT NULL,'
-      '  x5_y5 SMALLINT NOT NULL'
+      '  x1_y5 SMALLINT NOT NULL'
       ');'
       'CREATE INDEX HASH_X1_Y1_IDX ON HASH (X1_Y1);'
-      'CREATE INDEX HASH_X2_Y2_IDX ON HASH (X2_Y2);'
-      'CREATE INDEX HASH_X3_Y3_IDX ON HASH (X3_Y3);'
-      'CREATE INDEX HASH_X4_Y4_IDX ON HASH (X4_Y4);'
-      'CREATE INDEX HASH_X5_Y5_IDX ON HASH (X5_Y5);'
+      'CREATE INDEX HASH_X1_Y2_IDX ON HASH (X1_Y2);'
+      'CREATE INDEX HASH_X1_Y3_IDX ON HASH (X1_Y3);'
+      'CREATE INDEX HASH_X1_Y4_IDX ON HASH (X1_Y4);'
+      'CREATE INDEX HASH_X1_Y5_IDX ON HASH (X1_Y5);'
+      ''
       ''
       '****************************'
       'Exemple step 3 add rows in loop:'
+      '****************************'
+      ''
       'INSERT INTO HASH('
       '  x1_y1,'
       '  x1_y2,'
       '  x1_y3,'
       '  x1_y4,'
-      '  x1_y5,'
-      '  x2_y1,'
-      '  x2_y2,'
-      '  x2_y3,'
-      '  x2_y4,'
-      '  x2_y5,'
-      '  x3_y1,'
-      '  x3_y2,'
-      '  x3_y3,'
-      '  x3_y4,'
-      '  x3_y5,'
-      '  x4_y1,'
-      '  x4_y2,'
-      '  x4_y3,'
-      '  x4_y4,'
-      '  x4_y5,'
-      '  x5_y1,'
-      '  x5_y2,'
-      '  x5_y3,'
-      '  x5_y4,'
-      '  x5_y5'
+      '  x1_y5'
       ') '
       'VALUES ('
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
       '  <#randomnumber><#randomnumber><#randomnumber>,'
       '  <#randomnumber><#randomnumber><#randomnumber>,'
       '  <#randomnumber><#randomnumber><#randomnumber>,'
@@ -667,8 +615,11 @@ object Form1: TForm1
       '  <#randomnumber><#randomnumber><#randomnumber>'
       ');'
       ''
+      ''
       '****************************'
       'Exemple step 4 select rows in loop:'
+      '****************************'
+      ''
       'Select '
       '  ID '
       'from '
@@ -697,126 +648,6 @@ object Form1: TForm1
         'nd '
       
         '  x1_y5 <= <#randomnumber13><#randomnumber14><#randomnumber15> +' +
-        ' 20 and '
-      
-        '  x2_y1 >= <#randomnumber16><#randomnumber17><#randomnumber18> a' +
-        'nd '
-      
-        '  x2_y1 <= <#randomnumber16><#randomnumber17><#randomnumber18> +' +
-        ' 20 and '
-      
-        '  x2_y2 >= <#randomnumber19><#randomnumber20><#randomnumber21> a' +
-        'nd '
-      
-        '  x2_y2 <= <#randomnumber19><#randomnumber20><#randomnumber21> +' +
-        ' 20 and '
-      
-        '  x2_y3 >= <#randomnumber22><#randomnumber23><#randomnumber24> a' +
-        'nd '
-      
-        '  x2_y3 <= <#randomnumber22><#randomnumber23><#randomnumber24> +' +
-        ' 20 and '
-      
-        '  x2_y4 >= <#randomnumber25><#randomnumber26><#randomnumber27> a' +
-        'nd '
-      
-        '  x2_y4 <= <#randomnumber25><#randomnumber26><#randomnumber27> +' +
-        ' 20 and '
-      
-        '  x2_y5 >= <#randomnumber28><#randomnumber29><#randomnumber30> a' +
-        'nd '
-      
-        '  x2_y5 <= <#randomnumber28><#randomnumber29><#randomnumber30> +' +
-        ' 20 and '
-      
-        '  x3_y1 >= <#randomnumber31><#randomnumber32><#randomnumber33> a' +
-        'nd '
-      
-        '  x3_y1 <= <#randomnumber31><#randomnumber32><#randomnumber33> +' +
-        ' 20 and '
-      
-        '  x3_y2 >= <#randomnumber34><#randomnumber35><#randomnumber36> a' +
-        'nd '
-      
-        '  x3_y2 <= <#randomnumber34><#randomnumber35><#randomnumber36> +' +
-        ' 20 and '
-      
-        '  x3_y3 >= <#randomnumber37><#randomnumber38><#randomnumber39> a' +
-        'nd '
-      
-        '  x3_y3 <= <#randomnumber37><#randomnumber38><#randomnumber39> +' +
-        ' 20 and '
-      
-        '  x3_y4 >= <#randomnumber40><#randomnumber41><#randomnumber42> a' +
-        'nd '
-      
-        '  x3_y4 <= <#randomnumber40><#randomnumber41><#randomnumber42> +' +
-        ' 20 and '
-      
-        '  x3_y5 >= <#randomnumber43><#randomnumber44><#randomnumber45> a' +
-        'nd '
-      
-        '  x3_y5 <= <#randomnumber43><#randomnumber44><#randomnumber45> +' +
-        ' 20 and '
-      
-        '  x4_y1 >= <#randomnumber46><#randomnumber47><#randomnumber48> a' +
-        'nd '
-      
-        '  x4_y1 <= <#randomnumber46><#randomnumber47><#randomnumber48> +' +
-        ' 20 and '
-      
-        '  x4_y2 >= <#randomnumber49><#randomnumber50><#randomnumber51> a' +
-        'nd '
-      
-        '  x4_y2 <= <#randomnumber49><#randomnumber50><#randomnumber51> +' +
-        ' 20 and '
-      
-        '  x4_y3 >= <#randomnumber52><#randomnumber53><#randomnumber54> a' +
-        'nd '
-      
-        '  x4_y3 <= <#randomnumber52><#randomnumber53><#randomnumber54> +' +
-        ' 20 and '
-      
-        '  x4_y4 >= <#randomnumber55><#randomnumber56><#randomnumber57> a' +
-        'nd '
-      
-        '  x4_y4 <= <#randomnumber55><#randomnumber56><#randomnumber57> +' +
-        ' 20 and '
-      
-        '  x4_y5 >= <#randomnumber58><#randomnumber59><#randomnumber60> a' +
-        'nd '
-      
-        '  x4_y5 <= <#randomnumber58><#randomnumber59><#randomnumber60> +' +
-        ' 20 and '
-      
-        '  x5_y1 >= <#randomnumber61><#randomnumber62><#randomnumber63> a' +
-        'nd '
-      
-        '  x5_y1 <= <#randomnumber61><#randomnumber62><#randomnumber63> +' +
-        ' 20 and '
-      
-        '  x5_y2 >= <#randomnumber64><#randomnumber65><#randomnumber66> a' +
-        'nd '
-      
-        '  x5_y2 <= <#randomnumber64><#randomnumber65><#randomnumber66> +' +
-        ' 20 and '
-      
-        '  x5_y3 >= <#randomnumber67><#randomnumber68><#randomnumber69> a' +
-        'nd '
-      
-        '  x5_y3 <= <#randomnumber67><#randomnumber68><#randomnumber69> +' +
-        ' 20 and '
-      
-        '  x5_y4 >= <#randomnumber70><#randomnumber71><#randomnumber72> a' +
-        'nd '
-      
-        '  x5_y4 <= <#randomnumber70><#randomnumber71><#randomnumber72> +' +
-        ' 20 and '
-      
-        '  x5_y5 >= <#randomnumber73><#randomnumber74><#randomnumber75> a' +
-        'nd'
-      
-        '  x5_y5 <= <#randomnumber73><#randomnumber74><#randomnumber75> +' +
         ' 20;')
     TabOrder = 14
     WordWrap = False
@@ -924,52 +755,40 @@ object Form1: TForm1
     Lines.Strings = (
       '****************************'
       'Exemple step 1 create the database: '
+      '****************************'
+      ''
       'CREATE DATABASE '#39'c:\test.fdb'#39' '
       '              USER '#39'sysdba'#39' '
       '              PASSWORD '#39'masterkey'#39' '
       '              PAGE_SIZE 4096 '
       '              DEFAULT CHARACTER SET ISO8859_1;'
       ''
+      ''
       '****************************'
       'Exemple step 2 create the Table: '
+      '****************************'
+      ''
       'CREATE TABLE HASH('
       '  ID INTEGER NOT NULL,  '
       '  x1_y1 SMALLINT NOT NULL,'
       '  x1_y2 SMALLINT NOT NULL,'
       '  x1_y3 SMALLINT NOT NULL,'
       '  x1_y4 SMALLINT NOT NULL,'
-      '  x1_y5 SMALLINT NOT NULL,'
-      '  x2_y1 SMALLINT NOT NULL,'
-      '  x2_y2 SMALLINT NOT NULL,'
-      '  x2_y3 SMALLINT NOT NULL,'
-      '  x2_y4 SMALLINT NOT NULL,'
-      '  x2_y5 SMALLINT NOT NULL,'
-      '  x3_y1 SMALLINT NOT NULL,'
-      '  x3_y2 SMALLINT NOT NULL,'
-      '  x3_y3 SMALLINT NOT NULL,'
-      '  x3_y4 SMALLINT NOT NULL,'
-      '  x3_y5 SMALLINT NOT NULL,'
-      '  x4_y1 SMALLINT NOT NULL,'
-      '  x4_y2 SMALLINT NOT NULL,'
-      '  x4_y3 SMALLINT NOT NULL,'
-      '  x4_y4 SMALLINT NOT NULL,'
-      '  x4_y5 SMALLINT NOT NULL,'
-      '  x5_y1 SMALLINT NOT NULL,'
-      '  x5_y2 SMALLINT NOT NULL,'
-      '  x5_y3 SMALLINT NOT NULL,'
-      '  x5_y4 SMALLINT NOT NULL,'
-      '  x5_y5 SMALLINT NOT NULL,'
+      '  x1_y5 SMALLINT NOT NULL'
       ' PRIMARY KEY (ID)  '
       ');'
       'CREATE INDEX HASH_X1_Y1_IDX ON HASH (X1_Y1);'
-      'CREATE INDEX HASH_X2_Y2_IDX ON HASH (X2_Y2);'
-      'CREATE INDEX HASH_X3_Y3_IDX ON HASH (X3_Y3);'
-      'CREATE INDEX HASH_X4_Y4_IDX ON HASH (X4_Y4);'
-      'CREATE INDEX HASH_X5_Y5_IDX ON HASH (X5_Y5);'
+      'CREATE INDEX HASH_X1_Y2_IDX ON HASH (X1_Y2);'
+      'CREATE INDEX HASH_X1_Y3_IDX ON HASH (X1_Y3);'
+      'CREATE INDEX HASH_X1_Y4_IDX ON HASH (X1_Y4);'
+      'CREATE INDEX HASH_X1_Y5_IDX ON HASH (X1_Y5);'
       'CREATE GENERATOR HASH_GEN;'
+      ''
       ''
       '****************************'
       'Exemple step 3 create the trigger: '
+      '****************************'
+      ''
       'CREATE OR ALTER TRIGGER OnBeforeInsertHash FOR HASH'
       'BEFORE INSERT POSITION 0'
       'AS BEGIN'
@@ -978,56 +797,19 @@ object Form1: TForm1
       ''
       'END;'
       ''
+      ''
       '****************************'
       'Exemple step 4 add rows in loop:'
+      '****************************'
+      ''
       'INSERT INTO HASH('
       '  x1_y1,'
       '  x1_y2,'
       '  x1_y3,'
       '  x1_y4,'
-      '  x1_y5,'
-      '  x2_y1,'
-      '  x2_y2,'
-      '  x2_y3,'
-      '  x2_y4,'
-      '  x2_y5,'
-      '  x3_y1,'
-      '  x3_y2,'
-      '  x3_y3,'
-      '  x3_y4,'
-      '  x3_y5,'
-      '  x4_y1,'
-      '  x4_y2,'
-      '  x4_y3,'
-      '  x4_y4,'
-      '  x4_y5,'
-      '  x5_y1,'
-      '  x5_y2,'
-      '  x5_y3,'
-      '  x5_y4,'
-      '  x5_y5'
+      '  x1_y5'
       ') '
       'VALUES ('
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
       '  <#randomnumber><#randomnumber><#randomnumber>,'
       '  <#randomnumber><#randomnumber><#randomnumber>,'
       '  <#randomnumber><#randomnumber><#randomnumber>,'
@@ -1035,8 +817,11 @@ object Form1: TForm1
       '  <#randomnumber><#randomnumber><#randomnumber>'
       ');'
       ''
+      ''
       '****************************'
       'Exemple step 5 select rows in loop:'
+      '****************************'
+      ''
       'Select '
       '  ID '
       'from '
@@ -1065,126 +850,6 @@ object Form1: TForm1
         'nd '
       
         '  x1_y5 <= <#randomnumber13><#randomnumber14><#randomnumber15> +' +
-        ' 20 and '
-      
-        '  x2_y1 >= <#randomnumber16><#randomnumber17><#randomnumber18> a' +
-        'nd '
-      
-        '  x2_y1 <= <#randomnumber16><#randomnumber17><#randomnumber18> +' +
-        ' 20 and '
-      
-        '  x2_y2 >= <#randomnumber19><#randomnumber20><#randomnumber21> a' +
-        'nd '
-      
-        '  x2_y2 <= <#randomnumber19><#randomnumber20><#randomnumber21> +' +
-        ' 20 and '
-      
-        '  x2_y3 >= <#randomnumber22><#randomnumber23><#randomnumber24> a' +
-        'nd '
-      
-        '  x2_y3 <= <#randomnumber22><#randomnumber23><#randomnumber24> +' +
-        ' 20 and '
-      
-        '  x2_y4 >= <#randomnumber25><#randomnumber26><#randomnumber27> a' +
-        'nd '
-      
-        '  x2_y4 <= <#randomnumber25><#randomnumber26><#randomnumber27> +' +
-        ' 20 and '
-      
-        '  x2_y5 >= <#randomnumber28><#randomnumber29><#randomnumber30> a' +
-        'nd '
-      
-        '  x2_y5 <= <#randomnumber28><#randomnumber29><#randomnumber30> +' +
-        ' 20 and '
-      
-        '  x3_y1 >= <#randomnumber31><#randomnumber32><#randomnumber33> a' +
-        'nd '
-      
-        '  x3_y1 <= <#randomnumber31><#randomnumber32><#randomnumber33> +' +
-        ' 20 and '
-      
-        '  x3_y2 >= <#randomnumber34><#randomnumber35><#randomnumber36> a' +
-        'nd '
-      
-        '  x3_y2 <= <#randomnumber34><#randomnumber35><#randomnumber36> +' +
-        ' 20 and '
-      
-        '  x3_y3 >= <#randomnumber37><#randomnumber38><#randomnumber39> a' +
-        'nd '
-      
-        '  x3_y3 <= <#randomnumber37><#randomnumber38><#randomnumber39> +' +
-        ' 20 and '
-      
-        '  x3_y4 >= <#randomnumber40><#randomnumber41><#randomnumber42> a' +
-        'nd '
-      
-        '  x3_y4 <= <#randomnumber40><#randomnumber41><#randomnumber42> +' +
-        ' 20 and '
-      
-        '  x3_y5 >= <#randomnumber43><#randomnumber44><#randomnumber45> a' +
-        'nd '
-      
-        '  x3_y5 <= <#randomnumber43><#randomnumber44><#randomnumber45> +' +
-        ' 20 and '
-      
-        '  x4_y1 >= <#randomnumber46><#randomnumber47><#randomnumber48> a' +
-        'nd '
-      
-        '  x4_y1 <= <#randomnumber46><#randomnumber47><#randomnumber48> +' +
-        ' 20 and '
-      
-        '  x4_y2 >= <#randomnumber49><#randomnumber50><#randomnumber51> a' +
-        'nd '
-      
-        '  x4_y2 <= <#randomnumber49><#randomnumber50><#randomnumber51> +' +
-        ' 20 and '
-      
-        '  x4_y3 >= <#randomnumber52><#randomnumber53><#randomnumber54> a' +
-        'nd '
-      
-        '  x4_y3 <= <#randomnumber52><#randomnumber53><#randomnumber54> +' +
-        ' 20 and '
-      
-        '  x4_y4 >= <#randomnumber55><#randomnumber56><#randomnumber57> a' +
-        'nd '
-      
-        '  x4_y4 <= <#randomnumber55><#randomnumber56><#randomnumber57> +' +
-        ' 20 and '
-      
-        '  x4_y5 >= <#randomnumber58><#randomnumber59><#randomnumber60> a' +
-        'nd '
-      
-        '  x4_y5 <= <#randomnumber58><#randomnumber59><#randomnumber60> +' +
-        ' 20 and '
-      
-        '  x5_y1 >= <#randomnumber61><#randomnumber62><#randomnumber63> a' +
-        'nd '
-      
-        '  x5_y1 <= <#randomnumber61><#randomnumber62><#randomnumber63> +' +
-        ' 20 and '
-      
-        '  x5_y2 >= <#randomnumber64><#randomnumber65><#randomnumber66> a' +
-        'nd '
-      
-        '  x5_y2 <= <#randomnumber64><#randomnumber65><#randomnumber66> +' +
-        ' 20 and '
-      
-        '  x5_y3 >= <#randomnumber67><#randomnumber68><#randomnumber69> a' +
-        'nd '
-      
-        '  x5_y3 <= <#randomnumber67><#randomnumber68><#randomnumber69> +' +
-        ' 20 and '
-      
-        '  x5_y4 >= <#randomnumber70><#randomnumber71><#randomnumber72> a' +
-        'nd '
-      
-        '  x5_y4 <= <#randomnumber70><#randomnumber71><#randomnumber72> +' +
-        ' 20 and '
-      
-        '  x5_y5 >= <#randomnumber73><#randomnumber74><#randomnumber75> a' +
-        'nd'
-      
-        '  x5_y5 <= <#randomnumber73><#randomnumber74><#randomnumber75> +' +
         ' 20;')
     TabOrder = 5
     WordWrap = False
@@ -1266,255 +931,92 @@ object Form1: TForm1
     OnPaintScrollBar = ALMemoPaintScrollBar
     Lines.Strings = (
       '****************************'
-      'Exemple step 1 create the database: '
-      
-        'The database will be created automatiquelly on the First Create ' +
-        'Table Statement'
+      'Exemple step 1 create the database:'
+      '****************************'
+      ''
+      'The database will be created automatiquelly '
+      'on the First Create Table Statement '
+      ''
       ''
       '****************************'
       'Exemple step 2 create the Table: '
-      'CREATE TABLE HASH('
+      '****************************'
+      ''
+      'CREATE VIRTUAL TABLE HASH USING rtree('
       '  ID INTEGER PRIMARY KEY ASC,'
-      '  x1_y1 INTEGER,'
-      '  x1_y2 INTEGER,'
-      '  x1_y3 INTEGER,'
-      '  x1_y4 INTEGER,'
-      '  x1_y5 INTEGER,'
-      '  x2_y1 INTEGER,'
-      '  x2_y2 INTEGER,'
-      '  x2_y3 INTEGER,'
-      '  x2_y4 INTEGER,'
-      '  x2_y5 INTEGER,'
-      '  x3_y1 INTEGER,'
-      '  x3_y2 INTEGER,'
-      '  x3_y3 INTEGER,'
-      '  x3_y4 INTEGER,'
-      '  x3_y5 INTEGER,'
-      '  x4_y1 INTEGER,'
-      '  x4_y2 INTEGER,'
-      '  x4_y3 INTEGER,'
-      '  x4_y4 INTEGER,'
-      '  x4_y5 INTEGER,'
-      '  x5_y1 INTEGER,'
-      '  x5_y2 INTEGER,'
-      '  x5_y3 INTEGER,'
-      '  x5_y4 INTEGER,'
-      '  x5_y5 INTEGER'
+      '  x1_y1_min UNSIGNED SMALLINT, x1_y1_max UNSIGNED SMALLINT,'
+      '  x1_y2_min UNSIGNED SMALLINT, x1_y2_max UNSIGNED SMALLINT,'
+      '  x1_y3_min UNSIGNED SMALLINT, x1_y3_max UNSIGNED SMALLINT,'
+      '  x1_y4_min UNSIGNED SMALLINT, x1_y4_max UNSIGNED SMALLINT,'
+      '  x1_y5_min UNSIGNED SMALLINT, x1_y5_max UNSIGNED SMALLINT'
       ');'
-      'CREATE INDEX HASH_X1_Y1_IDX ON HASH (X1_Y1);'
-      'CREATE INDEX HASH_X2_Y2_IDX ON HASH (X2_Y2);'
-      'CREATE INDEX HASH_X3_Y3_IDX ON HASH (X3_Y3);'
-      'CREATE INDEX HASH_X4_Y4_IDX ON HASH (X4_Y4);'
-      'CREATE INDEX HASH_X5_Y5_IDX ON HASH (X5_Y5);'
+      ''
       ''
       '****************************'
       'Exemple step 3 add rows in loop:'
+      '****************************'
+      ''
       'INSERT INTO HASH('
       '  ID,'
-      '  x1_y1,'
-      '  x1_y2,'
-      '  x1_y3,'
-      '  x1_y4,'
-      '  x1_y5,'
-      '  x2_y1,'
-      '  x2_y2,'
-      '  x2_y3,'
-      '  x2_y4,'
-      '  x2_y5,'
-      '  x3_y1,'
-      '  x3_y2,'
-      '  x3_y3,'
-      '  x3_y4,'
-      '  x3_y5,'
-      '  x4_y1,'
-      '  x4_y2,'
-      '  x4_y3,'
-      '  x4_y4,'
-      '  x4_y5,'
-      '  x5_y1,'
-      '  x5_y2,'
-      '  x5_y3,'
-      '  x5_y4,'
-      '  x5_y5) '
+      '  x1_y1_min, x1_y1_max,'
+      '  x1_y2_min, x1_y2_max,'
+      '  x1_y3_min, x1_y3_max,'
+      '  x1_y4_min, x1_y4_max,'
+      '  x1_y5_min, x1_y5_max) '
       'VALUES ('
       '  null,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>,'
-      '  <#randomnumber><#randomnumber><#randomnumber>);'
+      '  <#randomnumber1><#randomnumber2><#randomnumber3>,'
+      '  <#randomnumber1><#randomnumber2><#randomnumber3> +20,'
+      '  <#randomnumber4><#randomnumber5><#randomnumber6>,'
+      '  <#randomnumber4><#randomnumber5><#randomnumber6> +20,'
+      '  <#randomnumber7><#randomnumber8><#randomnumber9>,'
+      '  <#randomnumber7><#randomnumber8><#randomnumber9> +20,'
+      '  <#randomnumber10><#randomnumber11><#randomnumber12>,'
+      '  <#randomnumber10><#randomnumber11><#randomnumber12> +20,'
+      '  <#randomnumber13><#randomnumber14><#randomnumber15>,'
+      '  <#randomnumber13><#randomnumber14><#randomnumber15> +20'
+      ');'
+      ''
       ''
       '****************************'
       'Exemple step 4 select rows in loop:'
+      '****************************'
+      ''
       'Select '
-      '  ID '
+      '  H1.ID '
       'from '
-      '  HASH '
+      '  HASH'
       'where '
-      '  x1_y1 >= <#randomnumber1><#randomnumber2><#randomnumber3> and '
       
-        '  x1_y1 <= <#randomnumber1><#randomnumber2><#randomnumber3> + 20' +
-        ' and '
-      '  x1_y2 >= <#randomnumber4><#randomnumber5><#randomnumber6> and '
+        '  x1_y1_min >= <#randomnumber1><#randomnumber2><#randomnumber3> ' +
+        'and '
       
-        '  x1_y2 <= <#randomnumber4><#randomnumber5><#randomnumber6> + 20' +
-        ' and '
-      '  x1_y3 >= <#randomnumber7><#randomnumber8><#randomnumber9> and '
+        '  x1_y1_max <= <#randomnumber1><#randomnumber2><#randomnumber3> ' +
+        'and '
       
-        '  x1_y3 <= <#randomnumber7><#randomnumber8><#randomnumber9> + 20' +
-        ' and '
+        '  x1_y2_min >= <#randomnumber4><#randomnumber5><#randomnumber6> ' +
+        'and '
       
-        '  x1_y4 >= <#randomnumber10><#randomnumber11><#randomnumber12> a' +
-        'nd '
+        '  x1_y2_max <= <#randomnumber4><#randomnumber5><#randomnumber6> ' +
+        'and '
       
-        '  x1_y4 <= <#randomnumber10><#randomnumber11><#randomnumber12> +' +
-        ' 20 and '
+        '  x1_y3_min >= <#randomnumber7><#randomnumber8><#randomnumber9> ' +
+        'and '
       
-        '  x1_y5 >= <#randomnumber13><#randomnumber14><#randomnumber15> a' +
-        'nd '
+        '  x1_y3_max <= <#randomnumber7><#randomnumber8><#randomnumber9> ' +
+        'and '
       
-        '  x1_y5 <= <#randomnumber13><#randomnumber14><#randomnumber15> +' +
-        ' 20 and '
+        '  x1_y4_min >= <#randomnumber10><#randomnumber11><#randomnumber1' +
+        '2> and '
       
-        '  x2_y1 >= <#randomnumber16><#randomnumber17><#randomnumber18> a' +
-        'nd '
+        '  x1_y4_max <= <#randomnumber10><#randomnumber11><#randomnumber1' +
+        '2> and '
       
-        '  x2_y1 <= <#randomnumber16><#randomnumber17><#randomnumber18> +' +
-        ' 20 and '
+        '  x1_y5_min >= <#randomnumber13><#randomnumber14><#randomnumber1' +
+        '5> and '
       
-        '  x2_y2 >= <#randomnumber19><#randomnumber20><#randomnumber21> a' +
-        'nd '
-      
-        '  x2_y2 <= <#randomnumber19><#randomnumber20><#randomnumber21> +' +
-        ' 20 and '
-      
-        '  x2_y3 >= <#randomnumber22><#randomnumber23><#randomnumber24> a' +
-        'nd '
-      
-        '  x2_y3 <= <#randomnumber22><#randomnumber23><#randomnumber24> +' +
-        ' 20 and '
-      
-        '  x2_y4 >= <#randomnumber25><#randomnumber26><#randomnumber27> a' +
-        'nd '
-      
-        '  x2_y4 <= <#randomnumber25><#randomnumber26><#randomnumber27> +' +
-        ' 20 and '
-      
-        '  x2_y5 >= <#randomnumber28><#randomnumber29><#randomnumber30> a' +
-        'nd '
-      
-        '  x2_y5 <= <#randomnumber28><#randomnumber29><#randomnumber30> +' +
-        ' 20 and '
-      
-        '  x3_y1 >= <#randomnumber31><#randomnumber32><#randomnumber33> a' +
-        'nd '
-      
-        '  x3_y1 <= <#randomnumber31><#randomnumber32><#randomnumber33> +' +
-        ' 20 and '
-      
-        '  x3_y2 >= <#randomnumber34><#randomnumber35><#randomnumber36> a' +
-        'nd '
-      
-        '  x3_y2 <= <#randomnumber34><#randomnumber35><#randomnumber36> +' +
-        ' 20 and '
-      
-        '  x3_y3 >= <#randomnumber37><#randomnumber38><#randomnumber39> a' +
-        'nd '
-      
-        '  x3_y3 <= <#randomnumber37><#randomnumber38><#randomnumber39> +' +
-        ' 20 and '
-      
-        '  x3_y4 >= <#randomnumber40><#randomnumber41><#randomnumber42> a' +
-        'nd '
-      
-        '  x3_y4 <= <#randomnumber40><#randomnumber41><#randomnumber42> +' +
-        ' 20 and '
-      
-        '  x3_y5 >= <#randomnumber43><#randomnumber44><#randomnumber45> a' +
-        'nd '
-      
-        '  x3_y5 <= <#randomnumber43><#randomnumber44><#randomnumber45> +' +
-        ' 20 and '
-      
-        '  x4_y1 >= <#randomnumber46><#randomnumber47><#randomnumber48> a' +
-        'nd '
-      
-        '  x4_y1 <= <#randomnumber46><#randomnumber47><#randomnumber48> +' +
-        ' 20 and '
-      
-        '  x4_y2 >= <#randomnumber49><#randomnumber50><#randomnumber51> a' +
-        'nd '
-      
-        '  x4_y2 <= <#randomnumber49><#randomnumber50><#randomnumber51> +' +
-        ' 20 and '
-      
-        '  x4_y3 >= <#randomnumber52><#randomnumber53><#randomnumber54> a' +
-        'nd '
-      
-        '  x4_y3 <= <#randomnumber52><#randomnumber53><#randomnumber54> +' +
-        ' 20 and '
-      
-        '  x4_y4 >= <#randomnumber55><#randomnumber56><#randomnumber57> a' +
-        'nd '
-      
-        '  x4_y4 <= <#randomnumber55><#randomnumber56><#randomnumber57> +' +
-        ' 20 and '
-      
-        '  x4_y5 >= <#randomnumber58><#randomnumber59><#randomnumber60> a' +
-        'nd '
-      
-        '  x4_y5 <= <#randomnumber58><#randomnumber59><#randomnumber60> +' +
-        ' 20 and '
-      
-        '  x5_y1 >= <#randomnumber61><#randomnumber62><#randomnumber63> a' +
-        'nd '
-      
-        '  x5_y1 <= <#randomnumber61><#randomnumber62><#randomnumber63> +' +
-        ' 20 and '
-      
-        '  x5_y2 >= <#randomnumber64><#randomnumber65><#randomnumber66> a' +
-        'nd '
-      
-        '  x5_y2 <= <#randomnumber64><#randomnumber65><#randomnumber66> +' +
-        ' 20 and '
-      
-        '  x5_y3 >= <#randomnumber67><#randomnumber68><#randomnumber69> a' +
-        'nd '
-      
-        '  x5_y3 <= <#randomnumber67><#randomnumber68><#randomnumber69> +' +
-        ' 20 and '
-      
-        '  x5_y4 >= <#randomnumber70><#randomnumber71><#randomnumber72> a' +
-        'nd '
-      
-        '  x5_y4 <= <#randomnumber70><#randomnumber71><#randomnumber72> +' +
-        ' 20 and '
-      
-        '  x5_y5 >= <#randomnumber73><#randomnumber74><#randomnumber75> a' +
-        'nd'
-      
-        '  x5_y5 <= <#randomnumber73><#randomnumber74><#randomnumber75> +' +
-        ' 20;')
+        '  x1_y5_max <= <#randomnumber13><#randomnumber14><#randomnumber1' +
+        '5>;')
     TabOrder = 20
     WordWrap = False
     DesignSize = (

@@ -814,7 +814,7 @@ begin
   aBackBColor := GetBvalue(aSrcBmp.Canvas.Pixels[0,0]);
 
   //init a cropRect
-  aCropRect := Rect(MaxInt,MaxInt,0,0);
+  aCropRect := Rect(0,0,0,0);
 
   //Find Top
   aCropRect.top := 0;
@@ -894,35 +894,49 @@ begin
     aCropRect.right := Max(aCropRect.right,aIsBlack);
   end;
 
-
   //crop the img if necessary
   if (aCropRect.Top > 0) or
      (aCropRect.left > 0) or
      (aCropRect.bottom < aSrcBmp.Height) or
      (aCropRect.right < aSrcBmp.width) then begin
 
-    aTmpBmp := Tbitmap.Create;
-    Try
-      aTmpbmp.PixelFormat := Pf24Bit;
-      aTmpbmp.Width := aCropRect.right - aCropRect.left;
-      aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
-      BitBlt(
-             aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
-             0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
-             0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
-             aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
-             aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
-             asrcBmp.canvas.Handle,   //[in] Handle to the source device context
-             aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
-             aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
-             SRCCOPY                  //[in] Specifies a raster-operation code
-            );
-      aSrcbmp.Free;
-    Except
-      aTmpBmp.free;
-      raise;
-    End;
-    aSrcBmp := aTmpBmp;
+    //if the picture was blanc
+    if (aCropRect.Bottom < aCropRect.top) or
+       (aCropRect.right < aCropRect.left) then begin
+
+      aSrcBmp.Width := 0;
+      aSrcBmp.height := 0;
+
+    end
+
+    //else do a copy
+    else begin
+
+      //use BitBlt to do the copy
+      aTmpBmp := Tbitmap.Create;
+      Try
+        aTmpbmp.PixelFormat := Pf24Bit;
+        aTmpbmp.Width := aCropRect.right - aCropRect.left;
+        aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
+        If Not BitBlt(
+                      aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
+                      0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                      0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                      aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
+                      aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
+                      asrcBmp.canvas.Handle,   //[in] Handle to the source device context
+                      aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                      aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                      SRCCOPY                  //[in] Specifies a raster-operation code
+                     ) then raiseLastOsError;
+        aSrcbmp.Free;
+      Except
+        aTmpBmp.free;
+        raise;
+      End;
+      aSrcBmp := aTmpBmp;
+
+    end;
 
   end;
 
@@ -955,17 +969,17 @@ begin
       aTmpbmp.PixelFormat := Pf24Bit;
       aTmpbmp.Width := aCropRect.right - aCropRect.left;
       aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
-      BitBlt(
-             aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
-             0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
-             0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
-             aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
-             aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
-             asrcBmp.canvas.Handle,   //[in] Handle to the source device context
-             aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
-             aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
-             SRCCOPY                  //[in] Specifies a raster-operation code
-            );
+      If not BitBlt(
+                    aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
+                    0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                    0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                    aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
+                    aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
+                    asrcBmp.canvas.Handle,   //[in] Handle to the source device context
+                    aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                    aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                    SRCCOPY                  //[in] Specifies a raster-operation code
+                   ) then RaiseLastOSError;
       aSrcbmp.Free;
     Except
       aTmpBmp.free;

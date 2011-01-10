@@ -381,7 +381,10 @@ Begin
       SQL_D_FLOAT   : Result := Floattostr(aSQLDA.AsSingle[aIndex], aFormatSettings);
       SQL_INT64,
       SQL_LONG,
-      SQL_SHORT     : Result := FloatToStr(aSQLDA.asDouble[Aindex],aFormatSettings);
+      SQL_SHORT     : begin
+                        if aSQLDA.SQLScale[aIndex] < 0 then Result := FloatToStr(aSQLDA.asDouble[Aindex],aFormatSettings)
+                        else result := aSQLDA.AsString[Aindex];
+                      end;
       SQL_BLOB      : InternalReadBlob;
       else Result := aSQLDA.AsString[Aindex];
     end
@@ -1149,8 +1152,8 @@ Begin
       SQL_INT64,
       SQL_LONG,
       SQL_SHORT     : begin
-                        if aSQLDA.Data.sqlvar[aIndex].SqlScale = 0 then Result := aSQLDA.AsString[Aindex] //integer field
-                        else Result := FloatToStr(aSQLDA.asDouble[Aindex],aFormatSettings); //numeric field
+                        if aSQLDA.SQLScale[aIndex] < 0 then Result := FloatToStr(aSQLDA.asDouble[Aindex],aFormatSettings)
+                        else result := aSQLDA.AsString[Aindex];
                       end;
       SQL_BLOB      : InternalReadBlob;
       else Result := aSQLDA.AsString[Aindex];

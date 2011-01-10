@@ -1369,11 +1369,12 @@ Var aconnectionHandle: PSQLite3;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
     aLstSql: Tstrings;
+    aTmpLstSql: Tstrings;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
     S1: String;
-    i: integer;
+    i,j: integer;
 begin
 
   //init the aFormatSettings
@@ -1396,23 +1397,32 @@ begin
         aLstSql.clear;
         setlength(aSelectDataSQLs,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          S1 := fSQL;
-          while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-          while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-          for i := 1 to maxint do begin
-            if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-            else break;
-          end;
-          aLstSql.Add(S1);
-          setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
-          inc(aLoopIndex);
-          inc(FTotalUpdate);
-          if aLoopIndex > fMaxLoop then break;
+          aTmpLstSql := TStringList.Create;
+          Try
+            S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
+            aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            for J := 0 to aTmpLstSql.Count - 1 do begin
+              S1 := aTmpLstSql[j];
+              while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+              while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
+              for i := 1 to maxint do begin
+                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
+                else break;
+              end;
+              aLstSql.Add(S1);
+              setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
+            end;
+            inc(aLoopIndex);
+            inc(FTotalUpdate);
+            if aLoopIndex > fMaxLoop then break;
+          Finally
+            aTmpLstSql.Free;
+          End;
         end;
 
         //start the Transaction
@@ -1548,11 +1558,12 @@ Var aDBHandle: IscDbHandle;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
     aLstSql: Tstrings;
+    aTmpLstSql: Tstrings;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalFBXClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
     S1: String;
-    i: integer;
+    i, j: integer;
 begin
 
   //init the aFormatSettings
@@ -1575,23 +1586,32 @@ begin
         aLstSql.clear;
         setlength(aSelectDataSQLs,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          S1 := fSQL;
-          while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-          while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-          for i := 1 to maxint do begin
-            if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-            else break;
-          end;
-          aLstSql.Add(S1);
-          setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
-          inc(aLoopIndex);
-          inc(FTotalUpdate);
-          if aLoopIndex > fMaxLoop then break;
+          aTmpLstSql := TStringList.Create;
+          Try
+            S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
+            aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            for J := 0 to aTmpLstSql.Count - 1 do begin
+              S1 := aTmpLstSql[j];
+              while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+              while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
+              for i := 1 to maxint do begin
+                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
+                else break;
+              end;
+              aLstSql.Add(S1);
+              setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
+            end;
+            inc(aLoopIndex);
+            inc(FTotalUpdate);
+            if aLoopIndex > fMaxLoop then break;
+          Finally
+            aTmpLstSql.Free;
+          End;
         end;
 
         //start the Transaction
@@ -1725,12 +1745,13 @@ Var aConnectionHandle: PMySql;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
     aLstSql: Tstrings;
+    aTmpLstSql: Tstrings;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
     aLastUpdateGUI: Int64;
     S1: String;
-    i: integer;
+    i, j: integer;
 begin
 
   //init the aFormatSettings
@@ -1756,23 +1777,32 @@ begin
         aLstSql.clear;
         setlength(aSelectDataSQLs,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          S1 := fSQL;
-          while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-          while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-          for i := 1 to maxint do begin
-            if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-            else break;
-          end;
-          aLstSql.Add(S1);
-          setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-          aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
-          inc(aLoopIndex);
-          inc(FTotalUpdate);
-          if aLoopIndex > fMaxLoop then break;
+          aTmpLstSql := TStringList.Create;
+          Try
+            S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
+            aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            for J := 0 to aTmpLstSql.Count - 1 do begin
+              S1 := aTmpLstSql[j];
+              while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+              while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
+              for i := 1 to maxint do begin
+                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
+                else break;
+              end;
+              aLstSql.Add(S1);
+              setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
+              aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
+            end;
+            inc(aLoopIndex);
+            inc(FTotalUpdate);
+            if aLoopIndex > fMaxLoop then break;
+          Finally
+            aTmpLstSql.Free;
+          End;
         end;
 
         //start the Transaction

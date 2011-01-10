@@ -296,7 +296,7 @@ begin
     SQLITE_FLOAT: Result := Floattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
     SQLITE_INTEGER,
     SQLITE3_TEXT: result :=  String(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text(), even empty strings, are always zero terminated
-                                                                                             // Note: what's happen if #0 is inside the string ?
+                                                                                         // Note: what's happen if #0 is inside the string ?
     SQLITE_NULL: result := fNullString;
     else raise Exception.Create('Unsupported column type');
   end;

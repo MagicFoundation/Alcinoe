@@ -151,6 +151,8 @@ Type
     property  SqlDialect: word read FSqlDialect;
     Property  InTransaction: Boolean read GetInTransaction;
     Property  NullString: String Read fNullString Write fNullString;
+    property  Lib: TALFBXLibrary read FLibrary;
+    property  CharSet: TALFBXCharacterSet read fCharSet;
   end;
 
   {--------------------------------------------}
@@ -271,6 +273,8 @@ Type
     property  DataBaseName: String read FDataBaseName;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
+    property  Lib: TALFBXLibrary read FLibrary;
+    property  CharSet: TALFBXCharacterSet read fCharSet;
   end;
 
   {--------------------------------}
@@ -326,6 +330,7 @@ Type
     Destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure Execute; override;
+    property  Signal: Thandle read FSignal;
   end;
 
 
@@ -1141,7 +1146,7 @@ function TALFBXConnectionPoolClient.GetFieldValue(aSQLDA: TALFBXSQLResult;
   end;
 
 Begin
-  If not aSQLDA.IsNull[aIndex] then
+  If not aSQLDA.IsNull[aIndex] then begin
     Case aSQLDA.SQLType[aIndex] of
       SQL_TIMESTAMP : Result := datetimetostr(aSQLDA.AsDateTime[aIndex], aFormatSettings);
       SQL_TYPE_TIME : Result := Timetostr(aSQLDA.AsTime[aIndex], aFormatSettings);
@@ -1157,8 +1162,9 @@ Begin
                       end;
       SQL_BLOB      : InternalReadBlob;
       else Result := aSQLDA.AsString[Aindex];
-    end
-    else result := fNullString;
+    end;
+  end
+  else result := fNullString;
 end;
 
 {*********************************************************}

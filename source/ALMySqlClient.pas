@@ -153,6 +153,7 @@ Type
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
     Property  NullString: String Read fNullString Write fNullString;
+    property  Lib: TALMySqlLibrary read FLibrary;
   end;
 
   {------------------------------------------------}
@@ -257,6 +258,7 @@ Type
     property  DataBaseName: String read FDataBaseName;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
+    property  Lib: TALMySqlLibrary read FLibrary;    
   end;
 
 Function AlMySqlClientSlashedStr(Const Str: String): String;

@@ -774,7 +774,7 @@ object Form1: TForm1
       '  x1_y2 SMALLINT NOT NULL,'
       '  x1_y3 SMALLINT NOT NULL,'
       '  x1_y4 SMALLINT NOT NULL,'
-      '  x1_y5 SMALLINT NOT NULL'
+      '  x1_y5 SMALLINT NOT NULL,'
       ' PRIMARY KEY (ID)  '
       ');'
       'CREATE INDEX HASH_X1_Y1_IDX ON HASH (X1_Y1);'
@@ -787,6 +787,10 @@ object Form1: TForm1
       ''
       '****************************'
       'Exemple step 3 create the trigger: '
+      'Note: we must create the trigger alone'
+      'because their is the char ; inside the'
+      'trigger and the set term is not yet '
+      'implemented.'
       '****************************'
       ''
       'CREATE OR ALTER TRIGGER OnBeforeInsertHash FOR HASH'
@@ -930,7 +934,7 @@ object Form1: TForm1
     OnPaint = ALMemoPaint
     OnPaintScrollBar = ALMemoPaintScrollBar
     Lines.Strings = (
-      '****************************'
+      '**************************** '
       'Exemple step 1 create the database:'
       '****************************'
       ''
@@ -980,12 +984,17 @@ object Form1: TForm1
       ''
       '****************************'
       'Exemple step 4 select rows in loop:'
+      'Note: take in account that when the '
+      'File system start put in cache the '
+      'database file, the speed can change'
+      'a lot... Do some select in loop for '
+      '10-20 min to see the difference'
       '****************************'
       ''
       'Select '
       '  H1.ID '
       'from '
-      '  HASH'
+      '  HASH H1'
       'where '
       
         '  x1_y1_min >= <#randomnumber1><#randomnumber2><#randomnumber3> ' +
@@ -1184,7 +1193,7 @@ object Form1: TForm1
     btnFont.Style = []
     OnPaint = ALEditPaint
     TabOrder = 32
-    Text = '1000'
+    Text = '1'
   end
   object ALEditSqlite3NBThread: TALEdit
     Left = 873
@@ -1402,7 +1411,7 @@ object Form1: TForm1
     btnFont.Style = []
     OnPaint = ALEditPaint
     TabOrder = 39
-    Text = '1000'
+    Text = '1'
   end
   object ALEditFirebirdNBThread: TALEdit
     Left = 121
@@ -1494,7 +1503,7 @@ object Form1: TForm1
     btnFont.Style = []
     OnPaint = ALEditPaint
     TabOrder = 45
-    Text = '1000'
+    Text = '1'
   end
   object ALEditMySqlNBThread: TALEdit
     Left = 497

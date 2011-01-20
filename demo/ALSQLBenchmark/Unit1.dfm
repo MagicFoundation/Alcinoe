@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 798
+  ClientHeight = 878
   ClientWidth = 1105
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
@@ -662,7 +662,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Execute SELECT via MySql'
     TabOrder = 15
-    OnClick = ALButtonMySqlClick
+    OnClick = ALButtonMySqlSelectClick
     OnPaint = ALButtonPaint
   end
   object ALEditMySqlDatabaseName: TALEdit
@@ -1213,7 +1213,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 779
+    Top = 859
     Width = 1105
     Height = 19
     Panels = <
@@ -1222,10 +1222,8 @@ object Form1: TForm1
       end
       item
         Width = 700
-      end
-      item
-        Width = 50
       end>
+    ExplicitTop = 779
   end
   object ALCheckBoxSqlite3SharedCache: TALCheckBox
     Left = 856
@@ -1242,119 +1240,9 @@ object Form1: TForm1
     TabOrder = 35
     OnPaint = ALCheckBoxSqlite3SharedCachePaint
   end
-  object Panel2: TPanel
-    Left = 0
-    Top = 494
-    Width = 1105
-    Height = 257
-    Align = alBottom
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = 'Panel2'
-    TabOrder = 36
-    object Splitter1: TSplitter
-      Left = 668
-      Top = 1
-      Height = 255
-      ExplicitLeft = 671
-      ExplicitTop = -4
-    end
-    object ALMemoResult: TALMemo
-      Left = 671
-      Top = 1
-      Width = 433
-      Height = 255
-      OnPaint = ALMemoPaint
-      OnPaintScrollBar = ALMemoPaintScrollBar
-      Align = alClient
-      TabOrder = 0
-      DesignSize = (
-        433
-        255)
-    end
-    object GridThread: TcxGrid
-      Left = 1
-      Top = 1
-      Width = 667
-      Height = 255
-      Align = alLeft
-      Font.Charset = ANSI_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'Arial'
-      Font.Style = []
-      ParentFont = False
-      TabOrder = 1
-      object TableViewThread: TcxGridTableView
-        NavigatorButtons.ConfirmDelete = False
-        NavigatorButtons.First.Visible = False
-        NavigatorButtons.PriorPage.Visible = False
-        NavigatorButtons.Prior.Visible = False
-        NavigatorButtons.Next.Visible = False
-        NavigatorButtons.NextPage.Visible = False
-        NavigatorButtons.Last.Visible = False
-        NavigatorButtons.Edit.Visible = True
-        NavigatorButtons.Refresh.Visible = False
-        NavigatorButtons.SaveBookmark.Visible = False
-        NavigatorButtons.GotoBookmark.Visible = False
-        NavigatorButtons.Filter.Visible = False
-        FilterBox.CustomizeDialog = False
-        DataController.Summary.DefaultGroupSummaryItems = <>
-        DataController.Summary.FooterSummaryItems = <>
-        DataController.Summary.SummaryGroups = <>
-        Filtering.MRUItemsList = False
-        Filtering.ColumnMRUItemsList = False
-        OptionsBehavior.FocusCellOnTab = True
-        OptionsBehavior.FocusFirstCellOnNewRecord = True
-        OptionsBehavior.GoToNextCellOnEnter = True
-        OptionsBehavior.ImmediateEditor = False
-        OptionsBehavior.FocusCellOnCycle = True
-        OptionsCustomize.ColumnFiltering = False
-        OptionsCustomize.ColumnGrouping = False
-        OptionsCustomize.ColumnHidingOnGrouping = False
-        OptionsData.Deleting = False
-        OptionsData.DeletingConfirmation = False
-        OptionsData.Editing = False
-        OptionsData.Inserting = False
-        OptionsSelection.HideSelection = True
-        OptionsView.CellEndEllipsis = True
-        OptionsView.ColumnAutoWidth = True
-        OptionsView.GroupByBox = False
-        OptionsView.HeaderEndEllipsis = True
-        object TableViewThreadNumber: TcxGridColumn
-          Caption = 'Thread #'
-          Width = 63
-        end
-        object TableViewThreadRequestCount: TcxGridColumn
-          Caption = 'Count'
-          DataBinding.ValueType = 'Integer'
-          Width = 48
-        end
-        object TableViewThreadAverageSelectUpdateTimeTaken: TcxGridColumn
-          Caption = 'Average Select & Update Time Taken / rec'
-          DataBinding.ValueType = 'Float'
-          HeaderAlignmentHorz = taCenter
-          Width = 215
-        end
-        object TableViewThreadAverageCommitTimeTaken: TcxGridColumn
-          Caption = 'Average Commit Time Taken  / rec'
-          DataBinding.ValueType = 'Float'
-          HeaderAlignmentHorz = taCenter
-          Width = 175
-        end
-        object TableViewThreadErrorMsg: TcxGridColumn
-          Caption = 'Error Msg'
-          HeaderAlignmentHorz = taCenter
-          Width = 164
-        end
-      end
-      object levelThread: TcxGridLevel
-        GridView = TableViewThread
-      end
-    end
-  end
   object Panel1: TPanel
     Left = 0
-    Top = 751
+    Top = 831
     Width = 1105
     Height = 28
     Align = alBottom
@@ -1362,7 +1250,8 @@ object Form1: TForm1
     Ctl3D = False
     ParentColor = True
     ParentCtl3D = False
-    TabOrder = 37
+    TabOrder = 36
+    ExplicitTop = 751
     object Label5: TLabel
       Left = 5
       Top = 8
@@ -1394,7 +1283,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 38
+    TabOrder = 37
     Text = '1000000'
   end
   object ALEditFirebirdNbLoopBeforeCommit: TALEdit
@@ -1410,7 +1299,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 39
+    TabOrder = 38
     Text = '1'
   end
   object ALEditFirebirdNBThread: TALEdit
@@ -1426,7 +1315,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 40
+    TabOrder = 39
     Text = '1'
   end
   object ALEditFireBirdNum_buffers: TALEdit
@@ -1442,7 +1331,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 41
+    TabOrder = 40
     Text = '0'
   end
   object ALButtonFirebirdCreateDatabase: TALButton
@@ -1451,7 +1340,7 @@ object Form1: TForm1
     Width = 161
     Height = 25
     Caption = 'Create Database via FireBird'
-    TabOrder = 42
+    TabOrder = 41
     OnClick = ALButtonFirebirdCreateDatabaseClick
     OnPaint = ALButtonPaint
   end
@@ -1464,7 +1353,7 @@ object Form1: TForm1
     Style = csDropDownList
     ItemHeight = 13
     ItemIndex = 0
-    TabOrder = 43
+    TabOrder = 42
     Text = 'FB102'
     Items.Strings = (
       'FB102'
@@ -1486,7 +1375,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 44
+    TabOrder = 43
     Text = '1000000'
   end
   object ALEditMySqlNbLoopBeforeCommit: TALEdit
@@ -1502,7 +1391,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 45
+    TabOrder = 44
     Text = '1'
   end
   object ALEditMySqlNBThread: TALEdit
@@ -1518,7 +1407,7 @@ object Form1: TForm1
     btnFont.Name = 'MS Sans Serif'
     btnFont.Style = []
     OnPaint = ALEditPaint
-    TabOrder = 46
+    TabOrder = 45
     Text = '1'
   end
   object ALButtonMysqlUpdate: TALButton
@@ -1527,7 +1416,7 @@ object Form1: TForm1
     Width = 161
     Height = 25
     Caption = 'Execute UPDATE via MySql'
-    TabOrder = 47
+    TabOrder = 46
     OnClick = ALButtonMysqlUpdateClick
     OnPaint = ALButtonPaint
   end
@@ -1537,7 +1426,7 @@ object Form1: TForm1
     Width = 171
     Height = 25
     Caption = 'Loop UPDATE via MySql'
-    TabOrder = 48
+    TabOrder = 47
     OnClick = ALButtonMySqlLoopUpdateClick
     OnPaint = ALButtonPaint
   end
@@ -1547,7 +1436,7 @@ object Form1: TForm1
     Width = 171
     Height = 25
     Caption = 'Loop SELECT via MySql'
-    TabOrder = 49
+    TabOrder = 48
     OnClick = ALButtonMysqlLoopSelectClick
     OnPaint = ALButtonPaint
   end
@@ -1563,8 +1452,243 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
     Caption = 'read uncommitted'
-    TabOrder = 50
+    TabOrder = 49
     OnPaint = ALCheckBoxSqlite3SharedCachePaint
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 496
+    Width = 1105
+    Height = 335
+    Align = alBottom
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Caption = 'Panel2'
+    TabOrder = 50
+    ExplicitHeight = 377
+    object Splitter4: TSplitter
+      Left = 739
+      Top = 1
+      Height = 333
+      Align = alRight
+      ExplicitLeft = 624
+      ExplicitTop = -3
+      ExplicitHeight = 469
+    end
+    object Panel5: TPanel
+      Left = 742
+      Top = 1
+      Width = 362
+      Height = 333
+      Align = alRight
+      Caption = 'Panel2'
+      TabOrder = 0
+      ExplicitHeight = 354
+      object ALMemoResult: TALMemo
+        Left = 1
+        Top = 1
+        Width = 360
+        Height = 331
+        OnPaint = ALMemoPaint
+        OnPaintScrollBar = ALMemoPaintScrollBar
+        Align = alClient
+        TabOrder = 0
+        ExplicitLeft = 3
+        ExplicitTop = -3
+        ExplicitHeight = 352
+        DesignSize = (
+          360
+          331)
+      end
+    end
+    object Panel6: TPanel
+      Left = 1
+      Top = 1
+      Width = 738
+      Height = 333
+      Align = alClient
+      Caption = 'Panel2'
+      TabOrder = 1
+      ExplicitLeft = -2
+      ExplicitTop = 0
+      ExplicitWidth = 629
+      ExplicitHeight = 469
+      object Splitter2: TSplitter
+        Left = 1
+        Top = 165
+        Width = 736
+        Height = 3
+        Cursor = crVSplit
+        Align = alTop
+        ExplicitLeft = 625
+        ExplicitWidth = 303
+      end
+      object GridThreadSelect: TcxGrid
+        Left = 1
+        Top = 1
+        Width = 736
+        Height = 164
+        Align = alTop
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        ExplicitLeft = 10
+        ExplicitTop = 25
+        ExplicitWidth = 515
+        object TableViewThreadSelect: TcxGridTableView
+          NavigatorButtons.ConfirmDelete = False
+          NavigatorButtons.First.Visible = False
+          NavigatorButtons.PriorPage.Visible = False
+          NavigatorButtons.Prior.Visible = False
+          NavigatorButtons.Next.Visible = False
+          NavigatorButtons.NextPage.Visible = False
+          NavigatorButtons.Last.Visible = False
+          NavigatorButtons.Edit.Visible = True
+          NavigatorButtons.Refresh.Visible = False
+          NavigatorButtons.SaveBookmark.Visible = False
+          NavigatorButtons.GotoBookmark.Visible = False
+          NavigatorButtons.Filter.Visible = False
+          FilterBox.CustomizeDialog = False
+          DataController.Summary.DefaultGroupSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.SummaryGroups = <>
+          Filtering.MRUItemsList = False
+          Filtering.ColumnMRUItemsList = False
+          OptionsBehavior.FocusCellOnTab = True
+          OptionsBehavior.FocusFirstCellOnNewRecord = True
+          OptionsBehavior.GoToNextCellOnEnter = True
+          OptionsBehavior.ImmediateEditor = False
+          OptionsBehavior.FocusCellOnCycle = True
+          OptionsCustomize.ColumnFiltering = False
+          OptionsCustomize.ColumnGrouping = False
+          OptionsCustomize.ColumnHidingOnGrouping = False
+          OptionsData.Deleting = False
+          OptionsData.DeletingConfirmation = False
+          OptionsData.Editing = False
+          OptionsData.Inserting = False
+          OptionsSelection.HideSelection = True
+          OptionsView.CellEndEllipsis = True
+          OptionsView.ColumnAutoWidth = True
+          OptionsView.GroupByBox = False
+          OptionsView.HeaderEndEllipsis = True
+          object TableViewThreadSelectNumber: TcxGridColumn
+            Caption = 'Thread #'
+            Width = 63
+          end
+          object TableViewThreadSelectRequestCount: TcxGridColumn
+            Caption = 'Count'
+            DataBinding.ValueType = 'Integer'
+            Width = 48
+          end
+          object TableViewThreadSelectAverageSelectTimeTaken: TcxGridColumn
+            Caption = 'Average Select Time Taken / rec'
+            DataBinding.ValueType = 'Float'
+            HeaderAlignmentHorz = taCenter
+            Width = 215
+          end
+          object TableViewThreadSelectAverageCommitTimeTaken: TcxGridColumn
+            Caption = 'Average Commit Time Taken  / rec'
+            DataBinding.ValueType = 'Float'
+            HeaderAlignmentHorz = taCenter
+            Width = 175
+          end
+          object TableViewThreadSelectErrorMsg: TcxGridColumn
+            Caption = 'Error Msg'
+            HeaderAlignmentHorz = taCenter
+            Width = 164
+          end
+        end
+        object levelThreadSelect: TcxGridLevel
+          GridView = TableViewThreadSelect
+        end
+      end
+      object GridThreadUpdate: TcxGrid
+        Left = 1
+        Top = 168
+        Width = 736
+        Height = 164
+        Align = alClient
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        ExplicitTop = 164
+        ExplicitWidth = 667
+        ExplicitHeight = 185
+        object TableViewThreadUpdate: TcxGridTableView
+          NavigatorButtons.ConfirmDelete = False
+          NavigatorButtons.First.Visible = False
+          NavigatorButtons.PriorPage.Visible = False
+          NavigatorButtons.Prior.Visible = False
+          NavigatorButtons.Next.Visible = False
+          NavigatorButtons.NextPage.Visible = False
+          NavigatorButtons.Last.Visible = False
+          NavigatorButtons.Edit.Visible = True
+          NavigatorButtons.Refresh.Visible = False
+          NavigatorButtons.SaveBookmark.Visible = False
+          NavigatorButtons.GotoBookmark.Visible = False
+          NavigatorButtons.Filter.Visible = False
+          FilterBox.CustomizeDialog = False
+          DataController.Summary.DefaultGroupSummaryItems = <>
+          DataController.Summary.FooterSummaryItems = <>
+          DataController.Summary.SummaryGroups = <>
+          Filtering.MRUItemsList = False
+          Filtering.ColumnMRUItemsList = False
+          OptionsBehavior.FocusCellOnTab = True
+          OptionsBehavior.FocusFirstCellOnNewRecord = True
+          OptionsBehavior.GoToNextCellOnEnter = True
+          OptionsBehavior.ImmediateEditor = False
+          OptionsBehavior.FocusCellOnCycle = True
+          OptionsCustomize.ColumnFiltering = False
+          OptionsCustomize.ColumnGrouping = False
+          OptionsCustomize.ColumnHidingOnGrouping = False
+          OptionsData.Deleting = False
+          OptionsData.DeletingConfirmation = False
+          OptionsData.Editing = False
+          OptionsData.Inserting = False
+          OptionsSelection.HideSelection = True
+          OptionsView.CellEndEllipsis = True
+          OptionsView.ColumnAutoWidth = True
+          OptionsView.GroupByBox = False
+          OptionsView.HeaderEndEllipsis = True
+          object TableViewThreadUpdateNumber: TcxGridColumn
+            Caption = 'Thread #'
+            Width = 63
+          end
+          object TableViewThreadUpdateRequestCount: TcxGridColumn
+            Caption = 'Count'
+            DataBinding.ValueType = 'Integer'
+            Width = 48
+          end
+          object TableViewThreadUpdateAverageUpdateTimeTaken: TcxGridColumn
+            Caption = 'Average Update Time Taken / rec'
+            DataBinding.ValueType = 'Float'
+            HeaderAlignmentHorz = taCenter
+            Width = 215
+          end
+          object TableViewThreadUpdateAverageCommitTimeTaken: TcxGridColumn
+            Caption = 'Average Commit Time Taken  / rec'
+            DataBinding.ValueType = 'Float'
+            HeaderAlignmentHorz = taCenter
+            Width = 175
+          end
+          object TableViewThreadUpdateErrorMsg: TcxGridColumn
+            Caption = 'Error Msg'
+            HeaderAlignmentHorz = taCenter
+            Width = 164
+          end
+        end
+        object levelThreadUpdate: TcxGridLevel
+          GridView = TableViewThreadUpdate
+        end
+      end
+    end
   end
   object OpenDialog1: TOpenDialog
     Left = 536

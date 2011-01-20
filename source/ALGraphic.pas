@@ -1,6 +1,7 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
 Author(s):    JWB Software
+              Anders Melander & Mike Lischke
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Graphic Functions
@@ -58,56 +59,20 @@ uses Windows,
      Graphics;
 
 type
-  // Type of a filter for use with Stretch()
-  TALFilterProc = function(Value: Single): Single;
 
-  // Sample filters for use with Stretch()
-  function ALSplineFilter(Value: Single): Single;
-  function ALBellFilter(Value: Single): Single;
-  function ALTriangleFilter(Value: Single): Single;
-  function ALBoxFilter(Value: Single): Single;
-  function ALHermiteFilter(Value: Single): Single;
-  function ALLanczos3Filter(Value: Single): Single;
-  function ALMitchellFilter(Value: Single): Single;
+  // resampling support types
+  TALResamplingFilter = (sfBox, sfTriangle, sfHermite, sfBell, sfSpline, sfLanczos3, sfMitchell);
 
-  // Interpolator
-  // Src:	Source bitmap
-  // Dst:	Destination bitmap
-  // filter:	Weight calculation filter
-  // fwidth:	Relative sample radius
-  procedure ALStrecth(Src, Dst: TBitmap; filter: TALFilterProc; fwidth: single);
-  //tolerance is same value as tolerance in photoshop
-  procedure ALReplaceColor(SrcBitmap: TBitmap; OldColor, NewColor: Tcolor; Tolerance: Integer);
+// Resampling support routines
+procedure ALStretch(NewWidth, NewHeight: Cardinal; Filter: TALResamplingFilter; Radius: Single; Source, Target: TBitmap); overload;
+procedure ALStretch(NewWidth, NewHeight: Cardinal; Filter: TALResamplingFilter; Radius: Single; Source: TBitmap); overload;
+procedure ALStrecth(Source, Target: TBitmap; filter: TALResamplingFilter; Radius: single); overload;
 
-// -----------------------------------------------------------------------------
-//
-//			List of Filters
-//
-// -----------------------------------------------------------------------------
+//tolerance is same value as tolerance in photoshop
+procedure ALReplaceColor(SrcBitmap: TBitmap; OldColor, NewColor: Tcolor; Tolerance: Integer);
 
-const
-  ALResampleFilters: array[0..6] of record
-    Name: string;	// Filter name
-    Filter: TALFilterProc;// Filter implementation
-    Width: Single;	// Suggested sampling width/radius
-  end = (
-    (Name: 'Box';	Filter: ALBoxFilter;	Width: 0.5),
-    (Name: 'Triangle';	Filter: ALTriangleFilter;	Width: 1.0),
-    (Name: 'Hermite';	Filter: ALHermiteFilter;	Width: 1.0),
-    (Name: 'Bell';	Filter: ALBellFilter;	Width: 1.5),
-    (Name: 'B-Spline';	Filter: ALSplineFilter;	Width: 2.0),
-    (Name: 'Lanczos3';	Filter: ALLanczos3Filter;	Width: 3.0),
-    (Name: 'Mitchell';	Filter: ALMitchellFilter;	Width: 2.0)
-    );
-
-Const cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.
-                                //No bitmap can be that large (at present), and this effectively turns off
-                                //range checking on Scanline variables.
-
-type pAlRGBTripleArray = ^TAlRGBTripleArray;
-     TAlRGBTripleArray = ARRAY[0..cAlPixelCountMax-1] OF TRGBTriple;
-
-     TALAverageColorMosaicKey = Array of array of Tcolor;
+Type
+  TALAverageColorMosaicKey = Array of array of Tcolor;
 
 Function AlGetAverageColor(aSrcBmp: TBitmap; aRect: Trect): Tcolor;
 Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap;
@@ -125,486 +90,542 @@ implementation
 
 uses math;
 
-// -----------------------------------------------------------------------------
-//
-//			Filter functions
-//
-// -----------------------------------------------------------------------------
+Const
+  cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.
+                            //No bitmap can be that large (at present), and this effectively turns off
+                            //range checking on Scanline variables.
 
-// Hermite filter
+type
+  pAlRGBTripleArray = ^TAlRGBTripleArray;
+  TAlRGBTripleArray = ARRAY[0..cAlPixelCountMax-1] OF TRGBTriple;
+
+  // resampling support types
+  TALRGBInt = record
+   R, G, B: Integer;
+  end;
+
+  PALRGBWord = ^TALRGBWord;
+  TALRGBWord = record
+   R, G, B: Word;
+  end;
+
+  PALRGBAWord = ^TALRGBAWord;
+  TALRGBAWord = record
+   R, G, B, A: Word;
+  end;
+
+  PALBGR = ^TALBGR;
+  TALBGR = packed record
+   B, G, R: Byte;
+  end;
+
+  PALBGRA = ^TALBGRA;
+  TALBGRA = packed record
+   B, G, R, A: Byte;
+  end;
+
+  PALRGB = ^TALRGB;
+  TALRGB = packed record
+   R, G, B: Byte;
+  end;
+
+  PALRGBA = ^TALRGBA;
+  TALRGBA = packed record
+   R, G, B, A: Byte;
+  end;
+
+  PALPixelArray = ^TALPixelArray;
+  TALPixelArray = array[0..0] of TALBGR;
+
+  TALFilterFunction = function(Value: Single): Single;
+
+  // contributor for a Pixel
+  PALContributor = ^TALContributor;
+  TALContributor = record
+   Weight: Integer; // Pixel Weight
+   Pixel: Integer; // Source Pixel
+  end;
+
+  TALContributors = array of TALContributor;
+
+  // list of source pixels contributing to a destination pixel
+  TALContributorEntry = record
+   N: Integer;
+   Contributors: TALContributors;
+  end;
+
+  TALContributorList = array of TALContributorEntry;
+
+const
+  cALDefaultFilterRadius: array[TALResamplingFilter] of Single = (0.5, 1, 1, 1.5, 2, 3, 2);
+
+{*****************************************}
+// f(t) = 2|t|^3 - 3|t|^2 + 1, -1 <= t <= 1
 function ALHermiteFilter(Value: Single): Single;
 begin
-  // f(t) = 2|t|^3 - 3|t|^2 + 1, -1 <= t <= 1
-  if (Value < 0.0) then
-    Value := -Value;
-  if (Value < 1.0) then
-    Result := (2.0 * Value - 3.0) * Sqr(Value) + 1.0
-  else
-    Result := 0.0;
+  if Value < 0 then Value := -Value;
+  if Value < 1 then Result := (2 * Value - 3) * Sqr(Value) + 1
+               else Result := 0;
 end;
 
-// Box filter
-// a.k.a. "Nearest Neighbour" filter
-// anme: I have not been able to get acceptable
-//       results with this filter for subsampling.
+{*********************************************************}
+// This filter is also known as 'nearest neighbour' Filter.
 function ALBoxFilter(Value: Single): Single;
 begin
-  if (Value > -0.5) and (Value <= 0.5) then
-    Result := 1.0
-  else
-    Result := 0.0;
+  if (Value > -0.5) and (Value <= 0.5) then Result := 1
+                                       else Result := 0;
 end;
 
-// Triangle filter
-// a.k.a. "Linear" or "Bilinear" filter
+{**********************************}
+// aka 'linear' or 'bilinear' filter
 function ALTriangleFilter(Value: Single): Single;
 begin
-  if (Value < 0.0) then
-    Value := -Value;
-  if (Value < 1.0) then
-    Result := 1.0 - Value
-  else
-    Result := 0.0;
+  if Value < 0 then Value := -Value;
+  if Value < 1 then Result := 1 - Value
+               else Result := 0;
 end;
 
-// Bell filter
+{*******************************************}
 function ALBellFilter(Value: Single): Single;
 begin
-  if (Value < 0.0) then
-    Value := -Value;
-  if (Value < 0.5) then
-    Result := 0.75 - Sqr(Value)
-  else if (Value < 1.5) then
-  begin
-    Value := Value - 1.5;
-    Result := 0.5 * Sqr(Value);
-  end else
-    Result := 0.0;
+  if Value < 0 then Value := -Value;
+  if Value < 0.5 then Result := 0.75 - Sqr(Value)
+                 else
+    if Value < 1.5 then
+    begin
+      Value := Value - 1.5;
+      Result := 0.5 * Sqr(Value);
+    end
+    else Result := 0;
 end;
 
+{****************}
 // B-spline filter
 function ALSplineFilter(Value: Single): Single;
 var
-  tt			: single;
+  Temp: Single;
 begin
-  if (Value < 0.0) then
-    Value := -Value;
-  if (Value < 1.0) then
+  if Value < 0 then Value := -Value;
+  if Value < 1 then
   begin
-    tt := Sqr(Value);
-    Result := 0.5*tt*Value - tt + 2.0 / 3.0;
-  end else if (Value < 2.0) then
-  begin
-    Value := 2.0 - Value;
-    Result := 1.0/6.0 * Sqr(Value) * Value;
-  end else
-    Result := 0.0;
+    Temp := Sqr(Value);
+    Result := 0.5 * Temp * Value - Temp + 2 / 3;
+  end
+  else
+    if Value < 2 then
+    begin
+      Value := 2 - Value;
+      Result := Sqr(Value) * Value / 6;
+    end
+    else Result := 0;
 end;
 
-// Lanczos3 filter
+{***********************************************}
 function ALLanczos3Filter(Value: Single): Single;
+
   function SinC(Value: Single): Single;
   begin
-    if (Value <> 0.0) then
+    if Value <> 0 then
     begin
       Value := Value * Pi;
-      Result := sin(Value) / Value
-    end else
-      Result := 1.0;
+      Result := Sin(Value) / Value;
+    end
+    else Result := 1;
   end;
+
 begin
-  if (Value < 0.0) then
-    Value := -Value;
-  if (Value < 3.0) then
-    Result := SinC(Value) * SinC(Value / 3.0)
-  else
-    Result := 0.0;
+  if Value < 0 then Value := -Value;
+  if Value < 3 then Result := SinC(Value) * SinC(Value / 3)
+               else Result := 0;
 end;
 
+{***********************************************}
 function ALMitchellFilter(Value: Single): Single;
 const
-  B		= (1.0 / 3.0);
-  C		= (1.0 / 3.0);
-var
-  tt			: single;
+  B = 1 / 3;
+  C = 1 / 3;
+var Temp: Single;
 begin
-  if (Value < 0.0) then
-    Value := -Value;
-  tt := Sqr(Value);
-  if (Value < 1.0) then
+  if Value < 0 then Value := -Value;
+  Temp := Sqr(Value);
+  if Value < 1 then
   begin
-    Value := (((12.0 - 9.0 * B - 6.0 * C) * (Value * tt))
-      + ((-18.0 + 12.0 * B + 6.0 * C) * tt)
-      + (6.0 - 2 * B));
-    Result := Value / 6.0;
-  end else
-  if (Value < 2.0) then
-  begin
-    Value := (((-1.0 * B - 6.0 * C) * (Value * tt))
-      + ((6.0 * B + 30.0 * C) * tt)
-      + ((-12.0 * B - 48.0 * C) * Value)
-      + (8.0 * B + 24 * C));
-    Result := Value / 6.0;
-  end else
-    Result := 0.0;
+    Value := (((12 - 9 * B - 6 * C) * (Value * Temp))
+             + ((-18 + 12 * B + 6 * C) * Temp)
+             + (6 - 2 * B));
+    Result := Value / 6;
+  end
+  else
+    if Value < 2 then
+    begin
+      Value := (((-B - 6 * C) * (Value * Temp))
+               + ((6 * B + 30 * C) * Temp)
+               + ((-12 * B - 48 * C) * Value)
+               + (8 * B + 24 * C));
+      Result := Value / 6;
+    end
+    else Result := 0;
 end;
 
-// -----------------------------------------------------------------------------
-//
-//			Interpolator
-//
-// -----------------------------------------------------------------------------
-type
-  // Contributor for a pixel
-  TContributor = record
-    pixel: integer;		// Source pixel
-    weight: single;		// Pixel weight
-  end;
+{***}
+const
+  cALFilterList: array[TALResamplingFilter] of TALFilterFunction = (
+    ALBoxFilter,
+    ALTriangleFilter,
+    ALHermiteFilter,
+    ALBellFilter,
+    ALSplineFilter,
+    ALLanczos3Filter,
+    ALMitchellFilter
+  );
 
-  TContributorList = array[0..0] of TContributor;
-  PContributorList = ^TContributorList;
-
-  // List of source pixels contributing to a destination pixel
-  TCList = record
-    n		: integer;
-    p		: PContributorList;
-  end;
-
-  TCListList = array[0..0] of TCList;
-  PCListList = ^TCListList;
-
-  TRGB = packed record
-    r, g, b	: single;
-  end;
-
-  // Physical bitmap pixel
-  TColorRGB = packed record
-    r, g, b	: BYTE;
-  end;
-  PColorRGB = ^TColorRGB;
-
-  // Physical bitmap scanline (row)
-  TRGBList = packed array[0..0] of TColorRGB;
-  PRGBList = ^TRGBList;
-
-procedure ALStrecth(Src, Dst: TBitmap; filter: TALFilterProc; fwidth: single);
+{*******************************************}
+procedure ALFillLineChache(N, Delta: Integer;
+                           Line: Pointer;
+                           var CurrentLineR: array of Integer;
+                           var CurrentLineG: array of Integer;
+                           var CurrentLineB: array of Integer);
 var
-  xscale, yscale	: single;		// Zoom scale factors
-  i, j, k		: integer;		// Loop variables
-  center		: single;		// Filter calculation variables
-  width, fscale, weight	: single;		// Filter calculation variables
-  left, right		: integer;		// Filter calculation variables
-  n			: integer;		// Pixel number
-  Work			: TBitmap;
-  contrib		: PCListList;
-  rgb			: TRGB;
-  color			: TColorRGB;
-  SourceLine		,
-  DestLine		: PRGBList;
-  SourcePixel		,
-  DestPixel		: PColorRGB;
-  Delta			,
-  DestDelta		: integer;
-  SrcWidth		,
-  SrcHeight		,
-  DstWidth		,
-  DstHeight		: integer;
-
-  function Color2RGB(Color: TColor): TColorRGB;
+  I: Integer;
+  Run: PALBGR;
+begin
+  Run := Line;
+  for I := 0 to N - 1 do
   begin
-    Result.r := Color AND $000000FF;
-    Result.g := (Color AND $0000FF00) SHR 8;
-    Result.b := (Color AND $00FF0000) SHR 16;
+    CurrentLineR[I] := Run.R;
+    CurrentLineG[I] := Run.G;
+    CurrentLineB[I] := Run.B;
+    Inc(PByte(Run), Delta);
+  end;
+end;
+
+{******************************************************************************************************}
+// ensures Value is in the range 0..255, values < 0 are clamped to 0 and values > 255 are clamped to 255
+function ALClampByte(Value: Integer): Byte;
+asm
+         OR EAX, EAX
+         JNS @@positive
+         XOR EAX, EAX
+         RET
+@@positive:
+         CMP EAX, 255
+         JBE @@OK
+         MOV EAX, 255
+@@OK:
+end;
+
+{**************************************}
+function ALApplyContributors(N: Integer;
+                             Contributors: TALContributors;
+                             var CurrentLineR: array of Integer;
+                             var CurrentLineG: array of Integer;
+                             var CurrentLineB: array of Integer): TALBGR;
+var
+  J: Integer;
+  RGB: TALRGBInt;
+  Total,
+  Weight: Integer;
+  Pixel: Cardinal;
+  Contr: ^TALContributor;
+begin
+  RGB.R := 0;
+  RGB.G := 0;
+  RGB.B := 0;
+  Total := 0;
+  Contr := @Contributors[0];
+  for J := 0 to N - 1 do
+  begin
+    Weight := Contr.Weight;
+    Inc(Total, Weight);
+    Pixel := Contr.Pixel;
+    Inc(RGB.r, CurrentLineR[Pixel] * Weight);
+    Inc(RGB.g, CurrentLineG[Pixel] * Weight);
+    Inc(RGB.b, CurrentLineB[Pixel] * Weight);
+
+    Inc(Contr);
   end;
 
-  function RGB2Color(Color: TColorRGB): TColor;
+  if Total = 0 then
   begin
-    Result := Color.r OR (Color.g SHL 8) OR (Color.b SHL 16);
+    Result.R := ALClampByte(RGB.R shr 8);
+    Result.G := ALClampByte(RGB.G shr 8);
+    Result.B := ALClampByte(RGB.B shr 8);
+  end
+  else
+  begin
+    Result.R := ALClampByte(RGB.R div Total);
+    Result.G := ALClampByte(RGB.G div Total);
+    Result.B := ALClampByte(RGB.B div Total);
   end;
+end;
+
+{*******************************************************************************************************}
+// This is the actual scaling routine. Target must be allocated already with sufficient size. Source must
+// contain valid data, Radius must not be 0 and Filter must not be nil.
+procedure ALDoStretch(Filter: TALFilterFunction; Radius: Single; Source, Target: TBitmap);
+var
+  ScaleX,
+  ScaleY: Single;  // Zoom scale factors
+  I, J,
+  K, N: Integer; // Loop variables
+  Center: Single; // Filter calculation variables
+  Width: Single;
+  Weight: Integer;  // Filter calculation variables
+  Left,
+  Right: Integer; // Filter calculation variables
+  Work: TBitmap;
+  ContributorList: TALContributorList;
+  SourceLine,
+  DestLine: PALPixelArray;
+  DestPixel: PALBGR;
+  Delta,
+  DestDelta: Integer;
+  SourceHeight,
+  SourceWidth,
+  TargetHeight,
+  TargetWidth: Integer;
+  CurrentLineR: array of Integer;
+  CurrentLineG: array of Integer;
+  CurrentLineB: array of Integer;
 
 begin
-  DstWidth := Dst.Width;
-  DstHeight := Dst.Height;
-  SrcWidth := Src.Width;
-  SrcHeight := Src.Height;
-  if (SrcWidth < 1) or (SrcHeight < 1) then
-    raise Exception.Create('Source bitmap too small');
+  // shortcut variables
+  SourceHeight := Source.Height;
+  SourceWidth := Source.Width;
+  TargetHeight := Target.Height;
+  TargetWidth := Target.Width;
 
-  // Create intermediate image to hold horizontal zoom
+  if (SourceHeight = 0) or (SourceWidth = 0) or
+     (TargetHeight = 0) or (TargetWidth = 0) then Exit;
+
+  // create intermediate image to hold horizontal zoom
   Work := TBitmap.Create;
   try
-    Work.Height := SrcHeight;
-    Work.Width := DstWidth;
-    // xscale := DstWidth / SrcWidth;
-    // yscale := DstHeight / SrcHeight;
-    // Improvement suggested by David Ullrich:
-    if (SrcWidth = 1) then
-      xscale:= DstWidth / SrcWidth
-    else
-      xscale:= (DstWidth - 1) / (SrcWidth - 1);
-    if (SrcHeight = 1) then
-      yscale:= DstHeight / SrcHeight
-    else
-      yscale:= (DstHeight - 1) / (SrcHeight - 1);
-    // This implementation only works on 24-bit images because it uses
-    // TBitmap.Scanline
-    Src.PixelFormat := pf24bit;
-    Dst.PixelFormat := Src.PixelFormat;
-    Work.PixelFormat := Src.PixelFormat;
+    Work.PixelFormat := pf24Bit;
+    Work.Height := SourceHeight;
+    Work.Width := TargetWidth;
+    if SourceWidth = 1 then ScaleX :=  TargetWidth / SourceWidth
+                       else ScaleX :=  (TargetWidth - 1) / (SourceWidth - 1);
+    if (SourceHeight = 1) or (TargetHeight = 1) then ScaleY :=  TargetHeight / SourceHeight
+                                                else ScaleY :=  (TargetHeight - 1) / (SourceHeight - 1);
 
-    // --------------------------------------------
-    // Pre-calculate filter contributions for a row
-    // -----------------------------------------------
-    GetMem(contrib, DstWidth* sizeof(TCList));
-    // Horizontal sub-sampling
-    // Scales from bigger to smaller width
-    if (xscale < 1.0) then
+    // pre-calculate filter contributions for a row
+    SetLength(ContributorList, TargetWidth);
+    // horizontal sub-sampling
+    if ScaleX < 1 then
     begin
-      width := fwidth / xscale;
-      fscale := 1.0 / xscale;
-      for i := 0 to DstWidth-1 do
+      // scales from bigger to smaller Width
+      Width := Radius / ScaleX;
+      for I := 0 to TargetWidth - 1 do
       begin
-        contrib^[i].n := 0;
-        GetMem(contrib^[i].p, trunc(width * 2.0 + 1) * sizeof(TContributor));
-        center := i / xscale;
-        // Original code:
-        // left := ceil(center - width);
-        // right := floor(center + width);
-        left := floor(center - width);
-        right := ceil(center + width);
-        for j := left to right do
+        ContributorList[I].N := 0;
+        SetLength(ContributorList[I].Contributors, Trunc(2 * Width + 1));
+        Center := I / ScaleX;
+        Left := Floor(Center - Width);
+        Right := Ceil(Center + Width);
+        for J := Left to Right do
         begin
-          weight := filter((center - j) / fscale) / fscale;
-          if (weight = 0.0) then
-            continue;
-          if (j < 0) then
-            n := -j
-          else if (j >= SrcWidth) then
-            n := SrcWidth - j + SrcWidth - 1
-          else
-            n := j;
-          k := contrib^[i].n;
-          contrib^[i].n := contrib^[i].n + 1;
-          contrib^[i].p^[k].pixel := n;
-          contrib^[i].p^[k].weight := weight;
+          Weight := Round(Filter((Center - J) * ScaleX) * ScaleX * 256);
+          if Weight <> 0 then
+          begin
+            if J < 0 then N := -J
+                     else
+              if J >= SourceWidth then N := SourceWidth - J + SourceWidth - 1
+                                  else N := J;
+            K := ContributorList[I].N;
+            Inc(ContributorList[I].N);
+            ContributorList[I].Contributors[K].Pixel := N;
+            ContributorList[I].Contributors[K].Weight := Weight;
+          end;
         end;
       end;
-    end else
-    // Horizontal super-sampling
-    // Scales from smaller to bigger width
+    end
+    else
     begin
-      for i := 0 to DstWidth-1 do
+      // horizontal super-sampling
+      // scales from smaller to bigger Width
+      for I := 0 to TargetWidth - 1 do
       begin
-        contrib^[i].n := 0;
-        GetMem(contrib^[i].p, trunc(fwidth * 2.0 + 1) * sizeof(TContributor));
-        center := i / xscale;
-        // Original code:
-        // left := ceil(center - fwidth);
-        // right := floor(center + fwidth);
-        left := floor(center - fwidth);
-        right := ceil(center + fwidth);
-        for j := left to right do
+        ContributorList[I].N := 0;
+        SetLength(ContributorList[I].Contributors, Trunc(2 * Radius + 1));
+        Center := I / ScaleX;
+        Left := Floor(Center - Radius);
+        Right := Ceil(Center + Radius);
+        for J := Left to Right do
         begin
-          weight := filter(center - j);
-          if (weight = 0.0) then
-            continue;
-          if (j < 0) then
-            n := -j
-          else if (j >= SrcWidth) then
-            n := SrcWidth - j + SrcWidth - 1
-          else
-            n := j;
-          k := contrib^[i].n;
-          contrib^[i].n := contrib^[i].n + 1;
-          contrib^[i].p^[k].pixel := n;
-          contrib^[i].p^[k].weight := weight;
+          Weight := Round(Filter(Center - J) * 256);
+          if Weight <> 0 then
+          begin
+            if J < 0 then N := -J
+                     else
+             if J >= SourceWidth then N := SourceWidth - J + SourceWidth - 1
+                                 else N := J;
+            K := ContributorList[I].N;
+            Inc(ContributorList[I].N);
+            ContributorList[I].Contributors[K].Pixel := N;
+            ContributorList[I].Contributors[K].Weight := Weight;
+          end;
         end;
       end;
     end;
 
-    // ----------------------------------------------------
-    // Apply filter to sample horizontally from Src to Work
-    // ----------------------------------------------------
-    for k := 0 to SrcHeight-1 do
+    // now apply filter to sample horizontally from Src to Work
+    SetLength(CurrentLineR, SourceWidth);
+    SetLength(CurrentLineG, SourceWidth);
+    SetLength(CurrentLineB, SourceWidth);
+    for K := 0 to SourceHeight - 1 do
     begin
-      SourceLine := Src.ScanLine[k];
-      DestPixel := Work.ScanLine[k];
-      for i := 0 to DstWidth-1 do
-      begin
-        rgb.r := 0.0;
-        rgb.g := 0.0;
-        rgb.b := 0.0;
-        for j := 0 to contrib^[i].n-1 do
+      SourceLine := Source.ScanLine[K];
+      ALFillLineChache(SourceWidth, 3, SourceLine, CurrentLineR, CurrentLineG, CurrentLineB);
+      DestPixel := Work.ScanLine[K];
+      for I := 0 to TargetWidth - 1 do
+        with ContributorList[I] do
         begin
-          color := SourceLine^[contrib^[i].p^[j].pixel];
-          weight := contrib^[i].p^[j].weight;
-          if (weight = 0.0) then
-            continue;
-          rgb.r := rgb.r + color.r * weight;
-          rgb.g := rgb.g + color.g * weight;
-          rgb.b := rgb.b + color.b * weight;
+          DestPixel^ := ALApplyContributors(N, ContributorList[I].Contributors, CurrentLineR, CurrentLineG, CurrentLineB);
+          // move on to next column
+          Inc(DestPixel);
         end;
-        if (rgb.r > 255.0) then
-          color.r := 255
-        else if (rgb.r < 0.0) then
-          color.r := 0
-        else
-          color.r := round(rgb.r);
-        if (rgb.g > 255.0) then
-          color.g := 255
-        else if (rgb.g < 0.0) then
-          color.g := 0
-        else
-          color.g := round(rgb.g);
-        if (rgb.b > 255.0) then
-          color.b := 255
-        else if (rgb.b < 0.0) then
-          color.b := 0
-        else
-          color.b := round(rgb.b);
-        // Set new pixel value
-        DestPixel^ := color;
-        // Move on to next column
-        inc(DestPixel);
-      end;
     end;
 
-    // Free the memory allocated for horizontal filter weights
-    for i := 0 to DstWidth-1 do
-      FreeMem(contrib^[i].p);
+    // free the memory allocated for horizontal filter weights, since we need the stucture again
+    for I := 0 to TargetWidth - 1 do ContributorList[I].Contributors := nil;
+    ContributorList := nil;
 
-    FreeMem(contrib);
-
-    // -----------------------------------------------
-    // Pre-calculate filter contributions for a column
-    // -----------------------------------------------
-    GetMem(contrib, DstHeight* sizeof(TCList));
-    // Vertical sub-sampling
-    // Scales from bigger to smaller height
-    if (yscale < 1.0) then
+    // pre-calculate filter contributions for a column
+    SetLength(ContributorList, TargetHeight);
+    // vertical sub-sampling
+    if ScaleY < 1 then
     begin
-      width := fwidth / yscale;
-      fscale := 1.0 / yscale;
-      for i := 0 to DstHeight-1 do
+      // scales from bigger to smaller height
+      Width := Radius / ScaleY;
+      for I := 0 to TargetHeight - 1 do
       begin
-        contrib^[i].n := 0;
-        GetMem(contrib^[i].p, trunc(width * 2.0 + 1) * sizeof(TContributor));
-        center := i / yscale;
-        // Original code:
-        // left := ceil(center - width);
-        // right := floor(center + width);
-        left := floor(center - width);
-        right := ceil(center + width);
-        for j := left to right do
+        ContributorList[I].N := 0;
+        SetLength(ContributorList[I].Contributors, Trunc(2 * Width + 1));
+        Center := I / ScaleY;
+        Left := Floor(Center - Width);
+        Right := Ceil(Center + Width);
+        for J := Left to Right do
         begin
-          weight := filter((center - j) / fscale) / fscale;
-          if (weight = 0.0) then
-            continue;
-          if (j < 0) then
-            n := -j
-          else if (j >= SrcHeight) then
-            n := SrcHeight - j + SrcHeight - 1
-          else
-            n := j;
-          k := contrib^[i].n;
-          contrib^[i].n := contrib^[i].n + 1;
-          contrib^[i].p^[k].pixel := n;
-          contrib^[i].p^[k].weight := weight;
+          Weight := Round(Filter((Center - J) * ScaleY) * ScaleY * 256);
+          if Weight <> 0 then
+          begin
+            if J < 0 then N := -J
+                     else
+              if J >= SourceHeight then N := SourceHeight - J + SourceHeight - 1
+                                   else N := J;
+            K := ContributorList[I].N;
+            Inc(ContributorList[I].N);
+            ContributorList[I].Contributors[K].Pixel := N;
+            ContributorList[I].Contributors[K].Weight := Weight;
+          end;
         end;
       end
-    end else
-    // Vertical super-sampling
-    // Scales from smaller to bigger height
+    end
+    else
     begin
-      for i := 0 to DstHeight-1 do
+      // vertical super-sampling
+      // scales from smaller to bigger height
+      for I := 0 to TargetHeight - 1 do
       begin
-        contrib^[i].n := 0;
-        GetMem(contrib^[i].p, trunc(fwidth * 2.0 + 1) * sizeof(TContributor));
-        center := i / yscale;
-        // Original code:
-        // left := ceil(center - fwidth);
-        // right := floor(center + fwidth);
-        left := floor(center - fwidth);
-        right := ceil(center + fwidth);
-        for j := left to right do
+        ContributorList[I].N := 0;
+        SetLength(ContributorList[I].Contributors, Trunc(2 * Radius + 1));
+        Center := I / ScaleY;
+        Left := Floor(Center - Radius);
+        Right := Ceil(Center + Radius);
+        for J := Left to Right do
         begin
-          weight := filter(center - j);
-          if (weight = 0.0) then
-            continue;
-          if (j < 0) then
-            n := -j
-          else if (j >= SrcHeight) then
-            n := SrcHeight - j + SrcHeight - 1
-          else
-            n := j;
-          k := contrib^[i].n;
-          contrib^[i].n := contrib^[i].n + 1;
-          contrib^[i].p^[k].pixel := n;
-          contrib^[i].p^[k].weight := weight;
+          Weight := Round(Filter(Center - J) * 256);
+          if Weight <> 0 then
+          begin
+            if J < 0 then N := -J
+                     else
+              if J >= SourceHeight then N := SourceHeight - J + SourceHeight - 1
+                                   else N := J;
+            K := ContributorList[I].N;
+            Inc(ContributorList[I].N);
+            ContributorList[I].Contributors[K].Pixel := N;
+            ContributorList[I].Contributors[K].Weight := Weight;
+          end;
         end;
       end;
     end;
 
-    // --------------------------------------------------
-    // Apply filter to sample vertically from Work to Dst
-    // --------------------------------------------------
+    // apply filter to sample vertically from Work to Target
+    SetLength(CurrentLineR, SourceHeight);
+    SetLength(CurrentLineG, SourceHeight);
+    SetLength(CurrentLineB, SourceHeight);
+
+
     SourceLine := Work.ScanLine[0];
-    Delta := integer(Work.ScanLine[1]) - integer(SourceLine);
-    DestLine := Dst.ScanLine[0];
-    DestDelta := integer(Dst.ScanLine[1]) - integer(DestLine);
-    for k := 0 to DstWidth-1 do
+    Delta := Integer(Work.ScanLine[1]) - Integer(SourceLine);
+    DestLine := Target.ScanLine[0];
+    DestDelta := Integer(Target.ScanLine[1]) - Integer(DestLine);
+    for K := 0 to TargetWidth - 1 do
     begin
-      DestPixel := pointer(DestLine);
-      for i := 0 to DstHeight-1 do
-      begin
-        rgb.r := 0;
-        rgb.g := 0;
-        rgb.b := 0;
-        // weight := 0.0;
-        for j := 0 to contrib^[i].n-1 do
+      DestPixel := Pointer(DestLine);
+      ALFillLineChache(SourceHeight, Delta, SourceLine, CurrentLineR, CurrentLineG, CurrentLineB);
+      for I := 0 to TargetHeight - 1 do
+        with ContributorList[I] do
         begin
-          color := PColorRGB(integer(SourceLine)+contrib^[i].p^[j].pixel*Delta)^;
-          weight := contrib^[i].p^[j].weight;
-          if (weight = 0.0) then
-            continue;
-          rgb.r := rgb.r + color.r * weight;
-          rgb.g := rgb.g + color.g * weight;
-          rgb.b := rgb.b + color.b * weight;
+          DestPixel^ := ALApplyContributors(N, ContributorList[I].Contributors, CurrentLineR, CurrentLineG, CurrentLineB);
+          Inc(Integer(DestPixel), DestDelta);
         end;
-        if (rgb.r > 255.0) then
-          color.r := 255
-        else if (rgb.r < 0.0) then
-          color.r := 0
-        else
-          color.r := round(rgb.r);
-        if (rgb.g > 255.0) then
-          color.g := 255
-        else if (rgb.g < 0.0) then
-          color.g := 0
-        else
-          color.g := round(rgb.g);
-        if (rgb.b > 255.0) then
-          color.b := 255
-        else if (rgb.b < 0.0) then
-          color.b := 0
-        else
-          color.b := round(rgb.b);
-        DestPixel^ := color;
-        inc(integer(DestPixel), DestDelta);
-      end;
-      Inc(SourceLine, 1);
-      Inc(DestLine, 1);
+      Inc(SourceLine);
+      Inc(DestLine);
     end;
 
-    // Free the memory allocated for vertical filter weights
-    for i := 0 to DstHeight-1 do
-      FreeMem(contrib^[i].p);
-
-    FreeMem(contrib);
+    // free the memory allocated for vertical filter weights
+    for I := 0 to TargetHeight - 1 do ContributorList[I].Contributors := nil;
+    // this one is done automatically on exit, but is here for completeness
+    ContributorList := nil;
 
   finally
     Work.Free;
+    CurrentLineR := nil;
+    CurrentLineG := nil;
+    CurrentLineB := nil;
   end;
+end;
+
+{**************************************************************************************************}
+// Scales the source bitmap to the given size (NewWidth, NewHeight) and stores the Result in Target.
+// Filter describes the filter function to be applied and Radius the size of the filter area.
+// Is Radius = 0 then the recommended filter area will be used (see DefaultFilterRadius).
+procedure ALStretch(NewWidth, NewHeight: Cardinal; Filter: TALResamplingFilter; Radius: Single; Source, Target: TBitmap);
+begin
+  if Radius = 0 then Radius := cALDefaultFilterRadius[Filter];
+  Target.Handle := 0;
+  Target.PixelFormat := pf24Bit;
+  Target.Width := NewWidth;
+  Target.Height := NewHeight;
+  Source.PixelFormat := pf24Bit;
+  ALDoStretch(cALFilterList[Filter], Radius, Source, Target);
+end;
+
+{*************************************************************************************************************}
+procedure ALStretch(NewWidth, NewHeight: Cardinal; Filter: TALResamplingFilter; Radius: Single; Source: TBitmap);
+var
+  Target: TBitmap;
+begin
+  if Radius = 0 then Radius := cALDefaultFilterRadius[Filter];
+  Target := TBitmap.Create;
+  try
+    Target.PixelFormat := pf24Bit;
+    Target.Width := NewWidth;
+    Target.Height := NewHeight;
+    Source.PixelFormat := pf24Bit;
+    ALDoStretch(cALFilterList[Filter], Radius, Source, Target);
+    Source.Assign(Target);
+  finally
+    Target.Free;
+  end;
+end;
+
+{****************************************************************************************}
+procedure ALStrecth(Source, Target: TBitmap; filter: TALResamplingFilter; Radius: single);
+begin
+  ALStretch(Target.Width, Target.Height, Filter, Radius, Source, Target);
 end;
 
 {*******************************************************************************************}
@@ -774,14 +795,12 @@ begin
     aResizedBitmap.Height:=200;
 
     //the First Picture
-    ALStrecth(aSrcBmp, aResizedBitmap, ALLanczos3Filter, 3.0);
-    Result := AlGetAverageColorMosaicKey(
-                                         aResizedBitmap,
+    ALStrecth(aSrcBmp, aResizedBitmap, sfLanczos3, 3.0);
+    Result := AlGetAverageColorMosaicKey(aResizedBitmap,
                                          nil,
                                          true,
                                          40,
-                                         40
-                                        );
+                                         40);
 
   finally
     aResizedBitmap.free;

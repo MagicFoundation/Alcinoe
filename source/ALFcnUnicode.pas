@@ -82,6 +82,7 @@ Function ALUTF8LowerCaseNoDiacritic(S: UTF8String): UTF8String;
 Function ALUTF8Normalize(S: UTF8String): UTF8String;
 function ALUTF8UpperCase(const s: UTF8String): UTF8String;
 function ALUTF8LowerCase(const s: UTF8String): UTF8String;
+function AlUTF8Check(S: UTF8String): Boolean;
 function AlUTF8removeBOM(S: UTF8String): String;
 function AlUTF8DetectBOM(const P: PChar; const Size: Integer): Boolean;
 function ALUTF8CharSize(const P: PChar; const Size: Integer): Integer;
@@ -90,7 +91,8 @@ function ALUTF8CharCount(const S: Utf8String): Integer; overload;
 Function ALUTF8UnicodeTrunc(s:UTF8string; Count: Integer): UTF8String;
 Function ALUTF8AsciiTrunc(s:UTF8string; Count: Integer): UTF8String;
 Function ALUTF8UpperFirstChar(s:UTF8string): UTF8String;
-Function ALUTF8LowerCaseFirstCharUpper(s:UTF8string): UTF8String;
+Function ALUTF8TitleCase(s:UTF8string): UTF8String;
+Function ALUTF8SentenceCase(s:UTF8string): UTF8String;
 Function ALStringToWideString(const S: string; aCodePage: Word): WideString;
 function AlWideStringToString(const WS: WideString; aCodePage: Word): string;
 Function ALUTF8Encode(const S: string; aCodePage: Word): UTF8String;
@@ -110,6 +112,7 @@ implementation
 
 uses SysUtils,
      StrUtils,
+     Math,
      AlFcnString;
 
 {*******************}
@@ -291,25 +294,29 @@ end;
 {*************************}
 {remove accented character}
 Function ALWideRemoveDiacritic(S: Widestring): Widestring;
+
+  {----------------------------------------------------------------}
+  Function internalGetCompositeCharSize(aChar: WideString): integer;
+  Begin
+    //max(1,xxx) in case FoldString return on error mean result = 0
+    //this can really happen ?
+    Result := Max(1, FoldStringW(MAP_COMPOSITE, PwideChar(aChar), length(aChar), nil, 0));
+  end;
+
 var LenS, LenTmpWideStr: Integer;
     i,J: integer;
     TmpWideStr: WideString;
-
-    {----------------------------------------------------------------}
-    Function internalGetCompositeCharSize(aChar: WideString): integer;
-    Begin
-      Result := FoldStringW(MAP_COMPOSITE, PwideChar(aChar), length(aChar), nil, 0);
-    end;
 
 begin
   result := '';
   If s = '' then exit;
 
-  {upper the result}
+  //init lenS
   LenS := length(S);
 
-  {remove diacritic}
+  //remove diacritic
   LenTmpWideStr := FoldStringW(MAP_COMPOSITE, PwideChar(S), LenS, nil, 0);
+  if LenTmpWideStr <= 0 then Exit;
   setlength(TmpWideStr,LenTmpWideStr);
   FoldStringW(MAP_COMPOSITE, PwideChar(S), LenS, PwideChar(TmpWideStr), LenTmpWideStr);
   i := 1;
@@ -414,6 +421,12 @@ end;
 function ALUTF8LowerCase(const s: UTF8String): UTF8String;
 begin
   result := utf8encode(WideLowerCase(utf8Decode(s)));
+end;
+
+{*******************************************}
+function AlUTF8Check(S: UTF8String): Boolean;
+begin
+  Result := Utf8Decode(S) <> '';
 end;
 
 {**********************************************}
@@ -541,26 +554,41 @@ begin
   result := utf8encode(WideUpperCase(copy(TmpWideStr,1,1)) + copy(TmpWideStr,2,MaxInt));
 end;
 
-{***************************************************************}
-Function ALUTF8LowerCaseFirstCharUpper(s:UTF8string): UTF8String;
+{*********************************************}
+//the first letter of each word is capitalized,
+//the rest are lower case
+Function ALUTF8TitleCase(s:UTF8string): UTF8String;
 var tmpWideStr: WideString;
     i: integer;
 begin
   TmpWideStr := UTF8Decode(S);
-  tmpWideStr := Trim(TmpWideStr);
   if length(TmpWideStr) = 0 then begin
     result := '';
     exit;
   end;
   TmpWideStr := WideUpperCase(copy(TmpWideStr,1,1)) + WidelowerCase(copy(TmpWideStr,2,MaxInt));
   for i:= 2 to length(TmpWideStr) do
-    if (TmpWideStr[i-1] in [WideChar(' '),WideChar('-'),WideChar('''')]) and
+    if (TmpWideStr[i-1] in [WideChar('&'),
+                            WideChar(' '),
+                            WideChar('-'),
+                            WideChar('''')])
+       and
        (
-        (i >= length(TmpWideStr)) or
-        (not (TmpWideStr[i+1] in [WideChar(' '),WideChar('-'),WideChar('''')]))
+        (i = length(TmpWideStr)) or
+        (
+         ((TmpWideStr[i+1] <> ' ') or (TmpWideStr[i-1] = '&')) and // Agenge L&G Prestige - Maison à Vendre - A Prendre Ou a Laisser
+         (TmpWideStr[i+1] <> '''') // Avenue de l'Elysée
+        )
        )
     then TmpWideStr[i] := WideUpperCase(TmpWideStr[i])[1];
   result := utf8encode(TmpWideStr);
+end;
+
+{*********************************************}
+// first letter of the sentence capitalized, all others lower case
+Function ALUTF8SentenceCase(s:UTF8string): UTF8String;
+begin
+  Result := ALUTF8UpperFirstChar(AlUtf8LowerCase(S));
 end;
 
 {****************************************************}

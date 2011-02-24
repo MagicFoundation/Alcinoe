@@ -682,10 +682,11 @@ begin
         Buffer.Free;
       end;
     end
-    else begin
+
+    else if BuffSize > 0 then begin
       StrStr := TStringStream.Create('');
       try
-        If assigned(aRequestDataStream) then StrStr.CopyFrom(aRequestDataStream, 0);
+        StrStr.CopyFrom(aRequestDataStream, 0);
         CheckError(
                    not HttpSendRequest(
                                        Request,
@@ -698,7 +699,20 @@ begin
       finally
         StrStr.Free;
       end;
+    end
+
+    else begin
+      CheckError(
+                 not HttpSendRequest(
+                                     Request,
+                                     nil,
+                                     0,
+                                     nil,
+                                     0
+                                    )
+                );
     end;
+
   except
     if (Request <> nil) then
       InternetCloseHandle(Request);

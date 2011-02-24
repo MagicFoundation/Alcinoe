@@ -636,10 +636,10 @@ begin
       end;
     end
 
-    else begin
+    else if buffsize > 0 then begin
       StrStr := TStringStream.Create('');
       try
-        If assigned(aRequestDataStream) then StrStr.CopyFrom(aRequestDataStream, 0);
+        StrStr.CopyFrom(aRequestDataStream, 0);
         CheckError(
                    not WinHttpSendRequest(
                                           Request,
@@ -656,7 +656,23 @@ begin
       finally
         StrStr.Free;
       end;
+    end
+
+    else begin
+      CheckError(
+                 not WinHttpSendRequest(
+                                        Request,
+                                        WINHTTP_NO_ADDITIONAL_HEADERS,
+                                        0,
+                                        nil,
+                                        0,
+                                        0,
+                                        Dword(self)
+                                       )
+                );
+      CheckError(not WinHttpReceiveResponse(Request, nil));
     end;
+
   except
     if (Request <> nil) then
       WinHttpCloseHandle(Request);

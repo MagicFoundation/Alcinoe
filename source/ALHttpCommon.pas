@@ -324,6 +324,7 @@ procedure ALExtractHTTPFields(Separators,
                               StripQuotes: Boolean = False);
 Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: String): String;
+Function  AlExtractUrlPathFromUrl(aUrl: String): String;
 Function  AlInternetCrackUrl(aUrl: String;
                              Var SchemeName,
                                  HostName,
@@ -331,10 +332,29 @@ Function  AlInternetCrackUrl(aUrl: String;
                                  Password,
                                  UrlPath,
                                  ExtraInfo: String;
-                             var PortNumber: integer): Boolean;
+                             var PortNumber: integer): Boolean; overload;
+Function  AlInternetCrackUrl(aUrl: String;
+                             Var SchemeName,
+                                 HostName,
+                                 UserName,
+                                 Password,
+                                 UrlPath,
+                                 Anchor: String;
+                             Query: TStrings;
+                             var PortNumber: integer): Boolean; overload;
+Function  AlInternetCrackUrl(var Url: String;
+                             var Anchor: String;
+                             Query: TStrings): Boolean; overload;
+Function  AlInternetCrackRelativeUrl(var RelativeUrl: String;
+                                     var Anchor: String;
+                                     Query: TStrings): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
-function  AlCombineUrl(RelativeUrl, BaseUrl: String): String;
+function  AlCombineUrl(RelativeUrl, BaseUrl: String): String; overload;
+Function  AlCombineUrl(RelativeUrl,
+                       BaseUrl,
+                       Anchor: String;
+                       Query: TStrings): String; overload;
 
 
 ResourceString
@@ -1133,6 +1153,19 @@ begin
   else result := '';
 end;
 
+{******************************************************}
+Function  AlExtractUrlPathFromUrl(aUrl: String): String;
+var URLComp: TURLComponents;
+    P: PChar;
+begin
+  FillChar(URLComp, SizeOf(URLComp), 0);
+  URLComp.dwStructSize := SizeOf(URLComp);
+  URLComp.dwUrlPathLength := INTERNET_MAX_PATH_LENGTH;
+  P := PChar(aUrl);
+  if InternetCrackUrl(P, 0, 0, URLComp) then Result := AlCopyStr(aUrl, URLComp.lpszUrlPath - P + 1, URLComp.dwUrlPathLength) // /fra/xxx/
+  else result := '';
+end;
+
 {***************************************}
 Function AlInternetCrackUrl(aUrl: String;
                             Var SchemeName,
@@ -1147,7 +1180,6 @@ var URLComp: TURLComponents;
 begin
   FillChar(URLComp, SizeOf(URLComp), 0);
   URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwHostNameLength := 1;
   URLComp.dwSchemeLength := INTERNET_MAX_SCHEME_LENGTH;
   URLComp.dwHostNameLength := INTERNET_MAX_HOST_NAME_LENGTH;
   URLComp.dwUserNameLength := INTERNET_MAX_USER_NAME_LENGTH;
@@ -1179,27 +1211,118 @@ begin
   end;
 end;
 
-{**********************************************************************************}
-Function AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
-var URLComp: TURLComponents;
-    P: PChar;
+{***************************************}
+Function AlInternetCrackUrl(aUrl: String;
+                            Var SchemeName,
+                                HostName,
+                                UserName,
+                                Password,
+                                UrlPath,
+                                Anchor: String;
+                            Query: TStrings;
+                            var PortNumber: integer): Boolean;
+var aExtraInfo: string;
+    P1: integer;
 begin
-  FillChar(URLComp, SizeOf(URLComp), 0);
-  URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwExtraInfoLength := 1;
-  P := PChar(aUrl);
-  If InternetCrackUrl(P, 0, 0, URLComp) then begin
-    aAnchor := AlCopyStr(aUrl, URLComp.lpszExtraInfo - P + 1, URLComp.dwExtraInfoLength); // #foo
-    If alCharPos('#',aAnchor) = 1 then Result := AlCopyStr(aUrl, 1, length(aurl) - length(aAnchor)) // www.mysite.com/blabla.htm
-    else begin
-      result := aUrl;
-      aAnchor := '';
-    end;
+  Result := AlInternetCrackUrl(aUrl,
+                               SchemeName,
+                               HostName,
+                               UserName,
+                               Password,
+                               UrlPath,
+                               aExtraInfo,
+                               PortNumber);
+  if result then begin
+    P1 := AlPos('#',aExtraInfo);
+    if P1 > 0 then begin
+      Anchor := AlCopyStr(aExtraInfo, P1+1, MaxInt);
+      delete(aExtraInfo, P1, Maxint);
+    end
+    else Anchor := '';
+    if (aExtraInfo <> '') and (aExtraInfo[1] = '?') then begin
+      if AlPos('&amp;', aExtraInfo) > 0 then Query.LineBreak := '&amp;'
+      else Query.LineBreak := '&';
+      Query.text := AlCopyStr(aExtraInfo,2,Maxint);
+    end
+    else Query.clear;
   end
   else begin
-    result := aUrl;
-    aAnchor := '';
+    Anchor := '';
+    Query.clear;
   end;
+
+end;
+
+{*******************************************}
+Function  AlInternetCrackUrl(var Url: String;
+                             var Anchor: String;
+                             Query: TStrings): Boolean;
+Var SchemeName,
+    HostName,
+    UserName,
+    Password,
+    UrlPath: String;
+    PortNumber: integer;
+begin
+  Result := AlInternetCrackUrl(Url,
+                               SchemeName,
+                               HostName,
+                               UserName,
+                               Password,
+                               UrlPath,
+                               Anchor,
+                               Query,
+                               PortNumber);
+  if Result then begin
+
+    if sametext(SchemeName, 'http') or
+       sametext(SchemeName, 'https') or
+       sametext(SchemeName, 'ftp') then begin
+
+      Url := SchemeName + '://' + HostName;
+
+      if (sametext(SchemeName, 'http') and (PortNumber <> 80)) or
+         (sametext(SchemeName, 'https') and (PortNumber <> 443)) or
+         (sametext(SchemeName, 'ftp') and (PortNumber <> 21))
+      then Url := Url + ':' + inttostr(PortNumber);
+
+      Url := Url + UrlPath;
+
+    end;
+
+  end;
+end;
+
+{***********************************************************}
+Function  AlInternetCrackRelativeUrl(var RelativeUrl: String;
+                                     var Anchor: String;
+                                     Query: TStrings): Boolean; overload;
+var afullUrl: String;
+    aBaseHref: String;
+begin
+  if RelativeUrl = '' then begin
+    result := False;
+    Exit;
+  end;
+  if RelativeUrl[1] = '/' then aBaseHref := 'http://www.arkadia.com'
+  else aBaseHref := 'http://www.arkadia.com/';
+  afullUrl := aBaseHref + RelativeUrl;
+  result := AlInternetCrackUrl(aFullUrl,
+                               Anchor,
+                               Query);
+  if result then RelativeUrl := AlStringReplace(aFullUrl, aBaseHref, '', []);
+end;
+
+{**********************************************************************************}
+Function AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
+Var P1: integer;
+begin
+  P1 := AlPos('#',aUrl);
+  if P1 > 0 then begin
+    aAnchor := AlCopyStr(aUrl, P1+1, MaxInt);
+    delete(aUrl, P1, Maxint);
+  end
+  else aAnchor := '';
 end;
 
 {*************************************************************}
@@ -1211,8 +1334,8 @@ end;
 
 {**********************************************************}
 function AlCombineUrl(RelativeUrl, BaseUrl: String): String;
-var  S: String;
-     Size: Dword;
+var Size: Dword;
+    Buffer: String;
 begin
   case AlExtractShemeFromUrl(RelativeUrl) of
 
@@ -1221,11 +1344,8 @@ begin
     INTERNET_SCHEME_UNKNOWN,
     INTERNET_SCHEME_DEFAULT: begin
                                Size := INTERNET_MAX_URL_LENGTH;
-                               SetLength(s, Size);
-                               if InternetCombineUrl(PChar(BaseUrl), PChar(RelativeUrl), @s[1], size, ICU_BROWSER_MODE or ICU_no_encode) then begin
-                                 SetLength(s, Size);
-                                 Result := s;
-                               end
+                               SetLength(Buffer, Size);
+                               if InternetCombineUrl(PChar(BaseUrl), PChar(RelativeUrl), @Buffer[1], size, ICU_BROWSER_MODE or ICU_no_encode) then Result := AlCopyStr(Buffer, 1, Size)
                                else result := RelativeUrl;
                              end;
 
@@ -1233,6 +1353,44 @@ begin
     else result := RelativeUrl;
 
   end;
+end;
+
+{*********************************}
+Function  AlCombineUrl(RelativeUrl,
+                       BaseUrl,
+                       Anchor: String;
+                       Query: TStrings): String;
+Var S1 : String;
+    aBool: Boolean;
+begin
+  if Query.Count > 0 then begin
+
+    if Query.LineBreak = #13#10 then begin
+      aBool := True;
+      Query.LineBreak := '&';
+    end
+    else aBool := False;
+
+    try
+
+      S1 := '?' + trim(Query.Text);
+      while alposEx(Query.LineBreak,
+                    S1,
+                    length(S1) - length(Query.LineBreak) + 1) > 0 do delete(S1,
+                                                                            length(S1) - length(Query.LineBreak) + 1,
+                                                                            MaxInt);
+      if S1 = '?' then S1 := '';
+
+    finally
+      if aBool then Query.LineBreak := #13#10;
+    end;
+
+  end
+  else S1 := '';
+
+  if Anchor <> '' then S1 := S1 + '#' + Anchor;
+
+  Result := AlCombineUrl(RelativeUrl + S1, BaseUrl);
 end;
 
 end.

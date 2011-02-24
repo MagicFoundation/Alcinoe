@@ -177,6 +177,8 @@ Type
     fCharSet: TALFBXCharacterSet;
     fOpenConnectionParams: String;
     FNullString: String;
+    FLogin: String;
+    FPassword: String;
   Protected
     function GetFieldValue(aSQLDA:TALFBXSQLResult;
                            aDBHandle: IscDbHandle;
@@ -271,6 +273,8 @@ Type
     Function  ConnectionCount: Integer;
     property  SqlDialect: word read FSqlDialect;
     property  DataBaseName: String read FDataBaseName;
+    property  Login: String read FLogin;
+    property  Password: String read FPassword;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
     property  Lib: TALFBXLibrary read FLibrary;
@@ -1228,6 +1232,8 @@ procedure TALFBXConnectionPoolClient.initObject(aDataBaseName,
 begin
   FDataBaseName:= aDataBaseName;
   FCharset:= ALFBXStrToCharacterSet(aCharSet);
+  fLogin := aLogin;
+  fPassword := aPassword;
   fOpenConnectionParams := 'user_name = '+aLogin+'; '+
                            'password = '+aPassword+'; '+
                            'lc_ctype = '+aCharSet;
@@ -1316,7 +1322,7 @@ Begin
     //delete the old unused connection
     aTickCount := ALGetTickCount64;
     if aTickCount - fLastConnectionGarbage > (FConnectionMaxIdleTime div 100)  then begin
-      while FConnectionPool.Count > 1 do begin
+      while FConnectionPool.Count > 0 do begin
         aConnectionPoolContainer := TalFBXConnectionPoolContainer(FConnectionPool[0]);
         if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
           Try
@@ -1329,6 +1335,7 @@ Begin
         end
         else break;
       end;
+      FLastConnectionGarbage := aTickCount;
     end;
 
     //acquire the new connection from the pool

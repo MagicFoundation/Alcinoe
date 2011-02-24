@@ -426,7 +426,7 @@ end;
 {*******************************************}
 function AlUTF8Check(S: UTF8String): Boolean;
 begin
-  Result := Utf8Decode(S) <> '';
+  Result := (S = '') or (Utf8Decode(S) <> '');
 end;
 
 {**********************************************}

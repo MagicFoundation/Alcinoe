@@ -589,9 +589,14 @@ Var P: integer;
 begin
   aMsgBodyContent := ALPop3ClientExtractTextFromMultilineResponse(Retr(aMsgNumber));
   P := AlPos(#13#10#13#10,aMsgBodyContent);
-  If P <= 0 then raise Exception.Create('Bad formated Email!');
-  aMsgHeaderContent.RawHeaderText := AlcopyStr(aMsgBodyContent,1,P);
-  Delete(aMsgBodyContent,1,P+3);
+  If P > 0 then begin
+    aMsgHeaderContent.RawHeaderText := AlcopyStr(aMsgBodyContent,1,P);
+    Delete(aMsgBodyContent,1,P+3);
+  end
+  else begin
+    aMsgHeaderContent.RawHeaderText := aMsgBodyContent;
+    aMsgBodyContent := '';
+  end;
 end;
 
 {********}

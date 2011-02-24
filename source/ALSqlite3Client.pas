@@ -945,7 +945,7 @@ Begin
     //delete the old unused connection
     aTickCount := ALGetTickCount64;
     if aTickCount - fLastConnectionGarbage > (FConnectionMaxIdleTime div 100)  then begin
-      while FConnectionPool.Count > 1 do begin
+      while FConnectionPool.Count > 0 do begin
         aConnectionPoolContainer := TalSqlite3ConnectionPoolContainer(FConnectionPool[0]);
         if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
           Try
@@ -960,6 +960,7 @@ Begin
         end
         else break;
       end;
+      FLastConnectionGarbage := aTickCount;      
     end;
 
     //acquire the new connection from the pool

@@ -339,15 +339,12 @@ Function  AlInternetCrackUrl(aUrl: String;
                                  UserName,
                                  Password,
                                  UrlPath,
-                                 Anchor: String;
+                                 Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                              Query: TStrings;
                              var PortNumber: integer): Boolean; overload;
-Function  AlInternetCrackUrl(var Url: String;
+Function  AlInternetCrackUrl(var Url: String; // if true return UrlPath
                              var Anchor: String;
                              Query: TStrings): Boolean; overload;
-Function  AlInternetCrackRelativeUrl(var RelativeUrl: String;
-                                     var Anchor: String;
-                                     Query: TStrings): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
 function  AlCombineUrl(RelativeUrl, BaseUrl: String): String; overload;
@@ -1218,7 +1215,7 @@ Function AlInternetCrackUrl(aUrl: String;
                                 UserName,
                                 Password,
                                 UrlPath,
-                                Anchor: String;
+                                Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                             Query: TStrings;
                             var PortNumber: integer): Boolean;
 var aExtraInfo: string;
@@ -1254,7 +1251,7 @@ begin
 end;
 
 {*******************************************}
-Function  AlInternetCrackUrl(var Url: String;
+Function  AlInternetCrackUrl(var Url: String;  // if true return the relative url
                              var Anchor: String;
                              Query: TStrings): Boolean;
 Var SchemeName,
@@ -1263,7 +1260,16 @@ Var SchemeName,
     Password,
     UrlPath: String;
     PortNumber: integer;
+    tmpUrl: String;
 begin
+
+  //exit if no url
+  if Url = '' then begin
+    result := False;
+    Exit;
+  end;
+
+  //first try with full url
   Result := AlInternetCrackUrl(Url,
                                SchemeName,
                                HostName,
@@ -1273,44 +1279,25 @@ begin
                                Anchor,
                                Query,
                                PortNumber);
-  if Result then begin
+  if Result then Url := UrlPath
 
-    if sametext(SchemeName, 'http') or
-       sametext(SchemeName, 'https') or
-       sametext(SchemeName, 'ftp') then begin
-
-      Url := SchemeName + '://' + HostName;
-
-      if (sametext(SchemeName, 'http') and (PortNumber <> 80)) or
-         (sametext(SchemeName, 'https') and (PortNumber <> 443)) or
-         (sametext(SchemeName, 'ftp') and (PortNumber <> 21))
-      then Url := Url + ':' + inttostr(PortNumber);
-
-      Url := Url + UrlPath;
-
-    end;
-
+  //try with relative url
+  else begin
+    tmpUrl := Url;
+    if tmpUrl[1] = '/' then tmpUrl := 'http://www.arkadia.com' + tmpUrl // we don't take care of the domaine name, it's will be skip, it's just to make the url valid
+    else tmpUrl := 'http://www.arkadia.com/' + tmpUrl;
+    Result := AlInternetCrackUrl(tmpUrl,
+                                 SchemeName,
+                                 HostName,
+                                 UserName,
+                                 Password,
+                                 UrlPath,
+                                 Anchor,
+                                 Query,
+                                 PortNumber);
+    if Result then Url := UrlPath;
   end;
-end;
 
-{***********************************************************}
-Function  AlInternetCrackRelativeUrl(var RelativeUrl: String;
-                                     var Anchor: String;
-                                     Query: TStrings): Boolean; overload;
-var afullUrl: String;
-    aBaseHref: String;
-begin
-  if RelativeUrl = '' then begin
-    result := False;
-    Exit;
-  end;
-  if RelativeUrl[1] = '/' then aBaseHref := 'http://www.arkadia.com'
-  else aBaseHref := 'http://www.arkadia.com/';
-  afullUrl := aBaseHref + RelativeUrl;
-  result := AlInternetCrackUrl(aFullUrl,
-                               Anchor,
-                               Query);
-  if result then RelativeUrl := AlStringReplace(aFullUrl, aBaseHref, '', []);
 end;
 
 {**********************************************************************************}
@@ -1373,13 +1360,14 @@ begin
 
     try
 
-      S1 := '?' + trim(Query.Text);
+      S1 := trim(Query.Text);
+      while alpos(Query.LineBreak, S1) = 1 do delete(S1,1,length(Query.LineBreak));
       while alposEx(Query.LineBreak,
                     S1,
                     length(S1) - length(Query.LineBreak) + 1) > 0 do delete(S1,
                                                                             length(S1) - length(Query.LineBreak) + 1,
                                                                             MaxInt);
-      if S1 = '?' then S1 := '';
+      if S1 <> '' then S1 := '?' + S1;
 
     finally
       if aBool then Query.LineBreak := #13#10;

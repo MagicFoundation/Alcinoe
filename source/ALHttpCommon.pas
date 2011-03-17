@@ -324,6 +324,7 @@ procedure ALExtractHTTPFields(Separators,
                               StripQuotes: Boolean = False);
 Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: String): String;
+Function  AlExtractDomainNameFromUrl(aUrl: String): String;
 Function  AlExtractUrlPathFromUrl(aUrl: String): String;
 Function  AlInternetCrackUrl(aUrl: String;
                              Var SchemeName,
@@ -1148,6 +1149,16 @@ begin
   P := PChar(aUrl);
   if InternetCrackUrl(P, 0, 0, URLComp) then Result := AlCopyStr(aUrl, URLComp.lpszHostName - P + 1, URLComp.dwHostNameLength) // www.mysite.com
   else result := '';
+end;
+
+{********************************************************}
+Function AlExtractDomainNameFromUrl(aUrl: String): String;
+begin
+  Result := AlExtractHostNameFromUrl(aUrl);
+  while length(AlStringReplace(Result,
+                               '.',
+                               '',
+                               [rfReplaceALL])) < length(result) - 1 do delete(Result, 1, ALpos('.',result));
 end;
 
 {******************************************************}

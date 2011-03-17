@@ -14,7 +14,7 @@ Description:  ALPHPRunnerEngine is a simple but useful component for
               interface of PHP (php5isapi.dll) or the CGI/FastCGI
               interface (php-cgi.exe) of PHP to communicate with PHP engine.
 
-Legal issues: Copyright (C) 1999-2007 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2011 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -480,6 +480,7 @@ uses ALFcnWinSock,
      AlFcnString,
      AlFcnExecute,
      AlFcnMisc,
+     ALWindows,
      AlFcnCGI;
 
 //////////////////////////////
@@ -1132,12 +1133,12 @@ end;
 {**************************************************************************************}
 function TALPhpNamedPipeFastCgiRunnerEngine.IORead(var Buffer; Count: Longint): Longint;
 Var lpNumberOfBytesRead: DWORD;
-    StartTickCount: DWORD;
+    StartTickCount: Int64;
 begin
   //Ok i don't found any other way than this loop to do a timeout !
   //timeout are neccessary if the php-cgi.exe dead suddenly for exemple
   //in the way without timout the readfile will never return freezing the application
-  StartTickCount := GetTickCount;
+  StartTickCount := ALGetTickCount64;
   Repeat
     CheckError(
                not PeekNamedPipe(
@@ -1155,8 +1156,8 @@ begin
       break;
     end
     else result := 0;
-    sleep(0);
-  Until GetTickCount - StartTickCount > Dword(fTimeout);
+    sleep(10); // this is neccessary to not use 100% CPU usage
+  Until ALGetTickCount64 - StartTickCount > fTimeout;
 end;
 
 {***************************************************************************************}
@@ -1236,7 +1237,7 @@ begin
     finally
       fCriticalSection.Release;
     end;
-    sleep(0);
+    sleep(10); // to not use 100% CPU Usage
   end;
 
   {free all object}
@@ -1532,7 +1533,7 @@ procedure TALPhpIsapiRunnerEngine.UnloadDLL;
 Var TerminateExtensionFunct : TTerminateExtension;
 begin
   If DLLLoaded then Begin
-    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(0);
+    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(10);
     @TerminateExtensionFunct := GetProcAddress(fDLLHandle, 'TerminateExtension');
     If assigned(TerminateExtensionFunct) then TerminateExtensionFunct(HSE_TERM_MUST_UNLOAD);
     CheckError(not FreeLibrary(fDLLHandle));

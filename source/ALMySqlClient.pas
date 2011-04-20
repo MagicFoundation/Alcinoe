@@ -519,7 +519,7 @@ procedure TalMySqlClient.SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                                     FormatSettings: TformatSettings);
 Var aMySqlRes: PMYSQL_RES;
     aMySqlRow: PMYSQL_ROW;
-    aMySqlFields: PMYSQL_FIELDS;
+    aMySqlFields: array of PMYSQL_FIELD;
     aMySqlFieldLengths: PMYSQL_LENGTHS;
     aColumnCount: Integer;
     aColumnIndex: integer;
@@ -560,7 +560,11 @@ begin
         aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
 
         //init the aMySqlFields array
-        aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+        //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
+        //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+        setlength(aMySqlFields,aColumnCount);
+        for aColumnIndex := 0 to aColumnCount - 1 do
+          aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
 
         //init the aViewRec
         if SQLs[aSQLsindex].ViewTag <> '' then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)

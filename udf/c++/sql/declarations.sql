@@ -71,3 +71,27 @@ DECLARE EXTERNAL FUNCTION aludf_utf8titlecase
   CSTRING(8191) NULL
   RETURNS CSTRING(8191) FREE_IT
   ENTRY_POINT 'aludf_utf8titlecase' MODULE_NAME 'aludf';        
+  
+
+/*****************************************
+ * aludf_utf8lowercasenodiacritic
+ * aludf_utf8lowercasenodiacritic converts all characters in the given UTF8String 
+ * to lower case without any diacritic. The conversion is not locale specific. 
+ *****************************************/
+DECLARE EXTERNAL FUNCTION aludf_utf8lowercasenodiacritic
+  CSTRING(8191) NULL
+  RETURNS CSTRING(8191) FREE_IT
+  ENTRY_POINT 'aludf_utf8lowercasenodiacritic' MODULE_NAME 'aludf';  
+  
+  
+/*****************************************
+ * aludf_utf8uppercasenodiacritic
+ * aludf_utf8uppercasenodiacritic converts all characters in the given UTF8String 
+ * to upper case without any diacritic. The conversion is not locale specific. 
+ *****************************************/
+DECLARE EXTERNAL FUNCTION aludf_utf8uppercasenodiacritic
+  CSTRING(8191) NULL
+  RETURNS CSTRING(8191) FREE_IT
+  ENTRY_POINT 'aludf_utf8uppercasenodiacritic' MODULE_NAME 'aludf';    
+  
+  

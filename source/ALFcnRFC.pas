@@ -179,8 +179,7 @@ Begin
   P1 := AlcharPos(':',ADateStr);
   P2 := AlcharPos('-',ADateStr);
   While (P2 > 0) and (P2 < P1) do begin
-    Delete(aDateStr,P2,1);
-    dec(P1);
+    aDateStr[P2] := ' ';
     P2 := AlcharPosEx('-',ADateStr,P2);
   end; //'DD Mon YYYY HH:MM:SS GMT' or 'DD Mon YYYY HH:MM:SS +0200' or '23 Aug 2004 06:48:46 -0700'
   While Alpos('  ',ADateStr) > 0 do ADateStr := AlStringReplace(ADateStr,'  ',' ',[RfReplaceAll]); //'DD Mon YYYY HH:MM:SS GMT' or 'DD Mon YYYY HH:MM:SS +0200'

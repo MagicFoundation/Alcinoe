@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 473
   Top = 288
   Caption = 'ALWebSpider'
-  ClientHeight = 359
-  ClientWidth = 559
+  ClientHeight = 371
+  ClientWidth = 826
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,6 +11,8 @@ object Form1: TForm1
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
@@ -90,8 +92,8 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 321
-    Width = 559
+    Top = 333
+    Width = 826
     Height = 19
     Panels = <
       item
@@ -100,8 +102,8 @@ object Form1: TForm1
       item
         Width = 100
       end>
-    ExplicitTop = 330
-    ExplicitWidth = 553
+    ExplicitTop = 321
+    ExplicitWidth = 559
   end
   object editURL2Crawl: TEdit
     Left = 136
@@ -209,15 +211,15 @@ object Form1: TForm1
   end
   object StatusBar2: TStatusBar
     Left = 0
-    Top = 340
-    Width = 559
+    Top = 352
+    Width = 826
     Height = 19
     Panels = <
       item
         Width = 50
       end>
-    ExplicitTop = 349
-    ExplicitWidth = 553
+    ExplicitTop = 340
+    ExplicitWidth = 559
   end
   object BtnChooseSaveDirectory: TButton
     Left = 481
@@ -230,9 +232,9 @@ object Form1: TForm1
   end
   object MemoErrorMsg: TMemo
     Left = 0
-    Top = 269
-    Width = 559
-    Height = 52
+    Top = 265
+    Width = 826
+    Height = 68
     Align = alBottom
     Ctl3D = True
     ParentCtl3D = False
@@ -240,37 +242,7 @@ object Form1: TForm1
     ScrollBars = ssVertical
     TabOrder = 9
     WordWrap = False
-    ExplicitTop = 278
-    ExplicitWidth = 553
-  end
-  object Panel1: TPanel
-    Left = 341
-    Top = 144
-    Width = 200
-    Height = 70
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Ctl3D = False
-    ParentColor = True
-    ParentCtl3D = False
-    TabOrder = 13
-    object Label5: TLabel
-      Left = 5
-      Top = 8
-      Width = 189
-      Height = 52
-      Caption = 
-        'Please add in your website a link to http://www.arkadia.com or s' +
-        'end me an email to svanderclock@arkadia.com if you like this com' +
-        'ponent!'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clTeal
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-      WordWrap = True
-    end
+    ExplicitTop = 272
   end
   object EditIncludeLink: TEdit
     Left = 136
@@ -285,7 +257,7 @@ object Form1: TForm1
     Font.Style = []
     ParentCtl3D = False
     ParentFont = False
-    TabOrder = 14
+    TabOrder = 13
   end
   object EditExcludeLink: TEdit
     Left = 136
@@ -300,7 +272,75 @@ object Form1: TForm1
     Font.Style = []
     ParentCtl3D = False
     ParentFont = False
+    TabOrder = 14
+  end
+  object Panel1: TPanel
+    Left = 520
+    Top = 16
+    Width = 292
+    Height = 153
+    BevelOuter = bvNone
+    BorderStyle = bsSingle
+    Color = clSilver
+    Ctl3D = False
+    ParentBackground = False
+    ParentCtl3D = False
     TabOrder = 15
+    object Label8: TLabel
+      Left = 5
+      Top = 8
+      Width = 132
+      Height = 45
+      Caption = 'Please help us to keep the development of these components free'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      WordWrap = True
+    end
+    object Label12: TLabel
+      Left = 5
+      Top = 63
+      Width = 125
+      Height = 75
+      Caption = 
+        'If you like these components please simply click on each button ' +
+        'below ... thanks for your support !'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      WordWrap = True
+    end
+    object Panel2: TPanel
+      Left = 151
+      Top = 8
+      Width = 130
+      Height = 134
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Color = clWhite
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object PanelWebBrowser: TPanel
+        Left = -5
+        Top = -23
+        Width = 133
+        Height = 159
+        BevelOuter = bvNone
+        Color = clMedGray
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+      end
+    end
   end
   object MainWebSpider: TAlWebSpider
     OnCrawlDownloadSuccess = MainWebSpiderCrawlDownloadSuccess

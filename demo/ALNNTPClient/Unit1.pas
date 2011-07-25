@@ -2,13 +2,25 @@ unit Unit1;
 
 interface
 
-uses SysUtils,
+uses Windows,
+     Messages,
+     SysUtils,
+     Variants,
      Classes,
+     Graphics,
      Controls,
      Forms,
+     Dialogs,
      StdCtrls,
+     shellapi,
      ExtCtrls,
-     AlNNTPClient;
+     ComCtrls,
+     SyncObjs,
+     AlNNTPClient,
+     ActiveX,
+     OleCtrls,
+     SHDocVw,
+     ComObj;
 
 type
   TForm1 = class(TForm)
@@ -45,12 +57,15 @@ type
     ListButton: TButton;
     GroupButton: TButton;
     StatByIDButton: TButton;
-    Panel1: TPanel;
-    Label8: TLabel;
     Label11: TLabel;
     ArticleIDEdit: TEdit;
     ButtonLast: TButton;
     ButtonPost: TButton;
+    Panel1: TPanel;
+    Label8: TLabel;
+    Label12: TLabel;
+    Panel2: TPanel;
+    PanelWebBrowser: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure NextButtonClick(Sender: TObject);
     procedure ConnectButtonClick(Sender: TObject);
@@ -65,6 +80,7 @@ type
     procedure StatByIDButtonClick(Sender: TObject);
     procedure ButtonLastClick(Sender: TObject);
     procedure ButtonPostClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FNNTPCLient: TALNNTPCLient;
   end;
@@ -79,13 +95,6 @@ Uses alFcnString,
      ALMultiPartMixedParser;
 
 {$R *.DFM}
-
-{*******************************************}
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  DisplayMemo.Clear;
-  FNNTPClient := TAlNNTPClient.Create;
-end;
 
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -193,6 +202,53 @@ begin
     aNEwsArticleHeader.Free;
   end;
 end;
+
+
+
+
+{-------------------}
+var ie: IWebBrowser2;
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
+begin
+  DisplayMemo.Clear;
+  FNNTPClient := TAlNNTPClient.Create;
+  CoInitialize(nil);
+  ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
+  SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
+  SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
+  windows.setparent(ie.hwnd, PanelWebBrowser.handle);
+  ie.Left := maxint; // don't understand why it's look impossible to setup the position
+  ie.Top  := maxint; // don't understand why it's look impossible to setup the position
+  ie.Width := 100;
+  ie.Height := 300;
+  ie.MenuBar := false;
+  ie.AddressBar := false;
+  ie.Resizable := false;
+  ie.StatusBar := false;
+  ie.ToolBar := 0;
+  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
+  ie.Visible := true;
+end;
+
+{********************************************************************}
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  try
+    ie.quit;
+  except
+  end;
+  sleep(500);
+  CoUninitialize;
+end;
+
+{$IFDEF DEBUG}
+initialization
+  ReportMemoryleaksOnSHutdown := True;
+{$ENDIF}
 
 end.
 

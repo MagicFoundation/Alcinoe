@@ -17,7 +17,10 @@ uses Windows,
      ALWebSpider,
      AlAVLBinaryTree,
      AlHttpCommon,
-     ExtCtrls;
+     ExtCtrls,
+     OleCtrls,
+     SHDocVw,
+     ComObj;
 
 type
 
@@ -41,12 +44,15 @@ type
     MainWebSpider: TAlWebSpider;
     MainHttpClient: TALWinHttpClient;
     ButtonStop: TButton;
-    Panel1: TPanel;
-    Label5: TLabel;
     EditIncludeLink: TEdit;
     Label4: TLabel;
     EditExcludeLink: TEdit;
     Label6: TLabel;
+    Panel1: TPanel;
+    Label8: TLabel;
+    Label12: TLabel;
+    Panel2: TPanel;
+    PanelWebBrowser: TPanel;
     procedure ButtonStartClick(Sender: TObject);
     procedure BtnChooseSaveDirectoryClick(Sender: TObject);
     procedure MainWebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: String; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
@@ -57,6 +63,8 @@ type
     procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: String; HtmlTagParams: TStrings; URL: String; var LocalPath: String);
     procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: String);
     procedure ButtonStopClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
   private
     FPageDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
@@ -576,6 +584,49 @@ Begin
     BaseHref := '';
   end
 end;
+
+
+
+
+{-------------------}
+var ie: IWebBrowser2;
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
+begin
+  ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
+  SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
+  SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
+  windows.setparent(ie.hwnd, PanelWebBrowser.handle);
+  ie.Left := maxint; // don't understand why it's look impossible to setup the position
+  ie.Top  := maxint; // don't understand why it's look impossible to setup the position
+  ie.Width := 100;
+  ie.Height := 300;
+  ie.MenuBar := false;
+  ie.AddressBar := false;
+  ie.Resizable := false;
+  ie.StatusBar := false;
+  ie.ToolBar := 0;
+  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
+  ie.Visible := true;
+end;
+
+{********************************************************************}
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  try
+    ie.quit;
+  except
+  end;
+  sleep(500);
+end;
+
+{$IFDEF DEBUG}
+initialization
+  ReportMemoryleaksOnSHutdown := True;
+{$ENDIF}
 
 end.
 

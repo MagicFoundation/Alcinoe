@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 437
   Top = 108
   Caption = 'Form1'
-  ClientHeight = 279
-  ClientWidth = 285
+  ClientHeight = 368
+  ClientWidth = 315
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,10 +11,12 @@ object Form1: TForm1
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Main_TopPanel: TPanel
-    Left = 57
+    Left = 69
     Top = 16
     Width = 158
     Height = 55
@@ -142,7 +144,7 @@ object Form1: TForm1
     end
   end
   object Button1: TButton
-    Left = 160
+    Left = 172
     Top = 96
     Width = 75
     Height = 25
@@ -150,7 +152,7 @@ object Form1: TForm1
     TabOrder = 1
   end
   object ALButton1: TALButton
-    Left = 40
+    Left = 52
     Top = 96
     Width = 75
     Height = 25
@@ -160,7 +162,7 @@ object Form1: TForm1
     OnPaint = ALButton1Paint
   end
   object ALRadioButton1: TALRadioButton
-    Left = 40
+    Left = 52
     Top = 134
     Width = 98
     Height = 17
@@ -169,7 +171,7 @@ object Form1: TForm1
     OnPaint = ALRadioButton1Paint
   end
   object ALCheckBox1: TALCheckBox
-    Left = 40
+    Left = 52
     Top = 158
     Width = 88
     Height = 17
@@ -178,7 +180,7 @@ object Form1: TForm1
     OnPaint = ALCheckBox1Paint
   end
   object RadioButton1: TRadioButton
-    Left = 161
+    Left = 173
     Top = 134
     Width = 113
     Height = 17
@@ -186,47 +188,86 @@ object Form1: TForm1
     TabOrder = 5
   end
   object CheckBox1: TCheckBox
-    Left = 162
+    Left = 174
     Top = 158
     Width = 97
     Height = 17
     Caption = 'TCheckBox'
     TabOrder = 6
   end
-  object Panel1: TPanel
-    Left = 46
-    Top = 200
-    Width = 200
-    Height = 70
+  object Panel2: TPanel
+    Left = 11
+    Top = 192
+    Width = 292
+    Height = 153
     BevelOuter = bvNone
     BorderStyle = bsSingle
+    Color = clSilver
     Ctl3D = False
-    ParentColor = True
+    ParentBackground = False
     ParentCtl3D = False
     TabOrder = 7
-    object Label5: TLabel
+    object Label7: TLabel
       Left = 5
       Top = 8
-      Width = 189
-      Height = 52
+      Width = 132
+      Height = 45
+      Caption = 'Please help us to keep the development of these components free'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      WordWrap = True
+    end
+    object Label8: TLabel
+      Left = 5
+      Top = 63
+      Width = 125
+      Height = 75
       Caption = 
-        'Please add in your website a link to http://www.arkadia.com or s' +
-        'end me an email to svanderclock@arkadia.com if you like this com' +
-        'ponent!'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clTeal
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
+        'If you like these components please simply click on each button ' +
+        'below ... thanks for your support !'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Arial'
       Font.Style = []
       ParentFont = False
       WordWrap = True
+    end
+    object Panel3: TPanel
+      Left = 151
+      Top = 8
+      Width = 130
+      Height = 134
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Color = clWhite
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object PanelWebBrowser: TPanel
+        Left = -5
+        Top = -23
+        Width = 133
+        Height = 159
+        BevelOuter = bvNone
+        Color = clMedGray
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+      end
     end
   end
   object TopBtn_ImageList: TImageList
     DrawingStyle = dsTransparent
     Height = 20
     Width = 20
-    Left = 8
+    Left = 20
     Top = 56
     Bitmap = {
       494C010109000E00040014001400FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600

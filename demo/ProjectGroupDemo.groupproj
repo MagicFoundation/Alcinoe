@@ -4,6 +4,8 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
+    <Projects Include="..\..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj" />
+    <Projects Include="..\..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj" />
     <Projects Include="ALButton\ALButtonDemo.dproj" />
     <Projects Include="ALCipherDemo\ALCipherDemo.dproj" />
     <Projects Include="ALComboBox\ALComboBoxDemo.dproj" />
@@ -231,14 +233,32 @@
   <Target Name="ALSqlite3clientDemo:Make">
     <MSBuild Projects="ALSqlite3ClientDemo\ALSqlite3clientDemo.dproj" Targets="Make" />
   </Target>
+  <Target Name="BlowPipeSMS">
+    <MSBuild Projects="..\..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj" Targets="" />
+  </Target>
+  <Target Name="BlowPipeSMS:Clean">
+    <MSBuild Projects="..\..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="BlowPipeSMS:Make">
+    <MSBuild Projects="..\..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj" Targets="Make" />
+  </Target>
+  <Target Name="BlowPipeEmail">
+    <MSBuild Projects="..\..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj" Targets="" />
+  </Target>
+  <Target Name="BlowPipeEmail:Clean">
+    <MSBuild Projects="..\..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj" Targets="Clean" />
+  </Target>
+  <Target Name="BlowPipeEmail:Make">
+    <MSBuild Projects="..\..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj" Targets="Make" />
+  </Target>
   <Target Name="Build">
-    <CallTarget Targets="ALButtonDemo;ALComboBoxDemo;ALEditDemo;ALHintBalloonDemo;ALListBoxDemo;ALMemoDemo;ALSMTPClientDemo;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALStringBenchmark;ALFBXDemo;ALNNTPClientDemo;ALPhpRunnerDemo;ALSQLBenchmark;ALStringListBenchmark;ALCipherDemo;ALStressHTTPServer;ALFBXEvent;ALFBXMonitoringStats;ALSqlite3clientDemo" />
+    <CallTarget Targets="ALButtonDemo;ALComboBoxDemo;ALEditDemo;ALHintBalloonDemo;ALListBoxDemo;ALMemoDemo;ALSMTPClientDemo;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;AlXmlDocDemo;ALStringBenchmark;ALFBXDemo;ALNNTPClientDemo;ALPhpRunnerDemo;ALSQLBenchmark;ALStringListBenchmark;ALCipherDemo;ALStressHTTPServer;ALFBXEvent;ALFBXMonitoringStats;ALSqlite3clientDemo;BlowPipeSMS;BlowPipeEmail" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="ALButtonDemo:Clean;ALComboBoxDemo:Clean;ALEditDemo:Clean;ALHintBalloonDemo:Clean;ALListBoxDemo:Clean;ALMemoDemo:Clean;ALSMTPClientDemo:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALStringBenchmark:Clean;ALFBXDemo:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSQLBenchmark:Clean;ALStringListBenchmark:Clean;ALCipherDemo:Clean;ALStressHTTPServer:Clean;ALFBXEvent:Clean;ALFBXMonitoringStats:Clean;ALSqlite3clientDemo:Clean" />
+    <CallTarget Targets="ALButtonDemo:Clean;ALComboBoxDemo:Clean;ALEditDemo:Clean;ALHintBalloonDemo:Clean;ALListBoxDemo:Clean;ALMemoDemo:Clean;ALSMTPClientDemo:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;AlXmlDocDemo:Clean;ALStringBenchmark:Clean;ALFBXDemo:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSQLBenchmark:Clean;ALStringListBenchmark:Clean;ALCipherDemo:Clean;ALStressHTTPServer:Clean;ALFBXEvent:Clean;ALFBXMonitoringStats:Clean;ALSqlite3clientDemo:Clean;BlowPipeSMS:Clean;BlowPipeEmail:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="ALButtonDemo:Make;ALComboBoxDemo:Make;ALEditDemo:Make;ALHintBalloonDemo:Make;ALListBoxDemo:Make;ALMemoDemo:Make;ALSMTPClientDemo:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALStringBenchmark:Make;ALFBXDemo:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSQLBenchmark:Make;ALStringListBenchmark:Make;ALCipherDemo:Make;ALStressHTTPServer:Make;ALFBXEvent:Make;ALFBXMonitoringStats:Make;ALSqlite3clientDemo:Make" />
+    <CallTarget Targets="ALButtonDemo:Make;ALComboBoxDemo:Make;ALEditDemo:Make;ALHintBalloonDemo:Make;ALListBoxDemo:Make;ALMemoDemo:Make;ALSMTPClientDemo:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;AlXmlDocDemo:Make;ALStringBenchmark:Make;ALFBXDemo:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSQLBenchmark:Make;ALStringListBenchmark:Make;ALCipherDemo:Make;ALStressHTTPServer:Make;ALFBXEvent:Make;ALFBXMonitoringStats:Make;ALSqlite3clientDemo:Make;BlowPipeSMS:Make;BlowPipeEmail:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

@@ -16,7 +16,10 @@ uses Windows,
      shellapi,
      ExtCtrls,
      ComCtrls,
-     AlWininetHttpClient;
+     AlWininetHttpClient,
+     OleCtrls,
+     SHDocVw,
+     ComObj;
 
 type
   TForm1 = class(TForm)
@@ -98,17 +101,21 @@ type
     ButtonPost: TButton;
     ButtonGet: TButton;
     ButtonOpenInExplorer: TButton;
-    Panel1: TPanel;
-    Label9: TLabel;
     CheckBoxEncodeParams: TCheckBox;
     ButtonHead: TButton;
     CheckBoxRawPostData: TCheckBox;
+    Panel1: TPanel;
+    Label9: TLabel;
+    Label10: TLabel;
+    Panel2: TPanel;
+    PanelWebBrowser: TPanel;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ButtonOpenInExplorerClick(Sender: TObject);
     procedure ButtonPostClick(Sender: TObject);
     procedure ButtonHeadClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FWinInetHttpClient: TalWinInetHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -289,20 +296,6 @@ begin
   FWinInetHttpClient.Free;
 end;
 
-{*******************************************}
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  FWinInetHttpClient := TaLWinInetHttpClient.Create(self);
-  with FWinInetHttpClient do begin
-    AccessType := wHttpAt_Preconfig;
-    InternetOptions := [wHttpIo_Keep_connection];
-    OnStatusChange := OnHttpClientStatusChange;
-    OnDownloadProgress := OnHttpDownloadProgress;
-    OnUploadProgress := OnHttpUploadProgress;
-    MemoRequestRawHeader.Text := RequestHeader.RawHeaderText;
-  end;
-end;
-
 {************************************************}
 procedure TForm1.ButtonHeadClick(Sender: TObject);
 Var AHTTPResponseHeader: TALHTTPResponseHeader;
@@ -432,5 +425,58 @@ begin
     aTmpPostDataString.free;
   end;
 end;
+
+
+
+
+{-------------------}
+var ie: IWebBrowser2;
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
+begin
+  FWinInetHttpClient := TaLWinInetHttpClient.Create(self);
+  with FWinInetHttpClient do begin
+    AccessType := wHttpAt_Preconfig;
+    InternetOptions := [wHttpIo_Keep_connection];
+    OnStatusChange := OnHttpClientStatusChange;
+    OnDownloadProgress := OnHttpDownloadProgress;
+    OnUploadProgress := OnHttpUploadProgress;
+    MemoRequestRawHeader.Text := RequestHeader.RawHeaderText;
+  end;
+
+  ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
+  SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
+  SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
+  windows.setparent(ie.hwnd, PanelWebBrowser.handle);
+  ie.Left := maxint; // don't understand why it's look impossible to setup the position
+  ie.Top  := maxint; // don't understand why it's look impossible to setup the position
+  ie.Width := 100;
+  ie.Height := 300;
+  ie.MenuBar := false;
+  ie.AddressBar := false;
+  ie.Resizable := false;
+  ie.StatusBar := false;
+  ie.ToolBar := 0;
+  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
+  ie.Visible := true;
+end;
+
+{********************************************************************}
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  try
+    ie.quit;
+  except
+  end;
+  sleep(500);
+end;
+
+{$IFDEF DEBUG}
+initialization
+  ReportMemoryleaksOnSHutdown := True;
+{$ENDIF}
 
 end.

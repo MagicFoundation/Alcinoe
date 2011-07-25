@@ -4,12 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, AlScrollBar, ALMemo, ALButton;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, AlScrollBar, ALMemo, ALButton,
+  OleCtrls, SHDocVw, ComObj;
 
 type
   TForm1 = class(TForm)
-    Panel1: TPanel;
-    Label5: TLabel;
     ALButton1: TALButton;
     ALButton2: TALButton;
     ALButton3: TALButton;
@@ -24,6 +23,11 @@ type
     ALButton12: TALButton;
     ALButton13: TALButton;
     ALButton14: TALButton;
+    Panel2: TPanel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Panel3: TPanel;
+    PanelWebBrowser: TPanel;
     procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure FormClick(Sender: TObject);
     procedure ALButton1Click(Sender: TObject);
@@ -40,6 +44,8 @@ type
     procedure ALButton12Click(Sender: TObject);
     procedure ALButton13Click(Sender: TObject);
     procedure ALButton14Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
   private
   public
   end;
@@ -648,5 +654,48 @@ begin
   end;
   Showmessage(FormatDateTime('nn:ss:zzz',now-StartDate));
 end;
+
+
+
+
+{-------------------}
+var ie: IWebBrowser2;
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
+begin
+  ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
+  SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
+  SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
+  windows.setparent(ie.hwnd, PanelWebBrowser.handle);
+  ie.Left := maxint; // don't understand why it's look impossible to setup the position
+  ie.Top  := maxint; // don't understand why it's look impossible to setup the position
+  ie.Width := 100;
+  ie.Height := 300;
+  ie.MenuBar := false;
+  ie.AddressBar := false;
+  ie.Resizable := false;
+  ie.StatusBar := false;
+  ie.ToolBar := 0;
+  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
+  ie.Visible := true;
+end;
+
+{********************************************************************}
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  try
+    ie.quit;
+  except
+  end;
+  sleep(500);
+end;
+
+{$IFDEF DEBUG}
+initialization
+  ReportMemoryleaksOnSHutdown := True;
+{$ENDIF}
 
 end.

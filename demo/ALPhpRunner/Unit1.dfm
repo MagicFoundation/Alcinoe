@@ -4,8 +4,8 @@ object Form1: TForm1
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'TALPHPRunner'
-  ClientHeight = 748
-  ClientWidth = 800
+  ClientHeight = 818
+  ClientWidth = 790
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -14,35 +14,40 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object MainStatusBar: TStatusBar
     Left = 0
-    Top = 729
-    Width = 800
+    Top = 799
+    Width = 790
     Height = 19
     Panels = <
       item
         Width = 300
       end>
-    ExplicitTop = 677
+    ExplicitTop = 729
+    ExplicitWidth = 800
   end
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 800
-    Height = 729
+    Width = 790
+    Height = 799
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 1
-    ExplicitHeight = 677
+    ExplicitWidth = 800
+    ExplicitHeight = 729
     object TabSheet1: TTabSheet
       Caption = 'Main'
-      ExplicitHeight = 649
+      ExplicitWidth = 792
+      ExplicitHeight = 701
       object GroupBox9: TGroupBox
         Left = 0
-        Top = 134
-        Width = 792
+        Top = 209
+        Width = 782
         Height = 192
         Align = alTop
         Caption = 'PARAMS'
@@ -53,6 +58,8 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
+        ExplicitTop = 134
+        ExplicitWidth = 792
         object Label4: TLabel
           Left = 8
           Top = 85
@@ -257,8 +264,8 @@ object Form1: TForm1
       end
       object GroupBox10: TGroupBox
         Left = 0
-        Top = 336
-        Width = 792
+        Top = 411
+        Width = 782
         Height = 227
         Align = alTop
         Caption = 'RESPONSE'
@@ -269,6 +276,8 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 1
+        ExplicitTop = 336
+        ExplicitWidth = 792
         object Label2: TLabel
           Left = 8
           Top = 21
@@ -350,8 +359,8 @@ object Form1: TForm1
       object GroupBox1: TGroupBox
         Left = 0
         Top = 10
-        Width = 792
-        Height = 114
+        Width = 782
+        Height = 189
         Align = alTop
         Caption = 'INTERPRETER'
         Font.Charset = DEFAULT_CHARSET
@@ -361,9 +370,6 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 2
-        ExplicitLeft = 3
-        ExplicitTop = 3
-        ExplicitWidth = 777
         object Label11: TLabel
           Left = 8
           Top = 27
@@ -432,7 +438,7 @@ object Form1: TForm1
         object EditPhpCGIPath: TEdit
           Left = 119
           Top = 25
-          Width = 384
+          Width = 340
           Height = 19
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
@@ -445,39 +451,10 @@ object Form1: TForm1
           TabOrder = 0
           Text = 'c:\program files\php\php-cgi.exe'
         end
-        object Panel2: TPanel
-          Left = 551
-          Top = 28
-          Width = 200
-          Height = 61
-          BevelOuter = bvNone
-          BorderStyle = bsSingle
-          Ctl3D = False
-          ParentColor = True
-          ParentCtl3D = False
-          TabOrder = 1
-          object Label14: TLabel
-            Left = 5
-            Top = 0
-            Width = 189
-            Height = 52
-            Caption = 
-              'Please add in your website a link to http://www.arkadia.com or s' +
-              'end me an email to svanderclock@arkadia.com if you like this com' +
-              'ponent!'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clTeal
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = []
-            ParentFont = False
-            WordWrap = True
-          end
-        end
         object EditPhpIsapiDllPath: TEdit
           Left = 119
           Top = 50
-          Width = 384
+          Width = 340
           Height = 19
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
@@ -487,7 +464,7 @@ object Form1: TForm1
           Font.Style = []
           ParentCtl3D = False
           ParentFont = False
-          TabOrder = 2
+          TabOrder = 1
           Text = 'c:\program files\php\php5isapi.dll'
         end
         object EditPhpFastCgiHost: TEdit
@@ -503,13 +480,13 @@ object Form1: TForm1
           Font.Style = []
           ParentCtl3D = False
           ParentFont = False
-          TabOrder = 3
+          TabOrder = 2
           Text = '127.0.0.1'
         end
         object EditPhpFastCgiPort: TEdit
           Left = 393
           Top = 75
-          Width = 110
+          Width = 66
           Height = 19
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
@@ -519,14 +496,82 @@ object Form1: TForm1
           Font.Style = []
           ParentCtl3D = False
           ParentFont = False
-          TabOrder = 4
+          TabOrder = 3
           Text = '9000'
+        end
+        object Panel2: TPanel
+          Left = 476
+          Top = 25
+          Width = 292
+          Height = 151
+          BevelOuter = bvNone
+          BorderStyle = bsSingle
+          Color = clSilver
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 4
+          object Label14: TLabel
+            Left = 5
+            Top = 8
+            Width = 132
+            Height = 45
+            Caption = 'Please help us to keep the development of these components free'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clMaroon
+            Font.Height = -12
+            Font.Name = 'Arial'
+            Font.Style = [fsBold]
+            ParentFont = False
+            WordWrap = True
+          end
+          object Label35: TLabel
+            Left = 5
+            Top = 63
+            Width = 125
+            Height = 75
+            Caption = 
+              'If you like these components please simply click on each button ' +
+              'below ... thanks for your support !'
+            Font.Charset = ANSI_CHARSET
+            Font.Color = clBlack
+            Font.Height = -12
+            Font.Name = 'Arial'
+            Font.Style = []
+            ParentFont = False
+            WordWrap = True
+          end
+          object Panel6: TPanel
+            Left = 151
+            Top = 8
+            Width = 130
+            Height = 134
+            BevelOuter = bvNone
+            BorderStyle = bsSingle
+            Color = clWhite
+            Ctl3D = False
+            ParentBackground = False
+            ParentCtl3D = False
+            TabOrder = 0
+            object PanelWebBrowser: TPanel
+              Left = -5
+              Top = -23
+              Width = 133
+              Height = 159
+              BevelOuter = bvNone
+              Color = clMedGray
+              Ctl3D = False
+              ParentBackground = False
+              ParentCtl3D = False
+              TabOrder = 0
+            end
+          end
         end
       end
       object GroupBox2: TGroupBox
         Left = 0
-        Top = 573
-        Width = 792
+        Top = 648
+        Width = 782
         Height = 123
         Align = alTop
         Caption = 'BENCH'
@@ -537,6 +582,8 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 3
+        ExplicitTop = 573
+        ExplicitWidth = 792
         object Label13: TLabel
           Left = 8
           Top = 91
@@ -631,46 +678,46 @@ object Form1: TForm1
       end
       object Panel1: TPanel
         Left = 0
-        Top = 326
-        Width = 792
+        Top = 401
+        Width = 782
         Height = 10
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 4
-        ExplicitLeft = -3
-        ExplicitTop = 115
+        ExplicitTop = 326
+        ExplicitWidth = 792
       end
       object Panel3: TPanel
         Left = 0
-        Top = 124
-        Width = 792
+        Top = 199
+        Width = 782
         Height = 10
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 5
-        ExplicitLeft = 3
-        ExplicitTop = 71
+        ExplicitTop = 124
+        ExplicitWidth = 792
       end
       object Panel4: TPanel
         Left = 0
-        Top = 563
-        Width = 792
+        Top = 638
+        Width = 782
         Height = 10
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 6
-        ExplicitLeft = -3
-        ExplicitTop = 541
+        ExplicitTop = 563
+        ExplicitWidth = 792
       end
       object Panel5: TPanel
         Left = 0
         Top = 0
-        Width = 792
+        Width = 782
         Height = 10
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 7
-        ExplicitLeft = -3
+        ExplicitWidth = 792
       end
     end
   end

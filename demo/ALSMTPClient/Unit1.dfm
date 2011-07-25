@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 214
   Caption = 'SMTP Test'
   ClientHeight = 564
-  ClientWidth = 583
+  ClientWidth = 881
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,7 +21,7 @@ object Form1: TForm1
   object MsgMemo: TMemo
     Left = 0
     Top = 191
-    Width = 583
+    Width = 881
     Height = 120
     Hint = 'Enter the message text in this memo'
     Align = alTop
@@ -37,12 +37,12 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
-    ExplicitWidth = 575
+    ExplicitWidth = 583
   end
   object DisplayMemo: TMemo
     Left = 0
     Top = 394
-    Width = 583
+    Width = 881
     Height = 170
     Hint = 'This memo shows info messages'
     Align = alClient
@@ -59,17 +59,16 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 2
-    ExplicitWidth = 575
-    ExplicitHeight = 179
+    ExplicitWidth = 583
   end
   object ToolsPanel: TPanel
     Left = 0
     Top = 0
-    Width = 583
+    Width = 881
     Height = 191
     Align = alTop
     TabOrder = 3
-    ExplicitWidth = 575
+    ExplicitWidth = 583
     object Label1: TLabel
       Left = 22
       Top = 11
@@ -395,44 +394,83 @@ object Form1: TForm1
       Caption = 'Confirm'
       TabOrder = 11
     end
-    object Panel1: TPanel
-      Left = 368
-      Top = 112
-      Width = 200
-      Height = 70
+    object Panel2: TPanel
+      Left = 577
+      Top = 8
+      Width = 292
+      Height = 153
       BevelOuter = bvNone
       BorderStyle = bsSingle
+      Color = clSilver
       Ctl3D = False
-      ParentColor = True
+      ParentBackground = False
       ParentCtl3D = False
       TabOrder = 22
-      object Label8: TLabel
+      object Label15: TLabel
         Left = 5
         Top = 8
-        Width = 189
-        Height = 52
+        Width = 132
+        Height = 45
+        Caption = 'Please help us to keep the development of these components free'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clMaroon
+        Font.Height = -12
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
+        WordWrap = True
+      end
+      object Label16: TLabel
+        Left = 5
+        Top = 63
+        Width = 125
+        Height = 75
         Caption = 
-          'Please add in your website a link to http://www.arkadia.com or s' +
-          'end me an email to svanderclock@arkadia.com if you like this com' +
-          'ponent!'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clTeal
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
+          'If you like these components please simply click on each button ' +
+          'below ... thanks for your support !'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clBlack
+        Font.Height = -12
+        Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
         WordWrap = True
+      end
+      object Panel3: TPanel
+        Left = 151
+        Top = 8
+        Width = 130
+        Height = 134
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clWhite
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+        object PanelWebBrowser: TPanel
+          Left = -5
+          Top = -23
+          Width = 133
+          Height = 159
+          BevelOuter = bvNone
+          Color = clMedGray
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 0
+        end
       end
     end
   end
   object AttachPanel: TPanel
     Left = 0
     Top = 311
-    Width = 583
+    Width = 881
     Height = 17
     Align = alTop
     TabOrder = 4
-    ExplicitWidth = 575
+    ExplicitWidth = 583
     object Label6: TLabel
       Left = 16
       Top = 2
@@ -444,7 +482,7 @@ object Form1: TForm1
   object FileAttachMemo: TMemo
     Left = 0
     Top = 328
-    Width = 583
+    Width = 881
     Height = 49
     Hint = 'Enter the attached file path, one per line'
     Align = alTop
@@ -460,16 +498,16 @@ object Form1: TForm1
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
-    ExplicitWidth = 575
+    ExplicitWidth = 583
   end
   object InfoPanel: TPanel
     Left = 0
     Top = 377
-    Width = 583
+    Width = 881
     Height = 17
     Align = alTop
     TabOrder = 5
-    ExplicitWidth = 575
+    ExplicitWidth = 583
     object Label7: TLabel
       Left = 16
       Top = 2

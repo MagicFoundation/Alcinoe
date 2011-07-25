@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 377
   Top = 296
   Caption = 'TALStressHttpServer'
-  ClientHeight = 590
-  ClientWidth = 877
+  ClientHeight = 582
+  ClientWidth = 1006
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,22 +12,27 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object PageControl1: TPageControl
     Left = 0
     Top = 0
-    Width = 877
-    Height = 590
+    Width = 1006
+    Height = 582
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
+    ExplicitWidth = 877
+    ExplicitHeight = 590
     object TabSheet1: TTabSheet
       Caption = 'Application'
+      ExplicitWidth = 869
+      ExplicitHeight = 562
       DesignSize = (
-        869
-        562)
+        998
+        554)
       object Label4: TLabel
         Left = 11
         Top = 8
@@ -99,7 +104,7 @@ object Form1: TForm1
       object MemoLstUrl: TMemo
         Left = 3
         Top = 29
-        Width = 846
+        Width = 975
         Height = 106
         Anchors = [akLeft, akTop, akRight]
         Ctl3D = False
@@ -115,12 +120,13 @@ object Form1: TForm1
         ScrollBars = ssVertical
         TabOrder = 1
         WordWrap = False
+        ExplicitWidth = 846
       end
       object GridThread: TcxGrid
         Left = 0
         Top = 198
-        Width = 869
-        Height = 345
+        Width = 998
+        Height = 337
         Align = alBottom
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = ANSI_CHARSET
@@ -130,6 +136,8 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 2
+        ExplicitWidth = 869
+        ExplicitHeight = 345
         object TableViewThread: TcxGridTableView
           NavigatorButtons.ConfirmDelete = False
           NavigatorButtons.First.Visible = False
@@ -223,8 +231,8 @@ object Form1: TForm1
       end
       object StatusBar1: TStatusBar
         Left = 0
-        Top = 543
-        Width = 869
+        Top = 535
+        Width = 998
         Height = 19
         Panels = <
           item
@@ -233,6 +241,8 @@ object Form1: TForm1
           item
             Width = 50
           end>
+        ExplicitTop = 543
+        ExplicitWidth = 869
       end
       object EditMaxHttpRequest: TSpinEdit
         Left = 148
@@ -276,6 +286,8 @@ object Form1: TForm1
     object TabSheet2: TTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
+      OnContextPopup = TabSheet2ContextPopup
+      ExplicitHeight = 634
       object GroupBox3: TGroupBox
         Left = 7
         Top = 11
@@ -494,7 +506,7 @@ object Form1: TForm1
       object GroupBox7: TGroupBox
         Left = 304
         Top = 419
-        Width = 481
+        Width = 691
         Height = 126
         Caption = 'Internet options'
         Font.Charset = DEFAULT_CHARSET
@@ -909,7 +921,7 @@ object Form1: TForm1
       object GroupBox8: TGroupBox
         Left = 304
         Top = 11
-        Width = 481
+        Width = 385
         Height = 398
         Caption = 'Request Raw Header '
         Font.Charset = DEFAULT_CHARSET
@@ -935,7 +947,7 @@ object Form1: TForm1
         object MemoRequestRawHeader: TMemo
           Left = 9
           Top = 38
-          Width = 459
+          Width = 360
           Height = 350
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
@@ -952,6 +964,74 @@ object Form1: TForm1
           ScrollBars = ssVertical
           TabOrder = 0
           WordWrap = False
+        end
+      end
+      object Panel2: TPanel
+        Left = 698
+        Top = 16
+        Width = 292
+        Height = 392
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clSilver
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 8
+        object Label7: TLabel
+          Left = 5
+          Top = 8
+          Width = 132
+          Height = 45
+          Caption = 'Please help us to keep the development of these components free'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          WordWrap = True
+        end
+        object Label6: TLabel
+          Left = 5
+          Top = 63
+          Width = 125
+          Height = 75
+          Caption = 
+            'If you like these components please simply click on each button ' +
+            'below ... thanks for your support !'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          WordWrap = True
+        end
+        object Panel3: TPanel
+          Left = 151
+          Top = 8
+          Width = 130
+          Height = 134
+          BevelOuter = bvNone
+          BorderStyle = bsSingle
+          Color = clWhite
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 0
+          object PanelWebBrowser: TPanel
+            Left = -5
+            Top = -23
+            Width = 133
+            Height = 159
+            BevelOuter = bvNone
+            Color = clMedGray
+            Ctl3D = False
+            ParentBackground = False
+            ParentCtl3D = False
+            TabOrder = 0
+          end
         end
       end
     end

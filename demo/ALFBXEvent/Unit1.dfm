@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 641
-  ClientWidth = 389
+  ClientHeight = 562
+  ClientWidth = 698
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,6 +11,8 @@ object Form1: TForm1
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Label3: TLabel
@@ -130,35 +132,6 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object Panel1: TPanel
-    Left = 82
-    Top = 560
-    Width = 200
-    Height = 70
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Ctl3D = False
-    ParentColor = True
-    ParentCtl3D = False
-    TabOrder = 10
-    object Label5: TLabel
-      Left = 5
-      Top = 8
-      Width = 189
-      Height = 52
-      Caption = 
-        'Please add in your website a link to http://www.arkadia.com or s' +
-        'end me an email to svanderclock@arkadia.com if you like this com' +
-        'ponent!'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clTeal
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-      WordWrap = True
-    end
-  end
   object ALButton1: TALButton
     Left = 18
     Top = 320
@@ -205,7 +178,7 @@ object Form1: TForm1
     TabStop = False
     OnPaint = ALMemoPaint
     OnPaintScrollBar = ALMemoPaintScrollBar
-    TabOrder = 11
+    TabOrder = 10
     DesignSize = (
       353
       169)
@@ -280,6 +253,7 @@ object Form1: TForm1
     Top = 66
     Width = 249
     Height = 19
+    Cursor = crArrow
     OnButtonClick = ALEditFirebirdDatabaseButtonClick
     btnVisible = True
     btnCaption = '...'
@@ -319,6 +293,74 @@ object Form1: TForm1
     DesignSize = (
       353
       79)
+  end
+  object Panel2: TPanel
+    Left = 389
+    Top = 8
+    Width = 292
+    Height = 153
+    BevelOuter = bvNone
+    BorderStyle = bsSingle
+    Color = clSilver
+    Ctl3D = False
+    ParentBackground = False
+    ParentCtl3D = False
+    TabOrder = 11
+    object Label7: TLabel
+      Left = 5
+      Top = 8
+      Width = 132
+      Height = 45
+      Caption = 'Please help us to keep the development of these components free'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      WordWrap = True
+    end
+    object Label8: TLabel
+      Left = 5
+      Top = 63
+      Width = 125
+      Height = 75
+      Caption = 
+        'If you like these components please simply click on each button ' +
+        'below ... thanks for your support !'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = []
+      ParentFont = False
+      WordWrap = True
+    end
+    object Panel3: TPanel
+      Left = 151
+      Top = 8
+      Width = 130
+      Height = 134
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Color = clWhite
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object PanelWebBrowser: TPanel
+        Left = -5
+        Top = -23
+        Width = 133
+        Height = 159
+        BevelOuter = bvNone
+        Color = clMedGray
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+      end
+    end
   end
   object OpenDialog1: TOpenDialog
     Left = 354

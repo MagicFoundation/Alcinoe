@@ -14,6 +14,7 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
@@ -202,35 +203,6 @@ object Form1: TForm1
           TabOrder = 4
           OnClick = ButtonGetClick
         end
-        object Panel1: TPanel
-          Left = 567
-          Top = 12
-          Width = 200
-          Height = 70
-          BevelOuter = bvNone
-          BorderStyle = bsSingle
-          Ctl3D = False
-          ParentColor = True
-          ParentCtl3D = False
-          TabOrder = 5
-          object Label9: TLabel
-            Left = 5
-            Top = 8
-            Width = 189
-            Height = 52
-            Caption = 
-              'Please add in your website a link to http://www.arkadia.com or s' +
-              'end me an email to svanderclock@arkadia.com if you like this com' +
-              'ponent!'
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clTeal
-            Font.Height = -11
-            Font.Name = 'MS Sans Serif'
-            Font.Style = []
-            ParentFont = False
-            WordWrap = True
-          end
-        end
         object CheckBoxEncodeParams: TCheckBox
           Left = 11
           Top = 167
@@ -243,7 +215,7 @@ object Form1: TForm1
           Font.Name = 'MS Sans Serif'
           Font.Style = []
           ParentFont = False
-          TabOrder = 6
+          TabOrder = 5
         end
         object ButtonHead: TButton
           Left = 462
@@ -257,7 +229,7 @@ object Form1: TForm1
           Font.Name = 'MS Sans Serif'
           Font.Style = []
           ParentFont = False
-          TabOrder = 7
+          TabOrder = 6
           OnClick = ButtonHeadClick
         end
         object CheckBoxRawPostData: TCheckBox
@@ -272,7 +244,7 @@ object Form1: TForm1
           Font.Name = 'MS Sans Serif'
           Font.Style = []
           ParentFont = False
-          TabOrder = 8
+          TabOrder = 7
         end
       end
       object GroupBox10: TGroupBox
@@ -871,7 +843,7 @@ object Form1: TForm1
         Left = 8
         Top = 475
         Width = 289
-        Height = 71
+        Height = 70
         Caption = 'Access Type'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -1142,7 +1114,7 @@ object Form1: TForm1
         Left = 472
         Top = 11
         Width = 313
-        Height = 534
+        Height = 364
         Caption = 'Request Raw Header '
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -1168,7 +1140,7 @@ object Form1: TForm1
           Left = 9
           Top = 38
           Width = 294
-          Height = 486
+          Height = 312
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -1180,6 +1152,74 @@ object Form1: TForm1
           ScrollBars = ssVertical
           TabOrder = 0
           WordWrap = False
+        end
+      end
+      object Panel1: TPanel
+        Left = 472
+        Top = 384
+        Width = 313
+        Height = 161
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clSilver
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 8
+        object Label9: TLabel
+          Left = 7
+          Top = 19
+          Width = 164
+          Height = 45
+          Caption = 'Please help us to keep the development of these components free'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          WordWrap = True
+        end
+        object Label10: TLabel
+          Left = 7
+          Top = 74
+          Width = 157
+          Height = 75
+          Caption = 
+            'If you like these components please simply click on each button ' +
+            'below ... thanks for your support !'
+          Font.Charset = ANSI_CHARSET
+          Font.Color = clBlack
+          Font.Height = -12
+          Font.Name = 'Arial'
+          Font.Style = []
+          ParentFont = False
+          WordWrap = True
+        end
+        object Panel2: TPanel
+          Left = 173
+          Top = 12
+          Width = 130
+          Height = 134
+          BevelOuter = bvNone
+          BorderStyle = bsSingle
+          Color = clWhite
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 0
+          object PanelWebBrowser: TPanel
+            Left = -5
+            Top = -23
+            Width = 133
+            Height = 159
+            BevelOuter = bvNone
+            Color = clMedGray
+            Ctl3D = False
+            ParentBackground = False
+            ParentCtl3D = False
+            TabOrder = 0
+          end
         end
       end
     end

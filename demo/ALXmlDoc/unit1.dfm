@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 209
   Caption = 'Form1'
   ClientHeight = 564
-  ClientWidth = 573
+  ClientWidth = 603
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,6 +11,8 @@ object Form1: TForm1
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object ButtonLoadXmlWithALXmlDocument: TButton
@@ -25,7 +27,7 @@ object Form1: TForm1
   object ButtonLoadXmlWithXmlDocument: TButton
     Left = 296
     Top = 16
-    Width = 265
+    Width = 292
     Height = 25
     Caption = 'Load Xml File using TXmlDocument'
     TabOrder = 1
@@ -41,7 +43,7 @@ object Form1: TForm1
   object MemoLoadXmlWithXmlDocument: TMemo
     Left = 296
     Top = 48
-    Width = 265
+    Width = 292
     Height = 129
     TabOrder = 3
   end
@@ -64,14 +66,14 @@ object Form1: TForm1
   object MemoGenerate100000NodeWithXmlDocument: TMemo
     Left = 296
     Top = 232
-    Width = 265
+    Width = 292
     Height = 129
     TabOrder = 6
   end
   object ButtonGenerate100000NodeWithXmlDocument: TButton
     Left = 296
     Top = 200
-    Width = 265
+    Width = 292
     Height = 25
     Caption = 'Generate 100 000 nodes using TXmlDocument'
     TabOrder = 7
@@ -94,32 +96,71 @@ object Form1: TForm1
     TabOrder = 9
   end
   object Panel1: TPanel
-    Left = 335
-    Top = 437
-    Width = 200
-    Height = 70
+    Left = 296
+    Top = 384
+    Width = 292
+    Height = 161
     BevelOuter = bvNone
     BorderStyle = bsSingle
+    Color = clSilver
     Ctl3D = False
-    ParentColor = True
+    ParentBackground = False
     ParentCtl3D = False
     TabOrder = 10
-    object Label9: TLabel
+    object Label8: TLabel
       Left = 5
-      Top = 8
-      Width = 189
-      Height = 52
+      Top = 12
+      Width = 132
+      Height = 45
+      Caption = 'Please help us to keep the development of these components free'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clMaroon
+      Font.Height = -12
+      Font.Name = 'Arial'
+      Font.Style = [fsBold]
+      ParentFont = False
+      WordWrap = True
+    end
+    object Label12: TLabel
+      Left = 5
+      Top = 67
+      Width = 125
+      Height = 75
       Caption = 
-        'Please add in your website a link to http://www.arkadia.com or s' +
-        'end me an email to svanderclock@arkadia.com if you like this com' +
-        'ponent!'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clTeal
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
+        'If you like these components please simply click on each button ' +
+        'below ... thanks for your support !'
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clBlack
+      Font.Height = -12
+      Font.Name = 'Arial'
       Font.Style = []
       ParentFont = False
       WordWrap = True
+    end
+    object Panel2: TPanel
+      Left = 151
+      Top = 12
+      Width = 130
+      Height = 134
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Color = clWhite
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object PanelWebBrowser: TPanel
+        Left = -5
+        Top = -23
+        Width = 133
+        Height = 159
+        BevelOuter = bvNone
+        Color = clMedGray
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+      end
     end
   end
   object MainOpenDialog: TOpenDialog

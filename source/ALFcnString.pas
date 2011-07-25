@@ -1,5 +1,6 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
+www:          http://sourceforge.net/projects/alcinoe/              
+svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
               John O'Harrow (john@elmcrest.demon.co.uk)
               Charalabos Michael (chmichael@creationpower.com)
@@ -76,7 +77,11 @@ History:      11/05/2005: Remove the bug in alFastTagReplace that raise
                           on the result of FastTagReplaceProc
 Link :
 
-Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to svanderclock@arkadia.com
+* If you have downloaded this source from a website different from 
+  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
+* Please, help us to keep the development of these components free by 
+  voting on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALfcnString;
 

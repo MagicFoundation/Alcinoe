@@ -1,5 +1,6 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
+svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
@@ -58,7 +59,11 @@ History :     5/02/2005: correct SetEditRect problem with font changed
               30/10/2005: move WM_MEMOSCROLL = WM_user + 1 to
                           WM_MEMOSCROLL = WM_user + 1000
 
-Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to svanderclock@arkadia.com
+* If you have downloaded this source from a website different from 
+  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
+* Please, help us to keep the development of these components free by 
+  voting on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMemo;
 

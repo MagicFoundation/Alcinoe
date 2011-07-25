@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 485
   Top = 214
   Caption = 'NNTP Test'
-  ClientHeight = 564
-  ClientWidth = 584
+  ClientHeight = 616
+  ClientWidth = 878
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,14 +12,15 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object MsgMemo: TMemo
     Left = 0
-    Top = 191
-    Width = 584
+    Top = 172
+    Width = 878
     Height = 120
     Hint = 'Enter the message text in this memo'
     Align = alTop
@@ -35,13 +36,14 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
-    ExplicitWidth = 575
+    ExplicitTop = 191
+    ExplicitWidth = 584
   end
   object DisplayMemo: TMemo
     Left = 0
-    Top = 394
-    Width = 584
-    Height = 170
+    Top = 375
+    Width = 878
+    Height = 241
     Hint = 'This memo shows info messages'
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
@@ -55,17 +57,17 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 2
-    ExplicitWidth = 575
-    ExplicitHeight = 179
+    ExplicitTop = 394
+    ExplicitWidth = 584
+    ExplicitHeight = 170
   end
   object ToolsPanel: TPanel
     Left = 0
     Top = 0
-    Width = 584
-    Height = 191
+    Width = 878
+    Height = 172
     Align = alTop
     TabOrder = 3
-    ExplicitWidth = 575
     object Label1: TLabel
       Left = 15
       Top = 11
@@ -103,7 +105,7 @@ object Form1: TForm1
     end
     object Label5: TLabel
       Left = 8
-      Top = 176
+      Top = 270
       Width = 66
       Height = 13
       Caption = 'Message text:'
@@ -299,35 +301,6 @@ object Form1: TForm1
       TabOrder = 16
       OnClick = StatByIDButtonClick
     end
-    object Panel1: TPanel
-      Left = 151
-      Top = 131
-      Width = 417
-      Height = 46
-      BevelOuter = bvNone
-      BorderStyle = bsSingle
-      Ctl3D = False
-      ParentColor = True
-      ParentCtl3D = False
-      TabOrder = 17
-      object Label8: TLabel
-        Left = 5
-        Top = 8
-        Width = 397
-        Height = 26
-        Caption = 
-          'Please add in your website a link to http://www.arkadia.com or s' +
-          'end me an email to svanderclock@arkadia.com if you like this com' +
-          'ponent!'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clTeal
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
-        WordWrap = True
-      end
-    end
     object ArticleIDEdit: TEdit
       Left = 80
       Top = 104
@@ -335,7 +308,7 @@ object Form1: TForm1
       Height = 21
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 18
+      TabOrder = 17
     end
     object ButtonLast: TButton
       Left = 471
@@ -345,7 +318,7 @@ object Form1: TForm1
       Caption = 'Last'
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 19
+      TabOrder = 18
       OnClick = ButtonLastClick
     end
     object ButtonPost: TButton
@@ -356,18 +329,87 @@ object Form1: TForm1
       Caption = 'Post'
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 20
+      TabOrder = 19
       OnClick = ButtonPostClick
+    end
+    object Panel1: TPanel
+      Left = 577
+      Top = 8
+      Width = 292
+      Height = 153
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Color = clSilver
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 20
+      object Label8: TLabel
+        Left = 5
+        Top = 8
+        Width = 132
+        Height = 45
+        Caption = 'Please help us to keep the development of these components free'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clMaroon
+        Font.Height = -12
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
+        WordWrap = True
+      end
+      object Label12: TLabel
+        Left = 5
+        Top = 63
+        Width = 125
+        Height = 75
+        Caption = 
+          'If you like these components please simply click on each button ' +
+          'below ... thanks for your support !'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clBlack
+        Font.Height = -12
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object Panel2: TPanel
+        Left = 151
+        Top = 8
+        Width = 130
+        Height = 134
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clWhite
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+        object PanelWebBrowser: TPanel
+          Left = -5
+          Top = -23
+          Width = 133
+          Height = 159
+          BevelOuter = bvNone
+          Color = clMedGray
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 0
+        end
+      end
     end
   end
   object AttachPanel: TPanel
     Left = 0
-    Top = 311
-    Width = 584
+    Top = 292
+    Width = 878
     Height = 17
     Align = alTop
     TabOrder = 4
-    ExplicitWidth = 575
+    ExplicitTop = 311
+    ExplicitWidth = 584
     object Label6: TLabel
       Left = 8
       Top = 2
@@ -378,8 +420,8 @@ object Form1: TForm1
   end
   object FileAttachMemo: TMemo
     Left = 0
-    Top = 328
-    Width = 584
+    Top = 309
+    Width = 878
     Height = 49
     Hint = 'Enter the attached file path, one per line'
     Align = alTop
@@ -393,16 +435,18 @@ object Form1: TForm1
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
-    ExplicitWidth = 575
+    ExplicitTop = 328
+    ExplicitWidth = 584
   end
   object InfoPanel: TPanel
     Left = 0
-    Top = 377
-    Width = 584
+    Top = 358
+    Width = 878
     Height = 17
     Align = alTop
     TabOrder = 5
-    ExplicitWidth = 575
+    ExplicitTop = 377
+    ExplicitWidth = 584
     object Label7: TLabel
       Left = 8
       Top = 2

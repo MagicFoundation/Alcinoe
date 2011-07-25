@@ -1,4 +1,4 @@
-unit Unit1;                                
+unit Unit1;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   ALComboBox, ALEdit, cxStyles, cxCustomData, cxGraphics, cxFilter, cxData,
   cxDataStorage, cxEdit, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxClasses, cxControls, cxGridCustomView, cxGrid, ComCtrls, AlSqlite3Client,
-  cxMemo, cxBlobEdit, alFbxClient, almysqlClient;
+  cxMemo, cxBlobEdit, alFbxClient, almysqlClient, OleCtrls, SHDocVw, ComObj;
 
 type
 
@@ -93,7 +93,6 @@ type
     StatusBar1: TStatusBar;
     ALCheckBoxSqlite3SharedCache: TALCheckBox;
     Panel1: TPanel;
-    Label5: TLabel;
     Label13: TLabel;
     Label26: TLabel;
     ALEditFirebirdNBLoop: TALEdit;
@@ -137,6 +136,11 @@ type
     TableViewThreadUpdateAverageCommitTimeTaken: TcxGridColumn;
     TableViewThreadUpdateErrorMsg: TcxGridColumn;
     levelThreadUpdate: TcxGridLevel;
+    Panel2: TPanel;
+    Label5: TLabel;
+    Label35: TLabel;
+    Panel4: TPanel;
+    PanelWebBrowser: TPanel;
     procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlSelectClick(Sender: TObject);
@@ -158,6 +162,8 @@ type
     procedure ALButtonMysqlUpdateClick(Sender: TObject);
     procedure ALButtonMySqlLoopUpdateClick(Sender: TObject);
     procedure ALButtonMysqlLoopSelectClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
   private
   public
     Sqlite3ConnectionPoolClient: TalSqlite3ConnectionPoolClient;
@@ -1979,8 +1985,46 @@ begin
   application.ProcessMessages;
 end;
 
+
+{-------------------}
+var ie: IWebBrowser2;
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
+begin
+  ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
+  SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
+  SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
+  windows.setparent(ie.hwnd, PanelWebBrowser.handle);
+  ie.Left := maxint; // don't understand why it's look impossible to setup the position
+  ie.Top  := maxint; // don't understand why it's look impossible to setup the position
+  ie.Width := 100;
+  ie.Height := 300;
+  ie.MenuBar := false;
+  ie.AddressBar := false;
+  ie.Resizable := false;
+  ie.StatusBar := false;
+  ie.ToolBar := 0;
+  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
+  ie.Visible := true;
+end;
+
+{********************************************************************}
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  try
+    ie.quit;
+  except
+  end;
+  sleep(500);
+end;
+
 initialization
   randomize;
-  ReportMemoryLeaksOnShutdown := True;
+{$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+{$ENDIF}
 
 end.

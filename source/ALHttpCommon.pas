@@ -1,5 +1,6 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
+www:          http://sourceforge.net/projects/alcinoe/              
+svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
@@ -63,7 +64,11 @@ History :     04/10/2005: * Move ALTryGMTHeaderHttpStrToDateTime to
 Link :        http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
               http://wp.netscape.com/newsref/std/cookie_spec.html
 
-Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to svanderclock@arkadia.com
+* If you have downloaded this source from a website different from 
+  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
+* Please, help us to keep the development of these components free by 
+  voting on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALHttpCommon;
 
@@ -1321,6 +1326,7 @@ begin
     delete(aUrl, P1, Maxint);
   end
   else aAnchor := '';
+  Result := aUrl;
 end;
 
 {*************************************************************}

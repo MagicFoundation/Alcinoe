@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 878
+  ClientHeight = 886
   ClientWidth = 1105
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
@@ -12,6 +12,8 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   OnClick = FormClick
+  OnClose = FormClose
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Label3: TLabel
@@ -1213,7 +1215,7 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 859
+    Top = 867
     Width = 1105
     Height = 19
     Panels = <
@@ -1223,7 +1225,7 @@ object Form1: TForm1
       item
         Width = 700
       end>
-    ExplicitTop = 779
+    ExplicitTop = 859
   end
   object ALCheckBoxSqlite3SharedCache: TALCheckBox
     Left = 856
@@ -1242,32 +1244,82 @@ object Form1: TForm1
   end
   object Panel1: TPanel
     Left = 0
-    Top = 831
+    Top = 703
     Width = 1105
-    Height = 28
+    Height = 164
     Align = alBottom
     BevelOuter = bvNone
     Ctl3D = False
     ParentColor = True
     ParentCtl3D = False
     TabOrder = 36
-    ExplicitTop = 751
-    object Label5: TLabel
-      Left = 5
-      Top = 8
-      Width = 655
-      Height = 13
-      Caption = 
-        'Please add in your website a link to http://www.arkadia.com or s' +
-        'end me an email to svanderclock@arkadia.com if you like this com' +
-        'ponent!'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clTeal
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = []
-      ParentFont = False
-      WordWrap = True
+    object Panel2: TPanel
+      Left = 8
+      Top = 6
+      Width = 292
+      Height = 153
+      BevelOuter = bvNone
+      BorderStyle = bsSingle
+      Color = clSilver
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      object Label5: TLabel
+        Left = 5
+        Top = 8
+        Width = 132
+        Height = 45
+        Caption = 'Please help us to keep the development of these components free'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clMaroon
+        Font.Height = -12
+        Font.Name = 'Arial'
+        Font.Style = [fsBold]
+        ParentFont = False
+        WordWrap = True
+      end
+      object Label35: TLabel
+        Left = 5
+        Top = 63
+        Width = 125
+        Height = 75
+        Caption = 
+          'If you like these components please simply click on each button ' +
+          'below ... thanks for your support !'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clBlack
+        Font.Height = -12
+        Font.Name = 'Arial'
+        Font.Style = []
+        ParentFont = False
+        WordWrap = True
+      end
+      object Panel4: TPanel
+        Left = 151
+        Top = 8
+        Width = 130
+        Height = 134
+        BevelOuter = bvNone
+        BorderStyle = bsSingle
+        Color = clWhite
+        Ctl3D = False
+        ParentBackground = False
+        ParentCtl3D = False
+        TabOrder = 0
+        object PanelWebBrowser: TPanel
+          Left = -5
+          Top = -23
+          Width = 133
+          Height = 159
+          BevelOuter = bvNone
+          Color = clMedGray
+          Ctl3D = False
+          ParentBackground = False
+          ParentCtl3D = False
+          TabOrder = 0
+        end
+      end
     end
   end
   object ALEditFirebirdNBLoop: TALEdit
@@ -1457,18 +1509,17 @@ object Form1: TForm1
   end
   object Panel3: TPanel
     Left = 0
-    Top = 496
+    Top = 488
     Width = 1105
-    Height = 335
+    Height = 215
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
     Caption = 'Panel2'
     TabOrder = 50
-    ExplicitHeight = 377
     object Splitter4: TSplitter
       Left = 739
       Top = 1
-      Height = 333
+      Height = 213
       Align = alRight
       ExplicitLeft = 624
       ExplicitTop = -3
@@ -1478,55 +1529,49 @@ object Form1: TForm1
       Left = 742
       Top = 1
       Width = 362
-      Height = 333
+      Height = 213
       Align = alRight
       Caption = 'Panel2'
       TabOrder = 0
-      ExplicitHeight = 354
+      ExplicitHeight = 333
       object ALMemoResult: TALMemo
         Left = 1
         Top = 1
         Width = 360
-        Height = 331
+        Height = 211
         OnPaint = ALMemoPaint
         OnPaintScrollBar = ALMemoPaintScrollBar
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 3
-        ExplicitTop = -3
-        ExplicitHeight = 352
+        ExplicitHeight = 331
         DesignSize = (
           360
-          331)
+          211)
       end
     end
     object Panel6: TPanel
       Left = 1
       Top = 1
       Width = 738
-      Height = 333
+      Height = 213
       Align = alClient
       Caption = 'Panel2'
       TabOrder = 1
-      ExplicitLeft = -2
-      ExplicitTop = 0
-      ExplicitWidth = 629
-      ExplicitHeight = 469
+      ExplicitHeight = 333
       object Splitter2: TSplitter
         Left = 1
-        Top = 165
+        Top = 105
         Width = 736
         Height = 3
         Cursor = crVSplit
         Align = alTop
-        ExplicitLeft = 625
-        ExplicitWidth = 303
+        ExplicitTop = 162
       end
       object GridThreadSelect: TcxGrid
         Left = 1
         Top = 1
         Width = 736
-        Height = 164
+        Height = 104
         Align = alTop
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
@@ -1535,9 +1580,6 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitLeft = 10
-        ExplicitTop = 25
-        ExplicitWidth = 515
         object TableViewThreadSelect: TcxGridTableView
           NavigatorButtons.ConfirmDelete = False
           NavigatorButtons.First.Visible = False
@@ -1607,9 +1649,9 @@ object Form1: TForm1
       end
       object GridThreadUpdate: TcxGrid
         Left = 1
-        Top = 168
+        Top = 108
         Width = 736
-        Height = 164
+        Height = 104
         Align = alClient
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
@@ -1618,9 +1660,8 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 164
-        ExplicitWidth = 667
-        ExplicitHeight = 185
+        ExplicitTop = 168
+        ExplicitHeight = 164
         object TableViewThreadUpdate: TcxGridTableView
           NavigatorButtons.ConfirmDelete = False
           NavigatorButtons.First.Visible = False

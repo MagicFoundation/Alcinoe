@@ -2,14 +2,26 @@ unit Unit1;
 
 interface
 
-uses SysUtils,
+uses Windows,
+     Messages,
+     SysUtils,
+     Variants,
      Classes,
+     Graphics,
      Controls,
      Forms,
+     Dialogs,
      StdCtrls,
+     shellapi,
      ExtCtrls,
-     IniFiles,
-     AlSMTPClient;
+     ComCtrls,
+     SyncObjs,
+     AlSMTPClient,
+     inifiles,
+     ActiveX,
+     OleCtrls,
+     SHDocVw,
+     ComObj;
 
 type
   TForm1 = class(TForm)
@@ -54,8 +66,11 @@ type
     BccEdit: TEdit;
     AllInOneButton: TButton;
     ConfirmCheckBox: TCheckBox;
-    Panel1: TPanel;
-    Label8: TLabel;
+    Panel2: TPanel;
+    Label15: TLabel;
+    Label16: TLabel;
+    Panel3: TPanel;
+    PanelWebBrowser: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure ClearDisplayButtonClick(Sender: TObject);
     procedure ConnectButtonClick(Sender: TObject);
@@ -175,15 +190,6 @@ begin
   Result := (Strings.Count <> 0);
 end;
 
-{*******************************************}
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-  DisplayMemo.Clear;
-  FIniFileName := LowerCase(Application.ExeName);
-  FIniFileName := Copy(FIniFileName, 1, Length(FIniFileName) - 3) + 'ini';
-  FSmtpClient := TAlSMTPClient.Create;
-end;
-
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
@@ -235,32 +241,6 @@ begin
     Height := IniFile.ReadInteger(SectionWindow, KeyHeight, Height);
     IniFile.Free;
   end;
-end;
-
-{********************************************************************}
-procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
-var IniFile : TIniFile;
-begin
-    IniFile := TIniFile.Create(FIniFileName);
-    IniFile.WriteString(SectionData, KeyHost, HostEdit.Text);
-    IniFile.WriteString(SectionData, KeyPort, PortEdit.Text);
-    IniFile.WriteString(SectionData, KeyFrom, FromEdit.Text);
-    IniFile.WriteString(SectionData, KeyTo, ToEdit.Text);
-    IniFile.WriteString(SectionData, KeyCc, CcEdit.Text);
-    IniFile.WriteString(SectionData, KeyBcc, BccEdit.Text);
-    IniFile.WriteString(SectionData, KeySubject, SubjectEdit.Text);
-    IniFile.WriteString(SectionData, KeyUser, UsernameEdit.Text);
-    IniFile.WriteString(SectionData, KeyPass, PasswordEdit.Text);
-    IniFile.WriteInteger(SectionData, KeyAuth, AuthComboBox.ItemIndex);
-    IniFile.WriteInteger(SectionData, KeyPriority, PriorityComboBox.ItemIndex);
-    IniFile.WriteInteger(SectionData, KeyConfirm, Ord(ConfirmCheckBox.Checked));
-    SaveStringsToIniFile(FIniFileName, SectionFileAttach, KeyFileAttach, FileAttachMemo.Lines);
-    SaveStringsToIniFile(FIniFileName, SectionMsgMemo, KeyMsgMemo, MsgMemo.Lines);
-    IniFile.WriteInteger(SectionWindow, KeyTop, Top);
-    IniFile.WriteInteger(SectionWindow, KeyLeft, Left);
-    IniFile.WriteInteger(SectionWindow, KeyWidth, Width);
-    IniFile.WriteInteger(SectionWindow, KeyHeight, Height);
-    IniFile.Free;
 end;
 
 {********************************************************}
@@ -449,6 +429,78 @@ begin
     aLst.free;
   end;
 end;
+
+
+
+
+{-------------------}
+var ie: IWebBrowser2;
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
+begin
+  DisplayMemo.Clear;
+  FIniFileName := LowerCase(Application.ExeName);
+  FIniFileName := Copy(FIniFileName, 1, Length(FIniFileName) - 3) + 'ini';
+  FSmtpClient := TAlSMTPClient.Create;
+  CoInitialize(nil);
+
+  ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
+  SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
+  SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
+  windows.setparent(ie.hwnd, PanelWebBrowser.handle);
+  ie.Left := maxint; // don't understand why it's look impossible to setup the position
+  ie.Top  := maxint; // don't understand why it's look impossible to setup the position
+  ie.Width := 100;
+  ie.Height := 300;
+  ie.MenuBar := false;
+  ie.AddressBar := false;
+  ie.Resizable := false;
+  ie.StatusBar := false;
+  ie.ToolBar := 0;
+  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
+  ie.Visible := true;
+end;
+
+{********************************************************************}
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+var IniFile : TIniFile;
+begin
+  IniFile := TIniFile.Create(FIniFileName);
+  IniFile.WriteString(SectionData, KeyHost, HostEdit.Text);
+  IniFile.WriteString(SectionData, KeyPort, PortEdit.Text);
+  IniFile.WriteString(SectionData, KeyFrom, FromEdit.Text);
+  IniFile.WriteString(SectionData, KeyTo, ToEdit.Text);
+  IniFile.WriteString(SectionData, KeyCc, CcEdit.Text);
+  IniFile.WriteString(SectionData, KeyBcc, BccEdit.Text);
+  IniFile.WriteString(SectionData, KeySubject, SubjectEdit.Text);
+  IniFile.WriteString(SectionData, KeyUser, UsernameEdit.Text);
+  IniFile.WriteString(SectionData, KeyPass, PasswordEdit.Text);
+  IniFile.WriteInteger(SectionData, KeyAuth, AuthComboBox.ItemIndex);
+  IniFile.WriteInteger(SectionData, KeyPriority, PriorityComboBox.ItemIndex);
+  IniFile.WriteInteger(SectionData, KeyConfirm, Ord(ConfirmCheckBox.Checked));
+  SaveStringsToIniFile(FIniFileName, SectionFileAttach, KeyFileAttach, FileAttachMemo.Lines);
+  SaveStringsToIniFile(FIniFileName, SectionMsgMemo, KeyMsgMemo, MsgMemo.Lines);
+  IniFile.WriteInteger(SectionWindow, KeyTop, Top);
+  IniFile.WriteInteger(SectionWindow, KeyLeft, Left);
+  IniFile.WriteInteger(SectionWindow, KeyWidth, Width);
+  IniFile.WriteInteger(SectionWindow, KeyHeight, Height);
+  IniFile.Free;
+
+  try
+    ie.quit;
+  except
+  end;
+  sleep(500);
+  CoUninitialize;
+end;
+
+{$IFDEF DEBUG}
+initialization
+  ReportMemoryleaksOnSHutdown := True;
+{$ENDIF}
 
 end.
 

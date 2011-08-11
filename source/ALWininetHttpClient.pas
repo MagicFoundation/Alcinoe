@@ -56,6 +56,9 @@ Know bug :
 
 History :     28/11/2005: add Component in delphi;
               12/09/2007: rename TALWinInetInternetOpenAccessType in TALWinInetHttpInternetOpenAccessType
+              11/08/2011: add property DisconnectOnError => this to not auto
+                          disconnect on error because if so, we loose the cookies
+                          if any http error are encountered
 
 Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.ietf.org/rfc/rfc1867.txt
@@ -229,6 +232,7 @@ type
     FInetRoot: HINTERNET;
     FInetConnect: HINTERNET;
     FOnStatusChange: TAlWinInetHTTPClientStatusChangeEvent;
+    FDisconnectOnError: Boolean;
     procedure InitURL(const Value: string);
     procedure SetAccessType(const Value: TALWinInetHttpInternetOpenAccessType);
     procedure SetInternetOptions(const Value: TAlWininetHTTPClientInternetOptionSet);
@@ -250,6 +254,7 @@ type
   published
     property  AccessType: TALWinInetHttpInternetOpenAccessType read FAccessType write SetAccessType default wHttpAt_Preconfig;
     property  InternetOptions: TAlWininetHTTPClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wHttpIo_Keep_connection];
+    property  DisconnectOnError: Boolean read FDisconnectOnError write FDisconnectOnError default False; // WinInethttp seam to handle internally the disconnection/reconnection !
     property  OnStatusChange: TAlWinInetHTTPClientStatusChangeEvent read FOnStatusChange write FOnStatusChange;
   end;
 
@@ -289,21 +294,17 @@ begin
 
     {fire the On Status change event}
     if Assigned(FOnStatusChange) then
-      FOnStatusChange(
-                      TALWininetHttpClient(Context),
+      FOnStatusChange(TALWininetHttpClient(Context),
                       InternetStatus,
                       StatusInformation,
-                      StatusInformationLength
-                     );
+                      StatusInformationLength);
 
     {fire the On redirect event}
     If (InternetStatus = INTERNET_STATUS_REDIRECT) and Assigned(OnRedirect) then begin
       SetLength(NewURL, StatusInformationLength - 1);
       Move(StatusInformation^, NewURL[1], StatusInformationLength - 1);
-      OnRedirect(
-                 TALWinInetHttpClient(Context),
-                 NewURL
-                );
+      OnRedirect(TALWinInetHttpClient(Context),
+                 NewURL);
     end;
 
   end;
@@ -324,6 +325,7 @@ begin
   FAccessType := wHttpAt_Preconfig;
   FInternetOptions := [wHttpIo_Keep_connection];
   RequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWinInetHTTPClient)';
+  FDisconnectOnError := False;
 end;
 
 {**************************************}
@@ -341,15 +343,13 @@ begin
   ErrCode := GetLastError;
   if Error and (ErrCode <> 0) then begin
     SetLength(S, 256);
-    FormatMessage(
-                  FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
                   Pointer(GetModuleHandle('wininet.dll')),
                   ErrCode,
                   0,
                   PChar(S),
                   Length(S),
-                  nil
-                 );
+                  nil);
     SetLength(S, StrLen(PChar(S)));
     raise EALHTTPClientException.CreateFmt('%s - URL:%s', [trim(S), URL]);      { Do not localize }
   end;
@@ -444,12 +444,10 @@ procedure TALWinInetHTTPClient.Connect;
     if whttpIo_Offline in InternetOptions then Result := result or INTERNET_FLAG_OFFLINE;
   end;
 
-const AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (
-                                                                             INTERNET_OPEN_TYPE_DIRECT,
+const AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
                                                                              INTERNET_OPEN_TYPE_PRECONFIG,
                                                                              INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
-                                                                             INTERNET_OPEN_TYPE_PROXY
-                                                                            );
+                                                                             INTERNET_OPEN_TYPE_PROXY);
 {deactivated: see comment in ALWininetHTTPCLientStatusCallback}
 //var InternetSetStatusCallbackResult: PFNInternetStatusCallback;
 begin
@@ -467,13 +465,11 @@ begin
   //InternetSetStatusCallbackResult := pointer(INTERNET_INVALID_STATUS_CALLBACK);
 
   {init FInetRoot}
-  FInetRoot := InternetOpen(
-                            PChar(RequestHeader.UserAgent),
+  FInetRoot := InternetOpen(PChar(RequestHeader.UserAgent),
                             AccessTypeArr[FAccessType],
                             InternalGetProxyServerName,
                             InternalGetProxyBypass,
-                            InternalGetInternetOpenFlags
-                           );
+                            InternalGetInternetOpenFlags);
   CheckError(not Assigned(FInetRoot));
 
   try
@@ -484,16 +480,14 @@ begin
     //CheckError(InternetSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
 
     {init FInetConnect}
-    FInetConnect := InternetConnect(
-                                    FInetRoot,
+    FInetConnect := InternetConnect(FInetRoot,
                                     PChar(FURLHost),
                                     FURLPort,
                                     PChar(UserName),
                                     PChar(Password),
                                     INTERNET_SERVICE_HTTP,
                                     0,
-                                    Dword(Self)
-                                   );
+                                    Dword(Self));
     CheckError(not Assigned(FInetConnect));
 
     {Set FConnected to true}
@@ -585,16 +579,14 @@ begin
 
   Request := nil;
   try
-    Request := HttpOpenRequest(
-                               FInetConnect,
+    Request := HttpOpenRequest(FInetConnect,
                                InternalGetHttpOpenRequestVerb,
                                PChar(FURLSite),
                                InternalGetHttpProtocolVersion,
                                PChar(requestHeader.Referer),
                                @AcceptTypes,
                                InternalGetHttpOpenRequestFlags,
-                               Dword(Self)
-                              );
+                               Dword(Self));
 
     CheckError(not Assigned(Request));
 
@@ -609,12 +601,10 @@ begin
 
     {set the header}
     aHeader := requestHeader.RawHeaderText;
-    HttpAddRequestHeaders(
-                          Request,
+    HttpAddRequestHeaders(Request,
                           PChar(aHeader),
                           Length(aHeader),
-                          HTTP_ADDREQ_FLAG_REPLACE or HTTP_ADDREQ_FLAG_ADD
-                         );
+                          HTTP_ADDREQ_FLAG_REPLACE or HTTP_ADDREQ_FLAG_ADD);
 
     If assigned(aRequestDataStream) then begin
       aRequestDataStream.Position := 0;
@@ -721,7 +711,7 @@ begin
   except
     if (Request <> nil) then
       InternetCloseHandle(Request);
-    Disconnect;
+    If fDisconnectOnError then Disconnect;
     raise;
   end;
   Result := Integer(Request);
@@ -747,13 +737,11 @@ begin
     While true do begin
       Index := 0;
       SetLength(s, Size);
-      If HttpQueryInfo(
-                       Pointer(aContext),
+      If HttpQueryInfo(Pointer(aContext),
                        HTTP_QUERY_RAW_HEADERS_CRLF,
                        @s[1],
                        Size,
-                       Index
-                      ) then begin
+                       Index) then begin
         SetLength(s, Size);
         aResponseContentHeader.RawHeaderText := s;
         break;
@@ -765,26 +753,22 @@ begin
   { Handle error from status}
   Index := 0;
   Len := SizeOf(Status);
-  if HttpQueryInfo(
-                   Pointer(aContext),
+  if HttpQueryInfo(Pointer(aContext),
                    HTTP_QUERY_STATUS_CODE or HTTP_QUERY_FLAG_NUMBER,
                    @Status,
                    Len,
-                   Index
-                  ) and
+                   Index) and
      (Status >= 300) then begin
 
     Size := 4096;
     While true do begin
       Index := 0;
       SetLength(s, Size);
-      if HttpQueryInfo(
-                       Pointer(aContext),
+      if HttpQueryInfo(Pointer(aContext),
                        HTTP_QUERY_STATUS_TEXT,
                        @S[1],
                        Size,
-                       Index
-                      ) then begin
+                       Index) then begin
         SetLength(S, Size);
         raise EALHTTPClientException.CreateFmt('%s (%d) - ''%s''', [S, Status, URL], Status);
       end
@@ -795,13 +779,11 @@ begin
   { read content-length }
   Index := 0;
   Len := SizeOf(ContentLength);
-  if not HttpQueryInfo(
-                       Pointer(aContext),
+  if not HttpQueryInfo(Pointer(aContext),
                        HTTP_QUERY_CONTENT_LENGTH or HTTP_QUERY_FLAG_NUMBER,
                        @ContentLength,
                        Len,
-                       Index
-                      ) then ContentLength := 0;
+                       Index) then ContentLength := 0;
 
   { Read data }
   Len := 0;
@@ -847,7 +829,7 @@ begin
     try
       Receive(Context, aResponseContentStream, aResponseContentHeader);
     except
-      Disconnect;
+      If fDisconnectOnError then Disconnect;
       raise;
     end;
   finally

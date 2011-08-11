@@ -152,7 +152,7 @@ type
     Function  Post(aUrl:String; aPostDataStream: TStream): String; overload;
     Function  PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; Const EncodeParams: Boolean=True): String; overload;
     Function  PostMultiPartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents): String; overload;
-    Function  Head(aUrl:String) : String; overload;
+    Function  Head(aUrl:String): String; overload;
   published
     property  URL: string read FURL write SetURL;
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
@@ -269,11 +269,9 @@ procedure TALHTTPClient.Get(aUrl: String;
 begin
   Url := aURL;
   RequestMethod := HTTPrm_get;
-  Execute(
-          nil,
+  Execute(nil,
           aResponseContentStream,
-          aResponseContentHeader
-         );
+          aResponseContentHeader);
 end;
 
 {****************************************}
@@ -289,11 +287,9 @@ begin
   try
     If assigned(aPostDataStream) then FrequestHeader.ContentLength := inttostr(aPostDataStream.Size)
     else FrequestHeader.ContentLength := '0';
-    Execute(
-            aPostDataStream,
+    Execute(aPostDataStream,
             aResponseContentStream,
-            aResponseContentHeader
-           );
+            aResponseContentHeader);
   finally
     FrequestHeader.ContentLength := OldContentLengthValue;
   end;
@@ -304,12 +300,10 @@ procedure TALHTTPClient.Post(aUrl: String;
                              aResponseContentStream: TStream;
                              aResponseContentHeader: TALHTTPResponseHeader);
 begin
-  Post(
-       aUrl,
+  Post(aUrl,
        nil,
        aResponseContentStream,
-       aResponseContentHeader
-      );
+       aResponseContentHeader);
 end;
 
 {*********************************************************}
@@ -326,12 +320,10 @@ begin
   try
     aMultipartFormDataEncoder.Encode(aPostDataStrings, aPostDataFiles);
     FrequestHeader.ContentType := 'multipart/form-data; boundary='+aMultipartFormDataEncoder.DataStream.Boundary;
-    post(
-         aUrl,
+    post(aUrl,
          aMultipartFormDataEncoder.DataStream,
          aResponseContentStream,
-         aResponseContentHeader
-        );
+         aResponseContentHeader);
   finally
     aMultipartFormDataEncoder.free;
     FrequestHeader.ContentType := OldRequestContentType;
@@ -371,12 +363,10 @@ begin
     end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
-    post(
-         aUrl,
+    post(aUrl,
          aURLEncodedContentStream,
          aResponseContentStream,
-         aResponseContentHeader
-        );
+         aResponseContentHeader);
   finally
     aURLEncodedContentStream.free;
     FrequestHeader.ContentType := OldRequestContentType;
@@ -390,11 +380,9 @@ procedure TALHTTPClient.Head(aUrl: String;
 begin
   Url := aURL;
   RequestMethod := HTTPrm_head;
-  Execute(
-          nil,
+  Execute(nil,
           aResponseContentStream,
-          aResponseContentHeader
-         );
+          aResponseContentHeader);
 end;
 
 {***********************************************}
@@ -403,11 +391,9 @@ var aResponseContentStream: TStringStream;
 begin
   aResponseContentStream := TstringStream.Create('');
   try
-    Get(
-        aUrl,
+    Get(aUrl,
         aResponseContentStream,
-        nil
-       );
+        nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;
@@ -420,12 +406,10 @@ var aResponseContentStream: TStringStream;
 begin
   aResponseContentStream := TstringStream.Create('');
   try
-    post(
-         aUrl,
+    post(aUrl,
          aPostDataStream,
          aResponseContentStream,
-         nil
-        );
+         nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;
@@ -450,10 +434,8 @@ begin
   try
     aMultipartFormDataEncoder.Encode(aPostDataStrings, aPostDataFiles);
     FrequestHeader.ContentType := 'multipart/form-data; boundary='+aMultipartFormDataEncoder.DataStream.Boundary;
-    Result := post(
-                   aUrl,
-                   aMultipartFormDataEncoder.DataStream
-                  );
+    Result := post(aUrl,
+                   aMultipartFormDataEncoder.DataStream);
   finally
     aMultipartFormDataEncoder.free;
     FrequestHeader.ContentType := OldRequestContentType;
@@ -491,10 +473,8 @@ begin
     end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
-    Result := post(
-                   aUrl,
-                   aURLEncodedContentStream
-                  );
+    Result := post(aUrl,
+                   aURLEncodedContentStream);
   finally
     aURLEncodedContentStream.free;
     FrequestHeader.ContentType := OldRequestContentType;
@@ -507,11 +487,9 @@ var aResponseContentStream: TStringStream;
 begin
   aResponseContentStream := TstringStream.Create('');
   try
-    Head(
-        aUrl,
-        aResponseContentStream,
-        nil
-       );
+    Head(aUrl,
+         aResponseContentStream,
+         nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;

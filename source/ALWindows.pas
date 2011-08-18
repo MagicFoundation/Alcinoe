@@ -5,11 +5,30 @@ interface
 uses Windows,
      sysutils;
 
+type
+  _ALMEMORYSTATUSEX = record
+    dwLength: DWORD;
+    dwMemoryLoad: DWORD;
+    ullTotalPhys: Int64;
+    ullAvailPhys: Int64;
+    ullTotalPageFile: Int64;
+    ullAvailPageFile: Int64;
+    ullTotalVirtual: Int64;
+    ullAvailVirtual: Int64;
+    ullAvailExtendedVirtual: Int64;
+  end;
+  TALMemoryStatusEx = _ALMEMORYSTATUSEX;
+
+function ALGlobalMemoryStatusEx(var lpBuffer : TALMEMORYSTATUSEX): BOOL; stdcall;
+
 Var ALGetTickCount64: function: int64; stdcall;
 
 const cALINVALID_SET_FILE_POINTER = DWORD(-1);
 
 implementation
+
+{*****************************************************************************}
+function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
 
 {******************************************}
 function ALGetTickCount64XP: int64; stdcall;

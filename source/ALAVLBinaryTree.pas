@@ -1,5 +1,5 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
+www:          http://sourceforge.net/projects/alcinoe/
 svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
@@ -124,6 +124,7 @@ type
     function  CreateNode: TALBaseAVLBinaryTreeNode; virtual; abstract;
     procedure InternalIterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer); virtual;
     function  InternalAddNode(aNode: TALBaseAVLBinaryTreeNode): Boolean; virtual;
+    Function  InternalExtractNode(IdVal: Pointer): TALBaseAVLBinaryTreeNode; virtual;
     Function  InternalDeleteNode(IdVal: Pointer): Boolean; virtual;
     Procedure InternalClear; Virtual;
     Function  InternalGetHead: TALBaseAVLBinaryTreeNode; virtual;
@@ -140,6 +141,7 @@ type
     Destructor  Destroy; Override;
     procedure   Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer); virtual;
     function    AddNode(aNode: TALBaseAVLBinaryTreeNode): Boolean; virtual;
+    Function    ExtractNode(IdVal: Pointer): TALBaseAVLBinaryTreeNode; virtual;
     Function    DeleteNode(IdVal: Pointer): Boolean; virtual;
     Procedure   Clear; Virtual;
     Function    Head: TALBaseAVLBinaryTreeNode; virtual;
@@ -178,6 +180,7 @@ type
     function CreateNode: TALBaseAVLBinaryTreeNode; override;
   public
     function AddNode(aNode: TALIntegerKeyAVLBinaryTreeNode): Boolean; reintroduce; virtual;
+    Function ExtractNode(IdVal: Integer): TALIntegerKeyAVLBinaryTreeNode; reintroduce; virtual;
     function DeleteNode(idVal: Integer): boolean; reintroduce; virtual;
     Function Head: TALIntegerKeyAVLBinaryTreeNode; Reintroduce; virtual;
     function FindNode(idVal: Integer): TALIntegerKeyAVLBinaryTreeNode; Reintroduce; virtual;
@@ -209,6 +212,7 @@ type
     function CreateNode: TALBaseAVLBinaryTreeNode; override;
   public
     function AddNode(aNode: TALCardinalKeyAVLBinaryTreeNode): Boolean; reintroduce; virtual;
+    Function ExtractNode(IdVal: Cardinal): TALCardinalKeyAVLBinaryTreeNode; reintroduce; virtual;
     function DeleteNode(idVal: Cardinal): boolean; reintroduce; virtual;
     Function Head: TALCardinalKeyAVLBinaryTreeNode; Reintroduce; virtual;
     function FindNode(idVal: Cardinal): TALCardinalKeyAVLBinaryTreeNode; Reintroduce; virtual;
@@ -240,6 +244,7 @@ type
     function CreateNode: TALBaseAVLBinaryTreeNode; override;
   public
     function AddNode(aNode: TALInt64KeyAVLBinaryTreeNode): Boolean; reintroduce; virtual;
+    Function ExtractNode(IdVal: Int64): TALInt64KeyAVLBinaryTreeNode; reintroduce; virtual;
     function DeleteNode(idVal: Int64): boolean; reintroduce; virtual;
     Function Head: TALInt64KeyAVLBinaryTreeNode; Reintroduce; virtual;
     function FindNode(idVal: int64): TALInt64KeyAVLBinaryTreeNode; Reintroduce; virtual;
@@ -280,6 +285,7 @@ type
   public
     Constructor Create; override;
     function    AddNode(aNode: TALStringKeyAVLBinaryTreeNode): Boolean; reintroduce; virtual;
+    function    ExtractNode(IdVal: String): TALStringKeyAVLBinaryTreeNode; reintroduce; virtual;
     function    DeleteNode(idVal: String): boolean; reintroduce; virtual;
     Function    Head: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
     function    FindNode(idVal: String): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
@@ -322,6 +328,7 @@ type
     function    CreateSessionNode: TALCardinalKeySessionAVLBinaryTreeNode; virtual;
     procedure   Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer); override;
     function    AddNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode): Boolean; reintroduce; virtual;
+    function    ExtractNode(IdVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode; reintroduce; virtual;
     function    DeleteNode(idVal: Cardinal): boolean; override;
     Function    Head: TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual;
     function    FindNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual;
@@ -645,8 +652,8 @@ begin
   aNode.Free;
 end;
 
-{************************************************************************}
-function TALBaseAVLBinaryTree.InternalDeleteNode(IdVal: Pointer): Boolean;
+{******************************************************************************************}
+function TALBaseAVLBinaryTree.InternalExtractNode(IdVal: Pointer): TALBaseAVLBinaryTreeNode;
 var N1: TALBaseAVLBinaryTreeNode;
     N2: TALBaseAVLBinaryTreeNode;
     TmpNode: TALBaseAVLBinaryTreeNode;
@@ -660,7 +667,7 @@ begin
   {exit if head is nil}
   N1 := Fhead;
   if not Assigned(N1) then begin
-    result := False;
+    result := nil;
     Exit;
   end;
 
@@ -692,7 +699,7 @@ begin
 
       {Node not found, then exit}
       if not Assigned(N1) then begin
-        Result := False;
+        Result := nil;
         Exit;
       end;
     end;
@@ -741,10 +748,9 @@ begin
       Node.ChildNodes[Comparison > 0] := tmpnode;
   end;
 
-  {Dispose of the deleted node}
-  FreeNodeObj(N2);
+  {return the deleted node}
+  result := N2;
   Dec(FNodeCount);
-  Result := True;
 
   {Unwind the stack and rebalance}
   SubTreeDec := True;
@@ -754,6 +760,18 @@ begin
       AlAVLBinaryTree_DelBalance(Node.ChildNodes[Comparison > 0], SubTreeDec, Stack[StackPos].Comparison);
     dec(StackPos);
   end;
+end;
+
+{************************************************************************}
+function TALBaseAVLBinaryTree.InternalDeleteNode(IdVal: Pointer): Boolean;
+var N1: TALBaseAVLBinaryTreeNode;
+begin
+  N1 := InternalExtractNode(IdVal);
+  if assigned(N1) then begin
+    result := True;
+    FreeNodeObj(N1);
+  end
+  else result := False;
 end;
 
 {**********************************************************************}
@@ -1008,6 +1026,12 @@ begin
   InternalClear;
 end;
 
+{**********************************************************************************}
+function TALBaseAVLBinaryTree.ExtractNode(IdVal: Pointer): TALBaseAVLBinaryTreeNode;
+begin
+  Result := InternalExtractNode(IdVal);
+end;
+
 {****************************************************************}
 function TALBaseAVLBinaryTree.DeleteNode(IdVal: Pointer): Boolean;
 begin
@@ -1191,6 +1215,12 @@ begin
   Result := TALIntegerKeyAVLBinaryTreeNode.Create;
 end;
 
+{**********************************************************************************************}
+function TALIntegerKeyAVLBinaryTree.ExtractNode(IdVal: Integer): TALIntegerKeyAVLBinaryTreeNode;
+begin
+  result := TALIntegerKeyAVLBinaryTreeNode(inherited ExtractNode(@idVal));
+end;
+
 {**********************************************************************}
 Function TALIntegerKeyAVLBinaryTree.DeleteNode(idVal: Integer): boolean;
 begin
@@ -1295,6 +1325,12 @@ begin
   Result := TALCardinalKeyAVLBinaryTreeNode.Create;
 end;
 
+{*************************************************************************************************}
+function TALCardinalKeyAVLBinaryTree.ExtractNode(IdVal: Cardinal): TALCardinalKeyAVLBinaryTreeNode;
+begin
+  result := TALCardinalKeyAVLBinaryTreeNode(inherited ExtractNode(@idVal));
+end;
+
 {************************************************************************}
 Function TALCardinalKeyAVLBinaryTree.DeleteNode(idVal: Cardinal): boolean;
 begin
@@ -1397,6 +1433,12 @@ end;
 function TALInt64KeyAVLBinaryTree.CreateNode: TALBaseAVLBinaryTreeNode;
 begin
   Result := TALint64KeyAVLBinaryTreeNode.Create;
+end;
+
+{****************************************************************************************}
+function TALInt64KeyAVLBinaryTree.ExtractNode(IdVal: Int64): TALInt64KeyAVLBinaryTreeNode;
+begin
+  result := TALInt64KeyAVLBinaryTreeNode(inherited ExtractNode(@idVal));
 end;
 
 {******************************************************************}
@@ -1510,6 +1552,12 @@ end;
 function TALStringKeyAVLBinaryTree.CompareNode(aNode1,ANode2: TALBaseAVLBinaryTreeNode): Integer;
 begin
   Result := FcompareKeyFunct(TALStringKeyAVLBinaryTreeNode(aNode1).ID,TALStringKeyAVLBinaryTreeNode(aNode2).ID);
+end;
+
+{*******************************************************************************************}
+function TALStringKeyAVLBinaryTree.ExtractNode(IdVal: String): TALStringKeyAVLBinaryTreeNode;
+begin
+  result := TALStringKeyAVLBinaryTreeNode(inherited ExtractNode(@idVal));
 end;
 
 {********************************************************************}
@@ -1734,6 +1782,19 @@ begin
 
     result := TALCardinalKeySessionAVLBinaryTreeNode(inherited FindNode(idVal));
     If result <> nil then result.LastAccess := now;
+
+  finally
+    FcriticalSection.Release;
+  end;
+end;
+
+{***************************************************************************************************************}
+function TALCardinalKeySessionAVLBinaryTree.ExtractNode(IdVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode;
+begin
+  FcriticalSection.Acquire;
+  try
+
+    result := TALCardinalKeySessionAVLBinaryTreeNode(inherited ExtractNode(idVal));
 
   finally
     FcriticalSection.Release;

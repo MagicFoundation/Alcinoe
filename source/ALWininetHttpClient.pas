@@ -556,7 +556,8 @@ function TALWinInetHTTPClient.Send(const aRequestDataStream: TStream): Integer;
       HTTPrm_Get: Result := 'GET';
       HTTPrm_Post: Result := 'POST';
       HTTPrm_Head: Result := 'HEAD';
-      else result := nil;
+      HTTPrm_Trace: Result := 'TRACE'; // <= seam to not work on Wininet ! but work on winhttp
+      else raise Exception.Create('Unknown Request Method');
     end;
   end;
 

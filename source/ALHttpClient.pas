@@ -147,12 +147,14 @@ type
     Procedure PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader; Const EncodeParams: Boolean=True); overload;
     Procedure PostMultipartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Procedure Head(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Trace(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Function  Get(aUrl:String): String; overload;
     Function  Post(aUrl:String): String; overload;
     Function  Post(aUrl:String; aPostDataStream: TStream): String; overload;
     Function  PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; Const EncodeParams: Boolean=True): String; overload;
     Function  PostMultiPartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents): String; overload;
     Function  Head(aUrl:String): String; overload;
+    Function  trace(aUrl:String): String; overload;
   published
     property  URL: string read FURL write SetURL;
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
@@ -385,6 +387,18 @@ begin
           aResponseContentHeader);
 end;
 
+{*****************************************}
+procedure TALHTTPClient.Trace(aUrl: String;
+                              aResponseContentStream: TStream;
+                              aResponseContentHeader: TALHTTPResponseHeader);
+begin
+  Url := aURL;
+  RequestMethod := HTTPrm_Trace;
+  Execute(nil,
+          aResponseContentStream,
+          aResponseContentHeader);
+end;
+
 {***********************************************}
 function TALHTTPClient.Get(aUrl: String): String;
 var aResponseContentStream: TStringStream;
@@ -490,6 +504,21 @@ begin
     Head(aUrl,
          aResponseContentStream,
          nil);
+    result := aResponseContentStream.DataString;
+  finally
+    aResponseContentStream.Free;
+  end;
+end;
+
+{*************************************************}
+function TALHTTPClient.Trace(aUrl:String) : String;
+var aResponseContentStream: TStringStream;
+begin
+  aResponseContentStream := TstringStream.Create('');
+  try
+    Trace(aUrl,
+          aResponseContentStream,
+          nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;

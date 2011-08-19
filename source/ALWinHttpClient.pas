@@ -526,7 +526,9 @@ begin
 
   if RequestMethod = HTTPrm_Post then StrVerb := 'POST'
   else if RequestMethod = HTTPrm_Get then StrVerb := 'GET'
-  else StrVerb := 'HEAD';
+  else if RequestMethod = HTTPrm_head then StrVerb := 'HEAD'
+  else if RequestMethod = HTTPrm_trace then StrVerb := 'TRACE'
+  else raise Exception.Create('Unknown Request Method');
 
   Request := nil;
   try

@@ -74,9 +74,9 @@ object Form1: TForm1
         object Label6: TLabel
           Left = 8
           Top = 72
-          Width = 249
+          Width = 289
           Height = 13
-          Caption = 'Format "name=value" if not Raw Post Data checked'
+          Caption = 'Format "name=value" if not URL Encode Post Data checked'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -137,7 +137,7 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 0
-          Text = 'http://www.arkadia.com'
+          Text = 'http://www.wikipedia.org'
         end
         object MemoPostDataStrings: TMemo
           Left = 8
@@ -203,12 +203,12 @@ object Form1: TForm1
           TabOrder = 4
           OnClick = ButtonGetClick
         end
-        object CheckBoxEncodeParams: TCheckBox
+        object CheckBoxHttpEncodePostData: TCheckBox
           Left = 11
           Top = 167
           Width = 150
           Height = 17
-          Caption = 'Encode Post Data'
+          Caption = 'HTTP Encode Post Data'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -232,12 +232,12 @@ object Form1: TForm1
           TabOrder = 6
           OnClick = ButtonHeadClick
         end
-        object CheckBoxRawPostData: TCheckBox
-          Left = 135
+        object CheckBoxUrlEncodePostData: TCheckBox
+          Left = 169
           Top = 167
-          Width = 98
+          Width = 138
           Height = 17
-          Caption = 'Raw Post Data'
+          Caption = 'URL Encode Post Data'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -245,6 +245,21 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 7
+        end
+        object ButtonTrace: TButton
+          Left = 518
+          Top = 21
+          Width = 50
+          Height = 25
+          Caption = 'Trace'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          TabOrder = 8
+          OnClick = ButtonTraceClick
         end
       end
       object GroupBox10: TGroupBox
@@ -395,6 +410,7 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 0
+          OnClick = OnCfgEditCHange
         end
         object EditPassword: TEdit
           Left = 73
@@ -410,6 +426,7 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
+          OnClick = OnCfgEditCHange
         end
       end
       object GroupBox4: TGroupBox
@@ -479,6 +496,7 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 0
           Text = '0'
+          OnClick = OnCfgEditCHange
         end
         object EditReceiveTimeout: TEdit
           Left = 73
@@ -495,6 +513,7 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 1
           Text = '0'
+          OnClick = OnCfgEditCHange
         end
         object EditConnectTimeout: TEdit
           Left = 73
@@ -511,6 +530,7 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 2
           Text = '0'
+          OnClick = OnCfgEditCHange
         end
       end
       object GroupBox6: TGroupBox
@@ -539,6 +559,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object RadioButtonProtocolVersion1_1: TRadioButton
           Left = 128
@@ -555,6 +578,9 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 1
           TabStop = True
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
       end
       object GroupBox7: TGroupBox
@@ -583,6 +609,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Offline: TCheckBox
           Left = 8
@@ -597,6 +626,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 1
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Keep_connection: TCheckBox
           Left = 8
@@ -613,6 +645,9 @@ object Form1: TForm1
           ParentFont = False
           State = cbChecked
           TabOrder = 2
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_No_auto_redirect: TCheckBox
           Left = 8
@@ -627,6 +662,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 3
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Ignore_redirect_to_https: TCheckBox
           Left = 8
@@ -641,6 +679,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 4
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_No_auth: TCheckBox
           Left = 8
@@ -655,6 +696,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 5
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Ignore_cert_date_invalid: TCheckBox
           Left = 8
@@ -669,6 +713,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 6
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Need_file: TCheckBox
           Left = 8
@@ -683,6 +730,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 7
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Ignore_redirect_to_http: TCheckBox
           Left = 8
@@ -697,6 +747,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 8
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Hyperlink: TCheckBox
           Left = 8
@@ -711,6 +764,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 9
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Ignore_cert_cn_invalid: TCheckBox
           Left = 8
@@ -725,6 +781,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 10
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Cache_if_net_fail: TCheckBox
           Left = 8
@@ -739,6 +798,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 11
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_No_cache_write: TCheckBox
           Left = 8
@@ -753,6 +815,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 12
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Resynchronize: TCheckBox
           Left = 8
@@ -767,6 +832,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 13
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_No_cookies: TCheckBox
           Left = 8
@@ -781,6 +849,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 14
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Pragma_nocache: TCheckBox
           Left = 8
@@ -795,6 +866,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 15
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Reload: TCheckBox
           Left = 8
@@ -809,6 +883,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 16
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_No_ui: TCheckBox
           Left = 8
@@ -823,6 +900,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 17
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object CheckBoxInternetOption_Secure: TCheckBox
           Left = 8
@@ -837,6 +917,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 18
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
       end
       object GroupBox2: TGroupBox
@@ -865,6 +948,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object RadioButtonAccessType_Preconfig: TRadioButton
           Left = 16
@@ -881,6 +967,9 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 1
           TabStop = True
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object RadioButtonAccessType_Preconfig_with_no_autoproxy: TRadioButton
           Left = 104
@@ -895,6 +984,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 2
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
         object RadioButtonAccessType_Proxy: TRadioButton
           Left = 104
@@ -909,6 +1001,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 3
+          OnClick = OnCfgEditCHange
+          OnEnter = OnCfgEditCHange
+          OnKeyPress = OnCfgEditKeyPress
         end
       end
       object GroupBox1: TGroupBox
@@ -1004,6 +1099,7 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 0
           Text = '80'
+          OnClick = OnCfgEditCHange
         end
         object EdProxyUserName: TEdit
           Left = 73
@@ -1019,6 +1115,7 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
+          OnClick = OnCfgEditCHange
         end
         object EdProxyServer: TEdit
           Left = 73
@@ -1034,6 +1131,7 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 2
+          OnClick = OnCfgEditCHange
         end
         object EdProxyPassword: TEdit
           Left = 73
@@ -1049,6 +1147,7 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 3
+          OnClick = OnCfgEditCHange
         end
         object EdProxyBypass: TEdit
           Left = 73
@@ -1065,6 +1164,7 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 4
           Text = '<local>'
+          OnClick = OnCfgEditCHange
         end
       end
       object GroupBox5: TGroupBox
@@ -1108,6 +1208,7 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 0
           Text = '32768'
+          OnClick = OnCfgEditCHange
         end
       end
       object GroupBox8: TGroupBox
@@ -1152,6 +1253,7 @@ object Form1: TForm1
           ScrollBars = ssVertical
           TabOrder = 0
           WordWrap = False
+          OnClick = OnCfgEditCHange
         end
       end
       object Panel1: TPanel
@@ -1169,7 +1271,7 @@ object Form1: TForm1
         object Label9: TLabel
           Left = 7
           Top = 19
-          Width = 164
+          Width = 152
           Height = 45
           Caption = 'Please help us to keep the development of these components free'
           Font.Charset = ANSI_CHARSET
@@ -1183,8 +1285,8 @@ object Form1: TForm1
         object Label10: TLabel
           Left = 7
           Top = 74
-          Width = 157
-          Height = 75
+          Width = 156
+          Height = 60
           Caption = 
             'If you like these components please simply click on each button ' +
             'below ... thanks for your support !'

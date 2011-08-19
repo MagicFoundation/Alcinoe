@@ -91,14 +91,15 @@ type
     CheckBoxInternetOption_KEEP_CONNECTION: TCheckBox;
     CheckBoxInternetOption_NO_COOKIES: TCheckBox;
     CheckBoxInternetOption_NO_AUTO_REDIRECT: TCheckBox;
-    CheckBoxEncodeParams: TCheckBox;
+    CheckBoxHttpEncodePostData: TCheckBox;
     ButtonHead: TButton;
-    CheckBoxRawPostData: TCheckBox;
+    CheckBoxUrlEncodePostData: TCheckBox;
     Panel1: TPanel;
     Label9: TLabel;
     Label10: TLabel;
     Panel2: TPanel;
     PanelWebBrowser: TPanel;
+    ButtonTrace: TButton;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -106,11 +107,15 @@ type
     procedure ButtonPostClick(Sender: TObject);
     procedure ButtonHeadClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ButtonTraceClick(Sender: TObject);
+    procedure OnCfgEditChange(Sender: TObject);
+    procedure OnCfgEditKeyPress(Sender: TObject; var Key: Char);
   private
     FWinHttpClient: TalWinHttpClient;
     FDownloadSpeedStartTime: TdateTime;
     FDownloadSpeedBytesRead: Integer;
     FDownloadSpeedBytesNotRead: Integer;
+    fMustInitWinHTTP: Boolean;
     procedure initWinHTTP;
   public
     procedure OnHttpClientStatusChange(sender: Tobject; InternetStatus: DWord; StatusInformation: Pointer; StatusInformationLength: DWord);
@@ -136,6 +141,8 @@ Uses DateUtils,
 {***************************}
 procedure TForm1.initWinHTTP;
 Begin
+  if not fMustInitWinHTTP then Exit;
+  fMustInitWinHTTP := False;
   With FWinHTTPClient do begin
     UserName := EditUserName.Text;
     Password := EditPassword.Text;
@@ -302,6 +309,35 @@ begin
   end;
 end;
 
+{*************************************************}
+procedure TForm1.ButtonTraceClick(Sender: TObject);
+Var AHTTPResponseHeader: TALHTTPResponseHeader;
+    AHTTPResponseStream: TStringStream;
+begin
+  MainStatusBar.Panels[0].Text := '';
+  MainStatusBar.Panels[1].Text := '';
+  MainStatusBar.Panels[2].Text := '';
+  initWinHTTP;
+  MemoContentBody.Lines.Clear;
+  MemoResponseRawHeader.Lines.Clear;
+  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  AHTTPResponseStream := TstringStream.Create('');
+  try
+    try
+      FWinHttpClient.Trace(editURL.Text, AHTTPResponseStream, AHTTPResponseHeader);
+      MemoContentBody.Lines.Text := AHTTPResponseStream.DataString;
+      MemoResponseRawHeader.Lines.Text := AHTTPResponseHeader.RawHeaderText;
+    except
+      MemoContentBody.Lines.Text := AHTTPResponseStream.DataString;
+      MemoResponseRawHeader.Lines.Text := AHTTPResponseHeader.RawHeaderText;
+      Raise;
+    end;
+  finally
+    AHTTPResponseHeader.Free;
+    AHTTPResponseStream.Free;
+  end;
+end;
+
 {**********************************************************}
 procedure TForm1.ButtonOpenInExplorerClick(Sender: TObject);
 Var AFullPath: String;
@@ -346,34 +382,28 @@ begin
         end;
 
       if AMultiPartFormDataFiles.Count > 0 then
-        FWinHttpClient.PostMultiPartFormData(
-                                             editURL.Text,
+        FWinHttpClient.PostMultiPartFormData(editURL.Text,
                                              aTmpPostDataString,
                                              AMultiPartFormDataFiles,
                                              AHTTPResponseStream,
-                                             AHTTPResponseHeader
-                                            )
+                                             AHTTPResponseHeader)
 
       else if aTmpPostDataString.Count > 0 then begin
-        if not CheckBoxRawPostData.Checked then FWinHttpClient.PostURLEncoded(
-                                                                              editURL.Text,
-                                                                              aTmpPostDataString,
-                                                                              AHTTPResponseStream,
-                                                                              AHTTPResponseHeader,
-                                                                              CheckBoxEncodeParams.Checked
-                                                                             )
+        if CheckBoxUrlEncodePostData.Checked then FWinHttpClient.PostURLEncoded(editURL.Text,
+                                                                                aTmpPostDataString,
+                                                                                AHTTPResponseStream,
+                                                                                AHTTPResponseHeader,
+                                                                                CheckBoxHTTPEncodePostData.Checked)
         else begin
 
-          if CheckBoxEncodeParams.Checked then ARawPostDatastream := TstringStream.create(HTTPEncode(aTmpPostDataString.text))
+          if CheckBoxHTTPEncodePostData.Checked then ARawPostDatastream := TstringStream.create(HTTPEncode(aTmpPostDataString.text))
           else ARawPostDatastream := TstringStream.create(aTmpPostDataString.text);
           try
 
-            FWinHttpClient.post(
-                                editURL.Text,
+            FWinHttpClient.post(editURL.Text,
                                 ARawPostDatastream,
                                 AHTTPResponseStream,
-                                AHTTPResponseHeader
-                               );
+                                AHTTPResponseHeader);
 
           finally
             ARawPostDatastream.free;
@@ -403,7 +433,17 @@ begin
   end;
 end;
 
+{************************************************}
+procedure TForm1.OnCfgEditChange(Sender: TObject);
+begin
+  fMustInitWinHTTP := True;
+end;
 
+{*****************************************************************}
+procedure TForm1.OnCfgEditKeyPress(Sender: TObject; var Key: Char);
+begin
+  fMustInitWinHTTP := True;
+end;
 
 
 {-------------------}
@@ -413,6 +453,7 @@ var ie: IWebBrowser2;
 procedure TForm1.FormCreate(Sender: TObject);
 var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
 begin
+  fMustInitWinHTTP := True;
   FWinHttpClient := TaLWinHttpClient.Create(self);
   with FWinHttpClient do begin
     AccessType := wHttpAt_NO_PROXY;

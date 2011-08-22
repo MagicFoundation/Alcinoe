@@ -946,10 +946,10 @@ procedure TAlGSMComm.InitCommState;
 var MyDCB : TDCB;
 begin
   CheckError(
-             GetCommState(
-                          fSerial,
-                          MyDCB
-                         )
+             not GetCommState(
+                              fSerial,
+                              MyDCB
+                             )
             );
 
   MyDCB.BaudRate := FBaudRate;
@@ -958,10 +958,10 @@ begin
   MyDCB.ByteSize := 8;
 
   CheckError(
-             SetCommState(
-                          fSerial,
-                          MyDCB
-                         )
+             not SetCommState(
+                              fSerial,
+                              MyDCB
+                             )
             );
 end;
 
@@ -980,10 +980,10 @@ begin
   CommTimeouts.WriteTotalTimeoutConstant := Ftimeout;
 
   CheckError(
-             SetCommTimeouts(
-                             fSerial,
-                             CommTimeouts
-                            )
+             not SetCommTimeouts(
+                                 fSerial,
+                                 CommTimeouts
+                                )
             );
 end;
 
@@ -1210,7 +1210,7 @@ Begin
   aResponse := alUppercase(GetResponse);
   While (Alpos('>'#32, aResponse) <= 0) do Begin
     if (aStart + Ftimeout) < GetTickCount then Raise exception.Create('Timeout!')
-    else if (Alpos(#13#10'ERROR'#13#10, aResponse) > 0) then raise exception.Create(ErrorMsg);
+    else if (Alpos(#13#10'ERROR'#13#10, aResponse) > 0) then raise exception.Create(ErrorMsg + ' (' + trim(AlStringReplace(aResponse, #13#10, ' ', [rfReplaceALL])) + ')' );
     aResponse := aResponse + alUppercase(GetResponse);
   end;
 end;
@@ -1225,12 +1225,20 @@ end;
 {************************************************************************************}
 Procedure TAlGSMComm.GetATCmdOkResponse(var Response: String; Const ErrorMsg: String);
 Var aStart: Cardinal;
+    aTmpErrorMsg: String;
+    P1: Integer;
+
 Begin
   aStart := GetTickCount;
   Response := alUppercase(GetResponse);
   While (Alpos(#13#10'OK'#13#10, Response) <= 0) do Begin
     if (aStart + Ftimeout) < GetTickCount then Raise exception.Create('Timeout!')
-    else if (Alpos(#13#10'ERROR'#13#10, Response) > 0) or MatchesMask(Response, '*'#13#10'+CMS ERROR: *'#13#10'*') then raise exception.Create(ErrorMsg);
+    else if (Alpos(#13#10'ERROR'#13#10, Response) > 0) or MatchesMask(Response, '*'#13#10'+CMS ERROR: *'#13#10'*') then begin
+      P1 := AlPos(#13#10'+CMS ERROR:', Response);
+      if P1 > 0 then aTmpErrorMsg := ErrorMsg + ' (' +trim(AlCopyStr(Response, P1, Maxint)) + ')' // +CMS ERROR: 38
+      else aTmpErrorMsg := ErrorMsg;
+      raise exception.Create(aTmpErrorMsg);
+    end;
     Response := Response + alUppercase(GetResponse);
   end;
 end;

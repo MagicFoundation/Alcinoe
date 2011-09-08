@@ -344,7 +344,7 @@ Function AlInternetCrackUrl(aUrl: String;
                                 UrlPath,
                                 ExtraInfo: String;
                             var PortNumber: integer;
-                            const Flags: integer = 0): Boolean; overload;
+                            const Flags: DWORD = 0): Boolean; overload;
 Function  AlInternetCrackUrl(aUrl: String;
                              Var SchemeName,
                                  HostName,
@@ -354,11 +354,11 @@ Function  AlInternetCrackUrl(aUrl: String;
                                  Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                              Query: TStrings;
                              var PortNumber: integer;
-                             const Flags: integer = 0): Boolean; overload;
+                             const Flags: DWORD = 0): Boolean; overload;
 Function  AlInternetCrackUrl(var Url: String; // if true return UrlPath
                              var Anchor: String;
                              Query: TStrings;
-                             const Flags: integer = 0): Boolean; overload;
+                             const Flags: DWORD = 0): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
 function  AlCombineUrl(RelativeUrl, BaseUrl: String): String; overload;
@@ -1205,8 +1205,8 @@ end;
 
 {*************
 flags can be :
-  ICU_DECODE Converts encoded characters back to their normal form.
-  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters}
+  ICU_DECODE Converts encoded characters back to their normal form. (Exemple: sam%40a%mple.xml => sam@a%mple.xml)
+  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters (Exemple: sam%40a%mple.xml => error !)}
 Function AlInternetCrackUrl(aUrl: String;
                             Var SchemeName,
                                 HostName,
@@ -1215,7 +1215,7 @@ Function AlInternetCrackUrl(aUrl: String;
                                 UrlPath,
                                 ExtraInfo: String;
                             var PortNumber: integer;
-                            const Flags: integer = 0): Boolean;
+                            const Flags: DWORD = 0): Boolean;
 var URLComp: TURLComponents;
     P: PChar;
 begin
@@ -1236,20 +1236,33 @@ begin
   GetMem(URLComp.lpszExtraInfo, INTERNET_MAX_PATH_LENGTH);
   Try
 
-    P := PChar(aUrl);
-    if InternetCrackUrl(P, length(P), Flags, URLComp) then begin
-      Result := True;
-      with URLComp do begin
-        SchemeName := AlCopyStr(lpszScheme, 1, dwSchemeLength);
-        HostName := AlCopyStr(lpszHostName, 1, dwHostNameLength);
-        PortNumber := nPort;
-        UserName := AlCopyStr(lpszUserName, 1, dwUserNameLength);
-        Password := AlCopyStr(lpszPassword, 1, dwPasswordLength);
-        UrlPath := AlCopyStr(lpszUrlPath, 1, dwUrlPathLength);
-        ExtraInfo := AlCopyStr(lpszExtraInfo, 1, dwExtraInfoLength);
+    Try
+      P := PChar(aUrl);
+      if InternetCrackUrl(P, length(P), Flags, URLComp) then begin
+        Result := True;
+        with URLComp do begin
+          SchemeName := AlCopyStr(lpszScheme, 1, dwSchemeLength);
+          HostName := AlCopyStr(lpszHostName, 1, dwHostNameLength);
+          PortNumber := nPort;
+          UserName := AlCopyStr(lpszUserName, 1, dwUserNameLength);
+          Password := AlCopyStr(lpszPassword, 1, dwPasswordLength);
+          UrlPath := AlCopyStr(lpszUrlPath, 1, dwUrlPathLength);
+          ExtraInfo := AlCopyStr(lpszExtraInfo, 1, dwExtraInfoLength);
+        end;
+      end
+      else begin
+        Result := False;
+        SchemeName := '';
+        HostName := '';
+        PortNumber := 0;
+        UserName := '';
+        Password := '';
+        UrlPath := '';
+        ExtraInfo := '';
       end;
-    end
-    else begin
+    except
+      //InternetCrackUrl can sometime raise an exception
+      //ex: ftp://youyou:youyou%40yoyo@ftp.google.com:21/sample.xml without flag = ICU_DECODE or ICU_ESCAPE
       Result := False;
       SchemeName := '';
       HostName := '';
@@ -1258,7 +1271,7 @@ begin
       Password := '';
       UrlPath := '';
       ExtraInfo := '';
-    end;
+    End;
 
   Finally
     FreeMem(URLComp.lpszScheme, INTERNET_MAX_SCHEME_LENGTH);
@@ -1280,7 +1293,7 @@ Function AlInternetCrackUrl(aUrl: String;
                                 Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                             Query: TStrings;
                             var PortNumber: integer;
-                            const Flags: integer = 0): Boolean;
+                            const Flags: DWORD = 0): Boolean;
 var aExtraInfo: string;
     P1: integer;
 begin
@@ -1318,7 +1331,7 @@ end;
 Function  AlInternetCrackUrl(var Url: String;  // if true return the relative url
                              var Anchor: String;
                              Query: TStrings;
-                             const Flags: integer = 0): Boolean;
+                             const Flags: DWORD = 0): Boolean;
 Var SchemeName,
     HostName,
     UserName,

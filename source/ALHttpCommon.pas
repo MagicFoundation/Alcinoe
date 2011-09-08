@@ -65,9 +65,9 @@ Link :        http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
               http://wp.netscape.com/newsref/std/cookie_spec.html
 
 * Please send all your feedback to svanderclock@arkadia.com
-* If you have downloaded this source from a website different from 
+* If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
+* Please, help us to keep the development of these components free by
   voting on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALHttpCommon;
@@ -332,14 +332,19 @@ Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: String): String;
 Function  AlExtractDomainNameFromUrl(aUrl: String): String;
 Function  AlExtractUrlPathFromUrl(aUrl: String): String;
-Function  AlInternetCrackUrl(aUrl: String;
-                             Var SchemeName,
-                                 HostName,
-                                 UserName,
-                                 Password,
-                                 UrlPath,
-                                 ExtraInfo: String;
-                             var PortNumber: integer): Boolean; overload;
+{*************
+flags can be :
+  ICU_DECODE Converts encoded characters back to their normal form.
+  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters}
+Function AlInternetCrackUrl(aUrl: String;
+                            Var SchemeName,
+                                HostName,
+                                UserName,
+                                Password,
+                                UrlPath,
+                                ExtraInfo: String;
+                            var PortNumber: integer;
+                            const Flags: integer = 0): Boolean; overload;
 Function  AlInternetCrackUrl(aUrl: String;
                              Var SchemeName,
                                  HostName,
@@ -348,10 +353,12 @@ Function  AlInternetCrackUrl(aUrl: String;
                                  UrlPath,
                                  Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                              Query: TStrings;
-                             var PortNumber: integer): Boolean; overload;
+                             var PortNumber: integer;
+                             const Flags: integer = 0): Boolean; overload;
 Function  AlInternetCrackUrl(var Url: String; // if true return UrlPath
                              var Anchor: String;
-                             Query: TStrings): Boolean; overload;
+                             Query: TStrings;
+                             const Flags: integer = 0): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
 function  AlCombineUrl(RelativeUrl, BaseUrl: String): String; overload;
@@ -1140,20 +1147,28 @@ begin
   URLComp.dwStructSize := SizeOf(URLComp);
   URLComp.dwHostNameLength := 1;
   P := PChar(aUrl);
-  if InternetCrackUrl(P, 0, 0, URLComp) then Result := UrlComp.nScheme
+  if InternetCrackUrl(P, length(P), 0, URLComp) then Result := UrlComp.nScheme
   else result := INTERNET_SCHEME_UNKNOWN;
 end;
 
 {******************************************************}
 Function AlExtractHostNameFromUrl(aUrl: String): String;
-var URLComp: TURLComponents;
-    P: PChar;
+Var SchemeName,
+    HostName,
+    UserName,
+    Password,
+    UrlPath,
+    ExtraInfo: String;
+    PortNumber: integer;
 begin
-  FillChar(URLComp, SizeOf(URLComp), 0);
-  URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwHostNameLength := INTERNET_MAX_HOST_NAME_LENGTH;
-  P := PChar(aUrl);
-  if InternetCrackUrl(P, 0, 0, URLComp) then Result := AlCopyStr(aUrl, URLComp.lpszHostName - P + 1, URLComp.dwHostNameLength) // www.mysite.com
+  if AlInternetCrackUrl(aUrl,
+                        SchemeName,
+                        HostName,
+                        UserName,
+                        Password,
+                        UrlPath,
+                        ExtraInfo,
+                        PortNumber) then result := HostName
   else result := '';
 end;
 
@@ -1169,18 +1184,29 @@ end;
 
 {******************************************************}
 Function  AlExtractUrlPathFromUrl(aUrl: String): String;
-var URLComp: TURLComponents;
-    P: PChar;
+Var SchemeName,
+    HostName,
+    UserName,
+    Password,
+    UrlPath,
+    ExtraInfo: String;
+    PortNumber: integer;
 begin
-  FillChar(URLComp, SizeOf(URLComp), 0);
-  URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwUrlPathLength := INTERNET_MAX_PATH_LENGTH;
-  P := PChar(aUrl);
-  if InternetCrackUrl(P, 0, 0, URLComp) then Result := AlCopyStr(aUrl, URLComp.lpszUrlPath - P + 1, URLComp.dwUrlPathLength) // /fra/xxx/
+  if AlInternetCrackUrl(aUrl,
+                        SchemeName,
+                        HostName,
+                        UserName,
+                        Password,
+                        UrlPath,
+                        ExtraInfo,
+                        PortNumber) then result := UrlPath
   else result := '';
 end;
 
-{***************************************}
+{*************
+flags can be :
+  ICU_DECODE Converts encoded characters back to their normal form.
+  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters}
 Function AlInternetCrackUrl(aUrl: String;
                             Var SchemeName,
                                 HostName,
@@ -1188,7 +1214,8 @@ Function AlInternetCrackUrl(aUrl: String;
                                 Password,
                                 UrlPath,
                                 ExtraInfo: String;
-                            var PortNumber: integer): Boolean;
+                            var PortNumber: integer;
+                            const Flags: integer = 0): Boolean;
 var URLComp: TURLComponents;
     P: PChar;
 begin
@@ -1200,29 +1227,47 @@ begin
   URLComp.dwPasswordLength := INTERNET_MAX_PASSWORD_LENGTH;
   URLComp.dwUrlPathLength := INTERNET_MAX_PATH_LENGTH;
   URLComp.dwExtraInfoLength := INTERNET_MAX_PATH_LENGTH;
-  P := PChar(aUrl);
-  if InternetCrackUrl(P, 0, 0, URLComp) then begin
-    Result := True;
-    with URLComp do begin
-      SchemeName := AlCopyStr(lpszScheme, 1, dwSchemeLength);
-      HostName := AlCopyStr(lpszHostName, 1, dwHostNameLength);
-      PortNumber := nPort;
-      UserName := AlCopyStr(lpszUserName, 1, dwUserNameLength);
-      Password := AlCopyStr(lpszPassword, 1, dwPasswordLength);
-      UrlPath := AlCopyStr(lpszUrlPath, 1, dwUrlPathLength);
-      ExtraInfo := AlCopyStr(lpszExtraInfo, 1, dwExtraInfoLength);
+
+  GetMem(URLComp.lpszScheme, INTERNET_MAX_SCHEME_LENGTH);
+  GetMem(URLComp.lpszHostName, INTERNET_MAX_HOST_NAME_LENGTH);
+  GetMem(URLComp.lpszUserName, INTERNET_MAX_USER_NAME_LENGTH);
+  GetMem(URLComp.lpszPassword, INTERNET_MAX_PASSWORD_LENGTH);
+  GetMem(URLComp.lpszUrlPath, INTERNET_MAX_PATH_LENGTH);
+  GetMem(URLComp.lpszExtraInfo, INTERNET_MAX_PATH_LENGTH);
+  Try
+
+    P := PChar(aUrl);
+    if InternetCrackUrl(P, length(P), Flags, URLComp) then begin
+      Result := True;
+      with URLComp do begin
+        SchemeName := AlCopyStr(lpszScheme, 1, dwSchemeLength);
+        HostName := AlCopyStr(lpszHostName, 1, dwHostNameLength);
+        PortNumber := nPort;
+        UserName := AlCopyStr(lpszUserName, 1, dwUserNameLength);
+        Password := AlCopyStr(lpszPassword, 1, dwPasswordLength);
+        UrlPath := AlCopyStr(lpszUrlPath, 1, dwUrlPathLength);
+        ExtraInfo := AlCopyStr(lpszExtraInfo, 1, dwExtraInfoLength);
+      end;
+    end
+    else begin
+      Result := False;
+      SchemeName := '';
+      HostName := '';
+      PortNumber := 0;
+      UserName := '';
+      Password := '';
+      UrlPath := '';
+      ExtraInfo := '';
     end;
-  end
-  else begin
-    Result := False;
-    SchemeName := '';
-    HostName := '';
-    PortNumber := 0;
-    UserName := '';
-    Password := '';
-    UrlPath := '';
-    ExtraInfo := '';
-  end;
+
+  Finally
+    FreeMem(URLComp.lpszScheme, INTERNET_MAX_SCHEME_LENGTH);
+    FreeMem(URLComp.lpszHostName, INTERNET_MAX_HOST_NAME_LENGTH);
+    FreeMem(URLComp.lpszUserName, INTERNET_MAX_USER_NAME_LENGTH);
+    FreeMem(URLComp.lpszPassword, INTERNET_MAX_PASSWORD_LENGTH);
+    FreeMem(URLComp.lpszUrlPath, INTERNET_MAX_PATH_LENGTH);
+    FreeMem(URLComp.lpszExtraInfo, INTERNET_MAX_PATH_LENGTH);
+  End;
 end;
 
 {***************************************}
@@ -1234,7 +1279,8 @@ Function AlInternetCrackUrl(aUrl: String;
                                 UrlPath,
                                 Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                             Query: TStrings;
-                            var PortNumber: integer): Boolean;
+                            var PortNumber: integer;
+                            const Flags: integer = 0): Boolean;
 var aExtraInfo: string;
     P1: integer;
 begin
@@ -1245,7 +1291,8 @@ begin
                                Password,
                                UrlPath,
                                aExtraInfo,
-                               PortNumber);
+                               PortNumber,
+                               flags);
   if result then begin
     P1 := AlPos('#',aExtraInfo);
     if P1 > 0 then begin
@@ -1270,7 +1317,8 @@ end;
 {*******************************************}
 Function  AlInternetCrackUrl(var Url: String;  // if true return the relative url
                              var Anchor: String;
-                             Query: TStrings): Boolean;
+                             Query: TStrings;
+                             const Flags: integer = 0): Boolean;
 Var SchemeName,
     HostName,
     UserName,
@@ -1295,7 +1343,8 @@ begin
                                UrlPath,
                                Anchor,
                                Query,
-                               PortNumber);
+                               PortNumber,
+                               flags);
   if Result then Url := UrlPath
 
   //try with relative url
@@ -1311,7 +1360,8 @@ begin
                                  UrlPath,
                                  Anchor,
                                  Query,
-                                 PortNumber);
+                                 PortNumber,
+                                 Flags);
     if Result then Url := UrlPath;
   end;
 

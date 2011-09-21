@@ -79,6 +79,7 @@ History :     27/05/2006: Add loadfromstream, loadfromfile,
               12/01/2009: rename loadonlychildnode by streamcontainonlychildnode in
                           TalXmlNode.loadFromStream to not make any confusion
               01/03/2009: Correct "parse error" bug
+              20/09/2011: Correct "UTF-8" / "utf-8" detection bug
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
@@ -1242,7 +1243,7 @@ Var RawXmlString: TALXMLString;
 
       {calculate the encoding}
       if RawXmlStringPos = 1 then begin
-        if (ALExtractAttrValue(CALEncoding, aContent, '') = 'UTF-8') then EncodingType := xetUTF_8
+        if SameText(ALExtractAttrValue(CALEncoding, aContent, ''), 'UTF-8') then EncodingType := xetUTF_8
         else EncodingType := xetUnknown;
       end;
 

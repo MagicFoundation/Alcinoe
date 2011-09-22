@@ -343,8 +343,7 @@ Function AlInternetCrackUrl(aUrl: String;
                                 Password,
                                 UrlPath,
                                 ExtraInfo: String;
-                            var PortNumber: integer;
-                            const Flags: DWORD = 0): Boolean; overload;
+                            var PortNumber: integer): Boolean; overload;
 Function  AlInternetCrackUrl(aUrl: String;
                              Var SchemeName,
                                  HostName,
@@ -353,12 +352,10 @@ Function  AlInternetCrackUrl(aUrl: String;
                                  UrlPath,
                                  Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                              Query: TStrings;
-                             var PortNumber: integer;
-                             const Flags: DWORD = 0): Boolean; overload;
+                             var PortNumber: integer): Boolean; overload;
 Function  AlInternetCrackUrl(var Url: String; // if true return UrlPath
                              var Anchor: String;
-                             Query: TStrings;
-                             const Flags: DWORD = 0): Boolean; overload;
+                             Query: TStrings): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
 function  AlCombineUrl(RelativeUrl, BaseUrl: String): String; overload;
@@ -1140,14 +1137,27 @@ end;
 
 {************************************************************}
 Function AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
-var URLComp: TURLComponents;
-    P: PChar;
+Var SchemeName,
+    HostName,
+    UserName,
+    Password,
+    UrlPath,
+    ExtraInfo: String;
+var PortNumber: integer;
 begin
-  FillChar(URLComp, SizeOf(URLComp), 0);
-  URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwHostNameLength := 1;
-  P := PChar(aUrl);
-  if InternetCrackUrl(P, length(P), 0, URLComp) then Result := UrlComp.nScheme
+  if AlInternetCrackUrl(aUrl,
+                        SchemeName,
+                        HostName,
+                        UserName,
+                        Password,
+                        UrlPath,
+                        ExtraInfo,
+                        PortNumber) then begin
+    if sametext(SchemeName,'http') then result := INTERNET_SCHEME_HTTP
+    else if sametext(SchemeName,'https') then result := INTERNET_SCHEME_HTTPS
+    else if sametext(SchemeName,'ftp') then result := INTERNET_SCHEME_FTP
+    else result := INTERNET_SCHEME_UNKNOWN;
+  end
   else result := INTERNET_SCHEME_UNKNOWN;
 end;
 
@@ -1206,7 +1216,7 @@ end;
 {*************
 flags can be :
   ICU_DECODE Converts encoded characters back to their normal form. (Exemple: sam%40a%mple.xml => sam@a%mple.xml)
-  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters (Exemple: sam%40a%mple.xml => error !)}
+  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters (Exemple: sam%40a%mple.xml => error because %m is a wrong escape sequences !)}
 Function AlInternetCrackUrl(aUrl: String;
                             Var SchemeName,
                                 HostName,
@@ -1214,74 +1224,77 @@ Function AlInternetCrackUrl(aUrl: String;
                                 Password,
                                 UrlPath,
                                 ExtraInfo: String;
-                            var PortNumber: integer;
-                            const Flags: DWORD = 0): Boolean;
-var URLComp: TURLComponents;
-    P: PChar;
+                            var PortNumber: integer): Boolean;
+Var P1: Integer;
+    S1: String;
 begin
-  FillChar(URLComp, SizeOf(URLComp), 0);
-  URLComp.dwStructSize := SizeOf(URLComp);
-  URLComp.dwSchemeLength := INTERNET_MAX_SCHEME_LENGTH;
-  URLComp.dwHostNameLength := INTERNET_MAX_HOST_NAME_LENGTH;
-  URLComp.dwUserNameLength := INTERNET_MAX_USER_NAME_LENGTH;
-  URLComp.dwPasswordLength := INTERNET_MAX_PASSWORD_LENGTH;
-  URLComp.dwUrlPathLength := INTERNET_MAX_PATH_LENGTH;
-  URLComp.dwExtraInfoLength := INTERNET_MAX_PATH_LENGTH;
+  SchemeName := '';
+  HostName := '';
+  UserName := '';
+  Password := '';
+  UrlPath := '';
+  ExtraInfo := '';
+  PortNumber := 0;
+  Result := True;
 
-  GetMem(URLComp.lpszScheme, INTERNET_MAX_SCHEME_LENGTH);
-  GetMem(URLComp.lpszHostName, INTERNET_MAX_HOST_NAME_LENGTH);
-  GetMem(URLComp.lpszUserName, INTERNET_MAX_USER_NAME_LENGTH);
-  GetMem(URLComp.lpszPassword, INTERNET_MAX_PASSWORD_LENGTH);
-  GetMem(URLComp.lpszUrlPath, INTERNET_MAX_PATH_LENGTH);
-  GetMem(URLComp.lpszExtraInfo, INTERNET_MAX_PATH_LENGTH);
-  Try
-
-    Try
-      P := PChar(aUrl);
-      if InternetCrackUrl(P, length(P), Flags, URLComp) then begin
-        Result := True;
-        with URLComp do begin
-          SchemeName := AlCopyStr(lpszScheme, 1, dwSchemeLength);
-          HostName := AlCopyStr(lpszHostName, 1, dwHostNameLength);
-          PortNumber := nPort;
-          UserName := AlCopyStr(lpszUserName, 1, dwUserNameLength);
-          Password := AlCopyStr(lpszPassword, 1, dwPasswordLength);
-          UrlPath := AlCopyStr(lpszUrlPath, 1, dwUrlPathLength);
-          ExtraInfo := AlCopyStr(lpszExtraInfo, 1, dwExtraInfoLength);
-        end;
+  P1 := AlPos('://', aUrl);  // ftp://xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx?param1=value1
+  if P1 > 0 then begin
+    SchemeName := AlCopyStr(aUrl, 1, P1-1); // ftp
+    delete(aUrl,1, P1+2);                   // xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx?param1=value1
+    P1 := AlPos('?',aUrl);
+    if P1 > 0 then begin
+      ExtraInfo := AlCopyStr(aUrl, P1, Maxint); // ?param1=value1
+      delete(aUrl, P1, Maxint);                 // xxxx:yyyyy@ftp.yoyo.com:21/path/filename.xxx
+    end;
+    P1 := AlPos('/',aUrl);
+    if P1 > 0 then begin
+      UrlPath := AlCopyStr(aUrl, P1, Maxint); // /path/filename.xxx
+      delete(aUrl, P1, Maxint);               // xxxx:yyyyy@ftp.yoyo.com:21
+    end;
+    P1 := lastdelimiter('@',aUrl);
+    if P1 > 0 then begin
+      S1 := AlCopyStr(aUrl, 1, P1-1); // xxxx:yyyyy
+      delete(aUrl,1, P1);             // ftp.yoyo.com:21
+      P1 := Alpos(':', S1);
+      if P1 > 0 then begin
+        UserName := AlCopyStr(S1,1,P1-1);      // xxxx
+        Password := AlCopyStr(S1,P1+1,Maxint); // yyyyy
       end
       else begin
-        Result := False;
-        SchemeName := '';
-        HostName := '';
-        PortNumber := 0;
-        UserName := '';
+        UserName := S1;
         Password := '';
-        UrlPath := '';
-        ExtraInfo := '';
       end;
-    except
-      //InternetCrackUrl can sometime raise an exception
-      //ex: ftp://youyou:youyou%40yoyo@ftp.google.com:21/sample.xml without flag = ICU_DECODE or ICU_ESCAPE
-      Result := False;
-      SchemeName := '';
-      HostName := '';
-      PortNumber := 0;
-      UserName := '';
-      Password := '';
-      UrlPath := '';
-      ExtraInfo := '';
-    End;
+    end;
+    P1 := AlPos(':',aUrl);
+    if P1 > 0 then begin
+      S1 := AlCopyStr(aUrl, P1+1, Maxint); // 21
+      delete(aUrl, P1, Maxint);            // ftp.yoyo.com
+      if not tryStrToInt(S1, PortNumber) then PortNumber := 0;
+    end;
+    if PortNumber = 0 then begin
+      if sameText(SchemeName, 'http') then PortNumber := 80
+      else if sameText(SchemeName, 'https') then PortNumber := 443
+      else if sameText(SchemeName, 'ftp') then PortNumber := 21
+      else result := False;
+    end;
+    if result then begin
+      HostName := aUrl;
+      result := HostName <> '';
+    end;
+  end
+  else result := False;
 
-  Finally
-    FreeMem(URLComp.lpszScheme, INTERNET_MAX_SCHEME_LENGTH);
-    FreeMem(URLComp.lpszHostName, INTERNET_MAX_HOST_NAME_LENGTH);
-    FreeMem(URLComp.lpszUserName, INTERNET_MAX_USER_NAME_LENGTH);
-    FreeMem(URLComp.lpszPassword, INTERNET_MAX_PASSWORD_LENGTH);
-    FreeMem(URLComp.lpszUrlPath, INTERNET_MAX_PATH_LENGTH);
-    FreeMem(URLComp.lpszExtraInfo, INTERNET_MAX_PATH_LENGTH);
-  End;
+  if not result then begin
+    SchemeName := '';
+    HostName := '';
+    UserName := '';
+    Password := '';
+    UrlPath := '';
+    ExtraInfo := '';
+    PortNumber := 0;
+  end;
 end;
+
 
 {***************************************}
 Function AlInternetCrackUrl(aUrl: String;
@@ -1292,8 +1305,7 @@ Function AlInternetCrackUrl(aUrl: String;
                                 UrlPath,
                                 Anchor: String; // not the anchor is never send to the server ! it's only used on client side
                             Query: TStrings;
-                            var PortNumber: integer;
-                            const Flags: DWORD = 0): Boolean;
+                            var PortNumber: integer): Boolean;
 var aExtraInfo: string;
     P1: integer;
 begin
@@ -1304,8 +1316,7 @@ begin
                                Password,
                                UrlPath,
                                aExtraInfo,
-                               PortNumber,
-                               flags);
+                               PortNumber);
   if result then begin
     P1 := AlPos('#',aExtraInfo);
     if P1 > 0 then begin
@@ -1330,8 +1341,7 @@ end;
 {*******************************************}
 Function  AlInternetCrackUrl(var Url: String;  // if true return the relative url
                              var Anchor: String;
-                             Query: TStrings;
-                             const Flags: DWORD = 0): Boolean;
+                             Query: TStrings): Boolean;
 Var SchemeName,
     HostName,
     UserName,
@@ -1356,8 +1366,7 @@ begin
                                UrlPath,
                                Anchor,
                                Query,
-                               PortNumber,
-                               flags);
+                               PortNumber);
   if Result then Url := UrlPath
 
   //try with relative url
@@ -1373,8 +1382,7 @@ begin
                                  UrlPath,
                                  Anchor,
                                  Query,
-                                 PortNumber,
-                                 Flags);
+                                 PortNumber);
     if Result then Url := UrlPath;
   end;
 

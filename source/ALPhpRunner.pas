@@ -512,12 +512,10 @@ begin
     ServerVariables.Values['REQUEST_METHOD'] := 'POST';
     ServerVariables.Values['CONTENT_TYPE'] := 'application/x-www-form-urlencoded';
 
-    Execute(
-            ServerVariables,
+    Execute(ServerVariables,
             aURLEncodedContentStream,
             ResponseContentStream,
-            ResponseHeader
-           );
+            ResponseHeader);
   finally
     aURLEncodedContentStream.free;
   end;
@@ -533,12 +531,10 @@ begin
   ResponseContentStream := TStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
-    Execute(
-            ServerVariables,
+    Execute(ServerVariables,
             RequestContentStream,
             ResponseContentStream,
-            ResponseHeader
-           );
+            ResponseHeader);
     Result := ResponseContentStream.DataString;
   finally
     ResponseContentStream.Free;
@@ -556,12 +552,10 @@ var RequestContentStream: TstringStream;
 begin
   RequestContentStream := TStringStream.Create(RequestContentString);
   Try
-    Execute(
-            ServerVariables,
+    Execute(ServerVariables,
             RequestContentStream,
             ResponseContentStream,
-            ResponseHeader
-           );
+            ResponseHeader);
   finally
     RequestContentStream.Free;
   end;
@@ -575,12 +569,10 @@ begin
   ResponseContentStream := TStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
-    Execute(
-            ServerVariables,
+    Execute(ServerVariables,
             RequestContentStream,
             ResponseContentStream,
-            ResponseHeader
-           );
+            ResponseHeader);
     Result := ResponseContentStream.DataString;
   finally
     ResponseContentStream.Free;
@@ -598,12 +590,10 @@ begin
   ResponseContentStream := TStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
-    ExecutePostUrlEncoded(
-                          ServerVariables,
+    ExecutePostUrlEncoded(ServerVariables,
                           PostDataStrings,
                           ResponseContentStream,
-                          ResponseHeader
-                         );
+                          ResponseHeader);
     Result := ResponseContentStream.DataString;
   finally
     ResponseContentStream.Free;
@@ -1184,12 +1174,10 @@ begin
   end;
   inc(FRequestCount);
 
-  inherited Execute(
-                    ServerVariables,
+  inherited Execute(ServerVariables,
                     RequestContentStream,
                     ResponseContentStream,
-                    ResponseHeader
-                   );
+                    ResponseHeader);
 end;
 
 
@@ -1284,7 +1272,7 @@ begin
   end;
 end;
 
-{*********************************************$*********************************************************************}
+{*******************************************************************************************************************}
 Procedure TALPhpNamedPipeFastCgiManager.ReleasePHPRunnerEngine(aPHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine);
 begin
   fCriticalSection.Acquire;
@@ -1314,12 +1302,10 @@ begin
 
     try
 
-      aPhpRunnerEngine.Execute(
-                               ServerVariables,
+      aPhpRunnerEngine.Execute(ServerVariables,
                                RequestContentStream,
                                ResponseContentStream,
-                               ResponseHeader
-                              );
+                               ResponseHeader);
 
     Except
       freeandnil(aPhpRunnerEngine);
@@ -1356,13 +1342,11 @@ procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: Tstrings;
                                         ResponseContentStream: Tstream;
                                         ResponseHeader: TALHTTPResponseHeader);
 begin
-  AlCGIExec(
-            fPhpInterpreterFilename,
+  AlCGIExec(fPhpInterpreterFilename,
             ServerVariables,
             RequestContentStream,
             ResponseContentStream,
-            ResponseHeader
-           );
+            ResponseHeader);
 end;
 
 
@@ -1599,11 +1583,9 @@ begin
   ResponseContentStream := TStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
-    Execute(
-            WebRequest,
+    Execute(WebRequest,
             ResponseContentStream,
-            ResponseHeader
-           );
+            ResponseHeader);
     Result := ResponseContentStream.DataString;
   finally
     ResponseContentStream.Free;

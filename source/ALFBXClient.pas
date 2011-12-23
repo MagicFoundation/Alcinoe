@@ -49,7 +49,7 @@ Link :        http://www.progdigy.com/modules.php?name=UIB
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
+* Please, help us to keep the development of these components free by
   voting on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFBXClient;
@@ -222,6 +222,9 @@ Type
                        const aNumbuffers: integer = -1;
                        const aOpenConnectionExtraParams: String = ''); overload; virtual;
     Destructor  Destroy; Override;
+    function  GetDataBaseInfoInt(const item: Integer): Integer;
+    function  GetDataBaseInfoString(const item: Integer): string;
+    function  GetDataBaseInfoDateTime(const item: Integer): TDateTime;
     Function  AcquireConnection: IscDbHandle; virtual;
     Procedure ReleaseConnection(var DBHandle: IscDbHandle;
                                 const CloseConnection: Boolean = False); virtual;
@@ -1309,6 +1312,63 @@ begin
   //inherite
   inherited;
 
+end;
+
+{************************************************************************************}
+function  TALFBXConnectionPoolClient.GetDataBaseInfoInt(const item: Integer): Integer;
+Var DBHandle: IscDbHandle;
+begin
+  DBHandle := AcquireConnection;
+  try
+    case item of
+      isc_info_implementation,
+      isc_info_base_level:
+      result := byte(FLibrary.DatabaseInfoString(DbHandle, item, 8)[5]);
+      else result := FLibrary.DatabaseInfoIntValue(DbHandle, AnsiChar(item));
+    end;
+  finally
+    ReleaseConnection(DBHandle);
+  end;
+end;
+
+{**************************************************************************************}
+function  TALFBXConnectionPoolClient.GetDataBaseInfoString(const item: Integer): string;
+Var DBHandle: IscDbHandle;
+    size: byte;
+    data: RawByteString;
+begin
+  DBHandle := AcquireConnection;
+  try
+    data := FLibrary.DatabaseInfoString(DbHandle, item, 256);
+    case Item of
+      isc_info_cur_logfile_name,
+      isc_info_wal_prv_ckpt_fname: begin
+                                     size := byte(data[4]);
+                                     Move(data[5], data[1], size);
+                                     SetLength(data, size);
+                                   end;
+      else begin
+        size := byte(data[5]);
+        Move(data[6], data[1], size);
+        SetLength(data, size);
+      end;
+    end;
+    Result := string(data);
+  finally
+    ReleaseConnection(DBHandle);
+  end;
+end;
+
+{*******************************************************************************************}
+function  TALFBXConnectionPoolClient.GetDataBaseInfoDateTime(const item: Integer): TDateTime;
+Var DBHandle: IscDbHandle;
+begin
+  DBHandle := AcquireConnection;
+  try
+    result := FLibrary.DatabaseInfoDateTime(DbHandle, item);
+  finally
+    ReleaseConnection(DBHandle);
+  end;
 end;
 
 {*****************************************************************}

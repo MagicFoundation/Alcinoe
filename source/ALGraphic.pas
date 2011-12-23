@@ -49,9 +49,9 @@ History:
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
-* If you have downloaded this source from a website different from 
+* If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
+* Please, help us to keep the development of these components free by
   voting on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALGraphic;
@@ -88,8 +88,11 @@ Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap;
 Function AlGetAverageColorMosaicKey(aSrcBmp: TBitmap): TALAverageColorMosaicKey; overload;
 
 //tolerance is same value as tolerance in photoshop
-procedure AlTrimImage(Var aSrcBmp: TBitmap; const aTolerance: Integer = 0);
-procedure AlCropImage(Var aSrcBmp: TBitmap; aCropRect: Trect);
+procedure AlTrimImage(aSrcBmp: TBitmap; const aTolerance: Integer = 0);
+procedure AlCropImage(aSrcBmp: TBitmap; aCropRect: Trect);
+procedure ALRotateBMP90(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
+procedure ALRotateBMP180(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
+procedure ALRotateBMP270(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
 
 implementation
 
@@ -608,7 +611,7 @@ begin
   ALDoStretch(cALFilterList[Filter], Radius, Source, Target);
 end;
 
-{*************************************************************************************************************}
+{***************************************************************************************************************}
 procedure ALStretch(NewWidth, NewHeight: Cardinal; Filter: TALResamplingFilter; Radius: Single; Source: TBitmap);
 var
   Target: TBitmap;
@@ -709,7 +712,7 @@ Var aMosaicSquareWidthTmp: Integer;
 
 Begin
 
-  //init aMosaicSquareWidthTmp and aMosaicSquareHeightTmp  
+  //init aMosaicSquareWidthTmp and aMosaicSquareHeightTmp
   aMosaicSquareWidthTmp := aMosaicSquareWidth;
   if aMosaicSquareWidthTmp <= 0 then aMosaicSquareWidthTmp := Round(aSrcBmp.Width / 5);
   aMosaicSquareHeightTmp := aMosaicSquareHeight;
@@ -813,8 +816,8 @@ begin
 
 End;
 
-{*************************************************************************}
-procedure AlTrimImage(Var aSrcBmp: TBitmap; const aTolerance: Integer = 0);
+{*********************************************************************}
+procedure AlTrimImage(aSrcBmp: TBitmap; const aTolerance: Integer = 0);
 var aRow: pAlRGBTripleArray;
     aIsBlack : Integer;
     aCropRect: Trect;
@@ -953,12 +956,12 @@ begin
                       aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
                       SRCCOPY                  //[in] Specifies a raster-operation code
                      ) then raiseLastOsError;
-        aSrcbmp.Free;
-      Except
+        aSrcBmp.Width := aTmpbmp.Width;
+        aSrcBmp.Height := aTmpbmp.Height;
+        aSrcbmp.Assign(aTmpbmp);
+      Finally
         aTmpBmp.free;
-        raise;
       End;
-      aSrcBmp := aTmpBmp;
 
     end;
 
@@ -966,8 +969,8 @@ begin
 
 end;
 
-{************************************************************}
-procedure AlCropImage(Var aSrcBmp: TBitmap; aCropRect: Trect);
+{********************************************************}
+procedure AlCropImage(aSrcBmp: TBitmap; aCropRect: Trect);
 Var aTmpBmp: Tbitmap;
 begin
 
@@ -975,7 +978,7 @@ begin
   if (aSrcBmp.Width = 0) or
      (aSrcBmp.Height = 0) then exit;
 
-  //init the aCropRect   
+  //init the aCropRect
   if (aCropRect.Top < 0) then aCropRect.Top := 0;
   if (aCropRect.left < 0) then aCropRect.left := 0;
   if (aCropRect.bottom > aSrcBmp.Height) then aCropRect.bottom := aSrcBmp.Height;
@@ -1004,13 +1007,91 @@ begin
                     aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
                     SRCCOPY                  //[in] Specifies a raster-operation code
                    ) then RaiseLastOSError;
-      aSrcbmp.Free;
-    Except
+      aSrcBmp.Width := aTmpbmp.Width;
+      aSrcBmp.Height := aTmpbmp.Height;
+      aSrcbmp.Assign(aTmpbmp);
+    Finally
       aTmpBmp.free;
-      raise;
     End;
-    aSrcBmp := aTmpBmp;
 
+  end;
+
+end;
+
+{***********************************************************}
+procedure ALRotateBMP90(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
+var X, Y: Integer;
+    aSrcScanLine: pAlRGBTripleArray;
+    aDestScanLines: array of pAlRGBTripleArray;
+begin
+
+  //init the aDestBmp
+  aDestBmp.PixelFormat := pf24bit;
+  aDestBmp.Width := aSrcBmp.Height;
+  aDestBmp.Height := aSrcBmp.Width;
+
+  //init aDestScanLines
+  SetLength(aDestScanLines, aDestBmp.Height);
+  for Y := 0 to aDestBmp.Height - 1 do aDestScanLines[Y] := aDestBmp.ScanLine[Y];
+
+  //invert the pixel
+  for Y := 0 to aSrcBmp.Height - 1 do begin
+    aSrcScanLine := aSrcBmp.Scanline[Y];
+    for X := 0 to aSrcBmp.Width - 1 do begin
+      aDestScanLines[X][(aSrcBmp.Height - 1) - Y] := aSrcScanLine[X]
+    end;
+  end;
+
+end;
+
+{************************************************************}
+procedure ALRotateBMP180(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
+var X, Y: Integer;
+    aSrcScanLine: pAlRGBTripleArray;
+    aDestScanLines: array of pAlRGBTripleArray;
+begin
+
+  //init the aDestBmp
+  aDestBmp.PixelFormat := pf24bit;
+  aDestBmp.Width := aSrcBmp.Width;
+  aDestBmp.Height := aSrcBmp.Height;
+
+  //init aDestScanLines
+  SetLength(aDestScanLines, aDestBmp.Height);
+  for Y := 0 to aDestBmp.Height - 1 do aDestScanLines[Y] := aDestBmp.ScanLine[Y];
+
+  //invert the pixel
+  for Y := 0 to aSrcBmp.Height - 1 do begin
+    aSrcScanLine := aSrcBmp.Scanline[Y];
+    for X := 0 to aSrcBmp.Width - 1 do begin
+      aDestScanLines[(aSrcBmp.Height - 1) - Y][(aSrcBmp.width - 1) - X] := aSrcScanLine[X]
+    end;
+  end;
+
+end;
+
+{************************************************************}
+procedure ALRotateBMP270(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
+var X, Y: Integer;
+    aSrcScanLine: pAlRGBTripleArray;
+    aDestScanLines: array of pAlRGBTripleArray;
+begin
+
+  //init the aDestBmp
+  aDestBmp.PixelFormat := pf24bit;
+  aDestBmp.Width := aSrcBmp.Height;
+  aDestBmp.Height := aSrcBmp.Width;
+
+  //init aDestScanLines
+  SetLength(aDestScanLines, aDestBmp.Height);
+  for Y := 0 to aDestBmp.Height - 1 do aDestScanLines[Y] := aDestBmp.ScanLine[Y];
+
+  //invert the pixel
+  for Y := 0 to aSrcBmp.Height - 1 do begin
+    aSrcScanLine := aSrcBmp.Scanline[Y];
+    for X := 0 to aSrcBmp.Width - 1 do begin
+      aDestScanLines[(aSrcBmp.width - 1) - X][Y] := aSrcScanLine[X]
+    end;
   end;
 
 end;

@@ -185,6 +185,7 @@ Type
     FLogin: String;
     FPassword: String;
   Protected
+    function GetDataBaseName: String; virtual;
     function GetFieldValue(aSQLDA:TALFBXSQLResult;
                            aDBHandle: IscDbHandle;
                            aTraHandle: IscTrHandle;
@@ -280,7 +281,7 @@ Type
                          const TPB: string = ''); overload; virtual;
     Function  ConnectionCount: Integer;
     property  SqlDialect: word read FSqlDialect;
-    property  DataBaseName: String read FDataBaseName;
+    property  DataBaseName: String read GetDataBaseName;
     property  Login: String read FLogin;
     property  Password: String read FPassword;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
@@ -1135,6 +1136,12 @@ end;
 ///// TALFBXConnectionPoolClient /////
 //////////////////////////////////////
 
+{**********************************************************}
+function TALFBXConnectionPoolClient.GetDataBaseName: String;
+begin
+  result := FdatabaseName;
+end;
+
 {************************************************************************}
 function TALFBXConnectionPoolClient.GetFieldValue(aSQLDA: TALFBXSQLResult;
                                                   aDBHandle: IscDbHandle;
@@ -1413,7 +1420,7 @@ Begin
     //create a new connection
     else begin
       Result := nil;
-      FLibrary.AttachDatabase(FDataBaseName,
+      FLibrary.AttachDatabase(DataBaseName,
                               Result,
                               fOpenConnectionParams);
     end;

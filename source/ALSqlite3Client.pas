@@ -55,7 +55,7 @@ History :
 Link :        http://www.sqlite.org/
 
 * Please send all your feedback to svanderclock@arkadia.com
-* If you have downloaded this source from a website different from 
+* If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
   voting on http://www.arkadia.com/html/alcinoe_like.html
@@ -73,6 +73,12 @@ uses Windows,
      AlSqlite3Wrapper;
 
 Type
+
+  {-------------------------------------------------------------------------}
+  TalSqlite3ClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
+                                                      ViewTag: String;
+                                                      ExtData: Pointer;
+                                                      Var Continue: Boolean);
 
   {--------------------------------}
   EALSqlite3Error = class(Exception)
@@ -134,6 +140,21 @@ Type
     Procedure TransactionStart;
     Procedure TransactionCommit;
     Procedure TransactionRollback;
+    Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
+                         XMLDATA: TalXMLNode;
+                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings); overload;
+    Procedure SelectData(SQL: String;
+                         Skip: integer;
+                         First: Integer;
+                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings); overload;
+    Procedure SelectData(SQL: String;
+                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings); overload;
     Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings); overload;
@@ -220,6 +241,24 @@ Type
                                   const doCloseConnection: Boolean = False); virtual;
     Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
+                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings;
+                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+    Procedure SelectData(SQL: String;
+                         Skip: integer;
+                         First: Integer;
+                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings;
+                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+    Procedure SelectData(SQL: String;
+                         OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings;
+                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+    Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
+                         XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Procedure SelectData(SQL: String;
@@ -245,6 +284,7 @@ Type
     procedure UpdateData(SQL: String;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Function  ConnectionCount: Integer;
+    Function  WorkingConnectionCount: Integer;
     property  DataBaseName: String read FDataBaseName;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
@@ -550,6 +590,8 @@ end;
 {*************************************************************************}
 procedure TalSqlite3Client.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                                       XMLDATA: TalXMLNode;
+                                      OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                      ExtData: Pointer;
                                       FormatSettings: TformatSettings);
 Var astmt: PSQLite3Stmt;
     aStepResult: integer;
@@ -563,105 +605,187 @@ Var astmt: PSQLite3Stmt;
     aRecIndex: integer;
     aRecAdded: integer;
     aStartDate: int64;
+    aContinue: Boolean;
+    aXmlDocument: TalXmlDocument;
+
 begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
   //clear the XMLDATA
-  XMLDATA.ChildNodes.Clear;
+  if assigned(XMLDATA) then begin
+    XMLDATA.ChildNodes.Clear;
+    aXmlDocument := Nil;
+  end
+  else begin
+    aXmlDocument := ALCreateEmptyXMLDocument('root');
+    XMLDATA := aXmlDocument.DocumentElement;
+  end;
+  
+  try
 
-  {loop on all the SQL}
-  For aSQLsindex := 0 to length(SQLs) - 1 do begin
+    {loop on all the SQL}
+    For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-    //trim the SQL
-    SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
+      //trim the SQL
+      SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
 
-    //if the SQL is not empty
-    if SQLs[aSQLsindex].SQL <> '' then begin
+      //if the SQL is not empty
+      if SQLs[aSQLsindex].SQL <> '' then begin
 
-      //init aStartDate
-      aStartDate := ALGetTickCount64;
+        //init aStartDate
+        aStartDate := ALGetTickCount64;
 
-      //prepare the query
-      astmt := nil;
-      CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
-      Try
+        //prepare the query
+        astmt := nil;
+        CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
+        Try
 
-        //Return the number of columns in the result set returned by the
-        //prepared statement. This routine returns 0 if pStmt is an SQL statement
-        //that does not return data (for example an UPDATE).
-        aColumnCount := FLibrary.sqlite3_column_count(astmt);
+          //Return the number of columns in the result set returned by the
+          //prepared statement. This routine returns 0 if pStmt is an SQL statement
+          //that does not return data (for example an UPDATE).
+          aColumnCount := FLibrary.sqlite3_column_count(astmt);
 
-        //init the aColumnNames array
-        setlength(aColumnNames,aColumnCount);
-        For aColumnIndex := 0 to aColumnCount - 1 do
-          aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+          //init the aColumnNames array
+          setlength(aColumnNames,aColumnCount);
+          For aColumnIndex := 0 to aColumnCount - 1 do
+            aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
 
-        //init the aViewRec
-        if SQLs[aSQLsindex].ViewTag <> '' then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
-        else aViewRec := XMLdata;
+          //init the aViewRec
+          if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
+          else aViewRec := XMLdata;
 
-        //loop throught all row
-        aRecIndex := 0;
-        aRecAdded := 0;
-        while True do begin
+          //loop throught all row
+          aRecIndex := 0;
+          aRecAdded := 0;
+          while True do begin
 
-          //retrieve the next row
-          aStepResult := FLibrary.sqlite3_step(astmt);
+            //retrieve the next row
+            aStepResult := FLibrary.sqlite3_step(astmt);
 
-          //break if no more row
-          if aStepResult = SQLITE_DONE then break
+            //break if no more row
+            if aStepResult = SQLITE_DONE then break
 
-          //download the row
-          else if aStepResult = SQLITE_ROW then begin
+            //download the row
+            else if aStepResult = SQLITE_ROW then begin
 
-            //process if > Skip
-            inc(aRecIndex);
-            If aRecIndex > SQLs[aSQLsindex].Skip then begin
+              //process if > Skip
+              inc(aRecIndex);
+              If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-              //stop if no row are requested
-              If (SQLs[aSQLsindex].First = 0) then break;
+                //stop if no row are requested
+                If (SQLs[aSQLsindex].First = 0) then break;
 
-              //init NewRec
-              if SQLs[aSQLsindex].RowTag <> '' then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
-              Else aNewRec := aViewRec;
+                //init NewRec
+                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
+                Else aNewRec := aViewRec;
 
-              //loop throught all column
-              For aColumnIndex := 0 to aColumnCount - 1 do begin
-                aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-                aValueRec.Text := GetFieldValue(astmt,
-                                                aColumnIndex,
-                                                FormatSettings);
+                //loop throught all column
+                For aColumnIndex := 0 to aColumnCount - 1 do begin
+                  aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
+                  aValueRec.Text := GetFieldValue(astmt,
+                                                  aColumnIndex,
+                                                  FormatSettings);
+                end;
+
+                //handle OnNewRowFunct
+                if assigned(OnNewRowFunct) then begin
+                  aContinue := True;
+                  OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
+                  if Not aContinue then Break;
+                end;
+
+                //free the node if aXmlDocument
+                if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+                //handle the First
+                inc(aRecAdded);
+                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+
               end;
 
-              //handle the First
-              inc(aRecAdded);
-              If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+            end
 
-            end;
+            //misc error, raise an exception
+            else CheckAPIError(True);
 
-          end
+          end;
 
-          //misc error, raise an exception
-          else CheckAPIError(True);
+        Finally
+          //free the memory used by the API
+          CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+        End;
 
-        end;
+        //do the onSQLDone
+        doSQLDone(SQLs[aSQLsindex].SQL,
+                  aViewRec,
+                  aStartDate,
+                  ALGetTickCount64);
 
-      Finally
-        //free the memory used by the API
-        CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
       End;
 
-      //do the onSQLDone
-      doSQLDone(SQLs[aSQLsindex].SQL,
-                aViewRec,
-                aStartDate,
-                ALGetTickCount64);
+    end;
 
-    End;
+  Finally
+    if assigned(aXmlDocument) then aXmlDocument.free;
+  End;
 
-  end;
+end;
+
+{************************************************}
+procedure TalSqlite3Client.SelectData(SQL: String;
+                                      Skip: Integer;
+                                      First: Integer;
+                                      OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                      ExtData: Pointer;
+                                      FormatSettings: TformatSettings);
+var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := Skip;
+  aSelectDataSQLs[0].First := First;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings);
+end;
+
+{************************************************}
+procedure TalSqlite3Client.SelectData(SQL: String;
+                                      OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                      ExtData: Pointer;
+                                      FormatSettings: TformatSettings);
+var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := -1;
+  aSelectDataSQLs[0].First := -1;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings);
+end;
+
+{*************************************************************************}
+procedure TalSqlite3Client.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
+                                      XMLDATA: TalXMLNode;
+                                      FormatSettings: TformatSettings);
+begin
+
+  SelectData(SQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
 
 end;
 
@@ -682,6 +806,8 @@ begin
   aSelectDataSQLs[0].First := First;
   SelectData(aSelectDataSQLs,
              XMLDATA,
+             nil,
+             nil,
              FormatSettings);
 end;
 
@@ -700,6 +826,8 @@ begin
   aSelectDataSQLs[0].First := -1;
   SelectData(aSelectDataSQLs,
              XMLDATA,
+             nil,
+             nil,
              FormatSettings);
 end;
 
@@ -717,6 +845,8 @@ begin
   aSelectDataSQLs[0].First := -1;
   SelectData(aSelectDataSQLs,
              XMLDATA,
+             nil,
+             nil,
              FormatSettings);
 end;
 
@@ -1011,8 +1141,17 @@ Begin
     if aDoPragma then UpdateData(FOpenConnectionPragmaStatements,result);
   Except
 
-    //dec the WorkingConnectionCount
-    dec(FWorkingConnectionCount);
+    //synchronize the code
+    FConnectionPoolCS.Acquire;
+    Try
+
+      //dec the WorkingConnectionCount
+      dec(FWorkingConnectionCount);
+
+    //get out of the synchronization
+    finally
+      FConnectionPoolCS.Release;
+    end;
 
     //release the lock
     if FDatabaseWriteLocked then begin
@@ -1205,8 +1344,11 @@ end;
 {***************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                                                     XMLDATA: TalXMLNode;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                                    ExtData: Pointer;
                                                     FormatSettings: TformatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
+
 Var astmt: PSQLite3Stmt;
     aStepResult: integer;
     aColumnCount: Integer;
@@ -1221,124 +1363,212 @@ Var astmt: PSQLite3Stmt;
     aTmpConnectionHandle: PSQLite3;
     aOwnConnection: Boolean;
     aStartDate: int64;
+    aContinue: Boolean;
+    aXmlDocument: TalXmlDocument;
+
 begin
 
   //clear the XMLDATA
-  XMLDATA.ChildNodes.Clear;
+  if assigned(XMLDATA) then begin
+    XMLDATA.ChildNodes.Clear;
+    aXmlDocument := Nil;
+  end
+  else begin
+    aXmlDocument := ALCreateEmptyXMLDocument('root');
+    XMLDATA := aXmlDocument.DocumentElement;
+  end;
+  
+  try
 
-  //acquire a connection and start the transaction if necessary
-  aTmpConnectionHandle := ConnectionHandle;
-  aOwnConnection := (not assigned(ConnectionHandle));
-  if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
-  Try
+    //acquire a connection and start the transaction if necessary
+    aTmpConnectionHandle := ConnectionHandle;
+    aOwnConnection := (not assigned(ConnectionHandle));
+    if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
+    Try
 
-    {loop on all the SQL}
-    For aSQLsindex := 0 to length(SQLs) - 1 do begin
+      {loop on all the SQL}
+      For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //trim the SQL
-      SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
+        //trim the SQL
+        SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
 
-      //if the SQL is not empty
-      if SQLs[aSQLsindex].SQL <> '' then begin
+        //if the SQL is not empty
+        if SQLs[aSQLsindex].SQL <> '' then begin
 
-        //init aStartDate
-        aStartDate := ALGetTickCount64;
+          //init aStartDate
+          aStartDate := ALGetTickCount64;
 
-        //prepare the query
-        astmt := nil;
-        CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
-        Try
+          //prepare the query
+          astmt := nil;
+          CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
+          Try
 
-          //Return the number of columns in the result set returned by the
-          //prepared statement. This routine returns 0 if pStmt is an SQL statement
-          //that does not return data (for example an UPDATE).
-          aColumnCount := FLibrary.sqlite3_column_count(astmt);
+            //Return the number of columns in the result set returned by the
+            //prepared statement. This routine returns 0 if pStmt is an SQL statement
+            //that does not return data (for example an UPDATE).
+            aColumnCount := FLibrary.sqlite3_column_count(astmt);
 
-          //init the aColumnNames array
-          setlength(aColumnNames,aColumnCount);
-          For aColumnIndex := 0 to aColumnCount - 1 do
-            aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
+            //init the aColumnNames array
+            setlength(aColumnNames,aColumnCount);
+            For aColumnIndex := 0 to aColumnCount - 1 do
+              aColumnNames[aColumnIndex] := FLibrary.sqlite3_column_name(astmt, aColumnIndex);
 
-          //init the aViewRec
-          if SQLs[aSQLsindex].ViewTag <> '' then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
-          else aViewRec := XMLdata;
+            //init the aViewRec
+            if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
+            else aViewRec := XMLdata;
 
-          //loop throught all row
-          aRecIndex := 0;
-          aRecAdded := 0;
-          while True do begin
+            //loop throught all row
+            aRecIndex := 0;
+            aRecAdded := 0;
+            while True do begin
 
-            //retrieve the next row
-            aStepResult := FLibrary.sqlite3_step(astmt);
+              //retrieve the next row
+              aStepResult := FLibrary.sqlite3_step(astmt);
 
-            //break if no more row
-            if aStepResult = SQLITE_DONE then break
+              //break if no more row
+              if aStepResult = SQLITE_DONE then break
 
-            //download the row
-            else if aStepResult = SQLITE_ROW then begin
+              //download the row
+              else if aStepResult = SQLITE_ROW then begin
 
-              //process if > Skip
-              inc(aRecIndex);
-              If aRecIndex > SQLs[aSQLsindex].Skip then begin
+                //process if > Skip
+                inc(aRecIndex);
+                If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-                //stop if no row are requested
-                If (SQLs[aSQLsindex].First = 0) then break;
+                  //stop if no row are requested
+                  If (SQLs[aSQLsindex].First = 0) then break;
 
-                //init NewRec
-                if SQLs[aSQLsindex].RowTag <> '' then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
-                Else aNewRec := aViewRec;
+                  //init NewRec
+                  if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument))  then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
+                  Else aNewRec := aViewRec;
 
-                //loop throught all column
-                For aColumnIndex := 0 to aColumnCount - 1 do begin
-                  aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
-                  aValueRec.Text := GetFieldValue(astmt,
-                                                  aColumnIndex,
-                                                  FormatSettings);
+                  //loop throught all column
+                  For aColumnIndex := 0 to aColumnCount - 1 do begin
+                    aValueRec := aNewRec.AddChild(ALlowercase(aColumnNames[aColumnIndex]));
+                    aValueRec.Text := GetFieldValue(astmt,
+                                                    aColumnIndex,
+                                                    FormatSettings);
+                  end;
+
+                  //handle OnNewRowFunct
+                  if assigned(OnNewRowFunct) then begin
+                    aContinue := True;
+                    OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
+                    if Not aContinue then Break;
+                  end;
+
+                  //free the node if aXmlDocument
+                  if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+                  //handle the First
+                  inc(aRecAdded);
+                  If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+
                 end;
 
-                //handle the First
-                inc(aRecAdded);
-                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+              end
 
-              end;
+              //misc error, raise an exception
+              else CheckAPIError(aTmpConnectionHandle, True);
 
-            end
+            end;
 
-            //misc error, raise an exception
-            else CheckAPIError(aTmpConnectionHandle, True);
+          Finally
+            //free the memory used by the API
+            CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
+          End;
 
-          end;
+          //do the onSQLDone
+          DoSQLDone(SQLs[aSQLsindex].SQL,
+                    aViewRec,
+                    aStartDate,
+                    ALGetTickCount64,
+                    aTmpConnectionHandle);
 
-        Finally
-          //free the memory used by the API
-          CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
         End;
 
-        //do the onSQLDone
-        DoSQLDone(SQLs[aSQLsindex].SQL,
-                  aViewRec,
-                  aStartDate,
-                  ALGetTickCount64,
-                  aTmpConnectionHandle);
+      end;
 
-      End;
+      //commit the transaction and release the connection if owned
+      if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
 
+    except
+      On E: Exception do begin
+
+        //rollback the transaction and release the connection if owned
+        if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+
+        //raise the error
+        raise;
+
+      end;
     end;
 
-    //commit the transaction and release the connection if owned
-    if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+  Finally
+    if assigned(aXmlDocument) then aXmlDocument.free;
+  End;
 
-  except
-    On E: Exception do begin
+end;
 
-      //rollback the transaction and release the connection if owned
-      if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+{**************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
+                                                    Skip: Integer;
+                                                    First: Integer;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    FormatSettings: TformatSettings;
+                                                    const ConnectionHandle: PSQLite3 = nil);
+var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := Skip;
+  aSelectDataSQLs[0].First := First;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings,
+             ConnectionHandle);
+end;
 
-      //raise the error
-      raise;
+{**************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
+                                                    OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    FormatSettings: TformatSettings;
+                                                    const ConnectionHandle: PSQLite3 = nil);
+var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := -1;
+  aSelectDataSQLs[0].First := -1;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings,
+             ConnectionHandle);
+end;
 
-    end;
-  end;
+{***************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
+                                                    XMLDATA: TalXMLNode;
+                                                    FormatSettings: TformatSettings;
+                                                    const ConnectionHandle: PSQLite3 = nil);
+begin
+
+  SelectData(SQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings,
+             ConnectionHandle);
 
 end;
 
@@ -1360,6 +1590,8 @@ begin
   aSelectDataSQLs[0].First := First;
   SelectData(aSelectDataSQLs,
              XMLDATA,
+             nil,
+             nil,
              FormatSettings,
              ConnectionHandle);
 end;
@@ -1380,6 +1612,8 @@ begin
   aSelectDataSQLs[0].First := -1;
   SelectData(aSelectDataSQLs,
              XMLDATA,
+             nil,
+             nil,
              FormatSettings,
              ConnectionHandle);
 end;
@@ -1399,6 +1633,8 @@ begin
   aSelectDataSQLs[0].First := -1;
   SelectData(aSelectDataSQLs,
              XMLDATA,
+             nil,
+             nil,
              FormatSettings,
              ConnectionHandle);
 end;
@@ -1502,6 +1738,17 @@ begin
   FConnectionPoolCS.Acquire;
   Try
     Result := FConnectionPool.Count + FWorkingConnectionCount;
+  finally
+    FConnectionPoolCS.Release;
+  end;
+end;
+
+{**********************************************************************}
+function TalSqlite3ConnectionPoolClient.WorkingConnectionCount: Integer;
+begin
+  FConnectionPoolCS.Acquire;
+  Try
+    Result := FWorkingConnectionCount;
   finally
     FConnectionPoolCS.Release;
   end;

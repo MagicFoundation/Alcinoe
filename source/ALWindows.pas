@@ -23,12 +23,15 @@ function ALGlobalMemoryStatusEx(var lpBuffer : TALMEMORYSTATUSEX): BOOL; stdcall
 
 Var ALGetTickCount64: function: int64; stdcall;
 
+function ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG; stdcall;
+
 const cALINVALID_SET_FILE_POINTER = DWORD(-1);
 
 implementation
 
 {*****************************************************************************}
 function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
+function ALInterlockedExchange64; external kernel32 name 'InterlockedExchange64';
 
 {******************************************}
 function ALGetTickCount64XP: int64; stdcall;

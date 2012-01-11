@@ -90,15 +90,11 @@ type
   TALBaseAVLBinaryTreeNode = class;
   TALBaseAVLBinaryTree = class;
 
-  {iterate function----------------------}
-  TALAVLBinaryTreeIterateFunc = procedure(
-                                          aTree: TALBaseAVLBinaryTree;
+  {iterate function--------------------------------------------------}
+  TALAVLBinaryTreeIterateFunc = procedure(aTree: TALBaseAVLBinaryTree;
                                           aNode: TALBaseAVLBinaryTreeNode;
                                           aExtData: Pointer;
-                                          Var aContinue: Boolean
-                                         );
-
-
+                                          Var aContinue: Boolean);
 
   {TALBaseAVLBinaryTreeNode---------------}
   TALBaseAVLBinaryTreeNode = class(Tobject)

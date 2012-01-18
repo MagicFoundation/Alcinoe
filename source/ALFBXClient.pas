@@ -101,6 +101,8 @@ Type
     fTraHandle: IscTrHandle;
     fNullString: String;
     fCharSet: TALFBXCharacterSet;
+    fDefaultReadTPB: String;
+    fDefaultWriteTPB: String;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
   Protected
@@ -140,7 +142,7 @@ Type
     Procedure TransactionCommit;
     Procedure TransactionRollback;
     Procedure SelectData(SQLs: TALFBXClientSelectDataSQLs;
-                         XMLDATA: TalXMLNode;                                   
+                         XMLDATA: TalXMLNode;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
                          FormatSettings: TformatSettings); overload;
@@ -179,6 +181,8 @@ Type
     Property  NullString: String Read fNullString Write fNullString;
     property  Lib: TALFBXLibrary read FLibrary;
     property  CharSet: TALFBXCharacterSet read fCharSet;
+    property  DefaultReadTPB: String read fDefaultReadTPB Write fDefaultReadTPB;
+    property  DefaultWriteTPB: String read fDefaultWriteTPB write fDefaultWriteTPB;
   end;
 
   {--------------------------------------------}
@@ -205,6 +209,8 @@ Type
     FNullString: String;
     FLogin: String;
     FPassword: String;
+    fDefaultReadTPB: String;
+    fDefaultWriteTPB: String;
   Protected
     function GetDataBaseName: String; virtual;
     function GetFieldValue(aSQLDA:TALFBXSQLResult;
@@ -334,6 +340,8 @@ Type
     Property  NullString: String Read fNullString Write fNullString;
     property  Lib: TALFBXLibrary read FLibrary;
     property  CharSet: TALFBXCharacterSet read fCharSet;
+    property  DefaultReadTPB: String read fDefaultReadTPB Write fDefaultReadTPB;
+    property  DefaultWriteTPB: String read fDefaultWriteTPB write fDefaultWriteTPB;
   end;
 
   {--------------------------------}
@@ -392,6 +400,185 @@ Type
     property  Signal: Thandle read FSignal;
   end;
 
+Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
+                                                             //the first attribute specified in the TPB, and must always be set to isc_tpb_version3.
+                                                             //isc_tpb_version3 = InterBase version 3 transaction
+
+                                          isc_tpb_read +     //Access mode describes the actions that can be performed by the functions associated with
+                                                             //the transaction. Valid access modes are:
+                                                             //  * isc_tpb_read: Read-only access mode that allows a transaction only to select data
+                                                             //                  from tables
+                                                             //  * isc_tpb_write: Read-write access mode of that allows a transaction to select, insert,
+                                                             //                   update, and delete table data [Default]
+
+                                          isc_tpb_read_committed + isc_tpb_rec_version +
+                                                             // Isolation level describes the view of the database given a transaction as it relates to
+                                                             // actions performed by other simultaneously occurring transactions.
+                                                             // Valid isolation levels are:
+                                                             //  * isc_tpb_concurrency: High throughput, high concurrency transaction with acceptable
+                                                             //                         consistency; use of this parameter takes full advantage of the InterBase
+                                                             //                         multi-generational transaction model [Default]
+                                                             //                         By default, after a transaction starts it cannot access committed changes
+                                                             //                         to a table made by other simultaneous transactions, even though it shares
+                                                             //                         access to the table with them. Such a transaction has an isolation level of
+                                                             //                         isc_tpb_concurrency, meaning it can have concurrent access to tables also
+                                                             //                         accessed simultaneously by other transactions.
+                                                             //  * isc_tpb_consistency: Table-locking transaction model
+                                                             //                         InterBase also supports a restrictive isolation level. isc_tpb_consistency
+                                                             //                         prevents a transaction from accessing tables if they are written to by other
+                                                             //                         transactions; it also prevents other transactions from writing to a table
+                                                             //                         once this transaction writes to it. This isolation level is designed to
+                                                             //                         guarantee that if a transaction writes to a table before other simultaneous
+                                                             //                         read and write transactions, then only it can change a table?s data. Because
+                                                             //                         it essentially restricts (and often prevents) shared access to tables,
+                                                             //                         isc_tpb_consistency should be used with care.
+                                                             //  * isc_tpb_read_committed, isc_tpb_rec_version: High throughput, high concurrency transaction
+                                                             //                                                 that can read changes committed by other concurrent
+                                                             //                                                 transactions. Use of this parameter takes full advantage
+                                                             //                                                 of the InterBase multi-generational transaction model.
+                                                             //                                                 * isc_tpb_rec_version: Enables an isc_tpb_read_committed
+                                                             //                                                   transaction to read the most recently
+                                                             //                                                   committed version of a record even if
+                                                             //                                                   other, uncommitted versions are pending.
+                                                             //                                                 -------
+                                                             //                                                 isc_tpb_read_committed, offers all the advantages of the
+                                                             //                                                 isc_tpb_concurrency isolation level and additionally enables
+                                                             //                                                 a transaction to access changes committed by other
+                                                             //                                                 simultaneous transactions. Two other parameters,
+                                                             //                                                 isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
+                                                             //                                                 used with the isc_tpb_read_committed parameter. They offer
+                                                             //                                                 refined control over the committed changes a transaction is
+                                                             //                                                 permitted to access:
+                                                             //                                                 * isc_tpb_rec_version specifies that a transaction can read
+                                                             //                                                   the latest committed version of a row, even if a more recent
+                                                             //                                                   uncommitted version is pending.
+
+                                                             //  * isc_tpb_read_committed, isc_tpb_no_rec_version: High throughput, high concurrency transaction
+                                                             //                                                    that can read changes committed by other concurrent
+                                                             //                                                    transactions. Use of this parameter takes full advantage
+                                                             //                                                    of the InterBase multi-generational transaction model.
+                                                             //                                                    * isc_tpb_no_rec_version: Enables an isc_tpb_read_committed
+                                                             //                                                      transaction to read only the latest committed version of
+                                                             //                                                      a record. If an uncommitted version of a record is
+                                                             //                                                      pending and isc_tpb_wait is also specified, then the
+                                                             //                                                      transaction waits for the pending record to be committed
+                                                             //                                                      or rolled back before proceeding. Otherwise, a lock
+                                                             //                                                      conflict error is reported at once.
+                                                             //                                                    -------
+                                                             //                                                    isc_tpb_read_committed, offers all the advantages of the
+                                                             //                                                    isc_tpb_concurrency isolation level and additionally enables
+                                                             //                                                    a transaction to access changes committed by other
+                                                             //                                                    simultaneous transactions. Two other parameters,
+                                                             //                                                    isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
+                                                             //                                                    used with the isc_tpb_read_committed parameter. They offer
+                                                             //                                                    refined control over the committed changes a transaction is
+                                                             //                                                    permitted to access:
+                                                             //                                                    * isc_tpb_no_rec_version, the default refinement,
+                                                             //                                                      specifies that a transaction can only read the latest
+                                                             //                                                      version of a row. If a change to a row is pending, but
+                                                             //                                                      not yet committed, the row cannot be read.
+
+                                          isc_tpb_nowait;    // Lock resolution describes how a transaction should react if a lock conflict occurs. Valid
+                                                             // lock resolutions are:
+                                                             // * isc_tpb_wait: Lock resolution specifies that the transaction is to wait until locked
+                                                             //                 resources are released before retrying an operation [Default]
+                                                             // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
+                                                             //                   released, but instead, a lock conflict error should be returned immediately
+
+       cALFbxClientDefaultWriteNOWaitTPB = isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
+                                                              //the first attribute specified in the TPB, and must always be set to isc_tpb_version3.
+                                                              //isc_tpb_version3 = InterBase version 3 transaction
+
+                                           isc_tpb_write +    //Access mode describes the actions that can be performed by the functions associated with
+                                                              //the transaction. Valid access modes are:
+                                                              //  * isc_tpb_read: Read-only access mode that allows a transaction only to select data
+                                                              //                  from tables
+                                                              //  * isc_tpb_write: Read-write access mode of that allows a transaction to select, insert,
+                                                              //                   update, and delete table data [Default]
+
+                                           isc_tpb_read_committed + isc_tpb_no_rec_version +
+                                                              // Isolation level describes the view of the database given a transaction as it relates to
+                                                              // actions performed by other simultaneously occurring transactions.
+                                                              // Valid isolation levels are:
+                                                              //  * isc_tpb_concurrency: High throughput, high concurrency transaction with acceptable
+                                                              //                         consistency; use of this parameter takes full advantage of the InterBase
+                                                              //                         multi-generational transaction model [Default]
+                                                              //                         By default, after a transaction starts it cannot access committed changes
+                                                              //                         to a table made by other simultaneous transactions, even though it shares
+                                                              //                         access to the table with them. Such a transaction has an isolation level of
+                                                              //                         isc_tpb_concurrency, meaning it can have concurrent access to tables also
+                                                              //                         accessed simultaneously by other transactions.
+                                                              //  * isc_tpb_consistency: Table-locking transaction model
+                                                              //                         InterBase also supports a restrictive isolation level. isc_tpb_consistency
+                                                              //                         prevents a transaction from accessing tables if they are written to by other
+                                                              //                         transactions; it also prevents other transactions from writing to a table
+                                                              //                         once this transaction writes to it. This isolation level is designed to
+                                                              //                         guarantee that if a transaction writes to a table before other simultaneous
+                                                              //                         read and write transactions, then only it can change a table?s data. Because
+                                                              //                         it essentially restricts (and often prevents) shared access to tables,
+                                                              //                         isc_tpb_consistency should be used with care.
+                                                              //  * isc_tpb_read_committed, isc_tpb_rec_version: High throughput, high concurrency transaction
+                                                              //                                                 that can read changes committed by other concurrent
+                                                              //                                                 transactions. Use of this parameter takes full advantage
+                                                              //                                                 of the InterBase multi-generational transaction model.
+                                                              //                                                 * isc_tpb_rec_version: Enables an isc_tpb_read_committed
+                                                              //                                                   transaction to read the most recently
+                                                              //                                                   committed version of a record even if
+                                                              //                                                   other, uncommitted versions are pending.
+                                                              //                                                 -------
+                                                              //                                                 isc_tpb_read_committed, offers all the advantages of the
+                                                              //                                                 isc_tpb_concurrency isolation level and additionally enables
+                                                              //                                                 a transaction to access changes committed by other
+                                                              //                                                 simultaneous transactions. Two other parameters,
+                                                              //                                                 isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
+                                                              //                                                 used with the isc_tpb_read_committed parameter. They offer
+                                                              //                                                 refined control over the committed changes a transaction is
+                                                              //                                                 permitted to access:
+                                                              //                                                 * isc_tpb_rec_version specifies that a transaction can read
+                                                              //                                                   the latest committed version of a row, even if a more recent
+                                                              //                                                   uncommitted version is pending.
+
+                                                              //  * isc_tpb_read_committed, isc_tpb_no_rec_version: High throughput, high concurrency transaction
+                                                              //                                                    that can read changes committed by other concurrent
+                                                              //                                                    transactions. Use of this parameter takes full advantage
+                                                              //                                                    of the InterBase multi-generational transaction model.
+                                                              //                                                    * isc_tpb_no_rec_version: Enables an isc_tpb_read_committed
+                                                              //                                                      transaction to read only the latest committed version of
+                                                              //                                                      a record. If an uncommitted version of a record is
+                                                              //                                                      pending and isc_tpb_wait is also specified, then the
+                                                              //                                                      transaction waits for the pending record to be committed
+                                                              //                                                      or rolled back before proceeding. Otherwise, a lock
+                                                              //                                                      conflict error is reported at once.
+                                                              //                                                    -------
+                                                              //                                                    isc_tpb_read_committed, offers all the advantages of the
+                                                              //                                                    isc_tpb_concurrency isolation level and additionally enables
+                                                              //                                                    a transaction to access changes committed by other
+                                                              //                                                    simultaneous transactions. Two other parameters,
+                                                              //                                                    isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
+                                                              //                                                    used with the isc_tpb_read_committed parameter. They offer
+                                                              //                                                    refined control over the committed changes a transaction is
+                                                              //                                                    permitted to access:
+                                                              //                                                    * isc_tpb_no_rec_version, the default refinement,
+                                                              //                                                      specifies that a transaction can only read the latest
+                                                              //                                                      version of a row. If a change to a row is pending, but
+                                                              //                                                      not yet committed, the row cannot be read.
+
+                                           isc_tpb_nowait;    // Lock resolution describes how a transaction should react if a lock conflict occurs. Valid
+                                                              // lock resolutions are:
+                                                              // * isc_tpb_wait: Lock resolution specifies that the transaction is to wait until locked
+                                                              //                 resources are released before retrying an operation [Default]
+                                                              // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
+                                                              //
+
+       cALFbxClientDefaultReadWaitTPB = isc_tpb_version3 + 
+                                        isc_tpb_read +
+                                        isc_tpb_read_committed + isc_tpb_rec_version +
+                                        isc_tpb_wait;
+
+       cALFbxClientDefaultWriteWaitTPB = isc_tpb_version3 +
+                                         isc_tpb_write +
+                                         isc_tpb_read_committed + isc_tpb_no_rec_version +
+                                         isc_tpb_wait;
 
 implementation
 
@@ -503,6 +690,8 @@ end;
 {********************************}
 procedure TALFBXClient.initObject;
 begin
+  fDefaultReadTPB := cALFbxClientDefaultReadNOWaitTPB;
+  fDefaultWriteTPB := cALFbxClientDefaultWriteNOWaitTPB;
   fDBHandle := nil;
   fTraHandle := nil;
   FSQLDIALECT := 3;
@@ -679,211 +868,24 @@ end;
 
 {****************************************************************************}
 procedure TALFBXClient.TransactionStart(Readonly: Boolean; const TPB: String);
+Var aTmpTPB: String;
 begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
   if InTransaction then raise Exception.Create('Another transaction is active!');
 
-  //Start the transaction
+  //init aTmpTPB
   If TPB = '' then begin
-
-    if Readonly then begin
-
-      Flibrary.TransactionStart(
-                                fTraHandle,
-                                fDBHandle,
-
-                                isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
-                                                   //the first attribute specified in the TPB, and must always be set to isc_tpb_version3.
-                                                   //isc_tpb_version3 = InterBase version 3 transaction
-
-                                isc_tpb_read +     //Access mode describes the actions that can be performed by the functions associated with
-                                                   //the transaction. Valid access modes are:
-                                                   //  * isc_tpb_read: Read-only access mode that allows a transaction only to select data
-                                                   //                  from tables
-                                                   //  * isc_tpb_write: Read-write access mode of that allows a transaction to select, insert,
-                                                   //                   update, and delete table data [Default]
-
-                                isc_tpb_read_committed + isc_tpb_rec_version +
-                                                   // Isolation level describes the view of the database given a transaction as it relates to
-                                                   // actions performed by other simultaneously occurring transactions.
-                                                   // Valid isolation levels are:
-                                                   //  * isc_tpb_concurrency: High throughput, high concurrency transaction with acceptable
-                                                   //                         consistency; use of this parameter takes full advantage of the InterBase
-                                                   //                         multi-generational transaction model [Default]
-                                                   //                         By default, after a transaction starts it cannot access committed changes
-                                                   //                         to a table made by other simultaneous transactions, even though it shares
-                                                   //                         access to the table with them. Such a transaction has an isolation level of
-                                                   //                         isc_tpb_concurrency, meaning it can have concurrent access to tables also
-                                                   //                         accessed simultaneously by other transactions.
-                                                   //  * isc_tpb_consistency: Table-locking transaction model
-                                                   //                         InterBase also supports a restrictive isolation level. isc_tpb_consistency
-                                                   //                         prevents a transaction from accessing tables if they are written to by other
-                                                   //                         transactions; it also prevents other transactions from writing to a table
-                                                   //                         once this transaction writes to it. This isolation level is designed to
-                                                   //                         guarantee that if a transaction writes to a table before other simultaneous
-                                                   //                         read and write transactions, then only it can change a table?s data. Because
-                                                   //                         it essentially restricts (and often prevents) shared access to tables,
-                                                   //                         isc_tpb_consistency should be used with care.
-                                                   //  * isc_tpb_read_committed, isc_tpb_rec_version: High throughput, high concurrency transaction
-                                                   //                                                 that can read changes committed by other concurrent
-                                                   //                                                 transactions. Use of this parameter takes full advantage
-                                                   //                                                 of the InterBase multi-generational transaction model.
-                                                   //                                                 * isc_tpb_rec_version: Enables an isc_tpb_read_committed
-                                                   //                                                   transaction to read the most recently
-                                                   //                                                   committed version of a record even if
-                                                   //                                                   other, uncommitted versions are pending.
-                                                   //                                                 -------
-                                                   //                                                 isc_tpb_read_committed, offers all the advantages of the
-                                                   //                                                 isc_tpb_concurrency isolation level and additionally enables
-                                                   //                                                 a transaction to access changes committed by other
-                                                   //                                                 simultaneous transactions. Two other parameters,
-                                                   //                                                 isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                   //                                                 used with the isc_tpb_read_committed parameter. They offer
-                                                   //                                                 refined control over the committed changes a transaction is
-                                                   //                                                 permitted to access:
-                                                   //                                                 * isc_tpb_rec_version specifies that a transaction can read
-                                                   //                                                   the latest committed version of a row, even if a more recent
-                                                   //                                                   uncommitted version is pending.
-
-                                                   //  * isc_tpb_read_committed, isc_tpb_no_rec_version: High throughput, high concurrency transaction
-                                                   //                                                    that can read changes committed by other concurrent
-                                                   //                                                    transactions. Use of this parameter takes full advantage
-                                                   //                                                    of the InterBase multi-generational transaction model.
-                                                   //                                                    * isc_tpb_no_rec_version: Enables an isc_tpb_read_committed
-                                                   //                                                      transaction to read only the latest committed version of
-                                                   //                                                      a record. If an uncommitted version of a record is
-                                                   //                                                      pending and isc_tpb_wait is also specified, then the
-                                                   //                                                      transaction waits for the pending record to be committed
-                                                   //                                                      or rolled back before proceeding. Otherwise, a lock
-                                                   //                                                      conflict error is reported at once.
-                                                   //                                                    -------
-                                                   //                                                    isc_tpb_read_committed, offers all the advantages of the
-                                                   //                                                    isc_tpb_concurrency isolation level and additionally enables
-                                                   //                                                    a transaction to access changes committed by other
-                                                   //                                                    simultaneous transactions. Two other parameters,
-                                                   //                                                    isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                   //                                                    used with the isc_tpb_read_committed parameter. They offer
-                                                   //                                                    refined control over the committed changes a transaction is
-                                                   //                                                    permitted to access:
-                                                   //                                                    * isc_tpb_no_rec_version, the default refinement,
-                                                   //                                                      specifies that a transaction can only read the latest
-                                                   //                                                      version of a row. If a change to a row is pending, but
-                                                   //                                                      not yet committed, the row cannot be read.
-
-                                isc_tpb_nowait     // Lock resolution describes how a transaction should react if a lock conflict occurs. Valid
-                                                   // lock resolutions are:
-                                                   // * isc_tpb_wait: Lock resolution specifies that the transaction is to wait until locked
-                                                   //                 resources are released before retrying an operation [Default]
-                                                   // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
-                                                   //                   released, but instead, a lock conflict error should be returned immediately
-                               )
-    end
-
-    else begin
-
-      Flibrary.TransactionStart(
-                                fTraHandle,
-                                fDBHandle,
-
-                                isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
-                                                   //the first attribute specified in the TPB, and must always be set to isc_tpb_version3.
-                                                   //isc_tpb_version3 = InterBase version 3 transaction
-
-                                isc_tpb_write +    //Access mode describes the actions that can be performed by the functions associated with
-                                                   //the transaction. Valid access modes are:
-                                                   //  * isc_tpb_read: Read-only access mode that allows a transaction only to select data
-                                                   //                  from tables
-                                                   //  * isc_tpb_write: Read-write access mode of that allows a transaction to select, insert,
-                                                   //                   update, and delete table data [Default]
-
-                                isc_tpb_read_committed + isc_tpb_no_rec_version +
-                                                   // Isolation level describes the view of the database given a transaction as it relates to
-                                                   // actions performed by other simultaneously occurring transactions.
-                                                   // Valid isolation levels are:
-                                                   //  * isc_tpb_concurrency: High throughput, high concurrency transaction with acceptable
-                                                   //                         consistency; use of this parameter takes full advantage of the InterBase
-                                                   //                         multi-generational transaction model [Default]
-                                                   //                         By default, after a transaction starts it cannot access committed changes
-                                                   //                         to a table made by other simultaneous transactions, even though it shares
-                                                   //                         access to the table with them. Such a transaction has an isolation level of
-                                                   //                         isc_tpb_concurrency, meaning it can have concurrent access to tables also
-                                                   //                         accessed simultaneously by other transactions.
-                                                   //  * isc_tpb_consistency: Table-locking transaction model
-                                                   //                         InterBase also supports a restrictive isolation level. isc_tpb_consistency
-                                                   //                         prevents a transaction from accessing tables if they are written to by other
-                                                   //                         transactions; it also prevents other transactions from writing to a table
-                                                   //                         once this transaction writes to it. This isolation level is designed to
-                                                   //                         guarantee that if a transaction writes to a table before other simultaneous
-                                                   //                         read and write transactions, then only it can change a table?s data. Because
-                                                   //                         it essentially restricts (and often prevents) shared access to tables,
-                                                   //                         isc_tpb_consistency should be used with care.
-                                                   //  * isc_tpb_read_committed, isc_tpb_rec_version: High throughput, high concurrency transaction
-                                                   //                                                 that can read changes committed by other concurrent
-                                                   //                                                 transactions. Use of this parameter takes full advantage
-                                                   //                                                 of the InterBase multi-generational transaction model.
-                                                   //                                                 * isc_tpb_rec_version: Enables an isc_tpb_read_committed
-                                                   //                                                   transaction to read the most recently
-                                                   //                                                   committed version of a record even if
-                                                   //                                                   other, uncommitted versions are pending.
-                                                   //                                                 -------
-                                                   //                                                 isc_tpb_read_committed, offers all the advantages of the
-                                                   //                                                 isc_tpb_concurrency isolation level and additionally enables
-                                                   //                                                 a transaction to access changes committed by other
-                                                   //                                                 simultaneous transactions. Two other parameters,
-                                                   //                                                 isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                   //                                                 used with the isc_tpb_read_committed parameter. They offer
-                                                   //                                                 refined control over the committed changes a transaction is
-                                                   //                                                 permitted to access:
-                                                   //                                                 * isc_tpb_rec_version specifies that a transaction can read
-                                                   //                                                   the latest committed version of a row, even if a more recent
-                                                   //                                                   uncommitted version is pending.
-
-                                                   //  * isc_tpb_read_committed, isc_tpb_no_rec_version: High throughput, high concurrency transaction
-                                                   //                                                    that can read changes committed by other concurrent
-                                                   //                                                    transactions. Use of this parameter takes full advantage
-                                                   //                                                    of the InterBase multi-generational transaction model.
-                                                   //                                                    * isc_tpb_no_rec_version: Enables an isc_tpb_read_committed
-                                                   //                                                      transaction to read only the latest committed version of
-                                                   //                                                      a record. If an uncommitted version of a record is
-                                                   //                                                      pending and isc_tpb_wait is also specified, then the
-                                                   //                                                      transaction waits for the pending record to be committed
-                                                   //                                                      or rolled back before proceeding. Otherwise, a lock
-                                                   //                                                      conflict error is reported at once.
-                                                   //                                                    -------
-                                                   //                                                    isc_tpb_read_committed, offers all the advantages of the
-                                                   //                                                    isc_tpb_concurrency isolation level and additionally enables
-                                                   //                                                    a transaction to access changes committed by other
-                                                   //                                                    simultaneous transactions. Two other parameters,
-                                                   //                                                    isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                   //                                                    used with the isc_tpb_read_committed parameter. They offer
-                                                   //                                                    refined control over the committed changes a transaction is
-                                                   //                                                    permitted to access:
-                                                   //                                                    * isc_tpb_no_rec_version, the default refinement,
-                                                   //                                                      specifies that a transaction can only read the latest
-                                                   //                                                      version of a row. If a change to a row is pending, but
-                                                   //                                                      not yet committed, the row cannot be read.
-
-                                isc_tpb_nowait     // Lock resolution describes how a transaction should react if a lock conflict occurs. Valid
-                                                   // lock resolutions are:
-                                                   // * isc_tpb_wait: Lock resolution specifies that the transaction is to wait until locked
-                                                   //                 resources are released before retrying an operation [Default]
-                                                   // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
-                                                   //
-                               )
-
-    end
-
+    if Readonly then aTmpTPB := fDefaultReadTPB
+    else aTmpTPB := fDefaultWriteTPB;
   end
+  else aTmpTPB := TPB;
 
-  else begin
-
-    Flibrary.TransactionStart(fTraHandle,
-                              fDBHandle,
-                              TPB);
-
-  end;
+  //Start the transaction
+  Flibrary.TransactionStart(fTraHandle,
+                            fDBHandle,
+                            aTmpTPB);
 
 end;
 
@@ -1381,6 +1383,8 @@ procedure TALFBXConnectionPoolClient.initObject(aDataBaseName,
                                                 const aNumbuffers: integer = -1;
                                                 const aOpenConnectionExtraParams: String = '');
 begin
+  fDefaultReadTPB := cALFbxClientDefaultReadNOWaitTPB;
+  fDefaultWriteTPB := cALFbxClientDefaultWriteNOWaitTPB;
   FDataBaseName:= aDataBaseName;
   FCharset:= ALFBXStrToCharacterSet(aCharSet);
   fLogin := aLogin;
@@ -1398,6 +1402,7 @@ begin
   FLastConnectionGarbage := ALGettickCount64;
   FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
   FNullString := '';
+
 end;
 
 {**********************************************************}
@@ -1664,6 +1669,7 @@ procedure TALFBXConnectionPoolClient.TransactionStart(Var DBHandle: IscDbHandle;
                                                       const ReadOnly: boolean = False;
                                                       const TPB: string = '');
 Var areleaseDBHandleonError: Boolean;
+    aTmpTPB: String;
 begin
 
   //init the aConnectionHandle
@@ -1675,205 +1681,17 @@ begin
   else areleaseDBHandleonError := False;
   try
 
-    //Start the transaction
+    //init aTmpTPB
     If TPB = '' then begin
-
-      if Readonly then begin
-
-        Flibrary.TransactionStart(
-                                  TraHandle,
-                                  DBHandle,
-
-                                  isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
-                                                     //the first attribute specified in the TPB, and must always be set to isc_tpb_version3.
-                                                     //isc_tpb_version3 = InterBase version 3 transaction
-
-                                  isc_tpb_read +     //Access mode describes the actions that can be performed by the functions associated with
-                                                     //the transaction. Valid access modes are:
-                                                     //  * isc_tpb_read: Read-only access mode that allows a transaction only to select data
-                                                     //                  from tables
-                                                     //  * isc_tpb_write: Read-write access mode of that allows a transaction to select, insert,
-                                                     //                   update, and delete table data [Default]
-
-                                  isc_tpb_read_committed + isc_tpb_rec_version +
-                                                     // Isolation level describes the view of the database given a transaction as it relates to
-                                                     // actions performed by other simultaneously occurring transactions.
-                                                     // Valid isolation levels are:
-                                                     //  * isc_tpb_concurrency: High throughput, high concurrency transaction with acceptable
-                                                     //                         consistency; use of this parameter takes full advantage of the InterBase
-                                                     //                         multi-generational transaction model [Default]
-                                                     //                         By default, after a transaction starts it cannot access committed changes
-                                                     //                         to a table made by other simultaneous transactions, even though it shares
-                                                     //                         access to the table with them. Such a transaction has an isolation level of
-                                                     //                         isc_tpb_concurrency, meaning it can have concurrent access to tables also
-                                                     //                         accessed simultaneously by other transactions.
-                                                     //  * isc_tpb_consistency: Table-locking transaction model
-                                                     //                         InterBase also supports a restrictive isolation level. isc_tpb_consistency
-                                                     //                         prevents a transaction from accessing tables if they are written to by other
-                                                     //                         transactions; it also prevents other transactions from writing to a table
-                                                     //                         once this transaction writes to it. This isolation level is designed to
-                                                     //                         guarantee that if a transaction writes to a table before other simultaneous
-                                                     //                         read and write transactions, then only it can change a table?s data. Because
-                                                     //                         it essentially restricts (and often prevents) shared access to tables,
-                                                     //                         isc_tpb_consistency should be used with care.
-                                                     //  * isc_tpb_read_committed, isc_tpb_rec_version: High throughput, high concurrency transaction
-                                                     //                                                 that can read changes committed by other concurrent
-                                                     //                                                 transactions. Use of this parameter takes full advantage
-                                                     //                                                 of the InterBase multi-generational transaction model.
-                                                     //                                                 * isc_tpb_rec_version: Enables an isc_tpb_read_committed
-                                                     //                                                   transaction to read the most recently
-                                                     //                                                   committed version of a record even if
-                                                     //                                                   other, uncommitted versions are pending.
-                                                     //                                                 -------
-                                                     //                                                 isc_tpb_read_committed, offers all the advantages of the
-                                                     //                                                 isc_tpb_concurrency isolation level and additionally enables
-                                                     //                                                 a transaction to access changes committed by other
-                                                     //                                                 simultaneous transactions. Two other parameters,
-                                                     //                                                 isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                     //                                                 used with the isc_tpb_read_committed parameter. They offer
-                                                     //                                                 refined control over the committed changes a transaction is
-                                                     //                                                 permitted to access:
-                                                     //                                                 * isc_tpb_rec_version specifies that a transaction can read
-                                                     //                                                   the latest committed version of a row, even if a more recent
-                                                     //                                                   uncommitted version is pending.
-
-                                                     //  * isc_tpb_read_committed, isc_tpb_no_rec_version: High throughput, high concurrency transaction
-                                                     //                                                    that can read changes committed by other concurrent
-                                                     //                                                    transactions. Use of this parameter takes full advantage
-                                                     //                                                    of the InterBase multi-generational transaction model.
-                                                     //                                                    * isc_tpb_no_rec_version: Enables an isc_tpb_read_committed
-                                                     //                                                      transaction to read only the latest committed version of
-                                                     //                                                      a record. If an uncommitted version of a record is
-                                                     //                                                      pending and isc_tpb_wait is also specified, then the
-                                                     //                                                      transaction waits for the pending record to be committed
-                                                     //                                                      or rolled back before proceeding. Otherwise, a lock
-                                                     //                                                      conflict error is reported at once.
-                                                     //                                                    -------
-                                                     //                                                    isc_tpb_read_committed, offers all the advantages of the
-                                                     //                                                    isc_tpb_concurrency isolation level and additionally enables
-                                                     //                                                    a transaction to access changes committed by other
-                                                     //                                                    simultaneous transactions. Two other parameters,
-                                                     //                                                    isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                     //                                                    used with the isc_tpb_read_committed parameter. They offer
-                                                     //                                                    refined control over the committed changes a transaction is
-                                                     //                                                    permitted to access:
-                                                     //                                                    * isc_tpb_no_rec_version, the default refinement,
-                                                     //                                                      specifies that a transaction can only read the latest
-                                                     //                                                      version of a row. If a change to a row is pending, but
-                                                     //                                                      not yet committed, the row cannot be read.
-
-                                  isc_tpb_nowait     // Lock resolution describes how a transaction should react if a lock conflict occurs. Valid
-                                                     // lock resolutions are:
-                                                     // * isc_tpb_wait: Lock resolution specifies that the transaction is to wait until locked
-                                                     //                 resources are released before retrying an operation [Default]
-                                                     // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
-                                                     //                   released, but instead, a lock conflict error should be returned immediately
-                                 )
-      end
-
-      else begin
-
-        Flibrary.TransactionStart(
-                                  TraHandle,
-                                  DBHandle,
-
-                                  isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
-                                                     //the first attribute specified in the TPB, and must always be set to isc_tpb_version3.
-                                                     //isc_tpb_version3 = InterBase version 3 transaction
-
-                                  isc_tpb_write +    //Access mode describes the actions that can be performed by the functions associated with
-                                                     //the transaction. Valid access modes are:
-                                                     //  * isc_tpb_read: Read-only access mode that allows a transaction only to select data
-                                                     //                  from tables
-                                                     //  * isc_tpb_write: Read-write access mode of that allows a transaction to select, insert,
-                                                     //                   update, and delete table data [Default]
-
-                                  isc_tpb_read_committed + isc_tpb_no_rec_version +
-                                                     // Isolation level describes the view of the database given a transaction as it relates to
-                                                     // actions performed by other simultaneously occurring transactions.
-                                                     // Valid isolation levels are:
-                                                     //  * isc_tpb_concurrency: High throughput, high concurrency transaction with acceptable
-                                                     //                         consistency; use of this parameter takes full advantage of the InterBase
-                                                     //                         multi-generational transaction model [Default]
-                                                     //                         By default, after a transaction starts it cannot access committed changes
-                                                     //                         to a table made by other simultaneous transactions, even though it shares
-                                                     //                         access to the table with them. Such a transaction has an isolation level of
-                                                     //                         isc_tpb_concurrency, meaning it can have concurrent access to tables also
-                                                     //                         accessed simultaneously by other transactions.
-                                                     //  * isc_tpb_consistency: Table-locking transaction model
-                                                     //                         InterBase also supports a restrictive isolation level. isc_tpb_consistency
-                                                     //                         prevents a transaction from accessing tables if they are written to by other
-                                                     //                         transactions; it also prevents other transactions from writing to a table
-                                                     //                         once this transaction writes to it. This isolation level is designed to
-                                                     //                         guarantee that if a transaction writes to a table before other simultaneous
-                                                     //                         read and write transactions, then only it can change a table?s data. Because
-                                                     //                         it essentially restricts (and often prevents) shared access to tables,
-                                                     //                         isc_tpb_consistency should be used with care.
-                                                     //  * isc_tpb_read_committed, isc_tpb_rec_version: High throughput, high concurrency transaction
-                                                     //                                                 that can read changes committed by other concurrent
-                                                     //                                                 transactions. Use of this parameter takes full advantage
-                                                     //                                                 of the InterBase multi-generational transaction model.
-                                                     //                                                 * isc_tpb_rec_version: Enables an isc_tpb_read_committed
-                                                     //                                                   transaction to read the most recently
-                                                     //                                                   committed version of a record even if
-                                                     //                                                   other, uncommitted versions are pending.
-                                                     //                                                 -------
-                                                     //                                                 isc_tpb_read_committed, offers all the advantages of the
-                                                     //                                                 isc_tpb_concurrency isolation level and additionally enables
-                                                     //                                                 a transaction to access changes committed by other
-                                                     //                                                 simultaneous transactions. Two other parameters,
-                                                     //                                                 isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                     //                                                 used with the isc_tpb_read_committed parameter. They offer
-                                                     //                                                 refined control over the committed changes a transaction is
-                                                     //                                                 permitted to access:
-                                                     //                                                 * isc_tpb_rec_version specifies that a transaction can read
-                                                     //                                                   the latest committed version of a row, even if a more recent
-                                                     //                                                   uncommitted version is pending.
-
-                                                     //  * isc_tpb_read_committed, isc_tpb_no_rec_version: High throughput, high concurrency transaction
-                                                     //                                                    that can read changes committed by other concurrent
-                                                     //                                                    transactions. Use of this parameter takes full advantage
-                                                     //                                                    of the InterBase multi-generational transaction model.
-                                                     //                                                    * isc_tpb_no_rec_version: Enables an isc_tpb_read_committed
-                                                     //                                                      transaction to read only the latest committed version of
-                                                     //                                                      a record. If an uncommitted version of a record is
-                                                     //                                                      pending and isc_tpb_wait is also specified, then the
-                                                     //                                                      transaction waits for the pending record to be committed
-                                                     //                                                      or rolled back before proceeding. Otherwise, a lock
-                                                     //                                                      conflict error is reported at once.
-                                                     //                                                    -------
-                                                     //                                                    isc_tpb_read_committed, offers all the advantages of the
-                                                     //                                                    isc_tpb_concurrency isolation level and additionally enables
-                                                     //                                                    a transaction to access changes committed by other
-                                                     //                                                    simultaneous transactions. Two other parameters,
-                                                     //                                                    isc_tpb_rec_version, and isc_tpb_no_rec_version, should be
-                                                     //                                                    used with the isc_tpb_read_committed parameter. They offer
-                                                     //                                                    refined control over the committed changes a transaction is
-                                                     //                                                    permitted to access:
-                                                     //                                                    * isc_tpb_no_rec_version, the default refinement,
-                                                     //                                                      specifies that a transaction can only read the latest
-                                                     //                                                      version of a row. If a change to a row is pending, but
-                                                     //                                                      not yet committed, the row cannot be read.
-
-                                  isc_tpb_nowait     // Lock resolution describes how a transaction should react if a lock conflict occurs. Valid
-                                                     // lock resolutions are:
-                                                     // * isc_tpb_wait: Lock resolution specifies that the transaction is to wait until locked
-                                                     //                 resources are released before retrying an operation [Default]
-                                                     // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
-                                                     //
-                                 )
-
-      end
-
+      if Readonly then aTmpTPB := fDefaultReadTPB
+      else aTmpTPB := fDefaultWriteTPB;
     end
+    else aTmpTPB := TPB;
 
-    else begin
-
-      Flibrary.TransactionStart(TraHandle,
-                                DBHandle,
-                                TPB);
-
-    end;
+    //Start the transaction
+    Flibrary.TransactionStart(TraHandle,
+                              DBHandle,
+                              aTmpTPB);
 
   except
     if areleaseDBHandleonError then begin

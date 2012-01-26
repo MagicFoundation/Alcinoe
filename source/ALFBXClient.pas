@@ -140,7 +140,9 @@ Type
     Procedure Disconnect;
     Procedure TransactionStart(Readonly: Boolean; const TPB: String = '');
     Procedure TransactionCommit;
+    Procedure TransactionCommitRetaining;
     Procedure TransactionRollback;
+    Procedure TransactionRollbackRetaining;
     Procedure SelectData(SQLs: TALFBXClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
@@ -263,9 +265,13 @@ Type
                                const TPB: string = ''); virtual;
     Procedure TransactionCommit(var DBHandle: IscDbHandle;
                                 var TraHandle: IscTrHandle); virtual;
+    Procedure TransactionCommitRetaining(DBHandle: IscDbHandle;
+                                         TraHandle: IscTrHandle); virtual;
     Procedure TransactionRollback(var DBHandle: IscDbHandle;
                                   var TraHandle: IscTrHandle;
                                   const doCloseConnection: Boolean = False); virtual;
+    Procedure TransactionRollbackRetaining(DBHandle: IscDbHandle;
+                                           TraHandle: IscTrHandle); virtual;
     Procedure SelectData(SQLs: TALFBXClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
@@ -902,6 +908,18 @@ begin
 
 end;
 
+{************************************************}
+procedure TALFBXClient.TransactionCommitRetaining;
+begin
+
+  //Error if we are not connected
+  if not InTransaction then raise Exception.Create('No active transaction to commit!');
+
+  //commit the transaction
+  Flibrary.TransactionCommitRetaining(fTraHandle);
+
+end;
+
 {*****************************************}
 procedure TALFBXClient.TransactionRollback;
 begin
@@ -918,6 +936,18 @@ begin
     //free or not ... but what else we can do ? commit => exept => rollback => except ???
   End;
   fTraHandle := nil;
+
+end;
+
+{**************************************************}
+procedure TALFBXClient.TransactionRollbackRetaining;
+begin
+
+  //Error if we are not connected
+  if not InTransaction then raise Exception.Create('No active transaction to rollback!');
+
+  //rollback the transaction
+  Flibrary.TransactionRollbackRetaining(fTraHandle);
 
 end;
 
@@ -1726,6 +1756,19 @@ begin
 
 end;
 
+{************************************************************************************}
+procedure TALFBXConnectionPoolClient.TransactionCommitRetaining(DBHandle: IscDbHandle;
+                                                                TraHandle: IscTrHandle);
+begin
+
+  //security check
+  if not assigned(DBHandle) then raise exception.Create('Connection handle can not be null');
+
+  //commit the transaction
+  FLibrary.TransactionCommitRetaining(TraHandle);
+
+end;
+
 {*********************************************************************************}
 procedure TALFBXConnectionPoolClient.TransactionRollback(var DBHandle: IscDbHandle;
                                                          var TraHandle: IscTrHandle;
@@ -1756,6 +1799,19 @@ begin
     ReleaseConnection(DBHandle, aTmpdoCloseConnection);
 
   End;
+
+end;
+
+{**************************************************************************************}
+procedure TALFBXConnectionPoolClient.TransactionRollbackRetaining(DBHandle: IscDbHandle;
+                                                                  TraHandle: IscTrHandle);
+begin
+
+  //security check
+  if not assigned(DBHandle) then raise exception.Create('Connection handle can not be null');
+
+  //rollback the connection
+  FLibrary.TransactionRollbackRetaining(TraHandle);
 
 end;
 

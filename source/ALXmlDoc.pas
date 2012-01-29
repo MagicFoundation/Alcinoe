@@ -24,7 +24,7 @@ Description:  TALXmlDocument is exactly like Delphi TXmlDocument (Same functions
 
               When you set the Active property to true, TALXMLDocument parse the XML
               document so that you can examine or modify it. In particular, the
-              DocumentElement property provides an interface to the root node of the 
+              DocumentElement property provides an interface to the root node of the
               document. You can use that interface to access its child nodes and to
               add or delete child nodes.
 
@@ -80,6 +80,8 @@ History :     27/05/2006: Add loadfromstream, loadfromfile,
                           TalXmlNode.loadFromStream to not make any confusion
               01/03/2009: Correct "parse error" bug
               20/09/2011: Correct "UTF-8" / "utf-8" detection bug
+              27/01/2012: Add the doNodeAutoCreate option
+                          permit also to update the nodename of a TalXmlNode
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
@@ -163,6 +165,7 @@ type
                    );
 
   TALXMLDocOption = (
+                     doNodeAutoCreate, //If the application tries to read a node by name, using the Nodes property of an IXMLNodeList interface, and that node does not exist, then the application creates a new node using the specified name.
                      doNodeAutoIndent, //When formatting the XML text from the parsed set of nodes, child nodes are automatically indented from their parent nodes.
                      doAttrNull,       //When reading the value of an attribute that does not exist, the value is given as a Null Variant (as opposed to a value of an empty string).
                      doAutoSave        //When the XML document closes, any changes are automatically saved back to the XML document file or to the XML property.
@@ -356,6 +359,7 @@ type
     procedure SetDocumentRef(ADocumentRef: TALXmlDocument); // [added from TXMLNode]
     procedure SetInternalChildValue(const Value: TALXMLString); virtual; // [added from TXMLNode]
     procedure SetInternalValue(const Value: TALXMLString); virtual; // [added from TXMLNode]
+    procedure SetNodeName(const Value: TALXMLString); // [added from TXMLNode]
     procedure SetOwnerDocument(const Value: TALXMLDocument); // [added from TXMLNode]
     procedure SetParentNode(const Value: TALXMLNode); virtual;
     procedure SetChildValue(const IndexOrName: OleVariant; const Value: OleVariant);
@@ -398,7 +402,7 @@ type
     property HasChildNodes: Boolean read GetHasChildNodes;
     property IsTextElement: Boolean read GetIsTextElement;
     property LocalName: TALXMLString read GetLocalName;
-    property NodeName: TALXMLString read GetNodeName;
+    property NodeName: TALXMLString read GetNodeName write SetNodeName; //[Replace from TXMLNode] property NodeName: TALXMLString;
     property NodeType: TALXMLNodeType read GetNodeType;
     property NodeValue: OleVariant read GetNodeValue write SetNodeValue;
     property OwnerDocument: TALXMLDocument read GetOwnerDocument Write SetOwnerDocument;
@@ -791,14 +795,14 @@ type
 
 {misc constante}
 Const cAlXMLUTF8EncodingStr = 'UTF-8';
-      cALXmlUTF8HeaderStr = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
-      CALNSDelim               = ':';
-      CALXML                   = 'xml';
-      CALVersion               = 'version';
-      CALEncoding              = 'encoding';
-      CALStandalone            = 'standalone';
-      CALDefaultNodeIndent     = '  '; { 2 spaces }
-      CALXmlDocument           = 'DOCUMENT';
+      cALXmlUTF8HeaderStr   = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
+      CALNSDelim            = ':';
+      CALXML                = 'xml';
+      CALVersion            = 'version';
+      CALEncoding           = 'encoding';
+      CALStandalone         = 'standalone';
+      CALDefaultNodeIndent  = '  '; { 2 spaces }
+      CALXmlDocument        = 'DOCUMENT';
 
 {misc function}
 Function  ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
@@ -2845,6 +2849,34 @@ begin
   end;
 end;
 
+{**********************************************************}
+procedure TALXMLNode.SetNodeName(const Value: TALXMLString);
+var i: integer;
+begin
+
+  {Check if the name abides the rules. We will be very forgiving here and
+   just accept any name that at least does not contain control characters}
+  for i := 1 to length(Value) do
+    if Value[i] in [' ', #9, #13, #10] then AlXmlDocError(CALXMLParameterIsIncorrect);
+  If Value='' then AlXmlDocError(CALXMLParameterIsIncorrect);
+
+  case NodeType of
+    NtElement:         InternalValue := Value;
+    NtAttribute:       InternalValue := Value;
+    ntText:            ALXmlDocError(CALXmlOperationError,['TEXT']);
+    ntCData:	         ALXmlDocError(CALXmlOperationError,['CDATA']);
+    ntEntityRef:       ;//todo
+    ntEntity:	         ;//todo
+    ntProcessingInstr: InternalValue := Value;
+    ntComment:	       ALXmlDocError(CALXmlOperationError,['COMMENT']);
+    ntDocument:	       ALXmlDocError(CALXmlOperationError,['DOCUMENT']);
+    ntDocType:         ;//todo
+    ntDocFragment:	   ALXmlDocError(CALXmlOperationError,['DOCFRAGMENT']);
+    ntNotation:	       ;//todo
+  end;
+
+end;
+
 {***********************************************}
 {Returns the namespace prefix of the node’s name.
  GetPrefix returns the namespace prefix of an element or attribute node’s name. A namespace prefix is a symbolic
@@ -3579,6 +3611,10 @@ end;
 function TALXMLNodeList.GetNodeByName(const Name: TALXmlString): TALXMLNode;
 begin
   Result := FindNode(TALXMLString(Name));
+  if (not Assigned(Result)) and
+     (doNodeAutoCreate in fOwner.OwnerDocument.Options) and
+     ((FOwner.GetNodeType <> ntDocument) or (FOwner.OwnerDocument.DocumentElement = nil)) // Don't try to autocreate a second document element !
+  then Result := FOwner.AddChild(Name);
   if not Assigned(Result) then ALXMLDocError(CALXmlNodeNotFound, [Name]);
 end;
 

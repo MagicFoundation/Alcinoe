@@ -43,6 +43,9 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 Know bug :
 
 History :     02/03/2010: add aNumbuffers: Integer to the connect
+              27/01/2012: add the keyword &> (ex: &>xxx) at the beginning of
+                          the rowtag to update the rowtag by the value of the
+                          field xxx
 
 Link :        http://www.progdigy.com/modules.php?name=UIB
 
@@ -969,6 +972,7 @@ Var aSqlda: TALFBXSQLResult;
     aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
+    aUpdateRowTagByFieldValue: Boolean;
 
 begin
 
@@ -1016,6 +1020,13 @@ begin
             if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
             else aViewRec := XMLdata;
 
+            //init aUpdateRowTagByFieldValue
+            if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+              delete(SQLs[aSQLsindex].RowTag, 1, 2);
+              aUpdateRowTagByFieldValue := True;
+            end
+            else aUpdateRowTagByFieldValue := False;
+
             //retrieve all row
             aRecIndex := 0;
             aRecAdded := 0;
@@ -1048,6 +1059,7 @@ begin
                                                                                                                                )
                                                                                              )
                   else aValueRec.Text := GetFieldValue(asqlda, fDBHandle, fTRAHandle, aColumnIndex, FormatSettings);
+                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
                 end;
 
                 //handle OnNewRowFunct
@@ -1217,6 +1229,9 @@ Var aSqlpa: TALFBXSQLParams;
     aSQLsindex: integer;
     aStartDate: int64;
 begin
+
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
@@ -1841,6 +1856,7 @@ Var aStmtHandle: IscStmtHandle;
     aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
+    aUpdateRowTagByFieldValue: Boolean;
 
 begin
 
@@ -1896,6 +1912,13 @@ begin
               if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
               else aViewRec := XMLdata;
 
+              //init aUpdateRowTagByFieldValue
+              if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+                delete(SQLs[aSQLsindex].RowTag, 1, 2);
+                aUpdateRowTagByFieldValue := True;
+              end
+              else aUpdateRowTagByFieldValue := False;
+
               //retrieve all row
               aRecIndex := 0;
               aRecAdded := 0;
@@ -1928,6 +1951,7 @@ begin
                                                                                                                                  )
                                                                                                )
                     else aValueRec.Text := GetFieldValue(asqlda, aTmpDBHandle, aTmpTRAHandle, aColumnIndex, FormatSettings);
+                    if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
                   end;
 
                   //handle OnNewRowFunct
@@ -2166,6 +2190,9 @@ Var aSqlpa: TALFBXSQLParams;
     aGDSCode: integer;
     aStartDate: int64;
 begin
+
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
 
   //acquire a connection and start the transaction if necessary
   aTmpDBHandle := DBHandle;

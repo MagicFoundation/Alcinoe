@@ -46,11 +46,12 @@ History :     02/03/2010: add aNumbuffers: Integer to the connect
               27/01/2012: add the keyword &> (ex: &>xxx) at the beginning of
                           the rowtag to update the rowtag by the value of the
                           field xxx
+              29/01/2012: Add also a way to do Update SQL with params 
 
 Link :        http://www.progdigy.com/modules.php?name=UIB
 
 * Please send all your feedback to svanderclock@arkadia.com
-* If you have downloaded this source from a website different from 
+* If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
   voting on http://www.arkadia.com/html/alcinoe_like.html
@@ -87,10 +88,21 @@ Type
   end;
   TALFBXClientSelectDataSQLs = array of TALFBXClientSelectDataSQL;
 
+  {------------------------------------------}
+  TALFBXClientUpdateDataSQLParamField = record
+    Value: String;
+    IsNull: Boolean;
+    IsBlob: Boolean;
+  end;
+  TALFBXClientUpdateDataSQLParams = record
+    fields: array of TALFBXClientUpdateDataSQLParamField;
+  end;
+
   {--------------------------------}
   TALFBXClientUpdateDataSQL = record
     SQL: String;
-    Blobs: array of Tstream;
+    Params: array of TALFBXClientUpdateDataSQLParams; // use to replace the ? in SQL like
+                                                      // insert into TableA(FieldA) Values(?)
   end;
   TALFBXClientUpdateDataSQLs = array of TALFBXClientUpdateDataSQL;
 
@@ -579,7 +591,7 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
                                                               // * isc_tpb_nowait: Lock resolution specifies that the transaction is not to wait for locks to be
                                                               //
 
-       cALFbxClientDefaultReadWaitTPB = isc_tpb_version3 + 
+       cALFbxClientDefaultReadWaitTPB = isc_tpb_version3 +
                                         isc_tpb_read +
                                         isc_tpb_read_committed + isc_tpb_rec_version +
                                         isc_tpb_wait;
@@ -1224,8 +1236,10 @@ end;
 {******************************************************************}
 procedure TALFBXClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs);
 Var aSqlpa: TALFBXSQLParams;
+    aStmtHandle: IscStmtHandle;
     aBlobhandle: IscBlobHandle;
-    aCurReqBlobsIndex: integer;
+    aSqlsParamsIndex: integer;
+    aSqlsParamsFieldsIndex: integer;
     aSQLsindex: integer;
     aStartDate: int64;
 begin
@@ -1248,25 +1262,65 @@ begin
       //init aStartDate
       aStartDate := ALGetTickCount64;
 
-      //special case if their is blob
-      if length(SQLs[aSQLsindex].Blobs) > 0 then begin
+      //special case if their is params
+      if length(SQLs[aSQLsindex].Params) > 0 then begin
 
         //create the aSqlpa object
         aSqlpa := TALFBXSQLParams.Create(fCharSet);
         try
 
-          //loop throught all blob
-          for aCurReqBlobsIndex := 0 to length(SQLs[aSQLsindex].Blobs) - 1 do begin
-            aSqlpa.AddFieldType('',uftBlob);
-            aBlobhandle := nil;
-            aSqlpa.AsQuad[aCurReqBlobsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
-            Try
-              FLibrary.BlobWriteStream(aBlobHandle,SQLs[aSQLsindex].Blobs[aCurReqBlobsIndex]);
-            Finally
-              FLibrary.BlobClose(aBlobHandle);
-            End;
+          //init the aStmtHandle
+          aStmtHandle := nil;
+          Flibrary.DSQLAllocateStatement(fDBHandle, aStmtHandle);
+          try
+
+            //prepare the SQL
+            Flibrary.DSQLPrepare(fDBHandle, fTraHandle, aStmtHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, nil);
+
+            //loop throught all Params
+            for aSqlsParamsIndex := low(SQLs[aSQLsindex].Params) to high(SQLs[aSQLsindex].Params) do begin
+
+              //loop throught all Params Fields
+              for aSqlsParamsFieldsIndex := low(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) to high(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) do begin
+
+                //with current Params Fields
+                with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+
+                  //init the aSqlpa fields definition
+                  if aSqlsParamsIndex = low(SQLs[aSQLsindex].Params) then begin
+                    if IsBlob then aSqlpa.AddFieldType('', uftBlob)
+                    else aSqlpa.AddFieldType('', uftVarchar);
+                  end;
+
+                  //isnull
+                  if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
+
+                  //IsBlob
+                  else if IsBlob then begin
+                    aBlobhandle := nil;
+                    aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
+                    Try
+                      FLibrary.BlobWriteString(aBlobHandle,Value);
+                    Finally
+                      FLibrary.BlobClose(aBlobHandle);
+                    End;
+                  end
+
+                  //all the other
+                  else aSqlpa.AsString[aSqlsParamsFieldsIndex] := Value;
+
+                end;
+
+              end;
+
+              //execute the SQL
+              FLibrary.DSQLExecute(fTraHandle, aStmtHandle, FSQLDIALECT, aSqlpa);
+
+            end;
+
+          finally
+            Flibrary.DSQLFreeStatement(aStmtHandle, DSQL_drop);
           end;
-          Flibrary.DSQLExecuteImmediate(fDBHandle, fTraHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, aSqlpa);
 
         finally
           asqlpa.free;
@@ -1274,7 +1328,7 @@ begin
 
       end
 
-      //if their is no blob smply call DSQLExecuteImmediate
+      //if their is no params simply call DSQLExecuteImmediate
       else Flibrary.DSQLExecuteImmediate(fDBHandle, fTraHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, nil);
 
       //do the onSQLDone
@@ -1297,7 +1351,7 @@ begin
   setlength(aUpdateDataSQLs,SQLs.Count);
   For aSQLsindex := 0 to SQLs.Count - 1 do begin
     aUpdateDataSQLs[aSQLsindex].SQL := SQLs[aSQLsindex];
-    setlength(aUpdateDataSQLs[aSQLsindex].Blobs,0);
+    setlength(aUpdateDataSQLs[aSQLsindex].Params,0);
   end;
   UpdateData(aUpdateDataSQLs);
 end;
@@ -1308,7 +1362,7 @@ Var aUpdateDataSQLs: TALFBXClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  setlength(aUpdateDataSQLs[0].Blobs,0);
+  setlength(aUpdateDataSQLs[0].Params,0);
   UpdateData(aUpdateDataSQLs);
 end;
 
@@ -2181,9 +2235,11 @@ procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs
                                                 const TraHandle: IscTrHandle = nil;
                                                 const TPB: string = '');
 Var aSqlpa: TALFBXSQLParams;
+    aStmtHandle: IscStmtHandle;
     aBlobhandle: IscBlobHandle;
-    aCurReqBlobsIndex: integer;
     aSQLsindex: integer;
+    aSqlsParamsIndex: integer;
+    aSqlsParamsFieldsIndex: integer;
     aTmpDBHandle: IscDbHandle;
     aTmpTraHandle: IscTrHandle;
     aOwnConnection: Boolean;
@@ -2217,25 +2273,65 @@ begin
         //init aStartDate
         aStartDate := ALGetTickCount64;
 
-        //special case if their is blob
-        if length(SQLs[aSQLsindex].Blobs) > 0 then begin
+        //special case if their is params
+        if length(SQLs[aSQLsindex].Params) > 0 then begin
 
           //create the aSqlpa object
           aSqlpa := TALFBXSQLParams.Create(fCharSet);
           try
 
-            //loop throught all blob
-            for aCurReqBlobsIndex := 0 to length(SQLs[aSQLsindex].Blobs) - 1 do begin
-              aSqlpa.AddFieldType('',uftBlob);
-              aBlobhandle := nil;
-              aSqlpa.AsQuad[aCurReqBlobsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
-              Try
-                FLibrary.BlobWriteStream(aBlobHandle,SQLs[aSQLsindex].Blobs[aCurReqBlobsIndex]);
-              Finally
-                FLibrary.BlobClose(aBlobHandle);
-              End;
+            //init the aStmtHandle
+            aStmtHandle := nil;
+            Flibrary.DSQLAllocateStatement(aTmpDBHandle, aStmtHandle);
+            try
+
+              //prepare the SQL
+              Flibrary.DSQLPrepare(aTmpDBHandle, aTmpTraHandle, aStmtHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, nil);
+
+              //loop throught all Params
+              for aSqlsParamsIndex := low(SQLs[aSQLsindex].Params) to high(SQLs[aSQLsindex].Params) do begin
+
+                //loop throught all Params Fields
+                for aSqlsParamsFieldsIndex := low(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) to high(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) do begin
+
+                  //with current Params Fields
+                  with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+
+                    //init the aSqlpa fields definition
+                    if aSqlsParamsIndex = low(SQLs[aSQLsindex].Params) then begin
+                      if IsBlob then aSqlpa.AddFieldType('', uftBlob)
+                      else aSqlpa.AddFieldType('', uftVarchar);
+                    end;
+
+                    //isnull
+                    if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
+
+                    //IsBlob
+                    else if IsBlob then begin
+                      aBlobhandle := nil;
+                      aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
+                      Try
+                        FLibrary.BlobWriteString(aBlobHandle,Value);
+                      Finally
+                        FLibrary.BlobClose(aBlobHandle);
+                      End;
+                    end
+
+                    //all the other
+                    else aSqlpa.AsString[aSqlsParamsFieldsIndex] := Value;
+
+                  end;
+
+                end;
+
+                //execute the SQL
+                FLibrary.DSQLExecute(aTmpTraHandle, aStmtHandle, FSQLDIALECT, aSqlpa);
+
+              end;
+
+            finally
+              Flibrary.DSQLFreeStatement(aStmtHandle, DSQL_drop);
             end;
-            Flibrary.DSQLExecuteImmediate(aTmpDBHandle, aTmpTraHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, aSqlpa);
 
           finally
             asqlpa.free;
@@ -2243,7 +2339,7 @@ begin
 
         end
 
-        //if their is no blob smply call DSQLExecuteImmediate
+        //if their is no params simply call DSQLExecuteImmediate
         else Flibrary.DSQLExecuteImmediate(aTmpDBHandle, aTmpTraHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, nil);
 
         //do the onSQLDone
@@ -2297,7 +2393,7 @@ begin
   setlength(aUpdateDataSQLs,SQLs.Count);
   For aSQLsindex := 0 to SQLs.Count - 1 do begin
     aUpdateDataSQLs[aSQLsindex].SQL := SQLs[aSQLsindex];
-    setlength(aUpdateDataSQLs[aSQLsindex].Blobs,0);
+    setlength(aUpdateDataSQLs[aSQLsindex].params,0);
   end;
   UpdateData(aUpdateDataSQLs,
              DBHandle,
@@ -2314,7 +2410,7 @@ Var aUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  setlength(aUpdateDataSQLs[0].Blobs,0);
+  setlength(aUpdateDataSQLs[0].Params,0);
   UpdateData(aUpdateDataSQLs,
              DBHandle,
              TraHandle,

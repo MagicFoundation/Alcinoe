@@ -1225,7 +1225,6 @@ object Form1: TForm1
       item
         Width = 700
       end>
-    ExplicitTop = 859
   end
   object ALCheckBoxSqlite3SharedCache: TALCheckBox
     Left = 856
@@ -1533,7 +1532,6 @@ object Form1: TForm1
       Align = alRight
       Caption = 'Panel2'
       TabOrder = 0
-      ExplicitHeight = 333
       object ALMemoResult: TALMemo
         Left = 1
         Top = 1
@@ -1543,7 +1541,6 @@ object Form1: TForm1
         OnPaintScrollBar = ALMemoPaintScrollBar
         Align = alClient
         TabOrder = 0
-        ExplicitHeight = 331
         DesignSize = (
           360
           211)
@@ -1557,7 +1554,6 @@ object Form1: TForm1
       Align = alClient
       Caption = 'Panel2'
       TabOrder = 1
-      ExplicitHeight = 333
       object Splitter2: TSplitter
         Left = 1
         Top = 105
@@ -1660,8 +1656,6 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 168
-        ExplicitHeight = 164
         object TableViewThreadUpdate: TcxGridTableView
           NavigatorButtons.ConfirmDelete = False
           NavigatorButtons.First.Visible = False

@@ -48,19 +48,7 @@ DECLARE EXTERNAL FUNCTION aludf_utf8normalize
   CSTRING(8191) NULL
   RETURNS CSTRING(8191) FREE_IT
   ENTRY_POINT 'aludf_utf8normalize' MODULE_NAME 'aludf';      
-  
-  
-/*****************************************
- * aludf_zerotoone
- * return 1 if parameter is zero, else return
- * the parameter. usefull in situation like 
- * z = x / aludf_zerotoone(y)
- *****************************************/
-DECLARE EXTERNAL FUNCTION aludf_zerotoone
-  INTEGER
-  RETURNS INTEGER BY VALUE
-  ENTRY_POINT 'aludf_zerotoone' MODULE_NAME 'aludf';        
-  
+    
   
 /*****************************************
  * aludf_utf8titlecase
@@ -93,5 +81,14 @@ DECLARE EXTERNAL FUNCTION aludf_utf8uppercasenodiacritic
   CSTRING(8191) NULL
   RETURNS CSTRING(8191) FREE_IT
   ENTRY_POINT 'aludf_utf8uppercasenodiacritic' MODULE_NAME 'aludf';    
+
   
+/*****************************************
+ * aludf_utf8charcount
+ * Returns the number of char in the given UTF8 string. 
+ *****************************************/
+DECLARE EXTERNAL FUNCTION aludf_utf8charcount
+  CSTRING(8191) NULL
+  RETURNS INTEGER BY VALUE
+  ENTRY_POINT 'aludf_utf8charcount' MODULE_NAME 'aludf';        
   

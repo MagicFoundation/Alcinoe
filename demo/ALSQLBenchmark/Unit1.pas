@@ -350,6 +350,7 @@ begin
 
         S1 := AlMemoFireBirdQuery.Lines.Text;
         while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
         while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
         for i := 1 to 100 do begin
           if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -462,6 +463,7 @@ begin
 
         S1 := AlMemoFireBirdQuery.Lines.Text;
         while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
         while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
         for i := 1 to 100 do begin
           if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -717,6 +719,7 @@ begin
 
         S1 := AlMemoMySqlQuery.Lines.Text;
         while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
         while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
         for i := 1 to 100 do begin
           if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -785,6 +788,7 @@ begin
 
       S1 := AlMemoMySqlQuery.Lines.Text;
       while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+      while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
       while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
       for i := 1 to 100 do begin
         if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -1002,6 +1006,7 @@ begin
 
         S1 := AlMemoSQLite3Query.Lines.Text;
         while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
         while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
         for i := 1 to 100 do begin
           if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -1097,6 +1102,7 @@ begin
       //the sql
       S1 := AlMemoSQLite3Query.Lines.Text;
       while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+      while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
       while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
       for i := 1 to 100 do begin
         if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -1440,6 +1446,7 @@ begin
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
               while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+              while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
               while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
               for i := 1 to 100 do begin
                 if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -1648,6 +1655,7 @@ begin
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
               while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+              while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
               while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
               for i := 1 to 100 do begin
                 if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
@@ -1858,6 +1866,7 @@ begin
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
               while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
+              while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
               while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
               for i := 1 to 100 do begin
                 if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);

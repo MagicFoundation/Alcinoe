@@ -1325,9 +1325,14 @@ begin
     end
     else Anchor := '';
     if (aExtraInfo <> '') and (aExtraInfo[1] = '?') then begin
-      if AlPos('&amp;', aExtraInfo) > 0 then Query.LineBreak := '&amp;'
-      else Query.LineBreak := '&';
-      Query.text := AlCopyStr(aExtraInfo,2,Maxint);
+      {$IF CompilerVersion >= 18.5}
+        if AlPos('&amp;', aExtraInfo) > 0 then Query.LineBreak := '&amp;'
+        else Query.LineBreak := '&';
+        Query.text := AlCopyStr(aExtraInfo,2,Maxint);
+      {$ELSE}
+        if AlPos('&amp;', aExtraInfo) > 0 then Query.text := AlStringReplace(AlCopyStr(aExtraInfo,2,Maxint), '&amp;', #13#10, [rfReplaceAll])
+        else                                   Query.text := AlStringReplace(AlCopyStr(aExtraInfo,2,Maxint), '&',     #13#10, [rfReplaceAll]);
+      {$IFEND}
     end
     else Query.clear;
   end
@@ -1441,26 +1446,37 @@ Var S1 : String;
 begin
   if Query.Count > 0 then begin
 
-    if Query.LineBreak = #13#10 then begin
-      aBool := True;
-      Query.LineBreak := '&';
-    end
-    else aBool := False;
+    {$IF CompilerVersion >= 18.5}
+      if Query.LineBreak = #13#10 then begin
+        aBool := True;
+        Query.LineBreak := '&';
+      end
+      else aBool := False;
 
-    try
+      try
 
-      S1 := trim(Query.Text);
-      while alpos(Query.LineBreak, S1) = 1 do delete(S1,1,length(Query.LineBreak));
-      while alposEx(Query.LineBreak,
+        S1 := trim(Query.Text);
+        while alpos(Query.LineBreak, S1) = 1 do delete(S1,1,length(Query.LineBreak));
+        while alposEx(Query.LineBreak,
+                      S1,
+                      length(S1) - length(Query.LineBreak) + 1) > 0 do delete(S1,
+                                                                              length(S1) - length(Query.LineBreak) + 1,
+                                                                              MaxInt);
+        if S1 <> '' then S1 := '?' + S1;
+
+      finally
+        if aBool then Query.LineBreak := #13#10;
+      end;
+    {$ELSE}
+      S1 := AlStringReplace(trim(Query.Text),#13#10,'&',[rfReplaceAll]);
+      while alpos('&', S1) = 1 do delete(S1,1,1);
+      while alposEx('&',
                     S1,
-                    length(S1) - length(Query.LineBreak) + 1) > 0 do delete(S1,
-                                                                            length(S1) - length(Query.LineBreak) + 1,
-                                                                            MaxInt);
+                    length(S1)) > 0 do delete(S1,
+                                              length(S1),
+                                              MaxInt);
       if S1 <> '' then S1 := '?' + S1;
-
-    finally
-      if aBool then Query.LineBreak := #13#10;
-    end;
+    {$IFEND}
 
   end
   else S1 := '';

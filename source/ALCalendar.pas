@@ -266,7 +266,7 @@ Begin
   YHeader4 := 0;
   Month := 1;
 
-  For i := 0 to high(Days) do begin
+  For i := low(Days) to high(Days) do begin
 
     case DayOfTheWeek(dt) of
       DayMonday : Days[i].Rect := Rect(xLundi,Yday,xLundi + wbox, Yday + HBox);
@@ -379,7 +379,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         Const MonthBoxPaddingTop: integer = 5): Boolean;
 
 Var HBox, WBox: Integer;
-    Jour, GrayJour: Tdatetime;
+    Day, GrayDay: Tdatetime;
     Wblank: Integer;
     YHeader2, YHeader3, YHeader4: Integer;
     HHeader1, Hheader2: Integer;
@@ -491,44 +491,56 @@ begin
 
 
     //Draw Days
-    Jour := encodeDate(year,01,01);
-    For i := 0 to high(Days) do begin
-      if DayOfTheMonth(Jour) = 1 then begin
-        GrayJour := Jour - 1;
+    Day := encodeDate(year,01,01);
+    For i := low(Days) to high(Days) do begin
+      if DayOfTheMonth(Day) = 1 then begin
+        GrayDay := Day - 1;
         R := Days[i].Rect;
         r.Left := r.Left - Wbox;
         R.Right := r.Right - wbox;
-        while DayOfTheWeek(GrayJour) <> DayFriday do begin
-          ALDrawCalendarBox(inttostr(DayOfTheMonth(GrayJour)),
-                            BackGroundColor,
+        Canvas.Font.Color := DayDisabledStyle.FontColor;
+        Canvas.Font.Name := DayDisabledStyle.FontName;
+        Canvas.Font.Height := DayDisabledStyle.FontHeight;
+        Canvas.Font.Style := DayDisabledStyle.FontStyle;
+        while DayOfTheWeek(GrayDay) <> DayFriday do begin
+          ALDrawCalendarBox(inttostr(DayOfTheMonth(GrayDay)),
+                            DayDisabledStyle.BackGroundColor,
                             DayDisabledStyle.FontColor,
                             R,
                             Canvas);
           r.Left := r.Left - Wbox;
           R.Right := r.Right - wbox;
-          GrayJour := GrayJour - 1;
+          GrayDay := GrayDay - 1;
         end;
       end;
-      ALDrawCalendarBox(inttostr(DayOfTheMonth(Jour)),
+      Canvas.Font.Color := Days[i].Style.FontColor;
+      Canvas.Font.Name := Days[i].Style.FontName;
+      Canvas.Font.Height := Days[i].Style.FontHeight;
+      Canvas.Font.Style := Days[i].Style.FontStyle;
+      ALDrawCalendarBox(inttostr(DayOfTheMonth(Day)),
                         Days[i].Style.BackGroundColor,
                         Days[i].Style.FontColor,
                         Days[i].Rect,
                         Canvas);
-      jour := jour + 1;
-      if DayOfTheMonth(Jour) = 1 then begin
-        GrayJour := Jour;
+      Day := Day + 1;
+      if DayOfTheMonth(Day) = 1 then begin
+        GrayDay := Day;
         R := Days[i].Rect;
         r.Left := r.Left + Wbox;
         R.Right := r.Right + wbox;
-        while DayOfTheWeek(GrayJour) <> DaySaturday do begin
-          ALDrawCalendarBox(inttostr(DayOfTheMonth(GrayJour)),
-                            BackGroundColor,
+        Canvas.Font.Color := DayDisabledStyle.FontColor;
+        Canvas.Font.Name := DayDisabledStyle.FontName;
+        Canvas.Font.Height := DayDisabledStyle.FontHeight;
+        Canvas.Font.Style := DayDisabledStyle.FontStyle;
+        while DayOfTheWeek(GrayDay) <> DaySaturday do begin
+          ALDrawCalendarBox(inttostr(DayOfTheMonth(GrayDay)),
+                            DayDisabledStyle.BackGroundColor,
                             DayDisabledStyle.FontColor,
                             R,
                             Canvas);
           r.Left := r.Left + Wbox;
           R.Right := r.Right + wbox;
-          GrayJour := GrayJour + 1;
+          GrayDay := GrayDay + 1;
         end;
       end;
     end;

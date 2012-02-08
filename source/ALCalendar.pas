@@ -168,7 +168,7 @@ Begin
   c.FillRect(r);
 
   {--Bottom border------------}
-  c.Pen.Color := BorderColorLo;
+  c.Pen.Color := BorderColorBottom;
   C.MoveTo(r.Left, r.Bottom);
   C.LineTo(r.Right,r.Bottom);
 

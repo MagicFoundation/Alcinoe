@@ -61,11 +61,18 @@ interface
 uses Windows,
      sysutils;
 
+{$IF CompilerVersion < 18.5}
+  // from http://stackoverflow.com/questions/6378107/how-to-define-an-unsigned-64-bit-integer-in-delphi7
+  // their is no way in delphi 7 to have an uint64 (unsigned int64)
+  // but i think we not really need an unsigned INT64 and just an int64 will be enalf
+ type uLongLong = LongLong;
+{$IFEND}
+
 const
 
   { resource string }
   cALMySql_INVALIDELIBVERSION   = 'Incorrect Database Server version.';
-  cALMySql_CANTLOADLIB         = 'Can''t load library: %s.';
+  cALMySql_CANTLOADLIB          = 'Can''t load library: %s.';
 
   { General Declarations }
   MYSQL_ERRMSG_SIZE    = 512;

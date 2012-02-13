@@ -20,10 +20,8 @@ type
   TALMemoryStatusEx = _ALMEMORYSTATUSEX;
 
 function ALGlobalMemoryStatusEx(var lpBuffer : TALMEMORYSTATUSEX): BOOL; stdcall;
-function ALInterlockedCompareExchange64(var Destination: LONGLONG; Exchange, Comperand: LONGLONG): LONGLONG; stdcall;
-
+Var ALInterlockedCompareExchange64: function(var Destination: LONGLONG; Exchange, Comperand: LONGLONG): LONGLONG; stdcall;
 Var ALGetTickCount64: function: int64; stdcall;
-
 function ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
 
 const cALINVALID_SET_FILE_POINTER = DWORD(-1);
@@ -32,7 +30,6 @@ implementation
 
 {*****************************************************************************}
 function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
-function ALInterlockedCompareExchange64; external kernel32 name 'InterlockedCompareExchange64';
 
 {*********************************************************************************}
 function  ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
@@ -58,6 +55,7 @@ begin
   if kernel32 = 0 then RaiseLastOSError;
   @ALGetTickCount64 := GetProcAddress(kernel32, 'GetTickCount64');
   if not Assigned(ALGetTickCount64) then ALGetTickCount64 := ALGetTickCount64XP;
+  @ALInterlockedCompareExchange64 := GetProcAddress(kernel32, 'InterlockedCompareExchange64');
 end;
 
 initialization

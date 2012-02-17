@@ -363,6 +363,8 @@ Function  AlCombineUrl(RelativeUrl,
                        BaseUrl,
                        Anchor: String;
                        Query: TStrings): String; overload;
+Function ALIPV4ToNumeric(aIP: String): Cardinal;
+Function ALNumericToIPv4(aIP: Cardinal): String;
 
 
 ResourceString
@@ -1485,5 +1487,53 @@ begin
 
   Result := AlCombineUrl(RelativeUrl + S1, BaseUrl);
 end;
+
+{**********************************************}
+Function ALIPV4ToNumeric(aIP: String): Cardinal;
+Var P1, P2: Integer;
+    I1, I2, I3, I4: integer;
+Begin
+  {----------}
+  P1 := 1;
+  P2 := AlPosEx('.',aIP, P1);
+  if (P2 <= P1) or
+     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I1)) or
+     (not I1 in [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+  {----------}
+  P1 := P2+1;
+  P2 := AlPosEx('.',aIP, P1);
+  if (P2 <= P1) or
+     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I2)) or
+     (not I2 in [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+  {----------}
+  P1 := P2+1;
+  P2 := AlPosEx('.',aIP, P1);
+  if (P2 <= P1) or
+     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I3)) or
+     (not I3 in [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+  {----------}
+  P1 := P2+1;
+  P2 := length(aIP) + 1;
+  if (P2 <= P1) or
+     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I4)) or
+     (not I4 in  [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+  {----------}
+  Result := (I1*256*256*256) + (I2*256*256) +  (I3*256) + (I4)
+End;
+
+{**********************************************}
+Function ALNumericToIPv4(aIP: Cardinal): String;
+Var S1, S2, S3, S4: String;
+    P1: extended;
+Begin
+  P1 := aIP / 256;
+  S4 := inttostr(trunc(256 * (P1 - INT(P1))));
+  P1 := P1 / 256;
+  S3 := inttostr(trunc(256 * (P1 - INT(P1))));
+  P1 := P1 / 256;
+  S2 := inttostr(trunc(256 * (P1 - INT(P1))));
+  S1 := inttostr(trunc (P1));
+  Result := S1 + '.' + S2 + '.' + S3 + '.' + S4;
+End;
 
 end.

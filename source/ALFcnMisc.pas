@@ -71,6 +71,7 @@ Function AlStrToBool(Value:String):Boolean;
 Function ALMakeKeyStrByGUID: String;
 function AlIsValidEmail(const Value: string): boolean;
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
+Function ALInc(var x: integer; Count: integer): Integer;
 
 implementation
 
@@ -213,6 +214,13 @@ function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTim
 
 begin
   Result := aLocalDateTime + InternalCalcTimeZoneBias;
+end;
+
+{******************************************************}
+Function ALInc(var x: integer; Count: integer): Integer;
+begin
+  inc(X, count);
+  result := X;
 end;
 
 end.

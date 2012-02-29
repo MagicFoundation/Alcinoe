@@ -363,8 +363,9 @@ Function  AlCombineUrl(RelativeUrl,
                        BaseUrl,
                        Anchor: String;
                        Query: TStrings): String; overload;
-Function ALIPV4ToNumeric(aIP: String): Cardinal;
-Function ALNumericToIPv4(aIP: Cardinal): String;
+Function ALIPV4StrToNumeric(aIPv4: String): Cardinal;
+Function ALTryIPV4StrToNumeric(aIPv4Str: String; var aIPv4Num: Cardinal): Boolean;
+Function ALNumericToIPv4Str(aIPv4: Cardinal): String;
 
 
 ResourceString
@@ -1488,45 +1489,76 @@ begin
   Result := AlCombineUrl(RelativeUrl + S1, BaseUrl);
 end;
 
-{**********************************************}
-Function ALIPV4ToNumeric(aIP: String): Cardinal;
+{********************************************************************************}
+Function ALTryIPV4StrToNumeric(aIPv4Str: String; var aIPv4Num: Cardinal): Boolean;
 Var P1, P2: Integer;
     I1, I2, I3, I4: integer;
 Begin
+
+  {----------}
+  if aIPv4Str = '' then begin
+    Result := False;
+    Exit;
+  end;
+
   {----------}
   P1 := 1;
-  P2 := AlPosEx('.',aIP, P1);
+  P2 := AlPosEx('.',aIPv4Str, P1);
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I1)) or
-     (not I1 in [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I1)) or
+     (not (I1 in [0..255])) then begin
+    Result := False;
+    Exit;
+  end;
+
   {----------}
   P1 := P2+1;
-  P2 := AlPosEx('.',aIP, P1);
+  P2 := AlPosEx('.',aIPv4Str, P1);
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I2)) or
-     (not I2 in [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I2)) or
+     (not (I2 in [0..255])) then begin
+    Result := False;
+    Exit;
+  end;
+
   {----------}
   P1 := P2+1;
-  P2 := AlPosEx('.',aIP, P1);
+  P2 := AlPosEx('.',aIPv4Str, P1);
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I3)) or
-     (not I3 in [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
+     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I3)) or
+     (not (I3 in [0..255])) then begin
+    Result := False;
+    Exit;
+  end;
+
   {----------}
   P1 := P2+1;
-  P2 := length(aIP) + 1;
+  P2 := length(aIPv4Str) + 1;
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIP,P1,P2-P1), I4)) or
-     (not I4 in  [0..255]) then Raise Exception.Create('Bad IPv4 string: ' + aIP); // 81
-  {----------}
-  Result := (I1*256*256*256) + (I2*256*256) +  (I3*256) + (I4)
+     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I4)) or
+     (not (I4 in  [0..255])) then begin
+    Result := False;
+    Exit;
+  end;
+
+  {-------------}
+  Result := True;
+  aIPv4Num := (I1*256*256*256) + (I2*256*256) +  (I3*256) + (I4);
+
 End;
 
-{**********************************************}
-Function ALNumericToIPv4(aIP: Cardinal): String;
+{***************************************************}
+Function ALIPV4StrToNumeric(aIPv4: String): Cardinal;
+Begin
+  if not ALTryIPV4StrToNumeric(aIPv4, Result) then Raise Exception.Create('Bad IPv4 string: ' + aIPv4);
+End;
+
+{***************************************************}
+Function ALNumericToIPv4Str(aIPv4: Cardinal): String;
 Var S1, S2, S3, S4: String;
     P1: extended;
 Begin
-  P1 := aIP / 256;
+  P1 := aIPv4 / 256;
   S4 := inttostr(trunc(256 * (P1 - INT(P1))));
   P1 := P1 / 256;
   S3 := inttostr(trunc(256 * (P1 - INT(P1))));

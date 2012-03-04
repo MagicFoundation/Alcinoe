@@ -829,7 +829,7 @@ begin
   FLibrary.DatabaseDrop(FDbHandle);
 
   //close the connection
-  disconnect;
+  fDBHandle := nil;
 
 end;
 

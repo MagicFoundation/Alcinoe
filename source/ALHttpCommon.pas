@@ -1445,7 +1445,9 @@ Function  AlCombineUrl(RelativeUrl,
                        Anchor: String;
                        Query: TStrings): String;
 Var S1 : String;
+    {$IF CompilerVersion >= 18.5}
     aBool: Boolean;
+    {$IFEND}
 begin
   if Query.Count > 0 then begin
 
@@ -1556,16 +1558,15 @@ End;
 {***************************************************}
 Function ALNumericToIPv4Str(aIPv4: Cardinal): String;
 Var S1, S2, S3, S4: String;
-    P1: extended;
 Begin
-  P1 := aIPv4 / 256;
-  S4 := inttostr(trunc(256 * (P1 - INT(P1))));
-  P1 := P1 / 256;
-  S3 := inttostr(trunc(256 * (P1 - INT(P1))));
-  P1 := P1 / 256;
-  S2 := inttostr(trunc(256 * (P1 - INT(P1))));
-  S1 := inttostr(trunc (P1));
+
+  S1 := inttostr(( aIPv4 div (256*256*256) ) mod 256);
+  S2 := inttostr(( aIPv4 div (256*256)     ) mod 256);
+  S3 := inttostr(( aIPv4 div (256)         ) mod 256);
+  S4 := inttostr(( aIPv4                   ) mod 256);
+
   Result := S1 + '.' + S2 + '.' + S3 + '.' + S4;
+
 End;
 
 end.

@@ -1150,7 +1150,7 @@ begin
       break;
     end
     else result := 0;
-    sleep(10); // this is neccessary to not use 100% CPU usage
+    sleep(1); // this is neccessary to not use 100% CPU usage
   Until ALGetTickCount64 - StartTickCount > fTimeout;
 end;
 
@@ -1229,7 +1229,7 @@ begin
     finally
       fCriticalSection.Release;
     end;
-    sleep(10); // to not use 100% CPU Usage
+    sleep(1); // to not use 100% CPU Usage
   end;
 
   {free all object}
@@ -1521,7 +1521,11 @@ procedure TALPhpIsapiRunnerEngine.UnloadDLL;
 Var TerminateExtensionFunct : TTerminateExtension;
 begin
   If DLLLoaded then Begin
-    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(10);
+    {$IF CompilerVersion < 18.5}
+    while InterlockedCompareExchange(pointer(fconnectioncount), nil, nil) <> nil do sleep(1);
+    {$ELSE}
+    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(1);
+    {$IFEND}
     @TerminateExtensionFunct := GetProcAddress(fDLLHandle, 'TerminateExtension');
     If assigned(TerminateExtensionFunct) then TerminateExtensionFunct(HSE_TERM_MUST_UNLOAD);
     CheckError(not FreeLibrary(fDLLHandle));

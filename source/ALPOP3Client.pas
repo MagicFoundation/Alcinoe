@@ -1,7 +1,7 @@
-﻿{*************************************************************
+{*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
 svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+Author(s):    St�phane Vander Clock (svanderclock@arkadia.com)
               Igor (Igor@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 

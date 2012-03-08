@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe WinExec Functions
-Version:      3.52
+Version:      3.53
 
 Description:  Function to launch executable (and wait for termination)
 
@@ -44,6 +44,7 @@ Know bug:
 
 History:      04/05/2007: overload the function ALWinExec32;
               01/01/2010: add ALNTSetPrivilege
+              05/03/2012: Correct a 100% CPU usage in ALWinExec32
 
 Link:
 
@@ -160,7 +161,7 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
 
         If aBytesWritten = Dword(length(AstrBuffer)) then break
         else delete(aStrBuffer,1,aBytesWritten);
-
+        
       end;
     end;
   end;
@@ -258,7 +259,10 @@ begin
 
         InputStream.Position := 0;
         InternalProcessInput;
-        while (WaitForSingleObject(aProcessInformation.hProcess, 0) = WAIT_TIMEOUT) do InternalProcessOutput;
+        while (WaitForSingleObject(aProcessInformation.hProcess, 0) = WAIT_TIMEOUT) do begin
+          InternalProcessOutput;
+          sleep(1); // to not use 100% CPU usage
+        end;
         InternalProcessOutput;
         GetExitCodeProcess(aProcessInformation.hProcess, Cardinal(Result));
 

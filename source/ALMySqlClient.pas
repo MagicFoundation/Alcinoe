@@ -123,7 +123,7 @@ Type
                             aFormatSettings: TformatSettings): String;
     procedure doSQLDone(SQL: String;
                         XmlData: TalXmlNode;
-                        StartDate, EndDate: Int64); virtual;
+                        StartTickCount, EndTickCount: Int64); virtual;
     procedure initObject; virtual;
   Public
     Constructor Create(ApiVer: TALMySqlVersion_API;
@@ -216,7 +216,7 @@ Type
                             aFormatSettings: TformatSettings): String;
     procedure doSQLDone(SQL: String;
                         XmlData: TalXmlNode;
-                        StartDate, EndDate: Int64;
+                        StartTickCount, EndTickCount: Int64;
                         ConnectionHandle: PMySql); virtual;
     procedure initObject(aHost: String;
                          aPort: integer;
@@ -400,7 +400,7 @@ end;
 {*********************************************}
 procedure TalMySqlClient.doSQLDone(SQL: String;
                                    XmlData: TalXmlNode;
-                                   StartDate, EndDate: Int64);
+                                   StartTickCount, EndTickCount: Int64);
 begin
   //virtual method
 end;
@@ -579,6 +579,7 @@ Var aMySqlRes: PMYSQL_RES;
     aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
+    aUpdateRowTagByFieldValue: Boolean;
 
 begin
 
@@ -600,11 +601,8 @@ begin
     {loop on all the SQL}
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //trim the SQL
-      SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
       //if the SQL is not empty
-      if SQLs[aSQLsindex].SQL <> '' then begin
+      if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
         //init aStartDate
         aStartDate := ALGetTickCount64;
@@ -628,6 +626,13 @@ begin
           //init the aViewRec
           if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
           else aViewRec := XMLdata;
+
+          //init aUpdateRowTagByFieldValue
+          if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+            delete(SQLs[aSQLsindex].RowTag, 1, 2);
+            aUpdateRowTagByFieldValue := True;
+          end
+          else aUpdateRowTagByFieldValue := False;
 
           //loop throught all row
           aRecIndex := 0;
@@ -681,6 +686,7 @@ begin
                                                        aMySqlFields[aColumnIndex]._type,
                                                        aMySqlFieldLengths[aColumnIndex],
                                                        FormatSettings);
+                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
                 end;
 
                 //handle OnNewRowFunct
@@ -847,17 +853,17 @@ Var aSQLsindex: integer;
     aStartDate: int64;
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
   //loop on all the SQL
   For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-    //trim the SQL
-    SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
     //if the SQL is not empty
-    if SQLs[aSQLsindex].SQL <> '' then begin
+    if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
       //init aStartDate
       aStartDate := ALGetTickCount64;
@@ -971,7 +977,7 @@ end;
 {***********************************************************}
 procedure TalMySqlConnectionPoolClient.doSQLDone(SQL: String;
                                                  XmlData: TalXmlNode;
-                                                 StartDate, EndDate: Int64;
+                                                 StartTickCount, EndTickCount: Int64;
                                                  ConnectionHandle: PMySql);
 begin
   // virtual method
@@ -1369,6 +1375,7 @@ Var aMySqlRes: PMYSQL_RES;
     aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
+    aUpdateRowTagByFieldValue: Boolean;
 
 begin
 
@@ -1393,11 +1400,8 @@ begin
       //loop on all the SQL
       For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-        //trim the SQL
-        SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
         //if the SQL is not empty
-        if SQLs[aSQLsindex].SQL <> '' then begin
+        if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
           //init aStartDate
           aStartDate := ALGetTickCount64;
@@ -1417,6 +1421,13 @@ begin
             //init the aViewRec
             if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
             else aViewRec := XMLdata;
+
+            //init aUpdateRowTagByFieldValue
+            if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+              delete(SQLs[aSQLsindex].RowTag, 1, 2);
+              aUpdateRowTagByFieldValue := True;
+            end
+            else aUpdateRowTagByFieldValue := False;
 
             //loop throught all row
             aRecIndex := 0;
@@ -1470,6 +1481,7 @@ begin
                                                          aMySqlFields[aColumnIndex]._type,
                                                          aMySqlFieldLengths[aColumnIndex],
                                                          FormatSettings);
+                    if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
                   end;
 
                   //handle OnNewRowFunct
@@ -1667,6 +1679,9 @@ Var aSQLsindex: integer;
     aStartDate: int64;
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
   //acquire a connection and start the transaction if necessary
   aTmpConnectionHandle := ConnectionHandle;
   aOwnConnection := (not assigned(ConnectionHandle));
@@ -1676,11 +1691,8 @@ begin
     //loop on all the SQL
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //trim the SQL
-      SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
       //if the SQL is not empty
-      if SQLs[aSQLsindex].SQL <> '' then begin
+      if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
         //init aStartDate
         aStartDate := ALGetTickCount64;

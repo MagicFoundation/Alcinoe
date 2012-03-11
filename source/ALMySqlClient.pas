@@ -121,9 +121,6 @@ Type
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
                             aFormatSettings: TformatSettings): String;
-    procedure doSQLDone(SQL: String;
-                        XmlData: TalXmlNode;
-                        StartTickCount, EndTickCount: Int64); virtual;
     procedure initObject; virtual;
   Public
     Constructor Create(ApiVer: TALMySqlVersion_API;
@@ -214,10 +211,6 @@ Type
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
                             aFormatSettings: TformatSettings): String;
-    procedure doSQLDone(SQL: String;
-                        XmlData: TalXmlNode;
-                        StartTickCount, EndTickCount: Int64;
-                        ConnectionHandle: PMySql); virtual;
     procedure initObject(aHost: String;
                          aPort: integer;
                          aDataBaseName,
@@ -397,14 +390,6 @@ begin
   end;
 end;
 
-{*********************************************}
-procedure TalMySqlClient.doSQLDone(SQL: String;
-                                   XmlData: TalXmlNode;
-                                   StartTickCount, EndTickCount: Int64);
-begin
-  //virtual method
-end;
-
 {**********************************}
 procedure TalMySqlClient.initObject;
 begin
@@ -576,7 +561,6 @@ Var aMySqlRes: PMYSQL_RES;
     aSQLsindex: integer;
     aRecIndex: integer;
     aRecAdded: integer;
-    aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
@@ -603,9 +587,6 @@ begin
 
       //if the SQL is not empty
       if trim(SQLs[aSQLsindex].SQL) <> '' then begin
-
-        //init aStartDate
-        aStartDate := ALGetTickCount64;
 
         //prepare the query
         CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
@@ -713,12 +694,6 @@ begin
           //Frees the memory allocated to aMySqlRes
           fLibrary.mysql_free_result(aMySqlRes);
         End;
-
-        //do the onSQLDone
-        doSQLDone(SQLs[aSQLsindex].SQL,
-                  aViewRec,
-                  aStartDate,
-                  ALGetTickCount64);
 
       End;
 
@@ -850,7 +825,6 @@ end;
 {**********************************************************************}
 procedure TalMySqlClient.UpdateData(SQLs: TalMySqlClientUpdateDataSQLs);
 Var aSQLsindex: integer;
-    aStartDate: int64;
 begin
 
   //exit if no SQL
@@ -865,17 +839,8 @@ begin
     //if the SQL is not empty
     if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
-      //init aStartDate
-      aStartDate := ALGetTickCount64;
-
       //do the query
       CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
-
-      //do the onSQLDone
-      doSQLDone(SQLs[aSQLsindex].SQL,
-                nil,
-                aStartDate,
-                ALGetTickCount64);
 
     end;
 
@@ -972,15 +937,6 @@ begin
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
   end;
-end;
-
-{***********************************************************}
-procedure TalMySqlConnectionPoolClient.doSQLDone(SQL: String;
-                                                 XmlData: TalXmlNode;
-                                                 StartTickCount, EndTickCount: Int64;
-                                                 ConnectionHandle: PMySql);
-begin
-  // virtual method
 end;
 
 {**************************************************************}
@@ -1372,7 +1328,6 @@ Var aMySqlRes: PMYSQL_RES;
     aRecAdded: integer;
     aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
-    aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
@@ -1402,9 +1357,6 @@ begin
 
         //if the SQL is not empty
         if trim(SQLs[aSQLsindex].SQL) <> '' then begin
-
-          //init aStartDate
-          aStartDate := ALGetTickCount64;
 
           //prepare the query
           CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
@@ -1508,13 +1460,6 @@ begin
             //Frees the memory allocated to aMySqlRes
             fLibrary.mysql_free_result(aMySqlRes);
           End;
-
-          //do the onSQLDone
-          DoSQLDone(SQLs[aSQLsindex].SQL,
-                    aViewRec,
-                    aStartDate,
-                    ALGetTickCount64,
-                    aTmpConnectionHandle);
 
         End;
 
@@ -1676,7 +1621,6 @@ procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TalMySqlClientUpdateData
 Var aSQLsindex: integer;
     aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
-    aStartDate: int64;
 begin
 
   //exit if no SQL
@@ -1694,18 +1638,8 @@ begin
       //if the SQL is not empty
       if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
-        //init aStartDate
-        aStartDate := ALGetTickCount64;
-
         //do the query
         CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
-
-        //do the onSQLDone
-        DoSQLDone(SQLs[aSQLsindex].SQL,
-                  nil,
-                  aStartDate,
-                  ALGetTickCount64,
-                  aTmpConnectionHandle);
 
       end;
 

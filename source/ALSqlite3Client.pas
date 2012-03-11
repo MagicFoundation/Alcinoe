@@ -121,9 +121,6 @@ Type
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
                             aFormatSettings: TformatSettings): String;
-    procedure doSQLDone(SQL: String;
-                        XmlData: TalXmlNode;
-                        StartTickCount, EndTickCount: Int64); virtual;
     procedure initObject; virtual;
   Public
     Constructor Create(const lib: String = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
@@ -208,10 +205,6 @@ Type
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
                             aFormatSettings: TformatSettings): String; virtual;
-    procedure doSQLDone(SQL: String;
-                        XmlData: TalXmlNode;
-                        StartTickCount, EndTickCount: Int64;
-                        ConnectionHandle: PSQLite3); virtual;
     procedure initObject(aDataBaseName: String;
                          const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
                          const aOpenConnectionPragmaStatements: String = ''); virtual;
@@ -347,14 +340,6 @@ begin
     SQLITE_NULL: result := fNullString;
     else raise Exception.Create('Unsupported column type');
   end;
-end;
-
-{***********************************************}
-procedure TalSqlite3Client.doSQLDone(SQL: String;
-                                     XmlData: TalXmlNode;
-                                     StartTickCount, EndTickCount: Int64);
-begin
-  //virtual method
 end;
 
 {************************************}
@@ -604,7 +589,6 @@ Var astmt: PSQLite3Stmt;
     aSQLsindex: integer;
     aRecIndex: integer;
     aRecAdded: integer;
-    aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
@@ -631,9 +615,6 @@ begin
 
       //if the SQL is not empty
       if trim(SQLs[aSQLsindex].SQL) <> '' then begin
-
-        //init aStartDate
-        aStartDate := ALGetTickCount64;
 
         //prepare the query
         astmt := nil;
@@ -722,12 +703,6 @@ begin
           //free the memory used by the API
           CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
         End;
-
-        //do the onSQLDone
-        doSQLDone(SQLs[aSQLsindex].SQL,
-                  aViewRec,
-                  aStartDate,
-                  ALGetTickCount64);
 
       End;
 
@@ -860,7 +835,6 @@ end;
 procedure TalSqlite3Client.UpdateData(SQLs: TalSqlite3ClientUpdateDataSQLs);
 Var astmt: PSQLite3Stmt;
     aSQLsindex: integer;
-    aStartDate: int64;
 begin
 
   //exit if no SQL
@@ -875,9 +849,6 @@ begin
     //if the SQL is not empty
     if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
-      //init aStartDate
-      aStartDate := ALGetTickCount64;
-
       //prepare the query
       CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
       Try
@@ -889,12 +860,6 @@ begin
         //free the memory used by the API
         CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
       End;
-
-      //do the onSQLDone
-      doSQLDone(SQLs[aSQLsindex].SQL,
-                nil,
-                aStartDate,
-                ALGetTickCount64);
 
     end;
 
@@ -954,15 +919,6 @@ begin
     SQLITE_NULL: result := fNullString;
     else raise Exception.Create('Unsupported column type');
   end;
-end;
-
-{*************************************************************}
-procedure TalSqlite3ConnectionPoolClient.doSQLDone(SQL: String;
-                                                   XmlData: TalXmlNode;
-                                                   StartTickCount, EndTickCount: Int64;
-                                                   ConnectionHandle: PSQLite3);
-begin
-  // virtual method
 end;
 
 {************************************************************************}
@@ -1368,7 +1324,6 @@ Var astmt: PSQLite3Stmt;
     aRecAdded: integer;
     aTmpConnectionHandle: PSQLite3;
     aOwnConnection: Boolean;
-    aStartDate: int64;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
@@ -1398,9 +1353,6 @@ begin
 
         //if the SQL is not empty
         if trim(SQLs[aSQLsindex].SQL) <> '' then begin
-
-          //init aStartDate
-          aStartDate := ALGetTickCount64;
 
           //prepare the query
           astmt := nil;
@@ -1489,13 +1441,6 @@ begin
             //free the memory used by the API
             CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
           End;
-
-          //do the onSQLDone
-          DoSQLDone(SQLs[aSQLsindex].SQL,
-                    aViewRec,
-                    aStartDate,
-                    ALGetTickCount64,
-                    aTmpConnectionHandle);
 
         End;
 
@@ -1658,7 +1603,6 @@ Var astmt: PSQLite3Stmt;
     aSQLsindex: integer;
     aTmpConnectionHandle: PSQLite3;
     aOwnConnection: Boolean;
-    aStartDate: int64;
 begin
 
   //exit if no SQL
@@ -1676,9 +1620,6 @@ begin
       //if the SQL is not empty
       if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
-        //init aStartDate
-        aStartDate := ALGetTickCount64;
-
         //prepare the query
         CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
         Try
@@ -1690,13 +1631,6 @@ begin
           //free the memory used by the API
           CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
         End;
-
-        //do the onSQLDone
-        DoSQLDone(SQLs[aSQLsindex].SQL,
-                  nil,
-                  aStartDate,
-                  ALGetTickCount64,
-                  aTmpConnectionHandle);
 
       end;
 

@@ -46,7 +46,7 @@ History :     02/03/2010: add aNumbuffers: Integer to the connect
               27/01/2012: add the keyword &> (ex: &>xxx) at the beginning of
                           the rowtag to update the rowtag by the value of the
                           field xxx
-              29/01/2012: Add also a way to do Update SQL with params 
+              29/01/2012: Add also a way to do Update SQL with params
 
 Link :        http://www.progdigy.com/modules.php?name=UIB
 
@@ -78,9 +78,22 @@ Type
                                                   ExtData: Pointer;
                                                   Var Continue: Boolean);
 
+
+  {--------------------------------}
+  TALFBXClientSQLParamField = record
+    Value: String;
+    IsNull: Boolean;
+    IsBlob: Boolean;
+  end;
+  TALFBXClientSQLParams = record
+    fields: array of TALFBXClientSQLParamField;
+  end;
+
   {--------------------------------}
   TALFBXClientSelectDataSQL = record
     SQL: String;
+    Params: array of TALFBXClientSQLParams; // use to replace the ? in SQL like
+                                            // Select ... from TableA(FieldA) where Values = ?
     RowTag: String;
     ViewTag: String;
     Skip: integer;
@@ -88,23 +101,41 @@ Type
   end;
   TALFBXClientSelectDataSQLs = array of TALFBXClientSelectDataSQL;
 
-  {------------------------------------------}
-  TALFBXClientUpdateDataSQLParamField = record
-    Value: String;
-    IsNull: Boolean;
-    IsBlob: Boolean;
-  end;
-  TALFBXClientUpdateDataSQLParams = record
-    fields: array of TALFBXClientUpdateDataSQLParamField;
-  end;
-
   {--------------------------------}
   TALFBXClientUpdateDataSQL = record
     SQL: String;
-    Params: array of TALFBXClientUpdateDataSQLParams; // use to replace the ? in SQL like
-                                                      // insert into TableA(FieldA) Values(?)
+    Params: array of TALFBXClientSQLParams; // use to replace the ? in SQL like
+                                            // insert into TableA(FieldA) Values(?)
   end;
   TALFBXClientUpdateDataSQLs = array of TALFBXClientUpdateDataSQL;
+
+  {------------------------------------}
+  TALFBXClientMonitoringIOStats = record
+    page_reads,
+    page_writes,
+    page_fetches,
+    page_marks: int64;
+  end;
+
+  {----------------------------------------}
+  TALFBXClientMonitoringRecordStats = record
+    record_idx_reads,
+    record_seq_reads,
+    record_inserts,
+    record_updates,
+    record_deletes,
+    record_backouts,
+    record_purges,
+    record_expunges: int64;
+  end;
+
+  {----------------------------------------}
+  TALFBXClientMonitoringMemoryUsage = record
+    memory_used,
+    memory_allocated,
+    max_memory_used,
+    max_memory_allocated: int64;
+  end;
 
   {---------------------------}
   TALFBXClient = Class(Tobject)
@@ -114,12 +145,17 @@ Type
     FLibrary: TALFBXLibrary;
     fDBHandle: IscDbHandle;
     fTraHandle: IscTrHandle;
+    fStmtHandle: IscStmtHandle;
+    fSqlda: TALFBXSQLResult;
+    fStmtSQL: String;
     fNullString: String;
     fCharSet: TALFBXCharacterSet;
     fDefaultReadTPB: String;
     fDefaultWriteTPB: String;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
+    function  GetConnectionID: Integer;
+    function  GetTransactionID: Cardinal;
   Protected
     function GetFieldValue(aSQLDA:TALFBXSQLResult;
                            aDBHandle: IscDbHandle;
@@ -128,14 +164,21 @@ Type
                            aFormatSettings: TformatSettings): String;
     procedure doSQLDone(SQL: String;
                         XmlData: TalXmlNode;
-                        StartDate, EndDate: Int64); virtual;
+                        StartTickCount, EndTickCount: Int64); virtual;
     procedure initObject; virtual;
   Public
     Constructor Create(ApiVer: TALFBXVersion_API; const lib: String = GDS32DLL); overload; virtual;
     Constructor Create(lib: TALFBXLibrary); overload; virtual;
     Destructor Destroy; Override;
-    procedure GetTransactionStats(Var idx_reads: LongInt;
-                                  Var seq_reads: LongInt);
+    procedure GetMonitoringInfos(ConnectionID,         
+                                 TransactionID: int64;
+                                 StatementSQL: String;
+                                 Var IOStats: TALFBXClientMonitoringIOStats;
+                                 Var RecordStats: TALFBXClientMonitoringRecordStats;
+                                 Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
+                                 Const SkipIOStats: Boolean = False;
+                                 Const SkipRecordStats: Boolean = False;
+                                 Const SkipMemoryUsage: Boolean = False);
     function  GetDataBaseInfoInt(const item: Integer): Integer;
     function  GetDataBaseInfoString(const item: Integer): string;
     function  GetDataBaseInfoDateTime(const item: Integer): TDateTime;
@@ -158,8 +201,13 @@ Type
     Procedure TransactionCommitRetaining;
     Procedure TransactionRollback;
     Procedure TransactionRollbackRetaining;
+    Function  Prepare(SQL: String): TALFBXStatementType;
     Procedure SelectData(SQLs: TALFBXClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
+                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings); overload;
+    Procedure SelectData(SQL: TALFBXClientSelectDataSQL;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
                          FormatSettings: TformatSettings); overload;
@@ -174,6 +222,9 @@ Type
                          ExtData: Pointer;
                          FormatSettings: TformatSettings); overload;
     Procedure SelectData(SQLs: TALFBXClientSelectDataSQLs;
+                         XMLDATA: TalXMLNode;
+                         FormatSettings: TformatSettings); overload;
+    Procedure SelectData(SQL: TALFBXClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings); overload;
     Procedure SelectData(SQL: String;
@@ -190,6 +241,7 @@ Type
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings); overload;
     procedure UpdateData(SQLs: TALFBXClientUpdateDataSQLs); overload;
+    procedure UpdateData(SQL: TALFBXClientUpdateDataSQL); overload;
     procedure UpdateData(SQLs: Tstrings); overload;
     procedure UpdateData(SQL: String); overload;
     Property  Connected: Boolean Read GetConnected;
@@ -200,6 +252,8 @@ Type
     property  CharSet: TALFBXCharacterSet read fCharSet;
     property  DefaultReadTPB: String read fDefaultReadTPB Write fDefaultReadTPB;
     property  DefaultWriteTPB: String read fDefaultWriteTPB write fDefaultWriteTPB;
+    property  TransactionID: Cardinal read GetTransactionID;
+    property  ConnectionID: Integer read GetConnectionID;
   end;
 
   {--------------------------------------------}
@@ -237,7 +291,7 @@ Type
                            aFormatSettings: TformatSettings): String; virtual;
     procedure doSQLDone(SQL: String;
                         XmlData: TalXmlNode;
-                        StartDate, EndDate: Int64;
+                        StartTickCount, EndTickCount: Int64;
                         DBHandle: IscDbHandle;
                         TraHandle: IscTrHandle); virtual;
     procedure initObject(aDataBaseName,
@@ -603,10 +657,36 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
 
 implementation
 
-uses ALWindows,
+uses StrUtils,
+     ALWindows,
      AlFcnString,
      AlFcnHTML,
      alfbxError;
+
+{*********************************************}
+function TALFBXClient.GetConnectionID: integer;
+begin
+
+  //Error if we are not connected
+  If not connected then raise Exception.Create('Not connected');
+
+  //result
+  result := GetDataBaseInfoInt(isc_info_attachment_id);
+
+end;
+
+{***********************************************}
+function TALFBXClient.GetTransactionID: Cardinal;
+begin
+
+  //Error if we are not connected
+  If not connected then raise Exception.Create('Not connected');
+  if not InTransaction then raise Exception.Create('No active transaction');
+
+  //result
+  Result := Flibrary.TransactionGetId(fTraHandle)
+
+end;
 
 {******************************************}
 function TALFBXClient.GetConnected: Boolean;
@@ -618,6 +698,180 @@ end;
 function TALFBXClient.GetInTransaction: Boolean;
 begin
   result := assigned(fTraHandle)
+end;
+
+{*****************************************************}
+procedure TALFBXClient.GetMonitoringInfos(ConnectionID,
+                                          TransactionID: int64;
+                                          StatementSQL: String;
+                                          Var IOStats: TALFBXClientMonitoringIOStats;
+                                          Var RecordStats: TALFBXClientMonitoringRecordStats;
+                                          Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
+                                          Const SkipIOStats: Boolean = False;
+                                          Const SkipRecordStats: Boolean = False;
+                                          Const SkipMemoryUsage: Boolean = False);
+Var aXMLDATA: TalXmlDocument;
+    aFormatSettings: TformatSettings;
+    aSelectPart: String;
+    aFromPart: String;
+    aJoinPart: String;
+    aWherePart: String;
+
+    a_saved_TraHandle: IscTrHandle;
+    a_saved_StmtHandle: IscStmtHandle;
+    a_saved_Sqlda: TALFBXSQLResult;
+    a_saved_StmtSQL: String;
+
+Begin
+
+  //The key term of the monitoring feature is an activity snapshot. It represents the current state of the database, comprising a
+  //variety of information about the database itself, active attachments and users, transactions, prepared and running statements, and more.
+  //
+  //A snapshot is created the first time any of the monitoring tables is being selected from in the given transaction and it is
+  //preserved until the transaction ends, in order that multiple-table queries (e.g., master-detail ones) will always return a consistent view of the data.
+  //
+  //In other words, the monitoring tables always behave like a snapshot table stability ("consistency") transaction, even if the host transaction
+  //has been started with a lower isolation level.
+  //
+  //To refresh the snapshot, the current transaction should be finished and the monitoring tables should be queried in a new transaction context.
+
+  //security check
+  if not Connected then raise Exception.Create('Not connected');
+
+  //build the aSelectPart;
+  aSelectPart := IFThen(not SkipIOStats,     'MON$PAGE_READS as PAGE_READS, '+
+                                             'MON$PAGE_WRITES as PAGE_WRITES, '+
+                                             'MON$PAGE_FETCHES as PAGE_FETCHES, '+
+                                             'MON$PAGE_MARKS as PAGE_MARKS, ') +
+                 IFThen(not SkipRecordStats, 'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                                             'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
+                                             'MON$RECORD_INSERTS as RECORD_INSERTS, '+
+                                             'MON$RECORD_UPDATES as RECORD_UPDATES, '+
+                                             'MON$RECORD_DELETES as RECORD_DELETES, '+
+                                             'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
+                                             'MON$RECORD_PURGES as RECORD_PURGES, '+
+                                             'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
+                 IFThen(not SkipMemoryUsage, 'MON$MEMORY_USED as MEMORY_USED, '+
+                                             'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
+                                             'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
+                                             'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
+  if aSelectPart <> '' then delete(aSelectPart,length(aSelectPart) - 1, 1)
+  else Exit;
+
+  //build the aFromPart
+  if StatementSQL <> '' then       aFromPart := 'MON$STATEMENTS'
+  else if TransactionID <> -1 then aFromPart := 'MON$TRANSACTIONS'
+  else if ConnectionID <> -1 then  aFromPart := 'MON$ATTACHMENTS'
+  else                             aFromPart := 'MON$DATABASE';
+
+  //build the aJoinPart
+  aJoinPart := IFThen(not SkipIOStats,     'JOIN MON$IO_STATS ON MON$IO_STATS.MON$STAT_ID = '        +aFromPart+'.MON$STAT_ID ') +
+               IFThen(not SkipRecordStats, 'JOIN MON$RECORD_STATS ON MON$RECORD_STATS.MON$STAT_ID = '+aFromPart+'.MON$STAT_ID ') +
+               IFThen(not SkipMemoryUsage, 'JOIN MON$MEMORY_USAGE ON MON$MEMORY_USAGE.MON$STAT_ID = '+aFromPart+'.MON$STAT_ID ');
+
+  //build the aWherePart
+  if StatementSQL <> '' then       aWherePart := 'MON$SQL_TEXT = ' + QuotedStr(StatementSQL) +
+                                                 IFThen(TransactionID <> -1, ' AND MON$TRANSACTION_ID = '+inttostr(TransactionID)) +
+                                                 IFThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+inttostr(ConnectionID))
+  else if TransactionID <> -1 then aWherePart := 'MON$TRANSACTION_ID = '+inttostr(TransactionID) +
+                                                 IFThen(ConnectionID <> -1,  ' AND MON$ATTACHMENT_ID = '+inttostr(ConnectionID))
+  else if ConnectionID <> -1 then  aWherePart := 'MON$ATTACHMENT_ID = '+inttostr(ConnectionID)
+  else                             aWherePart := '';
+
+
+  //Save the old data
+  a_saved_TraHandle := fTraHandle;
+  a_saved_StmtHandle := fStmtHandle;
+  a_saved_Sqlda := fSqlda;
+  a_saved_StmtSQL := fStmtSQL;
+  Try
+
+    //clear the handle
+    fTraHandle := nil;
+    fStmtHandle := nil;
+    fSqlda := nil;
+    fStmtSQL := '';
+
+    //start the TMP transaction
+    TransactionStart(True);
+    Try
+
+      //get the data from the monitoring table
+      aXMLDATA := ALCreateEmptyXMLDocument('root');
+      try
+
+        SelectData('SELECT '+
+                     aSelectPart +
+                   'FROM ' +
+                     aFromPart + ' ' +
+                   aJoinPart +
+                   'WHERE ' +
+                     aWherePart,
+                   'rec',
+                   aXMLDATA.DocumentElement,
+                   aFormatSettings);
+
+        if aXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
+        with aXMLDATA.DocumentElement.ChildNodes[0] do begin
+
+          if not SkipIOStats then begin
+            with IOStats do begin
+              page_reads := strtoint64(ChildNodes['page_reads'].text);
+              page_writes := strtoint64(ChildNodes['page_writes'].text);
+              page_fetches := strtoint64(ChildNodes['page_fetches'].text);
+              page_marks := strtoint64(ChildNodes['page_marks'].text);
+            end;
+          end;
+
+          if not SkipRecordStats then begin
+            with RecordStats do begin
+              record_seq_reads := strtoint64(ChildNodes['record_seq_reads'].text);
+              record_idx_reads := strtoint64(ChildNodes['record_idx_reads'].text);
+              record_inserts := strtoint64(ChildNodes['record_inserts'].text);
+              record_updates := strtoint64(ChildNodes['record_updates'].text);
+              record_deletes := strtoint64(ChildNodes['record_deletes'].text);
+              record_backouts := strtoint64(ChildNodes['record_backouts'].text);
+              record_purges := strtoint64(ChildNodes['record_purges'].text);
+              record_expunges := strtoint64(ChildNodes['record_expunges'].text);
+            end;
+          end;
+
+          if not SkipMemoryUsage then begin
+            with MemoryUsage do begin
+              memory_used := strtoint64(ChildNodes['memory_used'].text);
+              memory_allocated := strtoint64(ChildNodes['memory_allocated'].text);
+              max_memory_used := strtoint64(ChildNodes['max_memory_used'].text);
+              max_memory_allocated := strtoint64(ChildNodes['max_memory_allocated'].text);
+            end;
+          end;
+
+        end;
+
+      finally
+        aXMLDATA.free;
+      end;
+
+      //commit the TMP transaction
+      TransactionCommit;
+
+    Except
+
+      //roolback the TMP transaction
+      TransactionRollBack;
+      Raise;
+
+    End;
+
+  Finally
+
+    //get back the original transaction data
+    fTraHandle := a_saved_TraHandle;
+    fStmtHandle := a_saved_StmtHandle;
+    fSqlda := a_saved_Sqlda;
+    fStmtSQL := a_saved_StmtSQL;
+
+  End;
+
 end;
 
 {*********************************************************}
@@ -663,47 +917,10 @@ Begin
     else result := fNullString;
 end;
 
-{****************************************************************}
-procedure TALFBXClient.GetTransactionStats(Var idx_reads: LongInt;
-                                           Var seq_reads: LongInt);
-Var XMLDATA: TalXmlDocument;
-    aFormatSettings: TformatSettings;
-Begin
-
-  //security check
-  if not InTransaction then raise Exception.Create('No active transaction');
-
-  //get the data from the monitoring table
-  XMLDATA := ALCreateEmptyXMLDocument('root');
-  try
-
-    SelectData('SELECT '+
-                 'MON$RECORD_IDX_READS as IDX_READS, '+
-                 'MON$RECORD_SEQ_READS as SEQ_READS '+
-               'FROM '+
-                 'MON$RECORD_STATS '+
-               'JOIN MON$TRANSACTIONS ON MON$TRANSACTIONS.MON$STAT_ID=MON$RECORD_STATS.MON$STAT_ID '+
-               'WHERE '+
-                 'MON$TRANSACTIONS.MON$TRANSACTION_ID=current_transaction',
-               XMLDATA.DocumentElement,
-               aFormatSettings);
-
-    if XMLDATA.DocumentElement.ChildNodes.Count <> 2 then raise Exception.Create('Can not get the transaction stats');
-    with XMLDATA.DocumentElement do begin
-      Idx_reads := strtoint(ChildNodes['idx_reads'].Text);
-      Seq_Reads := strtoint(ChildNodes['seq_reads'].Text);
-    end;
-
-  finally
-    XMLDATA.free;
-  end;
-
-end;
-
 {*******************************************}
 procedure TALFBXClient.doSQLDone(SQL: String;
                                  XmlData: TalXmlNode;
-                                 StartDate, EndDate: Int64);
+                                 StartTickCount, EndTickCount: Int64);
 begin
  // virtual method
 end;
@@ -715,6 +932,9 @@ begin
   fDefaultWriteTPB := cALFbxClientDefaultWriteNOWaitTPB;
   fDBHandle := nil;
   fTraHandle := nil;
+  fStmtHandle := nil;
+  fSqlda := nil;
+  fStmtSQL := '';
   FSQLDIALECT := 3;
   fCharSet := csnone;
   fNullString := '';
@@ -807,7 +1027,7 @@ end;
 {*************************************************}
 procedure TALFBXClient.CreateDatabase(SQL: String);
 begin
-  if connected then raise Exception.Create('Already connected!');
+  if connected then raise Exception.Create('You must disconnect first');
   Flibrary.DSQLExecuteImmediate(fDBHandle, fTraHandle, SQL, FSQLDIALECT, nil);
   try
     Flibrary.DetachDatabase(fDBHandle);
@@ -815,6 +1035,7 @@ begin
     //i m very curious what we can do here ?
   end;
   fDBHandle := nil;
+  fTraHandle := nil;
 end;
 
 {**********************************}
@@ -823,7 +1044,7 @@ begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
-  if InTransaction then raise Exception.Create('Another transaction is active!');
+  if InTransaction then raise Exception.Create('Transaction is active');
 
   //drop the database
   FLibrary.DatabaseDrop(FDbHandle);
@@ -841,7 +1062,7 @@ procedure TALFBXClient.Connect(DataBaseName,
                                const ExtraParams: String = '');
 Var aParams: String;
 begin
-  if connected then raise Exception.Create('Already connected!');
+  if connected then raise Exception.Create('Already connected');
   fCharSet :=  ALFBXStrToCharacterSet(CharSet);
   aParams := 'user_name = '+Login+'; '+
              'password = '+Password+'; '+
@@ -894,7 +1115,7 @@ begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
-  if InTransaction then raise Exception.Create('Another transaction is active!');
+  if InTransaction then raise Exception.Create('transaction is already active');
 
   //init aTmpTPB
   If TPB = '' then begin
@@ -915,7 +1136,14 @@ procedure TALFBXClient.TransactionCommit;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to commit!');
+  if not InTransaction then raise Exception.Create('No active transaction to commit');
+
+  //free old statement
+  if assigned(fStmtHandle) then Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
+  if assigned(fSqlda) then fSqlda.free;
+  fStmtHandle := nil;
+  fSqlda := nil;
+  fStmtSQL := '';
 
   //commit the transaction
   Flibrary.TransactionCommit(fTraHandle);
@@ -928,7 +1156,7 @@ procedure TALFBXClient.TransactionCommitRetaining;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to commit!');
+  if not InTransaction then raise Exception.Create('No active transaction to commit');
 
   //commit the transaction
   Flibrary.TransactionCommitRetaining(fTraHandle);
@@ -940,7 +1168,18 @@ procedure TALFBXClient.TransactionRollback;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to rollback!');
+  if not InTransaction then raise Exception.Create('No active transaction to rollback');
+
+  //free old statement
+  Try
+    if assigned(fStmtHandle) then Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
+  Except
+    //what else we can do ?
+  End;
+  if assigned(fSqlda) then fSqlda.free;
+  fStmtHandle := nil;
+  fSqlda := nil;
+  fStmtSQL := '';
 
   //rollback the transaction
   Try
@@ -958,11 +1197,54 @@ end;
 procedure TALFBXClient.TransactionRollbackRetaining;
 begin
 
-  //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to rollback!');
+  //Error if we are not inTransaction
+  if not InTransaction then raise Exception.Create('No active transaction to rollback');
 
   //rollback the transaction
   Flibrary.TransactionRollbackRetaining(fTraHandle);
+
+end;
+
+{**************************************************************}
+Function TALFBXClient.Prepare(SQL: String): TALFBXStatementType;
+begin
+
+  //Error if we are not inTransaction
+  if not InTransaction then raise Exception.Create('No active transaction');
+
+  //free old statement
+  if assigned(fStmtHandle) then Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
+  if assigned(fSqlda) then fSqlda.free;
+  fStmtHandle := nil;
+  fSqlda := nil;
+  fStmtSQL := '';
+
+  //create the sqlda result
+  fSqlda := TALFBXSQLResult.Create(fCharSet);
+  Try
+
+    //init the aStmtHandle
+    Flibrary.DSQLAllocateStatement(fDBHandle, fStmtHandle);
+    try
+
+      //prepare the SQL
+      Result := Flibrary.DSQLPrepare(fDBHandle, fTraHandle, fStmtHandle, SQL, FSQLDIALECT, fSqlda);
+
+      //init fStmtSQL
+      fStmtSQL := SQL;
+
+    except
+      Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
+      fStmtHandle := nil;
+      fStmtSQL := '';
+      raise;
+    end;
+
+  Except
+    fSqlda.free;
+    fSqlda := nil;
+    raise;
+  end;
 
 end;
 
@@ -972,8 +1254,11 @@ procedure TALFBXClient.SelectData(SQLs: TALFBXClientSelectDataSQLs;
                                   OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                                   ExtData: Pointer;
                                   FormatSettings: TformatSettings);
-Var aSqlda: TALFBXSQLResult;
-    aStmtHandle: IscStmtHandle;
+
+Var aSqlpa: TALFBXSQLParams;
+    aSqlsParamsIndex: integer;
+    aSqlsParamsFieldsIndex: integer;
+    aBlobhandle: IscBlobHandle;
     aColumnIndex: integer;
     aNewRec: TalXmlNode;
     aValueRec: TalXmlNode;
@@ -983,6 +1268,7 @@ Var aSqlda: TALFBXSQLResult;
     aRecAdded: integer;
     aStartDate: int64;
     aContinue: Boolean;
+    aDropStmt: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
 
@@ -1006,276 +1292,22 @@ begin
     {loop on all the SQL}
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //trim the SQL
-      SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
       //if the SQL is not empty
-      if SQLs[aSQLsindex].SQL <> '' then begin
+      if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
         //init aStartDate
         aStartDate := ALGetTickCount64;
 
-        //create the sqlda result
-        aSqlda := TALFBXSQLResult.Create(fCharSet);
+        //set aSqlpa to nil
+        aSqlpa := Nil;
+
         Try
 
-          //init the aStmtHandle
-          aStmtHandle := nil;
-          Flibrary.DSQLAllocateStatement(fDBHandle, aStmtHandle);
-          try
+          //special case if their is params
+          if length(SQLs[aSQLsindex].Params) > 0 then begin
 
-            //prepare and execute the query
-            Flibrary.DSQLPrepare(fDBHandle, fTraHandle, aStmtHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, aSqlda);
-            FLibrary.DSQLExecute(fTraHandle, aStmtHandle, FSQLDIALECT, nil);
-
-            //init the aViewRec
-            if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
-            else aViewRec := XMLdata;
-
-            //init aUpdateRowTagByFieldValue
-            if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
-              delete(SQLs[aSQLsindex].RowTag, 1, 2);
-              aUpdateRowTagByFieldValue := True;
-            end
-            else aUpdateRowTagByFieldValue := False;
-
-            //retrieve all row
-            aRecIndex := 0;
-            aRecAdded := 0;
-            while Flibrary.DSQLFetch(fDBHandle, fTraHandle, aStmtHandle, FSQLDIALECT, asqlda) do begin
-
-              //process if > Skip
-              inc(aRecIndex);
-              If aRecIndex > SQLs[aSQLsindex].Skip then begin
-
-                //stop if no row are requested
-                If (SQLs[aSQLsindex].First = 0) then break;
-
-                //init NewRec
-                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
-                Else aNewRec := aViewRec;
-
-                //loop throught all column
-                For aColumnIndex := 0 to asqlda.FieldCount - 1 do begin
-                  aValueRec := aNewRec.AddChild(ALlowercase(asqlda.AliasName[aColumnIndex]));
-                  if (aSQLDA.SQLType[aColumnIndex] = SQL_BLOB) then avalueRec.ChildNodes.Add(
-                                                                                             avalueRec.OwnerDocument.CreateNode(
-                                                                                                                                GetFieldValue(
-                                                                                                                                              asqlda,
-                                                                                                                                              fDBHandle,
-                                                                                                                                              fTRAHandle,
-                                                                                                                                              aColumnIndex,
-                                                                                                                                              FormatSettings
-                                                                                                                                             ),
-                                                                                                                                ntCData
-                                                                                                                               )
-                                                                                             )
-                  else aValueRec.Text := GetFieldValue(asqlda, fDBHandle, fTRAHandle, aColumnIndex, FormatSettings);
-                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
-                end;
-
-                //handle OnNewRowFunct
-                if assigned(OnNewRowFunct) then begin
-                  aContinue := True;
-                  OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
-                  if Not aContinue then Break;
-                end;
-
-                //free the node if aXmlDocument
-                if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
-
-                //handle the First
-                inc(aRecAdded);
-                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
-
-              end;
-
-            end;
-
-          finally
-            Flibrary.DSQLFreeStatement(aStmtHandle, DSQL_drop);
-          end;
-
-        finally
-          aSqlda.free;
-        end;
-
-        //do the onSQLDone
-        DoSQLDone(SQLs[aSQLsindex].SQL,
-                  aViewRec,
-                  aStartDate,
-                  ALGetTickCount64);
-
-      End;
-
-    end;
-
-  Finally
-    if assigned(aXmlDocument) then aXmlDocument.free;
-  End;
-
-end;
-
-{********************************************}
-procedure TALFBXClient.SelectData(SQL: String;
-                                  Skip: Integer;
-                                  First: Integer;
-                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                  ExtData: Pointer;
-                                  FormatSettings: TformatSettings);
-var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
-begin
-  setlength(aSelectDataSQLs,1);
-  aSelectDataSQLs[0].Sql := Sql;
-  aSelectDataSQLs[0].RowTag := '';
-  aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := Skip;
-  aSelectDataSQLs[0].First := First;
-  SelectData(aSelectDataSQLs,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
-end;
-
-{********************************************}
-procedure TALFBXClient.SelectData(SQL: String;
-                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                  ExtData: Pointer;
-                                  FormatSettings: TformatSettings);
-var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
-begin
-  setlength(aSelectDataSQLs,1);
-  aSelectDataSQLs[0].Sql := Sql;
-  aSelectDataSQLs[0].RowTag := '';
-  aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
-  SelectData(aSelectDataSQLs,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
-end;
-
-{*****************************************************************}
-procedure TALFBXClient.SelectData(SQLs: TALFBXClientSelectDataSQLs;
-                                  XMLDATA: TalXMLNode;
-                                  FormatSettings: TformatSettings);
-begin
-
-  SelectData(SQLs,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
-
-end;
-
-{********************************************}
-procedure TALFBXClient.SelectData(SQL: String;
-                                  RowTag: String;
-                                  Skip: Integer;
-                                  First: Integer;
-                                  XMLDATA: TalXMLNode;
-                                  FormatSettings: TformatSettings);
-var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
-begin
-  setlength(aSelectDataSQLs,1);
-  aSelectDataSQLs[0].Sql := Sql;
-  aSelectDataSQLs[0].RowTag := RowTag;
-  aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := Skip;
-  aSelectDataSQLs[0].First := First;
-  SelectData(aSelectDataSQLs,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
-end;
-
-{********************************************}
-procedure TALFBXClient.SelectData(SQL: String;
-                                  RowTag: String;
-                                  XMLDATA: TalXMLNode;
-                                  FormatSettings: TformatSettings);
-var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
-begin
-  setlength(aSelectDataSQLs,1);
-  aSelectDataSQLs[0].Sql := Sql;
-  aSelectDataSQLs[0].RowTag := RowTag;
-  aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
-  SelectData(aSelectDataSQLs,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
-end;
-
-{********************************************}
-procedure TALFBXClient.SelectData(SQL: String;
-                                  XMLDATA: TalXMLNode;
-                                  FormatSettings: TformatSettings);
-var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
-begin
-  setlength(aSelectDataSQLs,1);
-  aSelectDataSQLs[0].Sql := Sql;
-  aSelectDataSQLs[0].RowTag := '';
-  aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
-  SelectData(aSelectDataSQLs,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
-end;
-
-{******************************************************************}
-procedure TALFBXClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs);
-Var aSqlpa: TALFBXSQLParams;
-    aStmtHandle: IscStmtHandle;
-    aBlobhandle: IscBlobHandle;
-    aSqlsParamsIndex: integer;
-    aSqlsParamsFieldsIndex: integer;
-    aSQLsindex: integer;
-    aStartDate: int64;
-begin
-
-  //exit if no SQL
-  if length(SQLs) = 0 then Exit;
-
-  //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
-
-  {loop on all the SQL}
-  For aSQLsindex := 0 to length(SQLs) - 1 do begin
-
-    //trim the SQL
-    SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
-    //if the SQL is not empty
-    if SQLs[aSQLsindex].SQL <> '' then begin
-
-      //init aStartDate
-      aStartDate := ALGetTickCount64;
-
-      //special case if their is params
-      if length(SQLs[aSQLsindex].Params) > 0 then begin
-
-        //create the aSqlpa object
-        aSqlpa := TALFBXSQLParams.Create(fCharSet);
-        try
-
-          //init the aStmtHandle
-          aStmtHandle := nil;
-          Flibrary.DSQLAllocateStatement(fDBHandle, aStmtHandle);
-          try
-
-            //prepare the SQL
-            Flibrary.DSQLPrepare(fDBHandle, fTraHandle, aStmtHandle, SQLs[aSQLsindex].SQL, FSQLDIALECT, nil);
+            //create the aSqlpa object
+            aSqlpa := TALFBXSQLParams.Create(fCharSet);
 
             //loop throught all Params
             for aSqlsParamsIndex := low(SQLs[aSQLsindex].Params) to high(SQLs[aSQLsindex].Params) do begin
@@ -1313,13 +1345,384 @@ begin
 
               end;
 
-              //execute the SQL
-              FLibrary.DSQLExecute(fTraHandle, aStmtHandle, FSQLDIALECT, aSqlpa);
+            end;
+
+          end;
+
+          //prepare if neccessary
+          if (not assigned(fSqlda)) or
+             (not assigned(fStmtHandle)) or
+             (SQLs[aSQLsindex].SQL <> fStmtSQL) then begin
+            Prepare(SQLs[aSQLsindex].SQL);
+            aDropStmt := True;
+          end
+          else aDropStmt := False;
+
+          //execute the query
+          //do this BEFORE the try because to execute Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_close);
+          //the cursor MUST BE OPEN and to be open it's must be done via DSQLExecute, so if DSQLExecute crash
+          //we can thing that the cursor will be not open
+          FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, asqlpa);
+
+          try
+
+            //init the aViewRec
+            if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
+            else aViewRec := XMLdata;
+
+            //init aUpdateRowTagByFieldValue
+            if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+              delete(SQLs[aSQLsindex].RowTag, 1, 2);
+              aUpdateRowTagByFieldValue := True;
+            end
+            else aUpdateRowTagByFieldValue := False;
+
+            //retrieve all row
+            aRecIndex := 0;
+            aRecAdded := 0;
+            while Flibrary.DSQLFetch(fDBHandle, fTraHandle, fStmtHandle, FSQLDIALECT, fsqlda) do begin
+
+              //process if > Skip
+              inc(aRecIndex);
+              If aRecIndex > SQLs[aSQLsindex].Skip then begin
+
+                //stop if no row are requested
+                If (SQLs[aSQLsindex].First = 0) then break;
+
+                //init NewRec
+                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
+                Else aNewRec := aViewRec;
+
+                //loop throught all column
+                For aColumnIndex := 0 to fsqlda.FieldCount - 1 do begin
+                  aValueRec := aNewRec.AddChild(ALlowercase(fsqlda.AliasName[aColumnIndex]));
+                  if (fSQLDA.SQLType[aColumnIndex] = SQL_BLOB) then avalueRec.ChildNodes.Add(
+                                                                                             avalueRec.OwnerDocument.CreateNode(
+                                                                                                                                GetFieldValue(fsqlda,
+                                                                                                                                              fDBHandle,
+                                                                                                                                              fTRAHandle,
+                                                                                                                                              aColumnIndex,
+                                                                                                                                              FormatSettings),
+                                                                                                                                ntCData
+                                                                                                                               )
+                                                                                             )
+                  else aValueRec.Text := GetFieldValue(fsqlda,
+                                                       fDBHandle,
+                                                       fTRAHandle,
+                                                       aColumnIndex,
+                                                       FormatSettings);
+                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
+                end;
+
+                //handle OnNewRowFunct
+                if assigned(OnNewRowFunct) then begin
+                  aContinue := True;
+                  OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
+                  if Not aContinue then Break;
+                end;
+
+                //free the node if aXmlDocument
+                if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+                //handle the First
+                inc(aRecAdded);
+                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+
+              end;
 
             end;
 
+            //do the onSQLDone here, before the DSQLFreeStatement
+            //in this way we can in the OnSQLDone retrieve the stats
+            //of the statement
+            DoSQLDone(SQLs[aSQLsindex].SQL,
+                      aViewRec,
+                      aStartDate,
+                      ALGetTickCount64);
+
+
           finally
-            Flibrary.DSQLFreeStatement(aStmtHandle, DSQL_drop);
+
+            //free the statement
+            if aDropStmt then begin
+              Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
+              fSqlda.free;
+              fStmtHandle := nil;
+              fSqlda := nil;
+              fStmtSQL := '';
+            end
+
+            //else simply close the cursor
+            else Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_close);
+
+          end;
+
+        Finally
+
+          //free the asqlpa
+          if assigned(asqlpa) then asqlpa.free;
+
+        End;
+
+      End;
+
+    end;
+
+  Finally
+    if assigned(aXmlDocument) then aXmlDocument.free;
+  End;
+
+end;
+
+{***************************************************************}
+procedure TALFBXClient.SelectData(SQL: TALFBXClientSelectDataSQL;
+                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                                  ExtData: Pointer;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0] := SQL;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings);
+end;
+
+{********************************************}
+procedure TALFBXClient.SelectData(SQL: String;
+                                  Skip: Integer;
+                                  First: Integer;
+                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                                  ExtData: Pointer;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := Skip;
+  aSelectDataSQLs[0].First := First;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings);
+end;
+
+{********************************************}
+procedure TALFBXClient.SelectData(SQL: String;
+                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                                  ExtData: Pointer;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := -1;
+  aSelectDataSQLs[0].First := -1;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings);
+end;
+
+{*****************************************************************}
+procedure TALFBXClient.SelectData(SQLs: TALFBXClientSelectDataSQLs;
+                                  XMLDATA: TalXMLNode;
+                                  FormatSettings: TformatSettings);
+begin
+
+  SelectData(SQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
+
+end;
+
+{***************************************************************}
+procedure TALFBXClient.SelectData(SQL: TALFBXClientSelectDataSQL;
+                                  XMLDATA: TalXMLNode;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0] := SQL;
+  SelectData(aSelectDataSQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
+end;
+
+{********************************************}
+procedure TALFBXClient.SelectData(SQL: String;
+                                  RowTag: String;
+                                  Skip: Integer;
+                                  First: Integer;
+                                  XMLDATA: TalXMLNode;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
+  aSelectDataSQLs[0].RowTag := RowTag;
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := Skip;
+  aSelectDataSQLs[0].First := First;
+  SelectData(aSelectDataSQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
+end;
+
+{********************************************}
+procedure TALFBXClient.SelectData(SQL: String;
+                                  RowTag: String;
+                                  XMLDATA: TalXMLNode;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
+  aSelectDataSQLs[0].RowTag := RowTag;
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := -1;
+  aSelectDataSQLs[0].First := -1;
+  SelectData(aSelectDataSQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
+end;
+
+{********************************************}
+procedure TALFBXClient.SelectData(SQL: String;
+                                  XMLDATA: TalXMLNode;
+                                  FormatSettings: TformatSettings);
+var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
+  aSelectDataSQLs[0].RowTag := '';
+  aSelectDataSQLs[0].viewTag := '';
+  aSelectDataSQLs[0].skip := -1;
+  aSelectDataSQLs[0].First := -1;
+  SelectData(aSelectDataSQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
+end;
+
+{******************************************************************}
+procedure TALFBXClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs);
+Var aSqlpa: TALFBXSQLParams;
+    aBlobhandle: IscBlobHandle;
+    aSqlsParamsIndex: integer;
+    aSqlsParamsFieldsIndex: integer;
+    aSQLsindex: integer;
+    aStartDate: int64;
+    aDropStmt: Boolean;
+begin
+
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
+  //Error if we are not connected
+  If not connected then raise Exception.Create('Not connected');
+
+  {loop on all the SQL}
+  For aSQLsindex := 0 to length(SQLs) - 1 do begin
+
+    //if the SQL is not empty
+    if trim(SQLs[aSQLsindex].SQL) <> '' then begin
+
+      //init aStartDate
+      aStartDate := ALGetTickCount64;
+
+      //special case if their is params
+      if length(SQLs[aSQLsindex].Params) > 0 then begin
+
+        //create the aSqlpa object
+        aSqlpa := TALFBXSQLParams.Create(fCharSet);
+        try
+
+          //loop throught all Params
+          for aSqlsParamsIndex := low(SQLs[aSQLsindex].Params) to high(SQLs[aSQLsindex].Params) do begin
+
+            //loop throught all Params Fields
+            for aSqlsParamsFieldsIndex := low(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) to high(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) do begin
+
+              //with current Params Fields
+              with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+
+                //init the aSqlpa fields definition
+                if aSqlsParamsIndex = low(SQLs[aSQLsindex].Params) then begin
+                  if IsBlob then aSqlpa.AddFieldType('', uftBlob)
+                  else aSqlpa.AddFieldType('', uftVarchar);
+                end;
+
+                //isnull
+                if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
+
+                //IsBlob
+                else if IsBlob then begin
+                  aBlobhandle := nil;
+                  aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
+                  Try
+                    FLibrary.BlobWriteString(aBlobHandle,Value);
+                  Finally
+                    FLibrary.BlobClose(aBlobHandle);
+                  End;
+                end
+
+                //all the other
+                else aSqlpa.AsString[aSqlsParamsFieldsIndex] := Value;
+
+              end;
+
+            end;
+
+            //prepare if neccessary
+            if (not assigned(fSqlda)) or
+               (not assigned(fStmtHandle)) or
+               (SQLs[aSQLsindex].SQL <> fStmtSQL) then begin
+              Prepare(SQLs[aSQLsindex].SQL);
+              aDropStmt := True;
+            end
+            else aDropStmt := False;
+
+            //execute the SQL
+            //do this WITHOUT any TRY..FINALLY because to execute Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_close);
+            //the cursor MUST BE OPEN and to be open it's must be done via DSQLExecute, so if DSQLExecute crash
+            //we can thing that the cursor will be not open
+            FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, aSqlpa);
+
+            //free the statement
+            if aDropStmt then begin
+              Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_drop);
+              fSqlda.free;
+              fStmtHandle := nil;
+              fSqlda := nil;
+              fStmtSQL := '';
+            end
+
+            //else simply close the cursor
+            else Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_close);
+
           end;
 
         finally
@@ -1341,6 +1744,15 @@ begin
 
   end;
 
+end;
+
+{****************************************************************}
+procedure TALFBXClient.UpdateData(SQL: TALFBXClientUpdateDataSQL);
+var aUpdateDataSQLs: TALFBXClientUpdateDataSQLs;
+begin
+  setlength(aUpdateDataSQLs,1);
+  aUpdateDataSQLs[0] := SQL;
+  UpdateData(aUpdateDataSQLs);
 end;
 
 {************************************************}
@@ -1426,7 +1838,7 @@ end;
 {*********************************************************}
 procedure TALFBXConnectionPoolClient.doSQLDone(SQL: String;
                                                XmlData: TalXmlNode;
-                                               StartDate, EndDate: Int64;
+                                               StartTickCount, EndTickCount: Int64;
                                                DBHandle: IscDbHandle;
                                                TraHandle: IscTrHandle);
 begin
@@ -1629,7 +2041,7 @@ Begin
   Try
 
     //raise an exception if currently realeasing all connection
-    if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connection!');
+    if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connection');
 
     //delete the old unused connection
     aTickCount := ALGetTickCount64;
@@ -1940,11 +2352,8 @@ begin
       {loop on all the SQL}
       For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-        //trim the SQL
-        SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
         //if the SQL is not empty
-        if SQLs[aSQLsindex].SQL <> '' then begin
+        if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
           //init aStartDate
           aStartDate := ALGetTickCount64;
@@ -1994,17 +2403,19 @@ begin
                     aValueRec := aNewRec.AddChild(ALlowercase(asqlda.AliasName[aColumnIndex]));
                     if (aSQLDA.SQLType[aColumnIndex] = SQL_BLOB) then avalueRec.ChildNodes.Add(
                                                                                                avalueRec.OwnerDocument.CreateNode(
-                                                                                                                                  GetFieldValue(
-                                                                                                                                                asqlda,
+                                                                                                                                  GetFieldValue(asqlda,
                                                                                                                                                 aTmpDBHandle,
                                                                                                                                                 aTmpTRAHandle,
                                                                                                                                                 aColumnIndex,
-                                                                                                                                                FormatSettings
-                                                                                                                                               ),
+                                                                                                                                                FormatSettings),
                                                                                                                                   ntCData
                                                                                                                                  )
                                                                                                )
-                    else aValueRec.Text := GetFieldValue(asqlda, aTmpDBHandle, aTmpTRAHandle, aColumnIndex, FormatSettings);
+                    else aValueRec.Text := GetFieldValue(asqlda,
+                                                         aTmpDBHandle,
+                                                         aTmpTRAHandle,
+                                                         aColumnIndex,
+                                                         FormatSettings);
                     if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
                   end;
 
@@ -2090,6 +2501,7 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
@@ -2116,6 +2528,7 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := -1;
@@ -2164,6 +2577,7 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
@@ -2190,6 +2604,7 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := -1;
@@ -2215,6 +2630,7 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
+  setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := -1;
@@ -2264,11 +2680,8 @@ begin
     {loop on all the SQL}
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //trim the SQL
-      SQLs[aSQLsindex].SQL := trim(SQLs[aSQLsindex].SQL);
-
       //if the SQL is not empty
-      if SQLs[aSQLsindex].SQL <> '' then begin
+      if trim(SQLs[aSQLsindex].SQL) <> '' then begin
 
         //init aStartDate
         aStartDate := ALGetTickCount64;

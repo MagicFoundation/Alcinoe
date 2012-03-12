@@ -87,7 +87,7 @@ Type
     property SQLState: string read FSQLState;
   end;
 
-  {------------------------------------}
+  {----------------------------------}
   TalMySqlClientSelectDataSQL = record
     SQL: String;
     RowTag: String;
@@ -97,14 +97,14 @@ Type
   end;
   TalMySqlClientSelectDataSQLs = array of TalMySqlClientSelectDataSQL;
 
-  {------------------------------------}
+  {----------------------------------}
   TalMySqlClientUpdateDataSQL = record
     SQL: String;
     Blobs: array of Tstream;
   end;
   TalMySqlClientUpdateDataSQLs = array of TalMySqlClientUpdateDataSQL;
 
-  {-------------------------------}
+  {-----------------------------}
   TalMySqlClient = Class(Tobject)
   Private
     fLibrary: TALMySqlLibrary;
@@ -143,6 +143,10 @@ Type
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
                          FormatSettings: TformatSettings); overload;
+    Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
+                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings); overload;
     Procedure SelectData(SQL: String;
                          Skip: integer;
                          First: Integer;
@@ -154,6 +158,9 @@ Type
                          ExtData: Pointer;
                          FormatSettings: TformatSettings); overload;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
+                         XMLDATA: TalXMLNode;
+                         FormatSettings: TformatSettings); overload;
+    Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings); overload;
     Procedure SelectData(SQL: String;
@@ -170,6 +177,7 @@ Type
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings); overload;
     procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs); overload;
+    procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL); overload;
     procedure UpdateData(SQLs: Tstrings); overload;
     procedure UpdateData(SQL: String); overload;
     function  insert_id(SQL: String): ULongLong;
@@ -251,6 +259,12 @@ Type
                          ExtData: Pointer;
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
+                         XMLDATA: TalXMLNode;
+                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                         ExtData: Pointer;
+                         FormatSettings: TformatSettings;
+                         const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(SQL: String;
                          Skip: integer;
                          First: Integer;
@@ -264,6 +278,10 @@ Type
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
+                         XMLDATA: TalXMLNode;
+                         FormatSettings: TformatSettings;
+                         const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
@@ -285,6 +303,8 @@ Type
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL;
+                         const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQLs: Tstrings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQL: String;
@@ -296,7 +316,7 @@ Type
     property  DataBaseName: String read FDataBaseName;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
-    property  Lib: TALMySqlLibrary read FLibrary;    
+    property  Lib: TALMySqlLibrary read FLibrary;
   end;
 
 Function AlMySqlClientSlashedStr(Const Str: String): String;
@@ -585,124 +605,135 @@ begin
     {loop on all the SQL}
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //if the SQL is not empty
-      if trim(SQLs[aSQLsindex].SQL) <> '' then begin
+      //prepare the query
+      CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
+      aMySqlRes := fLibrary.mysql_use_result(fMySQL);
+      CheckAPIError(aMySqlRes = nil);
+      Try
 
-        //prepare the query
-        CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
-        aMySqlRes := fLibrary.mysql_use_result(fMySQL);
-        CheckAPIError(aMySqlRes = nil);
-        Try
+        //Returns the number of columns in a result set.
+        aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
 
-          //Returns the number of columns in a result set.
-          aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
+        //init the aMySqlFields array
+        //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
+        //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+        setlength(aMySqlFields,aColumnCount);
+        for aColumnIndex := 0 to aColumnCount - 1 do
+          aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
 
-          //init the aMySqlFields array
-          //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
-          //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
-          setlength(aMySqlFields,aColumnCount);
-          for aColumnIndex := 0 to aColumnCount - 1 do
-            aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
+        //init the aViewRec
+        if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
+        else aViewRec := XMLdata;
 
-          //init the aViewRec
-          if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
-          else aViewRec := XMLdata;
+        //init aUpdateRowTagByFieldValue
+        if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+          delete(SQLs[aSQLsindex].RowTag, 1, 2);
+          aUpdateRowTagByFieldValue := True;
+        end
+        else aUpdateRowTagByFieldValue := False;
 
-          //init aUpdateRowTagByFieldValue
-          if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
-            delete(SQLs[aSQLsindex].RowTag, 1, 2);
-            aUpdateRowTagByFieldValue := True;
+        //loop throught all row
+        aRecIndex := 0;
+        aRecAdded := 0;
+        while True do begin
+
+          //retrieve the next row. return A MYSQL_ROW structure for the next row.
+          //NULL if there are no more rows to retrieve or if an error occurred.
+          aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+
+          //break if no more row
+          if aMySqlRow = nil then begin
+            CheckAPIerror(Flibrary.mysql_errno(fMySQL) <> 0);
+            break;
           end
-          else aUpdateRowTagByFieldValue := False;
 
-          //loop throught all row
-          aRecIndex := 0;
-          aRecAdded := 0;
-          while True do begin
+          //download the row
+          else begin
 
-            //retrieve the next row. return A MYSQL_ROW structure for the next row.
-            //NULL if there are no more rows to retrieve or if an error occurred.
-            aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+            //process if > Skip
+            inc(aRecIndex);
+            If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-            //break if no more row
-            if aMySqlRow = nil then begin
-              CheckAPIerror(Flibrary.mysql_errno(fMySQL) <> 0);
-              break;
-            end
+              //stop if no row are requested
+              If (SQLs[aSQLsindex].First = 0) then break;
 
-            //download the row
-            else begin
+              //init NewRec
+              if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
+              Else aNewRec := aViewRec;
 
-              //process if > Skip
-              inc(aRecIndex);
-              If aRecIndex > SQLs[aSQLsindex].Skip then begin
+              //init aMySqlFieldLengths
+              aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
+              CheckAPIerror(aMySqlFieldLengths = nil);
 
-                //stop if no row are requested
-                If (SQLs[aSQLsindex].First = 0) then break;
-
-                //init NewRec
-                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
-                Else aNewRec := aViewRec;
-
-                //init aMySqlFieldLengths
-                aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
-                CheckAPIerror(aMySqlFieldLengths = nil);
-
-                //loop throught all column
-                For aColumnIndex := 0 to aColumnCount - 1 do begin
-                  aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
-                  if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
-                                                           FIELD_TYPE_MEDIUM_BLOB,
-                                                           FIELD_TYPE_LONG_BLOB,
-                                                           FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
-                                                                                                           avalueRec.OwnerDocument.CreateNode(
-                                                                                                                                              GetFieldValue(aMySqlRow[aColumnIndex],
-                                                                                                                                                            aMySqlFields[aColumnIndex]._type,
-                                                                                                                                                            aMySqlFieldLengths[aColumnIndex],
-                                                                                                                                                            FormatSettings),
-                                                                                                                                              ntCData
-                                                                                                                                             )
-                                                                                                           )
-                  else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
-                                                       aMySqlFields[aColumnIndex]._type,
-                                                       aMySqlFieldLengths[aColumnIndex],
-                                                       FormatSettings);
-                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
-                end;
-
-                //handle OnNewRowFunct
-                if assigned(OnNewRowFunct) then begin
-                  aContinue := True;
-                  OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
-                  if Not aContinue then Break;
-                end;
-
-                //free the node if aXmlDocument
-                if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
-
-                //handle the First
-                inc(aRecAdded);
-                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
-
+              //loop throught all column
+              For aColumnIndex := 0 to aColumnCount - 1 do begin
+                aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
+                if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
+                                                         FIELD_TYPE_MEDIUM_BLOB,
+                                                         FIELD_TYPE_LONG_BLOB,
+                                                         FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
+                                                                                                         avalueRec.OwnerDocument.CreateNode(
+                                                                                                                                            GetFieldValue(aMySqlRow[aColumnIndex],
+                                                                                                                                                          aMySqlFields[aColumnIndex]._type,
+                                                                                                                                                          aMySqlFieldLengths[aColumnIndex],
+                                                                                                                                                          FormatSettings),
+                                                                                                                                            ntCData
+                                                                                                                                           )
+                                                                                                         )
+                else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
+                                                     aMySqlFields[aColumnIndex]._type,
+                                                     aMySqlFieldLengths[aColumnIndex],
+                                                     FormatSettings);
+                if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
               end;
+
+              //handle OnNewRowFunct
+              if assigned(OnNewRowFunct) then begin
+                aContinue := True;
+                OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
+                if Not aContinue then Break;
+              end;
+
+              //free the node if aXmlDocument
+              if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+              //handle the First
+              inc(aRecAdded);
+              If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
 
             end;
 
           end;
 
-        Finally
-          //Frees the memory allocated to aMySqlRes
-          fLibrary.mysql_free_result(aMySqlRes);
-        End;
+        end;
 
+      Finally
+        //Frees the memory allocated to aMySqlRes
+        fLibrary.mysql_free_result(aMySqlRes);
       End;
 
-    end;
+    End;
 
   Finally
     if assigned(aXmlDocument) then aXmlDocument.free;
   End;
 
+end;
+
+{*******************************************************************}
+procedure TalMySqlClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
+                                    OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                                    ExtData: Pointer;
+                                    FormatSettings: TformatSettings);
+var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0] := Sql;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings);
 end;
 
 {**********************************************}
@@ -759,6 +790,21 @@ begin
              nil,
              FormatSettings);
 
+end;
+
+{*******************************************************************}
+procedure TalMySqlClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
+                                    XMLDATA: TalXMLNode;
+                                    FormatSettings: TformatSettings);
+var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0] := Sql;
+  SelectData(aSelectDataSQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings);
 end;
 
 {**********************************************}
@@ -836,16 +882,20 @@ begin
   //loop on all the SQL
   For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-    //if the SQL is not empty
-    if trim(SQLs[aSQLsindex].SQL) <> '' then begin
-
-      //do the query
-      CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
-
-    end;
+    //do the query
+    CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
 
   end;
 
+end;
+
+{********************************************************************}
+procedure TalMySqlClient.UpdateData(SQL: TalMySqlClientUpdateDataSQL);
+Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
+begin
+  setlength(aUpdateDataSQLs,1);
+  aUpdateDataSQLs[0] := SQL;
+  UpdateData(aUpdateDataSQLs);
 end;
 
 {**************************************************}
@@ -1355,115 +1405,110 @@ begin
       //loop on all the SQL
       For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-        //if the SQL is not empty
-        if trim(SQLs[aSQLsindex].SQL) <> '' then begin
+        //prepare the query
+        CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
+        aMySqlRes := fLibrary.mysql_use_result(aTmpConnectionHandle);
+        CheckAPIError(aTmpConnectionHandle, aTmpConnectionHandle = nil);
+        Try
 
-          //prepare the query
-          CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
-          aMySqlRes := fLibrary.mysql_use_result(aTmpConnectionHandle);
-          CheckAPIError(aTmpConnectionHandle, aTmpConnectionHandle = nil);
-          Try
+          //Returns the number of columns in a result set.
+          aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
 
-            //Returns the number of columns in a result set.
-            aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
+          //init the aMySqlFields array
+          aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
 
-            //init the aMySqlFields array
-            aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+          //init the aViewRec
+          if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
+          else aViewRec := XMLdata;
 
-            //init the aViewRec
-            if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
-            else aViewRec := XMLdata;
+          //init aUpdateRowTagByFieldValue
+          if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
+            delete(SQLs[aSQLsindex].RowTag, 1, 2);
+            aUpdateRowTagByFieldValue := True;
+          end
+          else aUpdateRowTagByFieldValue := False;
 
-            //init aUpdateRowTagByFieldValue
-            if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
-              delete(SQLs[aSQLsindex].RowTag, 1, 2);
-              aUpdateRowTagByFieldValue := True;
+          //loop throught all row
+          aRecIndex := 0;
+          aRecAdded := 0;
+          while True do begin
+
+            //retrieve the next row. return A MYSQL_ROW structure for the next row.
+            //NULL if there are no more rows to retrieve or if an error occurred.
+            aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+
+            //break if no more row
+            if aMySqlRow = nil then begin
+              CheckAPIerror(aTmpConnectionHandle, Flibrary.mysql_errno(aTmpConnectionHandle) <> 0);
+              break;
             end
-            else aUpdateRowTagByFieldValue := False;
 
-            //loop throught all row
-            aRecIndex := 0;
-            aRecAdded := 0;
-            while True do begin
+            //download the row
+            else begin
 
-              //retrieve the next row. return A MYSQL_ROW structure for the next row.
-              //NULL if there are no more rows to retrieve or if an error occurred.
-              aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+              //process if > Skip
+              inc(aRecIndex);
+              If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-              //break if no more row
-              if aMySqlRow = nil then begin
-                CheckAPIerror(aTmpConnectionHandle, Flibrary.mysql_errno(aTmpConnectionHandle) <> 0);
-                break;
-              end
+                //stop if no row are requested
+                If (SQLs[aSQLsindex].First = 0) then break;
 
-              //download the row
-              else begin
+                //init NewRec
+                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument))  then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
+                Else aNewRec := aViewRec;
 
-                //process if > Skip
-                inc(aRecIndex);
-                If aRecIndex > SQLs[aSQLsindex].Skip then begin
+                //init aMySqlFieldLengths
+                aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
+                CheckAPIerror(aTmpConnectionHandle, aMySqlFieldLengths = nil);
 
-                  //stop if no row are requested
-                  If (SQLs[aSQLsindex].First = 0) then break;
-
-                  //init NewRec
-                  if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument))  then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
-                  Else aNewRec := aViewRec;
-
-                  //init aMySqlFieldLengths
-                  aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
-                  CheckAPIerror(aTmpConnectionHandle, aMySqlFieldLengths = nil);
-
-                  //loop throught all column
-                  For aColumnIndex := 0 to aColumnCount - 1 do begin
-                    aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
-                    if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
-                                                             FIELD_TYPE_MEDIUM_BLOB,
-                                                             FIELD_TYPE_LONG_BLOB,
-                                                             FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
-                                                                                                             avalueRec.OwnerDocument.CreateNode(
-                                                                                                                                                GetFieldValue(aMySqlRow[aColumnIndex],
-                                                                                                                                                              aMySqlFields[aColumnIndex]._type,
-                                                                                                                                                              aMySqlFieldLengths[aColumnIndex],
-                                                                                                                                                              FormatSettings),
-                                                                                                                                                ntCData
-                                                                                                                                               )
-                                                                                                             )
-                    else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
-                                                         aMySqlFields[aColumnIndex]._type,
-                                                         aMySqlFieldLengths[aColumnIndex],
-                                                         FormatSettings);
-                    if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
-                  end;
-
-                  //handle OnNewRowFunct
-                  if assigned(OnNewRowFunct) then begin
-                    aContinue := True;
-                    OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
-                    if Not aContinue then Break;
-                  end;
-
-                  //free the node if aXmlDocument
-                  if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
-
-                  //handle the First
-                  inc(aRecAdded);
-                  If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
-
+                //loop throught all column
+                For aColumnIndex := 0 to aColumnCount - 1 do begin
+                  aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
+                  if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
+                                                           FIELD_TYPE_MEDIUM_BLOB,
+                                                           FIELD_TYPE_LONG_BLOB,
+                                                           FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
+                                                                                                           avalueRec.OwnerDocument.CreateNode(
+                                                                                                                                              GetFieldValue(aMySqlRow[aColumnIndex],
+                                                                                                                                                            aMySqlFields[aColumnIndex]._type,
+                                                                                                                                                            aMySqlFieldLengths[aColumnIndex],
+                                                                                                                                                            FormatSettings),
+                                                                                                                                              ntCData
+                                                                                                                                             )
+                                                                                                           )
+                  else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
+                                                       aMySqlFields[aColumnIndex]._type,
+                                                       aMySqlFieldLengths[aColumnIndex],
+                                                       FormatSettings);
+                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
                 end;
+
+                //handle OnNewRowFunct
+                if assigned(OnNewRowFunct) then begin
+                  aContinue := True;
+                  OnNewRowFunct(aNewRec, SQLs[aSQLsindex].ViewTag, ExtData, aContinue);
+                  if Not aContinue then Break;
+                end;
+
+                //free the node if aXmlDocument
+                if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+                //handle the First
+                inc(aRecAdded);
+                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
 
               end;
 
             end;
 
-          Finally
-            //Frees the memory allocated to aMySqlRes
-            fLibrary.mysql_free_result(aMySqlRes);
-          End;
+          end;
 
+        Finally
+          //Frees the memory allocated to aMySqlRes
+          fLibrary.mysql_free_result(aMySqlRes);
         End;
 
-      end;
+      End;
 
       //commit the transaction and release the connection if owned
       if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
@@ -1484,6 +1529,24 @@ begin
     if assigned(aXmlDocument) then aXmlDocument.free;
   End;
 
+end;
+
+{*********************************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
+                                                  OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                                                  ExtData: Pointer;
+                                                  FormatSettings: TformatSettings;
+                                                  const ConnectionHandle: PMySql = nil);
+var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0] := Sql;
+  SelectData(aSelectDataSQLs,
+             nil,
+             OnNewRowFunct,
+             ExtData,
+             FormatSettings,
+             ConnectionHandle);
 end;
 
 {************************************************************}
@@ -1546,6 +1609,23 @@ begin
              FormatSettings,
              ConnectionHandle);
 
+end;
+
+{*********************************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
+                                                  XMLDATA: TalXMLNode;
+                                                  FormatSettings: TformatSettings;
+                                                  const ConnectionHandle: PMySql = nil);
+var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
+begin
+  setlength(aSelectDataSQLs,1);
+  aSelectDataSQLs[0] := Sql;
+  SelectData(aSelectDataSQLs,
+             XMLDATA,
+             nil,
+             nil,
+             FormatSettings,
+             ConnectionHandle);
 end;
 
 {************************************************************}
@@ -1635,13 +1715,8 @@ begin
     //loop on all the SQL
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
-      //if the SQL is not empty
-      if trim(SQLs[aSQLsindex].SQL) <> '' then begin
-
-        //do the query
-        CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
-
-      end;
+      //do the query
+      CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
 
     end;
 
@@ -1660,6 +1735,16 @@ begin
     end;
   end;
 
+end;
+
+{*********************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQL: TalMySqlClientUpdateDataSQL;
+                                                  const ConnectionHandle: PMySql = nil);
+Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
+begin
+  setlength(aUpdateDataSQLs,1);
+  aUpdateDataSQLs[0] := SQL;
+  UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
 {***************************************************************}

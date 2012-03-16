@@ -65,8 +65,6 @@ History :     27/10/2005: Rebuild of the unit
               04/04/2006: add TALIntegerKeyAVLBinaryTree
               01/08/2006: add FindAndAcquireNode, AcquireNode, FindAndReleaseNode, ReleaseNode,
                           CreateAndAcquireSessionNode to TALCardinalKeySessionAVLBinaryTree.
-              01/07/2008: add the procedure rebuild (when we add the value already ordered in the bintree,
-                          we have the worse performance ! rebuild can correct this problem)
 
 Link :
 
@@ -151,7 +149,6 @@ type
     function    Next(aNode: TALBaseAVLBinaryTreeNode): TALBaseAVLBinaryTreeNode; virtual; {Return the next node whose value is larger than aNode}
     function    Prev(aNode: TALBaseAVLBinaryTreeNode): TALBaseAVLBinaryTreeNode; virtual; {Return the largest node whose value is smaller than aNode}
     Function    NodeCount: integer; virtual;
-    Procedure   Rebuild;
   end;
 
 
@@ -627,11 +624,9 @@ end;
 {*******************************************}
 procedure TALBaseAVLBinaryTree.InternalClear;
 begin
-  InternalIterate(
-                  AlAVLBinaryTree_IterateDestroyNodeFunc,
+  InternalIterate(AlAVLBinaryTree_IterateDestroyNodeFunc,
                   True,
-                  nil
-                 );
+                  nil);
   FHead := nil;
   FNodeCount := 0;
 end;
@@ -1074,62 +1069,6 @@ end;
 function TALBaseAVLBinaryTree.Prev(aNode: TALBaseAVLBinaryTreeNode): TALBaseAVLBinaryTreeNode;
 begin
   Result := InternalPrev(aNode);
-end;
-
-{*************************************}
-procedure TALBaseAVLBinaryTree.Rebuild;
-Var aObjectStack: TObjectStack;
-    aObjectList: TObjectList;
-    aNode: TALBaseAVLBinaryTreeNode;
-    i: integer;
-begin
-
-  {create the TobjectStack}
-  aObjectStack := TObjectStack.Create;
-  Try
-
-    {create the aObjectList}
-    aObjectList := TobjectList.Create(False);
-    Try
-
-      {push the head in the TobjectStack}
-      aObjectStack.Push(Head);
-
-      {start the loop}
-      While aObjectStack.Count > 0 do begin
-        aNode := TALBaseAVLBinaryTreeNode(aObjectStack.Pop);
-        If assigned(aNode) then begin
-          {add the Node to the List}
-          aObjectList.Add(aNode);
-          {continue the loop with the leftchild and rightChild}
-          aObjectStack.Push(aNode.ChildNodes[True]);
-          aObjectStack.Push(aNode.ChildNodes[False]);
-        end;
-      end;
-
-      {clear the BinTree}
-      FHead := nil;
-      FNodeCount := 0;
-
-      {add randomly the node in the bintree}
-      While aObjectList.Count > 0 do begin
-        i := Random(aObjectList.Count);
-        aNode := TALBaseAVLBinaryTreeNode(aObjectList[i]);
-        aObjectList.Delete(i);
-        aNode.ChildNodes[true] := nil;
-        aNode.ChildNodes[False] := nil;
-        aNode.Bal := 0;
-        addNode(aNode);
-      end;
-
-    Finally
-      aObjectList.Free;
-    End;
-
-  finally
-    aObjectStack.free;
-  end;
-
 end;
 
 {************************************************************}
@@ -1819,11 +1758,9 @@ begin
   Try
     aExtData.LowDateTime := Now - FExpireInterval;
 
-    InternalIterate(
-                    AlAVLBinaryTree_IterateDeleteExpiredNode,
+    InternalIterate(AlAVLBinaryTree_IterateDeleteExpiredNode,
                     True,
-                    @aExtData
-                   );
+                    @aExtData);
 
     for i := 0 to aExtData.lstExpiredNode.Count - 1 do
       InternalDeleteNode(@TALCardinalKeySessionAVLBinaryTreeNode(aExtData.lstExpiredNode[i]).ID);

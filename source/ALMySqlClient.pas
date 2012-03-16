@@ -100,7 +100,6 @@ Type
   {----------------------------------}
   TalMySqlClientUpdateDataSQL = record
     SQL: String;
-    Blobs: array of Tstream;
   end;
   TalMySqlClientUpdateDataSQLs = array of TalMySqlClientUpdateDataSQL;
 
@@ -180,6 +179,7 @@ Type
     procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL); overload;
     procedure UpdateData(SQLs: Tstrings); overload;
     procedure UpdateData(SQL: String); overload;
+    procedure UpdateData(SQLs: array of string); overload;
     function  insert_id(SQL: String): ULongLong;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
@@ -219,6 +219,9 @@ Type
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
                             aFormatSettings: TformatSettings): String;
+    Function  AcquireConnection(const readonly: boolean = False): PMySql; virtual;
+    Procedure ReleaseConnection(var ConnectionHandle: PMySql;
+                                const CloseConnection: Boolean = False); virtual;
     procedure initObject(aHost: String;
                          aPort: integer;
                          aDataBaseName,
@@ -245,14 +248,12 @@ Type
                        alib: TALMySqlLibrary;
                        Const aOpenConnectionClientFlag: Cardinal = 0); overload; virtual;
     Destructor  Destroy; Override;
-    Function  AcquireConnection(const readonly: boolean = False): PMySql; virtual;
-    Procedure ReleaseConnection(var ConnectionHandle: PMySql;
-                                const CloseConnection: Boolean = False); virtual;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     Procedure TransactionStart(Var ConnectionHandle: PMySql; const ReadOnly: boolean = False); virtual;
-    Procedure TransactionCommit(var ConnectionHandle: PMySql); virtual;
+    Procedure TransactionCommit(var ConnectionHandle: PMySql;
+                                const CloseConnection: Boolean = False); virtual;
     Procedure TransactionRollback(var ConnectionHandle: PMySql;
-                                  const doCloseConnection: Boolean = False); virtual;
+                                  const CloseConnection: Boolean = False); virtual;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
@@ -260,7 +261,6 @@ Type
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
-                         XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
                          FormatSettings: TformatSettings;
@@ -308,6 +308,8 @@ Type
     procedure UpdateData(SQLs: Tstrings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQL: String;
+                         const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQLs: Array of String;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Function  insert_id(SQL: String;
                         const ConnectionHandle: PMySql = nil): UlongLong; virtual;
@@ -461,7 +463,7 @@ procedure TalMySqlClient.connect(Host: String;
                                  CharSet: String;
                                  Const ClientFlag: Cardinal = 0);
 begin
-  if connected then raise Exception.Create('Already connected!');
+  if connected then raise Exception.Create('Already connected');
 
   // This function must be called early within each
   // created thread to initialize thread-specific variables
@@ -523,7 +525,7 @@ begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
-  if InTransaction then raise Exception.Create('Another transaction is active!');
+  if InTransaction then raise Exception.Create('Another transaction is active');
 
   //execute the query
   UpdateData('START TRANSACTION');
@@ -536,7 +538,7 @@ procedure TalMySqlClient.TransactionCommit;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to commit!');
+  if not InTransaction then raise Exception.Create('No active transaction to commit');
 
   //Execute the Query
   UpdateData('COMMIT');
@@ -549,7 +551,7 @@ procedure TalMySqlClient.TransactionRollback;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to rollback!');
+  if not InTransaction then raise Exception.Create('No active transaction to rollback');
 
   //Execute the Query
   Try
@@ -906,7 +908,6 @@ begin
   setlength(aUpdateDataSQLs,SQLs.Count);
   For aSQLsindex := 0 to SQLs.Count - 1 do begin
     aUpdateDataSQLs[aSQLsindex].SQL := SQLs[aSQLsindex];
-    setlength(aUpdateDataSQLs[aSQLsindex].Blobs,0);
   end;
   UpdateData(aUpdateDataSQLs);
 end;
@@ -917,7 +918,18 @@ Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  setlength(aUpdateDataSQLs[0].Blobs,0);
+  UpdateData(aUpdateDataSQLs);
+end;
+
+{*********************************************************}
+procedure TalMySqlClient.UpdateData(SQLs: array of string);
+Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
+    i: integer;
+begin
+  setlength(aUpdateDataSQLs,length(SQLs));
+  for I := 0 to length(SQLs) - 1 do begin
+    aUpdateDataSQLs[i].SQL := SQLs[i];
+  end;
   UpdateData(aUpdateDataSQLs);
 end;
 
@@ -1104,11 +1116,11 @@ Begin
     Try
 
       //raise an exception if currently realeasing all connection
-      if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connection!');
+      if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
       //delete the old unused connection
       aTickCount := ALGetTickCount64;
-      if aTickCount - fLastConnectionGarbage > (FConnectionMaxIdleTime div 100)  then begin
+      if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
         while FConnectionPool.Count > 0 do begin
           aConnectionPoolContainer := TalMySqlConnectionPoolContainer(FConnectionPool[0]);
           if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
@@ -1275,6 +1287,7 @@ begin
         End;
         FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
       end;
+      FLastConnectionGarbage := ALGetTickCount64;
     finally
       FConnectionPoolCS.Release;
     end;
@@ -1310,8 +1323,9 @@ begin
 
 end;
 
-{*************************************************************************************}
-procedure TalMySqlConnectionPoolClient.TransactionCommit(var ConnectionHandle: PMySql);
+{************************************************************************************}
+procedure TalMySqlConnectionPoolClient.TransactionCommit(var ConnectionHandle: PMySql;
+                                                         const CloseConnection: Boolean = False);
 begin
 
   //security check
@@ -1321,21 +1335,21 @@ begin
   UpdateData('COMMIT', ConnectionHandle);
 
   //release the connection
-  ReleaseConnection(ConnectionHandle);
+  ReleaseConnection(ConnectionHandle, CloseConnection);
 
 end;
 
 {**************************************************************************************}
 procedure TalMySqlConnectionPoolClient.TransactionRollback(var ConnectionHandle: PMySql;
-                                                           const doCloseConnection: Boolean = False);
-var aTmpdoCloseConnection: Boolean;
+                                                           const CloseConnection: Boolean = False);
+var aTmpCloseConnection: Boolean;
 begin
 
   //security check
   if not assigned(ConnectionHandle) then raise exception.Create('Connection handle can not be null');
 
   //rollback the connection
-  aTmpdoCloseConnection := doCloseConnection;
+  aTmpCloseConnection := CloseConnection;
   Try
     Try
       UpdateData('ROLLBACK', ConnectionHandle);
@@ -1345,12 +1359,12 @@ begin
       //raising the exception here will hide the first exception message
       //it's not a problem to hide the error here because closing the
       //connection will normally rollback the data
-      aTmpdoCloseConnection := True;
+      aTmpCloseConnection := True;
     End;
   Finally
 
     //release the connection
-    ReleaseConnection(ConnectionHandle, aTmpdoCloseConnection);
+    ReleaseConnection(ConnectionHandle, aTmpCloseConnection);
 
   End;
 
@@ -1756,7 +1770,6 @@ begin
   setlength(aUpdateDataSQLs,SQLs.Count);
   For aSQLsindex := 0 to SQLs.Count - 1 do begin
     aUpdateDataSQLs[aSQLsindex].SQL := SQLs[aSQLsindex];
-    setlength(aUpdateDataSQLs[aSQLsindex].Blobs,0);
   end;
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
@@ -1768,7 +1781,19 @@ Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  setlength(aUpdateDataSQLs[0].Blobs,0);
+  UpdateData(aUpdateDataSQLs, ConnectionHandle);
+end;
+
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: array of String;
+                                                  const ConnectionHandle: PMySql = nil);
+Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
+    i: integer;
+begin
+  setlength(aUpdateDataSQLs,length(SQLs));
+  for I := 0 to length(SQLs) - 1 do begin
+    aUpdateDataSQLs[i].SQL := SQLs[i];
+  end;
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 

@@ -102,7 +102,6 @@ Type
   {------------------------------------}
   TalSqlite3ClientUpdateDataSQL = record
     SQL: String;
-    Blobs: array of Tstream;
   end;
   TalSqlite3ClientUpdateDataSQLs = array of TalSqlite3ClientUpdateDataSQL;
 
@@ -179,6 +178,7 @@ Type
     procedure UpdateData(SQL: TalSqlite3ClientUpdateDataSQL); overload;
     procedure UpdateData(SQLs: Tstrings); overload;
     procedure UpdateData(SQL: String); overload;
+    procedure UpdateData(SQLs: array of String); overload;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
     Property  NullString: String Read fNullString Write fNullString;
@@ -216,6 +216,9 @@ Type
     procedure initObject(aDataBaseName: String;
                          const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
                          const aOpenConnectionPragmaStatements: String = ''); virtual;
+    Function  AcquireConnection(const readonly: boolean = False): PSQLite3; virtual;
+    Procedure ReleaseConnection(var ConnectionHandle: PSQLite3;
+                                const CloseConnection: Boolean = False); virtual;
   Public
     Constructor Create(aDataBaseName: String;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
@@ -232,14 +235,12 @@ Type
     procedure shutdown;   //can not be put in the create because config can/must be call after shutdown
     procedure enable_shared_cache(enable: boolean);
     function  soft_heap_limit64(n: int64): int64;
-    Function  AcquireConnection(const readonly: boolean = False): PSQLite3; virtual;
-    Procedure ReleaseConnection(var ConnectionHandle: PSQLite3;
-                                const CloseConnection: Boolean = False); virtual;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     Procedure TransactionStart(Var ConnectionHandle: PSQLite3; const ReadOnly: boolean = False); virtual;
-    Procedure TransactionCommit(var ConnectionHandle: PSQLite3); virtual;
+    Procedure TransactionCommit(var ConnectionHandle: PSQLite3;
+                                const CloseConnection: Boolean = False); virtual;
     Procedure TransactionRollback(var ConnectionHandle: PSQLite3;
-                                  const doCloseConnection: Boolean = False); virtual;
+                                  const CloseConnection: Boolean = False); virtual;
     Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
@@ -247,7 +248,6 @@ Type
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
-                         XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
                          FormatSettings: TformatSettings;
@@ -295,6 +295,8 @@ Type
     procedure UpdateData(SQLs: Tstrings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     procedure UpdateData(SQL: String;
+                         const ConnectionHandle: PSQLite3 = nil); overload; virtual;
+    procedure UpdateData(SQLs: array of String;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
@@ -510,7 +512,7 @@ This private database will be automatically deleted as soon as the database conn
 procedure TalSqlite3Client.connect(DatabaseName: String;
                                    const flags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE);
 begin
-  if connected then raise Exception.Create('Already connected!');
+  if connected then raise Exception.Create('Already connected');
   Try
     CheckAPIError(fLibrary.sqlite3_open_v2(PAnsiChar(DatabaseName), FSqlite3, flags, nil) <> SQLITE_OK);
   Except
@@ -552,7 +554,7 @@ begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
-  if InTransaction then raise Exception.Create('Another transaction is active!');
+  if InTransaction then raise Exception.Create('Another transaction is active');
 
   //execute the query
   UpdateData('BEGIN TRANSACTION');
@@ -565,7 +567,7 @@ procedure TalSqlite3Client.TransactionCommit;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to commit!');
+  if not InTransaction then raise Exception.Create('No active transaction to commit');
 
   //Execute the Query
   UpdateData('COMMIT TRANSACTION');
@@ -578,7 +580,7 @@ procedure TalSqlite3Client.TransactionRollback;
 begin
 
   //Error if we are not connected
-  if not InTransaction then raise Exception.Create('No active transaction to rollback!');
+  if not InTransaction then raise Exception.Create('No active transaction to rollback');
 
   //Execute the Query
   Try
@@ -925,7 +927,6 @@ begin
   setlength(aUpdateDataSQLs,SQLs.Count);
   For aSQLsindex := 0 to SQLs.Count - 1 do begin
     aUpdateDataSQLs[aSQLsindex].SQL := SQLs[aSQLsindex];
-    setlength(aUpdateDataSQLs[aSQLsindex].Blobs,0);
   end;
   UpdateData(aUpdateDataSQLs);
 end;
@@ -936,7 +937,18 @@ Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  setlength(aUpdateDataSQLs[0].Blobs,0);
+  UpdateData(aUpdateDataSQLs);
+end;
+
+{***********************************************************}
+procedure TalSqlite3Client.UpdateData(SQLs: array of String);
+Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
+    i: integer;
+begin
+  setlength(aUpdateDataSQLs,length(SQLs));
+  for I := 0 to length(SQLs) - 1 do begin
+    aUpdateDataSQLs[i].SQL := SQLs[i];
+  end;
   UpdateData(aUpdateDataSQLs);
 end;
 
@@ -1087,11 +1099,11 @@ Begin
   Try
 
     //raise an exception if currently realeasing all connection
-    if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connection!');
+    if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
 
     //delete the old unused connection
     aTickCount := ALGetTickCount64;
-    if aTickCount - fLastConnectionGarbage > (FConnectionMaxIdleTime div 100)  then begin
+    if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
       while FConnectionPool.Count > 0 do begin
         aConnectionPoolContainer := TalSqlite3ConnectionPoolContainer(FConnectionPool[0]);
         if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
@@ -1272,6 +1284,7 @@ begin
         End;
         FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
       end;
+      FLastConnectionGarbage := ALGetTickCount64;
     finally
       FConnectionPoolCS.Release;
     end;
@@ -1308,7 +1321,8 @@ begin
 end;
 
 {*****************************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.TransactionCommit(var ConnectionHandle: PSQLite3);
+procedure TalSqlite3ConnectionPoolClient.TransactionCommit(var ConnectionHandle: PSQLite3;
+                                                           const CloseConnection: Boolean = False);
 begin
 
   //security check
@@ -1318,21 +1332,21 @@ begin
   UpdateData('COMMIT TRANSACTION', ConnectionHandle);
 
   //release the connection
-  ReleaseConnection(ConnectionHandle);
+  ReleaseConnection(ConnectionHandle, CloseConnection);
 
 end;
 
 {******************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.TransactionRollback(var ConnectionHandle: PSQLite3;
-                                                             const doCloseConnection: Boolean = False);
-var aTmpdoCloseConnection: Boolean;
+                                                             const CloseConnection: Boolean = False);
+var aTmpCloseConnection: Boolean;
 begin
 
   //security check
   if not assigned(ConnectionHandle) then raise exception.Create('Connection handle can not be null');
 
   //rollback the connection
-  aTmpdoCloseConnection := doCloseConnection;
+  aTmpCloseConnection := CloseConnection;
   Try
     Try
       UpdateData('ROLLBACK TRANSACTION', ConnectionHandle);
@@ -1342,12 +1356,12 @@ begin
       //raising the exception here will hide the first exception message
       //it's not a problem to hide the error here because closing the
       //connection will normally rollback the data
-      aTmpdoCloseConnection := True;
+      aTmpCloseConnection := True;
     End;
   Finally
 
     //release the connection
-    ReleaseConnection(ConnectionHandle, aTmpdoCloseConnection);
+    ReleaseConnection(ConnectionHandle, aTmpCloseConnection);
 
   End;
 
@@ -1747,7 +1761,6 @@ begin
   setlength(aUpdateDataSQLs,SQLs.Count);
   For aSQLsindex := 0 to SQLs.Count - 1 do begin
     aUpdateDataSQLs[aSQLsindex].SQL := SQLs[aSQLsindex];
-    setlength(aUpdateDataSQLs[aSQLsindex].Blobs,0);
   end;
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
@@ -1759,9 +1772,22 @@ Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  setlength(aUpdateDataSQLs[0].Blobs,0);
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
+
+{************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: array of String;
+                                                    const ConnectionHandle: PSQLite3 = nil);
+Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
+    i: integer;
+begin
+  setlength(aUpdateDataSQLs,length(SQLs));
+  for I := 0 to length(SQLs) - 1 do begin
+    aUpdateDataSQLs[i].SQL := SQLs[i];
+  end;
+  UpdateData(aUpdateDataSQLs, ConnectionHandle);
+end;
+
 
 {***************************************************************}
 function TalSqlite3ConnectionPoolClient.ConnectionCount: Integer;

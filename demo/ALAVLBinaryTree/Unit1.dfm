@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 202
   Caption = 'Form1'
   ClientHeight = 258
-  ClientWidth = 493
+  ClientWidth = 557
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -18,46 +18,26 @@ object Form1: TForm1
   TextHeight = 13
   object ALButton1: TALButton
     Left = 16
-    Top = 16
-    Width = 225
+    Top = 17
+    Width = 265
     Height = 25
-    Caption = 'Benchmark TALStringList (10 000 items)'
+    Caption = 'Add 1.000.000 items in TALStringKeyAVLBinaryTree'
     TabOrder = 0
     OnClick = ALButton1Click
-    OnPaint = ALButtonPaint
-  end
-  object ALButton2: TALButton
-    Left = 247
-    Top = 16
-    Width = 226
-    Height = 25
-    Caption = 'Benchmark Delphi TStringList (10 000 items)'
-    TabOrder = 1
-    OnClick = ALButton2Click
     OnPaint = ALButtonPaint
   end
   object ALButton3: TALButton
     Left = 16
     Top = 48
-    Width = 225
+    Width = 265
     Height = 25
-    Caption = 'Benchmark TALAVLStringList (100 000 items)'
-    TabOrder = 2
+    Caption = 'Search 100.000 items in TALStringKeyAVLBinaryTree'
+    TabOrder = 1
     OnClick = ALButton3Click
     OnPaint = ALButtonPaint
   end
-  object ALButton4: TALButton
-    Left = 247
-    Top = 47
-    Width = 226
-    Height = 25
-    Caption = 'Benchmark Delphi TStringList (100 000 items)'
-    TabOrder = 3
-    OnClick = ALButton4Click
-    OnPaint = ALButtonPaint
-  end
   object Panel2: TPanel
-    Left = 72
+    Left = 120
     Top = 88
     Width = 344
     Height = 153
@@ -67,7 +47,7 @@ object Form1: TForm1
     Ctl3D = False
     ParentBackground = False
     ParentCtl3D = False
-    TabOrder = 4
+    TabOrder = 2
     object Label7: TLabel
       Left = 10
       Top = 14
@@ -123,5 +103,25 @@ object Form1: TForm1
         TabOrder = 0
       end
     end
+  end
+  object ALButton2: TALButton
+    Left = 294
+    Top = 17
+    Width = 250
+    Height = 25
+    Caption = 'Add 1.000.000 items in TStringList and Sort'
+    TabOrder = 3
+    OnClick = ALButton2Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton4: TALButton
+    Left = 294
+    Top = 48
+    Width = 250
+    Height = 25
+    Caption = 'Search 100.000 items in Sorted TStringList'
+    TabOrder = 4
+    OnClick = ALButton4Click
+    OnPaint = ALButtonPaint
   end
 end

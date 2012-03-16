@@ -8,7 +8,8 @@ uses
   ALComboBox, ALEdit, cxStyles, cxCustomData, cxGraphics, cxFilter, cxData,
   cxDataStorage, cxEdit, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxClasses, cxControls, cxGridCustomView, cxGrid, ComCtrls, AlSqlite3Client,
-  cxMemo, cxBlobEdit, alFbxClient, almysqlClient, OleCtrls, SHDocVw, ComObj;
+  cxMemo, cxBlobEdit, alFbxClient, almysqlClient, OleCtrls, SHDocVw, ComObj,
+  cxDropDownEdit;
 
 type
 
@@ -28,92 +29,8 @@ type
   TProcessMemoryCounters = PROCESS_MEMORY_COUNTERS;
 
   TForm1 = class(TForm)
-    ALButtonFirebirdSelect: TALButton;
-    Label3: TLabel;
-    ALEditMySqlHost: TALEdit;
-    Label6: TLabel;
-    ALEditMySqlLogin: TALEdit;
-    Label7: TLabel;
-    ALEditMySqlPassword: TALEdit;
-    ALEditMySqlPort: TALEdit;
-    Label8: TLabel;
-    ALEditMySqlCharset: TALEdit;
-    Label10: TLabel;
-    ALEditMysqlLib: TALEdit;
-    Label11: TLabel;
-    ALMemoMySqlQuery: TALMemo;
-    Label9: TLabel;
-    ALButtonMySQLSelect: TALButton;
     OpenDialog1: TOpenDialog;
-    Bevel2: TBevel;
-    Label12: TLabel;
-    ALEditMySqlDatabaseName: TALEdit;
-    Label2: TLabel;
-    ALEditFirebirdLogin: TALEdit;
-    Label4: TLabel;
-    ALEditFirebirdPassword: TALEdit;
-    ALEditFirebirdCharset: TALEdit;
-    Label15: TLabel;
-    ALEditFirebirdLib: TALEdit;
-    Label16: TLabel;
-    ALMemoFireBirdQuery: TALMemo;
-    Label17: TLabel;
-    Label18: TLabel;
-    ALEditFirebirdDatabase: TALEdit;
-    Label1: TLabel;
-    Label14: TLabel;
-    ALButtonFirebirdLoopSelect: TALButton;
-    ALButtonFirebirdUpdate: TALButton;
-    ALButtonFirebirdLoopUpdate: TALButton;
-    Label24: TLabel;
-    Label25: TLabel;
-    Bevel1: TBevel;
-    Label27: TLabel;
-    ALEditSqlite3Lib: TALEdit;
-    ALMemoSqlite3Query: TALMemo;
-    ALButtonSqlLite3Select: TALButton;
-    ALEditSqlite3Database: TALEdit;
-    Label19: TLabel;
-    ALButtonSqlite3LoopSelect: TALButton;
-    ALButtonSqlite3Update: TALButton;
-    ALButtonSqlite3LoopUpdate: TALButton;
-    ALEditSQLite3NBLoop: TALEdit;
-    Label20: TLabel;
-    RadioGroupSqlite3Journal_Mode: TRadioGroup;
-    RadioGroupSQLite3Temp_Store: TRadioGroup;
-    RadioGroupSqlite3Synhcronous: TRadioGroup;
-    ALEditSqlite3Cache_Size: TALEdit;
-    Label21: TLabel;
-    Label22: TLabel;
-    ALEditSqlite3Page_Size: TALEdit;
-    Label23: TLabel;
-    ALEditSQLite3NbLoopBeforeCommit: TALEdit;
-    Label28: TLabel;
-    ALEditSqlite3NBThread: TALEdit;
     StatusBar1: TStatusBar;
-    ALCheckBoxSqlite3SharedCache: TALCheckBox;
-    Panel1: TPanel;
-    Label13: TLabel;
-    Label26: TLabel;
-    ALEditFirebirdNBLoop: TALEdit;
-    ALEditFirebirdNbLoopBeforeCommit: TALEdit;
-    Label29: TLabel;
-    ALEditFirebirdNBThread: TALEdit;
-    Label30: TLabel;
-    ALEditFireBirdNum_buffers: TALEdit;
-    ALButtonFirebirdCreateDatabase: TALButton;
-    Label31: TLabel;
-    ALComboBoxFirebirdapiVer: TALComboBox;
-    Label32: TLabel;
-    Label33: TLabel;
-    Label34: TLabel;
-    ALEditMySqlNBLoop: TALEdit;
-    ALEditMySqlNbLoopBeforeCommit: TALEdit;
-    ALEditMySqlNBThread: TALEdit;
-    ALButtonMysqlUpdate: TALButton;
-    ALButtonMySqlLoopUpdate: TALButton;
-    ALButtonMysqlLoopSelect: TALButton;
-    ALCheckBoxSqlite3ReadUncommited: TALCheckBox;
     Panel3: TPanel;
     Panel5: TPanel;
     Panel6: TPanel;
@@ -136,11 +53,100 @@ type
     TableViewThreadUpdateAverageCommitTimeTaken: TcxGridColumn;
     TableViewThreadUpdateErrorMsg: TcxGridColumn;
     levelThreadUpdate: TcxGridLevel;
+    PageControl1: TPageControl;
+    MySQL: TTabSheet;
+    SQLLite3: TTabSheet;
+    Firebird: TTabSheet;
+    Label2: TLabel;
+    Label4: TLabel;
+    Label15: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    Label18: TLabel;
+    Label13: TLabel;
+    Label26: TLabel;
+    Label29: TLabel;
+    Label30: TLabel;
+    Label31: TLabel;
+    ALButtonFirebirdSelect: TALButton;
+    ALEditFirebirdLogin: TALEdit;
+    ALEditFirebirdPassword: TALEdit;
+    ALEditFirebirdCharset: TALEdit;
+    ALEditFirebirdLib: TALEdit;
+    ALMemoFireBirdQuery: TALMemo;
+    ALEditFirebirdDatabase: TALEdit;
+    ALButtonFirebirdLoopSelect: TALButton;
+    ALButtonFirebirdUpdate: TALButton;
+    ALButtonFirebirdLoopUpdate: TALButton;
+    ALEditFirebirdNBLoop: TALEdit;
+    ALEditFirebirdNbLoopBeforeCommit: TALEdit;
+    ALEditFirebirdNBThread: TALEdit;
+    ALEditFireBirdNum_buffers: TALEdit;
+    ALButtonFirebirdCreateDatabase: TALButton;
+    ALComboBoxFirebirdapiVer: TALComboBox;
+    Label3: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label9: TLabel;
+    Label12: TLabel;
+    Label32: TLabel;
+    Label33: TLabel;
+    Label34: TLabel;
+    ALEditMySqlHost: TALEdit;
+    ALEditMySqlLogin: TALEdit;
+    ALEditMySqlPassword: TALEdit;
+    ALEditMySqlPort: TALEdit;
+    ALEditMySqlCharset: TALEdit;
+    ALEditMysqlLib: TALEdit;
+    ALMemoMySqlQuery: TALMemo;
+    ALButtonMySQLSelect: TALButton;
+    ALEditMySqlDatabaseName: TALEdit;
+    ALEditMySqlNBLoop: TALEdit;
+    ALEditMySqlNbLoopBeforeCommit: TALEdit;
+    ALEditMySqlNBThread: TALEdit;
+    ALButtonMysqlUpdate: TALButton;
+    ALButtonMySqlLoopUpdate: TALButton;
+    ALButtonMysqlLoopSelect: TALButton;
+    Label24: TLabel;
+    Label25: TLabel;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
+    Label23: TLabel;
+    Label28: TLabel;
+    ALEditSqlite3Lib: TALEdit;
+    ALMemoSqlite3Query: TALMemo;
+    ALButtonSqlLite3Select: TALButton;
+    ALEditSqlite3Database: TALEdit;
+    ALButtonSqlite3LoopSelect: TALButton;
+    ALButtonSqlite3Update: TALButton;
+    ALButtonSqlite3LoopUpdate: TALButton;
+    ALEditSQLite3NBLoop: TALEdit;
+    RadioGroupSqlite3Journal_Mode: TRadioGroup;
+    RadioGroupSQLite3Temp_Store: TRadioGroup;
+    RadioGroupSqlite3Synhcronous: TRadioGroup;
+    ALEditSqlite3Cache_Size: TALEdit;
+    ALEditSqlite3Page_Size: TALEdit;
+    ALEditSQLite3NbLoopBeforeCommit: TALEdit;
+    ALEditSqlite3NBThread: TALEdit;
+    ALCheckBoxSqlite3SharedCache: TALCheckBox;
+    ALCheckBoxSqlite3ReadUncommited: TALCheckBox;
     Panel2: TPanel;
     Label5: TLabel;
     Label35: TLabel;
     Panel4: TPanel;
     PanelWebBrowser: TPanel;
+    ALMemoFireBirdParams: TALMemo;
+    Label1: TLabel;
+    Label14: TLabel;
+    TableViewThreadSelectAveragePrepareTimeTaken: TcxGridColumn;
+    TableViewThreadUpdateAveragePrepareTimeTaken: TcxGridColumn;
+    Label27: TLabel;
+    ALMemoFirebirdTPB: TALMemo;
     procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlSelectClick(Sender: TObject);
@@ -177,14 +183,17 @@ type
   TFirebirdBenchmarkThread = Class(Tthread)
   private
     fSQL: String;
+    fParams: String;
+    fTPB: String;
     fUpdateSQL: Boolean;
     fOn: Boolean;
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: String;
-    FTotalUpdateTimeTaken: int64;
+    FTotalPrepareTimeTaken: int64;
+    FTotalUpdateOrSelectTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
-    FtotalUpdate: integer;
+    FTotalUpdateOrSelect: integer;
     fOwner: TWinControl;
     fRank: integer;
     Procedure UpdateGUI;
@@ -196,6 +205,8 @@ type
                        AOwner: TwinControl;
                        aRank: integer;
                        aSQL: String;
+                       aParams: String;
+                       aTPB: String;
                        aMaxLoop: integer;
                        aNBLoopBeforeCommit: integer;
                        aUpdateSQL: Boolean);
@@ -211,9 +222,9 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: String;
-    FTotalUpdateTimeTaken: int64;
+    FTotalUpdateOrSelectTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
-    FtotalUpdate: integer;
+    FTotalUpdateOrSelect: integer;
     fOwner: TWinControl;
     fRank: integer;
     Procedure UpdateGUI;
@@ -240,9 +251,9 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: String;
-    FTotalUpdateTimeTaken: int64;
+    FTotalUpdateOrSelectTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
-    FtotalUpdate: integer;
+    FTotalUpdateOrSelect: integer;
     fOwner: TWinControl;
     fRank: integer;
     Procedure UpdateGUI;
@@ -271,6 +282,7 @@ implementation
 uses alFcnSkin,
      alWindows,
      ALFBXBase,
+     ALFBXLib,
      ALMySqlWrapper,
      alSqlite3Wrapper,
      AlXmlDoc,
@@ -304,19 +316,79 @@ begin
   end;
 end;
 
+{****************************************************************************************************************************}
+function SQLFastTagReplaceFunct(const TagString: string; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): string;
+Var aMin, aMax, aIndex: integer;
+    aLstSavedData: TstringList;
+begin
+
+  Handled := True;
+  if sametext(TagString,'randomchar') then begin
+    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+    if aIndex >= 0 then begin
+      aLstSavedData := TstringList(ExtData^);
+      result := aLstSavedData.Values['randomchar_'+inttostr(aIndex)];
+      if result = '' then begin
+        result := AlRandomStr(1);
+        aLstSavedData.Values['randomchar_'+inttostr(aIndex)] := result;
+      end;
+    end
+    else result := AlRandomStr(1);
+  end
+  else if sametext(TagString,'randomstring') then begin
+    if not trystrtoint(TagParams.Values['MinLength'], aMin) then aMin := 1;
+    if not trystrtoint(TagParams.Values['MaxLength'], aMax) then aMax := 255;
+    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+    if aIndex >= 0 then begin
+      aLstSavedData := TstringList(ExtData^);
+      result := aLstSavedData.Values['randomstring_'+inttostr(aIndex)];
+      if result = '' then begin
+        result := AlRandomStr(aMin + random(aMax - aMin + 1));
+        aLstSavedData.Values['randomstring_'+inttostr(aIndex)] := result;
+      end;
+    end
+    else result := AlRandomStr(aMin + random(aMax - aMin + 1));
+  end
+  else if sametext(TagString,'randomnumber') then begin
+    if not trystrtoint(TagParams.Values['Min'], aMin) then aMin := 1;
+    if not trystrtoint(TagParams.Values['Max'], aMax) then aMax := Maxint;
+    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+    if aIndex >= 0 then begin
+      aLstSavedData := TstringList(ExtData^);
+      result := aLstSavedData.Values['randomnumber_'+inttostr(aIndex)];
+      if result = '' then begin
+        result := inttostr(aMin + random(aMax - aMin + 1));
+        aLstSavedData.Values['randomnumber_'+inttostr(aIndex)] := result;
+      end;
+    end
+    else result := inttostr(aMin + random(aMax - aMin + 1));
+  end
+  else Handled := False;
+
+end;
+
 {************************************************************}
 procedure TForm1.ALButtonFirebirdSelectClick(Sender: TObject);
 Var aFBXClient: TALFbxClient;
     aXMLDATA: TalXmlDocument;
-    aXMLDATA2: TalXmlDocument;
-    aStartDate: int64;
-    aEndDate: int64;
+    aMainStartDate: int64;
+    aStartPrepareDate: int64;
+    aEndPrepareDate: int64;
+    aStartSelectDate: int64;
+    aEndSelectDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
     aFormatSettings: TformatSettings;
-    S1: String;
-    i: integer;
     aFBAPiVersion: TALFBXVersion_API;
+    aSQL: TALFBXClientSelectDataSQL;
+    aIOStats_1: TALFBXClientMonitoringIOStats;
+    aRecordStats_1: TALFBXClientMonitoringRecordStats;
+    aIOStats_2: TALFBXClientMonitoringIOStats;
+    aRecordStats_2: TALFBXClientMonitoringRecordStats;
+    aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
+    aLst1: TStringList;
+    i: integer;
+    aTPB: String;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -326,6 +398,20 @@ begin
     4: aFBAPiVersion := FB25;
     else aFBAPiVersion := FB102;
   end;
+
+  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_consistency', isc_tpb_consistency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_no_rec_version', isc_tpb_no_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_rec_version', isc_tpb_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_write', isc_tpb_write, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read', isc_tpb_read, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_nowait', isc_tpb_nowait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_wait', isc_tpb_wait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
+  aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
   GetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
@@ -340,7 +426,6 @@ begin
                          StrtoInt(ALEditFireBirdNum_buffers.Text));
 
       aXMLDATA := ALCreateEmptyXMLDocument('root');
-      aXMLDATA2 := ALCreateEmptyXMLDocument('root');
       Try
 
         With aXMLDATA Do Begin
@@ -348,66 +433,119 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        S1 := AlMemoFireBirdQuery.Lines.Text;
-        while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-        for i := 1 to 100 do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-        end;
-        for i := 101 to maxint do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-          else break;
+        aLst1 := TstringList.create;
+        try
+          aSQL.SQL := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+                                       '<#',
+                                       '>',
+                                       SQLFastTagReplaceFunct,
+                                       True,
+                                       @aLst1)
+        finally
+          aLst1.free;
         end;
 
-        aStartDate := ALGetTickCount64;
-        aFBXClient.TransactionStart(True);
+        if ALMemoFireBirdParams.Lines.Count > 0 then begin
+          Setlength(aSQL.Params, 1);
+          Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
+          for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
+            aLst1 := TstringList.create;
+            try
+              aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+                                                                 '<#',
+                                                                 '>',
+                                                                 SQLFastTagReplaceFunct,
+                                                                 True,
+                                                                 @aLst1)
+            finally
+              aLst1.free;
+            end;
+            aSQL.Params[0].fields[i].isnull := False;
+            aSQL.Params[0].fields[i].isblob := False;
+          end;
+        end
+        else Setlength(aSQL.Params, 0);
+        aSQL.RowTag := 'rec';
+        aSQL.ViewTag := '';
+        aSQL.Skip := 0;
+        aSQL.First := 200;
+
+        aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
+                                      -1,
+                                      '',
+                                      aIOStats_1,
+                                      aRecordStats_1,
+                                      aMemoryUsage,
+                                      False,
+                                      False,
+                                      True);
+        aMainStartDate := ALGetTickCount64;
+        aFBXClient.TransactionStart(aTPB);
         try
-          aFBXClient.SelectData(S1,
-                                'rec',
-                                 0,
-                                 200,
+
+          aStartPrepareDate := ALGetTickCount64;
+          aFBXClient.Prepare(aSQL.SQL);
+          aendPrepareDate := ALGetTickCount64;
+
+          aStartSelectDate := ALGetTickCount64;
+          aFBXClient.SelectData(aSQL,
                                 aXMLDATA.DocumentElement,
                                 aFormatSettings);
-          aEndDate := ALGetTickCount64;
-
-          aFBXClient.SelectData('SELECT '+
-                                  'MON$RECORD_IDX_READS as IDX_READS, '+
-                                  'MON$RECORD_SEQ_READS as SEQ_READS '+
-                                'FROM '+
-                                  'MON$RECORD_STATS '+
-                                'JOIN MON$TRANSACTIONS ON MON$TRANSACTIONS.MON$STAT_ID=MON$RECORD_STATS.MON$STAT_ID '+
-                                'WHERE '+
-                                  'MON$TRANSACTIONS.MON$TRANSACTION_ID=current_transaction',
-                                aXMLDATA2.DocumentElement,
-                                aFormatSettings);
-          AlMemoResult.Lines.Clear;
-          AlMemoResult.Lines.add('Indexed Read: ' + aXMLDATA2.DocumentElement.ChildNodes['idx_reads'].Text);
-          AlMemoResult.Lines.add('Non Indexed Read: ' + aXMLDATA2.DocumentElement.ChildNodes['seq_reads'].Text);
-          AlMemoResult.Lines.add('');
-          AlMemoResult.Lines.add('**************');
-          AlMemoResult.Lines.add('');
+          aendSelectDate := ALGetTickCount64;
 
           aStartCommitDate := ALGetTickCount64;
           aFBXClient.TransactionCommit;
           aendCommitDate := ALGetTickCount64;
+
         Except
           aFBXClient.TransactionRollBack;
           Raise;
         end;
+        ALMemoResult.Clear;
+        ALMemoResult.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aMainStartDate) + ' ms');
+        aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
+                                      -1,
+                                      '',
+                                      aIOStats_2,
+                                      aRecordStats_2,
+                                      aMemoryUsage);
+        ALMemoResult.Lines.Add('');
+        ALMemoResult.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+        ALMemoResult.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+        ALMemoResult.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+        ALMemoResult.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+        ALMemoResult.Lines.Add('');
+        ALMemoResult.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+        ALMemoResult.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+        ALMemoResult.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+        ALMemoResult.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+        ALMemoResult.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+        ALMemoResult.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+        ALMemoResult.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+        ALMemoResult.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+        ALMemoResult.Lines.Add('');
+        ALMemoResult.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
+        ALMemoResult.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
+        ALMemoResult.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
+        ALMemoResult.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+        AlMemoResult.Lines.add('');
+        AlMemoResult.Lines.add('**************');
+        AlMemoResult.Lines.add('');
+        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + aXMLDATA.XML.Text;
 
+
+        TableViewThreadUpdate.DataController.RecordCount := 0;
         TableViewThreadSelect.DataController.RecordCount := 1;
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectNumber.Index, '1 (off)');
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectRequestCount.Index,1);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndDate - aStartDate);
+        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAveragePrepareTimeTaken.Index,aEndPrepareDate - aStartPrepareDate);
+        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndSelectDate - aStartSelectDate);
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
-        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + aXMLDATA.XML.Text;
 
       Finally
         aXMLDATA.free;
-        aXMLDATA2.free;
       End;
 
     Finally
@@ -418,21 +556,32 @@ begin
   Finally
     Screen.Cursor := CrDefault;
   End;
+
 end;
 
 {************************************************************}
 procedure TForm1.ALButtonFirebirdUpdateClick(Sender: TObject);
-Var aFBXClient: TalFBXClient;
-    aXMLDATA2: TalXmlDocument;
-    aFormatSettings: TformatSettings;
-    aStartDate: int64;
-    aEndDate: int64;
+Var aFBXClient: TALFbxClient;
+    aMainStartDate: int64;
+    aStartPrepareDate: int64;
+    aEndPrepareDate: int64;
+    aStartUpdateDate: int64;
+    aEndUpdateDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    LstSql: TstringList;
-    S1: String;
-    i: integer;
+    aFormatSettings: TformatSettings;
     aFBAPiVersion: TALFBXVersion_API;
+    aSQL: TALFBXClientUpdateDataSQL;
+    aIOStats_1: TALFBXClientMonitoringIOStats;
+    aRecordStats_1: TALFBXClientMonitoringRecordStats;
+    aIOStats_2: TALFBXClientMonitoringIOStats;
+    aRecordStats_2: TALFBXClientMonitoringRecordStats;
+    aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
+    aLst1: TStringList;
+    aLstSql: Tstrings;
+    i: integer;
+    aTPB: String;
+    S1: string;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -443,13 +592,26 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
+  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_consistency', isc_tpb_consistency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_no_rec_version', isc_tpb_no_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_rec_version', isc_tpb_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_write', isc_tpb_write, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read', isc_tpb_read, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_nowait', isc_tpb_nowait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_wait', isc_tpb_wait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
+  aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
   GetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
     aFBXClient := TALFbxClient.Create(aFBAPiVersion,ALEditFirebirdLib.Text);
-    LstSql := TstringList.Create;
+    aLstSql := TstringList.create;
     Try
       aFBXClient.connect(ALEditFireBirdDatabase.Text,
                          ALEditFireBirdLogin.text,
@@ -457,84 +619,127 @@ begin
                          ALEditFireBirdCharset.Text,
                          StrtoInt(ALEditFireBirdNum_buffers.Text));
 
+      aLst1 := TstringList.create;
+      try
+        aSQL.SQL := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+                                     '<#',
+                                     '>',
+                                     SQLFastTagReplaceFunct,
+                                     True,
+                                     @aLst1)
+      finally
+        aLst1.free;
+      end;
 
-      aXMLDATA2 := ALCreateEmptyXMLDocument('root');
-      Try
+      if ALMemoFireBirdParams.Lines.Count > 0 then begin
+        Setlength(aSQL.Params, 1);
+        Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
+        for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
+          aLst1 := TstringList.create;
+          try
+            aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+                                                               '<#',
+                                                               '>',
+                                                               SQLFastTagReplaceFunct,
+                                                               True,
+                                                               @aLst1)
+          finally
+            aLst1.free;
+          end;
+          aSQL.Params[0].fields[i].isnull := False;
+          aSQL.Params[0].fields[i].isblob := False;
+        end;
+      end
+      else Setlength(aSQL.Params, 0);
 
-        S1 := AlMemoFireBirdQuery.Lines.Text;
-        while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-        for i := 1 to 100 do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-        end;
-        for i := 101 to maxint do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-          else break;
-        end;
-        if (AlPos('begin',AllowerCase(S1)) <= 0) or
-           (AlPos('end',AllowerCase(S1)) <= 0) then begin
-          S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
-          LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+      if ALMemoFireBirdParams.Lines.Count <= 0 then begin
+        if (AlPos('begin',AllowerCase(aSQL.SQL)) <= 0) or
+           (AlPos('end',AllowerCase(aSQL.SQL)) <= 0) then begin
+          S1 := AlStringReplace(aSQL.SQL,#13#10,' ',[RfReplaceALL]);
+          aLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
         end
-        else LstSql.Add(S1);
+        else aLstSql.Add(aSQL.SQL);
+      end;
 
-        aStartDate := ALGetTickCount64;
-        aFBXClient.TransactionStart(False);
-        try
-          aFBXClient.UpdateData(LstSql);
-          aEndDate := ALGetTickCount64;
+      aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
+                                    -1,
+                                    '',
+                                    aIOStats_1,
+                                    aRecordStats_1,
+                                    aMemoryUsage,
+                                    False,
+                                    False,
+                                    True);
+      aMainStartDate := ALGetTickCount64;
+      aFBXClient.TransactionStart(aTPB);
+      try
 
-          aFBXClient.SelectData('SELECT '+
-                                  'MON$RECORD_IDX_READS as IDX_READS, '+
-                                  'MON$RECORD_SEQ_READS as SEQ_READS, '+
-                                  'MON$RECORD_INSERTS as INSERTS, '+
-                                  'MON$RECORD_UPDATES as UPDATES, '+
-                                  'MON$RECORD_DELETES as DELETES '+
-                                'FROM '+
-                                  'MON$RECORD_STATS '+
-                                'JOIN MON$TRANSACTIONS ON MON$TRANSACTIONS.MON$STAT_ID=MON$RECORD_STATS.MON$STAT_ID '+
-                                'WHERE '+
-                                  'MON$TRANSACTIONS.MON$TRANSACTION_ID=current_transaction',
-                                aXMLDATA2.DocumentElement,
-                                aFormatSettings);
-          AlMemoResult.Lines.Clear;
-          AlMemoResult.Lines.add('Indexed Read: ' + aXMLDATA2.DocumentElement.ChildNodes['idx_reads'].Text);
-          AlMemoResult.Lines.add('Non Indexed Read: ' + aXMLDATA2.DocumentElement.ChildNodes['seq_reads'].Text);
-          AlMemoResult.Lines.add('Inserts: ' + aXMLDATA2.DocumentElement.ChildNodes['inserts'].Text);
-          AlMemoResult.Lines.add('Updates: ' + aXMLDATA2.DocumentElement.ChildNodes['updates'].Text);
-          AlMemoResult.Lines.add('Deletes: ' + aXMLDATA2.DocumentElement.ChildNodes['deletes'].Text);
+        aStartPrepareDate := ALGetTickCount64;
+        if aLstSql.Count = 1 then aFBXClient.Prepare(aLstSql[0])
+        else if aLstSql.Count <= 0 then aFBXClient.Prepare(aSQL.SQL);
+        aendPrepareDate := ALGetTickCount64;
 
-          aStartCommitDate := ALGetTickCount64;
-          aFBXClient.TransactionCommit;
-          aendCommitDate := ALGetTickCount64;
-        Except
-          aFBXClient.TransactionRollBack;
-          raise;
-        end;
+        aStartUpdateDate := ALGetTickCount64;
+        if aLstSql.Count > 0 then aFBXClient.UpdateData(aLstSql)
+        else aFBXClient.UpdateData(aSQL);
+        aendUpdateDate := ALGetTickCount64;
 
+        aStartCommitDate := ALGetTickCount64;
+        aFBXClient.TransactionCommit;
+        aendCommitDate := ALGetTickCount64;
 
-        TableViewThreadUpdate.DataController.RecordCount := 1;
-        TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
-        TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
-        TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndDate - aStartDate);
-        TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
-        TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      Except
+        aFBXClient.TransactionRollBack;
+        Raise;
+      end;
+      ALMemoResult.Clear;
+      ALMemoResult.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aMainStartDate) + ' ms');
+      aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
+                                    -1,
+                                    '',
+                                    aIOStats_2,
+                                    aRecordStats_2,
+                                    aMemoryUsage);
+      ALMemoResult.Lines.Add('');
+      ALMemoResult.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+      ALMemoResult.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+      ALMemoResult.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+      ALMemoResult.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+      ALMemoResult.Lines.Add('');
+      ALMemoResult.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+      ALMemoResult.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+      ALMemoResult.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+      ALMemoResult.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+      ALMemoResult.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+      ALMemoResult.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+      ALMemoResult.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+      ALMemoResult.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+      ALMemoResult.Lines.Add('');
+      ALMemoResult.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
+      ALMemoResult.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
+      ALMemoResult.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
+      ALMemoResult.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
 
-      Finally
-        aXMLDATA2.Free;
-      End;
+      TableViewThreadSelect.DataController.RecordCount := 0;
+      TableViewThreadUpdate.DataController.RecordCount := 1;
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAveragePrepareTimeTaken.Index,aEndPrepareDate - aStartPrepareDate);
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndUpdateDate - aStartUpdateDate);
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
 
     Finally
+      aLstSql.free;
       aFBXClient.disconnect;
       aFBXClient.free;
-      LstSql.free;
     End;
 
   Finally
     Screen.Cursor := CrDefault;
   End;
+
 end;
 
 {********************************************************************}
@@ -557,6 +762,9 @@ begin
   Finally
     aFBXClient.free;
   End;
+
+  AlMemoResult.Lines.Clear;  
+  
 end;
 
 {****************************************************************}
@@ -564,6 +772,7 @@ procedure TForm1.ALButtonFirebirdLoopSelectClick(Sender: TObject);
 Var aFirebirdBenchmarkThread: TFirebirdBenchmarkThread;
     i: integer;
     aFBAPiVersion: TALFBXVersion_API;
+    aTPB: String;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -573,6 +782,20 @@ begin
     4: aFBAPiVersion := FB25;
     else aFBAPiVersion := FB102;
   end;
+
+  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_consistency', isc_tpb_consistency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_no_rec_version', isc_tpb_no_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_rec_version', isc_tpb_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_write', isc_tpb_write, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read', isc_tpb_read, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_nowait', isc_tpb_nowait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_wait', isc_tpb_wait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
+  aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
   {init button action}
   If ALButtonFirebirdLoopSelect.tag = 0 then begin
@@ -587,6 +810,7 @@ begin
   else exit;
 
   //init local variable
+  TableViewThreadUpdate.DataController.RecordCount := 0;
   TableViewThreadSelect.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
 
   //create the fFirebirdConnectionPoolClient
@@ -610,6 +834,8 @@ begin
                                                                 self,
                                                                 i,
                                                                 trim(ALMemoFirebirdQuery.Lines.Text),
+                                                                trim(ALMemoFirebirdParams.Lines.Text),
+                                                                aTPB,
                                                                 strtoint(ALEditFirebirdNBLoop.Text),
                                                                 strtoint(ALEditFirebirdNbLoopBeforeCommit.Text),
                                                                 false);
@@ -627,6 +853,7 @@ procedure TForm1.ALButtonFirebirdLoopUpdateClick(Sender: TObject);
 Var aFirebirdBenchmarkThread: TFirebirdBenchmarkThread;
     i: integer;
     aFBAPiVersion: TALFBXVersion_API;
+    aTPB: String;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -636,6 +863,20 @@ begin
     4: aFBAPiVersion := FB25;
     else aFBAPiVersion := FB102;
   end;
+
+  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_consistency', isc_tpb_consistency, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_no_rec_version', isc_tpb_no_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_rec_version', isc_tpb_rec_version, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_write', isc_tpb_write, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_read', isc_tpb_read, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_nowait', isc_tpb_nowait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, 'isc_tpb_wait', isc_tpb_wait, [rfIgnoreCase]);
+  aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
+  aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
   {init button action}
   If ALButtonFirebirdLoopUpdate.tag = 0 then begin
@@ -650,6 +891,7 @@ begin
   else exit;
 
   //init local variable
+  TableViewThreadSelect.DataController.RecordCount := 0;
   TableViewThreadUpdate.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
 
   //create the fFirebirdConnectionPoolClient
@@ -673,6 +915,8 @@ begin
                                                                 self,
                                                                 i,
                                                                 trim(ALMemoFirebirdQuery.Lines.Text),
+                                                                trim(ALMemoFirebirdParams.Lines.Text),
+                                                                aTPB,
                                                                 strtoint(ALEditFirebirdNBLoop.Text),
                                                                 strtoint(ALEditFirebirdNbLoopBeforeCommit.Text),
                                                                 true);
@@ -693,7 +937,7 @@ Var aMySqlClient: TalMySqlClient;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
     S1: String;
-    i: integer;
+    aLst1: TstringList;
 begin
   GetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
@@ -717,16 +961,16 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        S1 := AlMemoMySqlQuery.Lines.Text;
-        while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-        for i := 1 to 100 do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-        end;
-        for i := 101 to maxint do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-          else break;
+        aLst1 := TstringList.create;
+        try
+          S1 := ALFastTagReplace(AlMemoMySqlQuery.Lines.Text,
+                                 '<#',
+                                 '>',
+                                 SQLFastTagReplaceFunct,
+                                 True,
+                                 @aLst1)
+        finally
+          aLst1.free;
         end;
 
         aStartDate := ALGetTickCount64;
@@ -738,11 +982,13 @@ begin
                                 aFormatSettings);
         aEndDate := ALGetTickCount64;
 
+        TableViewThreadUpdate.DataController.RecordCount := 0;
         TableViewThreadSelect.DataController.RecordCount := 1;
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectNumber.Index, '1 (off)');
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectRequestCount.Index,1);
+        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndDate - aStartDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,0);
+        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,0/0);
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
         AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
@@ -770,7 +1016,7 @@ Var aMySqlClient: TalMySqlClient;
     aEndCommitDate: int64;
     LstSql: TstringList;
     S1: String;
-    i: integer;
+    aLst1: TstringList;
 begin
   Screen.Cursor := CrHourGlass;
   try
@@ -786,16 +1032,16 @@ begin
                            ALEditMySqlCharset.Text,
                            0);
 
-      S1 := AlMemoMySqlQuery.Lines.Text;
-      while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-      while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-      while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-      for i := 1 to 100 do begin
-        if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-      end;
-      for i := 101 to maxint do begin
-        if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-        else break;
+      aLst1 := TstringList.create;
+      try
+        S1 := ALFastTagReplace(AlMemoMySqlQuery.Lines.Text,
+                               '<#',
+                               '>',
+                               SQLFastTagReplaceFunct,
+                               True,
+                               @aLst1)
+      finally
+        aLst1.free;
       end;
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
       LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
@@ -813,9 +1059,11 @@ begin
         raise;
       end;
 
+      TableViewThreadSelect.DataController.RecordCount := 0;
       TableViewThreadUpdate.DataController.RecordCount := 1;
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndDate - aStartDate);
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
@@ -852,6 +1100,7 @@ begin
   else exit;
 
   //init local variable
+  TableViewThreadUpdate.DataController.RecordCount := 0;
   TableViewThreadSelect.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
 
   //create the fMySqlConnectionPoolClient
@@ -908,6 +1157,7 @@ begin
   else exit;
 
   //init local variable
+  TableViewThreadSelect.DataController.RecordCount := 0;
   TableViewThreadUpdate.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
 
   //create the fMySqlConnectionPoolClient
@@ -953,7 +1203,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
     S1: String;
-    i: integer;
+    aLst1: TstringList;
 begin
   GetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
@@ -1004,16 +1254,16 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        S1 := AlMemoSQLite3Query.Lines.Text;
-        while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-        for i := 1 to 100 do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-        end;
-        for i := 101 to maxint do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-          else break;
+        aLst1 := TstringList.create;
+        try
+          S1 := ALFastTagReplace(AlMemoSQLite3Query.Lines.Text,
+                                 '<#',
+                                 '>',
+                                 SQLFastTagReplaceFunct,
+                                 True,
+                                 @aLst1)
+        finally
+          aLst1.free;
         end;
 
         aStartDate := ALGetTickCount64;
@@ -1025,11 +1275,13 @@ begin
                                   aFormatSettings);
         aEndDate := ALGetTickCount64;
 
+        TableViewThreadUpdate.DataController.RecordCount := 0;
         TableViewThreadSelect.DataController.RecordCount := 1;
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectNumber.Index, '1 (off)');
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectRequestCount.Index,1);
+        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndDate - aStartDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,0);
+        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,0/0);
         TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
         AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
@@ -1057,7 +1309,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aEndCommitDate: int64;
     LstSql: TstringList;
     S1: String;
-    i: integer;
+    aLst1: TstringList;
 begin
   Screen.Cursor := CrHourGlass;
   try
@@ -1100,16 +1352,16 @@ begin
       end;
 
       //the sql
-      S1 := AlMemoSQLite3Query.Lines.Text;
-      while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-      while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-      while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-      for i := 1 to 100 do begin
-        if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-      end;
-      for i := 101 to maxint do begin
-        if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-        else break;
+      aLst1 := TstringList.create;
+      try
+        S1 := ALFastTagReplace(AlMemoSQLite3Query.Lines.Text,
+                               '<#',
+                               '>',
+                               SQLFastTagReplaceFunct,
+                               True,
+                               @aLst1)
+      finally
+        aLst1.free;
       end;
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
       LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
@@ -1128,10 +1380,11 @@ begin
         raise;
       end;
 
-      //init the visual component
+      TableViewThreadSelect.DataController.RecordCount := 0;
       TableViewThreadUpdate.DataController.RecordCount := 1;
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
+      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndDate - aStartDate);
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
       TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
@@ -1169,6 +1422,7 @@ begin
   else exit;
 
   //init local variable
+  TableViewThreadUpdate.DataController.RecordCount := 0;
   TableViewThreadSelect.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
 
   //init the aPragmaStatements
@@ -1252,6 +1506,7 @@ begin
   else exit;
 
   //init local variable
+  TableViewThreadSelect.DataController.RecordCount := 0;
   TableViewThreadUpdate.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
 
   //init the aPragmaStatements
@@ -1387,9 +1642,9 @@ begin
   fNBLoopBeforeCommit:= aNBLoopBeforeCommit;
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
   FErrorMsg := '';
-  FTotalUpdateTimeTaken := 0;
+  FTotalUpdateOrSelectTimeTaken := 0;
   FTotalCommitTimeTaken := 0;
-  FtotalUpdate := 0;
+  FTotalUpdateOrSelect := 0;
   fOwner := AOwner;
   fRank := aRank;
   fUpdateSQL := aUpdateSQL;
@@ -1416,7 +1671,9 @@ Var aconnectionHandle: PSQLite3;
     aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
     S1: String;
-    i,j: integer;
+
+    j: integer;
+    aLst1: TstringList;
 begin
 
   //init the aFormatSettings
@@ -1445,15 +1702,16 @@ begin
             aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
-              while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-              while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-              while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-              for i := 1 to 100 do begin
-                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-              end;
-              for i := 101 to maxint do begin
-                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-                else break;
+              aLst1 := TstringList.create;
+              try
+                S1 := ALFastTagReplace(S1,
+                                       '<#',
+                                       '>',
+                                       SQLFastTagReplaceFunct,
+                                       True,
+                                       @aLst1)
+              finally
+                aLst1.free;
               end;
               aLstSql.Add(S1);
               setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
@@ -1464,7 +1722,7 @@ begin
               aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
             end;
             inc(aLoopIndex);
-            inc(FTotalUpdate);
+            inc(FTotalUpdateOrSelect);
             if aLoopIndex > fMaxLoop then break;
           Finally
             aTmpLstSql.Free;
@@ -1483,7 +1741,7 @@ begin
                                                                      aFormatSettings,
                                                                      aconnectionHandle);
           aEndDate := ALGetTickCount64;
-          FTotalUpdateTimeTaken := FTotalUpdateTimeTaken + aEndDate - aStartDate;
+          FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
 
           //commit the data
           aStartDate := ALGetTickCount64;
@@ -1534,9 +1792,10 @@ begin
           TForm1(fOwner).Sqlite3ConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,fTotalUpdate);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateTimeTaken / FtotalUpdate);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FtotalUpdate);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
       TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -1559,9 +1818,10 @@ begin
           TForm1(fOwner).Sqlite3ConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,fTotalUpdate);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateTimeTaken / FtotalUpdate);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FtotalUpdate);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
       TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -1583,21 +1843,26 @@ constructor TFirebirdBenchmarkThread.Create(CreateSuspended: Boolean;
                                             AOwner: TwinControl;
                                             aRank: integer;
                                             aSQL: String;
+                                            aParams: String;
+                                            aTPB: String;
                                             aMaxLoop,
                                             aNBLoopBeforeCommit: integer;
                                             aUpdateSQL: Boolean);
 begin
   inherited Create(CreateSuspended);
   fSQL:= aSQL;
+  fParams:= aParams;
+  fTPB:= aTPB;    
   fOn:= true;
   fMaxLoop:= aMaxLoop;
   if fMaxLoop <= 0 then fMaxLoop := MaxInt;
   fNBLoopBeforeCommit:= aNBLoopBeforeCommit;
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
   FErrorMsg := '';
-  FTotalUpdateTimeTaken := 0;
+  FTotalPrepareTimeTaken := -1;
+  FTotalUpdateOrSelectTimeTaken := 0;
   FTotalCommitTimeTaken := 0;
-  FtotalUpdate := 0;
+  FTotalUpdateOrSelect := 0;
   fOwner := AOwner;
   fRank := aRank;
   fUpdateSQL := aUpdateSQL;
@@ -1613,19 +1878,44 @@ end;
 
 {*****************************************}
 procedure TFirebirdBenchmarkThread.Execute;
+
+  {-------------------------------------------------}
+  function internalDoTagReplace(Str: String): String;
+  var aLst1: TstringList;
+  Begin
+    aLst1 := TstringList.create;
+    try
+      Str := ALFastTagReplace(Str,
+                              '<#',
+                              '>',
+                              SQLFastTagReplaceFunct,
+                              True,
+                              @aLst1);
+      Result := Str;
+    finally
+      aLst1.free;
+    end;
+  End;
+
+
 Var aDBHandle: IscDbHandle;
     aTraHandle: IscTrHandle;
     aStartDate: int64;
     aEndDate: int64;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
-    aLstSql: Tstrings;
-    aTmpLstSql: Tstrings;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalFBXClientSelectDataSQLs;
+    aUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
+    aTmpSelectDataSQLs: TalFBXClientSelectDataSQLs;
+    aTmpUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
     aFormatSettings: TformatSettings;
+    aStmtHandle: IscStmtHandle;
+    aSqlda: TALFBXSQLResult;
     S1: String;
-    i, j: integer;
+    j, k, l: integer;
+    aLst1: TstringList;
+
 begin
 
   //init the aFormatSettings
@@ -1635,7 +1925,6 @@ begin
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
 
   //create local object
-  aLstSql := TstringList.create;
   aXMLDATA := ALCreateEmptyXMLDocument('root');
   Try
 
@@ -1645,55 +1934,186 @@ begin
       try
 
         //update the aLstSql
-        aLstSql.clear;
         setlength(aSelectDataSQLs,0);
-        for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          aTmpLstSql := TStringList.Create;
+        setlength(aUpdateDataSQLs,0);
+        if fParams = '' then begin
+          aLst1 := TStringList.Create;
           Try
             S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
-            aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
-            for J := 0 to aTmpLstSql.Count - 1 do begin
-              S1 := aTmpLstSql[j];
-              while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-              while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-              while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-              for i := 1 to 100 do begin
-                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
+            aLst1.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            for J := 0 to aLst1.Count - 1 do begin
+              if fUpdateSQL then begin
+                setlength(aUpdateDataSQLs,length(aUpdateDataSQLs)+1);
+                setlength(aUpdateDataSQLs[length(aUpdateDataSQLs)-1].Params,0);
+                aUpdateDataSQLs[length(aUpdateDataSQLs)-1].Sql := S1;
+              end
+              else begin
+                setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
+                setlength(aSelectDataSQLs[length(aSelectDataSQLs)-1].Params,0);
+                aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
+                aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
+                aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
+                aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
+                aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
               end;
-              for i := 101 to maxint do begin
-                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-                else break;
-              end;
-              aLstSql.Add(S1);
-              setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
             end;
-            inc(aLoopIndex);
-            inc(FTotalUpdate);
-            if aLoopIndex > fMaxLoop then break;
           Finally
-            aTmpLstSql.Free;
+            aLst1.Free;
+          End;
+        end
+        else begin
+          aLst1 := TStringList.Create;
+          Try
+            aLst1.Text := Trim(fParams);
+            if fUpdateSQL then begin
+              setlength(aUpdateDataSQLs,1);
+              setlength(aUpdateDataSQLs[0].Params,1);
+              setlength(aUpdateDataSQLs[0].Params[0].fields,aLst1.Count);
+              for J := 0 to aLst1.Count - 1 do begin
+                aUpdateDataSQLs[0].Params[0].fields[j].Value := aLst1[j];
+                aUpdateDataSQLs[0].Params[0].fields[j].isnull := false;
+                aUpdateDataSQLs[0].Params[0].fields[j].isblob := False;
+              end;
+              aUpdateDataSQLs[0].Sql := fSQL;
+            end
+            else begin
+              setlength(aSelectDataSQLs,1);
+              setlength(aSelectDataSQLs[0].Params,1);
+              setlength(aSelectDataSQLs[0].Params[0].fields,aLst1.Count);
+              for J := 0 to aLst1.Count - 1 do begin
+                aSelectDataSQLs[0].Params[0].fields[j].Value := aLst1[j];
+                aSelectDataSQLs[0].Params[0].fields[j].isnull := false;
+                aSelectDataSQLs[0].Params[0].fields[j].isblob := False;
+              end;
+              aSelectDataSQLs[0].Sql := fSQL;
+              aSelectDataSQLs[0].RowTag := '';
+              aSelectDataSQLs[0].viewTag := '';
+              aSelectDataSQLs[0].skip := 0;
+              aSelectDataSQLs[0].First := 0;
+            end;
+          Finally
+            aLst1.Free;
           End;
         end;
 
         //start the Transaction
-        Tform1(fOwner).FirebirdConnectionPoolClient.TransactionStart(aDbHandle, aTRAHandle);
+        Tform1(fOwner).FirebirdConnectionPoolClient.TransactionStart(aDbHandle, aTRAHandle, fTPB);
         try
 
-          //update the data
-          aStartDate := ALGetTickCount64;
-          if fUpdateSQL then Tform1(fOwner).FirebirdConnectionPoolClient.UpdateData(aLstSql, aDBHandle, aTraHandle)
-          else Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aSelectDataSQLs,
-                                                                      aXMLDATA.documentElement,
-                                                                      aFormatSettings,
-                                                                      aDbHandle,
-                                                                      aTraHandle);
-          aEndDate := ALGetTickCount64;
-          FTotalUpdateTimeTaken := FTotalUpdateTimeTaken + aEndDate - aStartDate;
+          //Prepare the Transaction
+          aStmtHandle := nil;
+          aSqlda := nil;
+          if fUpdateSQL then begin
+            if (length(aUpdateDataSQLs) = 1) and (alPos('<#', aUpdateDataSQLs[0].SQL) <= 0) then begin
+              aStartDate := ALGetTickCount64;
+              Tform1(fOwner).FirebirdConnectionPoolClient.Prepare(aUpdateDataSQLs[0].SQL,
+                                                                  aDBHandle,
+                                                                  aTraHandle,
+                                                                  aStmtHandle,
+                                                                  aSqlda,
+                                                                  fTPB);
+              aEndDate := ALGetTickCount64;
+              if FTotalPrepareTimeTaken = -1 then FTotalPrepareTimeTaken := 0;              
+              FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aEndDate - aStartDate;
+            end;
+          end
+          else begin
+            if (length(aSelectDataSQLs) = 1) and (alPos('<#', aSelectDataSQLs[0].SQL) <= 0) then begin
+              aStartDate := ALGetTickCount64;
+              Tform1(fOwner).FirebirdConnectionPoolClient.Prepare(aSelectDataSQLs[0].SQL,
+                                                                  aDBHandle,
+                                                                  aTraHandle,
+                                                                  aStmtHandle,
+                                                                  aSqlda,
+                                                                  fTPB);
+              aEndDate := ALGetTickCount64;
+              if FTotalPrepareTimeTaken = -1 then FTotalPrepareTimeTaken := 0;
+              FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aEndDate - aStartDate;
+            end;
+          end;
+          try
+
+
+            //Execute the SQL
+            for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
+              setlength(aTmpSelectDataSQLs, length(aSelectDataSQLs));
+              for j := 0 to length(aTmpSelectDataSQLs) - 1 do begin
+                aTmpSelectDataSQLs[j].SQL := internalDoTagReplace(aSelectDataSQLs[j].SQL);
+                setlength(aTmpSelectDataSQLs[j].Params, length(aSelectDataSQLs[j].Params));
+                for k := 0 to length(aTmpSelectDataSQLs[j].Params) - 1 do begin
+                  setlength(aTmpSelectDataSQLs[j].Params[k].fields, length(aSelectDataSQLs[j].Params[k].fields));
+                  for l := 0 to length(aTmpSelectDataSQLs[j].Params[k].fields) - 1 do begin
+                    aTmpSelectDataSQLs[j].Params[k].fields[l].Value := internalDoTagReplace(aSelectDataSQLs[j].Params[k].fields[l].Value);
+                    aTmpSelectDataSQLs[j].Params[k].fields[l].isnull := aSelectDataSQLs[j].Params[k].fields[l].isnull;
+                    aTmpSelectDataSQLs[j].Params[k].fields[l].isblob := aSelectDataSQLs[j].Params[k].fields[l].isblob;
+                  end;
+                end;
+                aTmpSelectDataSQLs[j].RowTag := aSelectDataSQLs[j].RowTag;
+                aTmpSelectDataSQLs[j].ViewTag := aSelectDataSQLs[j].ViewTag;
+                aTmpSelectDataSQLs[j].Skip := aSelectDataSQLs[j].Skip;
+                aTmpSelectDataSQLs[j].First := aSelectDataSQLs[j].First;
+              end;
+              setlength(aTmpUpdateDataSQLs, length(aUpdateDataSQLs));
+              for j := 0 to length(aTmpUpdateDataSQLs) - 1 do begin
+                aTmpUpdateDataSQLs[j].SQL := internalDoTagReplace(aUpdateDataSQLs[j].SQL);
+                setlength(aTmpUpdateDataSQLs[j].Params, length(aUpdateDataSQLs[j].Params));
+                for k := 0 to length(aTmpUpdateDataSQLs[j].Params) - 1 do begin
+                  setlength(aTmpUpdateDataSQLs[j].Params[k].fields, length(aUpdateDataSQLs[j].Params[k].fields));
+                  for l := 0 to length(aTmpUpdateDataSQLs[j].Params[k].fields) - 1 do begin
+                    aTmpUpdateDataSQLs[j].Params[k].fields[l].Value := internalDoTagReplace(aUpdateDataSQLs[j].Params[k].fields[l].Value);
+                    aTmpUpdateDataSQLs[j].Params[k].fields[l].isnull := aUpdateDataSQLs[j].Params[k].fields[l].isnull;
+                    aTmpUpdateDataSQLs[j].Params[k].fields[l].isblob := aUpdateDataSQLs[j].Params[k].fields[l].isblob;
+                  end;
+                end;
+              end;
+
+              if fUpdateSQL then begin
+                aStartDate := ALGetTickCount64;
+                if fUpdateSQL then Tform1(fOwner).FirebirdConnectionPoolClient.UpdateData(aTmpUpdateDataSQLs,
+                                                                                          aDBHandle,
+                                                                                          aTraHandle,
+                                                                                          aStmtHandle,
+                                                                                          aSqlda,
+                                                                                          fTPB);
+                aEndDate := ALGetTickCount64;
+                FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
+              end
+              else begin
+                aStartDate := ALGetTickCount64;
+                Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aTmpSelectDataSQLs,
+                                                                       aXMLDATA.documentElement,
+                                                                       aFormatSettings,
+                                                                       aDbHandle,
+                                                                       aTraHandle,
+                                                                       aStmtHandle,
+                                                                       aSqlda,
+                                                                       fTPB);
+                aEndDate := ALGetTickCount64;
+                FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
+              end;
+
+              inc(FTotalUpdateOrSelect);
+              inc(aLoopIndex);
+              if aLoopIndex > fMaxLoop then break;
+
+            end;
+
+          finally
+
+            if assigned(aStmtHandle) then begin
+              try
+                Tform1(fOwner).FirebirdConnectionPoolClient.lib.DSQLFreeStatement(aStmtHandle, DSQL_drop);
+              Except
+                //what else we can do here ?
+                //this can happen if connection lost for exemple
+                //i preferre to hide this exception to not hide previous exception
+              end;
+              aSqlda.free;
+              aStmtHandle := nil;
+              aSqlda := nil;
+            end;
+
+          end;
 
           //commit the data
           aStartDate := ALGetTickCount64;
@@ -1701,10 +2121,12 @@ begin
           aEndDate := ALGetTickCount64;
           FTotalCommitTimeTaken := FTotalCommitTimeTaken + aEndDate - aStartDate
 
-        Except
+        except
+
           //roolBack the data
           Tform1(fOwner).FirebirdConnectionPoolClient.TransactionRollBack(aDbHandle, aTraHandle);
           raise;
+
         end;
 
       Except
@@ -1720,7 +2142,6 @@ begin
     end;
 
   Finally
-    aLstSql.free;
     aXMLDATA.free;
   End;
 end;
@@ -1744,9 +2165,11 @@ begin
           TForm1(fOwner).FirebirdConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,fTotalUpdate);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateTimeTaken / FtotalUpdate);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FtotalUpdate);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,FTotalUpdateOrSelect);
+      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalUpdateOrSelect)
+      else  TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
       TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -1769,9 +2192,11 @@ begin
           TForm1(fOwner).FirebirdConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,fTotalUpdate);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateTimeTaken / FtotalUpdate);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FtotalUpdate);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,FTotalUpdateOrSelect);
+      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalUpdateOrSelect)
+      else  TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
       TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -1803,9 +2228,9 @@ begin
   fNBLoopBeforeCommit:= aNBLoopBeforeCommit;
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
   FErrorMsg := '';
-  FTotalUpdateTimeTaken := 0;
+  FTotalUpdateOrSelectTimeTaken := 0;
   FTotalCommitTimeTaken := 0;
-  FtotalUpdate := 0;
+  FTotalUpdateOrSelect := 0;
   fOwner := AOwner;
   fRank := aRank;
   fUpdateSQL := aUpdateSQL;
@@ -1833,7 +2258,8 @@ Var aConnectionHandle: PMySql;
     aFormatSettings: TformatSettings;
     aLastUpdateGUI: Int64;
     S1: String;
-    i, j: integer;
+    j: integer;
+    aLst1: TstringList;
 begin
 
   //init the aFormatSettings
@@ -1865,15 +2291,16 @@ begin
             aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
-              while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-              while AlPos('<#randomcharinhex>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomcharinhex>',inttohex(random(256),2),[rfIgnoreCase]);
-              while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
-              for i := 1 to 100 do begin
-                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll]);
-              end;
-              for i := 101 to maxint do begin
-                if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
-                else break;
+              aLst1 := TstringList.create;
+              try
+                S1 := ALFastTagReplace(S1,
+                                       '<#',
+                                       '>',
+                                       SQLFastTagReplaceFunct,
+                                       True,
+                                       @aLst1)
+              finally
+                aLst1.free;
               end;
               aLstSql.Add(S1);
               setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
@@ -1884,7 +2311,7 @@ begin
               aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
             end;
             inc(aLoopIndex);
-            inc(FTotalUpdate);
+            inc(FTotalUpdateOrSelect);
             if aLoopIndex > fMaxLoop then break;
           Finally
             aTmpLstSql.Free;
@@ -1903,7 +2330,7 @@ begin
                                                                    aFormatSettings,
                                                                    aConnectionHandle);
           aEndDate := ALGetTickCount64;
-          FTotalUpdateTimeTaken := FTotalUpdateTimeTaken + aEndDate - aStartDate;
+          FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
 
           //commit the data
           aStartDate := ALGetTickCount64;
@@ -1957,9 +2384,10 @@ begin
           TForm1(fOwner).MySqlConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,fTotalUpdate);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateTimeTaken / FtotalUpdate);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FtotalUpdate);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
       TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -1982,9 +2410,10 @@ begin
           TForm1(fOwner).MySqlConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,fTotalUpdate);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateTimeTaken / FtotalUpdate);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FtotalUpdate);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
+      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
       TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally

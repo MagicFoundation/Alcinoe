@@ -10,22 +10,22 @@ uses
 type
   TForm1 = class(TForm)
     ALButton1: TALButton;
-    ALButton2: TALButton;
     ALButton3: TALButton;
-    ALButton4: TALButton;
     Panel2: TPanel;
     Label7: TLabel;
     Label8: TLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
+    ALButton2: TALButton;
+    ALButton4: TALButton;
     procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure FormClick(Sender: TObject);
     procedure ALButton1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ALButton2Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
   public
   end;
@@ -35,8 +35,8 @@ var Form1: TForm1;
 implementation
 
 uses alFcnSkin,
-     alStringList,
-     alFcnString;
+     AlFcnString,
+     alavlBinaryTree;
 
 {$R *.dfm}
 
@@ -54,90 +54,107 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton1Click(Sender: TObject);
-Var Lst1: TALStringList;
+Var aStringKeyAVLBinaryTree: TALStringKeyAVLBinaryTree;
+    aStringKeyAVLBinaryTreeNode: TALStringKeyAVLBinaryTreeNode;
     StartDate: DWORD;
     i: integer;
 begin
-  StartDate := GetTickCount;
-  Lst1 := TALStringList.create;
+  aStringKeyAVLBinaryTree := TALStringKeyAVLBinaryTree.create;
   try
-    Lst1.Sorted := True;
-    Lst1.Duplicates := DupIgnore;
 
-    for I := 1 to 10000 do
-      Lst1.Values[AlRandomStr(5)] := AlRandomStr(5);
+    StartDate := GetTickCount;
+    for I := 1 to 1000000 do begin
+      aStringKeyAVLBinaryTreeNode := TALStringKeyAVLBinaryTreeNode.Create;
+      aStringKeyAVLBinaryTreeNode.ID := AlRandomStr(10);
+      if not aStringKeyAVLBinaryTree.AddNode(aStringKeyAVLBinaryTreeNode) then aStringKeyAVLBinaryTreeNode.Free;
+    end;
+    Showmessage('Add 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
 
   finally
-    Lst1.free;
+    aStringKeyAVLBinaryTree.free;
   end;
-  Showmessage('Process 10.000 Values[random(x)]:=random(y) in ' + inttostr(GetTickCount - StartDate) + ' ms');
 end;
 
-{**********************************************}
+{***********************************************}
 procedure TForm1.ALButton2Click(Sender: TObject);
-Var Lst1: TStringList;
+Var aLst: TStringList;
     StartDate: DWORD;
     i: integer;
 begin
-  Showmessage('You can go to take a coffee during the process!');
-  StartDate := GetTickCount;
-  Lst1 := TStringList.create;
+  aLst := TstringList.create;
   try
-    Lst1.Sorted := False;
+    aLst.Sorted := False;
 
-    for I := 1 to 10000 do
-      Lst1.Values[AlRandomStr(5)] := AlRandomStr(5);
+    StartDate := GetTickCount;
+    for I := 1 to 1000000 do
+      aLst.Add(AlRandomStr(10));
+    aLst.Duplicates := DupIgnore;
+    aLst.Sorted := True;
+    Showmessage('Add 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
 
   finally
-    Lst1.free;
+    aLst.free;
   end;
-  Showmessage('Process 10.000 Values[random(x)]:=random(y) in ' + inttostr(GetTickCount - StartDate) + ' ms');
 end;
-
 
 {***********************************************}
 procedure TForm1.ALButton3Click(Sender: TObject);
-Var Lst1: TALAVLStringList;
+Var aStringKeyAVLBinaryTree: TALStringKeyAVLBinaryTree;
+    aStringKeyAVLBinaryTreeNode: TALStringKeyAVLBinaryTreeNode;
     StartDate: DWORD;
     i: integer;
 begin
-  StartDate := GetTickCount;
-  Lst1 := TALAVLStringList.create;
+  aStringKeyAVLBinaryTree := TALStringKeyAVLBinaryTree.create;
   try
 
-    for I := 1 to 100000 do
-      Lst1.Values[AlRandomStr(5)] := AlRandomStr(5);
+    StartDate := GetTickCount;
+    for I := 1 to 1000000 do begin
+      aStringKeyAVLBinaryTreeNode := TALStringKeyAVLBinaryTreeNode.Create;
+      aStringKeyAVLBinaryTreeNode.ID := AlRandomStr(10);
+      if not aStringKeyAVLBinaryTree.AddNode(aStringKeyAVLBinaryTreeNode) then aStringKeyAVLBinaryTreeNode.Free;
+    end;
+
+    Showmessage('Add 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+
+    StartDate := GetTickCount;
+    for I := 1 to 100000 do begin
+      aStringKeyAVLBinaryTree.FindNode(AlRandomStr(10));
+    end;
+
+    Showmessage('Search 100.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
 
   finally
-    Lst1.free;
+    aStringKeyAVLBinaryTree.free;
   end;
-  Showmessage('Process 100.000 Values[random(x)]:=random(y) in ' + inttostr(GetTickCount - StartDate) + ' ms');
 end;
-
 
 {***********************************************}
 procedure TForm1.ALButton4Click(Sender: TObject);
-Var Lst1: TStringList;
+Var aLst: TStringList;
     StartDate: DWORD;
     i: integer;
 begin
-  Showmessage('You can go to in holidays during the process!');
-  StartDate := GetTickCount;
-  Lst1 := TStringList.create;
+  aLst := TstringList.create;
   try
-    Lst1.Sorted := False;
+    aLst.Sorted := False;
 
-    for I := 1 to 100000 do
-      Lst1.Values[AlRandomStr(5)] := AlRandomStr(5);
+    StartDate := GetTickCount;
+    for I := 1 to 1000000 do
+      aLst.Add(AlRandomStr(10));
+    aLst.Duplicates := DupIgnore;
+    aLst.Sorted := True;
+    Showmessage('Add 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+
+    StartDate := GetTickCount;
+    for I := 1 to 100000 do begin
+      aLst.IndexOf(AlRandomStr(10));
+    end;
+    Showmessage('Search 100.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
 
   finally
-    Lst1.free;
+    aLst.free;
   end;
-  Showmessage('Process 100.000 Values[random(x)]:=random(y) in ' + inttostr(GetTickCount - StartDate) + ' ms');
 end;
-
-
-
 
 {-------------------}
 var ie: IWebBrowser2;

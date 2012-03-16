@@ -110,7 +110,7 @@ Begin
 
     //download some statistiques
     //http://www.firebirdsql.org/manual/fbcache-mon-io-stats.html
-    aFbxClient.TransactionStart(true);
+    aFbxClient.TransactionStart(aFbxClient.DefaultReadTPB);
     Try
       aFbxClient.SelectData('SELECT '+
                               'A1.MON$USER, '+
@@ -122,7 +122,7 @@ Begin
                               'M1.MON$MEMORY_ALLOCATED, '+        // number of bytes currently allocated at the OS level (Low-level memory allocations performed by the Firebird memory manager. These are bytes actually allocated by the operating system, so it enables the physical memory consumption to be monitored.)
                               'M1.MON$MAX_MEMORY_USED, '+         // maximum number of bytes used by this object
                               'M1.MON$MAX_MEMORY_ALLOCATED, '+    // maximum number of bytes allocated from the operating system by this object
-                              'I1.MON$PAGE_READS, '+             // The number of pages read. These are the pages read from the disc and not from the cache.
+                              'I1.MON$PAGE_READS, '+              // The number of pages read. These are the pages read from the disc and not from the cache.
                               'I1.MON$PAGE_WRITES, '+             // The number of pages written back to disc.
                               'I1.MON$PAGE_FETCHES, '+            // The number of pages read from the cache as opposed to from disc.
                               'I1.MON$PAGE_MARKS, '+              // The number of pages changed while in the cache. It is possible that not all of these have been written back to disc.

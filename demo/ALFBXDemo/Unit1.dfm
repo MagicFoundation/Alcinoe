@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 445
   Top = 202
-  Caption = 'v'
-  ClientHeight = 596
-  ClientWidth = 689
+  Caption = 'ALFBXdemo'
+  ClientHeight = 806
+  ClientWidth = 683
   Color = 14805482
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -132,9 +132,35 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
+  object Label3: TLabel
+    Left = 58
+    Top = 386
+    Width = 42
+    Height = 13
+    Caption = 'Params'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label5: TLabel
+    Left = 32
+    Top = 405
+    Width = 68
+    Height = 13
+    Caption = '(1 item by row)'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = []
+    ParentFont = False
+  end
   object Panel1: TPanel
     Left = 379
-    Top = 8
+    Top = 13
     Width = 292
     Height = 153
     BevelOuter = bvNone
@@ -202,7 +228,7 @@ object Form1: TForm1
   end
   object ALButtonFirebirdStartTransaction: TALButton
     Left = 379
-    Top = 241
+    Top = 257
     Width = 161
     Height = 25
     Caption = 'Start Transaction'
@@ -256,13 +282,14 @@ object Form1: TForm1
     btnFont.Style = []
     OnPaint = ALEdit1Paint
     TabOrder = 5
-    Text = 'ISO8859_1'
+    Text = 'NONE'
   end
   object ALEditFirebirdLib: TALEdit
     Left = 106
     Top = 40
     Width = 249
     Height = 19
+    Cursor = crArrow
     OnButtonClick = ALEditFirebirdLibButtonClick
     btnVisible = True
     btnCaption = '...'
@@ -280,14 +307,14 @@ object Form1: TForm1
     Left = 106
     Top = 282
     Width = 249
-    Height = 140
+    Height = 95
     OnPaint = Memo_SQLPaint
     OnPaintScrollBar = Memo_SQLPaintScrollBar
     TabOrder = 7
     WordWrap = False
     DesignSize = (
       249
-      140)
+      95)
   end
   object ALEditFirebirdDatabase: TALEdit
     Left = 106
@@ -308,7 +335,7 @@ object Form1: TForm1
   end
   object ALButtonFirebirdCommit: TALButton
     Left = 379
-    Top = 335
+    Top = 383
     Width = 161
     Height = 25
     Caption = 'Commit'
@@ -319,7 +346,7 @@ object Form1: TForm1
   end
   object ALButtonFirebirdSelect: TALButton
     Left = 379
-    Top = 272
+    Top = 320
     Width = 161
     Height = 25
     Caption = 'Execute SELECT'
@@ -330,7 +357,7 @@ object Form1: TForm1
   end
   object ALButtonFirebirdRollBack: TALButton
     Left = 379
-    Top = 366
+    Top = 414
     Width = 161
     Height = 25
     Caption = 'Rollback'
@@ -357,10 +384,10 @@ object Form1: TForm1
   end
   object ALButtonFirebirdCreateDatabase: TALButton
     Left = 379
-    Top = 179
+    Top = 195
     Width = 161
     Height = 25
-    Caption = 'Create Database via FireBird'
+    Caption = 'Create Database'
     TabOrder = 13
     OnClick = ALButtonFirebirdCreateDatabaseClick
     OnPaint = ALButtonFirebirdUpdatePaint
@@ -373,29 +400,15 @@ object Form1: TForm1
     OnPaint = ComboBox_apiVerPaint
     Style = csDropDownList
     ItemHeight = 13
-    ItemIndex = 0
+    ItemIndex = 4
     TabOrder = 0
-    Text = 'FB102'
+    Text = 'FB25'
     Items.Strings = (
       'FB102'
       'FB103'
       'FB15'
       'FB20'
       'FB25')
-  end
-  object ALMemoFirebirdResult: TALMemo
-    Left = 0
-    Top = 440
-    Width = 689
-    Height = 156
-    OnPaint = Memo_SQLPaint
-    OnPaintScrollBar = Memo_SQLPaintScrollBar
-    Align = alBottom
-    Anchors = [akLeft, akTop, akRight, akBottom]
-    TabOrder = 14
-    DesignSize = (
-      689
-      156)
   end
   object ALMemoFirebirdTPB: TALMemo
     Left = 106
@@ -410,7 +423,7 @@ object Form1: TForm1
       'isc_tpb_read_committed'
       'isc_tpb_no_rec_version'
       'isc_tpb_nowait')
-    TabOrder = 15
+    TabOrder = 14
     WordWrap = False
     DesignSize = (
       249
@@ -418,38 +431,134 @@ object Form1: TForm1
   end
   object ALButtonFirebirdUpdate: TALButton
     Left = 379
-    Top = 303
+    Top = 351
     Width = 161
     Height = 25
     Caption = 'Execute Update'
     Enabled = False
-    TabOrder = 16
+    TabOrder = 15
     OnClick = ALButtonFirebirdUpdateClick
     OnPaint = ALButtonFirebirdUpdatePaint
   end
   object ALButtonFirebirdOpenConnection: TALButton
     Left = 379
-    Top = 210
+    Top = 226
     Width = 161
     Height = 25
     Caption = 'Open Connection'
-    TabOrder = 17
+    TabOrder = 16
     OnClick = ALButtonFirebirdOpenConnectionClick
     OnPaint = ALButtonFirebirdUpdatePaint
   end
   object ALButtonCloseConnection: TALButton
     Left = 379
-    Top = 397
+    Top = 445
     Width = 161
     Height = 25
     Caption = 'Close Connection'
     Enabled = False
-    TabOrder = 18
+    TabOrder = 17
     OnClick = ALButtonCloseConnectionClick
     OnPaint = ALButtonFirebirdUpdatePaint
   end
+  object ALButtonFirebirdPrepare: TALButton
+    Left = 379
+    Top = 288
+    Width = 161
+    Height = 25
+    Caption = 'Prepare'
+    Enabled = False
+    TabOrder = 18
+    OnClick = ALButtonFirebirdPrepareClick
+    OnPaint = ALButtonFirebirdUpdatePaint
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 496
+    Width = 683
+    Height = 310
+    Align = alBottom
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    TabOrder = 19
+    object Splitter1: TSplitter
+      Left = 413
+      Top = 1
+      Width = 5
+      Height = 308
+      Align = alRight
+      ExplicitLeft = 459
+      ExplicitHeight = 304
+    end
+    object ALMemoFirebirdResult: TALMemo
+      Left = 1
+      Top = 1
+      Width = 412
+      Height = 308
+      OnPaint = Memo_SQLPaint
+      OnPaintScrollBar = Memo_SQLPaintScrollBar
+      Align = alClient
+      TabOrder = 0
+      DesignSize = (
+        412
+        308)
+    end
+    object ALMemoFirebirdStats: TALMemo
+      Left = 418
+      Top = 1
+      Width = 264
+      Height = 308
+      OnPaint = Memo_SQLPaint
+      OnPaintScrollBar = Memo_SQLPaintScrollBar
+      Align = alRight
+      Font.Charset = ANSI_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Courier New'
+      Font.Style = []
+      ParentFont = False
+      TabOrder = 1
+      DesignSize = (
+        264
+        308)
+    end
+  end
+  object ALMemoFireBirdParams: TALMemo
+    Left = 106
+    Top = 386
+    Width = 249
+    Height = 93
+    OnPaint = Memo_SQLPaint
+    OnPaintScrollBar = Memo_SQLPaintScrollBar
+    TabOrder = 20
+    WordWrap = False
+    DesignSize = (
+      249
+      93)
+  end
+  object ALButtonFirebirdCommitRetaining: TALButton
+    Left = 552
+    Top = 383
+    Width = 119
+    Height = 25
+    Caption = 'Commit Retaining'
+    Enabled = False
+    TabOrder = 21
+    OnClick = ALButtonFirebirdCommitRetainingClick
+    OnPaint = ALButtonFirebirdUpdatePaint
+  end
+  object ALButtonFirebirdRollBackRetaining: TALButton
+    Left = 552
+    Top = 414
+    Width = 119
+    Height = 25
+    Caption = 'Rollback Retaining'
+    Enabled = False
+    TabOrder = 22
+    OnClick = ALButtonFirebirdRollBackRetainingClick
+    OnPaint = ALButtonFirebirdUpdatePaint
+  end
   object OpenDialog1: TOpenDialog
-    Left = 600
-    Top = 232
+    Left = 328
+    Top = 8
   end
 end

@@ -101,11 +101,11 @@ begin
 
 end;
 
-{************************************************************}
+{***************************************************************}
 constructor TalSphinxQlConnectionPoolClient.Create(aHost: String;
-                                                aPort: integer;
-                                                aApiVer: TALMySqlVersion_API;
-                                                const alib: String = 'libmysql.dll');
+                                                   aPort: integer;
+                                                   aApiVer: TALMySqlVersion_API;
+                                                   const alib: String = 'libmysql.dll');
 begin
 
   inherited Create(aHost,
@@ -120,10 +120,10 @@ begin
 
 end;
 
-{************************************************************}
+{***************************************************************}
 constructor TalSphinxQlConnectionPoolClient.Create(aHost: String;
-                                                aPort: integer;
-                                                alib: TALMySqlLibrary);
+                                                   aPort: integer;
+                                                   alib: TALMySqlLibrary);
 begin
 
   inherited Create(aHost,

@@ -71,7 +71,7 @@ uses Windows,
 const
 
   { resource string }
-  cALMySql_INVALIDELIBVERSION   = 'Incorrect Database Server version.';
+  cALMySql_INVALIDELIBVERSION   = 'Incorrect Database Server Version.';
   cALMySql_CANTLOADLIB          = 'Can''t load library: %s.';
 
   { General Declarations }

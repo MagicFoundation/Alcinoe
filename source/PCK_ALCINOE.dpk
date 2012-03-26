@@ -97,7 +97,8 @@ contains
   ALPOP3Client in 'ALPOP3Client.pas',
   ALSqlite3Client in 'ALSqlite3Client.pas',
   ALSqlite3Wrapper in 'ALSqlite3Wrapper.pas',
-  ALWindows in 'ALWindows.pas';
+  ALWindows in 'ALWindows.pas',
+  ALSphinxQLClient in 'ALSphinxQLClient.pas';
 
 end.
 

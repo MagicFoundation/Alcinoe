@@ -9,7 +9,7 @@ uses
   cxDataStorage, cxEdit, cxGridLevel, cxGridCustomTableView, cxGridTableView,
   cxClasses, cxControls, cxGridCustomView, cxGrid, ComCtrls, AlSqlite3Client,
   cxMemo, cxBlobEdit, alFbxClient, almysqlClient, OleCtrls, SHDocVw, ComObj,
-  cxDropDownEdit;
+  cxDropDownEdit, alSphinxQLClient;
 
 type
 
@@ -33,26 +33,8 @@ type
     StatusBar1: TStatusBar;
     Panel3: TPanel;
     Panel5: TPanel;
-    Panel6: TPanel;
     Splitter4: TSplitter;
-    GridThreadSelect: TcxGrid;
-    TableViewThreadSelect: TcxGridTableView;
-    TableViewThreadSelectNumber: TcxGridColumn;
-    TableViewThreadSelectRequestCount: TcxGridColumn;
-    TableViewThreadSelectAverageSelectTimeTaken: TcxGridColumn;
-    TableViewThreadSelectAverageCommitTimeTaken: TcxGridColumn;
-    TableViewThreadSelectErrorMsg: TcxGridColumn;
-    levelThreadSelect: TcxGridLevel;
-    Splitter2: TSplitter;
     ALMemoResult: TALMemo;
-    GridThreadUpdate: TcxGrid;
-    TableViewThreadUpdate: TcxGridTableView;
-    TableViewThreadUpdateNumber: TcxGridColumn;
-    TableViewThreadUpdateRequestCount: TcxGridColumn;
-    TableViewThreadUpdateAverageUpdateTimeTaken: TcxGridColumn;
-    TableViewThreadUpdateAverageCommitTimeTaken: TcxGridColumn;
-    TableViewThreadUpdateErrorMsg: TcxGridColumn;
-    levelThreadUpdate: TcxGridLevel;
     PageControl1: TPageControl;
     MySQL: TTabSheet;
     SQLLite3: TTabSheet;
@@ -143,10 +125,43 @@ type
     ALMemoFireBirdParams: TALMemo;
     Label1: TLabel;
     Label14: TLabel;
-    TableViewThreadSelectAveragePrepareTimeTaken: TcxGridColumn;
-    TableViewThreadUpdateAveragePrepareTimeTaken: TcxGridColumn;
     Label27: TLabel;
     ALMemoFirebirdTPB: TALMemo;
+    Sphinx: TTabSheet;
+    Label36: TLabel;
+    Label37: TLabel;
+    Label38: TLabel;
+    Label43: TLabel;
+    Label44: TLabel;
+    Label45: TLabel;
+    Label46: TLabel;
+    ALEditSphinxLib: TALEdit;
+    ALEditSphinxHost: TALEdit;
+    ALEditSphinxPort: TALEdit;
+    ALMemoSphinxQuery: TALMemo;
+    ALButtonSphinxSelect: TALButton;
+    ALButtonSphinxUpdate: TALButton;
+    ALButtonSphinxLoopSelect: TALButton;
+    ALButtonSphinxLoopUpdate: TALButton;
+    ALEditSphinxNBThread: TALEdit;
+    ALEditSphinxNBLoop: TALEdit;
+    ALEditSphinxNbLoopBeforeCommit: TALEdit;
+    Label39: TLabel;
+    ALComboBoxSphinxApiVer: TALComboBox;
+    Label40: TLabel;
+    ALComboBoxMySqlApiVer: TALComboBox;
+    Note: TTabSheet;
+    ALMemo1: TALMemo;
+    PanelStats: TPanel;
+    GridThread: TcxGrid;
+    TableViewThread: TcxGridTableView;
+    TableViewThreadNumber: TcxGridColumn;
+    TableViewThreadCount: TcxGridColumn;
+    TableViewThreadAveragePrepareTimeTaken: TcxGridColumn;
+    TableViewThreadAverageExecuteTimeTaken: TcxGridColumn;
+    TableViewThreadAverageCommitTimeTaken: TcxGridColumn;
+    TableViewThreadErrorMsg: TcxGridColumn;
+    levelThread: TcxGridLevel;
     procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlSelectClick(Sender: TObject);
@@ -170,6 +185,10 @@ type
     procedure ALButtonMysqlLoopSelectClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure ALButtonSphinxSelectClick(Sender: TObject);
+    procedure ALButtonSphinxUpdateClick(Sender: TObject);
+    procedure ALButtonSphinxLoopSelectClick(Sender: TObject);
+    procedure ALButtonSphinxLoopUpdateClick(Sender: TObject);
   private
   public
     Sqlite3ConnectionPoolClient: TalSqlite3ConnectionPoolClient;
@@ -191,9 +210,9 @@ type
     fNBLoopBeforeCommit: integer;
     FErrorMsg: String;
     FTotalPrepareTimeTaken: int64;
-    FTotalUpdateOrSelectTimeTaken: int64;
+    FTotalExecuteTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
-    FTotalUpdateOrSelect: integer;
+    FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
     Procedure UpdateGUI;
@@ -222,9 +241,9 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: String;
-    FTotalUpdateOrSelectTimeTaken: int64;
+    FTotalExecuteTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
-    FTotalUpdateOrSelect: integer;
+    FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
     Procedure UpdateGUI;
@@ -251,9 +270,9 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: String;
-    FTotalUpdateOrSelectTimeTaken: int64;
+    FTotalExecuteTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
-    FTotalUpdateOrSelect: integer;
+    FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
     Procedure UpdateGUI;
@@ -290,7 +309,8 @@ uses alFcnSkin,
 
 {$R *.dfm}
 
-{**************************************************}
+Var currentIncNumber: integer;
+
 function GetProcessMemoryInfo; external 'psapi.dll';
 
 {****************************************************}
@@ -299,17 +319,13 @@ var ProcessHandle : THandle;
     MemCounters   : TProcessMemoryCounters;
 begin
   Result := 0;
-  ProcessHandle := OpenProcess(
-                               PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
+  ProcessHandle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
                                false,
-                               ProcessID
-                              );
+                               ProcessID);
   try
-    if GetProcessMemoryInfo(
-                            ProcessHandle,
+    if GetProcessMemoryInfo(ProcessHandle,
                             MemCounters,
-                            sizeof(MemCounters)
-                           )
+                            sizeof(MemCounters))
     then Result := MemCounters.WorkingSetSize;
   finally
     CloseHandle(ProcessHandle);
@@ -318,7 +334,7 @@ end;
 
 {****************************************************************************************************************************}
 function SQLFastTagReplaceFunct(const TagString: string; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): string;
-Var aMin, aMax, aIndex: integer;
+Var aMin, aMax, aIndex, aIncBy: integer;
     aLstSavedData: TstringList;
 begin
 
@@ -353,15 +369,23 @@ begin
     if not trystrtoint(TagParams.Values['Min'], aMin) then aMin := 1;
     if not trystrtoint(TagParams.Values['Max'], aMax) then aMax := Maxint;
     if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+    if not trystrtoint(TagParams.Values['IncBy'], aIncBy) then aIncBy := 0;
     if aIndex >= 0 then begin
       aLstSavedData := TstringList(ExtData^);
       result := aLstSavedData.Values['randomnumber_'+inttostr(aIndex)];
       if result = '' then begin
         result := inttostr(aMin + random(aMax - aMin + 1));
         aLstSavedData.Values['randomnumber_'+inttostr(aIndex)] := result;
-      end;
+      end
+      else result := inttostr(strtoint(Result) + aIncBy)
     end
     else result := inttostr(aMin + random(aMax - aMin + 1));
+  end
+  else if sametext(TagString,'incnumber') then begin
+    if not trystrtoint(TagParams.Values['min'], aMin) then aMin := 0;
+    result := inttostr(InterlockedExchange(currentIncNumber, currentIncNumber + 1) + 1);
+    if aMin > StrToInt(result) then result := inttostr(InterlockedExchange(currentIncNumber, aMin));
+    result := inttostr(strtoint(result)+1);
   end
   else Handled := False;
 
@@ -533,16 +557,14 @@ begin
         AlMemoResult.Lines.add('');
         AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + aXMLDATA.XML.Text;
 
-
-        TableViewThreadUpdate.DataController.RecordCount := 0;
-        TableViewThreadSelect.DataController.RecordCount := 1;
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectNumber.Index, '1 (off)');
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectRequestCount.Index,1);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAveragePrepareTimeTaken.Index,aEndPrepareDate - aStartPrepareDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndSelectDate - aStartSelectDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        TableViewThread.DataController.RecordCount := 1;
+        TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+        TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,aEndPrepareDate - aStartPrepareDate);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndSelectDate - aStartSelectDate);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
+        TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
 
       Finally
         aXMLDATA.free;
@@ -720,15 +742,14 @@ begin
       ALMemoResult.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
       ALMemoResult.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
 
-      TableViewThreadSelect.DataController.RecordCount := 0;
-      TableViewThreadUpdate.DataController.RecordCount := 1;
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAveragePrepareTimeTaken.Index,aEndPrepareDate - aStartPrepareDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndUpdateDate - aStartUpdateDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,aEndPrepareDate - aStartPrepareDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndUpdateDate - aStartUpdateDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
 
     Finally
       aLstSql.free;
@@ -810,8 +831,7 @@ begin
   else exit;
 
   //init local variable
-  TableViewThreadUpdate.DataController.RecordCount := 0;
-  TableViewThreadSelect.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
+  TableViewThread.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
 
   //create the fFirebirdConnectionPoolClient
   if not assigned(FirebirdConnectionPoolClient) then begin
@@ -829,7 +849,7 @@ begin
 
   //launch all the thread
   for i := 1 to strtoint(ALEditFirebirdNBThread.Text) do begin
-    TableViewThreadSelect.DataController.SetValue(i-1,TableViewThreadSelectNumber.Index,inttostr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aFirebirdBenchmarkThread := TFirebirdBenchmarkThread.Create(True,
                                                                 self,
                                                                 i,
@@ -891,8 +911,7 @@ begin
   else exit;
 
   //init local variable
-  TableViewThreadSelect.DataController.RecordCount := 0;
-  TableViewThreadUpdate.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
+  TableViewThread.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
 
   //create the fFirebirdConnectionPoolClient
   if not assigned(FirebirdConnectionPoolClient) then begin
@@ -910,7 +929,7 @@ begin
 
   //launch all the thread
   for i := 1 to strtoint(ALEditFirebirdNBThread.Text) do begin
-    TableViewThreadUpdate.DataController.SetValue(i-1,TableViewThreadUpdateNumber.Index,inttostr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aFirebirdBenchmarkThread := TFirebirdBenchmarkThread.Create(True,
                                                                 self,
                                                                 i,
@@ -938,12 +957,19 @@ Var aMySqlClient: TalMySqlClient;
     aFormatSettings: TformatSettings;
     S1: String;
     aLst1: TstringList;
+    aMySQLAPiVersion: TALMySqlVersion_API;
 begin
+
+  case ALComboBoxMySqlApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+
   GetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aMySqlClient := TalMySqlClient.Create(MYSQL50, ALEditMySqllib.Text);
+    aMySqlClient := TalMySqlClient.Create(aMySQLAPiVersion, ALEditMySqllib.Text);
     Try
       aMySqlClient.connect(ALEditMySqlHost.Text,
                            strtoint(ALEditMySqlPort.Text),
@@ -982,15 +1008,14 @@ begin
                                 aFormatSettings);
         aEndDate := ALGetTickCount64;
 
-        TableViewThreadUpdate.DataController.RecordCount := 0;
-        TableViewThreadSelect.DataController.RecordCount := 1;
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectNumber.Index, '1 (off)');
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectRequestCount.Index,1);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndDate - aStartDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,0/0);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        TableViewThread.DataController.RecordCount := 1;
+        TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+        TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
         AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
 
       Finally
@@ -1017,11 +1042,18 @@ Var aMySqlClient: TalMySqlClient;
     LstSql: TstringList;
     S1: String;
     aLst1: TstringList;
+    aMySQLAPiVersion: TALMySqlVersion_API;
 begin
+
+  case ALComboBoxMySqlApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+  
   Screen.Cursor := CrHourGlass;
   try
 
-    aMySqlClient := TalMySqlClient.Create(MYSQL50, ALEditMySqllib.Text);
+    aMySqlClient := TalMySqlClient.Create(aMySQLAPiVersion, ALEditMySqllib.Text);
     LstSql := TstringList.Create;
     Try
       aMySqlClient.connect(ALEditMySqlHost.Text,
@@ -1059,15 +1091,14 @@ begin
         raise;
       end;
 
-      TableViewThreadSelect.DataController.RecordCount := 0;
-      TableViewThreadUpdate.DataController.RecordCount := 1;
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndDate - aStartDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       AlMemoResult.Lines.Text := '';
 
     Finally
@@ -1084,8 +1115,14 @@ end;
 {*************************************************************}
 procedure TForm1.ALButtonMysqlLoopSelectClick(Sender: TObject);
 Var aMySqlBenchmarkThread: TMySqlBenchmarkThread;
+    aMySQLAPiVersion: TALMySqlVersion_API;
     i: integer;
 begin
+
+  case ALComboBoxMySqlApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
 
   {init button action}
   If ALButtonMySqlLoopSelect.tag = 0 then begin
@@ -1100,8 +1137,7 @@ begin
   else exit;
 
   //init local variable
-  TableViewThreadUpdate.DataController.RecordCount := 0;
-  TableViewThreadSelect.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
+  TableViewThread.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
 
   //create the fMySqlConnectionPoolClient
   if not assigned(MySqlConnectionPoolClient) then begin
@@ -1111,7 +1147,7 @@ begin
                                                                      ALEditMySqlLogin.Text,
                                                                      ALEditMySqlPassword.Text,
                                                                      ALEditMySqlCharset.Text,
-                                                                     MYSQL50,
+                                                                     aMySQLAPiVersion,
                                                                      ALEditMySqlLib.Text,
                                                                      0);
   end;
@@ -1121,7 +1157,7 @@ begin
 
   //launch all the thread
   for i := 1 to strtoint(ALEditMySqlNBThread.Text) do begin
-    TableViewThreadSelect.DataController.SetValue(i-1,TableViewThreadSelectNumber.Index,inttostr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aMySqlBenchmarkThread := TMySqlBenchmarkThread.Create(True,
                                                           self,
                                                           i,
@@ -1141,9 +1177,15 @@ end;
 {*************************************************************}
 procedure TForm1.ALButtonMySqlLoopUpdateClick(Sender: TObject);
 Var aMySqlBenchmarkThread: TMySqlBenchmarkThread;
+    aMySQLAPiVersion: TALMySqlVersion_API;
     i: integer;
 begin
 
+  case ALComboBoxMySqlApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+  
   {init button action}
   If ALButtonMySqlLoopUpdate.tag = 0 then begin
     ALButtonMySqlLoopUpdate.Tag := 1;
@@ -1157,8 +1199,7 @@ begin
   else exit;
 
   //init local variable
-  TableViewThreadSelect.DataController.RecordCount := 0;
-  TableViewThreadUpdate.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
+  TableViewThread.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
 
   //create the fMySqlConnectionPoolClient
   if not assigned(MySqlConnectionPoolClient) then begin
@@ -1168,7 +1209,7 @@ begin
                                                                      ALEditMySqlLogin.Text,
                                                                      ALEditMySqlPassword.Text,
                                                                      ALEditMySqlCharset.Text,
-                                                                     MYSQL50,
+                                                                     aMySQLAPiVersion,
                                                                      ALEditMySqlLib.Text,
                                                                      0);
   end;
@@ -1178,7 +1219,7 @@ begin
 
   //launch all the thread
   for i := 1 to strtoint(ALEditMySqlNBThread.Text) do begin
-    TableViewThreadUpdate.DataController.SetValue(i-1,TableViewThreadUpdateNumber.Index,inttostr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aMySqlBenchmarkThread := TMySqlBenchmarkThread.Create(True,
                                                           self,
                                                           i,
@@ -1275,15 +1316,14 @@ begin
                                   aFormatSettings);
         aEndDate := ALGetTickCount64;
 
-        TableViewThreadUpdate.DataController.RecordCount := 0;
-        TableViewThreadSelect.DataController.RecordCount := 1;
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectNumber.Index, '1 (off)');
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectRequestCount.Index,1);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageSelectTimeTaken.Index,aEndDate - aStartDate);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectAverageCommitTimeTaken.Index,0/0);
-        TableViewThreadSelect.DataController.SetValue(0,TableViewThreadSelectErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        TableViewThread.DataController.RecordCount := 1;
+        TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+        TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
         AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
 
       Finally
@@ -1380,15 +1420,14 @@ begin
         raise;
       end;
 
-      TableViewThreadSelect.DataController.RecordCount := 0;
-      TableViewThreadUpdate.DataController.RecordCount := 1;
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateNumber.Index, '1 (off)');
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateRequestCount.Index,1);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageUpdateTimeTaken.Index,aEndDate - aStartDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
-      TableViewThreadUpdate.DataController.SetValue(0,TableViewThreadUpdateErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       AlMemoResult.Lines.Text := '';
 
     Finally
@@ -1400,6 +1439,284 @@ begin
   Finally
     Screen.Cursor := CrDefault;
   End;
+end;
+
+{*********************************************************}
+procedure TForm1.ALButtonSphinxSelectClick(Sender: TObject);
+Var aSphinxClient: TalSphinxQLClient;
+    aXMLDATA: TalXmlDocument;
+    aStartDate: int64;
+    aEndDate: int64;
+    aFormatSettings: TformatSettings;
+    S1: String;
+    aLst1: TstringList;
+    aMySQLAPiVersion: TALMySqlVersion_API;
+begin
+
+  case ALComboBoxSphinxApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+
+  GetLocaleFormatSettings(1033, aFormatSettings);
+  Screen.Cursor := CrHourGlass;
+  try
+
+    aSphinxClient := TalSphinxQLClient.Create(aMySQLAPiVersion, ALEditSphinxlib.Text);
+    Try
+      aSphinxClient.connect(ALEditSphinxHost.Text,
+                           strtoint(ALEditSphinxPort.Text));
+
+      aXMLDATA := ALCreateEmptyXMLDocument('root');
+      Try
+
+        With aXMLDATA Do Begin
+          Options := [doNodeAutoIndent];
+          ParseOptions := [poPreserveWhiteSpace];
+        end;
+
+        aLst1 := TstringList.create;
+        try
+          S1 := ALFastTagReplace(AlMemoSphinxQuery.Lines.Text,
+                                 '<#',
+                                 '>',
+                                 SQLFastTagReplaceFunct,
+                                 True,
+                                 @aLst1)
+        finally
+          aLst1.free;
+        end;
+
+        aStartDate := ALGetTickCount64;
+        aSphinxClient.SelectData(S1,
+                                'rec',
+                                 0,
+                                 200,
+                                aXMLDATA.DocumentElement,
+                                aFormatSettings);
+        aEndDate := ALGetTickCount64;
+
+        TableViewThread.DataController.RecordCount := 1;
+        TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+        TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
+
+      Finally
+        aXMLDATA.free;
+      End;
+
+    Finally
+      aSphinxClient.disconnect;
+      aSphinxClient.free;
+    End;
+
+  Finally
+    Screen.Cursor := CrDefault;
+  End;
+end;
+
+{*********************************************************}
+procedure TForm1.ALButtonSphinxUpdateClick(Sender: TObject);
+Var aSphinxClient: TalSphinxQLClient;
+    aStartDate: int64;
+    aEndDate: int64;
+    aStartCommitDate: int64;
+    aEndCommitDate: int64;
+    LstSql: TstringList;
+    S1: String;
+    aLst1: TstringList;
+    aMySQLAPiVersion: TALMySqlVersion_API;
+begin
+
+  case ALComboBoxSphinxApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+
+  Screen.Cursor := CrHourGlass;
+  try
+
+    aSphinxClient := TalSphinxQLClient.Create(aMySQLAPiVersion, ALEditSphinxlib.Text);
+    LstSql := TstringList.Create;
+    Try
+      aSphinxClient.connect(ALEditSphinxHost.Text,
+                           strtoint(ALEditSphinxPort.Text));
+
+      aLst1 := TstringList.create;
+      try
+        S1 := ALFastTagReplace(AlMemoSphinxQuery.Lines.Text,
+                               '<#',
+                               '>',
+                               SQLFastTagReplaceFunct,
+                               True,
+                               @aLst1)
+      finally
+        aLst1.free;
+      end;
+      S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
+      LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+
+      aStartDate := ALGetTickCount64;
+      aSphinxClient.TransactionStart;
+      try
+        aSphinxClient.UpdateData(LstSql);
+        aEndDate := ALGetTickCount64;
+        aStartCommitDate := ALGetTickCount64;
+        aSphinxClient.TransactionCommit;
+        aendCommitDate := ALGetTickCount64;
+      Except
+        aSphinxClient.TransactionRollBack;
+        raise;
+      end;
+
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      AlMemoResult.Lines.Text := '';
+
+    Finally
+      aSphinxClient.disconnect;
+      aSphinxClient.free;
+      LstSql.free;
+    End;
+
+  Finally
+    Screen.Cursor := CrDefault;
+  End;
+end;
+
+{*************************************************************}
+procedure TForm1.ALButtonSphinxLoopSelectClick(Sender: TObject);
+Var aSphinxBenchmarkThread: TMYsqlBenchmarkThread;
+    aMySQLAPiVersion: TALMySqlVersion_API;
+    i: integer;
+begin
+
+  case ALComboBoxSphinxApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+
+  {init button action}
+  If ALButtonSphinxLoopSelect.tag = 0 then begin
+    ALButtonSphinxLoopSelect.Tag := 1;
+    ALButtonSphinxLoopSelect.Caption := 'STOP';
+  end
+  else If ALButtonSphinxLoopSelect.tag = 1 then begin
+    ALButtonSphinxLoopSelect.Tag := 2;
+    ALButtonSphinxLoopSelect.Caption := 'STOPPING';
+    exit;
+  end
+  else exit;
+
+  //init local variable
+  TableViewThread.DataController.RecordCount := strtoint(ALEditSphinxNBThread.Text);
+
+  //create the fSphinxConnectionPoolClient
+  if not assigned(MySQLConnectionPoolClient) then begin
+    MySQLConnectionPoolClient := TALMySqlConnectionPoolClient.Create(ALEditSphinxHost.Text,
+                                                                     StrToInt(ALEditSphinxPort.Text),
+                                                                     '',
+                                                                     '',
+                                                                     '',
+                                                                     '',
+                                                                     aMySQLAPiVersion,
+                                                                     ALEditSphinxLib.Text,
+                                                                     0);
+  end;
+
+  //clear the status bar
+  StatusBar1.Panels[1].Text := '';
+
+  //launch all the thread
+  for i := 1 to strtoint(ALEditSphinxNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+    aSphinxBenchmarkThread := TMySQLBenchmarkThread.Create(True,
+                                                           self,
+                                                           i,
+                                                           trim(ALMemoSphinxQuery.Lines.Text),
+                                                           strtoint(ALEditSphinxNBLoop.Text),
+                                                           strtoint(ALEditSphinxNbLoopBeforeCommit.Text),
+                                                           false);
+    inc(NBSelectActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Repaint;
+    aSphinxBenchmarkThread.FreeOnTerminate := True;
+    aSphinxBenchmarkThread.Resume;
+  end;
+
+end;
+
+{*************************************************************}
+procedure TForm1.ALButtonSphinxLoopUpdateClick(Sender: TObject);
+Var aSphinxBenchmarkThread: TMySqlBenchmarkThread;
+    aMySQLAPiVersion: TALMySqlVersion_API;
+    i: integer;
+begin
+
+  case ALComboBoxSphinxApiVer.ItemIndex of
+    1: aMySQLAPiVersion := MYSQL55;
+    else aMySQLAPiVersion := MYSQL50;
+  end;
+
+  {init button action}
+  If ALButtonSphinxLoopUpdate.tag = 0 then begin
+    ALButtonSphinxLoopUpdate.Tag := 1;
+    ALButtonSphinxLoopUpdate.Caption := 'STOP';
+  end
+  else If ALButtonSphinxLoopUpdate.tag = 1 then begin
+    ALButtonSphinxLoopUpdate.Tag := 2;
+    ALButtonSphinxLoopUpdate.Caption := 'STOPPING';
+    exit;
+  end
+  else exit;
+
+  //init local variable
+  TableViewThread.DataController.RecordCount := strtoint(ALEditSphinxNBThread.Text);
+
+  //create the fSphinxConnectionPoolClient
+  if not assigned(MySQLConnectionPoolClient) then begin
+    MySqlConnectionPoolClient := TALMySQLConnectionPoolClient.Create(ALEditSphinxHost.Text,
+                                                                     StrToInt(ALEditSphinxPort.Text),
+                                                                     '',
+                                                                     '',
+                                                                     '',
+                                                                     '',
+                                                                     aMySQLAPiVersion,
+                                                                     ALEditSphinxLib.Text,
+                                                                     0);
+  end;
+
+  //clear the status bar
+  StatusBar1.Panels[1].Text := '';
+
+  //launch all the thread
+  for i := 1 to strtoint(ALEditSphinxNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+    aSphinxBenchmarkThread := TMysqlBenchmarkThread.Create(True,
+                                                           self,
+                                                           i,
+                                                           trim(ALMemoSphinxQuery.Lines.Text),
+                                                           strtoint(ALEditSphinxNBLoop.Text),
+                                                           strtoint(ALEditSphinxNbLoopBeforeCommit.Text),
+                                                           true);
+    inc(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Repaint;
+    aSphinxBenchmarkThread.FreeOnTerminate := True;
+    aSphinxBenchmarkThread.Resume;
+  end;
+
 end;
 
 {***************************************************************}
@@ -1422,8 +1739,7 @@ begin
   else exit;
 
   //init local variable
-  TableViewThreadUpdate.DataController.RecordCount := 0;
-  TableViewThreadSelect.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
+  TableViewThread.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
 
   //init the aPragmaStatements
   aPragmaStatements := '';
@@ -1469,7 +1785,7 @@ begin
 
   //launch all the thread
   for i := 1 to strtoint(ALEditSqlite3NBThread.Text) do begin
-    TableViewThreadSelect.DataController.SetValue(i-1,TableViewThreadSelectNumber.Index,inttostr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aSqlite3BenchmarkThread := TSqlite3BenchmarkThread.Create(True,
                                                               self,
                                                               i,
@@ -1506,8 +1822,7 @@ begin
   else exit;
 
   //init local variable
-  TableViewThreadSelect.DataController.RecordCount := 0;
-  TableViewThreadUpdate.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
+  TableViewThread.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
 
   //init the aPragmaStatements
   aPragmaStatements := '';
@@ -1553,7 +1868,7 @@ begin
 
   //launch all the thread
   for i := 1 to strtoint(ALEditSqlite3NBThread.Text) do begin
-    TableViewThreadUpdate.DataController.SetValue(i-1,TableViewThreadUpdateNumber.Index,inttostr(i) + ' (on)');
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
     aSqlite3BenchmarkThread := TSqlite3BenchmarkThread.Create(True,
                                                               self,
                                                               i,
@@ -1642,9 +1957,9 @@ begin
   fNBLoopBeforeCommit:= aNBLoopBeforeCommit;
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
   FErrorMsg := '';
-  FTotalUpdateOrSelectTimeTaken := 0;
+  FTotalExecuteTimeTaken := 0;
   FTotalCommitTimeTaken := 0;
-  FTotalUpdateOrSelect := 0;
+  FTotalLoop := 0;
   fOwner := AOwner;
   fRank := aRank;
   fUpdateSQL := aUpdateSQL;
@@ -1722,7 +2037,7 @@ begin
               aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
             end;
             inc(aLoopIndex);
-            inc(FTotalUpdateOrSelect);
+            inc(FTotalLoop);
             if aLoopIndex > fMaxLoop then break;
           Finally
             aTmpLstSql.Free;
@@ -1741,7 +2056,7 @@ begin
                                                                      aFormatSettings,
                                                                      aconnectionHandle);
           aEndDate := ALGetTickCount64;
-          FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
+          FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
 
           //commit the data
           aStartDate := ALGetTickCount64;
@@ -1777,12 +2092,12 @@ end;
 procedure TSqlite3BenchmarkThread.UpdateGUI;
 begin
   if fUpdateSQL then begin
-    TForm1(fOwner).TableViewThreadUpdate.BeginUpdate;
+    TForm1(fOwner).TableViewThread.BeginUpdate;
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBUpdateActiveThread);
         TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadUpdateNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
         if TForm1(fOwner).NBUpdateActiveThread = 0 then begin
           TForm1(fOwner).ALButtonSqlite3LoopUpdate.Tag := 0;
           TForm1(fOwner).ALButtonSqlite3LoopUpdate.Caption := 'Loop UPDATE via Sqlite3';
@@ -1792,23 +2107,23 @@ begin
           TForm1(fOwner).Sqlite3ConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
-      TForm1(fOwner).TableViewThreadUpdate.EndUpdate;
+      TForm1(fOwner).TableViewThread.EndUpdate;
     end;
   end
   else begin
-    TForm1(fOwner).TableViewThreadSelect.BeginUpdate;
+    TForm1(fOwner).TableViewThread.BeginUpdate;
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBSelectActiveThread);
         TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadSelectNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
         if TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).ALButtonSqlite3LoopSelect.Tag := 0;
           TForm1(fOwner).ALButtonSqlite3LoopSelect.Caption := 'Loop SELECT via Sqlite3';
@@ -1818,14 +2133,14 @@ begin
           TForm1(fOwner).Sqlite3ConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
-      TForm1(fOwner).TableViewThreadSelect.EndUpdate;
+      TForm1(fOwner).TableViewThread.EndUpdate;
     end;
   end;
   application.ProcessMessages;
@@ -1852,7 +2167,7 @@ begin
   inherited Create(CreateSuspended);
   fSQL:= aSQL;
   fParams:= aParams;
-  fTPB:= aTPB;    
+  fTPB:= aTPB;
   fOn:= true;
   fMaxLoop:= aMaxLoop;
   if fMaxLoop <= 0 then fMaxLoop := MaxInt;
@@ -1860,9 +2175,9 @@ begin
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
   FErrorMsg := '';
   FTotalPrepareTimeTaken := -1;
-  FTotalUpdateOrSelectTimeTaken := 0;
+  FTotalExecuteTimeTaken := 0;
   FTotalCommitTimeTaken := 0;
-  FTotalUpdateOrSelect := 0;
+  FTotalLoop := 0;
   fOwner := AOwner;
   fRank := aRank;
   fUpdateSQL := aUpdateSQL;
@@ -2076,7 +2391,7 @@ begin
                                                                                           aSqlda,
                                                                                           fTPB);
                 aEndDate := ALGetTickCount64;
-                FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
+                FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
               end
               else begin
                 aStartDate := ALGetTickCount64;
@@ -2089,10 +2404,10 @@ begin
                                                                        aSqlda,
                                                                        fTPB);
                 aEndDate := ALGetTickCount64;
-                FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
+                FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
               end;
 
-              inc(FTotalUpdateOrSelect);
+              inc(FTotalLoop);
               inc(aLoopIndex);
               if aLoopIndex > fMaxLoop then break;
 
@@ -2150,12 +2465,12 @@ end;
 procedure TFirebirdBenchmarkThread.UpdateGUI;
 begin
   if fUpdateSQL then begin
-    TForm1(fOwner).TableViewThreadUpdate.BeginUpdate;
+    TForm1(fOwner).TableViewThread.BeginUpdate;
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBUpdateActiveThread);
         TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadUpdateNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
         if TForm1(fOwner).NBUpdateActiveThread = 0 then begin
           TForm1(fOwner).ALButtonFirebirdLoopUpdate.Tag := 0;
           TForm1(fOwner).ALButtonFirebirdLoopUpdate.Caption := 'Loop UPDATE via Firebird';
@@ -2165,24 +2480,24 @@ begin
           TForm1(fOwner).FirebirdConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,FTotalUpdateOrSelect);
-      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalUpdateOrSelect)
-      else  TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalLoop)
+      else  TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
-      TForm1(fOwner).TableViewThreadUpdate.EndUpdate;
+      TForm1(fOwner).TableViewThread.EndUpdate;
     end;
   end
   else begin
-    TForm1(fOwner).TableViewThreadSelect.BeginUpdate;
+    TForm1(fOwner).TableViewThread.BeginUpdate;
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBSelectActiveThread);
         TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadSelectNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
         if TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).ALButtonFirebirdLoopSelect.Tag := 0;
           TForm1(fOwner).ALButtonFirebirdLoopSelect.Caption := 'Loop SELECT via Firebird';
@@ -2192,15 +2507,15 @@ begin
           TForm1(fOwner).FirebirdConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,FTotalUpdateOrSelect);
-      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalUpdateOrSelect)
-      else  TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalLoop)
+      else  TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
-      TForm1(fOwner).TableViewThreadSelect.EndUpdate;
+      TForm1(fOwner).TableViewThread.EndUpdate;
     end;
   end;
   application.ProcessMessages;
@@ -2228,9 +2543,9 @@ begin
   fNBLoopBeforeCommit:= aNBLoopBeforeCommit;
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
   FErrorMsg := '';
-  FTotalUpdateOrSelectTimeTaken := 0;
+  FTotalExecuteTimeTaken := 0;
   FTotalCommitTimeTaken := 0;
-  FTotalUpdateOrSelect := 0;
+  FTotalLoop := 0;
   fOwner := AOwner;
   fRank := aRank;
   fUpdateSQL := aUpdateSQL;
@@ -2256,7 +2571,6 @@ Var aConnectionHandle: PMySql;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
-    aLastUpdateGUI: Int64;
     S1: String;
     j: integer;
     aLst1: TstringList;
@@ -2267,9 +2581,6 @@ begin
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
-
-  //init the aLastUpdateGUI
-  aLastUpdateGUI := 0;
 
   //create local object
   aLstSql := TstringList.create;
@@ -2311,7 +2622,7 @@ begin
               aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
             end;
             inc(aLoopIndex);
-            inc(FTotalUpdateOrSelect);
+            inc(FTotalLoop);
             if aLoopIndex > fMaxLoop then break;
           Finally
             aTmpLstSql.Free;
@@ -2330,7 +2641,7 @@ begin
                                                                    aFormatSettings,
                                                                    aConnectionHandle);
           aEndDate := ALGetTickCount64;
-          FTotalUpdateOrSelectTimeTaken := FTotalUpdateOrSelectTimeTaken + aEndDate - aStartDate;
+          FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
 
           //commit the data
           aStartDate := ALGetTickCount64;
@@ -2351,12 +2662,9 @@ begin
           Exit;
         end;
       end;
-      if ALGetTickCount64 - aLastUpdateGUI > 5000 then begin
-        Synchronize(UpdateGUI); // <= it's seam to be a source of bottleneck with mysql !!
-        aLastUpdateGUI := ALGetTickCount64;
-      end;
-      If ((not fUpdateSQL) and (Tform1(fOwner).ALButtonMySqlLoopSelect.tag = 2)) or
-         ((fUpdateSQL) and (Tform1(fOwner).ALButtonMySqlLoopUpdate.tag = 2)) then Break;
+      Synchronize(UpdateGUI); // <= it's seam to be a source of bottleneck with mysql !! MYSQL IT'S A BULLSHEET !!
+      If ((not fUpdateSQL) and ((Tform1(fOwner).ALButtonMySqlLoopSelect.tag = 2) or (Tform1(fOwner).ALButtonSphinxLoopSelect.tag = 2))) or
+         ((fUpdateSQL) and ((Tform1(fOwner).ALButtonMySqlLoopUpdate.tag = 2) or (Tform1(fOwner).ALButtonSphinxLoopUpdate.tag = 2))) then Break;
     end;
 
   Finally
@@ -2369,55 +2677,59 @@ end;
 procedure TMySqlBenchmarkThread.UpdateGUI;
 begin
   if fUpdateSQL then begin
-    TForm1(fOwner).TableViewThreadUpdate.BeginUpdate;
+    TForm1(fOwner).TableViewThread.BeginUpdate;
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBUpdateActiveThread);
         TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadUpdateNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
         if TForm1(fOwner).NBUpdateActiveThread = 0 then begin
           TForm1(fOwner).ALButtonMySqlLoopUpdate.Tag := 0;
           TForm1(fOwner).ALButtonMySqlLoopUpdate.Caption := 'Loop UPDATE via MySql';
+          TForm1(fOwner).ALButtonSphinxLoopUpdate.Tag := 0;
+          TForm1(fOwner).ALButtonSphinxLoopUpdate.Caption := 'Loop UPDATE via Sphinx';
         end;
         if TForm1(fOwner).NBUpdateActiveThread + TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).MySqlConnectionPoolClient.Free;
           TForm1(fOwner).MySqlConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateRequestCount.Index,FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageUpdateTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadUpdate.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadUpdateErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
-      TForm1(fOwner).TableViewThreadUpdate.EndUpdate;
+      TForm1(fOwner).TableViewThread.EndUpdate;
     end;
   end
   else begin
-    TForm1(fOwner).TableViewThreadSelect.BeginUpdate;
+    TForm1(fOwner).TableViewThread.BeginUpdate;
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBSelectActiveThread);
         TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadSelectNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
         if TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).ALButtonMySqlLoopSelect.Tag := 0;
           TForm1(fOwner).ALButtonMySqlLoopSelect.Caption := 'Loop SELECT via MySql';
+          TForm1(fOwner).ALButtonSphinxLoopSelect.Tag := 0;
+          TForm1(fOwner).ALButtonSphinxLoopSelect.Caption := 'Loop SELECT via Sphinx';
         end;
         if TForm1(fOwner).NBUpdateActiveThread + TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).MySqlConnectionPoolClient.Free;
           TForm1(fOwner).MySqlConnectionPoolClient := nil;
         end;
       end;
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectRequestCount.Index,FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageSelectTimeTaken.Index,FTotalUpdateOrSelectTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalUpdateOrSelect);
-      TForm1(fOwner).TableViewThreadSelect.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadSelectErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Memory usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
-      TForm1(fOwner).TableViewThreadSelect.EndUpdate;
+      TForm1(fOwner).TableViewThread.EndUpdate;
     end;
   end;
   application.ProcessMessages;

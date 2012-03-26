@@ -376,9 +376,14 @@ end;
 constructor TalSqlite3Client.Create(const lib: String = 'sqlite3.dll'; const initializeLib: Boolean = True);
 begin
   fLibrary := TALSqlite3Library.Create;
-  fLibrary.Load(lib, initializeLib);
-  FownLibrary := True;
-  initObject;
+  try
+    fLibrary.Load(lib, initializeLib);
+    FownLibrary := True;
+    initObject;
+  Except
+    fLibrary.free;
+    raise;
+  end;
 end;
 
 {**********************************************************}
@@ -1012,13 +1017,18 @@ constructor TalSqlite3ConnectionPoolClient.Create(aDataBaseName: String;
                                                   const initializeLib: Boolean = True);
 begin
   fLibrary := TALSqlite3Library.Create;
-  fLibrary.Load(alib, False);
-  config(SQLITE_CONFIG_MULTITHREAD);
-  if initializeLib then initialize;
-  FownLibrary := True;
-  initObject(aDataBaseName,
-             aOpenConnectionFlags,
-             aOpenConnectionPragmaStatements);
+  try
+    fLibrary.Load(alib, False);
+    config(SQLITE_CONFIG_MULTITHREAD);
+    if initializeLib then initialize;
+    FownLibrary := True;
+    initObject(aDataBaseName,
+               aOpenConnectionFlags,
+               aOpenConnectionPragmaStatements);
+  Except
+    fLibrary.free;
+    raise;
+  end;
 end;
 
 {**********************************************************************}

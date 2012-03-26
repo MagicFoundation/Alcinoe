@@ -36,6 +36,7 @@
     <DelphiCompile Include="ALSQLBenchmark.dpr">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
+    <DCCReference Include="..\..\source\ALSphinxQLClient.pas" />
     <DCCReference Include="Unit1.pas">
       <Form>Form1</Form>
     </DCCReference>

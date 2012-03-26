@@ -132,7 +132,7 @@ Type
                       Login,
                       Password,
                       CharSet: String;
-                      Const ClientFlag: Cardinal = 0);
+                      Const ClientFlag: Cardinal = 0); virtual;
     Procedure Disconnect;
     Procedure TransactionStart;
     Procedure TransactionCommit;
@@ -432,9 +432,14 @@ constructor TalMySqlClient.Create(ApiVer: TALMySqlVersion_API;
                                   const lib: String = 'libmysql.dll');
 begin
   fLibrary := TALMySqlLibrary.Create(ApiVer);
-  fLibrary.Load(lib);
-  FownLibrary := True;
-  initObject;
+  try
+    fLibrary.Load(lib);
+    FownLibrary := True;
+    initObject;
+  Except
+    fLibrary.free;
+    raise;
+  end;
 end;
 
 {******************************************************}
@@ -1045,15 +1050,20 @@ constructor TalMySqlConnectionPoolClient.Create(aHost: String;
                                                 Const aOpenConnectionClientFlag: Cardinal = 0);
 begin
   fLibrary := TALMySqlLibrary.Create(aApiVer);
-  fLibrary.Load(alib);
-  FownLibrary := True;
-  initObject(aHost,
-             aPort,
-             aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aOpenConnectionClientFlag);
+  Try
+    fLibrary.Load(alib);
+    FownLibrary := True;
+    initObject(aHost,
+               aPort,
+               aDataBaseName,
+               aLogin,
+               aPassword,
+               aCharSet,
+               aOpenConnectionClientFlag);
+  except
+    fLibrary.free;
+    raise;
+  End;
 end;
 
 {************************************************************}

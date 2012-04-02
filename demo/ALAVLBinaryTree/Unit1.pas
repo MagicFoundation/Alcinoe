@@ -88,9 +88,11 @@ begin
     StartDate := GetTickCount;
     for I := 1 to 1000000 do
       aLst.Add(AlRandomStr(10));
+    Showmessage('Add 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+    StartDate := GetTickCount;
     aLst.Duplicates := DupIgnore;
     aLst.Sorted := True;
-    Showmessage('Add 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+    Showmessage('Sort 1.000.000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
 
   finally
     aLst.free;

@@ -1309,22 +1309,20 @@ end;
 {***************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.TransactionStart(Var ConnectionHandle: PSQLite3;
                                                           const ReadOnly: boolean = False);
-Var areleaseConnectionHandleonError: Boolean;
 begin
 
+  //ConnectionHandle must be null
+  if assigned(ConnectionHandle) then raise exception.Create('Connection handle must be null');
+
   //init the aConnectionHandle
-  if not assigned(ConnectionHandle) then begin
-    ConnectionHandle := AcquireConnection(ReadOnly);
-    aReleaseConnectionHandleonError := True;
-  end
-  else aReleaseConnectionHandleonError := False;
+  ConnectionHandle := AcquireConnection(ReadOnly);
   try
 
     //start the transaction
     UpdateData('BEGIN TRANSACTION', ConnectionHandle);
 
   except
-    if aReleaseConnectionHandleonError then ReleaseConnection(ConnectionHandle, True);
+    ReleaseConnection(ConnectionHandle, True);
     raise;
   end;
 

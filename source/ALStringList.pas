@@ -432,7 +432,8 @@ begin
        (
         CaseSensitive and
         (aNode.Val <> aValue)
-       ) or
+       )
+       or
        (
         (not CaseSensitive) and
         (not sametext(aNode.Val, aValue))
@@ -514,6 +515,7 @@ begin
   if ExtractNameValue(S, aNewName, aNewValue) then aNewNvs := True
   else begin
     aNewName := S;
+    aNewValue := '';
     aNewNvs := False;
   end;
 

@@ -219,7 +219,7 @@ Type
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
                             aFormatSettings: TformatSettings): String;
-    Function  AcquireConnection(const readonly: boolean = False): PMySql; virtual;
+    Function  AcquireConnection: PMySql; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PMySql;
                                 const CloseConnection: Boolean = False); virtual;
     procedure initObject(aHost: String;
@@ -249,7 +249,7 @@ Type
                        Const aOpenConnectionClientFlag: Cardinal = 0); overload; virtual;
     Destructor  Destroy; Override;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
-    Procedure TransactionStart(Var ConnectionHandle: PMySql; const ReadOnly: boolean = False); virtual;
+    Procedure TransactionStart(Var ConnectionHandle: PMySql); virtual;
     Procedure TransactionCommit(var ConnectionHandle: PMySql;
                                 const CloseConnection: Boolean = False); virtual;
     Procedure TransactionRollback(var ConnectionHandle: PMySql;
@@ -1104,8 +1104,8 @@ begin
 
 end;
 
-{***********************************************************************************************}
-function TalMySqlConnectionPoolClient.AcquireConnection(const readonly: boolean = False): PMySql;
+{**************************************************************}
+function TalMySqlConnectionPoolClient.AcquireConnection: PMySql;
 Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
     aTickCount: int64;
 Begin
@@ -1309,25 +1309,22 @@ begin
 
 end;
 
-{***********************************************************************************}
-procedure TalMySqlConnectionPoolClient.TransactionStart(Var ConnectionHandle: PMySql;
-                                                        const ReadOnly: boolean = False);
-Var areleaseConnectionHandleonError: Boolean;
+{************************************************************************************}
+procedure TalMySqlConnectionPoolClient.TransactionStart(Var ConnectionHandle: PMySql);
 begin
 
+  //ConnectionHandle must be null
+  if assigned(ConnectionHandle) then raise exception.Create('Connection handle must be null');
+
   //init the aConnectionHandle
-  if not assigned(ConnectionHandle) then begin
-    ConnectionHandle := AcquireConnection(ReadOnly);
-    aReleaseConnectionHandleonError := True;
-  end
-  else aReleaseConnectionHandleonError := False;
+  ConnectionHandle := AcquireConnection;
   try
 
     //start the transaction
     UpdateData('START TRANSACTION', ConnectionHandle);
 
   except
-    if aReleaseConnectionHandleonError then ReleaseConnection(ConnectionHandle, True);
+    ReleaseConnection(ConnectionHandle, True);
     raise;
   end;
 
@@ -1423,7 +1420,7 @@ begin
     //acquire a connection and start the transaction if necessary
     aTmpConnectionHandle := ConnectionHandle;
     aOwnConnection := (not assigned(ConnectionHandle));
-    if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
+    if aOwnConnection then TransactionStart(aTmpConnectionHandle);
     Try
 
       //loop on all the SQL
@@ -1733,7 +1730,7 @@ begin
   //acquire a connection and start the transaction if necessary
   aTmpConnectionHandle := ConnectionHandle;
   aOwnConnection := (not assigned(ConnectionHandle));
-  if aOwnConnection then TransactionStart(aTmpConnectionHandle, False);
+  if aOwnConnection then TransactionStart(aTmpConnectionHandle);
   Try
 
     //loop on all the SQL
@@ -1817,7 +1814,7 @@ begin
   //acquire a connection and start the transaction if necessary
   aTmpConnectionHandle := ConnectionHandle;
   aOwnConnection := (not assigned(ConnectionHandle));
-  if aOwnConnection then TransactionStart(aTmpConnectionHandle, False);
+  if aOwnConnection then TransactionStart(aTmpConnectionHandle);
   Try
 
     //if the SQL is not empty

@@ -442,7 +442,7 @@ begin
       for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
         aLst1 := TstringList.create;
         try
-          aSQL.Params[i].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+          aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
                                                              '<#',
                                                              '>',
                                                              SQLFastTagReplaceFunct,
@@ -451,8 +451,8 @@ begin
         finally
           aLst1.free;
         end;
-        aSQL.Params[i].fields[i].isnull := False;
-        aSQL.Params[i].fields[i].isblob := False;
+        aSQL.Params[0].fields[i].isnull := False;
+        aSQL.Params[0].fields[i].isblob := False;
       end;
     end
     else Setlength(aSQL.Params, 0);
@@ -541,7 +541,7 @@ begin
     for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
       aLst1 := TstringList.create;
       try
-        aSQL.Params[i].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+        aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
                                                            '<#',
                                                            '>',
                                                            SQLFastTagReplaceFunct,
@@ -550,8 +550,8 @@ begin
       finally
         aLst1.free;
       end;
-      aSQL.Params[i].fields[i].isnull := False;
-      aSQL.Params[i].fields[i].isblob := False;
+      aSQL.Params[0].fields[i].isnull := False;
+      aSQL.Params[0].fields[i].isblob := False;
     end;
   end
   else Setlength(aSQL.Params, 0);

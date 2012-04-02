@@ -165,7 +165,6 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitHeight = 192
         object TableViewThread: TcxGridTableView
           NavigatorButtons.ConfirmDelete = False
           NavigatorButtons.First.Visible = False
@@ -252,6 +251,10 @@ object Form1: TForm1
     object Note: TTabSheet
       Caption = 'Note'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ALMemo1: TALMemo
         Left = 0
         Top = 0
@@ -313,10 +316,6 @@ object Form1: TForm1
         ParentFont = False
         TabOrder = 0
         WordWrap = False
-        ExplicitLeft = 1
-        ExplicitTop = 1
-        ExplicitWidth = 292
-        ExplicitHeight = 259
         DesignSize = (
           999
           301)
@@ -325,6 +324,10 @@ object Form1: TForm1
     object Firebird: TTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label2: TLabel
         Left = 68
         Top = 101
@@ -814,7 +817,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         ItemIndex = 4
         TabOrder = 0
         Text = 'FB25'
@@ -858,6 +861,10 @@ object Form1: TForm1
     end
     object MySQL: TTabSheet
       Caption = 'MySQL'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 50
         Top = 78
@@ -1300,7 +1307,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 13
+        ItemHeight = 0
         ItemIndex = 1
         TabOrder = 15
         Text = 'MYSQL55'
@@ -1312,6 +1319,10 @@ object Form1: TForm1
     object SQLLite3: TTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label24: TLabel
         Left = 16
         Top = 26

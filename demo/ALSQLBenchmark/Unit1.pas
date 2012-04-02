@@ -304,6 +304,7 @@ uses alFcnSkin,
      ALFBXLib,
      ALMySqlWrapper,
      alSqlite3Wrapper,
+     ALAVLBinaryTree,
      AlXmlDoc,
      alFcnString;
 
@@ -2224,6 +2225,8 @@ Var aDBHandle: IscDbHandle;
     aUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
     aTmpSelectDataSQLs: TalFBXClientSelectDataSQLs;
     aTmpUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
+    aStatementPool: TALFBXConnectionStatementPoolBinTree;
+    aStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
     aFormatSettings: TformatSettings;
     aStmtHandle: IscStmtHandle;
     aSqlda: TALFBXSQLResult;
@@ -2382,29 +2385,42 @@ begin
                 end;
               end;
 
-              if fUpdateSQL then begin
-                aStartDate := ALGetTickCount64;
-                if fUpdateSQL then Tform1(fOwner).FirebirdConnectionPoolClient.UpdateData(aTmpUpdateDataSQLs,
-                                                                                          aDBHandle,
-                                                                                          aTraHandle,
-                                                                                          aStmtHandle,
-                                                                                          aSqlda,
-                                                                                          fTPB);
-                aEndDate := ALGetTickCount64;
-                FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
+              if assigned(aStmtHandle) then begin
+                aStatementPool := TALFBXConnectionStatementPoolBinTree.Create;
+                aStatementPoolNode := TALFBXConnectionStatementPoolBinTreeNode.Create;
+                if fUpdateSQL then aStatementPoolNode.ID := aTmpUpdateDataSQLs[0].SQL
+                else aStatementPoolNode.ID := aTmpSelectDataSQLs[0].SQL;
+                TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).Lib := Tform1(fOwner).FirebirdConnectionPoolClient.Lib;
+                TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).StmtHandle := aStmtHandle;
+                TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).Sqlda := aSqlda;
+                if not aStatementPool.AddNode(aStatementPoolNode) then aStatementPoolNode.Free;
               end
-              else begin
-                aStartDate := ALGetTickCount64;
-                Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aTmpSelectDataSQLs,
-                                                                       aXMLDATA.documentElement,
-                                                                       aFormatSettings,
-                                                                       aDbHandle,
-                                                                       aTraHandle,
-                                                                       aStmtHandle,
-                                                                       aSqlda,
-                                                                       fTPB);
-                aEndDate := ALGetTickCount64;
-                FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
+              else aStatementPool := nil;
+              try
+                if fUpdateSQL then begin
+                  aStartDate := ALGetTickCount64;
+                  if fUpdateSQL then Tform1(fOwner).FirebirdConnectionPoolClient.UpdateData(aTmpUpdateDataSQLs,
+                                                                                            aDBHandle,
+                                                                                            aTraHandle,
+                                                                                            aStatementPool,
+                                                                                            fTPB);
+                  aEndDate := ALGetTickCount64;
+                  FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
+                end
+                else begin
+                  aStartDate := ALGetTickCount64;
+                  Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aTmpSelectDataSQLs,
+                                                                         aXMLDATA.documentElement,
+                                                                         aFormatSettings,
+                                                                         aDbHandle,
+                                                                         aTraHandle,
+                                                                         aStatementPool,
+                                                                         fTPB);
+                  aEndDate := ALGetTickCount64;
+                  FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aEndDate - aStartDate;
+                end;
+              finally
+                if assigned(aStatementPool) then aStatementPool.Free;
               end;
 
               inc(FTotalLoop);
@@ -2415,18 +2431,8 @@ begin
 
           finally
 
-            if assigned(aStmtHandle) then begin
-              try
-                Tform1(fOwner).FirebirdConnectionPoolClient.lib.DSQLFreeStatement(aStmtHandle, DSQL_drop);
-              Except
-                //what else we can do here ?
-                //this can happen if connection lost for exemple
-                //i preferre to hide this exception to not hide previous exception
-              end;
-              aSqlda.free;
-              aStmtHandle := nil;
-              aSqlda := nil;
-            end;
+            aStmtHandle := nil;
+            aSqlda := nil;
 
           end;
 

@@ -245,89 +245,12 @@ object Form1: TForm1
     Top = 0
     Width = 1007
     Height = 329
-    ActivePage = Sphinx
+    ActivePage = Firebird
     Align = alTop
     TabOrder = 0
-    object Note: TTabSheet
-      Caption = 'Note'
-      ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
-      object ALMemo1: TALMemo
-        Left = 0
-        Top = 0
-        Width = 999
-        Height = 301
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
-        Align = alClient
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          'ALSQLBenchmark'
-          ''
-          
-            'With this tool you can do the benchmark you want, but in sample ' +
-            'we gave '
-          
-            'you an example of 2 scenarios you can do. The first scenario wil' +
-            'l try to find '
-          'the most accurate search engine to answer query like'
-          ''
-          'Select'
-          '  ID'
-          'from'
-          '  Hash'
-          'Where '
-          '  X1_Y1 >= a and'
-          '  X1_Y1 <= b and'
-          '  X1_Y2 >= a and'
-          '  X1_Y2 <= b and'
-          '  X1_Y3 >= a and'
-          '  X1_Y3 <= b and'
-          '  X1_Y4 >= a and'
-          '  X1_Y4 <= b and'
-          '  X1_Y5 >= a and'
-          '  X1_Y5 <= b'
-          ''
-          
-            'The second scenario will try to see with search engine can be th' +
-            'e most '
-          
-            'accurate for a real estate website. For Example to answer Query ' +
-            'like'
-          ''
-          'Select'
-          '  ID'
-          'from'
-          '  properties'
-          'Where '
-          '  Total_sale_price > 150000 and'
-          '  Total_sale_price < 200000 and'
-          '  nb_bedroom > 3 and'
-          '  description like ('#39'%keyword%'#39')'
-          'Order by'
-          '  Total_Sale_Price ASC')
-        ParentFont = False
-        TabOrder = 0
-        WordWrap = False
-        DesignSize = (
-          999
-          301)
-      end
-    end
     object Firebird: TTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label2: TLabel
         Left = 68
         Top = 101
@@ -592,10 +515,15 @@ object Form1: TForm1
         Height = 121
         OnPaint = ALMemoPaint
         OnPaintScrollBar = ALMemoPaintScrollBar
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
         Lines.Strings = (
-          '****************************'
+          '***********************************'
           'Exemple step 1 create the database: '
-          '****************************'
+          '***********************************'
           ''
           'CREATE DATABASE '#39'c:\test.fdb'#39' '
           '              USER '#39'sysdba'#39' '
@@ -604,9 +532,9 @@ object Form1: TForm1
           '              DEFAULT CHARACTER SET ISO8859_1;'
           ''
           ''
-          '****************************'
+          '********************************'
           'Exemple step 2 create the Table: '
-          '****************************'
+          '********************************'
           ''
           'CREATE TABLE HASH('
           '  ID INTEGER NOT NULL,  '
@@ -625,13 +553,13 @@ object Form1: TForm1
           'CREATE GENERATOR HASH_GEN;'
           ''
           ''
-          '****************************'
+          '**********************************'
           'Exemple step 3 create the trigger: '
           'Note: we must create the trigger alone'
           'because their is the char ; inside the'
           'trigger and the set term is not yet '
           'implemented.'
-          '****************************'
+          '**********************************'
           ''
           'CREATE OR ALTER TRIGGER OnBeforeInsertHash FOR HASH'
           'BEFORE INSERT POSITION 0'
@@ -642,9 +570,9 @@ object Form1: TForm1
           'END;'
           ''
           ''
-          '****************************'
+          '********************************'
           'Exemple step 4 add rows in loop:'
-          '****************************'
+          '********************************'
           ''
           'SQL Text:'
           'INSERT INTO HASH('
@@ -664,9 +592,9 @@ object Form1: TForm1
           '<#randomnumber min="0" max="255">'
           ''
           ''
-          '****************************'
+          '***********************************'
           'Exemple step 5 select rows in loop:'
-          '****************************'
+          '***********************************'
           ''
           'Select '
           '  ID '
@@ -683,6 +611,7 @@ object Form1: TForm1
           '  x1_y4 <= <#randomnumber min="0" max="255" index="4"> + 20 and '
           '  x1_y5 >= <#randomnumber min="0" max="255" index="5"> and '
           '  x1_y5 <= <#randomnumber min="0" max="255" index="5"> + 20;')
+        ParentFont = False
         TabOrder = 8
         WordWrap = False
         DesignSize = (
@@ -817,7 +746,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         ItemIndex = 4
         TabOrder = 0
         Text = 'FB25'
@@ -835,6 +764,12 @@ object Form1: TForm1
         Height = 134
         OnPaint = ALMemoPaint
         OnPaintScrollBar = ALMemoPaintScrollBar
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
+        ParentFont = False
         TabOrder = 9
         WordWrap = False
         DesignSize = (
@@ -861,10 +796,6 @@ object Form1: TForm1
     end
     object MySQL: TTabSheet
       Caption = 'MySQL'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TLabel
         Left = 50
         Top = 78
@@ -1125,17 +1056,22 @@ object Form1: TForm1
         Height = 258
         OnPaint = ALMemoPaint
         OnPaintScrollBar = ALMemoPaintScrollBar
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
         Lines.Strings = (
-          '****************************'
+          '***********************************'
           'Exemple step 1 create the database: '
-          '****************************'
+          '***********************************'
           ''
           'CREATE DATABASE TEST;'
           ''
           ''
-          '****************************'
+          '********************************'
           'Exemple step 2 create the Table: '
-          '****************************'
+          '********************************'
           ''
           'CREATE TABLE HASH('
           '  ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,'
@@ -1152,9 +1088,9 @@ object Form1: TForm1
           'CREATE INDEX HASH_X1_Y5_IDX ON HASH (X1_Y5);'
           ''
           ''
-          '****************************'
+          '********************************'
           'Exemple step 3 add rows in loop:'
-          '****************************'
+          '********************************'
           ''
           'INSERT INTO HASH('
           '  x1_y1,'
@@ -1172,9 +1108,9 @@ object Form1: TForm1
           ');'
           ''
           ''
-          '****************************'
+          '***********************************'
           'Exemple step 4 select rows in loop:'
-          '****************************'
+          '***********************************'
           ''
           'Select '
           '  ID '
@@ -1191,6 +1127,7 @@ object Form1: TForm1
           '  x1_y4 <= <#randomnumber min="0" max="255" index="4"> + 20 and '
           '  x1_y5 >= <#randomnumber min="0" max="255" index="5"> and '
           '  x1_y5 <= <#randomnumber min="0" max="255" index="5"> + 20;')
+        ParentFont = False
         TabOrder = 7
         WordWrap = False
         DesignSize = (
@@ -1307,7 +1244,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 0
+        ItemHeight = 13
         ItemIndex = 1
         TabOrder = 15
         Text = 'MYSQL55'
@@ -1319,10 +1256,6 @@ object Form1: TForm1
     object SQLLite3: TTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label24: TLabel
         Left = 16
         Top = 26
@@ -1452,18 +1385,23 @@ object Form1: TForm1
         Height = 258
         OnPaint = ALMemoPaint
         OnPaintScrollBar = ALMemoPaintScrollBar
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
         Lines.Strings = (
-          '**************************** '
+          '*********************************** '
           'Exemple step 1 create the database:'
-          '****************************'
+          '***********************************'
           ''
           'The database will be created automatiquelly '
           'on the First Create Table Statement '
           ''
           ''
-          '****************************'
+          '********************************'
           'Exemple step 2 create the Table: '
-          '****************************'
+          '********************************'
           ''
           'CREATE VIRTUAL TABLE HASH USING rtree('
           '  ID INTEGER PRIMARY KEY ASC,'
@@ -1475,9 +1413,9 @@ object Form1: TForm1
           ');'
           ''
           ''
-          '****************************'
+          '********************************'
           'Exemple step 3 add rows in loop:'
-          '****************************'
+          '********************************'
           ''
           'INSERT INTO HASH('
           '  ID,'
@@ -1501,14 +1439,14 @@ object Form1: TForm1
           ');'
           ''
           ''
-          '****************************'
+          '***********************************'
           'Exemple step 4 select rows in loop:'
           'Note: take in account that when the '
           'File system start put in cache the '
           'database file, the speed can change'
           'a lot... Do some select in loop for '
           '10-20 min to see the difference'
-          '****************************'
+          '***********************************'
           ''
           'Select '
           '  H1.ID '
@@ -1525,6 +1463,7 @@ object Form1: TForm1
           '  x1_y4_max <= <#randomnumber min="0" max="255" index="4"> and '
           '  x1_y5_min >= <#randomnumber min="0" max="255" index="5"> and '
           '  x1_y5_max <= <#randomnumber min="0" max="255" index="5">;')
+        ParentFont = False
         TabOrder = 9
         WordWrap = False
         DesignSize = (
@@ -1905,30 +1844,32 @@ object Form1: TForm1
         Height = 258
         OnPaint = ALMemoPaint
         OnPaintScrollBar = ALMemoPaintScrollBar
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
         Lines.Strings = (
-          '**********'
-          'SCENARIO 1'
-          '**********'
-          ''
-          '****************************'
+          '************************************'
           'Exemple step 1 init the sphinx.conf: '
-          '****************************'
+          '************************************'
           ''
           'index HASH'
           '{'
           '  type               = rt'
           '  path               = c:\sphinxdata\HASH'
-          '  rt_field           = not_used'
-          '  rt_attr_multi      = x1_y1'
-          '  rt_attr_multi      = x1_y2'
-          '  rt_attr_multi      = x1_y3'
-          '  rt_attr_multi      = x1_y4'
-          '  rt_attr_multi      = x1_y5'
+          '  rt_mem_limit       = 32M'
+          '  rt_field           = x1_y1'
+          '  rt_field           = x1_y2'
+          '  rt_field           = x1_y3'
+          '  rt_field           = x1_y4'
+          '  rt_field           = x1_y5'
+          '  charset_type       = utf-8'
           '}'
           ''
-          '****************************'
+          '********************************'
           'Exemple step 2 add rows in loop:'
-          '****************************'
+          '********************************'
           ''
           'INSERT INTO HASH('
           '  ID,'
@@ -1940,199 +1881,133 @@ object Form1: TForm1
           ') '
           'VALUES ('
           '  <#incnumber>,'
-          '  (<#randomnumber min=0 max=235 index=1>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=1>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=2>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=3>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=4>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=5>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=6>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=7>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=8>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=9>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=10>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=11>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=12>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=13>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=14>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=15>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=16>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=17>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=18>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=19>,'
-          '   <#randomnumber min=0 max=235 index=1 incby=20>),'
+          '  '#39'<#randomnumber min=0 max=235 index=1>'
+          '   <#randomnumber min=0 max=235 index=1 incby=1>'
+          '   <#randomnumber min=0 max=235 index=1 incby=2>'
+          '   <#randomnumber min=0 max=235 index=1 incby=3>'
+          '   <#randomnumber min=0 max=235 index=1 incby=4>'
+          '   <#randomnumber min=0 max=235 index=1 incby=5>'
+          '   <#randomnumber min=0 max=235 index=1 incby=6>'
+          '   <#randomnumber min=0 max=235 index=1 incby=7>'
+          '   <#randomnumber min=0 max=235 index=1 incby=8>'
+          '   <#randomnumber min=0 max=235 index=1 incby=9>'
+          '   <#randomnumber min=0 max=235 index=1 incby=10>'
+          '   <#randomnumber min=0 max=235 index=1 incby=11>'
+          '   <#randomnumber min=0 max=235 index=1 incby=12>'
+          '   <#randomnumber min=0 max=235 index=1 incby=13>'
+          '   <#randomnumber min=0 max=235 index=1 incby=14>'
+          '   <#randomnumber min=0 max=235 index=1 incby=15>'
+          '   <#randomnumber min=0 max=235 index=1 incby=16>'
+          '   <#randomnumber min=0 max=235 index=1 incby=17>'
+          '   <#randomnumber min=0 max=235 index=1 incby=18>'
+          '   <#randomnumber min=0 max=235 index=1 incby=19>'
+          '   <#randomnumber min=0 max=235 index=1 incby=20>'#39','
           ''
-          '  (<#randomnumber min=0 max=235 index=2>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=1>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=2>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=3>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=4>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=5>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=6>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=7>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=8>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=9>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=10>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=11>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=12>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=13>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=14>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=15>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=16>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=17>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=18>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=19>,'
-          '   <#randomnumber min=0 max=235 index=2 incby=20>),'
+          '  '#39'<#randomnumber min=0 max=235 index=2>'
+          '   <#randomnumber min=0 max=235 index=2 incby=1>'
+          '   <#randomnumber min=0 max=235 index=2 incby=2>'
+          '   <#randomnumber min=0 max=235 index=2 incby=3>'
+          '   <#randomnumber min=0 max=235 index=2 incby=4>'
+          '   <#randomnumber min=0 max=235 index=2 incby=5>'
+          '   <#randomnumber min=0 max=235 index=2 incby=6>'
+          '   <#randomnumber min=0 max=235 index=2 incby=7>'
+          '   <#randomnumber min=0 max=235 index=2 incby=8>'
+          '   <#randomnumber min=0 max=235 index=2 incby=9>'
+          '   <#randomnumber min=0 max=235 index=2 incby=10>'
+          '   <#randomnumber min=0 max=235 index=2 incby=11>'
+          '   <#randomnumber min=0 max=235 index=2 incby=12>'
+          '   <#randomnumber min=0 max=235 index=2 incby=13>'
+          '   <#randomnumber min=0 max=235 index=2 incby=14>'
+          '   <#randomnumber min=0 max=235 index=2 incby=15>'
+          '   <#randomnumber min=0 max=235 index=2 incby=16>'
+          '   <#randomnumber min=0 max=235 index=2 incby=17>'
+          '   <#randomnumber min=0 max=235 index=2 incby=18>'
+          '   <#randomnumber min=0 max=235 index=2 incby=19>'
+          '   <#randomnumber min=0 max=235 index=2 incby=20>'#39','
           '   '
-          '  (<#randomnumber min=0 max=235 index=3>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=1>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=2>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=3>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=4>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=5>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=6>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=7>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=8>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=9>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=10>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=11>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=12>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=13>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=14>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=15>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=16>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=17>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=18>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=19>,'
-          '   <#randomnumber min=0 max=235 index=3 incby=20>),'
+          '  '#39'<#randomnumber min=0 max=235 index=3>'
+          '   <#randomnumber min=0 max=235 index=3 incby=1>'
+          '   <#randomnumber min=0 max=235 index=3 incby=2>'
+          '   <#randomnumber min=0 max=235 index=3 incby=3>'
+          '   <#randomnumber min=0 max=235 index=3 incby=4>'
+          '   <#randomnumber min=0 max=235 index=3 incby=5>'
+          '   <#randomnumber min=0 max=235 index=3 incby=6>'
+          '   <#randomnumber min=0 max=235 index=3 incby=7>'
+          '   <#randomnumber min=0 max=235 index=3 incby=8>'
+          '   <#randomnumber min=0 max=235 index=3 incby=9>'
+          '   <#randomnumber min=0 max=235 index=3 incby=10>'
+          '   <#randomnumber min=0 max=235 index=3 incby=11>'
+          '   <#randomnumber min=0 max=235 index=3 incby=12>'
+          '   <#randomnumber min=0 max=235 index=3 incby=13>'
+          '   <#randomnumber min=0 max=235 index=3 incby=14>'
+          '   <#randomnumber min=0 max=235 index=3 incby=15>'
+          '   <#randomnumber min=0 max=235 index=3 incby=16>'
+          '   <#randomnumber min=0 max=235 index=3 incby=17>'
+          '   <#randomnumber min=0 max=235 index=3 incby=18>'
+          '   <#randomnumber min=0 max=235 index=3 incby=19>'
+          '   <#randomnumber min=0 max=235 index=3 incby=20>'#39','
           '   '
-          '  (<#randomnumber min=0 max=235 index=4>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=1>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=2>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=3>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=4>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=5>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=6>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=7>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=8>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=9>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=10>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=11>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=12>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=13>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=14>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=15>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=16>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=17>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=18>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=19>,'
-          '   <#randomnumber min=0 max=235 index=4 incby=20>),'
+          '  '#39'<#randomnumber min=0 max=235 index=4>'
+          '   <#randomnumber min=0 max=235 index=4 incby=1>'
+          '   <#randomnumber min=0 max=235 index=4 incby=2>'
+          '   <#randomnumber min=0 max=235 index=4 incby=3>'
+          '   <#randomnumber min=0 max=235 index=4 incby=4>'
+          '   <#randomnumber min=0 max=235 index=4 incby=5>'
+          '   <#randomnumber min=0 max=235 index=4 incby=6>'
+          '   <#randomnumber min=0 max=235 index=4 incby=7>'
+          '   <#randomnumber min=0 max=235 index=4 incby=8>'
+          '   <#randomnumber min=0 max=235 index=4 incby=9>'
+          '   <#randomnumber min=0 max=235 index=4 incby=10>'
+          '   <#randomnumber min=0 max=235 index=4 incby=11>'
+          '   <#randomnumber min=0 max=235 index=4 incby=12>'
+          '   <#randomnumber min=0 max=235 index=4 incby=13>'
+          '   <#randomnumber min=0 max=235 index=4 incby=14>'
+          '   <#randomnumber min=0 max=235 index=4 incby=15>'
+          '   <#randomnumber min=0 max=235 index=4 incby=16>'
+          '   <#randomnumber min=0 max=235 index=4 incby=17>'
+          '   <#randomnumber min=0 max=235 index=4 incby=18>'
+          '   <#randomnumber min=0 max=235 index=4 incby=19>'
+          '   <#randomnumber min=0 max=235 index=4 incby=20>'#39','
           '   '
-          '  (<#randomnumber min=0 max=235 index=5>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=1>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=2>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=3>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=4>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=5>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=6>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=7>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=8>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=9>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=10>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=11>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=12>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=13>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=14>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=15>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=16>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=17>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=18>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=19>,'
-          '   <#randomnumber min=0 max=235 index=5 incby=20>)'
+          '  '#39'<#randomnumber min=0 max=235 index=5>'
+          '   <#randomnumber min=0 max=235 index=5 incby=1>'
+          '   <#randomnumber min=0 max=235 index=5 incby=2>'
+          '   <#randomnumber min=0 max=235 index=5 incby=3>'
+          '   <#randomnumber min=0 max=235 index=5 incby=4>'
+          '   <#randomnumber min=0 max=235 index=5 incby=5>'
+          '   <#randomnumber min=0 max=235 index=5 incby=6>'
+          '   <#randomnumber min=0 max=235 index=5 incby=7>'
+          '   <#randomnumber min=0 max=235 index=5 incby=8>'
+          '   <#randomnumber min=0 max=235 index=5 incby=9>'
+          '   <#randomnumber min=0 max=235 index=5 incby=10>'
+          '   <#randomnumber min=0 max=235 index=5 incby=11>'
+          '   <#randomnumber min=0 max=235 index=5 incby=12>'
+          '   <#randomnumber min=0 max=235 index=5 incby=13>'
+          '   <#randomnumber min=0 max=235 index=5 incby=14>'
+          '   <#randomnumber min=0 max=235 index=5 incby=15>'
+          '   <#randomnumber min=0 max=235 index=5 incby=16>'
+          '   <#randomnumber min=0 max=235 index=5 incby=17>'
+          '   <#randomnumber min=0 max=235 index=5 incby=18>'
+          '   <#randomnumber min=0 max=235 index=5 incby=19>'
+          '   <#randomnumber min=0 max=235 index=5 incby=20>'#39
           '      '
           ');'
           ''
-          '****************************'
+          '***********************************'
           'Exemple step 3 select rows in loop:'
-          '****************************'
+          '***********************************'
           ''
           'Select '
           '  ID '
           'from '
           '  HASH '
           'where '
-          '  x1_y1 in (<#randomnumber min="0" max="255">) and'
-          '  x1_y2 in (<#randomnumber min="0" max="255">) and'
-          '  x1_y3 in (<#randomnumber min="0" max="255">) and'
-          '  x1_y4 in (<#randomnumber min="0" max="255">) and'
-          '  x1_y5 in (<#randomnumber min="0" max="255">);'
-          ''
-          ''
-          ''
-          '**********'
-          'SCENARIO 2'
-          '**********'
-          ''
-          '*********************'
-          'step 1 init the sphinx.conf'
-          '*********************'
-          ''
-          'index PROPERTIES'
-          '{'
-          '  type               = rt'
-          '  path               = c:\sphinxdata\properties'
-          '  rt_mem_limit       = 512M'
-          '  rt_field           = description'
-          '  rt_attr_multi_64   = publication'
-          '  rt_attr_multi      = location'
-          '  rt_attr_uint       = broker'
-          '  rt_attr_bigint     = representative  '
-          '  rt_attr_uint       = category'
-          '  rt_attr_uint       = image'
-          '  rt_attr_uint       = weight'
-          '  rt_attr_timestamp  = date'
-          '  rt_attr_uint       = price'
-          '  rt_attr_uint       = surface'
-          '  rt_attr_uint       = nb_room'
-          '  rt_attr_uint       = nb_bedroom  '
-          '  charset_type       = utf-8'
-          '}'
-          ''
-          '*******************'
-          'Step 2 add rows in loop'
-          '*******************'
-          ''
-          ''
-          '********************'
-          'Step 3 select rows in loop'
-          '********************'
-          ''
-          'Select '
-          '  ID '
-          'from '
-          '  properties'
-          'where '
-          '  publication in (901539546968096765) and'
-          '  location in (7082) and'
-          '  category = 1 and'
-          '  nb_bedroom >= <#randomnumber min=1 max=10> and'
-          '  price <= <#randomnumber min=150000 max=200000>'
-          'order by '
-          '  advertisement_weight desc;'
-          ''
-          'Select '
-          '  ID '
-          'from '
-          '  properties'
-          'where '
-          '  publication in (901539546968096765) and'
-          '  location in (7082) and'
-          '  category = 1 and'
-          '  nb_bedroom >= <#randomnumber min=1 max=10> and'
-          '  price <= <#randomnumber min=150000 max=200000> and'
-          '  match('#39'vue mer'#39')'
-          'order by '
-          '  price desc;')
+          '  match('#39'@x1_y1 <#randomnumber min="0" max="255"> '
+          '         @x1_y2 <#randomnumber min="0" max="255">'
+          '         @x1_y3 <#randomnumber min="0" max="255">'
+          '         @x1_y4 <#randomnumber min="0" max="255">'
+          '         @x1_y5 <#randomnumber min="0" max="255">'#39');')
+        ParentFont = False
         TabOrder = 3
         WordWrap = False
         DesignSize = (

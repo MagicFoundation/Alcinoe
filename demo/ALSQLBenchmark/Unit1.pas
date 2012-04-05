@@ -150,8 +150,6 @@ type
     ALComboBoxSphinxApiVer: TALComboBox;
     Label40: TLabel;
     ALComboBoxMySqlApiVer: TALComboBox;
-    Note: TTabSheet;
-    ALMemo1: TALMemo;
     PanelStats: TPanel;
     GridThread: TcxGrid;
     TableViewThread: TcxGridTableView;

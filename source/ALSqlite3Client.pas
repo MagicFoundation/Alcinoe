@@ -115,8 +115,8 @@ Type
     finTransaction: Boolean;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
-    procedure CheckAPIError(Error: Boolean);
   Protected
+    procedure CheckAPIError(Error: Boolean);
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
                             aFormatSettings: TformatSettings): String;
@@ -208,8 +208,9 @@ Type
     FOpenConnectionFlags: integer;
     FOpenConnectionPragmaStatements: Tstrings;
     FNullString: String;
-    procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
   Protected
+    procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
+    function  GetDataBaseName: String; virtual;
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
                             aFormatSettings: TformatSettings): String; virtual;
@@ -300,7 +301,7 @@ Type
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
-    property  DataBaseName: String read FDataBaseName;
+    property  DataBaseName: String read GetDataBaseName;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
     property  Lib: TALSqlite3Library read FLibrary;
@@ -971,6 +972,12 @@ begin
     if assigned(ConnectionHandle) then raise EALSqlite3Error.Create(fLibrary.sqlite3_errmsg(ConnectionHandle), fLibrary.sqlite3_errcode(ConnectionHandle)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
     else raise EALSqlite3Error.Create('Sqlite3 error', -1);
   end
+end;
+
+{**************************************************************}
+function TalSqlite3ConnectionPoolClient.GetDataBaseName: String;
+begin
+  result := FdatabaseName;
 end;
 
 {*******************************************************************************}

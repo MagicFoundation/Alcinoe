@@ -160,7 +160,7 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 Strings: TStrings;
                                                 Decode: Boolean;
                                                 StripQuotes: Boolean = False);
-function  ALGetStringFromFile(filename: string): string;
+function  ALGetStringFromFile(filename: string; const ShareMode: Word = fmShareDenyWrite): string;
 function  ALGetStringFromFileWithoutUTF8BOM(filename: string): string;
 procedure ALSaveStringtoFile(Str,filename: string);
 Function  ALAnsiUpperCaseNoDiacritic(S: string): string;

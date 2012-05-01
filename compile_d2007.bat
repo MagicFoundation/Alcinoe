@@ -28,7 +28,7 @@ IF ERRORLEVEL 1 goto ERROR
 del *.html /s
 IF ERRORLEVEL 1 goto ERROR
 
-MSBuild source\PCK_ALCINOE.dproj /t:build /p:Configuration=RELEASE
+MSBuild source\Alcinoe_D2007.dproj /t:build /p:Configuration=RELEASE
 IF ERRORLEVEL 1 goto ERROR
 
 pause

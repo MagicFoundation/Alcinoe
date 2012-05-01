@@ -98,8 +98,8 @@ Function ALUTF8AsciiTrunc(s:UTF8string; Count: Integer): UTF8String;
 Function ALUTF8UpperFirstChar(s:UTF8string): UTF8String;
 Function ALUTF8TitleCase(s:UTF8string): UTF8String;
 Function ALUTF8SentenceCase(s:UTF8string): UTF8String;
-Function ALStringToWideString(const S: string; aCodePage: Word): WideString;
-function AlWideStringToString(const WS: WideString; aCodePage: Word): string;
+Function ALStringToWideString(const S: AnsiString; aCodePage: Word): WideString;
+function AlWideStringToString(const WS: WideString; aCodePage: Word): AnsiString;
 Function ALUTF8Encode(const S: string; aCodePage: Word): UTF8String;
 Function ALUTF8decode(const S: UTF8String; aCodePage: Word): String;
 Function ALGetCodePageFromName(Acharset:String): Word;
@@ -874,26 +874,26 @@ Begin
   end;
 end;
 
-{**************************************************************************}
-Function ALStringToWideString(const S: string; aCodePage: Word): WideString;
+{******************************************************************************}
+Function ALStringToWideString(const S: AnsiString; aCodePage: Word): WideString;
 var InputLength,
     OutputLength: Integer;
 begin
   InputLength := Length(S);
-  OutputLength := MultiByteToWideChar(aCodePage, 0, PChar(S), InputLength, nil, 0);
+  OutputLength := MultiByteToWideChar(aCodePage, 0, PAnsiChar(S), InputLength, nil, 0);
   SetLength(Result, OutputLength);
-  MultiByteToWideChar(aCodePage, 0, PChar(S), InputLength, PWideChar(Result), OutputLength);
+  MultiByteToWideChar(aCodePage, 0, PAnsiChar(S), InputLength, PWideChar(Result), OutputLength);
 end;
 
-{***************************************************************************}
-function AlWideStringToString(const WS: WideString; aCodePage: Word): string;
+{*******************************************************************************}
+function AlWideStringToString(const WS: WideString; aCodePage: Word): AnsiString;
 var InputLength,
     OutputLength: Integer;
 begin
   InputLength := Length(WS);
   OutputLength := WideCharToMultiByte(aCodePage, 0, PWideChar(WS), InputLength, nil, 0, nil, nil);
   SetLength(Result, OutputLength);
-  WideCharToMultiByte(aCodePage, 0, PWideChar(WS), InputLength, PChar(Result), OutputLength, nil, nil);
+  WideCharToMultiByte(aCodePage, 0, PWideChar(WS), InputLength, PAnsiChar(Result), OutputLength, nil, nil);
 end;
 
 {******************************************************************}

@@ -287,13 +287,11 @@ function ALWinExec32(const FileName: string;
                      InputStream: Tstream;
                      OutputStream: TStream): Dword;
 Begin
-  Result := ALWinExec32(
-                        FileName,
+  Result := ALWinExec32(FileName,
                         '',
                         '',
                         InputStream,
-                        OutputStream
-                       );
+                        OutputStream);
 End;
 
 {***********************************************************************}

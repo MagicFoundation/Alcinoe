@@ -1908,11 +1908,12 @@ begin
   end;
 end;
 
-{*****************************************************}
-function ALGetStringFromFile(filename: string): string;
+
+{***********************************************************************************************}
+function ALGetStringFromFile(filename: string; const ShareMode: Word = fmShareDenyWrite): string;
 Var AFileStream: TfileStream;
 begin
-  AFileStream := TFileStream.Create(filename,fmOpenRead or fmShareDenyWrite);
+  AFileStream := TFileStream.Create(filename,fmOpenRead or ShareMode);
   try
 
     If AFileStream.size > 0 then begin

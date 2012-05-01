@@ -114,8 +114,8 @@ Type
     fMySQLFormatSettings: TformatSettings;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
-    procedure CheckAPIError(Error: Boolean);
   Protected
+    procedure CheckAPIError(Error: Boolean);
     Function  GetFieldValue(aFieldValue: Pchar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
@@ -213,8 +213,11 @@ Type
     fOpenConnectionClientFlag: cardinal;
     FNullString: String;
     fMySQLFormatSettings: TformatSettings;
-    procedure CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
   Protected
+    procedure CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
+    function  GetDataBaseName: String; virtual;
+    function  GetHost: String; virtual;
+    function  GetPort: integer; virtual;
     Function  GetFieldValue(aFieldValue: Pchar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
@@ -315,7 +318,9 @@ Type
                         const ConnectionHandle: PMySql = nil): UlongLong; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
-    property  DataBaseName: String read FDataBaseName;
+    property  DataBaseName: String read GetDataBaseName;
+    property  Host: String read GetHost;
+    property  Port: integer read GetPort;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
     Property  NullString: String Read fNullString Write fNullString;
     property  Lib: TALMySqlLibrary read FLibrary;
@@ -976,6 +981,24 @@ begin
                                     -1,
                                     'HY000'); // The value 'HY000' (general error) is used for unmapped error numbers.
   end;
+end;
+
+{************************************************************}
+function TalMySqlConnectionPoolClient.GetDataBaseName: String;
+begin
+  result := FdatabaseName;
+end;
+
+{****************************************************}
+function TalMySqlConnectionPoolClient.GetHost: String;
+begin
+  result := fHost;
+end;
+
+{*****************************************************}
+function TalMySqlConnectionPoolClient.GetPort: integer;
+begin
+  result := fPort;
 end;
 
 {*********************************************************************}

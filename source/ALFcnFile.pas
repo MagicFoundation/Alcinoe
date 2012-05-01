@@ -59,8 +59,16 @@ interface
 uses Windows,
      sysutils;
 
-Function  AlEmptyDirectory(Directory: String; SubDirectory: Boolean; Const RemoveEmptySubDirectory: Boolean = True; Const FileNameMask: String = '*.*'; Const MinFileAge: TdateTime = 0): Boolean;
-Function  AlCopyDirectory(SrcDirectory, DestDirectory: String; SubDirectory: Boolean; Const FileNameMask: String = '*.*'; Const ErraseIfExist: Boolean = False): Boolean;
+Function AlEmptyDirectory(Directory: String;
+                          SubDirectory: Boolean;
+                          Const RemoveEmptySubDirectory: Boolean = True;
+                          Const FileNameMask: String = '*';
+                          Const MinFileAge: TdateTime = 0): Boolean;
+Function AlCopyDirectory(SrcDirectory,
+                         DestDirectory: String;
+                         SubDirectory: Boolean;
+                         Const FileNameMask: String = '*';
+                         Const ErraseIfExist: Boolean = False): Boolean;
 function  ALGetModuleName: string;
 function  ALGetModuleFileNameWithoutExtension: string;
 function  ALGetModulePath: String;
@@ -82,38 +90,37 @@ uses Masks,
 Function AlEmptyDirectory(Directory: String;
                           SubDirectory: Boolean;
                           Const RemoveEmptySubDirectory: Boolean = True;
-                          Const FileNameMask: String = '*.*';
+                          Const FileNameMask: String = '*';
                           Const MinFileAge: TdateTime = 0): Boolean;
 var sr: TSearchRec;
     aBool: Boolean;
 begin
   Result := True;
   Directory := ALMakeGoodEndPath(Directory);
-  if FindFirst(Directory + '*.*', faAnyFile	, sr) = 0 then begin
+  if FindFirst(Directory + '*', faAnyFile	, sr) = 0 then begin
     Try
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
           If ((sr.Attr and faDirectory) <> 0) then begin
             If SubDirectory then begin
-              AlEmptyDirectory(Directory + sr.Name, True, RemoveEmptySubDirectory, fileNameMask, MinFileAge);
+              Result := AlEmptyDirectory(Directory + sr.Name,
+                                         True,
+                                         RemoveEmptySubDirectory,
+                                         fileNameMask,
+                                         MinFileAge) and Result;
               If RemoveEmptySubDirectory then begin
                 Abool := RemoveDir(Directory + sr.Name);
-                If result and (fileNameMask = '*.*') then Result := Abool;
+                If result and (fileNameMask = '*') then Result := Abool;
               end;
             end;
           end
-          else If (
-                   (FileNameMask = '*.*') or
-                   MatchesMask(sr.Name, FileNameMask)
-                  )
+          else If ((FileNameMask = '*') or
+                   MatchesMask(sr.Name, FileNameMask))
                   and
-                  (
-                   (MinFileAge<=0) or
-                   (FileDateToDateTime(sr.Time) < MinFileAge)
-                  )
+                  ((MinFileAge<=0) or
+                   (FileDateToDateTime(sr.Time) < MinFileAge))
           then begin
-            abool := Deletefile(Directory + sr.Name);
-            If result then result := aBool;
+            Result := Deletefile(Directory + sr.Name) and result;
           end;
         end;
       until FindNext(sr) <> 0;
@@ -127,7 +134,7 @@ end;
 Function AlCopyDirectory(SrcDirectory,
                          DestDirectory: String;
                          SubDirectory: Boolean;
-                         Const FileNameMask: String = '*.*';
+                         Const FileNameMask: String = '*';
                          Const ErraseIfExist: Boolean = False): Boolean;
 var sr: TSearchRec;
     aBool: Boolean;
@@ -140,35 +147,25 @@ begin
     exit;
   end;
 
-  if FindFirst(SrcDirectory + '*.*', faAnyFile, sr) = 0 then begin
+  if FindFirst(SrcDirectory + '*', faAnyFile, sr) = 0 then begin
     Try
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
           If ((sr.Attr and faDirectory) <> 0) then begin
             If SubDirectory and
-               (
-                not AlCopyDirectory(
-                                    SrcDirectory + sr.Name,
+               (not AlCopyDirectory(SrcDirectory + sr.Name,
                                     DestDirectory + sr.Name,
                                     SubDirectory,
                                     FileNameMask,
-                                    ErraseIfExist
-                                   )
-               )
+                                    ErraseIfExist))
             then Result := False;
           end
-          else If (
-                   (FileNameMask = '*.*') or
-                   MatchesMask(sr.Name, FileNameMask)
-                  )
-          then begin
-            If (not fileExists(DestDirectory + sr.Name)) or ErraseIfExist
-              then abool := Copyfile(
-                                     Pchar(SrcDirectory + sr.Name),
-                                     Pchar(DestDirectory + sr.Name),
-                                     not ErraseIfExist
-                                    )
-              else aBool := True;
+          else If ((FileNameMask = '*') or
+                   MatchesMask(sr.Name, FileNameMask)) then begin
+            If (not fileExists(DestDirectory + sr.Name)) or ErraseIfExist then abool := Copyfile(Pchar(SrcDirectory + sr.Name),
+                                                                                                 Pchar(DestDirectory + sr.Name),
+                                                                                                 not ErraseIfExist)
+            else aBool := True;
             If result then result := aBool;
           end;
         end;

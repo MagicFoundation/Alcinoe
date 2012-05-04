@@ -44,8 +44,10 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
-
+History :     04-05-2012:
+              - Non-thread-safe THashedStringList was replaced to
+                TALStringList, before it was crushing sometimes when
+                searching in multi-thread environment.
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
@@ -89,7 +91,7 @@ Var vAlMimeContentTypeByExtList: Tstrings; {.htm=text/html}
 implementation
 
 Uses Registry,
-     inifiles,
+     ALStringList,
      alFcnString;
 
 {--------------------------------------------}
@@ -571,12 +573,9 @@ begin
   else Result := 'application/octet-stream';
 end;
 
-
-
-
 Initialization
- vAlMimeContentTypeByExtList := ThashedStringList.Create;
- vAlExtbyMimeContentTypeList := ThashedStringList.Create;
+ vAlMimeContentTypeByExtList := TALStringList.Create;
+ vAlExtbyMimeContentTypeList := TALStringList.Create;
  ALFillMimeContentTypeByExtList(vAlMimeContentTypeByExtList);
  ALFillExtByMimeContentTypeList(vAlExtbyMimeContentTypeList);
 

@@ -1258,6 +1258,21 @@ Var RawXmlString: TALXMLString;
   end;
 
   {---------------}
+  {Analyze DOCTYPE}
+  procedure AnalyzeDOCTYPE;
+  Var P1: Integer;
+  Begin
+    { <!DOCTYPE ....> }
+    If FirstTagElement then ALXmlDocError(CALXmlParseError);
+    P1 := PosInXmlString('>', RawXmlStringPos + 9);
+    If P1 > 0 then begin
+      //not yet implemented - simply skip the tag
+      RawXmlStringPos := P1 + 1;
+    end
+    else ALXmlDocError(CALXmlParseError);
+  end;
+
+  {---------------}
   {Analyze comment}
   procedure AnalyzeComment;
   Var P1: Integer;
@@ -1288,7 +1303,7 @@ Var RawXmlString: TALXMLString;
   Var P1: Integer;
       aContent: String;
   Begin
-    { <!-- name -->... }
+    { <![CDATA]...]]> }
     If FirstTagElement then ALXmlDocError(CALXmlParseError);
     P1 := PosInXmlString(']]>',RawXmlStringPos + 9);
     If P1 > 0 then begin
@@ -1488,6 +1503,15 @@ Begin
                 (RawXmlString[RawXmlStringPos + 6] = 'T') and
                 (RawXmlString[RawXmlStringPos + 7] = 'A') and
                 (RawXmlString[RawXmlStringPos + 8] = '[') then AnalyzeCData
+        else if (RawXmlStringPos + 7 < RawXmlStringLength) and
+                (RawXmlString[RawXmlStringPos + 1] = '!') and
+                (RawXmlString[RawXmlStringPos + 2] = 'D') and
+                (RawXmlString[RawXmlStringPos + 3] = 'O') and
+                (RawXmlString[RawXmlStringPos + 4] = 'C') and
+                (RawXmlString[RawXmlStringPos + 5] = 'T') and
+                (RawXmlString[RawXmlStringPos + 6] = 'Y') and
+                (RawXmlString[RawXmlStringPos + 7] = 'P') and
+                (RawXmlString[RawXmlStringPos + 8] = 'E') then AnalyzeDOCTYPE
         else AnalyzeTag
       end
       else AnalyzeText;

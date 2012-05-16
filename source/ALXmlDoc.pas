@@ -123,7 +123,7 @@ type
   TALXMLDocument= Class;
 
   {String definition. The component use only AnsiString and work with multi-bites characteres throught UTF-8 encoding}
-  TALXMLString=String;
+  TALXMLString=ansiString;
 
   TAlXMLParseProcessingInstructionEvent = procedure (Sender: TObject; const Target, Data: TALXMLString) of object;
   TAlXMLParseTextEvent = procedure (Sender: TObject; const str: TALXMLString) of object;
@@ -374,7 +374,6 @@ type
     //[Deleted from TXMLNode] destructor Destroy; override;
     //[Deleted from TXMLNode] function AddChild(const TagName, NamespaceURI: TALXMLString; GenPrefix: Boolean = False; Index: Integer = -1): TALXMLNode; overload;
     //[Deleted from TXMLNode] function AddChild(const TagName, NamespaceURI: TALXMLString; NodeClass: TALXMLNodeClass; Index: Integer = -1): TALXMLNode; overload;
-    //[Deleted from TXMLNode] function CloneNode(Deep: Boolean): TALXMLNode;
     //[Deleted from TXMLNode] function FindNamespaceDecl(const NamespaceURI: TALXMLString): TALXMLNode;
     //[Deleted from TXMLNode] function FindNamespaceURI(const TagOrPrefix: TALXMLString): TALXMLString;
     //[Deleted from TXMLNode] function GetAttributeNS(const AttrName, NamespaceURI: TALXMLString): OleVariant;
@@ -390,13 +389,14 @@ type
     //[Deleted from TXMLNode] property NamespaceURI: TALXMLString read GetNameSpaceURI;
     //[Deleted from TXMLNode] property ReadOnly: Boolean read GetReadOnly write SetReadOnly;
     constructor Create(const NameOrData: TALXmlString; const AddlData: TALXmlString = ''); virtual; //[Replace from TXMLNode] constructor Create(const ADOMNode: IDOMNode; const AParentNode: TALXMLNode; const OwnerDoc: TXMLDocument);
+    function CloneNode(Deep: Boolean): TALXMLNode;
     function AddChild(const TagName: TALXMLString; Index: Integer = -1): TALXMLNode; overload;
     function HasAttribute(const Name: TALXMLString): Boolean; overload;
     function NextSibling: TALXMLNode;
     function PreviousSibling: TALXMLNode;
     property AttributeNodes: TALXMLNodeList read GetAttributeNodes;
     property Attributes[const AttrName: TALXMLString]: OleVariant read GetAttribute write SetAttribute;
-    property AttributesAsString[const AttrName: TALXMLString]: String read GetAttributeAsString write SetAttributeAsString; // [added from TXMLNode]
+    property AttributesAsString[const AttrName: TALXMLString]: TALXMLString read GetAttributeAsString write SetAttributeAsString; // [added from TXMLNode]
     property ChildNodes: TALXMLNodeList read GetChildNodes write SetChildNodes;
     property ChildValues[const IndexOrName: OleVariant]: OleVariant read GetChildValue write SetChildValue; default;
     property HasChildNodes: Boolean read GetHasChildNodes;
@@ -706,7 +706,7 @@ type
     procedure ReleaseDoc(const CheckSave: Boolean = True);
     procedure SaveToXMLStrings;
     procedure SetPrologValue(const Value: TALXMLString; PrologItem: TALXMLPrologItem); //[Replace from TXMLNodeList] procedure SetPrologValue(const Value: Variant; PrologItem: TXMLPrologItem);
-    procedure SetXMLStrings(const Value: string);
+    procedure SetXMLStrings(const Value: TALXMLString);
     function GetActive: Boolean;
     function GetChildNodes: TALXMLNodeList;
     function GetDocumentElement: TALXMLNode;
@@ -756,7 +756,7 @@ type
     function IsEmptyDoc: Boolean;
     procedure LoadFromFile(const AFileName: TALXMLString = '');
     procedure LoadFromStream(const Stream: TStream); //[Replace from TXMLNodeList] procedure LoadFromStream(const Stream: TStream; EncodingType: TALXMLEncodingType = xetUnknown);
-    procedure LoadFromXML(const XML: string); overload;
+    procedure LoadFromXML(const XML: TALXMLString); overload;
     procedure Refresh;
     procedure SaveToFile(const AFileName: TALXMLString = '');
     procedure SaveToStream(const Stream: TStream);
@@ -805,14 +805,14 @@ Const cAlXMLUTF8EncodingStr = 'UTF-8';
       CALXmlDocument        = 'DOCUMENT';
 
 {misc function}
-Function  ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
-procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const EncodingStr: String = cAlXMLUTF8EncodingStr);
+Function  ALCreateEmptyXMLDocument(Rootname:TALXMLString):TalXMLDocument;
+procedure ALClearXMLDocument(rootname:TALXMLString; xmldoc: TalXMLDocument; const EncodingStr: TALXMLString = cAlXMLUTF8EncodingStr);
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
-                                   AttributeName, AttributeValue : string;
+                                   AttributeName, AttributeValue : TALXMLString;
                                    Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
                                         ChildNodeName,
-                                        ChildNodeValue : string): TalxmlNode;
+                                        ChildNodeValue : TALXMLString): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: TALXmlstring; const Default: TALXMLString = ''): TALXMLString;
 
 
@@ -845,7 +845,7 @@ end;
  Call ALXMLDocError to raise an EALXMLDocError exception. Using ALXMLDocError rather than explicitly creating
  the EALXMLDocError instance can result in more space-efficient code.
  *Msg is the error message associated with the EALXMLDocError instance.}
-procedure ALXMLDocError(const Msg: string); overload;
+procedure ALXMLDocError(const Msg: TALXMLString); overload;
 begin
   raise EALXMLDocError.Create(Msg);
 end;
@@ -857,7 +857,7 @@ end;
  *Msg is the error message associated with the EALXMLDocError instance.
  *Args supplies arguments for any format specifiers embedded in Msg.
  Args_Size is the index of the last entry in the Args array. That is one less than the total number of arguments.}
-procedure ALXMLDocError(const Msg: string; const Args: array of const); overload;
+procedure ALXMLDocError(const Msg: TALXMLString; const Args: array of const); overload;
 begin
   raise EALXMLDocError.CreateFmt(Msg, Args);
 end;
@@ -1141,8 +1141,8 @@ Var RawXmlString: TALXMLString;
     else result := True;
   end;
 
-  {--------------------------------------------------------------------}
-  Function PosInXmlString(Substr: String; Offset: integer = 1): integer;
+  {--------------------------------------------------------------------------}
+  Function PosInXmlString(Substr: TALXMLString; Offset: integer = 1): integer;
   Begin
     Result := ALPosEx(Substr,RawXmlString,OffSet);
     While (Result <= 0) do begin
@@ -1163,8 +1163,8 @@ Var RawXmlString: TALXMLString;
     end;
   end;
 
-  {-----------------------------------------------------------------------------------------------}
-  Function CharPosInString(const Substr: array of char; str: String; Offset: integer = 1): integer;
+  {-----------------------------------------------------------------------------------------------------}
+  Function CharPosInString(const Substr: array of char; str: TALXMLString; Offset: integer = 1): integer;
   Var i: integer;
       LowsubStr, highSubStr: integer;
       lnStr: integer;
@@ -1181,7 +1181,6 @@ Var RawXmlString: TALXMLString;
           result := Offset;
           exit;
         end;
-
       inc(offset);
     end;
   end;
@@ -1189,7 +1188,7 @@ Var RawXmlString: TALXMLString;
   {---------------------------------------------}
   Procedure CheckAttributes(TagParams: TStrings);
   Var i: integer;
-      S1, S2, S3: String;
+      S1, S2, S3: TALXMLString;
       L1: integer;
       P1: integer;
   Begin
@@ -1225,7 +1224,7 @@ Var RawXmlString: TALXMLString;
   {Analyze Processing Instructions (PI)}
   procedure AnalyzePI;
   Var P1, P2: Integer;
-      aName, aContent: String;
+      aName, aContent: TALXMLString;
   Begin
     { <?name?>...
       <?name content?>... }
@@ -1276,7 +1275,7 @@ Var RawXmlString: TALXMLString;
   {Analyze comment}
   procedure AnalyzeComment;
   Var P1: Integer;
-      aContent: String;
+      aContent: TALXMLString;
   Begin
     { <!-- name -->... }
     If FirstTagElement then ALXmlDocError(CALXmlParseError);
@@ -1301,7 +1300,7 @@ Var RawXmlString: TALXMLString;
   {Analyze cdata}
   procedure AnalyzeCDATA;
   Var P1: Integer;
-      aContent: String;
+      aContent: TALXMLString;
   Begin
     { <![CDATA]...]]> }
     If FirstTagElement then ALXmlDocError(CALXmlParseError);
@@ -1326,7 +1325,7 @@ Var RawXmlString: TALXMLString;
   {Analyze tag}
   procedure AnalyzeTag;
   Var P1, P2: Integer;
-      aName, aContent: String;
+      aName, aContent: TALXMLString;
       aContentLn: Integer;
       TagEnclosed : Boolean;
       aNode: TALXmlNode;
@@ -1375,11 +1374,9 @@ Var RawXmlString: TALXMLString;
           FirstTagElement := False
         end
         else begin
-          aNode := CreateNode(
-                              aName,
+          aNode := CreateNode(aName,
                               ntelement,
-                              ''
-                             );
+                              '');
           CurrentNode.ChildNodes.Add(aNode);
         end
       end
@@ -1387,15 +1384,13 @@ Var RawXmlString: TALXMLString;
 
       LstParams.Clear;
       If (aContent <> '') then begin
-        ALExtractHeaderFields(
-                              [' ', #9, #13, #10],    //Separators
+        ALExtractHeaderFields([' ', #9, #13, #10],    //Separators
                               [' ', #9, #13, #10],    //WhiteSpace
                               ['"', ''''],            //Quotes
                               Pchar(aContent),        //Content
                               lstParams,              //Strings
                               False,                  //Decode
-                              False                   //StripQuotes
-                             );
+                              False);                 //StripQuotes
         CheckAttributes(LstParams);
         For i := 0 to LstParams.Count - 1 do begin
           aContent := LstParams.ValueFromIndex[i];
@@ -1440,7 +1435,7 @@ Var RawXmlString: TALXMLString;
   {Analyze text}
   Procedure AnalyzeText;
   Var P1: Integer;
-      Str1: String;
+      Str1: TALXMLString;
   Begin
     P1 := CharPosInXmlString('<',RawXmlStringPos);
     If (P1<=0) then P1 := RawXmlStringLength + 1;
@@ -1643,7 +1638,7 @@ end;
  basis, LoadFromXML treats the text of the XML document as a whole.
  The XML parameter is a string containing the text of an XML document. It should represent the XML text encoded using UTF-8, Unicode, or UTF-16.
  After assigning the XML property as the contents of the document, LoadFromXML sets the Active property to true.}
-procedure TALXMLDocument.LoadFromXML(const XML: String);
+procedure TALXMLDocument.LoadFromXML(const XML: TALXMLString);
 var StringStream: TStringSTream;
 begin
   StringStream := TStringStream.Create(XML);
@@ -1712,8 +1707,8 @@ begin
   FFileName := '';
 end;
 
-{**********************************************************}
-procedure TALXMLDocument.SetXMLStrings(const Value: string);
+{****************************************************************}
+procedure TALXMLDocument.SetXMLStrings(const Value: TALXMLString);
 begin
   { Unhook the OnChanging event so we don't close the doc when refreshing }
   FXMLStrings.OnChanging := nil;
@@ -1967,7 +1962,7 @@ end;
 {*******************************************************************************************************************}
 function TALXMLDocument.GetPrologValue(PrologItem: TALXMLPrologItem; const Default: TALXMLString = ''): TALXMLString;
 var PrologNode: TALXMLNode;
-    PrologAttrs: string;
+    PrologAttrs: TALXMLString;
 begin
   PrologNode := GetPrologNode;
   if Assigned(PrologNode) then begin
@@ -2161,6 +2156,65 @@ constructor TALXMLNode.Create(const NameOrData: TALXmlString;
                               const AddlData: TALXmlString = '');
 Begin
   FDocument := nil;
+end;
+
+{*************************************************************}
+{CloneNode returns a copy of this node that has no parent. Any
+ attributes of this node are copied as well, including attribute
+ nodes that represent default values.
+ Deep indicates whether the child nodes of this node should be
+ cloned as well. For example, if an element node contains any text,
+ CloneNode only copies then text when deep is true, because in
+ the underlying DOM implementation, the text is contained in
+ a child node.
+ After calling CloneNode to create a new node, you can add that
+ node into the ChildNodes property of another node (or, if this
+ node represents an attribute, into the AttributeNodes property)
+ by calling ChildNodes. ->Add or ChildNodes. ->Insert.}
+function TALXMLNode.CloneNode(Deep: Boolean): TALXMLNode;
+
+  {-------------------------------------------------------}
+  function InternalCloneNode(const SourceNode: TALXmlNode;
+                             const TargetParentNode: TALXmlNode): TalXmlNode;
+  var I: Integer;
+  begin
+    case SourceNode.nodeType of
+      ntElement: begin
+                   result := ALCreateXmlNode(SourceNode.NodeName, SourceNode.nodeType, '');
+                   if TargetParentNode <> nil then TargetParentNode.ChildNodes.Add(result);
+                   for I := 0 to SourceNode.AttributeNodes.Count - 1 do
+                     InternalCloneNode(SourceNode.AttributeNodes[I],result);
+                   if Deep then
+                     for I := 0 to SourceNode.ChildNodes.Count - 1 do
+                      InternalCloneNode(SourceNode.ChildNodes[I],result);
+                 end;
+      ntAttribute: begin
+                     result := ALCreateXmlNode(SourceNode.NodeName, SourceNode.nodeType, '');
+                     Result.NodeValue := SourceNode.NodeValue;
+                     if TargetParentNode <> nil then TargetParentNode.AttributeNodes.Add(result);
+                   end;
+      ntText,
+      ntCData,
+      ntComment: begin
+                   result := ALCreateXmlNode(SourceNode.NodeName, SourceNode.nodeType, '');
+                   Result.NodeValue := SourceNode.NodeValue;
+                   if TargetParentNode <> nil then TargetParentNode.ChildNodes.Add(result);
+                 end;
+      ntEntityRef: result := nil; // todo
+      ntProcessingInstr: begin
+                           result := ALCreateXmlNode(SourceNode.NodeName, SourceNode.nodeType, SourceNode.nodeValue);
+                           if TargetParentNode <> nil then TargetParentNode.ChildNodes.Add(result);
+                         end;
+      ntDocFragment: result := nil; // todo
+      else begin
+        result := nil; // to hide warning
+        ALXMLDocError(cALXmlInvalidNodeType);
+      end;
+    end;
+  end;
+
+begin
+  result := InternalCloneNode(self, nil);
 end;
 
 {*************************************************************}
@@ -3899,8 +3953,8 @@ end;
 //////////Misc function//////////
 /////////////////////////////////
 
-{****************************************************************}
-Function ALCreateEmptyXMLDocument(Rootname:string):TalXMLDocument;
+{**********************************************************************}
+Function ALCreateEmptyXMLDocument(Rootname:TALXMLString):TalXMLDocument;
 begin
   Result := TAlXMLDocument.Create(nil);
   with result do begin
@@ -3910,8 +3964,8 @@ begin
   ALClearXMLDocument(rootname,Result);
 End;
 
-{***********************************************************************************************************************}
-procedure ALClearXMLDocument(rootname:string; xmldoc: TalXMLDocument; const EncodingStr: String = cAlXMLUTF8EncodingStr);
+{***********************************************************************************************************************************}
+procedure ALClearXMLDocument(rootname:TALXMLString; xmldoc: TalXMLDocument; const EncodingStr: TALXMLString = cAlXMLUTF8EncodingStr);
 begin
   with xmlDoc do begin
     Active := False;
@@ -3928,7 +3982,7 @@ End;
 {********************************************************}
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
                                         ChildNodeName,
-                                        ChildNodeValue : string): TalxmlNode;
+                                        ChildNodeValue : TALXMLString): TalxmlNode;
 var i : integer;
 Begin
   result := nil;
@@ -3953,7 +4007,7 @@ end;
 
 {***************************************************}
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
-                                   AttributeName, AttributeValue : string;
+                                   AttributeName, AttributeValue : TALXMLString;
                                    Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
 
 var i : integer;

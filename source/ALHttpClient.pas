@@ -146,11 +146,15 @@ type
     Procedure Post(aUrl:String; aPostDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Procedure PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader; Const EncodeParams: Boolean=True); overload;
     Procedure PostMultipartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Put(aUrl:String; aPutDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    procedure Delete(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Procedure Head(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Procedure Trace(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
     Function  Get(aUrl:String): String; overload;
+    function  Put(aURL: string; aPostDataStream: TStream): string; overload;
+    function  Delete(aURL: string): string; overload;
     Function  Post(aUrl:String): String; overload;
-    Function  Post(aUrl:String; aPostDataStream: TStream): String; overload;
+    Function  Post(aUrl:String; aPostDataStream: TStream): string; overload;
     Function  PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; Const EncodeParams: Boolean=True): String; overload;
     Function  PostMultiPartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents): String; overload;
     Function  Head(aUrl:String): String; overload;
@@ -297,6 +301,40 @@ begin
   end;
 end;
 
+{******************************************}
+procedure TALHTTPClient.Put(aURL: string;
+                            aPutDataStream: TStream;
+                            aResponseContentStream: TStream;
+                            aResponseContentHeader: TALHTTPResponseHeader);
+Var OldContentLengthValue: String;
+begin
+  URL := aURL;
+  RequestMethod := HTTPrm_Put;
+  OldContentLengthValue := FRequestHeader.ContentLength;
+  try
+    if Assigned(aPutDataStream) then FrequestHeader.ContentLength := inttostr(aPutDataStream.Size)
+    else FRequestHeader.ContentLength := '0';
+    Execute(aPutDataStream,
+            aResponseContentStream,
+            aResponseContentHeader);
+    
+  finally
+    FrequestHeader.ContentLength := OldContentLengthValue;
+  end;
+end;
+
+{******************************************}
+procedure TALHTTPClient.Delete(aUrl: String;
+                               aResponseContentStream: TStream;
+                               aResponseContentHeader: TALHTTPResponseHeader);
+begin
+  Url := aURL;
+  RequestMethod := HTTPrm_Delete;
+  Execute(nil,
+          aResponseContentStream,
+          aResponseContentHeader);
+end;
+
 {****************************************}
 procedure TALHTTPClient.Post(aUrl: String;
                              aResponseContentStream: TStream;
@@ -414,6 +452,7 @@ begin
   end;
 end;
 
+
 {**************************************************************************}
 function TALHTTPClient.Post(aUrl: String; aPostDataStream: TStream): String;
 var aResponseContentStream: TStringStream;
@@ -424,6 +463,22 @@ begin
          aPostDataStream,
          aResponseContentStream,
          nil);
+    result := aResponseContentStream.DataString;
+  finally
+    aResponseContentStream.Free;
+  end;
+end;
+
+{*************************************************************************}
+function TALHTTPClient.Put(aURL: string; aPostDataStream: TStream): string;
+var aResponseContentStream: TStringStream;
+begin
+  aResponseContentStream := TstringStream.Create('');
+  try
+    Put(aUrl,
+        aPostDataStream,
+        aResponseContentStream,
+        nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;
@@ -504,6 +559,21 @@ begin
     Head(aUrl,
          aResponseContentStream,
          nil);
+    result := aResponseContentStream.DataString;
+  finally
+    aResponseContentStream.Free;
+  end;
+end;
+
+{**************************************************}
+function TALHTTPClient.Delete(aURL: string): string;
+var aResponseContentStream: TStringStream;
+begin
+  aResponseContentStream := TstringStream.Create('');
+  try
+    Delete(aUrl,
+           aResponseContentStream,
+           nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;

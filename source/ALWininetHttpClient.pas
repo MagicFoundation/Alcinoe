@@ -553,10 +553,12 @@ function TALWinInetHTTPClient.Send(const aRequestDataStream: TStream): Integer;
   Function InternalGetHttpOpenRequestVerb: Pchar;
   Begin
     Case RequestMethod of
-      HTTPrm_Get: Result := 'GET';
-      HTTPrm_Post: Result := 'POST';
-      HTTPrm_Head: Result := 'HEAD';
-      HTTPrm_Trace: Result := 'TRACE'; // <= seam to not work on Wininet ! but work on winhttp
+      HTTPrm_Get:    Result := 'GET';
+      HTTPrm_Post:   Result := 'POST';
+      HTTPrm_Head:   Result := 'HEAD';
+      HTTPrm_Delete: Result := 'DELETE';
+      HTTPrm_Put:    Result := 'PUT';
+      HTTPrm_Trace:  Result := 'TRACE'; // <= seam to not work on Wininet ! but work on winhttp
       else raise Exception.Create('Unknown Request Method');
     end;
   end;

@@ -578,7 +578,11 @@ Initialization
  vAlExtbyMimeContentTypeList := TALStringList.Create;
  ALFillMimeContentTypeByExtList(vAlMimeContentTypeByExtList);
  ALFillExtByMimeContentTypeList(vAlExtbyMimeContentTypeList);
-
+ TALStringList(vAlMimeContentTypeByExtList).Duplicates := dupIgnore;
+ TALStringList(vAlMimeContentTypeByExtList).Sorted := true;
+ TALStringList(vAlExtbyMimeContentTypeList).Duplicates := dupIgnore;
+ TALStringList(vAlExtbyMimeContentTypeList).Sorted := true;
+ 
 finalization
  vAlMimeContentTypeByExtList.Free;
  vAlExtbyMimeContentTypeList.Free;

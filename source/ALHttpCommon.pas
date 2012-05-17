@@ -98,7 +98,9 @@ Type
                           HTTPrm_Get,
                           HTTPrm_Post,
                           HTTPrm_Head,
-                          HTTPrm_Trace
+                          HTTPrm_Trace,
+                          HTTPrm_Put,
+                          HTTPrm_Delete
                          );
 
   {--Request header--}

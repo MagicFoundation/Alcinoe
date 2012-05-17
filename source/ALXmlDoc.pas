@@ -3690,6 +3690,7 @@ function TALXMLNodeList.GetNodeByName(const Name: TALXmlString): TALXMLNode;
 begin
   Result := FindNode(TALXMLString(Name));
   if (not Assigned(Result)) and
+     (assigned(fOwner.OwnerDocument)) and 
      (doNodeAutoCreate in fOwner.OwnerDocument.Options) and
      ((FOwner.GetNodeType <> ntDocument) or (FOwner.OwnerDocument.DocumentElement = nil)) // Don't try to autocreate a second document element !
   then Result := FOwner.AddChild(Name);
@@ -3799,8 +3800,9 @@ var TrailIndent, NewIndex: Integer;
 begin
   { Determine if we should add do formatting here }
   if Assigned(Owner.ParentNode) and
+     Assigned(Owner.OwnerDocument) and
      (doNodeAutoIndent in Owner.OwnerDocument.Options) and
-     not (Node.NodeType in [ntText, ntAttribute]) then
+     (not (Node.NodeType in [ntText, ntAttribute])) then
   begin
     { Insert formatting before the node }
     if Count = 0 then InsertFormattingNode(Owner.ParentNode.NestingLevel, -1);

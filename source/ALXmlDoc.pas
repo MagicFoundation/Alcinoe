@@ -994,6 +994,7 @@ constructor TALXMLDocument.create(AOwner: TComponent);
 begin
   { Need to have this to make this constructor visible to C++ classes }
   inherited;
+  FFileName:= '';  
 end;
 
 {************************************}
@@ -1018,7 +1019,6 @@ begin
   FStreamedActive := False;
   FDocSource:= xdsNone;
   FDocumentNode:= nil;
-  FFileName:= '';
   FParseOptions:= [];
   FSrcStream := nil;
   FOnParseProcessingInstruction:= nil;

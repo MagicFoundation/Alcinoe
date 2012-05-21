@@ -223,8 +223,7 @@ Type
                             aFieldLength: integer;
                             aFormatSettings: TformatSettings): String;
     Function  AcquireConnection: PMySql; virtual;
-    Procedure ReleaseConnection(var ConnectionHandle: PMySql;
-                                const CloseConnection: Boolean = False); virtual;
+    Procedure ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
     procedure initObject(aHost: String;
                          aPort: integer;
                          aDataBaseName,
@@ -253,10 +252,8 @@ Type
     Destructor  Destroy; Override;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     Procedure TransactionStart(Var ConnectionHandle: PMySql); virtual;
-    Procedure TransactionCommit(var ConnectionHandle: PMySql;
-                                const CloseConnection: Boolean = False); virtual;
-    Procedure TransactionRollback(var ConnectionHandle: PMySql;
-                                  const CloseConnection: Boolean = False); virtual;
+    Procedure TransactionCommit(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
+    Procedure TransactionRollback(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
@@ -304,18 +301,12 @@ Type
                          XMLDATA: TalXMLNode;
                          FormatSettings: TformatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: Tstrings;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQL: String;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: Array of String;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Function  insert_id(SQL: String;
-                        const ConnectionHandle: PMySql = nil): UlongLong; virtual;
+    procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQLs: Tstrings; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQL: String; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQLs: Array of String; const ConnectionHandle: PMySql = nil); overload; virtual;
+    Function  insert_id(SQL: String; const ConnectionHandle: PMySql = nil): UlongLong; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
     property  DataBaseName: String read GetDataBaseName;
@@ -343,12 +334,6 @@ begin
   Result := '''' + Result + '''';
 end;
 
-
-
-/////////////////////////
-///// EALMySqlError /////
-/////////////////////////
-
 {*************************************************}
 constructor EALMySqlError.Create(aErrorMsg: string;
                                  aErrorCode: Integer;
@@ -358,11 +343,6 @@ begin
   FSQLstate := aSqlState;
   inherited create(aErrorMsg);
 end;
-
-
-//////////////////////////
-///// TalMySqlClient /////
-//////////////////////////
 
 {********************************************}
 function TalMySqlClient.GetConnected: Boolean;
@@ -964,12 +944,6 @@ begin
 
 end;
 
-
-
-////////////////////////////////////
-///// TalMySqlConnPoolClient /////
-////////////////////////////////////
-
 {*********************************************************************************************}
 procedure TalMySqlConnectionPoolClient.CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
 begin
@@ -1145,6 +1119,7 @@ Begin
     // this look very important because if we comment this and
     // the mysql_thread_end then the Flibrary.unload can take several seconds
     // you can see this in the ALSQLBenchmark.exe project with the loop update button 
+    // http://dev.mysql.com/doc/refman/5.6/en/threaded-clients.html
     CheckAPIError(Nil, FLibrary.mysql_thread_init <> 0);
     Try
 
@@ -1193,11 +1168,11 @@ Begin
 
           //attempts to establish a connection to a MySQL database engine running on host
           CheckAPIError(Result, fLibrary.mysql_real_connect(Result,
-                                                            pChar(fHost),
+                                                            pChar(Host),
                                                             pChar(fLogin),
                                                             pChar(fPassword),
                                                             Pchar(fDatabaseName),
-                                                            fPort,
+                                                            Port,
                                                             nil,
                                                             fOpenConnectionClientFlag) = nil);
 
@@ -1235,8 +1210,7 @@ End;
  BLOB handles, then it returns SQLITE_BUSY.
  If MySql_close() is invoked while a transaction is open, the transaction is
  automatically rolled back.}
-procedure TalMySqlConnectionPoolClient.ReleaseConnection(var ConnectionHandle: PMySql;
-                                                         const CloseConnection: Boolean = False);
+procedure TalMySqlConnectionPoolClient.ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False);
 Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
 begin
 
@@ -1272,13 +1246,15 @@ begin
     Dec(FWorkingConnectionCount);
 
     // free memory allocated by mysql_thread_init().
+    // http://dev.mysql.com/doc/refman/5.6/en/threaded-clients.html
+    // but i see one drawback in this, if the thread is for exemple
+    // using 2 connections at the same time !
     Try
       FLibrary.mysql_thread_end;
     Except
       //Disconnect must be a "safe" procedure because it's mostly called in
       //finalization part of the code that it is not protected
     End;
-
 
   finally
     FConnectionPoolCS.Release;
@@ -1291,45 +1267,67 @@ procedure TalMySqlConnectionPoolClient.ReleaseAllConnections(Const WaitWorkingCo
 Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
 begin
 
-  {we do this to forbid any new thread to create a new transaction}
-  FReleasingAllconnections := True;
-  Try
+  //i m still not sure if the FLibrary.MySql_close
+  //need the FLibrary.mysql_thread_init. the mysql doc
+  //if a very true bullsheet. i think it's cost
+  //nothing to call it here. but of course this mean that
+  //releaseconnection could not be call inside a thread
+  //that still own a connection because at the end of this
+  //function we call mysql_thread_end
+  try
+    FLibrary.mysql_thread_init;
+  except
+    //must be safe
+  end;
 
-    //wait that all transaction are finished
-    if WaitWorkingConnections then
-      while true do begin
-        FConnectionPoolCS.Acquire;
-        Try
-          if FWorkingConnectionCount <= 0 then break;
-        finally
-          FConnectionPoolCS.Release;
-        end;
-        sleep(100);
-      end;
+  try
 
-    {free all database}
-    FConnectionPoolCS.Acquire;
+    {we do this to forbid any new thread to create a new transaction}
+    FReleasingAllconnections := True;
     Try
-      while FConnectionPool.Count > 0 do begin
-        aConnectionPoolContainer := TalMySqlConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
-        Try
-          FLibrary.MySql_close(aConnectionPoolContainer.ConnectionHandle);
-        Except
-          //Disconnect must be a "safe" procedure because it's mostly called in
-          //finalization part of the code that it is not protected
-        End;
-        FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
+
+      //wait that all transaction are finished
+      if WaitWorkingConnections then
+        while true do begin
+          FConnectionPoolCS.Acquire;
+          Try
+            if FWorkingConnectionCount <= 0 then break;
+          finally
+            FConnectionPoolCS.Release;
+          end;
+          sleep(1);
+        end;
+
+      {free all database}
+      FConnectionPoolCS.Acquire;
+      Try
+        while FConnectionPool.Count > 0 do begin
+          aConnectionPoolContainer := TalMySqlConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
+          Try
+            FLibrary.MySql_close(aConnectionPoolContainer.ConnectionHandle);
+          Except
+            //Disconnect must be a "safe" procedure because it's mostly called in
+            //finalization part of the code that it is not protected
+          End;
+          FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
+        end;
+        FLastConnectionGarbage := ALGetTickCount64;
+      finally
+        FConnectionPoolCS.Release;
       end;
-      FLastConnectionGarbage := ALGetTickCount64;
+
     finally
-      FConnectionPoolCS.Release;
-    end;
+      //Do not forbid anymore new thread to create a new transaction
+      FReleasingAllconnections := False;
+    End;
 
   finally
-    //Do not forbid anymore new thread to create a new transaction
-    FReleasingAllconnections := False;
-  End;
-
+    try
+      FLibrary.mysql_thread_end;
+    except
+      //must be safe
+    end;
+  end;
 end;
 
 {************************************************************************************}
@@ -1353,9 +1351,8 @@ begin
 
 end;
 
-{************************************************************************************}
-procedure TalMySqlConnectionPoolClient.TransactionCommit(var ConnectionHandle: PMySql;
-                                                         const CloseConnection: Boolean = False);
+{*****************************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.TransactionCommit(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False);
 begin
 
   //security check
@@ -1369,9 +1366,8 @@ begin
 
 end;
 
-{**************************************************************************************}
-procedure TalMySqlConnectionPoolClient.TransactionRollback(var ConnectionHandle: PMySql;
-                                                           const CloseConnection: Boolean = False);
+{*******************************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.TransactionRollback(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False);
 var aTmpCloseConnection: Boolean;
 begin
 
@@ -1410,7 +1406,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(SQLs: TalMySqlClientSelectData
 
 Var aMySqlRes: PMYSQL_RES;
     aMySqlRow: PMYSQL_ROW;
-    aMySqlFields: PMYSQL_FIELDS;
+    aMySqlFields: array of PMYSQL_FIELD;
     aMySqlFieldLengths: PMYSQL_LENGTHS;
     aColumnCount: Integer;
     aColumnIndex: integer;
@@ -1459,10 +1455,14 @@ begin
           aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
 
           //init the aMySqlFields array
-          aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+          //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
+          //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+          setlength(aMySqlFields,aColumnCount);
+          for aColumnIndex := 0 to aColumnCount - 1 do
+            aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
 
           //init the aViewRec
-          if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument))  then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
+          if (SQLs[aSQLsindex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(SQLs[aSQLsindex].ViewTag)
           else aViewRec := XMLdata;
 
           //init aUpdateRowTagByFieldValue
@@ -1498,7 +1498,7 @@ begin
                 If (SQLs[aSQLsindex].First = 0) then break;
 
                 //init NewRec
-                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument))  then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
+                if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
                 Else aNewRec := aViewRec;
 
                 //init aMySqlFieldLengths
@@ -1561,6 +1561,10 @@ begin
       On E: Exception do begin
 
         //rollback the transaction and release the connection if owned
+        //! fixme ! fixme ! fixme ! fixme ! fixme ! fixme ! fixme ! fixme !
+        //instead of closing the connection, it's could be better to know
+        //if the error is related to the connection, or related to the
+        //SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
         if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
 
         //raise the error
@@ -1739,9 +1743,8 @@ begin
              ConnectionHandle);
 end;
 
-{***********************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TalMySqlClientUpdateDataSQLs;
-                                                  const ConnectionHandle: PMySql = nil);
+{**************************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TalMySqlClientUpdateDataSQLs; const ConnectionHandle: PMySql = nil);
 Var aSQLsindex: integer;
     aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
@@ -1771,6 +1774,10 @@ begin
     On E: Exception do begin
 
       //rollback the transaction and release the connection if owned
+      //! fixme ! fixme ! fixme ! fixme ! fixme ! fixme ! fixme ! fixme !
+      //instead of closing the connection, it's could be better to know
+      //if the error is related to the connection, or related to the
+      //SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
       if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
 
       //raise the error
@@ -1781,9 +1788,8 @@ begin
 
 end;
 
-{*********************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQL: TalMySqlClientUpdateDataSQL;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQL: TalMySqlClientUpdateDataSQL; const ConnectionHandle: PMySql = nil);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
@@ -1791,9 +1797,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{***************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: Tstrings;
-                                                  const ConnectionHandle: PMySql = nil);
+{******************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: Tstrings; const ConnectionHandle: PMySql = nil);
 Var aSQLsindex : integer;
     aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
@@ -1804,9 +1809,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQL: String;
-                                                  const ConnectionHandle: PMySql = nil);
+{***************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQL: String; const ConnectionHandle: PMySql = nil);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
@@ -1814,9 +1818,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: array of String;
-                                                  const ConnectionHandle: PMySql = nil);
+{*************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: array of String; const ConnectionHandle: PMySql = nil);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
     i: integer;
 begin
@@ -1827,9 +1830,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{**********************************************************}
-function TalMySqlConnectionPoolClient.insert_id(SQL: String;
-                                                const ConnectionHandle: PMySql = nil): ULongLong;
+{************************************************************************************************************}
+function TalMySqlConnectionPoolClient.insert_id(SQL: String; const ConnectionHandle: PMySql = nil): ULongLong;
 Var aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
 begin
@@ -1862,6 +1864,10 @@ begin
     On E: Exception do begin
 
       //rollback the transaction and release the connection if owned
+      //! fixme ! fixme ! fixme ! fixme ! fixme ! fixme ! fixme ! fixme !
+      //instead of closing the connection, it's could be better to know
+      //if the error is related to the connection, or related to the
+      //SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
       if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
 
       //raise the error

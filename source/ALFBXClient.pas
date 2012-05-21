@@ -415,7 +415,6 @@ Type
                                    var Sqlda: TALFBXSQLResult;
                                    TPB: String;
                                    const CloseConnection: Boolean = False); virtual;
-    Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     procedure initObject(aDataBaseName,
                          aLogin,
                          aPassword,
@@ -439,6 +438,7 @@ Type
                        const aNumbuffers: integer = -1;
                        const aOpenConnectionExtraParams: String = ''); overload; virtual;
     Destructor  Destroy; Override;
+    Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;    
     procedure GetMonitoringInfos(ConnectionID,
                                  TransactionID: int64;
                                  StatementSQL: String;

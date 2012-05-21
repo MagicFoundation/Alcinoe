@@ -133,6 +133,7 @@ Type
   private
     FNodeList: TALAVLStringListBinaryTreeNodeList;
     FAVLBinTree: TALAVLStringListBinaryTree;
+    FDuplicates: TDuplicates;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
     procedure ExchangeItems(Index1, Index2: Integer);
@@ -144,6 +145,7 @@ Type
     function GetForceValueFromIndex(Index: Integer): string;
     procedure SetForceValue(const Name, Value: string);
     procedure SetForceValueFromIndex(Index: Integer; const Value: string);
+    procedure SetDuplicates(const Value: TDuplicates);
   protected
     procedure Changed; virtual;
     procedure Changing; virtual;
@@ -172,6 +174,7 @@ Type
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
     property ForceValues[const Name: string]: string read GetForceValue write SetForceValue;
     property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;
+    property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
   end;
 
 implementation
@@ -189,14 +192,10 @@ begin
   //the difference between TALStringList and TStringList is that
   //TstringList use ansiCompareStr or ansiCompareText that are
   //dependant from the local
-  if CaseSensitive then Result := CompareStr(
-                                             AlStringReplace(S1,NameValueSeparator,#1,[]),
-                                             AlStringReplace(S2,NameValueSeparator,#1,[])
-                                            )
-  else Result := CompareText(
-                             AlStringReplace(S1,NameValueSeparator,#1,[]),
-                             AlStringReplace(S2,NameValueSeparator,#1,[])
-                            );
+  if CaseSensitive then Result := CompareStr(AlStringReplace(S1,NameValueSeparator,#1,[]),
+                                             AlStringReplace(S2,NameValueSeparator,#1,[]))
+  else Result := CompareText(AlStringReplace(S1,NameValueSeparator,#1,[]),
+                             AlStringReplace(S2,NameValueSeparator,#1,[]));
 end;
 
 {****************************************************************************}
@@ -288,6 +287,7 @@ begin
   FNodeList := TALAVLStringListBinaryTreeNodeList.Create(False);
   FOnChange := nil;
   FOnChanging := nil;
+  FDuplicates := DupError;
 end;
 
 {**********************************}
@@ -428,16 +428,13 @@ Var aName, aValue: String;
 begin
   if ExtractNameValue(S, aName, aValue) then begin
     aNode := FAVLBinTree.FindNode(aName);
-    if (not assigned(aNode)) or
-       (
-        CaseSensitive and
-        (aNode.Val <> aValue)
-       )
+    if (not assigned(aNode))
        or
-       (
-        (not CaseSensitive) and
-        (not sametext(aNode.Val, aValue))
-       )
+       ((CaseSensitive) and
+        (aNode.Val <> aValue))
+       or
+       ((not CaseSensitive) and
+        (not sametext(aNode.Val, aValue)))
     then result := -1
     else result := aNode.idx;
   end
@@ -494,7 +491,10 @@ begin
   aNode.Obj := AObject;
   if not FAVLBinTree.AddNode(aNode) then begin
     aNode.free;
-    Raise Exception.create('List does not allow duplicate Names');
+    case Duplicates of
+      dupIgnore: Exit;
+      else Raise Exception.create('List does not allow duplicate Names');
+    end;
   end;
   FNodeList.Insert(Index, aNode);
   for i := Index + 1 to FNodeList.Count - 1 do
@@ -531,7 +531,10 @@ begin
     aNewNode.Obj := aOldNode.Obj;
     if not FAVLBinTree.AddNode(aNewNode) then begin
       aNewNode.free;
-      Raise Exception.create('List does not allow duplicate Names');
+      case Duplicates of
+        dupIgnore: Exit;
+        else Raise Exception.create('List does not allow duplicate Names');
+      end;
     end;
     FNodeList[Index] := aNewNode;
     FAVLBinTree.DeleteNode(aOldNode.ID);
@@ -604,6 +607,13 @@ end;
 procedure TALAVLStringList.SetCaseSensitive(const Value: Boolean);
 begin
   FAVLBinTree.CaseSensitive := Value;
+end;
+
+{*****************************************************************}
+procedure TALAVLStringList.SetDuplicates(const Value: TDuplicates);
+begin
+  if value = dupAccept then raise exception.Create('TALAVLStringList does not support duplicate Names');
+  FDuplicates := Value;
 end;
 
 {**************************************************************************************}

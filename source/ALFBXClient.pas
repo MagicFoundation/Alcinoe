@@ -282,6 +282,7 @@ Type
     StmtHandle: IscStmtHandle;
     Sqlda: TALFBXSQLResult;
     LastAccessDate: int64;
+    OwnsObjects: Boolean;
     Constructor Create; Override;
     destructor Destroy; Override;
   end;
@@ -5177,6 +5178,7 @@ begin
   StmtHandle := nil;
   Sqlda  := nil;
   LastAccessDate := alGetTickCount64;
+  OwnsObjects := True;
 
 end;
 
@@ -5184,14 +5186,19 @@ end;
 destructor TALFBXConnectionStatementPoolBinTreeNode.Destroy;
 begin
 
-  //drop the statement
-  try
-    if assigned(StmtHandle) then Lib.DSQLFreeStatement(StmtHandle, DSQL_drop);
-  Except
-    //what else we can do here ?
-    //this can happen if connection lost for exemple
+  //if OwnsObjects only free the statement
+  if OwnsObjects then begin
+
+    //drop the statement
+    try
+      if assigned(StmtHandle) then Lib.DSQLFreeStatement(StmtHandle, DSQL_drop);
+    Except
+      //what else we can do here ?
+      //this can happen if connection lost for exemple
+    end;
+    if assigned(Sqlda) then Sqlda.free;
+
   end;
-  if assigned(Sqlda) then Sqlda.free;
 
   //inherit
   inherited;

@@ -1443,13 +1443,15 @@ end;
 {*********************************************************}
 procedure TForm1.ALButtonSphinxSelectClick(Sender: TObject);
 Var aSphinxClient: TalSphinxQLClient;
-    aXMLDATA: TalXmlDocument;
+    aXMLDATA1: TalXmlDocument;
+    aXMLDATA2: TalXmlDocument;
     aStartDate: int64;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
     S1: String;
     aLst1: TstringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
+    i: integer;
 begin
 
   case ALComboBoxSphinxApiVer.ItemIndex of
@@ -1466,10 +1468,11 @@ begin
       aSphinxClient.connect(ALEditSphinxHost.Text,
                            strtoint(ALEditSphinxPort.Text));
 
-      aXMLDATA := ALCreateEmptyXMLDocument('root');
+      aXMLDATA1 := ALCreateEmptyXMLDocument('root');
+      aXMLDATA2 := ALCreateEmptyXMLDocument('root');
       Try
 
-        With aXMLDATA Do Begin
+        With aXMLDATA1 Do Begin
           Options := [doNodeAutoIndent];
           ParseOptions := [poPreserveWhiteSpace];
         end;
@@ -1491,9 +1494,24 @@ begin
                                 'rec',
                                  0,
                                  200,
-                                aXMLDATA.DocumentElement,
+                                aXMLDATA1.DocumentElement,
                                 aFormatSettings);
         aEndDate := ALGetTickCount64;
+
+
+        ALMemoResult.Clear;
+        ALMemoResult.Lines.Add('Time Taken: ' + inttostr(aEndDate - aStartDate) + ' ms');
+        aSphinxClient.SelectData('SHOW META',
+                                 'rec',
+                                 aXMLDATA2.DocumentElement,
+                                 aFormatSettings);
+        ALMemoResult.Lines.Add('');
+        for I := 0 to aXMLDATA2.DocumentElement.ChildNodes.Count - 1 do
+          ALMemoResult.Lines.Add(aXMLDATA2.DocumentElement.ChildNodes[i].childnodes['variable_name'].Text + ': ' + aXMLDATA2.DocumentElement.ChildNodes[i].childnodes['value'].Text);
+        AlMemoResult.Lines.add('');
+        AlMemoResult.Lines.add('**************');
+        AlMemoResult.Lines.add('');
+        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + aXMLDATA1.XML.Text;
 
         TableViewThread.DataController.RecordCount := 1;
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
@@ -1503,10 +1521,10 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
-        AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
 
       Finally
-        aXMLDATA.free;
+        aXMLDATA1.free;
+        aXMLDATA2.free;
       End;
 
     Finally
@@ -2391,6 +2409,7 @@ begin
                 TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).Lib := Tform1(fOwner).FirebirdConnectionPoolClient.Lib;
                 TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).StmtHandle := aStmtHandle;
                 TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).Sqlda := aSqlda;
+                TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).OwnsObjects := False;
                 if not aStatementPool.AddNode(aStatementPoolNode) then aStatementPoolNode.Free;
               end
               else aStatementPool := nil;
@@ -2429,6 +2448,14 @@ begin
 
           finally
 
+            //drop the statement
+            try
+              if assigned(aStmtHandle) then Tform1(fOwner).FirebirdConnectionPoolClient.Lib.DSQLFreeStatement(aStmtHandle, DSQL_drop);
+            Except
+              //what else we can do here ?
+              //this can happen if connection lost for exemple
+            end;
+            if assigned(aSqlda) then aSqlda.free;
             aStmtHandle := nil;
             aSqlda := nil;
 

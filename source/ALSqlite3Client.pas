@@ -1285,7 +1285,7 @@ begin
         finally
           FConnectionPoolCS.Release;
         end;
-        sleep(100);
+        sleep(1);
       end;
 
     {free all database}

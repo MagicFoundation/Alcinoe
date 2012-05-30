@@ -91,25 +91,38 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
+{*********************************************}
+function ALIsDecimal(const S: string): boolean;
+var aChar: char;
+begin
+  result := true;
+  for aChar in S do begin
+    if not (aChar in ['0'..'9','-']) then begin
+      result := false;
+      break;
+    end;
+  end;
+end;
+
+{***********************************************}
+Function ALIsInteger(const S : String) : Boolean;
+var i: integer;
+Begin
+  result := ALIsDecimal(S) and TryStrToInt(S, i);
+End;
+
 {**********************************************}
 Function ALIsInt64 (const S : String) : Boolean;
 var i : int64;
 Begin
- Result := tryStrToInt64(S, I);
-End;
-
-{************************************************}
-Function ALIsInteger (const S : String) : Boolean;
-var i : Integer;
-Begin
- Result := TryStrToInt(S, I);
+  Result := ALIsDecimal(S) and tryStrToInt64(S, I);
 End;
 
 {*************************************************}
 Function ALIsSmallInt (const S : String) : Boolean;
 var i : Integer;
 Begin
- Result := TryStrToInt(S, I) and (i <= 32767) and (I >= -32768);
+  Result := ALIsDecimal(S) and TryStrToInt(S, I) and (i <= 32767) and (I >= -32768);
 End;
 
 {*****************************************}

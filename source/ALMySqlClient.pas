@@ -103,6 +103,13 @@ Type
   end;
   TalMySqlClientUpdateDataSQLs = array of TalMySqlClientUpdateDataSQL;
 
+  {---------------------}
+  TALMySQLOption = record
+    Option: TMySqlOption;
+    Value:  PANSIChar;
+  end;
+  TALMySQLOptions = array of TALMySQLOption;
+
   {-----------------------------}
   TalMySqlClient = Class(Tobject)
   Private
@@ -132,7 +139,8 @@ Type
                       Login,
                       Password,
                       CharSet: String;
-                      Const ClientFlag: Cardinal = 0); virtual;
+                      Const ClientFlag: Cardinal = 0;
+                      Const Options: TALMySQLOptions = nil); virtual;
     Procedure Disconnect;
     Procedure TransactionStart;
     Procedure TransactionCommit;
@@ -211,6 +219,7 @@ Type
     fPassword: String;
     fCharset: String;
     fOpenConnectionClientFlag: cardinal;
+    FOpenConnectionOptions: TALMySQLOptions;
     FNullString: String;
     fMySQLFormatSettings: TformatSettings;
   Protected
@@ -230,7 +239,8 @@ Type
                          aLogin,
                          aPassword,
                          aCharSet: String;
-                         Const aOpenConnectionClientFlag: Cardinal = 0); virtual;
+                         Const aOpenConnectionClientFlag: Cardinal = 0;
+                         Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
   Public
     Constructor Create(aHost: String;
                        aPort: integer;
@@ -239,8 +249,9 @@ Type
                        aPassword,
                        aCharSet: String;
                        aApiVer: TALMySqlVersion_API;
-                       const alib: String = 'libmysql.dll';
-                       Const aOpenConnectionClientFlag: Cardinal = 0); overload; virtual;
+                       Const alib: String = 'libmysql.dll';
+                       Const aOpenConnectionClientFlag: Cardinal = 0;
+                       Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
     Constructor Create(aHost: String;
                        aPort: integer;
                        aDataBaseName,
@@ -248,7 +259,8 @@ Type
                        aPassword,
                        aCharSet: String;
                        alib: TALMySqlLibrary;
-                       Const aOpenConnectionClientFlag: Cardinal = 0); overload; virtual;
+                       Const aOpenConnectionClientFlag: Cardinal = 0;
+                       Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
     Destructor  Destroy; Override;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     Procedure TransactionStart(Var ConnectionHandle: PMySql); virtual;
@@ -451,7 +463,9 @@ procedure TalMySqlClient.connect(Host: String;
                                  Login,
                                  Password,
                                  CharSet: String;
-                                 Const ClientFlag: Cardinal = 0);
+                                 Const ClientFlag: Cardinal = 0;
+                                 const Options: TALMySQLOptions = nil);
+var i: integer;
 begin
   if connected then raise Exception.Create('Already connected');
 
@@ -469,6 +483,12 @@ begin
 
     //set the The name of the character set to use as the default character set.
     If (CharSet <> '') then CheckAPIError(fLibrary.mysql_options(fMySQL, MYSQL_SET_CHARSET_NAME, Pchar(CharSet)) <> 0);
+
+    // set the options if they are existing
+    for i := 0 to length(Options) - 1 do
+      CheckAPIError(FLibrary.mysql_options(FMySQL,
+                                           Options[i].Option,
+                                           Options[i].Value) <> 0);
 
     //attempts to establish a connection to a MySQL database engine running on host
     CheckAPIError(fLibrary.mysql_real_connect(fMySQL,
@@ -860,6 +880,7 @@ begin
              FormatSettings);
 end;
 
+
 {**********************************************************************}
 procedure TalMySqlClient.UpdateData(SQLs: TalMySqlClientUpdateDataSQLs);
 Var aSQLsindex: integer;
@@ -1010,7 +1031,8 @@ procedure TalMySqlConnectionPoolClient.initObject(aHost: String;
                                                   aLogin,
                                                   aPassword,
                                                   aCharSet: String;
-                                                  Const aOpenConnectionClientFlag: Cardinal = 0);
+                                                  Const aOpenConnectionClientFlag: Cardinal = 0;
+                                                  Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
   fHost := aHost;
   fPort := aPort;
@@ -1019,6 +1041,7 @@ begin
   fPassword := aPassword;
   fCharset := aCharset;
   fOpenConnectionClientFlag := aOpenConnectionClientFlag;
+  FOpenConnectionOptions := aOpenConnectionOptions;  
   FConnectionPool:= TObjectList.Create(True);
   FConnectionPoolCS:= TCriticalSection.create;
   FWorkingConnectionCount:= 0;
@@ -1043,8 +1066,9 @@ constructor TalMySqlConnectionPoolClient.Create(aHost: String;
                                                 aPassword,
                                                 aCharSet: String;
                                                 aApiVer: TALMySqlVersion_API;
-                                                const alib: String = 'libmysql.dll';
-                                                Const aOpenConnectionClientFlag: Cardinal = 0);
+                                                Const alib: String = 'libmysql.dll';
+                                                Const aOpenConnectionClientFlag: Cardinal = 0;
+                                                Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
   fLibrary := TALMySqlLibrary.Create(aApiVer);
   Try
@@ -1056,7 +1080,8 @@ begin
                aLogin,
                aPassword,
                aCharSet,
-               aOpenConnectionClientFlag);
+               aOpenConnectionClientFlag,
+               aOpenConnectionOptions);
   except
     fLibrary.free;
     raise;
@@ -1071,7 +1096,8 @@ constructor TalMySqlConnectionPoolClient.Create(aHost: String;
                                                 aPassword,
                                                 aCharSet: String;
                                                 alib: TALMySqlLibrary;
-                                                Const aOpenConnectionClientFlag: Cardinal = 0);
+                                                Const aOpenConnectionClientFlag: Cardinal = 0;
+                                                Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
   fLibrary := alib;
   FownLibrary := False;
@@ -1081,7 +1107,8 @@ begin
              aLogin,
              aPassword,
              aCharSet,
-             aOpenConnectionClientFlag);
+             aOpenConnectionClientFlag,
+             aOpenConnectionOptions);
 end;
 
 {**********************************************}
@@ -1105,6 +1132,7 @@ end;
 function TalMySqlConnectionPoolClient.AcquireConnection: PMySql;
 Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
     aTickCount: int64;
+    i: integer;
 Begin
 
   //for a stupid warning
@@ -1165,6 +1193,12 @@ Begin
 
           //set the The name of the character set to use as the default character set.
           If (fCharSet <> '') then CheckAPIError(Result, fLibrary.mysql_options(Result, MYSQL_SET_CHARSET_NAME, Pchar(fCharSet)) <> 0);
+
+          // set the options if they are existing
+          for i := 0 to length(FOpenConnectionOptions) - 1 do
+            CheckAPIError(Result, FLibrary.mysql_options(Result,
+                                                         FOpenConnectionOptions[i].Option,
+                                                         FOpenConnectionOptions[i].Value) <> 0);
 
           //attempts to establish a connection to a MySQL database engine running on host
           CheckAPIError(Result, fLibrary.mysql_real_connect(Result,
@@ -1877,6 +1911,7 @@ begin
   end;
 
 end;
+
 
 {*************************************************************}
 function TalMySqlConnectionPoolClient.ConnectionCount: Integer;

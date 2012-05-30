@@ -145,6 +145,6 @@ begin
                    0,  // aOpenConnectionClientFlag: Cardinal = 0);
                    aOpenConnectionOptions); // aOpenConnectionOptions
 
-  end;
+end;
 
 end.

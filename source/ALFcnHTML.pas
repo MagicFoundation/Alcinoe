@@ -69,21 +69,21 @@ interface
 uses Classes;
 
 {Html Tag function}
-procedure ALANSIExtractHTMLText(HtmlContent: String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
-function  ALANSIExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String; overload;
-procedure ALUTF8ExtractHTMLText(HtmlContent: UTF8String; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
-function  ALUTF8ExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String; overload;
-function  ALXMLCDataElementEncode(Src: string): string;
-function  ALXMLTextElementEncode(Src: string; const useNumericReference: boolean = True): string;
-function  ALUTF8XMLTextElementDecode(Src: Utf8string): Utf8string;
-function  ALANSIXMLTextElementDecode(Src: string): string;
-function  ALANSIHTMLEncode(Src: string; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): string;
-function  ALUTF8HTMLEncode(Src: UTF8String; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): UTF8String;
-function  ALANSIHTMLDecode(Src: string): string;
-function  ALUTF8HTMLDecode(Src: Utf8string): Utf8string;
+procedure ALANSIExtractHTMLText(HtmlContent: AnsiString; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
+function  ALANSIExtractHTMLText(HtmlContent: AnsiString; Const DecodeHTMLText: Boolean = True): AnsiString; overload;
+procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString; LstExtractedResourceText : Tstrings; Const DecodeHTMLText: Boolean = True); overload;
+function  ALUTF8ExtractHTMLText(HtmlContent: AnsiString; Const DecodeHTMLText: Boolean = True): AnsiString; overload;
+function  ALXMLCDataElementEncode(Src: AnsiString): AnsiString;
+function  ALXMLTextElementEncode(Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+function  ALUTF8XMLTextElementDecode(Src: AnsiString): AnsiString;
+function  ALANSIXMLTextElementDecode(Src: AnsiString): AnsiString;
+function  ALANSIHTMLEncode(Src: AnsiString; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): AnsiString;
+function  ALUTF8HTMLEncode(Src: AnsiString; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): AnsiString;
+function  ALANSIHTMLDecode(Src: AnsiString): AnsiString;
+function  ALUTF8HTMLDecode(Src: AnsiString): AnsiString;
 
 {for internal use}
-procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: String; Const DeleteBodyOfUnwantedTag: Boolean = False; const ReplaceUnwantedTagCharBy: Char = #1);
+procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString; Const DeleteBodyOfUnwantedTag: Boolean = False; const ReplaceUnwantedTagCharBy: Char = #1);
 procedure ALInitHtmlEntitiesLst(aLstHtmlEntities: Tstrings);
 procedure ALCompactHtmlTagParams(TagParams: TStrings);
 
@@ -360,7 +360,7 @@ end;
   that is split in 3 line in TagParams}
 Procedure ALCompactHtmlTagParams(TagParams: TStrings);
 Var i: integer;
-    S1, S2, S3: String;
+    S1, S2, S3: AnsiString;
     P1, P2, P3: integer;
     Flag2, Flag3: boolean;
 Begin
@@ -406,143 +406,115 @@ Begin
 end;
 
 {******************************************************}
-procedure ALUTF8ExtractHTMLText(HtmlContent: UTF8String;
+procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
                                 LstExtractedResourceText : Tstrings;
                                 Const DecodeHTMLText: Boolean = True);
 
   {-----------------------------------------------------------}
-  procedure intenalAdd2LstExtractedResourceText(S: utf8String);
+  procedure intenalAdd2LstExtractedResourceText(S: AnsiString);
   Begin
     If DecodeHTMLText then Begin
       S := alUTF8HtmlDecode(trim(S));
-      S := AlStringReplace(
-                           S,
+      S := AlStringReplace(S,
                            #13,
                            ' ',
-                           [rfreplaceAll]
-                          );
-      S := AlStringReplace(
-                           S,
+                           [rfreplaceAll]);
+      S := AlStringReplace(S,
                            #10,
                            ' ',
-                           [rfreplaceAll]
-                          );
-      S := AlStringReplace(
-                           S,
+                           [rfreplaceAll]);
+      S := AlStringReplace(S,
                            #9,
                            ' ',
-                           [rfreplaceAll]
-                          );
+                           [rfreplaceAll]);
       While AlPos('  ',S) > 0 Do
-        S := AlStringReplace(
-                             S,
+        S := AlStringReplace(S,
                              '  ',
                              ' ',
-                             [rfreplaceAll]
-                            );
-      s := Trim(S);
+                             [rfreplaceAll]);
+      S := Trim(S);
     end;
-    If s <> '' then LstExtractedResourceText.add(S);
+    If S <> '' then LstExtractedResourceText.add(S);
   end;
 
 Var P1, P2: integer;
 Begin
-  ALHideHtmlUnwantedTagForHTMLHandleTagfunct(string(HtmlContent), True);
-  HtmlContent := ALFastTagReplace(
-                                  HtmlContent,
+  ALHideHtmlUnwantedTagForHTMLHandleTagfunct(HtmlContent, True);
+  HtmlContent := ALFastTagReplace(HtmlContent,
                                   '<',
                                   '>',
                                   #2, {this char is not use in html}
-                                  [rfreplaceall]
-                                 );
-  HtmlContent := ALStringReplace(
-                                 HtmlContent,
+                                  [rfreplaceall]);
+  HtmlContent := ALStringReplace(HtmlContent,
                                  #1, {default ReplaceUnwantedTagCharBy use by ALHideHtmlUnwantedTagForHTMLHandleTagfunct ; this char is not use in html}
                                  '<',
-                                 [rfreplaceall]
-                                );
+                                 [rfreplaceall]);
   HtmlContent := HtmlContent + #2;
 
   LstExtractedResourceText.Clear;
   P1 := 1;
   P2 := ALpos(#2,HtmlContent);
   While P2 > 0 do begin
-    If P2 > P1 then intenalAdd2LstExtractedResourceText(
-                                                        ALCopyStr(
-                                                                  HtmlContent,
+    If P2 > P1 then intenalAdd2LstExtractedResourceText(ALCopyStr(HtmlContent,
                                                                   P1,
-                                                                  p2-P1
-                                                                 )
-                                                       );
+                                                                  p2-P1));
     P1 := P2+1;
     P2 := ALposEX(#2,HtmlContent, P1);
   end;
 end;
 
-{*****************************************************************************************************}
-function  ALUTF8ExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String;
+{*********************************************************************************************************}
+function  ALUTF8ExtractHTMLText(HtmlContent: AnsiString; Const DecodeHTMLText: Boolean = True): AnsiString;
 Var LstExtractedResourceText: Tstrings;
 Begin
   LstExtractedResourceText := TstringList.Create;
   Try
-    ALUTF8ExtractHTMLText(
-                          HtmlContent,
+    ALUTF8ExtractHTMLText(HtmlContent,
                           LstExtractedResourceText,
-                          DecodeHTMLText
-                         );
-    Result := trim(
-                   AlStringReplace(
-                                   LstExtractedResourceText.Text,
+                          DecodeHTMLText);
+    Result := trim(AlStringReplace(LstExtractedResourceText.Text,
                                    #13#10,
                                    ' ',
-                                   [rfReplaceAll]
-                                  )
-                  );
+                                   [rfReplaceAll]));
   finally
     LstExtractedResourceText.free;
   end;
 end;
 
-{**************************************************}
-procedure ALANSIExtractHTMLText(HtmlContent: String;
+{******************************************************}
+procedure ALANSIExtractHTMLText(HtmlContent: AnsiString;
                                 LstExtractedResourceText : Tstrings;
                                 Const DecodeHTMLText: Boolean = True);
 Var I: Integer;
 Begin
-  ALUTF8ExtractHTMLText(
-                        AnsiToUTF8(HtmlContent),
+  ALUTF8ExtractHTMLText(AnsiToUTF8(HtmlContent),
                         LstExtractedResourceText,
-                        DecodeHTMLText
-                       );
+                        DecodeHTMLText);
 
   For i := 0 to LstExtractedResourceText.count - 1 do
     LstExtractedResourceText[I] := UTF8ToAnsi(LstExtractedResourceText[i]);
 End;
 
-{*****************************************************************************************************}
-function  ALANSIExtractHTMLText(HtmlContent: UTF8String; Const DecodeHTMLText: Boolean = True): String;
+{*********************************************************************************************************}
+function  ALANSIExtractHTMLText(HtmlContent: AnsiString; Const DecodeHTMLText: Boolean = True): AnsiString;
 Var LstExtractedResourceText: Tstrings;
 Begin
   LstExtractedResourceText := TstringList.Create;
   Try
-    ALANSIExtractHTMLText(
-                          HtmlContent,
+    ALANSIExtractHTMLText(HtmlContent,
                           LstExtractedResourceText,
-                          DecodeHTMLText
-                         );
-    Result := AlStringReplace(
-                              LstExtractedResourceText.Text,
+                          DecodeHTMLText);
+    Result := AlStringReplace(LstExtractedResourceText.Text,
                               #13#10,
                               ' ',
-                              [rfReplaceAll]
-                             );
+                              [rfReplaceAll]);
   finally
     LstExtractedResourceText.free;
   end;
 end;
 
-{*****************************************************}
-function  ALXMLCDataElementEncode(Src: string): string;
+{*************************************************************}
+function  ALXMLCDataElementEncode(Src: AnsiString): AnsiString;
 Begin
   //  The preferred approach to using CDATA sections for encoding text that contains the triad "]]>" is to use multiple CDATA sections by splitting each
   //  occurrence of the triad just before the ">". For example, to encode "]]>" one would write:
@@ -555,7 +527,7 @@ End;
 {*************************************************}
 {we use useNumericReference by default because it's
  compatible with XHTML, especially because of the &apos; entity}
-function ALXMLTextElementEncode(Src: string; const useNumericReference: boolean = True): string;
+function ALXMLTextElementEncode(Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
 var i, l: integer;
     Buf, P: PChar;
     ch: Integer;
@@ -632,12 +604,12 @@ begin
 end;
 
 {***************************************************************}
-function ALUTF8XMLTextElementDecode(Src: Utf8string): Utf8string;
+function ALUTF8XMLTextElementDecode(Src: AnsiString): AnsiString;
 var CurrentSrcPos, CurrentResultPos : Integer;
     j: integer;
     aTmpInteger: Integer;
     SrcLength: integer;
-    aEntity: String;
+    aEntity: AnsiString;
 
     {--------------------------------------}
     procedure CopyCurrentSrcPosCharToResult;
@@ -649,7 +621,7 @@ var CurrentSrcPos, CurrentResultPos : Integer;
 
     {---------------------------------------------------------------------------------}
     procedure CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
-    Var aUTF8String: UTF8String;
+    Var aUTF8String: AnsiString;
         K: integer;
     Begin
       aUTF8String := UTF8Encode(WideChar(aUnicodeOrdEntity));
@@ -746,21 +718,17 @@ begin
   setLength(Result,CurrentResultPos-1);
 end;
 
-{*******************************************************}
-function ALANSIXMLTextElementDecode(Src: string): string;
+{***************************************************************}
+function ALANSIXMLTextElementDecode(Src: AnsiString): AnsiString;
 begin
-  Result := Utf8toAnsi(
-                       ALUTF8XMLTextElementDecode(
-                                                  AnsiToUTF8(Src)
-                                                 )
-                      );
+  Result := Utf8toAnsi(ALUTF8XMLTextElementDecode(AnsiToUTF8(Src)));
 end;
 
 {***********************************************************************************************************************************************}
-function ALUTF8HTMLEncode(Src: UTF8String; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): UTF8String;
+function ALUTF8HTMLEncode(Src: AnsiString; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): AnsiString;
 var i, k, l: integer;
     Buf, P: PChar;
-    aEntityStr: String;
+    aEntityStr: AnsiString;
     aEntityInt: Integer;
     aIndex: integer;
     aTmpWideString: WideString;
@@ -897,20 +865,16 @@ begin
 
 end;
 
-{***************************************************************************************************************************************}
-function ALANSIHTMLEncode(Src: string; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): string;
+{***********************************************************************************************************************************************}
+function ALANSIHTMLEncode(Src: AnsiString; Const EncodeASCIIHtmlEntities: Boolean = True; const useNumericReference: boolean = True): AnsiString;
 Begin
-  Result := Utf8toAnsi(
-                       ALUTF8HTMLEncode(
-                                        AnsiToUTF8(Src),
+  Result := Utf8toAnsi(ALUTF8HTMLEncode(AnsiToUTF8(Src),
                                         EncodeASCIIHtmlEntities,
-                                        useNumericReference
-                                       )
-                      );
+                                        useNumericReference));
 end;
 
 {*****************************************************}
-function ALUTF8HTMLDecode(Src: Utf8string): Utf8string;
+function ALUTF8HTMLDecode(Src: AnsiString): AnsiString;
 var CurrentSrcPos, CurrentResultPos : Integer;
     j: integer;
     aTmpInteger: Integer;
@@ -926,7 +890,7 @@ var CurrentSrcPos, CurrentResultPos : Integer;
 
     {---------------------------------------------------------------------------------}
     procedure CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
-    Var aUTF8String: UTF8String;
+    Var aUTF8String: AnsiString;
         K: integer;
     Begin
       aUTF8String := UTF8Encode(WideChar(aUnicodeOrdEntity));
@@ -1019,25 +983,21 @@ begin
   setLength(Result,CurrentResultPos-1);
 end;
 
-{*********************************************}
-function ALANSIHTMLDecode(Src: string): string;
+{*****************************************************}
+function ALANSIHTMLDecode(Src: AnsiString): AnsiString;
 Begin
-  Result := Utf8toAnsi(
-                       ALUTF8HTMLDecode(
-                                        AnsiToUTF8(Src)
-                                       )
-                      );
+  Result := Utf8toAnsi(ALUTF8HTMLDecode(AnsiToUTF8(Src)));
 end;
 
-{***************************************************************************}
-procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: String;
+{*******************************************************************************}
+procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: Char = #1); {this char is not use in html}
 Var InDoubleQuote : Boolean;
     InSimpleQuote : Boolean;
     P1, P2 : integer;
     X1 : Integer;
-    Str1 : String;
+    Str1 : AnsiString;
 Begin
   P1 := 1;
   While P1 <= length(htmlContent) do
@@ -1166,12 +1126,12 @@ end;
 
 Initialization
   vALhtml_LstEntities := TstringList.create;
+  ALInitHtmlEntitiesLst(vALhtml_LstEntities);
   With (vALhtml_LstEntities as TstringList) do begin
     CaseSensitive := True;
     Duplicates := DupAccept;
     Sorted := True;
   end;
-  ALInitHtmlEntitiesLst(vALhtml_LstEntities);
 
 Finalization
   vALhtml_LstEntities.Free;

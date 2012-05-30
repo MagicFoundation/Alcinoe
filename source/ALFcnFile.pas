@@ -59,26 +59,26 @@ interface
 uses Windows,
      sysutils;
 
-Function AlEmptyDirectory(Directory: String;
+Function AlEmptyDirectory(Directory: ansiString;
                           SubDirectory: Boolean;
                           Const RemoveEmptySubDirectory: Boolean = True;
-                          Const FileNameMask: String = '*';
+                          Const FileNameMask: ansiString = '*';
                           Const MinFileAge: TdateTime = 0): Boolean;
 Function AlCopyDirectory(SrcDirectory,
-                         DestDirectory: String;
+                         DestDirectory: ansiString;
                          SubDirectory: Boolean;
-                         Const FileNameMask: String = '*';
+                         Const FileNameMask: ansiString = '*';
                          Const ErraseIfExist: Boolean = False): Boolean;
-function  ALGetModuleName: string;
-function  ALGetModuleFileNameWithoutExtension: string;
-function  ALGetModulePath: String;
-Function  AlGetFileVersion(const AFileName: string): String;
-Function  ALMakeGoodEndPath(Rep : string):string;
-function  ALGetFileCreationDateTime(const aFileName: string): TDateTime;
-function  ALGetFileLastWriteDateTime(const aFileName: string): TDateTime;
-function  ALGetFileLastAccessDateTime(const aFileName: string): TDateTime;
-Procedure ALSetFileCreationDateTime(Const aFileName: string; Const aCreationDateTime: TDateTime);
-function  ALIsDirectoryEmpty(const directory : string) : boolean;
+function  ALGetModuleName: ansistring;
+function  ALGetModuleFileNameWithoutExtension: ansistring;
+function  ALGetModulePath: ansiString;
+Function  AlGetFileVersion(const AFileName: ansistring): ansiString;
+Function  ALMakeGoodEndPath(Rep: ansiString):ansiString;
+function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
+function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
+function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
+Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
+function  ALIsDirectoryEmpty(const directory: ansiString) : boolean;
 
 implementation
 
@@ -86,11 +86,11 @@ uses Masks,
      DateUtils,
      alFcnString;
 
-{******************************************}
-Function AlEmptyDirectory(Directory: String;
+{**********************************************}
+Function AlEmptyDirectory(Directory: ansiString;
                           SubDirectory: Boolean;
                           Const RemoveEmptySubDirectory: Boolean = True;
-                          Const FileNameMask: String = '*';
+                          Const FileNameMask: ansiString = '*';
                           Const MinFileAge: TdateTime = 0): Boolean;
 var sr: TSearchRec;
     aBool: Boolean;
@@ -132,9 +132,9 @@ end;
 
 {************************************}
 Function AlCopyDirectory(SrcDirectory,
-                         DestDirectory: String;
+                         DestDirectory: ansiString;
                          SubDirectory: Boolean;
-                         Const FileNameMask: String = '*';
+                         Const FileNameMask: ansiString = '*';
                          Const ErraseIfExist: Boolean = False): Boolean;
 var sr: TSearchRec;
     aBool: Boolean;
@@ -162,8 +162,8 @@ begin
           end
           else If ((FileNameMask = '*') or
                    MatchesMask(sr.Name, FileNameMask)) then begin
-            If (not fileExists(DestDirectory + sr.Name)) or ErraseIfExist then abool := Copyfile(Pchar(SrcDirectory + sr.Name),
-                                                                                                 Pchar(DestDirectory + sr.Name),
+            If (not fileExists(DestDirectory + sr.Name)) or ErraseIfExist then abool := Copyfile(PAnsichar(SrcDirectory + sr.Name),
+                                                                                                 PAnsichar(DestDirectory + sr.Name),
                                                                                                  not ErraseIfExist)
             else aBool := True;
             If result then result := aBool;
@@ -176,10 +176,10 @@ begin
   end
 end;
 
-{*********************************************************}
-Function AlGetFileVersion(const AFileName: string): String;
+{*****************************************************************}
+Function AlGetFileVersion(const AFileName: ansiString): ansiString;
 var
-  FileName: string;
+  FileName: ansiString;
   InfoSize, Wnd: DWORD;
   VerBuf: Pointer;
   FI: PVSFixedFileInfo;
@@ -188,11 +188,11 @@ begin
   Result := '';
   FileName := AFileName;
   UniqueString(FileName);
-  InfoSize := GetFileVersionInfoSize(PChar(FileName), Wnd);
+  InfoSize := GetFileVersionInfoSize(PAnsiChar(FileName), Wnd);
   if InfoSize <> 0 then begin
     GetMem(VerBuf, InfoSize);
     try
-      if GetFileVersionInfo(PChar(FileName), Wnd, InfoSize, VerBuf) then
+      if GetFileVersionInfo(PAnsiChar(FileName), Wnd, InfoSize, VerBuf) then
         if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
           Result := inttostr(HiWord(FI.dwFileVersionMS)) +'.'+ inttostr(LoWord(FI.dwFileVersionMS)) +'.'+ inttostr(HiWord(FI.dwFileVersionLS)) +'.'+ inttostr(LoWord(FI.dwFileVersionLS));
     finally
@@ -201,14 +201,14 @@ begin
   end;
 end;
 
-{**********************************************}
-Function ALMakeGoodEndPath(Rep : string):string;
+{*****************************************************}
+Function ALMakeGoodEndPath(Rep: ansiString):ansiString;
 begin
   result :=  IncludeTrailingPathDelimiter(Rep);
 end;
 
-{***************************************************}
-function ALGetModuleFileNameWithoutExtension: string;
+{*******************************************************}
+function ALGetModuleFileNameWithoutExtension: ansiString;
 Var Ln: Integer;
 begin
   result := ExtractFileName(ALGetModuleName);
@@ -216,104 +216,86 @@ begin
   if Ln > 0 then delete(Result,length(Result)-ln+1,ln);  
 end;
 
-{*******************************}
-function ALGetModuleName: string;
+{***********************************}
+function ALGetModuleName: ansiString;
 var ModName: array[0..MAX_PATH] of Char;
 begin
   SetString(Result, ModName, Windows.GetModuleFileName(HInstance, ModName, SizeOf(ModName)));
   If ALpos('\\?\',result) = 1 then delete(Result,1,4);
 end;
 
-{*******************************}
-function ALGetModulePath: String;
+{***********************************}
+function ALGetModulePath: ansiString;
 begin
   Result:=ExtractFilePath(ALGetModuleName);
   If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
 end;
 
-{**********************************************************************}
-function  ALGetFileCreationDateTime(const aFileName: string): TDateTime;
+{**************************************************************************}
+function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
+var aHandle: THandle;
+    aFindData: TWin32FindData;
+    aLocalFileTime: TFileTime;
+    aFileDate: Integer;
+begin                        
+  aHandle := FindFirstFile(PAnsiChar(aFileName), aFindData);
+  if (aHandle = INVALID_HANDLE_VALUE) or
+     (not Windows.FindClose(aHandle)) or
+     (not FileTimeToLocalFileTime(aFindData.ftCreationTime, aLocalFileTime)) or
+     (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
+  Result := filedatetodatetime(aFileDate);
+end;
+
+{***************************************************************************}
+function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
 var aHandle: THandle;
     aFindData: TWin32FindData;
     aLocalFileTime: TFileTime;
     aFileDate: Integer;
 begin
-  aHandle := FindFirstFile(PChar(aFileName), aFindData);
-  if aHandle <> INVALID_HANDLE_VALUE then begin
-    Windows.FindClose(aHandle);
-    if (aFindData.dwFileAttributes and FILE_ATTRIBUTE_DIRECTORY) = 0 then begin
-      FileTimeToLocalFileTime(aFindData.ftCreationTime, aLocalFileTime);
-      if FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo) then Begin
-        Result := filedatetodatetime(aFileDate);
-        Exit;
-      end;
-    end;
-  end;
-  Result := -0.5; //invalid DateTime
+  aHandle := FindFirstFile(PAnsiChar(aFileName), aFindData);
+  if (aHandle = INVALID_HANDLE_VALUE) or
+     (not Windows.FindClose(aHandle)) or
+     (not FileTimeToLocalFileTime(aFindData.ftLastWriteTime, aLocalFileTime)) or
+     (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
+  Result := filedatetodatetime(aFileDate);
 end;
 
-{***********************************************************************}
-function  ALGetFileLastWriteDateTime(const aFileName: string): TDateTime;
+{****************************************************************************}
+function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
 var aHandle: THandle;
     aFindData: TWin32FindData;
     aLocalFileTime: TFileTime;
     aFileDate: Integer;
 begin
-  aHandle := FindFirstFile(PChar(aFileName), aFindData);
-  if aHandle <> INVALID_HANDLE_VALUE then begin
-    Windows.FindClose(aHandle);
-    if (aFindData.dwFileAttributes and FILE_ATTRIBUTE_DIRECTORY) = 0 then begin
-      FileTimeToLocalFileTime(aFindData.ftLastWriteTime, aLocalFileTime);
-      if FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo) then begin
-        Result := filedatetodatetime(aFileDate);
-        Exit;
-      end;
-    end;
-  end;
-  Result := -0.5; //invalid DateTime
+  aHandle := FindFirstFile(PAnsiChar(aFileName), aFindData);
+  if (aHandle = INVALID_HANDLE_VALUE) or
+     (not Windows.FindClose(aHandle)) or
+     (not FileTimeToLocalFileTime(aFindData.ftLastAccessTime, aLocalFileTime)) or
+     (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
+  Result := filedatetodatetime(aFileDate);
 end;
 
-{************************************************************************}
-function  ALGetFileLastAccessDateTime(const aFileName: string): TDateTime;
-var aHandle: THandle;
-    aFindData: TWin32FindData;
-    aLocalFileTime: TFileTime;
-    aFileDate: Integer;
-begin
-  aHandle := FindFirstFile(PChar(aFileName), aFindData);
-  if aHandle <> INVALID_HANDLE_VALUE then begin
-    Windows.FindClose(aHandle);
-    if (aFindData.dwFileAttributes and FILE_ATTRIBUTE_DIRECTORY) = 0 then begin
-      FileTimeToLocalFileTime(aFindData.ftLastAccessTime, aLocalFileTime);
-      if FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo) then begin
-        Result := filedatetodatetime(aFileDate);
-        Exit;
-      end;
-    end;
-  end;
-  Result := -0.5; //invalid DateTime
-end;
-
-{***********************************************************************************************}
-Procedure ALSetFileCreationDateTime(Const aFileName: string; Const aCreationDateTime: TDateTime);
-Var ahandle: integer;
+{***************************************************************************************************}
+Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
+Var ahandle: Thandle;
     aSystemTime: TsystemTime;
     afiletime: TfileTime;
 Begin
   aHandle := sysUtils.fileOpen(aFileName, fmOpenWrite or fmShareDenyNone);
-  if aHandle < 0 then exit;
+  if aHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
   Try
     dateTimeToSystemTime(aCreationDateTime, aSystemTime);
-    SystemTimeToFileTime(aSystemTime, aFileTime);
-    LocalFileTimeToFileTime(aFileTime, aFileTime);
-    setFileTime(aHandle, @aFileTime, nil, nil);
+    if (not SystemTimeToFileTime(aSystemTime, aFileTime)) or
+       (not LocalFileTimeToFileTime(aFileTime, aFileTime)) or
+       (not setFileTime(aHandle, @aFileTime, nil, nil)) then raiselastOsError;
   finally
     fileClose(aHandle);
   end;
 End;
 
-{**************************************************************}
-function ALIsDirectoryEmpty(const directory : string) : boolean;
+{*****************************************************************}
+function ALIsDirectoryEmpty(const directory: ansiString) : boolean;
 var SR: TSearchRec;
 begin
   Result := True;

@@ -965,6 +965,10 @@ begin
 
 end;
 
+{*******}
+ThreadVar
+  vAlMySqlConnectionPoolClientThreadInitRefCount: Integer;
+
 {*********************************************************************************************}
 procedure TalMySqlConnectionPoolClient.CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
 begin
@@ -1149,6 +1153,7 @@ Begin
     // you can see this in the ALSQLBenchmark.exe project with the loop update button 
     // http://dev.mysql.com/doc/refman/5.6/en/threaded-clients.html
     CheckAPIError(Nil, FLibrary.mysql_thread_init <> 0);
+    inc(vAlMySqlConnectionPoolClientThreadInitRefCount);
     Try
 
       //raise an exception if currently realeasing all connection
@@ -1225,7 +1230,8 @@ Begin
     Except
 
       // free memory allocated by mysql_thread_init().
-      FLibrary.mysql_thread_end;
+      dec(vAlMySqlConnectionPoolClientThreadInitRefCount);
+      if vAlMySqlConnectionPoolClientThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
       Raise;
 
     End;
@@ -1284,7 +1290,8 @@ begin
     // but i see one drawback in this, if the thread is for exemple
     // using 2 connections at the same time !
     Try
-      FLibrary.mysql_thread_end;
+      dec(vAlMySqlConnectionPoolClientThreadInitRefCount);
+      if vAlMySqlConnectionPoolClientThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
     Except
       //Disconnect must be a "safe" procedure because it's mostly called in
       //finalization part of the code that it is not protected
@@ -1310,6 +1317,7 @@ begin
   //function we call mysql_thread_end
   try
     FLibrary.mysql_thread_init;
+    inc(vAlMySqlConnectionPoolClientThreadInitRefCount);
   except
     //must be safe
   end;
@@ -1357,7 +1365,8 @@ begin
 
   finally
     try
-      FLibrary.mysql_thread_end;
+      dec(vAlMySqlConnectionPoolClientThreadInitRefCount);
+      if vAlMySqlConnectionPoolClientThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
     except
       //must be safe
     end;

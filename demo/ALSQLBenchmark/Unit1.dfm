@@ -495,6 +495,7 @@ object Form1: TForm1
         Top = 51
         Width = 249
         Height = 19
+        Cursor = crArrow
         OnButtonClick = ALEditButtonFindFileClick
         btnVisible = True
         btnCaption = '...'

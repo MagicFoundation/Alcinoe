@@ -199,14 +199,14 @@ type
   {---------------------------------------}
   TFirebirdBenchmarkThread = Class(Tthread)
   private
-    fSQL: String;
-    fParams: String;
-    fTPB: String;
+    fSQL: AnsiString;
+    fParams: AnsiString;
+    fTPB: AnsiString;
     fUpdateSQL: Boolean;
     fOn: Boolean;
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
-    FErrorMsg: String;
+    FErrorMsg: AnsiString;
     FTotalPrepareTimeTaken: int64;
     FTotalExecuteTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
@@ -221,9 +221,9 @@ type
     constructor Create(CreateSuspended: Boolean;
                        AOwner: TwinControl;
                        aRank: integer;
-                       aSQL: String;
-                       aParams: String;
-                       aTPB: String;
+                       aSQL: AnsiString;
+                       aParams: AnsiString;
+                       aTPB: AnsiString;
                        aMaxLoop: integer;
                        aNBLoopBeforeCommit: integer;
                        aUpdateSQL: Boolean);
@@ -233,12 +233,12 @@ type
   {--------------------------------------}
   TSqlite3BenchmarkThread = Class(Tthread)
   private
-    fSQL: String;
+    fSQL: AnsiString;
     fUpdateSQL: Boolean;
     fOn: Boolean;
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
-    FErrorMsg: String;
+    FErrorMsg: AnsiString;
     FTotalExecuteTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
     FTotalLoop: integer;
@@ -252,7 +252,7 @@ type
     constructor Create(CreateSuspended: Boolean;
                        AOwner: TwinControl;
                        aRank: integer;
-                       aSQL: String;
+                       aSQL: AnsiString;
                        aMaxLoop: integer;
                        aNBLoopBeforeCommit: integer;
                        aUpdateSQL: Boolean);
@@ -262,12 +262,12 @@ type
   {------------------------------------}
   TMySqlBenchmarkThread = Class(Tthread)
   private
-    fSQL: String;
+    fSQL: AnsiString;
     fUpdateSQL: Boolean;
     fOn: Boolean;
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
-    FErrorMsg: String;
+    FErrorMsg: AnsiString;
     FTotalExecuteTimeTaken: int64;
     FTotalCommitTimeTaken: int64;
     FTotalLoop: integer;
@@ -281,7 +281,7 @@ type
     constructor Create(CreateSuspended: Boolean;
                        AOwner: TwinControl;
                        aRank: integer;
-                       aSQL: String;
+                       aSQL: AnsiString;
                        aMaxLoop: integer;
                        aNBLoopBeforeCommit: integer;
                        aUpdateSQL: Boolean);
@@ -332,7 +332,7 @@ begin
 end;
 
 {****************************************************************************************************************************}
-function SQLFastTagReplaceFunct(const TagString: string; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): string;
+function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
 Var aMin, aMax, aIndex, aIncBy: integer;
     aLstSavedData: TstringList;
 begin
@@ -411,7 +411,7 @@ Var aFBXClient: TALFbxClient;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aLst1: TStringList;
     i: integer;
-    aTPB: String;
+    aTPB: AnsiString;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -601,8 +601,8 @@ Var aFBXClient: TALFbxClient;
     aLst1: TStringList;
     aLstSql: Tstrings;
     i: integer;
-    aTPB: String;
-    S1: string;
+    aTPB: AnsiString;
+    S1: AnsiString;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -792,7 +792,7 @@ procedure TForm1.ALButtonFirebirdLoopSelectClick(Sender: TObject);
 Var aFirebirdBenchmarkThread: TFirebirdBenchmarkThread;
     i: integer;
     aFBAPiVersion: TALFBXVersion_API;
-    aTPB: String;
+    aTPB: AnsiString;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -872,7 +872,7 @@ procedure TForm1.ALButtonFirebirdLoopUpdateClick(Sender: TObject);
 Var aFirebirdBenchmarkThread: TFirebirdBenchmarkThread;
     i: integer;
     aFBAPiVersion: TALFBXVersion_API;
-    aTPB: String;
+    aTPB: AnsiString;
 begin
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -954,7 +954,7 @@ Var aMySqlClient: TalMySqlClient;
     aStartDate: int64;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
-    S1: String;
+    S1: AnsiString;
     aLst1: TstringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
 begin
@@ -1039,7 +1039,7 @@ Var aMySqlClient: TalMySqlClient;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
     LstSql: TstringList;
-    S1: String;
+    S1: AnsiString;
     aLst1: TstringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
 begin
@@ -1242,7 +1242,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aStartDate: int64;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
-    S1: String;
+    S1: AnsiString;
     aLst1: TstringList;
 begin
   GetLocaleFormatSettings(1033, aFormatSettings);
@@ -1347,7 +1347,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
     LstSql: TstringList;
-    S1: String;
+    S1: AnsiString;
     aLst1: TstringList;
 begin
   Screen.Cursor := CrHourGlass;
@@ -1448,7 +1448,7 @@ Var aSphinxClient: TalSphinxQLClient;
     aStartDate: int64;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
-    S1: String;
+    S1: AnsiString;
     aLst1: TstringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
     i: integer;
@@ -1545,7 +1545,7 @@ Var aSphinxClient: TalSphinxQLClient;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
     LstSql: TstringList;
-    S1: String;
+    S1: AnsiString;
     aLst1: TstringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
 begin
@@ -1739,7 +1739,7 @@ end;
 {***************************************************************}
 procedure TForm1.ALButtonSqlite3LoopSelectClick(Sender: TObject);
 Var aSqlite3BenchmarkThread: TSqlite3BenchmarkThread;
-    aPragmaStatements: String;
+    aPragmaStatements: AnsiString;
     i: integer;
 begin
 
@@ -1822,7 +1822,7 @@ end;
 {***************************************************************}
 procedure TForm1.ALButtonSqlite3LoopUpdateClick(Sender: TObject);
 Var aSqlite3BenchmarkThread: TSqlite3BenchmarkThread;
-    aPragmaStatements: String;
+    aPragmaStatements: AnsiString;
     i: integer;
 begin
 
@@ -1961,7 +1961,7 @@ end;
 constructor TSqlite3BenchmarkThread.Create(CreateSuspended: Boolean;
                                            AOwner: TwinControl;
                                            aRank: integer;
-                                           aSQL: String;
+                                           aSQL: AnsiString;
                                            aMaxLoop: integer;
                                            aNBLoopBeforeCommit: integer;
                                            aUpdateSQL: Boolean);
@@ -2002,7 +2002,7 @@ Var aconnectionHandle: PSQLite3;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
-    S1: String;
+    S1: AnsiString;
 
     j: integer;
     aLst1: TstringList;
@@ -2174,9 +2174,9 @@ end;
 constructor TFirebirdBenchmarkThread.Create(CreateSuspended: Boolean;
                                             AOwner: TwinControl;
                                             aRank: integer;
-                                            aSQL: String;
-                                            aParams: String;
-                                            aTPB: String;
+                                            aSQL: AnsiString;
+                                            aParams: AnsiString;
+                                            aTPB: AnsiString;
                                             aMaxLoop,
                                             aNBLoopBeforeCommit: integer;
                                             aUpdateSQL: Boolean);
@@ -2212,7 +2212,7 @@ end;
 procedure TFirebirdBenchmarkThread.Execute;
 
   {-------------------------------------------------}
-  function internalDoTagReplace(Str: String): String;
+  function internalDoTagReplace(Str: AnsiString): AnsiString;
   var aLst1: TstringList;
   Begin
     aLst1 := TstringList.create;
@@ -2246,7 +2246,7 @@ Var aDBHandle: IscDbHandle;
     aFormatSettings: TformatSettings;
     aStmtHandle: IscStmtHandle;
     aSqlda: TALFBXSQLResult;
-    S1: String;
+    S1: AnsiString;
     j, k, l: integer;
     aLst1: TstringList;
 
@@ -2561,7 +2561,7 @@ end;
 constructor TMySqlBenchmarkThread.Create(CreateSuspended: Boolean;
                                          AOwner: TwinControl;
                                          aRank: integer;
-                                         aSQL: String;
+                                         aSQL: AnsiString;
                                          aMaxLoop,
                                          aNBLoopBeforeCommit: integer;
                                          aUpdateSQL: Boolean);
@@ -2602,7 +2602,7 @@ Var aConnectionHandle: PMySql;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
     aFormatSettings: TformatSettings;
-    S1: String;
+    S1: AnsiString;
     j: integer;
     aLst1: TstringList;
 begin

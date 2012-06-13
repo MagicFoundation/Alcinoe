@@ -55,13 +55,13 @@ type
     PanelWebBrowser: TPanel;
     procedure ButtonStartClick(Sender: TObject);
     procedure BtnChooseSaveDirectoryClick(Sender: TObject);
-    procedure MainWebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: String; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; Url, RedirectedTo: String; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; Url: String; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlFindLink(Sender: TObject; HtmlTagString: String; HtmlTagParams: TStrings; URL: String);
-    procedure MainWebSpiderCrawlGetNextLink(Sender: TObject; var Url: String);
-    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: String; HtmlTagParams: TStrings; URL: String; var LocalPath: String);
-    procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: String);
+    procedure MainWebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; Url, RedirectedTo: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; Url: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlFindLink(Sender: TObject; HtmlTagString: AnsiString; HtmlTagParams: TStrings; URL: AnsiString);
+    procedure MainWebSpiderCrawlGetNextLink(Sender: TObject; var Url: AnsiString);
+    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: AnsiString; HtmlTagParams: TStrings; URL: AnsiString; var LocalPath: AnsiString);
+    procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: AnsiString);
     procedure ButtonStopClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -70,7 +70,7 @@ type
     FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FCurrentDeepLevel: Integer;
     FCurrentLocalFileNameIndex: integer;
-    function GetNextLocalFileName(aContentType: String): String;
+    function GetNextLocalFileName(aContentType: AnsiString): AnsiString;
   public
   end;
 
@@ -79,7 +79,7 @@ type
   Private
   Protected
   Public
-    Data: String;
+    Data: AnsiString;
   end;
 
   {---------------------------------------------------------------------}
@@ -201,18 +201,18 @@ end;
 
 {************************************************************}
 procedure TForm1.BtnChooseSaveDirectoryClick(Sender: TObject);
-Var aDir: string;
+Var aDir: AnsiString;
 Begin
  aDir := '';
  if SelectDirectory(aDir, [sdAllowCreate, sdPerformCreate, sdPrompt],0) then  EditSaveDirectory.Text := ALMakeGoodEndPath(aDir);
 end;
 
 {*****************************************************************}
-function TForm1.GetNextLocalFileName(aContentType: String): String;
-Var aExt: String;
+function TForm1.GetNextLocalFileName(aContentType: AnsiString): AnsiString;
+Var aExt: AnsiString;
 
   {-------------------------------------}
-  Function SplitPathMakeFilename: String;
+  Function SplitPathMakeFilename: AnsiString;
   begin
     Result := EditSaveDirectory.Text + inttostr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\';
     If (not DirectoryExists(Result)) and (not createDir(Result)) then raise exception.Create('cannot create dir: ' + Result);
@@ -232,7 +232,7 @@ end;
 
 {***************************************************************}
 procedure TForm1.MainWebSpiderCrawlDownloadError(Sender: TObject;
-                                                 URL, ErrorMessage: String;
+                                                 URL, ErrorMessage: AnsiString;
                                                  HTTPResponseHeader: TALHTTPResponseHeader;
                                                  var StopCrawling: Boolean);
 Var aNode: TPageDownloadedBinTreeNode;
@@ -256,7 +256,7 @@ end;
 
 {******************************************************************}
 procedure TForm1.MainWebSpiderCrawlDownloadRedirect(Sender: TObject;
-                                                    Url, RedirectedTo: String;
+                                                    Url, RedirectedTo: AnsiString;
                                                     HTTPResponseHeader: TALHTTPResponseHeader;
                                                     var StopCrawling: Boolean);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
@@ -296,13 +296,13 @@ end;
 
 {*****************************************************************}
 procedure TForm1.MainWebSpiderCrawlDownloadSuccess(Sender: TObject;
-                                                   Url: String;
+                                                   Url: AnsiString;
                                                    HTTPResponseHeader: TALHTTPResponseHeader;
                                                    HttpResponseContent: TStream;
                                                    var StopCrawling: Boolean);
 Var aNode: TPageDownloadedBinTreeNode;
-    Str: String;
-    AFileName: String;
+    Str: AnsiString;
+    AFileName: AnsiString;
     pMimeTypeFromData: LPWSTR;
 begin
 
@@ -316,7 +316,7 @@ begin
   IF (FindMimeFromData(
                        nil, // bind context - can be nil
                        nil, // url - can be nil
-                       pchar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
+                       PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
                        length(str), // size of buffer
                        PWidechar(WideString(HTTPResponseHeader.ContentType)), // proposed mime if - can be nil
                        0, // will be defined
@@ -353,14 +353,14 @@ end;
 
 {**********************************************************}
 procedure TForm1.MainWebSpiderCrawlFindLink(Sender: TObject;
-                                            HtmlTagString: String;
+                                            HtmlTagString: AnsiString;
                                             HtmlTagParams: TStrings;
-                                            URL: String);
+                                            URL: AnsiString);
 Var aNode: TPageNotYetDownloadedBinTreeNode;
     Lst: TstringList;
     I: integer;
     Flag1 : Boolean;
-    S1: String;
+    S1: AnsiString;
 begin
   {If Check BoxDownload Image}
   IF not CheckBoxDownloadImage.Checked and
@@ -436,7 +436,7 @@ end;
 
 {*************************************************************}
 procedure TForm1.MainWebSpiderCrawlGetNextLink(Sender: TObject;
-                                               var Url: String);
+                                               var Url: AnsiString);
 
     {-----------------------------------------------------------------------------}
     function InternalfindNextUrlToDownload(aNode: TPageNotYetDownloadedBinTreeNode;
@@ -502,12 +502,12 @@ end;
 
 {**************************************************************************}
 procedure TForm1.MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
-                                                            HtmlTagString: String;
+                                                            HtmlTagString: AnsiString;
                                                             HtmlTagParams: TStrings;
-                                                            URL: String;
-                                                            var LocalPath: String);
+                                                            URL: AnsiString;
+                                                            var LocalPath: AnsiString);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
-    aAnchorValue: String;
+    aAnchorValue: AnsiString;
 begin
   LocalPath := '';
 
@@ -543,10 +543,10 @@ end;
 
 {*****************************************************************************}
 procedure TForm1.MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject;
-                                                               var FileName, BaseHref: String);
+                                                               var FileName, BaseHref: AnsiString);
 
   {-------------------------------------}
-  Function SplitPathMakeFilename: String;
+  Function SplitPathMakeFilename: AnsiString;
   begin
     If FCurrentLocalFileNameIndex < 0 then result := ''
     else If FCurrentLocalFileNameIndex = 0 then result := EditSaveDirectory.Text + 'Start.htm'

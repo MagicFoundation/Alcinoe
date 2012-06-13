@@ -132,15 +132,15 @@ type
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
-    procedure TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+    procedure TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
+    procedure TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
   private
     procedure WMUpdateGUI(var Msg: TMessage); message WM_UpdateGUI;
   public
@@ -163,9 +163,9 @@ type
   TStressHttpThreadVarContainer = Class(TObject)
     On: Boolean;
     Rank: integer;
-    Url: String;
+    Url: AnsiString;
     RequestCount: Integer;
-    RequestStatus: String;
+    RequestStatus: AnsiString;
     BytesRead: Integer;
     DNSTimeTaken: Integer;
     ConnectTimeTaken: Integer;
@@ -177,9 +177,9 @@ type
   TStressHttpThread = Class(Tthread)
   private
     FBytesRead: Integer;
-    fUrl: String;
+    fUrl: AnsiString;
     fRequestCount: Integer;
-    FRequestStatus: String;
+    FRequestStatus: AnsiString;
     FDNSTimeTaken: Integer;
     FConnectTimeTaken: Integer;
     FSendTimeTaken: Integer;
@@ -266,19 +266,19 @@ Begin
 end;
 
 {*******************************************************************************************************************************************}
-procedure TForm1.TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
+procedure TForm1.TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
 begin
   if AText <> '' then AText := AText + ' KB/s';
 end;
 
 {***************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: string);
+procedure TForm1.TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
 begin
   if AText <> '' then AText := AText + ' ms';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if ToTalBytesRead > 107374182400 then aText := inttostr(round(ToTalBytesRead / 107374182400)) + ' GB'
   else if ToTalBytesRead > 1048576 then aText := inttostr(round(ToTalBytesRead / 1048576)) + ' MB'
@@ -286,42 +286,42 @@ begin
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if (TotalReceiveCount > 0) and (TotalReceiveTimeTaken > 0) then AText := inttostr(Round((totalBytesRead / 1024) /  ((TotalReceiveTimeTaken / 1000)))) + ' KB/s'
   else aText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if TotalDNSCount > 0 then AText := inttostr(Round(TotalDNSTimeTaken / TotalDNSCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if TotalReceiveCount > 0 then AText := inttostr(Round(TotalReceiveTimeTaken / TotalReceiveCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if TotalSendCount > 0 then AText := inttostr(Round(TotalSendTimeTaken / TotalSendCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if TotalWaitCount > 0 then AText := inttostr(Round(TotalWaitTimeTaken / TotalWaitCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: string);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
 begin
   if TotalConnectCount > 0 then AText := inttostr(Round(TotalConnectTimeTaken / TotalConnectCount)) + ' ms'
   else AText := '';
@@ -520,10 +520,10 @@ end;
 {**********************************}
 procedure TStressHttpThread.Execute;
 
-Var atmpUrl: string;
-    aBody: String;
-    aHostName: String;
-    aLowerCaseBody: String;
+Var atmpUrl: AnsiString;
+    aBody: AnsiString;
+    aHostName: AnsiString;
+    aLowerCaseBody: AnsiString;
     aResponseContentStream: TStream;
     aResponseContentHeader: TALHTTPResponseHeader;
     aHttpClient: TALWinHttpClient;

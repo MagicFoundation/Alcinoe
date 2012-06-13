@@ -11,11 +11,11 @@ type
 
   TMyEventThread = class(TALFBXEventThread)
   Private
-    FMsg: String;
+    FMsg: AnsiString;
   protected
     Procedure UpdateMemoResults;
     procedure DoException(Error: Exception); override;
-    procedure DoEvent(const EventName: string; Count: Integer); override;
+    procedure DoEvent(const EventName: AnsiString; Count: Integer); override;
   end;
 
   TForm1 = class(TForm)
@@ -120,7 +120,7 @@ begin
 end;
 
 {************************************************************************}
-procedure TMyEventThread.DoEvent(const EventName: string; Count: Integer);
+procedure TMyEventThread.DoEvent(const EventName: AnsiString; Count: Integer);
 begin
   FMsg := 'Event fired: ' + EventName;
   synchronize(UpdateMemoResults);

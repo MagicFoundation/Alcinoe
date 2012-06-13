@@ -73,7 +73,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton1Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -127,7 +127,7 @@ end;
 
 {**********************************************}
 procedure TForm1.ALButton2Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -181,7 +181,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton3Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -230,7 +230,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton4Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -279,7 +279,7 @@ end;
 
 {**********************************************}
 procedure TForm1.ALButton5Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -328,7 +328,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton6Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -377,7 +377,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton7Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -436,7 +436,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton8Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -559,7 +559,7 @@ end;
 
 {************************************************}
 procedure TForm1.ALButton13Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin
@@ -608,7 +608,7 @@ end;
 
 {************************************************}
 procedure TForm1.ALButton14Click(Sender: TObject);
-Var S1: String;
+Var S1: AnsiString;
      i: integer;
     StartDate: TdateTime;
 begin

@@ -91,7 +91,7 @@ uses alFcnSkin,
 {$R *.dfm}
 
 {****************************************************************************************************************************}
-function SQLFastTagReplaceFunct(const TagString: string; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): string;
+function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
 Var aMin, aMax, aIndex: integer;
     aLstSavedData: TstringList;
 begin
@@ -240,7 +240,7 @@ end;
 
 {**********************************************************************}
 procedure TForm1.ALButtonFirebirdStartTransactionClick(Sender: TObject);
-Var aTPB: String;
+Var aTPB: AnsiString;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
@@ -341,7 +341,7 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: Int64;
-    aSQl: string;
+    aSQl: AnsiString;
     aLst: TStringList;
 begin
 

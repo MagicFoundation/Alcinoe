@@ -109,7 +109,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
     LstSql: TstringList;
-    S1: String;
+    S1: AnsiString;
     i: integer;
 begin
   Screen.Cursor := CrHourGlass;
@@ -199,7 +199,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aStartDate: int64;
     aEndDate: int64;
     aFormatSettings: TformatSettings;
-    S1: String;
+    S1: AnsiString;
     i: integer;
 begin
   GetLocaleFormatSettings(1033, aFormatSettings);

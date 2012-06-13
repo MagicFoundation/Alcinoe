@@ -15,9 +15,9 @@ uses classes,
 Procedure ALFBXMonitoringStats_StartMainProcess;
 
   {----------------------------------------------------------------}
-  Function InternalExtractParamFileName(aParamName: String): String;
+  Function InternalExtractParamFileName(aParamName: AnsiString): AnsiString;
   Var i: Integer;
-      ACurrParamStr: String;
+      ACurrParamStr: AnsiString;
   Begin
     result := '';
     AParamName := AlLowerCase(AParamName) + ':';
@@ -43,7 +43,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
   end;
 
   {---------------------------------------------------------}
-  Function InternalIfParamExist(aParamName: String): boolean;
+  Function InternalIfParamExist(aParamName: AnsiString): boolean;
   Var i: Integer;
   Begin
     result := False;
@@ -55,7 +55,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
   end;
 
   {------------------------------------------------------------------}
-  function InternalRightPad(aStr: string; aPadSize : integer): string;
+  function InternalRightPad(aStr: AnsiString; aPadSize : integer): AnsiString;
   var RestLen: Integer;
   begin
     Result := trim(aStr);
@@ -65,7 +65,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
   end;
 
   {--------------------------------------------------}
-  function InternalFormatNumber(aStr: string): string;
+  function InternalFormatNumber(aStr: AnsiString): AnsiString;
   var aInt: Int64;
   begin
     aInt := strtoint64(aStr);
@@ -88,10 +88,10 @@ var aFbxClient: TalFbxClient;
     aXmlData: TalXmlDocument;
     aXmlRec: TalXmlNode;
     aFormatSettings: TformatSettings;
-    aFbClientdllPath: String;
+    aFbClientdllPath: AnsiString;
     AlstSQL: TstringList;
     i, j: integer;
-    S1: String;
+    S1: AnsiString;
 Begin
 
   GetLocaleFormatSettings(1033, aFormatSettings);

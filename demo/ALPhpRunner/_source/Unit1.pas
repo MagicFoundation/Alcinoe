@@ -198,11 +198,11 @@ end;
 
 {**********************************************************}
 procedure TForm1.ButtonOpenInExplorerClick(Sender: TObject);
-Var AFullPath: String;
+Var AFullPath: AnsiString;
 begin
   AFullPath := ALGetModulePath + '~tmp.html';
   MemoContentBody.Lines.SaveToFile(AFullPath);
-  ShellExecute(0,'OPEN',Pchar(AFullPath),nil,nil,SW_SHOW)
+  ShellExecute(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
 end;
 
 {*******************************************************}

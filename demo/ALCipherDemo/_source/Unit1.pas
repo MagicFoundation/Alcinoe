@@ -64,7 +64,7 @@ uses alFcnSkin,
 {$R *.dfm}
 
 {***************************************************}
-function internalRandomStr(aLength: Longint): string;
+function internalRandomStr(aLength: Longint): AnsiString;
 var X: Longint;
 begin
   if aLength <= 0 then exit;
@@ -74,9 +74,9 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton1Click(Sender: TObject);
-Var Key: String;
-    Data: String;
-    Str1, Str2: String;
+Var Key: AnsiString;
+    Data: AnsiString;
+    Str1, Str2: AnsiString;
     Counter: integer;
     DataCount: longint;
     StartTime: DWORD;
@@ -115,9 +115,9 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton3Click(Sender: TObject);
-Var Key: String;
-    Data: String;
-    Str1, Str2: String;
+Var Key: AnsiString;
+    Data: AnsiString;
+    Str1, Str2: AnsiString;
     Counter: integer;
     DataCount: longint;
     StartTime: DWORD;
@@ -156,9 +156,9 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton4Click(Sender: TObject);
-Var Key: String;
-    Data: String;
-    Str1, Str2: String;
+Var Key: AnsiString;
+    Data: AnsiString;
+    Str1, Str2: AnsiString;
     Counter: integer;
     DataCount: longint;
     StartTime: DWORD;
@@ -197,7 +197,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton5Click(Sender: TObject);
-Var outString: String;
+Var outString: AnsiString;
 begin
   ALBFEncryptStringCBC(ALMimeBase64DecodeString(trim(ALMemocryptedData.Lines.Text)), outString, EditKey.Text, False);
   ALMemoDeCryptedData.Lines.Text := outString;
@@ -205,14 +205,14 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton6Click(Sender: TObject);
-Var outString: String;
+Var outString: AnsiString;
 begin
   ALRDLEncryptStringCBC(ALMemoDecryptedData.Lines.Text, outString, EditKey.Text, True);
   ALMemoCryptedData.Lines.Text := ALMimeBase64EncodeStringNoCRLF(outString);
 end;
 
 procedure TForm1.ALButton7Click(Sender: TObject);
-Var outString: String;
+Var outString: AnsiString;
 begin
   ALRDLEncryptStringCBC(ALMimeBase64DecodeString(trim(ALMemocryptedData.Lines.Text)), outString, EditKey.Text, False);
   ALMemoDeCryptedData.Lines.Text := outString;
@@ -309,7 +309,7 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton2Click(Sender: TObject);
-Var outString: String;
+Var outString: AnsiString;
 begin
   ALBFEncryptStringCBC(ALMemoDecryptedData.Lines.Text, outString, EditKey.Text, True);
   ALMemoCryptedData.Lines.Text := ALMimeBase64EncodeStringNoCRLF(outString);

@@ -86,7 +86,7 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure AllInOneButtonClick(Sender: TObject);
   private
-    FIniFileName  : String;
+    FIniFileName  : AnsiString;
     FInitialized  : Boolean;
     FSMTPCLient: TALSMTPCLient;
   end;
@@ -127,9 +127,9 @@ const
   KeyMsgMemo        = 'Msg';
 
 {********************************************************}
-procedure SaveStringsToIniFile(const IniFileName : String;
-                               const IniSection  : String;
-                               const IniKey      : String;
+procedure SaveStringsToIniFile(const IniFileName : AnsiString;
+                               const IniSection  : AnsiString;
+                               const IniKey      : AnsiString;
                                Strings           : TStrings);
 var IniFile : TIniFile;
     nItem   : Integer;
@@ -152,14 +152,14 @@ begin
 end;
 
 {*********************************************************}
-function LoadStringsFromIniFile(const IniFileName : String;
-                                const IniSection  : String;
-                                const IniKey      : String;
+function LoadStringsFromIniFile(const IniFileName : AnsiString;
+                                const IniSection  : AnsiString;
+                                const IniKey      : AnsiString;
                                 Strings           : TStrings) : Boolean;
 var IniFile : TIniFile;
     nItem   : Integer;
     I       : Integer;
-    Buf     : String;
+    Buf     : AnsiString;
 begin
   Result := TRUE;
   if (IniFileName = '') or
@@ -282,7 +282,7 @@ end;
 {**************************************************}
 procedure TForm1.RcptToButtonClick(Sender: TObject);
 Var ALst: TstringList;
-    Str: String;
+    Str: AnsiString;
     i: integer;
 begin
   aLst := TstringList.Create;
@@ -311,7 +311,7 @@ procedure TForm1.DataButtonClick(Sender: TObject);
 Var aEmailHeader: TALEmailHeader;
     AMultiPartMixedAttachments : TALMultiPartMixedContents;
     i : integer;
-    Str: String;
+    Str: AnsiString;
 begin
   aEmailHeader := TALEmailHeader.Create;
   Try
@@ -356,7 +356,7 @@ procedure TForm1.AllInOneButtonClick(Sender: TObject);
 Var aEmailHeader: TALEmailHeader;
     AMultiPartMixedAttachments : TALMultiPartMixedContents;
     aLst: TstringList;
-    Str: string;
+    Str: AnsiString;
     i : integer;
 begin
 

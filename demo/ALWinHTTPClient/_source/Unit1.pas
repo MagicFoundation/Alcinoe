@@ -109,7 +109,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ButtonTraceClick(Sender: TObject);
     procedure OnCfgEditChange(Sender: TObject);
-    procedure OnCfgEditKeyPress(Sender: TObject; var Key: Char);
+    procedure OnCfgEditKeyPress(Sender: TObject; var Key: AnsiChar);
   private
     FWinHttpClient: TalWinHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -187,7 +187,7 @@ procedure TForm1.OnHttpClientStatusChange(Sender: Tobject;
                                           InternetStatus: DWord;
                                           StatusInformation: Pointer;
                                           StatusInformationLength: DWord);
-var StatusStr: String;
+var StatusStr: AnsiString;
 begin
   case InternetStatus of
     WINHTTP_CALLBACK_STATUS_CLOSING_CONNECTION: StatusStr := 'Closing the connection to the server';
@@ -340,11 +340,11 @@ end;
 
 {**********************************************************}
 procedure TForm1.ButtonOpenInExplorerClick(Sender: TObject);
-Var AFullPath: String;
+Var AFullPath: AnsiString;
 begin
   AFullPath := ALGetModulePath + '~tmp.html';
   MemoContentBody.Lines.SaveToFile(AFullPath);
-  ShellExecute(0,'OPEN',Pchar(AFullPath),nil,nil,SW_SHOW)
+  ShellExecute(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
 end;
 
 {************************************************}
@@ -440,7 +440,7 @@ begin
 end;
 
 {*****************************************************************}
-procedure TForm1.OnCfgEditKeyPress(Sender: TObject; var Key: Char);
+procedure TForm1.OnCfgEditKeyPress(Sender: TObject; var Key: AnsiChar);
 begin
   fMustInitWinHTTP := True;
 end;

@@ -66,10 +66,10 @@ type
     procedure ButtonLoadXmlWithXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
-    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: String);
-    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: String);
-    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: String; const Attributes: TStrings);
-    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: String);
+    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: AnsiString);
+    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: AnsiString);
+    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: AnsiString; const Attributes: TStrings);
+    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: AnsiString);
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -120,7 +120,7 @@ begin
 end;
 
 {************************************************************}
-Function CreateEmptyXMLDocument(Rootname:string):IXMLDocument;
+Function CreateEmptyXMLDocument(Rootname:AnsiString):IXMLDocument;
 Var aXmlDoc: TXMLDocument;
 begin
   aXmlDoc := TXMLDocument.Create(nil);
@@ -338,25 +338,25 @@ begin
 end;
 
 {************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: String);
+procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
 {***********************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: String);
+procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
 {**********************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: String; const Attributes: TStrings);
+procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: AnsiString; const Attributes: TStrings);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;
 end;
 
 {*********************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: String);
+procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: AnsiString);
 begin
   inc(FNodeCount);
 end;

@@ -7,7 +7,7 @@ package Alcinoe_d2007;
 {$DEBUGINFO ON}
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
-{$IOCHECKS OFF}
+{$IOCHECKS ON}
 {$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
@@ -22,9 +22,8 @@ package Alcinoe_d2007;
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DESCRIPTION 'Alcinoe pack'}
-{$IMPLICITBUILD OFF}
-{$DEFINE RELEASE}
+{$DESCRIPTION 'Alcinoe'}
+{$IMPLICITBUILD ON}
 
 requires
   vcl,
@@ -40,7 +39,6 @@ contains
   ALCalendar in 'ALCalendar.pas',
   ALComboBox in 'ALComboBox.pas',
   ALCommon in 'ALCommon.pas',
-  ALCPUID in 'ALCPUID.pas',
   ALDeflate in 'ALDeflate.pas',
   ALDialog in 'ALDialog.pas',
   ALEdit in 'ALEdit.pas',

@@ -8,20 +8,10 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
      cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
      cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
      cxGridCustomView, cxGrid, Spin, OleCtrls, SHDocVw,
-     ComObj, cxLookAndFeels, cxLookAndFeelPainters, dxSkinsCore, dxSkinBlack,
-     dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee, dxSkinDarkRoom,
-     dxSkinDarkSide, dxSkinDevExpressDarkStyle, dxSkinDevExpressStyle, dxSkinFoggy,
-     dxSkinGlassOceans, dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian,
-     dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin, dxSkinMoneyTwins,
-     dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green,
-     dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black,
-     dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinPumpkin, dxSkinSeven,
-     dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver,
-     dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
-     dxSkinsDefaultPainters, dxSkinValentine, dxSkinVS2010, dxSkinWhiteprint,
-     dxSkinXmas2008Blue, dxSkinscxPCPainter, cxButtons, cxContainer,
-     cxTextEdit, cxMemo, cxLabel, cxGroupBox, cxCheckBox, cxPCdxBarPopupMenu, cxPC,
-     cxRadioGroup, cxMaskEdit, dxSkinsForm, Menus;
+     ComObj, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
+     cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
+     cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
+     cxMemo, cxLabel, cxPC;
 
 Const
   WM_UpdateGUI = WM_User + 1;

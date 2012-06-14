@@ -32,10 +32,6 @@ object Form1: TForm1
       Caption = 'Application'
       Color = 15066860
       ParentColor = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       DesignSize = (
         998
         584)

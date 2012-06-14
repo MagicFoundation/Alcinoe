@@ -27,8 +27,6 @@ object Form1: TForm1
       item
         Width = 300
       end>
-    ExplicitTop = 729
-    ExplicitWidth = 800
   end
   object PageControl1: TPageControl
     Left = 0
@@ -38,12 +36,8 @@ object Form1: TForm1
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 800
-    ExplicitHeight = 729
     object TabSheet1: TTabSheet
       Caption = 'Main'
-      ExplicitWidth = 792
-      ExplicitHeight = 701
       object GroupBox9: TGroupBox
         Left = 0
         Top = 209
@@ -58,8 +52,6 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 0
-        ExplicitTop = 134
-        ExplicitWidth = 792
         object Label4: TLabel
           Left = 8
           Top = 85
@@ -276,8 +268,6 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 1
-        ExplicitTop = 336
-        ExplicitWidth = 792
         object Label2: TLabel
           Left = 8
           Top = 21
@@ -582,8 +572,6 @@ object Form1: TForm1
         Font.Style = [fsBold]
         ParentFont = False
         TabOrder = 3
-        ExplicitTop = 573
-        ExplicitWidth = 792
         object Label13: TLabel
           Left = 8
           Top = 91
@@ -684,8 +672,6 @@ object Form1: TForm1
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 4
-        ExplicitTop = 326
-        ExplicitWidth = 792
       end
       object Panel3: TPanel
         Left = 0
@@ -695,8 +681,6 @@ object Form1: TForm1
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 5
-        ExplicitTop = 124
-        ExplicitWidth = 792
       end
       object Panel4: TPanel
         Left = 0
@@ -706,8 +690,6 @@ object Form1: TForm1
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 6
-        ExplicitTop = 563
-        ExplicitWidth = 792
       end
       object Panel5: TPanel
         Left = 0
@@ -717,7 +699,6 @@ object Form1: TForm1
         Align = alTop
         BevelOuter = bvNone
         TabOrder = 7
-        ExplicitWidth = 792
       end
     end
   end

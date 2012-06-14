@@ -119,7 +119,7 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ButtonTraceClick(Sender: TObject);
     procedure OnCfgEditCHange(Sender: TObject);
-    procedure OnCfgEditKeyPress(Sender: TObject; var Key: AnsiChar);
+    procedure OnCfgEditKeyPress(Sender: TObject; var Key: Char);
   private
     FWinInetHttpClient: TalWinInetHttpClient;
     FDownloadSpeedStartTime: TdateTime;
@@ -368,7 +368,7 @@ begin
 end;
 
 {*****************************************************************}
-procedure TForm1.OnCfgEditKeyPress(Sender: TObject; var Key: AnsiChar);
+procedure TForm1.OnCfgEditKeyPress(Sender: TObject; var Key: Char);
 begin
   fMustInitWinHTTP := True;
 end;
@@ -379,7 +379,7 @@ Var AFullPath: AnsiString;
 begin
   AFullPath := ALGetModulePath + '~tmp.html';
   MemoContentBody.Lines.SaveToFile(AFullPath);
-  ShellExecute(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
+  ShellExecuteA(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
 end;
 
 {************************************************}

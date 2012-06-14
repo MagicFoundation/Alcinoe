@@ -102,8 +102,6 @@ object Form1: TForm1
       item
         Width = 100
       end>
-    ExplicitTop = 321
-    ExplicitWidth = 559
   end
   object editURL2Crawl: TEdit
     Left = 136
@@ -218,8 +216,6 @@ object Form1: TForm1
       item
         Width = 50
       end>
-    ExplicitTop = 340
-    ExplicitWidth = 559
   end
   object BtnChooseSaveDirectory: TButton
     Left = 481
@@ -242,7 +238,6 @@ object Form1: TForm1
     ScrollBars = ssVertical
     TabOrder = 9
     WordWrap = False
-    ExplicitTop = 272
   end
   object EditIncludeLink: TEdit
     Left = 136

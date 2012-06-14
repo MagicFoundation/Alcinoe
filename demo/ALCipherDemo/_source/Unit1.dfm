@@ -79,8 +79,6 @@ object Form1: TForm1
       item
         Width = 50
       end>
-    ExplicitTop = 427
-    ExplicitWidth = 603
   end
   object ALButton3: TALButton
     Left = 24

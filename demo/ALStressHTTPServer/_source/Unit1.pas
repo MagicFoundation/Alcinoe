@@ -2,104 +2,86 @@ unit Unit1;
 
 interface
 
-uses Windows,
-     Messages,
-     SysUtils,
-     Variants,
-     Classes,
-     Graphics,
-     Controls,
-     Forms,
-     Dialogs,
-     StdCtrls,
-     shellapi,
-     ExtCtrls,
-     ComCtrls,
-     AlWinHttpClient,
-     AlStringList,
-     AlWinHttpWrapper,
-     cxStyles,
-     cxCustomData,
-     cxGraphics,
-     cxFilter,
-     cxData,
-     cxDataStorage,
-     cxEdit,
-     cxDropDownEdit,
-     cxImageComboBox,
-     cxSpinEdit,
-     cxGridLevel,
-     cxGridCustomTableView,
-     cxGridTableView,
-     cxClasses,
-     cxControls,
-     cxGridCustomView,
-     cxGrid,
-     Spin,
-     OleCtrls,
-     SHDocVw,
-     ComObj;
+uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+     Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, AlHttpCommon, AlWinHttpClient,
+     AlStringList, AlWinHttpWrapper, cxStyles, cxCustomData, cxGraphics, cxFilter,
+     cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
+     cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
+     cxGridCustomView, cxGrid, Spin, OleCtrls, SHDocVw,
+     ComObj, cxLookAndFeels, cxLookAndFeelPainters, dxSkinsCore, dxSkinBlack,
+     dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee, dxSkinDarkRoom,
+     dxSkinDarkSide, dxSkinDevExpressDarkStyle, dxSkinDevExpressStyle, dxSkinFoggy,
+     dxSkinGlassOceans, dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian,
+     dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin, dxSkinMoneyTwins,
+     dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green,
+     dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black,
+     dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinPumpkin, dxSkinSeven,
+     dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver,
+     dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
+     dxSkinsDefaultPainters, dxSkinValentine, dxSkinVS2010, dxSkinWhiteprint,
+     dxSkinXmas2008Blue, dxSkinscxPCPainter, cxButtons, cxContainer,
+     cxTextEdit, cxMemo, cxLabel, cxGroupBox, cxCheckBox, cxPCdxBarPopupMenu, cxPC,
+     cxRadioGroup, cxMaskEdit, dxSkinsForm, Menus;
 
 Const
   WM_UpdateGUI = WM_User + 1;
 
 type
   TForm1 = class(TForm)
-    PageControl1: TPageControl;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
-    GroupBox3: TGroupBox;
-    Label18: TLabel;
-    Label19: TLabel;
-    EditUserName: TEdit;
-    EditPassword: TEdit;
-    GroupBox4: TGroupBox;
-    Label14: TLabel;
-    Label17: TLabel;
-    Label20: TLabel;
-    EditSendTimeout: TEdit;
-    EditReceiveTimeout: TEdit;
-    EditConnectTimeout: TEdit;
-    GroupBox6: TGroupBox;
-    GroupBox7: TGroupBox;
-    GroupBox2: TGroupBox;
-    RadioButtonAccessType_NAMED_PROXY: TRadioButton;
-    RadioButtonAccessType_NO_PROXY: TRadioButton;
-    RadioButtonAccessType_DEFAULT_PROXY: TRadioButton;
-    GroupBox1: TGroupBox;
-    Label15: TLabel;
-    Label12: TLabel;
-    Label11: TLabel;
-    Label16: TLabel;
-    Label13: TLabel;
-    EdProxyPort: TEdit;
-    EdProxyUserName: TEdit;
-    EdProxyServer: TEdit;
-    EdProxyPassword: TEdit;
-    EdProxyBypass: TEdit;
-    GroupBox5: TGroupBox;
-    Label24: TLabel;
-    EditBufferUploadSize: TEdit;
-    CheckBoxInternetOption_BYPASS_PROXY_CACHE: TCheckBox;
-    CheckBoxInternetOption_ESCAPE_DISABLE: TCheckBox;
-    CheckBoxInternetOption_REFRESH: TCheckBox;
-    CheckBoxInternetOption_SECURE: TCheckBox;
-    CheckBoxInternetOption_ESCAPE_PERCENT: TCheckBox;
-    CheckBoxInternetOption_NULL_CODEPAGE: TCheckBox;
-    CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TCheckBox;
-    GroupBox8: TGroupBox;
-    MemoRequestRawHeader: TMemo;
-    Label8: TLabel;
-    RadioButtonProtocolVersion1_0: TRadioButton;
-    RadioButtonProtocolVersion1_1: TRadioButton;
-    CheckBoxInternetOption_KEEP_CONNECTION: TCheckBox;
-    CheckBoxInternetOption_NO_COOKIES: TCheckBox;
-    CheckBoxInternetOption_NO_AUTO_REDIRECT: TCheckBox;
-    ButtonStart: TButton;
-    Label4: TLabel;
-    MemoLstUrl: TMemo;
-    Label1: TLabel;
-    Label2: TLabel;
+    PageControl1: TcxPageControl;
+    TabSheet1: TcxTabSheet;
+    TabSheet2: TcxTabSheet;
+    GroupBox3: TcxGroupBox;
+    Label18: TcxLabel;
+    Label19: TcxLabel;
+    EditUserName: tcxtextedit;
+    EditPassword: tcxtextedit;
+    GroupBox4: TcxGroupBox;
+    Label14: TcxLabel;
+    Label17: TcxLabel;
+    Label20: TcxLabel;
+    EditSendTimeout: tcxtextedit;
+    EditReceiveTimeout: tcxtextedit;
+    EditConnectTimeout: tcxtextedit;
+    GroupBox6: TcxGroupBox;
+    GroupBox7: TcxGroupBox;
+    GroupBox2: TcxGroupBox;
+    RadioButtonAccessType_NAMED_PROXY: TcxRadioButton;
+    RadioButtonAccessType_NO_PROXY: TcxRadioButton;
+    RadioButtonAccessType_DEFAULT_PROXY: TcxRadioButton;
+    GroupBox1: TcxGroupBox;
+    Label15: TcxLabel;
+    Label12: TcxLabel;
+    Label11: TcxLabel;
+    Label16: TcxLabel;
+    Label13: TcxLabel;
+    EdProxyPort: tcxtextedit;
+    EdProxyUserName: tcxtextedit;
+    EdProxyServer: tcxtextedit;
+    EdProxyPassword: tcxtextedit;
+    EdProxyBypass: tcxtextedit;
+    GroupBox5: TcxGroupBox;
+    Label24: TcxLabel;
+    EditBufferUploadSize: tcxtextedit;
+    CheckBoxInternetOption_BYPASS_PROXY_CACHE: TcxCheckBox;
+    CheckBoxInternetOption_ESCAPE_DISABLE: TcxCheckBox;
+    CheckBoxInternetOption_REFRESH: TcxCheckBox;
+    CheckBoxInternetOption_SECURE: TcxCheckBox;
+    CheckBoxInternetOption_ESCAPE_PERCENT: TcxCheckBox;
+    CheckBoxInternetOption_NULL_CODEPAGE: TcxCheckBox;
+    CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TcxCheckBox;
+    GroupBox8: TcxGroupBox;
+    MemoRequestRawHeader: TcxMemo;
+    Label8: TcxLabel;
+    RadioButtonProtocolVersion1_0: TcxRadioButton;
+    RadioButtonProtocolVersion1_1: TcxRadioButton;
+    CheckBoxInternetOption_KEEP_CONNECTION: TcxCheckBox;
+    CheckBoxInternetOption_NO_COOKIES: TcxCheckBox;
+    CheckBoxInternetOption_NO_AUTO_REDIRECT: TcxCheckBox;
+    Label4: TcxLabel;
+    MemoLstUrl: TcxMemo;
+    Label1: TcxLabel;
+    Label2: TcxLabel;
     GridThread: TcxGrid;
     TableViewThread: TcxGridTableView;
     TableViewThreadNumber: TcxGridColumn;
@@ -109,17 +91,17 @@ type
     TableViewThreadDownloadSpeed: TcxGridColumn;
     levelThread: TcxGridLevel;
     TableViewThreadRequestCount: TcxGridColumn;
-    CheckBoxDoLikeSpider: TCheckBox;
-    CheckBoxStopOnError: TCheckBox;
+    CheckBoxDoLikeSpider: TcxCheckBox;
+    CheckBoxStopOnError: TcxCheckBox;
     StatusBar1: TStatusBar;
-    EditMaxHttpRequest: TSpinEdit;
-    EditNbThread: TSpinEdit;
-    Label3: TLabel;
-    EditSendDelayBetweenEachSend: TEdit;
-    Label5: TLabel;
+    EditMaxHttpRequest: TcxSpinEdit;
+    EditNbThread: TcxSpinEdit;
+    Label3: TcxLabel;
+    EditSendDelayBetweenEachSend: tcxtextedit;
+    Label5: TcxLabel;
     Panel2: TPanel;
-    Label7: TLabel;
-    Label6: TLabel;
+    Label7: TcxLabel;
+    Label6: TcxLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
     TableViewThreadDNS: TcxGridColumn;
@@ -127,24 +109,43 @@ type
     TableViewThreadReceive: TcxGridColumn;
     TableViewThreadSend: TcxGridColumn;
     TableViewThreadWait: TcxGridColumn;
+    ButtonStart: TcxButton;
+    dxSkinController1: TdxSkinController;
     cxStyleRepository1: TcxStyleRepository;
     cxStyle1: TcxStyle;
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
-    procedure TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
-    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+    procedure TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: String);
+    procedure TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
+    procedure TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
   private
     procedure WMUpdateGUI(var Msg: TMessage); message WM_UpdateGUI;
+    procedure initHttpClientParams;
   public
+    HttpClientUserName: AnsiString;
+    HttpClientPassword: AnsiString;
+    HttpClientConnectTimeout: integer;
+    HttpClientSendTimeout: integer;
+    HttpClientReceiveTimeout: integer;
+    HttpClientProtocolVersion: TALHTTPProtocolVersion;
+    HttpClientUploadBufferSize: integer;
+    HttpClientProxyServer: AnsiString;
+    HttpClientProxyPort: integer;
+    HttpClientProxyUserName: AnsiString;
+    HttpClientProxyPassword: AnsiString;
+    HttpClientProxyBypass: AnsiString;
+    HttpClientAccessType: TALWinHttpClientInternetOpenAccessType;
+    HttpClientInternetOptions: TALWinHttpClientInternetOptionSet;
+    HttpClientRawHeaderText: ansiString;
     NBActiveThread: Integer;
+    LastUpdateStatusBar: int64;
     StartTime: int64;
     ToTalBytesRead: Int64;
     TotalDNScount: integer;
@@ -157,7 +158,6 @@ type
     TotalWaitTimeTaken: Int64;
     TotalReceiveCount: int64;
     TotalReceiveTimeTaken: int64;
-    procedure initWinHTTP(aHttpClient: TAlWinHttpClient);
   end;
 
   TStressHttpThreadVarContainer = Class(TObject)
@@ -218,67 +218,64 @@ Uses Math,
      ALWindows,
      AlfcnHtml,
      AlFcnMime,
-     AlFcnString,
-     AlHttpCommon;
+     AlFcnString;
 
 {$R *.dfm}
 
-{**********************************************************}
-procedure TForm1.initWinHTTP(aHttpClient: TAlWinHttpClient);
+{************************************}
+procedure TForm1.initHttpClientParams;
 Begin
-  With aHTTPClient do begin
-    UserName := EditUserName.Text;
-    Password := EditPassword.Text;
+  HttpClientUserName := EditUserName.Text;
+  HttpClientPassword := EditPassword.Text;
 
-    if AlIsInteger(EditConnectTimeout.Text) then ConnectTimeout := strtoint(EditConnectTimeout.Text);
-    if AlIsInteger(EditsendTimeout.Text) then SendTimeout := strtoint(EditSendTimeout.Text);
-    if AlIsInteger(EditReceiveTimeout.Text) then ReceiveTimeout := strtoint(EditReceiveTimeout.Text);
+  HttpClientConnectTimeout := strtoint(EditConnectTimeout.Text);
+  HttpClientSendTimeout := strtoint(EditSendTimeout.Text);
+  HttpClientReceiveTimeout := strtoint(EditReceiveTimeout.Text);
 
-    if RadioButtonProtocolVersion1_0.Checked then ProtocolVersion := HTTPpv_1_0
-    else ProtocolVersion := HTTPpv_1_1;
+  if RadioButtonProtocolVersion1_0.Checked then HttpClientProtocolVersion := HTTPpv_1_0
+  else HttpClientProtocolVersion := HTTPpv_1_1;
 
-    if AlIsInteger(EditBufferUploadSize.Text) then UploadBufferSize := strtoint(EditBufferUploadSize.Text);
+  HttpClientUploadBufferSize := strtoint(EditBufferUploadSize.Text);
 
-    ProxyParams.ProxyServer := EdProxyServer.Text;
-    ProxyParams.ProxyPort := strToInt(EdProxyPort.Text);
-    ProxyParams.ProxyUserName := EdProxyUserName.Text;
-    ProxyParams.ProxyPassword := EdProxyPassword.Text;
-    ProxyParams.ProxyBypass := EdProxyBypass.Text;
+  HttpClientProxyServer := EdProxyServer.Text;
+  HttpClientProxyPort := strToInt(EdProxyPort.Text);
+  HttpClientProxyUserName := EdProxyUserName.Text;
+  HttpClientProxyPassword := EdProxyPassword.Text;
+  HttpClientProxyBypass := EdProxyBypass.Text;
 
-    if RadioButtonAccessType_NO_PROXY.Checked then AccessType := wHttpAt_NO_PROXY
-    else if RadioButtonAccessType_NAMED_PROXY.Checked then AccessType := wHttpAt_NAMED_PROXY
-    else if RadioButtonAccessType_DEFAULT_PROXY.Checked then AccessType := wHttpAt_DEFAULT_PROXY;
+  if RadioButtonAccessType_NO_PROXY.Checked then HttpClientAccessType := wHttpAt_NO_PROXY
+  else if RadioButtonAccessType_NAMED_PROXY.Checked then HttpClientAccessType := wHttpAt_NAMED_PROXY
+  else if RadioButtonAccessType_DEFAULT_PROXY.Checked then HttpClientAccessType := wHttpAt_DEFAULT_PROXY;
 
-    InternetOptions := [];
-    If CheckBoxInternetOption_BYPASS_PROXY_CACHE.checked then InternetOptions := InternetOptions + [wHttpIo_BYPASS_PROXY_CACHE];
-    If CheckBoxInternetOption_ESCAPE_DISABLE.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_DISABLE];
-    If CheckBoxInternetOption_ESCAPE_DISABLE_QUERY.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_DISABLE_QUERY];
-    If CheckBoxInternetOption_ESCAPE_PERCENT.checked then InternetOptions := InternetOptions + [wHttpIo_ESCAPE_PERCENT];
-    If CheckBoxInternetOption_NULL_CODEPAGE.checked then InternetOptions := InternetOptions + [wHttpIo_NULL_CODEPAGE];
-    If CheckBoxInternetOption_REFRESH.checked then InternetOptions := InternetOptions + [wHttpIo_REFRESH];
-    If CheckBoxInternetOption_SECURE.checked then InternetOptions := InternetOptions + [wHttpIo_SECURE];
-    If CheckBoxInternetOption_NO_COOKIES.checked then InternetOptions := InternetOptions + [wHttpIo_NO_COOKIES];
-    If CheckBoxInternetOption_KEEP_CONNECTION.checked then InternetOptions := InternetOptions + [wHttpIo_KEEP_CONNECTION];
-    If CheckBoxInternetOption_NO_AUTO_REDIRECT.checked then InternetOptions := InternetOptions + [wHttpIo_NO_AUTO_REDIRECT];
+  HttpClientInternetOptions := [];
+  If CheckBoxInternetOption_BYPASS_PROXY_CACHE.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_BYPASS_PROXY_CACHE];
+  If CheckBoxInternetOption_ESCAPE_DISABLE.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_ESCAPE_DISABLE];
+  If CheckBoxInternetOption_ESCAPE_DISABLE_QUERY.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_ESCAPE_DISABLE_QUERY];
+  If CheckBoxInternetOption_ESCAPE_PERCENT.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_ESCAPE_PERCENT];
+  If CheckBoxInternetOption_NULL_CODEPAGE.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_NULL_CODEPAGE];
+  If CheckBoxInternetOption_REFRESH.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_REFRESH];
+  If CheckBoxInternetOption_SECURE.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_SECURE];
+  If CheckBoxInternetOption_NO_COOKIES.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_NO_COOKIES];
+  If CheckBoxInternetOption_KEEP_CONNECTION.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_KEEP_CONNECTION];
+  If CheckBoxInternetOption_NO_AUTO_REDIRECT.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_NO_AUTO_REDIRECT];
 
-    RequestHeader.RawHeaderText := MemoRequestRawHeader.Text;
-  end;
+  HttpClientRawHeaderText := MemoRequestRawHeader.Text;
 end;
 
 {*******************************************************************************************************************************************}
-procedure TForm1.TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
+procedure TForm1.TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: String);
 begin
   if AText <> '' then AText := AText + ' KB/s';
 end;
 
 {***************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: AnsiString);
+procedure TForm1.TableViewThreadTimeTakenGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: String);
 begin
   if AText <> '' then AText := AText + ' ms';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if ToTalBytesRead > 107374182400 then aText := inttostr(round(ToTalBytesRead / 107374182400)) + ' GB'
   else if ToTalBytesRead > 1048576 then aText := inttostr(round(ToTalBytesRead / 1048576)) + ' MB'
@@ -286,42 +283,42 @@ begin
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if (TotalReceiveCount > 0) and (TotalReceiveTimeTaken > 0) then AText := inttostr(Round((totalBytesRead / 1024) /  ((TotalReceiveTimeTaken / 1000)))) + ' KB/s'
   else aText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if TotalDNSCount > 0 then AText := inttostr(Round(TotalDNSTimeTaken / TotalDNSCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if TotalReceiveCount > 0 then AText := inttostr(Round(TotalReceiveTimeTaken / TotalReceiveCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if TotalSendCount > 0 then AText := inttostr(Round(TotalSendTimeTaken / TotalSendCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if TotalWaitCount > 0 then AText := inttostr(Round(TotalWaitTimeTaken / TotalWaitCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
-procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: AnsiString);
+procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
   if TotalConnectCount > 0 then AText := inttostr(Round(TotalConnectTimeTaken / TotalConnectCount)) + ' ms'
   else AText := '';
@@ -378,12 +375,6 @@ begin
         StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBActiveThread);
         TableViewThread.DataController.SetValue(rank-1,TableViewThreadNumber.Index,inttostr(rank) + ' (off)');
         if NBActiveThread = 0 then begin
-          aTimeElapsed := ALGetTickCount64 - StartTime;
-          aTotalRequestCount := 0;
-          for I := 0 to TableViewThread.DataController.RecordCount - 1 do
-            aTotalRequestCount := aTotalRequestCount + TableViewThread.DataController.GetValue(I,TableViewThreadRequestCount.Index);
-            StatusBar1.Panels[1].Text := inttostr(aTotalRequestCount) + ' Requests in ' + inttostr(round(aTimeElapsed / 1000)) + ' seconds (' + FormatFloat('0.##',aTotalRequestCount / (Max(aTimeElapsed,1) / 1000)) + ' Request/s | '+
-                                         FormatFloat('0.##',((ToTalBytesRead / 1024) / (max(1,aTimeElapsed) / 1000)))+' KB/s)';
           ButtonStart.Tag := 0;
           ButtonStart.Caption := 'Start';
         end;
@@ -399,6 +390,16 @@ begin
       TableViewThread.DataController.SetValue(Rank-1,TableViewThreadReceive.Index,internalInttoVariant(ReceiveTimeTaken));
       if (BytesRead > 0) and (ReceiveTimeTaken > 0) then TableViewThread.DataController.SetValue(Rank-1,TableViewThreadDownloadSpeed.Index,Round((BytesRead / 1024) /  (ReceiveTimeTaken / 1000)))
       else  TableViewThread.DataController.SetValue(Rank-1,TableViewThreadDownloadSpeed.Index,null);
+
+      if ALGetTickCount64 - LastUpdateStatusBar > 1000  then begin
+        LastUpdateStatusBar := ALGetTickCount64;
+        aTimeElapsed := ALGetTickCount64 - StartTime;
+        aTotalRequestCount := 0;
+        for I := 0 to TableViewThread.DataController.RecordCount - 1 do
+          aTotalRequestCount := aTotalRequestCount + TableViewThread.DataController.GetValue(I,TableViewThreadRequestCount.Index);
+          StatusBar1.Panels[1].Text := inttostr(aTotalRequestCount) + ' Requests in ' + inttostr(round(aTimeElapsed / 1000)) + ' seconds (' + FormatFloat('0.##',aTotalRequestCount / (Max(aTimeElapsed,1) / 1000)) + ' Request/s | '+
+                                       FormatFloat('0.##',((ToTalBytesRead / 1024) / (max(1,aTimeElapsed) / 1000)))+' KB/s)';
+      end;
 
     finally
       TableViewThread.EndUpdate;
@@ -435,7 +436,9 @@ begin
   end;
 
   TableViewThread.DataController.RecordCount := strtoint(EditNbThread.Text);
+  initHttpClientParams;
   NBActiveThread := 0;
+  LastUpdateStatusBar := ALGetTickCount64;
   StartTime := ALGetTickCount64;
   ToTalBytesRead := 0;
   TotalDNScount := 0;
@@ -553,8 +556,22 @@ begin
         with aHttpClient do begin
           OnDownloadProgress := OnHttpDownloadProgress;
           OnStatusChange := OnHttpStatusChange;
+          UserName := Form1.HttpClientUserName;
+          Password := Form1.HttpClientPassword;
+          ConnectTimeout := Form1.HttpClientConnectTimeout;
+          SendTimeout := Form1.HttpClientSendTimeout;
+          ReceiveTimeout := Form1.HttpClientReceiveTimeout;
+          ProtocolVersion := Form1.HttpClientProtocolVersion;
+          UploadBufferSize := Form1.HttpClientUploadBufferSize;
+          ProxyParams.ProxyServer := Form1.HttpClientProxyServer;
+          ProxyParams.ProxyPort := Form1.HttpClientProxyPort;
+          ProxyParams.ProxyUserName := Form1.HttpClientProxyUserName;
+          ProxyParams.ProxyPassword := Form1.HttpClientProxyPassword;
+          ProxyParams.ProxyBypass := Form1.HttpClientProxyBypass;
+          AccessType := Form1.HttpClientAccessType;
+          InternetOptions := Form1.HttpClientInternetOptions;
+          RequestHeader.RawHeaderText := Form1.HttpClientRawHeaderText;
         end;
-        Form1.initWinHTTP(aHttpClient);
 
         aResponseContentStream:= TStringStream.create('');
         aResponseContentHeader := TALHTTPResponseHeader.Create;

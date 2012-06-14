@@ -36,8 +36,6 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
-    ExplicitTop = 191
-    ExplicitWidth = 584
   end
   object DisplayMemo: TMemo
     Left = 0
@@ -57,9 +55,6 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 2
-    ExplicitTop = 394
-    ExplicitWidth = 584
-    ExplicitHeight = 170
   end
   object ToolsPanel: TPanel
     Left = 0
@@ -408,8 +403,6 @@ object Form1: TForm1
     Height = 17
     Align = alTop
     TabOrder = 4
-    ExplicitTop = 311
-    ExplicitWidth = 584
     object Label6: TLabel
       Left = 8
       Top = 2
@@ -435,8 +428,6 @@ object Form1: TForm1
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
-    ExplicitTop = 328
-    ExplicitWidth = 584
   end
   object InfoPanel: TPanel
     Left = 0
@@ -445,8 +436,6 @@ object Form1: TForm1
     Height = 17
     Align = alTop
     TabOrder = 5
-    ExplicitTop = 377
-    ExplicitWidth = 584
     object Label7: TLabel
       Left = 8
       Top = 2

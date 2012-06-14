@@ -1,6 +1,6 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{74EF26A8-F448-4228-9D31-744113FC2D2C}</ProjectGuid>
+			<ProjectGuid>{DD838778-9C7F-4DCB-BF69-BBB13B98BCAC}</ProjectGuid>
 			<MainSource>Alcinoe_dxe2.dpk</MainSource>
 			<Base>True</Base>
 			<Config Condition="'$(Config)'==''">Debug</Config>
@@ -40,12 +40,12 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<DCC_UsePackage>rtl;inet;dbrtl;$(DCC_UsePackage)</DCC_UsePackage>
 			<GenPackage>true</GenPackage>
-			<DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-			<DCC_Description>Alcinoe pack</DCC_Description>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Web.Win;Winapi;System.Win;$(DCC_Namespace)</DCC_Namespace>
+			<DCC_Description>Alcinoe</DCC_Description>
 			<DCC_CodePage>65001</DCC_CodePage>
 			<DCC_N>false</DCC_N>
 			<DCC_S>false</DCC_S>
@@ -57,15 +57,17 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win64)'!=''">
 			<DCC_Namespace>Data.Win;Datasnap.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
-			<DCC_BplOutput>..\lib\DXE2\win64\</DCC_BplOutput>
-			<DCC_DcuOutput>..\lib\DXE2\win64\</DCC_DcuOutput>
+			<DCC_BplOutput>..\lib\dxe2\win64\</DCC_BplOutput>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_DcuOutput>..\lib\dxe2\win64\</DCC_DcuOutput>
+			<DCC_UsePackage>vcl;$(DCC_UsePackage)</DCC_UsePackage>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
-			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-			<DCC_BplOutput>..\lib\DXE2\win32\</DCC_BplOutput>
-			<DCC_DcuOutput>..\lib\DXE2\win32\</DCC_DcuOutput>
+			<DCC_Namespace>Data.Win;Datasnap.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+			<DCC_BplOutput>..\lib\dxe2\win32\</DCC_BplOutput>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_DcuOutput>..\lib\dxe2\win32\</DCC_DcuOutput>
+			<DCC_UsePackage>vcl;Alcinoe_d2007;$(DCC_UsePackage)</DCC_UsePackage>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -95,7 +97,6 @@
 			<DCCReference Include="ALCalendar.pas"/>
 			<DCCReference Include="ALComboBox.pas"/>
 			<DCCReference Include="ALCommon.pas"/>
-			<DCCReference Include="ALCPUID.pas"/>
 			<DCCReference Include="ALDeflate.pas"/>
 			<DCCReference Include="ALDialog.pas"/>
 			<DCCReference Include="ALEdit.pas"/>

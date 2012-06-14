@@ -66,10 +66,10 @@ type
     procedure ButtonLoadXmlWithXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
-    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: TALXMLString);
-    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: TALXMLString);
-    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: TALXMLString; const Attributes: TStrings);
-    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: TALXMLString);
+    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
+    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
+    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND}; const Attributes: TStrings);
+    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -337,26 +337,26 @@ begin
   end;
 end;
 
-{******************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: TALXMLString);
+{******************************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
 begin
   inc(FNodeCount);
 end;
 
-{*****************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: TALXMLString);
+{*****************************************************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
 begin
   inc(FNodeCount);
 end;
 
-{****************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: TALXMLString; const Attributes: TStrings);
+{****************************************************************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND}; const Attributes: TStrings);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;
 end;
 
-{***************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: TALXMLString);
+{***************************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
 begin
   inc(FNodeCount);
 end;

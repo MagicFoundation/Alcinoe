@@ -83,7 +83,6 @@ object Form1: TForm1
     Height = 145
     Style = lbOwnerDrawVariable
     IntegralHeight = True
-    ItemHeight = 16
     Items.Strings = (
       '1'
       '2'

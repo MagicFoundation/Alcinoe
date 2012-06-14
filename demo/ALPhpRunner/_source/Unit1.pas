@@ -202,7 +202,7 @@ Var AFullPath: AnsiString;
 begin
   AFullPath := ALGetModulePath + '~tmp.html';
   MemoContentBody.Lines.SaveToFile(AFullPath);
-  ShellExecute(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
+  ShellExecuteA(0,'OPEN',PAnsiChar(AFullPath),nil,nil,SW_SHOW)
 end;
 
 {*******************************************************}

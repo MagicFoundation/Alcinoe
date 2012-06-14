@@ -14,7 +14,7 @@ uses classes,
 {**********************************************}
 Procedure ALFBXMonitoringStats_StartMainProcess;
 
-  {----------------------------------------------------------------}
+  {------------------------------------------------------------------------}
   Function InternalExtractParamFileName(aParamName: AnsiString): AnsiString;
   Var i: Integer;
       ACurrParamStr: AnsiString;
@@ -24,25 +24,21 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
     For i := 1 To paramCount do begin
       ACurrParamStr := paramstr(i);
       If AlPos(aParamName,AlLowerCase(ACurrParamStr)) = 1 then begin
-        result := AlStringReplace(
-                                  AlCopyStr(
-                                            ACurrParamStr,
+        result := AlStringReplace(AlCopyStr(ACurrParamStr,
                                             AlPos(
                                                   ':',
                                                   ACurrParamStr
                                                  ) + 1,
-                                            maxint
-                                           ),
+                                            maxint),
                                   '"',
                                   '',
-                                  [RfReplaceAll]
-                                 );
+                                  [RfReplaceAll]);
         exit;
       end;
     end;
   end;
 
-  {---------------------------------------------------------}
+  {-------------------------------------------------------------}
   Function InternalIfParamExist(aParamName: AnsiString): boolean;
   Var i: Integer;
   Begin
@@ -54,7 +50,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
     end;
   end;
 
-  {------------------------------------------------------------------}
+  {--------------------------------------------------------------------------}
   function InternalRightPad(aStr: AnsiString; aPadSize : integer): AnsiString;
   var RestLen: Integer;
   begin
@@ -64,7 +60,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
     Result := Result + StringOfChar(' ', RestLen);
   end;
 
-  {--------------------------------------------------}
+  {----------------------------------------------------------}
   function InternalFormatNumber(aStr: AnsiString): AnsiString;
   var aInt: Int64;
   begin

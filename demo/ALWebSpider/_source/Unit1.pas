@@ -201,7 +201,7 @@ end;
 
 {************************************************************}
 procedure TForm1.BtnChooseSaveDirectoryClick(Sender: TObject);
-Var aDir: AnsiString;
+Var aDir: String;
 Begin
  aDir := '';
  if SelectDirectory(aDir, [sdAllowCreate, sdPerformCreate, sdPrompt],0) then  EditSaveDirectory.Text := ALMakeGoodEndPath(aDir);

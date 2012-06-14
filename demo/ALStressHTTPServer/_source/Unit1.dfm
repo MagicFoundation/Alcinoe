@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 377
   Top = 296
   Caption = 'TALStressHttpServer'
-  ClientHeight = 582
+  ClientHeight = 615
   ClientWidth = 1008
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,112 +16,78 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object PageControl1: TPageControl
+  object PageControl1: TcxPageControl
     Left = 0
     Top = 0
     Width = 1008
-    Height = 582
-    ActivePage = TabSheet1
+    Height = 615
     Align = alClient
     TabOrder = 0
-    object TabSheet1: TTabSheet
+    Properties.ActivePage = TabSheet1
+    ClientRectBottom = 610
+    ClientRectLeft = 5
+    ClientRectRight = 1003
+    ClientRectTop = 26
+    object TabSheet1: TcxTabSheet
       Caption = 'Application'
+      Color = 15066860
+      ParentColor = False
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
-        1000
-        554)
-      object Label4: TLabel
+        998
+        584)
+      object Label4: TcxLabel
         Left = 11
         Top = 8
-        Width = 56
-        Height = 13
         Caption = 'List of Url'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label1: TLabel
+      object Label1: TcxLabel
         Left = 11
-        Top = 145
-        Width = 82
-        Height = 13
+        Top = 167
         Caption = 'Number of thread'
+        Transparent = True
       end
-      object Label2: TLabel
+      object Label2: TcxLabel
         Left = 11
-        Top = 171
-        Width = 137
-        Height = 13
+        Top = 193
         Caption = 'Max Http Request by Thread'
+        Transparent = True
       end
-      object Label3: TLabel
-        Left = 472
-        Top = 145
-        Width = 117
-        Height = 13
+      object Label3: TcxLabel
+        Left = 503
+        Top = 166
         Caption = 'Delay between each call'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
         ParentFont = False
+        Transparent = True
       end
-      object Label5: TLabel
-        Left = 662
-        Top = 145
-        Width = 13
-        Height = 13
+      object Label5: TcxLabel
+        Left = 693
+        Top = 167
         Caption = 'ms'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
         ParentFont = False
+        Transparent = True
       end
-      object ButtonStart: TButton
-        Left = 368
-        Top = 141
-        Width = 75
-        Height = 25
-        Caption = 'Start'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 0
-        OnClick = ButtonStartClick
-      end
-      object MemoLstUrl: TMemo
-        Left = 3
+      object MemoLstUrl: TcxMemo
+        Left = 0
         Top = 29
-        Width = 977
-        Height = 106
         Anchors = [akLeft, akTop, akRight]
-        Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
         Lines.Strings = (
           'http://www.pap.fr')
-        ParentCtl3D = False
         ParentFont = False
-        ScrollBars = ssVertical
-        TabOrder = 1
-        WordWrap = False
+        TabOrder = 0
+        Height = 124
+        Width = 998
       end
       object GridThread: TcxGrid
         Left = 0
-        Top = 198
-        Width = 1000
-        Height = 337
+        Top = 226
+        Width = 998
+        Height = 339
         Align = alBottom
         Anchors = [akLeft, akTop, akRight, akBottom]
         Font.Charset = ANSI_CHARSET
@@ -130,21 +96,19 @@ object Form1: TForm1
         Font.Name = 'Arial'
         Font.Style = []
         ParentFont = False
-        TabOrder = 2
-        ExplicitTop = 197
+        TabOrder = 1
         object TableViewThread: TcxGridTableView
-          NavigatorButtons.ConfirmDelete = False
-          NavigatorButtons.First.Visible = False
-          NavigatorButtons.PriorPage.Visible = False
-          NavigatorButtons.Prior.Visible = False
-          NavigatorButtons.Next.Visible = False
-          NavigatorButtons.NextPage.Visible = False
-          NavigatorButtons.Last.Visible = False
-          NavigatorButtons.Edit.Visible = True
-          NavigatorButtons.Refresh.Visible = False
-          NavigatorButtons.SaveBookmark.Visible = False
-          NavigatorButtons.GotoBookmark.Visible = False
-          NavigatorButtons.Filter.Visible = False
+          Navigator.Buttons.First.Visible = False
+          Navigator.Buttons.PriorPage.Visible = False
+          Navigator.Buttons.Prior.Visible = False
+          Navigator.Buttons.Next.Visible = False
+          Navigator.Buttons.NextPage.Visible = False
+          Navigator.Buttons.Last.Visible = False
+          Navigator.Buttons.Edit.Visible = True
+          Navigator.Buttons.Refresh.Visible = False
+          Navigator.Buttons.SaveBookmark.Visible = False
+          Navigator.Buttons.GotoBookmark.Visible = False
+          Navigator.Buttons.Filter.Visible = False
           FilterBox.CustomizeDialog = False
           DataController.Summary.DefaultGroupSummaryItems = <>
           DataController.Summary.FooterSummaryItems = <
@@ -212,6 +176,7 @@ object Form1: TForm1
           OptionsView.Footer = True
           OptionsView.GroupByBox = False
           OptionsView.HeaderEndEllipsis = True
+          Styles.Background = cxStyle1
           object TableViewThreadNumber: TcxGridColumn
             Caption = 'Thread #'
             Width = 74
@@ -277,31 +242,35 @@ object Form1: TForm1
           GridView = TableViewThread
         end
       end
-      object CheckBoxDoLikeSpider: TCheckBox
+      object CheckBoxDoLikeSpider: TcxCheckBox
         Left = 252
-        Top = 142
-        Width = 97
-        Height = 17
+        Top = 164
         Caption = 'Do like a Spider '
-        Checked = True
-        State = cbChecked
-        TabOrder = 3
-      end
-      object CheckBoxStopOnError: TCheckBox
-        Left = 252
-        Top = 165
+        State = cbsChecked
+        TabOrder = 2
+        Transparent = True
         Width = 97
-        Height = 17
+      end
+      object CheckBoxStopOnError: TcxCheckBox
+        Left = 252
+        Top = 187
         Caption = 'Stop on Error'
-        Checked = True
-        State = cbChecked
-        TabOrder = 4
+        State = cbsChecked
+        TabOrder = 3
+        Transparent = True
+        Width = 97
       end
       object StatusBar1: TStatusBar
         Left = 0
-        Top = 535
-        Width = 1000
+        Top = 565
+        Width = 998
         Height = 19
+        Color = 15525605
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
         Panels = <
           item
             Width = 150
@@ -309,234 +278,165 @@ object Form1: TForm1
           item
             Width = 50
           end>
+        UseSystemFont = False
       end
-      object EditMaxHttpRequest: TSpinEdit
+      object EditMaxHttpRequest: TcxSpinEdit
         Left = 156
-        Top = 169
-        Width = 78
-        Height = 22
-        Ctl3D = False
-        MaxValue = 0
-        MinValue = 0
-        ParentCtl3D = False
-        TabOrder = 6
+        Top = 191
+        TabOrder = 5
         Value = 100
-      end
-      object EditNbThread: TSpinEdit
-        Left = 156
-        Top = 141
         Width = 78
-        Height = 22
-        Ctl3D = False
-        MaxValue = 0
-        MinValue = 0
-        ParentCtl3D = False
-        TabOrder = 7
-        Value = 10
       end
-      object EditSendDelayBetweenEachSend: TEdit
-        Left = 597
-        Top = 141
-        Width = 60
-        Height = 21
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
+      object EditNbThread: TcxSpinEdit
+        Left = 156
+        Top = 163
+        TabOrder = 6
+        Value = 10
+        Width = 78
+      end
+      object EditSendDelayBetweenEachSend: TcxTextEdit
+        Left = 628
+        Top = 163
         ParentFont = False
-        TabOrder = 8
+        TabOrder = 7
         Text = '0'
+        Width = 60
+      end
+      object ButtonStart: TcxButton
+        Left = 392
+        Top = 164
+        Width = 75
+        Height = 25
+        Caption = 'Start'
+        TabOrder = 8
+        OnClick = ButtonStartClick
       end
     end
-    object TabSheet2: TTabSheet
+    object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
-      object GroupBox3: TGroupBox
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
-        Width = 289
-        Height = 70
         Caption = 'Authentication'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 0
-        object Label18: TLabel
+        Height = 78
+        Width = 289
+        object Label18: TcxLabel
           Left = 16
           Top = 21
-          Width = 50
-          Height = 13
           Caption = 'UserName'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label19: TLabel
+        object Label19: TcxLabel
           Left = 20
           Top = 46
-          Width = 46
-          Height = 13
           Caption = 'Password'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object EditUserName: TEdit
+        object EditUserName: TcxTextEdit
           Left = 73
           Top = 18
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 0
+          Width = 200
         end
-        object EditPassword: TEdit
+        object EditPassword: TcxTextEdit
           Left = 73
           Top = 42
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
+          Width = 200
         end
       end
-      object GroupBox4: TGroupBox
+      object GroupBox4: TcxGroupBox
         Left = 7
-        Top = 91
-        Width = 289
-        Height = 94
+        Top = 97
         Caption = 'Timeout'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 1
-        object Label14: TLabel
+        Height = 102
+        Width = 289
+        object Label14: TcxLabel
           Left = 41
           Top = 45
-          Width = 25
-          Height = 13
           Caption = 'Send'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label17: TLabel
+        object Label17: TcxLabel
           Left = 26
           Top = 21
-          Width = 40
-          Height = 13
           Caption = 'Connect'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label20: TLabel
+        object Label20: TcxLabel
           Left = 26
           Top = 69
-          Width = 40
-          Height = 13
           Caption = 'Receive'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object EditSendTimeout: TEdit
+        object EditSendTimeout: TcxTextEdit
           Left = 73
           Top = 42
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 0
           Text = '0'
+          Width = 200
         end
-        object EditReceiveTimeout: TEdit
+        object EditReceiveTimeout: TcxTextEdit
           Left = 73
           Top = 66
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
           Text = '0'
+          Width = 200
         end
-        object EditConnectTimeout: TEdit
+        object EditConnectTimeout: TcxTextEdit
           Left = 73
           Top = 18
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 2
           Text = '0'
+          Width = 200
         end
       end
-      object GroupBox6: TGroupBox
+      object GroupBox6: TcxGroupBox
         Left = 7
-        Top = 195
-        Width = 289
-        Height = 54
+        Top = 208
         Caption = 'Protocole version'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 2
-        object RadioButtonProtocolVersion1_0: TRadioButton
+        Height = 54
+        Width = 289
+        object RadioButtonProtocolVersion1_0: TcxRadioButton
           Left = 32
           Top = 21
           Width = 73
@@ -549,8 +449,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          Transparent = True
         end
-        object RadioButtonProtocolVersion1_1: TRadioButton
+        object RadioButtonProtocolVersion1_1: TcxRadioButton
           Left = 128
           Top = 21
           Width = 81
@@ -565,180 +466,131 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 1
           TabStop = True
+          Transparent = True
         end
       end
-      object GroupBox7: TGroupBox
-        Left = 304
-        Top = 419
-        Width = 691
-        Height = 126
+      object GroupBox7: TcxGroupBox
+        Left = 303
+        Top = 453
         Caption = 'Internet options'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 3
-        object CheckBoxInternetOption_BYPASS_PROXY_CACHE: TCheckBox
+        Height = 134
+        Width = 691
+        object CheckBoxInternetOption_BYPASS_PROXY_CACHE: TcxCheckBox
           Left = 8
           Top = 24
-          Width = 150
-          Height = 17
           Caption = 'BYPASS_PROXY_CACHE'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 0
+          Transparent = True
+          Width = 150
         end
-        object CheckBoxInternetOption_ESCAPE_DISABLE: TCheckBox
+        object CheckBoxInternetOption_ESCAPE_DISABLE: TcxCheckBox
           Left = 8
           Top = 48
-          Width = 150
-          Height = 17
           Caption = 'ESCAPE_DISABLE'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 1
+          Transparent = True
+          Width = 150
         end
-        object CheckBoxInternetOption_REFRESH: TCheckBox
+        object CheckBoxInternetOption_REFRESH: TcxCheckBox
           Left = 200
           Top = 48
-          Width = 73
-          Height = 17
           Caption = 'REFRESH'
-          Checked = True
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
-          State = cbChecked
+          State = cbsChecked
           TabOrder = 2
+          Transparent = True
+          Width = 73
         end
-        object CheckBoxInternetOption_SECURE: TCheckBox
+        object CheckBoxInternetOption_SECURE: TcxCheckBox
           Left = 200
           Top = 72
-          Width = 73
-          Height = 17
           Caption = 'SECURE'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 3
+          Transparent = True
+          Width = 73
         end
-        object CheckBoxInternetOption_ESCAPE_PERCENT: TCheckBox
+        object CheckBoxInternetOption_ESCAPE_PERCENT: TcxCheckBox
           Left = 8
           Top = 96
-          Width = 129
-          Height = 17
           Caption = 'ESCAPE_PERCENT'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 4
+          Transparent = True
+          Width = 129
         end
-        object CheckBoxInternetOption_NULL_CODEPAGE: TCheckBox
+        object CheckBoxInternetOption_NULL_CODEPAGE: TcxCheckBox
           Left = 200
           Top = 24
-          Width = 121
-          Height = 17
           Caption = 'NULL_CODEPAGE'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 5
+          Transparent = True
+          Width = 121
         end
-        object CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TCheckBox
+        object CheckBoxInternetOption_ESCAPE_DISABLE_QUERY: TcxCheckBox
           Left = 8
           Top = 72
-          Width = 161
-          Height = 17
           Caption = 'ESCAPE_DISABLE_QUERY'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 6
+          Transparent = True
+          Width = 161
         end
-        object CheckBoxInternetOption_KEEP_CONNECTION: TCheckBox
+        object CheckBoxInternetOption_KEEP_CONNECTION: TcxCheckBox
           Left = 336
           Top = 24
-          Width = 129
-          Height = 17
           Caption = 'KEEP_CONNECTION'
-          Checked = True
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
-          State = cbChecked
+          State = cbsChecked
           TabOrder = 7
+          Transparent = True
+          Width = 129
         end
-        object CheckBoxInternetOption_NO_COOKIES: TCheckBox
+        object CheckBoxInternetOption_NO_COOKIES: TcxCheckBox
           Left = 200
           Top = 96
-          Width = 97
-          Height = 17
           Caption = 'NO_COOKIES'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 8
+          Transparent = True
+          Width = 97
         end
-        object CheckBoxInternetOption_NO_AUTO_REDIRECT: TCheckBox
+        object CheckBoxInternetOption_NO_AUTO_REDIRECT: TcxCheckBox
           Left = 336
           Top = 48
-          Width = 137
-          Height = 17
           Caption = 'NO_AUTO_REDIRECT'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
           TabOrder = 9
+          Transparent = True
+          Width = 137
         end
       end
-      object GroupBox2: TGroupBox
+      object GroupBox2: TcxGroupBox
         Left = 8
-        Top = 474
-        Width = 289
-        Height = 71
+        Top = 495
         Caption = 'Access Type'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 4
-        object RadioButtonAccessType_NAMED_PROXY: TRadioButton
+        Height = 79
+        Width = 290
+        object RadioButtonAccessType_NAMED_PROXY: TcxRadioButton
           Left = 16
           Top = 48
           Width = 105
@@ -751,8 +603,9 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 0
+          Transparent = True
         end
-        object RadioButtonAccessType_NO_PROXY: TRadioButton
+        object RadioButtonAccessType_NO_PROXY: TcxRadioButton
           Left = 16
           Top = 24
           Width = 81
@@ -767,8 +620,9 @@ object Form1: TForm1
           ParentFont = False
           TabOrder = 1
           TabStop = True
+          Transparent = True
         end
-        object RadioButtonAccessType_DEFAULT_PROXY: TRadioButton
+        object RadioButtonAccessType_DEFAULT_PROXY: TcxRadioButton
           Left = 144
           Top = 24
           Width = 121
@@ -781,260 +635,166 @@ object Form1: TForm1
           Font.Style = []
           ParentFont = False
           TabOrder = 2
+          Transparent = True
         end
       end
-      object GroupBox1: TGroupBox
+      object GroupBox1: TcxGroupBox
         Left = 8
-        Top = 323
-        Width = 289
-        Height = 145
+        Top = 335
         Caption = 'Proxy'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 5
-        object Label15: TLabel
+        Height = 148
+        Width = 289
+        object Label15: TcxLabel
           Left = 47
           Top = 45
-          Width = 19
-          Height = 13
           Caption = 'Port'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label12: TLabel
+        object Label12: TcxLabel
           Left = 35
           Top = 21
-          Width = 31
-          Height = 13
           Caption = 'Server'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label11: TLabel
+        object Label11: TcxLabel
           Left = 16
           Top = 69
-          Width = 50
-          Height = 13
           Caption = 'UserName'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label16: TLabel
+        object Label16: TcxLabel
           Left = 20
           Top = 94
-          Width = 46
-          Height = 13
           Caption = 'Password'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object Label13: TLabel
+        object Label13: TcxLabel
           Left = 32
           Top = 117
-          Width = 34
-          Height = 13
           Caption = 'Bypass'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object EdProxyPort: TEdit
+        object EdProxyPort: TcxTextEdit
           Left = 73
           Top = 42
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 0
           Text = '80'
+          Width = 200
         end
-        object EdProxyUserName: TEdit
+        object EdProxyUserName: TcxTextEdit
           Left = 73
           Top = 66
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
+          Width = 200
         end
-        object EdProxyServer: TEdit
+        object EdProxyServer: TcxTextEdit
           Left = 73
           Top = 18
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 2
+          Width = 200
         end
-        object EdProxyPassword: TEdit
+        object EdProxyPassword: TcxTextEdit
           Left = 73
           Top = 90
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 3
+          Width = 200
         end
-        object EdProxyBypass: TEdit
+        object EdProxyBypass: TcxTextEdit
           Left = 73
           Top = 114
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 4
           Text = '<local>'
+          Width = 200
         end
       end
-      object GroupBox5: TGroupBox
+      object GroupBox5: TcxGroupBox
         Left = 8
-        Top = 259
-        Width = 289
-        Height = 54
+        Top = 272
         Caption = 'Buffer Size'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 6
-        object Label24: TLabel
+        Height = 54
+        Width = 289
+        object Label24: TcxLabel
           Left = 27
           Top = 21
-          Width = 34
-          Height = 13
           Caption = 'Upload'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object EditBufferUploadSize: TEdit
+        object EditBufferUploadSize: TcxTextEdit
           Left = 73
           Top = 18
-          Width = 200
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
           ParentFont = False
           TabOrder = 0
           Text = '32768'
+          Width = 200
         end
       end
-      object GroupBox8: TGroupBox
-        Left = 304
+      object GroupBox8: TcxGroupBox
+        Left = 303
         Top = 11
-        Width = 385
-        Height = 398
         Caption = 'Request Raw Header '
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = [fsBold]
+        Style.IsFontAssigned = True
         TabOrder = 7
-        object Label8: TLabel
+        Height = 436
+        Width = 385
+        object Label8: TcxLabel
           Left = 9
           Top = 22
-          Width = 176
-          Height = 13
           Caption = 'Format "Name: values" on each lines'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           ParentFont = False
+          Transparent = True
         end
-        object MemoRequestRawHeader: TMemo
+        object MemoRequestRawHeader: TcxMemo
           Left = 9
           Top = 38
-          Width = 360
-          Height = 350
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
           Lines.Strings = (
             'accept-language: en-us'
             'accept: */*'
             'user-agent Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.0)')
-          ParentCtl3D = False
           ParentFont = False
-          ScrollBars = ssVertical
+          Properties.WordWrap = False
           TabOrder = 0
-          WordWrap = False
+          Height = 385
+          Width = 360
         end
       end
       object Panel2: TPanel
-        Left = 698
-        Top = 16
+        Left = 694
+        Top = 55
         Width = 292
-        Height = 392
+        Height = 385
         BevelOuter = bvNone
         BorderStyle = bsSingle
         Color = clSilver
@@ -1042,35 +802,23 @@ object Form1: TForm1
         ParentBackground = False
         ParentCtl3D = False
         TabOrder = 8
-        object Label7: TLabel
-          Left = 5
-          Top = 8
-          Width = 132
-          Height = 45
+        object Label7: TcxLabel
+          Left = 12
+          Top = 11
           Caption = 'Please help us to keep the development of these components free'
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clMaroon
-          Font.Height = -12
-          Font.Name = 'Arial'
-          Font.Style = [fsBold]
           ParentFont = False
-          WordWrap = True
+          Properties.WordWrap = True
+          Width = 115
         end
-        object Label6: TLabel
-          Left = 5
-          Top = 63
-          Width = 125
-          Height = 75
+        object Label6: TcxLabel
+          Left = 12
+          Top = 66
           Caption = 
             'If you like these components please simply click on each button ' +
             'below ... thanks for your support !'
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clBlack
-          Font.Height = -12
-          Font.Name = 'Arial'
-          Font.Style = []
           ParentFont = False
-          WordWrap = True
+          Properties.WordWrap = True
+          Width = 120
         end
         object Panel3: TPanel
           Left = 151
@@ -1100,9 +848,17 @@ object Form1: TForm1
       end
     end
   end
+  object dxSkinController1: TdxSkinController
+    NativeStyle = False
+    SkinName = 'Foggy'
+    Left = 496
+    Top = 360
+  end
   object cxStyleRepository1: TcxStyleRepository
     PixelsPerInch = 96
     object cxStyle1: TcxStyle
+      AssignedValues = [svColor]
+      Color = clWhite
     end
   end
 end

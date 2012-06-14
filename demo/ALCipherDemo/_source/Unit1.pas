@@ -63,13 +63,13 @@ uses alFcnSkin,
 
 {$R *.dfm}
 
-{***************************************************}
+{*******************************************************}
 function internalRandomStr(aLength: Longint): AnsiString;
 var X: Longint;
 begin
   if aLength <= 0 then exit;
   SetLength(Result, aLength);
-  for X:=1 to aLength do Result[X] := Chr(Random(256));
+  for X:=1 to aLength do Result[X] := ansiChar(Random(256));
 end;
 
 {***********************************************}
@@ -211,6 +211,7 @@ begin
   ALMemoCryptedData.Lines.Text := ALMimeBase64EncodeStringNoCRLF(outString);
 end;
 
+{***********************************************}
 procedure TForm1.ALButton7Click(Sender: TObject);
 Var outString: AnsiString;
 begin

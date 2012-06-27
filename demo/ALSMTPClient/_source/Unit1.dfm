@@ -30,14 +30,11 @@ object Form1: TForm1
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Style = []
-    Lines.Strings = (
-      'MsgMemo')
     ParentFont = False
     ParentShowHint = False
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
-    ExplicitWidth = 583
   end
   object DisplayMemo: TMemo
     Left = 0
@@ -51,15 +48,12 @@ object Form1: TForm1
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Style = []
-    Lines.Strings = (
-      'DisplayMemo')
     ParentFont = False
     ParentShowHint = False
     ReadOnly = True
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 2
-    ExplicitWidth = 583
   end
   object ToolsPanel: TPanel
     Left = 0
@@ -68,7 +62,8 @@ object Form1: TForm1
     Height = 191
     Align = alTop
     TabOrder = 3
-    ExplicitWidth = 583
+    ExplicitLeft = -56
+    ExplicitTop = -6
     object Label1: TLabel
       Left = 22
       Top = 11
@@ -162,7 +157,7 @@ object Form1: TForm1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      Text = 'HostEdit'
+      Text = 'smtp.mail.yahoo.fr'
     end
     object FromEdit: TEdit
       Left = 80
@@ -173,7 +168,7 @@ object Form1: TForm1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 2
-      Text = 'FromEdit'
+      Text = 'alcinoe.alcinoe@yahoo.com'
     end
     object ToEdit: TEdit
       Left = 240
@@ -184,7 +179,7 @@ object Form1: TForm1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 3
-      Text = 'ToEdit'
+      Text = 'alcinoe.alcinoe@yahoo.com'
     end
     object SubjectEdit: TEdit
       Left = 80
@@ -195,7 +190,7 @@ object Form1: TForm1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 6
-      Text = 'SubjectEdit'
+      Text = 'Test'
     end
     object PortEdit: TEdit
       Left = 240
@@ -206,13 +201,13 @@ object Form1: TForm1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
-      Text = 'PortEdit'
+      Text = '25'
     end
     object ClearDisplayButton: TButton
       Left = 472
-      Top = 88
+      Top = 104
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Clear info message memo'
       Caption = 'Clear &Info'
       ParentShowHint = False
@@ -224,7 +219,7 @@ object Form1: TForm1
       Left = 368
       Top = 8
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Connect to the mail server'
       Caption = 'Connect'
       ParentShowHint = False
@@ -234,9 +229,9 @@ object Form1: TForm1
     end
     object HeloButton: TButton
       Left = 368
-      Top = 28
+      Top = 32
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Send the signon message'
       Caption = 'Helo'
       ParentShowHint = False
@@ -246,9 +241,9 @@ object Form1: TForm1
     end
     object MailFromButton: TButton
       Left = 368
-      Top = 88
+      Top = 104
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Send the mail originator'
       Caption = 'MailFrom'
       ParentShowHint = False
@@ -260,7 +255,7 @@ object Form1: TForm1
       Left = 472
       Top = 8
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Send the mail recipents'
       Caption = 'RcptTo'
       ParentShowHint = False
@@ -270,9 +265,9 @@ object Form1: TForm1
     end
     object DataButton: TButton
       Left = 472
-      Top = 28
+      Top = 32
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Send mail text and attached files'
       Caption = 'Data'
       ParentShowHint = False
@@ -282,9 +277,9 @@ object Form1: TForm1
     end
     object QuitButton: TButton
       Left = 472
-      Top = 48
+      Top = 56
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 'Quit mail server'
       Caption = 'Quit'
       ParentShowHint = False
@@ -298,7 +293,7 @@ object Form1: TForm1
       Width = 121
       Height = 21
       TabOrder = 8
-      Text = 'UsernameEdit'
+      Text = 'alcinoe.alcinoe@yahoo.com'
     end
     object PasswordEdit: TEdit
       Left = 240
@@ -306,7 +301,7 @@ object Form1: TForm1
       Width = 121
       Height = 21
       TabOrder = 9
-      Text = 'PasswordEdit'
+      Text = 'alcinoe2012'
     end
     object AuthComboBox: TComboBox
       Left = 80
@@ -314,8 +309,9 @@ object Form1: TForm1
       Width = 121
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
+      ItemIndex = 1
       TabOrder = 10
+      Text = 'Plain'
       Items.Strings = (
         'None'
         'Plain'
@@ -326,18 +322,18 @@ object Form1: TForm1
     end
     object EhloButton: TButton
       Left = 368
-      Top = 48
+      Top = 56
       Width = 96
-      Height = 17
+      Height = 20
       Caption = 'Ehlo'
       TabOrder = 14
       OnClick = EhloButtonClick
     end
     object AuthButton: TButton
       Left = 368
-      Top = 68
+      Top = 80
       Width = 96
-      Height = 17
+      Height = 20
       Caption = 'Auth'
       TabOrder = 15
       OnClick = AuthButtonClick
@@ -348,7 +344,6 @@ object Form1: TForm1
       Width = 121
       Height = 21
       TabOrder = 4
-      Text = 'CcEdit'
     end
     object BccEdit: TEdit
       Left = 240
@@ -356,13 +351,12 @@ object Form1: TForm1
       Width = 121
       Height = 21
       TabOrder = 5
-      Text = 'BccEdit'
     end
     object AllInOneButton: TButton
       Left = 472
-      Top = 68
+      Top = 80
       Width = 96
-      Height = 17
+      Height = 20
       Hint = 
         'Connect, Helo, MailFrom, RcptTo, Data and Quit all chained in a ' +
         'single action.'
@@ -378,8 +372,9 @@ object Form1: TForm1
       Width = 121
       Height = 21
       Style = csDropDownList
-      ItemHeight = 13
+      ItemIndex = 2
       TabOrder = 7
+      Text = 'normal'
       Items.Strings = (
         ''
         'urgent'
@@ -470,7 +465,6 @@ object Form1: TForm1
     Height = 17
     Align = alTop
     TabOrder = 4
-    ExplicitWidth = 583
     object Label6: TLabel
       Left = 16
       Top = 2
@@ -491,14 +485,11 @@ object Form1: TForm1
     Font.Height = -11
     Font.Name = 'Courier New'
     Font.Style = []
-    Lines.Strings = (
-      'FileAttachMemo')
     ParentFont = False
     ParentShowHint = False
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
-    ExplicitWidth = 583
   end
   object InfoPanel: TPanel
     Left = 0
@@ -507,7 +498,6 @@ object Form1: TForm1
     Height = 17
     Align = alTop
     TabOrder = 5
-    ExplicitWidth = 583
     object Label7: TLabel
       Left = 16
       Top = 2

@@ -117,7 +117,7 @@ object Form1: TForm1
     ParentCtl3D = False
     ParentFont = False
     TabOrder = 0
-    Text = 'http://www.arkadia.com'
+    Text = 'http://www.pap.fr'
   end
   object ButtonStart: TButton
     Left = 136
@@ -350,7 +350,7 @@ object Form1: TForm1
     Top = 136
   end
   object MainHttpClient: TALWinHttpClient
-    InternetOptions = [wHttpIo_REFRESH, wHttpIo_Keep_connection, wHttpIo_No_auto_redirect]
+    InternetOptions = [wHttpIo_REFRESH, wHttpIo_Keep_connection]
     Left = 64
     Top = 136
   end

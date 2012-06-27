@@ -91,51 +91,51 @@ uses alFcnSkin,
 {$R *.dfm}
 
 {****************************************************************************************************************************}
-function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
+function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TALStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
 Var aMin, aMax, aIndex: integer;
-    aLstSavedData: TstringList;
+    aLstSavedData: TALStringList;
 begin
 
   Handled := True;
-  if sametext(TagString,'randomchar') then begin
-    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+  if ALSameText(TagString,'randomchar') then begin
+    if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TstringList(ExtData^);
-      result := aLstSavedData.Values['randomchar_'+inttostr(aIndex)];
+      aLstSavedData := TALStringList(ExtData^);
+      result := aLstSavedData.Values['randomchar_'+ALIntToStr(aIndex)];
       if result = '' then begin
         result := AlRandomStr(1);
-        aLstSavedData.Values['randomchar_'+inttostr(aIndex)] := result;
+        aLstSavedData.Values['randomchar_'+ALIntToStr(aIndex)] := result;
       end;
     end
     else result := AlRandomStr(1);
   end
-  else if sametext(TagString,'randomstring') then begin
-    if not trystrtoint(TagParams.Values['MinLength'], aMin) then aMin := 1;
-    if not trystrtoint(TagParams.Values['MaxLength'], aMax) then aMax := 255;
-    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+  else if ALSameText(TagString,'randomstring') then begin
+    if not ALTryStrToInt(TagParams.Values['MinLength'], aMin) then aMin := 1;
+    if not ALTryStrToInt(TagParams.Values['MaxLength'], aMax) then aMax := 255;
+    if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TstringList(ExtData^);
-      result := aLstSavedData.Values['randomstring_'+inttostr(aIndex)];
+      aLstSavedData := TALStringList(ExtData^);
+      result := aLstSavedData.Values['randomstring_'+ALIntToStr(aIndex)];
       if result = '' then begin
         result := AlRandomStr(aMin + random(aMax - aMin + 1));
-        aLstSavedData.Values['randomstring_'+inttostr(aIndex)] := result;
+        aLstSavedData.Values['randomstring_'+ALIntToStr(aIndex)] := result;
       end;
     end
     else result := AlRandomStr(aMin + random(aMax - aMin + 1));
   end
-  else if sametext(TagString,'randomnumber') then begin
-    if not trystrtoint(TagParams.Values['Min'], aMin) then aMin := 1;
-    if not trystrtoint(TagParams.Values['Max'], aMax) then aMax := Maxint;
-    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+  else if ALSameText(TagString,'randomnumber') then begin
+    if not ALTryStrToInt(TagParams.Values['Min'], aMin) then aMin := 1;
+    if not ALTryStrToInt(TagParams.Values['Max'], aMax) then aMax := Maxint;
+    if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TstringList(ExtData^);
-      result := aLstSavedData.Values['randomnumber_'+inttostr(aIndex)];
+      aLstSavedData := TALStringList(ExtData^);
+      result := aLstSavedData.Values['randomnumber_'+ALIntToStr(aIndex)];
       if result = '' then begin
-        result := inttostr(aMin + random(aMax - aMin + 1));
-        aLstSavedData.Values['randomnumber_'+inttostr(aIndex)] := result;
+        result := ALIntToStr(aMin + random(aMax - aMin + 1));
+        aLstSavedData.Values['randomnumber_'+ALIntToStr(aIndex)] := result;
       end;
     end
-    else result := inttostr(aMin + random(aMax - aMin + 1));
+    else result := ALIntToStr(aMin + random(aMax - aMin + 1));
   end
   else Handled := False;
 
@@ -156,13 +156,13 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  aFBXClient := TALFbxClient.Create(aFBAPiVersion,ALEditFirebirdLib.Text);
+  aFBXClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
   Try
 
     aTickCount := ALGetTickCount64;
-    aFBXClient.CreateDatabase(AlMemoFireBirdQuery.Lines.Text);
+    aFBXClient.CreateDatabase(AnsiString(AlMemoFireBirdQuery.Lines.Text));
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
 
     ALMemoFirebirdResult.Lines.Text := 'Create DataBase Done';
 
@@ -200,17 +200,17 @@ begin
         else aFBAPiVersion := FB102;
       end;
 
-      fAlFbxClient := TALFbxClient.Create(aFBAPiVersion,ALEditFirebirdLib.Text);
+      fAlFbxClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
       Try
 
         aTickCount := ALGetTickCount64;
-        fAlFbxClient.connect(ALEditFireBirdDatabase.Text,
-                             ALEditFireBirdLogin.text,
-                             ALEditFireBirdPassword.text,
-                             ALEditFireBirdCharset.Text,
+        fAlFbxClient.connect(AnsiString(ALEditFireBirdDatabase.Text),
+                             AnsiString(ALEditFireBirdLogin.text),
+                             AnsiString(ALEditFireBirdPassword.text),
+                             AnsiString(ALEditFireBirdCharset.Text),
                              StrtoInt(ALEditFireBirdNum_buffers.Text));
         ALMemoFirebirdStats.Clear;
-        ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+        ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
 
         ALMemoFirebirdResult.Lines.Text := 'Open Connection Done';
 
@@ -261,7 +261,7 @@ begin
   ALButtonCloseConnection.Enabled := True;
   Try
 
-    aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+    aTPB:= ALTrim(AnsiString(ALMemoFireBirdTPB.Lines.Text));
     aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
     aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
     aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
@@ -287,7 +287,7 @@ begin
     aTickCount := ALGetTickCount64;
     fAlFbxClient.TransactionStart(aTPB);
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -295,24 +295,24 @@ begin
                                     aRecordStats_2,
                                     aMemoryUsage);
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
     ALMemoFirebirdResult.Lines.Text := 'Start Transaction Done';
 
@@ -342,12 +342,12 @@ var aIOStats_1: TALFBXClientMonitoringIOStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: Int64;
     aSQl: AnsiString;
-    aLst: TStringList;
+    aLst: TALStringList;
 begin
 
-  aLst := TstringList.create;
+  aLst := TALStringList.create;
   try
-    aSQl := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+    aSQl := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                              '<#',
                              '>',
                              SQLFastTagReplaceFunct,
@@ -369,7 +369,7 @@ begin
   aTickCount := ALGetTickCount64;
   FAlFBXClient.Prepare(aSQl);
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -377,24 +377,24 @@ begin
                                   aRecordStats_2,
                                   aMemoryUsage);
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
   ALMemoFirebirdResult.Lines.Text := 'Prepare Done';
 
@@ -403,7 +403,7 @@ end;
 {************************************************************}
 procedure TForm1.ALButtonFirebirdSelectClick(Sender: TObject);
 var aXMLDATA: TalXmlDocument;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     aSQL: TALFBXClientSelectDataSQL;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
@@ -411,11 +411,11 @@ var aXMLDATA: TalXmlDocument;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: Int64;
-    aLst1: TStringList;
+    aLst1: TALStringList;
     i: integer;
 begin
 
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   aXMLDATA := ALCreateEmptyXMLDocument('root');
   Try
 
@@ -424,9 +424,9 @@ begin
       ParseOptions := [poPreserveWhiteSpace];
     end;
 
-    aLst1 := TstringList.create;
+    aLst1 := TALStringList.create;
     try
-      aSQL.SQL := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+      aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                                    '<#',
                                    '>',
                                    SQLFastTagReplaceFunct,
@@ -440,9 +440,9 @@ begin
       Setlength(aSQL.Params, 1);
       Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
       for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-        aLst1 := TstringList.create;
+        aLst1 := TALStringList.create;
         try
-          aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+          aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
                                                              '<#',
                                                              '>',
                                                              SQLFastTagReplaceFunct,
@@ -475,7 +475,7 @@ begin
                             aXMLDATA.DocumentElement,
                             aFormatSettings);
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -483,26 +483,26 @@ begin
                                     aRecordStats_2,
                                     aMemoryUsage);
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
-    ALMemoFirebirdResult.Lines.Text := aXMLDATA.XML.Text;
+    ALMemoFirebirdResult.Lines.Text := String(aXMLDATA.XML.Text);
 
   Finally
     aXMLDATA.free;
@@ -519,13 +519,13 @@ var aSQL: TALFBXClientUpdateDataSQL;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
     aTickCount: Int64;
-    aLst1: TStringList;
+    aLst1: TALStringList;
     i: integer;
 begin
 
-  aLst1 := TstringList.create;
+  aLst1 := TALStringList.create;
   try
-    aSQL.SQL := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+    aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                                  '<#',
                                  '>',
                                  SQLFastTagReplaceFunct,
@@ -539,9 +539,9 @@ begin
     Setlength(aSQL.Params, 1);
     Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
     for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-      aLst1 := TstringList.create;
+      aLst1 := TALStringList.create;
       try
-        aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+        aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
                                                            '<#',
                                                            '>',
                                                            SQLFastTagReplaceFunct,
@@ -567,7 +567,7 @@ begin
   aTickCount := ALGetTickCount64;
   FAlFBXClient.UpdateData(aSQL);
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -575,24 +575,24 @@ begin
                                   aRecordStats_2,
                                   aMemoryUsage);
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
   ALMemoFirebirdResult.Lines.Text := 'Update Done';
 
@@ -632,7 +632,7 @@ begin
     aTickCount := ALGetTickCount64;
     fAlFbxClient.TransactionCommit;
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -640,24 +640,24 @@ begin
                                     aRecordStats_2,
                                     aMemoryUsage);
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
     ALMemoFirebirdResult.Lines.Text := 'Commit Transaction Done';
 
@@ -699,7 +699,7 @@ begin
   aTickCount := ALGetTickCount64;
   fAlFbxClient.TransactionCommitRetaining;
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -707,24 +707,24 @@ begin
                                   aRecordStats_2,
                                   aMemoryUsage);
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
   ALMemoFirebirdResult.Lines.Text := 'Commit Transaction Done';
 
@@ -768,7 +768,7 @@ begin
     aTickCount := ALGetTickCount64;
     fAlFbxClient.TransactionRollback;
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
     Try
       FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                       -1,
@@ -780,24 +780,24 @@ begin
       //hide the error
     End;
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+    ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+    ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+    ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+    ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+    ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+    ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+    ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+    ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+    ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+    ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+    ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+    ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
     ALMemoFirebirdStats.Lines.Add('');
-    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+    ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+    ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+    ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
     ALMemoFirebirdResult.Lines.Text := 'RollBack Transaction Done';
 
@@ -839,7 +839,7 @@ begin
   aTickCount := ALGetTickCount64;
   fAlFbxClient.TransactionRollbackRetaining;
   ALMemoFirebirdStats.Clear;
-  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+  ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -847,24 +847,24 @@ begin
                                   aRecordStats_2,
                                   aMemoryUsage);
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+  ALMemoFirebirdStats.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+  ALMemoFirebirdStats.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+  ALMemoFirebirdStats.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+  ALMemoFirebirdStats.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+  ALMemoFirebirdStats.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+  ALMemoFirebirdStats.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+  ALMemoFirebirdStats.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+  ALMemoFirebirdStats.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+  ALMemoFirebirdStats.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+  ALMemoFirebirdStats.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+  ALMemoFirebirdStats.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+  ALMemoFirebirdStats.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
   ALMemoFirebirdStats.Lines.Add('');
-  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+  ALMemoFirebirdStats.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+  ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+  ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
   ALMemoFirebirdResult.Lines.Text := 'RollBack Transaction Done';
 
@@ -892,7 +892,7 @@ begin
     aTickCount := ALGetTickCount64;
     fAlFbxClient.Disconnect;
     ALMemoFirebirdStats.Clear;
-    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aTickCount) + ' ms');
+    ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
 
     ALMemoFirebirdResult.Lines.Text := 'Close Transaction Done';
 
@@ -978,9 +978,10 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

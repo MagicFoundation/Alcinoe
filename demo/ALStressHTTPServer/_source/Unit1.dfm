@@ -311,10 +311,6 @@ object Form1: TForm1
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -851,6 +847,8 @@ object Form1: TForm1
     Top = 360
   end
   object cxStyleRepository1: TcxStyleRepository
+    Left = 136
+    Top = 160
     PixelsPerInch = 96
     object cxStyle1: TcxStyle
       AssignedValues = [svColor]

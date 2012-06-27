@@ -59,7 +59,7 @@ uses alFcnSkin,
      AlAVLBinaryTree,
      alFcnString,
      alFcnMime,
-     alfcnCrypt;
+     alCipher;
 
 {$R *.dfm}
 
@@ -107,7 +107,7 @@ begin
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 100 = 0 then begin
-      StatusBar1.Panels[0].Text := 'AES (EBC): ' + inttostr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
+      StatusBar1.Panels[0].Text := 'AES (EBC): ' + IntToStr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
       application.ProcessMessages;
     end;
   end;
@@ -148,7 +148,7 @@ begin
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 100 = 0 then begin
-      StatusBar1.Panels[1].Text := 'AES (CBC): ' + inttostr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
+      StatusBar1.Panels[1].Text := 'AES (CBC): ' + IntToStr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
       application.ProcessMessages;
     end;
   end;
@@ -189,7 +189,7 @@ begin
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
     if counter mod 100 = 0 then begin
-      StatusBar1.Panels[2].Text := 'BF (EBC): ' + inttostr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
+      StatusBar1.Panels[2].Text := 'BF (EBC): ' + IntToStr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
       application.ProcessMessages;
     end;
   end;
@@ -199,24 +199,24 @@ end;
 procedure TForm1.ALButton5Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALBFEncryptStringCBC(ALMimeBase64DecodeString(trim(ALMemocryptedData.Lines.Text)), outString, EditKey.Text, False);
-  ALMemoDeCryptedData.Lines.Text := outString;
+  ALBFEncryptStringCBC(ALMimeBase64DecodeString(ALTrim(AnsiString(ALMemocryptedData.Lines.Text))), outString, AnsiString(EditKey.Text), False);
+  ALMemoDeCryptedData.Lines.Text := String(outString);
 end;
 
 {***********************************************}
 procedure TForm1.ALButton6Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(ALMemoDecryptedData.Lines.Text, outString, EditKey.Text, True);
-  ALMemoCryptedData.Lines.Text := ALMimeBase64EncodeStringNoCRLF(outString);
+  ALRDLEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), True);
+  ALMemoCryptedData.Lines.Text := String(ALMimeBase64EncodeStringNoCRLF(outString));
 end;
 
 {***********************************************}
 procedure TForm1.ALButton7Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(ALMimeBase64DecodeString(trim(ALMemocryptedData.Lines.Text)), outString, EditKey.Text, False);
-  ALMemoDeCryptedData.Lines.Text := outString;
+  ALRDLEncryptStringCBC(ALMimeBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), False);
+  ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
 {***********************************************}
@@ -247,7 +247,7 @@ begin
     end;
     inc(counter);
     if (counter mod 1000 = 0) then begin
-      StatusBar1.Panels[0].Text := inttostr(counter) + ' items generated';
+      StatusBar1.Panels[0].Text := IntToStr(counter) + ' items generated';
       application.ProcessMessages;
     end;
   end;
@@ -282,7 +282,7 @@ begin
     end;
     inc(counter);
     if (counter mod 1000 = 0) then begin
-      StatusBar1.Panels[1].Text := inttostr(counter) + ' items generated';
+      StatusBar1.Panels[1].Text := IntToStr(counter) + ' items generated';
       application.ProcessMessages;
     end;
   end;
@@ -312,8 +312,8 @@ end;
 procedure TForm1.ALButton2Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALBFEncryptStringCBC(ALMemoDecryptedData.Lines.Text, outString, EditKey.Text, True);
-  ALMemoCryptedData.Lines.Text := ALMimeBase64EncodeStringNoCRLF(outString);
+  ALBFEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), True);
+  ALMemoCryptedData.Lines.Text := String(ALMimeBase64EncodeStringNoCRLF(outString));
 end;
 
 {**********************************************************************}
@@ -359,9 +359,10 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

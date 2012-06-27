@@ -22,7 +22,8 @@ uses Windows,
      ExtCtrls,
      OleCtrls,
      SHDocVw,
-     ComObj;
+     ComObj,
+     ALStringList;
 
 {------------------------------------}
 Const WM_XmlFullyLoaded = WM_user + 1;
@@ -66,19 +67,17 @@ type
     procedure ButtonLoadXmlWithXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
-    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
-    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
-    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND}; const Attributes: TStrings);
-    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
+    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; const Attributes: TALStrings);
+    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
   private
-    FStartDate: Cardinal;
     FnodeCount: Integer;
     Function scrollAllNode(aNode: iXmlNode): Integer; overload;
     Function scrollAllNode(aNode: TalXmlNode): Integer; overload;
-    procedure XmlFullyLoaded(var Message: Tmessage); message WM_XmlFullyLoaded;
   public
     { Public declarations }
   end;
@@ -102,24 +101,20 @@ var ProcessHandle : THandle;
     MemCounters   : TProcessMemoryCounters;
 begin
   Result := 0;
-  ProcessHandle := OpenProcess(
-                               PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
+  ProcessHandle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
                                false,
-                               ProcessID
-                              );
+                               ProcessID);
   try
-    if GetProcessMemoryInfo(
-                            ProcessHandle,
+    if GetProcessMemoryInfo(ProcessHandle,
                             MemCounters,
-                            sizeof(MemCounters)
-                           )
+                            sizeof(MemCounters))
     then Result := MemCounters.WorkingSetSize;
   finally
     CloseHandle(ProcessHandle);
   end;
 end;
 
-{************************************************************}
+{****************************************************************}
 Function CreateEmptyXMLDocument(Rootname:AnsiString):IXMLDocument;
 Var aXmlDoc: TXMLDocument;
 begin
@@ -147,11 +142,13 @@ begin
       While astack.Count > 0 do begin
         inc(result);
         aNode := ixmlNode(astack.Pop);
-        For i := 0 to ANode.ChildNodes.Count - 1 do
-          aStack.Push(pointer(ANode.ChildNodes[i]));
+        If assigned(ANode.ChildNodes) then
+          For i := 0 to ANode.ChildNodes.Count - 1 do
+            aStack.Push(pointer(ANode.ChildNodes[i]));
 
-        For i := 0 to ANode.AttributeNodes.Count - 1 do
-          aStack.Push(pointer(ANode.AttributeNodes[i]));
+        If assigned(ANode.AttributeNodes) then
+          For i := 0 to ANode.AttributeNodes.Count - 1 do
+            aStack.Push(pointer(ANode.AttributeNodes[i]));
       end;
 
 
@@ -192,38 +189,27 @@ begin
 
 end;
 
-{*****************************************************}
-procedure TForm1.XmlFullyLoaded(var Message: Tmessage);
-begin
-  Case message.WParam of
-    1: MemoLoadXmlWithALXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + inttostr(GetTickCount - fStartDate) + ' ms');
-    2: MemoLoadXmlWithXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + inttostr(GetTickCount - fStartDate) + ' ms');
-    3: MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to create all nodes: ' + inttostr(GetTickCount - fStartDate) + ' ms');
-    4: MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to create all nodes: ' + inttostr(GetTickCount - fStartDate) + ' ms');
-    5: MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Time to scroll all nodes: ' + inttostr(GetTickCount - fStartDate) + ' ms');
-  end;
-end;
-
 {********************************************************************}
 procedure TForm1.ButtonLoadXmlWithALXmlDocumentClick(Sender: TObject);
 Var aALXMLDocument: TALXmlDocument;
     aNodeCount: Integer;
+    MemoryUsage: DWORD;
+    aStartDate: cardinal;
 begin
   If MainOpenDialog.Execute then begin
 
     MemoLoadXmlWithALXmlDocument.Lines.Clear;
-    MemoLoadXmlWithALXmlDocument.Lines.Add('Memory usage before the load: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
-
+    MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
     Try
 
       aALXMLDocument:= TALXmlDocument.Create(nil);
       Try
-        FStartDate := GetTickCount;
-        aALXMLDocument.LoadFromFile(MainOpenDialog.FileName);
+        aStartDate := GetTickCount;
+        aALXMLDocument.LoadFromFile(AnsiString(MainOpenDialog.FileName));
         aNodeCount := scrollAllNode(aALXMLDocument.Node);
-        MemoLoadXmlWithALXmlDocument.Lines.Add('Memory usage after the load: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
-        MemoLoadXmlWithALXmlDocument.Lines.Add('Number of nodes created: ' + inttostr(aNodeCount));
-        postMessage(handle,WM_XmlFullyLoaded,1,0);
+        MemoLoadXmlWithALXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+        MemoLoadXmlWithALXmlDocument.Lines.Add('Number of nodes created: ' + IntToStr(aNodeCount));
+        MemoLoadXmlWithALXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
       finally
         aALXMLDocument.Free;
       end;
@@ -241,21 +227,23 @@ end;
 procedure TForm1.ButtonLoadXmlWithXmlDocumentClick(Sender: TObject);
 Var aXMLDocument: iXmlDocument;
     aNodeCount: Integer;
+    MemoryUsage: DWORD;
+    aStartDate: cardinal;
 begin
   If MainOpenDialog.Execute then begin
 
     MemoLoadXmlWithXmlDocument.Lines.Clear;
-    MemoLoadXmlWithXmlDocument.Lines.Add('Memory usage before the load: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
+    MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
 
     Try
 
       aXMLDocument:= CreateEmptyXMLDocument('root');
-      FStartDate := GetTickCount;
+      aStartDate := GetTickCount;
       aXMLDocument.LoadFromFile(MainOpenDialog.FileName);
       aNodeCount := scrollAllNode(aXMLDocument.node);
-      MemoLoadXmlWithXmlDocument.Lines.Add('Memory usage after the load: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
-      MemoLoadXmlWithXmlDocument.Lines.Add('Number of nodes created: ' + inttostr(aNodeCount));
-      postMessage(handle,WM_XmlFullyLoaded,2,0);
+      MemoLoadXmlWithXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+      MemoLoadXmlWithXmlDocument.Lines.Add('Number of nodes created: ' + IntToStr(aNodeCount));
+      MemoLoadXmlWithXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
 
     except
       on E: Exception do
@@ -266,20 +254,22 @@ begin
 
 end;
 
-{********************************************************************************}
+{*******************************************************************************}
 procedure TForm1.ButtonGenerate100000NodeWithALXmlDocumentClick(Sender: TObject);
 Var aALXMLDocument: TALXmlDocument;
     aNewRec, aValueRec: TalXmlNode;
+    MemoryUsage: DWORD;
+    aStartDate: cardinal;
     k,i: integer;
 begin
   MemoGenerate100000NodeWithALXmlDocument.Lines.Clear;
-  MemoGenerate100000NodeWithALXmlDocument.Lines.Add('Memory usage before the process: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
+  MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
 
   Try
 
     aALXMLDocument:= TALXmlDocument.Create(nil);
     Try
-      FStartDate := GetTickCount;
+      aStartDate := GetTickCount;
       aALXMLDocument.Active := True;
       aALXMLDocument.AddChild('root');
       For k := 1 to 1000 do begin
@@ -292,8 +282,8 @@ begin
         end;
       end;
 
-      MemoGenerate100000NodeWithALXmlDocument.Lines.Add('Memory usage after the process: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
-      postMessage(handle,WM_XmlFullyLoaded,3,0);
+      MemoGenerate100000NodeWithALXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+      MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to create all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
     finally
       aALXMLDocument.Free;
     end;
@@ -304,32 +294,34 @@ begin
   end;
 end;
 
-{******************************************************************************}
+{*****************************************************************************}
 procedure TForm1.ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
 Var aXMLDocument: iXmlDocument;
     aNewRec, aValueRec: iXmlNode;
+    MemoryUsage: DWORD;
+    aStartDate: cardinal;
     k,i: integer;
 begin
   MemoGenerate100000NodeWithXmlDocument.Lines.Clear;
-  MemoGenerate100000NodeWithXmlDocument.Lines.Add('Memory usage before the process: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
+  MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
 
   Try
 
       aXMLDocument:= CreateEmptyXMLDocument('root');
-      FStartDate := GetTickCount;
+      aStartDate := GetTickCount;
       aXMLDocument.Active := true;
       aXMLDocument.AddChild('root');
       For k := 1 to 1000 do begin
-        aNewRec := aXMLDocument.DocumentElement.AddChild(alRandomStr(8));
-        aNewrec.Attributes[alRandomStr(8)] := alRandomStr(25);
-        aNewrec.Attributes[alRandomStr(8)] := alRandomStr(25);
+        aNewRec := aXMLDocument.DocumentElement.AddChild(alRandomStrU(8));
+        aNewrec.Attributes[alRandomStrU(8)] := alRandomStrU(25);
+        aNewrec.Attributes[alRandomStrU(8)] := alRandomStrU(25);
         For i := 1 to 100 do begin
-          aValueRec := aNewRec.AddChild(alRandomStr(8));
-          aValueRec.Text := alRandomStr(25);
+          aValueRec := aNewRec.AddChild(alRandomStrU(8));
+          aValueRec.Text := alRandomStrU(25);
         end;
       end;
-      MemoGenerate100000NodeWithXmlDocument.Lines.Add('Memory usage after the process: ' + inttostr(ProcessMemoryUsage(GetCurrentProcessID)));
-      postMessage(handle,WM_XmlFullyLoaded,4,0);
+      MemoGenerate100000NodeWithXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+      MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to create all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
 
   except
     on E: Exception do
@@ -337,32 +329,33 @@ begin
   end;
 end;
 
-{******************************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
+{****************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
-{*****************************************************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
+{***************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
-{****************************************************************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND}; const Attributes: TStrings);
+{****************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: AnsiString; const Attributes: TALStrings);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;
 end;
 
-{***************************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: {$IF CompilerVersion >= 20}TALXMLString{$ELSE}STRING{$IFEND});
+{*************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
-{*******************************************************************************}
+{******************************************************************************}
 procedure TForm1.ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
+var aStartDate: cardinal;
 begin
   If MainOpenDialog.Execute then begin
 
@@ -371,11 +364,11 @@ begin
     Try
 
       FnodeCount := 0;
-      ALXMLDocumentSaxMode.filename := MainOpenDialog.FileName;
-      FStartDate := GetTickCount;
+      ALXMLDocumentSaxMode.filename := AnsiString(MainOpenDialog.FileName);
+      aStartDate := GetTickCount;
       ALXMLDocumentSaxMode.parseXML;
-      MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Number of nodes crawled: ' + inttostr(FNodeCount));
-      postMessage(handle,WM_XmlFullyLoaded,5,0);
+      MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Number of nodes crawled: ' + IntToStr(FNodeCount));
+      MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Time to scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
 
     except
       on E: Exception do
@@ -424,9 +417,10 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

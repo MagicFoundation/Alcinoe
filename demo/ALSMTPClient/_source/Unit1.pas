@@ -17,7 +17,6 @@ uses Windows,
      ComCtrls,
      SyncObjs,
      AlSMTPClient,
-     inifiles,
      ActiveX,
      OleCtrls,
      SHDocVw,
@@ -86,8 +85,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure AllInOneButtonClick(Sender: TObject);
   private
-    FIniFileName  : AnsiString;
-    FInitialized  : Boolean;
     FSMTPCLient: TALSMTPCLient;
   end;
 
@@ -97,98 +94,11 @@ var
 implementation
 
 Uses alFcnString,
+     ALStringList,
      ALInternetMessageCommon,
      ALMultiPartMixedParser;
 
 {$R *.DFM}
-
-const
-  SectionData       = 'Data';
-  KeyHost           = 'HostName';
-  KeyPort           = 'Port';
-  KeyFrom           = 'From';
-  KeyTo             = 'To';
-  KeyCc             = 'Cc';
-  KeyBcc            = 'Bcc';
-  KeySubject        = 'Subject';
-  KeyUser           = 'UserName';
-  KeyPass           = 'Password';
-  KeyAuth           = 'Authentification';
-  KeyPriority       = 'Priority';
-  KeyConfirm        = 'Confirm';
-  SectionWindow     = 'Window';
-  KeyTop            = 'Top';
-  KeyLeft           = 'Left';
-  KeyWidth          = 'Width';
-  KeyHeight         = 'Height';
-  SectionFileAttach = 'Files';
-  KeyFileAttach     = 'File';
-  SectionMsgMemo    = 'Message';
-  KeyMsgMemo        = 'Msg';
-
-{********************************************************}
-procedure SaveStringsToIniFile(const IniFileName : AnsiString;
-                               const IniSection  : AnsiString;
-                               const IniKey      : AnsiString;
-                               Strings           : TStrings);
-var IniFile : TIniFile;
-    nItem   : Integer;
-begin
-  if (IniFileName = '') or
-     (IniSection = '') or
-     (IniKey = '') or
-     (not Assigned(Strings)) then Exit;
-  IniFile := TIniFile.Create(IniFileName);
-  IniFile.EraseSection(IniSection);
-  if Strings.Count <= 0 then IniFile.WriteString(IniSection, IniKey + 'EmptyFlag', 'Empty')
-  else
-    for nItem := 0 to Strings.Count - 1 do
-        IniFile.WriteString(
-                            IniSection,
-                            IniKey + IntToStr(nItem),
-                            Strings.Strings[nItem]
-                           );
-  IniFile.Free;
-end;
-
-{*********************************************************}
-function LoadStringsFromIniFile(const IniFileName : AnsiString;
-                                const IniSection  : AnsiString;
-                                const IniKey      : AnsiString;
-                                Strings           : TStrings) : Boolean;
-var IniFile : TIniFile;
-    nItem   : Integer;
-    I       : Integer;
-    Buf     : AnsiString;
-begin
-  Result := TRUE;
-  if (IniFileName = '') or
-     (IniSection = '') or
-     (IniKey = '') or
-     (not Assigned(Strings)) then Exit;
-  Strings.Clear;
-  IniFile := TIniFile.Create(IniFileName);
-  try
-    if IniFile.ReadString(IniSection, IniKey + 'EmptyFlag', '') <> '' then Exit;
-    IniFile.ReadSectionValues(IniSection, Strings);
-  finally
-    IniFile.Free;
-  end;
-  nItem := Strings.Count - 1;
-  while nItem >= 0 do begin
-    Buf := Strings.Strings[nItem];
-    if CompareText(IniKey, Copy(Buf, 1, Length(IniKey))) <> 0 then Strings.Delete(nItem)
-    else begin
-      if not (Buf[Length(IniKey) + 1] in ['0'..'9']) then Strings.Delete(nItem)
-      else begin
-        I := Pos('=', Buf);
-        Strings.Strings[nItem] := Copy(Buf, I + 1, Length(Buf));
-      end;
-    end;
-    Dec(nItem);
-  end;
-  Result := (Strings.Count <> 0);
-end;
 
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -198,49 +108,8 @@ end;
 
 {*****************************************}
 procedure TForm1.FormShow(Sender: TObject);
-var IniFile : TIniFile;
 begin
-  if not FInitialized then begin
-    FInitialized := TRUE;
-    IniFile := TIniFile.Create(FIniFileName);
-    HostEdit.Text    := IniFile.ReadString(SectionData, KeyHost,'localhost');
-    PortEdit.Text    := IniFile.ReadString(SectionData, KeyPort, '25');
-    FromEdit.Text    := IniFile.ReadString(SectionData, KeyFrom, 'first.last@company.com');
-    ToEdit.Text      := IniFile.ReadString(SectionData, KeyTo, 'john.doe@acme');
-    CcEdit.Text      := IniFile.ReadString(SectionData, KeyCc, '');
-    BccEdit.Text     := IniFile.ReadString(SectionData, KeyBcc, 'francois.piette@swing.be');
-    SubjectEdit.Text := IniFile.ReadString(SectionData, KeySubject, 'This is the message subject');
-    UsernameEdit.Text :=  IniFile.ReadString(SectionData, KeyUser, 'account name');
-    PasswordEdit.Text      :=  IniFile.ReadString(SectionData, KeyPass, 'account password');
-    AuthComboBox.ItemIndex     := IniFile.ReadInteger(SectionData, KeyAuth, 0);
-    PriorityComboBox.ItemIndex := IniFile.ReadInteger(SectionData, KeyPriority, 2);
-    ConfirmCheckBox.Checked    := Boolean(IniFile.ReadInteger(SectionData, KeyConfirm, 0));
-    if not LoadStringsFromIniFile(
-                                  FIniFileName,
-                                  SectionFileAttach,
-                                  KeyFileAttach,
-                                  FileAttachMemo.Lines
-                                 ) then
-      FileAttachMemo.Text := '';
-    if not LoadStringsFromIniFile(
-                                  FIniFileName,
-                                  SectionMsgMemo,
-                                  KeyMsgMemo,
-                                  MsgMemo.Lines
-                                 ) then
-      MsgMemo.Text := 'This is the first line' + #13#10 +
-                      'Then the second one' + #13#10 +
-                      'The next one is empty' + #13#10 +
-                      '' + #13#10 +
-                      'The next one has only a single dot' + #13#10 +
-                      '.' + #13#10 +
-                      'Finally the last one' + #13#10;
-    Top    := IniFile.ReadInteger(SectionWindow, KeyTop,    (Screen.Height - Height) div 2);
-    Left   := IniFile.ReadInteger(SectionWindow, KeyLeft,   (Screen.Width - Width) div 2);
-    Width  := IniFile.ReadInteger(SectionWindow, KeyWidth,  Width);
-    Height := IniFile.ReadInteger(SectionWindow, KeyHeight, Height);
-    IniFile.Free;
-  end;
+
 end;
 
 {********************************************************}
@@ -252,54 +121,54 @@ end;
 {***************************************************}
 procedure TForm1.ConnectButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FSmtpClient.Connect(HostEdit.Text, strtoint(PortEdit.Text))));
+  DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.Connect(AnsiString(HostEdit.Text), StrToInt(PortEdit.Text)))));
 end;
 
 {************************************************}
 procedure TForm1.HeloButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FSMTPCLient.Helo));
+  DisplayMemo.Lines.Add(String(ALTrim(FSMTPCLient.Helo)));
 end;
 
 {************************************************}
 procedure TForm1.EhloButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FSMTPCLient.eHlo));
+  DisplayMemo.Lines.Add(String(ALTrim(FSMTPCLient.eHlo)));
 end;
 
 {************************************************}
 procedure TForm1.AuthButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FSmtpClient.Auth(UsernameEdit.Text, PasswordEdit.Text, TAlSmtpClientAuthType(AuthComboBox.ItemIndex))));
+  DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.Auth(AnsiString(UsernameEdit.Text), AnsiString(PasswordEdit.Text), TAlSmtpClientAuthType(AuthComboBox.ItemIndex)))));
 end;
 
 {****************************************************}
 procedure TForm1.MailFromButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FSmtpClient.MailFrom(FromEdit.Text)));
+  DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.MailFrom(AnsiString(FromEdit.Text)))));
 end;
 
 {**************************************************}
 procedure TForm1.RcptToButtonClick(Sender: TObject);
-Var ALst: TstringList;
+Var ALst: TALStringList;
     Str: AnsiString;
     i: integer;
 begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
 
-    Str := ToEdit.Text + #13#10 + CcEdit.Text + #13#10 + BccEdit.text;
+    Str := AnsiString(ToEdit.Text) + #13#10 + AnsiString(CcEdit.Text) + #13#10 + AnsiString(BccEdit.text);
     Str := AlStringReplace(Str,',',#13#10,[RfReplaceall]);
     Str := AlStringReplace(Str,';',#13#10,[RfReplaceall]);
-    aLst.Text := Trim(Str);
+    aLst.Text := ALTrim(Str);
     i := 0;
     While i <= aLst.Count - 1 do begin
-      aLst[i] := trim(aLst[i]);
+      aLst[i] := ALTrim(aLst[i]);
       If aLst[i] = '' then aLst.Delete(i)
       else inc(i);
     end;
 
-    DisplayMemo.Lines.Add(trim(FSmtpClient.RcptTo(Alst)));
+    DisplayMemo.Lines.Add(String(ALTrim(AnsiString(FSmtpClient.RcptTo(Alst)))));
 
   finally
     aLst.free;
@@ -316,28 +185,28 @@ begin
   aEmailHeader := TALEmailHeader.Create;
   Try
 
-    aEmailHeader.From := FromEdit.Text;
-    aEmailHeader.SendTo := ToEdit.Text;;
-    aEmailHeader.cc := ccEdit.Text;;
-    aEmailHeader.Subject := SubjectEdit.Text;
-    If ConfirmCheckBox.Checked then aEmailHeader.DispositionNotificationTo := FromEdit.Text;
-    aEmailHeader.Priority := PriorityComboBox.Text;
+    aEmailHeader.From := AnsiString(FromEdit.Text);
+    aEmailHeader.SendTo := AnsiString(ToEdit.Text);
+    aEmailHeader.cc := AnsiString(ccEdit.Text);
+    aEmailHeader.Subject := AnsiString(SubjectEdit.Text);
+    If ConfirmCheckBox.Checked then aEmailHeader.DispositionNotificationTo := AnsiString(FromEdit.Text);
+    aEmailHeader.Priority := AnsiString(PriorityComboBox.Text);
     If PriorityComboBox.ItemIndex = 1 then str := 'High'
     else If PriorityComboBox.ItemIndex = 2 then str := 'Normal'
     else str := 'Low';
     aEmailHeader.CustomHeaders.Add('X-MSMail-Priority: ' + str);
-    If trim(FileAttachMemo.Lines.text) <> '' then begin
+    If Trim(FileAttachMemo.Lines.text) <> '' then begin
       AMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
       Try
         For i := 0 to FileAttachMemo.Lines.Count - 1 do
           If FileAttachMemo.Lines[i] <> '' then
-            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(trim(FileAttachMemo.Lines[i]));
-          DisplayMemo.Lines.Add(trim(FSmtpClient.DataMultipartMixed(aEmailHeader, MsgMemo.Lines.Text, 'text/plain', AMultiPartMixedAttachments)));
+            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
+          DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.DataMultipartMixed(aEmailHeader, AnsiString(MsgMemo.Lines.Text), 'text/plain', AMultiPartMixedAttachments))));
       finally
         AMultiPartMixedAttachments.Free;
       end;
     end
-    else DisplayMemo.Lines.Add(trim(FSmtpClient.Data(aEmailHeader, MsgMemo.Lines.Text)));
+    else DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.Data(AnsiString(aEmailHeader.RawHeaderText), AnsiString(MsgMemo.Lines.Text)))));
 
 
   finally
@@ -348,79 +217,75 @@ end;
 {************************************************}
 procedure TForm1.QuitButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FSmtpClient.quit));
+  DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.quit)));
 end;
 
 {****************************************************}
 procedure TForm1.AllInOneButtonClick(Sender: TObject);
 Var aEmailHeader: TALEmailHeader;
     AMultiPartMixedAttachments : TALMultiPartMixedContents;
-    aLst: TstringList;
+    aLst: TALStringList;
     Str: AnsiString;
     i : integer;
 begin
 
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   aEmailHeader := TALEmailHeader.Create;
   Try
 
-    Str := ToEdit.Text + #13#10 + CcEdit.Text + #13#10 + BccEdit.text;
+    Str := AnsiString(ToEdit.Text) + #13#10 + AnsiString(CcEdit.Text) + #13#10 + AnsiString(BccEdit.text);
     Str := AlStringReplace(Str,',',#13#10,[RfReplaceall]);
     Str := AlStringReplace(Str,';',#13#10,[RfReplaceall]);
-    aLst.Text := Trim(Str);
+    aLst.Text := ALTrim(Str);
     i := 0;
     While i <= aLst.Count - 1 do begin
-      aLst[i] := trim(aLst[i]);
+      aLst[i] := ALTrim(aLst[i]);
       If aLst[i] = '' then aLst.Delete(i)
       else inc(i);
     end;
 
-    aEmailHeader.From := FromEdit.Text;
-    aEmailHeader.SendTo := ToEdit.Text;;
-    aEmailHeader.cc := ccEdit.Text;;
-    aEmailHeader.Subject := SubjectEdit.Text;
-    If ConfirmCheckBox.Checked then aEmailHeader.DispositionNotificationTo := FromEdit.Text;
-    aEmailHeader.Priority := PriorityComboBox.Text;
+    aEmailHeader.From := AnsiString(FromEdit.Text);
+    aEmailHeader.SendTo := AnsiString(ToEdit.Text);
+    aEmailHeader.cc := AnsiString(ccEdit.Text);
+    aEmailHeader.Subject := AnsiString(SubjectEdit.Text);
+    If ConfirmCheckBox.Checked then aEmailHeader.DispositionNotificationTo := AnsiString(FromEdit.Text);
+    aEmailHeader.Priority := AnsiString(PriorityComboBox.Text);
     If PriorityComboBox.ItemIndex = 1 then str := 'High'
     else If PriorityComboBox.ItemIndex = 2 then str := 'Normal'
     else str := 'Low';
     aEmailHeader.CustomHeaders.Add('X-MSMail-Priority: ' + str);
-    If trim(FileAttachMemo.Lines.text) <> '' then begin
+    If Trim(FileAttachMemo.Lines.text) <> '' then begin
       AMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
       Try
         For i := 0 to FileAttachMemo.Lines.Count - 1 do
           If FileAttachMemo.Lines[i] <> '' then
-            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(trim(FileAttachMemo.Lines[i]));
+            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
 
-          FSmtpClient.SendMailMultipartMixed(
-                                             HostEdit.Text,
-                                             strtoint(PortEdit.Text),
-                                             FromEdit.Text,
+          FSmtpClient.SendMailMultipartMixed(AnsiString(HostEdit.Text),
+                                             StrToInt(PortEdit.Text),
+                                             AnsiString(FromEdit.Text),
                                              aLst,
-                                             UsernameEdit.Text,
-                                             PasswordEdit.Text,
+                                             AnsiString(UsernameEdit.Text),
+                                             AnsiString(PasswordEdit.Text),
                                              TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
                                              aEmailHeader,
-                                             MsgMemo.Lines.Text,
+                                             AnsiString(MsgMemo.Lines.Text),
                                              'text/plain',
-                                             AMultiPartMixedAttachments
-                                            );
+                                             AMultiPartMixedAttachments);
 
       finally
         AMultiPartMixedAttachments.Free;
       end;
     end
-    else FSmtpClient.SendMail(
-                              HostEdit.Text,
-                              strtoint(PortEdit.Text),
-                              FromEdit.Text,
+    else FSmtpClient.SendMail(AnsiString(HostEdit.Text),
+                              StrToInt(PortEdit.Text),
+                              AnsiString(FromEdit.Text),
                               aLst,
-                              UsernameEdit.Text,
-                              PasswordEdit.Text,
+                              AnsiString(UsernameEdit.Text),
+                              AnsiString(PasswordEdit.Text),
                               TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
                               aEmailHeader.RawHeaderText,
-                              MsgMemo.Lines.Text
-                              );
+                              AnsiString(MsgMemo.Lines.Text));
 
     DisplayMemo.Lines.Add('Success');
 
@@ -441,8 +306,6 @@ procedure TForm1.FormCreate(Sender: TObject);
 var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
 begin
   DisplayMemo.Clear;
-  FIniFileName := LowerCase(Application.ExeName);
-  FIniFileName := Copy(FIniFileName, 1, Length(FIniFileName) - 3) + 'ini';
   FSmtpClient := TAlSMTPClient.Create;
   CoInitialize(nil);
 
@@ -466,29 +329,7 @@ end;
 
 {********************************************************************}
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
-var IniFile : TIniFile;
 begin
-  IniFile := TIniFile.Create(FIniFileName);
-  IniFile.WriteString(SectionData, KeyHost, HostEdit.Text);
-  IniFile.WriteString(SectionData, KeyPort, PortEdit.Text);
-  IniFile.WriteString(SectionData, KeyFrom, FromEdit.Text);
-  IniFile.WriteString(SectionData, KeyTo, ToEdit.Text);
-  IniFile.WriteString(SectionData, KeyCc, CcEdit.Text);
-  IniFile.WriteString(SectionData, KeyBcc, BccEdit.Text);
-  IniFile.WriteString(SectionData, KeySubject, SubjectEdit.Text);
-  IniFile.WriteString(SectionData, KeyUser, UsernameEdit.Text);
-  IniFile.WriteString(SectionData, KeyPass, PasswordEdit.Text);
-  IniFile.WriteInteger(SectionData, KeyAuth, AuthComboBox.ItemIndex);
-  IniFile.WriteInteger(SectionData, KeyPriority, PriorityComboBox.ItemIndex);
-  IniFile.WriteInteger(SectionData, KeyConfirm, Ord(ConfirmCheckBox.Checked));
-  SaveStringsToIniFile(FIniFileName, SectionFileAttach, KeyFileAttach, FileAttachMemo.Lines);
-  SaveStringsToIniFile(FIniFileName, SectionMsgMemo, KeyMsgMemo, MsgMemo.Lines);
-  IniFile.WriteInteger(SectionWindow, KeyTop, Top);
-  IniFile.WriteInteger(SectionWindow, KeyLeft, Left);
-  IniFile.WriteInteger(SectionWindow, KeyWidth, Width);
-  IniFile.WriteInteger(SectionWindow, KeyHeight, Height);
-  IniFile.Free;
-
   try
     ie.quit;
   except
@@ -497,10 +338,11 @@ begin
   CoUninitialize;
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
 

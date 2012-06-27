@@ -1,4 +1,4 @@
-program ALAVLBinaryTreeBenchmark;
+program ALSortedListBenchmark;
 
 uses
   Forms,

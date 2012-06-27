@@ -2,9 +2,9 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 258
-  ClientWidth = 493
-  Color = 14805482
+  ClientHeight = 331
+  ClientWidth = 500
+  Color = 15986666
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -18,47 +18,17 @@ object Form1: TForm1
   TextHeight = 13
   object ALButton1: TALButton
     Left = 16
-    Top = 16
-    Width = 225
+    Top = 17
+    Width = 220
     Height = 25
-    Caption = 'Benchmark TALStringList (10 000 items)'
+    Caption = 'Benchmark TALStringKeyAVLBinaryTree'
     TabOrder = 0
-    OnClick = ALButton1Click
-    OnPaint = ALButtonPaint
-  end
-  object ALButton2: TALButton
-    Left = 247
-    Top = 16
-    Width = 226
-    Height = 25
-    Caption = 'Benchmark Delphi TStringList (10 000 items)'
-    TabOrder = 1
-    OnClick = ALButton2Click
-    OnPaint = ALButtonPaint
-  end
-  object ALButton3: TALButton
-    Left = 16
-    Top = 48
-    Width = 225
-    Height = 25
-    Caption = 'Benchmark TALAVLStringList (100 000 items)'
-    TabOrder = 2
     OnClick = ALButton3Click
     OnPaint = ALButtonPaint
   end
-  object ALButton4: TALButton
-    Left = 247
-    Top = 47
-    Width = 226
-    Height = 25
-    Caption = 'Benchmark Delphi TStringList (100 000 items)'
-    TabOrder = 3
-    OnClick = ALButton4Click
-    OnPaint = ALButtonPaint
-  end
   object Panel2: TPanel
-    Left = 72
-    Top = 88
+    Left = 80
+    Top = 160
     Width = 344
     Height = 153
     BevelOuter = bvNone
@@ -67,7 +37,7 @@ object Form1: TForm1
     Ctl3D = False
     ParentBackground = False
     ParentCtl3D = False
-    TabOrder = 4
+    TabOrder = 1
     object Label7: TLabel
       Left = 10
       Top = 14
@@ -123,5 +93,75 @@ object Form1: TForm1
         TabOrder = 0
       end
     end
+  end
+  object ALButton2: TALButton
+    Left = 258
+    Top = 17
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TStringList'
+    TabOrder = 2
+    OnClick = ALButton4Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton5: TALButton
+    Left = 16
+    Top = 49
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TALInt64AVLList'
+    TabOrder = 3
+    OnClick = ALButton5Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton6: TALButton
+    Left = 258
+    Top = 49
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TALInt64List'
+    TabOrder = 4
+    OnClick = ALButton6Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton10: TALButton
+    Left = 16
+    Top = 80
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TALStringList'
+    TabOrder = 5
+    OnClick = ALButton10Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton11: TALButton
+    Left = 258
+    Top = 80
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TStringList'
+    TabOrder = 6
+    OnClick = ALButton11Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton33: TALButton
+    Left = 16
+    Top = 112
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TALAVLStringList'
+    TabOrder = 7
+    OnClick = ALButton33Click
+    OnPaint = ALButtonPaint
+  end
+  object ALButton34: TALButton
+    Left = 258
+    Top = 111
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TStringList'
+    TabOrder = 8
+    OnClick = ALButton4Click
+    OnPaint = ALButtonPaint
   end
 end

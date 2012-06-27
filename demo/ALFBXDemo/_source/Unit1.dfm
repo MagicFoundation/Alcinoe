@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'ALFBXdemo'
   ClientHeight = 806
   ClientWidth = 683
-  Color = 14805482
+  Color = 15986666
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -399,7 +399,6 @@ object Form1: TForm1
     Height = 21
     OnPaint = ComboBox_apiVerPaint
     Style = csDropDownList
-    ItemHeight = 13
     ItemIndex = 4
     TabOrder = 0
     Text = 'FB25'
@@ -479,34 +478,43 @@ object Form1: TForm1
     Height = 310
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
+    BevelOuter = bvNone
+    Color = 15986666
+    Ctl3D = False
+    ParentBackground = False
+    ParentCtl3D = False
     TabOrder = 19
     object Splitter1: TSplitter
-      Left = 413
-      Top = 1
+      Left = 414
+      Top = 0
       Width = 5
-      Height = 308
+      Height = 310
       Align = alRight
       ExplicitLeft = 459
+      ExplicitTop = 1
       ExplicitHeight = 304
     end
     object ALMemoFirebirdResult: TALMemo
-      Left = 1
-      Top = 1
-      Width = 412
-      Height = 308
+      Left = 0
+      Top = 0
+      Width = 414
+      Height = 310
       OnPaint = Memo_SQLPaint
       OnPaintScrollBar = Memo_SQLPaintScrollBar
       Align = alClient
       TabOrder = 0
+      ExplicitTop = 1
+      ExplicitWidth = 412
+      ExplicitHeight = 308
       DesignSize = (
-        412
-        308)
+        414
+        310)
     end
     object ALMemoFirebirdStats: TALMemo
-      Left = 418
-      Top = 1
+      Left = 419
+      Top = 0
       Width = 264
-      Height = 308
+      Height = 310
       OnPaint = Memo_SQLPaint
       OnPaintScrollBar = Memo_SQLPaintScrollBar
       Align = alRight
@@ -517,9 +525,12 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
       TabOrder = 1
+      ExplicitLeft = 418
+      ExplicitTop = 1
+      ExplicitHeight = 308
       DesignSize = (
         264
-        308)
+        310)
     end
   end
   object ALMemoFireBirdParams: TALMemo

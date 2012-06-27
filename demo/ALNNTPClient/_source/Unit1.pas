@@ -112,57 +112,57 @@ end;
 {***************************************************}
 procedure TForm1.ConnectButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.Connect(HostEdit.Text, strtoint(PortEdit.Text))));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.Connect(AnsiString(HostEdit.Text), StrToInt(PortEdit.Text)))));
 end;
 
 {************************************************}
 procedure TForm1.AuthInfoButtonClick(Sender: TObject);
 begin
-  FNNTPCLient.AUTHINFO(UsernameEdit.Text, PasswordEdit.text);
+  FNNTPCLient.AUTHINFO(AnsiString(UsernameEdit.Text), AnsiString(PasswordEdit.text));
   DisplayMemo.Lines.Add('AUTHINFO SUCESS');
 end;
 
 {************************************************}
 procedure TForm1.ListButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPCLient.List));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPCLient.List)));
 end;
 
 {************************************************}
 procedure TForm1.GroupButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.Group(NewsGroupEdit.Text)));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.Group(AnsiString(NewsGroupEdit.Text)))));
 end;
 
 {****************************************************}
 procedure TForm1.ArticleByIDButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.ArticleByID(ArticleIDEdit.Text)));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.ArticleByID(AnsiString(ArticleIDEdit.Text)))));
 end;
 
 {**************************************************}
 procedure TForm1.HeadByIDButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.HeadByID(ArticleIDEdit.Text)));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.HeadByID(AnsiString(ArticleIDEdit.Text)))));
 end;
 
 {************************************************}
 procedure TForm1.BodyByIDButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.BodyByID(ArticleIDEdit.Text)));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.BodyByID(AnsiString(ArticleIDEdit.Text)))));
 end;
 
 {************************************************}
 procedure TForm1.QuitButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.quit));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.quit)));
 
 end;
 
 {****************************************************}
 procedure TForm1.StatByIDButtonClick(Sender: TObject);
 begin
-  DisplayMemo.Lines.Add(trim(FNNTPClient.StatByID(ArticleIDEdit.Text)));
+  DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.StatByID(AnsiString(ArticleIDEdit.Text)))));
 end;
 
 {************************************************}
@@ -181,21 +181,21 @@ begin
   aNewsArticleHeader := TALNewsArticleHeader.Create;
   Try
 
-    aNewsArticleHeader.From := FromEdit.Text;
-    aNewsArticleHeader.Newsgroups := NewsGroupEdit.Text;;
-    aNewsArticleHeader.Subject := SubjectEdit.Text;
-    If trim(FileAttachMemo.Lines.text) <> '' then begin
+    aNewsArticleHeader.From := AnsiString(FromEdit.Text);
+    aNewsArticleHeader.Newsgroups := AnsiString(NewsGroupEdit.Text);
+    aNewsArticleHeader.Subject := AnsiString(SubjectEdit.Text);
+    If Trim(FileAttachMemo.Lines.text) <> '' then begin
       AMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
       Try
         For i := 0 to FileAttachMemo.Lines.Count - 1 do
           If FileAttachMemo.Lines[i] <> '' then
-            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(trim(FileAttachMemo.Lines[i]));
-          FNnTPClient.PostMultipartMixed(aNewsArticleHeader, MsgMemo.Lines.Text, 'text/plain', AMultiPartMixedAttachments);
+            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
+          FNnTPClient.PostMultipartMixed(aNewsArticleHeader, AnsiString(MsgMemo.Lines.Text), 'text/plain', AMultiPartMixedAttachments);
       finally
         AMultiPartMixedAttachments.Free;
       end;
     end
-    else FNNTPClient.Post(aNewsArticleHeader, MsgMemo.Lines.Text);
+    else FNNTPClient.Post(aNewsArticleHeader, AnsiString(MsgMemo.Lines.Text));
     DisplayMemo.Lines.Add('POST SUCCESS');
 
   finally
@@ -245,10 +245,11 @@ begin
   CoUninitialize;
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
 

@@ -305,6 +305,7 @@ uses alFcnSkin,
      alSqlite3Wrapper,
      ALAVLBinaryTree,
      AlXmlDoc,
+     alStringList,
      alFcnString;
 
 {$R *.dfm}
@@ -333,59 +334,59 @@ begin
 end;
 
 {****************************************************************************************************************************}
-function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
+function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TALStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
 Var aMin, aMax, aIndex, aIncBy: integer;
-    aLstSavedData: TstringList;
+    aLstSavedData: TALStringList;
 begin
 
   Handled := True;
-  if sametext(TagString,'randomchar') then begin
-    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+  if ALSameText(TagString,'randomchar') then begin
+    if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TstringList(ExtData^);
-      result := aLstSavedData.Values['randomchar_'+inttostr(aIndex)];
+      aLstSavedData := TALStringList(ExtData^);
+      result := aLstSavedData.Values['randomchar_'+ALIntToStr(aIndex)];
       if result = '' then begin
         result := AlRandomStr(1);
-        aLstSavedData.Values['randomchar_'+inttostr(aIndex)] := result;
+        aLstSavedData.Values['randomchar_'+ALIntToStr(aIndex)] := result;
       end;
     end
     else result := AlRandomStr(1);
   end
-  else if sametext(TagString,'randomstring') then begin
-    if not trystrtoint(TagParams.Values['MinLength'], aMin) then aMin := 1;
-    if not trystrtoint(TagParams.Values['MaxLength'], aMax) then aMax := 255;
-    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
+  else if ALSameText(TagString,'randomstring') then begin
+    if not ALTryStrToInt(TagParams.Values['MinLength'], aMin) then aMin := 1;
+    if not ALTryStrToInt(TagParams.Values['MaxLength'], aMax) then aMax := 255;
+    if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
     if aIndex >= 0 then begin
-      aLstSavedData := TstringList(ExtData^);
-      result := aLstSavedData.Values['randomstring_'+inttostr(aIndex)];
+      aLstSavedData := TALStringList(ExtData^);
+      result := aLstSavedData.Values['randomstring_'+ALIntToStr(aIndex)];
       if result = '' then begin
         result := AlRandomStr(aMin + random(aMax - aMin + 1));
-        aLstSavedData.Values['randomstring_'+inttostr(aIndex)] := result;
+        aLstSavedData.Values['randomstring_'+ALIntToStr(aIndex)] := result;
       end;
     end
     else result := AlRandomStr(aMin + random(aMax - aMin + 1));
   end
-  else if sametext(TagString,'randomnumber') then begin
-    if not trystrtoint(TagParams.Values['Min'], aMin) then aMin := 1;
-    if not trystrtoint(TagParams.Values['Max'], aMax) then aMax := Maxint;
-    if not trystrtoint(TagParams.Values['Index'], aIndex) then aIndex := -1;
-    if not trystrtoint(TagParams.Values['IncBy'], aIncBy) then aIncBy := 0;
+  else if ALSameText(TagString,'randomnumber') then begin
+    if not ALTryStrToInt(TagParams.Values['Min'], aMin) then aMin := 1;
+    if not ALTryStrToInt(TagParams.Values['Max'], aMax) then aMax := Maxint;
+    if not ALTryStrToInt(TagParams.Values['Index'], aIndex) then aIndex := -1;
+    if not ALTryStrToInt(TagParams.Values['IncBy'], aIncBy) then aIncBy := 0;
     if aIndex >= 0 then begin
-      aLstSavedData := TstringList(ExtData^);
-      result := aLstSavedData.Values['randomnumber_'+inttostr(aIndex)];
+      aLstSavedData := TALStringList(ExtData^);
+      result := aLstSavedData.Values['randomnumber_'+ALIntToStr(aIndex)];
       if result = '' then begin
-        result := inttostr(aMin + random(aMax - aMin + 1));
-        aLstSavedData.Values['randomnumber_'+inttostr(aIndex)] := result;
+        result := ALIntToStr(aMin + random(aMax - aMin + 1));
+        aLstSavedData.Values['randomnumber_'+ALIntToStr(aIndex)] := result;
       end
-      else result := inttostr(strtoint(Result) + aIncBy)
+      else result := ALIntToStr(ALStrToInt(Result) + aIncBy)
     end
-    else result := inttostr(aMin + random(aMax - aMin + 1));
+    else result := ALIntToStr(aMin + random(aMax - aMin + 1));
   end
-  else if sametext(TagString,'incnumber') then begin
-    if not trystrtoint(TagParams.Values['min'], aMin) then aMin := 0;
-    result := inttostr(InterlockedExchange(currentIncNumber, currentIncNumber + 1) + 1);
-    if aMin > StrToInt(result) then result := inttostr(InterlockedExchange(currentIncNumber, aMin));
-    result := inttostr(strtoint(result)+1);
+  else if ALSameText(TagString,'incnumber') then begin
+    if not ALTryStrToInt(TagParams.Values['min'], aMin) then aMin := 0;
+    result := ALIntToStr(InterlockedExchange(currentIncNumber, currentIncNumber + 1) + 1);
+    if aMin > ALStrToInt(result) then result := ALIntToStr(InterlockedExchange(currentIncNumber, aMin));
+    result := ALIntToStr(ALStrToInt(result)+1);
   end
   else Handled := False;
 
@@ -402,7 +403,7 @@ Var aFBXClient: TALFbxClient;
     aEndSelectDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     aFBAPiVersion: TALFBXVersion_API;
     aSQL: TALFBXClientSelectDataSQL;
     aIOStats_1: TALFBXClientMonitoringIOStats;
@@ -410,7 +411,7 @@ Var aFBXClient: TALFbxClient;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aLst1: TStringList;
+    aLst1: TALStringList;
     i: integer;
     aTPB: AnsiString;
 begin
@@ -423,7 +424,7 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB:= ALTrim(AnsiString(ALMemoFireBirdTPB.Lines.Text));
   aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
@@ -437,17 +438,17 @@ begin
   aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
   aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aFBXClient := TALFbxClient.Create(aFBAPiVersion,ALEditFirebirdLib.Text);
+    aFBXClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
     Try
-      aFBXClient.connect(ALEditFireBirdDatabase.Text,
-                         ALEditFireBirdLogin.text,
-                         ALEditFireBirdPassword.text,
-                         ALEditFireBirdCharset.Text,
-                         StrtoInt(ALEditFireBirdNum_buffers.Text));
+      aFBXClient.connect(AnsiString(ALEditFireBirdDatabase.Text),
+                         AnsiString(ALEditFireBirdLogin.text),
+                         AnsiString(ALEditFireBirdPassword.text),
+                         AnsiString(ALEditFireBirdCharset.Text),
+                         StrToInt(ALEditFireBirdNum_buffers.Text));
 
       aXMLDATA := ALCreateEmptyXMLDocument('root');
       Try
@@ -457,9 +458,9 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        aLst1 := TstringList.create;
+        aLst1 := TALStringList.create;
         try
-          aSQL.SQL := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+          aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                                        '<#',
                                        '>',
                                        SQLFastTagReplaceFunct,
@@ -473,9 +474,9 @@ begin
           Setlength(aSQL.Params, 1);
           Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
           for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-            aLst1 := TstringList.create;
+            aLst1 := TALStringList.create;
             try
-              aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+              aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
                                                                  '<#',
                                                                  '>',
                                                                  SQLFastTagReplaceFunct,
@@ -526,7 +527,7 @@ begin
           Raise;
         end;
         ALMemoResult.Clear;
-        ALMemoResult.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aMainStartDate) + ' ms');
+        ALMemoResult.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aMainStartDate) + ' ms');
         aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
                                       -1,
                                       '',
@@ -534,28 +535,28 @@ begin
                                       aRecordStats_2,
                                       aMemoryUsage);
         ALMemoResult.Lines.Add('');
-        ALMemoResult.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-        ALMemoResult.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-        ALMemoResult.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-        ALMemoResult.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+        ALMemoResult.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+        ALMemoResult.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+        ALMemoResult.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+        ALMemoResult.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
         ALMemoResult.Lines.Add('');
-        ALMemoResult.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-        ALMemoResult.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-        ALMemoResult.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-        ALMemoResult.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-        ALMemoResult.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-        ALMemoResult.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-        ALMemoResult.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-        ALMemoResult.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+        ALMemoResult.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+        ALMemoResult.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+        ALMemoResult.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+        ALMemoResult.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+        ALMemoResult.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+        ALMemoResult.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+        ALMemoResult.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+        ALMemoResult.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
         ALMemoResult.Lines.Add('');
-        ALMemoResult.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-        ALMemoResult.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-        ALMemoResult.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-        ALMemoResult.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+        ALMemoResult.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+        ALMemoResult.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+        ALMemoResult.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+        ALMemoResult.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
         AlMemoResult.Lines.add('');
         AlMemoResult.Lines.add('**************');
         AlMemoResult.Lines.add('');
-        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + aXMLDATA.XML.Text;
+        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + String(aXMLDATA.XML.Text);
 
         TableViewThread.DataController.RecordCount := 1;
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
@@ -564,7 +565,7 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndSelectDate - aStartSelectDate);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
 
       Finally
         aXMLDATA.free;
@@ -591,7 +592,7 @@ Var aFBXClient: TALFbxClient;
     aEndUpdateDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     aFBAPiVersion: TALFBXVersion_API;
     aSQL: TALFBXClientUpdateDataSQL;
     aIOStats_1: TALFBXClientMonitoringIOStats;
@@ -599,8 +600,8 @@ Var aFBXClient: TALFbxClient;
     aIOStats_2: TALFBXClientMonitoringIOStats;
     aRecordStats_2: TALFBXClientMonitoringRecordStats;
     aMemoryUsage: TALFBXClientMonitoringMemoryUsage;
-    aLst1: TStringList;
-    aLstSql: Tstrings;
+    aLst1: TALStringList;
+    aLstSql: TALStrings;
     i: integer;
     aTPB: AnsiString;
     S1: AnsiString;
@@ -614,7 +615,7 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB:= ALTrim(AnsiString(ALMemoFireBirdTPB.Lines.Text));
   aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
@@ -628,22 +629,22 @@ begin
   aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
   aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aFBXClient := TALFbxClient.Create(aFBAPiVersion,ALEditFirebirdLib.Text);
-    aLstSql := TstringList.create;
+    aFBXClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
+    aLstSql := TALStringList.create;
     Try
-      aFBXClient.connect(ALEditFireBirdDatabase.Text,
-                         ALEditFireBirdLogin.text,
-                         ALEditFireBirdPassword.text,
-                         ALEditFireBirdCharset.Text,
-                         StrtoInt(ALEditFireBirdNum_buffers.Text));
+      aFBXClient.connect(AnsiString(ALEditFireBirdDatabase.Text),
+                         AnsiString(ALEditFireBirdLogin.text),
+                         AnsiString(ALEditFireBirdPassword.text),
+                         AnsiString(ALEditFireBirdCharset.Text),
+                         StrToInt(ALEditFireBirdNum_buffers.Text));
 
-      aLst1 := TstringList.create;
+      aLst1 := TALStringList.create;
       try
-        aSQL.SQL := ALFastTagReplace(AlMemoFireBirdQuery.Lines.Text,
+        aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
                                      '<#',
                                      '>',
                                      SQLFastTagReplaceFunct,
@@ -657,9 +658,9 @@ begin
         Setlength(aSQL.Params, 1);
         Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
         for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-          aLst1 := TstringList.create;
+          aLst1 := TALStringList.create;
           try
-            aSQL.Params[0].fields[i].Value := ALFastTagReplace(ALMemoFireBirdParams.Lines[i],
+            aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
                                                                '<#',
                                                                '>',
                                                                SQLFastTagReplaceFunct,
@@ -678,7 +679,7 @@ begin
         if (AlPos('begin',AllowerCase(aSQL.SQL)) <= 0) or
            (AlPos('end',AllowerCase(aSQL.SQL)) <= 0) then begin
           S1 := AlStringReplace(aSQL.SQL,#13#10,' ',[RfReplaceALL]);
-          aLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+          aLstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
         end
         else aLstSql.Add(aSQL.SQL);
       end;
@@ -715,7 +716,7 @@ begin
         Raise;
       end;
       ALMemoResult.Clear;
-      ALMemoResult.Lines.Add('Time Taken: ' + inttostr(ALGetTickCount64 - aMainStartDate) + ' ms');
+      ALMemoResult.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aMainStartDate) + ' ms');
       aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -723,24 +724,24 @@ begin
                                     aRecordStats_2,
                                     aMemoryUsage);
       ALMemoResult.Lines.Add('');
-      ALMemoResult.Lines.Add('page_reads:   ' + intToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
-      ALMemoResult.Lines.Add('page_writes:  ' + intToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
-      ALMemoResult.Lines.Add('page_fetches: ' + intToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
-      ALMemoResult.Lines.Add('page_marks:   ' + intToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
+      ALMemoResult.Lines.Add('page_reads:   ' + IntToStr(aIOStats_2.page_reads   - aIOStats_1.page_reads));
+      ALMemoResult.Lines.Add('page_writes:  ' + IntToStr(aIOStats_2.page_writes  - aIOStats_1.page_writes));
+      ALMemoResult.Lines.Add('page_fetches: ' + IntToStr(aIOStats_2.page_fetches - aIOStats_1.page_fetches));
+      ALMemoResult.Lines.Add('page_marks:   ' + IntToStr(aIOStats_2.page_marks   - aIOStats_1.page_marks));
       ALMemoResult.Lines.Add('');
-      ALMemoResult.Lines.Add('record_idx_reads: ' + intToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
-      ALMemoResult.Lines.Add('record_seq_reads: ' + intToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
-      ALMemoResult.Lines.Add('record_inserts:   ' + intToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
-      ALMemoResult.Lines.Add('record_updates:   ' + intToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
-      ALMemoResult.Lines.Add('record_deletes:   ' + intToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
-      ALMemoResult.Lines.Add('record_backouts:  ' + intToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
-      ALMemoResult.Lines.Add('record_purges:    ' + intToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
-      ALMemoResult.Lines.Add('record_expunges:  ' + intToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
+      ALMemoResult.Lines.Add('record_idx_reads: ' + IntToStr(aRecordStats_2.record_idx_reads - aRecordStats_1.record_idx_reads));
+      ALMemoResult.Lines.Add('record_seq_reads: ' + IntToStr(aRecordStats_2.record_seq_reads - aRecordStats_1.record_seq_reads));
+      ALMemoResult.Lines.Add('record_inserts:   ' + IntToStr(aRecordStats_2.record_inserts   - aRecordStats_1.record_inserts));
+      ALMemoResult.Lines.Add('record_updates:   ' + IntToStr(aRecordStats_2.record_updates   - aRecordStats_1.record_updates));
+      ALMemoResult.Lines.Add('record_deletes:   ' + IntToStr(aRecordStats_2.record_deletes   - aRecordStats_1.record_deletes));
+      ALMemoResult.Lines.Add('record_backouts:  ' + IntToStr(aRecordStats_2.record_backouts  - aRecordStats_1.record_backouts));
+      ALMemoResult.Lines.Add('record_purges:    ' + IntToStr(aRecordStats_2.record_purges    - aRecordStats_1.record_purges));
+      ALMemoResult.Lines.Add('record_expunges:  ' + IntToStr(aRecordStats_2.record_expunges  - aRecordStats_1.record_expunges));
       ALMemoResult.Lines.Add('');
-      ALMemoResult.Lines.Add('memory_used:          ' + intToStr(aMemoryUsage.memory_used));
-      ALMemoResult.Lines.Add('memory_allocated:     ' + intToStr(aMemoryUsage.memory_allocated));
-      ALMemoResult.Lines.Add('max_memory_used:      ' + intToStr(aMemoryUsage.max_memory_used));
-      ALMemoResult.Lines.Add('max_memory_allocated: ' + intToStr(aMemoryUsage.max_memory_allocated));
+      ALMemoResult.Lines.Add('memory_used:          ' + IntToStr(aMemoryUsage.memory_used));
+      ALMemoResult.Lines.Add('memory_allocated:     ' + IntToStr(aMemoryUsage.memory_allocated));
+      ALMemoResult.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
+      ALMemoResult.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
       TableViewThread.DataController.RecordCount := 1;
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
@@ -749,7 +750,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndUpdateDate - aStartUpdateDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
 
     Finally
       aLstSql.free;
@@ -777,15 +778,15 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  aFBXClient := TALFbxClient.Create(aFBAPiVersion,ALEditFirebirdLib.Text);
+  aFBXClient := TALFbxClient.Create(aFBAPiVersion,AnsiString(ALEditFirebirdLib.Text));
   Try
-    aFBXClient.CreateDatabase(AlMemoFireBirdQuery.Lines.Text);
+    aFBXClient.CreateDatabase(AnsiString(AlMemoFireBirdQuery.Lines.Text));
   Finally
     aFBXClient.free;
   End;
 
-  AlMemoResult.Lines.Clear;  
-  
+  AlMemoResult.Lines.Clear;
+
 end;
 
 {****************************************************************}
@@ -804,7 +805,7 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB:= ALTrim(AnsiString(ALMemoFireBirdTPB.Lines.Text));
   aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
@@ -831,39 +832,44 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
+  TableViewThread.DataController.RecordCount := ALStrToInt(AnsiString(ALEditFirebirdNBThread.Text));
 
   //create the fFirebirdConnectionPoolClient
   if not assigned(FirebirdConnectionPoolClient) then begin
-    FirebirdConnectionPoolClient := TALFBXConnectionPoolClient.Create(ALEditFireBirdDatabase.Text,
-                                                                      ALEditFireBirdLogin.text,
-                                                                      ALEditFireBirdPassword.text,
-                                                                      ALEditFireBirdCharset.Text,
+    FirebirdConnectionPoolClient := TALFBXConnectionPoolClient.Create(AnsiString(ALEditFireBirdDatabase.Text),
+                                                                      AnsiString(ALEditFireBirdLogin.text),
+                                                                      AnsiString(ALEditFireBirdPassword.text),
+                                                                      AnsiString(ALEditFireBirdCharset.Text),
                                                                       aFBAPiVersion,
-                                                                      ALEditFirebirdLib.Text,
-                                                                      StrtoInt(ALEditFireBirdNum_buffers.Text));
+                                                                      AnsiString(ALEditFirebirdLib.Text),
+                                                                      StrToInt(ALEditFireBirdNum_buffers.Text));
   end;
 
   //clear the status bar
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditFirebirdNBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditFirebirdNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aFirebirdBenchmarkThread := TFirebirdBenchmarkThread.Create(True,
                                                                 self,
                                                                 i,
-                                                                trim(ALMemoFirebirdQuery.Lines.Text),
-                                                                trim(ALMemoFirebirdParams.Lines.Text),
+                                                                ALTrim(AnsiString(ALMemoFirebirdQuery.Lines.Text)),
+                                                                ALTrim(AnsiString(ALMemoFirebirdParams.Lines.Text)),
                                                                 aTPB,
-                                                                strtoint(ALEditFirebirdNBLoop.Text),
-                                                                strtoint(ALEditFirebirdNbLoopBeforeCommit.Text),
+                                                                StrToInt(ALEditFirebirdNBLoop.Text),
+                                                                StrToInt(ALEditFirebirdNbLoopBeforeCommit.Text),
                                                                 false);
     inc(NBSelectActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aFirebirdBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aFirebirdBenchmarkThread.Start;
+    {$ELSE}
     aFirebirdBenchmarkThread.Resume;
+    {$IFEND}
   end;
 
 end;
@@ -884,7 +890,7 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  aTPB:= trim(ALMemoFireBirdTPB.Lines.Text);
+  aTPB:= ALTrim(AnsiString(ALMemoFireBirdTPB.Lines.Text));
   aTPB := AlStringReplace(aTPB, 'isc_tpb_version3', isc_tpb_version3, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_read_committed', isc_tpb_read_committed, [rfIgnoreCase]);
   aTPB := AlStringReplace(aTPB, 'isc_tpb_concurrency', isc_tpb_concurrency, [rfIgnoreCase]);
@@ -911,39 +917,45 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditFirebirdNBThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditFirebirdNBThread.Text);
 
   //create the fFirebirdConnectionPoolClient
   if not assigned(FirebirdConnectionPoolClient) then begin
-    FirebirdConnectionPoolClient := TALFBXConnectionPoolClient.Create(ALEditFireBirdDatabase.Text,
-                                                                      ALEditFireBirdLogin.text,
-                                                                      ALEditFireBirdPassword.text,
-                                                                      ALEditFireBirdCharset.Text,
+    FirebirdConnectionPoolClient := TALFBXConnectionPoolClient.Create(AnsiString(ALEditFireBirdDatabase.Text),
+                                                                      AnsiString(ALEditFireBirdLogin.text),
+                                                                      AnsiString(ALEditFireBirdPassword.text),
+                                                                      AnsiString(ALEditFireBirdCharset.Text),
                                                                       aFBAPiVersion,
-                                                                      ALEditFirebirdLib.Text,
-                                                                      StrtoInt(ALEditFireBirdNum_buffers.Text));
+                                                                      AnsiString(ALEditFirebirdLib.Text),
+                                                                      StrToInt(ALEditFireBirdNum_buffers.Text));
   end;
 
   //clear the status bar
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditFirebirdNBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditFirebirdNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aFirebirdBenchmarkThread := TFirebirdBenchmarkThread.Create(True,
                                                                 self,
                                                                 i,
-                                                                trim(ALMemoFirebirdQuery.Lines.Text),
-                                                                trim(ALMemoFirebirdParams.Lines.Text),
+                                                                ALTrim(AnsiString(ALMemoFirebirdQuery.Lines.Text)),
+                                                                ALTrim(AnsiString(ALMemoFirebirdParams.Lines.Text)),
                                                                 aTPB,
-                                                                strtoint(ALEditFirebirdNBLoop.Text),
-                                                                strtoint(ALEditFirebirdNbLoopBeforeCommit.Text),
+                                                                StrToInt(ALEditFirebirdNBLoop.Text),
+                                                                StrToInt(ALEditFirebirdNbLoopBeforeCommit.Text),
                                                                 true);
     inc(NBUpdateActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aFirebirdBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aFirebirdBenchmarkThread.Start;
+    {$ELSE}
     aFirebirdBenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -954,9 +966,9 @@ Var aMySqlClient: TalMySqlClient;
     aXMLDATA: TalXmlDocument;
     aStartDate: int64;
     aEndDate: int64;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     S1: AnsiString;
-    aLst1: TstringList;
+    aLst1: TALStringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
 begin
 
@@ -965,18 +977,18 @@ begin
     else aMySQLAPiVersion := MYSQL50;
   end;
 
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aMySqlClient := TalMySqlClient.Create(aMySQLAPiVersion, ALEditMySqllib.Text);
+    aMySqlClient := TalMySqlClient.Create(aMySQLAPiVersion, AnsiString(ALEditMySqllib.Text));
     Try
-      aMySqlClient.connect(ALEditMySqlHost.Text,
-                           strtoint(ALEditMySqlPort.Text),
-                           ALEditMySqlDatabaseName.Text,
-                           ALEditMySqlLogin.Text,
-                           ALEditMySqlPassword.Text,
-                           ALEditMySqlCharset.Text,
+      aMySqlClient.connect(AnsiString(ALEditMySqlHost.Text),
+                           StrToInt(ALEditMySqlPort.Text),
+                           AnsiString(ALEditMySqlDatabaseName.Text),
+                           AnsiString(ALEditMySqlLogin.Text),
+                           AnsiString(ALEditMySqlPassword.Text),
+                           AnsiString(ALEditMySqlCharset.Text),
                            0);
 
       aXMLDATA := ALCreateEmptyXMLDocument('root');
@@ -987,9 +999,9 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        aLst1 := TstringList.create;
+        aLst1 := TALStringList.create;
         try
-          S1 := ALFastTagReplace(AlMemoMySqlQuery.Lines.Text,
+          S1 := ALFastTagReplace(AnsiString(AlMemoMySqlQuery.Lines.Text),
                                  '<#',
                                  '>',
                                  SQLFastTagReplaceFunct,
@@ -1015,8 +1027,8 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
-        AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        AlMemoResult.Lines.Text := String(aXMLDATA.XML.Text);
 
       Finally
         aXMLDATA.free;
@@ -1039,9 +1051,9 @@ Var aMySqlClient: TalMySqlClient;
     aEndDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    LstSql: TstringList;
+    LstSql: TALStringList;
     S1: AnsiString;
-    aLst1: TstringList;
+    aLst1: TALStringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
 begin
 
@@ -1049,24 +1061,24 @@ begin
     1: aMySQLAPiVersion := MYSQL55;
     else aMySQLAPiVersion := MYSQL50;
   end;
-  
+
   Screen.Cursor := CrHourGlass;
   try
 
-    aMySqlClient := TalMySqlClient.Create(aMySQLAPiVersion, ALEditMySqllib.Text);
-    LstSql := TstringList.Create;
+    aMySqlClient := TalMySqlClient.Create(aMySQLAPiVersion, AnsiString(ALEditMySqllib.Text));
+    LstSql := TALStringList.Create;
     Try
-      aMySqlClient.connect(ALEditMySqlHost.Text,
-                           strtoint(ALEditMySqlPort.Text),
-                           ALEditMySqlDatabaseName.Text,
-                           ALEditMySqlLogin.Text,
-                           ALEditMySqlPassword.Text,
-                           ALEditMySqlCharset.Text,
+      aMySqlClient.connect(AnsiString(ALEditMySqlHost.Text),
+                           StrToInt(ALEditMySqlPort.Text),
+                           AnsiString(ALEditMySqlDatabaseName.Text),
+                           AnsiString(ALEditMySqlLogin.Text),
+                           AnsiString(ALEditMySqlPassword.Text),
+                           AnsiString(ALEditMySqlCharset.Text),
                            0);
 
-      aLst1 := TstringList.create;
+      aLst1 := TALStringList.create;
       try
-        S1 := ALFastTagReplace(AlMemoMySqlQuery.Lines.Text,
+        S1 := ALFastTagReplace(AnsiString(AlMemoMySqlQuery.Lines.Text),
                                '<#',
                                '>',
                                SQLFastTagReplaceFunct,
@@ -1076,7 +1088,7 @@ begin
         aLst1.free;
       end;
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
-      LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+      LstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
 
       aStartDate := ALGetTickCount64;
       aMySqlClient.TransactionStart;
@@ -1098,7 +1110,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       AlMemoResult.Lines.Text := '';
 
     Finally
@@ -1137,18 +1149,18 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditMySqlNBThread.Text);
 
   //create the fMySqlConnectionPoolClient
   if not assigned(MySqlConnectionPoolClient) then begin
-    MySqlConnectionPoolClient := TALMySqlConnectionPoolClient.Create(ALEditMySqlHost.Text,
+    MySqlConnectionPoolClient := TALMySqlConnectionPoolClient.Create(AnsiString(ALEditMySqlHost.Text),
                                                                      StrToInt(ALEditMySqlPort.Text),
-                                                                     ALEditMySqlDatabaseName.Text,
-                                                                     ALEditMySqlLogin.Text,
-                                                                     ALEditMySqlPassword.Text,
-                                                                     ALEditMySqlCharset.Text,
+                                                                     AnsiString(ALEditMySqlDatabaseName.Text),
+                                                                     AnsiString(ALEditMySqlLogin.Text),
+                                                                     AnsiString(ALEditMySqlPassword.Text),
+                                                                     AnsiString(ALEditMySqlCharset.Text),
                                                                      aMySQLAPiVersion,
-                                                                     ALEditMySqlLib.Text,
+                                                                     AnsiString(ALEditMySqlLib.Text),
                                                                      0);
   end;
 
@@ -1156,20 +1168,26 @@ begin
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditMySqlNBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditMySqlNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aMySqlBenchmarkThread := TMySqlBenchmarkThread.Create(True,
                                                           self,
                                                           i,
-                                                          trim(ALMemoMySqlQuery.Lines.Text),
-                                                          strtoint(ALEditMySqlNBLoop.Text),
-                                                          strtoint(ALEditMySqlNbLoopBeforeCommit.Text),
+                                                          ALTrim(AnsiString(ALMemoMySqlQuery.Lines.Text)),
+                                                          StrToInt(ALEditMySqlNBLoop.Text),
+                                                          StrToInt(ALEditMySqlNbLoopBeforeCommit.Text),
                                                           false);
     inc(NBSelectActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aMySqlBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aMySqlBenchmarkThread.Start;
+    {$ELSE}
     aMySqlBenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -1185,7 +1203,7 @@ begin
     1: aMySQLAPiVersion := MYSQL55;
     else aMySQLAPiVersion := MYSQL50;
   end;
-  
+
   {init button action}
   If ALButtonMySqlLoopUpdate.tag = 0 then begin
     ALButtonMySqlLoopUpdate.Tag := 1;
@@ -1199,18 +1217,18 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditMySqlNBThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditMySqlNBThread.Text);
 
   //create the fMySqlConnectionPoolClient
   if not assigned(MySqlConnectionPoolClient) then begin
-    MySqlConnectionPoolClient := TALMySqlConnectionPoolClient.Create(ALEditMySqlHost.Text,
+    MySqlConnectionPoolClient := TALMySqlConnectionPoolClient.Create(AnsiString(ALEditMySqlHost.Text),
                                                                      StrToInt(ALEditMySqlPort.Text),
-                                                                     ALEditMySqlDatabaseName.Text,
-                                                                     ALEditMySqlLogin.Text,
-                                                                     ALEditMySqlPassword.Text,
-                                                                     ALEditMySqlCharset.Text,
+                                                                     AnsiString(ALEditMySqlDatabaseName.Text),
+                                                                     AnsiString(ALEditMySqlLogin.Text),
+                                                                     AnsiString(ALEditMySqlPassword.Text),
+                                                                     AnsiString(ALEditMySqlCharset.Text),
                                                                      aMySQLAPiVersion,
-                                                                     ALEditMySqlLib.Text,
+                                                                     AnsiString(ALEditMySqlLib.Text),
                                                                      0);
   end;
 
@@ -1218,20 +1236,26 @@ begin
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditMySqlNBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditMySqlNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aMySqlBenchmarkThread := TMySqlBenchmarkThread.Create(True,
                                                           self,
                                                           i,
-                                                          trim(ALMemoMySqlQuery.Lines.Text),
-                                                          strtoint(ALEditMySqlNBLoop.Text),
-                                                          strtoint(ALEditMySqlNbLoopBeforeCommit.Text),
+                                                          ALTrim(AnsiString(ALMemoMySqlQuery.Lines.Text)),
+                                                          StrToInt(ALEditMySqlNBLoop.Text),
+                                                          StrToInt(ALEditMySqlNbLoopBeforeCommit.Text),
                                                           true);
     inc(NBUpdateActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aMySqlBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aMySqlBenchmarkThread.Start;
+    {$ELSE}
     aMySqlBenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -1242,29 +1266,29 @@ Var aSqlite3Client: TalSqlite3Client;
     aXMLDATA: TalXmlDocument;
     aStartDate: int64;
     aEndDate: int64;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     S1: AnsiString;
-    aLst1: TstringList;
+    aLst1: TALStringList;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
+    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
     Try
 
       //enable or disable the shared cache
       aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(ALEditSqlite3Database.text);
+      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
       aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
       aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
       aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
         1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
@@ -1295,9 +1319,9 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        aLst1 := TstringList.create;
+        aLst1 := TALStringList.create;
         try
-          S1 := ALFastTagReplace(AlMemoSQLite3Query.Lines.Text,
+          S1 := ALFastTagReplace(AnsiString(AlMemoSQLite3Query.Lines.Text),
                                  '<#',
                                  '>',
                                  SQLFastTagReplaceFunct,
@@ -1323,8 +1347,8 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
-        AlMemoResult.Lines.Text := aXMLDATA.XML.Text;
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        AlMemoResult.Lines.Text := String(aXMLDATA.XML.Text);
 
       Finally
         aXMLDATA.free;
@@ -1347,29 +1371,29 @@ Var aSqlite3Client: TalSqlite3Client;
     aEndDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    LstSql: TstringList;
+    LstSql: TALStringList;
     S1: AnsiString;
-    aLst1: TstringList;
+    aLst1: TALStringList;
 begin
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
-    LstSql := TstringList.Create;
+    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
+    LstSql := TALStringList.Create;
     Try
 
       //enable or disable the shared cache
       aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(ALEditSqlite3Database.text);
+      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
       aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
       aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
       aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
         1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
@@ -1392,9 +1416,9 @@ begin
       end;
 
       //the sql
-      aLst1 := TstringList.create;
+      aLst1 := TALStringList.create;
       try
-        S1 := ALFastTagReplace(AlMemoSQLite3Query.Lines.Text,
+        S1 := ALFastTagReplace(AnsiString(AlMemoSQLite3Query.Lines.Text),
                                '<#',
                                '>',
                                SQLFastTagReplaceFunct,
@@ -1404,7 +1428,7 @@ begin
         aLst1.free;
       end;
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
-      LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+      LstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
 
       //do the job
       aStartDate := ALGetTickCount64;
@@ -1427,7 +1451,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       AlMemoResult.Lines.Text := '';
 
     Finally
@@ -1448,9 +1472,9 @@ Var aSphinxClient: TalSphinxQLClient;
     aXMLDATA2: TalXmlDocument;
     aStartDate: int64;
     aEndDate: int64;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     S1: AnsiString;
-    aLst1: TstringList;
+    aLst1: TALStringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
     i: integer;
 begin
@@ -1460,14 +1484,14 @@ begin
     else aMySQLAPiVersion := MYSQL50;
   end;
 
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aSphinxClient := TalSphinxQLClient.Create(aMySQLAPiVersion, ALEditSphinxlib.Text);
+    aSphinxClient := TalSphinxQLClient.Create(aMySQLAPiVersion, AnsiString(ALEditSphinxlib.Text));
     Try
-      aSphinxClient.connect(ALEditSphinxHost.Text,
-                           strtoint(ALEditSphinxPort.Text));
+      aSphinxClient.connect(AnsiString(ALEditSphinxHost.Text),
+                            StrToInt(ALEditSphinxPort.Text));
 
       aXMLDATA1 := ALCreateEmptyXMLDocument('root');
       aXMLDATA2 := ALCreateEmptyXMLDocument('root');
@@ -1478,9 +1502,9 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        aLst1 := TstringList.create;
+        aLst1 := TALStringList.create;
         try
-          S1 := ALFastTagReplace(AlMemoSphinxQuery.Lines.Text,
+          S1 := ALFastTagReplace(AnsiString(AlMemoSphinxQuery.Lines.Text),
                                  '<#',
                                  '>',
                                  SQLFastTagReplaceFunct,
@@ -1501,18 +1525,18 @@ begin
 
 
         ALMemoResult.Clear;
-        ALMemoResult.Lines.Add('Time Taken: ' + inttostr(aEndDate - aStartDate) + ' ms');
+        ALMemoResult.Lines.Add('Time Taken: ' + IntToStr(aEndDate - aStartDate) + ' ms');
         aSphinxClient.SelectData('SHOW META',
                                  'rec',
                                  aXMLDATA2.DocumentElement,
                                  aFormatSettings);
         ALMemoResult.Lines.Add('');
         for I := 0 to aXMLDATA2.DocumentElement.ChildNodes.Count - 1 do
-          ALMemoResult.Lines.Add(aXMLDATA2.DocumentElement.ChildNodes[i].childnodes['variable_name'].Text + ': ' + aXMLDATA2.DocumentElement.ChildNodes[i].childnodes['value'].Text);
+          ALMemoResult.Lines.Add(String(aXMLDATA2.DocumentElement.ChildNodes[i].childnodes['variable_name'].Text) + ': ' + String(aXMLDATA2.DocumentElement.ChildNodes[i].childnodes['value'].Text));
         AlMemoResult.Lines.add('');
         AlMemoResult.Lines.add('**************');
         AlMemoResult.Lines.add('');
-        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + aXMLDATA1.XML.Text;
+        AlMemoResult.Lines.Text := AlMemoResult.Lines.Text + String(aXMLDATA1.XML.Text);
 
         TableViewThread.DataController.RecordCount := 1;
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
@@ -1521,7 +1545,7 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
 
       Finally
         aXMLDATA1.free;
@@ -1545,9 +1569,9 @@ Var aSphinxClient: TalSphinxQLClient;
     aEndDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    LstSql: TstringList;
+    LstSql: TALStringList;
     S1: AnsiString;
-    aLst1: TstringList;
+    aLst1: TALStringList;
     aMySQLAPiVersion: TALMySqlVersion_API;
 begin
 
@@ -1559,15 +1583,15 @@ begin
   Screen.Cursor := CrHourGlass;
   try
 
-    aSphinxClient := TalSphinxQLClient.Create(aMySQLAPiVersion, ALEditSphinxlib.Text);
-    LstSql := TstringList.Create;
+    aSphinxClient := TalSphinxQLClient.Create(aMySQLAPiVersion, AnsiString(ALEditSphinxlib.Text));
+    LstSql := TALStringList.Create;
     Try
-      aSphinxClient.connect(ALEditSphinxHost.Text,
-                           strtoint(ALEditSphinxPort.Text));
+      aSphinxClient.connect(AnsiString(ALEditSphinxHost.Text),
+                            StrToInt(ALEditSphinxPort.Text));
 
-      aLst1 := TstringList.create;
+      aLst1 := TALStringList.create;
       try
-        S1 := ALFastTagReplace(AlMemoSphinxQuery.Lines.Text,
+        S1 := ALFastTagReplace(AnsiString(AlMemoSphinxQuery.Lines.Text),
                                '<#',
                                '>',
                                SQLFastTagReplaceFunct,
@@ -1577,7 +1601,7 @@ begin
         aLst1.free;
       end;
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
-      LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+      LstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
 
       aStartDate := ALGetTickCount64;
       aSphinxClient.TransactionStart;
@@ -1599,7 +1623,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aEndDate - aStartDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aendCommitDate - aStartCommitDate);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       AlMemoResult.Lines.Text := '';
 
     Finally
@@ -1638,18 +1662,18 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditSphinxNBThread.Text);
+  TableViewThread.DataController.RecordCount := ALStrToInt(AnsiString(ALEditSphinxNBThread.Text));
 
   //create the fSphinxConnectionPoolClient
   if not assigned(MySQLConnectionPoolClient) then begin
-    MySQLConnectionPoolClient := TALMySqlConnectionPoolClient.Create(ALEditSphinxHost.Text,
+    MySQLConnectionPoolClient := TALMySqlConnectionPoolClient.Create(AnsiString(ALEditSphinxHost.Text),
                                                                      StrToInt(ALEditSphinxPort.Text),
                                                                      '',
                                                                      '',
                                                                      '',
                                                                      '',
                                                                      aMySQLAPiVersion,
-                                                                     ALEditSphinxLib.Text,
+                                                                     AnsiString(ALEditSphinxLib.Text),
                                                                      0);
   end;
 
@@ -1657,20 +1681,26 @@ begin
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditSphinxNBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditSphinxNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aSphinxBenchmarkThread := TMySQLBenchmarkThread.Create(True,
                                                            self,
                                                            i,
-                                                           trim(ALMemoSphinxQuery.Lines.Text),
-                                                           strtoint(ALEditSphinxNBLoop.Text),
-                                                           strtoint(ALEditSphinxNbLoopBeforeCommit.Text),
+                                                           ALTrim(AnsiString(ALMemoSphinxQuery.Lines.Text)),
+                                                           StrToInt(ALEditSphinxNBLoop.Text),
+                                                           StrToInt(ALEditSphinxNbLoopBeforeCommit.Text),
                                                            false);
     inc(NBSelectActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aSphinxBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aSphinxBenchmarkThread.Start;
+    {$ELSE}
     aSphinxBenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -1700,18 +1730,18 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditSphinxNBThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditSphinxNBThread.Text);
 
   //create the fSphinxConnectionPoolClient
   if not assigned(MySQLConnectionPoolClient) then begin
-    MySqlConnectionPoolClient := TALMySQLConnectionPoolClient.Create(ALEditSphinxHost.Text,
+    MySqlConnectionPoolClient := TALMySQLConnectionPoolClient.Create(AnsiString(ALEditSphinxHost.Text),
                                                                      StrToInt(ALEditSphinxPort.Text),
                                                                      '',
                                                                      '',
                                                                      '',
                                                                      '',
                                                                      aMySQLAPiVersion,
-                                                                     ALEditSphinxLib.Text,
+                                                                     AnsiString(ALEditSphinxLib.Text),
                                                                      0);
   end;
 
@@ -1719,20 +1749,26 @@ begin
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditSphinxNBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditSphinxNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aSphinxBenchmarkThread := TMysqlBenchmarkThread.Create(True,
                                                            self,
                                                            i,
-                                                           trim(ALMemoSphinxQuery.Lines.Text),
-                                                           strtoint(ALEditSphinxNBLoop.Text),
-                                                           strtoint(ALEditSphinxNbLoopBeforeCommit.Text),
+                                                           ALTrim(AnsiString(ALMemoSphinxQuery.Lines.Text)),
+                                                           StrToInt(ALEditSphinxNBLoop.Text),
+                                                           StrToInt(ALEditSphinxNbLoopBeforeCommit.Text),
                                                            true);
     inc(NBUpdateActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aSphinxBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aSphinxBenchmarkThread.Start;
+    {$ELSE}
     aSphinxBenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -1757,15 +1793,15 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditSqlite3NBThread.Text);
 
   //init the aPragmaStatements
   aPragmaStatements := '';
-  aPragmaStatements := aPragmaStatements + 'PRAGMA page_size = '+ALEditSqlite3Page_Size.Text+';';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text)+';';
   aPragmaStatements := aPragmaStatements + 'PRAGMA encoding = "UTF-8";';
   aPragmaStatements := aPragmaStatements + 'PRAGMA legacy_file_format = 0;';
   aPragmaStatements := aPragmaStatements + 'PRAGMA auto_vacuum = NONE;';
-  aPragmaStatements := aPragmaStatements + 'PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text+';';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text)+';';
   case RadioGroupSqlite3Journal_Mode.ItemIndex of
     0: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = DELETE;';
     1: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = TRUNCATE;';
@@ -1789,10 +1825,10 @@ begin
 
   //create the fSqlite3ConnectionPoolClient
   if not assigned(Sqlite3ConnectionPoolClient) then begin
-    Sqlite3ConnectionPoolClient := TALSqlite3ConnectionPoolClient.Create(ALEditSqlite3Database.text,
+    Sqlite3ConnectionPoolClient := TALSqlite3ConnectionPoolClient.Create(AnsiString(ALEditSqlite3Database.text),
                                                                          SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE,
                                                                          aPragmaStatements,
-                                                                         ALEditSqlite3lib.Text);
+                                                                         AnsiString(ALEditSqlite3lib.Text));
 
     //enable or disable the shared cache
     Sqlite3ConnectionPoolClient.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
@@ -1802,20 +1838,26 @@ begin
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditSqlite3NBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditSqlite3NBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aSqlite3BenchmarkThread := TSqlite3BenchmarkThread.Create(True,
                                                               self,
                                                               i,
-                                                              trim(ALMemoSqlite3Query.Lines.Text),
-                                                              strtoint(ALEditSqlite3NBLoop.Text),
-                                                              strtoint(ALEditSQLite3NbLoopBeforeCommit.Text),
+                                                              ALTrim(AnsiString(ALMemoSqlite3Query.Lines.Text)),
+                                                              StrToInt(ALEditSqlite3NBLoop.Text),
+                                                              StrToInt(ALEditSQLite3NbLoopBeforeCommit.Text),
                                                               false);
     inc(NBSelectActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aSqlite3BenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aSqlite3BenchmarkThread.Start;
+    {$ELSE}
     aSqlite3BenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -1840,15 +1882,15 @@ begin
   else exit;
 
   //init local variable
-  TableViewThread.DataController.RecordCount := strtoint(ALEditSqlite3NBThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditSqlite3NBThread.Text);
 
   //init the aPragmaStatements
   aPragmaStatements := '';
-  aPragmaStatements := aPragmaStatements + 'PRAGMA page_size = '+ALEditSqlite3Page_Size.Text+';';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text)+';';
   aPragmaStatements := aPragmaStatements + 'PRAGMA encoding = "UTF-8";';
   aPragmaStatements := aPragmaStatements + 'PRAGMA legacy_file_format = 0;';
   aPragmaStatements := aPragmaStatements + 'PRAGMA auto_vacuum = NONE;';
-  aPragmaStatements := aPragmaStatements + 'PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text+';';
+  aPragmaStatements := aPragmaStatements + 'PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text)+';';
   case RadioGroupSqlite3Journal_Mode.ItemIndex of
     0: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = DELETE;';
     1: aPragmaStatements := aPragmaStatements + 'PRAGMA journal_mode = TRUNCATE;';
@@ -1872,10 +1914,10 @@ begin
 
   //create the fSqlite3ConnectionPoolClient
   if not assigned(Sqlite3ConnectionPoolClient) then begin
-    Sqlite3ConnectionPoolClient := TALSqlite3ConnectionPoolClient.Create(ALEditSqlite3Database.text,
+    Sqlite3ConnectionPoolClient := TALSqlite3ConnectionPoolClient.Create(AnsiString(ALEditSqlite3Database.text),
                                                                          SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE,
                                                                          aPragmaStatements,
-                                                                         ALEditSqlite3lib.Text);
+                                                                         AnsiString(ALEditSqlite3lib.Text));
 
     //enable or disable the shared cache
     Sqlite3ConnectionPoolClient.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
@@ -1885,20 +1927,26 @@ begin
   StatusBar1.Panels[1].Text := '';
 
   //launch all the thread
-  for i := 1 to strtoint(ALEditSqlite3NBThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(ALEditSqlite3NBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     aSqlite3BenchmarkThread := TSqlite3BenchmarkThread.Create(True,
                                                               self,
                                                               i,
-                                                              trim(ALMemoSqlite3Query.Lines.Text),
-                                                              strtoint(ALEditSqlite3NBLoop.Text),
-                                                              strtoint(ALEditSQLite3NbLoopBeforeCommit.Text),
+                                                              ALTrim(AnsiString(ALMemoSqlite3Query.Lines.Text)),
+                                                              StrToInt(ALEditSqlite3NBLoop.Text),
+                                                              StrToInt(ALEditSQLite3NbLoopBeforeCommit.Text),
                                                               true);
     inc(NBUpdateActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBSelectActiveThread) + inttostr(NBUpdateActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBSelectActiveThread) + IntToStr(NBUpdateActiveThread);
     StatusBar1.Repaint;
     aSqlite3BenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aSqlite3BenchmarkThread.Start;
+    {$ELSE}
     aSqlite3BenchmarkThread.Resume;
+    {$IFEND}
+
   end;
 
 end;
@@ -1998,25 +2046,25 @@ Var aconnectionHandle: PSQLite3;
     aEndDate: int64;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
-    aLstSql: Tstrings;
-    aTmpLstSql: Tstrings;
+    aLstSql: TALStrings;
+    aTmpLstSql: TALStrings;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     S1: AnsiString;
 
     j: integer;
-    aLst1: TstringList;
+    aLst1: TALStringList;
 begin
 
   //init the aFormatSettings
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
 
   //create local object
-  aLstSql := TstringList.create;
+  aLstSql := TALStringList.create;
   aXMLDATA := ALCreateEmptyXMLDocument('root');
   Try
 
@@ -2029,13 +2077,13 @@ begin
         aLstSql.clear;
         setlength(aSelectDataSQLs,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          aTmpLstSql := TStringList.Create;
+          aTmpLstSql := TALStringList.Create;
           Try
             S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
-            aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            aTmpLstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
-              aLst1 := TstringList.create;
+              aLst1 := TALStringList.create;
               try
                 S1 := ALFastTagReplace(S1,
                                        '<#',
@@ -2090,7 +2138,7 @@ begin
 
       Except
         on e: Exception do begin
-          FErrorMsg := E.message;
+          FErrorMsg := AnsiString(E.message);
           Synchronize(UpdateGUI);
           Exit;
         end;
@@ -2114,8 +2162,8 @@ begin
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
         if TForm1(fOwner).NBUpdateActiveThread = 0 then begin
           TForm1(fOwner).ALButtonSqlite3LoopUpdate.Tag := 0;
           TForm1(fOwner).ALButtonSqlite3LoopUpdate.Caption := 'Loop UPDATE via Sqlite3';
@@ -2130,7 +2178,7 @@ begin
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
       TForm1(fOwner).TableViewThread.EndUpdate;
     end;
@@ -2140,8 +2188,8 @@ begin
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBSelectActiveThread);
-        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
         if TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).ALButtonSqlite3LoopSelect.Tag := 0;
           TForm1(fOwner).ALButtonSqlite3LoopSelect.Caption := 'Loop SELECT via Sqlite3';
@@ -2156,7 +2204,7 @@ begin
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
       TForm1(fOwner).TableViewThread.EndUpdate;
     end;
@@ -2214,9 +2262,9 @@ procedure TFirebirdBenchmarkThread.Execute;
 
   {-------------------------------------------------}
   function internalDoTagReplace(Str: AnsiString): AnsiString;
-  var aLst1: TstringList;
+  var aLst1: TALStringList;
   Begin
-    aLst1 := TstringList.create;
+    aLst1 := TALStringList.create;
     try
       Str := ALFastTagReplace(Str,
                               '<#',
@@ -2244,17 +2292,17 @@ Var aDBHandle: IscDbHandle;
     aTmpUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
     aStatementPool: TALFBXConnectionStatementPoolBinTree;
     aStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     aStmtHandle: IscStmtHandle;
     aSqlda: TALFBXSQLResult;
     S1: AnsiString;
     j, k, l: integer;
-    aLst1: TstringList;
+    aLst1: TALStringList;
 
 begin
 
   //init the aFormatSettings
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
@@ -2272,10 +2320,10 @@ begin
         setlength(aSelectDataSQLs,0);
         setlength(aUpdateDataSQLs,0);
         if fParams = '' then begin
-          aLst1 := TStringList.Create;
+          aLst1 := TALStringList.Create;
           Try
             S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
-            aLst1.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            aLst1.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
             for J := 0 to aLst1.Count - 1 do begin
               if fUpdateSQL then begin
                 setlength(aUpdateDataSQLs,length(aUpdateDataSQLs)+1);
@@ -2297,9 +2345,9 @@ begin
           End;
         end
         else begin
-          aLst1 := TStringList.Create;
+          aLst1 := TALStringList.Create;
           Try
-            aLst1.Text := Trim(fParams);
+            aLst1.Text := ALTrim(fParams);
             if fUpdateSQL then begin
               setlength(aUpdateDataSQLs,1);
               setlength(aUpdateDataSQLs[0].Params,1);
@@ -2348,7 +2396,7 @@ begin
                                                                   aSqlda,
                                                                   fTPB);
               aEndDate := ALGetTickCount64;
-              if FTotalPrepareTimeTaken = -1 then FTotalPrepareTimeTaken := 0;              
+              if FTotalPrepareTimeTaken = -1 then FTotalPrepareTimeTaken := 0;
               FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aEndDate - aStartDate;
             end;
           end
@@ -2478,7 +2526,7 @@ begin
 
       Except
         on e: Exception do begin
-          FErrorMsg := E.message;
+          FErrorMsg := AnsiString(E.message);
           Synchronize(UpdateGUI);
           Exit;
         end;
@@ -2501,8 +2549,8 @@ begin
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
         if TForm1(fOwner).NBUpdateActiveThread = 0 then begin
           TForm1(fOwner).ALButtonFirebirdLoopUpdate.Tag := 0;
           TForm1(fOwner).ALButtonFirebirdLoopUpdate.Caption := 'Loop UPDATE via Firebird';
@@ -2518,7 +2566,7 @@ begin
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
       TForm1(fOwner).TableViewThread.EndUpdate;
     end;
@@ -2528,8 +2576,8 @@ begin
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBSelectActiveThread);
-        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
         if TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).ALButtonFirebirdLoopSelect.Tag := 0;
           TForm1(fOwner).ALButtonFirebirdLoopSelect.Caption := 'Loop SELECT via Firebird';
@@ -2545,7 +2593,7 @@ begin
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
       TForm1(fOwner).TableViewThread.EndUpdate;
     end;
@@ -2598,24 +2646,24 @@ Var aConnectionHandle: PMySql;
     aEndDate: int64;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
-    aLstSql: Tstrings;
-    aTmpLstSql: Tstrings;
+    aLstSql: TALStrings;
+    aTmpLstSql: TALStrings;
     aXMLDATA: TalXmlDocument;
     aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     S1: AnsiString;
     j: integer;
-    aLst1: TstringList;
+    aLst1: TALStringList;
 begin
 
   //init the aFormatSettings
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
 
   //create local object
-  aLstSql := TstringList.create;
+  aLstSql := TALStringList.create;
   aXMLDATA := ALCreateEmptyXMLDocument('root');
   Try
 
@@ -2628,13 +2676,13 @@ begin
         aLstSql.clear;
         setlength(aSelectDataSQLs,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          aTmpLstSql := TStringList.Create;
+          aTmpLstSql := TALStringList.Create;
           Try
             S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
-            aTmpLstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+            aTmpLstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
             for J := 0 to aTmpLstSql.Count - 1 do begin
               S1 := aTmpLstSql[j];
-              aLst1 := TstringList.create;
+              aLst1 := TALStringList.create;
               try
                 S1 := ALFastTagReplace(S1,
                                        '<#',
@@ -2689,7 +2737,7 @@ begin
 
       Except
         on e: Exception do begin
-          FErrorMsg := E.message;
+          FErrorMsg := AnsiString(E.message);
           Synchronize(UpdateGUI);
           Exit;
         end;
@@ -2713,8 +2761,8 @@ begin
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
         if TForm1(fOwner).NBUpdateActiveThread = 0 then begin
           TForm1(fOwner).ALButtonMySqlLoopUpdate.Tag := 0;
           TForm1(fOwner).ALButtonMySqlLoopUpdate.Caption := 'Loop UPDATE via MySql';
@@ -2731,7 +2779,7 @@ begin
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
       TForm1(fOwner).TableViewThread.EndUpdate;
     end;
@@ -2741,8 +2789,8 @@ begin
     try
       if not fOn then begin
         dec(TForm1(fOwner).NBSelectActiveThread);
-        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
-        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,inttostr(frank) + ' (off)');
+        TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBSelectActiveThread + TForm1(fOwner).NBUpdateActiveThread);
+        TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
         if TForm1(fOwner).NBSelectActiveThread = 0 then begin
           TForm1(fOwner).ALButtonMySqlLoopSelect.Tag := 0;
           TForm1(fOwner).ALButtonMySqlLoopSelect.Caption := 'Loop SELECT via MySql';
@@ -2759,7 +2807,7 @@ begin
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
-      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + inttostr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+      TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
       TForm1(fOwner).TableViewThread.EndUpdate;
     end;
@@ -2805,8 +2853,9 @@ end;
 
 initialization
   randomize;
-{$IFDEF DEBUG}
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

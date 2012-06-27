@@ -6,12 +6,12 @@ Author(s):    Jedi Project - JCL
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Mime Functions
-Version:      3.50
+Version:      4.00
 
 Description:  Function mime encode and decode from JCL and function
               to get default Mime content type from file extension
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -48,13 +48,14 @@ History :     04-05-2012:
               - Non-thread-safe THashedStringList was replaced to
                 TALStringList, before it was crushing sometimes when
                 searching in multi-thread environment.
+              26/06/2012: Add xe2 support
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnMime;
 
@@ -62,295 +63,566 @@ interface
 
 uses Windows,
      Classes,
-     sysutils;
+     Types,
+     sysutils,
+     ALStringList;
 
-{from JCL}
-function  ALMimeBase64EncodeString(const S: AnsiString): AnsiString;
-function  ALMimeBase64EncodeStringNoCRLF(const S: AnsiString): AnsiString;
-function  ALMimeBase64DecodeString(const S: AnsiString): AnsiString;
-function  ALMimeBase64EncodedSize(const InputSize: Cardinal): Cardinal;
-function  ALMimeBase64EncodedSizeNoCRLF(const InputSize: Cardinal): Cardinal;
-function  ALMimeBase64DecodedSize(const InputSize: Cardinal): Cardinal;
-procedure ALMimeBase64Encode(const InputBuffer; const InputByteCount: Cardinal; out OutputBuffer);
-procedure ALMimeBase64EncodeNoCRLF(const InputBuffer; const InputByteCount: Cardinal; out OutputBuffer);
-procedure ALMimeBase64EncodeFullLines(const InputBuffer; const InputByteCount: Cardinal; out OutputBuffer);
-function  ALMimeBase64Decode(const InputBuffer; const InputBytesCount: Cardinal; out OutputBuffer): Cardinal;
-function  ALMimeBase64DecodePartial(const InputBuffer; const InputBytesCount: Cardinal; out OutputBuffer; var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): Cardinal;
-function  ALMimeBase64DecodePartialEnd(out OutputBuffer; const ByteBuffer: Cardinal; const ByteBufferSpace: Cardinal): Cardinal;
+{$if CompilerVersion<=18.5}
+//http://stackoverflow.com/questions/7630781/delphi-2007-and-xe2-using-nativeint
+type
+  NativeInt = Integer;
+  NativeUInt = Cardinal;
+{$ifend}
 
-{From indy}
-procedure ALFillMimeContentTypeByExtList(AMIMEList : TStrings);
-procedure ALFillExtByMimeContentTypeList(AMIMEList : TStrings);
-Function  ALGetDefaultFileExtFromMimeContentType(aContentType: String): String;
-Function  ALGetDefaultMIMEContentTypeFromExt(aExt: String): String;
+//from JCL
+function ALMimeBase64EncodeString(const S: AnsiString): AnsiString;
+function ALMimeBase64EncodeStringNoCRLF(const S: AnsiString): AnsiString;
+function ALMimeBase64DecodeString(const S: AnsiString): AnsiString;
+function ALMimeBase64EncodedSize(const InputSize: NativeInt): NativeInt;
+function ALMimeBase64EncodedSizeNoCRLF(const InputSize: NativeInt): NativeInt;
+function ALMimeBase64DecodedSize(const InputSize: NativeInt): NativeInt;
 
-{Mime content type list variable}
-Var vAlMimeContentTypeByExtList: Tstrings; {.htm=text/html}
-    vAlExtbyMimeContentTypeList: Tstrings; {text/html=.htm}
+procedure ALMimeBase64Encode(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt = 0); overload;
+procedure ALMimeBase64EncodeNoCRLF(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt = 0); overload;
+procedure ALMimeBase64EncodeFullLines(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt = 0); overload;
+function ALMimeBase64Decode(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt = 0): NativeInt; overload;
+function ALMimeBase64DecodePartial(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt;
+  var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): NativeInt; overload;
+function ALMimeBase64DecodePartialEnd(out OutputBuffer: TByteDynArray; OutputOffset: NativeInt;
+  const ByteBuffer: Cardinal; const ByteBufferSpace: Cardinal): NativeInt; overload;
+
+procedure ALMimeBase64Encode(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray); overload;
+procedure ALMimeBase64EncodeNoCRLF(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray); overload;
+procedure ALMimeBase64EncodeFullLines(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray); overload;
+function ALMimeBase64Decode(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray): NativeInt; overload;
+function ALMimeBase64DecodePartial(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray; var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): NativeInt; overload;
+function ALMimeBase64DecodePartialEnd(out OutputBuffer: TByteDynArray; const ByteBuffer: Cardinal;
+  const ByteBufferSpace: Cardinal): NativeInt; overload;
+
+procedure ALMimeBase64Encode(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer); overload;
+procedure ALMimeBase64EncodeNoCRLF(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer); overload;
+procedure ALMimeBase64EncodeFullLines(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer); overload;
+function ALMimeBase64Decode(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer): NativeInt; overload;
+function ALMimeBase64DecodePartial(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer;
+  var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): NativeInt; overload;
+function ALMimeBase64DecodePartialEnd(out OutputBuffer; const ByteBuffer: Cardinal;
+  const ByteBufferSpace: Cardinal): NativeInt; overload;
+
+procedure ALMimeBase64EncodeFile(const InputFileName, OutputFileName: TFileName);
+procedure ALMimeBase64EncodeFileNoCRLF(const InputFileName, OutputFileName: TFileName);
+procedure ALMimeBase64DecodeFile(const InputFileName, OutputFileName: TFileName);
+procedure ALMimeBase64EncodeStream(const InputStream: TStream; const OutputStream: TStream);
+procedure ALMimeBase64EncodeStreamNoCRLF(const InputStream: TStream; const OutputStream: TStream);
+procedure ALMimeBase64DecodeStream(const InputStream: TStream; const OutputStream: TStream);
+
+const
+  cALMimeBase64_ENCODED_LINE_BREAK = 76;
+  cALMimeBase64_DECODED_LINE_BREAK = cALMimeBase64_ENCODED_LINE_BREAK div 4 * 3;
+  cALMimeBase64_BUFFER_SIZE = cALMimeBase64_DECODED_LINE_BREAK * 3 * 4 * 4;
+
+//From indy
+procedure ALFillMimeContentTypeByExtList(AMIMEList : TALStrings);
+procedure ALFillExtByMimeContentTypeList(AMIMEList : TALStrings);
+Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
+Function  ALGetDefaultMIMEContentTypeFromExt(aExt: AnsiString): AnsiString;
+
+Var vAlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
+    vAlExtbyMimeContentTypeList: TALStrings; {text/html=.htm}
 
 implementation
 
 Uses Registry,
-     ALStringList,
      alFcnString;
 
-{--------------------------------------------}
-type PALMimeBase64Byte4 = ^TALMimeBase64Byte4;
-     TALMimeBase64Byte4 = packed record
-       b1: Byte;
-       b2: Byte;
-       b3: Byte;
-       b4: Byte;
-     end;
-     PALMimeBase64Byte3 = ^TALMimeBase64Byte3;
-     TALMimeBase64Byte3 = packed record
-       b1: Byte;
-       b2: Byte;
-       b3: Byte;
-     end;
+// Caution: For MimeEncodeStream and all other kinds of multi-buffered
+// Mime encodings (i.e. Files etc.), BufferSize must be set to a multiple of 3.
+// Even though the implementation of the Mime decoding routines below
+// do not require a particular buffer size, they work fastest with sizes of
+// multiples of four. The chosen size is a multiple of 3 and of 4 as well.
+// The following numbers are, in addition, also divisible by 1024:
+// $2400, $3000, $3C00, $4800, $5400, $6000, $6C00.
 
-{-------------------------------------------------------------------------------}
-{*  Caution: For MimeEncodeStream and all other kinds of multi-buffered         }
-{*  Mime encodings (i.e. Files etc.), BufferSize must be set to a multiple of 3 }
-{*  Even though the implementation of the Mime decoding routines below          }
-{*  do not require a particular buffer size, they work fastest with sizes of    }
-{*  multiples of four. The chosen size is a multiple of 3 and of 4 as well.     }
-{*  The following numbers are, in addition, also divisible by 1024:             }
-{*  $2400, $3000, $3C00, $4800, $5400, $6000, $6C00.                            }
-const cALMime_Base64_Buffer_Size = $3000;
-      cALMime_Base64_Encoded_Line_Break = 76;
-      cALMime_Base64_Decoded_Line_Break = cALMime_Base64_Encoded_Line_Break div 4 * 3;
-      cALMime_Base64_Encode_Table: array[0..63] of Byte = (
-                                                           065, 066, 067, 068, 069, 070, 071, 072, //  00 - 07
-                                                           073, 074, 075, 076, 077, 078, 079, 080, //  08 - 15
-                                                           081, 082, 083, 084, 085, 086, 087, 088, //  16 - 23
-                                                           089, 090, 097, 098, 099, 100, 101, 102, //  24 - 31
-                                                           103, 104, 105, 106, 107, 108, 109, 110, //  32 - 39
-                                                           111, 112, 113, 114, 115, 116, 117, 118, //  40 - 47
-                                                           119, 120, 121, 122, 048, 049, 050, 051, //  48 - 55
-                                                           052, 053, 054, 055, 056, 057, 043, 047  // 56 - 63
-                                                          );
-      cALMime_Base64_Pad_Char = Byte('=');
-      cAlMime_Base64_Decode_Table: array[Byte] of Cardinal = (
-                                                              255, 255, 255, 255, 255, 255, 255, 255, //   0 -   7
-                                                              255, 255, 255, 255, 255, 255, 255, 255, //   8 -  15
-                                                              255, 255, 255, 255, 255, 255, 255, 255, //  16 -  23
-                                                              255, 255, 255, 255, 255, 255, 255, 255, //  24 -  31
-                                                              255, 255, 255, 255, 255, 255, 255, 255, //  32 -  39
-                                                              255, 255, 255, 062, 255, 255, 255, 063, //  40 -  47
-                                                              052, 053, 054, 055, 056, 057, 058, 059, //  48 -  55
-                                                              060, 061, 255, 255, 255, 255, 255, 255, //  56 -  63
-                                                              255, 000, 001, 002, 003, 004, 005, 006, //  64 -  71
-                                                              007, 008, 009, 010, 011, 012, 013, 014, //  72 -  79
-                                                              015, 016, 017, 018, 019, 020, 021, 022, //  80 -  87
-                                                              023, 024, 025, 255, 255, 255, 255, 255, //  88 -  95
-                                                              255, 026, 027, 028, 029, 030, 031, 032, //  96 - 103
-                                                              033, 034, 035, 036, 037, 038, 039, 040, // 104 - 111
-                                                              041, 042, 043, 044, 045, 046, 047, 048, // 112 - 119
-                                                              049, 050, 051, 255, 255, 255, 255, 255, // 120 - 127
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255,
-                                                              255, 255, 255, 255, 255, 255, 255, 255
-                                                             );
+{***}
+const
+  { The mime encoding table. Do not alter. }
+  cALMimeBase64_ENCODE_TABLE: array [0..63] of Byte = (
+    065, 066, 067, 068, 069, 070, 071, 072, //  00 - 07
+    073, 074, 075, 076, 077, 078, 079, 080, //  08 - 15
+    081, 082, 083, 084, 085, 086, 087, 088, //  16 - 23
+    089, 090, 097, 098, 099, 100, 101, 102, //  24 - 31
+    103, 104, 105, 106, 107, 108, 109, 110, //  32 - 39
+    111, 112, 113, 114, 115, 116, 117, 118, //  40 - 47
+    119, 120, 121, 122, 048, 049, 050, 051, //  48 - 55
+    052, 053, 054, 055, 056, 057, 043, 047); // 56 - 63
 
-{*****************************************************************}
-function ALMimeBase64EncodeString(const S: AnsiString): AnsiString;
-var L: Cardinal;
+  cALMimeBase64_PAD_CHAR = Byte('=');
+
+  cALMimeBase64_DECODE_TABLE: array [Byte] of Byte = (
+    255, 255, 255, 255, 255, 255, 255, 255, //   0 -   7
+    255, 255, 255, 255, 255, 255, 255, 255, //   8 -  15
+    255, 255, 255, 255, 255, 255, 255, 255, //  16 -  23
+    255, 255, 255, 255, 255, 255, 255, 255, //  24 -  31
+    255, 255, 255, 255, 255, 255, 255, 255, //  32 -  39
+    255, 255, 255, 062, 255, 255, 255, 063, //  40 -  47
+    052, 053, 054, 055, 056, 057, 058, 059, //  48 -  55
+    060, 061, 255, 255, 255, 255, 255, 255, //  56 -  63
+    255, 000, 001, 002, 003, 004, 005, 006, //  64 -  71
+    007, 008, 009, 010, 011, 012, 013, 014, //  72 -  79
+    015, 016, 017, 018, 019, 020, 021, 022, //  80 -  87
+    023, 024, 025, 255, 255, 255, 255, 255, //  88 -  95
+    255, 026, 027, 028, 029, 030, 031, 032, //  96 - 103
+    033, 034, 035, 036, 037, 038, 039, 040, // 104 - 111
+    041, 042, 043, 044, 045, 046, 047, 048, // 112 - 119
+    049, 050, 051, 255, 255, 255, 255, 255, // 120 - 127
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255,
+    255, 255, 255, 255, 255, 255, 255, 255);
+
+{*********************************************************************************************}
+procedure ALMimeBase64Encode(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray);
 begin
-  if Pointer(S) <> nil then begin
-    L := PCardinal(Cardinal(S) - 4)^;
+  ALMimeBase64Encode(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
+end;
+
+{***************************************************************************************************}
+procedure ALMimeBase64EncodeNoCRLF(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray);
+begin
+  ALMimeBase64EncodeNoCRLF(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
+end;
+
+{******************************************************************************************************}
+procedure ALMimeBase64EncodeFullLines(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray);
+begin
+  ALMimeBase64EncodeFullLines(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
+end;
+
+{********************************************************************************************}
+function ALMimeBase64Decode(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray): NativeInt;
+begin
+  Result := ALMimeBase64Decode(InputBuffer, 0, InputByteCount, OutputBuffer, 0);
+end;
+
+{***************************************************************************************************}
+function ALMimeBase64DecodePartial(const InputBuffer: TByteDynArray; const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray; var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): NativeInt;
+begin
+  Result := ALMimeBase64DecodePartial(InputBuffer, 0, InputByteCount, OutputBuffer, 0, ByteBuffer, ByteBufferSpace);
+end;
+
+{************************************************************************************************}
+function ALMimeBase64DecodePartialEnd(out OutputBuffer: TByteDynArray; const ByteBuffer: Cardinal;
+  const ByteBufferSpace: Cardinal): NativeInt;
+begin
+  Result := ALMimeBase64DecodePartialEnd(OutputBuffer, 0, ByteBuffer, ByteBufferSpace);
+end;
+
+{**}
+type
+  PByte4 = ^TByte4;
+  TByte4 = packed record
+    B1: Byte;
+    B2: Byte;
+    B3: Byte;
+    B4: Byte;
+  end;
+
+  PByte3 = ^TByte3;
+  TByte3 = packed record
+    B1: Byte;
+    B2: Byte;
+    B3: Byte;
+  end;
+
+{*******************************}
+// Wrapper functions & procedures
+function ALMimeBase64EncodeString(const S: AnsiString): AnsiString;
+var
+  L: NativeInt;
+begin
+  if S <> '' then
+  begin
+    L := Length(S);
     SetLength(Result, ALMimeBase64EncodedSize(L));
-    ALMimeBase64Encode(Pointer(S)^, L, Pointer(Result)^);
+    ALMimeBase64Encode(PAnsiChar(S)^, L, PAnsiChar(Result)^);
   end
-  else Result := '';
+  else
+    Result := '';
 end;
 
 {***********************************************************************}
 function ALMimeBase64EncodeStringNoCRLF(const S: AnsiString): AnsiString;
-var L: Cardinal;
+var
+  L: NativeInt;
 begin
-  if Pointer(S) <> nil then begin
-    L := PCardinal(Cardinal(S) - 4)^;
+  if S <> '' then
+  begin
+    L := Length(S);
     SetLength(Result, ALMimeBase64EncodedSizeNoCRLF(L));
-    ALMimeBase64EncodeNoCRLF(Pointer(S)^, L, Pointer(Result)^);
+    ALMimeBase64EncodeNoCRLF(PAnsiChar(S)^, L, PAnsiChar(Result)^);
   end
-  else Result := '';
+  else
+    Result := '';
 end;
 
 {*****************************************************************}
 function ALMimeBase64DecodeString(const S: AnsiString): AnsiString;
-var ByteBuffer, ByteBufferSpace: Cardinal;
-    L: Cardinal;
+var
+  ByteBuffer, ByteBufferSpace: Cardinal;
+  L: NativeInt;
+  P, R: PAnsiChar;
 begin
-  if Pointer(S) <> nil then begin
-    L := PCardinal(Cardinal(S) - 4)^;
+  if S <> '' then
+  begin
+    L := Length(S);
     SetLength(Result, ALMimeBase64DecodedSize(L));
     ByteBuffer := 0;
     ByteBufferSpace := 4;
-    L := ALMimeBase64DecodePartial(Pointer(S)^, L, Pointer(Result)^, ByteBuffer, ByteBufferSpace);
-    Inc(L, ALMimeBase64DecodePartialEnd(Pointer(Cardinal(Result) + L)^, ByteBuffer, ByteBufferSpace));
+    P := PAnsiChar(S);
+    R := PAnsiChar(Result);
+    L := ALMimeBase64DecodePartial(P^, L, R^, ByteBuffer, ByteBufferSpace);
+    Inc(R, L);
+    Inc(L, ALMimeBase64DecodePartialEnd(R^, ByteBuffer, ByteBufferSpace));
     SetLength(Result, L);
   end
-  else Result := '';
+  else
+    Result := '';
 end;
 
-{******************************************************************************************}
-procedure ALMimeBase64EncodeStream(const InputStream: TStream; const OutputStream: TStream);
-var InputBuffer: array [0..CALMIME_Base64_BUFFER_SIZE - 1] of Byte;
-    OutputBuffer: array [0..((CALMIME_Base64_BUFFER_SIZE + 2) div 3) * 4 - 1] of Byte;
-    BytesRead: Integer;
+{************************************************************************************************************}
+procedure DecodeHttpBasicAuthentication(const BasicCredentials: AnsiString; out UserId, PassWord: AnsiString);
+const
+  LBasic = 6; { Length ('Basic ') }
+var
+  DecodedPtr, P: PAnsiChar;
+  I, L: NativeInt;
 begin
-  BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
-  while BytesRead > 0 do begin
-    ALMimeBase64Encode(InputBuffer, BytesRead, OutputBuffer);
-    OutputStream.Write(OutputBuffer, ALMimeBase64EncodedSize(BytesRead));
-    BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
+  UserId := '';
+  PassWord := '';
+
+  P := PAnsiChar(BasicCredentials);
+  if P = nil then
+    Exit;
+
+  L := Length(BasicCredentials);
+  if L <= LBasic then
+    Exit;
+
+  Dec(L, LBasic);
+  Inc(P, LBasic);
+
+  GetMem(DecodedPtr, ALMimeBase64DecodedSize(L));
+  L := ALMimeBase64Decode(P^, L, DecodedPtr^);
+
+  { Look for colon (':'). }
+  I := 0;
+  P := DecodedPtr;
+  while (L > 0) and (P[I] <> ':') do
+  begin
+    Inc(I);
+    Dec(L);
   end;
+
+  { Store UserId and Password. }
+  SetString(UserId, DecodedPtr, I);
+  if L > 1 then
+    SetString(PassWord, DecodedPtr + I + 1, L - 1)
+  else
+    PassWord := '';
+
+  FreeMem(DecodedPtr);
 end;
 
-{******************************************************************************************}
-procedure ALMimeBase64DecodeStream(const InputStream: TStream; const OutputStream: TStream);
-var ByteBuffer, ByteBufferSpace: Cardinal;
-    InputBuffer: array [0..(CALMIME_Base64_BUFFER_SIZE + 3) div 4 * 3 - 1] of Byte;
-    OutputBuffer: array [0..CALMIME_Base64_BUFFER_SIZE - 1] of Byte;
-    BytesRead: Integer;
+{*****************}
+// Helper functions
+function ALMimeBase64EncodedSize(const InputSize: NativeInt): NativeInt;
 begin
-  ByteBuffer := 0;
-  ByteBufferSpace := 4;
-  BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
-  while BytesRead > 0 do begin
-    OutputStream.Write(OutputBuffer, ALMimeBase64DecodePartial(InputBuffer, BytesRead, OutputBuffer, ByteBuffer, ByteBufferSpace));
-    BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
-  end;
-  OutputStream.Write(OutputBuffer, ALMimeBase64DecodePartialEnd(OutputBuffer, ByteBuffer, ByteBufferSpace));
+  if InputSize > 0 then
+    Result := (InputSize + 2) div 3 * 4 + (InputSize - 1) div cALMimeBase64_DECODED_LINE_BREAK * 2
+  else
+    Result := InputSize;
 end;
 
-{********************************************************************}
-function ALMimeBase64EncodedSize(const InputSize: Cardinal): Cardinal;
-begin
-  if InputSize > 0 then Result := (InputSize + 2) div 3 * 4 + (InputSize - 1) div cALMIME_Base64_DECODED_LINE_BREAK * 2
-  else Result := InputSize;
-end;
-
-{**************************************************************************}
-function ALMimeBase64EncodedSizeNoCRLF(const InputSize: Cardinal): Cardinal;
+{****************************************************************************}
+function ALMimeBase64EncodedSizeNoCRLF(const InputSize: NativeInt): NativeInt;
 begin
   Result := (InputSize + 2) div 3 * 4;
 end;
 
-{********************************************************************}
-function ALMimeBase64DecodedSize(const InputSize: Cardinal): Cardinal;
+{**********************************************************************}
+function ALMimeBase64DecodedSize(const InputSize: NativeInt): NativeInt;
 begin
   Result := (InputSize + 3) div 4 * 3;
 end;
 
-{************************************************************************************************}
-procedure ALMimeBase64Encode(const InputBuffer; const InputByteCount: Cardinal; out OutputBuffer);
-var IDelta, ODelta: Cardinal;
+{*******************************}
+// Primary functions & procedures
+procedure ALMimeBase64Encode(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt;
+  out OutputBuffer: TByteDynArray; OutputOffset: NativeInt);
+var
+  IDelta, ODelta: NativeInt;
 begin
-  ALMimeBase64EncodeFullLines(InputBuffer, InputByteCount, OutputBuffer);
-  IDelta := InputByteCount div CALMIME_Base64_DECODED_LINE_BREAK; // Number of lines processed so far.
-  ODelta := IDelta * (CALMIME_Base64_ENCODED_LINE_BREAK + 2);
-  IDelta := IDelta * CALMIME_Base64_DECODED_LINE_BREAK;
-  ALMimeBase64EncodeNoCRLF(Pointer(Cardinal(@InputBuffer) + IDelta)^, InputByteCount - IDelta, Pointer(Cardinal(@OutputBuffer) + ODelta)^);
+  ALMimeBase64EncodeFullLines(InputBuffer, InputOffset, InputByteCount, OutputBuffer, OutputOffset);
+  IDelta := InputByteCount div cALMimeBase64_DECODED_LINE_BREAK; // Number of lines processed so far.
+  ODelta := IDelta * (cALMimeBase64_ENCODED_LINE_BREAK + 2);
+  IDelta := IDelta * cALMimeBase64_DECODED_LINE_BREAK;
+  ALMimeBase64EncodeNoCRLF(InputBuffer, InputOffset + IDelta, InputByteCount - IDelta, OutputBuffer, OutputOffset + ODelta);
 end;
 
-{*********************************************************************************************************}
-procedure ALMimeBase64EncodeFullLines(const InputBuffer; const InputByteCount: Cardinal; out OutputBuffer);
-var B, InnerLimit, OuterLimit: Cardinal;
-    InPtr: PALMimeBase64Byte3;
-    OutPtr: PALMimeBase64Byte4;
+{*******************************}
+// Primary functions & procedures
+procedure ALMimeBase64Encode(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer);
+var
+  IDelta, ODelta: NativeInt;
+  I, O: PByte;
+begin
+  ALMimeBase64EncodeFullLines(InputBuffer, InputByteCount, OutputBuffer);
+  IDelta := InputByteCount div cALMimeBase64_DECODED_LINE_BREAK; // Number of lines processed so far.
+  ODelta := IDelta * (cALMimeBase64_ENCODED_LINE_BREAK + 2);
+  IDelta := IDelta * cALMimeBase64_DECODED_LINE_BREAK;
+  I := @InputBuffer;
+  Inc(I, IDelta);
+  O := @OutputBuffer;
+  Inc(O, ODelta);
+  ALMimeBase64EncodeNoCRLF(I^, InputByteCount - IDelta, O^);
+end;
+
+{*********************************************************************************************}
+procedure ALMimeBase64EncodeFullLines(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt);
+var
+  B, InnerLimit, OuterLimit: NativeInt;
+  InIndex: NativeInt;
+  OutIndex: NativeInt;
 begin
   { Do we have enough input to encode a full line? }
-  if InputByteCount < CALMIME_Base64_DECODED_LINE_BREAK then Exit;
+  if InputByteCount < cALMimeBase64_DECODED_LINE_BREAK then
+    Exit;
 
-  InPtr := @InputBuffer;
-  OutPtr := @OutputBuffer;
+  InIndex := InputOffset;
+  OutIndex := OutputOffset;
 
-  InnerLimit := Cardinal(InPtr);
-  Inc(InnerLimit, CALMIME_Base64_DECODED_LINE_BREAK);
+  InnerLimit := InIndex;
+  Inc(InnerLimit, cALMimeBase64_DECODED_LINE_BREAK);
 
-  OuterLimit := Cardinal(InPtr);
+  OuterLimit := InIndex;
   Inc(OuterLimit, InputByteCount);
 
   { Multiple line loop. }
   repeat
-
     { Single line loop. }
     repeat
       { Read 3 bytes from InputBuffer. }
-      B := InPtr^.b1;
+      B := InputBuffer[InIndex + 0];
       B := B shl 8;
-      B := B or InPtr^.b2;
+      B := B or InputBuffer[InIndex + 1];
       B := B shl 8;
-      B := B or InPtr^.b3;
-      Inc(InPtr);
+      B := B or InputBuffer[InIndex + 2];
+      Inc(InIndex, 3);
       { Write 4 bytes to OutputBuffer (in reverse order). }
-      OutPtr^.b4 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+      OutputBuffer[OutIndex + 3] := cALMimeBase64_ENCODE_TABLE[B and $3F];
       B := B shr 6;
-      OutPtr^.b3 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+      OutputBuffer[OutIndex + 2] := cALMimeBase64_ENCODE_TABLE[B and $3F];
       B := B shr 6;
-      OutPtr^.b2 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+      OutputBuffer[OutIndex + 1] := cALMimeBase64_ENCODE_TABLE[B and $3F];
       B := B shr 6;
-      OutPtr^.b1 := CALMIME_Base64_ENCODE_TABLE[B];
-      Inc(OutPtr);
-    until Cardinal(InPtr) >= InnerLimit;
+      OutputBuffer[OutIndex + 0] := cALMimeBase64_ENCODE_TABLE[B];
+      Inc(OutIndex, 3);
+    until InIndex >= InnerLimit;
 
     { Write line break (CRLF). }
-    OutPtr^.b1 := 13;
-    OutPtr^.b2 := 10;
-    Inc(Cardinal(OutPtr), 2);
+    OutputBuffer[OutIndex + 0] := 13;
+    OutputBuffer[OutIndex + 1] := 10;
+    Inc(OutIndex, 2);
 
-    Inc(InnerLimit, CALMIME_Base64_DECODED_LINE_BREAK);
+    Inc(InnerLimit, cALMimeBase64_DECODED_LINE_BREAK);
   until InnerLimit > OuterLimit;
 end;
 
-{******************************************************************************************************}
-procedure ALMimeBase64EncodeNoCRLF(const InputBuffer; const InputByteCount: Cardinal; out OutputBuffer);
-var B, InnerLimit, OuterLimit: Cardinal;
-    InPtr: PALMimeBase64Byte3;
-    OutPtr: PALMimeBase64Byte4;
+{**********************************************************************************************************}
+procedure ALMimeBase64EncodeFullLines(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer);
+var
+  B: Cardinal;
+  InnerLimit, OuterLimit: NativeUint;
+  InPtr: PByte3;
+  OutPtr: PByte4;
 begin
-  if InputByteCount = 0 then Exit;
+  { Do we have enough input to encode a full line? }
+  if InputByteCount < cALMimeBase64_DECODED_LINE_BREAK then
+    Exit;
+
+  InPtr := @InputBuffer;
+  OutPtr := @OutputBuffer;
+
+  InnerLimit := NativeUint(InPtr);
+  Inc(InnerLimit, cALMimeBase64_DECODED_LINE_BREAK);
+
+  OuterLimit := NativeUint(InPtr);
+  Inc(OuterLimit, InputByteCount);
+
+  { Multiple line loop. }
+  repeat
+    { Single line loop. }
+    repeat
+      { Read 3 bytes from InputBuffer. }
+      B := InPtr^.B1;
+      B := B shl 8;
+      B := B or InPtr^.B2;
+      B := B shl 8;
+      B := B or InPtr^.B3;
+      Inc(InPtr);
+      { Write 4 bytes to OutputBuffer (in reverse order). }
+      OutPtr^.B4 := cALMimeBase64_ENCODE_TABLE[B and $3F];
+      B := B shr 6;
+      OutPtr^.B3 := cALMimeBase64_ENCODE_TABLE[B and $3F];
+      B := B shr 6;
+      OutPtr^.B2 := cALMimeBase64_ENCODE_TABLE[B and $3F];
+      B := B shr 6;
+      OutPtr^.B1 := cALMimeBase64_ENCODE_TABLE[B];
+      Inc(OutPtr);
+    until NativeUint(InPtr) >= InnerLimit;
+
+    { Write line break (CRLF). }
+    OutPtr^.B1 := 13;
+    OutPtr^.B2 := 10;
+    Inc(NativeUint(OutPtr), 2);
+
+    Inc(InnerLimit, cALMimeBase64_DECODED_LINE_BREAK);
+  until InnerLimit > OuterLimit;
+end;
+
+{******************************************************************************************}
+procedure ALMimeBase64EncodeNoCRLF(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt);
+var
+  B, InnerLimit, OuterLimit: NativeInt;
+  InIndex: NativeInt;
+  OutIndex: NativeInt;
+begin
+  if InputByteCount = 0 then
+    Exit;
+
+  InIndex := InputOffset;
+  OutIndex := OutputOffset;
+
+  OuterLimit := InputByteCount div 3 * 3;
+
+  InnerLimit := InIndex;
+  Inc(InnerLimit, OuterLimit);
+
+  { Last line loop. }
+  while InIndex < InnerLimit do
+  begin
+    { Read 3 bytes from InputBuffer. }
+    B := InputBuffer[InIndex + 0];
+    B := B shl 8;
+    B := B or InputBuffer[InIndex + 1];
+    B := B shl 8;
+    B := B or InputBuffer[InIndex + 2];
+    Inc(InIndex, 3);
+    { Write 4 bytes to OutputBuffer (in reverse order). }
+    OutputBuffer[OutIndex + 3] := cALMimeBase64_ENCODE_TABLE[B and $3F];
+    B := B shr 6;
+    OutputBuffer[OutIndex + 2] := cALMimeBase64_ENCODE_TABLE[B and $3F];
+    B := B shr 6;
+    OutputBuffer[OutIndex + 1] := cALMimeBase64_ENCODE_TABLE[B and $3F];
+    B := B shr 6;
+    OutputBuffer[OutIndex + 0] := cALMimeBase64_ENCODE_TABLE[B];
+    Inc(OutIndex, 3);
+  end;
+
+  { End of data & padding. }
+  case InputByteCount - OuterLimit of
+    1:
+      begin
+        B := InputBuffer[InIndex + 0];
+        B := B shl 4;
+        OutputBuffer[OutIndex + 1] := cALMimeBase64_ENCODE_TABLE[B and $3F];
+        B := B shr 6;
+        OutputBuffer[OutIndex + 0] := cALMimeBase64_ENCODE_TABLE[B];
+        OutputBuffer[OutIndex + 2] := cALMimeBase64_PAD_CHAR; { Pad remaining 2 bytes. }
+        OutputBuffer[OutIndex + 3] := cALMimeBase64_PAD_CHAR;
+      end;
+    2:
+      begin
+        B := InputBuffer[InIndex + 0];
+        B := B shl 8;
+        B := B or InputBuffer[InIndex + 1];
+        B := B shl 2;
+        OutputBuffer[OutIndex + 2] := cALMimeBase64_ENCODE_TABLE[B and $3F];
+        B := B shr 6;
+        OutputBuffer[OutIndex + 1] := cALMimeBase64_ENCODE_TABLE[B and $3F];
+        B := B shr 6;
+        OutputBuffer[OutIndex + 0] := cALMimeBase64_ENCODE_TABLE[B];
+        OutputBuffer[OutIndex + 3] := cALMimeBase64_PAD_CHAR; { Pad remaining byte. }
+      end;
+  end;
+end;
+
+{*******************************************************************************************************}
+procedure ALMimeBase64EncodeNoCRLF(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer);
+var
+  B: Cardinal;
+  InnerLimit, OuterLimit: NativeInt;
+  InPtr: PByte3;
+  OutPtr: PByte4;
+begin
+  if InputByteCount = 0 then
+    Exit;
 
   InPtr := @InputBuffer;
   OutPtr := @OutputBuffer;
 
   OuterLimit := InputByteCount div 3 * 3;
 
-  InnerLimit := Cardinal(InPtr);
+  InnerLimit := NativeUint(InPtr);
   Inc(InnerLimit, OuterLimit);
 
   { Last line loop. }
-  while Cardinal(InPtr) < InnerLimit do begin
+  while NativeUint(InPtr) < NativeUint(InnerLimit) do
+  begin
     { Read 3 bytes from InputBuffer. }
-    B := InPtr^.b1;
+    B := InPtr^.B1;
     B := B shl 8;
-    B := B or InPtr^.b2;
+    B := B or InPtr^.B2;
     B := B shl 8;
-    B := B or InPtr^.b3;
+    B := B or InPtr^.B3;
     Inc(InPtr);
     { Write 4 bytes to OutputBuffer (in reverse order). }
-    OutPtr^.b4 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+    OutPtr^.B4 := cALMimeBase64_ENCODE_TABLE[B and $3F];
     B := B shr 6;
-    OutPtr^.b3 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+    OutPtr^.B3 := cALMimeBase64_ENCODE_TABLE[B and $3F];
     B := B shr 6;
-    OutPtr^.b2 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+    OutPtr^.B2 := cALMimeBase64_ENCODE_TABLE[B and $3F];
     B := B shr 6;
-    OutPtr^.b1 := CALMIME_Base64_ENCODE_TABLE[B];
+    OutPtr^.B1 := cALMimeBase64_ENCODE_TABLE[B];
     Inc(OutPtr);
   end;
 
@@ -358,97 +630,172 @@ begin
   case InputByteCount - OuterLimit of
     1:
       begin
-        B := InPtr^.b1;
+        B := InPtr^.B1;
         B := B shl 4;
-        OutPtr.b2 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+        OutPtr.B2 := cALMimeBase64_ENCODE_TABLE[B and $3F];
         B := B shr 6;
-        OutPtr.b1 := CALMIME_Base64_ENCODE_TABLE[B];
-        OutPtr.b3 := CALMIME_Base64_PAD_CHAR; { Pad remaining 2 bytes. }
-        OutPtr.b4 := CALMIME_Base64_PAD_CHAR;
+        OutPtr.B1 := cALMimeBase64_ENCODE_TABLE[B];
+        OutPtr.B3 := cALMimeBase64_PAD_CHAR; { Pad remaining 2 bytes. }
+        OutPtr.B4 := cALMimeBase64_PAD_CHAR;
       end;
     2:
       begin
-        B := InPtr^.b1;
+        B := InPtr^.B1;
         B := B shl 8;
-        B := B or InPtr^.b2;
+        B := B or InPtr^.B2;
         B := B shl 2;
-        OutPtr.b3 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+        OutPtr.B3 := cALMimeBase64_ENCODE_TABLE[B and $3F];
         B := B shr 6;
-        OutPtr.b2 := CALMIME_Base64_ENCODE_TABLE[B and $3F];
+        OutPtr.B2 := cALMimeBase64_ENCODE_TABLE[B and $3F];
         B := B shr 6;
-        OutPtr.b1 := CALMIME_Base64_ENCODE_TABLE[B];
-        OutPtr.b4 := CALMIME_Base64_PAD_CHAR; { Pad remaining byte. }
+        OutPtr.B1 := cALMimeBase64_ENCODE_TABLE[B];
+        OutPtr.B4 := cALMimeBase64_PAD_CHAR; { Pad remaining byte. }
       end;
   end;
 end;
 
-{**********************************************************************************************************}
-function ALMimeBase64Decode(const InputBuffer; const InputBytesCount: Cardinal; out OutputBuffer): Cardinal;
-var ByteBuffer, ByteBufferSpace: Cardinal;
+{**************}
+// Decoding Core
+function ALMimeBase64Decode(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt): NativeInt;
+var
+  ByteBuffer, ByteBufferSpace: Cardinal;
 begin
   ByteBuffer := 0;
   ByteBufferSpace := 4;
-  Result := alMimeBase64DecodePartial(InputBuffer, InputBytesCount, OutputBuffer, ByteBuffer, ByteBufferSpace);
-  Inc(Result, alMimeBase64DecodePartialEnd(Pointer(Cardinal(@OutputBuffer) + Result)^, ByteBuffer, ByteBufferSpace));
+  Result := ALMimeBase64DecodePartial(InputBuffer, InputOffset, InputByteCount, OutputBuffer, OutputOffset, ByteBuffer, ByteBufferSpace);
+  Inc(Result, ALMimeBase64DecodePartialEnd(OutputBuffer, OutputOffset + Result, ByteBuffer, ByteBufferSpace));
 end;
 
-{**************************************************************************************************************************************************************************}
-function ALMimeBase64DecodePartial(const InputBuffer; const InputBytesCount: Cardinal; out OutputBuffer; var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): Cardinal;
-var lByteBuffer, lByteBufferSpace, C: Cardinal;
-    InPtr, OuterLimit: ^Byte;
-    OutPtr: PALMimeBase64Byte3;
+{**************}
+// Decoding Core
+function ALMimeBase64Decode(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer): NativeInt;
+var
+  ByteBuffer, ByteBufferSpace: Cardinal;
+  O: PByte;
 begin
-  if InputBytesCount > 0 then begin
+  ByteBuffer := 0;
+  ByteBufferSpace := 4;
+  Result := ALMimeBase64DecodePartial(InputBuffer, InputByteCount, OutputBuffer, ByteBuffer, ByteBufferSpace);
+  O := @OutputBuffer;
+  Inc(O, Result);
+  Inc(Result, ALMimeBase64DecodePartialEnd(O^, ByteBuffer, ByteBufferSpace));
+end;
+
+{******************************************************************************************}
+function ALMimeBase64DecodePartial(const InputBuffer: TByteDynArray; InputOffset: NativeInt;
+  const InputByteCount: NativeInt; out OutputBuffer: TByteDynArray; OutputOffset: NativeInt;
+  var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): NativeInt;
+var
+  LByteBuffer, LByteBufferSpace, C: Cardinal;
+  InIndex, OuterLimit: NativeInt;
+  OutIndex: NativeInt;
+begin
+  if InputByteCount > 0 then
+    begin
+      InIndex := InputOffset;
+      OuterLimit := InIndex + InputByteCount;
+      OutIndex := OutputOffset;
+      LByteBuffer := ByteBuffer;
+      LByteBufferSpace := ByteBufferSpace;
+      while InIndex < OuterLimit do
+      begin
+        { Read from InputBuffer. }
+        C := cALMimeBase64_DECODE_TABLE[InputBuffer[InIndex]];
+        Inc(InIndex);
+        if C = $FF then
+          Continue;
+        LByteBuffer := LByteBuffer shl 6;
+        LByteBuffer := LByteBuffer or C;
+        Dec(LByteBufferSpace);
+        { Have we read 4 bytes from InputBuffer? }
+        if LByteBufferSpace <> 0 then
+          Continue;
+
+        { Write 3 bytes to OutputBuffer (in reverse order). }
+        OutputBuffer[OutIndex + 2] := Byte(LByteBuffer);
+        LByteBuffer := LByteBuffer shr 8;
+        OutputBuffer[OutIndex + 1] := Byte(LByteBuffer);
+        LByteBuffer := LByteBuffer shr 8;
+        OutputBuffer[OutIndex + 0] := Byte(LByteBuffer);
+        LByteBuffer := 0;
+        Inc(OutIndex, 3);
+        LByteBufferSpace := 4;
+      end;
+      ByteBuffer := LByteBuffer;
+      ByteBufferSpace := LByteBufferSpace;
+      Result := OutIndex - OutputOffset;
+    end
+  else
+    Result := 0;
+end;
+
+{******************************************************************************************************}
+function ALMimeBase64DecodePartial(const InputBuffer; const InputByteCount: NativeInt; out OutputBuffer;
+  var ByteBuffer: Cardinal; var ByteBufferSpace: Cardinal): NativeInt;
+var
+  LByteBuffer, LByteBufferSpace, C: Cardinal;
+  InPtr, OuterLimit: PByte;
+  OutPtr: PByte3;
+begin
+  if InputByteCount > 0 then
+  begin
     InPtr := @InputBuffer;
-    Cardinal(OuterLimit) := Cardinal(InPtr) + InputBytesCount;
+    OuterLimit := Pointer(NativeUint(InPtr) + NativeUint(InputByteCount));
     OutPtr := @OutputBuffer;
-    lByteBuffer := ByteBuffer;
-    lByteBufferSpace := ByteBufferSpace;
-    while InPtr <> OuterLimit do begin
+    LByteBuffer := ByteBuffer;
+    LByteBufferSpace := ByteBufferSpace;
+    while InPtr <> OuterLimit do
+    begin
       { Read from InputBuffer. }
-      C := CALMIME_Base64_DECODE_TABLE[InPtr^];
+      C := cALMimeBase64_DECODE_TABLE[InPtr^];
       Inc(InPtr);
-      if C = $FF then Continue;
-      lByteBuffer := lByteBuffer shl 6;
-      lByteBuffer := lByteBuffer or C;
-      Dec(lByteBufferSpace);
+      if C = $FF then
+        Continue;
+      LByteBuffer := LByteBuffer shl 6;
+      LByteBuffer := LByteBuffer or C;
+      Dec(LByteBufferSpace);
       { Have we read 4 bytes from InputBuffer? }
-      if lByteBufferSpace <> 0 then Continue;
+      if LByteBufferSpace <> 0 then
+        Continue;
 
       { Write 3 bytes to OutputBuffer (in reverse order). }
-      OutPtr^.b3 := Byte(lByteBuffer);
-      lByteBuffer := lByteBuffer shr 8;
-      OutPtr^.b2 := Byte(lByteBuffer);
-      lByteBuffer := lByteBuffer shr 8;
-      OutPtr^.b1 := Byte(lByteBuffer);
-      lByteBuffer := 0;
+      OutPtr^.B3 := Byte(LByteBuffer);
+      LByteBuffer := LByteBuffer shr 8;
+      OutPtr^.B2 := Byte(LByteBuffer);
+      LByteBuffer := LByteBuffer shr 8;
+      OutPtr^.B1 := Byte(LByteBuffer);
+      LByteBuffer := 0;
       Inc(OutPtr);
-      lByteBufferSpace := 4;
+      LByteBufferSpace := 4;
     end;
-    ByteBuffer := lByteBuffer;
-    ByteBufferSpace := lByteBufferSpace;
-    Result := Cardinal(OutPtr) - Cardinal(@OutputBuffer);
+    ByteBuffer := LByteBuffer;
+    ByteBufferSpace := LByteBufferSpace;
+    Result := NativeInt(NativeUint(OutPtr) - NativeUint(@OutputBuffer));
   end
-  else Result := 0;
+  else
+    Result := 0;
 end;
 
-{*****************************************************************************************************************************}
-function ALMimeBase64DecodePartialEnd(out OutputBuffer; const ByteBuffer: Cardinal; const ByteBufferSpace: Cardinal): Cardinal;
-var lByteBuffer: Cardinal;
+{*********************************************************************************************}
+function ALMimeBase64DecodePartialEnd(out OutputBuffer: TByteDynArray; OutputOffset: NativeInt;
+  const ByteBuffer: Cardinal; const ByteBufferSpace: Cardinal): NativeInt;
+var
+  LByteBuffer: Cardinal;
 begin
   case ByteBufferSpace of
     1:
       begin
-        lByteBuffer := ByteBuffer shr 2;
-        PALMimeBase64Byte3(@OutputBuffer)^.b2 := Byte(lByteBuffer);
-        lByteBuffer := lByteBuffer shr 8;
-        PALMimeBase64Byte3(@OutputBuffer)^.b1 := Byte(lByteBuffer);
+        LByteBuffer := ByteBuffer shr 2;
+        OutputBuffer[OutputOffset + 1] := Byte(LByteBuffer);
+        LByteBuffer := LByteBuffer shr 8;
+        OutputBuffer[OutputOffset + 0] := Byte(LByteBuffer);
         Result := 2;
       end;
     2:
       begin
-        lByteBuffer := ByteBuffer shr 4;
-        PALMimeBase64Byte3(@OutputBuffer)^.b1 := Byte(lByteBuffer);
+        LByteBuffer := ByteBuffer shr 4;
+        OutputBuffer[OutputOffset + 0] := Byte(LByteBuffer);
         Result := 1;
       end;
   else
@@ -456,8 +803,167 @@ begin
   end;
 end;
 
-{*************************************************************}
-procedure ALFillMimeContentTypeByExtList(AMIMEList : TStrings);
+{*********************************************************************************}
+function ALMimeBase64DecodePartialEnd(out OutputBuffer; const ByteBuffer: Cardinal;
+  const ByteBufferSpace: Cardinal): NativeInt;
+var
+  LByteBuffer: Cardinal;
+begin
+  case ByteBufferSpace of
+    1:
+      begin
+        LByteBuffer := ByteBuffer shr 2;
+        PByte3(@OutputBuffer)^.B2 := Byte(LByteBuffer);
+        LByteBuffer := LByteBuffer shr 8;
+        PByte3(@OutputBuffer)^.B1 := Byte(LByteBuffer);
+        Result := 2;
+      end;
+    2:
+      begin
+        LByteBuffer := ByteBuffer shr 4;
+        PByte3(@OutputBuffer)^.B1 := Byte(LByteBuffer);
+        Result := 1;
+      end;
+  else
+    Result := 0;
+  end;
+end;
+
+{*************************}
+// File Encoding & Decoding
+procedure ALMimeBase64EncodeFile(const InputFileName, OutputFileName: TFileName);
+var
+  InputStream, OutputStream: TFileStream;
+begin
+  InputStream := TFileStream.Create(InputFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    OutputStream := TFileStream.Create(OutputFileName, fmCreate);
+    try
+      ALMimeBase64EncodeStream(InputStream, OutputStream);
+    finally
+      OutputStream.Free;
+    end;
+  finally
+    InputStream.Free;
+  end;
+end;
+
+{*************************************************************************************}
+procedure ALMimeBase64EncodeFileNoCRLF(const InputFileName, OutputFileName: TFileName);
+var
+  InputStream, OutputStream: TFileStream;
+begin
+  InputStream := TFileStream.Create(InputFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    OutputStream := TFileStream.Create(OutputFileName, fmCreate);
+    try
+      ALMimeBase64EncodeStreamNoCRLF(InputStream, OutputStream);
+    finally
+      OutputStream.Free;
+    end;
+  finally
+    InputStream.Free;
+  end;
+end;
+
+{*******************************************************************************}
+procedure ALMimeBase64DecodeFile(const InputFileName, OutputFileName: TFileName);
+var
+  InputStream, OutputStream: TFileStream;
+begin
+  InputStream := TFileStream.Create(InputFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    OutputStream := TFileStream.Create(OutputFileName, fmCreate);
+    try
+      ALMimeBase64DecodeStream(InputStream, OutputStream);
+    finally
+      OutputStream.Free;
+    end;
+  finally
+    InputStream.Free;
+  end;
+end;
+
+{***************************}
+// Stream Encoding & Decoding
+procedure ALMimeBase64EncodeStream(const InputStream: TStream; const OutputStream: TStream);
+var
+  InputBuffer: array [0..cALMimeBase64_BUFFER_SIZE - 1] of Byte;
+  OutputBuffer: array [0..(cALMimeBase64_BUFFER_SIZE + 2) div 3 * 4 + cALMimeBase64_BUFFER_SIZE div cALMimeBase64_DECODED_LINE_BREAK * 2 - 1] of Byte;
+  BytesRead: NativeInt;
+  IDelta, ODelta: NativeInt;
+  I, O: PByte;
+begin
+  InputBuffer[0] := 0;
+  BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
+
+  while BytesRead = Length(InputBuffer) do
+  begin
+    ALMimeBase64EncodeFullLines(InputBuffer, Length(InputBuffer), OutputBuffer);
+    OutputStream.Write(OutputBuffer, Length(OutputBuffer));
+    BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
+  end;
+
+  ALMimeBase64EncodeFullLines(InputBuffer, BytesRead, OutputBuffer);
+
+  IDelta := BytesRead div cALMimeBase64_DECODED_LINE_BREAK; // Number of lines processed.
+  ODelta := IDelta * (cALMimeBase64_ENCODED_LINE_BREAK + 2);
+  IDelta := IDelta * cALMimeBase64_DECODED_LINE_BREAK;
+
+  I := @InputBuffer;
+  Inc(I, IDelta);
+  O := @OutputBuffer;
+  Inc(O, ODelta);
+
+  ALMimeBase64EncodeNoCRLF(I^, BytesRead - IDelta, O^);
+
+  OutputStream.Write(OutputBuffer, ALMimeBase64EncodedSize(BytesRead));
+end;
+
+{************************************************************************************************}
+procedure ALMimeBase64EncodeStreamNoCRLF(const InputStream: TStream; const OutputStream: TStream);
+var
+  InputBuffer: array [0..cALMimeBase64_BUFFER_SIZE - 1] of Byte;
+  OutputBuffer: array [0..((cALMimeBase64_BUFFER_SIZE + 2) div 3) * 4 - 1] of Byte;
+  BytesRead: NativeInt;
+begin
+  InputBuffer[0] := 0;
+  BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
+
+  while BytesRead = Length(InputBuffer) do
+  begin
+    ALMimeBase64EncodeNoCRLF(InputBuffer, Length(InputBuffer), OutputBuffer);
+    OutputStream.Write(OutputBuffer, Length(OutputBuffer));
+    BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
+  end;
+
+  ALMimeBase64EncodeNoCRLF(InputBuffer, BytesRead, OutputBuffer);
+  OutputStream.Write(OutputBuffer, ALMimeBase64EncodedSizeNoCRLF(BytesRead));
+end;
+
+{******************************************************************************************}
+procedure ALMimeBase64DecodeStream(const InputStream: TStream; const OutputStream: TStream);
+var
+  ByteBuffer, ByteBufferSpace: Cardinal;
+  InputBuffer: array [0..cALMimeBase64_BUFFER_SIZE - 1] of Byte;
+  OutputBuffer: array [0..(cALMimeBase64_BUFFER_SIZE + 3) div 4 * 3 - 1] of Byte;
+  BytesRead: NativeInt;
+begin
+  ByteBuffer := 0;
+  ByteBufferSpace := 4;
+  InputBuffer[0] := 0;
+  BytesRead := InputStream.Read(InputBuffer, SizeOf(InputBuffer));
+
+  while BytesRead > 0 do
+  begin
+    OutputStream.Write(OutputBuffer, ALMimeBase64DecodePartial(InputBuffer, BytesRead, OutputBuffer, ByteBuffer, ByteBufferSpace));
+    BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
+  end;
+  OutputStream.Write(OutputBuffer, ALMimeBase64DecodePartialEnd(OutputBuffer, ByteBuffer, ByteBufferSpace));
+end;
+
+{***************************************************************}
+procedure ALFillMimeContentTypeByExtList(AMIMEList : TALStrings);
 var reg: TRegistry;
     KeyList: TStrings;
     i: Integer;
@@ -481,8 +987,8 @@ begin
             if reg.OpenKeyReadOnly('\' + aExt) then begin
               aExt := Trim(aExt);
               If (length(aExt) > 1) then begin
-                aContentType := trim(Reg.ReadString('Content Type'));
-                if aContentType <> '' then AMIMEList.Values[alLowerCase(aExt)] := AlLowerCase(aContentType);
+                aContentType := Trim(Reg.ReadString('Content Type'));
+                if aContentType <> '' then AMIMEList.Values[alLowerCase(ansiString(aExt))] := AlLowerCase(ansistring(aContentType));
               end;
               Reg.CloseKey;
             end;
@@ -499,8 +1005,8 @@ begin
   end;
 end;
 
-{*************************************************************}
-procedure ALFillExtByMimeContentTypeList(AMIMEList : TStrings);
+{***************************************************************}
+procedure ALFillExtByMimeContentTypeList(AMIMEList : TALStrings);
 var reg: TRegistry;
     KeyList: TStrings;
     i: Integer;
@@ -522,12 +1028,12 @@ begin
           aContentType := KeyList[i];
           If aContentType <> '' then begin
             if Reg.OpenKeyreadOnly('\MIME\Database\Content Type\' + aContentType) then begin
-              aContenttype := trim(aContentType);
+              aContenttype := Trim(aContentType);
               if aContentType <> '' then begin
                 aExt := reg.ReadString('Extension');
                 if aExt <> '' then begin
                   If (aExt[1] <> '.') then aExt := '.' + aExt;
-                  AMIMEList.Values[alLowerCase(aContentType)] := AlLowerCase(aExt)
+                  AMIMEList.Values[alLowerCase(ansiString(aContentType))] := AlLowerCase(ansistring(aExt))
                 end;
               end;
               Reg.CloseKey;
@@ -546,7 +1052,7 @@ begin
 end;
 
 {****************************************************************************}
-Function ALGetDefaultFileExtFromMimeContentType(aContentType: String): String;
+Function ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
 Var P: integer;
     Index : Integer;
 Begin
@@ -555,18 +1061,18 @@ Begin
   aContentType := ALLowerCase(aContentType);
   P := AlPosEx(';',aContentType);
   if (P > 0) then delete(aContentType,P,MaxInt);
-  aContentType := Trim(AContentType);
+  aContentType := ALTrim(AContentType);
 
   Index := vAlExtbyMimeContentTypeList.IndexOfName(aContentType);
   if Index <> -1 then Result := vAlExtbyMimeContentTypeList.ValueFromIndex[Index];
 end;
 
 {****************************************************************}
-Function ALGetDefaultMIMEContentTypeFromExt(aExt: String): String;
+Function ALGetDefaultMIMEContentTypeFromExt(aExt: AnsiString): AnsiString;
 var Index : Integer;
-    LExt: string;
+    LExt: AnsiString;
 begin
-  LExt := AlLowerCase(trim(aExt));
+  LExt := AlLowerCase(ALTrim(aExt));
   If (LExt = '') or (LExt[1] <> '.') then LExt := '.' + LExt;
   Index := vAlMimeContentTypeByExtList.IndexOfName(LExt);
   if Index <> -1 then Result := vAlMimeContentTypeByExtList.ValueFromIndex[Index]

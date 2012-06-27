@@ -1,16 +1,16 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
+svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALQuickSortList
-Version:      3.50
+Version:      4.00
 
 Description:  TALIntegerList or TALDoubleList that work exactly
               like TstringList but with integer or Double.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     16/06/2012: Add xe2 Support
 
 Link :
 
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALQuickSortList;
 
@@ -60,15 +60,25 @@ interface
 uses Classes,
      ALAVLBinaryTree;
 
+{$if CompilerVersion<=18.5}
+//http://stackoverflow.com/questions/7630781/delphi-2007-and-xe2-using-nativeint
+type
+  NativeInt = Integer;
+  NativeUInt = Cardinal;
+{$ifend}     
+
 Type
 
   {----------------------------------------------------------------------------------}
   TALQuickSortListCompare = function(List: TObject; Index1, Index2: Integer): Integer;
 
+  {-----------------------------------------}
+  TALQuickSortPointerList = array of Pointer;
+
   {-----------------------------------}
   TALBaseQuickSortList = class(TObject)
   private
-    FList: PPointerList;
+    FList: TALQuickSortPointerList;
     FCount: Integer;
     FCapacity: Integer;
     FSorted: Boolean;
@@ -86,12 +96,14 @@ Type
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure InsertItem(Index: Integer; Item: Pointer);
     procedure Insert(Index: Integer; Item: Pointer);
-    property  List: PPointerList read FList;
+    property  List: TALQuickSortPointerList read FList;
   public
     Constructor Create;
     destructor Destroy; override;
     procedure Clear; virtual;
     procedure Delete(Index: Integer);
+    class procedure Error(const Msg: string; Data: NativeInt); overload; virtual;
+    class procedure Error(Msg: PResStringRec; Data: NativeInt); overload;
     procedure Exchange(Index1, Index2: Integer);
     function  Expand: TALBaseQuickSortList;
     procedure CustomSort(Compare: TALQuickSortListCompare); virtual;
@@ -225,22 +237,25 @@ Type
   {-----------------------------}
   TALBaseAVLList = class(TObject)
   private
-    FList: PPointerList;
+    FList: TALQuickSortPointerList;
     FCount: Integer;
     FCapacity: Integer;
     FDuplicates: TDuplicates;
   protected
     function  Get(Index: Integer): Pointer;
     procedure Grow;
+    procedure Notify(Ptr: Pointer; Action: TListNotification); virtual;
     procedure SetCapacity(NewCapacity: Integer);
     procedure SetCount(NewCount: Integer);
     procedure InsertItem(Index: Integer; Item: Pointer);
-    property  List: PPointerList read FList;
+    property  List: TALQuickSortPointerList read FList;
   public
     Constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear; virtual;
     procedure Delete(Index: Integer);
+    class procedure Error(const Msg: string; Data: NativeInt); overload; virtual;
+    class procedure Error(Msg: PResStringRec; Data: NativeInt); overload;
     function  Expand: TALBaseAVLList;
     property  Capacity: Integer read FCapacity write SetCapacity;
     property  Count: Integer read FCount write SetCount;
@@ -280,11 +295,17 @@ Type
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
   end;
 
+resourcestring
+  SALDuplicateItem = 'List does not allow duplicates';
+  SALListCapacityError = 'List capacity out of bounds (%d)';
+  SALListCountError = 'List count out of bounds (%d)';
+  SALListIndexError = 'List index out of bounds (%d)';
+  SALSortedListError = 'Operation not allowed on sorted list';
+
 implementation
 
-uses SYSutils;
-
-{ TQuickSortList }
+uses SYSutils,
+     AlFcnString;
 
 {***********************************************************************************}
 function AlBaseQuickSortListCompare(List: TObject; Index1, Index2: Integer): Integer;
@@ -295,7 +316,7 @@ end;
 {**************************************}
 constructor TALBaseQuickSortList.Create;
 begin
-  FList:= nil;
+  SetLength(FList,0);
   FCount:= 0;
   FCapacity:= 0;
   FSorted := False;
@@ -318,126 +339,176 @@ end;
 {***********************************************************************}
 procedure TALBaseQuickSortList.InsertItem(Index: Integer; Item: Pointer);
 begin
-  if FCount = FCapacity then Grow;
-  if Index < FCount then System.Move(FList^[Index],
-                                     FList^[Index + 1],
-                                     (FCount - Index) * SizeOf(Pointer));
-  FList^[Index] := Item;
+  if FCount = FCapacity then
+    Grow;
+  if Index < FCount then
+    ALMove(FList[Index], FList[Index + 1],
+      (FCount - Index) * SizeOf(Pointer));
+  FList[Index] := Item;
   Inc(FCount);
-  if Item <> nil then
+  if (Item <> nil) then
     Notify(Item, lnAdded);
 end;
 
 {********************************************************************}
 procedure TALBaseQuickSortList.ExchangeItems(Index1, Index2: Integer);
-var Item: Pointer;
+var
+  Item: Pointer;
 begin
-  Item := FList^[Index1];
-  FList^[Index1] := FList^[Index2];
-  FList^[Index2] := Item;
+  Item := FList[Index1];
+  FList[Index1] := FList[Index2];
+  FList[Index2] := Item;
 end;
 
 {****************************************************}
 procedure TALBaseQuickSortList.Delete(Index: Integer);
-var Temp: Pointer;
+var
+  Temp: Pointer;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  Temp := Get(Index);
+  if (Index < 0) or (Index >= FCount) then
+    Error(@SALListIndexError, Index);
+  Temp := FList[Index];
   Dec(FCount);
-  if Index < FCount then System.Move(FList^[Index + 1],
-                                     FList^[Index],
-                                     (FCount - Index) * SizeOf(Pointer));
-  if Temp <> nil then Notify(Temp, lnDeleted);
+  if Index < FCount then
+    ALMove(FList[Index + 1], FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
+  if (Temp <> nil) then
+    Notify(Temp, lnDeleted);
+end;
+
+{*****************************************************************************}
+class procedure TALBaseQuickSortList.Error(const Msg: string; Data: NativeInt);
+begin
+  raise EListError.CreateFmt(Msg, [Data]);
+end;
+
+{******************************************************************************}
+class procedure TALBaseQuickSortList.Error(Msg: PResStringRec; Data: NativeInt);
+begin
+  raise EListError.CreateFmt(LoadResString(Msg), [Data]);
 end;
 
 {***************************************************************}
 procedure TALBaseQuickSortList.Exchange(Index1, Index2: Integer);
 begin
   {Warning:	Do not call Exchange on a sorted list except to swap two identical
-   strings with different associated objects. Exchange does not check whether
+   items with different associated objects. Exchange does not check whether
    the list is sorted, and can destroy the sort order of a sorted list.}
-  if (Index1 < 0) or (Index1 >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index1]));
-  if (Index2 < 0) or (Index2 >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index2]));
+  if (Index1 < 0) or (Index1 >= FCount) then
+    Error(@SALListIndexError, Index1);
+  if (Index2 < 0) or (Index2 >= FCount) then
+    Error(@SALListIndexError, Index2);
   ExchangeItems(Index1, Index2);
 end;
 
 {*******************************************************************}
 procedure TALBaseQuickSortList.Insert(Index: Integer; Item: Pointer);
 begin
-  if Sorted then raise EListError.Create('Operation not allowed on sorted list');
-  if (Index < 0) or (Index > FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if Sorted then Error(@SALSortedListError, 0);
+  if (Index < 0) or (Index > FCount) then
+    Error(@SALListIndexError, Index);
   InsertItem(Index, Item);
 end;
 
 {****************************************************************}
 procedure TALBaseQuickSortList.Put(Index: Integer; Item: Pointer);
-var Temp: Pointer;
+var
+  Temp: Pointer;
 begin
-  if Sorted then raise EListError.Create('Operation not allowed on sorted list');
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  if Item <> FList^[Index] then begin
-    Temp := FList^[Index];
-    FList^[Index] := Item;
-    if Temp <> nil then Notify(Temp, lnDeleted);
-    if Item <> nil then Notify(Item, lnAdded);
+  if Sorted then
+    Error(@SALSortedListError, 0);
+  if (Index < 0) or (Index >= FCount) then
+    Error(@SALListIndexError, Index);
+  if Item <> FList[Index] then
+  begin
+    Temp := FList[Index];
+    FList[Index] := Item;
+    if Temp <> nil then
+      Notify(Temp, lnDeleted);
+    if Item <> nil then
+      Notify(Item, lnAdded);
   end;
 end;
 
 {*********************************************************}
 function TALBaseQuickSortList.Get(Index: Integer): Pointer;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  Result := FList^[Index];
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SALListIndexError, Index);
+  Result := FList[Index];
 end;
 
 {*********************************************************}
 function TALBaseQuickSortList.Expand: TALBaseQuickSortList;
 begin
-  if FCount = FCapacity then Grow;
+  if FCount = FCapacity then
+    Grow;
   Result := Self;
 end;
 
 {**********************************}
 procedure TALBaseQuickSortList.Grow;
-var Delta: Integer;
+var
+  Delta: Integer;
 begin
-  if FCapacity > 64 then Delta := FCapacity div 4
-  else if FCapacity > 8 then Delta := 16
-  else Delta := 4;
+  if FCapacity > 64 then
+    Delta := FCapacity div 4
+  else
+    if FCapacity > 8 then
+      Delta := 16
+    else
+      Delta := 4;
   SetCapacity(FCapacity + Delta);
 end;
 
 {***************************************************************}
 procedure TALBaseQuickSortList.SetCapacity(NewCapacity: Integer);
 begin
-  if (NewCapacity < FCount) or (NewCapacity > MaxListSize) then raise EListError.Create(format('List capacity out of bounds (%d)', [NewCapacity]));
-  if NewCapacity <> FCapacity then begin
-    ReallocMem(FList, NewCapacity * SizeOf(Pointer));
+  if NewCapacity < FCount then
+    Error(@SALListCapacityError, NewCapacity);
+  if NewCapacity <> FCapacity then
+  begin
+    SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
 end;
 
 {*********************************************************}
 procedure TALBaseQuickSortList.SetCount(NewCount: Integer);
-var I: Integer;
+var
+  I: Integer;
+  Temp: Pointer;
 begin
-  if (NewCount < 0) or (NewCount > MaxListSize) then raise EListError.Create(format('List count out of bounds (%d)', [NewCount]));
-  if NewCount > FCapacity then SetCapacity(NewCount);
-  if NewCount > FCount then FillChar(FList^[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
-  else for I := FCount - 1 downto NewCount do Delete(I);
-  FCount := NewCount;
+  if NewCount < 0 then
+    Error(@SALListCountError, NewCount);
+  if NewCount <> FCount then
+  begin
+    if NewCount > FCapacity then
+      SetCapacity(NewCount);
+    if NewCount > FCount then
+      FillChar(FList[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
+    else
+    for I := FCount - 1 downto NewCount do
+    begin
+      Dec(FCount);
+      Temp := List[I];
+      if Temp <> nil then
+        Notify(Temp, lnDeleted);
+    end;
+    FCount := NewCount;
+  end;
 end;
 
 {*****************************************************************************}
 procedure TALBaseQuickSortList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
-//virtual
 end;
 
 {*******************************************************}
 procedure TALBaseQuickSortList.SetSorted(Value: Boolean);
 begin
-  if FSorted <> Value then begin
+  if FSorted <> Value then
+  begin
     if Value then Sort;
     FSorted := Value;
   end;
@@ -445,7 +516,8 @@ end;
 
 {*****************************************************************************************}
 procedure TALBaseQuickSortList.QuickSort(L, R: Integer; SCompare: TALQuickSortListCompare);
-var I, J, P: Integer;
+var
+  I, J, P: Integer;
 begin
   repeat
     I := L;
@@ -454,10 +526,14 @@ begin
     repeat
       while SCompare(Self, I, P) < 0 do Inc(I);
       while SCompare(Self, J, P) > 0 do Dec(J);
-      if I <= J then begin
-        ExchangeItems(I, J);
-        if P = I then P := J
-        else if P = J then P := I;
+      if I <= J then
+      begin
+        if I <> J then
+          ExchangeItems(I, J);
+        if P = I then
+          P := J
+        else if P = J then
+          P := I;
         Inc(I);
         Dec(J);
       end;
@@ -470,7 +546,8 @@ end;
 {**************************************************************************}
 procedure TALBaseQuickSortList.CustomSort(Compare: TALQuickSortListCompare);
 begin
-  if not Sorted and (FCount > 1) then QuickSort(0, FCount - 1, Compare);
+  if not Sorted and (FCount > 1) then
+    QuickSort(0, FCount - 1, Compare);
 end;
 
 {**********************************}
@@ -479,13 +556,11 @@ begin
   CustomSort(AlBaseQuickSortListCompare);
 end;
 
-{********************************************************************************}
+{*********************************************************************************}
 function TALBaseQuickSortList.CompareItems(const Index1, Index2: Integer): Integer;
 begin
   Result := 0;
 end;
-
-{ TALIntegerList }
 
 {********************************************************}
 function TALIntegerList.Add(const Item: integer): Integer;
@@ -500,7 +575,7 @@ begin
   else if Find(Item, Result) then
     case Duplicates of
       dupIgnore: Exit;
-      dupError: raise EListError.Create('List does not allow duplicates');
+      dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
 end;
@@ -611,7 +686,7 @@ end;
 {*********************************************************}
 function TALIntegerList.GetObject(Index: Integer): TObject;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   Result :=  PALIntegerListItem(Get(index))^.FObject;
 end;
 
@@ -626,11 +701,9 @@ end;
 {*******************************************************************}
 procedure TALIntegerList.PutObject(Index: Integer; AObject: TObject);
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   PALIntegerListItem(Get(index))^.FObject := AObject;
 end;
-
-{ TALCardinalList }
 
 {**********************************************************}
 function TALCardinalList.Add(const Item: Cardinal): Integer;
@@ -645,7 +718,7 @@ begin
   else if Find(Item, Result) then
     case Duplicates of
       dupIgnore: Exit;
-      dupError: raise EListError.Create('List does not allow duplicates');
+      dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
 end;
@@ -771,7 +844,7 @@ end;
 {**********************************************************}
 function TALCardinalList.GetObject(Index: Integer): TObject;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   Result :=  PALCardinalListItem(Get(index))^.FObject;
 end;
 
@@ -786,11 +859,9 @@ end;
 {********************************************************************}
 procedure TALCardinalList.PutObject(Index: Integer; AObject: TObject);
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   PALCardinalListItem(Get(index))^.FObject := AObject;
 end;
-
-{ TALInt64List }
 
 {****************************************************}
 function TALInt64List.Add(const Item: Int64): Integer;
@@ -805,7 +876,7 @@ begin
   else if Find(Item, Result) then
     case Duplicates of
       dupIgnore: Exit;
-      dupError: raise EListError.Create('List does not allow duplicates');
+      dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
 end;
@@ -931,7 +1002,7 @@ end;
 {*******************************************************}
 function TALInt64List.GetObject(Index: Integer): TObject;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   Result :=  PALInt64ListItem(Get(index))^.FObject;
 end;
 
@@ -946,11 +1017,9 @@ end;
 {*****************************************************************}
 procedure TALInt64List.PutObject(Index: Integer; AObject: TObject);
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   PALInt64ListItem(Get(index))^.FObject := AObject;
 end;
-
-{ TALDoubleList }
 
 {******************************************************}
 function TALDoubleList.Add(const Item: Double): Integer;
@@ -965,7 +1034,7 @@ begin
   else if Find(Item, Result) then
     case Duplicates of
       dupIgnore: Exit;
-      dupError: raise EListError.Create('List does not allow duplicates');
+      dupError: Error(@SALDuplicateItem, 0);
     end;
   InsertItem(Result, Item, AObject);
 end;
@@ -1091,7 +1160,7 @@ end;
 {********************************************************}
 function TALDoubleList.GetObject(Index: Integer): TObject;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   Result :=  PALDoubleListItem(Get(index))^.FObject;
 end;
 
@@ -1106,16 +1175,14 @@ end;
 {******************************************************************}
 procedure TALDoubleList.PutObject(Index: Integer; AObject: TObject);
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   PALDoubleListItem(Get(index))^.FObject := AObject;
 end;
-
-{ TALBaseAVLList }
 
 {********************************}
 constructor TALBaseAVLList.Create;
 begin
-  FList:= nil;
+  Setlength(FList,0);
   FCount:= 0;
   FCapacity:= 0;
   FDuplicates := dupIgnore;
@@ -1137,73 +1204,118 @@ end;
 {*****************************************************************}
 procedure TALBaseAVLList.InsertItem(Index: Integer; Item: Pointer);
 begin
-  if FCount = FCapacity then Grow;
-  if Index < FCount then System.Move(FList^[Index],
-                                     FList^[Index + 1],
-                                     (FCount - Index) * SizeOf(Pointer));
-  FList^[Index] := Item;
+  if FCount = FCapacity then
+    Grow;
+  if Index < FCount then
+    ALMove(FList[Index], FList[Index + 1],
+      (FCount - Index) * SizeOf(Pointer));
+  FList[Index] := Item;
   Inc(FCount);
+  if (Item <> nil) then
+    Notify(Item, lnAdded);
 end;
 
 {**********************************************}
 procedure TALBaseAVLList.Delete(Index: Integer);
-var Temp: Pointer;
+var
+  Temp: Pointer;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  Temp := Get(Index);
+  if (Index < 0) or (Index >= FCount) then
+    Error(@SALListIndexError, Index);
+  Temp := FList[Index];
   Dec(FCount);
-  if Index < FCount then System.Move(FList^[Index + 1],
-                                     FList^[Index],
-                                     (FCount - Index) * SizeOf(Pointer));
-  if Temp <> nil then dispose(Temp);
+  if Index < FCount then
+    ALMove(FList[Index + 1], FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
+  if (Temp <> nil) then
+    Notify(Temp, lnDeleted);
+end;
+
+{***********************************************************************}
+class procedure TALBaseAVLList.Error(const Msg: string; Data: NativeInt);
+begin
+  raise EListError.CreateFmt(Msg, [Data]);
+end;
+
+{************************************************************************}
+class procedure TALBaseAVLList.Error(Msg: PResStringRec; Data: NativeInt);
+begin
+  raise EListError.CreateFmt(LoadResString(Msg), [Data]);
 end;
 
 {***************************************************}
 function TALBaseAVLList.Get(Index: Integer): Pointer;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  Result := FList^[Index];
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SALListIndexError, Index);
+  Result := FList[Index];
 end;
 
 {*********************************************}
 function TALBaseAVLList.Expand: TALBaseAVLList;
 begin
-  if FCount = FCapacity then Grow;
+  if FCount = FCapacity then
+    Grow;
   Result := Self;
 end;
 
 {****************************}
 procedure TALBaseAVLList.Grow;
-var Delta: Integer;
+var
+  Delta: Integer;
 begin
-  if FCapacity > 64 then Delta := FCapacity div 4
-  else if FCapacity > 8 then Delta := 16
-  else Delta := 4;
+  if FCapacity > 64 then
+    Delta := FCapacity div 4
+  else
+    if FCapacity > 8 then
+      Delta := 16
+    else
+      Delta := 4;
   SetCapacity(FCapacity + Delta);
+end;
+
+{***********************************************************************}
+procedure TALBaseAVLList.Notify(Ptr: Pointer; Action: TListNotification);
+begin
 end;
 
 {*********************************************************}
 procedure TALBaseAVLList.SetCapacity(NewCapacity: Integer);
 begin
-  if (NewCapacity < FCount) or (NewCapacity > MaxListSize) then raise EListError.Create(format('List capacity out of bounds (%d)', [NewCapacity]));
-  if NewCapacity <> FCapacity then begin
-    ReallocMem(FList, NewCapacity * SizeOf(Pointer));
+  if NewCapacity < FCount then
+    Error(@SALListCapacityError, NewCapacity);
+  if NewCapacity <> FCapacity then
+  begin
+    SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
 end;
 
 {***************************************************}
 procedure TALBaseAVLList.SetCount(NewCount: Integer);
-var I: Integer;
+var
+  I: Integer;
+  Temp: Pointer;
 begin
-  if (NewCount < 0) or (NewCount > MaxListSize) then raise EListError.Create(format('List count out of bounds (%d)', [NewCount]));
-  if NewCount > FCapacity then SetCapacity(NewCount);
-  if NewCount > FCount then FillChar(FList^[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
-  else for I := FCount - 1 downto NewCount do Delete(I);
-  FCount := NewCount;
+  if NewCount < 0 then
+    Error(@SALListCountError, NewCount);
+  if NewCount <> FCount then
+  begin
+    if NewCount > FCapacity then
+      SetCapacity(NewCount);
+    if NewCount > FCount then
+      FillChar(FList[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
+    else
+    for I := FCount - 1 downto NewCount do
+    begin
+      Dec(FCount);
+      Temp := List[I];
+      if Temp <> nil then
+        Notify(Temp, lnDeleted);
+    end;
+    FCount := NewCount;
+  end;
 end;
-
-{ TALAVLInt64ListBinaryTreeNode }
 
 {***********************************************}
 constructor TALAVLInt64ListBinaryTreeNode.Create;
@@ -1212,8 +1324,6 @@ begin
   Obj := nil;
   idx := -1;
 end;
-
-{ TALInt64AVLList }
 
 {*********************************}
 constructor TALInt64AVLList.Create;
@@ -1251,11 +1361,9 @@ end;
 
 {****************************************************************************************}
 procedure TALInt64AVLList.InsertItem(Index: Integer; const item: Int64; AObject: TObject);
-Var aPALInt64ListItem: PALInt64ListItem;
-    aNode: TALAVLInt64ListBinaryTreeNode;
+Var aNode: TALAVLInt64ListBinaryTreeNode;
     i: integer;
 begin
-
   aNode := TALAVLInt64ListBinaryTreeNode.Create;
   aNode.ID := item;
   aNode.Obj := AObject;
@@ -1264,27 +1372,22 @@ begin
     aNode.free;
     case Duplicates of
       dupIgnore: Exit;
-      else raise EListError.Create('List does not allow duplicates');
+      else Error(@SALDuplicateItem, 0);
     end;
   end;
 
-  New(aPALInt64ListItem);
-  aPALInt64ListItem^.FInt64 := item;
-  aPALInt64ListItem^.FObject := aNode;
   try
-    inherited InsertItem(index,aPALInt64ListItem);
+    inherited InsertItem(index,aNode);
   except
-    Dispose(aPALInt64ListItem);
     FAVLBinTree.DeleteNode(item);
     raise;
   end;
 
   for i := Index + 1 to Count - 1 do
     inc(TALAVLInt64ListBinaryTreeNode(objects[i]).Idx);
-
 end;
 
-{*******************************************************************}
+{**********************************************************************}
 function TALInt64AVLList.Find(item: Int64; var Index: Integer): Boolean;
 var aNode: TALInt64KeyAVLBinaryTreeNode;
 begin
@@ -1296,7 +1399,7 @@ end;
 {******************************************************}
 function TALInt64AVLList.GetItem(Index: Integer): Int64;
 begin
-  Result := PALInt64ListItem(Get(index))^.FInt64
+  Result := TALAVLInt64ListBinaryTreeNode(Get(index)^).ID
 end;
 
 {*****************************************************}
@@ -1309,21 +1412,19 @@ end;
 procedure TALInt64AVLList.Delete(Index: Integer);
 var i: integer;
 begin
-
   FAVLBinTree.DeleteNode(GetItem(Index));
 
   for i := Index + 1 to Count - 1 do
-    dec(TALAVLInt64ListBinaryTreeNode(objects[i]).Idx);
+    dec(TALAVLInt64ListBinaryTreeNode(Get(i)^).Idx);
 
   inherited Delete(Index);
-
 end;
 
 {**********************************************************}
 function TALInt64AVLList.GetObject(Index: Integer): TObject;
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  Result :=  TALAVLInt64ListBinaryTreeNode(PALInt64ListItem(Get(index))^.FObject).Obj;
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
+  Result :=  TALAVLInt64ListBinaryTreeNode(Get(index)^).Obj;
 end;
 
 {****************************************************************}
@@ -1334,11 +1435,11 @@ begin
   Result := -1;
 end;
 
-{*****************************************************************}
+{********************************************************************}
 procedure TALInt64AVLList.PutObject(Index: Integer; AObject: TObject);
 begin
-  if (Index < 0) or (Index >= FCount) then raise EListError.Create(format('List index out of bounds (%d)', [Index]));
-  TALAVLInt64ListBinaryTreeNode(PALInt64ListItem(Get(index))^.FObject).Obj := AObject;
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
+  TALAVLInt64ListBinaryTreeNode(Get(index)^).Obj := AObject;
 end;
 
 end.

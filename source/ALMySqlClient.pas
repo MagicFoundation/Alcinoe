@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALMySqlClient
-Version:      3.53
+Version:      4.00
 
 Description:  An Object to query MySql Server Version 5 and get
               the Result In Xml Stream
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :    30/01/2008: Correct memory leak bug.
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://dev.mysql.com/doc/refman/5.0/en/
               http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
@@ -52,7 +52,7 @@ Link :        http://dev.mysql.com/doc/refman/5.0/en/
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit AlMySqlClient;
 
@@ -64,34 +64,36 @@ uses Windows,
      Contnrs,
      SyncObjs,
      AlXmlDoc,
+     ALStringList,
+     ALFcnString,
      AlMySqlWrapper;
 
 Type
 
   {-----------------------------------------------------------------------}
   TalMySqlClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
-                                                    ViewTag: String;
+                                                    ViewTag: AnsiString;
                                                     ExtData: Pointer;
                                                     Var Continue: Boolean);
 
-  {------------------------------}
-  EALMySqlError = class(Exception)
+  {---------------------------------}
+  EALMySqlError = class(EALException)
   private
     FErrorCode: Integer;
-    FSQLstate: String;
+    FSQLstate: AnsiString;
   public
-    constructor Create(aErrorMsg: string;
+    constructor Create(aErrorMsg: AnsiString;
                        aErrorCode: Integer;
-                       aSqlState: String); overload;
+                       aSqlState: AnsiString); overload;
     property ErrorCode: Integer read FErrorCode;
-    property SQLState: string read FSQLState;
+    property SQLState: AnsiString read FSQLState;
   end;
 
   {----------------------------------}
   TalMySqlClientSelectDataSQL = record
-    SQL: String;
-    RowTag: String;
-    ViewTag: String;
+    SQL: AnsiString;
+    RowTag: AnsiString;
+    ViewTag: AnsiString;
     Skip: integer;
     First: Integer;
   end;
@@ -99,7 +101,7 @@ Type
 
   {----------------------------------}
   TalMySqlClientUpdateDataSQL = record
-    SQL: String;
+    SQL: AnsiString;
   end;
   TalMySqlClientUpdateDataSQLs = array of TalMySqlClientUpdateDataSQL;
 
@@ -116,29 +118,29 @@ Type
     fLibrary: TALMySqlLibrary;
     FownLibrary: Boolean;
     fMySql: PMySql;
-    fNullString: String;
+    fNullString: AnsiString;
     finTransaction: Boolean;
-    fMySQLFormatSettings: TformatSettings;
+    fMySQLFormatSettings: TALFormatSettings;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
   Protected
     procedure CheckAPIError(Error: Boolean);
-    Function  GetFieldValue(aFieldValue: Pchar;
+    Function  GetFieldValue(aFieldValue: PAnsiChar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
-                            aFormatSettings: TformatSettings): String;
+                            aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
   Public
     Constructor Create(ApiVer: TALMySqlVersion_API;
-                       const lib: String = 'libmysql.dll'); overload; virtual;
+                       const lib: AnsiString = 'libmysql.dll'); overload; virtual;
     Constructor Create(lib: TALMySqlLibrary); overload; virtual;
     Destructor Destroy; Override;
-    Procedure Connect(Host: String;
+    Procedure Connect(Host: AnsiString;
                       Port: integer;
                       DataBaseName,
                       Login,
                       Password,
-                      CharSet: String;
+                      CharSet: AnsiString;
                       Const ClientFlag: Cardinal = 0;
                       Const Options: TALMySQLOptions = nil); virtual;
     Procedure Disconnect;
@@ -149,59 +151,59 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs); overload;
     procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL); overload;
-    procedure UpdateData(SQLs: Tstrings); overload;
-    procedure UpdateData(SQL: String); overload;
-    procedure UpdateData(SQLs: array of string); overload;
-    function  insert_id(SQL: String): ULongLong;
+    procedure UpdateData(SQLs: TALStrings); overload;
+    procedure UpdateData(SQL: AnsiString); overload;
+    procedure UpdateData(SQLs: array of AnsiString); overload;
+    function  insert_id(SQL: AnsiString): ULongLong;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
-    Property  NullString: String Read fNullString Write fNullString;
+    Property  NullString: AnsiString Read fNullString Write fNullString;
     property  Lib: TALMySqlLibrary read FLibrary;
   end;
 
-  {------------------------------------------------}
+  {----------------------------------------------}
   TalMySqlConnectionPoolContainer = Class(TObject)
     ConnectionHandle: PMySql;
     LastAccessDate: int64;
   End;
 
-  {---------------------------------------------}
+  {-------------------------------------------}
   TalMySqlConnectionPoolClient = Class(Tobject)
   Private
     FLibrary: TALMySqlLibrary;
@@ -212,52 +214,52 @@ Type
     FReleasingAllconnections: Boolean;
     FLastConnectionGarbage: Int64;
     FConnectionMaxIdleTime: integer;
-    FHost: String;
+    FHost: AnsiString;
     FPort: Integer;
-    FDataBaseName: String;
-    fLogin: String;
-    fPassword: String;
-    fCharset: String;
+    FDataBaseName: AnsiString;
+    fLogin: AnsiString;
+    fPassword: AnsiString;
+    fCharset: AnsiString;
     fOpenConnectionClientFlag: cardinal;
     FOpenConnectionOptions: TALMySQLOptions;
-    FNullString: String;
-    fMySQLFormatSettings: TformatSettings;
+    FNullString: AnsiString;
+    fMySQLFormatSettings: TALFormatSettings;
   Protected
     procedure CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
-    function  GetDataBaseName: String; virtual;
-    function  GetHost: String; virtual;
+    function  GetDataBaseName: AnsiString; virtual;
+    function  GetHost: AnsiString; virtual;
     function  GetPort: integer; virtual;
-    Function  GetFieldValue(aFieldValue: Pchar;
+    Function  GetFieldValue(aFieldValue: PAnsiChar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
-                            aFormatSettings: TformatSettings): String;
+                            aFormatSettings: TALFormatSettings): AnsiString;
     Function  AcquireConnection: PMySql; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
-    procedure initObject(aHost: String;
+    procedure initObject(aHost: AnsiString;
                          aPort: integer;
                          aDataBaseName,
                          aLogin,
                          aPassword,
-                         aCharSet: String;
+                         aCharSet: AnsiString;
                          Const aOpenConnectionClientFlag: Cardinal = 0;
                          Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
   Public
-    Constructor Create(aHost: String;
+    Constructor Create(aHost: AnsiString;
                        aPort: integer;
                        aDataBaseName,
                        aLogin,
                        aPassword,
-                       aCharSet: String;
+                       aCharSet: AnsiString;
                        aApiVer: TALMySqlVersion_API;
-                       Const alib: String = 'libmysql.dll';
+                       Const alib: AnsiString = 'libmysql.dll';
                        Const aOpenConnectionClientFlag: Cardinal = 0;
                        Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
-    Constructor Create(aHost: String;
+    Constructor Create(aHost: AnsiString;
                        aPort: integer;
                        aDataBaseName,
                        aLogin,
                        aPassword,
-                       aCharSet: String;
+                       aCharSet: AnsiString;
                        alib: TALMySqlLibrary;
                        Const aOpenConnectionClientFlag: Cardinal = 0;
                        Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
@@ -270,74 +272,73 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
+    Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
+    Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
+    Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL; const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: Tstrings; const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQL: String; const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: Array of String; const ConnectionHandle: PMySql = nil); overload; virtual;
-    Function  insert_id(SQL: String; const ConnectionHandle: PMySql = nil): UlongLong; virtual;
+    procedure UpdateData(SQLs: TALStrings; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQL: AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(SQLs: Array of AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
+    Function  insert_id(SQL: AnsiString; const ConnectionHandle: PMySql = nil): UlongLong; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
-    property  DataBaseName: String read GetDataBaseName;
-    property  Host: String read GetHost;
+    property  DataBaseName: AnsiString read GetDataBaseName;
+    property  Host: AnsiString read GetHost;
     property  Port: integer read GetPort;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
-    Property  NullString: String Read fNullString Write fNullString;
+    Property  NullString: AnsiString Read fNullString Write fNullString;
     property  Lib: TALMySqlLibrary read FLibrary;
   end;
 
-Function AlMySqlClientSlashedStr(Const Str: String): String;
+Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 
 implementation
 
-Uses ALWindows,
-     AlFcnString;
+Uses ALWindows;
 
-{**********************************************************}
-Function AlMySqlClientSlashedStr(Const Str: String): String;
+{******************************************************************}
+Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 var I: Integer;
 begin
   Result := Str;
@@ -346,10 +347,10 @@ begin
   Result := '''' + Result + '''';
 end;
 
-{*************************************************}
-constructor EALMySqlError.Create(aErrorMsg: string;
+{*****************************************************}
+constructor EALMySqlError.Create(aErrorMsg: AnsiString;
                                  aErrorCode: Integer;
-                                 aSqlState: String);
+                                 aSqlState: AnsiString);
 begin
   fErrorCode := aErrorCode;
   FSQLstate := aSqlState;
@@ -381,11 +382,11 @@ Begin
   end;
 end;
 
-{*******************************************************}
-function TalMySqlClient.GetFieldValue(aFieldValue: Pchar;
+{***********************************************************}
+function TalMySqlClient.GetFieldValue(aFieldValue: PAnsiChar;
                                       aFieldType: TMysqlFieldTypes;
                                       aFieldLength: integer;
-                                      aFormatSettings: TformatSettings): String;
+                                      aFormatSettings: TALFormatSettings): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -397,12 +398,12 @@ begin
       FIELD_TYPE_DECIMAL,
       FIELD_TYPE_NEWDECIMAL,
       FIELD_TYPE_FLOAT,
-      FIELD_TYPE_DOUBLE: result := floattostr(strtofloat(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_DATETIME: Result := DateTimeToStr(StrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_DATE,
-      FIELD_TYPE_NEWDATE: Result := DateToStr(StrToDate(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIME: Result := TimeToStr(StrToTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIMESTAMP: Result := DateTimeToStr(StrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_NULL: result := fNullString; // Example: SELECT NULL FROM DUAL
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
@@ -415,7 +416,7 @@ begin
   fMySql := nil;
   finTransaction := False;
   fNullString := '';
-  GetLocaleFormatSettings(1033, fMySQLFormatSettings);
+  ALGetLocaleFormatSettings(1033, fMySQLFormatSettings);
   fMySQLFormatSettings.DecimalSeparator := '.';
   fMySQLFormatSettings.ThousandSeparator := ',';
   fMySQLFormatSettings.DateSeparator := '-';
@@ -426,7 +427,7 @@ end;
 
 {************************************************************}
 constructor TalMySqlClient.Create(ApiVer: TALMySqlVersion_API;
-                                  const lib: String = 'libmysql.dll');
+                                  const lib: AnsiString = 'libmysql.dll');
 begin
   fLibrary := TALMySqlLibrary.Create(ApiVer);
   try
@@ -455,14 +456,14 @@ begin
   inherited;
 end;
 
-{**********************************************************
+{*************************************************************
 http://dev.mysql.com/doc/refman/5.1/en/mysql-real-connect.html}
-procedure TalMySqlClient.connect(Host: String;
+procedure TalMySqlClient.connect(Host: AnsiString;
                                  Port: integer;
                                  DataBaseName,
                                  Login,
                                  Password,
-                                 CharSet: String;
+                                 CharSet: AnsiString;
                                  Const ClientFlag: Cardinal = 0;
                                  const Options: TALMySQLOptions = nil);
 var i: integer;
@@ -482,7 +483,7 @@ begin
   	CheckAPIError(fMySQL = nil);
 
     //set the The name of the character set to use as the default character set.
-    If (CharSet <> '') then CheckAPIError(fLibrary.mysql_options(fMySQL, MYSQL_SET_CHARSET_NAME, Pchar(CharSet)) <> 0);
+    If (CharSet <> '') then CheckAPIError(fLibrary.mysql_options(fMySQL, MYSQL_SET_CHARSET_NAME, PAnsiChar(CharSet)) <> 0);
 
     // set the options if they are existing
     for i := 0 to length(Options) - 1 do
@@ -492,10 +493,10 @@ begin
 
     //attempts to establish a connection to a MySQL database engine running on host
     CheckAPIError(fLibrary.mysql_real_connect(fMySQL,
-                                              pChar(Host),
-                                              pChar(Login),
-                                              pChar(Password),
-                                              Pchar(DatabaseName),
+                                              PAnsiChar(Host),
+                                              PAnsiChar(Login),
+                                              PAnsiChar(Password),
+                                              PAnsiChar(DatabaseName),
                                               Port,
                                               nil,
                                               ClientFlag) = nil);
@@ -580,7 +581,7 @@ procedure TalMySqlClient.SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                                     XMLDATA: TalXMLNode;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 Var aMySqlRes: PMYSQL_RES;
     aMySqlRow: PMYSQL_ROW;
     aMySqlFields: array of PMYSQL_FIELD;
@@ -618,7 +619,7 @@ begin
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
       //prepare the query
-      CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
+      CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
       aMySqlRes := fLibrary.mysql_use_result(fMySQL);
       CheckAPIError(aMySqlRes = nil);
       Try
@@ -736,7 +737,7 @@ end;
 procedure TalMySqlClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -748,13 +749,13 @@ begin
              FormatSettings);
 end;
 
-{**********************************************}
-procedure TalMySqlClient.SelectData(SQL: String;
+{**************************************************}
+procedure TalMySqlClient.SelectData(SQL: AnsiString;
                                     Skip: Integer;
                                     First: Integer;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -770,11 +771,11 @@ begin
              FormatSettings);
 end;
 
-{**********************************************}
-procedure TalMySqlClient.SelectData(SQL: String;
+{**************************************************}
+procedure TalMySqlClient.SelectData(SQL: AnsiString;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -793,7 +794,7 @@ end;
 {*********************************************************************}
 procedure TalMySqlClient.SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 begin
 
   SelectData(SQLs,
@@ -807,7 +808,7 @@ end;
 {*******************************************************************}
 procedure TalMySqlClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -819,13 +820,13 @@ begin
              FormatSettings);
 end;
 
-{**********************************************}
-procedure TalMySqlClient.SelectData(SQL: String;
-                                    RowTag: String;
+{**************************************************}
+procedure TalMySqlClient.SelectData(SQL: AnsiString;
+                                    RowTag: AnsiString;
                                     Skip: Integer;
                                     First: Integer;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -841,11 +842,11 @@ begin
              FormatSettings);
 end;
 
-{**********************************************}
-procedure TalMySqlClient.SelectData(SQL: String;
-                                    RowTag: String;
+{**************************************************}
+procedure TalMySqlClient.SelectData(SQL: AnsiString;
+                                    RowTag: AnsiString;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -861,10 +862,10 @@ begin
              FormatSettings);
 end;
 
-{**********************************************}
-procedure TalMySqlClient.SelectData(SQL: String;
+{**************************************************}
+procedure TalMySqlClient.SelectData(SQL: AnsiString;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TformatSettings);
+                                    FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -896,7 +897,7 @@ begin
   For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
     //do the query
-    CheckAPIError(fLibrary.mysql_real_query(fMySQL, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
+    CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
 
   end;
 
@@ -911,8 +912,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{**************************************************}
-procedure TalMySqlClient.UpdateData(SQLs: Tstrings);
+{****************************************************}
+procedure TalMySqlClient.UpdateData(SQLs: TALStrings);
 Var aSQLsindex : integer;
     aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
@@ -923,8 +924,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{***********************************************}
-procedure TalMySqlClient.UpdateData(SQL: String);
+{***************************************************}
+procedure TalMySqlClient.UpdateData(SQL: AnsiString);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
@@ -932,8 +933,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{*********************************************************}
-procedure TalMySqlClient.UpdateData(SQLs: array of string);
+{*************************************************************}
+procedure TalMySqlClient.UpdateData(SQLs: array of AnsiString);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
     i: integer;
 begin
@@ -944,8 +945,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{********************************************************}
-function TalMySqlClient.insert_id(SQL: String): ULongLong;
+{************************************************************}
+function TalMySqlClient.insert_id(SQL: AnsiString): ULongLong;
 begin
 
   //if the SQL is not empty
@@ -982,14 +983,14 @@ begin
   end;
 end;
 
-{************************************************************}
-function TalMySqlConnectionPoolClient.GetDataBaseName: String;
+{****************************************************************}
+function TalMySqlConnectionPoolClient.GetDataBaseName: AnsiString;
 begin
   result := FdatabaseName;
 end;
 
-{****************************************************}
-function TalMySqlConnectionPoolClient.GetHost: String;
+{********************************************************}
+function TalMySqlConnectionPoolClient.GetHost: AnsiString;
 begin
   result := fHost;
 end;
@@ -1000,11 +1001,11 @@ begin
   result := fPort;
 end;
 
-{*********************************************************************}
-function TalMySqlConnectionPoolClient.GetFieldValue(aFieldValue: Pchar;
+{*************************************************************************}
+function TalMySqlConnectionPoolClient.GetFieldValue(aFieldValue: PAnsiChar;
                                                     aFieldType: TMysqlFieldTypes;
                                                     aFieldLength: integer;
-                                                    aFormatSettings: TformatSettings): String;
+                                                    aFormatSettings: TALFormatSettings): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -1016,25 +1017,25 @@ begin
       FIELD_TYPE_DECIMAL,
       FIELD_TYPE_NEWDECIMAL,
       FIELD_TYPE_FLOAT,
-      FIELD_TYPE_DOUBLE: result := floattostr(strtofloat(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_DATETIME: Result := DateTimeToStr(StrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_DATE,
-      FIELD_TYPE_NEWDATE: Result := DateToStr(StrToDate(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIME: Result := TimeToStr(StrToTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIMESTAMP: Result := DateTimeToStr(StrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_NULL: result := fNullString; // Example: SELECT NULL FROM DUAL
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
   end;
 end;
 
-{**************************************************************}
-procedure TalMySqlConnectionPoolClient.initObject(aHost: String;
+{******************************************************************}
+procedure TalMySqlConnectionPoolClient.initObject(aHost: AnsiString;
                                                   aPort: integer;
                                                   aDataBaseName,
                                                   aLogin,
                                                   aPassword,
-                                                  aCharSet: String;
+                                                  aCharSet: AnsiString;
                                                   Const aOpenConnectionClientFlag: Cardinal = 0;
                                                   Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
@@ -1053,7 +1054,7 @@ begin
   FLastConnectionGarbage := ALGettickCount64;
   FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
   FNullString := '';
-  GetLocaleFormatSettings(1033, fMySQLFormatSettings);
+  ALGetLocaleFormatSettings(1033, fMySQLFormatSettings);
   fMySQLFormatSettings.DecimalSeparator := '.';
   fMySQLFormatSettings.ThousandSeparator := ',';
   fMySQLFormatSettings.DateSeparator := '-';
@@ -1062,15 +1063,15 @@ begin
   fMySQLFormatSettings.ShortTimeFormat := 'hh:nn:ss';
 end;
 
-{************************************************************}
-constructor TalMySqlConnectionPoolClient.Create(aHost: String;
+{****************************************************************}
+constructor TalMySqlConnectionPoolClient.Create(aHost: AnsiString;
                                                 aPort: integer;
                                                 aDataBaseName,
                                                 aLogin,
                                                 aPassword,
-                                                aCharSet: String;
+                                                aCharSet: AnsiString;
                                                 aApiVer: TALMySqlVersion_API;
-                                                Const alib: String = 'libmysql.dll';
+                                                Const alib: AnsiString = 'libmysql.dll';
                                                 Const aOpenConnectionClientFlag: Cardinal = 0;
                                                 Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
@@ -1092,13 +1093,13 @@ begin
   End;
 end;
 
-{************************************************************}
-constructor TalMySqlConnectionPoolClient.Create(aHost: String;
+{****************************************************************}
+constructor TalMySqlConnectionPoolClient.Create(aHost: AnsiString;
                                                 aPort: integer;
                                                 aDataBaseName,
                                                 aLogin,
                                                 aPassword,
-                                                aCharSet: String;
+                                                aCharSet: AnsiString;
                                                 alib: TALMySqlLibrary;
                                                 Const aOpenConnectionClientFlag: Cardinal = 0;
                                                 Const aOpenConnectionOptions: TALMySQLOptions = nil);
@@ -1157,7 +1158,7 @@ Begin
     Try
 
       //raise an exception if currently realeasing all connection
-      if FReleasingAllconnections then raise exception.Create('Can not acquire connection: currently releasing all connections');
+      if FReleasingAllconnections then raise Exception.Create('Can not acquire connection: currently releasing all connections');
 
       //delete the old unused connection
       aTickCount := ALGetTickCount64;
@@ -1197,7 +1198,7 @@ Begin
           CheckAPIError(nil, result = nil);
 
           //set the The name of the character set to use as the default character set.
-          If (fCharSet <> '') then CheckAPIError(Result, fLibrary.mysql_options(Result, MYSQL_SET_CHARSET_NAME, Pchar(fCharSet)) <> 0);
+          If (fCharSet <> '') then CheckAPIError(Result, fLibrary.mysql_options(Result, MYSQL_SET_CHARSET_NAME, PAnsiChar(fCharSet)) <> 0);
 
           // set the options if they are existing
           for i := 0 to length(FOpenConnectionOptions) - 1 do
@@ -1207,10 +1208,10 @@ Begin
 
           //attempts to establish a connection to a MySQL database engine running on host
           CheckAPIError(Result, fLibrary.mysql_real_connect(Result,
-                                                            pChar(Host),
-                                                            pChar(fLogin),
-                                                            pChar(fPassword),
-                                                            Pchar(fDatabaseName),
+                                                            PAnsiChar(Host),
+                                                            PAnsiChar(fLogin),
+                                                            PAnsiChar(fPassword),
+                                                            PAnsiChar(fDatabaseName),
                                                             Port,
                                                             nil,
                                                             fOpenConnectionClientFlag) = nil);
@@ -1255,7 +1256,7 @@ Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
 begin
 
   //security check
-  if not assigned(ConnectionHandle) then raise exception.Create('Connection handle can not be null');
+  if not assigned(ConnectionHandle) then raise Exception.Create('Connection handle can not be null');
 
   //release the connection
   FConnectionPoolCS.Acquire;
@@ -1378,7 +1379,7 @@ procedure TalMySqlConnectionPoolClient.TransactionStart(Var ConnectionHandle: PM
 begin
 
   //ConnectionHandle must be null
-  if assigned(ConnectionHandle) then raise exception.Create('Connection handle must be null');
+  if assigned(ConnectionHandle) then raise Exception.Create('Connection handle must be null');
 
   //init the aConnectionHandle
   ConnectionHandle := AcquireConnection;
@@ -1399,7 +1400,7 @@ procedure TalMySqlConnectionPoolClient.TransactionCommit(var ConnectionHandle: P
 begin
 
   //security check
-  if not assigned(ConnectionHandle) then raise exception.Create('Connection handle can not be null');
+  if not assigned(ConnectionHandle) then raise Exception.Create('Connection handle can not be null');
 
   //commit the transaction
   UpdateData('COMMIT', ConnectionHandle);
@@ -1415,7 +1416,7 @@ var aTmpCloseConnection: Boolean;
 begin
 
   //security check
-  if not assigned(ConnectionHandle) then raise exception.Create('Connection handle can not be null');
+  if not assigned(ConnectionHandle) then raise Exception.Create('Connection handle can not be null');
 
   //rollback the connection
   aTmpCloseConnection := CloseConnection;
@@ -1444,7 +1445,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(SQLs: TalMySqlClientSelectData
                                                   XMLDATA: TalXMLNode;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 
 Var aMySqlRes: PMYSQL_RES;
@@ -1489,7 +1490,7 @@ begin
       For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
         //prepare the query
-        CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
+        CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
         aMySqlRes := fLibrary.mysql_use_result(aTmpConnectionHandle);
         CheckAPIError(aTmpConnectionHandle, aTmpConnectionHandle = nil);
         Try
@@ -1626,7 +1627,7 @@ end;
 procedure TalMySqlConnectionPoolClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1640,13 +1641,13 @@ begin
              ConnectionHandle);
 end;
 
-{************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: String;
+{****************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
                                                   Skip: Integer;
                                                   First: Integer;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1664,11 +1665,11 @@ begin
              ConnectionHandle);
 end;
 
-{************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: String;
+{****************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1689,7 +1690,7 @@ end;
 {***********************************************************************************}
 procedure TalMySqlConnectionPoolClient.SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 begin
 
@@ -1705,7 +1706,7 @@ end;
 {*********************************************************************************}
 procedure TalMySqlConnectionPoolClient.SelectData(SQL: TalMySqlClientSelectDataSQL;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1719,13 +1720,13 @@ begin
              ConnectionHandle);
 end;
 
-{************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: String;
-                                                  RowTag: String;
+{****************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
+                                                  RowTag: AnsiString;
                                                   Skip: Integer;
                                                   First: Integer;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1743,11 +1744,11 @@ begin
              ConnectionHandle);
 end;
 
-{************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: String;
-                                                  RowTag: String;
+{****************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
+                                                  RowTag: AnsiString;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1765,10 +1766,10 @@ begin
              ConnectionHandle);
 end;
 
-{************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: String;
+{****************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TformatSettings;
+                                                  FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 var aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
 begin
@@ -1806,7 +1807,7 @@ begin
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
       //do the query
-      CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
+      CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL)) <> 0);
 
     end;
 
@@ -1840,8 +1841,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{******************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: Tstrings; const ConnectionHandle: PMySql = nil);
+{********************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TALStrings; const ConnectionHandle: PMySql = nil);
 Var aSQLsindex : integer;
     aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
@@ -1852,8 +1853,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{***************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQL: String; const ConnectionHandle: PMySql = nil);
+{*******************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQL: AnsiString; const ConnectionHandle: PMySql = nil);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
@@ -1861,8 +1862,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{*************************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: array of String; const ConnectionHandle: PMySql = nil);
+{*****************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: array of AnsiString; const ConnectionHandle: PMySql = nil);
 Var aUpdateDataSQLs: TalMySqlClientUpdateDataSQLs;
     i: integer;
 begin
@@ -1873,8 +1874,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{************************************************************************************************************}
-function TalMySqlConnectionPoolClient.insert_id(SQL: String; const ConnectionHandle: PMySql = nil): ULongLong;
+{****************************************************************************************************************}
+function TalMySqlConnectionPoolClient.insert_id(SQL: AnsiString; const ConnectionHandle: PMySql = nil): ULongLong;
 Var aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
 begin
@@ -1920,7 +1921,6 @@ begin
   end;
 
 end;
-
 
 {*************************************************************}
 function TalMySqlConnectionPoolClient.ConnectionCount: Integer;

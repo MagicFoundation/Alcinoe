@@ -6,7 +6,7 @@ Author(s):    Yury Plashenkov (yury@plashenkov.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALSQLite3Wrapper
-Version:      1.00
+Version:      4.00
 
 Description:  SQLite3.dll API Interface Unit
 
@@ -17,7 +17,7 @@ Description:  SQLite3.dll API Interface Unit
               SQLite is the most widely deployed SQL database engine
               in the world.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -50,7 +50,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://www.sqlite.org/
               http://code.google.com/p/sqlite3delphi/
@@ -60,7 +60,7 @@ Link :        http://www.sqlite.org/
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALSqlite3Wrapper;
 
@@ -768,7 +768,7 @@ type
     destructor Destroy; override;
     function Loaded: Boolean; virtual;
     function Unload: Boolean; virtual;
-    function Load(const lib: string = 'sqlite3.dll'; const initialize: boolean = True): Boolean; virtual;
+    function Load(const lib: AnsiString = 'sqlite3.dll'; const initialize: boolean = True): Boolean; virtual;
   end;
 
 implementation
@@ -977,11 +977,11 @@ begin
 end;
 
 {************************************************************************************************************}
-function TALSqlite3Library.Load(const lib: string = 'sqlite3.dll'; const initialize: boolean = True): Boolean;
+function TALSqlite3Library.Load(const lib: AnsiString = 'sqlite3.dll'; const initialize: boolean = True): Boolean;
 Begin
   Result := Loaded;
   if not Result then begin
-    Flibsqlite3 := LoadLibrary(PChar(lib));
+    Flibsqlite3 := LoadLibraryA(PAnsiChar(lib));
     if Loaded then begin
       sqlite3_libversion := GetProcAddress(Flibsqlite3,'sqlite3_libversion');
       sqlite3_sourceid := GetProcAddress(Flibsqlite3,'sqlite3_sourceid');

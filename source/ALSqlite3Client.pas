@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALSqlite3Client
-Version:      1.00
+Version:      4.00
 
 Description:  An object to query Sqlite3 database and get
               the result In Xml stream
@@ -17,7 +17,7 @@ Description:  An object to query Sqlite3 database and get
               SQLite is the most widely deployed SQL database engine
               in the world.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -50,7 +50,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://www.sqlite.org/
 
@@ -58,7 +58,7 @@ Link :        http://www.sqlite.org/
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit AlSqlite3Client;
 
@@ -70,13 +70,15 @@ uses Windows,
      Contnrs,
      SyncObjs,
      AlXmlDoc,
-     AlSqlite3Wrapper;
+     AlSqlite3Wrapper,
+     ALFcnString,
+     ALStringList;
 
 Type
 
   {-------------------------------------------------------------------------}
   TalSqlite3ClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
-                                                      ViewTag: String;
+                                                      ViewTag: AnsiString;
                                                       ExtData: Pointer;
                                                       Var Continue: Boolean);
 
@@ -85,15 +87,15 @@ Type
   private
     FErrorCode: Integer;
   public
-    constructor Create(aErrorMsg: string; aErrorCode: Integer); overload;
+    constructor Create(aErrorMsg: AnsiString; aErrorCode: Integer); overload;
     property ErrorCode: Integer read FErrorCode;
   end;
 
   {------------------------------------}
   TalSqlite3ClientSelectDataSQL = record
-    SQL: String;
-    RowTag: String;
-    ViewTag: String;
+    SQL: AnsiString;
+    RowTag: AnsiString;
+    ViewTag: AnsiString;
     Skip: integer;
     First: Integer;
   end;
@@ -101,7 +103,7 @@ Type
 
   {------------------------------------}
   TalSqlite3ClientUpdateDataSQL = record
-    SQL: String;
+    SQL: AnsiString;
   end;
   TalSqlite3ClientUpdateDataSQLs = array of TalSqlite3ClientUpdateDataSQL;
 
@@ -111,7 +113,7 @@ Type
     fLibrary: TALSqlite3Library;
     FownLibrary: Boolean;
     fSqlite3: PSQLite3;
-    fNullString: String;
+    fNullString: AnsiString;
     finTransaction: Boolean;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
@@ -119,10 +121,10 @@ Type
     procedure CheckAPIError(Error: Boolean);
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
-                            aFormatSettings: TformatSettings): String;
+                            aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
   Public
-    Constructor Create(const lib: String = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
+    Constructor Create(const lib: AnsiString = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
     Constructor Create(lib: TALSqlite3Library); overload; virtual;
     Destructor Destroy; Override;
     procedure config(Option: Integer);
@@ -130,7 +132,7 @@ Type
     procedure shutdown;   //can not be put in the create because config can/must be call after shutdown
     procedure enable_shared_cache(enable: boolean);
     function  soft_heap_limit64(n: int64): int64;
-    Procedure Connect(DatabaseName: String;
+    Procedure Connect(DatabaseName: AnsiString;
                       const flags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE);
     Procedure Disconnect;
     Procedure TransactionStart;
@@ -140,48 +142,48 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
-    Procedure SelectData(SQL: String;
+                         FormatSettings: TALFormatSettings); overload;
+    Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload;
     procedure UpdateData(SQLs: TalSqlite3ClientUpdateDataSQLs); overload;
     procedure UpdateData(SQL: TalSqlite3ClientUpdateDataSQL); overload;
-    procedure UpdateData(SQLs: Tstrings); overload;
-    procedure UpdateData(SQL: String); overload;
-    procedure UpdateData(SQLs: array of String); overload;
+    procedure UpdateData(SQLs: TALStrings); overload;
+    procedure UpdateData(SQL: AnsiString); overload;
+    procedure UpdateData(SQLs: array of AnsiString); overload;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
-    Property  NullString: String Read fNullString Write fNullString;
+    Property  NullString: AnsiString Read fNullString Write fNullString;
     property  Lib: TALSqlite3Library read FLibrary;
   end;
 
@@ -204,32 +206,32 @@ Type
     FReleasingAllconnections: Boolean;
     FLastConnectionGarbage: Int64;
     FConnectionMaxIdleTime: integer;
-    FDataBaseName: String;
+    FDataBaseName: AnsiString;
     FOpenConnectionFlags: integer;
-    FOpenConnectionPragmaStatements: Tstrings;
-    FNullString: String;
+    FOpenConnectionPragmaStatements: TALStrings;
+    FNullString: AnsiString;
   Protected
     procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
-    function  GetDataBaseName: String; virtual;
+    function  GetDataBaseName: AnsiString; virtual;
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
-                            aFormatSettings: TformatSettings): String; virtual;
-    procedure initObject(aDataBaseName: String;
+                            aFormatSettings: TALFormatSettings): AnsiString; virtual;
+    procedure initObject(aDataBaseName: AnsiString;
                          const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
-                         const aOpenConnectionPragmaStatements: String = ''); virtual;
+                         const aOpenConnectionPragmaStatements: AnsiString = ''); virtual;
     Function  AcquireConnection(const readonly: boolean = False): PSQLite3; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PSQLite3;
                                 const CloseConnection: Boolean = False); virtual;
   Public
-    Constructor Create(aDataBaseName: String;
+    Constructor Create(aDataBaseName: AnsiString;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
-                       const aOpenConnectionPragmaStatements: String = '';
-                       const alib: String = 'sqlite3.dll';
+                       const aOpenConnectionPragmaStatements: AnsiString = '';
+                       const alib: AnsiString = 'sqlite3.dll';
                        const initializeLib: Boolean = True); overload; virtual;
-    Constructor Create(aDataBaseName: String;
+    Constructor Create(aDataBaseName: AnsiString;
                        alib: TALSqlite3Library;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
-                       const aOpenConnectionPragmaStatements: String = ''); overload; virtual;
+                       const aOpenConnectionPragmaStatements: AnsiString = ''); overload; virtual;
     Destructor  Destroy; Override;
     procedure config(Option: Integer);
     procedure initialize; //can not be put in the create because config can/must be call prior initialize
@@ -246,88 +248,77 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
+    Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
+    Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
-                         RowTag: String;
+    Procedure SelectData(SQL: AnsiString;
+                         RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    Procedure SelectData(SQL: String;
+    Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TformatSettings;
+                         FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     procedure UpdateData(SQLs: TalSqlite3ClientUpdateDataSQLs;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     procedure UpdateData(SQL: TalSqlite3ClientUpdateDataSQL;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    procedure UpdateData(SQLs: Tstrings;
+    procedure UpdateData(SQLs: TALStrings;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    procedure UpdateData(SQL: String;
+    procedure UpdateData(SQL: AnsiString;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
-    procedure UpdateData(SQLs: array of String;
+    procedure UpdateData(SQLs: array of AnsiString;
                          const ConnectionHandle: PSQLite3 = nil); overload; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
-    property  DataBaseName: String read GetDataBaseName;
+    property  DataBaseName: AnsiString read GetDataBaseName;
     property  ConnectionMaxIdleTime: integer read FConnectionMaxIdleTime write fConnectionMaxIdleTime;
-    Property  NullString: String Read fNullString Write fNullString;
+    Property  NullString: AnsiString Read fNullString Write fNullString;
     property  Lib: TALSqlite3Library read FLibrary;
   end;
 
 implementation
 
-Uses ALWindows,
-     AlFcnString;
+Uses ALWindows;
 
-///////////////////////////
-///// EALSqlite3Error /////
-///////////////////////////
-
-{*************************************************************************}
-constructor EALSqlite3Error.Create(aErrorMsg: string; aErrorCode: Integer);
+{*****************************************************************************}
+constructor EALSqlite3Error.Create(aErrorMsg: AnsiString; aErrorCode: Integer);
 begin
   fErrorCode := aErrorCode;
-  inherited create(aErrorMsg);
+  inherited create(String(aErrorMsg));
 end;
-
-
-
-////////////////////////////
-///// TalSqlite3Client /////
-////////////////////////////
 
 {**********************************************}
 function TalSqlite3Client.GetConnected: Boolean;
@@ -345,7 +336,7 @@ end;
 procedure TalSqlite3Client.CheckAPIError(Error: Boolean);
 Begin
   if Error then begin
-    if assigned(Fsqlite3) then raise EALSqlite3Error.Create(fLibrary.sqlite3_errmsg(Fsqlite3), fLibrary.sqlite3_errcode(Fsqlite3)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
+    if assigned(Fsqlite3) then raise EALSqlite3Error.Create(AnsiString(fLibrary.sqlite3_errmsg(Fsqlite3)), fLibrary.sqlite3_errcode(Fsqlite3)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
     else raise EALSqlite3Error.Create('Sqlite3 error', -1);
   end;
 end;
@@ -353,13 +344,13 @@ end;
 {*****************************************************************}
 function TalSqlite3Client.GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                                         aIndex: Integer;
-                                        aFormatSettings: TformatSettings): String;
+                                        aFormatSettings: TALFormatSettings): AnsiString;
 begin
   Case FLibrary.sqlite3_column_type(aSqlite3stmt, aIndex) of
-    SQLITE_FLOAT: Result := Floattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
+    SQLITE_FLOAT: Result := ALFloattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
     SQLITE_INTEGER,
-    SQLITE3_TEXT: result :=  String(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text(), even empty strings, are always zero terminated
-                                                                                         // Note: what's happen if #0 is inside the string ?
+    SQLITE3_TEXT: result :=  AnsiString(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text(), even empty strings, are always zero terminated
+                                                                                             // Note: what's happen if #0 is inside the string ?
     SQLITE_NULL: result := fNullString;
     else raise Exception.Create('Unsupported column type');
   end;
@@ -373,8 +364,8 @@ begin
   fNullString := '';
 end;
 
-{**********************************************************************************************************}
-constructor TalSqlite3Client.Create(const lib: String = 'sqlite3.dll'; const initializeLib: Boolean = True);
+{**************************************************************************************************************}
+constructor TalSqlite3Client.Create(const lib: AnsiString = 'sqlite3.dll'; const initializeLib: Boolean = True);
 begin
   fLibrary := TALSqlite3Library.Create;
   try
@@ -515,7 +506,7 @@ with a pathname such as "./" to avoid ambiguity.
 
 If the filename is an empty string, then a private, temporary on-disk database will be created.
 This private database will be automatically deleted as soon as the database connection is closed.}
-procedure TalSqlite3Client.connect(DatabaseName: String;
+procedure TalSqlite3Client.connect(DatabaseName: AnsiString;
                                    const flags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE);
 begin
   if connected then raise Exception.Create('Already connected');
@@ -605,12 +596,12 @@ procedure TalSqlite3Client.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                                       XMLDATA: TalXMLNode;
                                       OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 Var astmt: PSQLite3Stmt;
     aStepResult: integer;
     aColumnCount: Integer;
     aColumnIndex: integer;
-    aColumnNames: Array of String;
+    aColumnNames: Array of AnsiString;
     aNewRec: TalXmlNode;
     aValueRec: TalXmlNode;
     aViewRec: TalXmlNode;
@@ -643,7 +634,7 @@ begin
 
       //prepare the query
       astmt := nil;
-      CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
+      CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
       Try
 
         //Return the number of columns in the result set returned by the
@@ -741,7 +732,7 @@ end;
 procedure TalSqlite3Client.SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                                       OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -753,13 +744,13 @@ begin
              FormatSettings);
 end;
 
-{************************************************}
-procedure TalSqlite3Client.SelectData(SQL: String;
+{****************************************************}
+procedure TalSqlite3Client.SelectData(SQL: AnsiString;
                                       Skip: Integer;
                                       First: Integer;
                                       OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -775,11 +766,11 @@ begin
              FormatSettings);
 end;
 
-{************************************************}
-procedure TalSqlite3Client.SelectData(SQL: String;
+{****************************************************}
+procedure TalSqlite3Client.SelectData(SQL: AnsiString;
                                       OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -798,7 +789,7 @@ end;
 {*************************************************************************}
 procedure TalSqlite3Client.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                                       XMLDATA: TalXMLNode;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 begin
 
   SelectData(SQLs,
@@ -812,7 +803,7 @@ end;
 {***********************************************************************}
 procedure TalSqlite3Client.SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                                       XMLDATA: TalXMLNode;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -824,13 +815,13 @@ begin
              FormatSettings);
 end;
 
-{************************************************}
-procedure TalSqlite3Client.SelectData(SQL: String;
-                                      RowTag: String;
+{****************************************************}
+procedure TalSqlite3Client.SelectData(SQL: AnsiString;
+                                      RowTag: AnsiString;
                                       Skip: Integer;
                                       First: Integer;
                                       XMLDATA: TalXMLNode;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -846,11 +837,11 @@ begin
              FormatSettings);
 end;
 
-{************************************************}
-procedure TalSqlite3Client.SelectData(SQL: String;
-                                      RowTag: String;
+{****************************************************}
+procedure TalSqlite3Client.SelectData(SQL: AnsiString;
+                                      RowTag: AnsiString;
                                       XMLDATA: TalXMLNode;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -866,10 +857,10 @@ begin
              FormatSettings);
 end;
 
-{************************************************}
-procedure TalSqlite3Client.SelectData(SQL: String;
+{****************************************************}
+procedure TalSqlite3Client.SelectData(SQL: AnsiString;
                                       XMLDATA: TalXMLNode;
-                                      FormatSettings: TformatSettings);
+                                      FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
@@ -901,7 +892,7 @@ begin
   For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
     //prepare the query
-    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
+    CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
     Try
 
       //retrieve the next row
@@ -925,8 +916,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{****************************************************}
-procedure TalSqlite3Client.UpdateData(SQLs: Tstrings);
+{******************************************************}
+procedure TalSqlite3Client.UpdateData(SQLs: TALStrings);
 Var aSQLsindex : integer;
     aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
 begin
@@ -937,8 +928,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{*************************************************}
-procedure TalSqlite3Client.UpdateData(SQL: String);
+{*****************************************************}
+procedure TalSqlite3Client.UpdateData(SQL: AnsiString);
 Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
@@ -946,8 +937,8 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-{***********************************************************}
-procedure TalSqlite3Client.UpdateData(SQLs: array of String);
+{***************************************************************}
+procedure TalSqlite3Client.UpdateData(SQLs: array of AnsiString);
 Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
     i: integer;
 begin
@@ -958,24 +949,17 @@ begin
   UpdateData(aUpdateDataSQLs);
 end;
 
-
-
-
-////////////////////////////////////
-///// TalSqlite3ConnPoolClient /////
-////////////////////////////////////
-
 {*************************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
 begin
   if Error then begin
-    if assigned(ConnectionHandle) then raise EALSqlite3Error.Create(fLibrary.sqlite3_errmsg(ConnectionHandle), fLibrary.sqlite3_errcode(ConnectionHandle)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
+    if assigned(ConnectionHandle) then raise EALSqlite3Error.Create(AnsiString(fLibrary.sqlite3_errmsg(ConnectionHandle)), fLibrary.sqlite3_errcode(ConnectionHandle)) // !! take care that sqlite3_errmsg(Fsqlite3) return an UTF8 !!
     else raise EALSqlite3Error.Create('Sqlite3 error', -1);
   end
 end;
 
-{**************************************************************}
-function TalSqlite3ConnectionPoolClient.GetDataBaseName: String;
+{******************************************************************}
+function TalSqlite3ConnectionPoolClient.GetDataBaseName: AnsiString;
 begin
   result := FdatabaseName;
 end;
@@ -983,27 +967,27 @@ end;
 {*******************************************************************************}
 function TalSqlite3ConnectionPoolClient.GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                                                       aIndex: Integer;
-                                                      aFormatSettings: TformatSettings): String;
+                                                      aFormatSettings: TALFormatSettings): AnsiString;
 begin
   Case FLibrary.sqlite3_column_type(aSqlite3stmt, aIndex) of
-    SQLITE_FLOAT: Result := Floattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
+    SQLITE_FLOAT: Result := ALFloattostr(FLibrary.sqlite3_column_double(aSqlite3stmt, aIndex), aFormatSettings);
     SQLITE_INTEGER,
-    SQLITE3_TEXT: result :=  String(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text(), even empty strings, are always zero terminated
+    SQLITE3_TEXT: result :=  AnsiString(FLibrary.sqlite3_column_text(aSqlite3stmt, aIndex)); // Strings returned by sqlite3_column_text(), even empty strings, are always zero terminated
                                                                                              // Note: what's happen if #0 is inside the string ?
     SQLITE_NULL: result := fNullString;
     else raise Exception.Create('Unsupported column type');
   end;
 end;
 
-{************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.initObject(aDataBaseName: String;
+{****************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.initObject(aDataBaseName: AnsiString;
                                                     const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
-                                                    const aOpenConnectionPragmaStatements: String = '');
+                                                    const aOpenConnectionPragmaStatements: AnsiString = '');
 begin
   FDataBaseName:= aDataBaseName;
   FOpenConnectionFlags := aOpenConnectionFlags;
-  FOpenConnectionPragmaStatements := TstringList.Create;
-  FOpenConnectionPragmaStatements.Text := trim(AlStringReplace(aOpenConnectionPragmaStatements,';',#13#10,[rfReplaceAll]));
+  FOpenConnectionPragmaStatements := TALStringList.Create;
+  FOpenConnectionPragmaStatements.Text := ALTrim(AlStringReplace(aOpenConnectionPragmaStatements,';',#13#10,[rfReplaceAll]));
   FConnectionPool:= TObjectList.Create(True);
   FConnectionPoolCS:= TCriticalSection.create;
   FDatabaseRWCS := TMultiReadExclusiveWriteSynchronizer.Create;
@@ -1016,11 +1000,11 @@ begin
 end;
 
 
-{**********************************************************************}
-constructor TalSqlite3ConnectionPoolClient.Create(aDataBaseName: String;
+{**************************************************************************}
+constructor TalSqlite3ConnectionPoolClient.Create(aDataBaseName: AnsiString;
                                                   const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
-                                                  const aOpenConnectionPragmaStatements: String = '';
-                                                  const alib: String = 'sqlite3.dll';
+                                                  const aOpenConnectionPragmaStatements: AnsiString = '';
+                                                  const alib: AnsiString = 'sqlite3.dll';
                                                   const initializeLib: Boolean = True);
 begin
   fLibrary := TALSqlite3Library.Create;
@@ -1038,11 +1022,11 @@ begin
   end;
 end;
 
-{**********************************************************************}
-constructor TalSqlite3ConnectionPoolClient.Create(aDataBaseName: String;
+{**************************************************************************}
+constructor TalSqlite3ConnectionPoolClient.Create(aDataBaseName: AnsiString;
                                                   alib: TALSqlite3Library;
                                                   const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
-                                                  const aOpenConnectionPragmaStatements: String = '');
+                                                  const aOpenConnectionPragmaStatements: AnsiString = '');
 begin
   fLibrary := alib;
   FownLibrary := False;
@@ -1335,7 +1319,7 @@ begin
 
 end;
 
-{*****************************************************************************************}
+{****************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.TransactionCommit(var ConnectionHandle: PSQLite3;
                                                            const CloseConnection: Boolean = False);
 begin
@@ -1387,14 +1371,14 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(SQLs: TalSqlite3ClientSelect
                                                     XMLDATA: TalXMLNode;
                                                     OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 
 Var astmt: PSQLite3Stmt;
     aStepResult: integer;
     aColumnCount: Integer;
     aColumnIndex: integer;
-    aColumnNames: Array of String;
+    aColumnNames: Array of AnsiString;
     aNewRec: TalXmlNode;
     aValueRec: TalXmlNode;
     aViewRec: TalXmlNode;
@@ -1432,7 +1416,7 @@ begin
 
         //prepare the query
         astmt := nil;
-        CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
+        CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
         Try
 
           //Return the number of columns in the result set returned by the
@@ -1545,7 +1529,7 @@ end;
 procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                                                     OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1559,13 +1543,13 @@ begin
              ConnectionHandle);
 end;
 
-{**************************************************************}
-procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
+{******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: AnsiString;
                                                     Skip: Integer;
                                                     First: Integer;
                                                     OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1583,11 +1567,11 @@ begin
              ConnectionHandle);
 end;
 
-{**************************************************************}
-procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
+{******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: AnsiString;
                                                     OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1608,23 +1592,21 @@ end;
 {***************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                                                     XMLDATA: TalXMLNode;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 begin
-
   SelectData(SQLs,
              XMLDATA,
              nil,
              nil,
              FormatSettings,
              ConnectionHandle);
-
 end;
 
 {*************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                                                     XMLDATA: TalXMLNode;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1638,13 +1620,13 @@ begin
              ConnectionHandle);
 end;
 
-{**************************************************************}
-procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
-                                                    RowTag: String;
+{******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: AnsiString;
+                                                    RowTag: AnsiString;
                                                     Skip: Integer;
                                                     First: Integer;
                                                     XMLDATA: TalXMLNode;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1662,11 +1644,11 @@ begin
              ConnectionHandle);
 end;
 
-{**************************************************************}
-procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
-                                                    RowTag: String;
+{******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: AnsiString;
+                                                    RowTag: AnsiString;
                                                     XMLDATA: TalXMLNode;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1684,10 +1666,10 @@ begin
              ConnectionHandle);
 end;
 
-{**************************************************************}
-procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: String;
+{******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.SelectData(SQL: AnsiString;
                                                     XMLDATA: TalXMLNode;
-                                                    FormatSettings: TformatSettings;
+                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 var aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
 begin
@@ -1727,7 +1709,7 @@ begin
     For aSQLsindex := 0 to length(SQLs) - 1 do begin
 
       //prepare the query
-      CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, Pchar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
+      CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(SQLs[aSQLsindex].SQL), length(SQLs[aSQLsindex].SQL), astmt, nil) <> SQLITE_OK);
       Try
 
         //retrieve the next row
@@ -1767,8 +1749,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{*****************************************************************}
-procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: Tstrings;
+{*******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: TALStrings;
                                                     const ConnectionHandle: PSQLite3 = nil);
 Var aSQLsindex : integer;
     aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
@@ -1780,8 +1762,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{**************************************************************}
-procedure TalSqlite3ConnectionPoolClient.UpdateData(SQL: String;
+{******************************************************************}
+procedure TalSqlite3ConnectionPoolClient.UpdateData(SQL: AnsiString;
                                                     const ConnectionHandle: PSQLite3 = nil);
 Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
 begin
@@ -1790,8 +1772,8 @@ begin
   UpdateData(aUpdateDataSQLs, ConnectionHandle);
 end;
 
-{************************************************************************}
-procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: array of String;
+{****************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.UpdateData(SQLs: array of AnsiString;
                                                     const ConnectionHandle: PSQLite3 = nil);
 Var aUpdateDataSQLs: TalSqlite3ClientUpdateDataSQLs;
     i: integer;

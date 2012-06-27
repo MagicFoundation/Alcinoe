@@ -13,14 +13,14 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXError
-Version:      3.51
+Version:      4.00
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
               performance client/server applications based on FireBird
               without the BDE or ODBC.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -53,16 +53,16 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
-Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 364)
               http://www.progdigy.com/modules.php?name=UIB
 
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 
 unit ALFBXError;

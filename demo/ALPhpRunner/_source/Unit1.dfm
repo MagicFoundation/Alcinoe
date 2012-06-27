@@ -205,7 +205,7 @@ object Form1: TForm1
           WordWrap = False
         end
         object RadioButtonPHPCGIRunnerEngineKind: TRadioButton
-          Left = 529
+          Left = 686
           Top = 17
           Width = 48
           Height = 17
@@ -215,7 +215,7 @@ object Form1: TForm1
           TabStop = True
         end
         object RadioButtonPHPNamedPipeFastCGIRunnerEngineKind: TRadioButton
-          Left = 599
+          Left = 529
           Top = 17
           Width = 138
           Height = 17
@@ -223,20 +223,12 @@ object Form1: TForm1
           TabOrder = 6
         end
         object RadioButtonPHPSocketFastCGIRunnerEngineKind: TRadioButton
-          Left = 599
+          Left = 529
           Top = 40
           Width = 138
           Height = 17
           Caption = 'Socket FastCGI'
           TabOrder = 7
-        end
-        object RadioButtonPHPISAPIRunnerEngineKind: TRadioButton
-          Left = 529
-          Top = 40
-          Width = 64
-          Height = 17
-          Caption = 'ISAPI'
-          TabOrder = 8
         end
         object ButtonExecute: TButton
           Left = 351
@@ -250,7 +242,7 @@ object Form1: TForm1
           Font.Name = 'MS Sans Serif'
           Font.Style = []
           ParentFont = False
-          TabOrder = 9
+          TabOrder = 8
           OnClick = ButtonExecuteClick
         end
       end
@@ -373,25 +365,12 @@ object Form1: TForm1
           Font.Style = [fsBold]
           ParentFont = False
         end
-        object Label8: TLabel
-          Left = 8
-          Top = 52
-          Width = 102
-          Height = 13
-          Caption = 'php5isapi.dll Path'
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = [fsBold]
-          ParentFont = False
-        end
         object Label9: TLabel
           Left = 8
-          Top = 77
-          Width = 73
+          Top = 55
+          Width = 125
           Height = 13
-          Caption = 'FastCgi Host'
+          Caption = 'FastCgi (Socket) Host'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -400,11 +379,11 @@ object Form1: TForm1
           ParentFont = False
         end
         object Label10: TLabel
-          Left = 317
-          Top = 77
-          Width = 70
+          Left = 361
+          Top = 55
+          Width = 24
           Height = 13
-          Caption = 'FastCgi Port'
+          Caption = 'Port'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -413,8 +392,8 @@ object Form1: TForm1
           ParentFont = False
         end
         object Label12: TLabel
-          Left = 119
-          Top = 96
+          Left = 142
+          Top = 74
           Width = 142
           Height = 13
           Caption = 'php-cgi.exe -b 127.0.0.1:9000'
@@ -426,9 +405,9 @@ object Form1: TForm1
           ParentFont = False
         end
         object EditPhpCGIPath: TEdit
-          Left = 119
+          Left = 142
           Top = 25
-          Width = 340
+          Width = 317
           Height = 19
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
@@ -441,10 +420,10 @@ object Form1: TForm1
           TabOrder = 0
           Text = 'c:\program files\php\php-cgi.exe'
         end
-        object EditPhpIsapiDllPath: TEdit
-          Left = 119
-          Top = 50
-          Width = 340
+        object EditPhpFastCgiHost: TEdit
+          Left = 142
+          Top = 53
+          Width = 203
           Height = 19
           Ctl3D = False
           Font.Charset = DEFAULT_CHARSET
@@ -455,27 +434,11 @@ object Form1: TForm1
           ParentCtl3D = False
           ParentFont = False
           TabOrder = 1
-          Text = 'c:\program files\php\php5isapi.dll'
-        end
-        object EditPhpFastCgiHost: TEdit
-          Left = 119
-          Top = 75
-          Width = 194
-          Height = 19
-          Ctl3D = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clWindowText
-          Font.Height = -11
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentCtl3D = False
-          ParentFont = False
-          TabOrder = 2
           Text = '127.0.0.1'
         end
         object EditPhpFastCgiPort: TEdit
           Left = 393
-          Top = 75
+          Top = 53
           Width = 66
           Height = 19
           Ctl3D = False
@@ -486,7 +449,7 @@ object Form1: TForm1
           Font.Style = []
           ParentCtl3D = False
           ParentFont = False
-          TabOrder = 3
+          TabOrder = 2
           Text = '9000'
         end
         object Panel2: TPanel
@@ -500,7 +463,7 @@ object Form1: TForm1
           Ctl3D = False
           ParentBackground = False
           ParentCtl3D = False
-          TabOrder = 4
+          TabOrder = 3
           object Label14: TLabel
             Left = 5
             Top = 8

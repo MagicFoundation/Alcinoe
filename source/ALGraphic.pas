@@ -6,12 +6,12 @@ Author(s):    JWB Software
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Graphic Functions
-Version:      3.51
+Version:      4.00
 
 Description:  Procedure ALStrecth to stretch a bitmap using
               lanczos3 (by exemple)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -44,7 +44,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History:
+History :     26/06/2012: Add xe2 support
 
 Link :
 
@@ -52,7 +52,7 @@ Link :
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALGraphic;
 
@@ -62,6 +62,13 @@ uses Windows,
      SysUtils,
      Classes,
      Graphics;
+
+{$if CompilerVersion<=18.5}
+//http://stackoverflow.com/questions/7630781/delphi-2007-and-xe2-using-nativeint
+type
+  NativeInt = Integer;
+  NativeUInt = Cardinal;
+{$ifend}
 
 type
 
@@ -577,7 +584,7 @@ begin
         with ContributorList[I] do
         begin
           DestPixel^ := ALApplyContributors(N, ContributorList[I].Contributors, CurrentLineR, CurrentLineG, CurrentLineB);
-          Inc(Integer(DestPixel), DestDelta);
+          Inc(NativeInt(DestPixel), DestDelta);
         end;
       Inc(SourceLine);
       Inc(DestLine);
@@ -652,13 +659,9 @@ begin
       for y := 0 to SrcBitmap.Height do begin
         aColor := SrcBitmap.Canvas.Pixels[x,y];
         If (Tolerance<=0) or
-           (
-            sqrt(
-                 sqr(GetRValue(aColor) - R1) +
+           (sqrt(sqr(GetRValue(aColor) - R1) +
                  sqr(GetGValue(aColor) - G1) +
-                 sqr(GetBValue(aColor) - B1)
-                ) <= Tolerance
-           )
+                 sqr(GetBValue(aColor) - B1)) <= Tolerance)
         then SrcBitmap.Canvas.Pixels[x,y] := NewColor;
       end;
   finally
@@ -735,12 +738,10 @@ Begin
     while Y1 < aSrcBmp.Height do begin
 
       //calc the rect
-      aRect := Rect(
-                    X1,
+      aRect := Rect(X1,
                     Y1,
                     Min(X1 + aMosaicSquareWidthTmp, aSrcBmp.Width),
-                    Min(Y1 + aMosaicSquareHeightTmp, aSrcBmp.Height)
-                   );
+                    Min(Y1 + aMosaicSquareHeightTmp, aSrcBmp.Height));
 
       //find the average color
       aColor := AlGetAverageColor(aSrcBmp,aRect);
@@ -850,11 +851,9 @@ begin
     aisBlack := 0;
     for X := 0 to aSrcBmp.Width-1 do begin
       With aRow[X] do begin
-        if (sqrt(
-                 sqr(rgbtRed - aBackRColor) +
+        if (sqrt(sqr(rgbtRed - aBackRColor) +
                  sqr(rgbtGreen - aBackGColor) +
-                 sqr(rgbtBlue - aBackBColor)
-                ) > aTolerance) then begin
+                 sqr(rgbtBlue - aBackBColor)) > aTolerance) then begin
            aIsBlack := 1;
            break;
         end;
@@ -871,11 +870,9 @@ begin
     aisBlack := 0;
     for X := 0 to aSrcBmp.Width-1 do begin
       With aRow[X] do begin
-        if (sqrt(
-                 sqr(rgbtRed - aBackRColor) +
+        if (sqrt(sqr(rgbtRed - aBackRColor) +
                  sqr(rgbtGreen - aBackGColor) +
-                 sqr(rgbtBlue - aBackBColor)
-                ) > aTolerance) then begin
+                 sqr(rgbtBlue - aBackBColor)) > aTolerance) then begin
            aIsBlack := 1;
            break;
         end;
@@ -892,11 +889,9 @@ begin
     aisBlack := 0;
     for X := 0 to aSrcBmp.Width-1 do begin
       With aRow[X] do begin
-        if (sqrt(
-                 sqr(rgbtRed - aBackRColor) +
+        if (sqrt(sqr(rgbtRed - aBackRColor) +
                  sqr(rgbtGreen - aBackGColor) +
-                 sqr(rgbtBlue - aBackBColor)
-                ) <= aTolerance) then inc(aisBlack)
+                 sqr(rgbtBlue - aBackBColor)) <= aTolerance) then inc(aisBlack)
         else break;
       end;
     end;
@@ -910,11 +905,9 @@ begin
     aisBlack := aSrcBmp.Width;
     for X := aSrcBmp.Width-1 downto 0 do begin
       With aRow[X] do begin
-        if (sqrt(
-                 sqr(rgbtRed - aBackRColor) +
+        if (sqrt(sqr(rgbtRed - aBackRColor) +
                  sqr(rgbtGreen - aBackGColor) +
-                 sqr(rgbtBlue - aBackBColor)
-                ) <= aTolerance) then dec(aisBlack)
+                 sqr(rgbtBlue - aBackBColor)) <= aTolerance) then dec(aisBlack)
         else break;
       end;
     end;
@@ -945,17 +938,16 @@ begin
         aTmpbmp.PixelFormat := Pf24Bit;
         aTmpbmp.Width := aCropRect.right - aCropRect.left;
         aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
-        If Not BitBlt(
-                      aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
-                      0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
-                      0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
-                      aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
-                      aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
-                      asrcBmp.canvas.Handle,   //[in] Handle to the source device context
-                      aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
-                      aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
-                      SRCCOPY                  //[in] Specifies a raster-operation code
-                     ) then raiseLastOsError;
+        If Not BitBlt(aTmpbmp.canvas.Handle,           //[in] Handle to the destination device context.
+                      0,                               //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                      0,                               //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                      aTmpbmp.Width,                   //[in] Specifies the width, in logical units, of the source and destination rectangles.
+                      aTmpBmp.Height,                  //[in] Specifies the height, in logical units, of the source and the destination rectangles.
+                      asrcBmp.canvas.Handle,           //[in] Handle to the source device context
+                      aCropRect.left,                  //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                      aCropRect.top,                   //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                      SRCCOPY) then raiseLastOsError;  //[in] Specifies a raster-operation code
+
         aSrcBmp.Width := aTmpbmp.Width;
         aSrcBmp.Height := aTmpbmp.Height;
         aSrcbmp.Assign(aTmpbmp);
@@ -996,17 +988,15 @@ begin
       aTmpbmp.PixelFormat := Pf24Bit;
       aTmpbmp.Width := aCropRect.right - aCropRect.left;
       aTmpbmp.Height := aCropRect.bottom - aCropRect.top;
-      If not BitBlt(
-                    aTmpbmp.canvas.Handle,   //[in] Handle to the destination device context.
-                    0,                       //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
-                    0,                       //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
-                    aTmpbmp.Width,           //[in] Specifies the width, in logical units, of the source and destination rectangles.
-                    aTmpBmp.Height,          //[in] Specifies the height, in logical units, of the source and the destination rectangles.
-                    asrcBmp.canvas.Handle,   //[in] Handle to the source device context
-                    aCropRect.left,          //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
-                    aCropRect.top,           //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
-                    SRCCOPY                  //[in] Specifies a raster-operation code
-                   ) then RaiseLastOSError;
+      If not BitBlt(aTmpbmp.canvas.Handle,            //[in] Handle to the destination device context.
+                    0,                                //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                    0,                                //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the destination rectangle
+                    aTmpbmp.Width,                    //[in] Specifies the width, in logical units, of the source and destination rectangles.
+                    aTmpBmp.Height,                   //[in] Specifies the height, in logical units, of the source and the destination rectangles.
+                    asrcBmp.canvas.Handle,            //[in] Handle to the source device context
+                    aCropRect.left,                   //[in] Specifies the x-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                    aCropRect.top,                    //[in] Specifies the y-coordinate, in logical units, of the upper-left corner of the source rectangle.
+                    SRCCOPY) then RaiseLastOSError;   //[in] Specifies a raster-operation code
       aSrcBmp.Width := aTmpbmp.Width;
       aSrcBmp.Height := aTmpbmp.Height;
       aSrcbmp.Assign(aTmpbmp);

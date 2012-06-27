@@ -5,13 +5,13 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALMultiPartFormDataParser
-Version:      3.50
+Version:      4.00
 
 Description:  MultiPart Form Data function to encode or decode
               stream in multipart/form-data mime format. this format
               is use to send some file by HTTP request.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -47,7 +47,8 @@ Know bug :
 History :     08/09/2007: Fix bug (empty field returned when data
                           is present)
               06/11/2007: REbuild the architecture to add a base class
-              13/01/2008: Move EALHttpClientConnectionDropped in ALHttpCommon              
+              13/01/2008: Move EALHttpClientConnectionDropped in ALHttpCommon
+              26/06/2012: Add xe2 support
 
 Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.ietf.org/rfc/rfc1867.txt
@@ -58,7 +59,7 @@ Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMultiPartFormDataParser;
 
@@ -68,6 +69,7 @@ uses Classes,
      SysUtils,
      HTTPApp,
      ALHttpCommon,
+     AlStringList,
      AlMultiPartBaseParser;
 
 {Below a sample of multipart/mixed message :
@@ -95,15 +97,15 @@ type
   {-Single multipart Object----------------------------------}
   TALMultiPartFormDataContent = class(TALMultiPartBaseContent)
   private
-    function GetFieldName: String;
-    function GetFileName: String;
-    procedure SetfieldName(const aValue: String);
-    procedure SetfileName(const aValue: String);
+    function GetFieldName: AnsiString;
+    function GetFileName: AnsiString;
+    procedure SetfieldName(const aValue: AnsiString);
+    procedure SetfileName(const aValue: AnsiString);
   public
-    procedure LoadDataFromFile(aFileName: string); override;
+    procedure LoadDataFromFile(aFileName: AnsiString); override;
     procedure LoadDataFromStream(aStream: TStream); override;
-    Property FieldName: String Read GetFieldName Write SetFieldName;
-    Property FileName: String Read GetFileName Write SetfileName;
+    Property FieldName: AnsiString Read GetFieldName Write SetFieldName;
+    Property FileName: AnsiString Read GetFileName Write SetfileName;
   end;
 
   {--List Of multipart Objects---------------------------------}
@@ -125,9 +127,9 @@ type
   TAlMultiPartFormDataStream = class(TAlMultiPartBaseStream)
   private
   public
-    procedure AddField(const aFieldName, aFieldValue: string);
-    procedure AddFile(const aFieldName, aFileName, aContentType: string; aFileData: TStream); overload;
-    procedure AddFile(const aFieldName, aFileName: string); overload;
+    procedure AddField(const aFieldName, aFieldValue: AnsiString);
+    procedure AddFile(const aFieldName, aFileName, aContentType: AnsiString; aFileData: TStream); overload;
+    procedure AddFile(const aFieldName, aFileName: AnsiString); overload;
     procedure AddContent(aContent: TALMultiPartFormDataContent); reintroduce;
   end;
 
@@ -138,7 +140,7 @@ type
     Function CreateDataStream: TAlMultiPartBaseStream; override;
     function GetDataStream: TAlMultiPartFormDataStream; reintroduce;
   public
-    procedure Encode(aContentFields: TStrings; aContentFiles: TALMultiPartFormDataContents);
+    procedure Encode(aContentFields: TALStrings; aContentFiles: TALMultiPartFormDataContents);
     property  DataStream: TAlMultiPartFormDataStream read GetDataStream;
   end;
 
@@ -146,9 +148,9 @@ type
   TALMultipartFormDataDecoder = class(TALMultipartBaseDecoder)
   private
     FContentFiles: TALMultiPartFormDataContents;
-    FContentFields: TStrings;
+    FContentFields: TALStrings;
     FRemoveDuplicateField: Boolean;
-    function GetContentFields: Tstrings;
+    function GetContentFields: TALStrings;
     function GetContentFiles: TALMultiPartFormDataContents;
   protected
     function GetContents: TALMultiPartFormDataContents; reintroduce;
@@ -157,33 +159,31 @@ type
   public
     constructor Create; override;
     destructor  Destroy; override;
-    procedure   Decode(aDataStr, aboundary: String); overload; Override;
-    procedure   Decode(aRequest: TWebRequest; aboundary: String); overload;
+    procedure   Decode(aDataStr, aboundary: AnsiString); overload; Override;
+    procedure   Decode(aRequest: TWebRequest; aboundary: AnsiString); overload;
     property    ContentFiles: TALMultiPartFormDataContents read GetContentFiles;
-    property    ContentFields: Tstrings read GetContentFields;
+    property    ContentFields: TALStrings read GetContentFields;
     property    RemoveDuplicateField: Boolean read FRemoveDuplicateField write FRemoveDuplicateField Default True;
   end;
 
 implementation
 
-//////////////////////////////////////////////////////////////////
-//////////  TALMultiPartFormDataContent  /////////////////////////
-//////////////////////////////////////////////////////////////////
+uses ALFcnString;
 
-{********************************************************}
-function TALMultiPartFormDataContent.GetFieldName: String;
+{************************************************************}
+function TALMultiPartFormDataContent.GetFieldName: AnsiString;
 begin
   Result := ALMultipartExtractSubValueFromHeaderLine(ContentDisposition, 'name');
 end;
 
-{*******************************************************}
-function TALMultiPartFormDataContent.GetFileName: String;
+{***********************************************************}
+function TALMultiPartFormDataContent.GetFileName: AnsiString;
 begin
   Result := ALMultipartExtractSubValueFromHeaderLine(ContentDisposition, 'filename');
 end;
 
-{************************************************************************}
-procedure TALMultiPartFormDataContent.LoadDataFromFile(aFileName: string);
+{****************************************************************************}
+procedure TALMultiPartFormDataContent.LoadDataFromFile(aFileName: AnsiString);
 begin
   inherited LoadDataFromFile(aFileName);
   ContentTransferEncoding := '';
@@ -196,23 +196,17 @@ begin
   ContentTransferEncoding := '';
 end;
 
-{***********************************************************************}
-procedure TALMultiPartFormDataContent.SetfieldName(const aValue: String);
+{**************************************************************************}
+procedure TALMultiPartFormDataContent.SetfieldName(const aValue: AnsiString);
 begin
   ContentDisposition := ALMultipartSetSubValueInHeaderLine(ContentDisposition, 'name', aValue);
 end;
 
-{**********************************************************************}
-procedure TALMultiPartFormDataContent.SetfileName(const aValue: String);
+{**************************************************************************}
+procedure TALMultiPartFormDataContent.SetfileName(const aValue: AnsiString);
 begin
   ContentDisposition := ALMultipartSetSubValueInHeaderLine(ContentDisposition, 'filename', aValue);
 end;
-
-
-
-//////////////////////////////////////////////////////////////////
-//////////  TALMultiPartFormDataContents  ////////////////////////
-//////////////////////////////////////////////////////////////////
 
 {***************************************************************************************}
 function TALMultiPartFormDataContents.Add(AObject: TALMultiPartFormDataContent): Integer;
@@ -262,17 +256,10 @@ begin
   inherited Items[Index] := AObject;
 end;
 
-
-
-
-////////////////////////////////////////////////////////////////////////
-////////// TAlMultiPartFormDataStream //////////////////////////////////
-////////////////////////////////////////////////////////////////////////
-
 {************************************************************}
 procedure TAlMultiPartFormDataStream.AddFile(const aFieldName,
                                                    aFileName,
-                                                   aContentType: string;
+                                                   aContentType: AnsiString;
                                               aFileData: TStream);
 Var aContent: TALMultiPartFormDataContent;
 begin
@@ -289,7 +276,7 @@ end;
 
 {************************************************************}
 procedure TAlMultiPartFormDataStream.AddFile(const aFieldName,
-                                                   aFileName: string);
+                                                   aFileName: AnsiString);
 Var aContent: TALMultiPartFormDataContent;
 begin
   aContent := TALMultiPartFormDataContent.Create;
@@ -302,12 +289,12 @@ begin
   end;
 end;
 
-{***********************************************************************************}
-procedure TAlMultiPartFormDataStream.AddField(const aFieldName, aFieldValue: string);
+{***************************************************************************************}
+procedure TAlMultiPartFormDataStream.AddField(const aFieldName, aFieldValue: AnsiString);
 Var aContent: TALMultiPartFormDataContent;
-    aStringStream: TStringStream;
+    aStringStream: TALStringStream;
 begin
-  aStringStream:= TStringStream.Create(aFieldValue);
+  aStringStream:= TALStringStream.Create(aFieldValue);
   aContent := TALMultiPartFormDataContent.Create;
   Try
     aContent.LoadDataFromStream(aStringStream);
@@ -325,12 +312,6 @@ begin
   Inherited AddContent(aContent);
 end;
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-////////// TALMultipartFormDataEncoder ////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
 {****************************************************************************}
 function TALMultipartFormDataEncoder.CreateDataStream: TAlMultiPartBaseStream;
 begin
@@ -343,8 +324,8 @@ begin
   Result := TAlMultiPartFormDataStream(inherited GetDataStream);
 end;
 
-{******************************************************************************************************************}
-procedure TALMultipartFormDataEncoder.Encode(aContentFields: TStrings; aContentFiles: TALMultiPartFormDataContents);
+{********************************************************************************************************************}
+procedure TALMultipartFormDataEncoder.Encode(aContentFields: TALStrings; aContentFiles: TALMultiPartFormDataContents);
 Var i: Integer;
 begin
   with TAlMultiPartFormDataStream(DataStream) do begin
@@ -360,18 +341,12 @@ begin
   end;
 end;
 
-
-
-//////////////////////////////////////////////////////////////////
-//////////  TALMultipartFormDataDecoder  /////////////////////////
-//////////////////////////////////////////////////////////////////
-
 {*********************************************}
 constructor TALMultipartFormDataDecoder.Create;
 begin
   inherited;
   FContentFiles := TALMultiPartFormDataContents.Create(False);
-  FContentFields := TStringList.Create;
+  FContentFields := TALStringList.Create;
   FRemoveDuplicateField := True;
 end;
 
@@ -383,8 +358,8 @@ begin
   inherited;
 end;
 
-{*************************************************************************************}
-procedure TALMultipartFormDataDecoder.Decode(aRequest: TWebRequest; aboundary: String);
+{*****************************************************************************************}
+procedure TALMultipartFormDataDecoder.Decode(aRequest: TWebRequest; aboundary: AnsiString);
 var aContentStream: TMemoryStream;
     aTotalBytes: LongInt;
     aBytesRead: Longint;
@@ -409,8 +384,8 @@ begin
     end;
     if aRequest.ContentLength - aBytesRead > 0 then
       raise EALHttpClientConnectionDropped.Create('Client Dropped Connection.'#13#10 +
-        'Total Bytes indicated by Header: ' + IntToStr(aTotalBytes) + #13#10 +
-        'Total Bytes Read: ' + IntToStr(aBytesRead));
+        'Total Bytes indicated by Header: ' + ALIntToStr(aTotalBytes) + #13#10 +
+        'Total Bytes Read: ' + ALIntToStr(aBytesRead));
 
     {parse the request now}
     Decode(aContentStream, aBoundary);
@@ -420,8 +395,8 @@ begin
 
 end;
 
-{************************************************************************}
-procedure TALMultipartFormDataDecoder.Decode(aDataStr, aboundary: String);
+{****************************************************************************}
+procedure TALMultipartFormDataDecoder.Decode(aDataStr, aboundary: AnsiString);
 Var i: integer;
     aContents: TALMultiPartFormDataContents;
     CanInsertFile: Boolean;
@@ -443,7 +418,7 @@ begin
         CanInsertFile := True;
         IF FRemoveDuplicateField then
           For P1 := 0 to fContentFiles.Count - 1 do
-            If sametext(fContentfiles[P1].FieldName, aContents[i].fieldName) then begin
+            If ALSameText(fContentfiles[P1].FieldName, aContents[i].fieldName) then begin
               CanInsertFile := False;
               {More bigger the file is, more lucky
                we are that it contain the full data}
@@ -465,7 +440,6 @@ begin
   end;
 end;
 
-
 {**************************************************************************}
 function TALMultipartFormDataDecoder.CreateContent: TALMultiPartBaseContent;
 begin
@@ -484,8 +458,8 @@ begin
   Result := TALMultiPartFormDataContents(inherited GetContents);
 end;
 
-{**************************************************************}
-function TALMultipartFormDataDecoder.GetContentFields: Tstrings;
+{****************************************************************}
+function TALMultipartFormDataDecoder.GetContentFields: TALStrings;
 begin
   Result := fContentFields;
 end;

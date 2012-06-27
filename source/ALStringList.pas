@@ -5,16 +5,23 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALStringList
-Version:      3.50
+Version:      4.00
 
-Description:  TALStringList in inherited from Delphi TstringList.
-              It's allow to search a name=value using a quicksort
-              algorithm when the list is sorted.
-              TALAVLStringList it's a TStringlist Like, but use
-              internaly an AVL binary Tree to handle big indexed
-              list
+Description:  *TALStringList Work the same as Delphi TstringList except
+               that it's allow to search a name=value using a quicksort
+               algorithm when the list is sorted. Also TALStringList
+               use a locale independant algorithme (based on the 8-bit
+               ordinal value of each character) instead of the AnsiCompareText
+               and AnsiCompareStr used by the Delphi TstringList. at the
+               end the sort in TALStringList is up to 10x more faster
+               than in Delphi TstringList. Also TALStringList is not an
+               unicode TstringList but an 100% Ansi StringList
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+              *TALAVLStringList it's also a like a TStringlist, but use
+               internaly an AVL binary Tree to speed up the
+               insert / delete / lookup.
+
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -47,10 +54,15 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :     27/10/2007 add ForceValues and ForceValueFromIndex
-                         that do not delete an entry when we do
-                         ForceValue[name] := ''
-              26/01/2009 add TALAVLStringList
+History :     27/10/2007: add ForceValues and ForceValueFromIndex
+                          that do not delete an entry when we do
+                          ForceValue[name] := ''
+              26/01/2009: add TALAVLStringList
+              15/06/2012: update TALStringList to be the 8 bit version
+                          of TstringList. Replace ForceValues and
+                          ForceValueFromIndex by PersistentValues and
+                          PersistentValueFromIndex
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -58,35 +70,223 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALStringList;
 
 interface
 
-Uses Windows,
-     Classes,
+Uses Classes,
      sysutils,
      Contnrs,
      AlAvlBinaryTRee;
 
 Type
 
-  {--------------------------------}
-  TALStringList = class(TStringList)
+  {-----------------}
+  TALStrings = class;
+
+  {--------------------------}
+  TALStringsEnumerator = class
   private
-    function GetForceValue(const Name: string): string;
-    function GetForceValueFromIndex(Index: Integer): string;
-    procedure SetForceValue(const Name, Value: string);
-    procedure SetForceValueFromIndex(Index: Integer; const Value: string);
-  protected
-    procedure Put(Index: Integer; const S: string); override;
-    function CompareStrings(const S1, S2: string): Integer; override;
+    FIndex: Integer;
+    FStrings: TALStrings;
   public
-    function FindName(const S: string; var Index: Integer): Boolean; virtual;
-    function IndexOfName(const Name: string): Integer; override;
-    property ForceValues[const Name: string]: string read GetForceValue write SetForceValue;
-    property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;
+    constructor Create(AStrings: TALStrings);
+    function GetCurrent: AnsiString; inline;
+    function MoveNext: Boolean;
+    property Current: AnsiString read GetCurrent;
+  end;
+
+  {-----------------------------}
+  TALStrings = class(TPersistent)
+  private
+    //[deleted from Tstrings] FEncoding: TEncoding;
+    //[deleted from Tstrings] FDefaultEncoding: TEncoding;
+    //[deleted from Tstrings] FWriteBOM: Boolean;
+    //[deleted from Tstrings] procedure SetDefaultEncoding(const Value: TEncoding);
+    //[deleted from Tstrings] procedure SetStringsAdapter(const Value: IStringsAdapter);
+    //[deleted from Tstrings] FAdapter: IStringsAdapter;
+    //[deleted from Tstrings] procedure ReadData(Reader: TReader);
+    //[deleted from Tstrings] procedure WriteData(Writer: TWriter);
+    FDefined: TStringsDefined;
+    FDelimiter: AnsiChar;
+    FLineBreak: AnsiString;
+    FQuoteChar: AnsiChar;
+    FNameValueSeparator: AnsiChar;
+    FStrictDelimiter: Boolean;
+    FUpdateCount: Integer;
+    function GetCommaText: AnsiString;
+    function GetDelimitedText: AnsiString;
+    function GetName(Index: Integer): AnsiString;
+    function GetValue(const Name: AnsiString): AnsiString;
+    procedure SetCommaText(const Value: AnsiString);
+    procedure SetDelimitedText(const Value: AnsiString);
+    procedure SetValue(const Name, Value: AnsiString);
+    procedure SetPersistentValue(const Name, Value: AnsiString); // [added from Tstrings]
+    function GetDelimiter: AnsiChar;
+    procedure SetDelimiter(const Value: AnsiChar);
+    function GetLineBreak: AnsiString;
+    procedure SetLineBreak(const Value: AnsiString);
+    function GetQuoteChar: AnsiChar;
+    procedure SetQuoteChar(const Value: AnsiChar);
+    function GetNameValueSeparator: AnsiChar;
+    procedure SetNameValueSeparator(const Value: AnsiChar);
+    function GetStrictDelimiter: Boolean;
+    procedure SetStrictDelimiter(const Value: Boolean);
+    function GetValueFromIndex(Index: Integer): AnsiString;
+    procedure SetValueFromIndex(Index: Integer; const Value: AnsiString);
+    procedure SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString); // [added from Tstrings]
+  protected
+    //[deleted from Tstrings] procedure SetEncoding(const Value: TEncoding);
+    //[deleted from Tstrings] procedure DefineProperties(Filer: TFiler); override;
+    procedure Error(const Msg: String; Data: Integer); overload;
+    procedure Error(Msg: PResStringRec; Data: Integer); overload;
+    function ExtractName(const S: AnsiString): AnsiString;
+    function Get(Index: Integer): AnsiString; virtual; abstract;
+    function GetCapacity: Integer; virtual;
+    function GetCount: Integer; virtual; abstract;
+    function GetObject(Index: Integer): TObject; virtual;
+    function GetTextStr: AnsiString; virtual;
+    procedure Put(Index: Integer; const S: AnsiString); virtual;
+    procedure PutObject(Index: Integer; AObject: TObject); virtual;
+    procedure SetCapacity(NewCapacity: Integer); virtual;
+    procedure SetTextStr(const Value: AnsiString); virtual;
+    procedure SetUpdateState(Updating: Boolean); virtual;
+    property UpdateCount: Integer read FUpdateCount;
+    function CompareStrings(const S1, S2: AnsiString): Integer; virtual;
+    procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
+  public
+    //[deleted from Tstrings] procedure LoadFromFile(const FileName: string; Encoding: TEncoding); overload; virtual;
+    //[deleted from Tstrings] procedure LoadFromStream(Stream: TStream; Encoding: TEncoding); overload; virtual;
+    //[deleted from Tstrings] procedure SaveToFile(const FileName: string; Encoding: TEncoding); overload; virtual;
+    //[deleted from Tstrings] procedure SaveToStream(Stream: TStream; Encoding: TEncoding); overload; virtual;
+    //[deleted from Tstrings] property DefaultEncoding: TEncoding read FDefaultEncoding write SetDefaultEncoding;
+    //[deleted from Tstrings] property Encoding: TEncoding read FEncoding;
+    //[deleted from Tstrings] property WriteBOM: Boolean read FWriteBOM write FWriteBOM;
+    //[deleted from Tstrings] property StringsAdapter: IStringsAdapter read FAdapter write SetStringsAdapter;
+    //[deleted from Tstrings] destructor Destroy; override;
+    constructor Create;
+    function Add(const S: AnsiString): Integer; virtual;
+    function AddObject(const S: AnsiString; AObject: TObject): Integer; virtual;
+    procedure Append(const S: AnsiString);
+    procedure AddStrings(Strings: TALStrings); overload; virtual;
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    procedure AddStrings(const Strings: TArray<AnsiString>); overload;
+    procedure AddStrings(const Strings: TArray<AnsiString>; const Objects: TArray<TObject>); overload;
+    {$IFEND}
+    procedure Assign(Source: TPersistent); override;
+    procedure BeginUpdate;
+    procedure Clear; virtual; abstract;
+    procedure Delete(Index: Integer); virtual; abstract;
+    procedure EndUpdate;
+    function Equals(Strings: TALStrings): Boolean; reintroduce;
+    procedure Exchange(Index1, Index2: Integer); virtual;
+    function GetEnumerator: TALStringsEnumerator;
+    function GetText: PAnsiChar; virtual;
+    function IndexOf(const S: AnsiString): Integer; virtual;
+    function IndexOfName(const Name: AnsiString): Integer; virtual;
+    function IndexOfObject(AObject: TObject): Integer; virtual;
+    procedure Insert(Index: Integer; const S: AnsiString); virtual; abstract;
+    procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
+    procedure LoadFromFile(const FileName: String); virtual;
+    procedure LoadFromStream(Stream: TStream); virtual;
+    procedure Move(CurIndex, NewIndex: Integer); virtual;
+    procedure SaveToFile(const FileName: String); virtual;
+    procedure SaveToStream(Stream: TStream); virtual;
+    procedure SetText(Text: PAnsiChar); virtual;
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    function ToStringArray: TArray<AnsiString>;
+    function ToObjectArray: TArray<TObject>;
+    {$IFEND}
+    property Capacity: Integer read GetCapacity write SetCapacity;
+    property CommaText: AnsiString read GetCommaText write SetCommaText;
+    property Count: Integer read GetCount;
+    property Delimiter: AnsiChar read GetDelimiter write SetDelimiter;
+    property DelimitedText: AnsiString read GetDelimitedText write SetDelimitedText;
+    property LineBreak: AnsiString read GetLineBreak write SetLineBreak;
+    property Names[Index: Integer]: AnsiString read GetName;
+    property Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property QuoteChar: AnsiChar read GetQuoteChar write SetQuoteChar;
+    property Values[const Name: AnsiString]: AnsiString read GetValue write SetValue;
+    property ValueFromIndex[Index: Integer]: AnsiString read GetValueFromIndex write SetValueFromIndex;
+    property PersistentValues[const Name: AnsiString]: AnsiString read GetValue write SetPersistentValue; // [added from Tstrings]
+    property PersistentValueFromIndex[Index: Integer]: AnsiString read GetValueFromIndex write SetPersistentValueFromIndex; // [added from Tstrings]
+    property NameValueSeparator: AnsiChar read GetNameValueSeparator write SetNameValueSeparator;
+    property StrictDelimiter: Boolean read GetStrictDelimiter write SetStrictDelimiter;
+    property Strings[Index: Integer]: AnsiString read Get write Put; default;
+    property Text: AnsiString read GetTextStr write SetTextStr;
+  end;
+
+  {--------------------}
+  TALStringList = class;
+
+  {-----------------------------}
+  PALStringItem = ^TALStringItem;
+  TALStringItem = record
+    FString: AnsiString;
+    FObject: TObject;
+  end;
+
+  {-----------------------------------------}
+  TALStringItemList = array of TALStringItem;
+  TALStringListSortCompare = function(List: TALStringList; Index1, Index2: Integer): Integer;
+
+  {-------------------------------}
+  TALStringList = class(TALStrings)
+  private
+    FList: TALStringItemList;
+    FCount: Integer;
+    FCapacity: Integer;
+    FSorted: Boolean;
+    FDuplicates: TDuplicates;
+    FCaseSensitive: Boolean;
+    FOnChange: TNotifyEvent;
+    FOnChanging: TNotifyEvent;
+    FOwnsObject: Boolean;
+    procedure ExchangeItems(Index1, Index2: Integer);
+    procedure Grow;
+    procedure QuickSort(L, R: Integer; SCompare: TALStringListSortCompare);
+    procedure SetSorted(Value: Boolean);
+    procedure SetCaseSensitive(const Value: Boolean);
+  protected
+    procedure Changed; virtual;
+    procedure Changing; virtual;
+    function Get(Index: Integer): AnsiString; override;
+    function GetCapacity: Integer; override;
+    function GetCount: Integer; override;
+    function GetObject(Index: Integer): TObject; override;
+    procedure Put(Index: Integer; const S: AnsiString); override;
+    procedure PutObject(Index: Integer; AObject: TObject); override;
+    procedure SetCapacity(NewCapacity: Integer); override;
+    procedure SetUpdateState(Updating: Boolean); override;
+    function CompareStrings(const S1, S2: AnsiString): Integer; override;
+    procedure InsertItem(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
+    procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
+  public
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
+    destructor Destroy; override;
+    function Add(const S: AnsiString): Integer; override;
+    function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Clear; override;
+    procedure Delete(Index: Integer); override;
+    procedure Exchange(Index1, Index2: Integer); override;
+    function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
+    function FindName(const S: AnsiString; var Index: Integer): Boolean; // [added from TStringList]
+    function IndexOf(const S: AnsiString): Integer; override;
+    function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
+    procedure Insert(Index: Integer; const S: AnsiString); override;
+    procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
+    procedure Sort; virtual;
+    procedure CustomSort(Compare: TALStringListSortCompare); virtual;
+    property Duplicates: TDuplicates read FDuplicates write FDuplicates;
+    property Sorted: Boolean read FSorted write SetSorted;
+    property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
+    property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
   {-----------------------}
@@ -98,83 +298,66 @@ Type
   Private
   Protected
   Public
-    Val: String;  // Value
+    Val: AnsiString;  // Value
     Obj: Tobject; // Object
     Idx: integer; // Index in the NodeList
     Nvs: Boolean; // if NameValueSeparator was present
     Constructor Create; Override;
   end;
 
-  {-----------------------------------------------------------}
-  TALAVLStringListBinaryTree = class(TALStringKeyAVLBinaryTree)
+  {----------------------------------}
+  //when duplicate is set to ignore
+  //it's take care only about the "name" part
+  //and ignore the value part. exemple
+  //if name1=value2 is in the list and
+  //we add name1=value3 then if ignore duplicates
+  //no error will be raise and the add command
+  //will be silently ignored
+  TALAVLStringList = class(TALStrings)
   private
-    FEmptyNode: TALAVLStringListBinaryTreeNode; // we use this because inherited Tstring.setvalue use i := add('') following by put(i, avalue)
-  protected
-    Procedure InternalClear; override;
-  public
-    Constructor Create; override;
-    function    AddNode(aNode: TALAVLStringListBinaryTreeNode): Boolean; reintroduce; virtual;
-    function    DeleteNode(idVal: String): boolean; override;
-    function    FindNode(idVal: String): TALAVLStringListBinaryTreeNode; Reintroduce; virtual;
-  end;
-
-  {-----------------------------------------------------}
-  TALAVLStringListBinaryTreeNodeList = class(TObjectList)
-  private
-  protected
-    function GetItem(Index: Integer): TALAVLStringListBinaryTreeNode;
-    procedure SetItem(Index: Integer; AObject: TALAVLStringListBinaryTreeNode);
-  public
-    property Items[Index: Integer]: TALAVLStringListBinaryTreeNode read GetItem write SetItem; default;
-  end;
-
-  {--------------------------------}
-  TALAVLStringList = class(TStrings)
-  private
-    FNodeList: TALAVLStringListBinaryTreeNodeList;
-    FAVLBinTree: TALAVLStringListBinaryTree;
+    FNodeList: TObjectList;
+    FAVLBinTree: TALStringKeyAVLBinaryTree;
     FDuplicates: TDuplicates;
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
+    FOwnsObject: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure QuickSort(L, R: Integer; SCompare: TALAVLStringListSortCompare);
     procedure SetCaseSensitive(const Value: Boolean);
     function GetCaseSensitive: Boolean;
-    Function ExtractNameValue(S: String; var Name, Value: String): Boolean;
-    function GetForceValue(const Name: string): string;
-    function GetForceValueFromIndex(Index: Integer): string;
-    procedure SetForceValue(const Name, Value: string);
-    procedure SetForceValueFromIndex(Index: Integer; const Value: string);
+    Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
     procedure SetDuplicates(const Value: TDuplicates);
   protected
     procedure Changed; virtual;
     procedure Changing; virtual;
-    function Get(Index: Integer): string; override;
+    function Get(Index: Integer): AnsiString; override;
     function GetCount: Integer; override;
     function GetObject(Index: Integer): TObject; override;
-    procedure Put(Index: Integer; const S: string); override;
+    procedure Put(Index: Integer; const S: AnsiString); override;
     procedure PutObject(Index: Integer; AObject: TObject); override;
     procedure SetUpdateState(Updating: Boolean); override;
-    procedure InsertItem(Index: Integer; const S: string; AObject: TObject); virtual;
+    procedure InsertItem(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
+    procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
   public
-    Constructor Create; Virtual;
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
     destructor Destroy; override;
-    function Add(const S: string): Integer; override;
-    function AddObject(const S: string; AObject: TObject): Integer; override;
+    function Add(const S: AnsiString): Integer; override;
+    function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
+    procedure Assign(Source: TPersistent); override;
     procedure Clear; override;
     procedure Delete(Index: Integer); override;
     procedure Exchange(Index1, Index2: Integer); override;
-    function IndexOf(const S: string): Integer; override;
-    function IndexOfName(const Name: string): Integer; override;
-    procedure Insert(Index: Integer; const S: string); override;
-    procedure InsertObject(Index: Integer; const S: string; AObject: TObject); override;
+    function IndexOf(const S: AnsiString): Integer; override;
+    function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
+    procedure Insert(Index: Integer; const S: AnsiString); override;
+    procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
     procedure CustomSort(Compare: TALAVLStringListSortCompare); virtual;
+    property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
     property CaseSensitive: Boolean read GetCaseSensitive write SetCaseSensitive;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
-    property ForceValues[const Name: string]: string read GetForceValue write SetForceValue;
-    property ForceValueFromIndex[Index: Integer]: string read GetForceValueFromIndex write SetForceValueFromIndex;
-    property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
+    property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
 implementation
@@ -182,170 +365,1613 @@ implementation
 Uses RTLConsts,
      AlFcnString;
 
-/////////////////////////
-///// TALStringList /////
-/////////////////////////
-
-{*******************************************************************}
-function TALStringList.CompareStrings(const S1, S2: string): Integer;
+{************************************************************}
+constructor TALStringsEnumerator.Create(AStrings: TALStrings);
 begin
-  //the difference between TALStringList and TStringList is that
-  //TstringList use ansiCompareStr or ansiCompareText that are
-  //dependant from the local
-  if CaseSensitive then Result := CompareStr(AlStringReplace(S1,NameValueSeparator,#1,[]),
-                                             AlStringReplace(S2,NameValueSeparator,#1,[]))
-  else Result := CompareText(AlStringReplace(S1,NameValueSeparator,#1,[]),
-                             AlStringReplace(S2,NameValueSeparator,#1,[]));
+  inherited Create;
+  FIndex := -1;
+  FStrings := AStrings;
+end;
+
+{***************************************************}
+function TALStringsEnumerator.GetCurrent: AnsiString;
+begin
+  Result := FStrings[FIndex];
+end;
+
+{**********************************************}
+function TALStringsEnumerator.MoveNext: Boolean;
+begin
+  Result := FIndex < FStrings.Count - 1;
+  if Result then
+    Inc(FIndex);
+end;
+
+{****************************}
+constructor TALStrings.Create;
+begin
+  inherited Create;
+  FDefined := [];
+  FDelimiter := ',';          // doesn't matter what we set here because of fDefined
+  FLineBreak := sLineBreak;   // doesn't matter what we set here because of fDefined
+  FQuoteChar := '"';          // doesn't matter what we set here because of fDefined
+  FNameValueSeparator := '='; // doesn't matter what we set here because of fDefined
+  FStrictDelimiter:= False;   // doesn't matter what we set here because of fDefined
+  FUpdateCount:= 0;
+end;
+
+{****************************************************}
+function TALStrings.Add(const S: AnsiString): Integer;
+begin
+  Result := GetCount;
+  Insert(Result, S);
 end;
 
 {****************************************************************************}
-function TALStringList.FindName(const S: string; var Index: Integer): Boolean;
-
-  {----------------------------------------------------}
-  function InternalExtractName(const S: string): string;
-  var P: Integer;
-  begin
-    Result := S;
-    P := AlCharPos(NameValueSeparator, Result);
-    if P <> 0 then SetLength(Result, P-1);
-  end;
-
-var L, H, I, C: Integer;
+function TALStrings.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
-  Result := False;
-  L := 0;
-  H := Count - 1;
-  while L <= H do begin
-    I := (L + H) shr 1;
-    C := CompareStrings(InternalExtractName(Get(I)), S);
-    if C < 0 then L := I + 1
-    else begin
-      H := I - 1;
-      if C = 0 then Result := True;
-    end;
-  end;
-  Index := L;
+  Result := Add(S);
+  PutObject(Result, AObject);
 end;
 
-{**************************************************************}
-function TALStringList.IndexOfName(const Name: string): Integer;
+{***********************************************}
+procedure TALStrings.Append(const S: AnsiString);
 begin
-  if not Sorted then Result := inherited IndexOfName(Name)
-  else if not FindName(Name, Result) then Result := -1;
+  Add(S);
+end;
+
+{***************************************************}
+procedure TALStrings.AddStrings(Strings: TALStrings);
+var
+  I: Integer;
+begin
+  BeginUpdate;
+  try
+    for I := 0 to Strings.Count - 1 do
+      AddObject(Strings[I], Strings.Objects[I]);
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************}
+{$IF CompilerVersion >= 23} {Delphi XE2}
+procedure TALStrings.AddStrings(const Strings: TArray<AnsiString>);
+var
+  I: Integer;
+begin
+  BeginUpdate;
+  try
+    for I := Low(Strings) to High(Strings) do
+      Add(Strings[I]);
+  finally
+    EndUpdate;
+  end;
+end;
+{$IFEND}
+
+{**************************************}
+{$IF CompilerVersion >= 23} {Delphi XE2}
+procedure TALStrings.AddStrings(const Strings: TArray<AnsiString>; const Objects: TArray<TObject>);
+var
+  I: Integer;
+begin
+  if Length(Strings) <> Length(Objects) then
+    raise EArgumentOutOfRangeException.CreateRes(@System.RTLConsts.sInvalidStringAndObjectArrays);
+  BeginUpdate;
+  try
+    for I := Low(Strings) to High(Strings) do
+      AddObject(Strings[I], Objects[I]);
+  finally
+    EndUpdate;
+  end;
+end;
+{$IFEND}
+
+{***********************************************}
+procedure TALStrings.Assign(Source: TPersistent);
+var i: integer;
+begin
+  if Source is TALStrings then
+  begin
+    BeginUpdate;
+    try
+      Clear;
+      FDefined := TALStrings(Source).FDefined;
+      FNameValueSeparator := TALStrings(Source).FNameValueSeparator;
+      FQuoteChar := TALStrings(Source).FQuoteChar;
+      FDelimiter := TALStrings(Source).FDelimiter;
+      FLineBreak := TALStrings(Source).FLineBreak;
+      FStrictDelimiter := TALStrings(Source).FStrictDelimiter;
+      AddStrings(TALStrings(Source));
+    finally
+      EndUpdate;
+    end;
+    Exit;
+  end;
+  if Source is TStrings then
+  begin
+    BeginUpdate;
+    try
+      Clear;
+      FNameValueSeparator := AnsiChar(TStrings(Source).NameValueSeparator);
+      FQuoteChar := AnsiChar(TStrings(Source).QuoteChar);
+      FDelimiter := AnsiChar(TStrings(Source).Delimiter);
+      FLineBreak := AnsiString(TStrings(Source).LineBreak);
+      FStrictDelimiter := TStrings(Source).StrictDelimiter;
+      for I := 0 to Tstrings(Source).Count - 1 do
+        AddObject(Ansistring(Tstrings(Source)[I]), Tstrings(Source).Objects[I]);
+    finally
+      EndUpdate;
+    end;
+    Exit;
+  end;
+  inherited Assign(Source);
+end;
+
+{***********************************************}
+procedure TALStrings.AssignTo(Dest: TPersistent);
+var i: integer;
+begin
+  if Dest is TStrings then
+  begin
+    Tstrings(Dest).BeginUpdate;
+    try
+      Tstrings(Dest).Clear;
+      Tstrings(Dest).NameValueSeparator := char(FNameValueSeparator);
+      Tstrings(Dest).QuoteChar := char(FQuoteChar);
+      Tstrings(Dest).Delimiter := char(FDelimiter);
+      Tstrings(Dest).LineBreak := String(FLineBreak);
+      Tstrings(Dest).StrictDelimiter := FStrictDelimiter;
+      for I := 0 to Count - 1 do
+        Tstrings(Dest).AddObject(string(get(I)), Objects[I]);
+    finally
+      Tstrings(Dest).EndUpdate;
+    end;
+    Exit;
+  end;
+  inherited AssignTo(Dest);
+end;
+
+{*******************************}
+procedure TALStrings.BeginUpdate;
+begin
+  if FUpdateCount = 0 then SetUpdateState(True);
+  Inc(FUpdateCount);
+end;
+
+{*****************************}
+procedure TALStrings.EndUpdate;
+begin
+  Dec(FUpdateCount);
+  if FUpdateCount = 0 then SetUpdateState(False);
+end;
+
+{*******************************************************}
+function TALStrings.Equals(Strings: TALStrings): Boolean;
+var
+  I, Count: Integer;
+begin
+  Result := False;
+  Count := GetCount;
+  if Count <> Strings.GetCount then Exit;
+  for I := 0 to Count - 1 do if Get(I) <> Strings.Get(I) then Exit;
+  Result := True;
 end;
 
 {***********************************************************}
-procedure TALStringList.Put(Index: Integer; const S: string);
+procedure TALStrings.Error(const Msg: String; Data: Integer);
 begin
-  If not sorted then inherited Put(Index, S)
-  else begin
-    delete(index);
-    add(s);
+  raise EStringListError.CreateFmt(Msg, [Data]);
+end;
+
+{************************************************************}
+procedure TALStrings.Error(Msg: PResStringRec; Data: Integer);
+begin
+  raise EStringListError.CreateFmt(LoadResString(Msg), [Data]);
+end;
+
+{*****************************************************}
+procedure TALStrings.Exchange(Index1, Index2: Integer);
+var
+  TempObject: TObject;
+  TempString: AnsiString;
+begin
+  BeginUpdate;
+  try
+    TempString := Strings[Index1];
+    TempObject := Objects[Index1];
+    Strings[Index1] := Strings[Index2];
+    Objects[Index1] := Objects[Index2];
+    Strings[Index2] := TempString;
+    Objects[Index2] := TempObject;
+  finally
+    EndUpdate;
   end;
 end;
 
 {***************************************************************}
-function TALStringList.GetForceValue(const Name: string): string;
+function TALStrings.ExtractName(const S: AnsiString): AnsiString;
+var
+  P: Integer;
 begin
-  Result := Values[Name];
+  Result := S;
+  P := ALPos(NameValueSeparator, Result);
+
+  // change behavior from original Tstring
+  // i thing that if a Tstring have an item
+  //
+  // item1
+  //
+  // then set MyTstrings.values[item1] := Value1
+  // must do
+  //
+  // item1=Value1
+  //
+  // instead of what he actually do
+  //
+  // item1
+  // item1=Value1
+  //
+  // Original function:
+  //
+  // if P <> 0 then
+  //   SetLength(Result, P-1) else
+  //   SetLength(Result, 0);
+
+  if P <> 0 then SetLength(Result, P-1);
 end;
 
-{********************************************************************}
-function TALStringList.GetForceValueFromIndex(Index: Integer): string;
+{***************************************}
+function TALStrings.GetCapacity: Integer;
+begin  // descendents may optionally override/replace this default implementation
+  Result := Count;
+end;
+
+{*******************************************}
+function TALStrings.GetCommaText: AnsiString;
+var
+  LOldDefined: TStringsDefined;
+  LOldDelimiter: AnsiChar;
+  LOldQuoteChar: AnsiChar;
 begin
-  Result := ValueFromIndex[Index];
+  LOldDefined := FDefined;
+  LOldDelimiter := FDelimiter;
+  LOldQuoteChar := FQuoteChar;
+  Delimiter := ',';
+  QuoteChar := '"';
+  try
+    Result := GetDelimitedText;
+  finally
+    FDelimiter := LOldDelimiter;
+    FQuoteChar := LOldQuoteChar;
+    FDefined := LOldDefined;
+  end;
+end;
+
+{***********************************************}
+function TALStrings.GetDelimitedText: AnsiString;
+var
+  S: AnsiString;
+  P: PAnsiChar;
+  I, Count: Integer;
+  LDelimiters: TSysCharSet;
+begin
+  Count := GetCount;
+  if (Count = 1) and (Get(0) = '') then
+    Result := QuoteChar + QuoteChar
+  else
+  begin
+    Result := '';
+    LDelimiters := [AnsiChar(#0), AnsiChar(QuoteChar), AnsiChar(Delimiter)];
+    if not StrictDelimiter then
+      LDelimiters := LDelimiters + [AnsiChar(#1)..AnsiChar(' ')];
+    for I := 0 to Count - 1 do
+    begin
+      S := Get(I);
+      P := PAnsiChar(S);
+      while not (P^ in LDelimiters) do
+        Inc(P);
+      if (P^ <> #0) then S := ALQuotedStr(S, QuoteChar);
+      Result := Result + S + Delimiter;
+    end;
+    System.Delete(Result, Length(Result), 1);
+  end;
+end;
+
+{******************************************************}
+function TALStrings.GetEnumerator: TALStringsEnumerator;
+begin
+  Result := TALStringsEnumerator.Create(Self);
+end;
+
+{******************************************************}
+function TALStrings.GetName(Index: Integer): AnsiString;
+begin
+  Result := ExtractName(Get(Index));
+end;
+
+{*****************************************************}
+function TALStrings.GetObject(Index: Integer): TObject;
+begin
+  Result := nil;
+end;
+
+{*************************************}
+function TALStrings.GetText: PAnsiChar;
+begin
+  Result := StrNew(PAnsiChar(GetTextStr));
+end;
+
+{*****************************************}
+function TALStrings.GetTextStr: AnsiString;
+var
+  I, L, Size, Count: Integer;
+  P: PAnsiChar;
+  S, LB: AnsiString;
+begin
+  Count := GetCount;
+  Size := 0;
+  LB := LineBreak;
+  for I := 0 to Count - 1 do Inc(Size, Length(Get(I)) + Length(LB));
+  SetString(Result, nil, Size);
+  P := Pointer(Result);
+  for I := 0 to Count - 1 do
+  begin
+    S := Get(I);
+    L := Length(S);
+    if L <> 0 then
+    begin
+      ALMove(Pointer(S)^, P^, L);
+      Inc(P, L);
+    end;
+    L := Length(LB);
+    if L <> 0 then
+    begin
+      ALMove(Pointer(LB)^, P^, L);
+      Inc(P, L);
+    end;
+  end;
 end;
 
 {***************************************************************}
-procedure TALStringList.SetForceValue(const Name, Value: string);
-var I: Integer;
+function TALStrings.GetValue(const Name: AnsiString): AnsiString;
+var
+  I: Integer;
+begin
+  I := IndexOfName(Name);
+  if I >= 0 then
+    Result := ALCopyStr(Get(I), Length(Name) + 2, MaxInt) else
+    Result := '';
+end;
+
+{********************************************************}
+function TALStrings.IndexOf(const S: AnsiString): Integer;
+begin
+  for Result := 0 to GetCount - 1 do
+    if CompareStrings(Get(Result), S) = 0 then Exit;
+  Result := -1;
+end;
+
+{***************************************************************}
+function TALStrings.IndexOfName(const Name: AnsiString): Integer;
+var
+  P: Integer;
+  S: AnsiString;
+begin
+
+  // change behavior from original Tstring
+  // i thing that if a Tstring have an item
+  //
+  // item1
+  //
+  // then set MyTstrings.values[item1] := Value1
+  // must do
+  //
+  // item1=Value1
+  //
+  // instead of what he actually do
+  //
+  // item1
+  // item1=Value1
+  //
+  // Original function:
+  //
+  // for Result := 0 to GetCount - 1 do
+  // begin
+  //   S := Get(Result);
+  //   P := ALPos(NameValueSeparator, S);
+  //   if (P <> 0) and (CompareStrings(ALCopyStr(S, 1, P - 1), Name) = 0) then Exit;
+  // end;
+  // Result := -1;
+
+  for Result := 0 to GetCount - 1 do
+  begin
+    S := Get(Result);
+    P := ALPos(NameValueSeparator, S);
+    if ((P <> 0) and (CompareStrings(ALCopyStr(S, 1, P - 1), Name) = 0)) or
+       ((P = 0) and (CompareStrings(S, Name) = 0)) then Exit;
+  end;
+  Result := -1;
+end;
+
+{***********************************************************}
+function TALStrings.IndexOfObject(AObject: TObject): Integer;
+begin
+  for Result := 0 to GetCount - 1 do
+    if GetObject(Result) = AObject then Exit;
+  Result := -1;
+end;
+
+{***************************************************************************************}
+procedure TALStrings.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+begin
+  Insert(Index, S);
+  PutObject(Index, AObject);
+end;
+
+{********************************************************}
+procedure TALStrings.LoadFromFile(const FileName: String);
+var
+  Stream: TStream;
+begin
+  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(Stream);
+  finally
+    Stream.Free;
+  end;
+end;
+
+{***************************************************}
+procedure TALStrings.LoadFromStream(Stream: TStream);
+var
+  Size: Integer;
+  S: AnsiString;
+begin
+  BeginUpdate;
+  try
+    Size := Stream.Size - Stream.Position;
+    SetString(S, nil, Size);
+    Stream.Read(Pointer(S)^, Size);
+    SetTextStr(S);
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************************}
+procedure TALStrings.Move(CurIndex, NewIndex: Integer);
+var
+  TempObject: TObject;
+  TempString: AnsiString;
+begin
+  if CurIndex <> NewIndex then
+  begin
+    BeginUpdate;
+    try
+      TempString := Get(CurIndex);
+      TempObject := GetObject(CurIndex);
+      PutObject(CurIndex, nil);
+      Delete(CurIndex);
+      InsertObject(NewIndex, TempString, TempObject);
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{************************************************************}
+procedure TALStrings.Put(Index: Integer; const S: AnsiString);
+begin
+end;
+
+{***************************************************************}
+procedure TALStrings.PutObject(Index: Integer; AObject: TObject);
+begin
+end;
+
+{******************************************************}
+procedure TALStrings.SaveToFile(const FileName: String);
+var
+  Stream: TStream;
+begin
+  Stream := TFileStream.Create(FileName, fmCreate);
+  try
+    SaveToStream(Stream);
+  finally
+    Stream.Free;
+  end;
+end;
+
+{*************************************************}
+procedure TALStrings.SaveToStream(Stream: TStream);
+var
+  S: AnsiString;
+begin
+  S := GetTextStr;
+  Stream.WriteBuffer(Pointer(S)^, Length(S));
+end;
+
+{*****************************************************}
+procedure TALStrings.SetCapacity(NewCapacity: Integer);
+begin
+  // do nothing - descendents may optionally implement this method
+end;
+
+{*********************************************************}
+procedure TALStrings.SetCommaText(const Value: AnsiString);
+var
+  LOldDefined: TStringsDefined;
+  LOldDelimiter: AnsiChar;
+  LOldQuoteChar: AnsiChar;
+begin
+  LOldDefined := FDefined;
+  LOldDelimiter := FDelimiter;
+  LOldQuoteChar := FQuoteChar;
+  Delimiter := ',';
+  QuoteChar := '"';
+  try
+    SetDelimitedText(Value);
+  finally
+    FDelimiter := LOldDelimiter;
+    FQuoteChar := LOldQuoteChar;
+    FDefined := LOldDefined;
+  end;
+end;
+
+{********************************************}
+procedure TALStrings.SetText(Text: PAnsiChar);
+begin
+  SetTextStr(Text);
+end;
+
+{*******************************************************}
+procedure TALStrings.SetTextStr(const Value: AnsiString);
+var
+  P, Start, LB: PAnsiChar;
+  S: AnsiString;
+  LineBreakLen: Integer;
+begin
+  BeginUpdate;
+  try
+    Clear;
+    P := Pointer(Value);
+    if P <> nil then
+      if ALCompareStr(LineBreak, sLineBreak) = 0 then
+      begin
+        // This is a lot faster than using StrPos/AnsiStrPos when
+        // LineBreak is the default (#13#10)
+        while P^ <> #0 do
+        begin
+          Start := P;
+          while not (P^ in [#0, #10, #13]) do Inc(P);
+          SetString(S, Start, P - Start);
+          Add(S);
+          if P^ = #13 then Inc(P);
+          if P^ = #10 then Inc(P);
+        end;
+      end
+      else
+      begin
+        LineBreakLen := Length(LineBreak);
+        while P^ <> #0 do
+        begin
+          Start := P;
+          LB := StrPos(P, PAnsiChar(LineBreak));
+          while (P^ <> #0) and (P <> LB) do Inc(P);
+          SetString(S, Start, P - Start);
+          Add(S);
+          if P = LB then
+            Inc(P, LineBreakLen);
+        end;
+      end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************************}
+procedure TALStrings.SetUpdateState(Updating: Boolean);
+begin
+end;
+
+{***********************************************************}
+procedure TALStrings.SetValue(const Name, Value: AnsiString);
+var
+  I: Integer;
+begin
+  I := IndexOfName(Name);
+  if Value <> '' then
+  begin
+    if I < 0 then Add(Name + NameValueSeparator + Value)
+    else Put(I, Name + NameValueSeparator + Value);
+  end else
+  begin
+    if I >= 0 then Delete(I);
+  end;
+end;
+
+{*********************************************************************}
+procedure TALStrings.SetPersistentValue(const Name, Value: AnsiString);
+var
+  I: Integer;
 begin
   I := IndexOfName(Name);
   if I < 0 then Add(Name + NameValueSeparator + Value)
   else Put(I, Name + NameValueSeparator + Value);
 end;
 
-{**********************************************************************************}
-procedure TALStringList.SetForceValueFromIndex(Index: Integer; const Value: string);
+{*************************************************************}
+procedure TALStrings.SetDelimitedText(const Value: AnsiString);
+var
+  P, P1: PAnsiChar;
+  S: AnsiString;
+begin
+  BeginUpdate;
+  try
+    Clear;
+    P := PAnsiChar(Value);
+    if not StrictDelimiter then
+      while P^ in [#1..' '] do
+        Inc(P);
+    while P^ <> #0 do
+    begin
+      if P^ = QuoteChar then
+        S := ALExtractQuotedStr(P, QuoteChar)
+      else
+      begin
+        P1 := P;
+        while ((not FStrictDelimiter and (P^ > ' ')) or
+              (FStrictDelimiter and (P^ <> #0))) and (P^ <> Delimiter) do
+          Inc(P);
+        SetString(S, P1, P - P1);
+      end;
+      Add(S);
+      if not FStrictDelimiter then
+        while P^ in [#1..' '] do
+          Inc(P);
+
+      if P^ = Delimiter then
+      begin
+        P1 := P;
+        Inc(P1);
+        if P1^ = #0 then
+          Add('');
+        repeat
+          Inc(P);
+        until not (not FStrictDelimiter and (P^ in [#1..' ']));
+      end;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************}
+function TALStrings.GetDelimiter: AnsiChar;
+begin
+  if not (sdDelimiter in FDefined) then
+    Delimiter := ',';
+  Result := FDelimiter;
+end;
+
+{*******************************************}
+function TALStrings.GetLineBreak: AnsiString;
+begin
+  if not (sdLineBreak in FDefined) then
+    LineBreak := sLineBreak;
+  Result := FLineBreak;
+end;
+
+{*****************************************}
+function TALStrings.GetQuoteChar: AnsiChar;
+begin
+  if not (sdQuoteChar in FDefined) then
+    QuoteChar := '"';
+  Result := FQuoteChar;
+end;
+
+{**********************************************}
+function TALStrings.GetStrictDelimiter: Boolean;
+begin
+  if not (sdStrictDelimiter in FDefined) then
+    StrictDelimiter := False;
+  Result := FStrictDelimiter;
+end;
+
+{*******************************************************}
+procedure TALStrings.SetDelimiter(const Value: AnsiChar);
+begin
+  if (FDelimiter <> Value) or not (sdDelimiter in FDefined) then
+  begin
+    Include(FDefined, sdDelimiter);
+    FDelimiter := Value;
+  end
+end;
+
+{*********************************************************}
+procedure TALStrings.SetLineBreak(const Value: AnsiString);
+begin
+  if (FLineBreak <> Value) or not (sdLineBreak in FDefined) then
+  begin
+    Include(FDefined, sdLineBreak);
+    FLineBreak := Value;
+  end
+end;
+
+{*******************************************************}
+procedure TALStrings.SetQuoteChar(const Value: AnsiChar);
+begin
+  if (FQuoteChar <> Value) or not (sdQuoteChar in FDefined) then
+  begin
+    Include(FDefined, sdQuoteChar);
+    FQuoteChar := Value;
+  end
+end;
+
+{************************************************************}
+procedure TALStrings.SetStrictDelimiter(const Value: Boolean);
+begin
+  if (FStrictDelimiter <> Value) or not (sdStrictDelimiter in FDefined) then
+  begin
+    Include(FDefined, sdStrictDelimiter);
+    FStrictDelimiter := Value;
+  end
+end;
+
+{********************************************************************}
+function TALStrings.CompareStrings(const S1, S2: AnsiString): Integer;
+begin
+  Result := ALCompareText(S1, S2);
+end;
+
+{**************************************************}
+function TALStrings.GetNameValueSeparator: AnsiChar;
+begin
+  if not (sdNameValueSeparator in FDefined) then
+    NameValueSeparator := '=';
+  Result := FNameValueSeparator;
+end;
+
+{****************************************************************}
+procedure TALStrings.SetNameValueSeparator(const Value: AnsiChar);
+begin
+  if (FNameValueSeparator <> Value) or not (sdNameValueSeparator in FDefined) then
+  begin
+    Include(FDefined, sdNameValueSeparator);
+    FNameValueSeparator := Value;
+  end
+end;
+
+{****************************************************************}
+function TALStrings.GetValueFromIndex(Index: Integer): AnsiString;
+var
+  SepPos: Integer;
+begin
+  if Index >= 0 then
+  begin
+    Result := Get(Index);
+    SepPos := ALPos(NameValueSeparator, Result);
+    if (SepPos > 0) then
+      System.Delete(Result, 1, SepPos)
+    else
+      Result := '';
+  end
+  else
+    Result := '';
+end;
+
+{******************************************************************************}
+procedure TALStrings.SetValueFromIndex(Index: Integer; const Value: AnsiString);
+begin
+  if Value <> '' then
+  begin
+    if Index < 0 then Add(NameValueSeparator + Value)
+    else Put(Index, Names[Index] + NameValueSeparator + Value);
+  end
+  else
+    if Index >= 0 then Delete(Index);
+end;
+
+{****************************************************************************************}
+procedure TALStrings.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Index < 0 then Add(NameValueSeparator + Value)
   else Put(Index, Names[Index] + NameValueSeparator + Value);
 end;
 
-
-
-
-////////////////////////////
-///// TALAVLStringList /////
-////////////////////////////
-
-{**********************************}
-constructor TALAVLStringList.Create;
+{**************************************}
+{$IF CompilerVersion >= 23} {Delphi XE2}
+function TALStrings.ToStringArray: TArray<AnsiString>;
+var
+  I: Integer;
 begin
-  FAVLBinTree:= TALAVLStringListBinaryTree.Create;
-  FAVLBinTree.CaseSensitive := False;
-  FNodeList := TALAVLStringListBinaryTreeNodeList.Create(False);
-  FOnChange := nil;
-  FOnChanging := nil;
-  FDuplicates := DupError;
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[I] := Strings[I];
 end;
+{$IFEND}
 
-{**********************************}
-destructor TALAVLStringList.Destroy;
+{**************************************}
+{$IF CompilerVersion >= 23} {Delphi XE2}
+function TALStrings.ToObjectArray: TArray<TObject>;
+var
+  I: Integer;
+begin
+  SetLength(Result, Count);
+  for I := 0 to Count - 1 do
+    Result[I] := Objects[I];
+end;
+{$IFEND}
+
+{*******************************}
+destructor TALStringList.Destroy;
+var
+  I: Integer;
+  Temp: Array of TObject;
 begin
   FOnChange := nil;
   FOnChanging := nil;
-  FAVLBinTree.free;
-  FNodeList.free;
+
+  // If the list owns the Objects gather them and free after the list is disposed
+  if OwnsObjects then
+  begin
+    SetLength(Temp, FCount);
+    for I := 0 to FCount - 1 do
+      Temp[I] := FList[I].FObject;
+  end;
+
   inherited Destroy;
+  FCount := 0;
+  SetCapacity(0);
+
+  // Free the objects that were owned by the list
+  if Length(Temp) > 0 then
+    for I := 0 to Length(Temp) - 1 do
+      Temp[I].Free;
 end;
 
-{******************************************************}
-function TALAVLStringList.Add(const S: string): Integer;
+{*******************************************************}
+function TALStringList.Add(const S: AnsiString): Integer;
 begin
   Result := AddObject(S, nil);
 end;
 
-{******************************************************************************}
-function TALAVLStringList.AddObject(const S: string; AObject: TObject): Integer;
+{*******************************************************************************}
+function TALStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
+begin
+  if not Sorted then
+    Result := FCount
+  else
+    if Find(S, Result) then
+      case Duplicates of
+        dupIgnore: Exit;
+        dupError: Error(@SDuplicateString, 0);
+      end;
+  InsertItem(Result, S, AObject);
+end;
+
+{**************************************************}
+procedure TALStringList.Assign(Source: TPersistent);
+begin
+  if Source is TALStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALStringList(Source).FCaseSensitive;
+    FDuplicates := TALStringList(Source).FDuplicates;
+    FSorted := TALStringList(Source).FSorted;
+  end
+  else if Source is TALAVLStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALAVLStringList(Source).CaseSensitive;
+    FDuplicates := TALAVLStringList(Source).FDuplicates;
+    FSorted := False;
+  end
+  else if Source is TStringList then
+  begin
+    Clear;
+    FCaseSensitive := TStringList(Source).CaseSensitive;
+    FDuplicates := TStringList(Source).Duplicates;
+    FSorted := TStringList(Source).Sorted;
+  end;
+  inherited Assign(Source);
+end;
+
+{**************************************************}
+procedure TALStringList.AssignTo(Dest: TPersistent);
+begin
+  if Dest is TStringList then
+  begin
+    TStringList(Dest).clear;
+    TStringList(Dest).CaseSensitive := fCaseSensitive;
+    TStringList(Dest).Duplicates := fDuplicates;
+    TStringList(Dest).Sorted := fSorted;
+  end;
+  inherited AssignTo(Dest);
+end;
+
+{******************************}
+procedure TALStringList.Changed;
+begin
+  if (FUpdateCount = 0) and Assigned(FOnChange) then
+    FOnChange(Self);
+end;
+
+{*******************************}
+procedure TALStringList.Changing;
+begin
+  if (FUpdateCount = 0) and Assigned(FOnChanging) then
+    FOnChanging(Self);
+end;
+
+{****************************}
+procedure TALStringList.Clear;
+var
+  I: Integer;
+  Temp: Array of TObject;
+begin
+  if FCount <> 0 then
+  begin
+    Changing;
+
+    // If the list owns the Objects gather them and free after the list is disposed
+    if OwnsObjects then
+    begin
+      SetLength(Temp, FCount);
+      for I := 0 to FCount - 1 do
+        Temp[I] := FList[I].FObject;
+    end;
+
+    FCount := 0;
+    SetCapacity(0);
+
+    // Free the objects that were owned by the list
+    if Length(Temp) > 0 then
+      for I := 0 to Length(Temp) - 1 do
+        Temp[I].Free;
+
+    Changed;
+  end;
+end;
+
+{*********************************************}
+procedure TALStringList.Delete(Index: Integer);
+var
+  Obj: TObject;
+begin
+  if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
+  Changing;
+  // If this list owns its objects then free the associated TObject with this index
+  if OwnsObjects then
+    Obj := FList[Index].FObject
+  else
+    Obj := nil;
+
+  // Direct memory writing to managed array follows
+  //  see http://dn.embarcadero.com/article/33423
+  // Explicitly finalize the element we about to stomp on with move
+  Finalize(FList[Index]);
+  Dec(FCount);
+  if Index < FCount then
+  begin
+    System.Move(FList[Index + 1], FList[Index],
+      (FCount - Index) * SizeOf(TALStringItem));
+    // Make sure there is no danglng pointer in the last (now unused) element
+    PPointer(@FList[FCount])^ := nil;
+  end;
+  if Obj <> nil then
+    Obj.Free;
+  Changed;
+end;
+
+{********************************************************}
+procedure TALStringList.Exchange(Index1, Index2: Integer);
+begin
+  if (Index1 < 0) or (Index1 >= FCount) then Error(@SListIndexError, Index1);
+  if (Index2 < 0) or (Index2 >= FCount) then Error(@SListIndexError, Index2);
+  Changing;
+  ExchangeItems(Index1, Index2);
+  Changed;
+end;
+
+{*************************************************************}
+procedure TALStringList.ExchangeItems(Index1, Index2: Integer);
+var
+  Temp: Pointer;
+  Item1, Item2: PALStringItem;
+begin
+  Item1 := @FList[Index1];
+  Item2 := @FList[Index2];
+  Temp := Pointer(Item1^.FString);
+  Pointer(Item1^.FString) := Pointer(Item2^.FString);
+  Pointer(Item2^.FString) := Temp;
+  Temp := Item1^.FObject;
+  Item1^.FObject := Item2^.FObject;
+  Item2^.FObject := Temp;
+end;
+
+{****************************************************************************}
+function TALStringList.Find(const S: AnsiString; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareStrings(FList[I].FString, S);
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        if Duplicates <> dupAccept then L := I;
+      end;
+    end;
+  end;
+  Index := L;
+end;
+
+{********************************************************************************}
+function TALStringList.FindName(const S: AnsiString; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareStrings(ExtractName(FList[I].FString), S);
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        if Duplicates <> dupAccept then L := I;
+      end;
+    end;
+  end;
+  Index := L;
+end;
+
+{*****************************************************}
+function TALStringList.Get(Index: Integer): AnsiString;
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SListIndexError, Index);
+  Result := FList[Index].FString;
+end;
+
+{******************************************}
+function TALStringList.GetCapacity: Integer;
+begin
+  Result := FCapacity;
+end;
+
+{***************************************}
+function TALStringList.GetCount: Integer;
+begin
+  Result := FCount;
+end;
+
+{********************************************************}
+function TALStringList.GetObject(Index: Integer): TObject;
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SListIndexError, Index);
+  Result := FList[Index].FObject;
+end;
+
+{***************************}
+procedure TALStringList.Grow;
+var
+  Delta: Integer;
+begin
+  if FCapacity > 64 then Delta := FCapacity div 4 else
+    if FCapacity > 8 then Delta := 16 else
+      Delta := 4;
+  SetCapacity(FCapacity + Delta);
+end;
+
+{***********************************************************}
+function TALStringList.IndexOf(const S: AnsiString): Integer;
+begin
+  if not Sorted then Result := inherited IndexOf(S) else
+    if not Find(S, Result) then Result := -1;
+end;
+
+{******************************************************************}
+function TALStringList.IndexOfName(const Name: ansistring): Integer;
+begin
+  if not Sorted then Result := inherited IndexOfName(Name)
+  else if not FindName(Name, Result) then Result := -1;
+end;
+
+{******************************************************************}
+procedure TALStringList.Insert(Index: Integer; const S: AnsiString);
+begin
+  InsertObject(Index, S, nil);
+end;
+
+{******************************************************************************************}
+procedure TALStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+begin
+  if Sorted then Error(@SSortedListError, 0);
+  if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
+  InsertItem(Index, S, AObject);
+end;
+
+{****************************************************************************************}
+procedure TALStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+begin
+  Changing;
+  if FCount = FCapacity then Grow;
+  if Index < FCount then
+    System.Move(FList[Index], FList[Index + 1],
+      (FCount - Index) * SizeOf(TALStringItem));
+  with FList[Index] do
+  begin
+    Pointer(FString) := nil;
+    FObject := AObject;
+    FString := S;
+  end;
+  Inc(FCount);
+  Changed;
+end;
+
+{***************************************************************}
+procedure TALStringList.Put(Index: Integer; const S: AnsiString);
+begin
+  if not sorted then begin
+    if Cardinal(Index) >= Cardinal(FCount) then
+      Error(@SListIndexError, Index);
+    Changing;
+    FList[Index].FString := S;
+    Changed;
+  end
+  else begin
+    delete(index);
+    add(s);
+  end;
+end;
+
+{******************************************************************}
+procedure TALStringList.PutObject(Index: Integer; AObject: TObject);
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SListIndexError, Index);
+  Changing;
+  FList[Index].FObject := AObject;
+  Changed;
+end;
+
+{***********************************************************************************}
+procedure TALStringList.QuickSort(L, R: Integer; SCompare: TALStringListSortCompare);
+var
+  I, J, P: Integer;
+begin
+  repeat
+    I := L;
+    J := R;
+    P := (L + R) shr 1;
+    repeat
+      while SCompare(Self, I, P) < 0 do Inc(I);
+      while SCompare(Self, J, P) > 0 do Dec(J);
+      if I <= J then
+      begin
+        if I <> J then
+          ExchangeItems(I, J);
+        if P = I then
+          P := J
+        else if P = J then
+          P := I;
+        Inc(I);
+        Dec(J);
+      end;
+    until I > J;
+    if L < J then QuickSort(L, J, SCompare);
+    L := I;
+  until I >= R;
+end;
+
+{********************************************************}
+procedure TALStringList.SetCapacity(NewCapacity: Integer);
+begin
+  if NewCapacity < FCount then
+    Error(@SListCapacityError, NewCapacity);
+  if NewCapacity <> FCapacity then
+  begin
+    SetLength(FList, NewCapacity);
+    FCapacity := NewCapacity;
+  end;
+end;
+
+{************************************************}
+procedure TALStringList.SetSorted(Value: Boolean);
+begin
+  if FSorted <> Value then
+  begin
+    if Value then Sort;
+    FSorted := Value;
+  end;
+end;
+
+{********************************************************}
+procedure TALStringList.SetUpdateState(Updating: Boolean);
+begin
+  if Updating then Changing else Changed;
+end;
+
+{*****************************************************************************************}
+function ALStringListCompareStrings(List: TALStringList; Index1, Index2: Integer): Integer;
+begin
+  Result := List.CompareStrings(List.FList[Index1].FString,
+                                List.FList[Index2].FString);
+end;
+
+{***************************}
+procedure TALStringList.Sort;
+begin
+  CustomSort(ALStringListCompareStrings);
+end;
+
+{********************************************************************}
+procedure TALStringList.CustomSort(Compare: TALStringListSortCompare);
+begin
+  if not Sorted and (FCount > 1) then
+  begin
+    Changing;
+    QuickSort(0, FCount - 1, Compare);
+    Changed;
+  end;
+end;
+
+{***********************************************************************}
+function TALStringList.CompareStrings(const S1, S2: AnsiString): Integer;
+
+  {-------------------------------------------------------------}
+  function internalCompareStr(const S1, S2: AnsiString): Integer;
+  var
+    P1, P2: PAnsiChar;
+    I: Integer;
+    L1, L2: Integer;
+  begin
+    { Length and PChar of S1 }
+    L1 := Length(S1);
+    P1 := PAnsiChar(S1);
+
+    { Length and PChar of S2 }
+    L2 := Length(S2);
+    P2 := PAnsiChar(S2);
+
+    { Continue the loop until the end of one string is reached. }
+    I := 0;
+    while (I < L1) and (I < L2) do
+    begin
+      if (P1^ <> P2^) then begin
+        if (P1^ = NameValueSeparator) then result := -1
+        else if (P2^ = NameValueSeparator) then result := 1
+        else result := Ord(P1^) - Ord(P2^);
+        Exit;
+      end;
+
+      Inc(P1);
+      Inc(P2);
+      Inc(I);
+    end;
+
+    { If chars were not different return the difference in length }
+    Result := L1 - L2;
+  end;
+
+  {--------------------------------------------------------------}
+  function internalCompareText(const S1, S2: AnsiString): Integer;
+  var
+    P1, P2: PAnsiChar;
+    I: Integer;
+    C1, C2: AnsiChar;
+    L1, L2: Integer;
+  begin
+    { Length and PChar of S1 }
+    L1 := Length(S1);
+    P1 := PAnsiChar(S1);
+
+    { Length and PChar of S2 }
+    L2 := Length(S2);
+    P2 := PAnsiChar(S2);
+
+    { Continue the loop until the end of one string is reached. }
+    I := 0;
+    while (I < L1) and (I < L2) do
+    begin
+      if P1^ in ['a'..'z'] then
+        C1 := AnsiChar(Byte(P1^) xor $20)
+      else
+        C1 := P1^;
+
+      if P2^ in ['a'..'z'] then
+        C2 := AnsiChar(Byte(P2^) xor $20)
+      else
+        C2 := P2^;
+
+      if (C1 <> C2) then begin
+        if (C1 = NameValueSeparator) then result := -1
+        else if (C2 = NameValueSeparator) then result := 1
+        else result := Ord(C1) - Ord(C2);
+        Exit;
+      end;
+
+      Inc(P1);
+      Inc(P2);
+      Inc(I);
+    end;
+
+    { If chars were not different return the difference in length }
+    Result := L1 - L2;
+  end;
+
+begin
+
+  // Orignial Delphi Code
+  // the difference between TALStringList and TStringList is that
+  // TstringList use ansiCompareStr or ansiCompareText that are
+  // dependant from the local. I don't like this behavior because
+  // as you can read
+  // http://msdn.microsoft.com/en-us/library/windows/desktop/dd317759(v=vs.85).aspx
+  // "Using CompareString incorrectly can compromise the security of your
+  // application. Strings that are not compared correctly can produce
+  // invalid input. For example, the function can raise security issues when
+  // used for a non-linguistic comparison, because two strings that are
+  // distinct in their binary representation can be linguistically equivalent"
+  // so i prefere to use instead CompareStr and CompareText but only
+  // a..z = A..Z will be handle when case insensitive is set.
+  // other behavior must be handle in descendant classe
+  //
+  // also not the ansiCompareStr and ansiCompareText
+  // are 10x more slower than CompareStr and CompareText
+  //
+  // if CaseSensitive then
+  //   Result := AnsiCompareStr(S1, S2)
+  // else
+  //   Result := AnsiCompareText(S1, S2);
+
+  // it's important that the order is not change because
+  // of the ord(NameValueSeparator) this is need because of
+  // function FindName
+  //
+  // EX the items
+  //
+  //   aaa0
+  //   aaa=123
+  //   aaaa
+  //
+  // must be ordered like
+  //
+  //   aaa=123   |     aaa
+  //   aaa0      |     aaa0
+  //   aaaa      |     aaaa
+  //                   => OK, ordered work with findname
+  //
+  // but with just Result := ALCompareText(S1, S2)
+  // it's will be ordered like
+  //
+  //   aaa0      |     aaa0
+  //   aaa=123   |     aaa
+  //   aaaa      |     aaaa
+  //                   => KO, NOT ordered, break the findname
+  //
+  // so we need to give to the NameValueSeparator the lowest ASCII
+  // number (#0). for this we must use custom CompareStr and
+  // custom CompareText. the cost is that our custom implementation
+  // of internalCompareStr and internalCompareText (based on the pure
+  // pascal implementation of CompareStr and CompareText, will be aound
+  // 50% more slower than the ASM version of CompareStr and CompareText
+  // IE 50% more slower with average 50 bytes for S1 and S2, it's even
+  // more slower when the number of bytes in S1 and S2 increase
+
+  if CaseSensitive then
+    Result := InternalCompareStr(S1, S2)
+  else
+    Result := InternalCompareText(S1, S2);
+
+end;
+
+{*******************************}
+constructor TALStringList.Create;
+begin
+  inherited Create;
+  setlength(FList, 0);
+  FCount := 0;
+  FCapacity := 0;
+  FSorted := False;
+  FDuplicates := dupIgnore;
+  FCaseSensitive := False;
+  FOnChange := nil;
+  FOnChanging := nil;
+  FOwnsObject := False;
+end;
+
+{*****************************************************}
+constructor TALStringList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  setlength(FList, 0);
+  FCount := 0;
+  FCapacity := 0;
+  FSorted := False;
+  FDuplicates := dupIgnore;
+  FCaseSensitive := False;
+  FOnChange := nil;
+  FOnChanging := nil;
+  FOwnsObject := OwnsObjects;
+end;
+
+{*************************************************************}
+procedure TALStringList.SetCaseSensitive(const Value: Boolean);
+begin
+  if Value <> FCaseSensitive then
+  begin
+    FCaseSensitive := Value;
+    if Sorted then
+    begin
+      // Calling Sort won't sort the list because CustomSort will
+      // only sort the list if it's not already sorted
+      Sorted := False;
+      Sorted := True;
+    end;
+  end;
+end;
+
+{**********************************}
+destructor TALAVLStringList.Destroy;
+var
+  I: Integer;
+  Temp: Array of TObject;
+begin
+  FOnChange := nil;
+  FOnChanging := nil;
+
+  // If the list owns the Objects gather them and free after the list is disposed
+  if OwnsObjects then
+  begin
+    SetLength(Temp, Count);
+    for I := 0 to Count - 1 do
+      Temp[I] := Objects[I];
+  end;
+
+  FAVLBinTree.free;
+  FNodeList.free;
+  inherited Destroy;
+
+  // Free the objects that were owned by the list
+  if Length(Temp) > 0 then
+    for I := 0 to Length(Temp) - 1 do
+      Temp[I].Free;
+end;
+
+{**********************************************************}
+function TALAVLStringList.Add(const S: AnsiString): Integer;
+begin
+  Result := AddObject(S, nil);
+end;
+
+{**********************************************************************************}
+function TALAVLStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
 begin
   Result := Count;
   InsertItem(Result, S, AObject);
 end;
 
+{*****************************************************}
+procedure TALAVLStringList.Assign(Source: TPersistent);
+begin
+  if Source is TALAVLStringList then
+  begin
+    Clear;
+    CaseSensitive := TALAVLStringList(Source).CaseSensitive;
+    FDuplicates := TALAVLStringList(Source).FDuplicates;
+  end
+  else if Source is TALStringList then
+  begin
+    Clear;
+    CaseSensitive := TALStringList(Source).CaseSensitive;
+    FDuplicates := TALStringList(Source).Duplicates;
+  end
+  else if Source is TStringList then
+  begin
+    Clear;
+    CaseSensitive := TStringList(Source).CaseSensitive;
+    FDuplicates := TStringList(Source).Duplicates;
+  end;
+  inherited Assign(Source);
+end;
+
+{*****************************************************}
+procedure TALAVLStringList.AssignTo(Dest: TPersistent);
+begin
+  if Dest is TStringList then
+  begin
+    TStringList(Dest).clear;
+    TStringList(Dest).CaseSensitive := CaseSensitive;
+    TStringList(Dest).Duplicates := fDuplicates;
+    TStringList(Dest).Sorted := False;
+  end;
+  inherited AssignTo(Dest);
+end;
+
 {*********************************}
 procedure TALAVLStringList.Changed;
 begin
-  if (UpdateCount = 0) and Assigned(FOnChange) then FOnChange(Self);
+  if (FUpdateCount = 0) and Assigned(FOnChange) then
+    FOnChange(Self);
 end;
 
 {**********************************}
 procedure TALAVLStringList.Changing;
 begin
-  if (UpdateCount = 0) and Assigned(FOnChanging) then FOnChanging(Self);
+  if (FUpdateCount = 0) and Assigned(FOnChanging) then
+    FOnChanging(Self);
 end;
 
 {*******************************}
 procedure TALAVLStringList.Clear;
+var
+  I: Integer;
+  Temp: Array of TObject;
 begin
-  if Count <> 0 then begin
+  if Count <> 0 then
+  begin
     Changing;
-    FnodeList.Clear;
+
+    // If the list owns the Objects gather them and free after the list is disposed
+    if OwnsObjects then
+    begin
+      SetLength(Temp, Count);
+      for I := 0 to Count - 1 do
+        Temp[I] := Objects[I];
+    end;
+
     FAVLBinTree.Clear;
+    FnodeList.Clear;
+
+    // Free the objects that were owned by the list
+    if Length(Temp) > 0 then
+      for I := 0 to Length(Temp) - 1 do
+        Temp[I].Free;
+
     Changed;
   end;
 end;
 
 {************************************************}
 procedure TALAVLStringList.Delete(Index: Integer);
-var i: integer;
+var
+  Obj: TObject;
+  i: integer;
 begin
   if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
   Changing;
-  FAVLBinTree.DeleteNode(FNodelist[Index].ID);
+  // If this list owns its objects then free the associated TObject with this index
+  if OwnsObjects then
+    Obj := Objects[Index]
+  else
+    Obj := nil;
+
+  FAVLBinTree.DeleteNode(TALAVLStringListBinaryTreeNode(FNodelist[Index]).ID);
   FNodelist.Delete(Index);
   for i := Index to FNodeList.Count - 1 do
-    dec(FNodelist[i].Idx);
+    dec(TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx);
+
+  if Obj <> nil then
+    Obj.Free;
   Changed;
 end;
 
@@ -363,18 +1989,19 @@ end;
 procedure TALAVLStringList.ExchangeItems(Index1, Index2: Integer);
 var Item1, Item2: TALAVLStringListBinaryTreeNode;
 begin
-  Item1 := FNodelist[Index1];
-  Item2 := FNodelist[Index2];
+  Item1 := TALAVLStringListBinaryTreeNode(FNodelist[Index1]);
+  Item2 := TALAVLStringListBinaryTreeNode(FNodelist[Index2]);
   FNodeList.Exchange(Index1,Index2);
   Item1.idx := Index2;
   Item2.idx := Index1;
 end;
 
-{****************************************************}
-function TALAVLStringList.Get(Index: Integer): string;
+{********************************************************}
+function TALAVLStringList.Get(Index: Integer): AnsiString;
 begin
-  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
-  with FNodelist[Index] do begin
+  if Cardinal(Index) >= Cardinal(Count) then
+    Error(@SListIndexError, Index);
+  with TALAVLStringListBinaryTreeNode(FNodelist[Index]) do begin
     if Nvs then Result := ID + NameValueSeparator + Val
     else Result := ID;
   end;
@@ -386,103 +2013,70 @@ begin
   Result := FNodeList.Count;
 end;
 
-{******************************************************************}
-function TALAVLStringList.GetForceValue(const Name: string): string;
-begin
-  Result := Values[Name];
-end;
-
-{***********************************************************************}
-function TALAVLStringList.GetForceValueFromIndex(Index: Integer): string;
-begin
-  Result := ValueFromIndex[Index];
-end;
-
-{******************************************************************}
-procedure TALAVLStringList.SetForceValue(const Name, Value: string);
-var I: Integer;
-begin
-  I := IndexOfName(Name);
-  if I < 0 then Add(Name + NameValueSeparator + Value)
-  else Put(I, Name + NameValueSeparator + Value);
-end;
-
-{*************************************************************************************}
-procedure TALAVLStringList.SetForceValueFromIndex(Index: Integer; const Value: string);
-begin
-  if Index < 0 then Add(NameValueSeparator + Value)
-  else Put(Index, Names[Index] + NameValueSeparator + Value);
-end;
-
 {***********************************************************}
 function TALAVLStringList.GetObject(Index: Integer): TObject;
 begin
-  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
-  Result := FNodelist[Index].Obj;
+  if Cardinal(Index) >= Cardinal(Count) then
+    Error(@SListIndexError, Index);
+  Result := TALAVLStringListBinaryTreeNode(FNodelist[Index]).Obj;
 end;
 
-{**********************************************************}
-function TALAVLStringList.IndexOf(const S: string): Integer;
-Var aName, aValue: String;
+{**************************************************************}
+function TALAVLStringList.IndexOf(const S: AnsiString): Integer;
+Var aName, aValue: AnsiString;
     aNode: TALAVLStringListBinaryTreeNode;
 begin
   if ExtractNameValue(S, aName, aValue) then begin
-    aNode := FAVLBinTree.FindNode(aName);
+    aNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(aName));
     if (not assigned(aNode))
        or
        ((CaseSensitive) and
         (aNode.Val <> aValue))
        or
        ((not CaseSensitive) and
-        (not sametext(aNode.Val, aValue)))
+        (not ALSametext(aNode.Val, aValue)))
     then result := -1
     else result := aNode.idx;
   end
   else begin
-    aNode := FAVLBinTree.FindNode(S);
+    aNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(S));
     if (not assigned(aNode)) or (aNode.Nvs) then result := -1
     else result := aNode.idx;
   end;
 end;
 
-{*****************************************************************}
-function TALAVLStringList.IndexOfName(const Name: string): Integer;
+{*********************************************************************}
+function TALAVLStringList.IndexOfName(const Name: ansistring): Integer;
 Var aNode: TALAVLStringListBinaryTreeNode;
 begin
-  aNode := FAVLBinTree.FindNode(Name);
-  if assigned(aNode) and aNode.Nvs then result := aNode.Idx
+  aNode := TALAVLStringListBinaryTreeNode(FAVLBinTree.FindNode(Name));
+  if assigned(aNode) then result := aNode.Idx
   else result := -1;
 end;
 
-{*****************************************************************}
-procedure TALAVLStringList.Insert(Index: Integer; const S: string);
+{*********************************************************************}
+procedure TALAVLStringList.Insert(Index: Integer; const S: AnsiString);
 begin
   InsertObject(Index, S, nil);
 end;
 
-{*****************************************************************************************}
-procedure TALAVLStringList.InsertObject(Index: Integer; const S: string; AObject: TObject);
+{*********************************************************************************************}
+procedure TALAVLStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
   InsertItem(Index, S, AObject);
 end;
 
-{***************************************************************************************}
-procedure TALAVLStringList.InsertItem(Index: Integer; const S: string; AObject: TObject);
-Var aName, AValue: String;
+{*******************************************************************************************}
+procedure TALAVLStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+Var aName, AValue: AnsiString;
     aNvs: Boolean;
     aNode: TALAVLStringListBinaryTreeNode;
     i: integer;
 begin
   Changing;
 
-  if ExtractNameValue(S, aName, aValue) then aNvs := True
-  else begin
-    aName := S;
-    aValue := '';
-    aNvs := False;
-  end;
-
+  aNvs := ExtractNameValue(S, aName, aValue);
   aNode := TALAVLStringListBinaryTreeNode.Create;
   aNode.Idx := Index;
   aNode.ID := aName;
@@ -493,36 +2087,30 @@ begin
     aNode.free;
     case Duplicates of
       dupIgnore: Exit;
-      else Raise Exception.create('List does not allow duplicate Names');
+      else Error(@SDuplicateString, 0);
     end;
   end;
   FNodeList.Insert(Index, aNode);
   for i := Index + 1 to FNodeList.Count - 1 do
-    inc(FNodelist[i].Idx);
+    inc(TALAVLStringListBinaryTreeNode(FNodelist[i]).Idx);
 
   Changed;
 end;
 
-{**************************************************************}
-procedure TALAVLStringList.Put(Index: Integer; const S: string);
-Var aNewName, aNewValue: String;
+{******************************************************************}
+procedure TALAVLStringList.Put(Index: Integer; const S: AnsiString);
+Var aNewName, aNewValue: AnsiString;
     aNewNvs: Boolean;
     aNewNode, aOldNode: TALAVLStringListBinaryTreeNode;
 begin
-  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  if Cardinal(Index) >= Cardinal(Count) then
+    Error(@SListIndexError, Index);
   Changing;
 
-  if ExtractNameValue(S, aNewName, aNewValue) then aNewNvs := True
-  else begin
-    aNewName := S;
-    aNewValue := '';
-    aNewNvs := False;
-  end;
-
-  aOldNode := FNodeList[index];
-
+  aNewNvs := ExtractNameValue(S, aNewName, aNewValue);
+  aOldNode := TALAVLStringListBinaryTreeNode(FNodeList[index]);
   if (CaseSensitive and (aOldNode.ID <> aNewName)) or
-     ((not CaseSensitive) and (not sametext(aOldNode.ID, aNewName))) then begin
+     ((not CaseSensitive) and (not ALSametext(aOldNode.ID, aNewName))) then begin
     aNewNode := TALAVLStringListBinaryTreeNode.Create;
     aNewNode.Idx := Index;
     aNewNode.ID := aNewName;
@@ -533,7 +2121,7 @@ begin
       aNewNode.free;
       case Duplicates of
         dupIgnore: Exit;
-        else Raise Exception.create('List does not allow duplicate Names');
+        else Error(@SDuplicateString, 0);
       end;
     end;
     FNodeList[Index] := aNewNode;
@@ -550,15 +2138,17 @@ end;
 {*********************************************************************}
 procedure TALAVLStringList.PutObject(Index: Integer; AObject: TObject);
 begin
-  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  if Cardinal(Index) >= Cardinal(Count) then
+    Error(@SListIndexError, Index);
   Changing;
-  FNodeList[Index].Obj := AObject;
+  TALAVLStringListBinaryTreeNode(FNodeList[Index]).Obj := AObject;
   Changed;
 end;
 
 {*****************************************************************************************}
 procedure TALAVLStringList.QuickSort(L, R: Integer; SCompare: TALAVLStringListSortCompare);
-var I, J, P: Integer;
+var
+  I, J, P: Integer;
 begin
   repeat
     I := L;
@@ -567,10 +2157,14 @@ begin
     repeat
       while SCompare(Self, I, P) < 0 do Inc(I);
       while SCompare(Self, J, P) > 0 do Dec(J);
-      if I <= J then begin
-        ExchangeItems(I, J);
-        if P = I then P := J
-        else if P = J then P := I;
+      if I <= J then
+      begin
+        if I <> J then
+          ExchangeItems(I, J);
+        if P = I then
+          P := J
+        else if P = J then
+          P := I;
         Inc(I);
         Dec(J);
       end;
@@ -583,30 +2177,56 @@ end;
 {***********************************************************}
 procedure TALAVLStringList.SetUpdateState(Updating: Boolean);
 begin
-  if Updating then Changing
-  else Changed;
+  if Updating then Changing else Changed;
 end;
 
 {**************************************************************************}
 procedure TALAVLStringList.CustomSort(Compare: TALAVLStringListSortCompare);
 begin
-  if (Count > 1) then begin
+  if (Count > 1) then
+  begin
     Changing;
     QuickSort(0, Count - 1, Compare);
     Changed;
   end;
 end;
 
-{**************************************************}
-function TALAVLStringList.GetCaseSensitive: Boolean;
+{**********************************}
+constructor TALAVLStringList.Create;
 begin
-  result := FAVLBinTree.CaseSensitive;
+  inherited Create;
+  FAVLBinTree:= TALStringKeyAVLBinaryTree.Create;
+  FAVLBinTree.CaseSensitive := False;
+  FNodeList := TObjectList.Create(False);
+  FDuplicates := dupError;
+  FOnChange := nil;
+  FOnChanging := nil;
+  FOwnsObject := False;
+end;
+
+{********************************************************}
+constructor TALAVLStringList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FAVLBinTree:= TALStringKeyAVLBinaryTree.Create;
+  FAVLBinTree.CaseSensitive := False;
+  FNodeList := TObjectList.Create(False);
+  FDuplicates := dupError;
+  FOnChange := nil;
+  FOnChanging := nil;
+  FOwnsObject := OwnsObjects;
 end;
 
 {****************************************************************}
 procedure TALAVLStringList.SetCaseSensitive(const Value: Boolean);
 begin
   FAVLBinTree.CaseSensitive := Value;
+end;
+
+{**************************************************}
+function TALAVLStringList.GetCaseSensitive: Boolean;
+begin
+  result := FAVLBinTree.CaseSensitive;
 end;
 
 {*****************************************************************}
@@ -616,8 +2236,8 @@ begin
   FDuplicates := Value;
 end;
 
-{**************************************************************************************}
-Function TALAVLStringList.ExtractNameValue(S: String; var Name, Value: String): Boolean;
+{****************************************************************************************************}
+Function TALAVLStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
 Var P1: Integer;
 begin
   P1 := AlPos(NameValueSeparator,S);
@@ -628,17 +2248,10 @@ begin
   end
   else begin
     Result := False;
-    Name := '';
+    Name := S;
     Value := '';
   end;
 end;
-
-
-
-
-////////////////////////////////
-///// TALAVLStringListNode /////
-////////////////////////////////
 
 {************************************************}
 constructor TALAVLStringListBinaryTreeNode.Create;
@@ -648,78 +2261,6 @@ begin
   Obj := nil;
   idx := -1;
   NVS := False;
-end;
-
-
-
-
-//////////////////////////////////////
-///// TALAVLStringListBinaryTree /////
-//////////////////////////////////////
-
-{********************************************}
-constructor TALAVLStringListBinaryTree.Create;
-begin
-  inherited;
-  FEmptyNode := nil;
-end;
-
-{******************************************************************************************}
-function TALAVLStringListBinaryTree.AddNode(aNode: TALAVLStringListBinaryTreeNode): Boolean;
-begin
-  if (aNode.ID = '') then begin
-    Result := not Assigned(fEmptyNode);
-    if Result then FemptyNode := aNode;
-  end
-  else Result := inherited addNode(aNode);
-end;
-
-{*********************************************************************}
-function TALAVLStringListBinaryTree.DeleteNode(idVal: String): boolean;
-begin
-  if (IDVal = '') then begin
-    Result := Assigned(fEmptyNode);
-    if result then FreeAndNil(fEmptyNode);
-  end
-  else result := inherited DeleteNode(idVal);
-end;
-
-{******************************************************************************************}
-function TALAVLStringListBinaryTree.FindNode(idVal: String): TALAVLStringListBinaryTreeNode;
-var aNode: TALStringKeyAVLBinaryTreeNode;
-begin
-  if (IDVal = '') then result := FEmptyNode
-  else begin
-    aNode := Inherited FindNode(IdVal);
-    if assigned(aNode) then result := TALAVLStringListBinaryTreeNode(aNode)
-    else result := nil;
-  end;
-end;
-
-{*************************************************}
-procedure TALAVLStringListBinaryTree.InternalClear;
-begin
-  inherited;
-  if assigned(FEmptyNode) then FreeAndNil(FEmptyNode);
-end;
-
-
-
-
-//////////////////////////////////////////////
-///// TALAVLStringListBinaryTreeNodeList /////
-//////////////////////////////////////////////
-
-{**************************************************************************************************}
-function TALAVLStringListBinaryTreeNodeList.GetItem(Index: Integer): TALAVLStringListBinaryTreeNode;
-begin
-  Result := TALAVLStringListBinaryTreeNode(inherited Items[Index]);
-end;
-
-{************************************************************************************************************}
-procedure TALAVLStringListBinaryTreeNodeList.SetItem(Index: Integer; AObject: TALAVLStringListBinaryTreeNode);
-begin
-  inherited Items[Index] := AObject;
 end;
 
 end.

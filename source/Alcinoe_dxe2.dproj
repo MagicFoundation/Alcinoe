@@ -96,11 +96,8 @@
 			<DCCReference Include="ALButton.pas"/>
 			<DCCReference Include="ALCalendar.pas"/>
 			<DCCReference Include="ALComboBox.pas"/>
-			<DCCReference Include="ALCommon.pas"/>
-			<DCCReference Include="ALDeflate.pas"/>
 			<DCCReference Include="ALDialog.pas"/>
 			<DCCReference Include="ALEdit.pas"/>
-			<DCCReference Include="ALFcnCrypt.pas"/>
 			<DCCReference Include="ALFcnHTML.pas"/>
 			<DCCReference Include="ALFcnMime.pas"/>
 			<DCCReference Include="ALFcnMisc.pas"/>
@@ -123,7 +120,6 @@
 			<DCCReference Include="ALZLibEx.pas"/>
 			<DCCReference Include="ALWinHttpClient.pas"/>
 			<DCCReference Include="ALWinHttpWrapper.pas"/>
-			<DCCReference Include="ALFcnUnicode.pas"/>
 			<DCCReference Include="ALSMTPClient.pas"/>
 			<DCCReference Include="ALFcnRFC.pas"/>
 			<DCCReference Include="ALMultiPartMixedParser.pas"/>
@@ -139,7 +135,7 @@
 			<DCCReference Include="ALFBXError.pas"/>
 			<DCCReference Include="ALWinInetFTPClient.pas"/>
 			<DCCReference Include="ALFTPClient.pas"/>
-			<DCCReference Include="ALZlibExGZ.pas"/>
+			<DCCReference Include="ALZLibExGZ.pas"/>
 			<DCCReference Include="ALNNTPClient.pas"/>
 			<DCCReference Include="ALInternetMessageCommon.pas"/>
 			<DCCReference Include="ALMySqlWrapper.pas"/>
@@ -155,6 +151,7 @@
 			<DCCReference Include="ALSqlite3Wrapper.pas"/>
 			<DCCReference Include="ALWindows.pas"/>
 			<DCCReference Include="ALSphinxQLClient.pas"/>
+			<DCCReference Include="ALZLibExApi.pas"/>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

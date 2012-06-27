@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALHttpClient Base Class
-Version:      3.50
+Version:      4.00
 
 Description:  TALHttpClient is a ancestor of class like
               TALWinInetHttpClient or TALWinHttpClient
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -45,6 +45,7 @@ Know bug :
 
 History :     28/11/2005: move public procedure to published
                           in TALHttpClientProxyParams
+              26/06/2012: Add xe2 support
 
 Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.ietf.org/rfc/rfc1867.txt
@@ -56,7 +57,7 @@ Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALHttpClient;
 
@@ -65,6 +66,7 @@ interface
 uses SysUtils,
      Classes,
      ALHttpCommon,
+     ALStringList,
      ALMultiPartFormDataParser;
 
 type
@@ -74,25 +76,25 @@ type
   private
     FStatusCode: Integer;
   public
-    constructor Create(const Msg: string; SCode: Integer = 0);
-    constructor CreateFmt(const Msg: string; const Args: array of const; SCode: Integer = 0);
+    constructor Create(const Msg: AnsiString; SCode: Integer = 0);
+    constructor CreateFmt(const Msg: AnsiString; const Args: array of const; SCode: Integer = 0);
     property StatusCode: Integer read FStatusCode write FStatusCode;
   end;
 
   {-------------------------------------------}
   TALHTTPClientProxyParams = Class(TPersistent)
   Private
-    FProxyBypass: String;
-    FproxyServer: String;
-    FProxyUserName: String;
-    FProxyPassword: String;
+    FProxyBypass: AnsiString;
+    FproxyServer: AnsiString;
+    FProxyUserName: AnsiString;
+    FProxyPassword: AnsiString;
     FproxyPort: integer;
     FOnChange: TALHTTPPropertyChangeEvent;
-    procedure SetProxyBypass(const Value: String);
-    procedure SetProxyPassword(const Value: String);
+    procedure SetProxyBypass(const Value: AnsiString);
+    procedure SetProxyPassword(const Value: AnsiString);
     procedure SetProxyPort(const Value: integer);
-    procedure SetProxyServer(const Value: String);
-    procedure SetProxyUserName(const Value: String);
+    procedure SetProxyServer(const Value: AnsiString);
+    procedure SetProxyUserName(const Value: AnsiString);
     Procedure DoChange(propertyIndex: Integer);
   protected
     procedure AssignTo(Dest: TPersistent); override;
@@ -100,16 +102,16 @@ type
     constructor Create; virtual;
     procedure Clear;
   published
-    Property ProxyBypass: String read FProxyBypass write SetProxyBypass; //index 0
-    property ProxyServer: String read FProxyServer write SetProxyServer; //index 1
+    Property ProxyBypass: AnsiString read FProxyBypass write SetProxyBypass; //index 0
+    property ProxyServer: AnsiString read FProxyServer write SetProxyServer; //index 1
     property ProxyPort: integer read FProxyPort write SetProxyPort default 0; //index 2
-    property ProxyUserName: String read FProxyUserName write SetProxyUserName; //index 3
-    property ProxyPassword: String read FProxyPassword write SetProxyPassword; //index 4
+    property ProxyUserName: AnsiString read FProxyUserName write SetProxyUserName; //index 3
+    property ProxyPassword: AnsiString read FProxyPassword write SetProxyPassword; //index 4
     property OnChange: TALHTTPPropertyChangeEvent read FOnChange write FOnChange;
   end;
 
-  {----------------------------------------------------------------------------------------------}
-  TAlHTTPClientRedirectEvent         = procedure(sender: Tobject; const NewURL: String) of object;
+  {--------------------------------------------------------------------------------------------------}
+  TAlHTTPClientRedirectEvent         = procedure(sender: Tobject; const NewURL: AnsiString) of object;
   TALHTTPClientUploadProgressEvent   = procedure(sender: Tobject; Sent: Integer; Total: Integer) of object;
   TALHTTPClientDownloadProgressEvent = procedure(sender: Tobject; Read: Integer; Total: Integer) of object;
 
@@ -120,9 +122,9 @@ type
     FRequestHeader: TALHTTPRequestHeader;
     FProtocolVersion: TALHTTPProtocolVersion;
     FRequestMethod: TALHTTPRequestMethod;
-    FURL: string;
-    FUserName: string;
-    FPassword: string;
+    FURL: AnsiString;
+    FUserName: AnsiString;
+    FPassword: AnsiString;
     FConnectTimeout: Integer;
     FSendTimeout: Integer;
     FReceiveTimeout: Integer;
@@ -131,36 +133,37 @@ type
     FOnRedirect: TAlHTTPClientRedirectEvent;
     FUploadBufferSize: Integer;
   protected
-    procedure SetURL(const Value: string); virtual;
-    procedure SetUsername(const NameValue: string); virtual;
-    procedure SetPassword(const PasswordValue: string); virtual;
+    procedure SetURL(const Value: AnsiString); virtual;
+    procedure SetUsername(const NameValue: AnsiString); virtual;
+    procedure SetPassword(const PasswordValue: AnsiString); virtual;
     procedure OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer); virtual;
     procedure OnRequestHeaderChange(sender: Tobject; Const PropertyIndex: Integer); virtual;
     procedure SetUploadBufferSize(const Value: Integer); virtual;
+    procedure SetOnRedirect(const Value: TAlHTTPClientRedirectEvent); virtual;
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
     procedure Execute(const aRequestDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); virtual;
-    Procedure Get(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Procedure Post(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Procedure Post(aUrl:String; aPostDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Procedure PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader; Const EncodeParams: Boolean=True); overload;
-    Procedure PostMultipartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Procedure Put(aUrl:String; aPutDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    procedure Delete(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Procedure Head(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Procedure Trace(aUrl:String; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
-    Function  Get(aUrl:String): String; overload;
-    function  Put(aURL: string; aPostDataStream: TStream): string; overload;
-    function  Delete(aURL: string): string; overload;
-    Function  Post(aUrl:String): String; overload;
-    Function  Post(aUrl:String; aPostDataStream: TStream): string; overload;
-    Function  PostUrlEncoded(aUrl:String; aPostDataStrings: TStrings; Const EncodeParams: Boolean=True): String; overload;
-    Function  PostMultiPartFormData(aUrl:String; aPostDataStrings: TStrings; aPostDataFiles: TALMultiPartFormDataContents): String; overload;
-    Function  Head(aUrl:String): String; overload;
-    Function  trace(aUrl:String): String; overload;
+    Procedure Get(aUrl:AnsiString; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Post(aUrl:AnsiString; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Post(aUrl:AnsiString; aPostDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure PostUrlEncoded(aUrl:AnsiString; aPostDataStrings: TALStrings; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader; Const EncodeParams: Boolean=True); overload;
+    Procedure PostMultipartFormData(aUrl:AnsiString; aPostDataStrings: TALStrings; aPostDataFiles: TALMultiPartFormDataContents; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Head(aUrl:AnsiString; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Trace(aUrl:AnsiString; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Procedure Put(aUrl:AnsiString; aPutDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    procedure Delete(aUrl:AnsiString; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); overload;
+    Function  Get(aUrl:AnsiString): AnsiString; overload;
+    Function  Post(aUrl:AnsiString): AnsiString; overload;
+    Function  Post(aUrl:AnsiString; aPostDataStream: TStream): AnsiString; overload;
+    Function  PostUrlEncoded(aUrl:AnsiString; aPostDataStrings: TALStrings; Const EncodeParams: Boolean=True): AnsiString; overload;
+    Function  PostMultiPartFormData(aUrl:AnsiString; aPostDataStrings: TALStrings; aPostDataFiles: TALMultiPartFormDataContents): AnsiString; overload;
+    Function  Head(aUrl:AnsiString): AnsiString; overload;
+    Function  trace(aUrl:AnsiString): AnsiString; overload;
+    function  Put(aURL: Ansistring; aPutDataStream: TStream): AnsiString; overload;
+    function  Delete(aURL: Ansistring): AnsiString; overload;
   published
-    property  URL: string read FURL write SetURL;
+    property  URL: AnsiString read FURL write SetURL;
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
     property  SendTimeout: Integer read FSendTimeout write FSendTimeout default 0;
     property  ReceiveTimeout: Integer read FReceiveTimeout write FReceiveTimeout default 0;
@@ -169,47 +172,36 @@ type
     property  RequestHeader: TALHTTPRequestHeader read FRequestHeader;
     Property  ProtocolVersion: TALHTTPProtocolVersion read FProtocolVersion write FProtocolVersion default HTTPpv_1_1;
     Property  RequestMethod: TALHTTPRequestMethod read FRequestMethod write fRequestMethod default HTTPrm_get;
-    property  UserName: string read FUserName write SetUserName;
-    property  Password: string read FPassword write SetPassword;
+    property  UserName: AnsiString read FUserName write SetUserName;
+    property  Password: AnsiString read FPassword write SetPassword;
     property  OnUploadProgress: TALHTTPClientUploadProgressEvent read FOnUploadProgress write FOnUploadProgress;
     property  OnDownloadProgress: TALHTTPClientDownloadProgressEvent read FonDownloadProgress write FonDownloadProgress;
-    property  OnRedirect: TAlHTTPClientRedirectEvent read FOnRedirect write FOnRedirect;
+    property  OnRedirect: TAlHTTPClientRedirectEvent read FOnRedirect write SetOnRedirect;
   end;
 
-ResourceString
-  CALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
-  CALHTTPCLient_MsgInvalidHTTPRequest = 'Invalid HTTP Request: Length is 0';
-  CALHTTPCLient_MsgEmptyURL           = 'Empty URL';
+Const
+  cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
+  cALHTTPCLient_MsgInvalidHTTPRequest = 'Invalid HTTP Request: Length is 0';
+  cALHTTPCLient_MsgEmptyURL           = 'Empty URL';
 
 implementation
 
 uses HttpApp,
      AlFcnString;
 
-////////////////////////////////////////////////////////////////////////////////
-////////// EALHTTPClientException //////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-{*******************************************************************************}
-constructor EALHTTPClientException.Create(const Msg: string; SCode: Integer = 0);
+{***********************************************************************************}
+constructor EALHTTPClientException.Create(const Msg: AnsiString; SCode: Integer = 0);
 begin
-  inherited Create(Msg);
+  inherited Create(String(Msg));
   FStatusCode := SCode;
 end;
 
-{**************************************************************************************************************}
-constructor EALHTTPClientException.CreateFmt(const Msg: string; const Args: array of const; SCode: Integer = 0);
+{******************************************************************************************************************}
+constructor EALHTTPClientException.CreateFmt(const Msg: AnsiString; const Args: array of const; SCode: Integer = 0);
 begin
-  inherited CreateFmt(Msg, Args);
+  inherited CreateFmt(String(Msg), Args);
   FStatusCode := SCode;
 end;
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-////////// TALWinInetHTTPClient ////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {**************************************************}
 constructor TALHTTPClient.Create(Owner: TComponent);
@@ -242,20 +234,26 @@ begin
   inherited;
 end;
 
-{**************************************************}
-procedure TALHTTPClient.SetURL(const Value: string);
+{******************************************************}
+procedure TALHTTPClient.SetURL(const Value: AnsiString);
 begin
   Furl := Value;
 end;
 
-{***********************************************************}
-procedure TALHTTPClient.SetUsername(const NameValue: string);
+{***************************************************************}
+procedure TALHTTPClient.SetUsername(const NameValue: AnsiString);
 begin
   FUserName := NameValue;
 end;
 
-{***************************************************************}
-procedure TALHTTPClient.SetPassword(const PasswordValue: string);
+{*****************************************************************************}
+procedure TALHTTPClient.SetOnRedirect(const Value: TAlHTTPClientRedirectEvent);
+begin
+  FOnRedirect := Value;
+end;
+
+{*******************************************************************}
+procedure TALHTTPClient.SetPassword(const PasswordValue: AnsiString);
 begin
   FPassword := PasswordValue;
 end;
@@ -268,8 +266,8 @@ begin
 // virtual;
 end;
 
-{***************************************}
-procedure TALHTTPClient.Get(aUrl: String;
+{*******************************************}
+procedure TALHTTPClient.Get(aUrl: AnsiString;
                             aResponseContentStream: TStream;
                             aResponseContentHeader: TALHTTPResponseHeader);
 begin
@@ -280,18 +278,18 @@ begin
           aResponseContentHeader);
 end;
 
-{****************************************}
-procedure TALHTTPClient.Post(aUrl: String;
+{********************************************}
+procedure TALHTTPClient.Post(aUrl: AnsiString;
                              aPostDataStream: TStream;
                              aResponseContentStream: TStream;
                              aResponseContentHeader: TALHTTPResponseHeader);
-Var OldContentLengthValue: String;
+Var OldContentLengthValue: AnsiString;
 begin
   Url := aURL;
   RequestMethod := HTTPrm_Post;
   OldContentLengthValue := FrequestHeader.ContentLength;
   try
-    If assigned(aPostDataStream) then FrequestHeader.ContentLength := inttostr(aPostDataStream.Size)
+    If assigned(aPostDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPostDataStream.Size)
     else FrequestHeader.ContentLength := '0';
     Execute(aPostDataStream,
             aResponseContentStream,
@@ -301,42 +299,8 @@ begin
   end;
 end;
 
-{******************************************}
-procedure TALHTTPClient.Put(aURL: string;
-                            aPutDataStream: TStream;
-                            aResponseContentStream: TStream;
-                            aResponseContentHeader: TALHTTPResponseHeader);
-Var OldContentLengthValue: String;
-begin
-  URL := aURL;
-  RequestMethod := HTTPrm_Put;
-  OldContentLengthValue := FRequestHeader.ContentLength;
-  try
-    if Assigned(aPutDataStream) then FrequestHeader.ContentLength := inttostr(aPutDataStream.Size)
-    else FRequestHeader.ContentLength := '0';
-    Execute(aPutDataStream,
-            aResponseContentStream,
-            aResponseContentHeader);
-    
-  finally
-    FrequestHeader.ContentLength := OldContentLengthValue;
-  end;
-end;
-
-{******************************************}
-procedure TALHTTPClient.Delete(aUrl: String;
-                               aResponseContentStream: TStream;
-                               aResponseContentHeader: TALHTTPResponseHeader);
-begin
-  Url := aURL;
-  RequestMethod := HTTPrm_Delete;
-  Execute(nil,
-          aResponseContentStream,
-          aResponseContentHeader);
-end;
-
-{****************************************}
-procedure TALHTTPClient.Post(aUrl: String;
+{********************************************}
+procedure TALHTTPClient.Post(aUrl: AnsiString;
                              aResponseContentStream: TStream;
                              aResponseContentHeader: TALHTTPResponseHeader);
 begin
@@ -346,14 +310,14 @@ begin
        aResponseContentHeader);
 end;
 
-{*********************************************************}
-procedure TALHTTPClient.PostMultiPartFormData(aUrl: String;
-                                              aPostDataStrings: TStrings;
+{*************************************************************}
+procedure TALHTTPClient.PostMultiPartFormData(aUrl: AnsiString;
+                                              aPostDataStrings: TALStrings;
                                               aPostDataFiles: TALMultiPartFormDataContents;
                                               aResponseContentStream: TStream;
                                               aResponseContentHeader: TALHTTPResponseHeader);
 Var aMultipartFormDataEncoder: TALMultipartFormDataEncoder;
-    OldRequestContentType: String;
+    OldRequestContentType: AnsiString;
 begin
   aMultipartFormDataEncoder := TALMultipartFormDataEncoder.create;
   OldRequestContentType := FrequestHeader.ContentType;
@@ -370,18 +334,18 @@ begin
   end;
 end;
 
-{**************************************************}
-procedure TALHTTPClient.PostUrlEncoded(aUrl: String;
-                                       aPostDataStrings: TStrings;
+{******************************************************}
+procedure TALHTTPClient.PostUrlEncoded(aUrl: AnsiString;
+                                       aPostDataStrings: TALStrings;
                                        aResponseContentStream: TStream;
                                        aResponseContentHeader: TALHTTPResponseHeader;
                                        Const EncodeParams: Boolean=True);
-Var aURLEncodedContentStream: TstringStream;
-    OldRequestContentType: String;
-    Str: string;
+Var aURLEncodedContentStream: TALStringStream;
+    OldRequestContentType: AnsiString;
+    Str: AnsiString;
     I, P: Integer;
 begin
-  aURLEncodedContentStream := TstringStream.create('');
+  aURLEncodedContentStream := TALStringStream.create('');
   OldRequestContentType := FrequestHeader.ContentType;
   try
 
@@ -413,8 +377,8 @@ begin
   end;
 end;
 
-{***************************************}
-procedure TALHTTPClient.Head(aUrl: String;
+{********************************************}
+procedure TALHTTPClient.Head(aUrl: AnsiString;
                              aResponseContentStream: TStream;
                              aResponseContentHeader: TALHTTPResponseHeader);
 begin
@@ -425,8 +389,8 @@ begin
           aResponseContentHeader);
 end;
 
-{*****************************************}
-procedure TALHTTPClient.Trace(aUrl: String;
+{*********************************************}
+procedure TALHTTPClient.Trace(aUrl: AnsiString;
                               aResponseContentStream: TStream;
                               aResponseContentHeader: TALHTTPResponseHeader);
 begin
@@ -437,11 +401,44 @@ begin
           aResponseContentHeader);
 end;
 
-{***********************************************}
-function TALHTTPClient.Get(aUrl: String): String;
-var aResponseContentStream: TStringStream;
+{******************************************}
+procedure TALHTTPClient.Put(aUrl:AnsiString;
+                            aPutDataStream: TStream;
+                            aResponseContentStream: TStream;
+                            aResponseContentHeader: TALHTTPResponseHeader);
+Var OldContentLengthValue: AnsiString;
 begin
-  aResponseContentStream := TstringStream.Create('');
+  Url := aURL;
+  RequestMethod := HTTPrm_Put;
+  OldContentLengthValue := FrequestHeader.ContentLength;
+  try
+    If assigned(aPutDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPutDataStream.Size)
+    else FrequestHeader.ContentLength := '0';
+    Execute(aPutDataStream,
+            aResponseContentStream,
+            aResponseContentHeader);
+  finally
+    FrequestHeader.ContentLength := OldContentLengthValue;
+  end;
+end;
+
+{**********************************************}
+procedure TALHTTPClient.Delete(aUrl: AnsiString;
+                               aResponseContentStream: TStream;
+                               aResponseContentHeader: TALHTTPResponseHeader);
+begin
+  Url := aURL;
+  RequestMethod := HTTPrm_Delete;
+  Execute(nil,
+          aResponseContentStream,
+          aResponseContentHeader);
+end;
+
+{*******************************************************}
+function TALHTTPClient.Get(aUrl: AnsiString): AnsiString;
+var aResponseContentStream: TALStringStream;
+begin
+  aResponseContentStream := TALStringStream.Create('');
   try
     Get(aUrl,
         aResponseContentStream,
@@ -452,12 +449,11 @@ begin
   end;
 end;
 
-
-{**************************************************************************}
-function TALHTTPClient.Post(aUrl: String; aPostDataStream: TStream): String;
-var aResponseContentStream: TStringStream;
+{**********************************************************************************}
+function TALHTTPClient.Post(aUrl: AnsiString; aPostDataStream: TStream): AnsiString;
+var aResponseContentStream: TALStringStream;
 begin
-  aResponseContentStream := TstringStream.Create('');
+  aResponseContentStream := TALStringStream.Create('');
   try
     post(aUrl,
          aPostDataStream,
@@ -469,58 +465,41 @@ begin
   end;
 end;
 
-{*************************************************************************}
-function TALHTTPClient.Put(aURL: string; aPostDataStream: TStream): string;
-var aResponseContentStream: TStringStream;
-begin
-  aResponseContentStream := TstringStream.Create('');
-  try
-    Put(aUrl,
-        aPostDataStream,
-        aResponseContentStream,
-        nil);
-    result := aResponseContentStream.DataString;
-  finally
-    aResponseContentStream.Free;
-  end;
-end;
-
-{************************************************}
-function TALHTTPClient.Post(aUrl: String): String;
+{********************************************************}
+function TALHTTPClient.Post(aUrl: AnsiString): AnsiString;
 begin
   Result := Post(aUrl, nil);
 end;
 
-{********************************************************}
-function TALHTTPClient.PostMultiPartFormData(aUrl: String;
-                                             aPostDataStrings: TStrings;
-                                             aPostDataFiles: TALMultiPartFormDataContents): String;
+{************************************************************}
+function TALHTTPClient.PostMultiPartFormData(aUrl: AnsiString;
+                                             aPostDataStrings: TALStrings;
+                                             aPostDataFiles: TALMultiPartFormDataContents): AnsiString;
 Var aMultipartFormDataEncoder: TALMultipartFormDataEncoder;
-    OldRequestContentType: String;
+    OldRequestContentType: AnsiString;
 begin
   aMultipartFormDataEncoder := TALMultipartFormDataEncoder.create;
   OldRequestContentType := FrequestHeader.ContentType;
   try
     aMultipartFormDataEncoder.Encode(aPostDataStrings, aPostDataFiles);
     FrequestHeader.ContentType := 'multipart/form-data; boundary='+aMultipartFormDataEncoder.DataStream.Boundary;
-    Result := post(aUrl,
-                   aMultipartFormDataEncoder.DataStream);
+    Result := post(aUrl, aMultipartFormDataEncoder.DataStream);
   finally
     aMultipartFormDataEncoder.free;
     FrequestHeader.ContentType := OldRequestContentType;
   end;
 end;
 
-{*************************************************}
-function TALHTTPClient.PostUrlEncoded(aUrl: String;
-                                      aPostDataStrings: TStrings;
-                                      Const EncodeParams: Boolean=True): String;
-Var aURLEncodedContentStream: TstringStream;
-    OldRequestContentType: String;
-    Str: String;
+{*****************************************************}
+function TALHTTPClient.PostUrlEncoded(aUrl: AnsiString;
+                                      aPostDataStrings: TALStrings;
+                                      Const EncodeParams: Boolean=True): AnsiString;
+Var aURLEncodedContentStream: TALStringStream;
+    OldRequestContentType: AnsiString;
+    Str: AnsiString;
     I, P: Integer;
 begin
-  aURLEncodedContentStream := TstringStream.create('');
+  aURLEncodedContentStream := TALStringStream.create('');
   OldRequestContentType := FrequestHeader.ContentType;
   try
 
@@ -542,19 +521,18 @@ begin
     end;
 
     FrequestHeader.ContentType := 'application/x-www-form-urlencoded';
-    Result := post(aUrl,
-                   aURLEncodedContentStream);
+    Result := post(aUrl, aURLEncodedContentStream);
   finally
     aURLEncodedContentStream.free;
     FrequestHeader.ContentType := OldRequestContentType;
   end;
 end;
 
-{************************************************}
-function TALHTTPClient.Head(aUrl:String) : String;
-var aResponseContentStream: TStringStream;
+{********************************************************}
+function TALHTTPClient.Head(aUrl:AnsiString) : AnsiString;
+var aResponseContentStream: TALStringStream;
 begin
-  aResponseContentStream := TstringStream.Create('');
+  aResponseContentStream := TALStringStream.Create('');
   try
     Head(aUrl,
          aResponseContentStream,
@@ -565,30 +543,46 @@ begin
   end;
 end;
 
-{**************************************************}
-function TALHTTPClient.Delete(aURL: string): string;
-var aResponseContentStream: TStringStream;
+{********************************************************}
+function TALHTTPClient.Trace(aUrl:AnsiString): AnsiString;
+var aResponseContentStream: TALStringStream;
 begin
-  aResponseContentStream := TstringStream.Create('');
+  aResponseContentStream := TALStringStream.Create('');
   try
-    Delete(aUrl,
-           aResponseContentStream,
-           nil);
+    Trace(aUrl,
+          aResponseContentStream,
+          nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;
   end;
 end;
 
-{*************************************************}
-function TALHTTPClient.Trace(aUrl:String) : String;
-var aResponseContentStream: TStringStream;
+{********************************************************************************}
+function TALHTTPClient.Put(aURL: Ansistring; aPutDataStream: TStream): AnsiString;
+var aResponseContentStream: TALStringStream;
 begin
-  aResponseContentStream := TstringStream.Create('');
+  aResponseContentStream := TALStringStream.Create('');
   try
-    Trace(aUrl,
-          aResponseContentStream,
-          nil);
+    put(aUrl,
+        aPutDataStream,
+        aResponseContentStream,
+        nil);
+    result := aResponseContentStream.DataString;
+  finally
+    aResponseContentStream.Free;
+  end;
+end;
+
+{**********************************************************}
+function TALHTTPClient.Delete(aURL: Ansistring): AnsiString;
+var aResponseContentStream: TALStringStream;
+begin
+  aResponseContentStream := TALStringStream.Create('');
+  try
+    Delete(aUrl,
+           aResponseContentStream,
+           nil);
     result := aResponseContentStream.DataString;
   finally
     aResponseContentStream.Free;
@@ -612,13 +606,6 @@ procedure TALHTTPClient.SetUploadBufferSize(const Value: Integer);
 begin
   If Value >= 0 then FUploadBufferSize := Value;
 end;
-
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-////////// TALHTTPClientProxyParams ///////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
 
 {*************************************************************}
 procedure TALHTTPClientProxyParams.AssignTo(Dest: TPersistent);
@@ -664,8 +651,8 @@ begin
   if assigned(FonChange) then FonChange(Self,propertyIndex);
 end;
 
-{*********************************************************************}
-procedure TALHTTPClientProxyParams.SetProxyBypass(const Value: String);
+{*************************************************************************}
+procedure TALHTTPClientProxyParams.SetProxyBypass(const Value: AnsiString);
 begin
   If (Value <> FProxyBypass) then begin
     FProxyBypass := Value;
@@ -673,8 +660,8 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALHTTPClientProxyParams.SetProxyPassword(const Value: String);
+{***************************************************************************}
+procedure TALHTTPClientProxyParams.SetProxyPassword(const Value: AnsiString);
 begin
   If (Value <> FProxyPassword) then begin
     FProxyPassword := Value;
@@ -691,8 +678,8 @@ begin
   end;
 end;
 
-{*********************************************************************}
-procedure TALHTTPClientProxyParams.SetProxyServer(const Value: String);
+{*************************************************************************}
+procedure TALHTTPClientProxyParams.SetProxyServer(const Value: AnsiString);
 begin
   If (Value <> FProxyServer) then begin
     FProxyServer := Value;
@@ -700,8 +687,8 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALHTTPClientProxyParams.SetProxyUserName(const Value: String);
+{***************************************************************************}
+procedure TALHTTPClientProxyParams.SetProxyUserName(const Value: AnsiString);
 begin
   If (Value <> FProxyUserName) then begin
     FProxyUserName := Value;

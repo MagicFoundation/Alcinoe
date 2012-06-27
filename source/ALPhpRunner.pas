@@ -4,14 +4,13 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALPhpRunner
-Version:      3.54
+Version:      4.00
 
 Description:  ALPHPRunnerEngine is a simple but useful component for
               easily use php (any version) as a scripting language
               in Delphi applications. ALPhpRunnerEngine allows to
               execute the PHP scripts within the Delphi program without
-              a WebServer. ALPHPRunnerEngine use the ISAPI DLL
-              interface of PHP (php5isapi.dll) or the CGI/FastCGI
+              a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
               interface (php-cgi.exe) of PHP to communicate with PHP engine.
 
 Legal issues: Copyright (C) 1999-2011 by Arkadia Software Engineering
@@ -101,6 +100,8 @@ History :     29/01/2007: correct status missed in ALPhpRunnerECBServerSupportFu
               30/01/2007: Add fconnectioncount to not unload bug when action is processing
               10/10/2009: rename TALPhpRunnerEngine in TALPhpIsapiRunnerEngine
                           and add also TALPhpFastCgiRunnerEngine
+              26/06/2012: Add xe2 support. Also Retiring the TALPhpIsapiRunnerEngine
+                          http://www.iis-aid.com/articles/iis_aid_news/php_isapi_module_to_be_retired
 
 Link :
 
@@ -108,7 +109,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALPhpRunner;
 
@@ -117,45 +118,11 @@ interface
 uses Windows,
      Classes,
      sysutils,
-     ISAPI2,
-     HttpApp,
      WinSock,
      Contnrs,
      SyncObjs,
      ALHttpCommon,
-     ALIsapiHttp;
-
-Const
-
-  {------------------------------------------------------------}
-  HSE_REQ_SEND_RESPONSE_HEADER_EX = (HSE_REQ_END_RESERVED + 16);
-  HSE_REQ_MAP_URL_TO_PATH_EX      = (HSE_REQ_END_RESERVED + 12);
-
-type
-
-  {------------------------------}
-  HSE_SEND_HEADER_EX_INFO = record
-    pszStatus : LPCSTR;
-    pszHeader : LPCSTR;
-    cchStatus : DWORD;
-    cchHeader : DWORD;
-    fKeepConn : BOOL;
-  end;
-  LPHSE_SEND_HEADER_EX_INFO = ^HSE_SEND_HEADER_EX_INFO;
-  THSE_SEND_HEADER_EX_INFO = HSE_SEND_HEADER_EX_INFO;
-
-  {-------------------------}
-  HSE_URL_MAPEX_INFO = record
-    lpszPath : array[0..MAX_PATH - 1] of CHAR;
-    dwFlags : DWORD;
-    cchMatchingPath : DWORD;
-    cchMatchingURL : DWORD;
-    dwReserved1 : DWORD;
-    dwReserved2 : DWORD;
-  end;
-  LPHSE_URL_MAPEX_INFO = ^HSE_URL_MAPEX_INFO;
-  THSE_URL_MAPEX_INFO = HSE_URL_MAPEX_INFO;
-
+     ALStringList;
 
 {###############################################################################
 Below the list of some server variables.
@@ -280,29 +247,31 @@ code of Php5Isapi.dll
   URL
 ###############################################################################}
 
+type
+
   {---------------------------------}
   TALPhpRunnerEngine = class(Tobject)
   private
   protected
   public
-    procedure Execute(ServerVariables: Tstrings;
+    procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual; abstract;
-    function  Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String; overload; virtual;
-    procedure Execute(ServerVariables: Tstrings;
-                      RequestContentString: String;
+    function  Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString; overload; virtual;
+    procedure Execute(ServerVariables: TALStrings;
+                      RequestContentString: AnsiString;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(ServerVariables: Tstrings; RequestContentString: String): String; overload; virtual;
-    procedure ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                    PostDataStrings: TStrings;
+    function  Execute(ServerVariables: TALStrings; RequestContentString: AnsiString): AnsiString; overload; virtual;
+    procedure ExecutePostUrlEncoded(ServerVariables: TALStrings;
+                                    PostDataStrings: TALStrings;
                                     ResponseContentStream: Tstream;
                                     ResponseHeader: TALHTTPResponseHeader;
                                     Const EncodeParams: Boolean=True); overload; virtual;
-    function  ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                    PostDataStrings: TStrings;
-                                    Const EncodeParams: Boolean=True): String; overload; virtual;
+    function  ExecutePostUrlEncoded(ServerVariables: TALStrings;
+                                    PostDataStrings: TALStrings;
+                                    Const EncodeParams: Boolean=True): AnsiString; overload; virtual;
   end;
 
   {---------------------------------------------------}
@@ -312,10 +281,10 @@ code of Php5Isapi.dll
     procedure CheckError(Error: Boolean); virtual; abstract;
     Function  IOWrite(Var Buffer; Count: Longint): Longint; virtual; abstract;
     Function  IORead(var Buffer; Count: Longint): Longint; virtual; abstract;
-    Procedure SendRequest(aRequest:String); virtual;
-    function  ReadResponse: String; virtual;
+    Procedure SendRequest(aRequest:AnsiString); virtual;
+    function  ReadResponse: AnsiString; virtual;
   public
-    procedure Execute(ServerVariables: Tstrings;
+    procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -335,9 +304,9 @@ code of Php5Isapi.dll
     Function  IORead(var Buffer; Count: Longint): Longint; override;
   public
     constructor Create; overload; virtual;
-    constructor Create(aHost: String; APort: integer); overload; virtual;
+    constructor Create(aHost: AnsiString; APort: integer); overload; virtual;
     destructor  Destroy; override;
-    Procedure Connect(aHost: String; APort: integer); virtual;
+    Procedure Connect(aHost: AnsiString; APort: integer); virtual;
     Procedure Disconnect; virtual;
     property Connected: Boolean read FConnected;
     Property Timeout: integer read Ftimeout write Settimeout default 60000;
@@ -350,11 +319,11 @@ code of Php5Isapi.dll
     fServerterminationEvent: Thandle;
     fServerProcessInformation: TProcessInformation;
     FClientPipe: Thandle;
-    FPipePath: String;
+    FPipePath: AnsiString;
     Fconnected: Boolean;
     FRequestCount: Integer;
     FMaxRequestCount: Integer;
-    fPhpInterpreterFileName: String;
+    fPhpInterpreterFileName: AnsiString;
     Ftimeout: integer;
   protected
     procedure CheckError(Error: Boolean); override;
@@ -363,11 +332,11 @@ code of Php5Isapi.dll
     Property  RequestCount: Integer read FRequestCount;
   public
     constructor Create; overload; virtual;
-    constructor Create(aPhpInterpreterFilename: String); overload; virtual;
+    constructor Create(aPhpInterpreterFilename: AnsiString); overload; virtual;
     destructor  Destroy; override;
-    Procedure Connect(aPhpInterpreterFilename: String); virtual;
+    Procedure Connect(aPhpInterpreterFilename: AnsiString); virtual;
     Procedure Disconnect; virtual;
-    procedure Execute(ServerVariables: Tstrings;
+    procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
@@ -380,7 +349,7 @@ code of Php5Isapi.dll
   TALPhpNamedPipeFastCgiManager = class(TALPhpRunnerEngine)
   private
     fCriticalSection: TCriticalSection;
-    fPhpInterpreterFilename: String;
+    fPhpInterpreterFilename: AnsiString;
     FWorkingPhpRunnerEngineCount: integer;
     FAvailablePhpRunnerengineLst: TobjectList;
     fProcessPoolSize: integer;
@@ -392,13 +361,13 @@ code of Php5Isapi.dll
     Procedure ReleasePHPRunnerEngine(aPHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine);
   public
     constructor Create; overload; virtual;
-    constructor Create(aPhpInterpreter: String); overload; virtual;
+    constructor Create(aPhpInterpreter: AnsiString); overload; virtual;
     destructor  Destroy; override;
-    procedure Execute(ServerVariables: Tstrings;
+    procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
-    Property PhpInterpreter: String read fPhpInterpreterFilename write fPhpInterpreterFilename;
+    Property PhpInterpreter: AnsiString read fPhpInterpreterFilename write fPhpInterpreterFilename;
     Property ProcessPoolSize: integer read fProcessPoolSize write fProcessPoolSize default 8;
     Property MaxRequestCount: Integer read FMaxRequestCount write FMaxRequestCount Default 450;
     Property Timeout: integer read Ftimeout write Ftimeout default 60000;
@@ -407,100 +376,36 @@ code of Php5Isapi.dll
   {-----------------------------------------------}
   TALPhpCgiRunnerEngine = class(TALPhpRunnerEngine)
   private
-    fPhpInterpreterFilename: String;
+    fPhpInterpreterFilename: AnsiString;
   protected
   public
     constructor Create; overload; virtual;
-    constructor Create(aPhpInterpreter: String); overload; virtual;
-    procedure Execute(ServerVariables: Tstrings;
+    constructor Create(aPhpInterpreter: AnsiString); overload; virtual;
+    procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); override;
-    property PhpInterpreter: string read fPhpInterpreterFilename write fPhpInterpreterFilename;
+    property PhpInterpreter: AnsiString read fPhpInterpreterFilename write fPhpInterpreterFilename;
   end;
-
-  {-------------------------------------------------}
-  TALPhpIsapiRunnerEngine = class(TALPhpRunnerEngine)
-  private
-    fConnectionCount: Integer;
-    fDLLhandle: THandle;
-    fHttpExtensionProcFunct: THttpExtensionProc;
-    function GetDllLoaded: Boolean;
-  protected
-    procedure CheckError(Error: Boolean);
-  public
-    constructor Create; overload; virtual;
-    constructor Create(const DLLFileName: String); overload; virtual;
-    destructor  Destroy; override;
-    procedure LoadDLL(const DLLFileName: String); virtual;
-    Procedure UnloadDLL; virtual;
-    procedure Execute(WebRequest: TALIsapiRequest;
-                      ResponseContentStream: Tstream;
-                      ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(WebRequest: TALIsapiRequest): String; overload; virtual;
-    procedure Execute(ServerVariables: Tstrings;
-                      RequestContentStream: Tstream;
-                      ResponseContentStream: Tstream;
-                      ResponseHeader: TALHTTPResponseHeader); overload; override;
-    Property  DLLLoaded: Boolean read GetDllLoaded;
-    property  Dllhandle: THandle read fDLLhandle;
-  end;
-
-  {---------------------------------------}
-  TALPhpIsapiRunnerBaseECB = class(Tobject)
-  public
-    ECB: TEXTENSION_CONTROL_BLOCK;
-    ResponseContentStream: TStream;
-    ResponseHeader: TALHTTPResponseHeader;
-    constructor Create; virtual;
-    Function GetServerVariableValue(aName: String): String; virtual; abstract;
-  end;
-
-  {--------------------------------------------------------------}
-  TALPhpIsapiRunnerWebRequestECB = class(TALPhpIsapiRunnerBaseECB)
-  public
-    ServerVariablesObj: TWebRequest;
-    constructor Create; override;
-    Function GetServerVariableValue(aName: String): String; override;
-  end;
-
-  {------------------------------------------------------------}
-  TALPhpIsapiRunnerTstringsECB = class(TALPhpIsapiRunnerBaseECB)
-  public
-    ServerVariablesObj: Tstrings;
-    constructor Create; override;
-    Function GetServerVariableValue(aName: String): String; override;
-  end;
-
-{--------------------}
-function ALPhpIsapiRunnerECBGetServerVariable(hConn: HCONN; VariableName: PChar; Buffer: Pointer; var Size: DWORD ): BOOL; stdcall;
-function ALPhpIsapiRunnerECBWriteClient(ConnID: HCONN; Buffer: Pointer; var Bytes: DWORD; dwReserved: DWORD): BOOL; stdcall;
-function ALPhpIsapiRunnerECBReadClient(ConnID: HCONN; Buffer: Pointer; var Size: DWORD ): BOOL; stdcall;
-function ALPhpIsapiRunnerECBServerSupportFunction(hConn: HCONN; HSERRequest: DWORD; Buffer: Pointer; Size: LPDWORD; DataType: LPDWORD ): BOOL; stdcall;
 
 implementation
 
 uses ALFcnWinSock,
      AlFcnString,
      AlFcnExecute,
-     AlFcnMisc,
      ALWindows,
      AlFcnCGI;
 
-//////////////////////////////
-///// TALPhpRunnerEngine /////
-//////////////////////////////
-
-{***************************************************************************}
-procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                                   PostDataStrings: TStrings;
+{*****************************************************************************}
+procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
+                                                   PostDataStrings: TALStrings;
                                                    ResponseContentStream: Tstream;
                                                    ResponseHeader: TALHTTPResponseHeader;
                                                    Const EncodeParams: Boolean=True);
-Var aURLEncodedContentStream: TstringStream;
+Var aURLEncodedContentStream: TALStringStream;
     I: Integer;
 begin
-  aURLEncodedContentStream := TstringStream.create('');
+  aURLEncodedContentStream := TALStringStream.create('');
   try
 
     if EncodeParams then ALHTTPEncodeParamNameValues(PostDataStrings);
@@ -521,14 +426,14 @@ begin
   end;
 end;
 
-{***************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentString: String): String;
-var ResponseContentStream: TStringStream;
+{*************************************************************************************************************}
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; RequestContentString: AnsiString): AnsiString;
+var ResponseContentStream: TALStringStream;
     ResponseHeader: TALHTTPResponseHeader;
-    RequestContentStream: TstringStream;
+    RequestContentStream: TALStringStream;
 begin
-  RequestContentStream := TStringStream.Create(RequestContentString);
-  ResponseContentStream := TStringStream.Create('');
+  RequestContentStream := TALStringStream.Create(RequestContentString);
+  ResponseContentStream := TALStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     Execute(ServerVariables,
@@ -543,14 +448,14 @@ begin
   end;
 end;
 
-{*************************************************************}
-procedure TALPhpRunnerEngine.Execute(ServerVariables: Tstrings;
-                                     RequestContentString: String;
+{***************************************************************}
+procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStrings;
+                                     RequestContentString: AnsiString;
                                      ResponseContentStream: Tstream;
                                      ResponseHeader: TALHTTPResponseHeader);
-var RequestContentStream: TstringStream;
+var RequestContentStream: TALStringStream;
 begin
-  RequestContentStream := TStringStream.Create(RequestContentString);
+  RequestContentStream := TALStringStream.Create(RequestContentString);
   Try
     Execute(ServerVariables,
             RequestContentStream,
@@ -561,12 +466,12 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: Tstrings; RequestContentStream: Tstream): String;
-var ResponseContentStream: TStringStream;
+{**********************************************************************************************************}
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString;
+var ResponseContentStream: TALStringStream;
     ResponseHeader: TALHTTPResponseHeader;
 begin
-  ResponseContentStream := TStringStream.Create('');
+  ResponseContentStream := TALStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     Execute(ServerVariables,
@@ -580,14 +485,14 @@ begin
   end;
 end;
 
-{**************************************************************************}
-function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: Tstrings;
-                                                  PostDataStrings: TStrings;
-                                                  Const EncodeParams: Boolean=True): String;
-var ResponseContentStream: TStringStream;
+{****************************************************************************}
+function TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;
+                                                  PostDataStrings: TALStrings;
+                                                  Const EncodeParams: Boolean=True): AnsiString;
+var ResponseContentStream: TALStringStream;
     ResponseHeader: TALHTTPResponseHeader;
 begin
-  ResponseContentStream := TStringStream.Create('');
+  ResponseContentStream := TALStringStream.Create('');
   ResponseHeader := TALHTTPResponseHeader.Create;
   Try
     ExecutePostUrlEncoded(ServerVariables,
@@ -601,16 +506,9 @@ begin
   end;
 end;
 
-
-
-
-/////////////////////////////////////
-///// TALPhpFastCgiRunnerEngine /////
-/////////////////////////////////////
-
-{****************************************************************}
-procedure TALPhpFastCgiRunnerEngine.SendRequest(aRequest: String);
-Var P: Pchar;
+{********************************************************************}
+procedure TALPhpFastCgiRunnerEngine.SendRequest(aRequest: AnsiString);
+Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
 begin
@@ -624,12 +522,12 @@ begin
   end;
 end;
 
-{******************************************************}
-function TALPhpFastCgiRunnerEngine.ReadResponse: String;
+{**********************************************************}
+function TALPhpFastCgiRunnerEngine.ReadResponse: AnsiString;
 
-  {--------------------------------------------------------}
-  Procedure InternalRead(var aStr: String; aCount: Longint);
-  var aBuffStr: String;
+  {------------------------------------------------------------}
+  Procedure InternalRead(var aStr: AnsiString; aCount: Longint);
+  var aBuffStr: AnsiString;
       aBuffStrLength: Integer;
   Begin
     if aCount <= 0 then exit;
@@ -645,8 +543,8 @@ function TALPhpFastCgiRunnerEngine.ReadResponse: String;
     end;
   End;
 
-Var ErrMsg: String;
-    CurrMsgStr: String;
+Var ErrMsg: AnsiString;
+    CurrMsgStr: AnsiString;
     CurrMsgContentlength: integer;
     CurrMsgPaddingLength: integer;
 begin
@@ -681,7 +579,7 @@ begin
       //appStatusB3#appStatusB2#appStatusB1#appStatusB0#protocolStatus#reserved[3]
       //  [9]           [10]        [11]        [12]          [13]          [14]
 
-      if ErrMsg <> '' then raise Exception.Create(ErrMsg)
+      if ErrMsg <> '' then raise Exception.Create(String(ErrMsg))
       else if (length(CurrMsgStr) < 13) or (CurrMsgStr[13] <> #0 {FCGI_REQUEST_COMPLETE}) then raise Exception.Create('The Php has encountered an error while processing the request!')
       else exit; // ok, everything is ok so exit;
 
@@ -705,17 +603,17 @@ begin
 
 end;
 
-{********************************************************************}
-procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
+{**********************************************************************}
+procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
                                             RequestContentStream: Tstream;
                                             ResponseContentStream: Tstream;
                                             ResponseHeader: TALHTTPResponseHeader);
 
-  {-------------------------------------------------------------------}
+  {----------------------------------------------------------------------}
   {i not understand why in FCGI_PARAMS we need to specify te contentlength
    to max 65535 and in name value pair we can specify a length up to 17 Mo!
    anyway a content length of 65535 for the server variable seam to be suffisant}
-  procedure InternalAddParam(var aStr : string; aName, aValue: string);
+  procedure InternalAddParam(var aStr : AnsiString; aName, aValue: AnsiString);
   var I, J   : integer;
       Len    : array[0..1] of integer;
       Format : array[0..1] of integer;
@@ -732,23 +630,23 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
     else Format[1] := 4;
     {----------}
     Tam := Len[0] + Format[0] + Len[1] + Format[1];
-    aStr := aStr +#1             +#4          +#0          +#1          +chr(hi(Tam))    +chr(lo(Tam))    +#0            +#0;
-    //           +FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
+    aStr := aStr +#1             +#4          +#0          +#1          +AnsiChar(hi(Tam)) +AnsiChar(lo(Tam)) +#0            +#0;
+    //           +FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1   +contentLengthB0   +paddingLength +reserved
     J := length(aStr);
     SetLength(aStr, J + Tam);
     inc(J);
     for I := 0 to 1 do begin
-      if Format[I] = 1 then aStr[J] := char(Len[I])
+      if Format[I] = 1 then aStr[J] := AnsiChar(Len[I])
       else begin
-        aStr[J]   := char(((Len[I] shr  24) and $FF) + $80);
-        aStr[J+1] := char( (Len[I] shr  16) and $FF);
-        aStr[J+2] := char( (Len[I] shr   8) and $FF);
-        aStr[J+3] := char(  Len[I] and $FF);
+        aStr[J]   := AnsiChar(((Len[I] shr  24) and $FF) + $80);
+        aStr[J+1] := AnsiChar( (Len[I] shr  16) and $FF);
+        aStr[J+2] := AnsiChar( (Len[I] shr   8) and $FF);
+        aStr[J+3] := AnsiChar(  Len[I] and $FF);
       end;
       inc(J, Format[I]);
     end;
-    move(aName[1], aStr[J], Len[0]);
-    move(aValue[1], aStr[J + Len[0]], Len[1]);
+    ALMove(aName[1], aStr[J], Len[0]);
+    ALMove(aValue[1], aStr[J + Len[0]], Len[1]);
 
     //the content data of the name value pair look like :
     //nameLengthB0#valueLengthB0#nameData[nameLength]#valueData[valueLength]
@@ -758,9 +656,9 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
 
   end;
 
-  {------------------------------------------}
-  function InternalAddServerVariables: string;
-  var aValue : string;
+  {----------------------------------------------}
+  function InternalAddServerVariables: AnsiString;
+  var aValue : AnsiString;
       I : integer;
   begin
 
@@ -777,11 +675,11 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
 
   end;
 
-var aResponseStr: String;
-    aFormatedRequestStr : string;
+var aResponseStr: AnsiString;
+    aFormatedRequestStr : AnsiString;
     Tam : word;
     P1: integer;
-    S1 : String;
+    S1 : AnsiString;
 begin
 
   {init aFormatedRequestStr from aRequestStr}
@@ -793,12 +691,12 @@ begin
     while P1 <= RequestContentStream.Size do begin
       Tam := RequestContentStream.Read(S1[1], 8184); // ok i decide to plit the message in 8ko, because php send me in FCGI_STDOUT message split in 8ko (including 8 bytes of header)
       inc(P1, Tam);
-      aFormatedRequestStr := aFormatedRequestStr + #1             +#5         +#0          +#1          +chr(hi(Tam))    +chr(lo(Tam))    +#0            +#0       +AlCopyStr(S1,1,Tam);
-                                                 //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +contentData[contentLength]
+      aFormatedRequestStr := aFormatedRequestStr + #1             +#5         +#0          +#1          +AnsiChar(hi(Tam)) +AnsiChar(lo(Tam)) +#0            +#0       +AlCopyStr(S1,1,Tam);
+                                                 //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1   +contentLengthB0   +paddingLength +reserved +contentData[contentLength]
     end;
 
     {For securty issue... if content_length badly set then cpu can go to 100%}
-    ServerVariables.Values['CONTENT_LENGTH']  := inttostr(RequestContentStream.Size);
+    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStr(RequestContentStream.Size);
 
   end
 
@@ -809,13 +707,11 @@ begin
   aFormatedRequestStr :=  aFormatedRequestStr + #1             +#5         +#0          +#1          +#0              +#0              +#0            +#0;
                                               //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved
 
-  SendRequest(
-              #1             +#1                 +#0          +#1          +#0              +#8              +#0            +#0       +#0     +#1             +#1             +#0       +#0       +#0       +#0       +#0      +
-            //FCGI_VERSION_1 +FCGI_BEGIN_REQUEST +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +roleB1 +FCGI_RESPONDER +FCGI_KEEP_CONN +reserved +reserved +reserved +reserved +reserved
-                                                                                                                                     //contentData[contentLength]-----------------------------------------------------
+  SendRequest(#1               +#1                 +#0          +#1          +#0              +#8              +#0            +#0       +#0     +#1             +#1             +#0       +#0       +#0       +#0       +#0      +
+              //FCGI_VERSION_1 +FCGI_BEGIN_REQUEST +requestIdB1 +requestIdB0 +contentLengthB1 +contentLengthB0 +paddingLength +reserved +roleB1 +FCGI_RESPONDER +FCGI_KEEP_CONN +reserved +reserved +reserved +reserved +reserved
+                                                                                                                                        //contentData[contentLength]-----------------------------------------------------
               InternalAddServerVariables +
-              aFormatedRequestStr
-             );
+              aFormatedRequestStr);
 
   {----------}
   aResponseStr := ReadResponse;
@@ -826,15 +722,8 @@ begin
 
 end;
 
-
-
-
-///////////////////////////////////////////
-///// TALPhpSocketFastCgiRunnerEngine /////
-///////////////////////////////////////////
-
-{********************************************************************************}
-constructor TALPhpSocketFastCgiRunnerEngine.Create(aHost: String; APort: integer);
+{************************************************************************************}
+constructor TALPhpSocketFastCgiRunnerEngine.Create(aHost: AnsiString; APort: integer);
 Begin
   create;
   Connect(aHost, APort);
@@ -856,23 +745,23 @@ begin
   inherited;
 end;
 
-{*******************************************************************************}
-procedure TALPhpSocketFastCgiRunnerEngine.Connect(aHost: String; APort: integer);
+{***********************************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.Connect(aHost: AnsiString; APort: integer);
 
-  {---------------------------------------------}
-  procedure CallServer(Server:string; Port:word);
+  {-------------------------------------------------}
+  procedure CallServer(Server:AnsiString; Port:word);
   var SockAddr:Sockaddr_in;
-      IP: String;
+      IP: AnsiString;
   begin
     FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
     CheckError(FSocketDescriptor=INVALID_SOCKET);
     FillChar(SockAddr,SizeOf(SockAddr),0);
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
-    SockAddr.sin_addr.S_addr:=inet_addr(Pchar(Server));
-    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+    SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
+    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
       checkError(ALHostToIP(Server, IP));
-      SockAddr.sin_addr.S_addr:=inet_addr(Pchar(IP));
+      SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
   end;
@@ -885,8 +774,8 @@ begin
 
     WSAStartup (MAKEWORD(2,2), FWSAData);
     CallServer(aHost,aPort);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     Fconnected := True;
 
   Except
@@ -920,8 +809,8 @@ procedure TALPhpSocketFastCgiRunnerEngine.Settimeout(const Value: integer);
 begin
   If Value <> Ftimeout then begin
     if FConnected then begin
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     end;
     Ftimeout := Value;
   end;
@@ -941,15 +830,8 @@ begin
   CheckError(Result =  SOCKET_ERROR);
 end;
 
-
-
-
-//////////////////////////////////////////////
-///// TALPhpNamedPipeFastCgiRunnerEngine /////
-//////////////////////////////////////////////
-
-{*************************************************************************************}
-constructor TALPhpNamedPipeFastCgiRunnerEngine.Create(aPhpInterpreterFilename: String);
+{*****************************************************************************************}
+constructor TALPhpNamedPipeFastCgiRunnerEngine.Create(aPhpInterpreterFilename: AnsiString);
 begin
   Create;
   Connect(aPhpInterpreterFilename);
@@ -979,10 +861,10 @@ begin
   inherited;
 end;
 
-{************************************************************************************}
-procedure TALPhpNamedPipeFastCgiRunnerEngine.Connect(aPhpInterpreterFilename: String);
-Var aStartupInfo: TStartupInfo;
-    aEnvironment: String;
+{****************************************************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Connect(aPhpInterpreterFilename: AnsiString);
+Var aStartupInfo: TStartupInfoA;
+    aEnvironment: AnsiString;
 begin
   if FConnected then raise Exception.Create('Already connected');
 
@@ -992,16 +874,14 @@ begin
   FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALMakeKeyStrByGUID;
 
   //create the server pipe
-  FServerPipe := CreateNamedPipe(
-                                 Pchar(fpipePath),                                  //lpName
-                      		       PIPE_ACCESS_DUPLEX,                                //dwOpenMode
-		                             PIPE_TYPE_BYTE or PIPE_WAIT or PIPE_READMODE_BYTE, //dwPipeMode
-                     		         PIPE_UNLIMITED_INSTANCES,                          //nMaxInstances
-                     		         4096,                                              //nOutBufferSize
-                                 4096,                                              //nInBufferSize
-                                 0,                                                 //nDefaultTimeOut
-                                 NiL                                                //lpSecurityAttributes
-                                );
+  FServerPipe := CreateNamedPipeA(PAnsiChar(fpipePath),                              //lpName
+                       		        PIPE_ACCESS_DUPLEX,                                //dwOpenMode
+  		                            PIPE_TYPE_BYTE or PIPE_WAIT or PIPE_READMODE_BYTE, //dwPipeMode
+                     		          PIPE_UNLIMITED_INSTANCES,                          //nMaxInstances
+                     		          4096,                                              //nOutBufferSize
+                                  4096,                                              //nInBufferSize
+                                  0,                                                 //nDefaultTimeOut
+                                  NiL);                                              //lpSecurityAttributes
   checkerror(FServerPipe = INVALID_HANDLE_VALUE);
   try
 
@@ -1009,17 +889,15 @@ begin
     checkerror(not SetHandleInformation(FServerPipe, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
 
 		//create the termination event
-		fServerterminationEvent := CreateEvent(
-                                           NiL,   //lpEventAttributes
+		fServerterminationEvent := CreateEvent(NiL,   //lpEventAttributes
                                            TRUE,  //bManualReset
                                            FALSE, //bInitialState
-                                           NiL    //lpName
-                                          );
+                                           NiL);  //lpName
     CheckError(fServerterminationEvent = INVALID_HANDLE_VALUE);
     Try
 
   		checkerror(not SetHandleInformation(fServerterminationEvent, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
-      aEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + inttostr(fServerterminationEvent) + #0#0;
+      aEnvironment := AlGetEnvironmentString + '_FCGI_SHUTDOWN_EVENT_' + '=' + ALIntToStr(fServerterminationEvent) + #0#0;
 
       // Set up the start up info struct.
       ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
@@ -1041,29 +919,25 @@ begin
       checkerror(not SetHandleInformation(aStartupInfo.hStdInput, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT));
 
       // Launch the process that you want to redirect.
-      CheckError(Not CreateProcess(
-                                   PChar(aPhpInterpreterFilename),   // pointer to name of executable module
-                                   nil,                              // pointer to command line string
-                                   nil,                              // pointer to process security attributes
-                                   NiL,                              // pointer to thread security attributes
-                                   TrUE,                             // handle inheritance flag
-                                   CREATE_NO_WINDOW,                 // creation flags
-                                   Pchar(aEnvironment),              // pointer to new environment block
-                                   nil,                              // pointer to current directory name
-                                   aStartupInfo,                     // pointer to STARTUPINFO
-                                   fServerProcessInformation         // pointer to PROCESS_INFORMATION
-                                  ));
+      CheckError(Not CreateProcessA(PAnsiChar(aPhpInterpreterFilename),   // pointer to name of executable module
+                                    nil,                                  // pointer to command line string
+                                    nil,                                  // pointer to process security attributes
+                                    NiL,                                  // pointer to thread security attributes
+                                    TrUE,                                 // handle inheritance flag
+                                    CREATE_NO_WINDOW,                     // creation flags
+                                    PAnsiChar(aEnvironment),              // pointer to new environment block
+                                    nil,                                  // pointer to current directory name
+                                    aStartupInfo,                         // pointer to STARTUPINFO
+                                    fServerProcessInformation));          // pointer to PROCESS_INFORMATION
 
-      CheckError(not WaitNamedPipe(Pchar(fPipePath), fTimeout));
-      FClientPipe := CreateFile(
-                                Pchar(fPipePath),                                   //lpFileName
-                                GENERIC_WRITE or GENERIC_READ,                      //dwDesiredAccess
-                                FILE_SHARE_READ or FILE_SHARE_WRITE,                //dwShareMode
-                                nil,                                                //lpSecurityAttributes
-                                OPEN_EXISTING,                                      //dwCreationDisposition
-                                0,                                                  //dwFlagsAndAttributes
-                                0                                                   //hTemplateFile
-                               );
+      CheckError(not WaitNamedPipeA(PAnsiChar(fPipePath), fTimeout));
+      FClientPipe := CreateFileA(PAnsiChar(fPipePath),                               //lpFileName
+                                 GENERIC_WRITE or GENERIC_READ,                      //dwDesiredAccess
+                                 FILE_SHARE_READ or FILE_SHARE_WRITE,                //dwShareMode
+                                 nil,                                                //lpSecurityAttributes
+                                 OPEN_EXISTING,                                      //dwCreationDisposition
+                                 0,                                                  //dwFlagsAndAttributes
+                                 0);                                                 //hTemplateFile
       CheckError(FClientPipe = INVALID_HANDLE_VALUE);
 
     Except
@@ -1134,16 +1008,12 @@ begin
   //in the way without timout the readfile will never return freezing the application
   StartTickCount := ALGetTickCount64;
   Repeat
-    CheckError(
-               not PeekNamedPipe(
-                                 FClientPipe,            // handle to pipe to copy from
+    CheckError(not PeekNamedPipe(FClientPipe,            // handle to pipe to copy from
                                  nil,                    // pointer to data buffer
                                  0,                      // size, in bytes, of data buffer
                                  nil,                    // pointer to number of bytes read
                                  @lpNumberOfBytesRead,   // pointer to total number of bytes available
-                                 nil                     // pointer to unread bytes in this message
-                                )
-              );
+                                 nil));                     // pointer to unread bytes in this message
     if lpNumberOfBytesRead > 0 then begin
       CheckError(not ReadFile(FClientPipe,Buffer,count,lpNumberOfBytesRead,nil));
       result := lpNumberOfBytesRead;
@@ -1162,8 +1032,8 @@ begin
   result := lpNumberOfBytesWritten;
 end;
 
-{*****************************************************************************}
-procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: Tstrings;
+{*******************************************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
                                                      RequestContentStream: Tstream;
                                                      ResponseContentStream: Tstream;
                                                      ResponseHeader: TALHTTPResponseHeader);
@@ -1180,14 +1050,6 @@ begin
                     ResponseHeader);
 end;
 
-
-
-
-////////////////////////////////////////////////
-///// TALPhpConcurrencyFastCgiRunnerEngine /////
-////////////////////////////////////////////////
-
-
 {***********************************************}
 constructor TALPhpNamedPipeFastCgiManager.Create;
 begin
@@ -1201,8 +1063,8 @@ begin
   Ftimeout := 60000;
 end;
 
-{************************************************************************}
-constructor TALPhpNamedPipeFastCgiManager.Create(aPhpInterpreter: String);
+{****************************************************************************}
+constructor TALPhpNamedPipeFastCgiManager.Create(aPhpInterpreter: AnsiString);
 begin
   create;
   fPhpInterpreterFilename := aPhpInterpreter;
@@ -1290,8 +1152,8 @@ begin
   end;
 end;
 
-{************************************************************************}
-procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: Tstrings;
+{**************************************************************************}
+procedure TALPhpNamedPipeFastCgiManager.Execute(ServerVariables: TALStrings;
                                                 RequestContentStream: Tstream;
                                                 ResponseContentStream: Tstream;
                                                 ResponseHeader: TALHTTPResponseHeader);
@@ -1317,15 +1179,8 @@ begin
   end;
 end;
 
-
-
-
-/////////////////////////////////
-///// TALPhpCgiRunnerEngine /////
-/////////////////////////////////
-
-{****************************************************************}
-constructor TALPhpCgiRunnerEngine.Create(aPhpInterpreter: String);
+{********************************************************************}
+constructor TALPhpCgiRunnerEngine.Create(aPhpInterpreter: AnsiString);
 begin
   fPhpInterpreterFilename := aPhpInterpreter;
 end;
@@ -1336,8 +1191,8 @@ begin
   Create('php-cgi.exe');
 end;
 
-{****************************************************************}
-procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: Tstrings;
+{******************************************************************}
+procedure TALPhpCgiRunnerEngine.Execute(ServerVariables: TALStrings;
                                         RequestContentStream: Tstream;
                                         ResponseContentStream: Tstream;
                                         ResponseHeader: TALHTTPResponseHeader);
@@ -1347,395 +1202,6 @@ begin
             RequestContentStream,
             ResponseContentStream,
             ResponseHeader);
-end;
-
-
-
-
-//////////////////////////////////////////////
-/////ALPhpIsapiRunnerECBGetServerVariable/////
-//////////////////////////////////////////////
-
-{*********************************************************************************************************************************}
-function ALPhpIsapiRunnerECBGetServerVariable(hConn: HCONN; VariableName: PChar; Buffer: Pointer; var Size: DWORD ): BOOL; stdcall;
-Var TmpS: String;
-    ln: Integer;
-begin
-  Try
-
-    TmpS := TALPhpIsapiRunnerBaseECB(hConn).GetServerVariableValue(VariableName);
-    LN := length(TmpS) + 1;
-    If size < Dword(LN) then begin
-      Result := False;
-      SetLastError(ERROR_INSUFFICIENT_BUFFER);
-      Size := Ln;
-    end
-    else begin
-      Result := True;
-      StrPCopy(PChar(buffer), tmpS);
-      size:=Ln;
-    end;
-
-  Except
-    Result := False;
-  end;
-end;
-
-{**************************************************************************************************************************}
-function ALPhpIsapiRunnerECBWriteClient(ConnID: HCONN; Buffer: Pointer; var Bytes: DWORD; dwReserved: DWORD): BOOL; stdcall;
-begin
-  Try
-    TALPhpIsapiRunnerBaseECB(ConnID).ResponseContentStream.Write(Buffer^,Bytes);
-    Result := True;
-  except
-    Result := False;
-  end;
-end;
-
-{******************************************************************************************************}
-function ALPhpIsapiRunnerECBReadClient(ConnID: HCONN; Buffer: Pointer; var Size: DWORD ): BOOL; stdcall;
-begin
-  Result := True;
-  Size := 0;
-end;
-
-{*****************************************************************************************************************************************************}
-function ALPhpIsapiRunnerECBServerSupportFunction(hConn: HCONN; HSERRequest: DWORD; Buffer: Pointer; Size: LPDWORD; DataType: LPDWORD ): BOOL; stdcall;
-Var HeaderInfoEx : THSE_SEND_HEADER_EX_INFO;
-    MapInfo : LPHSE_URL_MAPEX_INFO;
-    DocumentRoot: String;
-    TmpPath: String;    
-    Ln: integer;
-begin
-  Try
-
-    Case HSERRequest of
-
-      {----------}
-      HSE_REQ_SEND_RESPONSE_HEADER_EX: begin
-                                         With TALPhpIsapiRunnerBaseECB(HCONN).ResponseHeader do begin
-                                           Result := true;
-                                           HeaderInfoEx := HSE_SEND_HEADER_EX_INFO(Buffer^);
-                                           RawHeaderText := AlCopyStr(HeaderInfoEx.pszStatus,1,HeaderInfoEx.cchStatus) + #13#10 +
-                                                            AlCopyStr(HeaderInfoEx.pszHeader,1,HeaderInfoEx.cchHeader);
-                                         end;
-                                       end;
-
-      {----------}
-      HSE_REQ_MAP_URL_TO_PATH_EX: begin
-                                    MapInfo := LPHSE_URL_MAPEX_INFO(DataType);
-                                    TmpPath := String(Pchar(Buffer));
-                                    If TmpPath = '' then result := false
-                                    else begin
-                                      DocumentRoot := TALPhpIsapiRunnerBaseECB(hConn).GetServerVariableValue('DOCUMENT_ROOT');
-                                      If DocumentRoot = '' then result := False
-                                      else begin
-                                        TmpPath := ExpandFilename(IncludeTrailingPathDelimiter(DocumentRoot)+ TmpPath);
-                                        Ln := length(TmpPath) + 1;
-                                        If Ln < MAX_PATH then begin
-                                          result := False;
-                                          SetLastError(ERROR_INSUFFICIENT_BUFFER);
-                                        end
-                                        else begin
-                                          Result := true;
-                                          StrPCopy(MapInfo^.lpszPath,TmpPath);
-                                        end;
-                                      end;
-                                    end;
-                                  end;
-
-      Else Begin
-        Result := False;
-        SetLastError(ERROR_NO_DATA);
-      end;
-
-    end
-
-  except
-    Result := False;
-  end;
-end;
-
-
-///////////////////////////////////
-///// TALPhpIsapiRunnerEngine /////
-///////////////////////////////////
-
-{***********************************************************}
-procedure TALPhpIsapiRunnerEngine.CheckError(Error: Boolean);
-begin
-	if Error then RaiseLastOSError;
-end;
-
-{*****************************************}
-constructor TALPhpIsapiRunnerEngine.Create;
-begin
-  fConnectionCount := 0;
-  fDLLhandle:=0;
-  fHttpExtensionProcFunct := nil;
-end;
-
-{********************************************************************}
-constructor TALPhpIsapiRunnerEngine.Create(const DLLFileName: String);
-begin
-  Create;
-  loadDll(DLLFileName);
-end;
-
-{*****************************************}
-destructor TALPhpIsapiRunnerEngine.Destroy;
-begin
-  UnloadDLL;
-  inherited;
-end;
-
-{*****************************************************}
-function TALPhpIsapiRunnerEngine.GetDllLoaded: Boolean;
-begin
-  result := fDLLhandle <> 0;
-end;
-
-{*******************************************************************}
-procedure TALPhpIsapiRunnerEngine.LoadDLL(const DLLFileName: String);
-Var GetExtensionVersionFunct: TGetExtensionVersion;
-    Version: THSE_VERSION_INFO;
-begin
-  fDLLhandle := LoadLibrary(Pchar(DLLFileName));
-  CheckError(fDLLhandle = 0);
-  Try
-
-    @fHttpExtensionProcFunct := GetProcAddress(fDLLHandle, 'HttpExtensionProc');
-    CheckError(@fHttpExtensionProcFunct = nil);
-
-    @GetExtensionVersionFunct := GetProcAddress(fDLLHandle, 'GetExtensionVersion');
-    CheckError(@GetExtensionVersionFunct = nil);
-    If not GetExtensionVersionFunct(Version) then raise exception.Create('Can not use the extension!');
-
-  except
-    UnloadDLL;
-  end;
-end;
-
-{******************************************}
-procedure TALPhpIsapiRunnerEngine.UnloadDLL;
-Var TerminateExtensionFunct : TTerminateExtension;
-begin
-  If DLLLoaded then Begin
-    {$IF CompilerVersion < 18.5}
-    while InterlockedCompareExchange(pointer(fconnectioncount), nil, nil) <> nil do sleep(1);
-    {$ELSE}
-    while InterlockedCompareExchange(fconnectioncount, 0, 0) <> 0 do sleep(1);
-    {$IFEND}
-    @TerminateExtensionFunct := GetProcAddress(fDLLHandle, 'TerminateExtension');
-    If assigned(TerminateExtensionFunct) then TerminateExtensionFunct(HSE_TERM_MUST_UNLOAD);
-    CheckError(not FreeLibrary(fDLLHandle));
-    fHttpExtensionProcFunct := nil;
-    fDLLHandle := 0;
-  end;
-end;
-
-{********************************************************************}
-procedure TALPhpIsapiRunnerEngine.Execute(WebRequest: TALIsapiRequest;
-                                          ResponseContentStream: Tstream;
-                                          ResponseHeader: TALHTTPResponseHeader);
-Var aPhpRunnerECB: TALPhpIsapiRunnerWebRequestECB;
-    aHttpExtensionProcResult: DWORD;
-begin
-  If not DLLLoaded then raise Exception.Create('DLL is not loaded!');
-
-  aPhpRunnerECB := TALPhpIsapiRunnerWebRequestECB.Create;
-  InterlockedIncrement(Fconnectioncount);
-  Try
-
-    With aPhpRunnerECB.ECB do begin
-      lpszMethod := pchar(WebRequest.Method);
-      lpszQueryString := pchar(WebRequest.Query);
-      lpszPathInfo:= pchar(WebRequest.PathInfo);
-      lpszPathTranslated:= pchar(WebRequest.PathTranslated);
-      lpszContentType:= pchar(WebRequest.ContentType);
-
-      cbTotalBytes:=WebRequest.ContentStream.Size;
-      cbAvailable:=WebRequest.ContentStream.Size;
-      If cbTotalBytes > 0 then begin
-        GetMem(lpbData, cbTotalBytes);
-        WebRequest.ContentStream.Position := 0;
-        WebRequest.ContentStream.read(lpbData^, cbTotalBytes);
-      end
-      else lpbData := nil;
-    end;
-
-    aPhpRunnerECB.ServerVariablesObj := WebRequest;
-    aPhpRunnerECB.ResponseContentStream := ResponseContentStream;
-    aPhpRunnerECB.ResponseHeader := ResponseHeader;
-
-    aHttpExtensionProcResult := fHttpExtensionProcFunct(aPhpRunnerECB.ECB);
-    if aHttpExtensionProcResult <> HSE_STATUS_SUCCESS then raise exception.Create('The extension has encountered an error while processing the request!');
-
-  finally
-    With aPhpRunnerECB.ECB do
-      if lpbData <> nil then FreeMem(lpbData, cbTotalBytes);
-    aPhpRunnerECB.free;
-    InterlockedDecrement(Fconnectioncount);
-  end;
-end;
-
-{****************************************************************************}
-function TALPhpIsapiRunnerEngine.Execute(WebRequest: TALIsapiRequest): String;
-var ResponseContentStream: TStringStream;
-    ResponseHeader: TALHTTPResponseHeader;
-begin
-  ResponseContentStream := TStringStream.Create('');
-  ResponseHeader := TALHTTPResponseHeader.Create;
-  Try
-    Execute(WebRequest,
-            ResponseContentStream,
-            ResponseHeader);
-    Result := ResponseContentStream.DataString;
-  finally
-    ResponseContentStream.Free;
-    ResponseHeader.Free;
-  end;
-end;
-
-{******************************************************************}
-procedure TALPhpIsapiRunnerEngine.Execute(ServerVariables: Tstrings;
-                                          RequestContentStream: Tstream;
-                                          ResponseContentStream: Tstream;
-                                          ResponseHeader: TALHTTPResponseHeader);
-Var aPhpRunnerECB: TALPhpIsapiRunnerTstringsECB;
-    aHttpExtensionProcResult: DWORD;
-    WorkServerVariables: Tstrings;
-    i: integer;
-    S1, S2: String;
-begin
-  {exit if the dll is not loaded (off course)}
-  If not DLLLoaded then raise Exception.Create('DLL is not loaded!');
-
-  {Create local object}
-  aPhpRunnerECB := TALPhpIsapiRunnerTstringsECB.Create;
-  WorkServerVariables := TstringList.Create;
-  InterlockedIncrement(Fconnectioncount);
-  Try
-
-    {init WorkServerVariables}
-    WorkServerVariables.Assign(ServerVariables);
-
-    {init aPhpRunnerECB.ECB}
-    With aPhpRunnerECB.ECB do begin
-      lpszMethod := pchar(WorkServerVariables.Values['REQUEST_METHOD']);
-      lpszQueryString := pchar(WorkServerVariables.Values['QUERY_STRING']);
-      lpszPathInfo:= pchar(WorkServerVariables.Values['PATH_INFO']);
-      lpszPathTranslated:= pchar(WorkServerVariables.Values['PATH_TRANSLATED']);
-      lpszContentType:= pchar(WorkServerVariables.Values['CONTENT_TYPE']);
-
-      If assigned(RequestContentStream) then begin
-        cbTotalBytes:=RequestContentStream.Size;
-        cbAvailable:=RequestContentStream.Size;
-        If cbTotalBytes > 0 then begin
-          GetMem(lpbData, cbTotalBytes);
-          RequestContentStream.Position := 0;
-          RequestContentStream.read(lpbData^, cbTotalBytes);
-        end
-        else lpbData := nil;
-      end
-      else begin
-        cbTotalBytes:=0;
-        cbAvailable:=0;
-        lpbData := nil;
-      end;
-
-      WorkServerVariables.Values['CONTENT_LENGTH'] := inttostr(cbTotalBytes);
-    end;
-
-    {update the ALL_HTTP value}
-    S1 := '';
-    For i := 0 to ServerVariables.Count - 1 do begin
-      S2 := AlUpperCase(ServerVariables.Names[i])+': '+ServerVariables.ValueFromIndex[i];
-      If AlPos('HTTP_',S2) = 1 then S1 := S1 + #13#10 + S2;
-    end;
-    If S1 <> '' then delete(S1,1,2);
-    WorkServerVariables.Values['ALL_HTTP'] := S1;
-
-    {init aPhpRunnerECB properties}
-    aPhpRunnerECB.ServerVariablesObj := WorkServerVariables;
-    aPhpRunnerECB.ResponseContentStream := ResponseContentStream;
-    aPhpRunnerECB.ResponseHeader := ResponseHeader;
-
-    aHttpExtensionProcResult := fHttpExtensionProcFunct(aPhpRunnerECB.ECB);
-    if aHttpExtensionProcResult <> HSE_STATUS_SUCCESS then raise exception.Create('The extension has encountered an error while processing the request!');
-
-  finally
-    With aPhpRunnerECB.ECB do
-      if lpbData <> nil then FreeMem(lpbData, cbTotalBytes);
-    aPhpRunnerECB.free;
-    WorkServerVariables.Free;
-    InterlockedDecrement(Fconnectioncount);
-  end;
-end;
-
-
-
-
-////////////////////////////////
-///// TALPhpIsapiRunnerECB /////
-////////////////////////////////
-
-{******************************************}
-constructor TALPhpIsapiRunnerbaseECB.Create;
-begin
-  ECB.cbSize:=sizeof(TEXTENSION_CONTROL_BLOCK);
-  ECB.dwVersion:= MAKELONG(HSE_VERSION_MINOR, HSE_VERSION_MAJOR);
-  ECB.ConnID:= THandle(Self);
-  ECB.GetServerVariable:=@ALPhpIsapiRunnerECBGetServerVariable;
-  ECB.WriteClient:=@ALPhpIsapiRunnerECBWriteClient;
-  ECB.ReadClient:=@ALPhpIsapiRunnerECBReadClient;
-  ECB.ServerSupportFunction:=@ALPhpIsapiRunnerECBServerSupportFunction;
-  ECB.lpszLogData:='';
-  ECB.lpszMethod := nil;
-  ECB.lpszQueryString := nil;
-  ECB.lpszPathInfo:= nil;
-  ECB.lpszPathTranslated:= nil;
-  ECB.lpszContentType:=nil;
-  ECB.cbTotalBytes:=0;
-  ECB.cbAvailable:=0;
-  ECB.lpbData:=nil;
-  ECB.dwHttpStatusCode := 0;
-  ResponseContentStream := nil;
-  ResponseHeader := nil;
-end;
-
-//////////////////////////////////////////
-///// TALPhpIsapiRunnerWebRequestECB /////
-//////////////////////////////////////////
-
-{************************************************}
-constructor TALPhpIsapiRunnerWebRequestECB.Create;
-begin
-  inherited;
-  ServerVariablesObj := nil;
-end;
-
-{************************************************************************************}
-function TALPhpIsapiRunnerWebRequestECB.GetServerVariableValue(aName: String): String;
-begin
-  Result := ServerVariablesObj.GetFieldByName(aName);
-end;
-
-////////////////////////////////////////
-///// TALPhpIsapiRunnerTstringsECB /////
-////////////////////////////////////////
-
-{**********************************************}
-constructor TALPhpIsapiRunnerTstringsECB.Create;
-begin
-  inherited;
-  ServerVariablesObj := nil;
-end;
-
-{**********************************************************************************}
-function TALPhpIsapiRunnerTstringsECB.GetServerVariableValue(aName: String): String;
-begin
-  Result := ServerVariablesObj.Values[aName];
 end;
 
 end.

@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALHintballon
-Version:      3.50
+Version:      4.00
 
 Description:  Custom Hint with good look (Balloon). Good for use
               in help tips
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -45,6 +45,7 @@ Know bug :
 
 History:      01/03/2004: fix CloseHintBalloons by Hilton Janfield
                           (hjanfield@shaw.ca)
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -52,7 +53,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALHintBalloon;
 
@@ -137,13 +138,6 @@ begin
   RegisterComponents('Alcinoe', [TALHintBalloonControl]);
 end;
 
-
-
-
-///////////////////////////////////////////////////////////////
-//////////Function TALHintBalloonCreateContentProcess//////////
-///////////////////////////////////////////////////////////////
-
 {*******************************************************************************}
 procedure ALHintBalloonConstructTextContent(ALHintBalloonObject: TALHintBalloon);
 var lblTitle, LblText: Tlabel;
@@ -160,7 +154,7 @@ begin
     LstCustomPropertyParams.QuoteChar := '''';
     LstCustomPropertyParams.DelimitedText := ALHintBalloonObject.CustomProperty;
 
-    {------------------------------------}
+    {-------------------------------------}
     ALHintBalloonObject.Color := $00E1FFFF;
     ALHintBalloonObject.Font.Name := 'Tahoma';
     ALHintBalloonObject.Font.Size := 8;
@@ -170,7 +164,7 @@ begin
     lblTitle := nil;
     IcoImage := nil;
 
-    {--------------------------------------}
+    {----------------------------------------------------}
     str := LstCustomPropertyParams.Values['IconeResName'];
     if (str <> '') then begin
       IcoImage := TImage.Create(ALHintBalloonObject.MainPanel);
@@ -185,7 +179,7 @@ begin
       end;
     end;
 
-    {-------------------------------}
+    {---------------------------------------------}
     str := LstCustomPropertyParams.Values['Title'];
     If (str <> '') then begin
       lblTitle := TLabel.Create(ALHintBalloonObject.MainPanel);
@@ -203,7 +197,7 @@ begin
       end;
     end;
 
-    {--------------------------------------------------------}
+    {------------------------------------------------------}
     LblText := TLabel.Create(ALHintBalloonObject.MainPanel);
     with LblText do begin
       Parent := ALHintBalloonObject.MainPanel;
@@ -225,7 +219,7 @@ begin
       ALHintBalloonObject.MainPanel.Width := Left + Width + 10;
       ALHintBalloonObject.MainPanel.Height := Top + Height + 10;
 
-      {----------------------------------------------------------}
+      {-----------------------------------------------------------------------------}
       MaxPanelWidth := strtoint(LstCustomPropertyParams.Values['MainPanelMaxWidth']);
       MaxPanelHeight := strtoint(LstCustomPropertyParams.Values['MainPanelMaxHeight']);
       IF ALHintBalloonObject.MainPanel.height > MaxPanelheight then begin
@@ -313,7 +307,6 @@ begin
 
 end;
 
-
 {**********************************************************************************}
 procedure ALHintBalloonConstructPictureContent(ALHintBalloonObject: TALHintBalloon);
 var MaxPanelWidth, MaxPanelHeight : integer;
@@ -325,10 +318,10 @@ begin
     LstCustomPropertyParams.QuoteChar := '''';
     LstCustomPropertyParams.DelimitedText := ALHintBalloonObject.CustomProperty;
 
-    {------------------------------------}
+    {-----------------------------------}
     ALHintBalloonObject.Color := ClBlack;
 
-    {--------------------------------------}
+    {--------------------------------------------------------}
     with TImage.Create(ALHintBalloonObject.MainPanel) do begin
       Parent := ALHintBalloonObject.MainPanel;
       Transparent := False;
@@ -375,13 +368,6 @@ begin
 
 end;
 
-
-
-
-/////////////////////////////////////////
-//////////TALHintBalloonControl//////////
-/////////////////////////////////////////
-
 {***********************************************************}
 constructor TALHintBalloonControl.Create(AOwner: TComponent);
 begin
@@ -410,16 +396,14 @@ begin
     CustomProperty := CustomProperty + ';' + quotedStr('Text='+blnText);
     CustomProperty := CustomProperty + ';' + quotedStr('MainPanelBestWidth='+inttostr(blnBestWidth));
 
-    ShowHintBalloon(
-                    ALHintBalloonConstructTextContent,
+    ShowHintBalloon(ALHintBalloonConstructTextContent,
                     blnLeft,
                     blnTop,
                     blnSourceControl,
                     FDuration,
                     blnArrowPosition,
                     FAnimationType,
-                    FAnimationSpeed
-                   );
+                    FAnimationSpeed);
   end;
 end;
 
@@ -432,16 +416,14 @@ begin
   FALHintBalloon := TALHintBalloon.CreateNew(Application);
   With FALHintBalloon do begin
     CustomProperty := quotedStr('ImageFileName='+blnImageFilename);
-    ShowHintBalloon(
-                    ALHintBalloonConstructPictureContent,
+    ShowHintBalloon(ALHintBalloonConstructPictureContent,
                     blnLeft,
                     blnTop,
                     blnSourceControl,
                     FDuration,
                     blnArrowPosition,
                     FAnimationType,
-                    FAnimationSpeed
-                   );
+                    FAnimationSpeed);
   end;
 end;
 
@@ -455,16 +437,14 @@ begin
   FALHintBalloon := TALHintBalloon.CreateNew(Application);
   With FALHintBalloon do begin
     CustomProperty := BlncustomProperty;
-    ShowHintBalloon(
-                    blnCreateContentProcess,
+    ShowHintBalloon(blnCreateContentProcess,
                     blnLeft,
                     blnTop,
                     blnSourceControl,
                     FDuration,
                     blnArrowPosition,
                     FAnimationType,
-                    FAnimationSpeed
-                   );
+                    FAnimationSpeed);
   end;
 end;
 
@@ -484,13 +464,6 @@ begin
     else inc(I);
   until (i >= Application.ComponentCount);
 end;
-
-
-
-
-/////////////////////////////////////////
-//////////TALHintBalloonControl//////////
-/////////////////////////////////////////
 
 {***************************************************************************************}
 function TALHintBalloon.TranslateAnimation(Value: TALHintBalloonAnimationType): cardinal;
@@ -619,7 +592,7 @@ var FormRegion, ArrowRegion: HRGN;
     MainPanelMaxWidth, MainPanelMaxHeight: Integer;
 begin
 
-  {---last focus form----}
+  {---last focus form-----------------}
   FLastActiveForm := screen.ActiveForm;
   If FLastActiveForm <> nil then begin
     FOldLastActiveFormWndProc := FLastActiveForm.WindowProc;
@@ -670,13 +643,13 @@ begin
   end;
 
 
-  {-----Creation du mainPanel------------------------------------------------------}
+  {-----Creation du mainPanel-------------------------------------------------------------------------}
   CustomProperty := CustomProperty + ';' + quotedStr('MainPanelMaxWidth='+inttostr(MainPanelMaxWidth));
   CustomProperty := CustomProperty + ';' + quotedStr('MainPanelMaxHeight='+inttostr(MainPanelMaxHeight));
   blnCreateContentProcess(self);
 
 
-  {-----Positonnement du hint---------------}
+  {-----Positonnement du hint----------------}
   if not assigned(blnSourceControl) then begin
     SourceControlRect.Top := blnTop;
     SourceControlRect.Left := blnLeft;

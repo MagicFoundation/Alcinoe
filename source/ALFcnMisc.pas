@@ -5,11 +5,11 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Misc functions
-Version:      3.52
+Version:      4.00
 
 Description:  Alcinoe Misc Functions
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -47,13 +47,14 @@ History :     09/01/2005: correct then AlEmptyDirectory function
               25/02/2008: Update AlIsValidEmail
               06/10/3008: Update AlIsValidEmail
               03/03/2010: add ALIsInt64
+              26/06/2012: Add xe2 support
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnMisc;
 
@@ -64,12 +65,7 @@ uses Windows,
 
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
-Function ALIsInt64 (const S : String) : Boolean;
-Function ALIsInteger (const S : String) : Boolean;
-Function ALIsSmallInt (const S : String) : Boolean;
-Function AlStrToBool(Value:String):Boolean;
-Function ALMakeKeyStrByGUID: String;
-function AlIsValidEmail(const Value: string): boolean;
+function AlIsValidEmail(const Value: AnsiString): boolean;
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
 Function ALInc(var x: integer; Count: integer): Integer;
 
@@ -91,62 +87,11 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
-{*********************************************}
-function ALIsDecimal(const S: string): boolean;
-var aChar: char;
-begin
-  result := true;
-  for aChar in S do begin
-    if not (aChar in ['0'..'9','-']) then begin
-      result := false;
-      break;
-    end;
-  end;
-end;
+{********************************************************}
+function AlIsValidEmail(const Value: AnsiString): boolean;
 
-{***********************************************}
-Function ALIsInteger(const S : String) : Boolean;
-var i: integer;
-Begin
-  result := ALIsDecimal(S) and TryStrToInt(S, i);
-End;
-
-{**********************************************}
-Function ALIsInt64 (const S : String) : Boolean;
-var i : int64;
-Begin
-  Result := ALIsDecimal(S) and tryStrToInt64(S, I);
-End;
-
-{*************************************************}
-Function ALIsSmallInt (const S : String) : Boolean;
-var i : Integer;
-Begin
-  Result := ALIsDecimal(S) and TryStrToInt(S, I) and (i <= 32767) and (I >= -32768);
-End;
-
-{*****************************************}
-Function AlStrToBool(Value:String):Boolean;
-Begin
-  Result := False;
-  TryStrtoBool(Value,Result);
-end;
-
-{***********************************}
-Function  ALMakeKeyStrByGUID: String;
-Var aGUID: TGUID;
-Begin
-  CreateGUID(aGUID);
-  Result := GUIDToString(aGUID);
-  Delete(Result,1,1);
-  Delete(Result,Length(result),1);
-End;
-
-{****************************************************}
-function AlIsValidEmail(const Value: string): boolean;
-
- {--------------------------------------------------}
- function CheckAllowedname(const s: string): boolean;
+ {------------------------------------------------------}
+ function CheckAllowedname(const s: AnsiString): boolean;
  var i: integer;
  begin
    Result:= false;
@@ -157,8 +102,8 @@ function AlIsValidEmail(const Value: string): boolean;
    Result:= true;
  end;
 
- {-------------------------------------------------}
- function CheckAllowedExt(const s: string): boolean;
+ {-----------------------------------------------------}
+ function CheckAllowedExt(const s: AnsiString): boolean;
  var i: integer;
  begin
    Result:= false;
@@ -170,7 +115,7 @@ function AlIsValidEmail(const Value: string): boolean;
  end;
 
 var i, j: integer;
-    namePart, serverPart, extPart: string;
+    namePart, serverPart, extPart: AnsiString;
 begin
   Result:= false;
 
@@ -178,7 +123,7 @@ begin
   if length(Value) < 6 then exit;
 
   // must have the '@' char inside
-  i:= AlCharPos('@', Value);
+  i:= AlPos('@', Value);
   if (i <= 1) or (i > length(Value)-4) then exit;
 
   //can not have @. or .@
@@ -192,11 +137,11 @@ begin
   serverPart:= AlCopyStr(Value, i + 1, Length(Value));
 
   // Extension (.fr, .com, etc..) must be betwen 2 to 6 char
-  i:= AlCharPos('.', serverPart);
+  i:= AlPos('.', serverPart);
   j := 0;
   While I > 0 do begin
     j := i;
-    I := AlCharPosEx('.', serverPart, i + 1);
+    I := AlPosEx('.', serverPart, i + 1);
   end;
   if (j <= 1) then Exit; // no dot at all so exit !
   extPart := AlCopyStr(ServerPart,J+1,Maxint);

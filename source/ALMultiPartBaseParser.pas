@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALMultiPartBaseParser
-Version:      3.50
+Version:      4.00
 
 Description:  MultiPart Base objects to encode or decode stream
               in mime multipart/xxx format.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cdosys/html/7a18a98b-3a18-45b2-83a9-28a8f4099970.asp
               http://www.ietf.org/rfc/rfc2646.txt
@@ -52,7 +52,7 @@ Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/c
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMultiPartBaseParser;
 
@@ -61,45 +61,46 @@ interface
 uses Classes,
      SysUtils,
      Contnrs,
-     HTTPApp;
+     HTTPApp,
+     ALStringList;
 
 type
 
   {-Single multipart Object--------------}
   TALMultiPartBaseContent = class(TObject)
   private
-    FContentType: string;
-    FContentTransferEncoding: String;
-    FContentDisposition: string;
-    FContentID: String;
-    FContentDescription: String;
+    FContentType: AnsiString;
+    FContentTransferEncoding: AnsiString;
+    FContentDisposition: AnsiString;
+    FContentID: AnsiString;
+    FContentDescription: AnsiString;
     FDataStream: TStream;
-    FCustomHeaders: Tstrings;
-    Function GetRawHeaderText: String;
-    procedure SetRawHeaderText(const aRawHeaderText: string);
-    function GetDataString: String;
-    procedure SetDataString(const aValue: String);
+    FCustomHeaders: TALStrings;
+    Function GetRawHeaderText: AnsiString;
+    procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
+    function GetDataString: AnsiString;
+    procedure SetDataString(const aValue: AnsiString);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear; virtual;
-    procedure LoadDataFromFile(aFileName: string); virtual;
+    procedure LoadDataFromFile(aFileName: AnsiString); virtual;
     procedure LoadDataFromStream(aStream: TStream); virtual;
-    procedure LoadDataFromFileBase64Encode(aFileName: string); virtual;
+    procedure LoadDataFromFileBase64Encode(aFileName: AnsiString); virtual;
     procedure LoadDataFromStreamBase64Encode(aStream: TStream); virtual;
-    procedure SaveDataToFile(aFileName: string); virtual;
+    procedure SaveDataToFile(aFileName: AnsiString); virtual;
     procedure SaveDataToStream(aStream: TStream); virtual;
-    procedure SaveDataToFileBase64Decode(aFileName: string); virtual;
+    procedure SaveDataToFileBase64Decode(aFileName: AnsiString); virtual;
     procedure SaveDataToStreamBase64Decode(aStream: TStream); virtual;
-    property ContentType: string read FContentType write FContentType; //Content-Type: text/plain; charset="utf-8"  or  Content-Type: image/bmp; name="Blue Lace 16.bmp"
-    property ContentTransferEncoding: string read FContentTransferEncoding write FContentTransferEncoding; //Content-Transfer-Encoding: base64
-    property ContentDisposition: string read FContentDisposition write FContentDisposition; //Content-Disposition: attachment; filename="Blue Lace 16.bmp"
-    property ContentID: string read FContentID write FContentID; //Content-ID: <foo4%25foo1@bar.net>
-    property ContentDescription: string read FContentDescription write FContentDescription; //Content-Description: some text
+    property ContentType: AnsiString read FContentType write FContentType; //Content-Type: text/plain; charset="utf-8"  or  Content-Type: image/bmp; name="Blue Lace 16.bmp"
+    property ContentTransferEncoding: AnsiString read FContentTransferEncoding write FContentTransferEncoding; //Content-Transfer-Encoding: base64
+    property ContentDisposition: AnsiString read FContentDisposition write FContentDisposition; //Content-Disposition: attachment; filename="Blue Lace 16.bmp"
+    property ContentID: AnsiString read FContentID write FContentID; //Content-ID: <foo4%25foo1@bar.net>
+    property ContentDescription: AnsiString read FContentDescription write FContentDescription; //Content-Description: some text
     property DataStream: TStream read FDataStream;
-    property DataString: String read GetDataString Write SetDataString;
-    property CustomHeaders: Tstrings read FCustomHeaders;
-    property RawHeaderText: String read GetRawHeaderText write setRawHeaderText;
+    property DataString: AnsiString read GetDataString Write SetDataString;
+    property CustomHeaders: TALStrings read FCustomHeaders;
+    property RawHeaderText: AnsiString read GetRawHeaderText write setRawHeaderText;
   end;
 
   {--List Of multipart Objects----------------}
@@ -120,13 +121,13 @@ type
   {--TAlMultiPartBaseStream-------------------}
   TAlMultiPartBaseStream = class(TMemoryStream)
   private
-    FBoundary: string;
-    function GenerateUniqueBoundary: string;
+    FBoundary: AnsiString;
+    function GenerateUniqueBoundary: AnsiString;
   public
     constructor Create; virtual;
     procedure   AddContent(aContent: TALMultiPartBaseContent); virtual;
     procedure   CloseBoundary; virtual;
-    property    Boundary: string read FBoundary write FBoundary;
+    property    Boundary: AnsiString read FBoundary write FBoundary;
   end;
 
   {--TALMultipartBaseEncoder-------------}
@@ -154,25 +155,25 @@ type
   public
     constructor	Create; virtual;
     destructor  Destroy; override;
-    procedure   Decode(aDataStream: Tstream; aboundary: String); overload; Virtual;
-    procedure   Decode(aDataStr: String; aboundary: String); overload; Virtual;
+    procedure   Decode(aDataStream: Tstream; aboundary: AnsiString); overload; Virtual;
+    procedure   Decode(aDataStr: AnsiString; aboundary: AnsiString); overload; Virtual;
   end;
 
-{-------------------------------------------------------------------------------}
-Function ALMultipartExtractBoundaryFromContentType(aContentType: String): String;
-Function ALMultipartExtractSubValueFromHeaderLine(aHeaderLine: String; aName: String): String;
-Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: String; aName, AValue: String): String;
+{---------------------------------------------------------------------------------------}
+Function ALMultipartExtractBoundaryFromContentType(aContentType: AnsiString): AnsiString;
+Function ALMultipartExtractSubValueFromHeaderLine(aHeaderLine: AnsiString; aName: AnsiString): AnsiString;
+Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: AnsiString; aName, AValue: AnsiString): AnsiString;
 
 implementation
 
 uses AlFcnString,
      AlFcnMime;
 
-{********************************************************************************************}
-Function ALMultipartExtractSubValueFromHeaderLine(aHeaderLine: String; aName: String): String;
+{********************************************************************************************************}
+Function ALMultipartExtractSubValueFromHeaderLine(aHeaderLine: AnsiString; aName: AnsiString): AnsiString;
 
-    {----------------------------------------------------}
-    function InternalRemoveQuoteStr(aStr: String): String;
+    {------------------------------------------------------------}
+    function InternalRemoveQuoteStr(aStr: AnsiString): AnsiString;
     Begin
       Result := AStr;
       If (Length(result) > 0) and
@@ -180,16 +181,16 @@ Function ALMultipartExtractSubValueFromHeaderLine(aHeaderLine: String; aName: St
          (result[1]=result[length(result)]) then result := AlCopyStr(Result,2,length(result)-2);
     end;
 
-Var Lst: TstringList;
+Var Lst: TALStringList;
     i: integer;
 begin
   Result := '';
   aName := AlLowerCase(aName);
-  Lst := TstringList.Create;
+  Lst := TALStringList.Create;
   Try
     Lst.Text := AlStringReplace(aHeaderLine,';',#13#10,[RfReplaceAll]);
     For i := 0 to Lst.Count - 1 do
-      If AlLowerCase(Trim(Lst.Names[i])) = aName then begin
+      If AlLowerCase(ALTrim(Lst.Names[i])) = aName then begin
         Result := InternalRemoveQuoteStr(Lst.ValueFromIndex[i]);
         Break;
       end;
@@ -198,29 +199,29 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
-Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: String; aName, AValue: String): String;
-Var Lst: TstringList;
-    aLowerCaseName: String;
+{**********************************************************************************************************}
+Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: AnsiString; aName, AValue: AnsiString): AnsiString;
+Var Lst: TALStringList;
+    aLowerCaseName: AnsiString;
     i: integer;
     Flag1: Boolean;
 begin
   Result := '';
   aLowerCaseName := AlLowerCase(aName);
   aHeaderLine := AlStringReplace(aHeaderLine, #13#10, ' ', [RfReplaceAll]);
-  Lst := TstringList.Create;
+  Lst := TALStringList.Create;
   Try
     Flag1 := False;
     Lst.Text := AlStringReplace(aHeaderLine,';',#13#10,[RfReplaceAll]);
     For i := 0 to Lst.Count - 1 do
-      If AlLowerCase(Trim(Lst.Names[i])) = aLowerCaseName then begin
+      If AlLowerCase(ALTrim(Lst.Names[i])) = aLowerCaseName then begin
         Lst.ValueFromIndex[i] := '"' + AValue + '"';
         Flag1 := True;
         Break;
       end;
 
     For i := 0 to Lst.Count - 1 do
-      Result := Result + '; ' + trim(Lst[i]);
+      Result := Result + '; ' + ALTrim(Lst[i]);
 
     if Not Flag1 then
        Result := Result + '; ' + aName + '=' + '"' + aValue + '"';
@@ -231,23 +232,18 @@ begin
   end;
 end;
 
-
-{*******************************************************************************}
-Function ALMultipartExtractBoundaryFromContentType(aContentType: String): String;
+{***************************************************************************************}
+Function ALMultipartExtractBoundaryFromContentType(aContentType: AnsiString): AnsiString;
 Begin
   Result := ALMultipartExtractSubValueFromHeaderLine(aContentType, 'boundary');
 end;
-
-//////////////////////////////////////////////////////////////
-//////////  TALMultiPartBaseContent //////////////////////////
-//////////////////////////////////////////////////////////////
 
 {*****************************************}
 constructor TALMultiPartBaseContent.Create;
 begin
   inherited;
   FDataStream := TMemoryStream.Create;
-  FCustomHeaders := TstringList.create;
+  FCustomHeaders := TALStringList.create;
   FCustomHeaders.NameValueSeparator := ':';
   Clear;
 end;
@@ -272,51 +268,51 @@ begin
   TMemoryStream(FdataStream).Clear;
 end;
 
-{********************************************************}
-function TALMultiPartBaseContent.GetRawHeaderText: String;
+{************************************************************}
+function TALMultiPartBaseContent.GetRawHeaderText: AnsiString;
 Var i : integer;
 begin
   Result := '';
-  If Trim(FContentType) <> '' then result := result + 'Content-Type: ' + trim(FContentType) + #13#10;
-  If Trim(FContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + trim(FContentTransferEncoding) + #13#10;
-  If Trim(fContentDisposition) <> '' then result := result + 'Content-Disposition: ' + trim(fContentDisposition) + #13#10;
-  If Trim(FContentID) <> '' then result := result + 'Content-ID: ' + trim(FContentID) + #13#10;
-  If Trim(FContentDescription) <> '' then result := result + 'Content-Description: ' + trim(FContentDescription) + #13#10;
+  If ALTrim(FContentType) <> '' then result := result + 'Content-Type: ' + ALTrim(FContentType) + #13#10;
+  If ALTrim(FContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + ALTrim(FContentTransferEncoding) + #13#10;
+  If ALTrim(fContentDisposition) <> '' then result := result + 'Content-Disposition: ' + ALTrim(fContentDisposition) + #13#10;
+  If ALTrim(FContentID) <> '' then result := result + 'Content-ID: ' + ALTrim(FContentID) + #13#10;
+  If ALTrim(FContentDescription) <> '' then result := result + 'Content-Description: ' + ALTrim(FContentDescription) + #13#10;
   For i := 0 to FCustomHeaders.count - 1 do
-    if (trim(FCustomHeaders.names[i]) <> '') and (trim(FCustomHeaders.ValueFromIndex[i]) <> '') then
-      result := result + FCustomHeaders.names[i] + ': ' + trim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
+    if (ALTrim(FCustomHeaders.names[i]) <> '') and (ALTrim(FCustomHeaders.ValueFromIndex[i]) <> '') then
+      result := result + FCustomHeaders.names[i] + ': ' + ALTrim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
 end;
 
-{*******************************************************************************}
-procedure TALMultiPartBaseContent.SetRawHeaderText(const aRawHeaderText: string);
-Var aRawHeaderLst: TstringList;
+{***********************************************************************************}
+procedure TALMultiPartBaseContent.SetRawHeaderText(const aRawHeaderText: AnsiString);
+Var aRawHeaderLst: TALStringList;
 
-  {-------------------------------------}
-  Function AlG001(aName: String): String;
+  {---------------------------------------------}
+  Function AlG001(aName: AnsiString): AnsiString;
   Var i: Integer;
-      Str: String;
+      Str: AnsiString;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
     If I >= 0 then Begin
-      result := Trim(aRawHeaderLst.ValueFromIndex[i]);
+      result := ALTrim(aRawHeaderLst.ValueFromIndex[i]);
       aRawHeaderLst.Delete(i);
       While True do begin
         If i >= aRawHeaderLst.Count then break;
         str := aRawHeaderLst[i];
         If (str = '') or
            (not (str[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-        Result := trim(result + ' ' + trim(str));
+        Result := ALTrim(result + ' ' + ALTrim(str));
         aRawHeaderLst.Delete(i);
       end;
     end
     else result := '';
   end;
 
-Var Str1, Str2: String;
+Var Str1, Str2: AnsiString;
     j: integer;
 begin
   Clear;
-  aRawHeaderLst := TstringList.create;
+  aRawHeaderLst := TALStringList.create;
   try
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
@@ -330,16 +326,16 @@ begin
     FCustomHeaders.clear;
     J := 0;
     while j <= aRawHeaderLst.count - 1 do begin
-      Str1 := trim(aRawHeaderLst.Names[j]);
-      If (trim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
-        Str1 := trim(Str1) + ': ' + trim(aRawHeaderLst.ValueFromIndex[j]);
+      Str1 := ALTrim(aRawHeaderLst.Names[j]);
+      If (ALTrim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
+        Str1 := ALTrim(Str1) + ': ' + ALTrim(aRawHeaderLst.ValueFromIndex[j]);
         inc(j);
         While True do begin
           If j >= aRawHeaderLst.Count then break;
           str2 := aRawHeaderLst[j];
           If (str2 = '') or
              (not (str2[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-          Str1 := trim(Str1 + ' ' + trim(str2));
+          Str1 := ALTrim(Str1 + ' ' + ALTrim(str2));
           inc(j);
         end;
         FCustomHeaders.Add(Str1);
@@ -352,8 +348,8 @@ begin
   end;
 end;
 
-{*****************************************************}
-function TALMultiPartBaseContent.GetDataString: String;
+{*********************************************************}
+function TALMultiPartBaseContent.GetDataString: AnsiString;
 begin
   FdataStream.Position := 0;
   SetLength(Result,FdataStream.size);
@@ -361,31 +357,31 @@ begin
   FdataStream.Position := 0;
 end;
 
-{********************************************************************}
-procedure TALMultiPartBaseContent.SetDataString(const aValue: String);
+{************************************************************************}
+procedure TALMultiPartBaseContent.SetDataString(const aValue: AnsiString);
 begin
   TmemoryStream(FdataStream).clear;
   FDataStream.WriteBuffer(aValue[1],length(aValue));
   FdataStream.Position := 0;
 end;
 
-{********************************************************************}
-procedure TALMultiPartBaseContent.LoadDataFromFile(aFileName: string);
+{************************************************************************}
+procedure TALMultiPartBaseContent.LoadDataFromFile(aFileName: AnsiString);
 begin
-  TmemoryStream(FDataStream).LoadFromFile(aFileName);
-  ContentType := ALGetDefaultMIMEContentTypeFromExt(ExtractfileExt(aFileName));
+  TmemoryStream(FDataStream).LoadFromFile(String(aFileName));
+  ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(aFileName));
   ContentTransferEncoding := 'binary';
 end;
 
-{********************************************************************************}
-procedure TALMultiPartBaseContent.LoadDataFromFileBase64Encode(aFileName: string);
-Var Buffer: String;
+{************************************************************************************}
+procedure TALMultiPartBaseContent.LoadDataFromFileBase64Encode(aFileName: AnsiString);
+Var Buffer: AnsiString;
 begin
   TMemoryStream(FDataStream).clear;
   Buffer := ALMimeBase64EncodeString(AlGetStringFromFile(aFileName));
   FDataStream.WriteBuffer(Buffer[1], length(Buffer));
   FDataStream.Position := 0;
-  ContentType := ALGetDefaultMIMEContentTypeFromExt(ExtractfileExt(aFileName));
+  ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(aFileName));
   ContentTransferEncoding := 'base64';
 end;
 
@@ -399,7 +395,7 @@ end;
 
 {*********************************************************************************}
 procedure TALMultiPartBaseContent.LoadDataFromStreamBase64Encode(aStream: TStream);
-Var Buffer: String;
+Var Buffer: AnsiString;
 Begin
   aStream.Position := 0;
   SetLength(Buffer,aStream.size);
@@ -411,10 +407,10 @@ Begin
   ContentTransferEncoding := 'base64';
 end;
 
-{******************************************************************}
-procedure TALMultiPartBaseContent.SaveDataToFile(aFilename: string);
+{**********************************************************************}
+procedure TALMultiPartBaseContent.SaveDataToFile(aFilename: AnsiString);
 begin
-  TMemoryStream(FDataStream).SaveToFile(aFileName);
+  TMemoryStream(FDataStream).SaveToFile(String(aFileName));
 end;
 
 {*******************************************************************}
@@ -423,9 +419,9 @@ begin
   TMemoryStream(FDataStream).SaveToStream(aStream);
 end;
 
-{******************************************************************************}
-procedure TALMultiPartBaseContent.SaveDataToFileBase64Decode(aFileName: string);
-Var Buffer: String;
+{**********************************************************************************}
+procedure TALMultiPartBaseContent.SaveDataToFileBase64Decode(aFileName: AnsiString);
+Var Buffer: AnsiString;
 begin
   FDataStream.Position := 0;
   SetLength(Buffer,FdataStream.size);
@@ -435,7 +431,7 @@ end;
 
 {*******************************************************************************}
 procedure TALMultiPartBaseContent.SaveDataToStreamBase64Decode(aStream: TStream);
-Var Buffer: String;
+Var Buffer: AnsiString;
 begin
   FDataStream.Position := 0;
   SetLength(Buffer,FdataStream.size);
@@ -444,20 +440,13 @@ begin
   aStream.WriteBuffer(Buffer[1], Length(Buffer));
 end;
 
-
-
-
-///////////////////////////////////////////////////////////////
-//////////  TALMultiPartBaseContents  ////////////////////////
-///////////////////////////////////////////////////////////////
-
 {*******************************************************************************}
 function TALMultiPartBaseContents.Add(AObject: TALMultiPartBaseContent): Integer;
 begin
   Result := inherited Add(AObject);
 end;
 
-{***************************************************************}
+{*************************************************************}
 function TALMultiPartBaseContents.Add: TALMultiPartBaseContent;
 begin
   Result := TALMultiPartBaseContent.Create;
@@ -469,42 +458,35 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{*********************************************************************************}
 function TALMultiPartBaseContents.GetItem(Index: Integer): TALMultiPartBaseContent;
 begin
   Result := TALMultiPartBaseContent(inherited Items[Index]);
 end;
 
-{*************************************************************************************}
+{***********************************************************************************}
 function TALMultiPartBaseContents.IndexOf(AObject: TALMultiPartBaseContent): Integer;
 begin
   Result := inherited IndexOf(AObject);
 end;
 
-{********************************************************************************************}
+{******************************************************************************************}
 procedure TALMultiPartBaseContents.Insert(Index: Integer; AObject: TALMultiPartBaseContent);
 begin
   inherited Insert(Index, AObject);
 end;
 
-{************************************************************************************}
+{**********************************************************************************}
 function TALMultiPartBaseContents.Remove(AObject: TALMultiPartBaseContent): Integer;
 begin
   Result := inherited Remove(AObject);
 end;
 
-{*********************************************************************************************}
+{*******************************************************************************************}
 procedure TALMultiPartBaseContents.SetItem(Index: Integer; AObject: TALMultiPartBaseContent);
 begin
   inherited Items[Index] := AObject;
 end;
-
-
-
-
-//////////////////////////////////////////////
-////////// TAlMultiPartBaseStream ///////////
-//////////////////////////////////////////////
 
 {****************************************}
 constructor TAlMultiPartBaseStream.Create;
@@ -515,7 +497,7 @@ end;
 
 {*****************************************************************************}
 procedure TAlMultiPartBaseStream.AddContent(aContent: TALMultiPartBaseContent);
-var sFormFieldInfo: string;
+var sFormFieldInfo: AnsiString;
 begin
   sFormFieldInfo := #13#10 +
                     '--' + Boundary + #13#10 +
@@ -525,36 +507,29 @@ begin
   CopyFrom(aContent.DataStream,0);
 end;
 
-{*************************************************************}
-function TAlMultiPartBaseStream.GenerateUniqueBoundary: string;
+{*****************************************************************}
+function TAlMultiPartBaseStream.GenerateUniqueBoundary: AnsiString;
 begin
-  Result := '---------------------------' + FormatDateTime('mmddyyhhnnsszzz', Now);
+  Result := '---------------------------' + ALFormatDateTime('mmddyyhhnnsszzz', Now, ALDefaultFormatSettings);
 end;
 
 {*********************************************}
 procedure TAlMultiPartBaseStream.CloseBoundary;
-var sFormFieldInfo: string;
+var sFormFieldInfo: AnsiString;
 begin
   sFormFieldInfo := #13#10 +
                     '--' + Boundary + '--' + #13#10;
   Write(Pointer(sFormFieldInfo)^, Length(sFormFieldInfo));
 end;
 
-
-
-
-////////////////////////////////////////////////
-////////// TALMultipartBaseEncoder ////////////
-////////////////////////////////////////////////
-
-{******************************************}
+{*****************************************}
 constructor TALMultipartBaseEncoder.Create;
 begin
   inherited;
   FDataStream := CreateDataStream;
 end;
 
-{******************************************}
+{*****************************************}
 destructor TALMultipartBaseEncoder.Destroy;
 begin
   FDataStream.Free;
@@ -578,15 +553,7 @@ begin
   end;
 end;
 
-
-
-
-////////////////////////////////////////////////////////
-////////// TALMultipartBaseDecoder ////////////////////
-////////////////////////////////////////////////////////
-
-
-{******************************************}
+{*****************************************}
 constructor TALMultipartBaseDecoder.Create;
 begin
   Inherited;
@@ -594,7 +561,7 @@ begin
   Fcontents.OwnsObjects := True;
 end;
 
-{******************************************}
+{*****************************************}
 destructor TALMultipartBaseDecoder.Destroy;
 begin
   FContents.Free;
@@ -607,9 +574,9 @@ begin
   Result := Fcontents;
 end;
 
-{********************************************************************************}
-procedure TALMultipartBaseDecoder.Decode(aDataStream: Tstream; aboundary: String);
-var sBuffer: string;
+{************************************************************************************}
+procedure TALMultipartBaseDecoder.Decode(aDataStream: Tstream; aboundary: AnsiString);
+var sBuffer: AnsiString;
 begin
   {read the data from the Data}
   aDataStream.Position := 0;
@@ -618,8 +585,8 @@ begin
   Decode(sBuffer, aboundary);
 end;
 
-{********************************************************************}
-procedure TALMultipartBaseDecoder.Decode(aDataStr, aboundary: String);
+{************************************************************************}
+procedure TALMultipartBaseDecoder.Decode(aDataStr, aboundary: AnsiString);
 var P1, P2, P3: Integer;
     LnBoundary: Integer;
     Flag1: Boolean;

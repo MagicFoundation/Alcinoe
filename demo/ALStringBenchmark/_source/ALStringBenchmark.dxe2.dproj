@@ -3,7 +3,7 @@
 			<ProjectGuid>{41774B09-6226-46C3-908D-8FF35101E537}</ProjectGuid>
 			<MainSource>ALStringBenchmark.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<TargetedPlatforms>3</TargetedPlatforms>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>

@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'ALSQLBenchmark'
   ClientHeight = 764
   ClientWidth = 1007
-  Color = 14805482
+  Color = 15986666
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -494,6 +494,7 @@ object Form1: TForm1
         Top = 51
         Width = 249
         Height = 19
+        Cursor = crArrow
         OnButtonClick = ALEditButtonFindFileClick
         btnVisible = True
         btnCaption = '...'
@@ -745,7 +746,6 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 13
         ItemIndex = 4
         TabOrder = 0
         Text = 'FB25'
@@ -795,6 +795,10 @@ object Form1: TForm1
     end
     object MySQL: TTabSheet
       Caption = 'MySQL'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 50
         Top = 78
@@ -1243,7 +1247,6 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 13
         ItemIndex = 1
         TabOrder = 15
         Text = 'MYSQL55'
@@ -1255,6 +1258,10 @@ object Form1: TForm1
     object SQLLite3: TTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label24: TLabel
         Left = 16
         Top = 26
@@ -1682,6 +1689,10 @@ object Form1: TForm1
     object Sphinx: TTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label36: TLabel
         Left = 38
         Top = 54
@@ -2108,7 +2119,6 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
-        ItemHeight = 13
         ItemIndex = 0
         TabOrder = 11
         Text = 'MYSQL50'

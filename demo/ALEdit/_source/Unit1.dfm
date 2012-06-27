@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 239
   ClientWidth = 316
-  Color = 14805482
+  Color = 15986666
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -11

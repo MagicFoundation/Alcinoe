@@ -148,9 +148,10 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

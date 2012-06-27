@@ -12,6 +12,7 @@ uses Windows,
      ComCtrls,
      Controls,
      Classes,
+     ALStringList,
      ALHttpClient,
      ALWinHttpClient,
      ALWebSpider,
@@ -55,13 +56,13 @@ type
     PanelWebBrowser: TPanel;
     procedure ButtonStartClick(Sender: TObject);
     procedure BtnChooseSaveDirectoryClick(Sender: TObject);
-    procedure MainWebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; Url, RedirectedTo: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; Url: AnsiString; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlFindLink(Sender: TObject; HtmlTagString: AnsiString; HtmlTagParams: TStrings; URL: AnsiString);
-    procedure MainWebSpiderCrawlGetNextLink(Sender: TObject; var Url: AnsiString);
-    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: AnsiString; HtmlTagParams: TStrings; URL: AnsiString; var LocalPath: AnsiString);
-    procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: AnsiString);
+    procedure MainWebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; Url, RedirectedTo: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlFindLink(Sender: TObject; HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderCrawlGetNextLink(Sender: TObject; var Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; var LocalPath: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure ButtonStopClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -106,8 +107,6 @@ uses FileCtrl,
 Const SplitDirectoryAmount = 5000;
 
 
-
-
 {*************************************************}
 procedure TForm1.ButtonStartClick(Sender: TObject);
 
@@ -148,7 +147,7 @@ procedure TForm1.ButtonStartClick(Sender: TObject);
 Var aNode: TPageNotYetDownloadedBinTreeNode;
 Begin
   {check the save directory}
-  If trim(EditSaveDirectory.Text) = '' then
+  If ALTrim(AnsiString(EditSaveDirectory.Text)) = '' then
     raise Exception.Create('Please select a directory to save the downloaded files!');
 
   {Handle if we ask to start or stop}
@@ -169,7 +168,7 @@ Begin
 
       {add editURL2Crawl.text to the fPageNotYetDownloadedBinTree}
       aNode:= TPageNotYetDownloadedBinTreeNode.Create;
-      aNode.ID := trim(editURL2Crawl.text);
+      aNode.ID := ALTrim(AnsiString(editURL2Crawl.text));
       aNode.DeepLevel := 0;
       FPageNotYetDownloadedBinTree.AddNode(aNode);
 
@@ -204,19 +203,19 @@ procedure TForm1.BtnChooseSaveDirectoryClick(Sender: TObject);
 Var aDir: String;
 Begin
  aDir := '';
- if SelectDirectory(aDir, [sdAllowCreate, sdPerformCreate, sdPrompt],0) then  EditSaveDirectory.Text := ALMakeGoodEndPath(aDir);
+ if SelectDirectory(aDir, [sdAllowCreate, sdPerformCreate, sdPrompt],0) then  EditSaveDirectory.Text := IncludeTrailingPathDelimiter(aDir);
 end;
 
-{*****************************************************************}
+{*************************************************************************}
 function TForm1.GetNextLocalFileName(aContentType: AnsiString): AnsiString;
 Var aExt: AnsiString;
 
-  {-------------------------------------}
+  {-----------------------------------------}
   Function SplitPathMakeFilename: AnsiString;
   begin
-    Result := EditSaveDirectory.Text + inttostr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\';
-    If (not DirectoryExists(Result)) and (not createDir(Result)) then raise exception.Create('cannot create dir: ' + Result);
-    Result := Result + inttostr(FCurrentLocalFileNameIndex) + aExt;
+    Result := AnsiString(EditSaveDirectory.Text) + ALIntToStr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\';
+    If (not SysUtils.DirectoryExists(String(Result))) and (not createDir(String(Result))) then raise exception.Create('cannot create dir: ' + String(Result));
+    Result := Result + ALIntToStr(FCurrentLocalFileNameIndex) + aExt;
     inc(FCurrentLocalFileNameIndex);
   end;
 
@@ -224,7 +223,7 @@ Begin
   aExt := ALlowercase(ALGetDefaultFileExtFromMimeContentType(aContentType)); // '.htm'
 
   If FCurrentLocalFileNameIndex = 0 then Begin
-    result := EditSaveDirectory.Text + 'Start' + aExt;
+    result := AnsiString(EditSaveDirectory.Text) + 'Start' + aExt;
     inc(FCurrentLocalFileNameIndex);
   end
   else result := SplitPathMakeFilename;
@@ -247,9 +246,9 @@ begin
   FPageNotYetDownloadedBinTree.DeleteNode(url);
 
   {update label}
-  MemoErrorMsg.Lines.Add('Error: ' + ErrorMessage);
-  StatusBar1.Panels[0].Text := 'Url Downloaded: ' + inttostr((FPageDownloadedBinTree.nodeCount));
-  StatusBar1.Panels[1].Text := 'Url to Download: ' + inttostr((FPageNotYetDownloadedBinTree.nodeCount));
+  MemoErrorMsg.Lines.Add('Error: ' + String(ErrorMessage));
+  StatusBar1.Panels[0].Text := 'Url Downloaded: ' + IntToStr((FPageDownloadedBinTree.nodeCount));
+  StatusBar1.Panels[1].Text := 'Url to Download: ' + IntToStr((FPageNotYetDownloadedBinTree.nodeCount));
   application.ProcessMessages;
   StopCrawling := not ButtonStop.Enabled;
 end;
@@ -272,7 +271,7 @@ begin
 
   {Stay in start site}
   If not CheckBoxStayInStartSite.Checked or
-     (ALlowercase(AlExtractHostNameFromUrl(trim(editURL2Crawl.Text))) = ALlowercase(AlExtractHostNameFromUrl(RedirectedTo))) then begin
+     (ALlowercase(AlExtractHostNameFromUrl(ALTrim(AnsiString(editURL2Crawl.Text)))) = ALlowercase(AlExtractHostNameFromUrl(RedirectedTo))) then begin
 
     {remove the anchor}
     RedirectedTo := AlRemoveAnchorFromUrl(RedirectedTo);
@@ -288,8 +287,8 @@ begin
   end;
 
   {update label}
-  StatusBar1.Panels[0].Text := 'Url Downloaded: ' + inttostr((FPageDownloadedBinTree.nodeCount));
-  StatusBar1.Panels[1].Text := 'Url to Download: ' + inttostr((FPageNotYetDownloadedBinTree.nodeCount));
+  StatusBar1.Panels[0].Text := 'Url Downloaded: ' + IntToStr((FPageDownloadedBinTree.nodeCount));
+  StatusBar1.Panels[1].Text := 'Url to Download: ' + IntToStr((FPageNotYetDownloadedBinTree.nodeCount));
   application.ProcessMessages;
   StopCrawling := not ButtonStop.Enabled;
 end;
@@ -325,15 +324,15 @@ begin
                       ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(HTTPResponseHeader.ContentType));
 
   {Get the FileName where to save the responseContent}
-  aFileName := GetNextLocalFileName(pMimeTypeFromData);
+  aFileName := GetNextLocalFileName(AnsiString(pMimeTypeFromData));
 
   {If html then add <!-- saved from '+ URL +' -->' at the top of the file}
-  If sametext(pMimeTypeFromData,'text/html') then begin
+  If ALSameText(AnsiString(pMimeTypeFromData),'text/html') then begin
     Str := '<!-- saved from '+ URL+' -->' +#13#10 + Str;
     AlSaveStringToFile(str,aFileName);
   end
   {Else Save the file without any change}
-  else TmemoryStream(HttpResponseContent).SaveToFile(aFileName);
+  else TmemoryStream(HttpResponseContent).SaveToFile(String(aFileName));
 
   {delete the Url from the PageNotYetDownloadedBinTree}
   FPageNotYetDownloadedBinTree.DeleteNode(Url);
@@ -345,8 +344,8 @@ begin
   If not FPageDownloadedBinTree.AddNode(aNode) then aNode.Free;
 
   {update label}
-  StatusBar1.Panels[0].Text := 'Url Downloaded: ' + inttostr((FPageDownloadedBinTree.nodeCount));
-  StatusBar1.Panels[1].Text := 'Url to Download: ' + inttostr((FPageNotYetDownloadedBinTree.nodeCount));
+  StatusBar1.Panels[0].Text := 'Url Downloaded: ' + IntToStr((FPageDownloadedBinTree.nodeCount));
+  StatusBar1.Panels[1].Text := 'Url to Download: ' + IntToStr((FPageNotYetDownloadedBinTree.nodeCount));
   application.ProcessMessages;
   StopCrawling := not ButtonStop.Enabled;
 end;
@@ -354,10 +353,10 @@ end;
 {**********************************************************}
 procedure TForm1.MainWebSpiderCrawlFindLink(Sender: TObject;
                                             HtmlTagString: AnsiString;
-                                            HtmlTagParams: TStrings;
+                                            HtmlTagParams: TALStrings;
                                             URL: AnsiString);
 Var aNode: TPageNotYetDownloadedBinTreeNode;
-    Lst: TstringList;
+    Lst: TALStringList;
     I: integer;
     Flag1 : Boolean;
     S1: AnsiString;
@@ -365,31 +364,31 @@ begin
   {If Check BoxDownload Image}
   IF not CheckBoxDownloadImage.Checked and
      (
-      sametext(HtmlTagString,'img') or
+      ALSameText(HtmlTagString,'img') or
       (
-       sametext(HtmlTagString,'input') and
-       sametext(Trim(HtmlTagParams.Values['type']),'image')
+       ALSameText(HtmlTagString,'input') and
+       ALSameText(ALTrim(HtmlTagParams.Values['type']),'image')
       )
      )
     then Exit;
 
   {Stay in start site}
   If CheckBoxStayInStartSite.Checked and
-     (ALlowercase(AlExtractHostNameFromUrl(trim(editURL2Crawl.Text))) <> ALlowercase(AlExtractHostNameFromUrl(Url))) then exit;
+     (ALlowercase(AlExtractHostNameFromUrl(ALTrim(AnsiString(editURL2Crawl.Text)))) <> ALlowercase(AlExtractHostNameFromUrl(Url))) then exit;
 
   {DeepLevel}
   If (UpDownMaxDeepLevel.Position >= 0) and (FCurrentDeepLevel + 1 > UpDownMaxDeepLevel.Position) then exit;
 
   {include link(s)}
   If EditIncludeLink.Text <> '' then begin
-    Lst := TstringList.Create;
+    Lst := TALStringList.Create;
     Try
-      Lst.Text := Trim(AlStringReplace(EditIncludeLink.Text,';',#13#10,[RfReplaceall]));
+      Lst.Text := ALTrim(AlStringReplace(AnsiString(EditIncludeLink.Text),';',#13#10,[RfReplaceall]));
       Flag1 := True;
       For i := 0 to Lst.Count - 1 do begin
-        S1 := Trim(Lst[i]);
+        S1 := ALTrim(Lst[i]);
         If S1 <> '' then begin
-          Flag1 := MatchesMask(URL, S1);
+          Flag1 := ALMatchesMask(URL, S1);
           If Flag1 then Break;
         end;
       end;
@@ -401,14 +400,14 @@ begin
 
   {Exclude link(s)}
   If EditExcludeLink.Text <> '' then begin
-    Lst := TstringList.Create;
+    Lst := TALStringList.Create;
     Try
-      Lst.Text := Trim(AlStringReplace(EditExcludeLink.Text,';',#13#10,[RfReplaceall]));
+      Lst.Text := ALTrim(AlStringReplace(AnsiString(EditExcludeLink.Text),';',#13#10,[RfReplaceall]));
       Flag1 := False;
       For i := 0 to Lst.Count - 1 do begin
-        S1 := Trim(Lst[i]);
+        S1 := ALTrim(Lst[i]);
         If S1 <> '' then begin
-          Flag1 := MatchesMask(URL, S1);
+          Flag1 := ALMatchesMask(URL, S1);
           If Flag1 then Break;
         end;
       end;
@@ -428,7 +427,7 @@ begin
     aNode.DeepLevel := FCurrentDeepLevel + 1;
     If not FPageNotYetDownloadedBinTree.AddNode(aNode) then aNode.Free
     else begin
-      StatusBar1.Panels[1].Text := 'Url to Download: ' + inttostr((FPageNotYetDownloadedBinTree.nodeCount));
+      StatusBar1.Panels[1].Text := 'Url to Download: ' + IntToStr((FPageNotYetDownloadedBinTree.nodeCount));
       application.ProcessMessages;
     end;
   end;
@@ -495,7 +494,7 @@ begin
     FCurrentDeepLevel := -1;
   end;
 
-  StatusBar2.Panels[0].Text := 'Downloading Url: ' + Url;
+  StatusBar2.Panels[0].Text := 'Downloading Url: ' + String(Url);
   Application.ProcessMessages;
   if not ButtonStop.Enabled then url := '';
 end;
@@ -503,7 +502,7 @@ end;
 {**************************************************************************}
 procedure TForm1.MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
                                                             HtmlTagString: AnsiString;
-                                                            HtmlTagParams: TStrings;
+                                                            HtmlTagParams: TALStrings;
                                                             URL: AnsiString;
                                                             var LocalPath: AnsiString);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
@@ -549,15 +548,15 @@ procedure TForm1.MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject;
   Function SplitPathMakeFilename: AnsiString;
   begin
     If FCurrentLocalFileNameIndex < 0 then result := ''
-    else If FCurrentLocalFileNameIndex = 0 then result := EditSaveDirectory.Text + 'Start.htm'
-    else Result := EditSaveDirectory.Text + inttostr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\' + inttostr(FCurrentLocalFileNameIndex) + '.htm';
+    else If FCurrentLocalFileNameIndex = 0 then result := AnsiString(EditSaveDirectory.Text + 'Start.htm')
+    else Result := AnsiString(EditSaveDirectory.Text + IntToStr((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\' + IntToStr(FCurrentLocalFileNameIndex) + '.htm');
     dec(FCurrentLocalFileNameIndex);
   end;
 
 Begin
   {Find FileName}
   FileName := SplitPathMakeFilename;
-  While (FileName <> '') and not fileExists(FileName) do
+  While (FileName <> '') and not fileExists(String(FileName)) do
     Filename := SplitPathMakeFilename;
 
   {if filename found}
@@ -565,7 +564,7 @@ Begin
 
     {Extract the Base Href}
     BaseHref := AlGetStringFromFile(FileName);
-    BaseHref := Trim(
+    BaseHref := ALTrim(
                      AlCopyStr(
                                BaseHref,
                                17,                        // '<!-- saved from ' + URL
@@ -577,7 +576,7 @@ Begin
   else BaseHref := '';
 
   {update label}
-  StatusBar2.Panels[0].Text := 'Update Href to Local path for file: ' + FileName;
+  StatusBar2.Panels[0].Text := 'Update Href to Local path for file: ' + String(FileName);
   application.ProcessMessages;
   if not ButtonStop.Enabled then begin
     FileName := '';
@@ -623,10 +622,11 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
 

@@ -61,6 +61,8 @@ var
 
 implementation
 
+uses AlFcnString;
+
 {$R *.dfm}
 
 {***************************************************}
@@ -69,7 +71,7 @@ begin
   if HostEdit.Text = '' then raise Exception.Create('Host cannot be empty')
   else begin
     if PortEdit.Text = '' then raise Exception.Create('Port cannot be empty')
-    else MemoDebug.Lines.Add(trim(FPOP3Client.Connect(HostEdit.Text, StrToInt(PortEdit.Text))));
+    else MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Connect(AnsiString(HostEdit.Text), StrToInt(PortEdit.Text)))));
   end;
 end;
 
@@ -78,7 +80,7 @@ procedure TForm1.DeleButtonClick(Sender: TObject);
 var P1: integer;
 begin
   if NumberEdit.Text = '' then raise Exception.Create('Number field must be filled');
-  if trystrtoint(NumberEdit.Text, P1) then MemoDebug.Lines.Add(trim(FPOP3Client.Dele(P1)))
+  if TryStrToInt(NumberEdit.Text, P1) then MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Dele(P1))))
   else raise Exception.Create('Number must be integer');
 end;
 
@@ -97,7 +99,7 @@ end;
 {************************************************}
 procedure TForm1.ListButtonClick(Sender: TObject);
 begin
-  MemoDebug.Lines.Add(trim(FPOP3Client.List));
+  MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.List)));
 end;
 
 {************************************************}
@@ -107,8 +109,8 @@ begin
   else begin
     if PasswordEdit.Text = '' then raise Exception.Create('Password cannot be empty')
     else begin
-      MemoDebug.Lines.Add(trim(FPOP3Client.User(UserNameEdit.Text)));
-      MemoDebug.Lines.Add(trim(FPOP3Client.Pass(PasswordEdit.Text)));
+      MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.User(AnsiString(UserNameEdit.Text)))));
+      MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Pass(AnsiString(PasswordEdit.Text)))));
     end;
   end;
 end;
@@ -116,7 +118,7 @@ end;
 {************************************************}
 procedure TForm1.QuitButtonClick(Sender: TObject);
 begin
-  MemoDebug.Lines.Add(trim(FPOP3Client.Quit));
+  MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Quit)));
 end;
 
 {************************************************}
@@ -124,26 +126,32 @@ procedure TForm1.RetrButtonClick(Sender: TObject);
 var P1: integer;
 begin
   if NumberEdit.Text = '' then raise Exception.Create('Number field must be filled');
-  if trystrtoint(NumberEdit.Text, P1) then MemoDebug.Lines.Add(trim(FPOP3Client.Retr(P1)))
+  if TryStrToInt(NumberEdit.Text, P1) then MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Retr(P1))))
   else raise Exception.Create('Number must be integer');
 end;
 
 {************************************************}
 procedure TForm1.RsetButtonClick(Sender: TObject);
 begin
-  MemoDebug.Lines.Add(Trim(FPOP3Client.Rset));
+  MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Rset)));
 end;
 
 {************************************************}
 procedure TForm1.StatButtonClick(Sender: TObject);
 begin
-  MemoDebug.Lines.Add(trim(FPOP3Client.Stat));
+  MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.Stat)));
 end;
 
 {************************************************}
 procedure TForm1.UIDLButtonClick(Sender: TObject);
 begin
-  MemoDebug.Lines.Add(trim(FPOP3Client.UIDL));
+  MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.UIDL)));
 end;
+
+initialization
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

@@ -215,23 +215,23 @@ Uses Math,
 {************************************}
 procedure TForm1.initHttpClientParams;
 Begin
-  HttpClientUserName := EditUserName.Text;
-  HttpClientPassword := EditPassword.Text;
+  HttpClientUserName := AnsiString(EditUserName.Text);
+  HttpClientPassword := AnsiString(EditPassword.Text);
 
-  HttpClientConnectTimeout := strtoint(EditConnectTimeout.Text);
-  HttpClientSendTimeout := strtoint(EditSendTimeout.Text);
-  HttpClientReceiveTimeout := strtoint(EditReceiveTimeout.Text);
+  HttpClientConnectTimeout := StrToInt(EditConnectTimeout.Text);
+  HttpClientSendTimeout := StrToInt(EditSendTimeout.Text);
+  HttpClientReceiveTimeout := StrToInt(EditReceiveTimeout.Text);
 
   if RadioButtonProtocolVersion1_0.Checked then HttpClientProtocolVersion := HTTPpv_1_0
   else HttpClientProtocolVersion := HTTPpv_1_1;
 
-  HttpClientUploadBufferSize := strtoint(EditBufferUploadSize.Text);
+  HttpClientUploadBufferSize := StrToInt(EditBufferUploadSize.Text);
 
-  HttpClientProxyServer := EdProxyServer.Text;
-  HttpClientProxyPort := strToInt(EdProxyPort.Text);
-  HttpClientProxyUserName := EdProxyUserName.Text;
-  HttpClientProxyPassword := EdProxyPassword.Text;
-  HttpClientProxyBypass := EdProxyBypass.Text;
+  HttpClientProxyServer := AnsiString(EdProxyServer.Text);
+  HttpClientProxyPort := StrToInt(EdProxyPort.Text);
+  HttpClientProxyUserName := AnsiString(EdProxyUserName.Text);
+  HttpClientProxyPassword := AnsiString(EdProxyPassword.Text);
+  HttpClientProxyBypass := AnsiString(EdProxyBypass.Text);
 
   if RadioButtonAccessType_NO_PROXY.Checked then HttpClientAccessType := wHttpAt_NO_PROXY
   else if RadioButtonAccessType_NAMED_PROXY.Checked then HttpClientAccessType := wHttpAt_NAMED_PROXY
@@ -249,7 +249,7 @@ Begin
   If CheckBoxInternetOption_KEEP_CONNECTION.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_KEEP_CONNECTION];
   If CheckBoxInternetOption_NO_AUTO_REDIRECT.checked then HttpClientInternetOptions := HttpClientInternetOptions + [wHttpIo_NO_AUTO_REDIRECT];
 
-  HttpClientRawHeaderText := MemoRequestRawHeader.Text;
+  HttpClientRawHeaderText := AnsiString(MemoRequestRawHeader.Text);
 end;
 
 {*******************************************************************************************************************************************}
@@ -267,50 +267,50 @@ end;
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems0GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if ToTalBytesRead > 107374182400 then aText := inttostr(round(ToTalBytesRead / 107374182400)) + ' GB'
-  else if ToTalBytesRead > 1048576 then aText := inttostr(round(ToTalBytesRead / 1048576)) + ' MB'
-  else if ToTalBytesRead > 1024 then aText := inttostr(round(ToTalBytesRead / 1024)) + ' KB';
+  if ToTalBytesRead > 107374182400 then aText := IntToStr(round(ToTalBytesRead / 107374182400)) + ' GB'
+  else if ToTalBytesRead > 1048576 then aText := IntToStr(round(ToTalBytesRead / 1048576)) + ' MB'
+  else if ToTalBytesRead > 1024 then aText := IntToStr(round(ToTalBytesRead / 1024)) + ' KB';
 end;
 
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems1GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if (TotalReceiveCount > 0) and (TotalReceiveTimeTaken > 0) then AText := inttostr(Round((totalBytesRead / 1024) /  ((TotalReceiveTimeTaken / 1000)))) + ' KB/s'
+  if (TotalReceiveCount > 0) and (TotalReceiveTimeTaken > 0) then AText := IntToStr(Round((totalBytesRead / 1024) /  ((TotalReceiveTimeTaken / 1000)))) + ' KB/s'
   else aText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems2GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if TotalDNSCount > 0 then AText := inttostr(Round(TotalDNSTimeTaken / TotalDNSCount)) + ' ms'
+  if TotalDNSCount > 0 then AText := IntToStr(Round(TotalDNSTimeTaken / TotalDNSCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems3GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if TotalReceiveCount > 0 then AText := inttostr(Round(TotalReceiveTimeTaken / TotalReceiveCount)) + ' ms'
+  if TotalReceiveCount > 0 then AText := IntToStr(Round(TotalReceiveTimeTaken / TotalReceiveCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems4GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if TotalSendCount > 0 then AText := inttostr(Round(TotalSendTimeTaken / TotalSendCount)) + ' ms'
+  if TotalSendCount > 0 then AText := IntToStr(Round(TotalSendTimeTaken / TotalSendCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems5GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if TotalWaitCount > 0 then AText := inttostr(Round(TotalWaitTimeTaken / TotalWaitCount)) + ' ms'
+  if TotalWaitCount > 0 then AText := IntToStr(Round(TotalWaitTimeTaken / TotalWaitCount)) + ' ms'
   else AText := '';
 end;
 
 {**************************************************************************************************************************************************************************************}
 procedure TForm1.TableViewThreadTcxGridDataControllerTcxDataSummaryFooterSummaryItems6GetText(Sender: TcxDataSummaryItem; const AValue: Variant; AIsFooter: Boolean; var AText: String);
 begin
-  if TotalConnectCount > 0 then AText := inttostr(Round(TotalConnectTimeTaken / TotalConnectCount)) + ' ms'
+  if TotalConnectCount > 0 then AText := IntToStr(Round(TotalConnectTimeTaken / TotalConnectCount)) + ' ms'
   else AText := '';
 end;
 
@@ -362,8 +362,8 @@ begin
 
       if not On then begin
         dec(NBActiveThread);
-        StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBActiveThread);
-        TableViewThread.DataController.SetValue(rank-1,TableViewThreadNumber.Index,inttostr(rank) + ' (off)');
+        StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
+        TableViewThread.DataController.SetValue(rank-1,TableViewThreadNumber.Index,ALIntToStr(rank) + ' (off)');
         if NBActiveThread = 0 then begin
           ButtonStart.Tag := 0;
           ButtonStart.Caption := 'Start';
@@ -387,7 +387,7 @@ begin
         aTotalRequestCount := 0;
         for I := 0 to TableViewThread.DataController.RecordCount - 1 do
           aTotalRequestCount := aTotalRequestCount + TableViewThread.DataController.GetValue(I,TableViewThreadRequestCount.Index);
-          StatusBar1.Panels[1].Text := inttostr(aTotalRequestCount) + ' Requests in ' + inttostr(round(aTimeElapsed / 1000)) + ' seconds (' + FormatFloat('0.##',aTotalRequestCount / (Max(aTimeElapsed,1) / 1000)) + ' Request/s | '+
+          StatusBar1.Panels[1].Text := IntToStr(aTotalRequestCount) + ' Requests in ' + IntToStr(round(aTimeElapsed / 1000)) + ' seconds (' + FormatFloat('0.##',aTotalRequestCount / (Max(aTimeElapsed,1) / 1000)) + ' Request/s | '+
                                        FormatFloat('0.##',((ToTalBytesRead / 1024) / (max(1,aTimeElapsed) / 1000)))+' KB/s)';
       end;
 
@@ -425,7 +425,7 @@ begin
     exit;
   end;
 
-  TableViewThread.DataController.RecordCount := strtoint(EditNbThread.Text);
+  TableViewThread.DataController.RecordCount := StrToInt(EditNbThread.Text);
   initHttpClientParams;
   NBActiveThread := 0;
   LastUpdateStatusBar := ALGetTickCount64;
@@ -443,23 +443,27 @@ begin
   TotalReceiveTimeTaken := 0;
 
   StatusBar1.Panels[1].Text := '';
-  for i := 1 to strtoint(EditNbThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,inttostr(i) + ' (on)');
+  for i := 1 to StrToInt(EditNbThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
     TableViewThread.DataController.SetValue(i-1,TableViewThreadRequestCount.Index,0);
     aStressHttpThread := TStressHttpThread.Create(True, i);
     aStressHttpThread.lstUrl.NameValueSeparator := #1;
     for J := 0 to MemoLstUrl.Lines.Count - 1 do
-      if trim(MemoLstUrl.Lines[j]) <> '' then
-        aStressHttpThread.LstUrl.Add(MemoLstUrl.Lines[j]);
-    aStressHttpThread.MaxHttpRequest := strtoint(EditMaxHttpRequest.Text);
+      if Trim(MemoLstUrl.Lines[j]) <> '' then
+        aStressHttpThread.LstUrl.Add(AnsiString(MemoLstUrl.Lines[j]));
+    aStressHttpThread.MaxHttpRequest := StrToInt(EditMaxHttpRequest.Text);
     aStressHttpThread.FreeOnTerminate := True;
     aStressHttpThread.DoLikeaSpider := CheckBoxDoLikeSpider.Checked;
-    aStressHttpThread.DelayBetweenEachCall := strtoint(EditSendDelayBetweenEachSend.text);
+    aStressHttpThread.DelayBetweenEachCall := StrToInt(EditSendDelayBetweenEachSend.text);
     aStressHttpThread.StopOnError := CheckBoxStopOnError.Checked;
     inc(NBActiveThread);
-    StatusBar1.Panels[0].Text := '# Threads: ' + inttostr(NBActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
     StatusBar1.Repaint;
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aStressHttpThread.Start;
+    {$ELSE}
     aStressHttpThread.Resume;
+    {$IFEND}
   end;
 end;
 
@@ -563,11 +567,11 @@ begin
           RequestHeader.RawHeaderText := Form1.HttpClientRawHeaderText;
         end;
 
-        aResponseContentStream:= TStringStream.create('');
+        aResponseContentStream:= TALStringStream.create('');
         aResponseContentHeader := TALHTTPResponseHeader.Create;
         try
           aHttpClient.Get(fUrl, aResponseContentStream, aResponseContentHeader);
-          aBody := TStringStream(aResponseContentStream).datastring;
+          aBody := TALStringStream(aResponseContentStream).datastring;
           FRequestStatus := aResponseContentHeader.StatusCode;
         finally
           aResponseContentStream.free;
@@ -628,7 +632,7 @@ begin
 
     Except
       on e: Exception do begin
-        FRequestStatus := E.message;
+        FRequestStatus := AnsiString(E.message);
         if StopOnError then Exit;
       end;
     end;
@@ -740,9 +744,10 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

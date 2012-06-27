@@ -1,6 +1,6 @@
-﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
-			<ProjectGuid>{C91E054E-876C-4EE7-B754-1A18A252FF50}</ProjectGuid>
+			<ProjectGuid>{55F6778B-8FE3-426E-8134-41E59C874684}</ProjectGuid>
 			<MainSource>POP3ClientDemo.dpr</MainSource>
 			<Base>True</Base>
 			<Config Condition="'$(Config)'==''">Debug</Config>

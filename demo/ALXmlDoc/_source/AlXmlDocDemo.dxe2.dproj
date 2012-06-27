@@ -78,13 +78,16 @@
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<DCC_RangeChecking>true</DCC_RangeChecking>
+			<DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="Unit1.pas">
+			<DCCReference Include="unit1.pas">
 				<Form>Form1</Form>
 			</DCCReference>
 			<BuildConfiguration Include="Debug">

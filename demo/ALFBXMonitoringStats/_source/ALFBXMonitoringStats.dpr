@@ -2,11 +2,13 @@ program ALFBXMonitoringStats;
 
 {$APPTYPE CONSOLE}
 
-uses classes,
+uses Windows,
+     classes,
      SysUtils,
      ALFbxBase,
      ALXmldoc,
      ALFcnString,
+     ALStringList,
      ALFBXClient;
 
 {$R *.res}
@@ -22,7 +24,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
     result := '';
     AParamName := AlLowerCase(AParamName) + ':';
     For i := 1 To paramCount do begin
-      ACurrParamStr := paramstr(i);
+      ACurrParamStr := AnsiString(paramstr(i));
       If AlPos(aParamName,AlLowerCase(ACurrParamStr)) = 1 then begin
         result := AlStringReplace(AlCopyStr(ACurrParamStr,
                                             AlPos(
@@ -45,7 +47,7 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
     result := False;
     AParamName := AlLowerCase(AParamName);
     For i := 1 To paramCount do begin
-      result := Sametext(aParamName,AlLowerCase(paramstr(i)));
+      result := ALSameText(aParamName,AlLowerCase(AnsiString(paramstr(i))));
       if result then break;
     end;
   end;
@@ -54,19 +56,19 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
   function InternalRightPad(aStr: AnsiString; aPadSize : integer): AnsiString;
   var RestLen: Integer;
   begin
-    Result := trim(aStr);
+    Result := ALTrim(aStr);
     RestLen := aPadSize - Length(Result);
     if RestLen < 1 then Exit;
-    Result := Result + StringOfChar(' ', RestLen);
+    Result := Result + StringOfChar(AnsiChar(' '), RestLen);
   end;
 
   {----------------------------------------------------------}
   function InternalFormatNumber(aStr: AnsiString): AnsiString;
   var aInt: Int64;
   begin
-    aInt := strtoint64(aStr);
-    if aInt >= 1000000 then result := formatfloat('0.0M', aInt / 1000000)
-    else if aInt >= 1000 then result := formatfloat('0K', aInt / 1000)
+    aInt := ALStrToInt64(aStr);
+    if aInt >= 1000000 then result := ALformatfloat('0.0M', aInt / 1000000, AlDefaultFormatSettings)
+    else if aInt >= 1000 then result := ALformatfloat('0K', aInt / 1000, AlDefaultFormatSettings)
     else result := astr;
   end;
 
@@ -83,14 +85,14 @@ Procedure ALFBXMonitoringStats_StartMainProcess;
 var aFbxClient: TalFbxClient;
     aXmlData: TalXmlDocument;
     aXmlRec: TalXmlNode;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     aFbClientdllPath: AnsiString;
-    AlstSQL: TstringList;
+    AlstSQL: TALStringList;
     i, j: integer;
     S1: AnsiString;
 Begin
 
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
 
   if (InternalExtractParamFileName('-database') = '') or
      (InternalExtractParamFileName('-user') = '') or
@@ -116,7 +118,7 @@ Begin
     writeln('');
 
     //write the number of active transactions
-    Writeln('Number of active transactions: ' + inttostr(aFbxClient.GetDataBaseInfoint(isc_info_active_tran_count)));
+    Writeln('Number of active transactions: ' + ALIntToStr(aFbxClient.GetDataBaseInfoint(isc_info_active_tran_count)));
 
 
     //download some statistiques
@@ -139,7 +141,7 @@ Begin
                               aXmlData.DocumentElement,
                               aFormatSettings);
 
-        AlstSQL := TstringList.create;
+        AlstSQL := TALStringList.create;
         try
 
           AlstSQL.Sorted := True;
@@ -161,7 +163,7 @@ Begin
             S1 := AlStringReplace(S1, #9, ' ', [rfReplaceALL]);
             while AlPos('  ', S1) > 0 do S1 := AlStringReplace(S1, '  ', ' ', [rfReplaceALL]);
             if length(S1) > 220 then S1 := AlCopyStr(S1, 1, 217) + '...';
-            Writeln(InternalRightPad(inttostr(integer(AlstSQL.Objects[i])),5) + ' ' +
+            Writeln(InternalRightPad(ALIntToStr(integer(AlstSQL.Objects[i])),5) + ' ' +
                     InternalRightPad(S1,220));
           end;
 
@@ -204,8 +206,8 @@ Begin
                               aXmlData.DocumentElement,
                               aFormatSettings);
 
-        Writeln('Number of Users: ' + inttostr(aXmlData.DocumentElement.ChildNodes.Count));
-        Writeln('Number of Active Users: ' + inttostr(InternalGetActiveUsers(aXmlData)));
+        Writeln('Number of Users: ' + ALIntToStr(aXmlData.DocumentElement.ChildNodes.Count));
+        Writeln('Number of Active Users: ' + ALIntToStr(InternalGetActiveUsers(aXmlData)));
         Writeln('');
 
         WRITELN(INTERNALRIGHTPAD('USER', 15) + ' ' +
@@ -233,11 +235,11 @@ Begin
                   InternalRightPad(axmlrec.childnodes['mon$state'].text,5) + ' ' +
                   InternalRightPad(axmlrec.childnodes['mon$remote_address'].text,15) + ' ' +
                   InternalRightPad(axmlrec.childnodes['mon$timestamp'].text,22) + ' ' +
-                  InternalRightPad(ExtractFileName(axmlrec.childnodes['mon$remote_process'].text), 25) + ' ' +
-                  InternalRightPad(Formatfloat('0.00', strtoint(axmlrec.childnodes['mon$memory_used'].text) / 1024 / 1024),6) + ' ' +
-                  InternalRightPad(Formatfloat('0.00', strtoint(axmlrec.childnodes['mon$memory_allocated'].text) / 1024 / 1024),11) + ' ' +
-                  InternalRightPad(Formatfloat('0.00', strtoint(axmlrec.childnodes['mon$max_memory_used'].text) / 1024 / 1024),10) + ' ' +
-                  InternalRightPad(Formatfloat('0.00', strtoint(axmlrec.childnodes['mon$max_memory_allocated'].text) / 1024 / 1024),15) + ' ' +
+                  InternalRightPad(ALExtractFileName(axmlrec.childnodes['mon$remote_process'].text), 25) + ' ' +
+                  InternalRightPad(ALFormatfloat('0.00', ALStrToInt(axmlrec.childnodes['mon$memory_used'].text) / 1024 / 1024, ALDefaultFormatSettings),6) + ' ' +
+                  InternalRightPad(ALFormatfloat('0.00', ALStrToInt(axmlrec.childnodes['mon$memory_allocated'].text) / 1024 / 1024, ALDefaultFormatSettings),11) + ' ' +
+                  InternalRightPad(ALFormatfloat('0.00', ALStrToInt(axmlrec.childnodes['mon$max_memory_used'].text) / 1024 / 1024, ALDefaultFormatSettings),10) + ' ' +
+                  InternalRightPad(ALFormatfloat('0.00', ALStrToInt(axmlrec.childnodes['mon$max_memory_allocated'].text) / 1024 / 1024, ALDefaultFormatSettings),15) + ' ' +
                   InternalRightPad(InternalFormatNumber(axmlrec.childnodes['mon$page_reads'].text),7) + ' ' +
                   InternalRightPad(InternalFormatNumber(axmlrec.childnodes['mon$page_writes'].text),8) + ' ' +
                   InternalRightPad(InternalFormatNumber(axmlrec.childnodes['mon$page_fetches'].text),9) + ' ' +
@@ -282,6 +284,11 @@ Begin
 End;
 
 begin
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
+
   try
     ALFBXMonitoringStats_StartMainProcess;
   except

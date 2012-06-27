@@ -65,6 +65,7 @@ object Form1: TForm1
       Width = 116
       Height = 21
       TabOrder = 0
+      Text = 'alcinoe.alcinoe@yahoo.com'
     end
     object PasswordEdit: TEdit
       Left = 138
@@ -72,6 +73,7 @@ object Form1: TForm1
       Width = 114
       Height = 21
       TabOrder = 1
+      Text = 'alcinoe2012'
     end
     object LoginButton: TButton
       Left = 258

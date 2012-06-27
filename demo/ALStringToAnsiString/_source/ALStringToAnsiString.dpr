@@ -3,6 +3,7 @@ program ALStringToAnsiString;
 {$APPTYPE CONSOLE}
 
 uses
+  Windows,
   Masks,
   SysUtils,
   AlFcnFile,
@@ -66,8 +67,7 @@ begin
             (i <= length(aLowerCaseBodyStr) - Length(aOldVarType)) and
             (aLowerCaseBodyStr[i] = aOldVarType[1]) and
             (aLowerCaseBodyStr[i+1] = aOldVarType[2]) and
-            (aLowerCaseBodyStr[i+2] = aOldVarType[3]) and
-            (aLowerCaseBodyStr[i+3] = aOldVarType[4]) and  // "char" is the min for aOldVarType and contain only 4 char             
+            (aLowerCaseBodyStr[i+2] = aOldVarType[3]) and // "char" is the min for aOldVarType and contain only 4 char
             (ALPosEx(aOldVarType, aLowerCaseBodyStr, i) = i) and
             (not (aLowerCaseBodyStr[i - 1] in aRestrictedsymbols)) and
             (not (aLowerCaseBodyStr[i + Length(aOldVarType)] in aRestrictedsymbols)) then begin
@@ -93,33 +93,99 @@ var aFileStr: AnsiString;
     aSR: TSearchRec;
 
 begin
-  Directory := ALMakeGoodEndPath(Directory);
-  BackupDir := ALMakeGoodEndPath(BackupDir);
-  if FindFirst(Directory + '*', faAnyFile	, aSR) = 0 then begin
+  Directory := ALIncludeTrailingPathDelimiter(Directory);
+  BackupDir := ALIncludeTrailingPathDelimiter(BackupDir);
+  if FindFirst(String(Directory) + '*', faAnyFile	, aSR) = 0 then begin
     Try
       repeat
         If (aSR.Name <> '.') and (aSR.Name <> '..') Then Begin
           If ((aSR.Attr and faDirectory) <> 0) then begin
             If SubDirectory then begin
-              createDir(BackupDir + aSR.Name);
-              ALStringToAnsiString_UpdateFiles(Directory + aSR.Name,
-                                                  True,
-                                                  BackupDir + aSR.Name,
-                                                  fileNameMask);
+              createDir(String(BackupDir) + aSR.Name);
+              ALStringToAnsiString_UpdateFiles(Directory + AnsiString(aSR.Name),
+                                               True,
+                                               BackupDir + AnsiString(aSR.Name),
+                                               fileNameMask);
             end;
           end
           else If ((FileNameMask = '*') or
-                   MatchesMask(aSR.Name, FileNameMask)) then begin
+                   ALMatchesMask(AnsiString(aSR.Name), FileNameMask)) then begin
 
-            Writeln(Directory + aSR.Name);
-            aFileStr := AlGetStringFromfile(Directory + aSR.Name);
-            AlSaveStringTofile(aFileStr, BackupDir + aSR.Name);
+            Writeln(Directory + AnsiString(aSR.Name));
+            aFileStr := AlGetStringFromfile(Directory + AnsiString(aSR.Name));
+            AlSaveStringTofile(aFileStr, BackupDir + AnsiString(aSR.Name));
 
-            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'string', 'AnsiString');
-            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'char',   'AnsiChar');
-            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'PChar',  'PAnsiChar');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'String', 'AnsiString');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Char', 'AnsiChar');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'PChar', 'PAnsiChar');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TStrings', 'TALStrings');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TStringList', 'TALStringList');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TStringStream', 'TALStringStream');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'CHR', 'AnsiChar');
 
-            AlSaveStringTofile(aFileStr, Directory + aSR.Name);
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'AnsiDequotedStr', 'ALDequotedStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'AnsiQuotedStr', 'ALQuotedStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'CompareStr', 'ALCompareStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'CompareText', 'ALCompareText');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Copy', 'ALCopyStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'CurrToStr', 'ALCurrToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'DateTimeToStr', 'ALDateTimeToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'DateToStr', 'ALDateToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExtractFileDir', 'ALExtractFileDir');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExtractFileDrive', 'ALExtractFileDrive');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExtractFileExt', 'ALExtractFileExt');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExtractFileName', 'ALExtractFileName');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExtractFilePath', 'ALExtractFilePath');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExtractQuotedStr', 'ALExtractQuotedStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FloatToStr', 'ALFloatToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Format', 'ALFormat');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'GetLocaleFormatSettings', 'ALGetLocaleFormatSettings');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'IfThen', 'ALIfThen');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'IntToHex', 'ALIntToHex');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'IntToStr', 'ALIntToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'LastDelimiter', 'ALLastDelimiter');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'LowerCase', 'ALLowerCase');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Move', 'ALMove');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Pos', 'ALPos');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'PosEx', 'ALPosEx');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'QuotedStr', 'ALQuotedStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'SameStr', 'ALSameStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'SameText', 'ALSameText');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StringReplace', 'ALStringReplace');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToCurr', 'ALStrToCurr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToCurrDef', 'ALStrToCurrDef');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToDate', 'ALStrToDate');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToDateTime', 'ALStrToDateTime');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToFloat', 'ALStrToFloat');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToFloatDef', 'ALStrToFloatDef');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToInt', 'ALStrToInt');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToInt64', 'ALStrToInt64');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToTime', 'ALStrToTime');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TimeToStr', 'ALTimeToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Trim', 'ALTrim');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TrimLeft', 'ALTrimLeft');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TrimRight', 'ALTrimRight');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToCurr', 'ALTryStrToCurr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToDate', 'ALTryStrToDate');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToDateTime', 'ALTryStrToDateTime');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToFloat', 'ALTryStrToFloat');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToInt', 'ALTryStrToInt');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToInt64', 'ALTryStrToInt64');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TryStrToTime', 'ALTryStrToTime');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'UIntToStr', 'ALUIntToStr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'UpperCase', 'ALUpperCase');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatDateTime', 'ALFormatDateTime');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'IsPathDelimiter', 'ALIsPathDelimiter');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'IncludeTrailingPathDelimiter', 'ALIncludeTrailingPathDelimiter');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ExcludeTrailingPathDelimiter', 'ALExcludeTrailingPathDelimiter');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'ALMakeGoodEndPath', 'ALIncludeTrailingPathDelimiter');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'MatchesMask', 'ALMatchesMask');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TFormatSettings', 'TALFormatSettings');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatFloat', 'ALFormatFloat');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatCurr', 'ALFormatFloat');
+
+
+            AlSaveStringTofile(aFileStr, Directory + AnsiString(aSR.Name));
 
           end;
         end;
@@ -139,7 +205,7 @@ Begin
   result := '';
   AParamName := AlLowerCase(AParamName) + ':';
   For i := 1 To paramCount do begin
-    ACurrParamStr := paramstr(i);
+    ACurrParamStr := AnsiString(paramstr(i));
     If AlPos(aParamName,AlLowerCase(ACurrParamStr)) = 1 then begin
       result := AlStringReplace(AlCopyStr(ACurrParamStr,
                                           AlPos(':', ACurrParamStr) + 1,
@@ -159,20 +225,25 @@ var aDirectory: ansiString;
 
 begin
 
+  {$IFDEF DEBUG}
+  ReportMemoryleaksOnSHutdown := True;
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
+
   try
 
     aDirectory := ALStringToAnsiString_ExtractParamValue('Directory');
     aSubDirectory := ALStringToAnsiString_ExtractParamValue('SubDirectory') = '1';
     aFileNameMask := ALStringToAnsiString_ExtractParamValue('FileNameMask');
-    aBackupDir := AlGetModulePath + 'backup_'+FormatDateTime('yyyy.mm.dd.hh.nn.ss', now) +'\';
-    createdir(aBackupDir);
+    aBackupDir := AlGetModulePath + 'backup_'+ALFormatDateTime('yyyy.mm.dd.hh.nn.ss', now, AlDefaultFormatSettings) +'\';
+    createdir(String(aBackupDir));
 
     if (aDirectory = '') or
-       (aFileNameMask = '')  then raise Exception.Create('Wrong command line, it''s must look like ALStringToAnsiString.exe directory:c:\sample\ SubDirectory:1 FileNameMask:*.pas');
+       (aFileNameMask = '') then raise Exception.Create('Wrong command line, it''s must look like ALStringToAnsiString.exe directory:c:\sample\ SubDirectory:1 FileNameMask:*.pas');
     ALStringToAnsiString_UpdateFiles(aDirectory,
-                                        aSubDirectory,
-                                        aBackupDir,
-                                        aFileNameMask);
+                                     aSubDirectory,
+                                     aBackupDir,
+                                     aFileNameMask);
   except
     on E: Exception do
       Writeln(E.Message);

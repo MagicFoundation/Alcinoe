@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 242
   ClientWidth = 348
-  Color = 14805482
+  Color = 15986666
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -46,7 +46,6 @@ object Form1: TForm1
     Top = 32
     Width = 145
     Height = 22
-    ItemHeight = 14
     TabOrder = 0
     Text = 'ComboBox1'
     Items.Strings = (
@@ -63,7 +62,6 @@ object Form1: TForm1
     Width = 145
     Height = 22
     OnPaint = ALComboBox1Paint
-    ItemHeight = 14
     TabOrder = 1
     Items.Strings = (
       '1'

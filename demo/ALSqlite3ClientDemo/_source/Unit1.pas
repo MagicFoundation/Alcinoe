@@ -108,29 +108,29 @@ Var aSqlite3Client: TalSqlite3Client;
     aEndDate: int64;
     aStartCommitDate: int64;
     aEndCommitDate: int64;
-    LstSql: TstringList;
+    LstSql: TALStringList;
     S1: AnsiString;
     i: integer;
 begin
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
-    LstSql := TstringList.Create;
+    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
+    LstSql := TALStringList.Create;
     Try
 
       //enable or disable the shared cache
       aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(ALEditSqlite3Database.text);
+      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
       aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
       aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
       aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
         1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
@@ -153,15 +153,15 @@ begin
       end;
 
       //the sql
-      S1 := AlMemoSQLite3Query.Lines.Text;
+      S1 := AnsiString(AlMemoSQLite3Query.Lines.Text);
       while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-      while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
+      while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',ALIntToStr(random(10)),[rfIgnoreCase]);
       for i := 1 to maxint do begin
-        if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
+        if AlPos('<#randomnumber'+ALIntToStr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+ALIntToStr(i)+'>',ALIntToStr(random(10)),[rfIgnoreCase, rfReplaceAll])
         else break;
       end;
       S1 := AlStringReplace(S1,#13#10,' ',[RfReplaceALL]);
-      LstSql.Text := Trim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
+      LstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
 
       //do the job
       aStartDate := ALGetTickCount64;
@@ -178,8 +178,8 @@ begin
       end;
 
       ALMemoResult.Lines.clear;
-      ALMemoResult.Lines.add('Time Taken to Update the data: ' + inttostr(aEndDate - aStartDate) + ' ms');
-      ALMemoResult.Lines.add('Time Taken to commit the modifications: ' + inttostr(aendCommitDate - aStartCommitDate) + ' ms');
+      ALMemoResult.Lines.add('Time Taken to Update the data: ' + IntToStr(aEndDate - aStartDate) + ' ms');
+      ALMemoResult.Lines.add('Time Taken to commit the modifications: ' + IntToStr(aendCommitDate - aStartCommitDate) + ' ms');
 
     Finally
       aSqlite3Client.disconnect;
@@ -198,29 +198,29 @@ Var aSqlite3Client: TalSqlite3Client;
     aXMLDATA: TalXmlDocument;
     aStartDate: int64;
     aEndDate: int64;
-    aFormatSettings: TformatSettings;
+    aFormatSettings: TALFormatSettings;
     S1: AnsiString;
     i: integer;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, aFormatSettings);
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
+    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
     Try
 
       //enable or disable the shared cache
       aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(ALEditSqlite3Database.text);
+      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
       aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
       aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
       aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
         1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
@@ -251,11 +251,11 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        S1 := AlMemoSQLite3Query.Lines.Text;
+        S1 := AnsiString(AlMemoSQLite3Query.Lines.Text);
         while AlPos('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomchar>',AlRandomStr(1),[rfIgnoreCase]);
-        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',inttostr(random(10)),[rfIgnoreCase]);
+        while AlPos('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := AlStringReplace(S1, '<#randomnumber>',ALIntToStr(random(10)),[rfIgnoreCase]);
         for i := 1 to maxint do begin
-          if AlPos('<#randomnumber'+inttostr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+inttostr(i)+'>',inttostr(random(10)),[rfIgnoreCase, rfReplaceAll])
+          if AlPos('<#randomnumber'+ALIntToStr(i)+'>', AlLowerCase(S1)) > 0 then S1 := AlStringReplace(S1, '<#randomnumber'+ALIntToStr(i)+'>',ALIntToStr(random(10)),[rfIgnoreCase, rfReplaceAll])
           else break;
         end;
 
@@ -268,9 +268,9 @@ begin
                                   aFormatSettings);
         aEndDate := ALGetTickCount64;
 
-        ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + inttostr(aEndDate - aStartDate) + ' ms' + #13#10 +
+        ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + IntToStr(aEndDate - aStartDate) + ' ms' + #13#10 +
                                    #13#10 +
-                                   trim (aXMLDATA.XML.Text);
+                                   String(ALTrim(aXMLDATA.XML.Text));
 
       Finally
         aXMLDATA.free;
@@ -295,21 +295,21 @@ begin
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(ALEditSqlite3lib.Text);
+    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
     Try
 
       //enable or disable the shared cache
       aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(ALEditSqlite3Database.text);
+      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+ALEditSqlite3Page_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
       aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
       aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
       aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+ALEditSqlite3Cache_Size.Text);
+      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
         0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
         1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
@@ -337,7 +337,7 @@ begin
       aEndDate := ALGetTickCount64;
 
       ALMemoResult.Lines.clear;
-      ALMemoResult.Lines.add('Time Taken to VACUUM the database: ' + inttostr(aEndDate - aStartDate) + ' ms');
+      ALMemoResult.Lines.add('Time Taken to VACUUM the database: ' + IntToStr(aEndDate - aStartDate) + ' ms');
 
     Finally
       aSqlite3Client.disconnect;
@@ -386,10 +386,11 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
 

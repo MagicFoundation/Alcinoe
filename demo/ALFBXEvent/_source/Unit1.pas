@@ -68,7 +68,8 @@ var
 
 implementation
 
-uses ALFcnSkin,
+uses ALFcnString,
+     ALFcnSkin,
      ALFbxBase;
 
 {$R *.dfm}
@@ -77,6 +78,8 @@ uses ALFcnSkin,
 procedure TForm1.ALButton1Click(Sender: TObject);
 var aFBAPiVersion: TALFBXVersion_API;
 begin
+  if Trim(ALMemoFireBirdEventName.text) = '' then raise Exception.Create('You must listen at least one event!');
+
   if assigned(fEventThread) then exit;
 
   case ALComboBoxFirebirdapiVer.ItemIndex of
@@ -87,15 +90,15 @@ begin
     else aFBAPiVersion := FB102;
   end;
 
-  fEventThread := TMyEventThread.Create(ALEditFirebirdDatabase.text,
-                                        ALEditFirebirdLogin.text,
-                                        ALEditFirebirdPassword.text,
-                                        ALEditFirebirdCharset.text,
-                                        StringReplace(Trim(ALMemoFireBirdEventName.lines.text),#13#10,';',[RfReplaceALL]),
+  fEventThread := TMyEventThread.Create(AnsiString(ALEditFirebirdDatabase.text),
+                                        AnsiString(ALEditFirebirdLogin.text),
+                                        AnsiString(ALEditFirebirdPassword.text),
+                                        AnsiString(ALEditFirebirdCharset.text),
+                                        ALStringReplace(ALTrim(AnsiString(ALMemoFireBirdEventName.lines.text)),#13#10,';',[RfReplaceALL]),
                                         aFBAPiVersion,
-                                        ALEditFirebirdLib.text,
+                                        AnsiString(ALEditFirebirdLib.text),
                                         -1,
-                                        StrtoInt(ALEditFireBirdNum_buffers.text),
+                                        StrToInt(ALEditFireBirdNum_buffers.text),
                                         '');
 end;
 
@@ -107,16 +110,10 @@ begin
   fEventThread := nil;
 end;
 
-
-
-//////////////////////////
-///// TMyEventThread /////
-//////////////////////////
-
 {*****************************************}
 procedure TMyEventThread.UpdateMemoResults;
 begin
-  Form1.ALMemoResult.Lines.Add(fMsg);
+  Form1.ALMemoResult.Lines.Add(string(fMsg));
 end;
 
 {************************************************************************}
@@ -129,15 +126,9 @@ end;
 {*****************************************************}
 procedure TMyEventThread.DoException(Error: Exception);
 begin
-  FMsg := 'Error detected: ' + Error.Message;
+  FMsg := 'Error detected: ' + AnsiString(Error.Message);
   synchronize(UpdateMemoResults);
 end;
-
-
-
-//////////////////
-///// DESIGN /////
-//////////////////
 
 {*************************************************************}
 procedure TForm1.ALEditFirebirdLibButtonClick(Sender: TObject);
@@ -219,9 +210,10 @@ begin
   sleep(500);
 end;
 
-{$IFDEF DEBUG}
 initialization
+  {$IFDEF DEBUG}
   ReportMemoryleaksOnSHutdown := True;
-{$ENDIF}
+  {$ENDIF}
+  SetMultiByteConversionCodePage(CP_UTF8);
 
 end.

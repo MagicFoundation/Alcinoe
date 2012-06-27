@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 562
   ClientWidth = 698
-  Color = clBtnFace
+  Color = 15986666
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -159,7 +159,6 @@ object Form1: TForm1
     Height = 21
     OnPaint = ALComboBoxPaint
     Style = csDropDownList
-    ItemHeight = 13
     ItemIndex = 0
     TabOrder = 0
     Text = 'FB102'

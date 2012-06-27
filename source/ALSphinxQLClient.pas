@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALSphinxQLClient
-Version:      3.53
+Version:      4.00
 
 Description:  An Object to query Sphinx full text search engine using
               SphinxQL protocol (MySql Clone Protocol)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        
 
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALSphinxQLClient;
 
@@ -60,13 +60,12 @@ interface
 uses AlMySqlClient,
      ALMySqlWrapper;
 
-
 Type
 
   {---------------------------------------}
   TalSphinxQlClient = Class(TalMySqlClient)
   Public
-    Procedure Connect(Host: String;
+    Procedure Connect(Host: AnsiString;
                       Port: integer;
                       Const Options: TALMySQLOptions = nil); reintroduce;
   end;
@@ -75,12 +74,12 @@ Type
   TalSphinxQlConnectionPoolClient = Class(TalMySqlConnectionPoolClient)
   Private
   Public
-    Constructor Create(aHost: String;
+    Constructor Create(aHost: AnsiString;
                        aPort: integer;
                        aApiVer: TALMySqlVersion_API;
-                       const alib: String = 'libmysql.dll';
+                       const alib: AnsiString = 'libmysql.dll';
                        const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
-    Constructor Create(aHost: String;
+    Constructor Create(aHost: AnsiString;
                        aPort: integer;
                        alib: TALMySqlLibrary;
                        const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
@@ -89,8 +88,8 @@ Type
 
 implementation
 
-{***********************************************}
-procedure TalSphinxQlClient.Connect(Host: String;
+{***************************************************}
+procedure TalSphinxQlClient.Connect(Host: AnsiString;
                                     Port: integer;
                                     Const Options: TALMySQLOptions = nil);
 begin
@@ -106,11 +105,11 @@ begin
 
 end;
 
-{***************************************************************}
-constructor TalSphinxQlConnectionPoolClient.Create(aHost: String;
+{*******************************************************************}
+constructor TalSphinxQlConnectionPoolClient.Create(aHost: AnsiString;
                                                    aPort: integer;
                                                    aApiVer: TALMySqlVersion_API;
-                                                   const alib: String = 'libmysql.dll';
+                                                   const alib: AnsiString = 'libmysql.dll';
                                                    const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
 
@@ -128,8 +127,8 @@ begin
 
 end;
 
-{***************************************************************}
-constructor TalSphinxQlConnectionPoolClient.Create(aHost: String;
+{*******************************************************************}
+constructor TalSphinxQlConnectionPoolClient.Create(aHost: AnsiString;
                                                    aPort: integer;
                                                    alib: TALMySqlLibrary;
                                                    const aOpenConnectionOptions: TALMySQLOptions = nil);

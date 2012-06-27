@@ -5,13 +5,13 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALMultiPartMixedParser
-Version:      3.50
+Version:      4.00
 
 Description:  MultiPart Mixed objects to encode or decode stream in
               mime multipart/mixed format. the best way to add some
               Attachments to any email or news content.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -46,6 +46,7 @@ Know bug :
 
 History :			14/06/2007: fixe TAlMultiPartMixedStream.AddInlineText %s in text bug by Daniel Bauten
               06/11/2007: REbuild the architecture to add a base class
+              26/06/2012: Add xe2 support
 
 Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cdosys/html/7a18a98b-3a18-45b2-83a9-28a8f4099970.asp
               http://www.ietf.org/rfc/rfc2646.txt
@@ -54,7 +55,7 @@ Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/c
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMultiPartMixedParser;
 
@@ -99,7 +100,7 @@ type
   private
     function GetAttachment: Boolean;
   public
-    procedure LoadDataFromFileAsAttachmentBase64Encode(aFileName: string); virtual;
+    procedure LoadDataFromFileAsAttachmentBase64Encode(aFileName: AnsiString); virtual;
     Property  IsAttachment: Boolean read GetAttachment;
   end;
 
@@ -122,9 +123,9 @@ type
   TAlMultiPartMixedStream = class(TAlMultiPartBaseStream)
   private
   public
-    procedure AddInlineTextBase64Encode(aContentType, aText: string);
-    procedure AddAttachmentBase64Encode(aFileName, aContentType: string; aFileData: TStream); overload;
-    procedure AddAttachmentBase64Encode(aFileName: String); overload;
+    procedure AddInlineTextBase64Encode(aContentType, aText: AnsiString);
+    procedure AddAttachmentBase64Encode(aFileName, aContentType: AnsiString; aFileData: TStream); overload;
+    procedure AddAttachmentBase64Encode(aFileName: AnsiString); overload;
     procedure AddContent(aContent: TALMultiPartMixedContent); reintroduce;
   end;
 
@@ -135,7 +136,7 @@ type
     Function CreateDataStream: TAlMultiPartBaseStream; override;
     function GetDataStream: TAlMultiPartMixedStream; reintroduce;
   public
-    procedure Encode(aInlineText, aInlineTextContentType: String; aAttachments: TALMultiPartMixedContents); overload;
+    procedure Encode(aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents); overload;
     property  DataStream: TAlMultiPartMixedStream read GetDataStream;
   end;
 
@@ -152,23 +153,20 @@ type
 
 implementation
 
-uses AlFcnString;
-
-///////////////////////////////////////////////////////////////
-//////////  TALMultiPartMixedContent //////////////////////////
-///////////////////////////////////////////////////////////////
+uses AlFcnString,
+     ALStringList;
 
 {*******************************************************}
 function TALMultiPartMixedContent.GetAttachment: Boolean;
-Var Lst: TstringList;
+Var Lst: TALStringList;
     i: integer;
 begin
   Result := False;
-  Lst := TstringList.Create;
+  Lst := TALStringList.Create;
   Try
     Lst.Text := AlStringReplace(ContentDisposition,';',#13#10,[RfReplaceAll]);
     For i := 0 to Lst.Count - 1 do
-      If AlLowerCase(Trim(Lst[i])) = 'attachment' then begin
+      If AlLowerCase(ALTrim(Lst[i])) = 'attachment' then begin
         Result := True;
         Break;
       end;
@@ -177,23 +175,16 @@ begin
   end;
 end;
 
-{*********************************************************************************************}
-procedure TALMultiPartMixedContent.LoadDataFromFileAsAttachmentBase64Encode(aFileName: string);
+{*************************************************************************************************}
+procedure TALMultiPartMixedContent.LoadDataFromFileAsAttachmentBase64Encode(aFileName: AnsiString);
 begin
   LoadDataFromFileBase64Encode(aFileName);
-  aFileName := ExtractFileName(aFileName);
+  aFileName := ALExtractFileName(aFileName);
   ContentType := ContentType + '; name="'+aFileName+'"';
   ContentDisposition := 'attachment; filename="'+aFileName+'"';
 end;
 
-
-
-
-///////////////////////////////////////////////////////////////
-//////////  TALMultiPartMixedContents  ////////////////////////
-///////////////////////////////////////////////////////////////
-
-{*********************************************************************************}
+{**********************************************************************************}
 function TALMultiPartMixedContents.Add(AObject: TALMultiPartMixedContent): Integer;
 begin
   Result := inherited Add(AObject);
@@ -241,21 +232,14 @@ begin
   inherited Items[Index] := AObject;
 end;
 
-
-
-
-//////////////////////////////////////////////
-////////// TAlMultiPartMixedStream ///////////
-//////////////////////////////////////////////
-
-{***************************************************************************************************************}
-procedure TAlMultiPartMixedStream.AddAttachmentBase64Encode(aFileName, aContentType: string; aFileData: TStream);
+{*******************************************************************************************************************}
+procedure TAlMultiPartMixedStream.AddAttachmentBase64Encode(aFileName, aContentType: AnsiString; aFileData: TStream);
 Var aContent: TALMultiPartMixedContent;
 begin
   aContent := TALMultiPartMixedContent.Create;
   Try
     aContent.LoadDataFromStreamBase64Encode(aFileData);
-    aFileName := ExtractFileName(aFileName);
+    aFileName := ALExtractFileName(aFileName);
     aContent.ContentType := aContentType + '; name="'+aFileName+'"';
     aContent.ContentDisposition := 'attachment; filename="'+aFileName+'"';
     AddContent(aContent);
@@ -264,8 +248,8 @@ begin
   end;
 end;
 
-{*****************************************************************************}
-procedure TAlMultiPartMixedStream.AddAttachmentBase64Encode(aFileName: string);
+{*********************************************************************************}
+procedure TAlMultiPartMixedStream.AddAttachmentBase64Encode(aFileName: AnsiString);
 Var aContent: TALMultiPartMixedContent;
 begin
   aContent := TALMultiPartMixedContent.Create;
@@ -277,13 +261,13 @@ begin
   end;
 end;
 
-{***************************************************************************************}
-procedure TAlMultiPartMixedStream.AddInlineTextBase64Encode(aContentType, aText: string);
+{*******************************************************************************************}
+procedure TAlMultiPartMixedStream.AddInlineTextBase64Encode(aContentType, aText: AnsiString);
 Var aContent: TALMultiPartMixedContent;
-    aStringStream: TstringStream;
+    aStringStream: TALStringStream;
 begin
   aContent := TALMultiPartMixedContent.Create;
-  aStringStream := TstringStream.Create(aText);
+  aStringStream := TALStringStream.Create(aText);
   Try
     aContent.LoadDataFromStreamBase64Encode(aStringStream);
     aContent.ContentType := aContentType;
@@ -296,7 +280,7 @@ end;
 
 {*******************************************************************************}
 procedure TAlMultiPartMixedStream.AddContent(aContent: TALMultiPartMixedContent);
-Var sFormFieldInfo: string;
+Var sFormFieldInfo: AnsiString;
 begin
   If Position = 0 then Begin
     sFormFieldInfo := #13#10 +
@@ -306,12 +290,6 @@ begin
 
   Inherited AddContent(aContent);
 end;
-
-
-
-////////////////////////////////////////////////
-////////// TALMultipartMixedEncoder ////////////
-////////////////////////////////////////////////
 
 {*************************************************************************}
 function TALMultipartMixedEncoder.CreateDataStream: TAlMultiPartBaseStream;
@@ -327,7 +305,7 @@ end;
 
 {****************************************************}
 procedure TALMultipartMixedEncoder.Encode(aInlineText,
-                                          aInlineTextContentType: String;
+                                          aInlineTextContentType: AnsiString;
                                           aAttachments: TALMultiPartMixedContents);
 Var i: Integer;
 begin
@@ -340,12 +318,6 @@ begin
     CloseBoundary;
   end;
 end;
-
-
-
-////////////////////////////////////////////////////////
-////////// TALMultipartMixedDecoder ////////////////////
-////////////////////////////////////////////////////////
 
 {***********************************************************************}
 function TALMultipartMixedDecoder.CreateContent: TALMultiPartBaseContent;

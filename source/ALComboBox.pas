@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALComboBox
-Version:      3.50
+Version:      4.00
 
 Description:  ComboBox with onPaint property
               - Flat design (no clt3D feature)
@@ -23,7 +23,7 @@ Description:  ComboBox with onPaint property
                 font or border color of the control each time the mouse
                 enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -54,6 +54,8 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
                  your name, street address, EMail address and any
                  comment you like to say.
 
+History :     26/06/2012: Add xe2 support
+
 Know bug :
 
 History :
@@ -64,7 +66,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALComboBox;
 
@@ -76,7 +78,7 @@ uses Windows,
      Controls,
      StdCtrls,
      Graphics,
-     ALCommon;
+     AlFcnSkin;
 
 type
 
@@ -272,13 +274,6 @@ Begin
   end;
 end;
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TalCustomComboBox ////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {*******************************************************}
 constructor TALCustomComboBox.Create(AOwner: TComponent);
 begin
@@ -389,13 +384,6 @@ begin
      else inherited;
   end;
 end;
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TalKeyCustomComboBox /////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {****************************************************}
 constructor TalKeyComboBox.Create(AOwner: TComponent);

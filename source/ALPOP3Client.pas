@@ -6,12 +6,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALPOP3Client
-Version:      3.52
+Version:      4.00
 
 Description:  TALPOP3Client class implements the POP3 protocol (Post Office
               Protocol - Version 3)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -44,7 +44,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://www.ietf.org/rfc/rfc1939.txt
 
@@ -52,7 +52,7 @@ Link :        http://www.ietf.org/rfc/rfc1939.txt
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALPOP3Client;
 
@@ -61,6 +61,7 @@ interface
 uses windows,
      Classes,
      WinSock,
+     ALStringList,
      ALInternetMessageCommon;
 
 type
@@ -75,33 +76,33 @@ type
       procedure Settimeout(const Value: integer);
     protected
       procedure CheckError(Error: Boolean);
-      Function SendCmd(aCmd:String; const MultilineResponse: Boolean=False): String; virtual;
-      Function GetResponse(const MultilineResponse: Boolean=False): String;
+      Function SendCmd(aCmd:AnsiString; const MultilineResponse: Boolean=False): AnsiString; virtual;
+      Function GetResponse(const MultilineResponse: Boolean=False): AnsiString;
       Function SocketWrite(Var Buffer; Count: Longint): Longint; Virtual;
       Function SocketRead(var Buffer; Count: Longint): Longint; Virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
-      Function  Connect(aHost: String; APort: integer): String; virtual;
+      Function  Connect(aHost: AnsiString; APort: integer): AnsiString; virtual;
       Procedure Disconnect; virtual;
-      function  User(UserName: String): String; virtual;
-      function  Pass(Password: String): String; virtual;
-      Function  List: String; overload; virtual;
-      procedure List(ALst: Tstrings); overload; virtual;
-      Function  List(aMsgNumber: integer): String; overload; virtual;
-      Function  Uidl: String; overload; virtual;
-      procedure Uidl(ALst: Tstrings); overload; virtual;
-      Function  Uidl(aMsgNumber: Integer): String; overload; virtual;
-      Procedure Uidl(aMsgNumber: Integer; Var aUniqueIDListing: String); overload; virtual;
-      Function  Quit: String; virtual;
-      Function  Rset: String; virtual;
-      Function  Stat: String; overload; virtual;
+      function  User(UserName: AnsiString): AnsiString; virtual;
+      function  Pass(Password: AnsiString): AnsiString; virtual;
+      Function  List: AnsiString; overload; virtual;
+      procedure List(ALst: TALStrings); overload; virtual;
+      Function  List(aMsgNumber: integer): AnsiString; overload; virtual;
+      Function  Uidl: AnsiString; overload; virtual;
+      procedure Uidl(ALst: TALStrings); overload; virtual;
+      Function  Uidl(aMsgNumber: Integer): AnsiString; overload; virtual;
+      Procedure Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString); overload; virtual;
+      Function  Quit: AnsiString; virtual;
+      Function  Rset: AnsiString; virtual;
+      Function  Stat: AnsiString; overload; virtual;
       Procedure Stat(Var ANumberofMsgInthemaildrop: Integer; Var aSizeofthemaildrop: integer); overload; virtual;
-      Function  Retr(aMsgNumber: Integer): String; overload; virtual;
-      procedure Retr(aMsgNumber: Integer; var aMsgBodyContent: String; aMsgHeaderContent: TALEMailHeader); overload; virtual;
-      Function  Top(aMsgNumber: Integer; aNumberOfLines: integer): String; virtual;
-      Function  Dele(aMsgNumber: Integer): String; virtual;
-      Function  Noop: String; virtual;
+      Function  Retr(aMsgNumber: Integer): AnsiString; overload; virtual;
+      procedure Retr(aMsgNumber: Integer; var aMsgBodyContent: AnsiString; aMsgHeaderContent: TALEMailHeader); overload; virtual;
+      Function  Top(aMsgNumber: Integer; aNumberOfLines: integer): AnsiString; virtual;
+      Function  Dele(aMsgNumber: Integer): AnsiString; virtual;
+      Function  Noop: AnsiString; virtual;
       property  Connected: Boolean read FConnected;
       Property  Timeout: integer read Ftimeout write Settimeout default 60000;
     end;
@@ -112,15 +113,15 @@ Uses SysUtils,
      AlFcnWinsock,
      AlFcnString;
 
-{*************************************************************************}
-Procedure ALPOP3ClientSplitResponseLine(aResponse: String; ALst: Tstrings);
+{*******************************************************************************}
+Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
 Begin
-  aResponse := Trim(aResponse); // +OK 2 320
+  aResponse := ALTrim(aResponse); // +OK 2 320
   aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]); // +OK 2 320
   While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]); // +OK 2 320
-  aResponse := trim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll]));  // +OK
-                                                                            // 2
-                                                                            // 320
+  aResponse := ALTrim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll]));  // +OK
+                                                                              // 2
+                                                                              // 320
   aLst.Text := aResponse;
 end;
 
@@ -141,7 +142,7 @@ end;
    follows the termination character, then the response from the POP
    server is ended and the line containing ".CRLF" is not considered
    part of the multi-line response.}
-Function ALPOP3ClientExtractTextFromMultilineResponse(aMultilineResponse: String): String;
+Function ALPOP3ClientExtractTextFromMultilineResponse(aMultilineResponse: AnsiString): AnsiString;
 Var ln: Integer;
     P: Integer;
 begin
@@ -162,11 +163,6 @@ begin
    pre-pending the termination octet to that line of the response.}
   Result := AlStringReplace(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
 end;
-
-
-///////////////////////////////////
-////////// TAlPOP3Client //////////
-///////////////////////////////////
 
 {*******************************}
 constructor TAlPOP3Client.Create;
@@ -191,23 +187,23 @@ begin
   if Error then RaiseLastOSError;
 end;
 
-{********************************************************************}
-Function TAlPOP3Client.Connect(aHost: String; APort: integer): String;
+{****************************************************************************}
+Function TAlPOP3Client.Connect(aHost: AnsiString; APort: integer): AnsiString;
 
-  {---------------------------------------------}
-  procedure CallServer(Server:string; Port:word);
+  {-------------------------------------------------}
+  procedure CallServer(Server:AnsiString; Port:word);
   var SockAddr:Sockaddr_in;
-      IP: String;
+      IP: AnsiString;
   begin
     FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
     CheckError(FSocketDescriptor=INVALID_SOCKET);
     FillChar(SockAddr,SizeOf(SockAddr),0);
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
-    SockAddr.sin_addr.S_addr:=inet_addr(Pchar(Server));
-    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+    SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
+    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
       checkError(not ALHostToIP(Server, IP));
-      SockAddr.sin_addr.S_addr:=inet_addr(Pchar(IP));
+      SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
   end;
@@ -219,8 +215,8 @@ begin
 
     WSAStartup (MAKEWORD(2,2), FWSAData);
     CallServer(aHost,aPort);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     Fconnected := True;
     Result := GetResponse();
 
@@ -282,7 +278,7 @@ end;
         ...
      C: USER mrose
      S: +OK mrose is a real hoopy frood}
-function TAlPOP3Client.User(UserName: String): String;
+function TAlPOP3Client.User(UserName: AnsiString): AnsiString;
 begin
   Result := SendCmd('USER ' + UserName, False);
 end;
@@ -322,7 +318,7 @@ end;
      S: +OK mrose is a real hoopy frood
      C: PASS secret
      S: +OK mrose's maildrop has 2 messages (320 octets)}
-function TAlPOP3Client.Pass(Password: String): String;
+function TAlPOP3Client.Pass(Password: AnsiString): AnsiString;
 begin
   Result := SendCmd('PASS ' + Password, False);
 end;
@@ -390,21 +386,21 @@ end;
        ...
      C: LIST 3
      S: -ERR no such message, only 2 messages in maildrop}
-Function TAlPOP3Client.List: String;
+Function TAlPOP3Client.List: AnsiString;
 begin
   Result := SendCmd('LIST', True);
 end;
 
-{*******************************************}
-procedure TAlPOP3Client.List(ALst: Tstrings);
+{*********************************************}
+procedure TAlPOP3Client.List(ALst: TALStrings);
 begin
-  ALst.Text := Trim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
+  ALst.Text := ALTrim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
 
-{*******************************************************}
-Function TAlPOP3Client.List(aMsgNumber: integer): String;
+{***********************************************************}
+Function TAlPOP3Client.List(aMsgNumber: integer): AnsiString;
 begin
-  Result := SendCmd('LIST ' + inttostr(aMsgNumber), False);
+  Result := SendCmd('LIST ' + ALInttostr(aMsgNumber), False);
 end;
 
 {*********}
@@ -468,28 +464,28 @@ end;
        ...
     C: UIDL 3
     S: -ERR no such message, only 2 messages in maildrop}
-Function TAlPOP3Client.UIDL: String;
+Function TAlPOP3Client.UIDL: AnsiString;
 begin
   Result := SendCmd('UIDL', True);
 end;
 
-{*******************************************}
-procedure TAlPOP3Client.UIDL(ALst: Tstrings);
+{*********************************************}
+procedure TAlPOP3Client.UIDL(ALst: TALStrings);
 begin
-  ALst.Text := Trim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(Uidl), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
+  ALst.Text := ALTrim(AlStringReplace(ALPOP3ClientExtractTextFromMultilineResponse(Uidl), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
 end;
 
-{*******************************************************}
-Function TAlPOP3Client.UIDL(aMsgNumber: Integer): String;
+{***********************************************************}
+Function TAlPOP3Client.UIDL(aMsgNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('UIDL ' + inttostr(aMsgNumber), False);
+  Result := SendCmd('UIDL ' + ALInttostr(aMsgNumber), False);
 end;
 
-{******************************************************************************}
-Procedure TAlPOP3Client.Uidl(aMsgNumber: Integer; Var aUniqueIDListing: String);
-Var aLst: TstringList;
+{**********************************************************************************}
+Procedure TAlPOP3Client.Uidl(aMsgNumber: Integer; Var aUniqueIDListing: AnsiString);
+Var aLst: TALStringList;
 Begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALPOP3ClientSplitResponseLine(UIDL(aMsgNumber), aLst);
     If aLst.Count < 3 then raise Exception.Create('UIDL cmd Error');
@@ -537,21 +533,21 @@ end;
  Examples:
      C: STAT
      S: +OK 2 320}
-function TAlPOP3Client.Stat: String;
+function TAlPOP3Client.Stat: AnsiString;
 begin
   Result := SendCmd('STAT', False);
 end;
 
 {****************************************************************************************************}
 procedure TAlPOP3Client.Stat(Var ANumberofMsgInthemaildrop: Integer; Var aSizeofthemaildrop: integer);
-Var aLst: TstringList;
+Var aLst: TALStringList;
 Begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALPOP3ClientSplitResponseLine(Stat, aLst);
     If aLst.Count < 3 then raise Exception.Create('Stat cmd Error');
-    If not TryStrToInt(aLst[1],ANumberofMsgInthemaildrop) then raise Exception.Create('Stat cmd Error');
-    If not TryStrToInt(aLst[2],aSizeofthemaildrop) then raise Exception.Create('Stat cmd Error');
+    If not ALTryStrToInt(aLst[1],ANumberofMsgInthemaildrop) then raise Exception.Create('Stat cmd Error');
+    If not ALTryStrToInt(aLst[2],aSizeofthemaildrop) then raise Exception.Create('Stat cmd Error');
   finally
     aLst.Free;
   end;
@@ -583,13 +579,13 @@ end;
      S: +OK 120 octets
      S: <the POP3 server sends the entire message here>
      S: .}
-Function TAlPOP3Client.Retr(aMsgNumber: Integer): String;
+Function TAlPOP3Client.Retr(aMsgNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('RETR ' + inttostr(aMsgNumber), True);
+  Result := SendCmd('RETR ' + ALInttostr(aMsgNumber), True);
 end;
 
-{****************************************************************************************************************}
-procedure TAlPOP3Client.Retr(aMsgNumber: Integer; var aMsgBodyContent: String; aMsgHeaderContent: TALEMailHeader);
+{********************************************************************************************************************}
+procedure TAlPOP3Client.Retr(aMsgNumber: Integer; var aMsgBodyContent: AnsiString; aMsgHeaderContent: TALEMailHeader);
 Var P: integer;
 begin
   aMsgBodyContent := ALPop3ClientExtractTextFromMultilineResponse(Retr(aMsgNumber));
@@ -642,9 +638,9 @@ end;
         ...
      C: TOP 100 3
      S: -ERR no such message}
-Function TAlPOP3Client.Top(aMsgNumber: Integer; aNumberOfLines: integer): String;
+Function TAlPOP3Client.Top(aMsgNumber: Integer; aNumberOfLines: integer): AnsiString;
 begin
-  Result := SendCmd('TOP ' + inttostr(aMsgNumber) + ' ' + inttostr(aNumberOfLines), True);
+  Result := SendCmd('TOP ' + ALInttostr(aMsgNumber) + ' ' + ALInttostr(aNumberOfLines), True);
 end;
 
 {***}
@@ -665,7 +661,7 @@ end;
  Examples:
      C: NOOP
      S: +OK}
-Function TAlPOP3Client.Noop: String;
+Function TAlPOP3Client.Noop: AnsiString;
 begin
   Result := SendCmd('NOOP', False);
 end;
@@ -697,9 +693,9 @@ end;
         ...
      C: DELE 2
      S: -ERR message 2 already deleted}
-Function TAlPOP3Client.Dele(aMsgNumber: Integer): String;
+Function TAlPOP3Client.Dele(aMsgNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('DELE ' + inttostr(aMsgNumber), False);
+  Result := SendCmd('DELE ' + ALInttostr(aMsgNumber), False);
 end;
 
 {***}
@@ -732,7 +728,7 @@ end;
         ...
      C: QUIT
      S: +OK dewey POP3 server signing off (2 messages left)}
-function TAlPOP3Client.Quit: String;
+function TAlPOP3Client.Quit: AnsiString;
 begin
   Result := SendCmd('QUIT', False);
   Disconnect;
@@ -757,7 +753,7 @@ end;
  Examples:
      C: RSET
      S: +OK maildrop has 2 messages (320 octets)}
-function TAlPOP3Client.Rset: String;
+function TAlPOP3Client.Rset: AnsiString;
 begin
   Result := SendCmd('RSET', False);
 end;
@@ -781,9 +777,9 @@ end;
  trailing CR-LF (thus there are 510 characters maximum allowed for the
  command and its parameters).  There is no provision for continuation
  command lines.}
-function TAlPOP3Client.SendCmd(aCmd: String;
-                               Const MultilineResponse: Boolean=False): String;
-Var P: Pchar;
+function TAlPOP3Client.SendCmd(aCmd: AnsiString;
+                               Const MultilineResponse: Boolean=False): AnsiString;
+Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
 begin
@@ -828,8 +824,8 @@ end;
  follows the termination character, then the response from the POP
  server is ended and the line containing ".CRLF" is not considered
  part of the multi-line response.}
-function TAlPOP3Client.GetResponse(Const MultilineResponse: Boolean=False): String;
-Var aBuffStr: String;
+function TAlPOP3Client.GetResponse(Const MultilineResponse: Boolean=False): AnsiString;
+Var aBuffStr: AnsiString;
     aBuffStrLength: Integer;
     aResponseLength: Integer;
     aGoodResponse: integer;
@@ -865,7 +861,7 @@ begin
     end;
   end;
 
-  If aGoodResponse <> 1 then Raise Exception.Create(Result);
+  If aGoodResponse <> 1 then Raise Exception.Create(String(Result));
 end;
 
 {**********************************************************************}
@@ -889,8 +885,8 @@ procedure TAlPOP3Client.Settimeout(const Value: integer);
 begin
   If Value <> Ftimeout then begin
     if FConnected then begin
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     end;
     Ftimeout := Value;
   end;

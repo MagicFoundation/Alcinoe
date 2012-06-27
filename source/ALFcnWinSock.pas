@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Winsock Functions
-Version:      3.50
+Version:      4.00
 
 Description:  Misc function that use winsock (for exempple ALHostToIP,
               ALIPAddrToName or ALgetLocalIPs)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History:
+History :     26/06/2012: Add xe2 support
 
 Link :
 
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnWinSock;
 
@@ -59,33 +59,35 @@ interface
 
 uses Windows,
      sysutils,
-     classes;
+     classes,
+     AlStringList;
 
-function  ALHostToIP(HostName: string; var Ip: string): Boolean;
-function  ALIPAddrToName(IPAddr : String): String;
-function  ALgetLocalIPs: Tstrings;
-function  ALgetLocalHostName: string;
+function  ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;
+function  ALIPAddrToName(IPAddr : AnsiString): AnsiString;
+function  ALgetLocalIPs: TALStrings;
+function  ALgetLocalHostName: AnsiString;
 
 implementation
 
-uses Winsock;
+uses Winsock,
+     AlFcnString;
 
-{*************************************************************}
-function ALHostToIP(HostName: string; var Ip: string): Boolean;
+{*********************************************************************}
+function ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;
 var WSAData : TWSAData;
     hostEnt : PHostEnt;
-    addr : PChar;
+    addr : PAnsiChar;
 begin
   WSAData.wVersion := 0;
   WSAStartup (MAKEWORD(2,2), WSAData);
   try
 
-    hostEnt := gethostbyname ( Pchar(hostName));
+    hostEnt := gethostbyname(PAnsiChar(hostName));
     if Assigned (hostEnt) then begin
       if Assigned (hostEnt^.h_addr_list) then begin
         addr := hostEnt^.h_addr_list^;
         if Assigned (addr) then begin
-          IP := Format ('%d.%d.%d.%d', [byte (addr [0]),
+          IP := ALFormat ('%d.%d.%d.%d', [byte (addr [0]),
           byte (addr [1]), byte (addr [2]), byte (addr [3])]);
           Result := True;
         end
@@ -100,8 +102,8 @@ begin
   end
 end;
 
-{***********************************************}
-function ALIPAddrToName(IPAddr : String): String;
+{*******************************************************}
+function ALIPAddrToName(IPAddr : AnsiString): AnsiString;
 var SockAddrIn: TSockAddrIn;
     HostEnt: PHostEnt;
     WSAData: TWSAData;
@@ -109,7 +111,7 @@ begin
   WSAData.wVersion := 0;
   WSAStartup(MAKEWORD(2,2), WSAData);
   Try
-    SockAddrIn.sin_addr.s_addr:= inet_addr(PChar(IPAddr));
+    SockAddrIn.sin_addr.s_addr:= inet_addr(PAnsiChar(IPAddr));
     HostEnt:= gethostbyaddr(@SockAddrIn.sin_addr.S_addr, 4, AF_INET);
     if HostEnt<>nil then result:=StrPas(Hostent^.h_name)
     else result:='';
@@ -118,22 +120,22 @@ begin
   end;
 end;
 
-{*******************************}
-function ALgetLocalIPs: Tstrings;
+{*********************************}
+function ALgetLocalIPs: TALStrings;
 type
   TaPInAddr = array[0..10] of PInAddr;
   PaPInAddr = ^TaPInAddr;
 var
   phe: PHostEnt;
   pptr: PaPInAddr;
-  Buffer: array[0..255] of Char;
+  Buffer: array[0..255] of AnsiChar;
   I: Integer;
   WSAData: TWSAData;
 begin
   WSAData.wVersion := 0;
   WSAStartup(MAKEWORD(2,2), WSAData);
   Try
-    Result := TstringList.Create;
+    Result := TALStringList.Create;
     Result.Clear;
     GetHostName(Buffer, SizeOf(Buffer));
     phe := GetHostByName(buffer);
@@ -149,9 +151,9 @@ begin
   end;
 end;
 
-{***********************************}
-function  ALgetLocalHostName: string;
-var Buffer: array [0..255] of char;
+{***************************************}
+function  ALgetLocalHostName: AnsiString;
+var Buffer: array [0..255] of AnsiChar;
     WSAData: TWSAData;
 begin
   WSAData.wVersion := 0;
@@ -159,7 +161,7 @@ begin
   Try
 
     if gethostname(Buffer, SizeOf(Buffer)) <> 0 then
-        raise Exception.Create('Winsock GetHostName failed');
+        raise EALException.Create('Winsock GetHostName failed');
     Result := StrPas(Buffer);
 
   finally

@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALMultiPartAlternativeParser
-Version:      3.50
+Version:      4.00
 
 Description:  MultiPart Alternative objects to encode or Decode stream
               in mime multipart/Alternative format.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :			
+History :     26/06/2012: Add xe2 support
 
 Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cdosys/html/7a18a98b-3a18-45b2-83a9-28a8f4099970.asp
               http://www.ietf.org/rfc/rfc2646.txt
@@ -52,7 +52,7 @@ Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/c
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMultiPartAlternativeParser;
 
@@ -148,10 +148,6 @@ type
 
 implementation
 
-///////////////////////////////////////////////////////////////
-//////////  TALMultiPartAlternativeContents  //////////////////
-///////////////////////////////////////////////////////////////
-
 {*********************************************************************************************}
 function TALMultiPartAlternativeContents.Add(AObject: TALMultiPartAlternativeContent): Integer;
 begin
@@ -200,16 +196,9 @@ begin
   inherited Items[Index] := AObject;
 end;
 
-
-
-
-//////////////////////////////////////////////
-////////// TAlMultiPartAlternativeStream /////
-//////////////////////////////////////////////
-
 {*******************************************************************************************}
 procedure TAlMultiPartAlternativeStream.AddContent(aContent: TALMultiPartAlternativeContent);
-Var sFormFieldInfo: string;
+Var sFormFieldInfo: AnsiString;
 begin
   If Position = 0 then Begin
     sFormFieldInfo := #13#10 +
@@ -219,12 +208,6 @@ begin
 
   Inherited AddContent(aContent);
 end;
-
-
-
-////////////////////////////////////////////////
-////////// TALMultipartAlternativeEncoder //////
-////////////////////////////////////////////////
 
 {*******************************************************************************}
 function TALMultipartAlternativeEncoder.CreateDataStream: TAlMultiPartBaseStream;
@@ -237,13 +220,6 @@ function TALMultipartAlternativeEncoder.GetDataStream: TAlMultiPartAlternativeSt
 begin
   Result := TAlMultiPartAlternativeStream(inherited GetDataStream);
 end;
-
-
-
-
-////////////////////////////////////////////////////////
-////////// TALMultipartAlternativeDecoder //////////////
-////////////////////////////////////////////////////////
 
 {*****************************************************************************}
 function TALMultipartAlternativeDecoder.CreateContent: TALMultiPartBaseContent;

@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALPanel
-Version:      3.50
+Version:      4.00
 
 Description:  Tpanel with special feature :
               - Flat design (no clt3D feature)
@@ -23,7 +23,7 @@ Description:  Tpanel with special feature :
                 we can easily change the font or border color of the
                 control each time the mouse enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -60,6 +60,7 @@ History :     30/11/2004: Remove doublebuffered=True because that force
                           the control and ALL his child to be completely
                           redraw all the time one of his child is redrawed...
                           it's too much data intensive
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -67,7 +68,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALPanel;
 
@@ -80,7 +81,7 @@ uses Windows,
      ExtCtrls,
      graphics,
      forms,
-     ALCommon;
+     AlFcnSkin;
 
 type
   {------------------------------------------------}
@@ -310,13 +311,6 @@ begin
     If BorderColor <> ClNone then paintborder;
   end;
 end;
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCustomPanel   /////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {****************************************************}
 constructor TALCustomPanel.Create(AOwner: TComponent);

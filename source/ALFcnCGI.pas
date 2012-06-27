@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      AlFcnCGI
-Version:      3.54
+Version:      4.00
 
 Description:  Function to run CGI application like PHP-CGI.exe or
               Perl.exe
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2007 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :
 
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 
 unit ALFcnCGI;
@@ -62,26 +62,27 @@ uses Windows,
      Classes,
      HttpApp,
      ALIsapiHTTP,
-     AlHttpCommon;
+     AlHttpCommon,
+     AlStringList;
 
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest; ServerVariables: Tstrings); overload;
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest; ServerVariables: TALStrings); overload;
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest;
-                                                        ServerVariables: Tstrings;
+                                                        ServerVariables: TALStrings;
                                                         ScriptName,
-                                                        ScriptFileName: String;
-                                                        Url: String); overload;
-Procedure ALCGIInitDefaultServerVariables(ServerVariables: Tstrings); overload;
-Procedure AlCGIInitDefaultServerVariables(ServerVariables: Tstrings;
+                                                        ScriptFileName: AnsiString;
+                                                        Url: AnsiString); overload;
+Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStrings); overload;
+Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
                                           ScriptName,
-                                          ScriptFileName: String;
-                                          Url: String); overload;
+                                          ScriptFileName: AnsiString;
+                                          Url: AnsiString); overload;
 Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TwebRequest;
-                                                 ServerVariables: Tstrings;
+                                                 ServerVariables: TALStrings;
                                                  ScriptName,
-                                                 ScriptFileName: String;
-                                                 Url: String); overload;
-Procedure AlCGIExec(InterpreterFilename: String;
-                    ServerVariables: TStrings;
+                                                 ScriptFileName: AnsiString;
+                                                 Url: AnsiString); overload;
+Procedure AlCGIExec(InterpreterFilename: AnsiString;
+                    ServerVariables: TALStrings;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
                     ResponseHeader: TALHTTPResponseHeader); overload;
@@ -89,21 +90,21 @@ Procedure AlCGIExec(ScriptName,
                     ScriptFileName,
                     Url,
                     X_REWRITE_URL,
-                    InterpreterFilename: String;
+                    InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
-                    overloadedCookies: String;
-                    overloadedQueryString: String;
-                    overloadedReferer: String;
+                    overloadedCookies: AnsiString;
+                    overloadedQueryString: AnsiString;
+                    overloadedReferer: AnsiString;
                     overloadedRequestContentStream: Tstream;
-                    Var ResponseContentString: String;
+                    Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader); overload;
 Procedure AlCGIExec(ScriptName,
                     ScriptFileName,
                     Url,
                     X_REWRITE_URL,
-                    InterpreterFilename: String;
+                    InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
-                    Var ResponseContentString: String;
+                    Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader); overload;
 
 implementation
@@ -112,8 +113,8 @@ uses sysutils,
      AlFcnExecute,
      AlFcnString;
 
-{**********************************************************************************************************}
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest; ServerVariables: Tstrings);
+{************************************************************************************************************}
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest; ServerVariables: TALStrings);
 Begin
   ServerVariables.Clear;
   {----------}
@@ -134,10 +135,10 @@ end;
 
 {******************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest;
-                                                        ServerVariables: Tstrings;
+                                                        ServerVariables: TALStrings;
                                                         ScriptName,
-                                                        ScriptFileName: String;
-                                                        Url: String);
+                                                        ScriptFileName: AnsiString;
+                                                        Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables);
   {----------}
@@ -150,8 +151,8 @@ Begin
   ServerVariables.Values['REQUEST_URI']     := URL;                //REQUEST_URI=/vbseo.php?vbseourl=forum4/discussion98851/showthread.php&bleubleu=24
 end;
 
-{*******************************************************************}
-Procedure ALCGIInitDefaultServerVariables(ServerVariables: Tstrings);
+{*********************************************************************}
+Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStrings);
 Begin
   ServerVariables.Clear;
   {----------}
@@ -170,11 +171,11 @@ Begin
   ServerVariables.Add('HTTP_ACCEPT=*/*');                           //HTTP_ACCEPT=*/* | List of acceptable content type
 end;
 
-{******************************************************************}
-Procedure AlCGIInitDefaultServerVariables(ServerVariables: Tstrings;
+{********************************************************************}
+Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
                                           ScriptName,
-                                          ScriptFileName: String;
-                                          Url: String);
+                                          ScriptFileName: AnsiString;
+                                          Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariables(ServerVariables);
   {----------}
@@ -189,10 +190,10 @@ end;
 
 {***********************************************************************}
 Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TwebRequest;
-                                                 ServerVariables: Tstrings;
+                                                 ServerVariables: TALStrings;
                                                  ScriptName,
-                                                 ScriptFileName: String;
-                                                 Url: String);
+                                                 ScriptFileName: AnsiString;
+                                                 Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables, ScriptName, ScriptFileName, Url);
   {----------}
@@ -224,26 +225,26 @@ Begin
   //ServerVariables.Add('LOGON_USER='+            WebRequest.GetFieldByName('LOGON_USER'));             //LOGON_USER=
 end;
 
-{**********************************************}
-Procedure AlCGIExec(InterpreterFilename: String;
-                    ServerVariables: TStrings;
+{**************************************************}
+Procedure AlCGIExec(InterpreterFilename: AnsiString;
+                    ServerVariables: TALStrings;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
                     ResponseHeader: TALHTTPResponseHeader);
 
 const EnvironmentTemplate = '%s=%s'#0;
 
-Var ScriptFileName: String;
-    Environment: String;
-    aStream: TStringStream;
+Var ScriptFileName: AnsiString;
+    Environment: AnsiString;
+    aStream: TALStringStream;
     FreeRequestContentStream: Boolean;
-    S1: String;
+    S1: AnsiString;
     P1: Integer;
     i: integer;
 
 begin
 
-  aStream := TstringStream.Create('');
+  aStream := TALStringStream.Create('');
   If not assigned(RequestContentStream) then begin
     RequestContentStream := TmemoryStream.Create;
     FreeRequestContentStream := True;
@@ -255,7 +256,7 @@ begin
     ScriptFileName := ServerVariables.Values['SCRIPT_FILENAME'];
 
     {For securty issue... if content_length badly set then cpu can go to 100%}
-    ServerVariables.Values['CONTENT_LENGTH']  := inttostr(RequestContentStream.Size);
+    ServerVariables.Values['CONTENT_LENGTH']  := ALIntToStr(RequestContentStream.Size);
 
     {init GATEWAY_INTERFACE}
     ServerVariables.Values['GATEWAY_INTERFACE'] := 'CGI/1.1';
@@ -297,19 +298,17 @@ begin
 
     {----------}
     For i := 0 to serverVariables.Count - 1 do
-      Environment := Environment + Format(EnvironmentTemplate,[ServerVariables.Names[i], ServerVariables.ValueFromIndex[i]]);
+      Environment := Environment + ALFormat(EnvironmentTemplate,[ServerVariables.Names[i], ServerVariables.ValueFromIndex[i]]);
 
     {----------}
     Environment := Environment + #0;
 
     {----------}
-    ALWinExec32(
-                AnsiQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
-                ExtractFileDir(InterpreterFilename),
+    ALWinExec32(ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
+                ALExtractFileDir(InterpreterFilename),
                 Environment,
                 RequestContentStream,
-                aStream
-               );
+                aStream);
 
     {----------}
     S1 := aStream.DataString;
@@ -329,22 +328,22 @@ Procedure AlCGIExec(ScriptName,
                     ScriptFileName,
                     Url,
                     X_REWRITE_URL,
-                    InterpreterFilename: String;
+                    InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
-                    overloadedCookies: String;
-                    overloadedQueryString: String;
-                    overloadedReferer: String;
+                    overloadedCookies: AnsiString;
+                    overloadedQueryString: AnsiString;
+                    overloadedReferer: AnsiString;
                     overloadedRequestContentStream: Tstream;
-                    Var ResponseContentString: String;
+                    Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader);
 
-Var ServerVariables: TStrings;
+Var ServerVariables: TALStrings;
     RequestContentStream: Tstream;
-    ResponsecontentStream: TStringStream;
+    ResponsecontentStream: TALStringStream;
 
 begin
-  ServerVariables := TstringList.Create;
-  ResponsecontentStream := TstringStream.Create('');
+  ServerVariables := TALStringList.Create;
+  ResponsecontentStream := TALStringStream.Create('');
   Try
 
     If overloadedRequestContentStream <> nil then RequestContentStream := overloadedRequestContentStream
@@ -356,13 +355,11 @@ begin
     If overloadedQueryString <> #0 then ServerVariables.Values['QUERY_STRING'] := overloadedQueryString;   //QUERY_STRING=goto=newpost&t=1
     If overloadedReferer <> #0 then ServerVariables.Values['HTTP_REFERER'] := overloadedReferer;           //HTTP_REFERER=http://www.yahoo.fr
 
-    AlCGIExec(
-              InterpreterFilename,
+    AlCGIExec(InterpreterFilename,
               ServerVariables,
               RequestContentStream,
               ResponsecontentStream,
-              ResponseHeader
-             );
+              ResponseHeader);
 
     ResponsecontentString := ResponsecontentStream.DataString;
 
@@ -377,13 +374,12 @@ Procedure AlCGIExec(ScriptName,
                     ScriptFileName,
                     Url,
                     X_REWRITE_URL,
-                    InterpreterFilename: String;
+                    InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
-                    Var ResponseContentString: String;
+                    Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader);
 begin
-  AlCGIExec(
-            ScriptName,
+  AlCGIExec(ScriptName,
             ScriptFileName,
             Url,
             X_REWRITE_URL,
@@ -394,8 +390,7 @@ begin
             #0,
             nil,
             ResponseContentString,
-            ResponseHeader
-           );
+            ResponseHeader);
 end;
 
 

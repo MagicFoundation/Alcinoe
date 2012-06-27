@@ -5,7 +5,7 @@ Author(s):    Darin Dimitrov (darin_dimitrov@hotmail.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Windows HTTP Services (WinHTTP) API Interface Unit
-Version:      3.50
+Version:      4.00
 
 Description:  Microsoft® Windows® HTTP Services (WinHTTP) provides
               developers with a server-supported, high-level interface
@@ -24,7 +24,7 @@ Description:  Microsoft® Windows® HTTP Services (WinHTTP) provides
               http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnanchor/html/winhttp.asp
 
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -57,7 +57,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :
 
@@ -65,7 +65,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALWinHttpWrapper;
 
@@ -933,7 +933,7 @@ function WinHttpSetCredentials(hRequest: HINTERNET;
 function WinHttpSendRequest(hRequest: HINTERNET; pwszHeaders: PWideChar;
   dwHeadersLength: DWORD; lpOptional: Pointer;
   dwOptionalLength: DWORD; dwTotalLength: DWORD;
-  dwContext: DWORD): BOOL; stdcall;
+  dwContext: DWORD_PTR): BOOL; stdcall;
   {$EXTERNALSYM WinHttpSendRequest}
 
 function WinHttpWriteData(hRequest: HINTERNET; lpBuffer: Pointer;

@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe RFC Functions
-Version:      3.50
+Version:      4.00
 
 Description:  Common functions to work with RFC standards. especialy
               to convert RFC date time string to TDateTime.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://www.rfc.net/
 
@@ -51,7 +51,7 @@ Link :        http://www.rfc.net/
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnRFC;
 
@@ -61,71 +61,62 @@ uses windows,
      SysConst,
      Classes;
 
-function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): String;
-function ALDateTimeToRfc822Str(const aValue: TDateTime): String;
-Function ALTryRfc822StrToGMTDateTime(const S: string; out Value: TDateTime): Boolean;
-function ALRfc822StrToGMTDateTime(const s: String): TDateTime;
+function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+Function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
 
 const
-  CAlRfc822DaysOfWeek: array[1..7] of string = (
-                                                'Sun',
-                                                'Mon',
-                                                'Tue',
-                                                'Wed',
-                                                'Thu',
-                                                'Fri',
-                                                'Sat'
-                                               );
+  CAlRfc822DaysOfWeek: array[1..7] of AnsiString = ('Sun',
+                                                    'Mon',
+                                                    'Tue',
+                                                    'Wed',
+                                                    'Thu',
+                                                    'Fri',
+                                                    'Sat');
 
-  CALRfc822MonthNames: array[1..12] of string = (
-                                                 'Jan',
-                                                 'Feb',
-                                                 'Mar',
-                                                 'Apr',
-                                                 'May',
-                                                 'Jun',
-                                                 'Jul',
-                                                 'Aug',
-                                                 'Sep',
-                                                 'Oct',
-                                                 'Nov',
-                                                 'Dec'
-                                                );
+  CALRfc822MonthNames: array[1..12] of AnsiString = ('Jan',
+                                                     'Feb',
+                                                     'Mar',
+                                                     'Apr',
+                                                     'May',
+                                                     'Jun',
+                                                     'Jul',
+                                                     'Aug',
+                                                     'Sep',
+                                                     'Oct',
+                                                     'Nov',
+                                                     'Dec');
 
 implementation
 
 Uses SYsUtils,
      AlFcnMisc,
+     AlStringList,
      AlFcnString;
 
 {*********************************************************************}
 {aValue is a GMT TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
-function  ALGMTDateTimeToRfc822Str(const aValue: TDateTime): String;
+function  ALGMTDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 var aDay, aMonth, aYear: Word;
 begin
-  DecodeDate(
-             aValue,
+  DecodeDate(aValue,
              aYear,
              aMonth,
-             aDay
-            );
+             aDay);
 
-  Result := Format(
-                   '%s, %.2d %s %.4d %s %s',
-                   [
-                    CAlRfc822DaysOfWeek[DayOfWeek(aValue)],
-                    aDay,
-                    CAlRfc822MonthNames[aMonth],
-                    aYear,
-                    FormatDateTime('hh":"nn":"ss', aValue),
-                    'GMT'
-                   ]
-                  );
+  Result := ALFormat('%s, %.2d %s %.4d %s %s',
+                     [CAlRfc822DaysOfWeek[DayOfWeek(aValue)],
+                      aDay,
+                      CAlRfc822MonthNames[aMonth],
+                      aYear,
+                      ALFormatDateTime('hh":"nn":"ss', aValue, ALDefaultFormatSettings),
+                      'GMT']);
 end;
 
 {***********************************************************************}
 {aValue is a Local TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
-function ALDateTimeToRfc822Str(const aValue: TDateTime): String;
+function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 begin
   Result := ALGMTDateTimeToRfc822Str(AlLocalDateTimeToGMTDateTime(aValue));
 end;
@@ -159,17 +150,17 @@ end;
   CDT, EST, EDT) and the +/-hhmm offset specifed in RFC-822 should be
   supported.  It is recommended that times in message headers be
   transmitted in GMT and displayed in the local time zone.}
-Function  ALTryRfc822StrToGMTDateTime(const S: string; out Value: TDateTime): Boolean;
+Function  ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 Var P1,P2: Integer;
-    ADateStr : String;
-    aLst: TstringList;
-    aMonthLabel: String;
-    aFormatSettings: TformatSettings;
-    aTimeZoneStr: String;
+    ADateStr : AnsiString;
+    aLst: TALStringList;
+    aMonthLabel: AnsiString;
+    aFormatSettings: TALformatSettings;
+    aTimeZoneStr: AnsiString;
     aTimeZoneDelta: TDateTime;
 
-    {----------------------------------------------------------}
-    Function MonthWithLeadingChar(const AMonth: String): String;
+    {------------------------------------------------------------------}
+    Function MonthWithLeadingChar(const AMonth: AnsiString): AnsiString;
     Begin
       If Length(AMonth) = 1 then result := '0' + AMonth
       else result := aMonth;
@@ -179,16 +170,16 @@ Begin
   ADateStr := S; //'Wdy, DD-Mon-YYYY HH:MM:SS GMT' or 'Wdy, DD-Mon-YYYY HH:MM:SS +0200' or '23 Aug 2004 06:48:46 -0700'
   P1 := AlPos(',',ADateStr);
   If P1 > 0 then delete(ADateStr,1,P1); //' DD-Mon-YYYY HH:MM:SS GMT' or ' DD-Mon-YYYY HH:MM:SS +0200' or '23 Aug 2004 06:48:46 -0700'
-  ADateStr := trim(ADateStr); //'DD-Mon-YYYY HH:MM:SS GMT' or 'DD-Mon-YYYY HH:MM:SS +0200' or '23 Aug 2004 06:48:46 -0700'
+  ADateStr := ALTrim(ADateStr); //'DD-Mon-YYYY HH:MM:SS GMT' or 'DD-Mon-YYYY HH:MM:SS +0200' or '23 Aug 2004 06:48:46 -0700'
 
-  P1 := AlcharPos(':',ADateStr);
-  P2 := AlcharPos('-',ADateStr);
+  P1 := AlPos(':',ADateStr);
+  P2 := AlPos('-',ADateStr);
   While (P2 > 0) and (P2 < P1) do begin
     aDateStr[P2] := ' ';
-    P2 := AlcharPosEx('-',ADateStr,P2);
+    P2 := AlPosEx('-',ADateStr,P2);
   end; //'DD Mon YYYY HH:MM:SS GMT' or 'DD Mon YYYY HH:MM:SS +0200' or '23 Aug 2004 06:48:46 -0700'
   While Alpos('  ',ADateStr) > 0 do ADateStr := AlStringReplace(ADateStr,'  ',' ',[RfReplaceAll]); //'DD Mon YYYY HH:MM:SS GMT' or 'DD Mon YYYY HH:MM:SS +0200'
-  Alst := TstringList.create;
+  Alst := TALStringList.create;
   Try
 
     Alst.Text :=  AlStringReplace(ADateStr,' ',#13#10,[RfReplaceall]);
@@ -197,24 +188,24 @@ Begin
       Exit;
     end;
 
-    aMonthLabel := trim(Alst[1]);
+    aMonthLabel := ALTrim(Alst[1]);
     P1 := 1;
-    While (p1 <= 12) and (not sameText(CAlRfc822MonthNames[P1],aMonthLabel)) do inc(P1);
+    While (p1 <= 12) and (not ALSameText(CAlRfc822MonthNames[P1],aMonthLabel)) do inc(P1);
     If P1 > 12 then begin
       Result := False;
       Exit;
     end;
 
-    GetLocaleFormatSettings(GetSystemDefaultLCID,aFormatSettings);
+    ALGetLocaleFormatSettings(GetThreadLocale,aFormatSettings);
     aFormatSettings.DateSeparator := '/';
     aFormatSettings.TimeSeparator := ':';
     aFormatSettings.ShortDateFormat := 'dd/mm/yyyy';
     aFormatSettings.ShortTimeFormat := 'hh:nn:zz';
 
-    aTimeZoneStr := trim(Alst[4]);
+    aTimeZoneStr := ALTrim(Alst[4]);
     aTimeZoneStr := AlStringReplace(aTimeZoneStr,'(','',[]);
     aTimeZoneStr := AlStringReplace(aTimeZoneStr,')','',[]);
-    aTimeZoneStr := Trim(aTimeZoneStr);
+    aTimeZoneStr := ALTrim(aTimeZoneStr);
     If aTimeZoneStr = '' then Begin
       Result := False;
       Exit;
@@ -225,27 +216,27 @@ Begin
             (aTimeZoneStr[3] in ['0','1','2','3','4','5','6','7','8','9']) and
             (aTimeZoneStr[4] in ['0','1','2','3','4','5','6','7','8','9']) and
             (aTimeZoneStr[5] in ['0','1','2','3','4','5','6','7','8','9']) then begin
-      aTimeZoneDelta := StrToDateTime(AlCopyStr(aTimeZoneStr,2,2) + ':' + AlCopyStr(aTimeZoneStr,4,2) + ':00', aFormatSettings);
+      aTimeZoneDelta := ALStrToDateTime(AlCopyStr(aTimeZoneStr,2,2) + ':' + AlCopyStr(aTimeZoneStr,4,2) + ':00', aFormatSettings);
       if aTimeZoneStr[1] = '+' then aTimeZoneDelta := -1*aTimeZoneDelta;
     end
-    else If SameText(aTimeZoneStr,'GMT') then  aTimeZoneDelta := 0
-    else If SameText(aTimeZoneStr,'UTC') then  aTimeZoneDelta := 0
-    else If SameText(aTimeZoneStr,'UT')  then  aTimeZoneDelta := 0
-    else If SameText(aTimeZoneStr,'EST') then aTimeZoneDelta := StrToDateTime('05:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'EDT') then aTimeZoneDelta := StrToDateTime('04:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'CST') then aTimeZoneDelta := StrToDateTime('06:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'CDT') then aTimeZoneDelta := StrToDateTime('05:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'MST') then aTimeZoneDelta := StrToDateTime('07:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'MDT') then aTimeZoneDelta := StrToDateTime('06:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'PST') then aTimeZoneDelta := StrToDateTime('08:00:00', aFormatSettings)
-    else If SameText(aTimeZoneStr,'PDT') then aTimeZoneDelta := StrToDateTime('07:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'GMT') then  aTimeZoneDelta := 0
+    else If ALSameText(aTimeZoneStr,'UTC') then  aTimeZoneDelta := 0
+    else If ALSameText(aTimeZoneStr,'UT')  then  aTimeZoneDelta := 0
+    else If ALSameText(aTimeZoneStr,'EST') then aTimeZoneDelta := ALStrToDateTime('05:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'EDT') then aTimeZoneDelta := ALStrToDateTime('04:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'CST') then aTimeZoneDelta := ALStrToDateTime('06:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'CDT') then aTimeZoneDelta := ALStrToDateTime('05:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'MST') then aTimeZoneDelta := ALStrToDateTime('07:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'MDT') then aTimeZoneDelta := ALStrToDateTime('06:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'PST') then aTimeZoneDelta := ALStrToDateTime('08:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'PDT') then aTimeZoneDelta := ALStrToDateTime('07:00:00', aFormatSettings)
     else begin
       Result := False;
       Exit;
     end;
 
-    ADateStr := trim(Alst[0]) + '/' + MonthWithLeadingChar(inttostr(P1))  + '/' + trim(Alst[2]) + ' ' + trim(Alst[3]); //'DD/MM/YYYY HH:MM:SS'
-    Result := TryStrToDateTime(ADateStr,Value,AformatSettings);
+    ADateStr := ALTrim(Alst[0]) + '/' + MonthWithLeadingChar(ALIntToStr(P1))  + '/' + ALTrim(Alst[2]) + ' ' + ALTrim(Alst[3]); //'DD/MM/YYYY HH:MM:SS'
+    Result := ALTryStrToDateTime(ADateStr,Value,AformatSettings);
     If Result then Value := Value + aTimeZoneDelta;
   finally
     aLst.free;
@@ -256,7 +247,7 @@ end;
 {Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
  the function allow also date like "Sun, 06-Nov-1994 08:49:37 GMT"
  to be compatible with cookies field (http://wp.netscape.com/newsref/std/cookie_spec.html)}
-function  ALRfc822StrToGMTDateTime(const s: String): TDateTime;
+function  ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
 Begin
   if not ALTryRfc822StrToGMTDateTime(S, Result) then
     raise EConvertError.CreateResFmt(@SInvalidDateTime, [S]);

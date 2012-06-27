@@ -5,11 +5,11 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Common Http Functions
-Version:      3.53
+Version:      4.00
 
 Description:  Common http functions that can be use by HTTP Components
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -60,6 +60,7 @@ History :     04/10/2005: * Move ALTryGMTHeaderHttpStrToDateTime to
               29/01/2008: * Update the handle of status line in TALHTTPResponseHeader
               03/01/2008: * Better handle of the status line in TALHTTPResponseHeader
               22/02/2008: * Update AlHttpEncode
+              26/06/2012: * Add xe2 support
 
 Link :        http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
               http://wp.netscape.com/newsref/std/cookie_spec.html
@@ -68,7 +69,7 @@ Link :        http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALHttpCommon;
 
@@ -77,154 +78,151 @@ interface
 uses Windows,
      Classes,
      sysutils,
-     Wininet;
+     Wininet,
+     ALFcnString,
+     AlStringList;
 
 Type
 
-  {------------------------------------------------}
-  EALHttpClientConnectionDropped = class(Exception);
+  {---------------------------------------------------}
+  EALHttpClientConnectionDropped = class(EALException);
 
   {-- onchange Event that specify the property index that is just changed --}
   TALHTTPPropertyChangeEvent = procedure(sender: Tobject; Const PropertyIndex: Integer) of object;
 
   {--protocol version--}
-  TALHTTPProtocolVersion = (
-                            HTTPpv_1_0,
-                            HTTPpv_1_1
-                           );
+  TALHTTPProtocolVersion = (HTTPpv_1_0, HTTPpv_1_1);
 
   {--Request method--}
-  TALHTTPRequestMethod = (
-                          HTTPrm_Get,
+  TALHTTPRequestMethod = (HTTPrm_Get,
                           HTTPrm_Post,
                           HTTPrm_Head,
                           HTTPrm_Trace,
                           HTTPrm_Put,
-                          HTTPrm_Delete
-                         );
+                          HTTPrm_Delete);
 
   {--Request header--}
   TALHTTPRequestHeader = Class(Tcomponent)
   Private
-    fAccept: String;
-    fAcceptCharSet: String;
-    fAcceptEncoding: String;
-    fAcceptLanguage: String;
-    fAllow: String;
-    fAuthorization: String;
-    fCacheControl: String;
-    fConnection: string;
-    fContentEncoding: string;
-    fContentLanguage: string;
-    fContentLength: string;
-    fContentLocation: string;
-    fContentMD5: string;
-    fContentRange: string;
-    fContentType: string;
-    fDate: string;
-    fExpect: string;
-    fExpires: string;
-    fFrom: String;
-    fHost: String;
-    fIfMatch: string;
-    fIfModifiedSince: string;
-    fIfNoneMatch: string;
-    fIfRange: string;
-    fIfUnmodifiedSince: string;
-    fLastModified: string;
-    fMaxForwards: string;
-    fPragma: string;
-    fProxyAuthorization: string;
-    fRange: string;
-    fReferer: String;
-    fTE: string;
-    fTrailer: String;
-    fTransferEncoding: String;
-    fUpgrade: String;
-    fUserAgent: String;
-    fVia: String;
-    fWarning: String;
-    FCustomHeaders: Tstrings;
-    FCookies: Tstrings;
+    fAccept: AnsiString;
+    fAcceptCharSet: AnsiString;
+    fAcceptEncoding: AnsiString;
+    fAcceptLanguage: AnsiString;
+    fAllow: AnsiString;
+    fAuthorization: AnsiString;
+    fCacheControl: AnsiString;
+    fConnection: AnsiString;
+    fContentEncoding: AnsiString;
+    fContentLanguage: AnsiString;
+    fContentLength: AnsiString;
+    fContentLocation: AnsiString;
+    fContentMD5: AnsiString;
+    fContentRange: AnsiString;
+    fContentType: AnsiString;
+    fDate: AnsiString;
+    fExpect: AnsiString;
+    fExpires: AnsiString;
+    fFrom: AnsiString;
+    fHost: AnsiString;
+    fIfMatch: AnsiString;
+    fIfModifiedSince: AnsiString;
+    fIfNoneMatch: AnsiString;
+    fIfRange: AnsiString;
+    fIfUnmodifiedSince: AnsiString;
+    fLastModified: AnsiString;
+    fMaxForwards: AnsiString;
+    fPragma: AnsiString;
+    fProxyAuthorization: AnsiString;
+    fRange: AnsiString;
+    fReferer: AnsiString;
+    fTE: AnsiString;
+    fTrailer: AnsiString;
+    fTransferEncoding: AnsiString;
+    fUpgrade: AnsiString;
+    fUserAgent: AnsiString;
+    fVia: AnsiString;
+    fWarning: AnsiString;
+    FCustomHeaders: TALStrings;
+    FCookies: TALStrings;
     FOnChange: TALHTTPPropertyChangeEvent;
     Procedure DoChange(propertyIndex: Integer);
-    procedure SetHeaderValueByPropertyIndex(const Index: Integer; const Value: string);
-    Function GetRawHeaderText: String;
-    procedure SetCookies(const Value: TStrings);
-    procedure SetRawHeaderText(const aRawHeaderText: string);
-    procedure SetCustomHeaders(const Value: Tstrings);
+    procedure SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
+    Function GetRawHeaderText: AnsiString;
+    procedure SetCookies(const Value: TALStrings);
+    procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
+    procedure SetCustomHeaders(const Value: TALStrings);
   protected
     procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Clear;
-    Property RawHeaderText: String read GetRawHeaderText write SetRawHeaderText;
+    Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
   Published
-    property Accept: String index 0 read FAccept write SetHeaderValueByPropertyIndex; {Accept: audio/*; q=0.2, audio/basic}
-    property AcceptCharSet: String index 1 read FAcceptCharSet write SetHeaderValueByPropertyIndex; {Accept-Charset: iso-8859-5, unicode-1-1;q=0.8}
-    property AcceptEncoding: String index 2 read FAcceptEncoding write SetHeaderValueByPropertyIndex; {Accept-Encoding: gzip;q=1.0, identity; q=0.5, *;q=0}
-    property AcceptLanguage: String index 3 read FAcceptLanguage write SetHeaderValueByPropertyIndex; {Accept-Language: da, en-gb;q=0.8, en;q=0.7}
-    property Allow: String index 4 read FAllow write SetHeaderValueByPropertyIndex; {Allow: GET, HEAD, PUT}
-    property Authorization: String index 5 read FAuthorization write SetHeaderValueByPropertyIndex; {Authorization: BASIC d2VibWFzdGVyOnpycW1hNHY=}
-    property CacheControl: String index 6 read FCacheControl write SetHeaderValueByPropertyIndex; {Cache-Control: no-cache}
-    property Connection: string index 7 read FConnection write SetHeaderValueByPropertyIndex; {Connection: close}
-    property ContentEncoding: string index 8 read FContentEncoding write SetHeaderValueByPropertyIndex; {Content-Encoding: gzip}
-    property ContentLanguage: string index 9 read FContentLanguage write SetHeaderValueByPropertyIndex; {Content-Language: mi, en}
-    property ContentLength: string index 10 read FContentLength write SetHeaderValueByPropertyIndex;  {Content-Length: 3495}
-    property ContentLocation: string index 11 read FContentLocation write SetHeaderValueByPropertyIndex;  {Content-Location: http://localhost/page.asp}
-    property ContentMD5: string index 12 read FContentMD5 write SetHeaderValueByPropertyIndex;  {Content-MD5: [md5-digest]}
-    property ContentRange: string index 13 read FContentRange write SetHeaderValueByPropertyIndex;  {Content-Range: bytes 2543-4532/7898}
-    property ContentType: string index 14 read FContentType write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
-    property Date: string index 15 read FDate write SetHeaderValueByPropertyIndex; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
-    property Expect: string index 16 read fExpect write SetHeaderValueByPropertyIndex; {Expect: 100-continue}
-    property Expires: string index 17 read FExpires write SetHeaderValueByPropertyIndex; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
-    property From: String index 18 read FFrom write SetHeaderValueByPropertyIndex; {From: webmaster@w3.org}
-    property Host: String index 19 read FHost write SetHeaderValueByPropertyIndex; {Host: www.w3.org}
-    property IfMatch: string index 20 read FIfMatch write SetHeaderValueByPropertyIndex; {If-Match: entity_tag001}
-    property IfModifiedSince: string index 21 read FIfModifiedSince write SetHeaderValueByPropertyIndex; {If-Modified-Since: Sat, 29 Oct 1994 19:43:31 GMT}
-    property IfNoneMatch: string index 22 read fIfNoneMatch write SetHeaderValueByPropertyIndex; {If-None-Match: entity_tag001}
-    property IfRange: string index 23 read fIfRange write SetHeaderValueByPropertyIndex; {If-Range: entity_tag001}
-    property IfUnmodifiedSince: string index 24 read fIfUnmodifiedSince write SetHeaderValueByPropertyIndex; {If-Unmodified-Since: Sat, 29 Oct 1994 19:43:31 GMT}
-    property LastModified: string index 25 read fLastModified write SetHeaderValueByPropertyIndex; {Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT}
-    property MaxForwards: string index 26 read fMaxForwards write SetHeaderValueByPropertyIndex; {Max-Forwards: 3}
-    property Pragma: string index 27 read FPragma write SetHeaderValueByPropertyIndex; {Pragma: no-cache}
-    property ProxyAuthorization: string index 28 read FProxyAuthorization write SetHeaderValueByPropertyIndex; {Proxy-Authorization: [credentials]}
-    property Range: string index 29 read FRange write SetHeaderValueByPropertyIndex; {Range: bytes=100-599}
-    property Referer: String index 30 read FReferer write SetHeaderValueByPropertyIndex; {Referer: http://www.w3.org/hypertext/DataSources/Overview.html}
-    property TE: string index 31 read fTE write SetHeaderValueByPropertyIndex; {TE: trailers, deflate;q=0.5}
-    property Trailer: String index 32 read FTrailer write SetHeaderValueByPropertyIndex; {Trailer: Date}
-    property TransferEncoding: String index 33 read FTransferEncoding write SetHeaderValueByPropertyIndex; {Transfer-Encoding: chunked}
-    property Upgrade: String index 34 read FUpgrade write SetHeaderValueByPropertyIndex; {Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11}
-    property UserAgent: String index 35 read FUserAgent write SetHeaderValueByPropertyIndex; {User-Agent: CERN-LineMode/2.15 libwww/2.17b3}
-    property Via: String index 36 read FVia write SetHeaderValueByPropertyIndex; {Via: 1.0 ricky, 1.1 mertz, 1.0 lucy}
-    property Warning: String index 37 read FWarning write SetHeaderValueByPropertyIndex; {Warning: 112 Disconnected Operation}
-    property CustomHeaders: Tstrings read FCustomHeaders write SetCustomHeaders;
-    property Cookies: TStrings read FCookies write SetCookies;
+    property Accept: AnsiString index 0 read FAccept write SetHeaderValueByPropertyIndex; {Accept: audio/*; q=0.2, audio/basic}
+    property AcceptCharSet: AnsiString index 1 read FAcceptCharSet write SetHeaderValueByPropertyIndex; {Accept-Charset: iso-8859-5, unicode-1-1;q=0.8}
+    property AcceptEncoding: AnsiString index 2 read FAcceptEncoding write SetHeaderValueByPropertyIndex; {Accept-Encoding: gzip;q=1.0, identity; q=0.5, *;q=0}
+    property AcceptLanguage: AnsiString index 3 read FAcceptLanguage write SetHeaderValueByPropertyIndex; {Accept-Language: da, en-gb;q=0.8, en;q=0.7}
+    property Allow: AnsiString index 4 read FAllow write SetHeaderValueByPropertyIndex; {Allow: GET, HEAD, PUT}
+    property Authorization: AnsiString index 5 read FAuthorization write SetHeaderValueByPropertyIndex; {Authorization: BASIC d2VibWFzdGVyOnpycW1hNHY=}
+    property CacheControl: AnsiString index 6 read FCacheControl write SetHeaderValueByPropertyIndex; {Cache-Control: no-cache}
+    property Connection: AnsiString index 7 read FConnection write SetHeaderValueByPropertyIndex; {Connection: close}
+    property ContentEncoding: AnsiString index 8 read FContentEncoding write SetHeaderValueByPropertyIndex; {Content-Encoding: gzip}
+    property ContentLanguage: AnsiString index 9 read FContentLanguage write SetHeaderValueByPropertyIndex; {Content-Language: mi, en}
+    property ContentLength: AnsiString index 10 read FContentLength write SetHeaderValueByPropertyIndex;  {Content-Length: 3495}
+    property ContentLocation: AnsiString index 11 read FContentLocation write SetHeaderValueByPropertyIndex;  {Content-Location: http://localhost/page.asp}
+    property ContentMD5: AnsiString index 12 read FContentMD5 write SetHeaderValueByPropertyIndex;  {Content-MD5: [md5-digest]}
+    property ContentRange: AnsiString index 13 read FContentRange write SetHeaderValueByPropertyIndex;  {Content-Range: bytes 2543-4532/7898}
+    property ContentType: AnsiString index 14 read FContentType write SetHeaderValueByPropertyIndex; {Content-Type: text/html; charset=ISO-8859-4}
+    property Date: AnsiString index 15 read FDate write SetHeaderValueByPropertyIndex; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
+    property Expect: AnsiString index 16 read fExpect write SetHeaderValueByPropertyIndex; {Expect: 100-continue}
+    property Expires: AnsiString index 17 read FExpires write SetHeaderValueByPropertyIndex; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
+    property From: AnsiString index 18 read FFrom write SetHeaderValueByPropertyIndex; {From: webmaster@w3.org}
+    property Host: AnsiString index 19 read FHost write SetHeaderValueByPropertyIndex; {Host: www.w3.org}
+    property IfMatch: AnsiString index 20 read FIfMatch write SetHeaderValueByPropertyIndex; {If-Match: entity_tag001}
+    property IfModifiedSince: AnsiString index 21 read FIfModifiedSince write SetHeaderValueByPropertyIndex; {If-Modified-Since: Sat, 29 Oct 1994 19:43:31 GMT}
+    property IfNoneMatch: AnsiString index 22 read fIfNoneMatch write SetHeaderValueByPropertyIndex; {If-None-Match: entity_tag001}
+    property IfRange: AnsiString index 23 read fIfRange write SetHeaderValueByPropertyIndex; {If-Range: entity_tag001}
+    property IfUnmodifiedSince: AnsiString index 24 read fIfUnmodifiedSince write SetHeaderValueByPropertyIndex; {If-Unmodified-Since: Sat, 29 Oct 1994 19:43:31 GMT}
+    property LastModified: AnsiString index 25 read fLastModified write SetHeaderValueByPropertyIndex; {Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT}
+    property MaxForwards: AnsiString index 26 read fMaxForwards write SetHeaderValueByPropertyIndex; {Max-Forwards: 3}
+    property Pragma: AnsiString index 27 read FPragma write SetHeaderValueByPropertyIndex; {Pragma: no-cache}
+    property ProxyAuthorization: AnsiString index 28 read FProxyAuthorization write SetHeaderValueByPropertyIndex; {Proxy-Authorization: [credentials]}
+    property Range: AnsiString index 29 read FRange write SetHeaderValueByPropertyIndex; {Range: bytes=100-599}
+    property Referer: AnsiString index 30 read FReferer write SetHeaderValueByPropertyIndex; {Referer: http://www.w3.org/hypertext/DataSources/Overview.html}
+    property TE: AnsiString index 31 read fTE write SetHeaderValueByPropertyIndex; {TE: trailers, deflate;q=0.5}
+    property Trailer: AnsiString index 32 read FTrailer write SetHeaderValueByPropertyIndex; {Trailer: Date}
+    property TransferEncoding: AnsiString index 33 read FTransferEncoding write SetHeaderValueByPropertyIndex; {Transfer-Encoding: chunked}
+    property Upgrade: AnsiString index 34 read FUpgrade write SetHeaderValueByPropertyIndex; {Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11}
+    property UserAgent: AnsiString index 35 read FUserAgent write SetHeaderValueByPropertyIndex; {User-Agent: CERN-LineMode/2.15 libwww/2.17b3}
+    property Via: AnsiString index 36 read FVia write SetHeaderValueByPropertyIndex; {Via: 1.0 ricky, 1.1 mertz, 1.0 lucy}
+    property Warning: AnsiString index 37 read FWarning write SetHeaderValueByPropertyIndex; {Warning: 112 Disconnected Operation}
+    property CustomHeaders: TALStrings read FCustomHeaders write SetCustomHeaders;
+    property Cookies: TALStrings read FCookies write SetCookies;
     property OnChange: TALHTTPPropertyChangeEvent read FOnChange write FOnChange;
   end;
 
   {--TALHTTPCookie--}
   TALHTTPResponseCookie = class(TCollectionItem)
   private
-    FName: string;
-    FValue: string;
-    FPath: string;
-    FDomain: string;
+    FName: AnsiString;
+    FValue: AnsiString;
+    FPath: AnsiString;
+    FDomain: AnsiString;
     FExpires: TDateTime;
     FSecure: Boolean;
   protected
-    function GetHeaderValue: string;
-    procedure SetHeaderValue(Const aValue: string);
+    function GetHeaderValue: AnsiString;
+    procedure SetHeaderValue(Const aValue: AnsiString);
   public
     constructor Create(Collection: TCollection); override;
     procedure AssignTo(Dest: TPersistent); override;
-    property HeaderValue: string read GetHeaderValue write SetHeaderValue;
+    property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
   Published
-    property Name: string read FName write FName;
-    property Value: string read FValue write FValue;
-    property Domain: string read FDomain write FDomain;
-    property Path: string read FPath write FPath;
+    property Name: AnsiString read FName write FName;
+    property Value: AnsiString read FValue write FValue;
+    property Domain: AnsiString read FDomain write FDomain;
+    property Path: AnsiString read FPath write FPath;
     property Expires: TDateTime read FExpires write FExpires;
     property Secure: Boolean read FSecure write FSecure Default False;
   end;
@@ -243,132 +241,137 @@ Type
   {--Response header--}
   TALHTTPResponseHeader = Class(TPersistent)
   Private
-    FAcceptRanges: String;
-    FAge: String;
-    FAllow: String;
-    FCacheControl: String;
-    FConnection: string;
-    FContentEncoding: string;
-    FContentLanguage: string;
-    FContentLength: string;
-    FContentLocation: string;
-    FContentMD5: string;
-    FContentRange: string;
-    FContentType: string;
-    FDate: string;
-    FETag: String;
-    FExpires: string;
-    FLastModified: string;
-    FLocation: String;
-    FPragma: string;
-    FProxyAuthenticate: String;
-    FRetryAfter: String;
-    FServer: String;
-    FTrailer: String;
-    FTransferEncoding: String;
-    FUpgrade: String;
-    FVary: String;
-    FVia: String;
-    FWarning: String;
-    FWWWAuthenticate: String;
-    FRawHeaderText: string;
-    FCustomHeaders: Tstrings;
+    FAcceptRanges: AnsiString;
+    FAge: AnsiString;
+    FAllow: AnsiString;
+    FCacheControl: AnsiString;
+    FConnection: AnsiString;
+    FContentEncoding: AnsiString;
+    FContentLanguage: AnsiString;
+    FContentLength: AnsiString;
+    FContentLocation: AnsiString;
+    FContentMD5: AnsiString;
+    FContentRange: AnsiString;
+    FContentType: AnsiString;
+    FDate: AnsiString;
+    FETag: AnsiString;
+    FExpires: AnsiString;
+    FLastModified: AnsiString;
+    FLocation: AnsiString;
+    FPragma: AnsiString;
+    FProxyAuthenticate: AnsiString;
+    FRetryAfter: AnsiString;
+    FServer: AnsiString;
+    FTrailer: AnsiString;
+    FTransferEncoding: AnsiString;
+    FUpgrade: AnsiString;
+    FVary: AnsiString;
+    FVia: AnsiString;
+    FWarning: AnsiString;
+    FWWWAuthenticate: AnsiString;
+    FRawHeaderText: AnsiString;
+    FCustomHeaders: TALStrings;
     FCookies: TALHTTPResponseCookieCollection;
-    FStatusCode: String;
-    FHttpProtocolVersion: String;
-    FReasonPhrase: String;
-    procedure SetRawHeaderText(const aRawHeaderText: string);
-    Function GetRawHeaderText: String;
+    FStatusCode: AnsiString;
+    FHttpProtocolVersion: AnsiString;
+    FReasonPhrase: AnsiString;
+    procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
+    Function GetRawHeaderText: AnsiString;
   protected
     procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    property AcceptRanges: String read FAcceptRanges; {Accept-Ranges: bytes}
-    property Age: String read FAge; {Age: 2147483648(2^31)}
-    property Allow: String read FAllow; {Allow: GET, HEAD, PUT}
-    property CacheControl: String read FCacheControl; {Cache-Control: no-cache}
-    property Connection: string read FConnection; {Connection: close}
-    property ContentEncoding: string read FContentEncoding; {Content-Encoding: gzip}
-    property ContentLanguage: string read FContentLanguage; {Content-Language: mi, en}
-    property ContentLength: string read FContentLength;  {Content-Length: 3495}
-    property ContentLocation: string read FContentLocation;  {Content-Location: http://localhost/page.asp}
-    property ContentMD5: string read FContentMD5;  {Content-MD5: [md5-digest]}
-    property ContentRange: string read FContentRange;  {Content-Range: bytes 2543-4532/7898}
-    property ContentType: string read FContentType; {Content-Type: text/html; charset=ISO-8859-4}
-    property Date: string read FDate; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
-    property ETag: String read FETag; {ETag: W/"xyzzy"}
-    property Expires: string read FExpires; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
-    property LastModified: string read FLastModified; {Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT}
-    property Location: String read FLocation; {Location: http://www.w3.org/pub/WWW/People.html}
-    property Pragma: string read FPragma; {Pragma: no-cache}
-    property ProxyAuthenticate: String read FProxyAuthenticate; {Proxy-Authenticate: [challenge]}
-    property RetryAfter: String read FRetryAfter; {Retry-After: Fri, 31 Dec 1999 23:59:59 GMT}
-    property Server: String read FServer; {Server: CERN/3.0 libwww/2.17}
-    property Trailer: String read FTrailer; {Trailer: Date}
-    property TransferEncoding: String read FTransferEncoding; {Transfer-Encoding: chunked}
-    property Upgrade: String read FUpgrade; {Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11}
-    property Vary: String read FVary; {Vary: Date}
-    property Via: String read FVia; {Via: 1.0 ricky, 1.1 mertz, 1.0 lucy}
-    property Warning: String read FWarning; {Warning: 112 Disconnected Operation}
-    property WWWAuthenticate: String read FWWWAuthenticate; {WWW-Authenticate: [challenge]}
-    Property CustomHeaders: Tstrings read FCustomHeaders;
+    property AcceptRanges: AnsiString read FAcceptRanges; {Accept-Ranges: bytes}
+    property Age: AnsiString read FAge; {Age: 2147483648(2^31)}
+    property Allow: AnsiString read FAllow; {Allow: GET, HEAD, PUT}
+    property CacheControl: AnsiString read FCacheControl; {Cache-Control: no-cache}
+    property Connection: AnsiString read FConnection; {Connection: close}
+    property ContentEncoding: AnsiString read FContentEncoding; {Content-Encoding: gzip}
+    property ContentLanguage: AnsiString read FContentLanguage; {Content-Language: mi, en}
+    property ContentLength: AnsiString read FContentLength;  {Content-Length: 3495}
+    property ContentLocation: AnsiString read FContentLocation;  {Content-Location: http://localhost/page.asp}
+    property ContentMD5: AnsiString read FContentMD5;  {Content-MD5: [md5-digest]}
+    property ContentRange: AnsiString read FContentRange;  {Content-Range: bytes 2543-4532/7898}
+    property ContentType: AnsiString read FContentType; {Content-Type: text/html; charset=ISO-8859-4}
+    property Date: AnsiString read FDate; {Date: Tue, 15 Nov 1994 08:12:31 GMT}
+    property ETag: AnsiString read FETag; {ETag: W/"xyzzy"}
+    property Expires: AnsiString read FExpires; {Expires: Thu, 01 Dec 1994 16:00:00 GMT}
+    property LastModified: AnsiString read FLastModified; {Last-Modified: Tue, 15 Nov 1994 12:45:26 GMT}
+    property Location: AnsiString read FLocation; {Location: http://www.w3.org/pub/WWW/People.html}
+    property Pragma: AnsiString read FPragma; {Pragma: no-cache}
+    property ProxyAuthenticate: AnsiString read FProxyAuthenticate; {Proxy-Authenticate: [challenge]}
+    property RetryAfter: AnsiString read FRetryAfter; {Retry-After: Fri, 31 Dec 1999 23:59:59 GMT}
+    property Server: AnsiString read FServer; {Server: CERN/3.0 libwww/2.17}
+    property Trailer: AnsiString read FTrailer; {Trailer: Date}
+    property TransferEncoding: AnsiString read FTransferEncoding; {Transfer-Encoding: chunked}
+    property Upgrade: AnsiString read FUpgrade; {Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11}
+    property Vary: AnsiString read FVary; {Vary: Date}
+    property Via: AnsiString read FVia; {Via: 1.0 ricky, 1.1 mertz, 1.0 lucy}
+    property Warning: AnsiString read FWarning; {Warning: 112 Disconnected Operation}
+    property WWWAuthenticate: AnsiString read FWWWAuthenticate; {WWW-Authenticate: [challenge]}
+    Property CustomHeaders: TALStrings read FCustomHeaders;
     Property Cookies: TALHTTPResponseCookieCollection read FCookies;
-    property StatusCode: String read FStatusCode;
-    property HttpProtocolVersion: String read FHttpProtocolVersion;
-    Property ReasonPhrase: String read FReasonPhrase;
-    property RawHeaderText: String read GetRawHeaderText write setRawHeaderText;
+    property StatusCode: AnsiString read FStatusCode;
+    property HttpProtocolVersion: AnsiString read FHttpProtocolVersion;
+    Property ReasonPhrase: AnsiString read FReasonPhrase;
+    property RawHeaderText: AnsiString read GetRawHeaderText write setRawHeaderText;
   end;
 
 {Http Function}
-function  ALHTTPDecode(const AStr: String): String;
-procedure ALHTTPEncodeParamNameValues(ParamValues: TStrings);
+function  ALHTTPDecode(const AStr: AnsiString): AnsiString;
+procedure ALHTTPEncodeParamNameValues(ParamValues: TALStrings);
 procedure ALExtractHTTPFields(Separators,
                               WhiteSpace,
                               Quotes: TSysCharSet;
-                              Content: PChar;
-                              Strings: TStrings;
+                              Content: PAnsiChar;
+                              Strings: TALStrings;
                               StripQuotes: Boolean = False);
-Function  AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
-Function  AlExtractHostNameFromUrl(aUrl: String): String;
-Function  AlExtractDomainNameFromUrl(aUrl: String): String;
-Function  AlExtractUrlPathFromUrl(aUrl: String): String;
-{*************
-flags can be :
-  ICU_DECODE Converts encoded characters back to their normal form.
-  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters}
-Function AlInternetCrackUrl(aUrl: String;
-                            Var SchemeName,
-                                HostName,
-                                UserName,
-                                Password,
-                                UrlPath,
-                                ExtraInfo: String;
-                            var PortNumber: integer): Boolean; overload;
-Function  AlInternetCrackUrl(aUrl: String;
+Function  AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
+Function  AlExtractHostNameFromUrl(aUrl: AnsiString): AnsiString;
+Function  AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
+Function  AlExtractUrlPathFromUrl(aUrl: AnsiString): AnsiString;
+Function  AlInternetCrackUrl(aUrl: AnsiString;
                              Var SchemeName,
                                  HostName,
                                  UserName,
                                  Password,
                                  UrlPath,
-                                 Anchor: String; // not the anchor is never send to the server ! it's only used on client side
-                             Query: TStrings;
+                                 ExtraInfo: AnsiString;
                              var PortNumber: integer): Boolean; overload;
-Function  AlInternetCrackUrl(var Url: String; // if true return UrlPath
-                             var Anchor: String;
-                             Query: TStrings): Boolean; overload;
-Function  AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
-Function  AlRemoveAnchorFromUrl(aUrl: String): String; overload;
-function  AlCombineUrl(RelativeUrl, BaseUrl: String): String; overload;
+Function  AlInternetCrackUrl(aUrl: AnsiString;
+                             Var SchemeName,
+                                 HostName,
+                                 UserName,
+                                 Password,
+                                 UrlPath,
+                                 Anchor: AnsiString; // not the anchor is never send to the server ! it's only used on client side
+                             Query: TALStrings;
+                             var PortNumber: integer): Boolean; overload;
+Function  AlInternetCrackUrl(var Url: AnsiString; // if true return UrlPath
+                             var Anchor: AnsiString;
+                             Query: TALStrings): Boolean; overload;
+Function  AlRemoveAnchorFromUrl(aUrl: AnsiString; Var aAnchor: AnsiString): AnsiString; overload;
+Function  AlRemoveAnchorFromUrl(aUrl: AnsiString): AnsiString; overload;
+function  AlCombineUrl(RelativeUrl, BaseUrl: AnsiString): AnsiString; overload;
 Function  AlCombineUrl(RelativeUrl,
                        BaseUrl,
-                       Anchor: String;
-                       Query: TStrings): String; overload;
-Function ALIPV4StrToNumeric(aIPv4: String): Cardinal;
-Function ALTryIPV4StrToNumeric(aIPv4Str: String; var aIPv4Num: Cardinal): Boolean;
-Function ALNumericToIPv4Str(aIPv4: Cardinal): String;
+                       Anchor: AnsiString;
+                       Query: TALStrings): AnsiString; overload;
 
+Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
+Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
+Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
+
+type
+  TALIPv6Binary = array[1..16] of ansiChar;
+
+Function ALZeroIpV6: TALIPv6Binary;
+Function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
+Function ALIPV6StrTobinary(aIPv6: ansiString): TALIPv6Binary;
+Function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
+Function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
 
 ResourceString
   CALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
@@ -379,11 +382,10 @@ implementation
 
 uses HTTPapp,
      alFcnRFC,
-     AlFcnMisc,
-     AlFcnString;
+     AlFcnMisc;
 
-{***********************************************************************}
-function AlStringFetch(var AInput: string; const ADelim: string): string;
+{***********************************************************************************}
+function AlStringFetch(var AInput: AnsiString; const ADelim: AnsiString): AnsiString;
 var
   LPos: Integer;
 begin
@@ -397,11 +399,6 @@ begin
     AInput := AlCopyStr(AInput, LPos + Length(ADelim), MaxInt);
   end;
 end;
-
-
-/////////////////////////////////////////////////////////////////////////////
-////////// TALHTTPResponseCookie ////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 
 {****************************************************************}
 constructor TALHTTPResponseCookie.Create(Collection: TCollection);
@@ -426,34 +423,29 @@ begin
     else inherited AssignTo(Dest);
 end;
 
-{****************************************************}
-function TALHTTPResponseCookie.GetHeaderValue: string;
+{********************************************************}
+function TALHTTPResponseCookie.GetHeaderValue: AnsiString;
 var aYear, aMonth, aDay: Word;
 begin
-  Result := Format('%s=%s; ', [HTTPEncode(FName), HTTPEncode(FValue)]);
-  if Domain <> '' then Result := Result + Format('domain=%s; ', [Domain]);
-  if Path <> '' then Result := Result + Format('path=%s; ', [Path]);
+  Result := ALFormat('%s=%s; ', [HTTPEncode(FName), HTTPEncode(FValue)]);
+  if Domain <> '' then Result := Result + ALFormat('domain=%s; ', [Domain]);
+  if Path <> '' then Result := Result + ALFormat('path=%s; ', [Path]);
   if Expires > -1 then begin
     DecodeDate(Expires, aYear, aMonth, aDay);
-    Result := Result + Format(
-                              FormatDateTime(
-                                             '"expires=%s, "dd"-%s-"yyyy" "hh":"nn":"ss" GMT; "',
-                                             Expires
-                                            ),
-                              [
-                               CAlRfc822DaysOfWeek[DayOfWeek(Expires)],
-                               CAlRfc822MonthNames[aMonth]
-                              ]
-                             );
+    Result := Result + ALFormat(ALFormatDateTime('"expires=%s, "dd"-%s-"yyyy" "hh":"nn":"ss" GMT; "',
+                                                 Expires,
+                                                 ALDefaultFormatSettings),
+                                [CAlRfc822DaysOfWeek[DayOfWeek(Expires)],
+                                 CAlRfc822MonthNames[aMonth]]);
   end;
   if Secure then Result := Result + 'secure';
-  if Copy(Result, Length(Result) - 1, MaxInt) = '; ' then SetLength(Result, Length(Result) - 2);
+  if ALCopyStr(Result, Length(Result) - 1, MaxInt) = '; ' then SetLength(Result, Length(Result) - 2);
 end;
 
-{*******************************************************************}
-procedure TALHTTPResponseCookie.SetHeaderValue(Const aValue: string);
-Var aCookieProp: TStringList;
-    aCookieStr: String;
+{***********************************************************************}
+procedure TALHTTPResponseCookie.SetHeaderValue(Const aValue: AnsiString);
+Var aCookieProp: TALStringList;
+    aCookieStr: AnsiString;
 begin
   FName:= '';
   FValue:= '';
@@ -462,13 +454,13 @@ begin
   FExpires:= -1;
   FSecure:= False;
 
-  aCookieProp := TStringList.Create;
+  aCookieProp := TALStringList.Create;
   try
     aCookieStr := AValue;
 
-    while Pos(';', aCookieStr) > 0 do begin
-      aCookieProp.Add(Trim(AlStringFetch(aCookieStr, ';')));
-      if (Pos(';', aCookieStr) = 0) and (Length(aCookieStr) > 0) then aCookieProp.Add(Trim(aCookieStr));
+    while ALPos(';', aCookieStr) > 0 do begin
+      aCookieProp.Add(ALTrim(AlStringFetch(aCookieStr, ';')));
+      if (ALPos(';', aCookieStr) = 0) and (Length(aCookieStr) > 0) then aCookieProp.Add(ALTrim(aCookieStr));
     end;
 
     if aCookieProp.Count = 0 then aCookieProp.Text := aCookieStr;
@@ -493,12 +485,6 @@ begin
   end;
 end;
 
-
-
-/////////////////////////////////////////////////////////////////////////////
-////////// TCookieCollection ////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
-
 {******************************************************************}
 function TALHTTPResponseCookieCollection.Add: TALHTTPResponseCookie;
 begin
@@ -517,18 +503,11 @@ begin
   Items[Index].Assign(Cookie);
 end;
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-////////// TALHTTPClientResponseHeader ////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
 {***************************************}
 constructor TALHTTPResponseHeader.Create;
 begin
   inherited;
-  FCustomHeaders := TstringList.create;
+  FCustomHeaders := TALStringList.create;
   FCustomHeaders.NameValueSeparator := ':';
   FCookies := TALHTTPResponseCookieCollection.Create(Self, TALHTTPResponseCookie);
   clear;
@@ -581,32 +560,32 @@ begin
   FReasonPhrase := '';
 end;
 
-{******************************************************}
-function TALHTTPResponseHeader.GetRawHeaderText: String;
+{**********************************************************}
+function TALHTTPResponseHeader.GetRawHeaderText: AnsiString;
 begin
   result := FRawHeaderText;
 end;
 
-{*****************************************************************************}
-procedure TALHTTPResponseHeader.SetRawHeaderText(Const aRawHeaderText: string);
-Var aRawHeaderLst: TstringList;
+{*********************************************************************************}
+procedure TALHTTPResponseHeader.SetRawHeaderText(Const aRawHeaderText: AnsiString);
+Var aRawHeaderLst: TALStringList;
     j: integer;
-    AStatusLine: String;
+    AStatusLine: AnsiString;
 
-  {-------------------------------------}
-  Function AlG001(aName: String): String;
+  {---------------------------------------------}
+  Function AlG001(aName: AnsiString): AnsiString;
   Var i: Integer;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
     If I >= 0 then Begin
-      result := Trim(aRawHeaderLst.ValueFromIndex[i]);
+      result := ALTrim(aRawHeaderLst.ValueFromIndex[i]);
       aRawHeaderLst.Delete(i);
     end
     else result := '';
   end;
 
 begin
-  aRawHeaderLst := TstringList.create;
+  aRawHeaderLst := TALStringList.create;
   try
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
@@ -643,27 +622,27 @@ begin
     FCookies.clear;
     J := aRawHeaderLst.IndexOfName('Set-Cookie');
     While J >= 0 do begin
-      If trim(aRawHeaderLst.ValueFromIndex[j]) <> '' then
-        Cookies.Add.HeaderValue := Trim(aRawHeaderLst.ValueFromIndex[j]);
+      If ALTrim(aRawHeaderLst.ValueFromIndex[j]) <> '' then
+        Cookies.Add.HeaderValue := ALTrim(aRawHeaderLst.ValueFromIndex[j]);
       aRawHeaderLst.Delete(j);
       J := aRawHeaderLst.IndexOfName('Set-Cookie');
     end;
 
     If aRawHeaderLst.Count > 0 then begin
       AStatusLine := aRawHeaderLst[0]; //HTTP/1.1 200 OK | 200 OK | status: 200 OK
-      FHttpProtocolVersion := trim(AlStringFetch(AstatusLine,' '));
+      FHttpProtocolVersion := ALTrim(AlStringFetch(AstatusLine,' '));
       If AlIsInteger(FHttpProtocolVersion) then begin
         FStatusCode := FHttpProtocolVersion;
         FHttpProtocolVersion := '';
       end
-      else FStatusCode := trim(AlStringFetch(AstatusLine,' '));
-      FReasonPhrase := trim(AstatusLine);
+      else FStatusCode := ALTrim(AlStringFetch(AstatusLine,' '));
+      FReasonPhrase := ALTrim(AstatusLine);
 
       If not AlIsInteger(FStatusCode) then begin
         FHttpProtocolVersion := '';
         AStatusLine := Alg001('Status');
-        FStatusCode := trim(AlStringFetch(AStatusLine,' '));
-        FReasonPhrase := trim(AlStringFetch(AStatusLine,' '));
+        FStatusCode := ALTrim(AlStringFetch(AStatusLine,' '));
+        FReasonPhrase := ALTrim(AlStringFetch(AStatusLine,' '));
       end
       else aRawHeaderLst.Delete(0);
     end
@@ -675,7 +654,7 @@ begin
 
     FCustomHeaders.clear;
     For j := 0 to aRawHeaderLst.count - 1 do
-      If trim(aRawHeaderLst[j]) <> '' then
+      If ALTrim(aRawHeaderLst[j]) <> '' then
         FCustomHeaders.Add(aRawHeaderLst[j]);
 
     FRawHeaderText := aRawHeaderText;
@@ -728,20 +707,13 @@ begin
   else inherited AssignTo(Dest);
 end;
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-////////// TALHTTPClientRequestHeader /////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
 {**********************************************************}
 constructor TALHTTPRequestHeader.Create(AOwner: TComponent);
 Begin
   inherited create(AOwner);
-  fCustomHeaders:= TstringList.create;
+  fCustomHeaders:= TALStringList.create;
   fCustomHeaders.NameValueSeparator := ':';
-  FCookies := TstringList.create;
+  FCookies := TALStringList.create;
   FOnchange := nil;
   clear;
   fAccept := 'text/html, */*';
@@ -807,11 +779,11 @@ begin
   if assigned(FonChange) then FonChange(Self,propertyIndex);
 end;
 
-{******************************************************************************************************}
-procedure TALHTTPRequestHeader.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: string);
+{**********************************************************************************************************}
+procedure TALHTTPRequestHeader.SetHeaderValueByPropertyIndex(const Index: Integer; const Value: AnsiString);
 
-  {--------------------------------------}
-  procedure alg001(Var AProperty: String);
+  {------------------------------------------}
+  procedure alg001(Var AProperty: AnsiString);
   Begin
     If AProperty <> Value then begin
       AProperty := Value;
@@ -862,75 +834,75 @@ begin
   end;
 end;
 
-{*****************************************************}
-Function TALHTTPRequestHeader.GetRawHeaderText: String;
+{*********************************************************}
+Function TALHTTPRequestHeader.GetRawHeaderText: AnsiString;
 Var i : integer;
 begin
   Result := '';
-  If trim(fAccept) <> '' then result := result + 'Accept: ' + trim(FAccept) + #13#10;
-  If trim(fAcceptCharSet) <> '' then result := result + 'Accept-Charset: ' + trim(FAcceptCharSet) + #13#10;
-  If trim(fAcceptEncoding) <> '' then result := result + 'Accept-Encoding: ' + trim(FAcceptEncoding) + #13#10;
-  If trim(fAcceptLanguage) <> '' then result := result + 'Accept-Language: ' + trim(FAcceptLanguage) + #13#10;
-  If trim(fAllow) <> '' then result := result + 'Allow: ' + trim(FAllow) + #13#10;
-  If trim(fAuthorization) <> '' then result := result + 'Authorization: ' + trim(FAuthorization) + #13#10;
-  If trim(fCacheControl) <> '' then result := result + 'Cache-Control: ' + trim(FCacheControl) + #13#10;
-  If trim(fConnection) <> '' then result := result + 'Connection: ' + trim(FConnection) + #13#10;
-  If trim(fContentEncoding) <> '' then result := result + 'Content-Encoding: ' + trim(FContentEncoding) + #13#10;
-  If trim(fContentLanguage) <> '' then result := result + 'Content-Language: ' + trim(FContentLanguage) + #13#10;
-  If trim(fContentLength) <> '' then result := result + 'Content-Length: ' + trim(FContentLength) + #13#10;
-  If trim(fContentLocation) <> '' then result := result + 'Content-Location: ' + trim(FContentLocation) + #13#10;
-  If trim(fContentMD5) <> '' then result := result + 'Content-MD5: ' + trim(FContentMD5) + #13#10;
-  If trim(fContentRange) <> '' then result := result + 'Content-Range: ' + trim(FContentRange) + #13#10;
-  If trim(fContentType) <> '' then result := result + 'Content-Type: ' + trim(FContentType) + #13#10;
-  If trim(fDate) <> '' then result := result + 'Date: ' + trim(FDate) + #13#10;
-  If trim(fExpect) <> '' then result := result + 'Expect: ' + trim(FExpect) + #13#10;
-  If trim(fExpires) <> '' then result := result + 'Expires: ' + trim(FExpires) + #13#10;
-  If trim(fFrom) <> '' then result := result + 'From: ' + trim(FFrom) + #13#10;
-  If trim(fHost) <> '' then result := result + 'Host: ' + trim(FHost) + #13#10;
-  If trim(fIfMatch) <> '' then result := result + 'If-Match: ' + trim(FIfMatch) + #13#10;
-  If trim(fIfModifiedSince) <> '' then result := result + 'If-Modified-Since: ' + trim(FIfModifiedSince) + #13#10;
-  If trim(fIfNoneMatch) <> '' then result := result + 'If-None-Match: ' + trim(fIfNoneMatch) + #13#10;
-  If trim(fIfRange) <> '' then result := result + 'If-Range: ' + trim(fIfRange) + #13#10;
-  If trim(fIfUnmodifiedSince) <> '' then result := result + 'If-Unmodified-Since: ' + trim(fIfUnmodifiedSince) + #13#10;
-  If trim(fLastModified) <> '' then result := result + 'Last-Modified: ' + trim(fLastModified) + #13#10;
-  If trim(fMaxForwards) <> '' then result := result + 'Max-Forwards: ' + trim(fMaxForwards) + #13#10;
-  If trim(fPragma) <> '' then result := result + 'Pragma: ' + trim(FPragma) + #13#10;
-  If trim(fProxyAuthorization) <> '' then result := result + 'Proxy-Authorization: ' + trim(FProxyAuthorization) + #13#10;
-  If trim(fRange) <> '' then result := result + 'Range: ' + trim(FRange) + #13#10;
-  If trim(fReferer) <> '' then result := result + 'Referer: ' + trim(FReferer) + #13#10;
-  If trim(fTE) <> '' then result := result + 'TE: ' + trim(fTE) + #13#10;
-  If trim(fTrailer) <> '' then result := result + 'Trailer: ' + trim(FTrailer) + #13#10;
-  If trim(fTransferEncoding) <> '' then result := result + 'Transfer-Encoding: ' + trim(FTransferEncoding) + #13#10;
-  If trim(fUpgrade) <> '' then result := result + 'Upgrade: ' + trim(FUpgrade) + #13#10;
-  If trim(fUserAgent) <> '' then result := result + 'User-Agent: ' + trim(FUserAgent) + #13#10;
-  If trim(fVia) <> '' then result := result + 'Via: ' + trim(FVia) + #13#10;
-  If trim(fWarning) <> '' then result := result + 'Warning: ' + trim(FWarning) + #13#10;
+  If ALTrim(fAccept) <> '' then result := result + 'Accept: ' + ALTrim(FAccept) + #13#10;
+  If ALTrim(fAcceptCharSet) <> '' then result := result + 'Accept-Charset: ' + ALTrim(FAcceptCharSet) + #13#10;
+  If ALTrim(fAcceptEncoding) <> '' then result := result + 'Accept-Encoding: ' + ALTrim(FAcceptEncoding) + #13#10;
+  If ALTrim(fAcceptLanguage) <> '' then result := result + 'Accept-Language: ' + ALTrim(FAcceptLanguage) + #13#10;
+  If ALTrim(fAllow) <> '' then result := result + 'Allow: ' + ALTrim(FAllow) + #13#10;
+  If ALTrim(fAuthorization) <> '' then result := result + 'Authorization: ' + ALTrim(FAuthorization) + #13#10;
+  If ALTrim(fCacheControl) <> '' then result := result + 'Cache-Control: ' + ALTrim(FCacheControl) + #13#10;
+  If ALTrim(fConnection) <> '' then result := result + 'Connection: ' + ALTrim(FConnection) + #13#10;
+  If ALTrim(fContentEncoding) <> '' then result := result + 'Content-Encoding: ' + ALTrim(FContentEncoding) + #13#10;
+  If ALTrim(fContentLanguage) <> '' then result := result + 'Content-Language: ' + ALTrim(FContentLanguage) + #13#10;
+  If ALTrim(fContentLength) <> '' then result := result + 'Content-Length: ' + ALTrim(FContentLength) + #13#10;
+  If ALTrim(fContentLocation) <> '' then result := result + 'Content-Location: ' + ALTrim(FContentLocation) + #13#10;
+  If ALTrim(fContentMD5) <> '' then result := result + 'Content-MD5: ' + ALTrim(FContentMD5) + #13#10;
+  If ALTrim(fContentRange) <> '' then result := result + 'Content-Range: ' + ALTrim(FContentRange) + #13#10;
+  If ALTrim(fContentType) <> '' then result := result + 'Content-Type: ' + ALTrim(FContentType) + #13#10;
+  If ALTrim(fDate) <> '' then result := result + 'Date: ' + ALTrim(FDate) + #13#10;
+  If ALTrim(fExpect) <> '' then result := result + 'Expect: ' + ALTrim(FExpect) + #13#10;
+  If ALTrim(fExpires) <> '' then result := result + 'Expires: ' + ALTrim(FExpires) + #13#10;
+  If ALTrim(fFrom) <> '' then result := result + 'From: ' + ALTrim(FFrom) + #13#10;
+  If ALTrim(fHost) <> '' then result := result + 'Host: ' + ALTrim(FHost) + #13#10;
+  If ALTrim(fIfMatch) <> '' then result := result + 'If-Match: ' + ALTrim(FIfMatch) + #13#10;
+  If ALTrim(fIfModifiedSince) <> '' then result := result + 'If-Modified-Since: ' + ALTrim(FIfModifiedSince) + #13#10;
+  If ALTrim(fIfNoneMatch) <> '' then result := result + 'If-None-Match: ' + ALTrim(fIfNoneMatch) + #13#10;
+  If ALTrim(fIfRange) <> '' then result := result + 'If-Range: ' + ALTrim(fIfRange) + #13#10;
+  If ALTrim(fIfUnmodifiedSince) <> '' then result := result + 'If-Unmodified-Since: ' + ALTrim(fIfUnmodifiedSince) + #13#10;
+  If ALTrim(fLastModified) <> '' then result := result + 'Last-Modified: ' + ALTrim(fLastModified) + #13#10;
+  If ALTrim(fMaxForwards) <> '' then result := result + 'Max-Forwards: ' + ALTrim(fMaxForwards) + #13#10;
+  If ALTrim(fPragma) <> '' then result := result + 'Pragma: ' + ALTrim(FPragma) + #13#10;
+  If ALTrim(fProxyAuthorization) <> '' then result := result + 'Proxy-Authorization: ' + ALTrim(FProxyAuthorization) + #13#10;
+  If ALTrim(fRange) <> '' then result := result + 'Range: ' + ALTrim(FRange) + #13#10;
+  If ALTrim(fReferer) <> '' then result := result + 'Referer: ' + ALTrim(FReferer) + #13#10;
+  If ALTrim(fTE) <> '' then result := result + 'TE: ' + ALTrim(fTE) + #13#10;
+  If ALTrim(fTrailer) <> '' then result := result + 'Trailer: ' + ALTrim(FTrailer) + #13#10;
+  If ALTrim(fTransferEncoding) <> '' then result := result + 'Transfer-Encoding: ' + ALTrim(FTransferEncoding) + #13#10;
+  If ALTrim(fUpgrade) <> '' then result := result + 'Upgrade: ' + ALTrim(FUpgrade) + #13#10;
+  If ALTrim(fUserAgent) <> '' then result := result + 'User-Agent: ' + ALTrim(FUserAgent) + #13#10;
+  If ALTrim(fVia) <> '' then result := result + 'Via: ' + ALTrim(FVia) + #13#10;
+  If ALTrim(fWarning) <> '' then result := result + 'Warning: ' + ALTrim(FWarning) + #13#10;
   For i := 0 to FCustomHeaders.count - 1 do
-    if (trim(FCustomHeaders.names[i]) <> '') and (trim(FCustomHeaders.ValueFromIndex[i]) <> '') then
-      result := result + FCustomHeaders.names[i] + ': ' + trim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
+    if (ALTrim(FCustomHeaders.names[i]) <> '') and (ALTrim(FCustomHeaders.ValueFromIndex[i]) <> '') then
+      result := result + FCustomHeaders.names[i] + ': ' + ALTrim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
   If FCookies.Count > 0 then
-    result := result + 'Cookie: ' + AlStringReplace(Trim(FCookies.text),#13#10,'; ', [rfReplaceAll]) + #13#10;
+    result := result + 'Cookie: ' + AlStringReplace(ALTrim(FCookies.text),#13#10,'; ', [rfReplaceAll]) + #13#10;
 end;
 
-{****************************************************************************}
-procedure TALHTTPRequestHeader.SetRawHeaderText(const aRawHeaderText: string);
-Var aRawHeaderLst: TstringList;
+{********************************************************************************}
+procedure TALHTTPRequestHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
+Var aRawHeaderLst: TALStringList;
     j: integer;
 
-  {-------------------------------------}
-  Function AlG001(aName: String): String;
+  {---------------------------------------------}
+  Function AlG001(aName: AnsiString): AnsiString;
   Var i: Integer;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
     If I >= 0 then Begin
-      result := Trim(aRawHeaderLst.ValueFromIndex[i]);
+      result := ALTrim(aRawHeaderLst.ValueFromIndex[i]);
       aRawHeaderLst.Delete(i);
     end
     else result := '';
   end;
 
 begin
-  aRawHeaderLst := TstringList.create;
+  aRawHeaderLst := TALStringList.create;
   try
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
@@ -977,13 +949,13 @@ begin
     FCookies.clear;
     J := aRawHeaderLst.IndexOfName('Cookie');
     If J >= 0 then begin
-      ALExtractHTTPFields([';'], [' '], [], PChar(aRawHeaderLst.ValueFromIndex[j]), Cookies, True);
+      ALExtractHTTPFields([';'], [' '], [], PAnsiChar(aRawHeaderLst.ValueFromIndex[j]), Cookies, True);
       aRawHeaderLst.Delete(j);
     end;
 
     FCustomHeaders.clear;
     For j := 0 to aRawHeaderLst.count - 1 do
-      If trim(aRawHeaderLst[j]) <> '' then
+      If ALTrim(aRawHeaderLst[j]) <> '' then
         FCustomHeaders.Add(aRawHeaderLst[j]);
 
     DoChange(-1);
@@ -1043,33 +1015,27 @@ begin
   else inherited AssignTo(Dest);
 end;
 
-{***************************************************************}
-procedure TALHTTPRequestHeader.SetCookies(const Value: TStrings);
+{*****************************************************************}
+procedure TALHTTPRequestHeader.SetCookies(const Value: TALStrings);
 begin
   FCookies.Assign(Value);
 end;
 
-{*********************************************************************}
-procedure TALHTTPRequestHeader.SetCustomHeaders(const Value: Tstrings);
+{***********************************************************************}
+procedure TALHTTPRequestHeader.SetCustomHeaders(const Value: TALStrings);
 begin
   FCustomHeaders.Assign(Value);
 end;
 
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-////////// Http Misc function /////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
-{************************************************}
-function ALHTTPDecode(const AStr: String): String;
-var Sp, Rp, Cp, Tp: PChar;
+{********************************************************}
+function ALHTTPDecode(const AStr: AnsiString): AnsiString;
+var Sp, Rp, Cp, Tp: PAnsiChar;
     int: integer;
-    S: String;
+    S: AnsiString;
 begin
   SetLength(Result, Length(AStr));
-  Sp := PChar(AStr);
-  Rp := PChar(Result);
+  Sp := PAnsiChar(AStr);
+  Rp := PAnsiChar(Result);
   while Sp^ <> #0 do begin
     case Sp^ of
       '+': Rp^ := ' ';
@@ -1085,8 +1051,8 @@ begin
                Cp := Sp;
                Inc(Sp);
                if (Cp^ <> #0) and (Sp^ <> #0) then begin
-                 S := '$' + Cp^ + Sp^;
-                 if trystrtoint(s,int) then Rp^ := Chr(int)
+                 S := AnsiChar('$') + AnsiChar(Cp^) + AnsiChar(Sp^);
+                 if ALTryStrToInt(s,int) then Rp^ := ansiChar(int)
                  else begin
                    Rp^ := '%';
                    Sp := Tp;
@@ -1103,14 +1069,14 @@ begin
     Inc(Rp);
     Inc(Sp);
   end;
-  SetLength(Result, Rp - PChar(Result));
+  SetLength(Result, Rp - PAnsiChar(Result));
 end;
 
-{***********************************************************}
-procedure ALHTTPEncodeParamNameValues(ParamValues: TStrings);
+{*************************************************************}
+procedure ALHTTPEncodeParamNameValues(ParamValues: TALStrings);
 var i: Integer;
     LPos: integer;
-    LStr: string;
+    LStr: AnsiString;
 begin
   for i := 0 to ParamValues.Count - 1 do begin
     LStr := ParamValues[i];
@@ -1133,21 +1099,21 @@ end;
 procedure ALExtractHTTPFields(Separators,
                               WhiteSpace,
                               Quotes: TSysCharSet;
-                              Content: PChar;
-                              Strings: TStrings;
+                              Content: PAnsiChar;
+                              Strings: TALStrings;
                               StripQuotes: Boolean = False);
 begin
   ALExtractHeaderFields(Separators, WhiteSpace, Quotes, Content, Strings, True, StripQuotes);
 end;
 
-{************************************************************}
-Function AlExtractShemeFromUrl(aUrl: String): TInternetScheme;
+{****************************************************************}
+Function AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
 Var SchemeName,
     HostName,
     UserName,
     Password,
     UrlPath,
-    ExtraInfo: String;
+    ExtraInfo: AnsiString;
 var PortNumber: integer;
 begin
   if AlInternetCrackUrl(aUrl,
@@ -1158,22 +1124,22 @@ begin
                         UrlPath,
                         ExtraInfo,
                         PortNumber) then begin
-    if sametext(SchemeName,'http') then result := INTERNET_SCHEME_HTTP
-    else if sametext(SchemeName,'https') then result := INTERNET_SCHEME_HTTPS
-    else if sametext(SchemeName,'ftp') then result := INTERNET_SCHEME_FTP
+    if ALSameText(SchemeName,'http') then result := INTERNET_SCHEME_HTTP
+    else if ALSameText(SchemeName,'https') then result := INTERNET_SCHEME_HTTPS
+    else if ALSameText(SchemeName,'ftp') then result := INTERNET_SCHEME_FTP
     else result := INTERNET_SCHEME_UNKNOWN;
   end
   else result := INTERNET_SCHEME_UNKNOWN;
 end;
 
-{******************************************************}
-Function AlExtractHostNameFromUrl(aUrl: String): String;
+{**************************************************************}
+Function AlExtractHostNameFromUrl(aUrl: AnsiString): AnsiString;
 Var SchemeName,
     HostName,
     UserName,
     Password,
     UrlPath,
-    ExtraInfo: String;
+    ExtraInfo: AnsiString;
     PortNumber: integer;
 begin
   if AlInternetCrackUrl(aUrl,
@@ -1187,8 +1153,8 @@ begin
   else result := '';
 end;
 
-{********************************************************}
-Function AlExtractDomainNameFromUrl(aUrl: String): String;
+{****************************************************************}
+Function AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
 begin
   Result := AlExtractHostNameFromUrl(aUrl);
   while length(AlStringReplace(Result,
@@ -1197,14 +1163,14 @@ begin
                                [rfReplaceALL])) < length(result) - 1 do delete(Result, 1, ALpos('.',result));
 end;
 
-{******************************************************}
-Function  AlExtractUrlPathFromUrl(aUrl: String): String;
+{**************************************************************}
+Function  AlExtractUrlPathFromUrl(aUrl: AnsiString): AnsiString;
 Var SchemeName,
     HostName,
     UserName,
     Password,
     UrlPath,
-    ExtraInfo: String;
+    ExtraInfo: AnsiString;
     PortNumber: integer;
 begin
   if AlInternetCrackUrl(aUrl,
@@ -1218,20 +1184,17 @@ begin
   else result := '';
 end;
 
-{*************
-flags can be :
-  ICU_DECODE Converts encoded characters back to their normal form. (Exemple: sam%40a%mple.xml => sam@a%mple.xml)
-  ICU_ESCAPE Converts all escape sequences (%xx) to their corresponding characters (Exemple: sam%40a%mple.xml => error because %m is a wrong escape sequences !)}
-Function AlInternetCrackUrl(aUrl: String;
-                            Var SchemeName,
-                                HostName,
-                                UserName,
-                                Password,
-                                UrlPath,
-                                ExtraInfo: String;
-                            var PortNumber: integer): Boolean;
+{********************************************}
+Function  AlInternetCrackUrl(aUrl: AnsiString;
+                             Var SchemeName,
+                                 HostName,
+                                 UserName,
+                                 Password,
+                                 UrlPath,
+                                 ExtraInfo: AnsiString;
+                             var PortNumber: integer): Boolean;
 Var P1: Integer;
-    S1: String;
+    S1: AnsiString;
 begin
   SchemeName := '';
   HostName := '';
@@ -1256,7 +1219,7 @@ begin
       UrlPath := AlCopyStr(aUrl, P1, Maxint); // /path/filename.xxx
       delete(aUrl, P1, Maxint);               // xxxx:yyyyy@ftp.yoyo.com:21
     end;
-    P1 := lastdelimiter('@',aUrl);
+    P1 := ALLastDelimiter('@',aUrl);
     if P1 > 0 then begin
       S1 := AlCopyStr(aUrl, 1, P1-1); // xxxx:yyyyy
       delete(aUrl,1, P1);             // ftp.yoyo.com:21
@@ -1274,12 +1237,12 @@ begin
     if P1 > 0 then begin
       S1 := AlCopyStr(aUrl, P1+1, Maxint); // 21
       delete(aUrl, P1, Maxint);            // ftp.yoyo.com
-      if not tryStrToInt(S1, PortNumber) then PortNumber := 0;
+      if not ALTryStrToInt(S1, PortNumber) then PortNumber := 0;
     end;
     if PortNumber = 0 then begin
-      if sameText(SchemeName, 'http') then PortNumber := 80
-      else if sameText(SchemeName, 'https') then PortNumber := 443
-      else if sameText(SchemeName, 'ftp') then PortNumber := 21
+      if ALSameText(SchemeName, 'http') then PortNumber := 80
+      else if ALSameText(SchemeName, 'https') then PortNumber := 443
+      else if ALSameText(SchemeName, 'ftp') then PortNumber := 21
       else result := False;
     end;
     if result then begin
@@ -1301,17 +1264,17 @@ begin
 end;
 
 
-{***************************************}
-Function AlInternetCrackUrl(aUrl: String;
+{*******************************************}
+Function AlInternetCrackUrl(aUrl: AnsiString;
                             Var SchemeName,
                                 HostName,
                                 UserName,
                                 Password,
                                 UrlPath,
-                                Anchor: String; // not the anchor is never send to the server ! it's only used on client side
-                            Query: TStrings;
+                                Anchor: AnsiString; // not the anchor is never send to the server ! it's only used on client side
+                            Query: TALStrings;
                             var PortNumber: integer): Boolean;
-var aExtraInfo: string;
+var aExtraInfo: AnsiString;
     P1: integer;
 begin
   Result := AlInternetCrackUrl(aUrl,
@@ -1348,17 +1311,17 @@ begin
 
 end;
 
-{*******************************************}
-Function  AlInternetCrackUrl(var Url: String;  // if true return the relative url
-                             var Anchor: String;
-                             Query: TStrings): Boolean;
+{***********************************************}
+Function  AlInternetCrackUrl(var Url: AnsiString;  // if true return the relative url
+                             var Anchor: AnsiString;
+                             Query: TALStrings): Boolean;
 Var SchemeName,
     HostName,
     UserName,
     Password,
-    UrlPath: String;
+    UrlPath: AnsiString;
     PortNumber: integer;
-    tmpUrl: String;
+    tmpUrl: AnsiString;
 begin
 
   //exit if no url
@@ -1398,8 +1361,8 @@ begin
 
 end;
 
-{**********************************************************************************}
-Function AlRemoveAnchorFromUrl(aUrl: String; Var aAnchor: String): String; overload;
+{************************************************************************************}
+Function AlRemoveAnchorFromUrl(aUrl: AnsiString; Var aAnchor: AnsiString): AnsiString;
 Var P1: integer;
 begin
   P1 := AlPos('#',aUrl);
@@ -1411,17 +1374,17 @@ begin
   Result := aUrl;
 end;
 
-{*************************************************************}
-Function AlRemoveAnchorFromUrl(aUrl: String): String; overload;
-var aAnchor: String;
+{***********************************************************}
+Function AlRemoveAnchorFromUrl(aUrl: AnsiString): AnsiString;
+var aAnchor: AnsiString;
 begin
   result := AlRemoveAnchorFromUrl(aUrl,aAnchor);
 end;
 
-{**********************************************************}
-function AlCombineUrl(RelativeUrl, BaseUrl: String): String;
+{******************************************************************}
+function AlCombineUrl(RelativeUrl, BaseUrl: AnsiString): AnsiString;
 var Size: Dword;
-    Buffer: String;
+    Buffer: AnsiString;
 begin
   case AlExtractShemeFromUrl(RelativeUrl) of
 
@@ -1431,7 +1394,7 @@ begin
     INTERNET_SCHEME_DEFAULT: begin
                                Size := INTERNET_MAX_URL_LENGTH;
                                SetLength(Buffer, Size);
-                               if InternetCombineUrl(PChar(BaseUrl), PChar(RelativeUrl), @Buffer[1], size, ICU_BROWSER_MODE or ICU_no_encode) then Result := AlCopyStr(Buffer, 1, Size)
+                               if InternetCombineUrlA(PAnsiChar(BaseUrl), PAnsiChar(RelativeUrl), @Buffer[1], size, ICU_BROWSER_MODE or ICU_no_encode) then Result := AlCopyStr(Buffer, 1, Size)
                                else result := RelativeUrl;
                              end;
 
@@ -1444,9 +1407,9 @@ end;
 {*********************************}
 Function  AlCombineUrl(RelativeUrl,
                        BaseUrl,
-                       Anchor: String;
-                       Query: TStrings): String;
-Var S1 : String;
+                       Anchor: AnsiString;
+                       Query: TALStrings): AnsiString;
+Var S1 : AnsiString;
     {$IF CompilerVersion >= 18.5}
     aBool: Boolean;
     {$IFEND}
@@ -1462,7 +1425,7 @@ begin
 
       try
 
-        S1 := trim(Query.Text);
+        S1 := ALTrim(Query.Text);
         while alpos(Query.LineBreak, S1) = 1 do delete(S1,1,length(Query.LineBreak));
         while alposEx(Query.LineBreak,
                       S1,
@@ -1475,7 +1438,7 @@ begin
         if aBool then Query.LineBreak := #13#10;
       end;
     {$ELSE}
-      S1 := AlStringReplace(trim(Query.Text),#13#10,'&',[rfReplaceAll]);
+      S1 := AlStringReplace(ALTrim(Query.Text),#13#10,'&',[rfReplaceAll]);
       while alpos('&', S1) = 1 do delete(S1,1,1);
       while alposEx('&',
                     S1,
@@ -1493,81 +1456,240 @@ begin
   Result := AlCombineUrl(RelativeUrl + S1, BaseUrl);
 end;
 
-{********************************************************************************}
-Function ALTryIPV4StrToNumeric(aIPv4Str: String; var aIPv4Num: Cardinal): Boolean;
+{************************************************************************************}
+Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
 Var P1, P2: Integer;
     I1, I2, I3, I4: integer;
 Begin
 
-  {----------}
+  //----------
   if aIPv4Str = '' then begin
     Result := False;
     Exit;
   end;
 
-  {----------}
+  //----------
   P1 := 1;
   P2 := AlPosEx('.',aIPv4Str, P1);
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I1)) or
+     (not ALTryStrToInt(AlCopyStr(aIPv4Str,P1,P2-P1), I1)) or
      (not (I1 in [0..255])) then begin
     Result := False;
     Exit;
   end;
 
-  {----------}
+  //----------
   P1 := P2+1;
   P2 := AlPosEx('.',aIPv4Str, P1);
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I2)) or
+     (not ALTryStrToInt(AlCopyStr(aIPv4Str,P1,P2-P1), I2)) or
      (not (I2 in [0..255])) then begin
     Result := False;
     Exit;
   end;
 
-  {----------}
+  //----------
   P1 := P2+1;
   P2 := AlPosEx('.',aIPv4Str, P1);
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I3)) or
+     (not ALTryStrToInt(AlCopyStr(aIPv4Str,P1,P2-P1), I3)) or
      (not (I3 in [0..255])) then begin
     Result := False;
     Exit;
   end;
 
-  {----------}
+  //----------
   P1 := P2+1;
   P2 := length(aIPv4Str) + 1;
   if (P2 <= P1) or
-     (not TryStrtoInt(AlCopyStr(aIPv4Str,P1,P2-P1), I4)) or
+     (not ALTryStrToInt(AlCopyStr(aIPv4Str,P1,P2-P1), I4)) or
      (not (I4 in  [0..255])) then begin
     Result := False;
     Exit;
   end;
 
-  {-------------}
+  //----------
   Result := True;
   aIPv4Num := (I1*256*256*256) + (I2*256*256) +  (I3*256) + (I4);
 
 End;
 
-{***************************************************}
-Function ALIPV4StrToNumeric(aIPv4: String): Cardinal;
+{*******************************************************}
+Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
 Begin
-  if not ALTryIPV4StrToNumeric(aIPv4, Result) then Raise Exception.Create('Bad IPv4 string: ' + aIPv4);
+  if not ALTryIPV4StrToNumeric(aIPv4, Result) then Raise EALException.Create('Bad IPv4 string: ' + aIPv4);
 End;
 
-{***************************************************}
-Function ALNumericToIPv4Str(aIPv4: Cardinal): String;
-Var S1, S2, S3, S4: String;
+{*******************************************************}
+Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
+Var S1, S2, S3, S4: ansiString;
 Begin
 
-  S1 := inttostr(( aIPv4 div (256*256*256) ) mod 256);
-  S2 := inttostr(( aIPv4 div (256*256)     ) mod 256);
-  S3 := inttostr(( aIPv4 div (256)         ) mod 256);
-  S4 := inttostr(( aIPv4                   ) mod 256);
+  S1 := ALIntToStr(( aIPv4 div (256*256*256) ) mod 256);
+  S2 := ALIntToStr(( aIPv4 div (256*256)     ) mod 256);
+  S3 := ALIntToStr(( aIPv4 div (256)         ) mod 256);
+  S4 := ALIntToStr(( aIPv4                   ) mod 256);
 
   Result := S1 + '.' + S2 + '.' + S3 + '.' + S4;
+
+End;
+
+{*********************************}
+Function ALZeroIpV6: TALIPv6Binary;
+begin
+  FillChar(result, 16, #0);
+end;
+
+{****************************************************************************************}
+Function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
+var aLstIpv6Part: TALStringList;
+    S1: ansiString;
+    P1: integer;
+    i: integer;
+begin
+
+  //----------
+  if aIPv6Str = '' then begin
+    Result := False;
+    Exit;
+  end;
+
+  // http://msdn.microsoft.com/en-us/library/aa921042.aspx
+  // Zero compression can be used only once in an address, which enables you to determine
+  // the number of 0 bits represented by each instance of a double-colon (::).
+  P1 := Alpos('::',aIPv6Str);
+  if (P1 > 0) and (AlPosEx('::', aIPv6Str, P1+1) > 0) then begin
+    result := False;
+    exit;
+  end
+  else if P1 = 1 then delete(aIPv6Str,1,1);  // with the exemple below, we have one extra ":"
+                                             // ::D3:0000:2F3B:02AA:00FF:FE28:9C5A => 0:D3:0000:2F3B:02AA:00FF:FE28:9C5A
+                                             // but with the exemple below ok because the last #13#10 will be trim when we will do
+                                             // aLstIpv6Part.Text := AlStringReplace(aIPv6Str, ':', #13#10, [rfReplaceALL]);
+                                             // 21DA:D3:0000:2F3B:02AA:00FF:FE28:: => 21DA:D3:0000:2F3B:02AA:00FF:FE28:0
+
+
+  //----------
+  aLstIpv6Part := TALStringList.Create;
+  try
+
+    //----------
+    aLstIpv6Part.Text := AlStringReplace(aIPv6Str, ':', #13#10, [rfReplaceALL]);
+
+    //----------
+    if (aLstIpv6Part.Count > 8) then begin
+      Result := False;
+      Exit;
+    end;
+
+    // http://msdn.microsoft.com/en-us/library/aa921042.aspx
+    // IPv6 representation can be further simplified by removing the leading zeros within each 16-bit block.
+    // However, each block must have at least a single digit. The following example shows the address without
+    // the leading zeros
+    // 21DA:D3:0:2F3B:2AA:FF:FE28:9C5A => 21DA:D3:0000:2F3B:02AA:00FF:FE28:9C5A
+    //
+    // Some types of addresses contain long sequences of zeros. In IPv6 addresses, a contiguous sequence of
+    // 16-bit blocks set to 0 in the colon-hexadecimal format can be compressed to :: (known as double-colon).
+    // The following list shows examples of compressing zeros
+    // FF02::2 => FF02:0:0:0:0:0:0:2
+    I := 0;
+    while i <= 7 do begin
+      if i >= aLstIpv6Part.Count then begin
+        result := False;
+        Exit;
+      end
+      else if (aLstIpv6Part[i] = '') then begin
+        aLstIpv6Part[i] := '0000';
+        while aLstIpv6Part.Count < 8 do begin
+          aLstIpv6Part.Insert(i,'0000');
+          inc(i);
+        end;
+      end
+      else begin
+        if length(aLstIpv6Part[i]) > 4 then begin
+          result := False;
+          Exit;
+        end
+        else if length(aLstIpv6Part[i]) < 4 then begin
+          SetLength(S1,4-length(aLstIpv6Part[i]));
+          FillChar(S1[1], length(S1), '0');
+          aLstIpv6Part[i] := S1 + aLstIpv6Part[i];
+        end;
+      end;
+      inc(i);
+    end;
+
+    //----------
+    for I := 0 to aLstIpv6Part.Count - 1 do begin
+
+      S1 := AlUpperCase(AlCopyStr(aLstIpv6Part[i], 1, 2));
+      if (not ALTryStrToInt('$' + S1, P1)) or
+         (not (P1 in [0..255])) then begin
+        Result := False;
+        exit;
+      end;
+      aIPv6Bin[(i*2) + 1] := AnsiChar(P1);
+
+      S1 := AlUpperCase(AlCopyStr(aLstIpv6Part[i], 3, 2));
+      if (not ALTryStrToInt('$' + S1, P1)) or
+         (not (P1 in [0..255])) then begin
+        Result := False;
+        exit;
+      end;
+      aIPv6Bin[(i*2) + 2] := AnsiChar(P1);
+
+    end;
+
+    Result := True;
+
+  finally
+    aLstIpv6Part.Free;
+  end;
+
+end;
+
+{***********************************************************}
+Function ALIPV6StrTobinary(aIPv6: ansiString): TALIPv6Binary;
+Begin
+  if not ALTryIPv6StrToBinary(aIPv6, Result) then Raise EALException.Create('Bad IPv6 string: ' + aIPv6);
+End;
+
+{***********************************************************}
+Function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
+Begin
+
+  Result := ALIntToHex(ord(aIPv6[1]), 2)  + ALIntToHex(ord(aIPv6[2]), 2)   + ':' +
+            ALIntToHex(ord(aIPv6[3]), 2)  + ALIntToHex(ord(aIPv6[4]), 2)   + ':' +
+            ALIntToHex(ord(aIPv6[5]), 2)  + ALIntToHex(ord(aIPv6[6]), 2)   + ':' +
+            ALIntToHex(ord(aIPv6[7]), 2)  + ALIntToHex(ord(aIPv6[8]), 2)   + ':' +
+            ALIntToHex(ord(aIPv6[9]), 2)  + ALIntToHex(ord(aIPv6[10]), 2)   + ':' +
+            ALIntToHex(ord(aIPv6[11]), 2) + ALIntToHex(ord(aIPv6[12]), 2)  + ':' +
+            ALIntToHex(ord(aIPv6[13]), 2) + ALIntToHex(ord(aIPv6[14]), 2)  + ':' +
+            ALIntToHex(ord(aIPv6[15]), 2) + ALIntToHex(ord(aIPv6[16]), 2);
+
+End;
+
+{**************************************************************************}
+Function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
+Begin
+
+  if length(aIPV6BinaryStr) <> 16 then Raise EALException.Create('Bad IPv6 binary string');
+  result[1] := aIPV6BinaryStr[1];
+  result[2] := aIPV6BinaryStr[2];
+  result[3] := aIPV6BinaryStr[3];
+  result[4] := aIPV6BinaryStr[4];
+  result[5] := aIPV6BinaryStr[5];
+  result[6] := aIPV6BinaryStr[6];
+  result[7] := aIPV6BinaryStr[7];
+  result[8] := aIPV6BinaryStr[8];
+  result[9] := aIPV6BinaryStr[9];
+  result[10] := aIPV6BinaryStr[10];
+  result[11] := aIPV6BinaryStr[11];
+  result[12] := aIPV6BinaryStr[12];
+  result[13] := aIPV6BinaryStr[13];
+  result[14] := aIPV6BinaryStr[14];
+  result[15] := aIPV6BinaryStr[15];
+  result[16] := aIPV6BinaryStr[16];
 
 End;
 

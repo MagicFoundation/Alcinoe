@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe ISAPI Http WebRequest and WebResponse Objects
-Version:      3.50
+Version:      4.00
 
 Description:  Inherited TWebRequest and TWebResponse for better handling
               of ISAPI Request
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :
 
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALIsapiHTTP;
 
@@ -153,7 +153,7 @@ begin
     FContentStream.Write(Buffer, Result);
     FMoreDataAvailableOnReadClient := FcontentStream.Size < ContentLength;
     If (FMaxContentSize > -1) and (FcontentStream.Size > FMaxContentSize) then
-      Raise EALIsapiRequestContentSizeTooBig.create('Content size is bigger than the maximum allowed size ('+inttostr(FMaxContentSize)+')');
+      Raise EALIsapiRequestContentSizeTooBig.create('Content size is bigger than the maximum allowed size ('+IntToStr(FMaxContentSize)+')');
   end;
 end;
 

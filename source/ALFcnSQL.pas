@@ -5,14 +5,14 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      SQL Parser Functions
-Version:      3.50
+Version:      4.00
 
 Description:  SQL function to create easily sql string without
               take care if it's an update or insert sql Statement.
               just add the value in a tstringList like
               fieldname=value and at the end contruct the sql string
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -46,6 +46,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 Know bug :
 
 History :     20/04/2006: Add plan property
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -53,13 +54,14 @@ Link :
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnSQL;
 
 interface
 
-uses classes;
+uses classes,
+     AlStringList;
 
 Type
 
@@ -74,38 +76,39 @@ Type
     First: integer;
     Skip: Integer;
     Distinct: Boolean;
-    Select: TStrings;
-    Where: Tstrings;
-    From: Tstrings;
-    Join: Tstrings;
-    GroupBy: Tstrings;
-    Having: Tstrings;
+    Select: TALStrings;
+    Where: TALStrings;
+    From: TALStrings;
+    Join: TALStrings;
+    GroupBy: TALStrings;
+    Having: TALStrings;
     Plan: ansiString;
-    OrderBy: TStrings;
-    Custom: Tstrings;
+    OrderBy: TALStrings;
+    Custom: TALStrings;
     Constructor Create; Virtual;
     Destructor Destroy; override;
     procedure Assign(Source: TAlSelectSQLClause); virtual;
-    function SQLText: String; virtual;
+    function SQLText: AnsiString; virtual;
     Procedure clear; virtual;
   end;
   TALUpdateSQLClause = Class(Tobject)
     ServerType: TALSQLClauseServerType;
     Kind: TALSQLClauseUpdateKind;
     Table: ansiString;
-    Value: Tstrings;
-    Where: Tstrings;
-    Custom: Tstrings;
+    Value: TALStrings;
+    Where: TALStrings;
+    Custom: TALStrings;
     Constructor Create; Virtual;
     Destructor Destroy; override;
     procedure Assign(Source: TALUpdateSQLClause); virtual;
-    function SQLText: String; virtual;
+    function SQLText: AnsiString; virtual;
     Procedure clear; virtual;
   end;
 
 implementation
 
-uses sysutils;
+uses sysutils,
+     AlFcnString;
 
 {************************************}
 constructor TAlSelectSQLClause.Create;
@@ -114,15 +117,15 @@ Begin
   First := -1;
   Skip := -1;
   Distinct := False;
-  Select:= TstringList.create;
-  Where:= TstringList.create;
-  From:= TstringList.create;
-  Join:= TstringList.create;
-  GroupBy:= TstringList.create;
-  Having:= TstringList.create;
+  Select:= TALStringList.create;
+  Where:= TALStringList.create;
+  From:= TALStringList.create;
+  Join:= TALStringList.create;
+  GroupBy:= TALStringList.create;
+  Having:= TALStringList.create;
   Plan := '';
-  OrderBy := TstringList.create;
-  Custom := TstringList.create;
+  OrderBy := TALStringList.create;
+  Custom := TALStringList.create;
 end;
 
 {************************************}
@@ -157,8 +160,8 @@ begin
   Custom.Assign(source.Custom);
 end;
 
-{******************************************}
-function TAlSelectSQLClause.SQLText: String;
+{**********************************************}
+function TAlSelectSQLClause.SQLText: AnsiString;
 Var Flag: Boolean;
     i: integer;
     S: ansiString;
@@ -169,8 +172,8 @@ Begin
 
   //first + skip (if server type = ALFirebird)
   if ServerType = alFirebird then begin
-    if First >= 0 then Result := result + 'first ' + inttostr(First) + ' ';
-    if skip >= 0 then Result := result + 'skip ' + inttostr(skip) + ' ';
+    if First >= 0 then Result := result + 'first ' + ALIntToStr(First) + ' ';
+    if skip >= 0 then Result := result + 'skip ' + ALIntToStr(skip) + ' ';
   end;
 
   //distinct
@@ -179,9 +182,9 @@ Begin
   //Select
   Flag := False;
   For i := 0 to Select.Count - 1 do begin
-    If trim(Select[i]) <> '' then begin
+    If ALTrim(Select[i]) <> '' then begin
       Flag := True;
-      Result := Result + trim(Select[i]) + ', ';
+      Result := Result + ALTrim(Select[i]) + ', ';
     end;
   end;
   IF not flag then result := result + '*'
@@ -190,20 +193,20 @@ Begin
   //From
   Result := Result + ' From ';
   For i := 0 to From.Count - 1 do
-    If trim(From[i]) <> '' then Result := Result + trim(From[i]) + ', ';
+    If ALTrim(From[i]) <> '' then Result := Result + ALTrim(From[i]) + ', ';
   Delete(Result,length(result)-1,2);
 
   //join
   For i := 0 to join.Count - 1 do
-    If trim(join[i]) <> '' then Result := Result + ' ' + trim(join[i]);
+    If ALTrim(join[i]) <> '' then Result := Result + ' ' + ALTrim(join[i]);
 
   //Where
   If where.Count > 0 then begin
     S := '';
     For i := 0 to where.Count - 1 do
-      If trim(where[i]) <> '' then begin
-        if ServerType <> AlSphinx then S := S + '(' + trim(where[i]) + ') and '
-        else S := S + trim(where[i]) + ' and ';
+      If ALTrim(where[i]) <> '' then begin
+        if ServerType <> AlSphinx then S := S + '(' + ALTrim(where[i]) + ') and '
+        else S := S + ALTrim(where[i]) + ' and ';
       end;
     If s <> '' then begin
       delete(S,length(S)-4,5);
@@ -215,7 +218,7 @@ Begin
   If groupby.Count > 0 then begin
     S := '';
     For i := 0 to groupby.Count - 1 do
-      If trim(groupby[i]) <> '' then S := S + trim(groupby[i]) + ' and ';
+      If ALTrim(groupby[i]) <> '' then S := S + ALTrim(groupby[i]) + ' and ';
     If s <> '' then begin
       Delete(S,length(S)-4,5);
       Result := Result + ' Group by ' + S;
@@ -226,7 +229,7 @@ Begin
   If having.Count > 0 then begin
     S := '';
     For i := 0 to having.Count - 1 do
-      If trim(having[i]) <> '' then S := S + trim(having[i]) + ' and ';
+      If ALTrim(having[i]) <> '' then S := S + ALTrim(having[i]) + ' and ';
     If s <> '' then begin
       Delete(S,length(S)-4,5);
       Result := Result + ' Having ' + S;
@@ -235,15 +238,15 @@ Begin
 
   //Plan
   if (ServerType = alFirebird) then begin
-    If trim(Plan) <> '' then
-      Result := Result + ' ' + trim(Plan);
+    If ALTrim(Plan) <> '' then
+      Result := Result + ' ' + ALTrim(Plan);
   end;
 
   //order by
   If orderby.Count > 0 then begin
     S := '';
     For i := 0 to orderby.Count - 1 do
-      If trim(orderby[i]) <> '' then  S := S + trim(orderby[i]) + ', ';
+      If ALTrim(orderby[i]) <> '' then  S := S + ALTrim(orderby[i]) + ', ';
     If s <> '' then begin
       Delete(S,length(S)-1,2);
       Result := Result + ' Order by ' + S;
@@ -253,8 +256,8 @@ Begin
   //first + skip (if server type = ALSphinx)
   if (ServerType in [alSphinx, alMySql]) then begin
     if (First >= 0) and
-       (skip >= 0) then Result := result + ' Limit ' + inttostr(skip) + ', ' + inttostr(First)
-    else if (First >= 0) then Result := result + ' Limit 0, ' + inttostr(First)
+       (skip >= 0) then Result := result + ' Limit ' + ALIntToStr(skip) + ', ' + ALIntToStr(First)
+    else if (First >= 0) then Result := result + ' Limit 0, ' + ALIntToStr(First)
   end;
 
 End;
@@ -283,9 +286,9 @@ Begin
   ServerType := ALFirebird;
   Kind := AlInsert;
   table:= '';
-  Value:= TstringList.create;
-  Where:= TstringList.create;
-  Custom := TstringList.create;
+  Value:= TALStringList.create;
+  Where:= TALStringList.create;
+  Custom := TALStringList.create;
 end;
 
 {************************************}
@@ -308,8 +311,8 @@ begin
   Custom.Assign(source.Custom);
 end;
 
-{******************************************}
-function TALUpdateSQLClause.SQLText: String;
+{**********************************************}
+function TALUpdateSQLClause.SQLText: AnsiString;
 var i: integer;
     S1, S2: ansiString;
 Begin
@@ -324,7 +327,7 @@ Begin
   If Kind = AlUpdate then Begin
     Result := '';
     for i := 0 to Value.Count- 1 do
-      If Trim(Value[i]) <> '' then Result := Result + trim(Value[i]) + ', ';
+      If ALTrim(Value[i]) <> '' then Result := Result + ALTrim(Value[i]) + ', ';
     delete(Result,length(result)-1,2);
 
     Result := 'Update ' + Table + ' Set ' + result;
@@ -332,7 +335,7 @@ Begin
     If where.Count > 0 then begin
       Result := Result + ' Where ';
       For i := 0 to where.Count - 1 do
-        If trim(where[i]) <> '' then Result := Result + '(' + trim(where[i]) + ') and ';
+        If ALTrim(where[i]) <> '' then Result := Result + '(' + ALTrim(where[i]) + ') and ';
       delete(Result,length(result)-4,5);
     end;
   end
@@ -343,9 +346,9 @@ Begin
     S2 :='';
 
     for i := 0 to Value.Count-1 do
-      If Trim(Value[i]) <> '' then begin
-        S1 := S1 + trim(Value.Names[i]) + ', ';
-        S2 := S2 + trim(Value.ValueFromIndex[i]) + ', ';
+      If ALTrim(Value[i]) <> '' then begin
+        S1 := S1 + ALTrim(Value.Names[i]) + ', ';
+        S2 := S2 + ALTrim(Value.ValueFromIndex[i]) + ', ';
       end;
     delete(S1,length(S1)-1,2);
     delete(S2,length(S2)-1,2);

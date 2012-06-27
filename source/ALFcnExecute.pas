@@ -5,11 +5,11 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe WinExec Functions
-Version:      3.53
+Version:      4.00
 
 Description:  Function to launch executable (and wait for termination)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -45,6 +45,7 @@ Know bug:
 History:      04/05/2007: overload the function ALWinExec32;
               01/01/2010: add ALNTSetPrivilege
               05/03/2012: Correct a 100% CPU usage in ALWinExec32
+              26/06/2012: Add xe2 support
 
 Link:
 
@@ -52,7 +53,7 @@ Link:
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnExecute;
 
@@ -93,23 +94,23 @@ const
   SE_ENABLE_DELEGATION_NAME = 'SeEnableDelegationPrivilege';
   SE_MANAGE_VOLUME_NAME = 'SeManageVolumePrivilege';
 
-Function AlGetEnvironmentString: string;
-function ALWinExec32(const FileName, CurrentDirectory, Environment: string; InputStream: Tstream; OutputStream: TStream): Dword; overload;
-function ALWinExec32(const FileName: string; InputStream: Tstream; OutputStream: TStream): Dword; overload;
-function ALWinExecAndWait32(FileName:String; Visibility : integer):DWORD;
-Function ALWinExecAndWait32V2(FileName: String; Visibility: integer): DWORD;
-function ALNTSetPrivilege(sPrivilege: string; bEnabled: Boolean): Boolean;
+Function AlGetEnvironmentString: AnsiString;
+function ALWinExec32(const FileName, CurrentDirectory, Environment: AnsiString; InputStream: Tstream; OutputStream: TStream): Dword; overload;
+function ALWinExec32(const FileName: AnsiString; InputStream: Tstream; OutputStream: TStream): Dword; overload;
+function ALWinExecAndWait32(FileName:AnsiString; Visibility : integer):DWORD;
+Function ALWinExecAndWait32V2(FileName: AnsiString; Visibility: integer): DWORD;
+function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 
 implementation
 
 uses AlFcnString;
 
-{**************************************}
-Function AlGetEnvironmentString: string;
-var P, Q : PChar;
+{******************************************}
+Function AlGetEnvironmentString: AnsiString;
+var P, Q : PAnsiChar;
     I : Integer;
 begin
-  P := PChar(Windows.GetEnvironmentStrings);
+  P := PAnsiChar(Windows.GetEnvironmentStringsA);
   try
 
     I := 0;
@@ -128,14 +129,14 @@ begin
     if I > 0 then ALMove(P^, Pointer(Result)^, I);
 
   finally
-    FreeEnvironmentStrings(P);
+    FreeEnvironmentStringsA(P);
   end;
 end;
 
 {**********************************}
 function ALWinExec32(const FileName,
                            CurrentDirectory,
-                           Environment: string;
+                           Environment: AnsiString;
                      InputStream: Tstream;
                      OutputStream: TStream): Dword;
 
@@ -145,23 +146,20 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   {-----------------------------}
   procedure InternalProcessInput;
   var aBytesWritten: Dword;
-      aStrBuffer: String;
+      aStrBuffer: AnsiString;
   begin
     If InputStream.size > 0 then begin
       SetLength(aStrBuffer,InputStream.size);
       InputStream.read(aStrBuffer[1],InputStream.size);
       While true do begin
-        if not WriteFile(
-                         aInputWritePipe,    // handle to file to write to
-                         aStrBuffer[1],      // pointer to data to write to file
-                         length(AstrBuffer), // number of bytes to write
-                         aBytesWritten,      // pointer to number of bytes written
-                         nil                 // pointer to structure needed for overlapped I/O
-                        ) then RaiseLastOSError;
+        if not WriteFile(aInputWritePipe,            // handle to file to write to
+                         aStrBuffer[1],              // pointer to data to write to file
+                         length(AstrBuffer),         // number of bytes to write
+                         aBytesWritten,              // pointer to number of bytes written
+                         nil) then RaiseLastOSError; // pointer to structure needed for overlapped I/O
 
         If aBytesWritten = Dword(length(AstrBuffer)) then break
         else delete(aStrBuffer,1,aBytesWritten);
-        
       end;
     end;
   end;
@@ -170,27 +168,23 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   procedure InternalProcessOutput;
   var aBytesInPipe: Cardinal;
       aBytesRead: Dword;
-      aStrBuffer: String;
+      aStrBuffer: AnsiString;
   Const AstrBufferSize: Dword = 8192;
   begin
     SetLength(aStrBuffer,AstrBufferSize);
     While true do begin
-      If not PeekNamedPipe(
-                           aOutputReadPipe, // handle to pipe to copy from
-                           nil,             // pointer to data buffer
-                           0,               // size, in bytes, of data buffer
-                           nil,             // pointer to number of bytes read
-                           @aBytesInPipe,   // pointer to total number of bytes available
-                           nil              // pointer to unread bytes in this message
-                          ) then break;
+      If not PeekNamedPipe(aOutputReadPipe,  // handle to pipe to copy from
+                           nil,              // pointer to data buffer
+                           0,                // size, in bytes, of data buffer
+                           nil,              // pointer to number of bytes read
+                           @aBytesInPipe,    // pointer to total number of bytes available
+                           nil) then break;  // pointer to unread bytes in this message
       if aBytesInPipe > 0 then begin
-        if not ReadFile(
-                        aOutputReadPipe, // handle of file to read
-                        aStrBuffer[1],   // address of buffer that receives data
-                        AstrBufferSize,  // number of bytes to read
-                        aBytesRead,      // address of number of bytes read
-                        nil              // address of structure for data
-                       ) then RaiseLastOSError;
+        if not ReadFile(aOutputReadPipe,             // handle of file to read
+                        aStrBuffer[1],               // address of buffer that receives data
+                        AstrBufferSize,              // number of bytes to read
+                        aBytesRead,                  // address of number of bytes read
+                        nil) then RaiseLastOSError;  // address of structure for data
         If aBytesRead > 0 then OutputStream.Write(aStrBuffer[1], aBytesRead);
       end
       else break;
@@ -198,7 +192,7 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   end;
 
 Var aProcessInformation: TProcessInformation;
-    aStartupInfo: TStartupInfo;
+    aStartupInfo: TStartupInfoA;
     aSecurityAttributes: TSecurityAttributes;
     aPEnvironment: Pointer;
     aPCurrentDirectory: Pointer;
@@ -211,21 +205,19 @@ begin
   aSecurityAttributes.bInheritHandle := TRUE;
 
   // Create the child output pipe.
-  if not CreatePipe(
-                    aOutputReadPipe,      // address of variable for read handle
-                    aOutputWritePipe,     // address of variable for write handle
-                    @aSecurityAttributes, // pointer to security attributes
-                    0                     // number of bytes reserved for pipe
-                   ) then RaiseLastOSError;
+  if not CreatePipe(aOutputReadPipe,          // address of variable for read handle
+                    aOutputWritePipe,         // address of variable for write handle
+                    @aSecurityAttributes,     // pointer to security attributes
+                    0) then RaiseLastOSError; // number of bytes reserved for pipe
+
   Try
 
     // Create the child input pipe.
-    if not CreatePipe(
-                      aInputReadPipe,       // address of variable for read handle
-                      aInputWritePipe,      // address of variable for write handle
-                      @aSecurityAttributes, // pointer to security attributes
-                      0                     // number of bytes reserved for pipe
-                     ) then RaiseLastOSError;
+    if not CreatePipe(aInputReadPipe,           // address of variable for read handle
+                      aInputWritePipe,          // address of variable for write handle
+                      @aSecurityAttributes,     // pointer to security attributes
+                      0) then RaiseLastOSError; // number of bytes reserved for pipe
+
     Try
 
       // Set up the start up info struct.
@@ -236,25 +228,24 @@ begin
       aStartupInfo.hStdInput  := aInputReadPipe;
       aStartupInfo.hStdError  := aOutputWritePipe;
 
-      if Environment <> '' then aPEnvironment := Pchar(Environment)
+      if Environment <> '' then aPEnvironment := PAnsiChar(Environment)
       else aPEnvironment := nil;
-      if CurrentDirectory <> '' then aPCurrentDirectory := Pchar(CurrentDirectory)
+      if CurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(CurrentDirectory)
       else aPCurrentDirectory := nil;
 
 
       // Launch the process that you want to redirect.
-      if not CreateProcess(
-                           nil,                     // pointer to name of executable module
-                           PChar(FileName),         // pointer to command line string
-                           @aSecurityAttributes,    // pointer to process security attributes
-                           NiL,                     // pointer to thread security attributes
-                           TrUE,                    // handle inheritance flag
-                           CREATE_NO_WINDOW,        // creation flags
-                           aPEnvironment,           // pointer to new environment block
-                           aPCurrentDirectory,      // pointer to current directory name
-                           aStartupInfo,            // pointer to STARTUPINFO
-                           aProcessInformation      // pointer to PROCESS_INFORMATION
-                          ) then RaiseLastOSError;
+      if not CreateProcessA(nil,                     // pointer to name of executable module
+                            PAnsiChar(FileName),     // pointer to command line string
+                            @aSecurityAttributes,    // pointer to process security attributes
+                            NiL,                     // pointer to thread security attributes
+                            TrUE,                    // handle inheritance flag
+                            CREATE_NO_WINDOW,        // creation flags
+                            aPEnvironment,           // pointer to new environment block
+                            aPCurrentDirectory,      // pointer to current directory name
+                            aStartupInfo,            // pointer to STARTUPINFO
+                            aProcessInformation)     // pointer to PROCESS_INFORMATION
+      then RaiseLastOSError;
       Try
 
         InputStream.Position := 0;
@@ -282,8 +273,8 @@ begin
   end;
 end;
 
-{******************************************}
-function ALWinExec32(const FileName: string;
+{**********************************************}
+function ALWinExec32(const FileName: AnsiString;
                      InputStream: Tstream;
                      OutputStream: TStream): Dword;
 Begin
@@ -294,28 +285,26 @@ Begin
                         OutputStream);
 End;
 
-{***********************************************************************}
-function ALWinExecAndWait32(FileName:String; Visibility : integer):DWORD;
-var StartupInfo:TStartupInfo;
+{***************************************************************************}
+function ALWinExecAndWait32(FileName:AnsiString; Visibility : integer):DWORD;
+var StartupInfo:TStartupInfoA;
     ProcessInfo:TProcessInformation;
 begin
   FillChar(StartupInfo,Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
   StartupInfo.wShowWindow := Visibility;
-  if not CreateProcess(
-                       nil,
-                       Pchar(FileName),               { pointer to command line string }
-                       nil,                           { pointer to process security attributes}
-                       nil,                           { pointer to thread security attributes }
-                       false,                         { handle inheritance flag }
-                       CREATE_NEW_CONSOLE or          { creation flags }
-                       NORMAL_PRIORITY_CLASS,
-                       nil,                           { pointer to new environment block }
-                       nil,                           { pointer to current directory name }
-                       StartupInfo,                   { pointer to STARTUPINFO }
-                       ProcessInfo                    { pointer to PROCESS_INF }
-                      )
+  if not CreateProcessA(nil,
+                        PAnsiChar(FileName),           { pointer to command line string }
+                        nil,                           { pointer to process security attributes}
+                        nil,                           { pointer to thread security attributes }
+                        false,                         { handle inheritance flag }
+                        CREATE_NEW_CONSOLE or          { creation flags }
+                        NORMAL_PRIORITY_CLASS,
+                        nil,                           { pointer to new environment block }
+                        nil,                           { pointer to current directory name }
+                        StartupInfo,                   { pointer to STARTUPINFO }
+                        ProcessInfo)                   { pointer to PROCESS_INF }
   then Result := DWORD(-1)
   else begin
     WaitforSingleObject(ProcessInfo.hProcess,INFINITE);
@@ -330,7 +319,7 @@ end;
 {*  ALWinExecAndWait32V2:                                                  }
 {*  The routine will process paint messages and messages                   }
 {*  send from other threads while it waits.                                }
-Function ALWinExecAndWait32V2(FileName: String; Visibility: integer): DWORD;
+Function ALWinExecAndWait32V2(FileName: AnsiString; Visibility: integer): DWORD;
 
   {------------------------------------------}
   Procedure WaitFor( processHandle: THandle );
@@ -339,14 +328,13 @@ Function ALWinExecAndWait32V2(FileName: String; Visibility: integer): DWORD;
   Begin
     Repeat
 
-      ret := MsgWaitForMultipleObjects(
-               1,             { 1 handle to wait on }
-               processHandle, { the handle }
-               False,         { wake on any event }
-               INFINITE,      { wait without timeout }
-               QS_PAINT or    { wake on paint messages }
-               QS_SENDMESSAGE { or messages from other threads }
-               );
+      ret := MsgWaitForMultipleObjects(1,               { 1 handle to wait on }
+                                       processHandle,   { the handle }
+                                       False,           { wake on any event }
+                                       INFINITE,        { wait without timeout }
+                                       QS_PAINT or      { wake on paint messages }
+                                       QS_SENDMESSAGE); { or messages from other threads }
+
       If ret = WAIT_FAILED Then Exit;
       If ret = (WAIT_OBJECT_0 + 1) Then
         While PeekMessage( msg, 0, WM_PAINT, WM_PAINT, PM_REMOVE ) Do
@@ -355,26 +343,24 @@ Function ALWinExecAndWait32V2(FileName: String; Visibility: integer): DWORD;
     Until ret = WAIT_OBJECT_0;
   End;
 
-Var StartupInfo:TStartupInfo;
+Var StartupInfo:TStartupInfoA;
     ProcessInfo:TProcessInformation;
 Begin
   FillChar(StartupInfo,Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
   StartupInfo.wShowWindow := Visibility;
-  If not CreateProcess(
-                       nil,
-                       Pchar(FileName),         { pointer to command line string }
-                       nil,                     { pointer to process security attributes }
-                       nil,                     { pointer to thread security attributes }
-                       false,                   { handle inheritance flag }
-                       CREATE_NEW_CONSOLE or    { creation flags }
-                       NORMAL_PRIORITY_CLASS,
-                       nil,                     { pointer to new environment block }
-                       nil,                     { pointer to current directory name }
-                       StartupInfo,             { pointer to STARTUPINFO }
-                       ProcessInfo              { pointer to PROCESS_INF }
-                      ) 
+  If not CreateProcessA(nil,
+                        PAnsiChar(FileName),      { pointer to command line string }
+                        nil,                      { pointer to process security attributes }
+                        nil,                      { pointer to thread security attributes }
+                        false,                    { handle inheritance flag }
+                        CREATE_NEW_CONSOLE or     { creation flags }
+                        NORMAL_PRIORITY_CLASS,
+                        nil,                      { pointer to new environment block }
+                        nil,                      { pointer to current directory name }
+                        StartupInfo,              { pointer to STARTUPINFO }
+                        ProcessInfo)              { pointer to PROCESS_INF }
   Then Result := DWORD(-1)   { failed, GetLastError has error code }
   Else Begin
      Waitfor(ProcessInfo.hProcess);
@@ -384,9 +370,9 @@ Begin
   End;
 End;
 
-{************************************************************************}
+{*******************************************************************************************************************}
 // taken from http://www.delphi-zone.com/2010/02/how-to-use-the-adjusttokenprivileges-function-to-enable-a-privilege/
-function ALNTSetPrivilege(sPrivilege: string; bEnabled: Boolean): Boolean;
+function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 var
   hToken: THandle;
   TokenPriv: TOKEN_PRIVILEGES;
@@ -408,9 +394,9 @@ begin
     try
 
       // Get the locally unique identifier (LUID) .
-      if LookupPrivilegeValue(nil,
-                              PChar(sPrivilege),
-                              TokenPriv.Privileges[0].Luid) then begin
+      if LookupPrivilegeValueA(nil,
+                               PAnsiChar(sPrivilege),
+                               TokenPriv.Privileges[0].Luid) then begin
 
         TokenPriv.PrivilegeCount := 1; // one privilege to set
 

@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALEdit
-Version:      3.51
+Version:      4.00
 
 Description:  Edit control with flat button, skin and more
               properties.
@@ -27,7 +27,7 @@ Description:  Edit control with flat button, skin and more
                 change the font or border color of the control each
                 time the mouse enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -60,21 +60,21 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :    1. Property Autosize don't work with the button
 
-History :     30/11/2004: correct SetEditRect problem with button
-              08/11/2004: correct password char
-              06/11/2004: correct the button probleme when we change
-                          the font
-              21/06/2003: Add Mask Edit
-              01/06/2003: Correct password char
+History :     16/04/2002: correct the multiline probleme
               02/05/2002: add OnButtonclik Event
-              16/04/2002: correct the multiline probleme
+              01/06/2003: Correct password char
+              21/06/2003: Add Mask Edit
+              06/11/2004: correct the button probleme when we change the font
+              08/11/2004: correct password char
+              30/11/2004: correct SetEditRect problem with button
+              15/06/2012: add xe2 support
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALEdit;
 
@@ -91,7 +91,7 @@ uses Windows,
      Clipbrd,
      MaskUtils,
      Mask,
-     ALCommon;
+     AlFcnSkin;
 
 type
 
@@ -471,13 +471,6 @@ begin
       End;
     end;
 end;
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCustomEdit    /////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {***************************************************}
 constructor TALCustomEdit.Create(AOwner: TComponent);
@@ -876,13 +869,6 @@ begin
   end;
 end;
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCustomMaskEdit    /////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {*******************************************************}
 constructor TALCustomMaskEdit.Create(AOwner: TComponent);
 begin
@@ -942,7 +928,7 @@ end;
 procedure TALCustomMaskEdit.KeyPress(var Key: Char);
 begin
   inherited KeyPress(Key);
-  if IsMasked and (Key <> #0) and not (Char(Key) in [^V, ^X, ^C]) then
+  if IsMasked and (Key <> #0) and not ((Char(Key) = ^V) or (Char(Key) = ^X) or (Char(Key) = ^C)) then
   begin
     CharKeys(Key);
     Key := #0;
@@ -1172,7 +1158,13 @@ begin
     if SelStart < 0 then
       SelStart := 0;
     SelStop  := SelStart + 1;
-    if (Length(EditText) > SelStop) and (EditText[SelStop] in LeadBytes) then
+    if (Length(EditText) > SelStop) and
+      {$IFDEF UNICODE}
+      IsLeadChar(EditText[SelStop])
+      {$ELSE}
+      (EditText[SelStop] in LeadBytes)
+      {$ENDIF}
+    then
       Inc(SelStop);
     if SelStart >= FMaxChars then
     begin
@@ -1276,14 +1268,26 @@ begin
     SetCursor(SelStart);
   end;
 
-  if (CharCode in LeadBytes) then
+  if
+    {$IFDEF UNICODE}
+    IsLeadChar(CharCode)
+    {$ELSE}
+    (CharCode in LeadBytes)
+    {$ENDIF}
+  then
     if PeekMessage(CharMsg, Handle, WM_CHAR, WM_CHAR, PM_REMOVE) then
       if CharMsg.Message = WM_Quit then
         PostQuitMessage(CharMsg.wparam);
   Result := InputChar(CharCode, SelStart);
   if Result then
   begin
-    if (CharCode in LeadBytes) then
+    if
+      {$IFDEF UNICODE}
+      IsLeadChar(CharCode)
+      {$ELSE}
+      (CharCode in LeadBytes)
+      {$ENDIF}
+    then
     begin
       Txt := CharCode + Char(CharMsg.wParam);
       SetSel(SelStart, SelStart + 2);
@@ -1331,7 +1335,13 @@ begin
   begin
     if (SelStop - SelStart) > 1 then
     begin
-      if ((SelStop - SelStart) = 2) and (EditText[SelStart+1] in LeadBytes) then
+      if ((SelStop - SelStart) = 2) and
+        {$IFDEF UNICODE}
+        IsLeadChar(EditText[SelStart+1])
+        {$ELSE}
+        (EditText[SelStart+1] in LeadBytes)
+        {$ENDIF}
+      then
       begin
         if (CharCode = VK_LEFT) then
           CursorDec(SelStart)
@@ -1350,7 +1360,13 @@ begin
       if SelStop = SelStart then
         SetCursor(SelStart)
       else
-        if EditText[SelStart+1] in LeadBytes then
+        if
+          {$IFDEF UNICODE}
+          IsLeadChar(EditText[SelStart+1])
+          {$ELSE}
+          (EditText[SelStart+1] in LeadBytes)
+          {$ENDIF}
+        then
           CursorInc(SelStart, 2)
         else
           CursorInc(SelStart, 1);
@@ -1708,7 +1724,13 @@ begin
         end;
       mMskAscii, mMskAsciiOpt:
         begin
-          if (NewChar in LeadBytes) and TestChar(NewChar) then
+          if
+            {$IFDEF UNICODE}
+            IsLeadChar(NewChar)
+            {$ELSE}
+            (NewChar in LeadBytes)
+            {$ENDIF}
+          and TestChar(NewChar) then
           begin
             Result := False;
             Exit;
@@ -1726,7 +1748,13 @@ begin
         end;
       mMskAlpha, mMskAlphaOpt, mMskAlphaNum, mMskAlphaNumOpt:
         begin
-          if (NewChar in LeadBytes) then
+          if
+            {$IFDEF UNICODE}
+            IsLeadChar(NewChar)
+            {$ELSE}
+            (NewChar in LeadBytes)
+            {$ENDIF}
+          then
           begin
             if TestChar(NewChar) then
               Result := False;
@@ -1839,7 +1867,13 @@ begin
       NewChar := NewVal[NewOffset];
       if not (DoInputChar(NewChar, MaskOffset)) then
       begin
-        if (NewChar in LeadBytes) then
+        if
+          {$IFDEF UNICODE}
+          IsLeadChar(NewChar)
+          {$ELSE}
+          (NewChar in LeadBytes)
+          {$ENDIF}
+        then
           NewVal[NewOffset + 1] := FMaskBlank;
         NewChar := FMaskBlank;
       end;
@@ -1849,7 +1883,13 @@ begin
         (NewChar <> NewVal[NewOffset])) then
       begin
         NewVal[NewOffset] := NewChar;
-        if (NewChar in LeadBytes) then
+        if
+          {$IFDEF UNICODE}
+          IsLeadChar(NewChar)
+          {$ELSE}
+          (NewChar in LeadBytes)
+          {$ENDIF}
+        then
         begin
           Inc(NewOffset);
           Inc(MaskOffset);

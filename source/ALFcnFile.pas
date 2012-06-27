@@ -5,11 +5,11 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe File Management Routines
-Version:      3.50
+Version:      4.00
 
 Description:  Alcinoe file Management Routines
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,6 +43,11 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 Know bug :
 
 History :     15/04/2008: Add AlIsEmptyDirectory Function
+              15/06/2012: Add XE2 support
+
+Note :        I know that most of the function here will be more efficient
+              to be in unicode, but i leave it in AnsiString for the compatiblity
+              with the Alcinoe Framework that is in AnsiString (UTF8)
 
 Link :
 
@@ -50,7 +55,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnFile;
 
@@ -59,21 +64,20 @@ interface
 uses Windows,
      sysutils;
 
-Function AlEmptyDirectory(Directory: ansiString;
+Function  AlEmptyDirectory(Directory: ansiString;
+                           SubDirectory: Boolean;
+                           Const RemoveEmptySubDirectory: Boolean = True;
+                           Const FileNameMask: ansiString = '*';
+                           Const MinFileAge: TdateTime = 0): Boolean;
+Function  AlCopyDirectory(SrcDirectory,
+                          DestDirectory: ansiString;
                           SubDirectory: Boolean;
-                          Const RemoveEmptySubDirectory: Boolean = True;
                           Const FileNameMask: ansiString = '*';
-                          Const MinFileAge: TdateTime = 0): Boolean;
-Function AlCopyDirectory(SrcDirectory,
-                         DestDirectory: ansiString;
-                         SubDirectory: Boolean;
-                         Const FileNameMask: ansiString = '*';
-                         Const ErraseIfExist: Boolean = False): Boolean;
+                          Const ErraseIfExist: Boolean = False): Boolean;
 function  ALGetModuleName: ansistring;
 function  ALGetModuleFileNameWithoutExtension: ansistring;
 function  ALGetModulePath: ansiString;
 Function  AlGetFileVersion(const AFileName: ansistring): ansiString;
-Function  ALMakeGoodEndPath(Rep: ansiString):ansiString;
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
@@ -95,39 +99,43 @@ Function AlEmptyDirectory(Directory: ansiString;
 var sr: TSearchRec;
     aBool: Boolean;
 begin
+  {$WARN SYMBOL_DEPRECATED OFF}
+  {$WARN SYMBOL_PLATFORM OFF}
   Result := True;
-  Directory := ALMakeGoodEndPath(Directory);
-  if FindFirst(Directory + '*', faAnyFile	, sr) = 0 then begin
+  Directory := ALIncludeTrailingPathDelimiter(Directory);
+  if FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
     Try
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
           If ((sr.Attr and faDirectory) <> 0) then begin
             If SubDirectory then begin
-              Result := AlEmptyDirectory(Directory + sr.Name,
+              Result := AlEmptyDirectory(Directory + ansistring(sr.Name),
                                          True,
                                          RemoveEmptySubDirectory,
                                          fileNameMask,
                                          MinFileAge) and Result;
               If RemoveEmptySubDirectory then begin
-                Abool := RemoveDir(Directory + sr.Name);
+                Abool := RemoveDir(string(Directory) + sr.Name);
                 If result and (fileNameMask = '*') then Result := Abool;
               end;
             end;
           end
           else If ((FileNameMask = '*') or
-                   MatchesMask(sr.Name, FileNameMask))
+                   MatchesMask(sr.Name, string(FileNameMask)))
                   and
                   ((MinFileAge<=0) or
                    (FileDateToDateTime(sr.Time) < MinFileAge))
           then begin
-            Result := Deletefile(Directory + sr.Name) and result;
+            Result := Deletefile(string(Directory) + sr.Name) and result;
           end;
         end;
       until FindNext(sr) <> 0;
     finally
       FindClose(sr);
     end;
-  end
+  end;
+  {$WARN SYMBOL_DEPRECATED ON}
+  {$WARN SYMBOL_PLATFORM ON}
 end;
 
 {************************************}
@@ -140,31 +148,31 @@ var sr: TSearchRec;
     aBool: Boolean;
 begin
   Result := True;
-  SrcDirectory := ALMakeGoodEndPath(SrcDirectory);
-  DestDirectory := ALMakeGoodEndPath(DestDirectory);
-  If not DirectoryExists(DestDirectory) and (not Createdir(DestDirectory)) then begin
+  SrcDirectory := ALIncludeTrailingPathDelimiter(SrcDirectory);
+  DestDirectory := ALIncludeTrailingPathDelimiter(DestDirectory);
+  If not DirectoryExists(string(DestDirectory)) and (not Createdir(String(DestDirectory))) then begin
     result := False;
     exit;
   end;
 
-  if FindFirst(SrcDirectory + '*', faAnyFile, sr) = 0 then begin
+  if FindFirst(String(SrcDirectory) + '*', faAnyFile, sr) = 0 then begin
     Try
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
           If ((sr.Attr and faDirectory) <> 0) then begin
             If SubDirectory and
-               (not AlCopyDirectory(SrcDirectory + sr.Name,
-                                    DestDirectory + sr.Name,
+               (not AlCopyDirectory(SrcDirectory + ansiString(sr.Name),
+                                    DestDirectory + ansiString(sr.Name),
                                     SubDirectory,
                                     FileNameMask,
                                     ErraseIfExist))
             then Result := False;
           end
           else If ((FileNameMask = '*') or
-                   MatchesMask(sr.Name, FileNameMask)) then begin
-            If (not fileExists(DestDirectory + sr.Name)) or ErraseIfExist then abool := Copyfile(PAnsichar(SrcDirectory + sr.Name),
-                                                                                                 PAnsichar(DestDirectory + sr.Name),
-                                                                                                 not ErraseIfExist)
+                   MatchesMask(sr.Name, string(FileNameMask))) then begin
+            If (not fileExists(String(DestDirectory) + sr.Name)) or ErraseIfExist then abool := Copyfile(PChar(String(SrcDirectory) + sr.Name),
+                                                                                                         PChar(String(DestDirectory) + sr.Name),
+                                                                                                         not ErraseIfExist)
             else aBool := True;
             If result then result := aBool;
           end;
@@ -188,57 +196,51 @@ begin
   Result := '';
   FileName := AFileName;
   UniqueString(FileName);
-  InfoSize := GetFileVersionInfoSize(PAnsiChar(FileName), Wnd);
+  InfoSize := GetFileVersionInfoSizeA(PAnsiChar(FileName), Wnd);
   if InfoSize <> 0 then begin
     GetMem(VerBuf, InfoSize);
     try
-      if GetFileVersionInfo(PAnsiChar(FileName), Wnd, InfoSize, VerBuf) then
+      if GetFileVersionInfoA(PAnsiChar(FileName), Wnd, InfoSize, VerBuf) then
         if VerQueryValue(VerBuf, '\', Pointer(FI), VerSize) then
-          Result := inttostr(HiWord(FI.dwFileVersionMS)) +'.'+ inttostr(LoWord(FI.dwFileVersionMS)) +'.'+ inttostr(HiWord(FI.dwFileVersionLS)) +'.'+ inttostr(LoWord(FI.dwFileVersionLS));
+          Result := ALIntToStr(HiWord(FI.dwFileVersionMS)) +'.'+ ALIntToStr(LoWord(FI.dwFileVersionMS)) +'.'+ ALIntToStr(HiWord(FI.dwFileVersionLS)) +'.'+ ALIntToStr(LoWord(FI.dwFileVersionLS));
     finally
       FreeMem(VerBuf);
     end;
   end;
 end;
 
-{*****************************************************}
-Function ALMakeGoodEndPath(Rep: ansiString):ansiString;
-begin
-  result :=  IncludeTrailingPathDelimiter(Rep);
-end;
-
 {*******************************************************}
 function ALGetModuleFileNameWithoutExtension: ansiString;
 Var Ln: Integer;
 begin
-  result := ExtractFileName(ALGetModuleName);
-  ln := Length(ExtractFileExt(Result));
+  result := ALExtractFileName(ALGetModuleName);
+  ln := Length(ALExtractFileExt(Result));
   if Ln > 0 then delete(Result,length(Result)-ln+1,ln);  
 end;
 
 {***********************************}
 function ALGetModuleName: ansiString;
-var ModName: array[0..MAX_PATH] of Char;
+var ModName: array[0..MAX_PATH] of AnsiChar;
 begin
-  SetString(Result, ModName, Windows.GetModuleFileName(HInstance, ModName, SizeOf(ModName)));
+  SetString(Result, ModName, Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
   If ALpos('\\?\',result) = 1 then delete(Result,1,4);
 end;
 
 {***********************************}
 function ALGetModulePath: ansiString;
 begin
-  Result:=ExtractFilePath(ALGetModuleName);
+  Result:=ALExtractFilePath(ALGetModuleName);
   If (length(result) > 0) and (result[length(result)] <> '\') then result := result + '\';
 end;
 
 {**************************************************************************}
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 var aHandle: THandle;
-    aFindData: TWin32FindData;
+    aFindData: TWin32FindDataA;
     aLocalFileTime: TFileTime;
     aFileDate: Integer;
-begin                        
-  aHandle := FindFirstFile(PAnsiChar(aFileName), aFindData);
+begin
+  aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
   if (aHandle = INVALID_HANDLE_VALUE) or
      (not Windows.FindClose(aHandle)) or
      (not FileTimeToLocalFileTime(aFindData.ftCreationTime, aLocalFileTime)) or
@@ -249,11 +251,11 @@ end;
 {***************************************************************************}
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
 var aHandle: THandle;
-    aFindData: TWin32FindData;
+    aFindData: TWin32FindDataA;
     aLocalFileTime: TFileTime;
     aFileDate: Integer;
 begin
-  aHandle := FindFirstFile(PAnsiChar(aFileName), aFindData);
+  aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
   if (aHandle = INVALID_HANDLE_VALUE) or
      (not Windows.FindClose(aHandle)) or
      (not FileTimeToLocalFileTime(aFindData.ftLastWriteTime, aLocalFileTime)) or
@@ -264,11 +266,11 @@ end;
 {****************************************************************************}
 function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
 var aHandle: THandle;
-    aFindData: TWin32FindData;
+    aFindData: TWin32FindDataA;
     aLocalFileTime: TFileTime;
     aFileDate: Integer;
 begin
-  aHandle := FindFirstFile(PAnsiChar(aFileName), aFindData);
+  aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
   if (aHandle = INVALID_HANDLE_VALUE) or
      (not Windows.FindClose(aHandle)) or
      (not FileTimeToLocalFileTime(aFindData.ftLastAccessTime, aLocalFileTime)) or
@@ -282,7 +284,7 @@ Var ahandle: Thandle;
     aSystemTime: TsystemTime;
     afiletime: TfileTime;
 Begin
-  aHandle := sysUtils.fileOpen(aFileName, fmOpenWrite or fmShareDenyNone);
+  aHandle := sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
   if aHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
   Try
     dateTimeToSystemTime(aCreationDateTime, aSystemTime);
@@ -299,7 +301,7 @@ function ALIsDirectoryEmpty(const directory: ansiString) : boolean;
 var SR: TSearchRec;
 begin
   Result := True;
-  if FindFirst(IncludeTrailingPathDelimiter(Directory) + '*', faAnyFile, sr) = 0 then begin
+  if FindFirst(IncludeTrailingPathDelimiter(String(Directory)) + '*', faAnyFile, sr) = 0 then begin
     Try
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin

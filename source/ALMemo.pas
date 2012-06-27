@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALMemo
-Version:      3.50
+Version:      4.00
 
 Description:  Memo with onPaint property
               - Flat design (no clt3D feature)
@@ -22,7 +22,7 @@ Description:  Memo with onPaint property
                 font or border color of the control each time the mouse
                 enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -58,12 +58,13 @@ Know bug :
 History :     5/02/2005: correct SetEditRect problem with font changed
               30/10/2005: move WM_MEMOSCROLL = WM_user + 1 to
                           WM_MEMOSCROLL = WM_user + 1000
+              15/06/2012: Add XE2 support
 
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMemo;
 
@@ -77,7 +78,7 @@ uses Windows,
      StdCtrls,
      Controls,
      ExtCtrls,
-     ALCommon,
+     AlFcnSkin,
      ALScrollBar;
 
 {-----------------------------------}
@@ -243,10 +244,6 @@ begin
   RegisterComponents('alcinoe', [TALMemo]);
 end;
 
-////////////////////////////////////////////////////////////////////////////////
-///////////////////// TALMemoScrollBarProperty /////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {****************************************************************}
 constructor TALMemoScrollBarProperty.Create(AOwner: TalScrollBar);
 begin
@@ -336,14 +333,6 @@ begin
   Result := FScrollBar.Enabled;
 end;
 
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////////////// TALMemo                  /////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {*******************************************************}
 Procedure TALCustomMemo.TriggerScrollEvent(Pos: Integer);
 Var NbLineVisible: Integer;
@@ -353,7 +342,7 @@ Begin
  LineCount := Lines.Count;
 
  str := lines.text;
- If (str<>'') and (str[length(str)] in [#13,#10]) then inc(LineCount);
+ If (str<>'') and ((str[length(str)] = #13) or (str[length(str)] = #10)) then inc(LineCount);
 
  If Pos > LineCount - 1 then Pos := LineCount - 1;
  If Pos < 0 then pos := 0;
@@ -384,7 +373,7 @@ Begin
     LineCount := Lines.Count;
 
     str := lines.text;
-    If (str<>'') and (str[length(str)] in [#13,#10]) then inc(LineCount);
+    If (str<>'') and ((str[length(str)] = #13) or (str[length(str)] = #10)) then inc(LineCount);
 
     If LineCount <= (clientheight-3) div LineHeight then FVertScrollBar.enabled := False
     else begin
@@ -495,7 +484,7 @@ Var     C: TControlCanvas;
 Begin
   If assigned(FonPaintScrollBar) then FOnPaintScrollBar(Self, continue, Area);
   If not continue then exit;
-  
+
   If not FVertScrollBar.Enabled then Begin
     C:= TControlCanvas.Create;
     Try
@@ -689,7 +678,7 @@ begin
     LineCount := Lines.Count;
 
     str := lines.text;
-    If (str<>'') and (str[length(str)] in [#13,#10]) then inc(LineCount);
+    If (str<>'') and ((str[length(str)] = #13) or (str[length(str)] = #10)) then inc(LineCount);
 
     If Key=34 then begin
       For i := 1 to LineCount - FVertScrollBar.Max do begin

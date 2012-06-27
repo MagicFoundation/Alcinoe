@@ -5,11 +5,11 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALCalendar
-Version:      3.52
+Version:      4.00
 
 Description:  Functions to draw a calendar on a canvas
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -45,6 +45,7 @@ Know bug :
 History :     31/03/2007: rename the function in AL*
               12/01/2008: renove call to Controls.pas
               28/05/2008: Update it in WideString/Utf8
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -52,7 +53,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALCalendar;
 
@@ -61,7 +62,8 @@ interface
 uses windows,
      types,
      Graphics,
-     SysUtils;
+     SysUtils,
+     ALFcnString;
 
 Type
 
@@ -100,7 +102,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         DaysHeaderBorderColorBottom: Tcolor;
                         //----
                         Year : Integer;
-                        FormatSettings: TformatSettings; // LongMonthNames and LongDayNames must be in UTF8
+                        FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
                         //----
                         Var CalendarWidth : Integer;
                         Var CalendarHeight : Integer;
@@ -114,9 +116,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
 
 implementation
 
-uses dateutils,
-     ALFcnUnicode,
-     ALFcnString;
+uses dateutils;
 
 {***********************************************************************************}
 Function ALDrawCalendarGetTextSizeW(aCanvas: Tcanvas; const Text: WideString): TSize;
@@ -167,12 +167,12 @@ Begin
   c.Brush.Color := HeaderColor;
   c.FillRect(r);
 
-  {--Bottom border------------}
+  {--Bottom border----------------}
   c.Pen.Color := BorderColorBottom;
   C.MoveTo(r.Left, r.Bottom);
   C.LineTo(r.Right,r.Bottom);
 
-  {--Separator1--------------------------}
+  {--Separator1---------------------------}
   C.MoveTo(r.left + W1Calendar, r.Top + 1);
   C.LineTo(r.left + W1Calendar, r.Top + HHeader1 - 1);
   c.Pen.Color := BorderColorHi;
@@ -366,7 +366,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         DaysHeaderBorderColorBottom: Tcolor;
                         //----
                         Year : Integer;
-                        FormatSettings: TformatSettings; // LongMonthNames and LongDayNames must be in UTF8
+                        FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
                         //----
                         Var CalendarWidth : Integer;
                         Var CalendarHeight : Integer;
@@ -396,11 +396,19 @@ begin
     Result := True;
     with FormatSettings do begin
       For i := 1 to 12 do begin
+        {$IFDEF UNICODE}
+        WideLongMonthNames[i] := WideLowerCase(Utf8ToWideString(LongMonthNames[i]));
+        {$ELSE}
         WideLongMonthNames[i] := WideLowerCase(Utf8Decode(LongMonthNames[i]));
+        {$ENDIF}
         if WideLongMonthNames[i] <> '' then WideLongMonthNames[i][1] := WideUpperCase(WideLongMonthNames[i][1])[1];
       end;
       For i := 1 to 7 do begin
+        {$IFDEF UNICODE}
+        WideLongDayNames[i] := Utf8ToWideString(LongDayNames[i]);
+        {$ELSE}
         WideLongDayNames[i] := Utf8Decode(LongDayNames[i]);
+        {$ENDIF}
         if DayHeaderOn2Char then begin
           if (length(WideLongDayNames[i]) >= 2) then WideLongDayNames[i] := WideUpperCase(WideLongDayNames[i][1]) + WideLowerCase(WideLongDayNames[i][2])
           else if (WideLongDayNames[i] <> '') then WideLongDayNames[i] := WideUpperCase(WideLongDayNames[i][1]);
@@ -462,13 +470,13 @@ begin
     Canvas.Font.Height := MonthHeaderStyle.FontHeight;
     Canvas.Font.Style := MonthHeaderStyle.FontStyle;
     R := Rect(0,0,CalendarWidth,Hheader1);
-    ALDrawCalendarHeader(WideLongMonthNames[1],WideLongMonthNames[2],WideLongMonthNames[3],inttostr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
+    ALDrawCalendarHeader(WideLongMonthNames[1],WideLongMonthNames[2],WideLongMonthNames[3],IntToStr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
     R := Rect(0,YHeader2,CalendarWidth,YHeader2+Hheader1);
-    ALDrawCalendarHeader(WideLongMonthNames[4],WideLongMonthNames[5],WideLongMonthNames[6],inttostr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
+    ALDrawCalendarHeader(WideLongMonthNames[4],WideLongMonthNames[5],WideLongMonthNames[6],IntToStr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
     R := Rect(0,YHeader3,CalendarWidth,YHeader3 + Hheader1);
-    ALDrawCalendarHeader(WideLongMonthNames[7],WideLongMonthNames[8],WideLongMonthNames[9],inttostr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
+    ALDrawCalendarHeader(WideLongMonthNames[7],WideLongMonthNames[8],WideLongMonthNames[9],IntToStr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
     R := Rect(0,YHeader4,CalendarWidth,YHeader4 + Hheader1);
-    ALDrawCalendarHeader(WideLongMonthNames[10],WideLongMonthNames[11],WideLongMonthNames[12],inttostr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
+    ALDrawCalendarHeader(WideLongMonthNames[10],WideLongMonthNames[11],WideLongMonthNames[12],IntToStr(year), R, Canvas, W1Calendar, Hheader1, MonthHeaderStyle.BackGroundColor, MonthsHeaderBorderColorBottom, MonthsHeaderBorderColorLo, MonthsHeaderBorderColorHi);
 
 
     //Draw Day titles
@@ -503,7 +511,7 @@ begin
         Canvas.Font.Height := DayDisabledStyle.FontHeight;
         Canvas.Font.Style := DayDisabledStyle.FontStyle;
         while DayOfTheWeek(GrayDay) <> DayFriday do begin
-          ALDrawCalendarBox(inttostr(DayOfTheMonth(GrayDay)),
+          ALDrawCalendarBox(IntToStr(DayOfTheMonth(GrayDay)),
                             DayDisabledStyle.BackGroundColor,
                             DayDisabledStyle.FontColor,
                             R,
@@ -517,7 +525,7 @@ begin
       Canvas.Font.Name := Days[i].Style.FontName;
       Canvas.Font.Height := Days[i].Style.FontHeight;
       Canvas.Font.Style := Days[i].Style.FontStyle;
-      ALDrawCalendarBox(inttostr(DayOfTheMonth(Day)),
+      ALDrawCalendarBox(IntToStr(DayOfTheMonth(Day)),
                         Days[i].Style.BackGroundColor,
                         Days[i].Style.FontColor,
                         Days[i].Rect,
@@ -533,7 +541,7 @@ begin
         Canvas.Font.Height := DayDisabledStyle.FontHeight;
         Canvas.Font.Style := DayDisabledStyle.FontStyle;
         while DayOfTheWeek(GrayDay) <> DaySaturday do begin
-          ALDrawCalendarBox(inttostr(DayOfTheMonth(GrayDay)),
+          ALDrawCalendarBox(IntToStr(DayOfTheMonth(GrayDay)),
                             DayDisabledStyle.BackGroundColor,
                             DayDisabledStyle.FontColor,
                             R,

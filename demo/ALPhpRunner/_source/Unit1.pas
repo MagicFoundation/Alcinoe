@@ -47,8 +47,6 @@ type
     GroupBox1: TGroupBox;
     Label11: TLabel;
     EditPhpCGIPath: TEdit;
-    EditPhpIsapiDllPath: TEdit;
-    Label8: TLabel;
     Label9: TLabel;
     EditPhpFastCgiHost: TEdit;
     EditPhpFastCgiPort: TEdit;
@@ -56,7 +54,6 @@ type
     RadioButtonPHPCGIRunnerEngineKind: TRadioButton;
     RadioButtonPHPNamedPipeFastCGIRunnerEngineKind: TRadioButton;
     RadioButtonPHPSocketFastCGIRunnerEngineKind: TRadioButton;
-    RadioButtonPHPISAPIRunnerEngineKind: TRadioButton;
     GroupBox2: TGroupBox;
     ButtonBench: TButton;
     Label12: TLabel;
@@ -128,8 +125,7 @@ begin
     try
       if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
       else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpNamedPipeFastCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
-      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text))
-      else aPhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(AnsiString(EditPhpIsapiDllPath.text));
+      else aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
       Try
         aServerVariablesLst.Assign(MemoServerVariables.lines);
         aPhpRunnerEngine.Execute(aServerVariablesLst,
@@ -177,8 +173,7 @@ begin
       MemoServerVariables.Lines.Values['REDIRECT_STATUS'] := '1';
       if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
       else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpNamedPipeFastCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
-      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text))
-      else aPhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(AnsiString(EditPhpIsapiDllPath.text));
+      else aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
       Try
         aServerVariablesLst.Assign(MemoServerVariables.lines);
         aPhpRunnerEngine.Execute(aServerVariablesLst,
@@ -238,8 +233,7 @@ begin
       MemoServerVariables.Lines.Values['REDIRECT_STATUS'] := '1';
       if RadioButtonPhpCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
       else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpNamedPipeFastCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
-      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text))
-      else aPhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(AnsiString(EditPhpIsapiDllPath.text));
+      else aPhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
       try
         aServerVariablesLst.Assign(MemoServerVariables.lines);
         APostDataStrings.Assign(MemoPostDataStrings.Lines);
@@ -303,8 +297,7 @@ begin
     try
       if RadioButtonPhpCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := TalPhpCgiRunnerEngine.Create(AnsiString(EditPhpCGIPath.Text))
       else if RadioButtonPhpNamedPipeFastCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := aPhpNamedPipeFastCgiManager
-      else if RadioButtonPhpSocketFastCGIRunnerEngineKind.Checked then aBenchThread.PhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text))
-      else aBenchThread.PhpRunnerEngine := TalPhpIsapiRunnerEngine.Create(AnsiString(EditPhpIsapiDllPath.text));
+      else aBenchThread.PhpRunnerEngine := TalPhpSocketFastCgiRunnerEngine.Create(AnsiString(EditPhpFastCgiHost.Text), StrToInt(EditPhpFastCgiPort.text));
       aBenChThread.serverVariable := TALStringList.Create;
       aBenChThread.serverVariable.Assign(MemoServerVariables.Lines);
       aBenchThread.NbCycle := StrToInt(EditCycleCount.Text);

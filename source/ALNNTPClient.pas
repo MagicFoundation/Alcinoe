@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALNNTPClient
-Version:      3.52
+Version:      4.00
 
 Description:  TALNNTPClient class implements the NNTP protocol (RFC-977
               and RFC-850) Support authentification (RFC-977 Extension)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://www.w3.org/Protocols/rfc977/rfc977
 
@@ -51,7 +51,7 @@ Link :        http://www.w3.org/Protocols/rfc977/rfc977
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALNNTPClient;
 
@@ -61,7 +61,8 @@ uses windows,
      Classes,
      WinSock,
      ALInternetMessageCommon,
-     ALMultiPartMixedParser;
+     ALMultiPartMixedParser,
+     ALStringList;
 
 type
 
@@ -75,78 +76,78 @@ type
       procedure Settimeout(const Value: integer);
     protected
       procedure CheckError(Error: Boolean);
-      Function SendCmd(aCmd:String; OkResponses: array of Word; const MultilineResponse: Boolean=False): String; virtual;
-      Function GetResponse(OkResponses: array of Word; const MultilineResponse: Boolean=False): String;
+      Function SendCmd(aCmd:AnsiString; OkResponses: array of Word; const MultilineResponse: Boolean=False): AnsiString; virtual;
+      Function GetResponse(OkResponses: array of Word; const MultilineResponse: Boolean=False): AnsiString;
       Function SocketWrite(Var Buffer; Count: Longint): Longint; Virtual;
       Function SocketRead(var Buffer; Count: Longint): Longint; Virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
-      Function  Connect(aHost: String; APort: integer): String; virtual;
+      Function  Connect(aHost: AnsiString; APort: integer): AnsiString; virtual;
       Procedure Disconnect; virtual;
-      Function  GetStatusCodeFromResponse(aResponse: String): Integer;
-      Procedure AUTHINFO(UserName, Password: String); virtual;
-      Function  List: String; overload; virtual;
-      procedure List(ALst: Tstrings); overload; virtual;
-      Function  ListDistributions: String; overload; virtual;
-      procedure ListDistributions(ALst: Tstrings); overload; virtual;
-      Function  ListNewsGroups(wildmat: String): String; overload; virtual;
-      procedure ListNewsGroups(ALst: Tstrings; wildmat: String); overload; virtual;
-      Function  ListGroup(NewsGroup: String): String; overload; virtual;
-      procedure ListGroup(ALst: Tstrings; NewsGroup: String); overload; virtual;
-      Function  NewsGroups(FromGMTDate: TdateTime; distributions: String): String; overload; virtual;
-      procedure NewsGroups(FromGMTDate: TdateTime; distributions: String; ALst: Tstrings); overload; virtual;
-      Function  NewNews(NewsGroups: String; FromGMTDate: TdateTime; distributions: String): String; overload; virtual;
-      procedure NewNews(NewsGroups: String; FromGMTDate: TdateTime; distributions: String; ALst: Tstrings); overload; virtual;
-      function  Group(NewsGroupName : String): String; overload; virtual;
-      Procedure Group(NewsGroupName: String; Var EstimatedNumberArticles, FirstArticleNumber, LastArticleNumber: Integer); overload; Virtual;
-      Function  ArticleByNumber(ArticleNumber: Integer): String; overload; virtual;
-      Procedure ArticleByNumber(ArticleNumber: Integer; Var ArticleContent: String); overload; virtual;
-      Procedure ArticleByNumber(ArticleNumber: Integer; Var ArticleBodyContent: String; ArticleHeaderContent: TALNewsArticleHeader); overload; virtual;
-      Function  ArticleByID(ArticleID : String): String; overload; virtual;
-      Procedure ArticleByID(ArticleID : String; Var ArticleContent: String); overload; virtual;
-      Procedure ArticleByID(ArticleID : String; Var ArticleBodyContent: String; ArticleHeaderContent: TALNewsArticleHeader); overload; virtual;
-      function  Article: String; overload; virtual;
-      procedure Article(var ArticleContent: String); overload; virtual;
-      procedure Article(var ArticleBodyContent: String; ArticleHeaderContent: TALNewsArticleHeader); overload; virtual;
-      Function  HeadByID(ArticleID : String): String; overload; virtual;
-      Procedure HeadByID(ArticleID : String; Var HeadContent: String); overload; virtual;
-      Procedure HeadByID(ArticleID : String; HeadContent: TALNewsArticleHeader); overload; virtual;
-      Function  HeadByNumber(ArticleNumber: Integer): String; overload; virtual;
-      Procedure HeadByNumber(ArticleNumber: Integer; Var HeadContent: String); overload; virtual;
+      Function  GetStatusCodeFromResponse(aResponse: AnsiString): Integer;
+      Procedure AUTHINFO(UserName, Password: AnsiString); virtual;
+      Function  List: AnsiString; overload; virtual;
+      procedure List(ALst: TALStrings); overload; virtual;
+      Function  ListDistributions: AnsiString; overload; virtual;
+      procedure ListDistributions(ALst: TALStrings); overload; virtual;
+      Function  ListNewsGroups(wildmat: AnsiString): AnsiString; overload; virtual;
+      procedure ListNewsGroups(ALst: TALStrings; wildmat: AnsiString); overload; virtual;
+      Function  ListGroup(NewsGroup: AnsiString): AnsiString; overload; virtual;
+      procedure ListGroup(ALst: TALStrings; NewsGroup: AnsiString); overload; virtual;
+      Function  NewsGroups(FromGMTDate: TdateTime; distributions: AnsiString): AnsiString; overload; virtual;
+      procedure NewsGroups(FromGMTDate: TdateTime; distributions: AnsiString; ALst: TALStrings); overload; virtual;
+      Function  NewNews(NewsGroups: AnsiString; FromGMTDate: TdateTime; distributions: AnsiString): AnsiString; overload; virtual;
+      procedure NewNews(NewsGroups: AnsiString; FromGMTDate: TdateTime; distributions: AnsiString; ALst: TALStrings); overload; virtual;
+      function  Group(NewsGroupName : AnsiString): AnsiString; overload; virtual;
+      Procedure Group(NewsGroupName: AnsiString; Var EstimatedNumberArticles, FirstArticleNumber, LastArticleNumber: Integer); overload; Virtual;
+      Function  ArticleByNumber(ArticleNumber: Integer): AnsiString; overload; virtual;
+      Procedure ArticleByNumber(ArticleNumber: Integer; Var ArticleContent: AnsiString); overload; virtual;
+      Procedure ArticleByNumber(ArticleNumber: Integer; Var ArticleBodyContent: AnsiString; ArticleHeaderContent: TALNewsArticleHeader); overload; virtual;
+      Function  ArticleByID(ArticleID : AnsiString): AnsiString; overload; virtual;
+      Procedure ArticleByID(ArticleID : AnsiString; Var ArticleContent: AnsiString); overload; virtual;
+      Procedure ArticleByID(ArticleID : AnsiString; Var ArticleBodyContent: AnsiString; ArticleHeaderContent: TALNewsArticleHeader); overload; virtual;
+      function  Article: AnsiString; overload; virtual;
+      procedure Article(var ArticleContent: AnsiString); overload; virtual;
+      procedure Article(var ArticleBodyContent: AnsiString; ArticleHeaderContent: TALNewsArticleHeader); overload; virtual;
+      Function  HeadByID(ArticleID : AnsiString): AnsiString; overload; virtual;
+      Procedure HeadByID(ArticleID : AnsiString; Var HeadContent: AnsiString); overload; virtual;
+      Procedure HeadByID(ArticleID : AnsiString; HeadContent: TALNewsArticleHeader); overload; virtual;
+      Function  HeadByNumber(ArticleNumber: Integer): AnsiString; overload; virtual;
+      Procedure HeadByNumber(ArticleNumber: Integer; Var HeadContent: AnsiString); overload; virtual;
       Procedure HeadByNumber(ArticleNumber: Integer; HeadContent: TALNewsArticleHeader); overload; virtual;
-      function  Head: String; overload; virtual;
-      procedure Head(var HeadContent: String); overload; virtual;
+      function  Head: AnsiString; overload; virtual;
+      procedure Head(var HeadContent: AnsiString); overload; virtual;
       procedure Head(HeadContent: TALNewsArticleHeader); overload; virtual;
-      Function  BodyByID(ArticleID : String): String; overload; virtual;
-      Procedure BodyByID(ArticleID : String; Var BodyContent: String); overload; virtual;
-      Function  BodyByNumber(ArticleNumber: Integer): String; overload; virtual;
-      Procedure BodyByNumber(ArticleNumber: Integer; Var BodyContent: String); overload; virtual;
-      Function  Body: String; overload; virtual;
-      Procedure Body(Var BodyContent: String); overload; virtual;
-      Function  StatByID(ArticleID : String): String; overload; virtual;
-      Procedure StatByID(ArticleID : String; Var ArticleNumber: integer); overload; virtual;
-      Function  StatByNumber(ArticleNumber: Integer): String; overload; virtual;
-      Procedure StatByNumber(ArticleNumber: Integer; Var ArticleID: String); overload; virtual;
-      Function  Stat: String; overload; virtual;
-      Procedure Stat(Var ArticleID : String; Var ArticleNumber: integer); overload; virtual;
-      Function  XHDRByID(HeaderName: String; ArticleID: String): string; overload; virtual;
-      Procedure XHDRByID(HeaderName: String; ArticleID: String; var HeaderContent: string); overload; virtual;
-      Function  XHDRByNumber(HeaderName: String; ArticleNumber: integer): string; overload; virtual;
-      Procedure XHDRByNumber(HeaderName: String; ArticleNumber: integer; var HeaderContent: string); overload; virtual;
-      Function  XHDR(HeaderName: String): string; overload; virtual;
-      Procedure XHDR(HeaderName: String; var HeaderContent: string); overload; virtual;
+      Function  BodyByID(ArticleID : AnsiString): AnsiString; overload; virtual;
+      Procedure BodyByID(ArticleID : AnsiString; Var BodyContent: AnsiString); overload; virtual;
+      Function  BodyByNumber(ArticleNumber: Integer): AnsiString; overload; virtual;
+      Procedure BodyByNumber(ArticleNumber: Integer; Var BodyContent: AnsiString); overload; virtual;
+      Function  Body: AnsiString; overload; virtual;
+      Procedure Body(Var BodyContent: AnsiString); overload; virtual;
+      Function  StatByID(ArticleID : AnsiString): AnsiString; overload; virtual;
+      Procedure StatByID(ArticleID : AnsiString; Var ArticleNumber: integer); overload; virtual;
+      Function  StatByNumber(ArticleNumber: Integer): AnsiString; overload; virtual;
+      Procedure StatByNumber(ArticleNumber: Integer; Var ArticleID: AnsiString); overload; virtual;
+      Function  Stat: AnsiString; overload; virtual;
+      Procedure Stat(Var ArticleID : AnsiString; Var ArticleNumber: integer); overload; virtual;
+      Function  XHDRByID(HeaderName: AnsiString; ArticleID: AnsiString): AnsiString; overload; virtual;
+      Procedure XHDRByID(HeaderName: AnsiString; ArticleID: AnsiString; var HeaderContent: AnsiString); overload; virtual;
+      Function  XHDRByNumber(HeaderName: AnsiString; ArticleNumber: integer): AnsiString; overload; virtual;
+      Procedure XHDRByNumber(HeaderName: AnsiString; ArticleNumber: integer; var HeaderContent: AnsiString); overload; virtual;
+      Function  XHDR(HeaderName: AnsiString): AnsiString; overload; virtual;
+      Procedure XHDR(HeaderName: AnsiString; var HeaderContent: AnsiString); overload; virtual;
       Function  Next: Boolean; overload; virtual;
-      Procedure Next(Var ArticleNumber: Integer; Var ArticleID: String); overload; virtual;
+      Procedure Next(Var ArticleNumber: Integer; Var ArticleID: AnsiString); overload; virtual;
       Function  Last: Boolean; overload; virtual;
-      Procedure Last(Var ArticleNumber: Integer; Var ArticleID: String); overload; virtual;
-      Function  IHave(ArticleID: String; ArticleContent: String): Boolean; virtual;
-      Procedure Post(ArticleContent: String); overload; virtual;
-      Procedure Post(HeaderContent, BodyContent: String); overload; virtual;
-      Procedure Post(HeaderContent:TALNewsArticleHeader; BodyContent: String); overload; virtual;
-      Procedure PostMultipartMixed(HeaderContent: TALNewsArticleHeader; InlineText, InlineTextContentType: String; Attachments: TALMultiPartMixedContents); virtual;
-      function  Slave: String; virtual;
-      Function  Quit: String; virtual;
+      Procedure Last(Var ArticleNumber: Integer; Var ArticleID: AnsiString); overload; virtual;
+      Function  IHave(ArticleID: AnsiString; ArticleContent: AnsiString): Boolean; virtual;
+      Procedure Post(ArticleContent: AnsiString); overload; virtual;
+      Procedure Post(HeaderContent, BodyContent: AnsiString); overload; virtual;
+      Procedure Post(HeaderContent:TALNewsArticleHeader; BodyContent: AnsiString); overload; virtual;
+      Procedure PostMultipartMixed(HeaderContent: TALNewsArticleHeader; InlineText, InlineTextContentType: AnsiString; Attachments: TALMultiPartMixedContents); virtual;
+      function  Slave: AnsiString; virtual;
+      Function  Quit: AnsiString; virtual;
       property  Connected: Boolean read FConnected;
       Property  Timeout: integer read Ftimeout write Settimeout default 60000;
     end;
@@ -157,13 +158,13 @@ Uses SysUtils,
      AlFcnWinsock,
      AlFcnString;
 
-{*************************************************************************}
-Procedure ALNNTPClientSplitResponseLine(aResponse: String; ALst: Tstrings);
+{*******************************************************************************}
+Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);
 Begin
-  aResponse := Trim(aResponse); // 211 111225 12861 362539 nzn.fr.delphi
+  aResponse := ALTrim(aResponse); // 211 111225 12861 362539 nzn.fr.delphi
   aResponse := AlStringReplace(aResponse,#9,' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
   While alPos('  ',aResponse) > 0 do aResponse := AlStringReplace(aResponse,'  ',' ',[RfReplaceAll]); // 211 111225 12861 362539 nzn.fr.delphi
-  aResponse := trim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll])); // 211
+  aResponse := ALTrim(AlStringReplace(aResponse,' ',#13#10,[RfReplaceAll])); // 211
                                                                            // 111225
                                                                            // 12861
                                                                            // 362539
@@ -171,8 +172,8 @@ Begin
   aLst.Text := aResponse;
 end;
 
-{****************************************************************************************}
-Function ALNNTPClientExtractTextFromMultilineResponse(aMultilineResponse: String): String;
+{************************************************************************************************}
+Function ALNNTPClientExtractTextFromMultilineResponse(aMultilineResponse: AnsiString): AnsiString;
 Var ln: Integer;
     P: Integer;
 begin
@@ -196,20 +197,16 @@ begin
   Result := AlStringReplace(Result,#13#10'..',#13#10'.', [RfReplaceAll]);
 end;
 
-{************************************************************************************************}
-Function ALNNTPClientEnclosedInAngleBrackets(Str: String; const insSpace: Boolean = True): String;
+{********************************************************************************************************}
+Function ALNNTPClientEnclosedInAngleBrackets(Str: AnsiString; const insSpace: Boolean = True): AnsiString;
 begin
-  Result := Trim(Str);
+  Result := ALTrim(Str);
   If Result <> '' then begin
     IF Result[1] <> '<' then Result := '<' + Result;
     IF Result[length(Result)] <> '>' then Result := Result + '>';
     if insSpace then Result := ' ' + Result;
   end;
 end;
-
-///////////////////////////////////
-////////// TAlNNTPClient //////////
-///////////////////////////////////
 
 {*******************************}
 constructor TAlNNTPClient.Create;
@@ -234,23 +231,23 @@ begin
   if Error then RaiseLastOSError;
 end;
 
-{********************************************************************}
-Function TAlNNTPClient.Connect(aHost: String; APort: integer): String;
+{****************************************************************************}
+Function TAlNNTPClient.Connect(aHost: AnsiString; APort: integer): AnsiString;
 
-  {---------------------------------------------}
-  procedure CallServer(Server:string; Port:word);
+  {-------------------------------------------------}
+  procedure CallServer(Server:AnsiString; Port:word);
   var SockAddr:Sockaddr_in;
-      IP: String;
+      IP: AnsiString;
   begin
     FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
     CheckError(FSocketDescriptor=INVALID_SOCKET);
     FillChar(SockAddr,SizeOf(SockAddr),0);
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
-    SockAddr.sin_addr.S_addr:=inet_addr(Pchar(Server));
-    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+    SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
+    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
       checkError(not ALHostToIP(Server, IP));
-      SockAddr.sin_addr.S_addr:=inet_addr(Pchar(IP));
+      SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
   end;
@@ -262,8 +259,8 @@ begin
 
     WSAStartup (MAKEWORD(2,2), FWSAData);
     CallServer(aHost,aPort);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     Fconnected := True;
     Result := GetResponse([200, 201]);
 
@@ -464,7 +461,7 @@ end;
     502 No permission
     503 Program error, function not performed
     nnn  authenticator-specific protocol.}
-procedure TAlNNTPClient.AUTHINFO(UserName, Password: String);
+procedure TAlNNTPClient.AUTHINFO(UserName, Password: AnsiString);
 begin
   SendCmd('AUTHINFO USER ' + UserName,[381], False);
   SendCmd('AUTHINFO PASS ' + Password,[281], False);
@@ -504,15 +501,15 @@ end;
 
  Responses
  215 list of newsgroups follows}
-Function TAlNNTPClient.List: String;
+Function TAlNNTPClient.List: AnsiString;
 begin
   Result := SendCmd('LIST',[215], True);
 end;
 
-{*******************************************}
-procedure TAlNNTPClient.List(ALst: Tstrings);
+{*********************************************}
+procedure TAlNNTPClient.List(ALst: TALStrings);
 begin
-  ALst.Text := Trim(ALNNTPClientExtractTextFromMultilineResponse(List));
+  ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(List));
 end;
 
 {*****************}
@@ -533,15 +530,15 @@ end;
 
  215 information follows
  503 program error, function not performed}
-function TAlNNTPClient.ListDistributions: String;
+function TAlNNTPClient.ListDistributions: AnsiString;
 begin
   Result := SendCmd('LIST DISTRIBUTIONS',[215], True);
 end;
 
-{********************************************************}
-procedure TAlNNTPClient.ListDistributions(ALst: Tstrings);
+{**********************************************************}
+procedure TAlNNTPClient.ListDistributions(ALst: TALStrings);
 begin
-  ALst.Text := Trim(ALNNTPClientExtractTextFromMultilineResponse(ListDISTRIBUTIONS));
+  ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListDISTRIBUTIONS));
 end;
 
 {************************}
@@ -568,16 +565,16 @@ end;
 
     215 information follows
     503 program error, function not performed}
-function TAlNNTPClient.ListNewsGroups(wildmat: String): String;
+function TAlNNTPClient.ListNewsGroups(wildmat: AnsiString): AnsiString;
 begin
   if wildmat <> '' then wildmat := ' ' + wildmat;
   Result := SendCmd('LIST NEWSGROUPS' + wildmat,[215], True);
 end;
 
-{**********************************************************************}
-procedure TAlNNTPClient.ListNewsGroups(ALst: Tstrings; wildmat: String);
+{****************************************************************************}
+procedure TAlNNTPClient.ListNewsGroups(ALst: TALStrings; wildmat: AnsiString);
 begin
-  ALst.Text := Trim(ALNNTPClientExtractTextFromMultilineResponse(ListNewsGroups(wildmat)));
+  ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListNewsGroups(wildmat)));
 end;
 
 {**************}
@@ -610,16 +607,16 @@ end;
  211 list of article numbers follow
  412 Not currently in newsgroup
  502 no permission}
-function TAlNNTPClient.ListGroup(NewsGroup: String): String;
+function TAlNNTPClient.ListGroup(NewsGroup: AnsiString): AnsiString;
 begin
   if NewsGroup <> '' then NewsGroup := ' ' + NewsGroup;
   Result := SendCmd('LISTGROUP' + NewsGroup,[211], True);
 end;
 
-{*******************************************************************}
-procedure TAlNNTPClient.ListGroup(ALst: Tstrings; NewsGroup: String);
+{*************************************************************************}
+procedure TAlNNTPClient.ListGroup(ALst: TALStrings; NewsGroup: AnsiString);
 begin
-  ALst.Text := Trim(ALNNTPClientExtractTextFromMultilineResponse(ListGroup(NewsGroup)));
+  ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListGroup(NewsGroup)));
 end;
 
 {******************************************}
@@ -655,15 +652,15 @@ end;
 
  Responses
  231 list of new newsgroups follows}
-Function TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; distributions: String): String;
+Function TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWGROUPS ' + FormatDateTime('yymmdd" "hhnnss',FromGMTDate) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
+  Result := SendCmd('NEWGROUPS ' + ALFormatDateTime('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettings) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
 end;
 
-{************************************************************************************************}
-procedure TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; distributions: String; ALst: Tstrings);
+{******************************************************************************************************}
+procedure TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; distributions: AnsiString; ALst: TALStrings);
 begin
-  ALst.Text := Trim(ALNNTPClientExtractTextFromMultilineResponse(NewsGroups(FromGMTDate,distributions)));
+  ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewsGroups(FromGMTDate,distributions)));
 end;
 
 {**************************************************}
@@ -721,15 +718,15 @@ end;
 
  Responses
  230 list of new articles by message-id follows}
-Function TAlNNTPClient.NewNews(Newsgroups: String; FromGMTDate: TdateTime; distributions: String): String;
+Function TAlNNTPClient.NewNews(Newsgroups: AnsiString; FromGMTDate: TdateTime; distributions: AnsiString): AnsiString;
 begin
-  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + FormatDateTime('yymmdd" "hhnnss',FromGMTDate) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
+  Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTime('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettings) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
 end;
 
-{*****************************************************************************************************************}
-procedure TAlNNTPClient.NewNews(Newsgroups: String; FromGMTDate: TdateTime; distributions: String; ALst: Tstrings);
+{***************************************************************************************************************************}
+procedure TAlNNTPClient.NewNews(Newsgroups: AnsiString; FromGMTDate: TdateTime; distributions: AnsiString; ALst: TALStrings);
 begin
-  ALst.Text := Trim(ALNNTPClientExtractTextFromMultilineResponse(NewNews(NewsGroups, FromGMTDate, distributions)));
+  ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewNews(NewsGroups, FromGMTDate, distributions)));
 end;
 
 {*********}
@@ -766,25 +763,25 @@ end;
      l = last article number in the group,
      s = name of the group.
  411 no such news group }
-Function TAlNNTPClient.Group(NewsGroupName: String): String;
+Function TAlNNTPClient.Group(NewsGroupName: AnsiString): AnsiString;
 begin
-  Result := SendCmd('GROUP ' + Trim(NewsGroupName),[211], False); //211 111225 12861 362539 nzn.fr.delphi
+  Result := SendCmd('GROUP ' + ALTrim(NewsGroupName),[211], False); //211 111225 12861 362539 nzn.fr.delphi
 end;
 
-{**************************************************}
-Procedure TAlNNTPClient.Group(NewsGroupName: String;
+{******************************************************}
+Procedure TAlNNTPClient.Group(NewsGroupName: AnsiString;
                               Var EstimatedNumberArticles,
                                   FirstArticleNumber,
                                   LastArticleNumber: Integer);
-Var aLst: TstringList;
+Var aLst: TALStringList;
 Begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALNNTPClientSplitResponseLine(Group(NewsGroupName), aLst);
     If aLst.Count < 4 then raise Exception.Create('GROUP cmd Error');
-    If not tryStrToInt(aLst[1], EstimatedNumberArticles) then raise Exception.Create('GROUP cmd Error');
-    If not tryStrToInt(aLst[2], FirstArticleNumber) then raise Exception.Create('GROUP cmd Error');
-    If not tryStrToInt(aLst[3], LastArticleNumber) then raise Exception.Create('GROUP cmd Error');
+    If not ALTryStrToInt(aLst[1], EstimatedNumberArticles) then raise Exception.Create('GROUP cmd Error');
+    If not ALTryStrToInt(aLst[2], FirstArticleNumber) then raise Exception.Create('GROUP cmd Error');
+    If not ALTryStrToInt(aLst[3], LastArticleNumber) then raise Exception.Create('GROUP cmd Error');
   finally
     aLst.Free;
   end;
@@ -870,20 +867,20 @@ end;
  420 no current article has been selected
  423 no such article number in this group
  430 no such article found}
-function TAlNNTPClient.ArticleByID(ArticleID: String): String;
+function TAlNNTPClient.ArticleByID(ArticleID: AnsiString): AnsiString;
 begin
   Result := SendCmd('ARTICLE' + ALNNTPClientEnclosedInAngleBrackets(ArticleID),[220], True);
 end;
 
-{*********************************************************************************}
-procedure TAlNNTPClient.ArticleByID(ArticleID: String; var ArticleContent: String);
+{*****************************************************************************************}
+procedure TAlNNTPClient.ArticleByID(ArticleID: AnsiString; var ArticleContent: AnsiString);
 begin
   ArticleContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByID(ArticleID));
 end;
 
-{****************************************************}
-procedure TAlNNTPClient.ArticleByID(ArticleID: String;
-                                    var ArticleBodyContent: String;
+{********************************************************}
+procedure TAlNNTPClient.ArticleByID(ArticleID: AnsiString;
+                                    var ArticleBodyContent: AnsiString;
                                     ArticleHeaderContent: TALNewsArticleHeader);
 Var P: integer;
 begin
@@ -894,21 +891,21 @@ begin
   Delete(ArticleBodyContent,1,P+3);
 end;
 
-{*********************************************************************}
-function TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer): String;
+{*************************************************************************}
+function TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('ARTICLE ' + inttostr(ArticleNumber),[220], true);
+  Result := SendCmd('ARTICLE ' + ALIntToStr(ArticleNumber),[220], true);
 end;
 
-{******************************************************************************************}
-procedure TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer; var ArticleContent: String);
+{**********************************************************************************************}
+procedure TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer; var ArticleContent: AnsiString);
 begin
   ArticleContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByNumber(ArticleNumber));
 end;
 
 {*************************************************************}
 procedure TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer;
-                                        var ArticleBodyContent: String;
+                                        var ArticleBodyContent: AnsiString;
                                         ArticleHeaderContent: TALNewsArticleHeader);
 Var P: integer;
 begin
@@ -919,20 +916,20 @@ begin
   Delete(ArticleBodyContent,1,P+3);
 end;
 
-{*************************************}
-function TAlNNTPClient.Article: String;
+{*****************************************}
+function TAlNNTPClient.Article: AnsiString;
 Begin
   Result := SendCmd('ARTICLE', [220], True);
 end;
 
-{**********************************************************}
-procedure TAlNNTPClient.Article(var ArticleContent: String);
+{**************************************************************}
+procedure TAlNNTPClient.Article(var ArticleContent: AnsiString);
 Begin
   ArticleContent := ALNNTPClientExtractTextFromMultilineResponse(Article);
 end;
 
-{**********************************************************************************************************}
-procedure TAlNNTPClient.Article(var ArticleBodyContent: String; ArticleHeaderContent: TALNewsArticleHeader);
+{**************************************************************************************************************}
+procedure TAlNNTPClient.Article(var ArticleBodyContent: AnsiString; ArticleHeaderContent: TALNewsArticleHeader);
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(Article);
@@ -942,32 +939,32 @@ begin
   Delete(ArticleBodyContent,1,P+3);
 end;
 
-{*********************************************************}
-function TAlNNTPClient.HeadByID(ArticleID: String): String;
+{*****************************************************************}
+function TAlNNTPClient.HeadByID(ArticleID: AnsiString): AnsiString;
 begin
   Result := SendCmd('HEAD' + ALNNTPClientEnclosedInAngleBrackets(ArticleID),[221], True);
 end;
 
-{***************************************************************************}
-procedure TAlNNTPClient.HeadByID(ArticleID: String; var HeadContent: String);
+{***********************************************************************************}
+procedure TAlNNTPClient.HeadByID(ArticleID: AnsiString; var HeadContent: AnsiString);
 begin
   HeadContent := ALNNTPClientExtractTextFromMultilineResponse(HeadByID(ArticleID));
 end;
 
-{*************************************************************************************}
-procedure TAlNNTPClient.HeadByID(ArticleID: String; HeadContent: TALNewsArticleHeader);
+{*****************************************************************************************}
+procedure TAlNNTPClient.HeadByID(ArticleID: AnsiString; HeadContent: TALNewsArticleHeader);
 begin
   HeadContent.RawHeaderText := ALNNTPClientExtractTextFromMultilineResponse(HeadByID(ArticleID));
 end;
 
-{******************************************************************}
-function TAlNNTPClient.HeadByNumber(ArticleNumber: Integer): String;
+{**********************************************************************}
+function TAlNNTPClient.HeadByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('HEAD ' + inttostr(ArticleNumber),[221], true);
+  Result := SendCmd('HEAD ' + ALIntToStr(ArticleNumber),[221], true);
 end;
 
-{************************************************************************************}
-procedure TAlNNTPClient.HeadByNumber(ArticleNumber: Integer; var HeadContent: String);
+{****************************************************************************************}
+procedure TAlNNTPClient.HeadByNumber(ArticleNumber: Integer; var HeadContent: AnsiString);
 begin
   HeadContent := ALNNTPClientExtractTextFromMultilineResponse(HeadByNumber(ArticleNumber));
 end;
@@ -978,14 +975,14 @@ begin
   HeadContent.RawHeaderText := ALNNTPClientExtractTextFromMultilineResponse(HeadByNumber(ArticleNumber));
 end;
 
-{**********************************}
-function TAlNNTPClient.Head: String;
+{**************************************}
+function TAlNNTPClient.Head: AnsiString;
 begin
   Result := SendCmd('HEAD',[221], True);
 end;
 
-{****************************************************}
-procedure TAlNNTPClient.Head(var HeadContent: String);
+{********************************************************}
+procedure TAlNNTPClient.Head(var HeadContent: AnsiString);
 begin
   HeadContent := ALNNTPClientExtractTextFromMultilineResponse(Head);
 end;
@@ -996,73 +993,73 @@ begin
   HeadContent.RawHeaderText := ALNNTPClientExtractTextFromMultilineResponse(Head);
 end;
 
-{*********************************************************}
-function TAlNNTPClient.BodyByID(ArticleID: String): String;
+{*****************************************************************}
+function TAlNNTPClient.BodyByID(ArticleID: AnsiString): AnsiString;
 begin
   Result := SendCmd('BODY' + ALNNTPClientEnclosedInAngleBrackets(ArticleID),[222], True);
 end;
 
-{***************************************************************************}
-procedure TAlNNTPClient.BodyByID(ArticleID: String; var BodyContent: String);
+{***********************************************************************************}
+procedure TAlNNTPClient.BodyByID(ArticleID: AnsiString; var BodyContent: AnsiString);
 begin
   BodyContent := ALNNTPClientExtractTextFromMultilineResponse(BodyByID(ArticleID));
 end;
 
-{******************************************************************}
-function TAlNNTPClient.BodyByNumber(ArticleNumber: Integer): String;
+{**********************************************************************}
+function TAlNNTPClient.BodyByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('BODY ' + inttostr(ArticleNumber),[222], true);
+  Result := SendCmd('BODY ' + ALIntToStr(ArticleNumber),[222], true);
 end;
 
-{************************************************************************************}
-procedure TAlNNTPClient.BodyByNumber(ArticleNumber: Integer; var BodyContent: String);
+{****************************************************************************************}
+procedure TAlNNTPClient.BodyByNumber(ArticleNumber: Integer; var BodyContent: AnsiString);
 begin
   BodyContent := ALNNTPClientExtractTextFromMultilineResponse(BodyByNumber(ArticleNumber));
 end;
 
-{**********************************}
-function TAlNNTPClient.Body: String;
+{**************************************}
+function TAlNNTPClient.Body: AnsiString;
 begin
   Result := SendCmd('BODY',[222], True);
 end;
 
-{****************************************************}
-procedure TAlNNTPClient.Body(var BodyContent: String);
+{********************************************************}
+procedure TAlNNTPClient.Body(var BodyContent: AnsiString);
 begin
   BodyContent := ALNNTPClientExtractTextFromMultilineResponse(Body);
 end;
 
-{*********************************************************}
-function TAlNNTPClient.StatByID(ArticleID: String): String;
+{*****************************************************************}
+function TAlNNTPClient.StatByID(ArticleID: AnsiString): AnsiString;
 begin
   Result := SendCmd('STAT' + ALNNTPClientEnclosedInAngleBrackets(ArticleID),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
 end;
 
-{******************************************************************************}
-procedure TAlNNTPClient.StatByID(ArticleID: String; var ArticleNumber: integer);
-Var aLst: TstringList;
+{**********************************************************************************}
+procedure TAlNNTPClient.StatByID(ArticleID: AnsiString; var ArticleNumber: integer);
+Var aLst: TALStringList;
 Begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALNNTPClientSplitResponseLine(StatByID(ArticleID), aLst);
     If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
-    If not tryStrToInt(aLst[1], ArticleNumber) then raise Exception.Create('STAT cmd Error');
+    If not ALTryStrToInt(aLst[1], ArticleNumber) then raise Exception.Create('STAT cmd Error');
   finally
     aLst.Free;
   end;
 end;
 
-{******************************************************************}
-function TAlNNTPClient.StatByNumber(ArticleNumber: Integer): String;
+{**********************************************************************}
+function TAlNNTPClient.StatByNumber(ArticleNumber: Integer): AnsiString;
 begin
-  Result := SendCmd('STAT ' + inttostr(ArticleNumber),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
+  Result := SendCmd('STAT ' + ALIntToStr(ArticleNumber),[223], False); //223 10110 <23445@sdcsvax.ARPA> status
 end;
 
-{**********************************************************************************}
-procedure TAlNNTPClient.StatByNumber(ArticleNumber: Integer; var ArticleID: String);
-Var aLst: TstringList;
+{**************************************************************************************}
+procedure TAlNNTPClient.StatByNumber(ArticleNumber: Integer; var ArticleID: AnsiString);
+Var aLst: TALStringList;
 Begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALNNTPClientSplitResponseLine(StatByNumber(ArticleNumber), aLst);
     If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
@@ -1072,22 +1069,22 @@ Begin
   end;
 end;
 
-{**********************************}
-function TAlNNTPClient.Stat: String;
+{**************************************}
+function TAlNNTPClient.Stat: AnsiString;
 begin
   Result := SendCmd('STAT', [223], False); //223 10110 <23445@sdcsvax.ARPA> status
 end;
 
 
-{******************************************************************************}
-procedure TAlNNTPClient.Stat(var ArticleID: String; var ArticleNumber: integer);
-Var aLst: TstringList;
+{**********************************************************************************}
+procedure TAlNNTPClient.Stat(var ArticleID: AnsiString; var ArticleNumber: integer);
+Var aLst: TALStringList;
 Begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALNNTPClientSplitResponseLine(Stat, aLst);
     If aLst.Count < 3 then raise Exception.Create('STAT cmd Error');
-    If not TryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('STAT cmd Error');
+    If not ALTryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('STAT cmd Error');
     ArticleID  := aLst[2]; // <23445@sdcsvax.ARPA>
   finally
     aLst.Free;
@@ -1143,37 +1140,37 @@ end;
  420 No current article selected
  430 no such article
  502 no permission}
-function TAlNNTPClient.XHDRByID(HeaderName: String; ArticleID: String): string;
+function TAlNNTPClient.XHDRByID(HeaderName: AnsiString; ArticleID: AnsiString): AnsiString;
 begin
   Result := SendCmd('XHDR ' + HeaderName + ' ' + ALNNTPClientEnclosedInAngleBrackets(ArticleID), [221], True);
 end;
 
-{*************************************************************************************************}
-procedure TAlNNTPClient.XHDRByID(HeaderName: String; ArticleID: String; Var HeaderContent: string);
+{*************************************************************************************************************}
+procedure TAlNNTPClient.XHDRByID(HeaderName: AnsiString; ArticleID: AnsiString; Var HeaderContent: AnsiString);
 begin
   HeaderContent := ALNNTPClientExtractTextFromMultilineResponse(XHDRByID(HeaderName,ArticleID));
 end;
 
-{**************************************************************************************}
-function TAlNNTPClient.XHDRByNumber(HeaderName: String; ArticleNumber: integer): string;
+{**********************************************************************************************}
+function TAlNNTPClient.XHDRByNumber(HeaderName: AnsiString; ArticleNumber: integer): AnsiString;
 begin
-  Result := SendCmd('XHDR ' + HeaderName + ' ' + inttostr(ArticleNumber), [221], True);
+  Result := SendCmd('XHDR ' + HeaderName + ' ' + ALIntToStr(ArticleNumber), [221], True);
 end;
 
-{**********************************************************************************************************}
-procedure TAlNNTPClient.XHDRByNumber(HeaderName: String; ArticleNumber: integer; Var HeaderContent: string);
+{******************************************************************************************************************}
+procedure TAlNNTPClient.XHDRByNumber(HeaderName: AnsiString; ArticleNumber: integer; Var HeaderContent: AnsiString);
 begin
   HeaderContent := ALNNTPClientExtractTextFromMultilineResponse(XHDRByNumber(HeaderName,ArticleNumber));
 end;
 
-{******************************************************}
-function TAlNNTPClient.XHDR(HeaderName: String): string;
+{**************************************************************}
+function TAlNNTPClient.XHDR(HeaderName: AnsiString): AnsiString;
 begin
   Result := SendCmd('XHDR ' + HeaderName, [221], True);
 end;
 
-{**************************************************************************}
-procedure TAlNNTPClient.XHDR(HeaderName: String; Var HeaderContent: string);
+{**********************************************************************************}
+procedure TAlNNTPClient.XHDR(HeaderName: AnsiString; Var HeaderContent: AnsiString);
 begin
   HeaderContent := ALNNTPClientExtractTextFromMultilineResponse(XHDR(HeaderName));
 end;
@@ -1207,15 +1204,15 @@ begin
   Result := aStatutCode=223;
 end;
 
-{******************************************************************************}
-procedure TAlNNTPClient.Next(var ArticleNumber: Integer; var ArticleID: String);
-Var aLst: TstringList;
+{**********************************************************************************}
+procedure TAlNNTPClient.Next(var ArticleNumber: Integer; var ArticleID: AnsiString);
+Var aLst: TALStringList;
 begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALNNTPClientSplitResponseLine(SendCmd('NEXT',[223], False), aLst);
     If aLst.Count < 3 then raise Exception.Create('NEXT cmd Error');
-    If not tryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('NEXT cmd Error');
+    If not ALTryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('NEXT cmd Error');
     ArticleID  := aLst[2]; //<21495@nudebch.uucp>
   finally
     aLst.Free;
@@ -1251,15 +1248,15 @@ begin
   Result := aStatutCode=223;
 end;
 
-{******************************************************************************}
-procedure TAlNNTPClient.Last(var ArticleNumber: Integer; var ArticleID: String);
-Var aLst: TstringList;
+{**********************************************************************************}
+procedure TAlNNTPClient.Last(var ArticleNumber: Integer; var ArticleID: AnsiString);
+Var aLst: TALStringList;
 begin
-  aLst := TstringList.Create;
+  aLst := TALStringList.Create;
   Try
     ALNNTPClientSplitResponseLine(SendCmd('LAST',[223], False), aLst);
     If aLst.Count < 3 then raise Exception.Create('LAST cmd Error');
-    if not tryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('LAST cmd Error');
+    if not ALTryStrToInt(aLst[1],ArticleNumber) then raise Exception.Create('LAST cmd Error');
     ArticleID  := aLst[2]; //<21495@nudebch.uucp>
   finally
     aLst.Free;
@@ -1318,8 +1315,8 @@ end;
  the received article.  This is not a fully satisfactory solution to
  the problem.  Perhaps some implementations will wish to send mail to
  the author of the article in certain of these cases.}
-function TAlNNTPClient.IHave(ArticleID, ArticleContent: String): Boolean;
-Var aResponse: String;
+function TAlNNTPClient.IHave(ArticleID, ArticleContent: AnsiString): Boolean;
+Var aResponse: AnsiString;
     aStatusCode: integer;
     i: integer;
 begin
@@ -1387,7 +1384,7 @@ end;
  connection; the client program should determine whether posting is
  generally permitted from these:) 200 server ready - posting allowed
  201 server ready - no posting allowed}
-Procedure TAlNNTPClient.Post(ArticleContent: String);
+Procedure TAlNNTPClient.Post(ArticleContent: AnsiString);
 Var i: integer;
 begin
   SendCmd('POST',[340], False);
@@ -1401,14 +1398,14 @@ begin
   SendCmd(ArticleContent + #13#10 + '.' + #13#10,[240], False);
 end;
 
-{***************************************************************}
-procedure TAlNNTPClient.Post(HeaderContent, BodyContent: String);
+{*******************************************************************}
+procedure TAlNNTPClient.Post(HeaderContent, BodyContent: AnsiString);
 begin
-  Post(Trim(HeaderContent) + #13#10#13#10 + BodyContent);
+  Post(ALTrim(HeaderContent) + #13#10#13#10 + BodyContent);
 end;
 
-{*************************************************************************************}
-procedure TAlNNTPClient.Post(HeaderContent: TALNewsArticleHeader; BodyContent: String);
+{*****************************************************************************************}
+procedure TAlNNTPClient.Post(HeaderContent: TALNewsArticleHeader; BodyContent: AnsiString);
 begin
   Post(HeaderContent.RawHeaderText, BodyContent);
 end;
@@ -1416,18 +1413,16 @@ end;
 {*****************************************************************************}
 procedure TAlNNTPClient.PostMultipartMixed(HeaderContent: TALNewsArticleHeader;
                                            InlineText,
-                                           InlineTextContentType: String;
+                                           InlineTextContentType: AnsiString;
                                            Attachments: TALMultiPartMixedContents);
 Var aMultipartMixedEncoder: TALMultipartMixedEncoder;
-    Str: String;
+    Str: AnsiString;
 begin
   aMultipartMixedEncoder := TALMultipartMixedEncoder.create;
   try
-    aMultipartMixedEncoder.Encode(
-                                  InlineText,
+    aMultipartMixedEncoder.Encode(InlineText,
                                   InlineTextContentType,
-                                  Attachments
-                                 );
+                                  Attachments);
     with aMultipartMixedEncoder do begin
       HeaderContent.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
@@ -1458,7 +1453,7 @@ end;
 
  Responses
  202 slave status noted}
-function TAlNNTPClient.Slave: String;
+function TAlNNTPClient.Slave: AnsiString;
 begin
   Result := SendCmd('SLAVE',[202], False);
 end;
@@ -1476,24 +1471,24 @@ end;
 
  Responses
  205 closing connection - goodbye!}
-function TAlNNTPClient.Quit: String;
+function TAlNNTPClient.Quit: AnsiString;
 begin
   Result := SendCmd('QUIT',[205], False);
   Disconnect;
 end;
 
-{***************************************************************************}
-function TAlNNTPClient.GetStatusCodeFromResponse(aResponse: String): Integer;
+{*******************************************************************************}
+function TAlNNTPClient.GetStatusCodeFromResponse(aResponse: AnsiString): Integer;
 
-  {----------------------------------------------}
-  function Internalstpblk(PValue : PChar) : PChar;
+  {------------------------------------------------------}
+  function Internalstpblk(PValue : PAnsiChar) : PAnsiChar;
   begin
     Result := PValue;
     while Result^ in [' ', #9, #10, #13] do Inc(Result);
   end;
 
-  {---------------------------------------------------------------------}
-  function InternalGetInteger(Data: PChar; var Number : Integer) : PChar;
+  {-----------------------------------------------------------------------------}
+  function InternalGetInteger(Data: PAnsiChar; var Number : Integer) : PAnsiChar;
   var bSign : Boolean;
   begin
     Number := 0;
@@ -1539,10 +1534,10 @@ end;
  trailing CR-LF (thus there are 510 characters maximum allowed for the
  command and its parameters).  There is no provision for continuation
  command lines.}
-function TAlNNTPClient.SendCmd(aCmd: String;
+function TAlNNTPClient.SendCmd(aCmd: AnsiString;
                                OkResponses: array of Word;
-                               Const MultilineResponse: Boolean=False): String;
-Var P: Pchar;
+                               Const MultilineResponse: Boolean=False): AnsiString;
+Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
 begin
@@ -1652,8 +1647,8 @@ end;
  to a specific implementation, other x9x codes may be used for
  debugging.  (An example might be to use e.g., 290 to acknowledge a
  remote debugging request.)}
-function TAlNNTPClient.GetResponse(OkResponses: array of Word; Const MultilineResponse: Boolean=False): String;
-Var aBuffStr: String;
+function TAlNNTPClient.GetResponse(OkResponses: array of Word; Const MultilineResponse: Boolean=False): AnsiString;
+Var aBuffStr: AnsiString;
     aBuffStrLength: Integer;
     aResponseLength: Integer;
     aStatusCode: Integer;
@@ -1696,7 +1691,7 @@ begin
     end;
   end;
 
-  If aGoodResponse <> 1 then Raise Exception.Create(Result);
+  If aGoodResponse <> 1 then Raise Exception.Create(String(Result));
 end;
 
 {**********************************************************************}
@@ -1720,8 +1715,8 @@ procedure TAlNNTPClient.Settimeout(const Value: integer);
 begin
   If Value <> Ftimeout then begin
     if FConnected then begin
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
     end;
     Ftimeout := Value;
   end;

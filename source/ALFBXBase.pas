@@ -15,14 +15,14 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXBase
-Version:      3.52
+Version:      4.00
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
               performance client/server applications based on FireBird
               without the BDE or ODBC.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -55,9 +55,9 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
-Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 391)
               http://www.progdigy.com/modules.php?name=UIB
 
 Note :        For the UIB version
@@ -70,13 +70,15 @@ Note :        For the UIB version
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 
 unit ALFBXBase;
 
+{$IFNDEF CPU64}
   {$ALIGN ON}
   {$MINENUMSIZE 4}
+{$ENDIF}
 
 interface
 uses
@@ -86,7 +88,11 @@ uses
 (* Basic data types *)
 type
 
-  PtrInt = type Longint;
+  {$IFDEF CPUX64}
+    PtrInt = IntPtr;
+  {$ELSE}
+    PtrInt = type Longint;
+  {$ENDIF}
 
   UCHAR =  AnsiChar;
   USHORT =  Word;
@@ -3011,7 +3017,7 @@ type
     function putbx(x: AnsiChar; p: PBStream): Integer;
     function Loaded: Boolean; virtual;
     function Unload: Boolean; virtual;
-    function Load(const lib: string = GDS32DLL): Boolean; virtual;
+    function Load(const lib: AnsiString = GDS32DLL): Boolean; virtual;
   end;
 
 implementation
@@ -3289,13 +3295,13 @@ begin
     end;
 end;
 
-function TALFBXBaseLibrary.Load(const lib: string = GDS32DLL): Boolean;
+function TALFBXBaseLibrary.Load(const lib: AnsiString = GDS32DLL): Boolean;
 
 begin
     Result := Loaded;
     if not Result then
     begin
-      FGDS32Lib := LoadLibrary(PChar(lib));
+      FGDS32Lib := LoadLibraryA(PAnsiChar(lib));
       if Loaded then
       begin
         BLOB_close := GetProcAddress(FGDS32Lib, 'BLOB_close');

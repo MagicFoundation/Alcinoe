@@ -15,14 +15,14 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXLib
-Version:      3.52
+Version:      4.00
 
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
               performance client/server applications based on FireBird
               without the BDE or ODBC.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -55,9 +55,9 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
-Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 398)
+Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 419)
               http://www.progdigy.com/modules.php?name=UIB
 
 NOTE :        Same as the UIB version Except
@@ -67,13 +67,15 @@ NOTE :        Same as the UIB version Except
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+* Please, help us to keep the development of these components free by
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 
 unit ALFBXLib;
 
+{$IFNDEF CPUX64}
   {$ALIGN ON}
+{$ENDIF}
   {$MINENUMSIZE 4}
 
 interface
@@ -84,10 +86,10 @@ uses
 
 type
 
-{$IFNDEF UNICODE}
-  UnicodeString = WideString;
-  RawByteString = AnsiString;
-{$ENDIF}
+//{$IFNDEF UNICODE}
+//  UnicodeString = WideString;
+//  RawByteString = AnsiString;
+//{$ENDIF}
 
   TALFBXFieldType = (uftUnKnown, uftNumeric, uftChar, uftVarchar, uftCstring, uftSmallint,
     uftInteger, uftQuad, uftFloat, uftDoublePrecision, uftTimestamp, uftBlob, uftBlobId,
@@ -107,14 +109,14 @@ type
     FErrorCode: Integer;
     FSQLCode  : Integer;
 {FB25_UP}
-    FSQLState: RawByteString;
+    FSQLState: {RawByteString}AnsiString;
 {FB25_UP}
   public
     property ErrorCode: Integer read FErrorCode;
     property SQLCode: Integer read FSQLCode;
     property GDSCode: Integer read FGDSCode;
 {FB25_UP}
-    property SQLState: RawByteString read FSQLState;
+    property SQLState: {RawByteString}AnsiString read FSQLState;
 {FB25_UP}
   end;
 
@@ -361,14 +363,14 @@ const
 {FB21_UP}
   );
 
-  function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
-  function ALFBXMBUDecode(const str: RawByteString; cp: Word): UnicodeString; overload;
-  procedure ALFBXMBUDecode(str: PAnsiChar; size: Integer; cp: Word; buffer: PWideChar); overload;
+  //function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
+  //function ALFBXMBUDecode(const str: RawByteString; cp: Word): UnicodeString; overload;
+  //procedure ALFBXMBUDecode(str: PAnsiChar; size: Integer; cp: Word; buffer: PWideChar); overload;
 
-  function ALFBXStrToCharacterSet(const CharacterSet: RawByteString): TALFBXCharacterSet;
+  function ALFBXStrToCharacterSet(const CharacterSet: {RawByteString}AnsiString): TALFBXCharacterSet;
   function ALFBXCreateDBParams(Params: AnsiString; Delimiter: AnsiChar = ';'): AnsiString;
 
-  function ALFBXCreateTRParams(Options: TALFBXTransParams; const LockRead: string = ''; const LockWrite: string = ''{FB20_UP}; LockTimeout: Word = 0{FB20_UP}): RawByteString;
+  //function ALFBXCreateTRParams(Options: TALFBXTransParams; const LockRead: string = ''; const LockWrite: string = ''{FB20_UP}; LockTimeout: Word = 0{FB20_UP}): RawByteString;
   function ALFBXCreateBlobParams(Params: AnsiString; Delimiter: AnsiChar = ';'): AnsiString;
 
 //******************************************************************************
@@ -459,68 +461,70 @@ type
   private
     FXSQLDA: PALFBXSQLDaData;
     FCharacterSet: TALFBXCharacterSet;
-    function GetAllocatedFields: Word;
-    procedure SetAllocatedFields(Fields: Word);
-    function GetFieldCount: Integer;
-    function GetSQLType(const Index: Word): Smallint;
-    function GetSQLLen(const Index: Word): Smallint;
-    function GetSQLScale(const Index: Word): Smallint;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Int64); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Double); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Integer); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Single); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Smallint); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: TDateTime); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Currency); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: boolean); overload;
-    procedure ConvertString(const Code: Smallint; Index: Word; out value: Cardinal); overload;
-    procedure ConvertStringToDate(const Code: Smallint; Index: Word; out value: Integer);
-    procedure DecodeStringB(const Code: Smallint; Index: Word; out Str: RawByteString);
-    procedure DecodeStringW(const Code: Smallint; Index: Word; out Str: UnicodeString);
-    procedure DecodeStringA(const Code: Smallint; Index: Word; out Str: AnsiString);
-    procedure DecodeString(const Code: Smallint; Index: Word; out Str: string); overload;
-    function DecodeString(const Code: Smallint; Index: Word): string; overload;
-    procedure EncodeStringA(Code: Smallint; Index: Word; const str: AnsiString);
-    procedure EncodeStringW(Code: Smallint; Index: Word; const str: UnicodeString);
-    procedure EncodeStringB(Code: Smallint; Index: Word; const str: RawByteString);
-    procedure EncodeString(Code: Smallint; Index: Word; const str: string);
-    function GetAsString(const Index: Word): string;
-    procedure SetAsString(const Index: Word; const Value: string);
-    function GetByNameAsString(const name: string): string;
-    procedure SetByNameAsString(const name, Value: string);
-    function GetByNameAsRawByteString(const name: string): RawByteString;
-    procedure SetByNameAsRawByteString(const name: string;
-      const Value: RawByteString);
   protected
-    function GetSqlName(const Index: Word): string;
-    function GetRelName(const Index: Word): string;
-    function GetOwnName(const Index: Word): string;
-    function GetAliasName(const Index: Word): string;
+    function GetAllocatedFields: Word; virtual;
+    procedure SetAllocatedFields(Fields: Word); virtual;
+    function GetFieldCount: Integer; virtual;
+    function GetSQLType(const Index: Word): Smallint; virtual;
+    function GetSQLLen(const Index: Word): Smallint; virtual;
+    function GetSQLScale(const Index: Word): Smallint; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Int64); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Double); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Integer); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Single); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Smallint); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: TDateTime); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Currency); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: boolean); overload; virtual;
+    procedure ConvertString(const Code: Smallint; Index: Word; out value: Cardinal); overload; virtual;
+    procedure ConvertStringToDate(const Code: Smallint; Index: Word; out value: Integer); virtual;
+    //procedure DecodeStringB(const Code: Smallint; Index: Word; out Str: RawByteString); virtual;
+    //procedure DecodeStringW(const Code: Smallint; Index: Word; out Str: UnicodeString); virtual;
+    procedure DecodeStringA(const Code: Smallint; Index: Word; out Str: AnsiString); overload; virtual;
+    //procedure DecodeString(const Code: Smallint; Index: Word; out Str: string); overload; virtual;
+    //function DecodeString(const Code: Smallint; Index: Word): string; overload; virtual;
+    function DecodeStringA(const Code: Smallint; Index: Word): AnsiString; overload; virtual;
+    procedure EncodeStringA(Code: Smallint; Index: Word; const str: AnsiString); virtual;
+    //procedure EncodeStringW(Code: Smallint; Index: Word; const str: UnicodeString); virtual;
+    //procedure EncodeStringB(Code: Smallint; Index: Word; const str: RawByteString); virtual;
+    //procedure EncodeString(Code: Smallint; Index: Word; const str: string); virtual;
+    //function GetAsString(const Index: Word): string; virtual;
+    //procedure SetAsString(const Index: Word; const Value: string); virtual;
+    //function GetByNameAsString(const name: string): string; virtual;
+    //procedure SetByNameAsString(const name, Value: string); virtual;
+    //function GetByNameAsRawByteString(const name: string): RawByteString; virtual;
+    //procedure SetByNameAsRawByteString(const name: string;
+    //  const Value: RawByteString); virtual;
+  protected
+    function GetSqlName(const Index: Word): AnsiString; virtual;
+    function GetRelName(const Index: Word): AnsiString; virtual;
+    function GetOwnName(const Index: Word): AnsiString; virtual;
+    function GetAliasName(const Index: Word): AnsiString; virtual;
 
     function GetFieldType(const Index: Word): TALFBXFieldType; virtual;
 
-    function GetIsNumeric(const Index: Word): boolean;
-    function GetIsBlob(const Index: Word): boolean;
-    function GetIsBlobText(const Index: Word): boolean;
-    function GetIsArray(const Index: Word): boolean;
+    function GetIsNumeric(const Index: Word): boolean; virtual;
+    function GetIsBlob(const Index: Word): boolean; virtual;
+    function GetIsBlobText(const Index: Word): boolean; virtual;
+    function GetIsArray(const Index: Word): boolean; virtual;
     function GetIsNullable(const Index: Word): boolean; virtual;
 
-    function GetIsNull(const Index: Word): boolean;
-    function GetAsDouble(const Index: Word): Double;
-    function GetAsCurrency(const Index: Word): Currency;
-    function GetAsInt64(const Index: Word): Int64;
-    function GetAsInteger(const Index: Word): Integer;
-    function GetAsSingle(const Index: Word): Single;
-    function GetAsSmallint(const Index: Word): Smallint;
-    function GetAsRawByteString(const Index: Word): RawByteString; virtual;
+    function GetIsNull(const Index: Word): boolean; virtual;
+    function GetAsDouble(const Index: Word): Double; virtual;
+    function GetAsCurrency(const Index: Word): Currency; virtual;
+    function GetAsInt64(const Index: Word): Int64; virtual;
+    function GetAsInteger(const Index: Word): Integer; virtual;
+    function GetAsSingle(const Index: Word): Single; virtual;
+    function GetAsSmallint(const Index: Word): Smallint; virtual;
+    //function GetAsRawByteString(const Index: Word): RawByteString; virtual;
     function GetAsAnsiString(const Index: Word): AnsiString; virtual;
-    function GetAsUnicodeString(const Index: Word): UnicodeString; virtual;
-    function GetAsQuad(const Index: Word): TISCQuad;
-    function GetAsVariant(const Index: Word): Variant; virtual;
-    function GetAsDateTime(const Index: Word): TDateTime;
-    function GetAsDate(const Index: Word): Integer;
-    function GetAsTime(const Index: Word): Cardinal;
-    function GetAsBoolean(const Index: Word): boolean;
+    //function GetAsUnicodeString(const Index: Word): UnicodeString; virtual;
+    function GetAsQuad(const Index: Word): TISCQuad; virtual;
+    //function GetAsVariant(const Index: Word): Variant; virtual;
+    function GetAsDateTime(const Index: Word): TDateTime; virtual;
+    function GetAsDate(const Index: Word): Integer; virtual;
+    function GetAsTime(const Index: Word): Cardinal; virtual;
+    function GetAsBoolean(const Index: Word): boolean; virtual;
 
     procedure SetIsNull(const Index: Word; const Value: boolean); virtual;
     procedure SetAsDouble(const Index: Word; const Value: Double); virtual;
@@ -529,54 +533,54 @@ type
     procedure SetAsInteger(const Index: Word; const Value: Integer); virtual;
     procedure SetAsSingle(const Index: Word; const Value: Single); virtual;
     procedure SetAsSmallint(const Index: Word; const Value: Smallint); virtual;
-    procedure SetAsRawByteString(const Index: Word; const Value: RawByteString); virtual;
+    //procedure SetAsRawByteString(const Index: Word; const Value: RawByteString); virtual;
     procedure SetAsAnsiString(const Index: Word; const Value: AnsiString); virtual;
-    procedure SetAsUnicodeString(const Index: Word; const Value: UnicodeString); virtual;
+    //procedure SetAsUnicodeString(const Index: Word; const Value: UnicodeString); virtual;
     procedure SetAsQuad(const Index: Word; const Value: TISCQuad); virtual;
     procedure SetAsDateTime(const Index: Word; const Value: TDateTime); virtual;
     procedure SetAsBoolean(const Index: Word; const Value: Boolean); virtual;
     procedure SetAsDate(const Index: Word; const Value: Integer); virtual;
     procedure SetAsTime(const Index: Word; const Value: Cardinal); virtual;
-    procedure SetAsVariant(const Index: Word; const Value: Variant); virtual;
+    //procedure SetAsVariant(const Index: Word; const Value: Variant); virtual;
 
-    function GetByNameIsNumeric(const Name: string): boolean;
-    function GetByNameIsBlob(const Name: string): boolean;
-    function GetByNameIsBlobText(const Name: string): boolean;
-    function GetByNameIsNull(const Name: string): boolean;
-    function GetByNameIsNullable(const Name: string): boolean;
+    function GetByNameIsNumeric(const Name: AnsiString): boolean;
+    function GetByNameIsBlob(const Name: AnsiString): boolean;
+    function GetByNameIsBlobText(const Name: AnsiString): boolean;
+    function GetByNameIsNull(const Name: AnsiString): boolean;
+    function GetByNameIsNullable(const Name: AnsiString): boolean;
 
-    function GetByNameAsDouble(const Name: string): Double;
-    function GetByNameAsCurrency(const Name: string): Currency;
-    function GetByNameAsInt64(const Name: string): Int64;
-    function GetByNameAsInteger(const Name: string): Integer;
-    function GetByNameAsSingle(const Name: string): Single;
-    function GetByNameAsSmallint(const Name: string): Smallint;
-    function GetByNameAsAnsiString(const Name: string): AnsiString;
-    function GetByNameAsUnicodeString(const Name: string): UnicodeString;
-    function GetByNameAsQuad(const Name: string): TISCQuad;
-    function GetByNameAsVariant(const Name: string): Variant;
-    function GetByNameAsDateTime(const Name: string): TDateTime;
-    function GetByNameAsBoolean(const Name: string): boolean;
-    function GetByNameAsDate(const Name: string): Integer;
-    function GetByNameAsTime(const Name: string): Cardinal;
+    function GetByNameAsDouble(const Name: AnsiString): Double;
+    function GetByNameAsCurrency(const Name: AnsiString): Currency;
+    function GetByNameAsInt64(const Name: AnsiString): Int64;
+    function GetByNameAsInteger(const Name: AnsiString): Integer;
+    function GetByNameAsSingle(const Name: AnsiString): Single;
+    function GetByNameAsSmallint(const Name: AnsiString): Smallint;
+    function GetByNameAsAnsiString(const Name: AnsiString): AnsiString;
+    //function GetByNameAsUnicodeString(const Name: string): UnicodeString;
+    function GetByNameAsQuad(const Name: AnsiString): TISCQuad;
+    //function GetByNameAsVariant(const Name: string): Variant;
+    function GetByNameAsDateTime(const Name: AnsiString): TDateTime;
+    function GetByNameAsBoolean(const Name: AnsiString): boolean;
+    function GetByNameAsDate(const Name: AnsiString): Integer;
+    function GetByNameAsTime(const Name: AnsiString): Cardinal;
 
-    procedure SetByNameIsNull(const Name: string; const Value: boolean);
-    procedure SetByNameAsDouble(const Name: string; const Value: Double);
-    procedure SetByNameAsCurrency(const Name: string; const Value: Currency);
-    procedure SetByNameAsInt64(const Name: string; const Value: Int64);
-    procedure SetByNameAsInteger(const Name: string; const Value: Integer);
-    procedure SetByNameAsSingle(const Name: string; const Value: Single);
-    procedure SetByNameAsSmallint(const Name: string; const Value: Smallint);
-    procedure SetByNameAsAnsiString(const Name: string; const Value: AnsiString);
-    procedure SetByNameAsUnicodeString(const Name: string; const Value: UnicodeString);
-    procedure SetByNameAsQuad(const Name: string; const Value: TISCQuad);
-    procedure SetByNameAsDateTime(const Name: string; const Value: TDateTime);
-    procedure SetByNameAsBoolean(const Name: string; const Value: boolean);
-    procedure SetByNameAsDate(const Name: string; const Value: Integer);
-    procedure SetByNameAsVariant(const Name: string; const Value: Variant);
+    procedure SetByNameIsNull(const Name: AnsiString; const Value: boolean);
+    procedure SetByNameAsDouble(const Name: AnsiString; const Value: Double);
+    procedure SetByNameAsCurrency(const Name: AnsiString; const Value: Currency);
+    procedure SetByNameAsInt64(const Name: AnsiString; const Value: Int64);
+    procedure SetByNameAsInteger(const Name: AnsiString; const Value: Integer);
+    procedure SetByNameAsSingle(const Name: AnsiString; const Value: Single);
+    procedure SetByNameAsSmallint(const Name: AnsiString; const Value: Smallint);
+    procedure SetByNameAsAnsiString(const Name: AnsiString; const Value: AnsiString);
+    //procedure SetByNameAsUnicodeString(const Name: string; const Value: UnicodeString);
+    procedure SetByNameAsQuad(const Name: AnsiString; const Value: TISCQuad);
+    procedure SetByNameAsDateTime(const Name: AnsiString; const Value: TDateTime);
+    procedure SetByNameAsBoolean(const Name: AnsiString; const Value: boolean);
+    procedure SetByNameAsDate(const Name: AnsiString; const Value: Integer);
+    //procedure SetByNameAsVariant(const Name: string; const Value: Variant);
   public
     constructor Create(aCharacterSet: TALFBXCharacterSet); virtual;
-    procedure CheckRange(const Index: Word);
+    procedure CheckRange(const Index: Word); virtual;
     function GetFieldIndex(const name: AnsiString): Word; virtual;
     function TryGetFieldIndex(const name: AnsiString; out index: Word): Boolean; virtual;
     property Data: PALFBXSQLDaData read FXSQLDA;
@@ -600,35 +604,35 @@ type
     property AsDouble     [const Index: Word]: Double     read GetAsDouble     write SetAsDouble;
     property AsCurrency   [const Index: Word]: Currency   read GetAsCurrency   write SetAsCurrency;
     property AsInt64      [const Index: Word]: Int64      read GetAsInt64      write SetAsInt64;
-    property AsString     [const Index: Word]: string     read GetAsString write SetAsString;
-    property AsRawByteString[const Index: Word]: RawByteString  read GetAsRawByteString write SetAsRawByteString;
+    //property AsString     [const Index: Word]: string     read GetAsString write SetAsString;
+    //property AsRawByteString[const Index: Word]: RawByteString  read GetAsRawByteString write SetAsRawByteString;
     property AsAnsiString [const Index: Word]: AnsiString  read GetAsAnsiString     write SetAsAnsiString;
-    property AsUnicodeString [const Index: Word]: UnicodeString read GetAsUnicodeString write SetAsUnicodeString;
+    //property AsUnicodeString [const Index: Word]: UnicodeString read GetAsUnicodeString write SetAsUnicodeString;
     property AsQuad       [const Index: Word]: TISCQuad   read GetAsQuad       write SetAsQuad;
     property AsDateTime   [const Index: Word]: TDateTime  read GetAsDateTime   write SetAsDateTime;
     property AsBoolean    [const Index: Word]: Boolean    read GetAsBoolean    write SetAsBoolean;
     property AsDate       [const Index: Word]: Integer    read GetAsDate       write SetAsDate;
     property AsTime       [const Index: Word]: Cardinal   read GetAsTime       write SetAsTime;
-    property AsVariant    [const Index: Word]: Variant    read GetAsVariant    write SetAsVariant;
+    //property AsVariant    [const Index: Word]: Variant    read GetAsVariant    write SetAsVariant;
 
-    property ByNameIsBlob       [const name: string]: boolean    read GetByNameIsBlob;
-    property ByNameIsBlobText   [const name: string]: boolean    read GetByNameIsBlobText;
-    property ByNameIsNull       [const name: string]: boolean    read GetByNameIsNull       write SetByNameIsNull;
-    property ByNameAsSmallint   [const name: string]: Smallint   read GetByNameAsSmallint   write SetByNameAsSmallint;
-    property ByNameAsInteger    [const name: string]: Integer    read GetByNameAsInteger    write SetByNameAsInteger;
-    property ByNameAsSingle     [const name: string]: Single     read GetByNameAsSingle     write SetByNameAsSingle;
-    property ByNameAsDouble     [const name: string]: Double     read GetByNameAsDouble     write SetByNameAsDouble;
-    property ByNameAsCurrency   [const name: string]: Currency   read GetByNameAsCurrency   write SetByNameAsCurrency;
-    property ByNameAsInt64      [const name: string]: Int64      read GetByNameAsInt64      write SetByNameAsInt64;
-    property ByNameAsString     [const name: string]: string     read GetByNameAsString     write SetByNameAsString;
-    property ByNameAsAnsiString     [const name: string]: AnsiString     read GetByNameAsAnsiString     write SetByNameAsAnsiString;
-    property ByNameAsRawByteString  [const name: string]: RawByteString     read GetByNameAsRawByteString     write SetByNameAsRawByteString;
-    property ByNameAsUnicodeString [const name: string]: UnicodeString read GetByNameAsUnicodeString write SetByNameAsUnicodeString;
-    property ByNameAsQuad       [const name: string]: TISCQuad   read GetByNameAsQuad       write SetByNameAsQuad;
-    property ByNameAsVariant    [const name: string]: Variant    read GetByNameAsVariant    write SetByNameAsVariant;
-    property ByNameAsDateTime   [const name: string]: TDateTime  read GetByNameAsDateTime   write SetByNameAsDateTime;
-    property ByNameAsBoolean    [const name: string]: Boolean    read GetByNameAsBoolean    write SetByNameAsBoolean;
-    property ByNameAsDate       [const name: string]: Integer    read GetByNameAsDate       write SetByNameAsDate;
+    property ByNameIsBlob       [const name: AnsiString]: boolean    read GetByNameIsBlob;
+    property ByNameIsBlobText   [const name: AnsiString]: boolean    read GetByNameIsBlobText;
+    property ByNameIsNull       [const name: AnsiString]: boolean    read GetByNameIsNull       write SetByNameIsNull;
+    property ByNameAsSmallint   [const name: AnsiString]: Smallint   read GetByNameAsSmallint   write SetByNameAsSmallint;
+    property ByNameAsInteger    [const name: AnsiString]: Integer    read GetByNameAsInteger    write SetByNameAsInteger;
+    property ByNameAsSingle     [const name: AnsiString]: Single     read GetByNameAsSingle     write SetByNameAsSingle;
+    property ByNameAsDouble     [const name: AnsiString]: Double     read GetByNameAsDouble     write SetByNameAsDouble;
+    property ByNameAsCurrency   [const name: AnsiString]: Currency   read GetByNameAsCurrency   write SetByNameAsCurrency;
+    property ByNameAsInt64      [const name: AnsiString]: Int64      read GetByNameAsInt64      write SetByNameAsInt64;
+    //property ByNameAsString     [const name: string]: string     read GetByNameAsString     write SetByNameAsString;
+    property ByNameAsAnsiString     [const name: AnsiString]: AnsiString     read GetByNameAsAnsiString     write SetByNameAsAnsiString;
+    //property ByNameAsRawByteString  [const name: string]: RawByteString     read GetByNameAsRawByteString     write SetByNameAsRawByteString;
+    //property ByNameAsUnicodeString [const name: string]: UnicodeString read GetByNameAsUnicodeString write SetByNameAsUnicodeString;
+    property ByNameAsQuad       [const name: AnsiString]: TISCQuad   read GetByNameAsQuad       write SetByNameAsQuad;
+    //property ByNameAsVariant    [const name: string]: Variant    read GetByNameAsVariant    write SetByNameAsVariant;
+    property ByNameAsDateTime   [const name: AnsiString]: TDateTime  read GetByNameAsDateTime   write SetByNameAsDateTime;
+    property ByNameAsBoolean    [const name: AnsiString]: Boolean    read GetByNameAsBoolean    write SetByNameAsBoolean;
+    property ByNameAsDate       [const name: AnsiString]: Integer    read GetByNameAsDate       write SetByNameAsDate;
   end;
 { TALFBXPoolStream }
 
@@ -659,9 +663,9 @@ type
     function Read(var Buffer; Count: Longint): Longint; override;
     function Write(const Buffer; Count: Longint): Longint; override;
     procedure SaveToStream(Stream: TStream);
-    procedure SaveToFile(const FileName: string);
+    procedure SaveToFile(const FileName: AnsiString);
     procedure LoadFromStream(Stream: TStream);
-    procedure LoadFromFile(const FileName: string);
+    procedure LoadFromFile(const FileName: AnsiString);
     property ItemsInPage: Integer read FItemsInPage;
     property ItemSize: Integer read FItemSize;
     property PageSize: Integer read FPageSize;
@@ -704,35 +708,36 @@ type
     FInMemoryEOF: boolean;
     FArrayInfos: array of TALFBXArrayInfo;
     FStatBlobsSize: Int64;
-    procedure AddCurrentRecord;
-    procedure FreeBlobs(Buffer: Pointer);
-    function GetRecordCount: Integer;
-    function GetCurrentRecord: Integer;
-    procedure AllocateDataBuffer;
-    function GetEof: boolean;
-    function GetUniqueRelationName: string;
-    function GetBof: boolean;
-    function GetDataQuadOffset(const index: word): Pointer;
-    function GetBlobData(const index: word): PALFBXBlobData;
-    function GetArrayData(const index: word): Pointer;
-    function GetArrayCount: Word;
-    function GetArrayInfos(const index: word): PALFBXArrayInfo;
   protected
-    function GetAsRawByteString(const Index: Word): RawByteString; override;
+    procedure AddCurrentRecord; virtual;
+    procedure FreeBlobs(Buffer: Pointer); virtual;
+    function GetRecordCount: Integer; virtual;
+    function GetCurrentRecord: Integer; virtual;
+    procedure AllocateDataBuffer; virtual;
+    function GetEof: boolean; virtual;
+    function GetUniqueRelationName: AnsiString; virtual;
+    function GetBof: boolean; virtual;
+    function GetDataQuadOffset(const index: word): Pointer; virtual;
+    function GetBlobData(const index: word): PALFBXBlobData; virtual;
+    function GetArrayData(const index: word): Pointer; virtual;
+    function GetArrayCount: Word; virtual;
+    function GetArrayInfos(const index: word): PALFBXArrayInfo; virtual;
+  protected
+    //function GetAsRawByteString(const Index: Word): RawByteString; override;
     function GetAsAnsiString(const Index: Word): AnsiString; override;
-    function GetAsUnicodeString(const Index: Word): UnicodeString; override;
-    function GetAsVariant(const Index: Word): Variant; override;
+    //function GetAsUnicodeString(const Index: Word): UnicodeString; override;
+    //function GetAsVariant(const Index: Word): Variant; override;
   public
     constructor Create(Charset: TALFBXCharacterSet; Fields: SmallInt = 0;
       CachedFetch: Boolean = False;
       FetchBlobs: boolean = false;
       BufferChunks: Cardinal = 1000); reintroduce;
     destructor Destroy; override;
-    procedure ClearRecords;
-    procedure GetRecord(const Index: Integer);
-    procedure SaveToStream(Stream: TStream);
-    procedure LoadFromStream(Stream: TStream);
-    procedure Next;
+    procedure ClearRecords; virtual;
+    procedure GetRecord(const Index: Integer); virtual;
+    procedure SaveToStream(Stream: TStream); virtual;
+    procedure LoadFromStream(Stream: TStream); virtual;
+    procedure Next; virtual;
 
     property BlobData[const index: word]: PALFBXBlobData read GetBlobData;
 
@@ -740,30 +745,30 @@ type
     property ArrayInfos[const index: word]: PALFBXArrayInfo read GetArrayInfos;
     property ArrayCount: Word read GetArrayCount;
 
-    procedure ReadBlob(const Index: Word; Stream: TStream); overload;
-    procedure ReadBlobB(const Index: Word; var data: RawByteString); overload;
-    procedure ReadBlobA(const Index: Word; var str: AnsiString); overload;
-    procedure ReadBlobW(const Index: Word; var str: UnicodeString); overload;
-    procedure ReadBlob(const Index: Word; var str: string); overload;
-    function ReadBlobB(const Index: Word): RawByteString; overload;
-    function ReadBlobA(const Index: Word): AnsiString; overload;
-    function ReadBlobW(const Index: Word): UnicodeString; overload;
-    function ReadBlob(const Index: Word): string; overload;
-    procedure ReadBlob(const Index: Word; var Value: Variant); overload;
-    procedure ReadBlob(const Index: Word; Data: Pointer); overload;
-    procedure ReadBlob(const name: string; Stream: TStream); overload;
-    procedure ReadBlobB(const name: string; var data: RawByteString); overload;
-    procedure ReadBlobA(const name: string; var str: AnsiString); overload;
-    procedure ReadBlobW(const name: string; var str: UnicodeString); overload;
-    procedure ReadBlob(const name: string; var str: string); overload;
-    function ReadBlobB(const name: string): RawByteString; overload;
-    function ReadBlobA(const name: string): AnsiString; overload;
-    function ReadBlobW(const name: string): UnicodeString; overload;
-    function ReadBlob(const name: string): string; overload;
-    procedure ReadBlob(const name: string; var Value: Variant); overload;
-    procedure ReadBlob(const name: string; Data: Pointer); overload;
+    procedure ReadBlob(const Index: Word; Stream: TStream); overload; virtual;
+    //procedure ReadBlobB(const Index: Word; var data: RawByteString); overload; virtual;
+    procedure ReadBlobA(const Index: Word; var str: AnsiString); overload; virtual;
+    //procedure ReadBlobW(const Index: Word; var str: UnicodeString); overload; virtual;
+    //procedure ReadBlob(const Index: Word; var str: string); overload; virtual;
+    //function ReadBlobB(const Index: Word): RawByteString; overload; virtual;
+    function ReadBlobA(const Index: Word): AnsiString; overload; virtual;
+    //function ReadBlobW(const Index: Word): UnicodeString; overload; virtual;
+    //function ReadBlob(const Index: Word): string; overload; virtual;
+    //procedure ReadBlob(const Index: Word; var Value: Variant); overload; virtual;
+    procedure ReadBlob(const Index: Word; Data: Pointer); overload; virtual;
+    procedure ReadBlob(const name: AnsiString; Stream: TStream); overload; virtual;
+    //procedure ReadBlobB(const name: string; var data: RawByteString); overload; virtual;
+    procedure ReadBlobA(const name: AnsiString; var str: AnsiString); overload; virtual;
+    //procedure ReadBlobW(const name: string; var str: UnicodeString); overload; virtual;
+    //procedure ReadBlob(const name: string; var str: string); overload; virtual;
+    //function ReadBlobB(const name: string): RawByteString; overload; virtual;
+    function ReadBlobA(const name: AnsiString): AnsiString; overload; virtual;
+    //function ReadBlobW(const name: string): UnicodeString; overload; virtual;
+    //function ReadBlob(const name: string): string; overload; virtual;
+    //procedure ReadBlob(const name: string; var Value: Variant); overload; virtual;
+    procedure ReadBlob(const name: AnsiString; Data: Pointer); overload; virtual;
 
-    function GetBlobSize(const Index: Word): Cardinal;
+    function GetBlobSize(const Index: Word): Cardinal; virtual;
 
     property Eof: boolean read GetEof;
     property ScrollEOF: boolean read FScrollEOF;
@@ -774,12 +779,12 @@ type
     property RecordCount: Integer read GetRecordCount;
     property CurrentRecord: Integer read GetCurrentRecord write GetRecord;
     property BufferChunks: Cardinal read FBufferChunks;
-    property UniqueRelationName: string read GetUniqueRelationName;
+    property UniqueRelationName: AnsiString read GetUniqueRelationName;
 
-    property SqlName[const Index: Word]: string read GetSqlName;
-    property RelName[const Index: Word]: string read GetRelName;
-    property OwnName[const Index: Word]: string read GetOwnName;
-    property AliasName[const Index: Word]: string read GetAliasName;
+    property SqlName[const Index: Word]: AnsiString read GetSqlName;
+    property RelName[const Index: Word]: AnsiString read GetRelName;
+    property OwnName[const Index: Word]: AnsiString read GetOwnName;
+    property AliasName[const Index: Word]: AnsiString read GetAliasName;
 
     property AsSmallint   [const Index: Word]: Smallint   read GetAsSmallint;
     property AsInteger    [const Index: Word]: Integer    read GetAsInteger;
@@ -787,34 +792,34 @@ type
     property AsDouble     [const Index: Word]: Double     read GetAsDouble;
     property AsCurrency   [const Index: Word]: Currency   read GetAsCurrency;
     property AsInt64      [const Index: Word]: Int64      read GetAsInt64;
-    property AsRawByteString [const Index: Word]: RawByteString read GetAsRawByteString;
+    //property AsRawByteString [const Index: Word]: RawByteString read GetAsRawByteString;
     property AsAnsiString [const Index: Word]: AnsiString read GetAsAnsiString;
-    property AsUnicodeString [const Index: Word]: UnicodeString read GetAsUnicodeString;
-    property AsVariant    [const Index: Word]: Variant    read GetAsVariant;
+    //property AsUnicodeString [const Index: Word]: UnicodeString read GetAsUnicodeString;
+    //property AsVariant    [const Index: Word]: Variant    read GetAsVariant;
     property AsDateTime   [const Index: Word]: TDateTime  read GetAsDateTime;
     property AsDate       [const Index: Word]: Integer    read GetAsDate;
     property AsTime       [const Index: Word]: Cardinal   read GetAsTime;
     property AsBoolean    [const Index: Word]: Boolean    read GetAsBoolean;
 
-    property ByNameIsNull[const name: string]: boolean read GetByNameIsNull;
-    property ByNameIsNullable[const name: string]: boolean read GetByNameIsNullable;
+    property ByNameIsNull[const name: AnsiString]: boolean read GetByNameIsNull;
+    property ByNameIsNullable[const name: AnsiString]: boolean read GetByNameIsNullable;
 
-    property ByNameAsSmallint   [const name: string]: Smallint   read GetByNameAsSmallint;
-    property ByNameAsInteger    [const name: string]: Integer    read GetByNameAsInteger;
-    property ByNameAsSingle     [const name: string]: Single     read GetByNameAsSingle;
-    property ByNameAsDouble     [const name: string]: Double     read GetByNameAsDouble;
-    property ByNameAsCurrency   [const name: string]: Currency   read GetByNameAsCurrency;
-    property ByNameAsInt64      [const name: string]: Int64      read GetByNameAsInt64;
-    property ByNameAsAnsiString     [const name: string]: AnsiString     read GetByNameAsAnsiString;
-    property ByNameAsUnicodeString [const name: string]: UnicodeString read GetByNameAsUnicodeString;
-    property ByNameAsQuad       [const name: string]: TISCQuad   read GetByNameAsQuad;
-    property ByNameAsVariant    [const name: string]: Variant    read GetByNameAsVariant;
-    property ByNameAsDateTime   [const name: string]: TDateTime  read GetByNameAsDateTime;
-    property ByNameAsBoolean    [const name: string]: Boolean    read GetByNameAsBoolean;
-    property ByNameAsDate       [const name: string]: Integer    read GetByNameAsDate;
-    property ByNameAsTime       [const name: string]: Cardinal   read GetByNameAsTime;
+    property ByNameAsSmallint   [const name: AnsiString]: Smallint   read GetByNameAsSmallint;
+    property ByNameAsInteger    [const name: AnsiString]: Integer    read GetByNameAsInteger;
+    property ByNameAsSingle     [const name: AnsiString]: Single     read GetByNameAsSingle;
+    property ByNameAsDouble     [const name: AnsiString]: Double     read GetByNameAsDouble;
+    property ByNameAsCurrency   [const name: AnsiString]: Currency   read GetByNameAsCurrency;
+    property ByNameAsInt64      [const name: AnsiString]: Int64      read GetByNameAsInt64;
+    property ByNameAsAnsiString     [const name: AnsiString]: AnsiString     read GetByNameAsAnsiString;
+    //property ByNameAsUnicodeString [const name: string]: UnicodeString read GetByNameAsUnicodeString;
+    property ByNameAsQuad       [const name: AnsiString]: TISCQuad   read GetByNameAsQuad;
+    //property ByNameAsVariant    [const name: string]: Variant    read GetByNameAsVariant;
+    property ByNameAsDateTime   [const name: AnsiString]: TDateTime  read GetByNameAsDateTime;
+    property ByNameAsBoolean    [const name: AnsiString]: Boolean    read GetByNameAsBoolean;
+    property ByNameAsDate       [const name: AnsiString]: Integer    read GetByNameAsDate;
+    property ByNameAsTime       [const name: AnsiString]: Cardinal   read GetByNameAsTime;
 
-    property Values[const name: string]: Variant read GetByNameAsVariant; default;
+    //property Values[const name: string]: Variant read GetByNameAsVariant; default;
   end;
 
   TALFBXSQLResultClass = class of TALFBXSQLResult;
@@ -826,14 +831,15 @@ type
   TALFBXSQLParams = class(TALFBXSQLDA)
   private
     FParamCount: Word;
-    function GetFieldName(const Index: Word): string;
-    procedure AllocateDataBuffer(AInit: boolean = true);
-    function GetMaxSqlLen(const Index: Word): SmallInt;
   protected
-    function AddFieldA(const name: AnsiString): Word;
-    function AddFieldW(const name: UnicodeString): Word;
-    function AddField(const name: string): Word;
-    procedure SetFieldType(const Index: Word; Size: Integer; Code: SmallInt; Scale: Smallint);
+    function GetFieldName(const Index: Word): AnsiString; virtual;
+    procedure AllocateDataBuffer(AInit: boolean = true); virtual;
+    function GetMaxSqlLen(const Index: Word): SmallInt; virtual;
+
+    function AddFieldA(const name: AnsiString): Word; virtual;
+    //function AddFieldW(const name: UnicodeString): Word; virtual;
+    //function AddField(const name: string): Word; virtual;
+    procedure SetFieldType(const Index: Word; Size: Integer; Code: SmallInt; Scale: Smallint); virtual;
 
     function GetIsNullable(const Index: Word): boolean; override;
 
@@ -843,9 +849,9 @@ type
     procedure SetAsInteger(const Index: Word; const Value: Integer); override;
     procedure SetAsSingle(const Index: Word; const Value: Single); override;
     procedure SetAsSmallint(const Index: Word; const Value: Smallint); override;
-    procedure SetAsRawByteString(const Index: Word; const Value: RawByteString); override;
+    //procedure SetAsRawByteString(const Index: Word; const Value: RawByteString); override;
     procedure SetAsAnsiString(const Index: Word; const Value: AnsiString); override;
-    procedure SetAsUnicodeString(const Index: Word; const Value: UnicodeString); override;
+    //procedure SetAsUnicodeString(const Index: Word; const Value: UnicodeString); override;
     procedure SetAsQuad(const Index: Word; const Value: TISCQuad); override;
     procedure SetAsDateTime(const Index: Word; const Value: TDateTime); override;
     procedure SetAsBoolean(const Index: Word; const Value: Boolean); override;
@@ -856,16 +862,16 @@ type
   public
     constructor Create(Charset: TALFBXCharacterSet); override;
     destructor Destroy; override;
-    procedure Clear;
-    function Parse(const SQL: string): string;
+    procedure Clear; virtual;
+    function Parse(const SQL: AnsiString): AnsiString; virtual;
     function TryGetFieldIndex(const name: AnsiString; out Index: Word): Boolean; override;
     function GetFieldIndex(const name: AnsiString): Word; override;
     // don't use this method
-    procedure AddFieldType(const Name: string; FieldType: TALFBXFieldType;
-      Scale: TALFBXScale = 1; Precision: byte = 0);
+    procedure AddFieldType(const Name: AnsiString; FieldType: TALFBXFieldType;
+      Scale: TALFBXScale = 1; Precision: byte = 0); virtual;
 
-    property Values[const name: string]: Variant read GetByNameAsVariant; default;
-    property FieldName[const Index: Word]: string read GetFieldName;
+    //property Values[const name: string]: Variant read GetByNameAsVariant; default;
+    property FieldName[const Index: Word]: AnsiString read GetFieldName;
     property ParamCount : Word read FParamCount;
     property MaxSqlLen[const Index: Word]: Smallint read GetMaxSqlLen;
 
@@ -902,9 +908,9 @@ type
     FSegmentSize: Word;
     function GetSegmentSize: Word;
     procedure SetSegmentSize(Value: Word);
-    procedure CheckFBXApiCall(const Status: ISCStatus; StatusVector: TALFBXStatusVector);
   public
     constructor Create(ApiVer: TALFBXVersion_Api); override;
+    procedure CheckFBXApiCall(const Status: ISCStatus; StatusVector: TALFBXStatusVector);
 
     property OnConnectionLost: TALFBXOnConnectionLost read FOnConnectionLost write FOnConnectionLost;
     property OnGetDBExceptionClass: TALFBXOnGetDBExceptionClass read FOnGetDBExceptionClass write FOnGetDBExceptionClass;
@@ -919,7 +925,7 @@ type
 
     {Attaches to an existing database.
      Ex: AttachDatabase('c:\DataBase.gdb', DBHandle, 'user_name=SYSDBA; password=masterkey'); }
-    procedure AttachDatabase(const FileName: RawByteString; var DbHandle: IscDbHandle; Params: AnsiString; Sep: AnsiChar = ';');
+    procedure AttachDatabase(const FileName: {RawByteString}AnsiString; var DbHandle: IscDbHandle; Params: AnsiString; Sep: AnsiChar = ';');
     {Detaches from a database previously connected with AttachDatabase.}
     procedure DetachDatabase(var DBHandle: IscDbHandle);
     procedure DatabaseInfo(var DBHandle: IscDbHandle; const Items: AnsiString; var Buffer: AnsiString); overload;
@@ -938,13 +944,13 @@ type
     procedure TransactionCommitRetaining(var TraHandle: IscTrHandle);
     procedure TransactionPrepare(var TraHandle: IscTrHandle);
     procedure TransactionRollbackRetaining(var TraHandle: IscTrHandle);
-    function TransactionGetId(var TraHandle: IscTrHandle): Cardinal;    
+    function TransactionGetId(var TraHandle: IscTrHandle): Cardinal;
     procedure DSQLExecuteImmediate(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle;
-      const Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLDA = nil); overload;
-    procedure DSQLExecuteImmediate(const Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLDA = nil); overload;
+      const Statement: {RawByteString}AnsiString; Dialect: Word; Sqlda: TALFBXSQLDA = nil); overload;
+    procedure DSQLExecuteImmediate(const Statement: {RawByteString}AnsiString; Dialect: Word; Sqlda: TALFBXSQLDA = nil); overload;
     procedure DSQLAllocateStatement(var DBHandle: IscDbHandle; var StmtHandle: IscStmtHandle);
     function DSQLPrepare(var DbHandle: IscDbHandle; var TraHandle: IscTrHandle; var StmtHandle: IscStmtHandle;
-      Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLResult = nil): TALFBXStatementType;
+      Statement: {RawByteString}AnsiString; Dialect: Word; Sqlda: TALFBXSQLResult = nil): TALFBXStatementType;
     procedure DSQLExecute(var TraHandle: IscTrHandle; var StmtHandle: IscStmtHandle;
       Dialect: Word; Sqlda: TALFBXSQLDA = nil);
     procedure DSQLExecute2(var TraHandle: IscTrHandle; var StmtHandle: IscStmtHandle;
@@ -958,10 +964,10 @@ type
     procedure DSQLDescribeBind(var StmtHandle: IscStmtHandle; Dialect: Word; Sqlda: TALFBXSQLParams);
     procedure DSQLSetCursorName(var StmtHandle: IscStmtHandle; const cursor: AnsiString);
     procedure DSQLExecImmed2(var DBHhandle: IscDbHandle; var TraHandle: IscTrHandle;
-      const Statement: RawbyteString; dialect: Word; InSqlda, OutSQLDA: TALFBXSQLDA);
+      const Statement: {RawByteString}AnsiString; dialect: Word; InSqlda, OutSQLDA: TALFBXSQLDA);
 
     procedure DSQLInfo(var StmtHandle: IscStmtHandle; const Items: array of byte; var buffer: AnsiString);
-    function  DSQLInfoPlan(var StmtHandle: IscStmtHandle): string;
+    function  DSQLInfoPlan(var StmtHandle: IscStmtHandle): AnsiString;
     function  DSQLInfoStatementType(var StmtHandle: IscStmtHandle): TALFBXStatementType;
     function  DSQLInfoRowsAffected(var StmtHandle: IscStmtHandle; StatementType: TALFBXStatementType): Cardinal;
     procedure DSQLInfoRowsAffected2(var StmtHandle: IscStmtHandle; out SelectedRows, InsertedRows, UpdatedRows, DeletedRows: Cardinal);
@@ -978,16 +984,16 @@ type
     procedure ArraySetDesc(const RelationName, FieldName: AnsiString; var SqlDtype,
       SqlLength, Dimensions: Smallint; var desc: TISCArrayDesc);
 
-    procedure ServiceAttach(const ServiceName: RawByteString;
-      var SvcHandle: IscSvcHandle; const Spb: RawByteString);
+    procedure ServiceAttach(const ServiceName: {RawByteString}AnsiString;
+      var SvcHandle: IscSvcHandle; const Spb: {RawByteString}AnsiString);
     procedure ServiceDetach(var SvcHandle: IscSvcHandle);
     procedure ServiceQuery(var SvcHandle: IscSvcHandle;
-      const SendSpb, RequestSpb: RawByteString; var Buffer: RawByteString);
-    procedure ServiceStart(var SvcHandle: IscSvcHandle; const Spb: RawByteString);
+      const SendSpb, RequestSpb: {RawByteString}AnsiString; var Buffer: {RawByteString}AnsiString);
+    procedure ServiceStart(var SvcHandle: IscSvcHandle; const Spb: {RawByteString}AnsiString);
 
     function ErrSqlcode(StatusVector: TALFBXStatusVector): ISCLong;
-    function ErrInterprete(StatusVector: TALFBXStatusVector): RawByteString;
-    function ErrSQLInterprete(SQLCODE: Smallint): RawByteString;
+    function ErrInterprete(StatusVector: TALFBXStatusVector): {RawByteString}AnsiString;
+    function ErrSQLInterprete(SQLCODE: Smallint): {RawByteString}AnsiString;
 {FB25_UP}
     function ErrSqlState(StatusVector: TALFBXStatusVector): FB_SQLSTATE_STRING;
 {FB25_UP}
@@ -1003,8 +1009,8 @@ type
     procedure BlobMaxSegment(var BlobHandle: IscBlobHandle; out Size: Cardinal);
     procedure BlobDefaultDesc(var Desc: TALFBXBlobDesc; const RelationName, FieldName: AnsiString);
     procedure BlobSaveToStream(var BlobHandle: IscBlobHandle; Stream: TStream);
-    function  BlobReadString(var BlobHandle: IscBlobHandle): RawByteString; overload;
-    procedure BlobReadString(var BlobHandle: IscBlobHandle; var Str: RawByteString); overload;
+    function  BlobReadString(var BlobHandle: IscBlobHandle): {RawByteString}AnsiString; overload;
+    procedure BlobReadString(var BlobHandle: IscBlobHandle; var Str: {RawByteString}AnsiString); overload;
     procedure BlobReadVariant(var BlobHandle: IscBlobHandle; var Value: Variant);
     // you must free memory allocated by this method !!
     procedure BlobReadBuffer(var BlobHandle: IscBlobHandle; var Size: Integer;
@@ -1017,7 +1023,7 @@ type
     function  BlobCreate(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle;
       var BlobHandle: IscBlobHandle; BPB: AnsiString = ''): TISCQuad;
     procedure BlobWriteSegment(var BlobHandle: IscBlobHandle; BufferLength: Cardinal; Buffer: Pointer);
-    procedure BlobWriteString(var BlobHandle: IscBlobHandle; const Str: RawByteString); overload;
+    procedure BlobWriteString(var BlobHandle: IscBlobHandle; const Str: {RawByteString}AnsiString); overload;
     procedure BlobWriteStream(var BlobHandle: IscBlobHandle; Stream: TStream);
 
     function StreamBlobOpen(var BlobId: TISCQuad; var Database: IscDbHandle;
@@ -1181,15 +1187,15 @@ const
     (Name: 'filter_parameter'; ParamType: prIgno) // not implemented (FB 2.0)
    );
 
-function ALFBXSQLQuote(const name: string): string;
-function ALFBXSQLUnQuote(const name: string): string;
+function ALFBXSQLQuote(const name: AnsiString): AnsiString;
+function ALFBXSQLUnQuote(const name: AnsiString): AnsiString;
 
 const
   cALFBXScaleDivisor: array[-15..-1] of Int64 = (1000000000000000,100000000000000,
     10000000000000,1000000000000,100000000000,10000000000,1000000000,100000000,
     10000000,1000000,100000,10000,1000,100,10);
 
-  cALFBXScaleFormat: array[-15..-1] of string = (
+  cALFBXScaleFormat: array[-15..-1] of AnsiString = (
     '0.0##############', '0.0#############', '0.0############', '0.0###########',
     '0.0##########', '0.0#########', '0.0########', '0.0#######', '0.0######',
     '0.0#####', '0.0####', '0.0###', '0.0##', '0.0#', '0.0');
@@ -1201,46 +1207,46 @@ const
 implementation
 
 uses
-{$IFDEF UNICODE}
-  AnsiStrings,
-{$ENDIF}
-  Math, ALFBXConst;
+//{$IFDEF UNICODE}
+//  AnsiStrings,
+//{$ENDIF}
+  Math, ALFBXConst, AlFcnString;
 
-function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
-begin
-  if cp > 0 then
-  begin
-    SetLength(Result, WideCharToMultiByte(cp, 0, PWideChar(str), length(str), nil, 0, nil, nil));
-    WideCharToMultiByte(cp, 0, PWideChar(str), length(str), PAnsiChar(Result), Length(Result), nil, nil);
-  end else
-    Result := AnsiString(str);
-end;
+//function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
+//begin
+//  if cp > 0 then
+//  begin
+//    SetLength(Result, WideCharToMultiByte(cp, 0, PWideChar(str), length(str), nil, 0, nil, nil));
+//    WideCharToMultiByte(cp, 0, PWideChar(str), length(str), PAnsiChar(Result), Length(Result), nil, nil);
+//  end else
+//    Result := AnsiString(str);
+//end;
 
-function ALFBXMBUDecode(const str: RawByteString; cp: Word): UnicodeString;
-begin
-  if cp > 0 then
-  begin
-    SetLength(Result, MultiByteToWideChar(cp, 0, PAnsiChar(str), length(str), nil, 0));
-    MultiByteToWideChar(cp, 0, PAnsiChar(str), length(str), PWideChar(Result), Length(Result));
-  end else
-    Result := UnicodeString(str);
-end;
+//function ALFBXMBUDecode(const str: RawByteString; cp: Word): UnicodeString;
+//begin
+//  if cp > 0 then
+//  begin
+//    SetLength(Result, MultiByteToWideChar(cp, 0, PAnsiChar(str), length(str), nil, 0));
+//    MultiByteToWideChar(cp, 0, PAnsiChar(str), length(str), PWideChar(Result), Length(Result));
+//  end else
+//    Result := UnicodeString(str);
+//end;
 
-procedure ALFBXMBUDecode(str: PAnsiChar; size: Integer; cp: Word; buffer: PWideChar);
-var
-  len: Integer;
-begin
-  len := MultiByteToWideChar(cp, 0, str, size, nil, 0);
-  MultiByteToWideChar(cp, 0, str, size, buffer, len);
-  inc(buffer, len);
-  buffer^ := #0;
-end;
+//procedure ALFBXMBUDecode(str: PAnsiChar; size: Integer; cp: Word; buffer: PWideChar);
+//var
+//  len: Integer;
+//begin
+//  len := MultiByteToWideChar(cp, 0, str, size, nil, 0);
+//  MultiByteToWideChar(cp, 0, str, size, buffer, len);
+//  inc(buffer, len);
+//  buffer^ := #0;
+//end;
 
 (******************************************************************************)
 (* Errors handling                                                            *)
 (******************************************************************************)
 
-function ALFBXSQLQuote(const name: string): string;
+function ALFBXSQLQuote(const name: AnsiString): AnsiString;
 var
   i, len: PtrInt;
 begin
@@ -1250,45 +1256,45 @@ begin
     Result := name;
     Exit;
   end;
-  if (len > 1) and (not ({$IFDEF UNICODE}(name[1] < #256) and {$ENDIF} (AnsiChar(name[1]) in ['A'..'Z']))) then
+  if (len > 1) and (not (AnsiChar(name[1]) in ['A'..'Z'])) then
   begin // non standard carracter: keep case
     Result := '"' + name + '"';
     Exit;
   end;
 
   for i := 1 to len do
-    if not ({$IFDEF UNICODE}(name[1] < #256) and {$ENDIF} (AnsiChar(name[i]) in ['A'..'Z', '0'..'9', '_', '$'])) then
+    if not (AnsiChar(name[i]) in ['A'..'Z', '0'..'9', '_', '$']) then
     begin // non standard carracter: keep case
       Result := '"' + name + '"';
       Exit;
     end;
-  Result := UpperCase(name);
+  Result := ALUpperCase(name);
 end;
 
-function ALFBXSQLUnQuote(const name: string): string;
+function ALFBXSQLUnQuote(const name: AnsiString): AnsiString;
 var
   i, len: PtrInt;
 begin
   len := Length(name);
   if (len > 1) and (name[1] = '"') and (name[len] = '"') then
   begin  // allready quoted: keep case
-    Result := copy(name, 2, len-2);
+    Result := ALCopyStr(name, 2, len-2);
     Exit;
   end;
 
-  if (len > 1) and (not ({$IFDEF UNICODE}(name[1] < #256) and {$ENDIF} (AnsiChar(name[1]) in ['A'..'Z']))) then
+  if (len > 1) and (not (AnsiChar(name[1]) in ['A'..'Z'])) then
   begin // non standard carracter: keep case
     Result := name;
     Exit;
   end;
 
   for i := 1 to len do
-    if not ({$IFDEF UNICODE}(name[1] < #256) and {$ENDIF} (AnsiChar(name[i]) in ['A'..'Z', '0'..'9', '_', '$'])) then
+    if not (AnsiChar(name[i]) in ['A'..'Z', '0'..'9', '_', '$']) then
     begin // non standard carracter: keep case
       Result := name;
       Exit;
     end;
-  Result := UpperCase(name);
+  Result := ALUpperCase(name);
 end;
 
 const
@@ -1346,20 +1352,27 @@ const
     Number: Integer;
     Excep: EALFBXExceptionClass;
     procedure RaiseException(const Excep: EALFBXExceptionClass);
-    var Exception: EALFBXError;
+    var
+      Exception: EALFBXError;
     begin
-      Exception := Excep.Create(string(ErrInterprete(StatusVector)));
+      Exception := Excep.Create(String(ErrInterprete(StatusVector)));
       if Excep = EALFBXException then
         EALFBXException(Exception).FNumber := Number;
       Exception.FSQLCode   := ErrSqlcode(StatusVector);
       if Exception.FSQLCode <> 0 then
-        Exception.Message := Exception.Message + string(ErrSQLInterprete(Exception.FSQLCode)) + cALFBXNewLine;
+        Exception.Message := Exception.Message + String(ErrSQLInterprete(Exception.FSQLCode));
       Exception.FGDSCode := Status;
       Exception.FErrorCode := GETCode(Status);
 {FB25_UP}
       Exception.FSQLState := ErrSqlState(StatusVector);
 {FB25_UP}
-      Exception.Message := Exception.Message + 'Error Code: ' + IntToStr(Exception.FErrorCode);
+      Exception.Message := Exception.Message + cALFBXNewLine +
+        Format('GDS Code: %d - SQL Code: %d - Error Code: %d', [Exception.FGDSCode, Exception.FSQLCode, Exception.FErrorCode]);
+
+      if ((Status = isc_lost_db_connection) or (Status = isc_network_error)
+        or (Status = isc_shutdown)) and Assigned(FOnConnectionLost) then
+          FOnConnectionLost(Self);
+
       raise Exception;
     end;
   begin
@@ -1386,9 +1399,6 @@ const
       else
         Excep := EALFBXError;
       end;
-      if ((Status = isc_lost_db_connection) or (Status = isc_network_error)) and
-        Assigned(FOnConnectionLost) then
-          FOnConnectionLost(Self);
       RaiseException(Excep)
     end;
   end;
@@ -1465,13 +1475,13 @@ const
       inc(FinalSize,l+1);
       CheckBufferSize;
       Result[FinalSize-l] := AnsiChar(l);
-      Move(PAnsiChar(AString)^, Result[FinalSize-l+1], l);
+      ALMove(PAnsiChar(AString)^, Result[FinalSize-l+1], l);
     end;
   begin
     FinalSize := 1;
     BufferSize := 32;
     SetLength(Result, BufferSize);
-    Result[1] := chr(isc_dpb_version1);
+    Result[1] := AnsiChar(isc_dpb_version1);
     CurPos  := PAnsiChar(Params);
     while (CurPos <> nil) do
     begin
@@ -1479,22 +1489,22 @@ const
       if (NextPos = nil) then
         CurStr := CurPos else
         begin
-          CurStr := Copy(CurPos, 0, NextPos-CurPos);
+          CurStr := ALCopyStr(CurPos, 0, NextPos-CurPos);
           Inc(NextPos);
         end;
       CurPos := NextPos;
       if (CurStr = '') then Continue;
       begin
         CurValue := '';
-        EqualPos := Pos(AnsiString('='), CurStr);
+        EqualPos := ALPos(AnsiString('='), CurStr);
         if EqualPos <> 0 then
         begin
-          CurValue := Copy(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
-          CurStr   := Copy(CurStr, 0, EqualPos-1);
+          CurValue := ALCopyStr(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
+          CurStr   := ALCopyStr(CurStr, 0, EqualPos-1);
         end;
         StrLower(PAnsiChar(CurStr));
-        CurStr := Trim(CurStr);
-        CurValue := Trim(CurValue);
+        CurStr := ALTrim(CurStr);
+        CurValue := ALTrim(CurValue);
         for Code := 1 to isc_dpb_Max_Value do
           with cALFBXDPBInfos[Code] do
             if (Name = CurStr) then
@@ -1506,13 +1516,13 @@ const
                     AddByte(0);
                   end;
                 prByte :
-                  if TryStrToInt(string(CurValue), AValue) and (AValue >= 0) and (AValue <= 255) then
+                  if ALTryStrToInt(CurValue, AValue) and (AValue >= 0) and (AValue <= 255) then
                   begin
                     AddByte(Code);
                     AddByte(Byte(AValue));
                   end;
                 prCard :
-                  if TryStrToInt(string(CurValue), AValue) and (AValue > 0) then
+                  if ALTryStrToInt(CurValue, AValue) and (AValue > 0) then
                   begin
                     AddByte(Code);
                     AddCard(AValue);
@@ -1531,76 +1541,76 @@ const
     SetLength(Result, FinalSize);
   end;
 
-  function ALFBXCreateTRParams(Options: TALFBXTransParams; const LockRead, LockWrite: string{FB20_UP}; LockTimeout: Word{FB20_UP}): RawByteString;
-  var
-    tp: TALFBXTransParam;
-    procedure ParseStrOption(const code: AnsiChar; const Value: AnsiString);
-    var
-      P, Start: PAnsiChar;
-      S: AnsiString;
-    begin
-      P := Pointer(Value);
-      if P <> nil then
-        while (P^ <> #0) do
-        begin
-          Start := P;
-          while not (P^ in [#0, ';']) do Inc(P);
-          if (P - Start) > 0 then
-          begin
-            SetString(S, Start, P - Start);
-            Result := Result + code + AnsiChar(P - Start) + S;
-          end;
-          if P^ =';' then inc(P);
-        end;
-    end;
-  const
-    tpc: array[TALFBXTransParam] of AnsiChar = (
-      isc_tpb_consistency,
-      isc_tpb_concurrency,
-      isc_tpb_shared,
-      isc_tpb_protected,
-      isc_tpb_exclusive,
-      isc_tpb_wait,
-      isc_tpb_nowait,
-      isc_tpb_read,
-      isc_tpb_write,
-      isc_tpb_lock_read,
-      isc_tpb_lock_write,
-      isc_tpb_verb_time,
-      isc_tpb_commit_time,
-      isc_tpb_ignore_limbo,
-      isc_tpb_read_committed,
-      isc_tpb_autocommit,
-      isc_tpb_rec_version,
-      isc_tpb_no_rec_version,
-      isc_tpb_restart_requests,
-      isc_tpb_no_auto_undo
-    {FB20_UP}
-      ,isc_tpb_lock_timeout
-    {FB20_UP}
-      );
-
-  begin
-    if Options = [tpConcurrency,tpWait,tpWrite] then
-      result := ''
-    else
-      begin
-        Result := isc_tpb_version3;
-        for tp := Low(TALFBXTransParam) to High(TALFBXTransParam) do
-          if (tp in Options) then
-          begin
-            case tp of
-              tpLockRead    : ParseStrOption(tpc[tp], AnsiString(LockRead));
-              tpLockWrite   : ParseStrOption(tpc[tp], AnsiString(LockWrite));
-            {FB20_UP}
-              tpLockTimeout : Result := Result + tpc[tp] + PAnsiChar(@LockTimeout)[0] + PAnsiChar(LockTimeout)[1];
-            {FB20_UP}
-            else
-              Result := Result + tpc[tp];
-            end;
-          end;
-      end;
-  end;
+//  function ALFBXCreateTRParams(Options: TALFBXTransParams; const LockRead, LockWrite: string{FB20_UP}; LockTimeout: Word{FB20_UP}): RawByteString;
+//  var
+//    tp: TALFBXTransParam;
+//    procedure ParseStrOption(const code: AnsiChar; const Value: AnsiString);
+//    var
+//      P, Start: PAnsiChar;
+//      S: AnsiString;
+//    begin
+//      P := Pointer(Value);
+//      if P <> nil then
+//        while (P^ <> #0) do
+//        begin
+//          Start := P;
+//          while not (P^ in [#0, ';']) do Inc(P);
+//          if (P - Start) > 0 then
+//          begin
+//            SetString(S, Start, P - Start);
+//            Result := Result + code + AnsiChar(P - Start) + S;
+//          end;
+//          if P^ =';' then inc(P);
+//        end;
+//    end;
+//  const
+//    tpc: array[TALFBXTransParam] of AnsiChar = (
+//      isc_tpb_consistency,
+//      isc_tpb_concurrency,
+//      isc_tpb_shared,
+//      isc_tpb_protected,
+//      isc_tpb_exclusive,
+//      isc_tpb_wait,
+//      isc_tpb_nowait,
+//      isc_tpb_read,
+//      isc_tpb_write,
+//      isc_tpb_lock_read,
+//      isc_tpb_lock_write,
+//      isc_tpb_verb_time,
+//      isc_tpb_commit_time,
+//      isc_tpb_ignore_limbo,
+//      isc_tpb_read_committed,
+//      isc_tpb_autocommit,
+//      isc_tpb_rec_version,
+//      isc_tpb_no_rec_version,
+//      isc_tpb_restart_requests,
+//      isc_tpb_no_auto_undo
+//    {FB20_UP}
+//      ,isc_tpb_lock_timeout
+//    {FB20_UP}
+//      );
+//
+//  begin
+//    if Options = [tpConcurrency,tpWait,tpWrite] then
+//      result := ''
+//    else
+//      begin
+//        Result := isc_tpb_version3;
+//        for tp := Low(TALFBXTransParam) to High(TALFBXTransParam) do
+//          if (tp in Options) then
+//          begin
+//            case tp of
+//              tpLockRead    : ParseStrOption(tpc[tp], AnsiString(LockRead));
+//              tpLockWrite   : ParseStrOption(tpc[tp], AnsiString(LockWrite));
+//            {FB20_UP}
+//              tpLockTimeout : Result := Result + tpc[tp] + PAnsiChar(@LockTimeout)[0] + PAnsiChar(LockTimeout)[1];
+//            {FB20_UP}
+//            else
+//              Result := Result + tpc[tp];
+//            end;
+//          end;
+//      end;
+//  end;
 
 {FB25_UP}
   function TALFBXLibrary.ServerShutdown(timeout: Cardinal; const reason: Integer): Integer;
@@ -1616,7 +1626,7 @@ const
   end;
 {FB25_UP}
 
-  procedure TALFBXLibrary.AttachDatabase(const FileName: RawByteString; var DbHandle: IscDbHandle;
+  procedure TALFBXLibrary.AttachDatabase(const FileName: AnsiString; var DbHandle: IscDbHandle;
     Params: AnsiString; Sep: AnsiChar = ';');
   var aStatusVector: TALFBXStatusVector;
   begin
@@ -1705,7 +1715,7 @@ const
       begin
         CheckFBXApiCall(isc_database_info(@aStatusVector, @DBHandle, 1, @item,
           Length(result), PAnsiChar(result)), aStatusVector);
-        if result[1] = chr(isc_info_truncated) then
+        if result[1] = AnsiChar(isc_info_truncated) then
           SetLength(result, Length(result) + size) else
             if (byte(result[1]) = item) or (result[1] = #1) then
               Break else
@@ -1717,7 +1727,7 @@ const
 
   end;
 
-  function ALFBXStrToCharacterSet(const CharacterSet: RawByteString): TALFBXCharacterSet;
+  function ALFBXStrToCharacterSet(const CharacterSet: {RawByteString}AnsiString): TALFBXCharacterSet;
   var
     len: Integer;
   begin
@@ -1846,7 +1856,7 @@ const
   //****************************************
 
   procedure TALFBXLibrary.DSQLExecuteImmediate(var DBHandle: IscDbHandle; var TraHandle: IscTrHandle;
-    const Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLDA = nil);
+    const Statement: {RawByteString}AnsiString; Dialect: Word; Sqlda: TALFBXSQLDA = nil);
   var aStatusVector: TALFBXStatusVector;
   begin
 
@@ -1855,7 +1865,7 @@ const
 
   end;
 
-  procedure TALFBXLibrary.DSQLExecuteImmediate(const Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLDA = nil);
+  procedure TALFBXLibrary.DSQLExecuteImmediate(const Statement: {RawByteString}AnsiString; Dialect: Word; Sqlda: TALFBXSQLDA = nil);
   var p: pointer;
       aStatusVector: TALFBXStatusVector;
   begin
@@ -1875,7 +1885,7 @@ const
   end;
 
   function TALFBXLibrary.DSQLPrepare(var DbHandle: IscDbHandle; var TraHandle: IscTrHandle; var StmtHandle: IscStmtHandle;
-    Statement: RawbyteString; Dialect: Word; Sqlda: TALFBXSQLResult = nil): TALFBXStatementType;
+    Statement: {RawByteString}AnsiString; Dialect: Word; Sqlda: TALFBXSQLResult = nil): TALFBXStatementType;
   var
     STInfo: packed record
       InfoCode: byte;
@@ -2090,7 +2100,7 @@ const
           begin
             dec(ArrayCount);
             Sqlda.FArrayInfos[ArrayCount].info :=
-              ArrayLookupBounds(DbHandle, TrHandle, AnsiString(Sqlda.RelName[i]), AnsiString(Sqlda.SqlName[i]));
+              ArrayLookupBounds(DbHandle, TrHandle, Sqlda.RelName[i], Sqlda.SqlName[i]);
             Sqlda.FArrayInfos[ArrayCount].index := i;
           end;
       end;
@@ -2145,7 +2155,7 @@ const
   end;
 
   procedure TALFBXLibrary.DSQLExecImmed2(var DBHhandle: IscDbHandle; var TraHandle: IscTrHandle;
-    const Statement: RawbyteString; dialect: Word; InSqlda, OutSQLDA: TALFBXSQLDA);
+    const Statement: {RawByteString}AnsiString; dialect: Word; InSqlda, OutSQLDA: TALFBXSQLDA);
   var aStatusVector: TALFBXStatusVector;
   begin
 
@@ -2163,7 +2173,7 @@ const
 
   end;
 
-  function TALFBXLibrary.DSQLInfoPlan(var StmtHandle: IscStmtHandle): string;
+  function TALFBXLibrary.DSQLInfoPlan(var StmtHandle: IscStmtHandle): AnsiString;
   var
     STInfo : packed record
       InfoCode: byte;
@@ -2315,7 +2325,7 @@ const
 
   end;
 
-  function TALFBXLibrary.ErrInterprete(StatusVector: TALFBXStatusVector): RawByteString;
+  function TALFBXLibrary.ErrInterprete(StatusVector: TALFBXStatusVector): {RawByteString}AnsiString;
   var
     pStatusVector: PALFBXStatusVector;
     len: Integer;
@@ -2330,13 +2340,13 @@ const
         else
           len := isc_interprete(buffer, @pStatusVector);
         if len > 0 then
-          Result := Result + copy(buffer, 0, len) + cALFBXNewLine else
+          Result := Result + ALCopyStr(buffer, 0, len) + cALFBXNewLine else
           Break;
       until False;
 
   end;
 
-  function TALFBXLibrary.ErrSQLInterprete(SQLCODE: Smallint): RawByteString;
+  function TALFBXLibrary.ErrSQLInterprete(SQLCODE: Smallint): {RawByteString}AnsiString;
   var
     i : Integer;
   begin
@@ -2352,7 +2362,7 @@ const
   function TALFBXLibrary.ErrSqlState(StatusVector: TALFBXStatusVector): FB_SQLSTATE_STRING;
   begin
     if Version_Api_Is_FB25_Up then fb_sqlstate(@Result, @StatusVector)
-    else result := 'ZZZZZZ';
+    else result := 'ZZZZZZ'; // 'ZZZZZZ' for FB < 2.5
   end;
 {FB25_UP}
 
@@ -2360,7 +2370,7 @@ const
 // Services
 //******************************************************************************
 
-  procedure TALFBXLibrary.ServiceAttach(const ServiceName: RawByteString; var SvcHandle: IscSvcHandle; const Spb: RawByteString);
+  procedure TALFBXLibrary.ServiceAttach(const ServiceName: {RawByteString}AnsiString; var SvcHandle: IscSvcHandle; const Spb: {RawByteString}AnsiString);
   var aStatusVector: TALFBXStatusVector;
   begin
 
@@ -2377,7 +2387,7 @@ const
 
   end;
 
-  procedure TALFBXLibrary.ServiceQuery(var SvcHandle: IscSvcHandle; const SendSpb, RequestSpb: RawByteString; var Buffer: RawByteString);
+  procedure TALFBXLibrary.ServiceQuery(var SvcHandle: IscSvcHandle; const SendSpb, RequestSpb: {RawByteString}AnsiString; var Buffer: {RawByteString}AnsiString);
   var aStatusVector: TALFBXStatusVector;
   begin
 
@@ -2387,7 +2397,7 @@ const
 
   end;
 
-  procedure TALFBXLibrary.ServiceStart(var SvcHandle: IscSvcHandle; const Spb: RawByteString);
+  procedure TALFBXLibrary.ServiceStart(var SvcHandle: IscSvcHandle; const Spb: {RawByteString}AnsiString);
   var aStatusVector: TALFBXStatusVector;
   begin
 
@@ -2453,29 +2463,29 @@ const
       if (NextPos = nil) then
         CurStr := CurPos else
         begin
-          CurStr := Copy(CurPos, 0, NextPos-CurPos);
+          CurStr := ALCopyStr(CurPos, 0, NextPos-CurPos);
           Inc(NextPos);
         end;
       CurPos := NextPos;
       if (CurStr = '') then Continue;
       begin
         CurValue := '';
-        EqualPos := Pos(AnsiChar('='), CurStr);
+        EqualPos := ALPos(AnsiChar('='), CurStr);
         if EqualPos <> 0 then
         begin
-          CurValue := Copy(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
-          CurStr   := Copy(CurStr, 0, EqualPos-1);
+          CurValue := ALCopyStr(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
+          CurStr   := ALCopyStr(CurStr, 0, EqualPos-1);
         end;
         StrLower(PAnsiChar(CurStr));
-        CurStr := Trim(CurStr);
-        CurValue := Trim(CurValue);
+        CurStr := ALTrim(CurStr);
+        CurValue := ALTrim(CurValue);
         for Code := 1 to isc_bpb_Max_Value do
           with cALFBXBPBInfos[Code] do
             if (Name = CurStr) then
             begin
               case ParamType of
                 prShrt :
-                  if TryStrToInt(string(CurValue), AValue) and (AValue >= -128) and (AValue <= 127) then
+                  if ALTryStrToInt(CurValue, AValue) and (AValue >= -128) and (AValue <= 127) then
                   begin
                     AddByte(Code);
                     AddShort(ShortInt(AValue));
@@ -2536,7 +2546,7 @@ type
   procedure TALFBXLibrary.BlobSize(var BlobHandle: IscBlobHandle; out Size: Cardinal);
   var
     BlobInfo : packed record
-      Code: Char;
+      Code: AnsiChar;
       Length: Word;
       Value: Cardinal;
       reserved: Word; // alignement (8)
@@ -2608,12 +2618,12 @@ type
     Stream.Seek(0, soFromBeginning);
   end;
 
-  function TALFBXLibrary.BlobReadString(var BlobHandle: IscBlobHandle): RawByteString;
+  function TALFBXLibrary.BlobReadString(var BlobHandle: IscBlobHandle): {RawByteString}AnsiString;
   begin
     BlobReadString(BlobHandle, Result);
   end;
 
-  procedure TALFBXLibrary.BlobReadString(var BlobHandle: IscBlobHandle; var Str: RawByteString);
+  procedure TALFBXLibrary.BlobReadString(var BlobHandle: IscBlobHandle; var Str: {RawByteString}AnsiString);
   var
     BlobInfos: array[0..2] of TBlobInfo;
     CurrentLength: Word;
@@ -2785,7 +2795,7 @@ type
 
   end;
 
-  procedure TALFBXLibrary.BlobWriteString(var BlobHandle: IscBlobHandle; const Str: RawByteString);
+  procedure TALFBXLibrary.BlobWriteString(var BlobHandle: IscBlobHandle; const Str: {RawByteString}AnsiString);
   begin
     BlobWriteSegment(BlobHandle, Length(Str), PAnsiChar(Str));
   end;
@@ -3037,28 +3047,28 @@ type
     FXSQLDA.version := SQLDA_CURRENT_VERSION;
   end;
 
-  function TALFBXSQLDA.GetSqlName(const Index: Word): string;
+  function TALFBXSQLDA.GetSqlName(const Index: Word): AnsiString;
   begin
     CheckRange(Index);
     SetString(Result, FXSQLDA.sqlvar[Index].SqlName,
       FXSQLDA.sqlvar[Index].SqlNameLength);
   end;
 
-  function TALFBXSQLDA.GetAliasName(const Index: Word): string;
+  function TALFBXSQLDA.GetAliasName(const Index: Word): AnsiString;
   begin
     CheckRange(Index);
     SetString(Result, FXSQLDA.sqlvar[Index].AliasName,
       FXSQLDA.sqlvar[Index].AliasNameLength);
   end;
 
-  function TALFBXSQLDA.GetOwnName(const Index: Word): string;
+  function TALFBXSQLDA.GetOwnName(const Index: Word): AnsiString;
   begin
     CheckRange(Index);
     SetString(Result, FXSQLDA.sqlvar[Index].OwnName,
       FXSQLDA.sqlvar[Index].OwnNameLength);
   end;
 
-  function TALFBXSQLDA.GetRelName(const Index: Word): string;
+  function TALFBXSQLDA.GetRelName(const Index: Word): AnsiString;
   begin
     CheckRange(Index);
     SetString(Result, FXSQLDA.sqlvar[Index].RelName,
@@ -3078,55 +3088,133 @@ type
       raise Exception.CreateFmt(cALFBX_FIELDNUMNOTFOUND, [index]);
   end;
 
-  function TALFBXSQLDA.DecodeString(const Code: Smallint; Index: Word): string;
+//  function TALFBXSQLDA.DecodeString(const Code: Smallint; Index: Word): string;
+//  begin
+//{$IFDEF UNICODE}
+//    DecodeStringW(Code, Index, Result);
+//{$ELSE}
+//    DecodeStringA(Code, Index, Result);
+//{$ENDIF}
+//  end;
+
+  function TALFBXSQLDA.DecodeStringA(const Code: Smallint; Index: Word): AnsiString;
   begin
-{$IFDEF UNICODE}
-    DecodeStringW(Code, Index, Result);
-{$ELSE}
     DecodeStringA(Code, Index, Result);
-{$ENDIF}
   end;
 
-  procedure TALFBXSQLDA.DecodeString(const Code: Smallint; Index: Word; out Str: string);
-  begin
-{$IFDEF UNICODE}
-    DecodeStringW(Code, Index, Str);
-{$ELSE}
-    DecodeStringA(Code, Index, Str);
-{$ENDIF}
-  end;
+//  procedure TALFBXSQLDA.DecodeString(const Code: Smallint; Index: Word; out Str: string);
+//  begin
+//{$IFDEF UNICODE}
+//    DecodeStringW(Code, Index, Str);
+//{$ELSE}
+//    DecodeStringA(Code, Index, Str);
+//{$ENDIF}
+//  end;
 
   procedure TALFBXSQLDA.DecodeStringA(const Code: Smallint; Index: Word; out Str: AnsiString);
   begin
-{$IFDEF UNICODE}
-    Str := AnsiString(DecodeString(Code, Index));
-{$ELSE}
+//{$IFDEF UNICODE}
+//    Str := AnsiString(DecodeString(Code, Index));
+//{$ELSE}
     with FXSQLDA.sqlvar[Index] do
     case Code of
       SQL_TEXT    : SetString(Str, sqldata, sqllen);
       SQL_VARYING : SetString(Str, PVary(sqldata).vary_string, PVary(sqldata).vary_length);
     end;
-{$ENDIF}
+//{$ENDIF}
   end;
 
-  procedure TALFBXSQLDA.DecodeStringW(const Code: Smallint; Index: Word; out Str: UnicodeString);
-  begin
-    with FXSQLDA.sqlvar[Index] do
-    case Code of
-      SQL_TEXT    :
-        begin
-          Str := ALFBXMBUDecode(Copy(sqldata, 0, sqllen), cALFBXCharacterSetCP[FCharacterSet]);
-          if SqlSubType > 0 then
-            SetLength(Str, sqllen div cALFBXBytesPerCharacter[FCharacterSet]);
-        end;
-      SQL_VARYING :
-        Str := ALFBXMBUDecode(
-          Copy(PAnsiChar(@PVary(sqldata).vary_string), 0, PVary(sqldata).vary_length),
-          cALFBXCharacterSetCP[FCharacterSet]);
-    end;
-  end;
+//  procedure TALFBXSQLDA.DecodeStringW(const Code: Smallint; Index: Word; out Str: UnicodeString);
+//  begin
+//    with FXSQLDA.sqlvar[Index] do
+//    case Code of
+//      SQL_TEXT    :
+//        begin
+//          Str := ALFBXMBUDecode(Copy(sqldata, 0, sqllen), cALFBXCharacterSetCP[FCharacterSet]);
+//          if SqlSubType > 0 then
+//            SetLength(Str, sqllen div cALFBXBytesPerCharacter[FCharacterSet]);
+//        end;
+//      SQL_VARYING :
+//        Str := ALFBXMBUDecode(
+//          Copy(PAnsiChar(@PVary(sqldata).vary_string), 0, PVary(sqldata).vary_length),
+//          cALFBXCharacterSetCP[FCharacterSet]);
+//    end;
+//  end;
 
-  procedure TALFBXSQLDA.EncodeStringB(Code: Smallint; Index: Word; const str: RawByteString);
+//  procedure TALFBXSQLDA.EncodeStringB(Code: Smallint; Index: Word; const str: RawByteString);
+//  var
+//    i: smallint;
+//    OldLen: SmallInt;
+//    NewLen: Integer;
+//  begin
+//    OldLen  := FXSQLDA.sqlvar[Index].SqlLen;
+//    with FXSQLDA.sqlvar[Index] do
+//    case Code of
+//      SQL_TEXT :
+//        begin
+//          NewLen := Length(str);
+//          if NewLen = 0 then
+//          begin
+//            // interbase need a valid pointer
+//            if sqldata = nil then
+//              getmem(sqldata, 4);
+//            sqllen := 0;
+//          end else
+//          begin
+//            if sqldata = nil then
+//              getmem(sqldata, NewLen) else
+//              ReallocMem(sqldata, NewLen);
+//            if MaxSqlLen <= 0 then
+//              sqllen := NewLen else
+//              sqllen := Min(NewLen, MaxSqlLen);
+//            Move(PAnsiChar(str)^, sqldata^, sqllen);
+//          end;
+//        end;
+//      SQL_VARYING :
+//        begin
+//          NewLen := Length(str);
+//          if NewLen = 0 then
+//          begin
+//            if sqldata = nil then
+//            begin
+//              // interbase need a valid pointer :(
+//              getmem(sqldata, 4);
+//              sqllen := 2;
+//            end;
+//            PVary(sqldata).vary_length := 0;
+//          end else
+//          begin
+//            if sqldata = nil then
+//              getmem(sqldata, NewLen+2) else
+//              ReallocMem(sqldata, NewLen+2);
+//            if MaxSqlLen > 0 then
+//              NewLen := Min(NewLen, MaxSqlLen);
+//            sqllen := NewLen + 2;
+//            PVary(sqldata).vary_length := NewLen;
+//            Move(PAnsiChar(str)^, PVary(sqldata).vary_string,PVary(sqldata).vary_length);
+//          end;
+//        end;
+//    end;
+
+//    // named parametters share the same memory !!
+//    with FXSQLDA.sqlvar[Index] do
+//      if (ParamNameLength > 0) and (OldLen <> SqlLen) then
+//         for i := 0 to FXSQLDA.sqln - 1 do
+//           if (FXSQLDA.sqlvar[i].ID = ID) then
+//           begin
+//             FXSQLDA.sqlvar[i].SqlData := SqlData;
+//             FXSQLDA.sqlvar[i].SqlLen  := SqlLen;
+//           end;
+//  end;
+
+  procedure TALFBXSQLDA.EncodeStringA(Code: Smallint; Index: Word; const str: AnsiString);
+//  begin
+//  {$IFDEF UNICODE}
+//    EncodeStringB(Code, Index, ALFBXMBUEncode(UniCodeString(str), cALFBXCharacterSetCP[FCharacterSet]));
+//  {$ELSE}
+//    EncodeStringB(Code, Index, str);
+//  {$ENDIF}
+//  end;
   var
     i: smallint;
     OldLen: SmallInt;
@@ -3152,7 +3240,7 @@ type
             if MaxSqlLen <= 0 then
               sqllen := NewLen else
               sqllen := Min(NewLen, MaxSqlLen);
-            Move(PAnsiChar(str)^, sqldata^, sqllen);
+            ALMove(PAnsiChar(str)^, sqldata^, sqllen);
           end;
         end;
       SQL_VARYING :
@@ -3176,7 +3264,7 @@ type
               NewLen := Min(NewLen, MaxSqlLen);
             sqllen := NewLen + 2;
             PVary(sqldata).vary_length := NewLen;
-            Move(PAnsiChar(str)^, PVary(sqldata).vary_string,PVary(sqldata).vary_length);
+            ALMove(PAnsiChar(str)^, PVary(sqldata).vary_string,PVary(sqldata).vary_length);
           end;
         end;
     end;
@@ -3192,72 +3280,72 @@ type
            end;
   end;
 
-  procedure TALFBXSQLDA.EncodeStringA(Code: Smallint; Index: Word; const str: AnsiString);
-  begin
-  {$IFDEF UNICODE}
-    EncodeStringB(Code, Index, ALFBXMBUEncode(UniCodeString(str), cALFBXCharacterSetCP[FCharacterSet]));
-  {$ELSE}
-    EncodeStringB(Code, Index, str);
-  {$ENDIF}
-  end;
+//  procedure TALFBXSQLDA.EncodeStringW(Code: Smallint; Index: Word; const str: UnicodeString);
+//  begin
+//    EncodeStringB(Code, Index, ALFBXMBUEncode(str, cALFBXCharacterSetCP[FCharacterSet]));
+//  end;
 
-  procedure TALFBXSQLDA.EncodeStringW(Code: Smallint; Index: Word; const str: UnicodeString);
-  begin
-    EncodeStringB(Code, Index, ALFBXMBUEncode(str, cALFBXCharacterSetCP[FCharacterSet]));
-  end;
-
-  procedure TALFBXSQLDA.EncodeString(Code: Smallint; Index: Word; const str: string);
-  begin
-  {$IFDEF UNICODE}
-    EncodeStringW(Code, Index, str);
-  {$ELSE}
-    EncodeStringA(Code, Index, str);
-  {$ENDIF}
-  end;
+//  procedure TALFBXSQLDA.EncodeString(Code: Smallint; Index: Word; const str: string);
+//  begin
+//  {$IFDEF UNICODE}
+//    EncodeStringW(Code, Index, str);
+//  {$ELSE}
+//    EncodeStringA(Code, Index, str);
+//  {$ENDIF}
+//  end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Int64);
   begin
-    value := StrToInt64(DecodeString(Code, Index));
+    //value := StrToInt64(DecodeString(Code, Index));
+    value := ALStrToInt64(DecodeStringA(Code, Index));
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Double);
   begin
-    value := StrToFloat(DecodeString(Code, Index));
+    //value := StrToFloat(DecodeString(Code, Index));
+    value := ALStrToFloat(DecodeStringA(Code, Index), ALDefaultFormatSettings);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Integer);
   begin
-    value := StrToInt(DecodeString(Code, Index));
+    //value := StrToInt(DecodeString(Code, Index));
+    value := ALStrToInt(DecodeStringA(Code, Index));
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Single);
   begin
-    value := StrToFloat(DecodeString(Code, Index));
+    //value := StrToFloat(DecodeString(Code, Index));
+    value := ALStrToFloat(DecodeStringA(Code, Index), ALDefaultFormatSettings);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Smallint);
   begin
-    value := StrToInt(DecodeString(Code, Index));
+    //value := StrToInt(DecodeString(Code, Index));
+    value := ALStrToInt(DecodeStringA(Code, Index));
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: TDateTime);
   begin
-    value := StrToDateTime(DecodeString(Code, Index));
+    //value := StrToDateTime(DecodeString(Code, Index));
+    value := ALStrToDateTime(DecodeStringA(Code, Index), ALDefaultFormatSettings);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Currency);
   begin
-    value := StrToCurr(DecodeString(Code, Index));
+    //value := StrToCurr(DecodeString(Code, Index));
+    value := ALStrToCurr(DecodeStringA(Code, Index), ALDefaultFormatSettings);
   end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: boolean);
   begin
-    value := StrToInt(DecodeString(Code, Index)) <> 0;
+    //value := StrToInt(DecodeString(Code, Index)) <> 0;
+    value := ALStrToInt(DecodeStringA(Code, Index)) <> 0;
   end;
 
   procedure TALFBXSQLDA.ConvertStringToDate(const Code: Smallint; Index: Word; out value: Integer);
   begin
-    Value := Trunc(StrToDate(DecodeString(Code, Index)));
+    //Value := Trunc(StrToDate(DecodeString(Code, Index)));
+    Value := Trunc(ALStrToDate(DecodeStringA(Code, Index), ALDefaultFormatSettings));
   end;
 
   constructor TALFBXSQLDA.Create(aCharacterSet: TALFBXCharacterSet);
@@ -3265,18 +3353,19 @@ type
     FCharacterSet := aCharacterSet;
   end;
 
-  procedure TALFBXSQLDA.DecodeStringB(const Code: Smallint; Index: Word; out Str: RawByteString);
-  begin
-    with FXSQLDA.sqlvar[Index] do
-    case Code of
-      SQL_TEXT    : SetString(Str, sqldata, sqllen);
-      SQL_VARYING : SetString(Str, PVary(sqldata).vary_string, PVary(sqldata).vary_length);
-    end;
-  end;
+//  procedure TALFBXSQLDA.DecodeStringB(const Code: Smallint; Index: Word; out Str: RawByteString);
+//  begin
+//    with FXSQLDA.sqlvar[Index] do
+//    case Code of
+//      SQL_TEXT    : SetString(Str, sqldata, sqllen);
+//      SQL_VARYING : SetString(Str, PVary(sqldata).vary_string, PVary(sqldata).vary_length);
+//    end;
+//  end;
 
   procedure TALFBXSQLDA.ConvertString(const Code: Smallint; Index: Word; out value: Cardinal);
   begin
-    value := StrToInt(DecodeString(Code, Index));
+    //value := StrToInt(DecodeString(Code, Index));
+    value := ALStrToInt(DecodeStringA(Code, Index));
   end;
 
   function TALFBXSQLDA.GetFieldCount: Integer;
@@ -3566,17 +3655,17 @@ type
     end;
   end;
 
-  function TALFBXSQLDA.GetAsString(const Index: Word): string;
-  begin
-{$IFDEF UNICODE}
-    Result := GetAsUnicodeString(Index)
-{$ELSE}
-    Result := GetAsAnsiString(Index)
-{$ENDIF}
-  end;
+//  function TALFBXSQLDA.GetAsString(const Index: Word): string;
+//  begin
+//{$IFDEF UNICODE}
+//    Result := GetAsUnicodeString(Index)
+//{$ELSE}
+//    Result := GetAsAnsiString(Index)
+//{$ENDIF}
+//  end;
 
   function TALFBXSQLDA.GetAsAnsiString(const Index: Word): AnsiString;
-    function BoolToStr(const Value: boolean): string;
+    function BoolToStr(const Value: boolean): AnsiString;
     begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
   var ASQLCode: SmallInt;
   begin
@@ -3590,12 +3679,12 @@ type
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+          SQL_SHORT  : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
+          SQL_LONG   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
           SQL_INT64,
-          SQL_QUAD   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+          SQL_QUAD   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
+          SQL_DOUBLE : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^, ALDefaultFormatSettings);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -3603,15 +3692,15 @@ type
         case ASQLCode of
           SQL_VARYING   : DecodeStringA(SQL_VARYING, Index, Result);
           SQL_TEXT      : DecodeStringA(SQL_TEXT, Index, Result);
-          SQL_TIMESTAMP : Result := AnsiString(DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata))));
-          SQL_TYPE_DATE : Result := AnsiString(DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset));
-          SQL_TYPE_TIME : Result := AnsiString(TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff));
+          SQL_TIMESTAMP : Result := ALDateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)), ALDefaultFormatSettings);
+          SQL_TYPE_DATE : Result := ALDateToStr(PInteger(sqldata)^ - cAlFBXDateOffset, ALDefaultFormatSettings);
+          SQL_TYPE_TIME : Result := ALTimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff, ALDefaultFormatSettings);
           SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := AnsiString(FloatToStr(PDouble(sqldata)^));
-          SQL_LONG      : Result := AnsiString(IntToStr(PInteger(sqldata)^));
-          SQL_FLOAT     : Result := AnsiString(FloatToStr(PSingle(sqldata)^));
-          SQL_SHORT     : Result := AnsiString(IntToStr(PSmallint(sqldata)^));
-          SQL_INT64     : Result := AnsiString(IntToStr(PInt64(sqldata)^));
+          SQL_DOUBLE    : Result := ALFloatToStr(PDouble(sqldata)^, ALDefaultFormatSettings);
+          SQL_LONG      : Result := ALIntToStr(PInteger(sqldata)^);
+          SQL_FLOAT     : Result := ALFloatToStr(PSingle(sqldata)^, ALDefaultFormatSettings);
+          SQL_SHORT     : Result := ALIntToStr(PSmallint(sqldata)^);
+          SQL_INT64     : Result := ALIntToStr(PInt64(sqldata)^);
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -3635,101 +3724,101 @@ type
         Result := cALFBXQuadNull;
   end;
 
-  function TALFBXSQLDA.GetAsRawByteString(const Index: Word): RawByteString;
-    function BoolToStr(const Value: boolean): string;
-    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
-  var ASQLCode: SmallInt;
-  begin
-    CheckRange(Index);
-    Result := '';
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
-          SQL_INT64,
-          SQL_QUAD   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
-          SQL_D_FLOAT,
-          SQL_DOUBLE : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_VARYING   : DecodeStringB(SQL_VARYING, Index, Result);
-          SQL_TEXT      : DecodeStringB(SQL_TEXT, Index, Result);
-          SQL_TIMESTAMP : Result := RawByteString(DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata))));
-          SQL_TYPE_DATE : Result := RawByteString(DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset));
-          SQL_TYPE_TIME : Result := RawByteString(TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff));
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := RawByteString(FloatToStr(PDouble(sqldata)^));
-          SQL_LONG      : Result := RawByteString(IntToStr(PInteger(sqldata)^));
-          SQL_FLOAT     : Result := RawByteString(FloatToStr(PSingle(sqldata)^));
-          SQL_SHORT     : Result := RawByteString(IntToStr(PSmallint(sqldata)^));
-          SQL_INT64     : Result := RawByteString(IntToStr(PInt64(sqldata)^));
-{FB25_UP}
-          SQL_NULL: ;
-{FB25_UP}
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-    end;
-  end;
+//  function TALFBXSQLDA.GetAsRawByteString(const Index: Word): RawByteString;
+//    function BoolToStr(const Value: boolean): string;
+//    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
+//  var ASQLCode: SmallInt;
+//  begin
+//    CheckRange(Index);
+//    Result := '';
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
+//          SQL_LONG   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+//          SQL_INT64,
+//          SQL_QUAD   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_VARYING   : DecodeStringB(SQL_VARYING, Index, Result);
+//          SQL_TEXT      : DecodeStringB(SQL_TEXT, Index, Result);
+//          SQL_TIMESTAMP : Result := RawByteString(DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata))));
+//          SQL_TYPE_DATE : Result := RawByteString(DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset));
+//          SQL_TYPE_TIME : Result := RawByteString(TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff));
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : Result := RawByteString(FloatToStr(PDouble(sqldata)^));
+//          SQL_LONG      : Result := RawByteString(IntToStr(PInteger(sqldata)^));
+//          SQL_FLOAT     : Result := RawByteString(FloatToStr(PSingle(sqldata)^));
+//          SQL_SHORT     : Result := RawByteString(IntToStr(PSmallint(sqldata)^));
+//          SQL_INT64     : Result := RawByteString(IntToStr(PInt64(sqldata)^));
+//{FB25_UP}
+//          SQL_NULL: ;
+//{FB25_UP}
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//    end;
+//  end;
 
-  function TALFBXSQLDA.GetAsVariant(const Index: Word): Variant;
-  var
-    ASQLCode: SmallInt;
-    Dbl: Double;
-  begin
-    CheckRange(Index);
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      Result := NULL;
-      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : Result := PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale];
-          SQL_LONG   : Result := PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale];
-          SQL_INT64,
-          SQL_QUAD   : Result := PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale];
-          SQL_D_FLOAT,
-          SQL_DOUBLE : Result := PDouble(sqldata)^;
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := PDouble(sqldata)^;
-          SQL_TIMESTAMP : Result := TDateTime(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
-          SQL_TYPE_DATE :
-            begin
-              Dbl := PInteger(sqldata)^ - cAlFBXDateOffset;
-              Result := TDateTime(Dbl);
-            end;
-          SQL_TYPE_TIME : Result := PCardinal(sqldata)^ / cALFBXTimeCoeff;
-          SQL_LONG      : Result := PInteger(sqldata)^;
-          SQL_FLOAT     : Result := PSingle(sqldata)^;
-          SQL_SHORT     : Result := PSmallint(sqldata)^;
-          SQL_INT64     : Result := PInt64(sqldata)^;
-          SQL_TEXT      : Result := DecodeString(SQL_TEXT, Index);
-          SQL_VARYING   : Result := DecodeString(SQL_VARYING, Index);
-{FB25_UP}
-          SQL_NULL: ;
-{FB25_UP}
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-    end;
-  end;
+//  function TALFBXSQLDA.GetAsVariant(const Index: Word): Variant;
+//  var
+//    ASQLCode: SmallInt;
+//    Dbl: Double;
+//  begin
+//    CheckRange(Index);
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      Result := NULL;
+//      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : Result := PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale];
+//          SQL_LONG   : Result := PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale];
+//          SQL_INT64,
+//          SQL_QUAD   : Result := PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale];
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : Result := PDouble(sqldata)^;
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : Result := PDouble(sqldata)^;
+//          SQL_TIMESTAMP : Result := TDateTime(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
+//          SQL_TYPE_DATE :
+//            begin
+//              Dbl := PInteger(sqldata)^ - cAlFBXDateOffset;
+//              Result := TDateTime(Dbl);
+//            end;
+//          SQL_TYPE_TIME : Result := PCardinal(sqldata)^ / cALFBXTimeCoeff;
+//          SQL_LONG      : Result := PInteger(sqldata)^;
+//          SQL_FLOAT     : Result := PSingle(sqldata)^;
+//          SQL_SHORT     : Result := PSmallint(sqldata)^;
+//          SQL_INT64     : Result := PInt64(sqldata)^;
+//          SQL_TEXT      : Result := DecodeString(SQL_TEXT, Index);
+//          SQL_VARYING   : Result := DecodeString(SQL_VARYING, Index);
+//{FB25_UP}
+//          SQL_NULL: ;
+//{FB25_UP}
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//    end;
+//  end;
 
   function TALFBXSQLDA.GetAsDateTime(const Index: Word): TDateTime;
   var ASQLCode: SmallInt;
@@ -3889,51 +3978,51 @@ end;
     end;
   end;
 
-  function TALFBXSQLDA.GetAsUnicodeString(const Index: Word): UnicodeString;
-    function BoolToStr(const Value: boolean): string;
-    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
-  var ASQLCode: SmallInt;
-  begin
-    CheckRange(Index);
-    Result := '';
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
-          SQL_INT64,
-          SQL_QUAD   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]);
-          SQL_D_FLOAT,
-          SQL_DOUBLE : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^);
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_TEXT      : DecodeStringW(SQL_TEXT, Index, Result);
-          SQL_VARYING   : DecodeStringW(SQL_VARYING, Index, Result);
-          SQL_TIMESTAMP : Result := DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
-          SQL_TYPE_DATE : Result := DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset);
-          SQL_TYPE_TIME : Result := TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff);
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := FloatToStr(PDouble(sqldata)^);
-          SQL_LONG      : Result := IntToStr(PInteger(sqldata)^);
-          SQL_FLOAT     : Result := FloatToStr(PSingle(sqldata)^);
-          SQL_SHORT     : Result := IntToStr(PSmallint(sqldata)^);
-          SQL_INT64     : Result := IntToStr(PInt64(sqldata)^);
-{FB25_UP}
-          SQL_NULL: ;
-{FB25_UP}
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-    end;
-  end;
+//  function TALFBXSQLDA.GetAsUnicodeString(const Index: Word): UnicodeString;
+//    function BoolToStr(const Value: boolean): string;
+//    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
+//  var ASQLCode: SmallInt;
+//  begin
+//    CheckRange(Index);
+//    Result := '';
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
+//          SQL_LONG   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
+//          SQL_INT64,
+//          SQL_QUAD   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^);
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_TEXT      : DecodeStringW(SQL_TEXT, Index, Result);
+//          SQL_VARYING   : DecodeStringW(SQL_VARYING, Index, Result);
+//          SQL_TIMESTAMP : Result := DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
+//          SQL_TYPE_DATE : Result := DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset);
+//          SQL_TYPE_TIME : Result := TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : Result := FloatToStr(PDouble(sqldata)^);
+//          SQL_LONG      : Result := IntToStr(PInteger(sqldata)^);
+//          SQL_FLOAT     : Result := FloatToStr(PSingle(sqldata)^);
+//          SQL_SHORT     : Result := IntToStr(PSmallint(sqldata)^);
+//          SQL_INT64     : Result := IntToStr(PInt64(sqldata)^);
+//{FB25_UP}
+//          SQL_NULL: ;
+//{FB25_UP}
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//    end;
+//  end;
 
   function TALFBXSQLDA.GetAsDate(const Index: Word): Integer;
   var ASQLCode: SmallInt;
@@ -4052,49 +4141,49 @@ end;
       end;
   end;
 
-  procedure TALFBXSQLDA.SetAsRawByteString(const Index: Word; const Value: RawByteString);
-  var
-    ASQLCode: SmallInt;
-  begin
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : PInteger(sqldata)^  := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
-          SQL_INT64,
-          SQL_QUAD   : PInt64(sqldata)^    := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
-          SQL_D_FLOAT,
-          SQL_DOUBLE : PDouble(sqldata)^   := StrToFloat(string(Value));
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_TEXT      : EncodeStringB(SQL_TEXT, Index, Value);
-          SQL_VARYING   : EncodeStringB(SQL_VARYING, Index, Value);
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : PDouble(sqldata)^   := StrToFloat(string(Value));
-          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(StrToDateTime(string(Value)), PISCTimeStamp(sqldata));
-          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(StrToDate(string(Value))) + cAlFBXDateOffset);
-          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(StrToTime(string(Value))) * cALFBXTimeCoeff);
-          SQL_LONG      : PInteger(sqldata)^ := StrToInt(string(Value));
-          SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(string(Value));
-          SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(string(Value));
-          SQL_INT64     : PInt64(sqldata)^ := StrToInt64(string(Value));
-{FB25_UP}
-          SQL_NULL: ;
-{FB25_UP}
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-        if (sqlind <> nil) then
-          sqlind^ := 0;
-    end;
-  end;
+//  procedure TALFBXSQLDA.SetAsRawByteString(const Index: Word; const Value: RawByteString);
+//  var
+//    ASQLCode: SmallInt;
+//  begin
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
+//          SQL_LONG   : PInteger(sqldata)^  := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
+//          SQL_INT64,
+//          SQL_QUAD   : PInt64(sqldata)^    := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : PDouble(sqldata)^   := StrToFloat(string(Value));
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_TEXT      : EncodeStringB(SQL_TEXT, Index, Value);
+//          SQL_VARYING   : EncodeStringB(SQL_VARYING, Index, Value);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : PDouble(sqldata)^   := StrToFloat(string(Value));
+//          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(StrToDateTime(string(Value)), PISCTimeStamp(sqldata));
+//          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(StrToDate(string(Value))) + cAlFBXDateOffset);
+//          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(StrToTime(string(Value))) * cALFBXTimeCoeff);
+//          SQL_LONG      : PInteger(sqldata)^ := StrToInt(string(Value));
+//          SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(string(Value));
+//          SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(string(Value));
+//          SQL_INT64     : PInt64(sqldata)^ := StrToInt64(string(Value));
+//{FB25_UP}
+//          SQL_NULL: ;
+//{FB25_UP}
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//        if (sqlind <> nil) then
+//          sqlind^ := 0;
+//    end;
+//  end;
 
   procedure TALFBXSQLDA.SetAsDateTime(const Index: Word; const Value: TDateTime);
   var
@@ -4127,8 +4216,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Trunc(Value);
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateTimeToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateTimeToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateTimeToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateTimeToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALDateTimeToStr(Value, ALDefaultFormatSettings));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALDateTimeToStr(Value, ALDefaultFormatSettings));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4169,8 +4260,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Value;
           SQL_INT64     : PInt64(sqldata)^ := Value;
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, DateToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, DateToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALDateToStr(Value, ALDefaultFormatSettings));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALDateToStr(Value, ALDefaultFormatSettings));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4211,8 +4304,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Value;
           SQL_INT64     : PInt64(sqldata)^ := Value;
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, TimeToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, TimeToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, TimeToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, TimeToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALTimeToStr(Value, ALDefaultFormatSettings));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALTimeToStr(Value, ALDefaultFormatSettings));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4250,8 +4345,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := ord(Value);
           SQL_SHORT     : PSmallint(sqldata)^ := ord(Value);
           SQL_INT64     : PInt64(sqldata)^ := ord(Value);
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(ord(Value)));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(ord(Value)));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(ord(Value)));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(ord(Value)));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(ord(Value)));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(ord(Value)));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4292,8 +4389,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Value;
           SQL_INT64     : PInt64(sqldata)^ := Value;
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(Value));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(Value));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4334,8 +4433,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Trunc(Value);
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4376,8 +4477,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Value;
           SQL_INT64     : PInt64(sqldata)^ := Value;
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(Value));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(Value));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4388,14 +4491,14 @@ end;
     end;
   end;
 
-  procedure TALFBXSQLDA.SetAsString(const Index: Word; const Value: string);
-  begin
-{$IFDEF UNICODE}
-    SetAsUnicodeString(Index, Value);
-{$ELSE}
-    SetAsAnsiString(Index, Value);
-{$ENDIF}
-  end;
+//  procedure TALFBXSQLDA.SetAsString(const Index: Word; const Value: string);
+//  begin
+//{$IFDEF UNICODE}
+//    SetAsUnicodeString(Index, Value);
+//{$ELSE}
+//    SetAsAnsiString(Index, Value);
+//{$ENDIF}
+//  end;
 
   procedure TALFBXSQLDA.SetAsAnsiString(const Index: Word; const Value: AnsiString);
   var
@@ -4408,12 +4511,12 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : PInteger(sqldata)^  := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
+          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(ALStrToFloat(Value, ALDefaultFormatSettings) * cALFBXScaleDivisor[sqlscale]);
+          SQL_LONG   : PInteger(sqldata)^  := Trunc(ALStrToFloat(Value, ALDefaultFormatSettings) * cALFBXScaleDivisor[sqlscale]);
           SQL_INT64,
-          SQL_QUAD   : PInt64(sqldata)^    := Trunc(StrToFloat(string(Value)) * cALFBXScaleDivisor[sqlscale]);
+          SQL_QUAD   : PInt64(sqldata)^    := Trunc(ALStrToFloat(Value, ALDefaultFormatSettings) * cALFBXScaleDivisor[sqlscale]);
           SQL_D_FLOAT,
-          SQL_DOUBLE : PDouble(sqldata)^   := StrToFloat(string(Value));
+          SQL_DOUBLE : PDouble(sqldata)^   := ALStrToFloat(Value, ALDefaultFormatSettings);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
@@ -4422,14 +4525,14 @@ end;
           SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, Value);
           SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, Value);
           SQL_D_FLOAT,
-          SQL_DOUBLE    : PDouble(sqldata)^   := StrToFloat(string(Value));
-          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(StrToDateTime(string(Value)), PISCTimeStamp(sqldata));
-          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(StrToDate(string(Value))) + cAlFBXDateOffset);
-          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(StrToTime(string(Value))) * cALFBXTimeCoeff);
-          SQL_LONG      : PInteger(sqldata)^ := StrToInt(string(Value));
-          SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(string(Value));
-          SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(string(Value));
-          SQL_INT64     : PInt64(sqldata)^ := StrToInt64(string(Value));
+          SQL_DOUBLE    : PDouble(sqldata)^   := ALStrToFloat(Value, ALDefaultFormatSettings);
+          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(ALStrToDateTime(Value, ALDefaultFormatSettings), PISCTimeStamp(sqldata));
+          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(ALStrToDate(Value, ALDefaultFormatSettings)) + cAlFBXDateOffset);
+          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(ALStrToTime(Value, ALDefaultFormatSettings)) * cALFBXTimeCoeff);
+          SQL_LONG      : PInteger(sqldata)^ := ALStrToInt(Value);
+          SQL_FLOAT     : PSingle(sqldata)^ := ALStrToFloat(Value, ALDefaultFormatSettings);
+          SQL_SHORT     : PSmallint(sqldata)^ := ALStrToInt(Value);
+          SQL_INT64     : PInt64(sqldata)^ := ALStrToInt64(Value);
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4441,50 +4544,50 @@ end;
     end;
   end;
 
-  procedure TALFBXSQLDA.SetAsUnicodeString(const Index: Word;
-    const Value: UnicodeString);
-  var
-    ASQLCode: SmallInt;
-  begin
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(StrToFloat(Value) * cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : PInteger(sqldata)^  := Trunc(StrToFloat(Value) * cALFBXScaleDivisor[sqlscale]);
-          SQL_INT64,
-          SQL_QUAD   : PInt64(sqldata)^    := Trunc(StrToFloat(Value) * cALFBXScaleDivisor[sqlscale]);
-          SQL_D_FLOAT,
-          SQL_DOUBLE : PDouble(sqldata)^   := StrToFloat(Value);
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_TEXT      : EncodeStringW(SQL_TEXT, Index, Value);
-          SQL_VARYING   : EncodeStringW(SQL_VARYING, Index, Value);
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : PDouble(sqldata)^   := StrToFloat(Value);
-          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(StrToDateTime(Value), PISCTimeStamp(sqldata));
-          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(StrToDate(Value)) + cAlFBXDateOffset);
-          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(StrToTime(Value)) * cALFBXTimeCoeff);
-          SQL_LONG      : PInteger(sqldata)^ := StrToInt(Value);
-          SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(Value);
-          SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(Value);
-          SQL_INT64     : PInt64(sqldata)^ := StrToInt64(Value);
-{FB25_UP}
-          SQL_NULL: ;
-{FB25_UP}
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-        if (sqlind <> nil) then
-          sqlind^ := 0;
-    end;
-  end;
+//  procedure TALFBXSQLDA.SetAsUnicodeString(const Index: Word;
+//    const Value: UnicodeString);
+//  var
+//    ASQLCode: SmallInt;
+//  begin
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : PSmallInt(sqldata)^ := Trunc(StrToFloat(Value) * cALFBXScaleDivisor[sqlscale]);
+//          SQL_LONG   : PInteger(sqldata)^  := Trunc(StrToFloat(Value) * cALFBXScaleDivisor[sqlscale]);
+//          SQL_INT64,
+//          SQL_QUAD   : PInt64(sqldata)^    := Trunc(StrToFloat(Value) * cALFBXScaleDivisor[sqlscale]);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : PDouble(sqldata)^   := StrToFloat(Value);
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_TEXT      : EncodeStringW(SQL_TEXT, Index, Value);
+//          SQL_VARYING   : EncodeStringW(SQL_VARYING, Index, Value);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : PDouble(sqldata)^   := StrToFloat(Value);
+//          SQL_TIMESTAMP : ALFBXEncodeTimeStamp(StrToDateTime(Value), PISCTimeStamp(sqldata));
+//          SQL_TYPE_DATE : PInteger(sqldata)^ := Round(int(StrToDate(Value)) + cAlFBXDateOffset);
+//          SQL_TYPE_TIME : PCardinal(sqldata)^ := Round(Frac(StrToTime(Value)) * cALFBXTimeCoeff);
+//          SQL_LONG      : PInteger(sqldata)^ := StrToInt(Value);
+//          SQL_FLOAT     : PSingle(sqldata)^ := StrToFloat(Value);
+//          SQL_SHORT     : PSmallint(sqldata)^ := StrToInt(Value);
+//          SQL_INT64     : PInt64(sqldata)^ := StrToInt64(Value);
+//{FB25_UP}
+//          SQL_NULL: ;
+//{FB25_UP}
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//        if (sqlind <> nil) then
+//          sqlind^ := 0;
+//    end;
+//  end;
 
   procedure TALFBXSQLDA.SetAsInt64(const Index: Word; const Value: Int64);
   var ASQLCode: SmallInt;
@@ -4516,8 +4619,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Value;
           SQL_INT64     : PInt64(sqldata)^ := Value;
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, IntToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, IntToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALIntToStr(Value));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALIntToStr(Value));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4558,8 +4663,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Trunc(Value);
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4605,8 +4712,10 @@ end;
           SQL_FLOAT     : PSingle(sqldata)^ := Value;
           SQL_SHORT     : PSmallint(sqldata)^ := Trunc(Value);
           SQL_INT64     : PInt64(sqldata)^ := Trunc(Value);
-          SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
-          SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+          //SQL_TEXT      : EncodeString(SQL_TEXT, Index, FloatToStr(Value));
+          //SQL_VARYING   : EncodeString(SQL_VARYING, Index, FloatToStr(Value));
+          SQL_TEXT      : EncodeStringA(SQL_TEXT, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
+          SQL_VARYING   : EncodeStringA(SQL_VARYING, Index, ALFloatToStr(Value, ALDefaultFormatSettings));
 {FB25_UP}
           SQL_NULL: ;
 {FB25_UP}
@@ -4617,27 +4726,27 @@ end;
     end;
   end;
 
-  procedure TALFBXSQLDA.SetAsVariant(const Index: Word; const Value: Variant);
-  begin
-    case TVarData(Value).VType of
-      varShortInt,
-      varSmallInt, varByte: SetAsSmallint(Index, Value);
-      varWord,
-      varInteger:               SetAsInteger(Index, Value);
-      varLongWord, varInt64:             SetAsInt64(Index, Value);
-      varSingle:                         SetAsSingle(Index, Value);
-      varDouble:                         SetAsDouble(Index, Value);
-      varCurrency:                       SetAsCurrency(Index, Value);
-      varDate:                           SetAsDateTime(Index, Value);
-      varOleStr, varString:              SetAsString(Index, Value);
-{$IFDEF UNICODE}
-      varUString:                        SetAsString(Index, Value);
-{$ENDIF}
-      varNull, VarEmpty:                 SetIsNull(index, true);
-    else
-      raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-    end;
-  end;
+//  procedure TALFBXSQLDA.SetAsVariant(const Index: Word; const Value: Variant);
+//  begin
+//    case TVarData(Value).VType of
+//      varShortInt,
+//      varSmallInt, varByte: SetAsSmallint(Index, Value);
+//      varWord,
+//      varInteger:               SetAsInteger(Index, Value);
+//      varLongWord, varInt64:             SetAsInt64(Index, Value);
+//      varSingle:                         SetAsSingle(Index, Value);
+//      varDouble:                         SetAsDouble(Index, Value);
+//      varCurrency:                       SetAsCurrency(Index, Value);
+//      varDate:                           SetAsDateTime(Index, Value);
+//      varOleStr, varString:              SetAsString(Index, Value);
+//{$IFDEF UNICODE}
+//      varUString:                        SetAsString(Index, Value);
+//{$ENDIF}
+//      varNull, VarEmpty:                 SetIsNull(index, true);
+//    else
+//      raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//    end;
+//  end;
 
   // TALFBXSQLDA.GetByName...
 
@@ -4663,211 +4772,211 @@ end;
     Result := False;
   end;
 
-  function TALFBXSQLDA.GetByNameAsDouble(const Name: string): Double;
+  function TALFBXSQLDA.GetByNameAsDouble(const Name: AnsiString): Double;
   begin
-    Result := GetAsDouble(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsDouble(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsInt64(const Name: string): Int64;
+  function TALFBXSQLDA.GetByNameAsInt64(const Name: AnsiString): Int64;
   begin
-    Result := GetAsInt64(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsInt64(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsInteger(const Name: string): Integer;
+  function TALFBXSQLDA.GetByNameAsInteger(const Name: AnsiString): Integer;
   begin
-    Result := GetAsInteger(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsInteger(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsSingle(const Name: string): Single;
+  function TALFBXSQLDA.GetByNameAsSingle(const Name: AnsiString): Single;
   begin
-    Result := GetAsSingle(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsSingle(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsSmallint(const Name: string): Smallint;
+  function TALFBXSQLDA.GetByNameAsSmallint(const Name: AnsiString): Smallint;
   begin
-    Result := GetAsSmallint(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsSmallint(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsString(const name: string): string;
+//  function TALFBXSQLDA.GetByNameAsString(const name: string): string;
+//  begin
+//  {$IFDEF UNICODE}
+//    Result := GetByNameAsUnicodeString(name);
+//  {$ELSE}
+//    Result := GetByNameAsAnsiString(name);
+//  {$ENDIF}
+//  end;
+
+  function TALFBXSQLDA.GetByNameAsAnsiString(const Name: AnsiString): AnsiString;
   begin
-  {$IFDEF UNICODE}
-    Result := GetByNameAsUnicodeString(name);
-  {$ELSE}
-    Result := GetByNameAsAnsiString(name);
-  {$ENDIF}
+    Result := GetAsAnsiString(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsAnsiString(const Name: string): AnsiString;
+  function TALFBXSQLDA.GetByNameAsQuad(const Name: AnsiString): TISCQuad;
   begin
-    Result := GetAsAnsiString(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsQuad(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsQuad(const Name: string): TISCQuad;
+//  function TALFBXSQLDA.GetByNameAsRawByteString(const name: string): RawByteString;
+//  begin
+//    Result := GetAsRawByteString(GetFieldIndex(AnsiString(name)));
+//  end;
+
+//  function TALFBXSQLDA.GetByNameAsVariant(const Name: string): Variant;
+//  begin
+//    Result := GetAsVariant(GetFieldIndex(AnsiString(Name)));
+//  end;
+
+  function TALFBXSQLDA.GetByNameIsBlob(const Name: AnsiString): boolean;
   begin
-    Result := GetAsQuad(GetFieldIndex(AnsiString(Name)));
+    Result := GetIsBlob(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsRawByteString(const name: string): RawByteString;
+  function TALFBXSQLDA.GetByNameIsBlobText(const Name: AnsiString): boolean;
   begin
-    Result := GetAsRawByteString(GetFieldIndex(AnsiString(name)));
+    Result := GetIsBlobText(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsVariant(const Name: string): Variant;
+  function TALFBXSQLDA.GetByNameIsNull(const Name: AnsiString): boolean;
   begin
-    Result := GetAsVariant(GetFieldIndex(AnsiString(Name)));
+    Result := GetIsNull(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameIsBlob(const Name: string): boolean;
+  function TALFBXSQLDA.GetByNameAsDateTime(const Name: AnsiString): TDateTime;
   begin
-    Result := GetIsBlob(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsDateTime(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameIsBlobText(const Name: string): boolean;
+  function TALFBXSQLDA.GetByNameAsCurrency(const Name: AnsiString): Currency;
   begin
-    Result := GetIsBlobText(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsCurrency(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameIsNull(const Name: string): boolean;
+  function TALFBXSQLDA.GetByNameAsBoolean(const Name: AnsiString): boolean;
   begin
-    Result := GetIsNull(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsBoolean(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsDateTime(const Name: string): TDateTime;
+//  function TALFBXSQLDA.GetByNameAsUnicodeString(const Name: string): UnicodeString;
+//  begin
+//    Result := GetAsUnicodeString(GetFieldIndex(AnsiString(Name)));
+//  end;
+
+  function TALFBXSQLDA.GetByNameAsDate(const Name: AnsiString): Integer;
   begin
-    Result := GetAsDateTime(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsDate(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsCurrency(const Name: string): Currency;
+  function TALFBXSQLDA.GetByNameAsTime(const Name: AnsiString): Cardinal;
   begin
-    Result := GetAsCurrency(GetFieldIndex(AnsiString(Name)));
+    Result := GetAsTime(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsBoolean(const Name: string): boolean;
+  function TALFBXSQLDA.GetByNameIsNumeric(const Name: AnsiString): boolean;
   begin
-    Result := GetAsBoolean(GetFieldIndex(AnsiString(Name)));
+    result := GetIsNumeric(GetFieldIndex(Name));
   end;
 
-  function TALFBXSQLDA.GetByNameAsUnicodeString(const Name: string): UnicodeString;
+  function TALFBXSQLDA.GetByNameIsNullable(const Name: AnsiString): boolean;
   begin
-    Result := GetAsUnicodeString(GetFieldIndex(AnsiString(Name)));
-  end;
-
-  function TALFBXSQLDA.GetByNameAsDate(const Name: string): Integer;
-  begin
-    Result := GetAsDate(GetFieldIndex(AnsiString(Name)));
-  end;
-
-  function TALFBXSQLDA.GetByNameAsTime(const Name: string): Cardinal;
-  begin
-    Result := GetAsTime(GetFieldIndex(AnsiString(Name)));
-  end;
-
-  function TALFBXSQLDA.GetByNameIsNumeric(const Name: string): boolean;
-  begin
-    result := GetIsNumeric(GetFieldIndex(AnsiString(Name)));
-  end;
-
-  function TALFBXSQLDA.GetByNameIsNullable(const Name: string): boolean;
-  begin
-    Result := GetIsNullable(GetFieldIndex(AnsiString(Name)));
+    Result := GetIsNullable(GetFieldIndex(Name));
   end;
 
   // TALFBXSQLDA.SetByNameAs
 
-  procedure TALFBXSQLDA.SetByNameIsNull(const Name: string;
+  procedure TALFBXSQLDA.SetByNameIsNull(const Name: AnsiString;
     const Value: boolean);
   begin
-    SetIsNull(GetFieldIndex(AnsiString(Name)), Value);
+    SetIsNull(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsBoolean(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsBoolean(const Name: AnsiString;
     const Value: boolean);
   begin
-     SetAsBoolean(GetFieldIndex(AnsiString(Name)), Value);
+     SetAsBoolean(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsDate(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsDate(const Name: AnsiString;
     const Value: Integer);
   begin
-    SetAsDate(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsDate(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsCurrency(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsCurrency(const Name: AnsiString;
     const Value: Currency);
   begin
-    SetAsCurrency(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsCurrency(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsDateTime(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsDateTime(const Name: AnsiString;
     const Value: TDateTime);
   begin
-    SetAsDateTime(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsDateTime(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsDouble(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsDouble(const Name: AnsiString;
     const Value: Double);
   begin
-    SetAsDouble(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsDouble(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsInt64(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsInt64(const Name: AnsiString;
     const Value: Int64);
   begin
-    SetAsInt64(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsInt64(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsInteger(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsInteger(const Name: AnsiString;
     const Value: Integer);
   begin
-    SetAsInteger(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsInteger(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsQuad(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsQuad(const Name: AnsiString;
     const Value: TISCQuad);
   begin
-    SetAsQuad(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsQuad(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsRawByteString(const name: string; const Value: RawByteString);
+//  procedure TALFBXSQLDA.SetByNameAsRawByteString(const name: string; const Value: RawByteString);
+//  begin
+//    SetAsRawByteString(GetFieldIndex(AnsiString(Name)), Value);
+//  end;
+
+  procedure TALFBXSQLDA.SetByNameAsSingle(const Name: AnsiString; const Value: Single);
   begin
-    SetAsRawByteString(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsSingle(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsSingle(const Name: string; const Value: Single);
-  begin
-    SetAsSingle(GetFieldIndex(AnsiString(Name)), Value);
-  end;
-
-  procedure TALFBXSQLDA.SetByNameAsSmallint(const Name: string;
+  procedure TALFBXSQLDA.SetByNameAsSmallint(const Name: AnsiString;
     const Value: Smallint);
   begin
-    SetAsSmallint(GetFieldIndex(AnsiString(Name)), Value);
+    SetAsSmallint(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsString(const name, Value: string);
+//  procedure TALFBXSQLDA.SetByNameAsString(const name, Value: string);
+//  begin
+//  {$IFDEF UNICODE}
+//    SetByNameAsUnicodeString(name, Value);
+//  {$ELSE}
+//    SetByNameAsAnsiString(name, Value);;
+//  {$ENDIF}
+//  end;
+
+  procedure TALFBXSQLDA.SetByNameAsAnsiString(const Name: AnsiString; const Value: AnsiString);
   begin
-  {$IFDEF UNICODE}
-    SetByNameAsUnicodeString(name, Value);
-  {$ELSE}
-    SetByNameAsAnsiString(name, Value);;
-  {$ENDIF}
+    SetAsAnsiString(GetFieldIndex(Name), Value);
   end;
 
-  procedure TALFBXSQLDA.SetByNameAsAnsiString(const Name: string; const Value: AnsiString);
-  begin
-    SetAsAnsiString(GetFieldIndex(AnsiString(Name)), Value);
-  end;
+//  procedure TALFBXSQLDA.SetByNameAsUnicodeString(const Name: string; const Value: UnicodeString);
+//  begin
+//    SetAsUnicodeString(GetFieldIndex(AnsiString(Name)), Value);
+//  end;
 
-  procedure TALFBXSQLDA.SetByNameAsUnicodeString(const Name: string; const Value: UnicodeString);
-  begin
-    SetAsUnicodeString(GetFieldIndex(AnsiString(Name)), Value);
-  end;
-
-  procedure TALFBXSQLDA.SetByNameAsVariant(const Name: string;
-    const Value: Variant);
-  begin
-    SetAsVariant(GetFieldIndex(AnsiString(Name)), Value);
-  end;
+//  procedure TALFBXSQLDA.SetByNameAsVariant(const Name: string;
+//    const Value: Variant);
+//  begin
+//    SetAsVariant(GetFieldIndex(AnsiString(Name)), Value);
+//  end;
 
   function TALFBXSQLDA.GetFieldType(const Index: Word): TALFBXFieldType;
   var
@@ -4941,7 +5050,7 @@ end;
   begin
     if FRecordPool = nil then
       FRecordPool := TALFBXPoolStream.Create(FBufferChunks, FDataBufferLength);
-    Move(FDataBuffer^, FRecordPool.Add^, FDataBufferLength);
+    ALMove(FDataBuffer^, FRecordPool.Add^, FDataBufferLength);
     FCurrentRecord := FRecordPool.ItemCount - 1;
   end;
 
@@ -4966,7 +5075,7 @@ end;
   begin
     if (Index <> FCurrentRecord) and (FRecordPool <> nil) then
     begin
-      Move(FRecordPool[Index]^, FDataBuffer^, FDataBufferLength);
+      ALMove(FRecordPool[Index]^, FDataBuffer^, FDataBufferLength);
       FCurrentRecord := Index;
     end;
     FInMemoryEOF := false;
@@ -5310,17 +5419,27 @@ end;
   end;
 
   procedure TALFBXSQLResult.ReadBlobA(const Index: Word; var str: AnsiString);
-{$IFDEF UNICODE}
+//{$IFDEF UNICODE}
+//  var
+//    data: UnicodeString;
+//{$ENDIF}
+//  begin
+//{$IFDEF UNICODE}
+//    ReadBlobW(Index, data);
+//    str := AnsiString(data);
+//{$ELSE}
+//    ReadBlobB(Index, str);
+//{$ENDIF}
+//  end;
   var
-    data: UnicodeString;
-{$ENDIF}
+    BlobData: PALFBXBlobData;
   begin
-{$IFDEF UNICODE}
-    ReadBlobW(Index, data);
-    str := AnsiString(data);
-{$ELSE}
-    ReadBlobB(Index, str);
-{$ENDIF}
+    CheckRange(Index);
+    if not FFetchBlobs then
+      raise Exception.Create(cALFBX_FETCHBLOBNOTSET);
+    BlobData := GetDataQuadOffset(Index);
+    SetLength(str, BlobData.Size);
+    ALMove(BlobData.Buffer^, PAnsiChar(data)^, BlobData.Size);
   end;
 
   procedure TALFBXSQLResult.ReadBlob(const Index: Word; Stream: TStream);
@@ -5335,52 +5454,52 @@ end;
     Stream.Seek(0, 0);
   end;
 
-  procedure TALFBXSQLResult.ReadBlob(const Index: Word; var Value: Variant);
-  var
-    PData: Pointer;
-    BlobData: PALFBXBlobData;
-    str: string;
-  begin
-    if IsBlobText[Index] then
-    begin
-      ReadBlob(Index, str);
-      Value := str;
-    end else
-    begin
-      if not FFetchBlobs then
-        raise Exception.Create(cALFBX_FETCHBLOBNOTSET);
-      BlobData := GetDataQuadOffset(Index);
-      Value := VarArrayCreate([0, BlobData.Size-1], varByte);
-      PData := VarArrayLock(Value);
-      try
-        Move(BlobData.Buffer^, PData^, BlobData.Size);
-      finally
-        VarArrayUnlock(Value);
-      end;
-    end;
-  end;
+//  procedure TALFBXSQLResult.ReadBlob(const Index: Word; var Value: Variant);
+//  var
+//    PData: Pointer;
+//    BlobData: PALFBXBlobData;
+//    str: string;
+//  begin
+//    if IsBlobText[Index] then
+//    begin
+//      ReadBlob(Index, str);
+//      Value := str;
+//    end else
+//    begin
+//      if not FFetchBlobs then
+//        raise Exception.Create(cALFBX_FETCHBLOBNOTSET);
+//      BlobData := GetDataQuadOffset(Index);
+//      Value := VarArrayCreate([0, BlobData.Size-1], varByte);
+//      PData := VarArrayLock(Value);
+//      try
+//        Move(BlobData.Buffer^, PData^, BlobData.Size);
+//      finally
+//        VarArrayUnlock(Value);
+//      end;
+//    end;
+//  end;
 
-  procedure TALFBXSQLResult.ReadBlobW(const Index: Word; var str: UnicodeString);
-  var
-    aStr: RawByteString;
-  begin
-    ReadBlobB(Index, aStr);
-    if FXSQLDA.sqlvar[Index].SqlSubType = 1 then  // is text ?
-      str := ALFBXMBUDecode(aStr, cALFBXCharacterSetCP[FCharacterSet]) else
-      begin
-        SetLength(str, Length(aStr) div 2);
-        Move(PByte(aStr)^, PByte(str)^, Length(str) * 2);
-      end;
-  end;
+//  procedure TALFBXSQLResult.ReadBlobW(const Index: Word; var str: UnicodeString);
+//  var
+//    aStr: RawByteString;
+//  begin
+//    ReadBlobB(Index, aStr);
+//    if FXSQLDA.sqlvar[Index].SqlSubType = 1 then  // is text ?
+//      str := ALFBXMBUDecode(aStr, cALFBXCharacterSetCP[FCharacterSet]) else
+//      begin
+//        SetLength(str, Length(aStr) div 2);
+//        Move(PByte(aStr)^, PByte(str)^, Length(str) * 2);
+//      end;
+//  end;
 
-  procedure TALFBXSQLResult.ReadBlob(const Index: Word; var str: string);
-  begin
-  {$IFDEF UNICODE}
-     ReadBlobW(Index, str);
-  {$ELSE}
-     ReadBlobA(Index, str);
-  {$ENDIF}
-  end;
+//  procedure TALFBXSQLResult.ReadBlob(const Index: Word; var str: string);
+//  begin
+//  {$IFDEF UNICODE}
+//     ReadBlobW(Index, str);
+//  {$ELSE}
+//     ReadBlobA(Index, str);
+//  {$ENDIF}
+//  end;
 
   procedure TALFBXSQLResult.ReadBlob(const Index: Word; Data: Pointer);
   var BlobData: PALFBXBlobData;
@@ -5389,70 +5508,70 @@ end;
     if not FFetchBlobs then
       raise Exception.Create(cALFBX_FETCHBLOBNOTSET);
     BlobData := GetDataQuadOffset(Index);
-    Move(BlobData.Buffer^, Data^, BlobData.Size);
+    ALMove(BlobData.Buffer^, Data^, BlobData.Size);
   end;
 
-  procedure TALFBXSQLResult.ReadBlob(const name: string; Data: Pointer);
+  procedure TALFBXSQLResult.ReadBlob(const name: AnsiString; Data: Pointer);
   begin
-    ReadBlob(GetFieldIndex(AnsiString(Name)), Data);
+    ReadBlob(GetFieldIndex(Name), Data);
   end;
 
-  function TALFBXSQLResult.ReadBlob(const Index: Word): string;
+//  function TALFBXSQLResult.ReadBlob(const Index: Word): string;
+//  begin
+//    ReadBlob(Index, Result);
+//  end;
+
+//  function TALFBXSQLResult.ReadBlob(const name: string): string;
+//  begin
+//    ReadBlob(name, Result);
+//  end;
+
+//  procedure TALFBXSQLResult.ReadBlobB(const Index: Word; var data: RawByteString);
+//  var
+//    BlobData: PALFBXBlobData;
+//  begin
+//    CheckRange(Index);
+//    if not FFetchBlobs then
+//      raise Exception.Create(cALFBX_FETCHBLOBNOTSET);
+//    BlobData := GetDataQuadOffset(Index);
+//    SetLength(data, BlobData.Size);
+//    Move(BlobData.Buffer^, PAnsiChar(data)^, BlobData.Size);
+//  end;
+
+//  procedure TALFBXSQLResult.ReadBlobW(const name: string; var str: UnicodeString);
+//  begin
+//    ReadBlobW(GetFieldIndex(AnsiString(Name)), str);
+//  end;
+
+//  procedure TALFBXSQLResult.ReadBlob(const name: string; var str: string);
+//  begin
+//  {$IFDEF UNICODE}
+//     ReadBlobW(name, str);
+//  {$ELSE}
+//     ReadBlobA(name, str);
+//  {$ENDIF}
+//  end;
+
+
+  procedure TALFBXSQLResult.ReadBlobA(const name: AnsiString; var str: AnsiString);
   begin
-    ReadBlob(Index, Result);
+    ReadBlobA(GetFieldIndex(Name), str);
   end;
 
-  function TALFBXSQLResult.ReadBlob(const name: string): string;
+//  procedure TALFBXSQLResult.ReadBlobB(const name: string; var data: RawByteString);
+//  begin
+//    ReadBlobB(GetFieldIndex(AnsiString(Name)), data);
+//  end;
+
+  procedure TALFBXSQLResult.ReadBlob(const name: AnsiString; Stream: TStream);
   begin
-    ReadBlob(name, Result);
+    ReadBlob(GetFieldIndex(Name), Stream);
   end;
 
-  procedure TALFBXSQLResult.ReadBlobB(const Index: Word; var data: RawByteString);
-  var
-    BlobData: PALFBXBlobData;
-  begin
-    CheckRange(Index);
-    if not FFetchBlobs then
-      raise Exception.Create(cALFBX_FETCHBLOBNOTSET);
-    BlobData := GetDataQuadOffset(Index);
-    SetLength(data, BlobData.Size);
-    Move(BlobData.Buffer^, PAnsiChar(data)^, BlobData.Size);
-  end;
-
-  procedure TALFBXSQLResult.ReadBlobW(const name: string; var str: UnicodeString);
-  begin
-    ReadBlobW(GetFieldIndex(AnsiString(Name)), str);
-  end;
-
-  procedure TALFBXSQLResult.ReadBlob(const name: string; var str: string);
-  begin
-  {$IFDEF UNICODE}
-     ReadBlobW(name, str);
-  {$ELSE}
-     ReadBlobA(name, str);
-  {$ENDIF}
-  end;
-
-
-  procedure TALFBXSQLResult.ReadBlobA(const name: string; var str: AnsiString);
-  begin
-    ReadBlobA(GetFieldIndex(AnsiString(Name)), str);
-  end;
-
-  procedure TALFBXSQLResult.ReadBlobB(const name: string; var data: RawByteString);
-  begin
-    ReadBlobB(GetFieldIndex(AnsiString(Name)), data);
-  end;
-
-  procedure TALFBXSQLResult.ReadBlob(const name: string; Stream: TStream);
-  begin
-    ReadBlob(GetFieldIndex(AnsiString(Name)), Stream);
-  end;
-
-  procedure TALFBXSQLResult.ReadBlob(const name: string; var Value: Variant);
-  begin
-    ReadBlob(GetFieldIndex(AnsiString(Name)), Value);
-  end;
+//  procedure TALFBXSQLResult.ReadBlob(const name: string; var Value: Variant);
+//  begin
+//    ReadBlob(GetFieldIndex(AnsiString(Name)), Value);
+//  end;
 
   function TALFBXSQLResult.GetBlobSize(const Index: Word): Cardinal;
   var BlobData: PALFBXBlobData;
@@ -5465,7 +5584,7 @@ end;
   end;
 
   function TALFBXSQLResult.GetAsAnsiString(const Index: Word): AnsiString;
-    function BoolToStr(const Value: boolean): string;
+    function BoolToStr(const Value: boolean): AnsiString;
     begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
   var ASQLCode: SmallInt;
   begin
@@ -5479,26 +5598,26 @@ end;
       if (sqlscale < 0)  then
       begin
         case ASQLCode of
-          SQL_SHORT  : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+          SQL_SHORT  : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
+          SQL_LONG   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
           SQL_INT64,
-          SQL_QUAD   : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+          SQL_QUAD   : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale], ALDefaultFormatSettings);
           SQL_D_FLOAT,
-          SQL_DOUBLE : Result := AnsiString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
+          SQL_DOUBLE : Result := ALFormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^, ALDefaultFormatSettings);
         else
           raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
         end;
       end else
         case ASQLCode of
           SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := AnsiString(FloatToStr(PDouble(sqldata)^));
-          SQL_TIMESTAMP : Result := AnsiString(DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata))));
-          SQL_TYPE_DATE : Result := AnsiString(DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset));
-          SQL_TYPE_TIME : Result := AnsiString(TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff));
-          SQL_LONG      : Result := AnsiString(IntToStr(PInteger(sqldata)^));
-          SQL_FLOAT     : Result := AnsiString(FloatToStr(PSingle(sqldata)^));
-          SQL_SHORT     : Result := AnsiString(IntToStr(PSmallint(sqldata)^));
-          SQL_INT64     : Result := AnsiString(IntToStr(PInt64(sqldata)^));
+          SQL_DOUBLE    : Result := ALFloatToStr(PDouble(sqldata)^, ALDefaultFormatSettings);
+          SQL_TIMESTAMP : Result := ALDateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)), ALDefaultFormatSettings);
+          SQL_TYPE_DATE : Result := ALDateToStr(PInteger(sqldata)^ - cAlFBXDateOffset, ALDefaultFormatSettings);
+          SQL_TYPE_TIME : Result := ALTimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff, ALDefaultFormatSettings);
+          SQL_LONG      : Result := ALIntToStr(PInteger(sqldata)^);
+          SQL_FLOAT     : Result := ALFloatToStr(PSingle(sqldata)^, ALDefaultFormatSettings);
+          SQL_SHORT     : Result := ALIntToStr(PSmallint(sqldata)^);
+          SQL_INT64     : Result := ALIntToStr(PInt64(sqldata)^);
           SQL_TEXT      : DecodeStringA(SQL_TEXT, Index, Result);
           SQL_VARYING   : DecodeStringA(SQL_VARYING, Index, Result);
           SQL_BLOB      : ReadBlobA(Index, Result);
@@ -5509,146 +5628,146 @@ end;
     end;
   end;
 
-  function TALFBXSQLResult.GetAsRawByteString(const Index: Word): RawByteString;
-    function BoolToStr(const Value: boolean): string;
-    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
-  var ASQLCode: SmallInt;
-  begin
-    CheckRange(Index);
-    Result := '';
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
-          SQL_LONG   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
-          SQL_INT64,
-          SQL_QUAD   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
-          SQL_D_FLOAT,
-          SQL_DOUBLE : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := RawByteString(FloatToStr(PDouble(sqldata)^));
-          SQL_TIMESTAMP : Result := RawByteString(DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata))));
-          SQL_TYPE_DATE : Result := RawByteString(DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset));
-          SQL_TYPE_TIME : Result := RawByteString(TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff));
-          SQL_LONG      : Result := RawByteString(IntToStr(PInteger(sqldata)^));
-          SQL_FLOAT     : Result := RawByteString(FloatToStr(PSingle(sqldata)^));
-          SQL_SHORT     : Result := RawByteString(IntToStr(PSmallint(sqldata)^));
-          SQL_INT64     : Result := RawByteString(IntToStr(PInt64(sqldata)^));
-          SQL_TEXT      : DecodeStringB(SQL_TEXT, Index, Result);
-          SQL_VARYING   : DecodeStringB(SQL_VARYING, Index, Result);
-          SQL_BLOB      : ReadBlobB(Index, Result);
-          SQL_ARRAY     : Result := '(Array)';
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-    end;
-  end;
+//  function TALFBXSQLResult.GetAsRawByteString(const Index: Word): RawByteString;
+//    function BoolToStr(const Value: boolean): string;
+//    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
+//  var ASQLCode: SmallInt;
+//  begin
+//    CheckRange(Index);
+//    Result := '';
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]));
+//          SQL_LONG   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]));
+//          SQL_INT64,
+//          SQL_QUAD   : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale]));
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : Result := RawByteString(FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^));
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : Result := RawByteString(FloatToStr(PDouble(sqldata)^));
+//          SQL_TIMESTAMP : Result := RawByteString(DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata))));
+//          SQL_TYPE_DATE : Result := RawByteString(DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset));
+//          SQL_TYPE_TIME : Result := RawByteString(TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff));
+//          SQL_LONG      : Result := RawByteString(IntToStr(PInteger(sqldata)^));
+//          SQL_FLOAT     : Result := RawByteString(FloatToStr(PSingle(sqldata)^));
+//          SQL_SHORT     : Result := RawByteString(IntToStr(PSmallint(sqldata)^));
+//          SQL_INT64     : Result := RawByteString(IntToStr(PInt64(sqldata)^));
+//          SQL_TEXT      : DecodeStringB(SQL_TEXT, Index, Result);
+//          SQL_VARYING   : DecodeStringB(SQL_VARYING, Index, Result);
+//          SQL_BLOB      : ReadBlobB(Index, Result);
+//          SQL_ARRAY     : Result := '(Array)';
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//    end;
+//  end;
 
-  function TALFBXSQLResult.GetAsUnicodeString(const Index: Word): UnicodeString;
-    function BoolToStr(const Value: boolean): string;
-    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
-  var ASQLCode: SmallInt;
-  begin
-    CheckRange(Index);
-    Result := '';
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
-          SQL_LONG   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
-          SQL_INT64,
-          SQL_QUAD   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
-          SQL_D_FLOAT,
-          SQL_DOUBLE : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^);
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := FloatToStr(PDouble(sqldata)^);
-          SQL_TIMESTAMP : Result := DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
-          SQL_TYPE_DATE : Result := DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset);
-          SQL_TYPE_TIME : Result := TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff);
-          SQL_LONG      : Result := IntToStr(PInteger(sqldata)^);
-          SQL_FLOAT     : Result := FloatToStr(PSingle(sqldata)^);
-          SQL_SHORT     : Result := IntToStr(PSmallint(sqldata)^);
-          SQL_INT64     : Result := IntToStr(PInt64(sqldata)^);
-          SQL_TEXT      : DecodeStringW(SQL_TEXT, Index, Result);
-          SQL_VARYING   : DecodeStringW(SQL_VARYING, Index, Result);
-          SQL_BLOB      : ReadBlobW(Index, Result);
-          SQL_ARRAY     : Result := '(Array)';
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-    end;
-  end;
+//  function TALFBXSQLResult.GetAsUnicodeString(const Index: Word): UnicodeString;
+//    function BoolToStr(const Value: boolean): string;
+//    begin if Value then result := cALFBXTrue else result := cALFBXFalse; end;
+//  var ASQLCode: SmallInt;
+//  begin
+//    CheckRange(Index);
+//    Result := '';
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
+//          SQL_LONG   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale]);
+//          SQL_INT64,
+//          SQL_QUAD   : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PInt64(sqldata)^ / cALFBXScaleDivisor[sqlscale]);
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : Result := FormatFloat(cALFBXScaleFormat[sqlscale], PDouble(sqldata)^);
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : Result := FloatToStr(PDouble(sqldata)^);
+//          SQL_TIMESTAMP : Result := DateTimeToStr(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
+//          SQL_TYPE_DATE : Result := DateToStr(PInteger(sqldata)^ - cAlFBXDateOffset);
+//          SQL_TYPE_TIME : Result := TimeToStr(PCardinal(sqldata)^ / cALFBXTimeCoeff);
+//          SQL_LONG      : Result := IntToStr(PInteger(sqldata)^);
+//          SQL_FLOAT     : Result := FloatToStr(PSingle(sqldata)^);
+//          SQL_SHORT     : Result := IntToStr(PSmallint(sqldata)^);
+//          SQL_INT64     : Result := IntToStr(PInt64(sqldata)^);
+//          SQL_TEXT      : DecodeStringW(SQL_TEXT, Index, Result);
+//          SQL_VARYING   : DecodeStringW(SQL_VARYING, Index, Result);
+//          SQL_BLOB      : ReadBlobW(Index, Result);
+//          SQL_ARRAY     : Result := '(Array)';
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//    end;
+//  end;
 
-  function TALFBXSQLResult.GetAsVariant(const Index: Word): Variant;
-  var
-    ASQLCode: SmallInt;
-    Dbl: Double;
-  begin
-    CheckRange(Index);
-    with FXSQLDA.sqlvar[Index] do
-    begin
-      Result := NULL;
-      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
-      ASQLCode := (sqltype and not(1));
-      // Is Numeric ?
-      if (sqlscale < 0)  then
-      begin
-        case ASQLCode of
-          SQL_SHORT  : Result := PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale];
-          SQL_LONG   : Result := PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale];
-          SQL_INT64,
-          SQL_QUAD   : Result := PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale];
-          SQL_D_FLOAT,
-          SQL_DOUBLE : Result := PDouble(sqldata)^;
-        else
-          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
-        end;
-      end else
-        case ASQLCode of
-          SQL_D_FLOAT,
-          SQL_DOUBLE    : Result := PDouble(sqldata)^;
-          SQL_TIMESTAMP : Result := TDateTime(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
-          SQL_TYPE_DATE :
-            begin
-              Dbl := PInteger(sqldata)^ - cAlFBXDateOffset;
-              Result := TDateTime(Dbl);
-            end;
-          SQL_TYPE_TIME : Result := PCardinal(sqldata)^ / cALFBXTimeCoeff;
-          SQL_LONG      : Result := PInteger(sqldata)^;
-          SQL_FLOAT     : Result := PSingle(sqldata)^;
-          SQL_SHORT     : Result := PSmallint(sqldata)^;
-          SQL_INT64     : Result := PInt64(sqldata)^;
-          SQL_TEXT      : Result := DecodeString(SQL_TEXT, Index);
-          SQL_VARYING   : Result := DecodeString(SQL_VARYING, Index);
-          SQL_BLOB      : ReadBlob(Index, Result);
-          SQL_ARRAY     : Result := '(Array)';
-        else
-          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
-        end;
-    end;
-  end;
+//  function TALFBXSQLResult.GetAsVariant(const Index: Word): Variant;
+//  var
+//    ASQLCode: SmallInt;
+//    Dbl: Double;
+//  begin
+//    CheckRange(Index);
+//    with FXSQLDA.sqlvar[Index] do
+//    begin
+//      Result := NULL;
+//      if (sqlind <> nil) and (sqlind^ = -1) then Exit;
+//      ASQLCode := (sqltype and not(1));
+//      // Is Numeric ?
+//      if (sqlscale < 0)  then
+//      begin
+//        case ASQLCode of
+//          SQL_SHORT  : Result := PSmallInt(sqldata)^ / cALFBXScaleDivisor[sqlscale];
+//          SQL_LONG   : Result := PInteger(sqldata)^  / cALFBXScaleDivisor[sqlscale];
+//          SQL_INT64,
+//          SQL_QUAD   : Result := PInt64(sqldata)^    / cALFBXScaleDivisor[sqlscale];
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE : Result := PDouble(sqldata)^;
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_UNEXPECTEDERROR);
+//        end;
+//      end else
+//        case ASQLCode of
+//          SQL_D_FLOAT,
+//          SQL_DOUBLE    : Result := PDouble(sqldata)^;
+//          SQL_TIMESTAMP : Result := TDateTime(ALFBXDecodeTimeStamp(PISCTimeStamp(sqldata)));
+//          SQL_TYPE_DATE :
+//            begin
+//              Dbl := PInteger(sqldata)^ - cAlFBXDateOffset;
+//              Result := TDateTime(Dbl);
+//            end;
+//          SQL_TYPE_TIME : Result := PCardinal(sqldata)^ / cALFBXTimeCoeff;
+//          SQL_LONG      : Result := PInteger(sqldata)^;
+//          SQL_FLOAT     : Result := PSingle(sqldata)^;
+//          SQL_SHORT     : Result := PSmallint(sqldata)^;
+//          SQL_INT64     : Result := PInt64(sqldata)^;
+//          SQL_TEXT      : Result := DecodeString(SQL_TEXT, Index);
+//          SQL_VARYING   : Result := DecodeString(SQL_VARYING, Index);
+//          SQL_BLOB      : ReadBlob(Index, Result);
+//          SQL_ARRAY     : Result := '(Array)';
+//        else
+//          raise EALFBXConvertError.Create(cALFBX_CASTERROR);
+//        end;
+//    end;
+//  end;
 
-  function TALFBXSQLResult.GetUniqueRelationName: string;
+  function TALFBXSQLResult.GetUniqueRelationName: AnsiString;
   var
     i: integer;
   begin
@@ -5713,7 +5832,7 @@ end;
       CurrentRecord := CurrentRecord + 1;
   end;
 
-function TALFBXSQLResult.ReadBlobA(const name: string): AnsiString;
+function TALFBXSQLResult.ReadBlobA(const name: AnsiString): AnsiString;
 begin
   ReadBlobA(name, Result);
 end;
@@ -5723,25 +5842,25 @@ begin
   ReadBlobA(Index, Result);
 end;
 
-function TALFBXSQLResult.ReadBlobB(const name: string): RawByteString;
-begin
-  ReadBlobB(name, result);
-end;
+//function TALFBXSQLResult.ReadBlobB(const name: string): RawByteString;
+//begin
+//  ReadBlobB(name, result);
+//end;
 
-function TALFBXSQLResult.ReadBlobB(const Index: Word): RawByteString;
-begin
-  ReadBlobB(Index, Result);
-end;
+//function TALFBXSQLResult.ReadBlobB(const Index: Word): RawByteString;
+//begin
+//  ReadBlobB(Index, Result);
+//end;
 
-function TALFBXSQLResult.ReadBlobW(const name: string): UnicodeString;
-begin
-  ReadBlobW(name, Result);
-end;
+//function TALFBXSQLResult.ReadBlobW(const name: string): UnicodeString;
+//begin
+//  ReadBlobW(name, Result);
+//end;
 
-function TALFBXSQLResult.ReadBlobW(const Index: Word): UnicodeString;
-begin
-  ReadBlobW(Index, Result);
-end;
+//function TALFBXSQLResult.ReadBlobW(const Index: Word): UnicodeString;
+//begin
+//  ReadBlobW(Index, Result);
+//end;
 
 { TALFBXPoolStream }
 
@@ -5798,11 +5917,11 @@ begin
   Result := Pointer(PtrInt(FPages[Item div FItemsInPage]) + (Item mod FItemsInPage) * FItemSize);
 end;
 
-procedure TALFBXPoolStream.LoadFromFile(const FileName: string);
+procedure TALFBXPoolStream.LoadFromFile(const FileName: AnsiString);
 var
   Stream: TStream;
 begin
-  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+  Stream := TFileStream.Create(String(FileName), fmOpenRead or fmShareDenyWrite);
   try
     LoadFromStream(Stream);
   finally
@@ -5848,7 +5967,7 @@ begin
       while n > 0 do
       begin
         p := Pointer(PtrInt(FPages[FPosition div FPageSize]) + (FPosition mod FPageSize));
-        Move(p^, c^, n);
+        ALMove(p^, c^, n);
         dec(count, n);
         inc(PtrInt(c), n);
         inc(FPosition, n);
@@ -5862,11 +5981,11 @@ begin
   Result := 0;
 end;
 
-procedure TALFBXPoolStream.SaveToFile(const FileName: string);
+procedure TALFBXPoolStream.SaveToFile(const FileName: AnsiString);
 var
   Stream: TStream;
 begin
-  Stream := TFileStream.Create(FileName, fmCreate);
+  Stream := TFileStream.Create(String(FileName), fmCreate);
   try
     SaveToStream(Stream);
   finally
@@ -5951,7 +6070,7 @@ begin
       while n > 0 do
       begin
         p := Pointer(PtrInt(FPages[FPosition div FPageSize]) + (FPosition mod FPageSize));
-        Move(c^, p^, n);
+        ALMove(c^, p^, n);
         dec(count, n);
         inc(PtrInt(c), n);
         inc(FPosition, n);
@@ -5985,41 +6104,41 @@ end;
     inherited;
   end;
 
-  function TALFBXSQLParams.GetFieldName(const Index: Word): string;
+  function TALFBXSQLParams.GetFieldName(const Index: Word): AnsiString;
   begin
     CheckRange(Index);
     SetString(Result, FXSQLDA.sqlvar[Index].ParamName,
       FXSQLDA.sqlvar[Index].ParamNameLength);
   end;
 
-procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFieldType;
+procedure TALFBXSQLParams.AddFieldType(const Name: AnsiString; FieldType: TALFBXFieldType;
     Scale: TALFBXScale = 1; Precision: byte = 0);
   begin
     case FieldType of
       uftNumeric   :
         begin
           case Precision of
-            0..4: SetFieldType(AddField(name), SizeOf(Smallint), SQL_SHORT + 1, -scale);
-            5..7: SetFieldType(AddField(name), SizeOf(Integer) , SQL_LONG + 1 , -scale);
+            0..4: SetFieldType(AddFieldA(name), SizeOf(Smallint), SQL_SHORT + 1, -scale);
+            5..7: SetFieldType(AddFieldA(name), SizeOf(Integer) , SQL_LONG + 1 , -scale);
           else
-            SetFieldType(AddField(name), SizeOf(Int64), SQL_INT64 + 1, -scale);
+            SetFieldType(AddFieldA(name), SizeOf(Int64), SQL_INT64 + 1, -scale);
           end;
         end;
       uftChar,
       uftVarchar,
-      uftCstring         : SetFieldType(AddField(name), 0                    , SQL_TEXT      + 1, 0);
-      uftSmallint        : SetFieldType(AddField(name), SizeOf(Smallint)     , SQL_SHORT     + 1, 0);
-      uftInteger         : SetFieldType(AddField(name), SizeOf(Integer)      , SQL_LONG      + 1, 0);
-      uftQuad            : SetFieldType(AddField(name), SizeOf(TISCQuad)     , SQL_QUAD      + 1, 0);
-      uftFloat           : SetFieldType(AddField(name), SizeOf(Single)       , SQL_FLOAT     + 1, 0);
-      uftDoublePrecision : SetFieldType(AddField(name), SizeOf(Double)       , SQL_DOUBLE    + 1, 0);
-      uftTimestamp       : SetFieldType(AddField(name), SizeOf(TISCTimeStamp), SQL_TIMESTAMP + 1, 0);
+      uftCstring         : SetFieldType(AddFieldA(name), 0                    , SQL_TEXT      + 1, 0);
+      uftSmallint        : SetFieldType(AddFieldA(name), SizeOf(Smallint)     , SQL_SHORT     + 1, 0);
+      uftInteger         : SetFieldType(AddFieldA(name), SizeOf(Integer)      , SQL_LONG      + 1, 0);
+      uftQuad            : SetFieldType(AddFieldA(name), SizeOf(TISCQuad)     , SQL_QUAD      + 1, 0);
+      uftFloat           : SetFieldType(AddFieldA(name), SizeOf(Single)       , SQL_FLOAT     + 1, 0);
+      uftDoublePrecision : SetFieldType(AddFieldA(name), SizeOf(Double)       , SQL_DOUBLE    + 1, 0);
+      uftTimestamp       : SetFieldType(AddFieldA(name), SizeOf(TISCTimeStamp), SQL_TIMESTAMP + 1, 0);
       uftBlob,
-      uftBlobId          : SetFieldType(AddField(name), SizeOf(TISCQuad)     , SQL_BLOB      + 1, 0);
-      uftDate            : SetFieldType(AddField(name), SizeOf(Integer)      , SQL_TYPE_DATE + 1, 0);
-      uftTime            : SetFieldType(AddField(name), SizeOf(Cardinal)     , SQL_TYPE_TIME + 1, 0);
-      uftInt64           : SetFieldType(AddField(name), SizeOf(Int64)        , SQL_INT64     + 1, 0);
-      uftArray           : SetFieldType(AddField(name), SizeOf(TISCQuad)     , SQL_ARRAY     + 1, 0);
+      uftBlobId          : SetFieldType(AddFieldA(name), SizeOf(TISCQuad)     , SQL_BLOB      + 1, 0);
+      uftDate            : SetFieldType(AddFieldA(name), SizeOf(Integer)      , SQL_TYPE_DATE + 1, 0);
+      uftTime            : SetFieldType(AddFieldA(name), SizeOf(Cardinal)     , SQL_TYPE_TIME + 1, 0);
+      uftInt64           : SetFieldType(AddFieldA(name), SizeOf(Int64)        , SQL_INT64     + 1, 0);
+      uftArray           : SetFieldType(AddFieldA(name), SizeOf(TISCQuad)     , SQL_ARRAY     + 1, 0);
     end;
   end;
 
@@ -6033,13 +6152,17 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
         if AInit then
           Include(Flags, pfNotInitialized) else
           Exclude(Flags, pfNotInitialized);
-        if SqlLen > 0 then
-          GetMem(sqldata, SqlLen) else
-          sqldata := nil;
+
+        if (SqlLen > 0) and (SqlData = nil) then
+          GetMem(sqldata, SqlLen);
+
         if ParamNameLength > 0 then
-          for j := 0 to GetAllocatedFields - 1 do
-            if (j <> i) and (ID = FXSQLDA.sqlvar[j].ID) then
-              Move(FXSQLDA.sqlvar[i], FXSQLDA.sqlvar[j], SizeOf(TALFBXSQLVar)-cALFBXMaxParamLength-2);
+          for j := i + 1 to FXSQLDA.sqln - 1 do
+            if (ID = FXSQLDA.sqlvar[j].ID) then
+            begin
+              ALMove(FXSQLDA.sqlvar[i], FXSQLDA.sqlvar[j], SizeOf(TALFBXSQLVar)-cALFBXMaxParamLength-2);
+              Break;
+            end;
       end;
   end;
 
@@ -6061,25 +6184,25 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
         if ParamNameLength > 0 then
           for i := 0 to GetAllocatedFields - 1 do
             if (i <> Index) and (ID = FXSQLDA.sqlvar[i].ID) then
-              Move(FXSQLDA.sqlvar[Index], FXSQLDA.sqlvar[i], SizeOf(TALFBXSQLVar)-cALFBXMaxParamLength-2);
+              ALMove(FXSQLDA.sqlvar[Index], FXSQLDA.sqlvar[i], SizeOf(TALFBXSQLVar)-cALFBXMaxParamLength-2);
       end;
   end;
 
-  function TALFBXSQLParams.Parse(const SQL: string): string;
+  function TALFBXSQLParams.Parse(const SQL: AnsiString): AnsiString;
   const
     Identifiers: set of AnsiChar = ['a'..'z', 'A'..'Z', '0'..'9', '_', '$'];
   var
-    Src: PChar;
+    Src: PAnsiChar;
     Dest, idlen: Word;
 
     procedure next;
     begin
       inc(dest);
-      Result[dest] := Char(Src^);
+      Result[dest] := AnsiChar(Src^);
       inc(Src);
     end;
 
-    procedure Skip(c: Char);
+    procedure Skip(c: AnsiChar);
     begin
       repeat
         next;
@@ -6093,7 +6216,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
 
   begin
     Clear;
-    Src := PChar(SQL);
+    Src := PAnsiChar(SQL);
     Dest := 0;
     SetLength(Result, Length(SQL));
     while true do
@@ -6121,7 +6244,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
         '-' : if Src[1] = '-' then
               begin
                 inc(Src, 2);
-                while not ({$IFDEF UNICODE}(Src^ < #256) and {$ENDIF}(AnsiChar(Src^) in [#0, #13, #10])) do
+                while not (AnsiChar(Src^) in [#0, #13, #10]) do
                   inc(Src);
               end else
                 next;
@@ -6132,7 +6255,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
         '"' : Skip('"');
         // Unnamed Input
         '?' : begin
-                AddField('');
+                AddFieldA('');
                 Next;
               end;
         '[' : Skip(']');
@@ -6147,13 +6270,13 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
                 begin
                   inc(Src);
                   while true do
-                    if {$IFDEF UNICODE}(Src[idlen] < #256) and {$ENDIF}(AnsiChar(Src[idlen]) in [#0, '"']) then
+                    if (AnsiChar(Src[idlen]) in [#0, '"']) then
                       Break else
                       inc(idlen);
                 end else
                 // unquoted identifiers
-                  while {$IFDEF UNICODE}(Src[idlen] < #256) and {$ENDIF}(AnsiChar(Src[idlen]) in Identifiers) do inc(idlen);
-                AddField(copy(Src, 1, idlen));
+                  while (AnsiChar(Src[idlen]) in Identifiers) do inc(idlen);
+                AddFieldA(ALCopyStr(Src, 1, idlen));
                 inc(Src, idlen);
                 if Src^ = '"' then inc(Src);
               end;
@@ -6161,18 +6284,18 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
         // in procedures
         'b','B':
           begin
-            if not ((dest > 0) and {$IFDEF UNICODE}(src[-1] < #256) and {$ENDIF} (AnsiChar(src[-1])
-              in Identifiers)) and (StrIComp(PChar(copy(Src, 0, 5)), 'begin') = 0) and
-                not ({$IFDEF UNICODE}(Src[5] < #256) and{$ENDIF}(AnsiChar(Src[5]) in Identifiers)) then
+            if not ((dest > 0) and (AnsiChar(src[-1])
+              in Identifiers)) and (StrIComp(PAnsiChar(AlCopyStr(Src, 0, 5)), 'begin') = 0) and
+                not (AnsiChar(Src[5]) in Identifiers) then
                   while (Src^ <> #0) do Next else next;
           end;
         // declare should also stop param parsing, as a declare cursor statement
         // may contain variables.
         'd','D':
           begin
-            if not ((dest > 0) and {$IFDEF UNICODE}(src[-1] < #256) and {$ENDIF} (AnsiChar(src[-1])
-              in Identifiers)) and (StrIComp(PChar(copy(Src, 0, 7)), 'declare') = 0) and
-                not ({$IFDEF UNICODE} (Src[7] < #256) and {$ENDIF}(AnsiChar(Src[7]) in Identifiers)) then
+            if not ((dest > 0) and (AnsiChar(src[-1])
+              in Identifiers)) and (StrIComp(PAnsiChar(AlCopyStr(Src, 0, 7)), 'declare') = 0) and
+                not (AnsiChar(Src[7]) in Identifiers) then
                   while (Src^ <> #0) do Next else next;
           end;
       else
@@ -6237,7 +6360,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
       inc(FXSQLDA.sqln);
       inc(FXSQLDA.sqld);
       ReallocMem(FXSQLDA, XSQLDA_LENGTH(FXSQLDA.sqln));
-      Move(FXSQLDA.sqlvar[num], FXSQLDA.sqlvar[Result], SizeOf(TALFBXSQLVar));
+      ALMove(FXSQLDA.sqlvar[num], FXSQLDA.sqlvar[Result], SizeOf(TALFBXSQLVar));
     end else
     begin
       inc(FXSQLDA.sqln);
@@ -6250,8 +6373,12 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
       p^.MaxSqlLen := 0;
       p^.ParamNameLength := len;
       if p^.ParamNameLength > 0 then
-        Move(PAnsiChar(Name)^, p^.ParamName[0], p^.ParamNameLength);
-      p^.sqltype    := SQL_TEXT + 1; // tip: don't allocate memory if not defined
+        ALMove(PAnsiChar(Name)^, p^.ParamName[0], p^.ParamNameLength);
+
+      {FB25_UP}
+      p^.sqltype    := SQL_NULL + 1; // !! p^.sqltype    := SQL_TEXT + 1; for FB < 2.5 !!
+      {FB25_UP}
+
       p^.sqlscale   := 0;
       p^.sqlsubtype := 0;
       p^.sqllen     := 0;
@@ -6261,19 +6388,19 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
     end;
   end;
 
-  function TALFBXSQLParams.AddFieldW(const name: UnicodeString): Word;
-  begin
-    Result := AddFieldA(AnsiString(name));
-  end;
+//  function TALFBXSQLParams.AddFieldW(const name: UnicodeString): Word;
+//  begin
+//    Result := AddFieldA(AnsiString(name));
+//  end;
 
-  function TALFBXSQLParams.AddField(const name: string): Word;
-  begin
-{$IFDEF UNICODE}
-    Result := AddFieldW(name);
-{$ELSE}
-    Result := AddFieldA(name);
-{$ENDIF}
-  end;
+//  function TALFBXSQLParams.AddField(const name: string): Word;
+//  begin
+//{$IFDEF UNICODE}
+//    Result := AddFieldW(name);
+//{$ELSE}
+//    Result := AddFieldA(name);
+//{$ENDIF}
+//  end;
 
   procedure TALFBXSQLParams.Clear;
   var i, j: Smallint;
@@ -6281,7 +6408,6 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
     for i := 0 to FXSQLDA.sqln - 1 do
     begin
       if (FXSQLDA.sqlvar[i].sqlind <> nil) then
-      begin
         freemem(FXSQLDA.sqlvar[i].sqlind);
         if FXSQLDA.sqlvar[i].sqldata <> nil then
           freemem(FXSQLDA.sqlvar[i].sqldata);
@@ -6292,7 +6418,6 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
               FXSQLDA.sqlvar[j].sqldata := nil;
               FXSQLDA.sqlvar[j].sqlind  := nil;
             end;
-      end;
     end;
     FXSQLDA.sqln := 0;
     FXSQLDA.sqld := 0;
@@ -6308,11 +6433,11 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
     inherited;
   end;
 
-  procedure TALFBXSQLParams.SetAsRawByteString(const Index: Word; const Value: RawByteString);
-  begin
-    SetFieldType(Index, Length(Value), SQL_TEXT + 1, 0);
-    inherited;
-  end;
+//  procedure TALFBXSQLParams.SetAsRawByteString(const Index: Word; const Value: RawByteString);
+//  begin
+//    SetFieldType(Index, Length(Value), SQL_TEXT + 1, 0);
+//    inherited;
+//  end;
 
   procedure TALFBXSQLParams.SetAsDateTime(const Index: Word;
     const Value: TDateTime);
@@ -6363,12 +6488,12 @@ procedure TALFBXSQLParams.AddFieldType(const Name: string; FieldType: TALFBXFiel
     inherited;
   end;
 
-  procedure TALFBXSQLParams.SetAsUnicodeString(const Index: Word;
-    const Value: UnicodeString);
-  begin
-    SetFieldType(Index, Length(Value) * 2, SQL_TEXT + 1, 0);
-    inherited;
-  end;
+//  procedure TALFBXSQLParams.SetAsUnicodeString(const Index: Word;
+//    const Value: UnicodeString);
+//  begin
+//    SetFieldType(Index, Length(Value) * 2, SQL_TEXT + 1, 0);
+//    inherited;
+//  end;
 
   procedure TALFBXSQLParams.SetAsInt64(const Index: Word; const Value: Int64);
   begin

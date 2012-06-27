@@ -6,11 +6,12 @@ Author(s):    TurboPower Software
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALCipher (Private Key Encryption/Decryption Primitives)
-Version:      3.50
+Version:      4.00
 
-Description:  Function to generate hash (using MD5 or SHA-1) from input
+Description:  Delphi library for cryptography. It provides support for
+              AES, Blowfish, SHA, MD5
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -48,6 +49,7 @@ History :     01/12/2006: add blowFish functions
                           also move the ALCipherStringHashxxx to
                           the unit alcncrypt and rename it in
                           ALStringHashxxx
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -55,7 +57,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALCipher;
 
@@ -63,7 +65,8 @@ interface
 
 uses Windows,
      Classes,
-     sysutils;
+     sysutils,
+     AlFcnString;
 
 const
 
@@ -74,7 +77,7 @@ const
 type
 
   { Cipher exception }
-  EALCipherException = class(Exception);
+  EALCipherException = class(EALException);
 
   { general structures }
   pALCipherLongIntArray = ^TALCipherLongIntArray;
@@ -132,7 +135,6 @@ type
 
 { encryption block types }
 type
-  TALCipherDESBlock  = array[0..7] of Byte;        { DES }
   TALCipherBFBlock   = array[0..1] of LongInt;     { BlowFish }
   TALCipherRDLBlock  = array[0..15] of Byte;       { Rijndael }
 
@@ -150,16 +152,6 @@ type
     PBox    : array[0..(cALCipherBFRounds+1)] of LongInt;
     SBox    : array[0..3, 0..255] of LongInt;
   end;
-
-  { DES }
-  TALCipherDESContext = packed record
-    TransformedKey : array [0..31] of LongInt;
-    Encrypt        : Boolean;
-  end;
-
-  { 3 DES }
-  TALCipherTripleDESContext = array [0..1] of TALCipherDESContext;
-  TALCipherTripleDESContext3Key = array [0..2] of TALCipherDESContext;               
 
   { Rijndael }
   TALCipherRDLContext = packed record
@@ -188,66 +180,104 @@ type
     sdBuf   : array [0..63] of Byte;
   end;
 
+{ Key generation }
+procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : AnsiString);
+procedure ALCipherGenerateRandomKey(var Key; KeySize : Integer);
 
-{ Blowfish Cipher }
+{ Misc public utilities }
+function  AlCipherBufferToHex(const Buf; BufSize : Cardinal) : AnsiString;
+procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
+function  ALCipherRolX(I, C : DWord) : DWord; register;
+
+{ Xor }
+function  ALXorEncrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
+function  ALXorDecrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
+
+{ Blowfish }
 procedure ALCipherInitEncryptBF(Key : TALCipherKey128; var Context : TALCipherBFContext);
 procedure ALCipherEncryptBF(const Context : TALCipherBFContext; var Block : TALCipherBFBlock; Encrypt : Boolean);
 procedure ALCipherEncryptBFCBC(const Context : TALCipherBFContext; const Prev : TALCipherBFBlock; var Block : TALCipherBFBlock; Encrypt : Boolean);
+procedure ALBFEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key : TALCipherKey128; Encrypt : Boolean); overload;
+procedure ALBFEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key : TALCipherKey128; Encrypt : Boolean); overload;
+function  AlBFEncryptString(const InString: AnsiString; const Key : TALCipherKey128; Encrypt : Boolean) : AnsiString; overload;
+function  ALBFEncryptStringCBC(const InString: AnsiString; const Key : TALCipherKey128; Encrypt : Boolean) : AnsiString; overload;
+procedure ALBFEncryptFile(const InFile, OutFile : AnsiString; const Key : TAlCipherKey128; Encrypt : Boolean); overload;
+procedure ALBFEncryptFileCBC(const InFile, OutFile : AnsiString; const Key : TAlCipherKey128; Encrypt : Boolean); overload;
+procedure ALBFEncryptStream(InStream, OutStream : TStream; const Key : TAlCipherKey128; Encrypt : Boolean); overload;
+procedure ALBFEncryptStreamCBC(InStream, OutStream : TStream; const Key : TAlCipherKey128; Encrypt : Boolean); overload;
+procedure ALBFEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALBFEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+function  AlBFEncryptString(const InString: AnsiString; const Key: AnsiString; Encrypt : Boolean) : AnsiString; overload;
+function  ALBFEncryptStringCBC(const InString: AnsiString; const Key: AnsiString; Encrypt : Boolean) : AnsiString; overload;
+procedure ALBFEncryptStream(InStream, OutStream: TStream; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALBFEncryptFile(const InFile, OutFile: AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALBFEncryptFileCBC(const InFile, OutFile: AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
 
-{ DES Cipher }
-procedure ALCipherInitEncryptDES(const Key : TALCipherKey64; var Context : TALCipherDESContext;  Encrypt : Boolean);
-procedure ALCipherEncryptDES(const Context : TALCipherDESContext; var Block : TALCipherDESBlock);
-procedure ALCipherEncryptDESCBC(const Context : TALCipherDESContext; const Prev : TALCipherDESBlock;  var Block : TALCipherDESBlock);
-
-{ Triple DES Cipher }
-procedure ALCipherInitEncryptTripleDES(const Key : TALCipherKey128; var Context : TALCipherTripleDESContext; Encrypt : Boolean);
-procedure ALCipherEncryptTripleDES(const Context : TALCipherTripleDESContext; var Block : TALCipherDESBlock);
-procedure ALCipherEncryptTripleDESCBC(const Context : TALCipherTripleDESContext; const Prev : TALCipherDESBlock; var Block : TALCipherDESBlock);
-
-{ Triple DES Cipher 3 Key }
-procedure ALCipherInitEncryptTripleDES3Key(const Key1, Key2, Key3 : TALCipherKey64; var Context : TALCipherTripleDESContext3Key; Encrypt : Boolean);
-procedure ALCipherEncryptTripleDES3Key(const Context : TALCipherTripleDESContext3Key; var Block : TALCipherDESBlock);
-procedure ALCipherEncryptTripleDESCBC3Key(const Context : TALCipherTripleDESContext3Key; const Prev : TALCipherDESBlock; var Block : TALCipherDESBlock);
-
-{ Rijndael Cipher }
+{ Rijndael (AES) }
 procedure ALCipherInitEncryptRDL(const Key; KeySize : Longint; var Context : TALCipherRDLContext; Encrypt : Boolean);
 procedure ALCipherEncryptRDL(const Context : TALCipherRDLContext; var Block : TALCipherRDLBlock);
 procedure ALCipherEncryptRDLCBC(const Context : TALCipherRDLContext; const Prev : TALCipherRDLBlock; var Block : TALCipherRDLBlock);
+procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+function  ALRDLEncryptString(const InString: AnsiString; const Key; KeySize : Longint; Encrypt : Boolean) : AnsiString; overload;
+function  ALRDLEncryptStringCBC(const InString: AnsiString; const Key; KeySize : Longint; Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptFile(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStream(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+function  ALRDLEncryptString(const InString: AnsiString; const Key: AnsiString; Encrypt : Boolean) : AnsiString; overload;
+function  ALRDLEncryptStringCBC(const InString: AnsiString; const Key: AnsiString; Encrypt : Boolean) : AnsiString; overload;
+procedure ALRDLEncryptFile(const InFile, OutFile : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStream(InStream, OutStream : TStream; const Key: AnsiString; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key: AnsiString; Encrypt : Boolean); overload;
 
-{ MD5 message digest }
+{ MD5 }
 procedure ALCipherInitMD5(var Context : TALCipherMD5Context);
 procedure ALCipherHashMD5(var Digest : TALCipherMD5Digest; const Buf; BufSize : LongInt);
 procedure ALCipherFinalizeMD5(var Context : TALCipherMD5Context; var Digest : TALCipherMD5Digest);
 procedure ALCipherUpdateMD5(var Context : TALCipherMD5Context; const Buf;  BufSize : LongInt);
+procedure ALFileHashMD5(var Digest : TAlCipherMD5Digest; const AFileName : AnsiString); overload;
+function  ALFileHashMD5(const AFileName : AnsiString): AnsiString; overload;
+procedure ALStreamHashMD5(var Digest : TAlCipherMD5Digest; AStream : TStream); overload;
+function  ALStreamHashMD5(AStream : TStream): AnsiString; overload;
+procedure ALStringHashMD5(var Digest : TALCipherMD5Digest; const Str : AnsiString); overload;
+function  ALStringHashMD5(const Str : AnsiString): AnsiString; overload;
 
-{ SHA-1 message digest }
+{ SHA1 }
 procedure ALCipherInitSHA1(var Context: TALCipherSHA1Context);
 procedure ALCipherHashSHA1(var Digest : TALCipherSHA1Digest; const Buf; BufSize : Longint);
 procedure ALCipherUpdateSHA1(var Context : TALCipherSHA1Context; const Buf; BufSize: Longint);
 procedure ALCipherFinalizeSHA1(var Context: TALCipherSHA1Context; var Digest : TALCipherSHA1Digest);
+procedure ALFileHashSHA1(var Digest : TAlCipherSHA1Digest; const AFileName : AnsiString); overload;
+function  ALFileHashSHA1(const AFileName : AnsiString): AnsiString; overload;
+procedure ALStreamHashSHA1(var Digest : TAlCipherSHA1Digest; AStream : TStream); overload;
+function  ALStreamHashSHA1(AStream : TStream): AnsiString; overload;
+procedure ALStringHashSHA1(var Digest : TALCipherSHA1Digest; const Str : AnsiString); overload;
+function  ALStringHashSHA1(const Str : AnsiString): AnsiString; overload;
 
 { Miscellaneous hash algorithms }
 procedure ALCipherHashELF(var Digest : LongInt; const Buf;  BufSize : LongInt);
 procedure ALCipherHashMix128(var Digest : LongInt; const Buf;  BufSize : LongInt);
+procedure ALStringHashELF(var Digest : LongInt; const Str : AnsiString); overload;
+function  ALStringHashELF(const Str : AnsiString): LongInt; overload;
+procedure ALStringHashMix128(var Digest : LongInt; const Str : AnsiString); overload;
+function  ALStringHashMix128(const Str : AnsiString): LongInt; overload;
 
-{ Key generation }
-procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : string);
-procedure ALCipherGenerateRandomKey(var Key; KeySize : Integer);
-
-{ Misc public utilities }
-function  AlCipherBufferToHex(const Buf; BufSize : Cardinal) : string;
-procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
-function  ALCipherRolX(I, C : DWord) : DWord; register;
 
 implementation
 
-uses Math;
+uses MMSystem,
+     Math;
 
 type
   pALCipherMD5ContextEx = ^TALCipherMD5ContextEx;
   TALCipherMD5ContextEx = packed record
-    Count : array [0..1] of DWord;  {number of bits handled mod 2^64}  
-    State : array [0..3] of DWord;  {scratch buffer}                   
+    Count : array [0..1] of DWord;  {number of bits handled mod 2^64}
+    State : array [0..3] of DWord;  {scratch buffer}
     Buf   : array [0..63] of Byte;    {input buffer}
   end;
 
@@ -954,371 +984,6 @@ const
      $D7CADC31, $D9C1D138, $CBDCC623, $C5D7CB2A, $EFE6E815, $E1EDE51C, $F3F0F207, $FDFBFF0E,
      $A792B479, $A999B970, $BB84AE6B, $B58FA362, $9FBE805D, $91B58D54, $83A89A4F, $8DA39746);
 
-{******************************************************************************************************************}
-procedure ALCipherInitEncryptDES(const Key : TALCipherKey64; var Context : TALCipherDESContext;  Encrypt : Boolean);
-const
-  PC1        : array [0..55] of Byte =
-    (56, 48, 40, 32, 24, 16, 8, 0, 57, 49, 41, 33, 25, 17, 9, 1, 58, 50, 42, 34, 26,
-     18, 10, 2, 59, 51, 43, 35, 62, 54, 46, 38, 30, 22, 14, 6, 61, 53, 45, 37, 29, 21,
-     13, 5, 60, 52, 44, 36, 28, 20, 12, 4, 27, 19, 11, 3);
-  PC2        : array [0..47] of Byte =
-    (13, 16, 10, 23, 0, 4, 2, 27, 14, 5, 20, 9, 22, 18, 11, 3, 25, 7,
-     15, 6, 26, 19, 12, 1, 40, 51, 30, 36, 46, 54, 29, 39, 50, 44, 32, 47,
-     43, 48, 38, 55, 33, 52, 45, 41, 49, 35, 28, 31);
-  CTotRot    : array [0..15] of Byte = (1, 2, 4, 6, 8, 10, 12, 14, 15, 17, 19, 21, 23, 25, 27, 28);
-  CBitMask   : array [0..7] of Byte = (128, 64, 32, 16, 8, 4, 2, 1);
-var
-  PC1M       : array [0..55] of Byte;
-  PC1R       : array [0..55] of Byte;
-  KS         : array [0..7] of Byte;
-  I, J, L, M : LongInt;
-begin
-  {convert PC1 to bits of key}
-  for J := 0 to 55 do begin
-    L := PC1[J];
-    M := L mod 8;
-    PC1M[J] := Ord((Key[L div 8] and CBitMask[M]) <> 0);
-  end;
-
-  {key chunk for each iteration}
-  for I := 0 to 15 do begin
-    {rotate PC1 the right amount}
-    for J := 0 to 27 do begin
-      L := J + CTotRot[I];
-      if (L < 28) then begin
-        PC1R[J] := PC1M[L];
-        PC1R[J + 28] := PC1M[L + 28];
-      end else begin
-        PC1R[J] := PC1M[L - 28];
-        PC1R[J + 28] := PC1M[L];
-      end;
-    end;
-
-    {select bits individually}
-    FillChar(KS, SizeOf(KS), 0);
-    for J := 0 to 47 do
-      if Boolean(PC1R[PC2[J]]) then begin
-        L := J div 6;
-        KS[L] := KS[L] or CBitMask[J mod 6] shr 2;
-      end;
-
-    {now convert to odd/even interleaved form for use in F}
-    if Encrypt then begin
-      Context.TransformedKey[I * 2] := (LongInt(KS[0]) shl 24) or (LongInt(KS[2]) shl 16) or
-        (LongInt(KS[4]) shl 8) or (LongInt(KS[6]));
-      Context.TransformedKey[I * 2 + 1] := (LongInt(KS[1]) shl 24) or (LongInt(KS[3]) shl 16) or
-        (LongInt(KS[5]) shl 8) or (LongInt(KS[7]));
-    end else begin
-      Context.TransformedKey[31 - (I * 2 + 1)] := (LongInt(KS[0]) shl 24) or (LongInt(KS[2]) shl 16) or
-        (LongInt(KS[4]) shl 8) or (LongInt(KS[6]));
-      Context.TransformedKey[31 - (I * 2)] := (LongInt(KS[1]) shl 24) or (LongInt(KS[3]) shl 16) or
-        (LongInt(KS[5]) shl 8) or (LongInt(KS[7]));
-    end;
-  end;
-
-  Context.Encrypt := Encrypt;
-end;
-
-{************************************************************************************************}
-procedure ALCipherEncryptDES(const Context : TALCipherDESContext;  var Block : TALCipherDESBlock);
-const
-  SPBox : array [0..7, 0..63] of DWord =                               
-    (($01010400, $00000000, $00010000, $01010404, $01010004, $00010404, $00000004, $00010000,
-      $00000400, $01010400, $01010404, $00000400, $01000404, $01010004, $01000000, $00000004,
-      $00000404, $01000400, $01000400, $00010400, $00010400, $01010000, $01010000, $01000404,
-      $00010004, $01000004, $01000004, $00010004, $00000000, $00000404, $00010404, $01000000,
-      $00010000, $01010404, $00000004, $01010000, $01010400, $01000000, $01000000, $00000400,
-      $01010004, $00010000, $00010400, $01000004, $00000400, $00000004, $01000404, $00010404,
-      $01010404, $00010004, $01010000, $01000404, $01000004, $00000404, $00010404, $01010400,
-      $00000404, $01000400, $01000400, $00000000, $00010004, $00010400, $00000000, $01010004),
-     ($80108020, $80008000, $00008000, $00108020, $00100000, $00000020, $80100020, $80008020,
-      $80000020, $80108020, $80108000, $80000000, $80008000, $00100000, $00000020, $80100020,
-      $00108000, $00100020, $80008020, $00000000, $80000000, $00008000, $00108020, $80100000,
-      $00100020, $80000020, $00000000, $00108000, $00008020, $80108000, $80100000, $00008020,
-      $00000000, $00108020, $80100020, $00100000, $80008020, $80100000, $80108000, $00008000,
-      $80100000, $80008000, $00000020, $80108020, $00108020, $00000020, $00008000, $80000000,
-      $00008020, $80108000, $00100000, $80000020, $00100020, $80008020, $80000020, $00100020,
-      $00108000, $00000000, $80008000, $00008020, $80000000, $80100020, $80108020, $00108000),
-     ($00000208, $08020200, $00000000, $08020008, $08000200, $00000000, $00020208, $08000200,
-      $00020008, $08000008, $08000008, $00020000, $08020208, $00020008, $08020000, $00000208,
-      $08000000, $00000008, $08020200, $00000200, $00020200, $08020000, $08020008, $00020208,
-      $08000208, $00020200, $00020000, $08000208, $00000008, $08020208, $00000200, $08000000,
-      $08020200, $08000000, $00020008, $00000208, $00020000, $08020200, $08000200, $00000000,
-      $00000200, $00020008, $08020208, $08000200, $08000008, $00000200, $00000000, $08020008,
-      $08000208, $00020000, $08000000, $08020208, $00000008, $00020208, $00020200, $08000008,
-      $08020000, $08000208, $00000208, $08020000, $00020208, $00000008, $08020008, $00020200),
-     ($00802001, $00002081, $00002081, $00000080, $00802080, $00800081, $00800001, $00002001,
-      $00000000, $00802000, $00802000, $00802081, $00000081, $00000000, $00800080, $00800001,
-      $00000001, $00002000, $00800000, $00802001, $00000080, $00800000, $00002001, $00002080,
-      $00800081, $00000001, $00002080, $00800080, $00002000, $00802080, $00802081, $00000081,
-      $00800080, $00800001, $00802000, $00802081, $00000081, $00000000, $00000000, $00802000,
-      $00002080, $00800080, $00800081, $00000001, $00802001, $00002081, $00002081, $00000080,
-      $00802081, $00000081, $00000001, $00002000, $00800001, $00002001, $00802080, $00800081,
-      $00002001, $00002080, $00800000, $00802001, $00000080, $00800000, $00002000, $00802080),
-     ($00000100, $02080100, $02080000, $42000100, $00080000, $00000100, $40000000, $02080000,
-      $40080100, $00080000, $02000100, $40080100, $42000100, $42080000, $00080100, $40000000,
-      $02000000, $40080000, $40080000, $00000000, $40000100, $42080100, $42080100, $02000100,
-      $42080000, $40000100, $00000000, $42000000, $02080100, $02000000, $42000000, $00080100,
-      $00080000, $42000100, $00000100, $02000000, $40000000, $02080000, $42000100, $40080100,
-      $02000100, $40000000, $42080000, $02080100, $40080100, $00000100, $02000000, $42080000,
-      $42080100, $00080100, $42000000, $42080100, $02080000, $00000000, $40080000, $42000000,
-      $00080100, $02000100, $40000100, $00080000, $00000000, $40080000, $02080100, $40000100),
-     ($20000010, $20400000, $00004000, $20404010, $20400000, $00000010, $20404010, $00400000,
-      $20004000, $00404010, $00400000, $20000010, $00400010, $20004000, $20000000, $00004010,
-      $00000000, $00400010, $20004010, $00004000, $00404000, $20004010, $00000010, $20400010,
-      $20400010, $00000000, $00404010, $20404000, $00004010, $00404000, $20404000, $20000000,
-      $20004000, $00000010, $20400010, $00404000, $20404010, $00400000, $00004010, $20000010,
-      $00400000, $20004000, $20000000, $00004010, $20000010, $20404010, $00404000, $20400000,
-      $00404010, $20404000, $00000000, $20400010, $00000010, $00004000, $20400000, $00404010,
-      $00004000, $00400010, $20004010, $00000000, $20404000, $20000000, $00400010, $20004010),
-     ($00200000, $04200002, $04000802, $00000000, $00000800, $04000802, $00200802, $04200800,
-      $04200802, $00200000, $00000000, $04000002, $00000002, $04000000, $04200002, $00000802,
-      $04000800, $00200802, $00200002, $04000800, $04000002, $04200000, $04200800, $00200002,
-      $04200000, $00000800, $00000802, $04200802, $00200800, $00000002, $04000000, $00200800,
-      $04000000, $00200800, $00200000, $04000802, $04000802, $04200002, $04200002, $00000002,
-      $00200002, $04000000, $04000800, $00200000, $04200800, $00000802, $00200802, $04200800,
-      $00000802, $04000002, $04200802, $04200000, $00200800, $00000000, $00000002, $04200802,
-      $00000000, $00200802, $04200000, $00000800, $04000002, $04000800, $00000800, $00200002),
-     ($10001040, $00001000, $00040000, $10041040, $10000000, $10001040, $00000040, $10000000,
-      $00040040, $10040000, $10041040, $00041000, $10041000, $00041040, $00001000, $00000040,
-      $10040000, $10000040, $10001000, $00001040, $00041000, $00040040, $10040040, $10041000,
-      $00001040, $00000000, $00000000, $10040040, $10000040, $10001000, $00041040, $00040000,
-      $00041040, $00040000, $10041000, $00001000, $00000040, $10040040, $00001000, $00041040,
-      $10001000, $00000040, $10000040, $10040000, $10040040, $10000000, $00040000, $10001040,
-      $00000000, $10041040, $00040040, $10000040, $10040000, $10001000, $10001040, $00000000,
-      $10041040, $00041000, $00041000, $00001040, $00001040, $00040040, $10000000, $10041000));
-var
-  I, L, R, Work : DWord;
-  CPtr          : PDWord;
-
-  procedure SplitBlock(const Block : TALCipherDESBlock;  var L, R : DWord); register;
-  asm
-    push ebx
-    push eax
-    mov  eax, [eax]
-    mov  bh, al
-    mov  bl, ah
-    rol  ebx, 16
-    shr  eax, 16
-    mov  bh, al
-    mov  bl, ah
-    mov  [edx], ebx
-    pop  eax
-    mov  eax, [eax+4]
-    mov  bh, al
-    mov  bl, ah
-    rol  ebx, 16
-    shr  eax, 16
-    mov  bh, al
-    mov  bl, ah
-    mov  [ecx], ebx
-    pop  ebx
-  end;
-
-  procedure JoinBlock(const L, R : LongInt;  var Block : TALCipherDESBlock); register;
-  asm
-    push ebx
-    mov  bh, al
-    mov  bl, ah
-    rol  ebx, 16
-    shr  eax, 16
-    mov  bh, al
-    mov  bl, ah
-    mov  [ecx+4], ebx
-    mov  bh, dl
-    mov  bl, dh
-    rol  ebx, 16
-    shr  edx, 16
-    mov  bh, dl
-    mov  bl, dh
-    mov  [ecx], ebx
-    pop  ebx
-  end;
-
-  procedure IPerm(var L, R : DWord);                                   
-  var
-    Work : DWord;                                                      
-  begin
-    Work := ((L shr 4) xor R) and $0F0F0F0F;
-    R := R xor Work;
-    L := L xor Work shl 4;
-
-    Work := ((L shr 16) xor R) and $0000FFFF;
-    R := R xor Work;
-    L := L xor Work shl 16;
-
-    Work := ((R shr 2) xor L) and $33333333;
-    L := L xor Work;
-    R := R xor Work shl 2;
-
-    Work := ((R shr 8) xor L) and $00FF00FF;
-    L := L xor Work;
-    R := R xor Work shl 8;
-
-    R := (R shl 1) or (R shr 31);
-    Work := (L xor R) and $AAAAAAAA;
-    L := L xor Work;
-    R := R xor Work;
-    L := (L shl 1) or (L shr 31);
-  end;
-
-  procedure FPerm(var L, R : DWord);                                   
-  var
-    Work : DWord;                                                      
-  begin
-    L := L;
-
-    R := (R shl 31) or (R shr 1);
-    Work := (L xor R) and $AAAAAAAA;
-    L := L xor Work;
-    R := R xor Work;
-    L := (L shr 1) or (L shl 31);
-
-    Work := ((L shr 8) xor R) and $00FF00FF;
-    R := R xor Work;
-    L := L xor Work shl 8;
-
-    Work := ((L shr 2) xor R) and $33333333;
-    R := R xor Work;
-    L := L xor Work shl 2;
-
-    Work := ((R shr 16) xor L) and $0000FFFF;
-    L := L xor Work;
-    R := R xor Work shl 16;
-
-    Work := ((R shr 4) xor L) and $0F0F0F0F;
-    L := L xor Work;
-    R := R xor Work shl 4;
-  end;
-
-begin
-  SplitBlock(Block, L, R);
-  IPerm(L, R);
-
-  CPtr := @Context;
-  for I := 0 to 7 do begin
-    Work := (((R shr 4) or (R shl 28)) xor CPtr^);
-    Inc(CPtr);
-    L := L xor SPBox[6, Work and $3F];
-    L := L xor SPBox[4, Work shr 8 and $3F];
-    L := L xor SPBox[2, Work shr 16 and $3F];
-    L := L xor SPBox[0, Work shr 24 and $3F];
-
-    Work := (R xor CPtr^);
-    Inc(CPtr);
-    L := L xor SPBox[7, Work and $3F];
-    L := L xor SPBox[5, Work shr 8 and $3F];
-    L := L xor SPBox[3, Work shr 16 and $3F];
-    L := L xor SPBox[1, Work shr 24 and $3F];
-
-    Work := (((L shr 4) or (L shl 28)) xor CPtr^);
-    Inc(CPtr);
-    R := R xor SPBox[6, Work and $3F];
-    R := R xor SPBox[4, Work shr 8 and $3F];
-    R := R xor SPBox[2, Work shr 16 and $3F];
-    R := R xor SPBox[0, Work shr 24 and $3F];
-
-    Work := (L xor CPtr^);
-    Inc(CPtr);
-    R := R xor SPBox[7, Work and $3F];
-    R := R xor SPBox[5, Work shr 8 and $3F];
-    R := R xor SPBox[3, Work shr 16 and $3F];
-    R := R xor SPBox[1, Work shr 24 and $3F];
-  end;
-
-  FPerm(L, R);
-  JoinBlock(L, R, Block);
-end;
-
-{************************************************************************************************************************************}
-procedure ALCipherEncryptDESCBC(const Context : TALCipherDESContext;  const Prev : TALCipherDESBlock;  var Block : TALCipherDESBlock);
-begin
-  if Context.Encrypt then begin
-    ALCipherXorMem(Block, Prev, SizeOf(Block));
-    ALCipherEncryptDES(Context, Block);
-  end else begin
-    ALCipherEncryptDES(Context, Block);
-    ALCipherXorMem(Block, Prev, SizeOf(Block));
-  end;
-end;
-
-{*******************************************************************************************************************************}
-procedure ALCipherInitEncryptTripleDES(const Key : TALCipherKey128;  var Context : TALCipherTripleDESContext; Encrypt : Boolean);
-var
-  KeyArray : array [0..1] of TALCipherKey64;
-begin
-  Move(Key, KeyArray, SizeOf(KeyArray));                             
-  if Encrypt then begin
-    ALCipherInitEncryptDES(KeyArray[0], Context[0], True);
-    ALCipherInitEncryptDES(KeyArray[1], Context[1], False);
-  end else begin
-    ALCipherInitEncryptDES(KeyArray[0], Context[0], False);
-    ALCipherInitEncryptDES(KeyArray[1], Context[1], True);
-  end;
-end;
-
-{************************************************************************************************************}
-procedure ALCipherEncryptTripleDES(const Context : TALCipherTripleDESContext;  var Block : TALCipherDESBlock);
-begin
-  ALCipherEncryptDES(Context[0], Block);
-  ALCipherEncryptDES(Context[1], Block);
-  ALCipherEncryptDES(Context[0], Block);
-end;
-
-{***********************************************************************************************************************************************}
-procedure ALCipherEncryptTripleDESCBC(const Context : TALCipherTripleDESContext;  const Prev : TALCipherDESBlock; var Block : TALCipherDESBlock);
-begin
-  if Context[0].Encrypt then begin
-    ALCipherXorMem(Block, Prev, SizeOf(Block));
-    ALCipherEncryptDES(Context[0], Block);
-    ALCipherEncryptDES(Context[1], Block);
-    ALCipherEncryptDES(Context[0], Block);
-  end else begin
-    ALCipherEncryptDES(Context[0], Block);
-    ALCipherEncryptDES(Context[1], Block);
-    ALCipherEncryptDES(Context[0], Block);
-    ALCipherXorMem(Block, Prev, SizeOf(Block));
-  end;
-end;
-
-{**************************************************************************************************************************************************}
-procedure ALCipherInitEncryptTripleDES3Key(const Key1, Key2, Key3 : TALCipherKey64; var Context : TALCipherTripleDESContext3Key; Encrypt : Boolean);
-begin
-  if Encrypt then begin
-    ALCipherInitEncryptDES(Key1, Context[0], True);
-    ALCipherInitEncryptDES(Key2, Context[1], False);
-    ALCipherInitEncryptDES(Key3, Context[2], True);
-  end else begin
-    ALCipherInitEncryptDES(Key1, Context[2], False);
-    ALCipherInitEncryptDES(Key2, Context[1], True);
-    ALCipherInitEncryptDES(Key3, Context[0], False);
-  end;
-end;
-
-{*******************************************************************************************************************}
-procedure ALCipherEncryptTripleDES3Key(const Context : TALCipherTripleDESContext3Key; var Block : TALCipherDESBlock);
-begin
-  ALCipherEncryptDES(Context[2], Block);
-  ALCipherEncryptDES(Context[1], Block);
-  ALCipherEncryptDES(Context[0], Block);
-end;
-
-{******************************************************************************************************************************************************}
-procedure ALCipherEncryptTripleDESCBC3Key(const Context : TALCipherTripleDESContext3Key; const Prev : TALCipherDESBlock; var Block : TALCipherDESBlock);
-begin
-  if Context[0].Encrypt then begin
-    ALCipherXorMem(Block, Prev, SizeOf(Block));
-    ALCipherEncryptDES(Context[0], Block);
-    ALCipherEncryptDES(Context[1], Block);
-    ALCipherEncryptDES(Context[2], Block);
-  end else begin
-    ALCipherEncryptDES(Context[0], Block);
-    ALCipherEncryptDES(Context[1], Block);
-    ALCipherEncryptDES(Context[2], Block);
-    ALCipherXorMem(Block, Prev, SizeOf(Block));
-  end;
-end;
-
 {***************************************************************************************}
 procedure ALCipherInitEncryptBF(Key : TALCipherKey128; var Context : TALCipherBFContext);
 var
@@ -1329,9 +994,9 @@ var
   Block : TALCipherBFBlock;
 begin
   {initialize PArray}
-  Move(cALCipherbf_P, Context.PBox, SizeOf(Context.PBox));
+  ALMove(cALCipherbf_P, Context.PBox, SizeOf(Context.PBox));
   {initialize SBox}
-  Move(cALCipherbf_S, Context.SBox, SizeOf(Context.SBox));
+  ALMove(cALCipherbf_S, Context.SBox, SizeOf(Context.SBox));
 
   {update PArray with the key bits}
   J := 0;
@@ -1379,9 +1044,9 @@ end;
 procedure ALCipherEncryptBF(const Context : TALCipherBFContext; var Block : TALCipherBFBlock; Encrypt : Boolean);
 var
   I : Integer;
-  TmpBlock : TALCipherBFBlockEx;                                             
+  TmpBlock : TALCipherBFBlockEx;
 begin
-  Move(Block, TmpBlock, SizeOf(TmpBlock));
+  ALMove(Block, TmpBlock, SizeOf(TmpBlock));
   if Encrypt then begin
     Block[0] := Block[0] xor Context.PBox[0];
 
@@ -1442,8 +1107,8 @@ begin
     TByteArray(Key)[I] := System.Random(256);                        
 end;
 
-{******************************************************************************}
-procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : string);
+{**********************************************************************************}
+procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : AnsiString);
 var
   D : TALCipherMD5Digest;
 begin
@@ -1541,8 +1206,8 @@ var
   end;
 
 begin
-  Move(Buffer, Buf, SizeOf(Buf));                                    
-  Move(InBuf, InA, SizeOf(InA));                                     
+  ALMove(Buffer, Buf, SizeOf(Buf));                                    
+  ALMove(InBuf, InA, SizeOf(InA));                                     
   A := Buf [0];
   B := Buf [1];
   C := Buf [2];
@@ -1626,7 +1291,7 @@ begin
   Inc(Buf [2], C);
   Inc(Buf [3], D);
 
-  Move(Buf, Buffer, SizeOf(Buffer));                                 
+  ALMove(Buf, Buffer, SizeOf(Buffer));                                 
 end;
 
 {***********************************************************}
@@ -1634,7 +1299,7 @@ procedure ALCipherInitMD5(var Context : TALCipherMD5Context);
 var
   MD5 : TALCipherMD5ContextEx;                                               
 begin
-  Move(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));
   MD5.Count[0] := 0;
   MD5.Count[1] := 0;
 
@@ -1643,7 +1308,7 @@ begin
   MD5.State[1] := $EFCDAB89;
   MD5.State[2] := $98BADCFE;
   MD5.State[3] := $10325476;
-  Move(MD5, Context, SizeOf(Context));                               
+  ALMove(MD5, Context, SizeOf(Context));                               
 end;
 
 {*********************************************************************************************}
@@ -1656,7 +1321,7 @@ var
   I      : Word;
   II     : Word;
 begin
-  Move(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));                                   
 
   {compute number of bytes mod 64}
   MDI := (MD5.Count[0] shr 3) and $3F;
@@ -1688,7 +1353,7 @@ begin
       MDI := 0;
     end;
   end;
-  Move(MD5, Context, SizeOf(Context));                               
+  ALMove(MD5, Context, SizeOf(Context));
 end;
 
 {************************************************************************************************}
@@ -1707,7 +1372,7 @@ var
   II     : Word;
   PadLen : Word;
 begin
-  Move(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));                                   
   {save number of bits}
   InBuf[14] := MD5.Count[0];
   InBuf[15] := MD5.Count[1];
@@ -1720,7 +1385,7 @@ begin
     PadLen := 120 - MDI;
   ALCipherUpdateMD5(Context, Padding, PadLen);
 
-  Move(Context, MD5, SizeOf(MD5));                                   
+  ALMove(Context, MD5, SizeOf(MD5));                                   
 
   {append length in bits and transform}
   II := 0;
@@ -1742,7 +1407,7 @@ begin
     Digest[II + 3] := Byte((MD5.State[I] shr 24) and $FF);
     Inc(II, 4);
   end;
-  Move(MD5, Context, SizeOf(Context));                               
+  ALMove(MD5, Context, SizeOf(Context));                               
 end;
 
 {****************************************************************************************}
@@ -1782,7 +1447,7 @@ begin
   PTemp := @Temp;
   if (BufSize > L * SizeOf(TALCipher128Bit)) then begin
     for I := 0 to (BufSize - L * SizeOf(TALCipher128Bit)) - 1 do
-      PTemp^[I] := PTemp^[I] + TByteArray(Buf)[(L * SizeOf(TALCipher128Bit)) + I]; 
+      PTemp^[I] := PTemp^[I] + TByteArray(Buf)[(L * SizeOf(TALCipher128Bit)) + I];
     ALCipherMix128(Temp);
   end;
 
@@ -1791,6 +1456,35 @@ end;
 
 {*******************************************************************************}
 procedure ALCipherXorMemPrim(var Mem1;  const Mem2;  Count : Cardinal); register;
+{$IFDEF WIN64}
+var
+  PMem1, PMem2: PLongword;
+  Rest: Integer;
+begin
+  Rest := Count and 3;
+  Count := Count shr 2;
+  PMem1 := PLongword(@Mem1);
+  PMem2 := PLongword(@Mem2);
+
+  // Xor main part in longword steps, count is already dvided by 4
+  while Count > 0 do
+  begin
+    PMem1^ := PMem1^ xor PMem2^;
+    Inc(PMem1);
+    Inc(PMem2);
+    Dec(Count);
+  end;
+
+  // Xor rest in byte steps.
+  while Rest > 0 do
+  begin
+    PByte(PMem1)^ := PByte(PMem1)^ xor PByte(PMem2)^;
+    Inc(PByte(PMem1));
+    Inc(PByte(PMem2));
+    Dec(Rest);
+  end;
+end;
+{$ELSE}
 asm
   push esi
   push edi
@@ -1828,6 +1522,7 @@ asm
   pop  edi
   pop  esi
 end;
+{$ENDIF}
 
 {*****************************************************************}
 procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
@@ -1835,14 +1530,14 @@ begin
   ALCipherXorMemPrim(Mem1, Mem2, Count);
 end;
 
-{*******************************************************************}
-function AlCipherBufferToHex(const Buf; BufSize : Cardinal) : string;
+{***********************************************************************}
+function AlCipherBufferToHex(const Buf; BufSize : Cardinal) : AnsiString;
 var
   I     : LongInt;
 begin
   Result := '';
   for I := 0 to BufSize - 1 do
-    Result := Result + IntToHex(TByteArray(Buf)[I], 2);
+    Result := Result + ALIntToHex(TByteArray(Buf)[I], 2);
 end;
 
 {*****SHA-1 hashing routines*************************************}
@@ -1885,7 +1580,7 @@ var
 begin
   with Context do begin
     sdIndex:= 0;
-    Move( sdBuf, W, Sizeof( W ));
+    ALMove( sdBuf, W, Sizeof( W ));
 
     // W := Mt, for t = 0 to 15 : Mt is M sub t
     for i := 0 to 15 do
@@ -1981,12 +1676,12 @@ begin
     PBuf := @Buf;
     while BufSize > 0 do begin
       if ( Sizeof( sdBuf ) - sdIndex ) <= DWord( BufSize ) then begin
-        Move( PBuf^, sdBuf[ sdIndex ], Sizeof( sdBuf ) - sdIndex );
+        ALMove( PBuf^, sdBuf[ sdIndex ], Sizeof( sdBuf ) - sdIndex );
         Dec( BufSize, Sizeof( sdBuf ) - sdIndex );
         Inc( PBuf, Sizeof( sdBuf ) - sdIndex );
         ALCipherSHA1Hash( Context );
       end else begin
-        Move( PBuf^, sdBuf[ sdIndex ], BufSize );
+        ALMove( PBuf^, sdBuf[ sdIndex ], BufSize );
         Inc( sdIndex, BufSize );
         BufSize := 0;
       end;
@@ -2014,7 +1709,7 @@ begin
     sdHash[ 3 ] := ALCipherSHA1SwapByteOrder( sdHash[ 3 ]);
     sdHash[ 4 ] := ALCipherSHA1SwapByteOrder( sdHash[ 4 ]);
 
-    Move( sdHash, Digest, Sizeof( Digest ));
+    ALMove( sdHash, Digest, Sizeof( Digest ));
     ALCipherSHA1Clear( Context );
   end;
 end;
@@ -2143,7 +1838,7 @@ begin
   FillChar(Context, SizeOf(Context), #0);
   Context.Encrypt := Encrypt;
   Sk := Min(KeySize, SizeOf(Context.Rk));
-  Move(Key, Context.Rk, Sk);
+  ALMove(Key, Context.Rk, Sk);
   Nk := KeySize div 4;       { # key columns }
   if (Nk > cALCipherRDLNk256) then
     Nk := cALCipherRDLNk256
@@ -2169,6 +1864,844 @@ begin
         Context.W[i].dw := Context.W[i - Nk].dw xor temp.dw;
       end;
   end;
+end;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{***}
+const
+  cAlCryptInvalidFileFormat = 'Invalid file format';
+
+{********************************************************************************************}
+function ALXorEncrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
+var c : Byte;
+    I:Integer;
+begin
+  Result := '';
+  for I := 1 to Length(InString) do
+  begin
+    C := Byte(InString[I]) xor (StartKey shr 8);
+    Result := Result + ALIntToHex(c ,2);
+    StartKey := (c + StartKey) * MultKey + AddKey;
+  end;
+end;
+
+{********************************************************************************************}
+function ALXorDecrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
+Var C : AnsiChar;
+    I:Integer;
+begin
+  Result := '';
+  I := 1;
+  While I < Length(InString) do begin
+    C := AnsiChar(ALStrToInt('$' + ALCopyStr(InString,I,2)));
+    Result := Result + AnsiChar(Byte(C) xor (StartKey shr 8));
+    StartKey := (Byte(C) + StartKey) * MultKey + AddKey;
+    Inc(i,2);
+  end;
+end;
+
+{*****Blowfish****************************************}
+procedure ALBFEncryptString(const InString: AnsiString;
+                            var OutString: AnsiString;
+                            const Key: TALCipherKey128;
+                            Encrypt : Boolean);
+begin
+  OutString := ALBFEncryptString(InString, Key, Encrypt);
+end;
+
+{********************************************************}
+procedure ALBFEncryptStringCBC(const InString: AnsiString;
+                               var OutString: AnsiString;
+                               const Key: TALCipherKey128;
+                               Encrypt : Boolean);
+begin
+  OutString := ALBFEncryptStringCBC(InString, Key, Encrypt);
+end;
+
+{****************************************************}
+function ALBFEncryptString(const InString: AnsiString;
+                           const Key: TALCipherKey128;
+                           Encrypt : Boolean): AnsiString;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  try
+    InStream.Write(InString[1], Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then ALBFEncryptStream(InStream, OutStream, Key, True)
+    else ALBFEncryptStream(InStream, OutStream, Key, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.Read(Result[1], OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{*******************************************************}
+function ALBFEncryptStringCBC(const InString: AnsiString;
+                              const Key: TALCipherKey128;
+                              Encrypt : Boolean) : AnsiString;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  Try
+    InStream.Write(InString[1], Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then ALBFEncryptStreamCBC(InStream, OutStream, Key, True)
+    else ALBFEncryptStreamCBC(InStream, OutStream, Key, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.Read(Result[1], OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{************************************************************************************************************}
+procedure AlBFEncryptFile(const InFile, OutFile : AnsiString; const Key : TALCipherKey128; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(String(OutFile), fmCreate);
+    try
+      ALBFEncryptStream(InStream, OutStream, Key, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{***************************************************************************************************************}
+procedure AlBFEncryptFileCBC(const InFile, OutFile : AnsiString; const Key : TALCipherKey128; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(String(OutFile), fmCreate);
+    try
+      ALBFEncryptStreamCBC(InStream, OutStream, Key, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{*********************************************************************************************************}
+procedure AlBFEncryptStream(InStream, OutStream : TStream; const Key : TALCipherKey128; Encrypt : Boolean);
+var
+  I          : LongInt;
+  Block      : TALCipherBFBlock;
+  Context    : TALCipherBFContext;
+  BlockCount : LongInt;
+begin
+  ALCipherInitEncryptBF(Key, Context);
+
+  {get the number of blocks in the file}
+  BlockCount := (InStream.Size div SizeOf(Block));
+
+  {when encrypting, make sure we have a block with at least one free}
+  {byte at the end. used to store the odd byte count value}
+  if Encrypt then
+    Inc(BlockCount);
+
+  {process all except the last block}
+  for I := 1 to BlockCount - 1 do begin
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cAlCryptInvalidFileFormat);
+    ALCipherEncryptBF(Context, Block, Encrypt);
+    OutStream.Write(Block, SizeOf(Block));
+  end;
+
+  if Encrypt then begin
+    FillChar(Block, SizeOf(Block), #0);
+
+    {set actual number of bytes to read}
+    I := (InStream.Size mod SizeOf(Block));
+    if InStream.Read(Block, I) <> I then
+      raise EAlCipherException.Create(cALCryptInvalidFileFormat);
+
+    {store number of bytes as last byte in last block}
+    PByteArray(@Block)^[SizeOf(Block)-1] := I;
+
+    {encrypt and save full block}
+    ALCipherEncryptBF(Context, Block, Encrypt);
+    OutStream.Write(Block, SizeOf(Block));
+  end else begin
+    {encrypted file is always a multiple of the block size}
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+    ALCipherEncryptBF(Context, Block, Encrypt);
+
+    {get actual number of bytes encoded}
+    I := PByteArray(@Block)^[SizeOf(Block)-1];
+
+    {save valid portion of block}
+    OutStream.Write(Block, I);
+  end;
+end;
+
+{************************************************************************************************************}
+procedure AlBFEncryptStreamCBC(InStream, OutStream : TStream; const Key : TALCipherKey128; Encrypt : Boolean);
+var
+  I : LongInt;
+  Block : TALCipherBFBlock;
+  IV : TALCipherBFBlock;
+  Work : TALCipherBFBlock;
+  Context : TALCipherBFContext;
+  BlockCount : LongInt;
+begin
+  ALCipherInitEncryptBF(Key, Context);
+
+  {get the number of blocks in the file}
+  BlockCount := (InStream.Size div SizeOf(Block));
+
+  if Encrypt then begin
+    {set up an initialization vector (IV)}
+    Block[0] := timeGetTime;
+    Block[1] := timeGetTime;
+    ALCipherEncryptBF(Context, Block, Encrypt);
+    OutStream.Write(Block, SizeOf(Block));
+    IV := Block;
+  end else begin
+    {read the frist block to prime the IV}
+    InStream.Read(Block, SizeOf(Block));
+    Dec(BlockCount);
+    IV := Block;
+  end;
+
+  {when encrypting, make sure we have a block with at least one free}
+  {byte at the end. used to store the odd byte count value}
+  if Encrypt then
+    Inc(BlockCount);
+
+  {process all except the last block}
+  for I := 1 to BlockCount - 1 do begin
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+
+    if Encrypt then begin
+      ALCipherEncryptBFCBC(Context, IV, Block, Encrypt);
+      IV := Block;
+    end else begin
+      Work := Block;
+      ALCipherEncryptBFCBC(Context, IV, Block, Encrypt);
+      IV := Work;
+    end;
+
+    OutStream.Write(Block, SizeOf(Block));
+  end;
+
+  if Encrypt then begin
+    FillChar(Block, SizeOf(Block), #0);
+
+    {set actual number of bytes to read}
+    I := (InStream.Size mod SizeOf(Block));
+    if InStream.Read(Block, I) <> I then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+
+    {store number of bytes as last byte in last block}
+    PByteArray(@Block)^[SizeOf(Block)-1] := I;
+
+    {encrypt and save full block}
+    ALCipherEncryptBFCBC(Context, IV, Block, Encrypt);
+    OutStream.Write(Block, SizeOf(Block));
+  end else begin
+    {encrypted file is always a multiple of the block size}
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+    ALCipherEncryptBFCBC(Context, IV, Block, Encrypt);
+
+    {get actual number of bytes encoded}
+    I := PByteArray(@Block)^[SizeOf(Block)-1];
+
+    {save valid portion of block}
+    OutStream.Write(Block, I);
+  end;
+end;
+
+{*****************************************************}
+procedure ALBFEncryptString(const InString: AnsiString;
+                            var OutString : AnsiString;
+                            const Key: AnsiString;
+                            Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  ALBFEncryptString(InString,OutString, aCipherKey128, Encrypt);
+end;
+
+{********************************************************}
+procedure ALBFEncryptStringCBC(const InString: AnsiString;
+                               var OutString : AnsiString;
+                               const Key: AnsiString;
+                               Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  ALBFEncryptStringCBC(InString, OutString, aCipherKey128, Encrypt);
+end;
+
+{*****************************************************}
+function  AlBFEncryptString(const InString: AnsiString;
+                            const Key: AnsiString;
+                            Encrypt : Boolean) : AnsiString;
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  Result := AlBFEncryptString(InString, aCipherKey128, Encrypt);
+end;
+
+{********************************************************}
+function  ALBFEncryptStringCBC(const InString: AnsiString;
+                               const Key: AnsiString;
+                               Encrypt : Boolean) : AnsiString;
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  result := ALBFEncryptStringCBC(InString, aCipherKey128, Encrypt);
+end;
+
+{*******************************************************}
+procedure ALBFEncryptStream(InStream, OutStream: TStream;
+                            const Key: AnsiString;
+                            Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  ALBFEncryptStream(InStream, OutStream, aCipherKey128, Encrypt);
+end;
+
+{**********************************************************}
+procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream;
+                               const Key: AnsiString;
+                               Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  ALBFEncryptStreamCBC(InStream, OutStream, aCipherKey128, Encrypt);
+end;
+
+{**********************************************************}
+procedure ALBFEncryptFile(const InFile, OutFile: AnsiString;
+                          const Key: AnsiString;
+                          Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  ALBFEncryptFile(InFile, OutFile, aCipherKey128, Encrypt);
+end;
+
+{*************************************************************}
+procedure ALBFEncryptFileCBC(const InFile, OutFile: AnsiString;
+                             const Key: AnsiString;
+                             Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  ALBFEncryptFileCBC(InFile, OutFile, aCipherKey128, Encrypt);
+end;
+
+{*****Rijndael*****************************************}
+procedure AlRDLEncryptString(const InString: AnsiString;
+                             var OutString: AnsiString;
+                             const Key;
+                             KeySize : Longint;
+                             Encrypt : Boolean);
+begin
+  OutString := AlRDLEncryptString(InString, Key, KeySize, Encrypt);
+end;
+
+{*********************************************************}
+procedure AlRDLEncryptStringCBC(const InString: AnsiString;
+                                var OutString: AnsiString;
+                                const Key;
+                                KeySize : Longint;
+                                Encrypt : Boolean);
+begin
+  OutString := AlRDLEncryptStringCBC(InString, Key, KeySize, Encrypt);
+end;
+
+{*****************************************************}
+function AlRDLEncryptString(const InString: AnsiString;
+                            const Key;
+                            KeySize : Longint;
+                            Encrypt : Boolean): AnsiString;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  try
+    InStream.Write(InString[1], Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then AlRDLEncryptStream(InStream, OutStream, Key, KeySize, True)
+    else AlRDLEncryptStream(InStream, OutStream, Key, KeySize, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.Read(Result[1], OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{********************************************************}
+function AlRDLEncryptStringCBC(const InString: AnsiString;
+                               const Key;
+                               KeySize : Longint;
+                               Encrypt : Boolean) : AnsiString;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  Try
+    InStream.Write(InString[1], Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, True)
+    else AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.Read(Result[1], OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{**************************************************************************************************************}
+procedure AlRDLEncryptFile(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(String(OutFile), fmCreate);
+    try
+      ALRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{*****************************************************************************************************************}
+procedure AlRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(String(OutFile), fmCreate);
+    try
+      ALRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{***********************************************************************************************************}
+procedure AlRDLEncryptStream(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  I          : LongInt;
+  Block      : TALCipherRDLBlock;
+  Context    : TALCipherRDLContext;
+  BlockCount : LongInt;
+begin
+  ALCipherInitEncryptRDL(Key, KeySize, Context, Encrypt);
+
+  {get the number of blocks in the file}
+  BlockCount := (InStream.Size div SizeOf(Block));
+
+  {when encrypting, make sure we have a block with at least one free}
+  {byte at the end. used to store the odd byte count value}
+  if Encrypt then
+    Inc(BlockCount);
+
+  {process all except the last block}
+  for I := 1 to BlockCount - 1 do begin
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+    ALCipherEncryptRDL(Context, Block);
+    OutStream.Write(Block, SizeOf(Block));
+  end;
+
+  if Encrypt then begin
+    FillChar(Block, SizeOf(Block), #0);
+
+    {set actual number of bytes to read}
+    I := (InStream.Size mod SizeOf(Block));
+    if InStream.Read(Block, I) <> I then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+
+    {store number of bytes as last byte in last block}
+    PByteArray(@Block)^[SizeOf(Block)-1] := I;
+
+    {encrypt and save full block}
+    ALCipherEncryptRDL(Context, Block);
+    OutStream.Write(Block, SizeOf(Block));
+  end else begin
+    {encrypted file is always a multiple of the block size}
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+    ALCipherEncryptRDL(Context, Block);
+
+    {get actual number of bytes encoded}
+    I := PByteArray(@Block)^[SizeOf(Block)-1];
+
+    {save valid portion of block}
+    OutStream.Write(Block, I);
+  end;
+end;
+
+{**************************************************************************************************************}
+procedure AlRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  I          : LongInt;
+  Block      : TALCipherRDLBlock;
+  IV         : TALCipherRDLBlock;
+  Work       : TALCipherRDLBlock;
+  Context    : TALCipherRDLContext;
+  BlockCount : LongInt;
+begin
+  ALCipherInitEncryptRDL(Key, KeySize, Context, Encrypt);
+
+  {get the number of blocks in the file}
+  BlockCount := (InStream.Size div SizeOf(Block));
+
+  if Encrypt then begin
+    {set up an initialization vector (IV)}
+    Block[0] := timeGetTime;
+    Block[1] := timeGetTime;
+    ALCipherEncryptRDL(Context, Block);
+    OutStream.Write(Block, SizeOf(Block));
+    IV := Block;
+  end else begin
+    {read the frist block to prime the IV}
+    InStream.Read(Block, SizeOf(Block));
+    Dec(BlockCount);
+    IV := Block;
+  end;
+
+  {when encrypting, make sure we have a block with at least one free}
+  {byte at the end. used to store the odd byte count value}
+  if Encrypt then
+    Inc(BlockCount);
+
+  {process all except the last block}
+  for I := 1 to BlockCount - 1 do begin
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+
+    if Encrypt then begin
+      ALCipherEncryptRDLCBC(Context, IV, Block);
+      IV := Block;
+    end else begin
+      Work := Block;
+      ALCipherEncryptRDLCBC(Context, IV, Block);
+      IV := Work;
+    end;
+
+    OutStream.Write(Block, SizeOf(Block));
+  end;
+
+  if Encrypt then begin
+    FillChar(Block, SizeOf(Block), #0);
+
+    {set actual number of bytes to read}
+    I := (InStream.Size mod SizeOf(Block));
+    if InStream.Read(Block, I) <> I then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+
+    {store number of bytes as last byte in last block}
+    PByteArray(@Block)^[SizeOf(Block)-1] := I;
+
+    {encrypt and save full block}
+    ALCipherEncryptRDLCBC(Context, IV, Block);
+    OutStream.Write(Block, SizeOf(Block));
+  end else begin
+    {encrypted file is always a multiple of the block size}
+    if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
+      raise EALCipherException.Create(cALCryptInvalidFileFormat);
+    ALCipherEncryptRDLCBC(Context, IV, Block);
+
+    {get actual number of bytes encoded}
+    I := PByteArray(@Block)^[SizeOf(Block)-1];
+
+    {save valid portion of block}
+    OutStream.Write(Block, I);
+  end;
+end;
+
+{******************************************************}
+procedure AlRDLEncryptString(const InString: AnsiString;
+                             var OutString : AnsiString;
+                             const Key: AnsiString;
+                             Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  AlRDLEncryptString(InString,OutString, aCipherKey128, 16, Encrypt);
+end;
+
+{*********************************************************}
+procedure AlRDLEncryptStringCBC(const InString: AnsiString;
+                                var OutString : AnsiString;
+                                const Key: AnsiString;
+                                Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  AlRDLEncryptStringCBC(InString, OutString, aCipherKey128, 16, Encrypt);
+end;
+
+{******************************************************}
+function  AlRDLEncryptString(const InString: AnsiString;
+                             const Key: AnsiString;
+                             Encrypt : Boolean) : AnsiString;
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  Result := AlRDLEncryptString(InString, aCipherKey128, 16, Encrypt);
+end;
+
+{*********************************************************}
+function  AlRDLEncryptStringCBC(const InString: AnsiString;
+                                const Key: AnsiString;
+                                Encrypt : Boolean) : AnsiString;
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  result := AlRDLEncryptStringCBC(InString, aCipherKey128, 16, Encrypt);
+end;
+
+{********************************************************}
+procedure AlRDLEncryptStream(InStream, OutStream: TStream;
+                             const Key: AnsiString;
+                             Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
+end;
+
+{***********************************************************}
+procedure AlRDLEncryptStreamCBC(InStream, OutStream: TStream;
+                                const Key: AnsiString;
+                                Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
+end;
+
+{***********************************************************}
+procedure AlRDLEncryptFile(const InFile, OutFile: AnsiString;
+                           const Key: AnsiString;
+                           Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  AlRDLEncryptFile(InFile, OutFile, aCipherKey128, 16, Encrypt);
+end;
+
+{**************************************************************}
+procedure AlRDLEncryptFileCBC(const InFile, OutFile: AnsiString;
+                              const Key: AnsiString;
+                              Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5Key(aCipherKey128, Key);
+  AlRDLEncryptFileCBC(InFile, OutFile, aCipherKey128, 16, Encrypt);
+end;
+
+{****MD5******************************************************************************}
+procedure AlFileHashMD5(var Digest : TALCipherMD5Digest; const AFileName : AnsiString);
+var
+  FS : TFileStream;
+begin
+  FS := TFileStream.Create(String(AFileName), fmOpenRead);
+  try
+    ALStreamHashMD5(Digest, FS);
+  finally
+    FS.Free;
+  end;
+end;
+
+{***************************************************************}
+function ALFileHashMD5(const AFileName : AnsiString): AnsiString;
+Var aMD5Digest: TAlCipherMD5Digest;
+Begin
+  ALFileHashMD5(aMD5Digest, AFileName);
+  Result := AlCipherBufferToHex(aMD5Digest, SizeOf(aMD5Digest));
+end;
+
+{****************************************************************************}
+procedure AlStreamHashMD5(var Digest : TALCipherMD5Digest; AStream : TStream);
+var
+  BufSize : Cardinal;
+  Buf : array[0..1023] of Byte;
+  Context : TALCipherMD5Context;
+begin
+  ALCipherInitMD5(Context);
+  BufSize := AStream.Read(Buf, SizeOf(Buf));
+  while (BufSize > 0) do begin
+    ALCipherUpdateMD5(Context, Buf, BufSize);
+    BufSize := AStream.Read(Buf, SizeOf(Buf));
+  end;
+  ALCipherFinalizeMD5(Context, Digest);
+end;
+
+{******************************************************}
+function AlStreamHashMD5(AStream : TStream): AnsiString;
+Var aMD5Digest: TAlCipherMD5Digest;
+Begin
+  AlStreamHashMD5(aMD5Digest, AStream);
+  Result := AlCipherBufferToHex(aMD5Digest, SizeOf(aMD5Digest));
+end;
+
+{****SHA1*******************************************************************************}
+procedure AlFileHashSHA1(var Digest : TALCipherSHA1Digest; const AFileName : AnsiString);
+var
+  FS : TFileStream;
+begin
+  FS := TFileStream.Create(String(AFileName), fmOpenRead);
+  try
+    ALStreamHashSHA1(Digest, FS);
+  finally
+    FS.Free;
+  end;
+end;
+
+{*****************************************************************}
+function  ALFileHashSHA1(const AFileName : AnsiString): AnsiString;
+Var aSHA1Digest: TALCipherSHA1Digest;
+Begin
+  ALFileHashSHA1(aSHA1Digest, AFileName);
+  Result := AlCipherBufferToHex(aSHA1Digest, SizeOf(aSHA1Digest));
+end;
+
+{******************************************************************************}
+procedure AlStreamHashSHA1(var Digest : TALCipherSHA1Digest; AStream : TStream);
+var
+  BufSize : Cardinal;
+  Buf : array[0..1023] of Byte;
+  Context : TALCipherSHA1Context;
+begin
+  ALCipherInitSHA1(Context);
+  BufSize := AStream.Read(Buf, SizeOf(Buf));
+  while (BufSize > 0) do begin
+    ALCipherUpdateSHA1(Context, Buf, BufSize);
+    BufSize := AStream.Read(Buf, SizeOf(Buf));
+  end;
+  ALCipherFinalizeSHA1(Context, Digest);
+end;
+
+{*******************************************************}
+function AlStreamHashSHA1(AStream : TStream): AnsiString;
+Var aSHA1Digest: TALCipherSHA1Digest;
+Begin
+  AlStreamHashSHA1(aSHA1Digest, AStream);
+  Result := AlCipherBufferToHex(aSHA1Digest, SizeOf(aSHA1Digest));
+end;
+
+{**********************************************************************}
+procedure ALStringHashELF(var Digest : LongInt; const Str : AnsiString);
+begin
+  ALCipherHashELF(Digest, Str[1], Length(Str));
+end;
+
+{********************************************************}
+function ALStringHashELF(const Str : AnsiString): LongInt;
+Begin
+  AlStringHashELF(Result, str);
+end;
+
+{*************************************************************************}
+procedure ALStringHashMix128(var Digest : LongInt; const Str : AnsiString);
+begin
+  ALCipherHashMix128(Digest, Str[1], Length(Str));
+end;
+
+{***********************************************************}
+function ALStringHashMix128(const Str : AnsiString): LongInt;
+Begin
+  ALStringHashMix128(Result, Str);
+end;
+
+{*********************************************************************************}
+procedure ALStringHashMD5(var Digest : TALCipherMD5Digest; const Str : AnsiString);
+begin
+  ALCipherHashMD5(Digest, Str[1], Length(Str));
+end;
+
+{***********************************************************}
+function ALStringHashMD5(const Str : AnsiString): AnsiString;
+Var aMD5Digest: TAlCipherMD5Digest;
+Begin
+  AlStringHashMD5(aMD5Digest, Str);
+  Result := AlCipherBufferToHex(aMD5Digest, SizeOf(aMD5Digest));
+end;
+
+{***********************************************************************************}
+procedure ALStringHashSHA1(var Digest : TALCipherSHA1Digest; const Str : AnsiString);
+begin
+  ALCipherHashSHA1(Digest, Str[1], Length(Str));
+end;
+
+{************************************************************}
+function ALStringHashSHA1(const Str : AnsiString): AnsiString;
+Var aSHA1Digest: TAlCipherSHA1Digest;
+Begin
+  AlStringHashSHA1(aSHA1Digest, Str);
+  Result := AlCipherBufferToHex(ASHA1Digest, SizeOf(aSHA1Digest));
 end;
 
 end.

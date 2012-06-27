@@ -6,11 +6,11 @@ Author(s):    Sergey Seroukhov (Zeos Database Objects)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALMySqlWrapper
-Version:      3.51
+Version:      4.00
 
 Description:  MysQL libmysql.dll Version 5 API Interface Unit
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :        http://www.sourceforge.net/projects/zeoslib
               http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
@@ -52,7 +52,7 @@ Link :        http://www.sourceforge.net/projects/zeoslib
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMySqlWrapper;
 
@@ -714,7 +714,7 @@ TMYSQL_CLIENT_OPTIONS =
     destructor Destroy; override;
     function Loaded: Boolean; virtual;
     function Unload: Boolean; virtual;
-    function Load(const lib: string = 'libmysql.dll'): Boolean; virtual;
+    function Load(const lib: AnsiString = 'libmysql.dll'): Boolean; virtual;
   end;
 
 implementation
@@ -851,12 +851,12 @@ begin
   end;
 end;
 
-{********************************************************}
-function TALMySqlLibrary.Load(const lib: string): Boolean;
+{*****************************************************************************}
+function TALMySqlLibrary.Load(const lib: AnsiString = 'libmysql.dll'): Boolean;
 Begin
   Result := Loaded;
   if not Result then begin
-    Flibmysql := LoadLibrary(PChar(lib));
+    Flibmysql := LoadLibraryA(PAnsiChar(lib));
     if Loaded then begin
       mysql_affected_rows := GetProcAddress(Flibmysql,'mysql_affected_rows');
       mysql_character_set_name := GetProcAddress(Flibmysql,'mysql_character_set_name');

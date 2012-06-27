@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALListBox
-Version:      3.50
+Version:      4.00
 
 Description:  AlListBox with onPaint property
               - Flat design (no clt3D feature)
@@ -23,7 +23,7 @@ Description:  AlListBox with onPaint property
                 color of the control each time the mouse enter or leave the
                 control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -65,12 +65,13 @@ History :     23/11/2004: Add the style, OnDrawItem, itemHeight functionality
                           WM_AFTERKEYPRESS = WM_user + 1000
                           and WM_ItemIndexChanged = WM_user + 2 to
                           WM_ItemIndexChanged = WM_user + 1001
+              15/06/2012: add xe2 support
 
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALListBox;
 
@@ -87,7 +88,7 @@ Uses Windows,
      StdCtrls,
      ExtCtrls,
      AlScrollBar,
-     ALCommon;
+     AlFcnSkin;
 
 {--------------------------------------}
 Const WM_AFTERKEYPRESS = WM_user + 1000;
@@ -201,7 +202,6 @@ Type
     procedure WndProc(var Message: TMessage); override;
     procedure DragCanceled; override;
     procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); virtual;
-    function GetCount: Integer; override;
     function GetSelCount: Integer; override;
     procedure MeasureItem(Index: Integer; var Height: Integer); virtual;
     function InternalGetItemData(Index: Integer): Longint; dynamic;
@@ -233,6 +233,7 @@ Type
     property OnItemsChange: TNotifyEvent read FOnItemsChange write FOnItemsChange;
     property OnItemIndexChange: TNotifyEvent read FOnItemIndexChange write FOnItemIndexChange;
   public
+    function GetCount: Integer; override;
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddItem(Item: String; AObject: TObject); override;
@@ -579,7 +580,6 @@ Type
   published
   end;
 
-
 procedure Register;
 
 implementation
@@ -596,13 +596,9 @@ begin
   RegisterComponents('Alcinoe', [TALKeyListBox]);
 end;
 
-
-////////////////////////////////////////////////////////////////////////////
-///////////////// Classe NoScrollBarLISTBOX ////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
-
-{----------------------------------------------------------------}
-const BorderStyles: array[TBorderStyle] of DWORD = (0, WS_BORDER);
+{***}
+const
+  BorderStyles: array[TBorderStyle] of DWORD = (0, WS_BORDER);
 
 {**********************************}
 procedure TALListBoxStrings.Changed;
@@ -1178,7 +1174,7 @@ var
 begin
   if Style in [lbVirtual, lbVirtualOwnerDraw] then
   begin
-    if Assigned(FOnData) and (Message.WParam > -1) and (Message.WParam < Count) then
+    if Assigned(FOnData) and (Message.WParam < WPARAM(Count)) then
     begin
       S := '';
       OnData(Self, Message.wParam, S);
@@ -1199,7 +1195,7 @@ var
 begin
   if Style in [lbVirtual, lbVirtualOwnerDraw] then
   begin
-    if Assigned(FOnData) and (Message.WParam > -1) and (Message.WParam < Count) then
+    if Assigned(FOnData) and (Message.WParam < WPARAM(Count)) then
     begin
       S := '';
       OnData(Self, Message.wParam, S);
@@ -1645,7 +1641,11 @@ begin
 
   if Ord(Key) <> VK_BACK then
   begin
+    {$IFDEF UNICODE}
+    if IsLeadChar(Key) then
+    {$ELSE}
     if Key in LeadBytes then
+    {$ENDIF}
     begin
       if PeekMessage(Msg, Handle, WM_CHAR, WM_CHAR, PM_REMOVE) then
       begin
@@ -1723,11 +1723,6 @@ begin
   if Value <> ScrollWidth then
     SendMessage(Handle, LB_SETHORIZONTALEXTENT, Value, 0);
 end;
-
-
-////////////////////////////////////////////////////////////////////////////
-///////////////// Classe ALLISTBOX /////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////
 
 {*******************************************************************}
 constructor TALListBoxScrollBarProperty.Create(AOwner: TalScrollBar);
@@ -2553,11 +2548,6 @@ Begin
     FOnData(Control,Index, Data);
   end;
 end;
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TAlKeyCustomListBox  /////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {*****************************************************}
 function TALKeyListBox.IndexOfKey(key: String):integer;

@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALStaticText
-Version:      3.50
+Version:      4.00
 
 Description:  StaticText with onPaint property
               - Flat design (no clt3D feature)
@@ -23,7 +23,7 @@ Description:  StaticText with onPaint property
                 change the font or border color of the control each
                 time the mouse enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -60,6 +60,7 @@ History :     08/11/2004: correct the disabled look to flat
               08/11/2004: draw focus rect in same color of the font
               19/11/2004: change CM_FontChanged to replace the Invalidate
                           call by DrawLabelFace procedure
+              26/06/2012: Add xe2 support
                           
 Link :
 
@@ -67,7 +68,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALStaticText;
 
@@ -79,7 +80,7 @@ uses Windows,
      Controls,
      Graphics,
      forms,
-     ALCommon;
+     AlFcnSkin;
 
 type
 
@@ -232,13 +233,6 @@ begin
     DrawText(C.Handle, PChar(caption), Length(caption), R, Flags);
   end;
 end;
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCustomStaticText  /////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {**************************************************************}
 procedure TALCustomStaticText.ReplaceInvalidateInQueueByRefresh;

@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFTPClient Base Classe
-Version:      3.50
+Version:      4.00
 
 Description:  TALFTPClient is a ancestor base class of
               TALWinInetFTPClient
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -43,7 +43,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     26/06/2012: Add xe2 support
 
 Link :
 
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFTPClient;
 
@@ -75,17 +75,17 @@ type
   {------------------------------------------}
   TALFTPClientProxyParams = Class(TPersistent)
   Private
-    FProxyBypass: String;
-    FproxyServer: String;
-    FProxyUserName: String;
-    FProxyPassword: String;
+    FProxyBypass: AnsiString;
+    FproxyServer: AnsiString;
+    FProxyUserName: AnsiString;
+    FProxyPassword: AnsiString;
     FproxyPort: integer;
     FOnChange: TALFTPPropertyChangeEvent;
-    procedure SetProxyBypass(const Value: String);
-    procedure SetProxyPassword(const Value: String);
+    procedure SetProxyBypass(const Value: AnsiString);
+    procedure SetProxyPassword(const Value: AnsiString);
     procedure SetProxyPort(const Value: integer);
-    procedure SetProxyServer(const Value: String);
-    procedure SetProxyUserName(const Value: String);
+    procedure SetProxyServer(const Value: AnsiString);
+    procedure SetProxyUserName(const Value: AnsiString);
     Procedure DoChange(propertyIndex: Integer);
   protected
     procedure AssignTo(Dest: TPersistent); override;
@@ -93,11 +93,11 @@ type
     constructor Create; virtual;
     procedure Clear;
   published
-    Property ProxyBypass: String read FProxyBypass write SetProxyBypass; //index 0
-    property ProxyServer: String read FProxyServer write SetProxyServer; //index 1
+    Property ProxyBypass: AnsiString read FProxyBypass write SetProxyBypass; //index 0
+    property ProxyServer: AnsiString read FProxyServer write SetProxyServer; //index 1
     property ProxyPort: integer read FProxyPort write SetProxyPort default 0; //index 2
-    property ProxyUserName: String read FProxyUserName write SetProxyUserName; //index 3
-    property ProxyPassword: String read FProxyPassword write SetProxyPassword; //index 4
+    property ProxyUserName: AnsiString read FProxyUserName write SetProxyUserName; //index 3
+    property ProxyPassword: AnsiString read FProxyPassword write SetProxyPassword; //index 4
     property OnChange: TALFTPPropertyChangeEvent read FOnChange write FOnChange;
   end;
 
@@ -110,20 +110,20 @@ type
     Time: Integer;
     Size: Integer;
     Attr: Integer;
-    Name: TFileName;
+    Name: AnsiString;
     ExcludeAttr: Integer;
     FindHandle: Pointer;
-    FindData: TWin32FindData;
+    FindData: TWin32FindDataA;
   end;
 
-  {-------------------------------}
+  {------------------------------}
   TALFTPClient = class(TComponent)
   private
     FProxyParams: TALFTPClientProxyParams;
-    FServerName: string;
+    FServerName: AnsiString;
     FServerPort: Integer;
-    FUserName: string;
-    FPassword: string;
+    FUserName: AnsiString;
+    FPassword: AnsiString;
     FConnectTimeout: Integer;
     FSendTimeout: Integer;
     FReceiveTimeout: Integer;
@@ -131,10 +131,10 @@ type
     FOnDownloadProgress: TALFTPClientDownloadProgressEvent;
     FUploadBufferSize: Integer;
   protected
-    procedure SetServerName(const Value: string); virtual;
+    procedure SetServerName(const Value: AnsiString); virtual;
     procedure SetServerPort(const Value: Integer); virtual;
-    procedure SetUsername(const NameValue: string); virtual;
-    procedure SetPassword(const PasswordValue: string); virtual;
+    procedure SetUsername(const NameValue: AnsiString); virtual;
+    procedure SetPassword(const PasswordValue: AnsiString); virtual;
     function  GetConnected: Boolean; virtual;
     procedure SetConnected(const Value: Boolean); virtual;
     procedure OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer); virtual;
@@ -142,28 +142,28 @@ type
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
-    procedure CreateDirectory(Directory: String); virtual;
-    procedure DeleteFile(FileName: String); virtual;
-    Function  FindFirst(const Path: string; Attr: Integer; var F: TALFtpclientSearchRec): Integer; virtual;
+    procedure CreateDirectory(Directory: AnsiString); virtual;
+    procedure DeleteFile(FileName: AnsiString); virtual;
+    Function  FindFirst(const Path: AnsiString; Attr: Integer; var F: TALFtpclientSearchRec): Integer; virtual;
     Function  FindNext(var F: TALFtpclientSearchRec): Integer; virtual;
     procedure FindClose(var F: TALFtpclientSearchRec); virtual;
-    Function  GetCurrentDirectory: String; virtual;
-    Procedure GetFile(RemoteFile: String; LocalFile: String; FailIfExists: Boolean); overload; virtual;
-    Procedure GetFile(RemoteFile: String; DataStream: Tstream); overload; virtual;
-    Function  GetFileSize(filename: String): Longword; virtual;
-    Procedure PutFile(LocalFile: String; Remotefile: String); overload; virtual;
-    Procedure PutFile(DataStream: TStream; Remotefile: String); overload; virtual;
-    Procedure RemoveDirectory(Directory: String); virtual;
-    Procedure RenameFile(ExistingFile, NewFile: String); virtual;
-    Procedure SetCurrentDirectory(Directory: String); virtual;
+    Function  GetCurrentDirectory: AnsiString; virtual;
+    Procedure GetFile(RemoteFile: AnsiString; LocalFile: AnsiString; FailIfExists: Boolean); overload; virtual;
+    Procedure GetFile(RemoteFile: AnsiString; DataStream: Tstream); overload; virtual;
+    Function  GetFileSize(filename: AnsiString): Longword; virtual;
+    Procedure PutFile(LocalFile: AnsiString; Remotefile: AnsiString); overload; virtual;
+    Procedure PutFile(DataStream: TStream; Remotefile: AnsiString); overload; virtual;
+    Procedure RemoveDirectory(Directory: AnsiString); virtual;
+    Procedure RenameFile(ExistingFile, NewFile: AnsiString); virtual;
+    Procedure SetCurrentDirectory(Directory: AnsiString); virtual;
     procedure Connect; virtual;
     procedure Disconnect; virtual;
   published
     Property  connected: Boolean read GetConnected write SetConnected default False;
-    property  ServerName: string read FServerName write SetServerName;
+    property  ServerName: AnsiString read FServerName write SetServerName;
     property  ServerPort: integer read FServerPort write SetServerPort default 21;
-    property  UserName: string read FUserName write SetUserName;
-    property  Password: string read FPassword write SetPassword;
+    property  UserName: AnsiString read FUserName write SetUserName;
+    property  Password: AnsiString read FPassword write SetPassword;
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
     property  SendTimeout: Integer read FSendTimeout write FSendTimeout default 0;
     property  ReceiveTimeout: Integer read FReceiveTimeout write FReceiveTimeout default 0;
@@ -179,11 +179,7 @@ ResourceString
 
 implementation
 
-////////////////////////////////////////////////////////////////////////////////
-////////// TALWinInetFTPClient ////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-{**************************************************}
+{*************************************************}
 constructor TALFTPClient.Create(Owner: TComponent);
 begin
   inherited;
@@ -208,20 +204,20 @@ begin
   inherited;
 end;
 
-{***********************************************************}
-procedure TALFTPClient.SetUsername(const NameValue: string);
+{**************************************************************}
+procedure TALFTPClient.SetUsername(const NameValue: AnsiString);
 begin
   FUserName := NameValue;
 end;
 
-{***************************************************************}
-procedure TALFTPClient.SetPassword(const PasswordValue: string);
+{******************************************************************}
+procedure TALFTPClient.SetPassword(const PasswordValue: AnsiString);
 begin
   FPassword := PasswordValue;
 end;
 
-{********************************************************}
-procedure TALFTPClient.SetServerName(const Value: string);
+{************************************************************}
+procedure TALFTPClient.SetServerName(const Value: AnsiString);
 begin
   FServerName := Value;
 end;
@@ -232,32 +228,32 @@ begin
   FServerPort := Value;
 end;
 
-{*****************************************************************************************}
+{****************************************************************************************}
 procedure TALFTPClient.OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer);
 begin
  //virtual
 end;
 
-{****************************************************************}
+{***************************************************************}
 procedure TALFTPClient.SetUploadBufferSize(const Value: Integer);
 begin
   If Value >= 0 then FUploadBufferSize := Value;
 end;
 
-{********************************************************}
-procedure TALFTPClient.CreateDirectory(Directory: String);
+{************************************************************}
+procedure TALFTPClient.CreateDirectory(Directory: AnsiString);
 begin
 //virtual
 end;
 
-{**************************************************}
-procedure TALFTPClient.DeleteFile(FileName: String);
+{******************************************************}
+procedure TALFTPClient.DeleteFile(FileName: AnsiString);
 begin
 //virtual
 end;
 
-{********************************************************************************************************}
-function TALFTPClient.FindFirst(const Path: string; Attr: Integer; var F: TALFtpclientSearchRec): Integer;
+{************************************************************************************************************}
+function TALFTPClient.FindFirst(const Path: AnsiString; Attr: Integer; var F: TALFtpclientSearchRec): Integer;
 begin
   //virtual
   Result := 0;
@@ -276,58 +272,58 @@ begin
 //virtual
 end;
 
-{************************************************}
-function TALFTPClient.GetCurrentDirectory: String;
+{****************************************************}
+function TALFTPClient.GetCurrentDirectory: AnsiString;
 begin
   //virtual
   Result := '';
 end;
 
-{**********************************************************************}
-procedure TALFTPClient.GetFile(RemoteFile: String; DataStream: Tstream);
+{**************************************************************************}
+procedure TALFTPClient.GetFile(RemoteFile: AnsiString; DataStream: Tstream);
 begin
   //virtual
 end;
 
-{***********************************************************************************}
-procedure TALFTPClient.GetFile(RemoteFile, LocalFile: String; FailIfExists: Boolean);
+{***************************************************************************************}
+procedure TALFTPClient.GetFile(RemoteFile, LocalFile: AnsiString; FailIfExists: Boolean);
 begin
 //virtual
 end;
 
-{************************************************************}
-function TALFTPClient.GetFileSize(filename: String): Longword;
+{****************************************************************}
+function TALFTPClient.GetFileSize(filename: AnsiString): Longword;
 begin
   //virtual
   Result := 0;
 end;
 
-{**********************************************************************}
-procedure TALFTPClient.PutFile(DataStream: TStream; Remotefile: String);
+{**************************************************************************}
+procedure TALFTPClient.PutFile(DataStream: TStream; Remotefile: AnsiString);
+begin
+//virtual
+end;
+
+{****************************************************************}
+procedure TALFTPClient.PutFile(LocalFile, Remotefile: AnsiString);
 begin
 //virtual
 end;
 
 {************************************************************}
-procedure TALFTPClient.PutFile(LocalFile, Remotefile: String);
+procedure TALFTPClient.RemoveDirectory(Directory: AnsiString);
 begin
 //virtual
 end;
 
-{********************************************************}
-procedure TALFTPClient.RemoveDirectory(Directory: String);
+{*******************************************************************}
+procedure TALFTPClient.RenameFile(ExistingFile, NewFile: AnsiString);
 begin
 //virtual
 end;
 
-{***************************************************************}
-procedure TALFTPClient.RenameFile(ExistingFile, NewFile: String);
-begin
-//virtual
-end;
-
-{************************************************************}
-procedure TALFTPClient.SetCurrentDirectory(Directory: String);
+{****************************************************************}
+procedure TALFTPClient.SetCurrentDirectory(Directory: AnsiString);
 begin
 //virtual
 end;
@@ -344,14 +340,7 @@ begin
 //virtual
 end;
 
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////
-////////// TALFTPClientProxyParams ///////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////
-
-{*************************************************************}
+{************************************************************}
 procedure TALFTPClientProxyParams.AssignTo(Dest: TPersistent);
 begin
   if Dest is TALFTPClientProxyParams then begin
@@ -366,7 +355,7 @@ begin
   else inherited AssignTo(Dest);
 end;
 
-{***************************************}
+{**************************************}
 procedure TALFTPClientProxyParams.Clear;
 begin
   FProxyBypass := '';
@@ -377,7 +366,7 @@ begin
   DoChange(-1);
 end;
 
-{******************************************}
+{*****************************************}
 constructor TALFTPClientProxyParams.Create;
 Begin
   inherited create;
@@ -389,14 +378,14 @@ Begin
   FOnchange := nil;
 end;
 
-{******************************************************************}
+{*****************************************************************}
 procedure TALFTPClientProxyParams.DoChange(propertyIndex: Integer);
 begin
   if assigned(FonChange) then FonChange(Self,propertyIndex);
 end;
 
-{*********************************************************************}
-procedure TALFTPClientProxyParams.SetProxyBypass(const Value: String);
+{************************************************************************}
+procedure TALFTPClientProxyParams.SetProxyBypass(const Value: AnsiString);
 begin
   If (Value <> FProxyBypass) then begin
     FProxyBypass := Value;
@@ -404,8 +393,8 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALFTPClientProxyParams.SetProxyPassword(const Value: String);
+{**************************************************************************}
+procedure TALFTPClientProxyParams.SetProxyPassword(const Value: AnsiString);
 begin
   If (Value <> FProxyPassword) then begin
     FProxyPassword := Value;
@@ -413,7 +402,7 @@ begin
   end;
 end;
 
-{********************************************************************}
+{*******************************************************************}
 procedure TALFTPClientProxyParams.SetProxyPort(const Value: integer);
 begin
   If (Value <> FProxyPort) then begin
@@ -422,8 +411,8 @@ begin
   end;
 end;
 
-{*********************************************************************}
-procedure TALFTPClientProxyParams.SetProxyServer(const Value: String);
+{************************************************************************}
+procedure TALFTPClientProxyParams.SetProxyServer(const Value: AnsiString);
 begin
   If (Value <> FProxyServer) then begin
     FProxyServer := Value;
@@ -431,8 +420,8 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALFTPClientProxyParams.SetProxyUserName(const Value: String);
+{**************************************************************************}
+procedure TALFTPClientProxyParams.SetProxyUserName(const Value: AnsiString);
 begin
   If (Value <> FProxyUserName) then begin
     FProxyUserName := Value;

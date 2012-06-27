@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALAVLBinaryTree (Self-Balancing Binary Trees)
-Version:      3.50
+Version:      4.00
 
 Description:  - These binary trees are self-balancing in the AVL sense
                 (the depth of any left branch differs by no more than
@@ -20,7 +20,7 @@ Description:  - These binary trees are self-balancing in the AVL sense
                 entire tree. This is much slower than calling the Iterate
                 method.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -65,6 +65,8 @@ History :     27/10/2005: Rebuild of the unit
               04/04/2006: add TALIntegerKeyAVLBinaryTree
               01/08/2006: add FindAndAcquireNode, AcquireNode, FindAndReleaseNode, ReleaseNode,
                           CreateAndAcquireSessionNode to TALCardinalKeySessionAVLBinaryTree.
+              01/08/2012: remove the TALCardinalKeySessionAVLBinaryTree. not used anymore
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -72,7 +74,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALAVLBinaryTree;
 
@@ -141,8 +143,8 @@ type
     Function    Head: TALBaseAVLBinaryTreeNode; virtual;
     Procedure   SaveToStream(Astream: Tstream); Virtual;
     Procedure   LoadFromStream(Astream: Tstream); Virtual;
-    Procedure   SaveToFile(AFilename: String); Virtual;
-    Procedure   LoadFromFile(AFilename: String); Virtual;
+    Procedure   SaveToFile(AFilename: AnsiString); Virtual;
+    Procedure   LoadFromFile(AFilename: AnsiString); Virtual;
     function    FindNode(idVal: pointer): TALBaseAVLBinaryTreeNode; virtual;
     function    First: TALBaseAVLBinaryTreeNode; virtual; {Return the smallest-value node in the tree}
     function    Last: TALBaseAVLBinaryTreeNode; virtual; {Return the largest-value node in the tree}
@@ -150,8 +152,6 @@ type
     function    Prev(aNode: TALBaseAVLBinaryTreeNode): TALBaseAVLBinaryTreeNode; virtual; {Return the largest node whose value is smaller than aNode}
     Function    NodeCount: integer; virtual;
   end;
-
-
 
   {TALIntegerKeyAVLBinaryTreeNode--------------------------------}
   TALIntegerKeyAVLBinaryTreeNode = class(TALBaseAVLBinaryTreeNode)
@@ -183,8 +183,6 @@ type
     function Prev(aNode: TALIntegerKeyAVLBinaryTreeNode): TALIntegerKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest node whose value is smaller than aNode}
   end;
 
-
-
   {TALCardinalKeyAVLBinaryTreeNode--------------------------------}
   TALCardinalKeyAVLBinaryTreeNode = class(TALBaseAVLBinaryTreeNode)
   Private
@@ -214,8 +212,6 @@ type
     function Next(aNode: TALCardinalKeyAVLBinaryTreeNode): TALCardinalKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the next node whose value is larger than aNode}
     function Prev(aNode: TALCardinalKeyAVLBinaryTreeNode): TALCardinalKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest node whose value is smaller than aNode}
   end;
-
-
 
   {TALInt64KeyAVLBinaryTreeNode--------------------------------}
   TALInt64KeyAVLBinaryTreeNode = class(TALBaseAVLBinaryTreeNode)
@@ -247,8 +243,6 @@ type
     function Prev(aNode: TALInt64KeyAVLBinaryTreeNode): TALInt64KeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest node whose value is smaller than aNode}
   end;
 
-
-
   {TALStringKeyAVLBinaryTreeNode--------------------------------}
   TALStringKeyAVLBinaryTreeNode = class(TALBaseAVLBinaryTreeNode)
   Private
@@ -256,12 +250,12 @@ type
     Procedure SaveToStream(Astream: Tstream); override;
     Procedure LoadFromStream(Astream: Tstream); override;
   Public
-    ID: String;
+    ID: AnsiString;
     Constructor Create; Override;
   end;
 
   {TALStringKeyAVLBinaryTreeCompareKeyFunct----------------------------------------------------------}
-  TALStringKeyAVLBinaryTreeCompareKeyFunct = function (const aKey1, aKey2: String): Integer of object;
+  TALStringKeyAVLBinaryTreeCompareKeyFunct = function (const aKey1, aKey2: AnsiString): Integer of object;
 
   {TALStringKeyAVLBinaryTree----------------------------}
   TALStringKeyAVLBinaryTree = class(TALBaseAVLBinaryTree)
@@ -270,18 +264,18 @@ type
     FcompareKeyFunct: TALStringKeyAVLBinaryTreeCompareKeyFunct;
     procedure SetcaseSensitive(const Value: Boolean);
   protected
-    Function CompareKeyCaseSensitive(Const aKey1, aKey2: String): Integer; {compares akey1 and akey2 and returns 0 if they are equal. If akey1 is greater than akey2, returns an integer greater than 0. If akey1 is less than akey2, returns an integer less than 0.}
-    Function CompareKeyCaseInSensitive(Const aKey1, aKey2: String): Integer; {compares akey1 and akey2 and returns 0 if they are equal. If akey1 is greater than akey2, returns an integer greater than 0. If akey1 is less than akey2, returns an integer less than 0.}
+    Function CompareKeyCaseSensitive(Const aKey1, aKey2: AnsiString): Integer; {compares akey1 and akey2 and returns 0 if they are equal. If akey1 is greater than akey2, returns an integer greater than 0. If akey1 is less than akey2, returns an integer less than 0.}
+    Function CompareKeyCaseInSensitive(Const aKey1, aKey2: AnsiString): Integer; {compares akey1 and akey2 and returns 0 if they are equal. If akey1 is greater than akey2, returns an integer greater than 0. If akey1 is less than akey2, returns an integer less than 0.}
     Function CompareNode(IdVal: pointer; ANode: TALBaseAVLBinaryTreeNode): Integer; override; {compares IdVal and aNode.keydata and returns 0 if they are equal. If IdVal is greater than aNode.keydata, returns an integer greater than 0. If aNode.keydata is less than IdVal, returns an integer less than 0.}
     Function CompareNode(aNode1, ANode2: TALBaseAVLBinaryTreeNode): Integer; override; {compares aNode1 and aNode2 and returns 0 if they are equal. If aNode1 is greater than aNode2, returns an integer greater than 0. If aNode1 is less than aNode2, returns an integer less than 0.}
     function CreateNode: TALBaseAVLBinaryTreeNode; override;
   public
     Constructor Create; override;
     function    AddNode(aNode: TALStringKeyAVLBinaryTreeNode): Boolean; reintroduce; virtual;
-    function    ExtractNode(IdVal: String): TALStringKeyAVLBinaryTreeNode; reintroduce; virtual;
-    function    DeleteNode(idVal: String): boolean; reintroduce; virtual;
+    function    ExtractNode(IdVal: AnsiString): TALStringKeyAVLBinaryTreeNode; reintroduce; virtual;
+    function    DeleteNode(idVal: AnsiString): boolean; reintroduce; virtual;
     Function    Head: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
-    function    FindNode(idVal: String): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
+    function    FindNode(idVal: AnsiString): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
     function    First: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the smallest-value node in the tree}
     function    Last: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest-value node in the tree}
     function    Next(aNode: TALStringKeyAVLBinaryTreeNode): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the next node whose value is larger than aNode}
@@ -289,63 +283,10 @@ type
     Property    CaseSensitive: Boolean read FCaseSensitive write SetcaseSensitive default True;
   end;
 
-
-
-  {TALCardinalKeySessionAVLBinaryTreeNode---------------------------------------}
-  TALCardinalKeySessionAVLBinaryTreeNode = class(TALCardinalKeyAVLBinaryTreeNode)
-  Private
-  Protected
-    Procedure   SaveToStream(Astream: Tstream); override;
-    Procedure   LoadFromStream(Astream: Tstream); override;
-  Public
-    Acquired: Boolean;
-    LastAccess: TDateTime;
-    Data: TStringList;
-    Constructor Create; override;
-    Destructor  Destroy; override;
-  end;
-
-  {TALCardinalKeySessionAVLBinaryTree-----------------------------------}
-  TALCardinalKeySessionAVLBinaryTree = class(TALCardinalKeyAVLBinaryTree)
-  private
-    FcriticalSection: TcriticalSection;
-    FLastCheck: TDateTime;
-    FCheckInterval: TDateTime;
-    FExpireInterval: TDateTime;
-  protected
-    procedure DeleteExpiredNode; overload; virtual;
-    function  CreateNode: TALBaseAVLBinaryTreeNode; override;
-  public
-    Constructor Create; override;
-    Destructor  Destroy; override;
-    function    CreateSessionNode: TALCardinalKeySessionAVLBinaryTreeNode; virtual;
-    procedure   Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer); override;
-    function    AddNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode): Boolean; reintroduce; virtual;
-    function    ExtractNode(IdVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode; reintroduce; virtual;
-    function    DeleteNode(idVal: Cardinal): boolean; override;
-    Function    Head: TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual;
-    function    FindNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual;
-    function    First: TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual; {Return the smallest-value node in the tree}
-    function    Last: TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest-value node in the tree}
-    function    Next(aNode: TALCardinalKeySessionAVLBinaryTreeNode): TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual; {Return the next node whose value is larger than aNode}
-    function    Prev(aNode: TALCardinalKeySessionAVLBinaryTreeNode): TALCardinalKeySessionAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest node whose value is smaller than aNode}
-    Procedure   Clear; override;
-    Property    CheckInterval: TDateTime read FcheckInterval Write FcheckInterval;
-    Property    ExpireInterval: TDateTime read FExpireInterval Write FExpireInterval;
-    Procedure   LoadFromStream(Astream: Tstream); Override;
-    Procedure   SaveToStream(Astream: Tstream); override;
-    Function    NodeCount: integer; override;
-    function    FindAndAcquireNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode; virtual;
-    procedure   AcquireNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode); virtual;
-    function    FindAndReleaseNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode; virtual;
-    procedure   ReleaseNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode); virtual;
-    function    CreateAndAcquireSessionNode: TALCardinalKeySessionAVLBinaryTreeNode; virtual;
-
-  end;
-
 implementation
 
-uses Contnrs;
+uses Contnrs,
+     ALFcnString;
 
 {Following stack declarations are used to avoid recursion in all tree
  routines. Because the tree is AVL-balanced, a stack size of 40
@@ -475,13 +416,6 @@ begin
   acontinue := True;
 end;
 
-
-
-
-//////////////////////////////////////////////
-////////// TALBaseAVLBinaryTreeNode //////////
-//////////////////////////////////////////////
-
 {******************************************}
 constructor TALBaseAVLBinaryTreeNode.Create;
 begin
@@ -501,13 +435,6 @@ procedure TALBaseAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
  //virtual
 end;
-
-
-
-
-///////////////////////////////////////
-////////// TALBaseAVLBinaryTree //////////
-///////////////////////////////////////
 
 {**************************************}
 Constructor TALBaseAVLBinaryTree.Create;
@@ -874,11 +801,11 @@ begin
   end;
 end;
 
-{*************************************************************}
-procedure TALBaseAVLBinaryTree.LoadFromFile(AFilename: String);
+{*****************************************************************}
+procedure TALBaseAVLBinaryTree.LoadFromFile(AFilename: AnsiString);
 var aStream: TStream;
 begin
-  aStream := TFileStream.Create(aFileName, fmOpenRead or fmShareDenyWrite);
+  aStream := TFileStream.Create(String(aFileName), fmOpenRead or fmShareDenyWrite);
   try
     LoadFromStream(aStream);
   finally
@@ -886,11 +813,11 @@ begin
   end;
 end;
 
-{***********************************************************}
-procedure TALBaseAVLBinaryTree.SaveToFile(AFilename: String);
+{***************************************************************}
+procedure TALBaseAVLBinaryTree.SaveToFile(AFilename: AnsiString);
 var aStream: TStream;
 begin
-  aStream := TFileStream.Create(aFileName, fmCreate);
+  aStream := TFileStream.Create(String(aFileName), fmCreate);
   try
     SaveToStream(aStream);
   finally
@@ -1089,12 +1016,6 @@ begin
   Result := InternalGetNodeCount;
 end;
 
-
-
-////////////////////////////////////////////////////
-////////// TALIntegerKeyAVLBinaryTreeNode //////////
-////////////////////////////////////////////////////
-
 {************************************************}
 constructor TALIntegerKeyAVLBinaryTreeNode.Create;
 begin
@@ -1113,12 +1034,6 @@ procedure TALIntegerKeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
   AStream.write(ID, SizeOf(ID));
 end;
-
-
-
-/////////////////////////////////////////////////
-////////// TALIntegerKeyAVLBinaryTree //////////
-/////////////////////////////////////////////////
 
 {******************************************************************************************}
 function TALIntegerKeyAVLBinaryTree.AddNode(aNode: TALIntegerKeyAVLBinaryTreeNode): Boolean;
@@ -1198,13 +1113,6 @@ begin
   Result := TALIntegerKeyAVLBinaryTreeNode(inherited Head);
 end;
 
-
-
-
-/////////////////////////////////////////////////////
-////////// TALCardinalKeyAVLBinaryTreeNode //////////
-/////////////////////////////////////////////////////
-
 {*************************************************}
 constructor TALCardinalKeyAVLBinaryTreeNode.Create;
 begin
@@ -1223,12 +1131,6 @@ procedure TALCardinalKeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
   AStream.write(ID, SizeOf(ID));
 end;
-
-
-
-/////////////////////////////////////////////////
-////////// TALCardinalKeyAVLBinaryTree //////////
-/////////////////////////////////////////////////
 
 {********************************************************************************************}
 function TALCardinalKeyAVLBinaryTree.AddNode(aNode: TALCardinalKeyAVLBinaryTreeNode): Boolean;
@@ -1308,13 +1210,6 @@ begin
   Result := TALCardinalKeyAVLBinaryTreeNode(inherited Head);
 end;
 
-
-
-
-//////////////////////////////////////////////////
-////////// TALInt64KeyAVLBinaryTreeNode //////////
-//////////////////////////////////////////////////
-
 {**********************************************}
 constructor TALInt64KeyAVLBinaryTreeNode.Create;
 begin
@@ -1333,12 +1228,6 @@ procedure TALInt64KeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
   AStream.write(ID, SizeOf(ID));
 end;
-
-
-
-//////////////////////////////////////////////
-////////// TALInt64KeyAVLBinaryTree //////////
-//////////////////////////////////////////////
 
 {**************************************************************************************}
 function TALInt64KeyAVLBinaryTree.AddNode(aNode: TALInt64KeyAVLBinaryTreeNode): Boolean;
@@ -1418,13 +1307,6 @@ begin
   Result := TALInt64KeyAVLBinaryTreeNode(inherited Head);
 end;
 
-
-
-
-///////////////////////////////////////////////////
-////////// TALStringKeyAVLBinaryTreeNode //////////
-///////////////////////////////////////////////////
-
 {***********************************************}
 constructor TALStringKeyAVLBinaryTreeNode.Create;
 begin
@@ -1450,13 +1332,6 @@ begin
   if k > 0 then AStream.write(ID[1], k);
 end;
 
-
-
-
-///////////////////////////////////////////////
-////////// TALStringKeyAVLBinaryTree //////////
-///////////////////////////////////////////////
-
 {*******************************************}
 constructor TALStringKeyAVLBinaryTree.Create;
 begin
@@ -1480,7 +1355,7 @@ end;
 {*******************************************************************************************************}
 function TALStringKeyAVLBinaryTree.CompareNode(IdVal: pointer; ANode: TALBaseAVLBinaryTreeNode): Integer;
 begin
-  Result := FcompareKeyFunct(PString(IdVal)^,TALStringKeyAVLBinaryTreeNode(aNode).ID);
+  Result := FcompareKeyFunct(PAnsiString(IdVal)^,TALStringKeyAVLBinaryTreeNode(aNode).ID);
 end;
 
 {***********************************************************************************************}
@@ -1489,20 +1364,20 @@ begin
   Result := FcompareKeyFunct(TALStringKeyAVLBinaryTreeNode(aNode1).ID,TALStringKeyAVLBinaryTreeNode(aNode2).ID);
 end;
 
-{*******************************************************************************************}
-function TALStringKeyAVLBinaryTree.ExtractNode(IdVal: String): TALStringKeyAVLBinaryTreeNode;
+{***********************************************************************************************}
+function TALStringKeyAVLBinaryTree.ExtractNode(IdVal: AnsiString): TALStringKeyAVLBinaryTreeNode;
 begin
   result := TALStringKeyAVLBinaryTreeNode(inherited ExtractNode(@idVal));
 end;
 
-{********************************************************************}
-function TALStringKeyAVLBinaryTree.DeleteNode(idVal: String): boolean;
+{************************************************************************}
+function TALStringKeyAVLBinaryTree.DeleteNode(idVal: AnsiString): boolean;
 begin
   result := inherited DeleteNode(@idVal);
 end;
 
-{****************************************************************************************}
-function TALStringKeyAVLBinaryTree.FindNode(idVal: String): TALStringKeyAVLBinaryTreeNode;
+{********************************************************************************************}
+function TALStringKeyAVLBinaryTree.FindNode(idVal: AnsiString): TALStringKeyAVLBinaryTreeNode;
 begin
   Result := TALStringKeyAVLBinaryTreeNode(inherited FindNode(@idVal));
 end;
@@ -1532,16 +1407,16 @@ begin
 end;
 
 
-{************************************************************************************************}
-function TALStringKeyAVLBinaryTree.CompareKeyCaseInSensitive(const aKey1, aKey2: String): Integer;
+{****************************************************************************************************}
+function TALStringKeyAVLBinaryTree.CompareKeyCaseInSensitive(const aKey1, aKey2: AnsiString): Integer;
 begin
-  Result := CompareText(aKey1,aKey2);
+  Result := ALCompareText(aKey1,aKey2);
 end;
 
-{**********************************************************************************************}
-function TALStringKeyAVLBinaryTree.CompareKeyCaseSensitive(const aKey1, aKey2: String): Integer;
+{**************************************************************************************************}
+function TALStringKeyAVLBinaryTree.CompareKeyCaseSensitive(const aKey1, aKey2: AnsiString): Integer;
 begin
-  result := CompareStr(aKey1,aKey2);
+  result := ALCompareStr(aKey1,aKey2);
 end;
 
 {*************************************************************************}
@@ -1558,443 +1433,6 @@ end;
 function TALStringKeyAVLBinaryTree.Head: TALStringKeyAVLBinaryTreeNode;
 begin
   Result := TALStringKeyAVLBinaryTreeNode(inherited head);
-end;
-
-
-
-
-////////////////////////////////////////////////////////////
-////////// TALCardinalKeySessionAVLBinaryTreeNode //////////
-////////////////////////////////////////////////////////////
-
-{********************************************************}
-constructor TALCardinalKeySessionAVLBinaryTreeNode.Create;
-begin
-  inherited;
-  Acquired := False;
-  LastAccess := Now;
-  Data := TStringList.Create;
-  Data.Delimiter := ';';
-  Data.QuoteChar := '''';
-end;
-
-{********************************************************}
-destructor TALCardinalKeySessionAVLBinaryTreeNode.Destroy;
-begin
-  Data.free;
-  inherited;
-end;
-
-{********************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTreeNode.LoadFromStream(Astream: Tstream);
-Var K:integer;
-    str: String;
-begin
-  inherited;
-  AStream.Read(LastAccess, SizeOf(LastAccess));
-  AStream.Read(k, SizeOf(k));
-  if k > 0 then begin
-    SetLength(str, k);
-    AStream.Read(str[1], k);
-    Data.DelimitedText := Str;
-  end;
-end;
-
-{******************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
-Var K:integer;
-    str: String;
-begin
-  inherited;
-  AStream.write(LastAccess, SizeOf(LastAccess));
-  Str := Data.DelimitedText;
-  K := length(str);
-  AStream.write(k, SizeOf(k));
-  if k > 0 then AStream.write(str[1], k);
-end;
-
-
-
-
-////////////////////////////////////////////////////////
-////////// TALCardinalKeySessionAVLBinaryTree //////////
-////////////////////////////////////////////////////////
-
-{**}
-Type
-  TAlAVLBinaryTree_IterateDeleteExpiredNodeExtData = record
-    lstExpiredNode : TList;
-    LowDateTime: TdateTime;
-  end;
-
-{*****************************************************************************}
-procedure AlAVLBinaryTree_IterateDeleteExpiredNode(aTree: TALBaseAVLBinaryTree;
-                                                   aNode: TALBaseAVLBinaryTreeNode;
-                                                   aExtData: Pointer;
-                                                   Var aContinue: Boolean);
-
-begin
-  With TAlAVLBinaryTree_IterateDeleteExpiredNodeExtData(aExtData^) do
-    if (TALCardinalKeySessionAVLBinaryTreeNode(aNode).LastAccess < LowDateTime) then lstExpiredNode.add(aNode);
-
-  acontinue := True;
-end;
-
-{****************************************************}
-constructor TALCardinalKeySessionAVLBinaryTree.Create;
-begin
-  FcriticalSection := TcriticalSection.create;
-  FCheckInterval := 0.0021; // Every three minutes ( 1 / 24 / 60 * 3)
-  FExpireInterval := 0.0834; // 120 minutes ( 1 / 24 / 60 * 120)
-  FLastCheck := Now;
-  Randomize;
-  Inherited;
-end;
-
-{****************************************************}
-destructor TALCardinalKeySessionAVLBinaryTree.Destroy;
-begin
-  FcriticalSection.Free;
-  inherited;
-end;
-
-{*******************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.CreateNode: TALBaseAVLBinaryTreeNode;
-begin
-  Result := TALCardinalKeySessionAVLBinaryTreeNode.create;
-end;
-
-{****************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.CreateSessionNode: TALCardinalKeySessionAVLBinaryTreeNode;
-var aNode: TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  Try
-
-    if (Now - FLastCheck > FCheckInterval) then begin
-      DeleteExpiredNode;
-      FLastCheck := Now;
-    end;
-
-    aNode := TALCardinalKeySessionAVLBinaryTreeNode(CreateNode);
-    aNode.ID := Random(MaxInt) + Random(MaxInt);
-    while (not InternalAddNode(aNode)) do aNode.ID := Random(MaxInt) + Random(MaxInt);
-    result := aNode;
-
-  Finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{**********************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.AddNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode): Boolean;
-begin
-  FcriticalSection.Acquire;
-  Try
-
-    if (Now - FLastCheck > FCheckInterval) then begin
-      DeleteExpiredNode;
-      FLastCheck := Now;
-    end;
-
-    result := inherited AddNode(aNode);
-
-  Finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.FindNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    if (Now - FLastCheck > FCheckInterval) then begin
-      DeleteExpiredNode;
-      FLastCheck := Now;
-    end;
-
-    result := TALCardinalKeySessionAVLBinaryTreeNode(inherited FindNode(idVal));
-    If result <> nil then result.LastAccess := now;
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{***************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.ExtractNode(IdVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    result := TALCardinalKeySessionAVLBinaryTreeNode(inherited ExtractNode(idVal));
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{*******************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.DeleteNode(idVal: Cardinal): boolean;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    result := inherited DeleteNode(IdVal);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{*************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.DeleteExpiredNode;
-Var aExtData: TAlAVLBinaryTree_IterateDeleteExpiredNodeExtData;
-    i: integer;
-begin
-  aExtData.lstExpiredNode := Tlist.Create;
-  Try
-    aExtData.LowDateTime := Now - FExpireInterval;
-
-    InternalIterate(AlAVLBinaryTree_IterateDeleteExpiredNode,
-                    True,
-                    @aExtData);
-
-    for i := 0 to aExtData.lstExpiredNode.Count - 1 do
-      InternalDeleteNode(@TALCardinalKeySessionAVLBinaryTreeNode(aExtData.lstExpiredNode[i]).ID);
-
-  finally
-    aExtData.lstExpiredNode.Free;
-  end;
-end;
-
-{*************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.Clear;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    Inherited clear;
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{***************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.Head: TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    Result := TALCardinalKeySessionAVLBinaryTreeNode(inherited head);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{****************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.First: TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    Result := TALCardinalKeySessionAVLBinaryTreeNode(inherited First);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{***************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.Last: TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    Result := TALCardinalKeySessionAVLBinaryTreeNode(inherited Last);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{**************************************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.Next(aNode: TALCardinalKeySessionAVLBinaryTreeNode): TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    Result := TALCardinalKeySessionAVLBinaryTreeNode(inherited Next(aNode));
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{**************************************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.Prev(aNode: TALCardinalKeySessionAVLBinaryTreeNode): TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    Result := TALCardinalKeySessionAVLBinaryTreeNode(inherited Prev(aNode));
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{***********************************************************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer);
-begin
-  FcriticalSection.Acquire;
-  try
-
-    inherited Iterate(Action, Up, ExtData);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{**************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.SaveToStream(Astream: Tstream);
-Begin
-  FcriticalSection.Acquire;
-  try
-
-    inherited SaveToStream(AStream);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{****************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.LoadFromStream(Astream: Tstream);
-Begin
-  FcriticalSection.Acquire;
-  try
-
-    inherited LoadFromStream(AStream);
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{****************************************************}
-Function TALCardinalKeySessionAVLBinaryTree.NodeCount;
-Begin
-  FcriticalSection.Acquire;
-  try
-
-    Result := inherited NodeCount;
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{**********************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.FindAndAcquireNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode;
-Var SuccessFullyAcquired: Boolean;
-begin
-  SuccessFullyAcquired := False;
-  FcriticalSection.Acquire;
-  try
-
-    if (Now - FLastCheck > FCheckInterval) then begin
-      DeleteExpiredNode;
-      FLastCheck := Now;
-    end;
-
-    result := TALCardinalKeySessionAVLBinaryTreeNode(inherited FindNode(idVal));
-    If result <> nil then begin
-      result.LastAccess := now;
-      If not Result.Acquired then begin
-        SuccessFullyAcquired := True;
-        Result.Acquired := True;
-      end;
-    end;
-
-  finally
-    FcriticalSection.Release;
-  end;
-
-  if (result <> nil) and (not SuccessFullyAcquired) then AcquireNode(Result);
-end;
-
-{******************************************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.AcquireNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode);
-
-  {-----------------------------------------------------------------------------------}
-  Function InternalAcquireNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode): Boolean;
-  Begin
-    FcriticalSection.Acquire;
-    try
-
-      Result := not aNode.Acquired;
-      If Result then aNode.Acquired := True;
-      aNode.LastAccess := now;
-
-    finally
-      FcriticalSection.Release;
-    end;
-  end;
-
-Begin
-
-  While true do
-   if InternalAcquireNode(aNode) then break;
-
-end;
-
-{**********************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.FindAndReleaseNode(idVal: Cardinal): TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  FcriticalSection.Acquire;
-  try
-
-    if (Now - FLastCheck > FCheckInterval) then begin
-      DeleteExpiredNode;
-      FLastCheck := Now;
-    end;
-
-    result := TALCardinalKeySessionAVLBinaryTreeNode(inherited FindNode(idVal));
-    If result <> nil then begin
-      result.LastAccess := now;
-      Result.Acquired  := False;
-    end;
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{******************************************************************************************************}
-procedure TALCardinalKeySessionAVLBinaryTree.ReleaseNode(aNode: TALCardinalKeySessionAVLBinaryTreeNode);
-Begin
-  FcriticalSection.Acquire;
-  try
-
-    aNode.Acquired := False;
-    aNode.LastAccess := now;
-
-  finally
-    FcriticalSection.Release;
-  end;
-end;
-
-{**************************************************************************************************************}
-function TALCardinalKeySessionAVLBinaryTree.CreateAndAcquireSessionNode: TALCardinalKeySessionAVLBinaryTreeNode;
-begin
-  Result := CreateSessionNode;
-  result.Acquired := True;
 end;
 
 end.

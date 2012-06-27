@@ -5,12 +5,12 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Internet Messages Utilities
-Version:      3.51
+Version:      4.00
 
 Description:  This unit contains utilities to manipulate
               Internet Messages Headers (EMAIL or NEWSNET messages)
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -44,6 +44,7 @@ Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
 Know bug :
 
 History :     05/02/2008: add soft line break in ALDecodeQuotedPrintableString
+              26/06/2012: Add xe2 support
 
 Link :        http://www.faqs.org/rfcs/rfc2047.html
 
@@ -51,38 +52,39 @@ Link :        http://www.faqs.org/rfcs/rfc2047.html
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALInternetMessageCommon;
 
 interface
 
-uses Classes;
+uses Classes,
+     AlStringList;
 
 Type
 
     {---------------------------------}
     TALEMailHeader = Class(Tpersistent)
     Private
-      fSendTo: String;
-      fSender: String;
-      fMessageID: String;
-      fbcc: String;
-      fContentTransferEncoding: String;
-      fComments: String;
-      fMIMEVersion: String;
-      fPriority: String;
-      fReplyTo: String;
-      fSubject: String;
-      fFrom: String;
-      fDate: String;
-      fDispositionNotificationTo: String;
-      fReferences: String;
-      fcc: String;
-      fContentType: String;
-      FCustomHeaders: Tstrings;
-      Function GetRawHeaderText: String;
-      procedure SetRawHeaderText(const aRawHeaderText: string);
+      fSendTo: AnsiString;
+      fSender: AnsiString;
+      fMessageID: AnsiString;
+      fbcc: AnsiString;
+      fContentTransferEncoding: AnsiString;
+      fComments: AnsiString;
+      fMIMEVersion: AnsiString;
+      fPriority: AnsiString;
+      fReplyTo: AnsiString;
+      fSubject: AnsiString;
+      fFrom: AnsiString;
+      fDate: AnsiString;
+      fDispositionNotificationTo: AnsiString;
+      fReferences: AnsiString;
+      fcc: AnsiString;
+      fContentType: AnsiString;
+      FCustomHeaders: TALStrings;
+      Function GetRawHeaderText: AnsiString;
+      procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
     protected
       procedure AssignTo(Dest: TPersistent); override;
     public
@@ -90,55 +92,55 @@ Type
       destructor Destroy; override;
       procedure Clear;
     Published
-      property From: String read fFrom write fFrom; {From: John Doe <jdoe@machine.example> - Author(s) or person(s) taking responsibility for the message 4.4.1; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
-      property Sender: String read fSender write fSender; {Sender: Michael Jones <mjones@machine.example> - The person or agent submitting the message to the network, if other than shown by the From header RFC 822: 4.4.2; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
-      property SendTo: String read fSendTo write fSendTo; {To: Mary Smith <mary@example.net> - Primary recipient(s) RFC 822: 4.5.1; RFC 1123: 5.2.15-16, 5.3.7;}
-      property cc: String read fcc write fcc; {cc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net> - Secondary, informational recipient(s) RFC 822: 4.5.2; RFC 1123: 5.2.15-16, 5.3.7;}
-      property bcc: String read fbcc write fbcc; {bcc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net> - Recipient(s) not to be disclosed to other recipients ("blind carbon copy") RFC 822: 4.5.3; RFC 1123: 5.2.15-16, 5.3.7;}
-      property ReplyTo: String read fReplyTo write fReplyTo; {Reply-To: "Mary Smith: Personal Account" <smith@home.example> - Suggested E-mail address for replies RFC 822: 4.4.3; RFC 1036: 2.2.1}
-      property Subject: String read fSubject write fSubject; {Subject: Saying Hello - Text that provides a summary, or indicates the nature, of the message RFC 822: 4.7.1; RFC 1036: 2.1.4}
-      property MessageID: String read fMessageID write fMessageID; {Message-ID: <1234@local.machine.example> -	Unique ID for the message RFC 822: 4.6.1; RFC 1036: 2.1.5}
-      property References: String read fReferences write fReferences; {References: <1234@local.machine.example> <3456@example.net> - In E-mail: reference to other related messages; in Usenet: reference to replied-to-articles RFC 822: 4.6.3; RFC 1036: 2.2.5}
-      property Comments: String read fComments write fComments; {Comments: Authenticated sender is gboyd@netcom.com - Text comments added to the message RFC 822: 4.7.2}
-      property Date: String read fDate write fDate; {Date: Fri, 21 Nov 1997 09:55:06 -0600 - The time when the message was written (or submitted) RFC 822: 5.1; RFC 1123: 5.2.14; RFC 1036: 2.1.2}
-      property ContentType: String read fContentType write fContentType; {Content-Type: text/plain; charset="iso-8859-1" - Data type and format of content RFC 1049 (historic); RFC 1123: 5.2.13; RFC 2045: 5; RFC 1766: 4.1}
-      property ContentTransferEncoding: String read fContentTransferEncoding write fContentTransferEncoding; {Content-Transfer-Encoding: 8bit - Coding method used in a MIME message body RFC 2045: 6;}
-      property MIMEVersion: String read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
-      property Priority: String read fPriority write fPriority; {Priority: normal - Priority for message delivery ("normal" / "non-urgent" / "urgent") RFC 2156}
-      property DispositionNotificationTo: String read fDispositionNotificationTo write fDispositionNotificationTo; {Disposition-Notification-To: boss@nil.test - Requests for notification when the message is received, and specifies the address for them RFC 2298}
-      property CustomHeaders: Tstrings read FCustomHeaders;
-      Property RawHeaderText: String read GetRawHeaderText write SetRawHeaderText;
+      property From: AnsiString read fFrom write fFrom; {From: John Doe <jdoe@machine.example> - Author(s) or person(s) taking responsibility for the message 4.4.1; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
+      property Sender: AnsiString read fSender write fSender; {Sender: Michael Jones <mjones@machine.example> - The person or agent submitting the message to the network, if other than shown by the From header RFC 822: 4.4.2; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
+      property SendTo: AnsiString read fSendTo write fSendTo; {To: Mary Smith <mary@example.net> - Primary recipient(s) RFC 822: 4.5.1; RFC 1123: 5.2.15-16, 5.3.7;}
+      property cc: AnsiString read fcc write fcc; {cc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net> - Secondary, informational recipient(s) RFC 822: 4.5.2; RFC 1123: 5.2.15-16, 5.3.7;}
+      property bcc: AnsiString read fbcc write fbcc; {bcc: <boss@nil.test>, "Giant; \"Big\" Box" <sysservices@example.net> - Recipient(s) not to be disclosed to other recipients ("blind carbon copy") RFC 822: 4.5.3; RFC 1123: 5.2.15-16, 5.3.7;}
+      property ReplyTo: AnsiString read fReplyTo write fReplyTo; {Reply-To: "Mary Smith: Personal Account" <smith@home.example> - Suggested E-mail address for replies RFC 822: 4.4.3; RFC 1036: 2.2.1}
+      property Subject: AnsiString read fSubject write fSubject; {Subject: Saying Hello - Text that provides a summary, or indicates the nature, of the message RFC 822: 4.7.1; RFC 1036: 2.1.4}
+      property MessageID: AnsiString read fMessageID write fMessageID; {Message-ID: <1234@local.machine.example> -	Unique ID for the message RFC 822: 4.6.1; RFC 1036: 2.1.5}
+      property References: AnsiString read fReferences write fReferences; {References: <1234@local.machine.example> <3456@example.net> - In E-mail: reference to other related messages; in Usenet: reference to replied-to-articles RFC 822: 4.6.3; RFC 1036: 2.2.5}
+      property Comments: AnsiString read fComments write fComments; {Comments: Authenticated sender is gboyd@netcom.com - Text comments added to the message RFC 822: 4.7.2}
+      property Date: AnsiString read fDate write fDate; {Date: Fri, 21 Nov 1997 09:55:06 -0600 - The time when the message was written (or submitted) RFC 822: 5.1; RFC 1123: 5.2.14; RFC 1036: 2.1.2}
+      property ContentType: AnsiString read fContentType write fContentType; {Content-Type: text/plain; charset="iso-8859-1" - Data type and format of content RFC 1049 (historic); RFC 1123: 5.2.13; RFC 2045: 5; RFC 1766: 4.1}
+      property ContentTransferEncoding: AnsiString read fContentTransferEncoding write fContentTransferEncoding; {Content-Transfer-Encoding: 8bit - Coding method used in a MIME message body RFC 2045: 6;}
+      property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
+      property Priority: AnsiString read fPriority write fPriority; {Priority: normal - Priority for message delivery ("normal" / "non-urgent" / "urgent") RFC 2156}
+      property DispositionNotificationTo: AnsiString read fDispositionNotificationTo write fDispositionNotificationTo; {Disposition-Notification-To: boss@nil.test - Requests for notification when the message is received, and specifies the address for them RFC 2298}
+      property CustomHeaders: TALStrings read FCustomHeaders;
+      Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
     end;
 
     {---------------------------------------}
     TALNewsArticleHeader = Class(Tpersistent)
     Private
-      FCustomHeaders: Tstrings;
-      fExpires: String;
-      fMessageID: String;
-      fReplyTo: String;
-      fOrganization: String;
-      fDateReceived: String;
-      fNNTPPostingHost: String;
-      fContentTransferEncoding: String;
-      fComments: String;
-      fMIMEVersion: String;
-      fSender: String;
-      fNewsgroups: String;
-      fReferences: String;
-      fPostingVersion: String;
-      fRelayVersion: String;
-      fDate: String;
-      fNNTPPostingDate: String;
-      fPath: String;
-      fDistribution: String;
-      fContentType: String;
-      fFollowupTo: String;
-      fSubject: String;
-      fControl: String;
-      fFrom: String;
-      Function GetRawHeaderText: String;
-      procedure SetRawHeaderText(const aRawHeaderText: string);
+      FCustomHeaders: TALStrings;
+      fExpires: AnsiString;
+      fMessageID: AnsiString;
+      fReplyTo: AnsiString;
+      fOrganization: AnsiString;
+      fDateReceived: AnsiString;
+      fNNTPPostingHost: AnsiString;
+      fContentTransferEncoding: AnsiString;
+      fComments: AnsiString;
+      fMIMEVersion: AnsiString;
+      fSender: AnsiString;
+      fNewsgroups: AnsiString;
+      fReferences: AnsiString;
+      fPostingVersion: AnsiString;
+      fRelayVersion: AnsiString;
+      fDate: AnsiString;
+      fNNTPPostingDate: AnsiString;
+      fPath: AnsiString;
+      fDistribution: AnsiString;
+      fContentType: AnsiString;
+      fFollowupTo: AnsiString;
+      fSubject: AnsiString;
+      fControl: AnsiString;
+      fFrom: AnsiString;
+      Function GetRawHeaderText: AnsiString;
+      procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
     protected
       procedure AssignTo(Dest: TPersistent); override;
     public
@@ -146,42 +148,42 @@ Type
       destructor Destroy; override;
       procedure Clear;
     Published
-      property RelayVersion: String read fRelayVersion write fRelayVersion; {Relay-Version: Version 1.7 PSU-NETNEWS 5/20/88; site MAINE.BITNET}
-      property PostingVersion: String read fPostingVersion write fPostingVersion; {Posting-Version: Version 1.7 PSU-NETNEWS 5/20/88; site MAINE.BITNET}
-      property From: String read fFrom write fFrom; {From: John Doe <jdoe@machine.example> - Author(s) or person(s) taking responsibility for the message 4.4.1; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
-      property Date: String read fDate write fDate; {Date: Fri, 21 Nov 1997 09:55:06 -0600 - The time when the message was written (or submitted) RFC 822: 5.1; RFC 1123: 5.2.14; RFC 1036: 2.1.2}
-      property Newsgroups: String read fNewsgroups write fNewsgroups; {Newsgroups: net.sport.football}
-      property Subject: String read fSubject write fSubject; {Subject: Saying Hello - Text that provides a summary, or indicates the nature, of the message RFC 822: 4.7.1; RFC 1036: 2.1.4}
-      property MessageID: String read fMessageID write fMessageID; {Message-ID: <1234@local.machine.example> -	Unique ID for the message RFC 822: 4.6.1; RFC 1036: 2.1.5}
-      property Path: String read fPath write fPath; {Path: psuvm!cunyvm!maine.bitnet!michael}
-      property ReplyTo: String read fReplyTo write fReplyTo; {Reply-To: "Mary Smith: Personal Account" <smith@home.example> - Suggested E-mail address for replies RFC 822: 4.4.3; RFC 1036: 2.2.1}
-      property Sender: String read fSender write fSender; {Sender: Michael Jones <mjones@machine.example> - The person or agent submitting the message to the network, if other than shown by the From header RFC 822: 4.4.2; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
-      property FollowupTo: String read fFollowupTo write fFollowupTo; {Followup-To: uk.legal,uk.misc}
-      property DateReceived: String read fDateReceived write fDateReceived; {Date-Received: Fri, 21 Nov 1997 09:55:06 -0600}
-      property Expires: String read fExpires write fExpires; {Expires: Fri, 21 Nov 1997 09:55:06 -0600}
-      property References: String read fReferences write fReferences; {References: <1234@local.machine.example> <3456@example.net> - In E-mail: reference to other related messages; in Usenet: reference to replied-to-articles RFC 822: 4.6.3; RFC 1036: 2.2.5}
-      property Control: String read fControl write fControl; {Control: cancel <xb8700A@twits.site.com>}
-      property Distribution: String read fDistribution write fDistribution; {Distribution: nj.all}
-      property Organization: String read fOrganization write fOrganization; {Organization: A poorly-installed InterNetNews site}
-      property Comments: String read fComments write fComments; {Comments: Authenticated sender is gboyd@netcom.com - Text comments added to the message RFC 822: 4.7.2}
-      property ContentType: String read fContentType write fContentType; {Content-Type: text/plain; charset="iso-8859-1" - Data type and format of content RFC 1049 (historic); RFC 1123: 5.2.13; RFC 2045: 5; RFC 1766: 4.1}
-      property ContentTransferEncoding: String read fContentTransferEncoding write fContentTransferEncoding; {Content-Transfer-Encoding: 8bit - Coding method used in a MIME message body RFC 2045: 6;}
-      property MIMEVersion: String read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
-      property NNTPPostingHost: String read fNNTPPostingHost write fNNTPPostingHost; {NNTP-Posting-Host: stc92-3-82-245-250-13.fbx.proxad.net}
-      property NNTPPostingDate: String read fNNTPPostingDate write fNNTPPostingDate; {NNTP-Posting-Date: Sun, 30 Sep 2007 20:28:56 +0000 (UTC)}
-      property CustomHeaders: Tstrings read FCustomHeaders;
-      Property RawHeaderText: String read GetRawHeaderText write SetRawHeaderText;
+      property RelayVersion: AnsiString read fRelayVersion write fRelayVersion; {Relay-Version: Version 1.7 PSU-NETNEWS 5/20/88; site MAINE.BITNET}
+      property PostingVersion: AnsiString read fPostingVersion write fPostingVersion; {Posting-Version: Version 1.7 PSU-NETNEWS 5/20/88; site MAINE.BITNET}
+      property From: AnsiString read fFrom write fFrom; {From: John Doe <jdoe@machine.example> - Author(s) or person(s) taking responsibility for the message 4.4.1; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
+      property Date: AnsiString read fDate write fDate; {Date: Fri, 21 Nov 1997 09:55:06 -0600 - The time when the message was written (or submitted) RFC 822: 5.1; RFC 1123: 5.2.14; RFC 1036: 2.1.2}
+      property Newsgroups: AnsiString read fNewsgroups write fNewsgroups; {Newsgroups: net.sport.football}
+      property Subject: AnsiString read fSubject write fSubject; {Subject: Saying Hello - Text that provides a summary, or indicates the nature, of the message RFC 822: 4.7.1; RFC 1036: 2.1.4}
+      property MessageID: AnsiString read fMessageID write fMessageID; {Message-ID: <1234@local.machine.example> -	Unique ID for the message RFC 822: 4.6.1; RFC 1036: 2.1.5}
+      property Path: AnsiString read fPath write fPath; {Path: psuvm!cunyvm!maine.bitnet!michael}
+      property ReplyTo: AnsiString read fReplyTo write fReplyTo; {Reply-To: "Mary Smith: Personal Account" <smith@home.example> - Suggested E-mail address for replies RFC 822: 4.4.3; RFC 1036: 2.2.1}
+      property Sender: AnsiString read fSender write fSender; {Sender: Michael Jones <mjones@machine.example> - The person or agent submitting the message to the network, if other than shown by the From header RFC 822: 4.4.2; RFC 1123: 5.2.15-16, 5.3.7; RFC 1036: 2.1.1}
+      property FollowupTo: AnsiString read fFollowupTo write fFollowupTo; {Followup-To: uk.legal,uk.misc}
+      property DateReceived: AnsiString read fDateReceived write fDateReceived; {Date-Received: Fri, 21 Nov 1997 09:55:06 -0600}
+      property Expires: AnsiString read fExpires write fExpires; {Expires: Fri, 21 Nov 1997 09:55:06 -0600}
+      property References: AnsiString read fReferences write fReferences; {References: <1234@local.machine.example> <3456@example.net> - In E-mail: reference to other related messages; in Usenet: reference to replied-to-articles RFC 822: 4.6.3; RFC 1036: 2.2.5}
+      property Control: AnsiString read fControl write fControl; {Control: cancel <xb8700A@twits.site.com>}
+      property Distribution: AnsiString read fDistribution write fDistribution; {Distribution: nj.all}
+      property Organization: AnsiString read fOrganization write fOrganization; {Organization: A poorly-installed InterNetNews site}
+      property Comments: AnsiString read fComments write fComments; {Comments: Authenticated sender is gboyd@netcom.com - Text comments added to the message RFC 822: 4.7.2}
+      property ContentType: AnsiString read fContentType write fContentType; {Content-Type: text/plain; charset="iso-8859-1" - Data type and format of content RFC 1049 (historic); RFC 1123: 5.2.13; RFC 2045: 5; RFC 1766: 4.1}
+      property ContentTransferEncoding: AnsiString read fContentTransferEncoding write fContentTransferEncoding; {Content-Transfer-Encoding: 8bit - Coding method used in a MIME message body RFC 2045: 6;}
+      property MIMEVersion: AnsiString read fMIMEVersion write fMIMEVersion; {MIME-Version: 1.0 - specifies the version of MIME that the message format complies with RFC 2045: 4}
+      property NNTPPostingHost: AnsiString read fNNTPPostingHost write fNNTPPostingHost; {NNTP-Posting-Host: stc92-3-82-245-250-13.fbx.proxad.net}
+      property NNTPPostingDate: AnsiString read fNNTPPostingDate write fNNTPPostingDate; {NNTP-Posting-Date: Sun, 30 Sep 2007 20:28:56 +0000 (UTC)}
+      property CustomHeaders: TALStrings read FCustomHeaders;
+      Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
     end;
 
-{---------------------------------------------------------------------------------------------------------------------}
-function AlParseEmailAddress(FriendlyEmail: String; var RealName : String; Const decodeRealName: Boolean=True): String;
-function AlExtractEmailAddress(FriendlyEmail: String): String;
-Function ALMakeFriendlyEmailAddress(aRealName, aEmail: String): String;
-Function ALEncodeRealName4FriendlyEmailAddress(aRealName: String): String;
-Function AlGenerateInternetMessageID: String; overload;
-Function AlGenerateInternetMessageID(ahostname: String): String; overload;
-Function ALDecodeQuotedPrintableString(src: String): String;
-Function AlDecodeInternetMessageHeaderInUTF8(aHeaderStr: String; aDefaultCodePage: Integer): UTF8String;
+{---------------------------------------------------------------------------------------------------------------------------------}
+function AlParseEmailAddress(FriendlyEmail: AnsiString; var RealName : AnsiString; Const decodeRealName: Boolean=True): AnsiString;
+function AlExtractEmailAddress(FriendlyEmail: AnsiString): AnsiString;
+Function ALMakeFriendlyEmailAddress(aRealName, aEmail: AnsiString): AnsiString;
+Function ALEncodeRealName4FriendlyEmailAddress(aRealName: AnsiString): AnsiString;
+Function AlGenerateInternetMessageID: AnsiString; overload;
+Function AlGenerateInternetMessageID(ahostname: AnsiString): AnsiString; overload;
+Function ALDecodeQuotedPrintableString(src: AnsiString): AnsiString;
+Function AlDecodeInternetMessageHeaderInUTF8(aHeaderStr: AnsiString; aDefaultCodePage: Integer): AnsiString;
 
 implementation
 
@@ -191,7 +193,6 @@ uses Sysutils,
      AlFcnRfc,
      AlFcnMime,
      AlFcnWinsock,
-     AlFcnUnicode,
      AlFcnString;
 
 {***************************************************************************}
@@ -205,16 +206,16 @@ uses Sysutils,
 { name@domain.com (myname)       myname         name@domain.com             }
 { (myname) name@domain.com       myname         name@domain.com             }
 { <name@domain.com> "my name"    my name        name@domain.com             }
-function AlParseEmailAddress(FriendlyEmail: String; var RealName : String; Const decodeRealName: Boolean=True): String;
+function AlParseEmailAddress(FriendlyEmail: AnsiString; var RealName : AnsiString; Const decodeRealName: Boolean=True): AnsiString;
 
 var P1, P2, P3, P4, P5: integer;
-    S1: String;
+    S1: AnsiString;
     ln: integer;
 
 begin
 
   {----------}
-  FriendlyEmail := trim(FriendlyEmail);
+  FriendlyEmail := ALTrim(FriendlyEmail);
 
   {----------}
   Result := '';
@@ -224,10 +225,10 @@ begin
   ln := Length(FriendlyEmail);
 
   {----------}
-  if MatchesMask(FriendlyEmail, '* <*>') then P1 := Ln-1  // toto <toto@toto.com> | "toto" <toto@toto.com> | (toto) <toto@toto.com>
-  else if MatchesMask(FriendlyEmail, '<*> *') then P1 := 2 // <toto@toto.com> toto.com | <toto@toto.com> "toto" | <toto@toto.com> (toto)
-  else if MatchesMask(FriendlyEmail, '<*>') then P1 := 2 // <toto@toto.com>
-  else if MatchesMask(FriendlyEmail, '* (*)') then P1 := 1 // toto@toto.com (toto)
+  if ALMatchesMask(FriendlyEmail, '* <*>') then P1 := Ln-1  // toto <toto@toto.com> | "toto" <toto@toto.com> | (toto) <toto@toto.com>
+  else if ALMatchesMask(FriendlyEmail, '<*> *') then P1 := 2 // <toto@toto.com> toto.com | <toto@toto.com> "toto" | <toto@toto.com> (toto)
+  else if ALMatchesMask(FriendlyEmail, '<*>') then P1 := 2 // <toto@toto.com>
+  else if ALMatchesMask(FriendlyEmail, '* (*)') then P1 := 1 // toto@toto.com (toto)
   else Begin
     RealName := '';
     Result := FriendlyEmail;
@@ -255,9 +256,7 @@ begin
   {----------}
   If (P2 > 0) and
      (P3 <= Ln) then begin
-    If (
-        ((FriendlyEmail[P2] = '<') and (FriendlyEmail[P3] = '>'))
-       ) then begin
+    If (((FriendlyEmail[P2] = '<') and (FriendlyEmail[P3] = '>'))) then begin
       Dec(P2);
       Inc(P3);        
     end
@@ -296,12 +295,12 @@ begin
   end;
 
   {----------}
-  RealName := Trim(AlCopyStr(FriendlyEmail,1,P2) + AlCopyStr(FriendlyEmail,P3,Maxint));
+  RealName := ALTrim(AlCopyStr(FriendlyEmail,1,P2) + AlCopyStr(FriendlyEmail,P3,Maxint));
 
   {----------}
   If (RealName = '') then begin
     If (result <> '') then exit;
-    RealName := trim(FriendlyEmail);
+    RealName := ALTrim(FriendlyEmail);
   end;
 
   {----------}
@@ -316,17 +315,15 @@ begin
    RealName := alStringReplace(RealName,#1,'\',[rfIgnoreCase,RfReplaceAll]);
   end
   else if (ln >= 2) and
-          (
-           ((RealName[1] = '(') and (RealName[ln] = ')')) or
+          (((RealName[1] = '(') and (RealName[ln] = ')')) or
            ((RealName[1] = '<') and (RealName[ln] = '>')) or
-           ((RealName[1] = '"') and (RealName[ln] = '"'))
-          ) then RealName := alCopyStr(RealName,2,Ln-2)
+           ((RealName[1] = '"') and (RealName[ln] = '"'))) then RealName := alCopyStr(RealName,2,Ln-2)
 
 end;
 
-{************************************************************}
-function AlExtractEmailAddress(FriendlyEmail: String): String;
-Var aRealName: String;
+{********************************************************************}
+function AlExtractEmailAddress(FriendlyEmail: AnsiString): AnsiString;
+Var aRealName: AnsiString;
 Begin
   Result := AlParseEmailAddress(FriendlyEmail, aRealName, False);
 end;
@@ -334,10 +331,10 @@ end;
 {**************************************************************************}
 {Return a new string with backslashes in str replaced by two backslashes and
  double quotes replaced by backslash-double quote.}
-Function ALEncodeRealName4FriendlyEmailAddress(aRealName: String): String;
+Function ALEncodeRealName4FriendlyEmailAddress(aRealName: AnsiString): AnsiString;
 var i, l, x: integer;
-    Buf, P: PChar;
-    ch: Char;
+    Buf, P: PAnsiChar;
+    ch: AnsiChar;
 begin
   Result := '';
   L := Length(aRealName);
@@ -352,15 +349,15 @@ begin
       x := Ord(aRealName[i]);
       case x of
         34: begin // quot "
-              ALMove('/"', P^, 2);
+              ALStrMove('/"', P, 2);
               Inc(P, 2);
             end;
         47: begin // backslash /
-              ALMove('//', P^, 2);
+              ALStrMove('//', P, 2);
               Inc(P, 2);
             end;
         else Begin
-          P^:= Char(X);
+          P^:= AnsiChar(X);
           Inc(P);
         end;
       end;
@@ -376,30 +373,30 @@ end;
 {********************************************************************************}
 {this takes a 2-tuple of the form (realname, email_address) and returns the string
  value suitable for a To: or Cc: header.}
-Function ALMakeFriendlyEmailAddress(aRealName, aEmail: String): String;
+Function ALMakeFriendlyEmailAddress(aRealName, aEmail: AnsiString): AnsiString;
 begin
   if aRealName <> '' then Result := ALEncodeRealName4FriendlyEmailAddress(aRealName) + ' <' + aEmail + '>'
   else result := aEmail;
 end;
 
-{*******************************************}
-Function AlGenerateInternetMessageID: String;
+{***********************************************}
+Function AlGenerateInternetMessageID: AnsiString;
 Begin
-  Result := AlStringReplace(ALMakeKeyStrByGUID,'-','',[rfReplaceAll]) + '@' + trim(AlGetLocalHostName);
+  Result := AlStringReplace(ALMakeKeyStrByGUID,'-','',[rfReplaceAll]) + '@' + ALTrim(AlGetLocalHostName);
 end;
 
-{**************************************************************}
-Function AlGenerateInternetMessageID(ahostname: String): String;
+{**********************************************************************}
+Function AlGenerateInternetMessageID(ahostname: AnsiString): AnsiString;
 Begin
-  ahostname := trim(ahostname);
+  ahostname := ALTrim(ahostname);
   If ahostname <> '' then Result := AlStringReplace(ALMakeKeyStrByGUID,'-','',[rfReplaceAll]) + '@' + ahostname
   else Result := AlGenerateInternetMessageID;
 end;
 
-{**********************************************************}
-Function ALDecodeQuotedPrintableString(src: String): String;
+{******************************************************************}
+Function ALDecodeQuotedPrintableString(src: AnsiString): AnsiString;
 var CurrentSrcPos, CurrentResultPos : Integer;
-    Entity : String;
+    Entity : AnsiString;
     SrcLength: integer;
     in1: integer;
 
@@ -411,8 +408,8 @@ var CurrentSrcPos, CurrentResultPos : Integer;
       inc(CurrentSrcPos);
     end;
 
-    {-----------------------------------------------------------------}
-    procedure CopyCharToResult(aChar: Char; NewCurrentSrcPos: integer);
+    {---------------------------------------------------------------------}
+    procedure CopyCharToResult(aChar: AnsiChar; NewCurrentSrcPos: integer);
     Begin
       result[CurrentResultPos] := aChar;
       inc(CurrentResultPos);
@@ -439,13 +436,11 @@ begin
       {Encoded entity is valid in length}
       If (CurrentSrcPos+2<=SrcLength) then Begin
 
-        Entity := ALCopyStr(
-                            Src,
+        Entity := ALCopyStr(Src,
                             CurrentSrcPos+1,
-                            2
-                           );
+                            2);
 
-        If tryStrtoint(alUpperCase('$'+Entity),in1) and (in1 <= 255) and (in1 >= 0) then CopyCharToResult(Char(in1), CurrentSrcPos+3)
+        If ALTryStrToInt(alUpperCase('$'+Entity),in1) and (in1 <= 255) and (in1 >= 0) then CopyCharToResult(AnsiChar(in1), CurrentSrcPos+3)
         else CopyCurrentSrcPosCharToResult;
 
       end
@@ -460,29 +455,31 @@ begin
   setLength(Result,CurrentResultPos-1);
 end;
 
-{******************************************************************************************************}
-Function AlDecodeInternetMessageHeaderInUTF8(aHeaderStr: String; aDefaultCodePage: Integer): UTF8String;
+{**********************************************************************************************************}
+Function AlDecodeInternetMessageHeaderInUTF8(aHeaderStr: AnsiString; aDefaultCodePage: Integer): AnsiString;
 
 Var P1, P2, P3, P4: integer;
     I: integer;
-    aCharSet: String;
-    aEncoding: String;
-    aencodedText: String;
+    aCharSet: AnsiString;
+    aEncoding: AnsiString;
+    aencodedText: AnsiString;
     aCodePage: integer;
-    LstEncodedWord: TstringList;
+    LstEncodedWord: TALStringList;
 
 Begin
   // encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
   // =?iso-8859-1?q?=20this=20is=20some=20text?=
   Result := '';
-  LstEncodedWord := TstringList.Create;
+  LstEncodedWord := TALStringList.Create;
   Try
 
     P1 := 1;
     While True do begin
       P2 := AlPosEx('=?',aHeaderStr,P1);
       If P2 <= 0 then Break;
-      P3 := ALCharPosEX('?', aHeaderStr, 3, P2+2);
+      P3 := ALPosEX('?', aHeaderStr, P2+2);
+      if P3 > 0 then P3 := ALPosEX('?', aHeaderStr, P3+1);
+      if P3 > 0 then P3 := ALPosEX('?', aHeaderStr, P3+1);
       If (P3 <= 0) or (P3=Length(aHeaderStr)) or (aHeaderStr[P3+1] <> '=') then begin
         LstEncodedWord.Add(AlCopyStr(aHeaderStr,P1,P2+2-P1));
         P1 := P1 + 2;
@@ -502,9 +499,9 @@ Begin
       If aEncodedText <> '' then begin
         P1 := AlPos('=?', aEncodedText);
         If P1 = 1 then begin
-          P2 := AlCharPosEx('?',aEncodedText,P1+2);
+          P2 := AlPosEx('?',aEncodedText,P1+2);
           If (P2 > 0) then Begin
-            P3 := AlCharPosEx('?',aEncodedText,P2+1);
+            P3 := AlPosEx('?',aEncodedText,P2+1);
             If P3 > 0 then begin
               P4 := AlPosEx('?=',aEncodedText,P3+1);
               If P4 > 0 then Begin
@@ -526,7 +523,7 @@ Begin
         If (I >= 2) and
            (LstEncodedWord.Objects[i] = Pointer(1)) and
            (LstEncodedWord.Objects[i-2] = Pointer(1)) and
-           (Trim(LstEncodedWord[i-1]) = '') then LstEncodedWord[i-1] := '';
+           (ALTrim(LstEncodedWord[i-1]) = '') then LstEncodedWord[i-1] := '';
       end;
     end;
     For i := 0 to LstEncodedWord.Count - 1 do Result := Result + LstEncodedWord[i];
@@ -535,13 +532,6 @@ Begin
     LstEncodedWord.Free;
   end;
 end;
-
-
-
-
-/////////////////////////////////////////
-////////// TALEmailHeader //////////
-/////////////////////////////////////////
 
 {***************************************************}
 procedure TALEmailHeader.AssignTo(Dest: TPersistent);
@@ -596,7 +586,7 @@ end;
 constructor TALEmailHeader.Create;
 begin
   inherited create;
-  FCustomHeaders:= TstringList.create;
+  FCustomHeaders:= TALStringList.create;
   FCustomHeaders.NameValueSeparator := ':';
   clear;
   fMessageID := 'AUTO';
@@ -612,71 +602,71 @@ begin
   inherited;
 end;
 
-{***********************************************}
-function TALEmailHeader.GetRawHeaderText: String;
+{***************************************************}
+function TALEmailHeader.GetRawHeaderText: AnsiString;
 Var i : integer;
-    Str: String;
+    Str: AnsiString;
 begin
   Result := '';
-  If Trim(fFrom) <> '' then result := result + 'From: ' + trim(fFrom) + #13#10;
-  If Trim(fSender) <> '' then result := result + 'Sender: ' + trim(fSender) + #13#10;
-  If Trim(fSendTo) <> '' then result := result + 'To: ' + trim(fSendTo) + #13#10;
-  If Trim(fcc) <> '' then result := result + 'cc: ' + trim(fcc) + #13#10;
-  If Trim(fbcc) <> '' then result := result + 'bcc: ' + trim(fbcc) + #13#10;
-  If Trim(fReplyTo) <> '' then result := result + 'Reply-To: ' + trim(fReplyTo) + #13#10;
-  If Trim(fSubject) <> '' then result := result + 'Subject: ' + trim(fSubject) + #13#10;
+  If ALTrim(fFrom) <> '' then result := result + 'From: ' + ALTrim(fFrom) + #13#10;
+  If ALTrim(fSender) <> '' then result := result + 'Sender: ' + ALTrim(fSender) + #13#10;
+  If ALTrim(fSendTo) <> '' then result := result + 'To: ' + ALTrim(fSendTo) + #13#10;
+  If ALTrim(fcc) <> '' then result := result + 'cc: ' + ALTrim(fcc) + #13#10;
+  If ALTrim(fbcc) <> '' then result := result + 'bcc: ' + ALTrim(fbcc) + #13#10;
+  If ALTrim(fReplyTo) <> '' then result := result + 'Reply-To: ' + ALTrim(fReplyTo) + #13#10;
+  If ALTrim(fSubject) <> '' then result := result + 'Subject: ' + ALTrim(fSubject) + #13#10;
   Str := fMessageID;
-  If Trim(str) <> '' then begin
-    If sametext(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
-    result := result + 'Message-ID: ' + trim(str) + #13#10;
+  If ALTrim(str) <> '' then begin
+    If ALSameText(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
+    result := result + 'Message-ID: ' + ALTrim(str) + #13#10;
   end;
-  If Trim(fReferences) <> '' then result := result + 'References: ' + trim(fReferences) + #13#10;
-  If Trim(fComments) <> '' then result := result + 'Comments: ' + trim(fComments) + #13#10;
+  If ALTrim(fReferences) <> '' then result := result + 'References: ' + ALTrim(fReferences) + #13#10;
+  If ALTrim(fComments) <> '' then result := result + 'Comments: ' + ALTrim(fComments) + #13#10;
   Str := fDate;
-  If Trim(str) <> '' then begin
-    If sametext(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
-    result := result + 'Date: ' + trim(str) + #13#10;
+  If ALTrim(str) <> '' then begin
+    If ALSameText(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
+    result := result + 'Date: ' + ALTrim(str) + #13#10;
   end;
-  If Trim(fContentType) <> '' then result := result + 'Content-Type: ' + trim(fContentType) + #13#10;
-  If Trim(fContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + trim(fContentTransferEncoding) + #13#10;
-  If Trim(fMIMEVersion) <> '' then result := result + 'MIME-Version: ' + trim(fMIMEVersion) + #13#10;
-  If Trim(fPriority) <> '' then result := result + 'Priority: ' + trim(fPriority) + #13#10;
-  If Trim(fDispositionNotificationTo) <> '' then result := result + 'Disposition-Notification-To: ' + trim(fDispositionNotificationTo) + #13#10;
+  If ALTrim(fContentType) <> '' then result := result + 'Content-Type: ' + ALTrim(fContentType) + #13#10;
+  If ALTrim(fContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + ALTrim(fContentTransferEncoding) + #13#10;
+  If ALTrim(fMIMEVersion) <> '' then result := result + 'MIME-Version: ' + ALTrim(fMIMEVersion) + #13#10;
+  If ALTrim(fPriority) <> '' then result := result + 'Priority: ' + ALTrim(fPriority) + #13#10;
+  If ALTrim(fDispositionNotificationTo) <> '' then result := result + 'Disposition-Notification-To: ' + ALTrim(fDispositionNotificationTo) + #13#10;
   For i := 0 to FCustomHeaders.count - 1 do
-    if (trim(FCustomHeaders.names[i]) <> '') and (trim(FCustomHeaders.ValueFromIndex[i]) <> '') then
-      result := result + FCustomHeaders.names[i] + ': ' + trim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
+    if (ALTrim(FCustomHeaders.names[i]) <> '') and (ALTrim(FCustomHeaders.ValueFromIndex[i]) <> '') then
+      result := result + FCustomHeaders.names[i] + ': ' + ALTrim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
 end;
 
-{**********************************************************************}
-procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: string);
-Var aRawHeaderLst: TstringList;
+{**************************************************************************}
+procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
+Var aRawHeaderLst: TALStringList;
 
-  {-------------------------------------}
-  Function AlG001(aName: String): String;
+  {---------------------------------------------}
+  Function AlG001(aName: AnsiString): AnsiString;
   Var i: Integer;
-      Str: String;
+      Str: AnsiString;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
     If I >= 0 then Begin
-      result := Trim(aRawHeaderLst.ValueFromIndex[i]);
+      result := ALTrim(aRawHeaderLst.ValueFromIndex[i]);
       aRawHeaderLst.Delete(i);
       While True do begin
         If i >= aRawHeaderLst.Count then break;
         str := aRawHeaderLst[i];
         If (str = '') or
            (not (str[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-        Result := trim(result + ' ' + trim(str));
+        Result := ALTrim(result + ' ' + ALTrim(str));
         aRawHeaderLst.Delete(i);
       end;
     end
     else result := '';
   end;
 
-Var Str1, Str2: String;
+Var Str1, Str2: AnsiString;
     j: integer;
 begin
   Clear;
-  aRawHeaderLst := TstringList.create;
+  aRawHeaderLst := TALStringList.create;
   try
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
@@ -701,16 +691,16 @@ begin
     FCustomHeaders.clear;
     J := 0;
     while j <= aRawHeaderLst.count - 1 do begin
-      Str1 := trim(aRawHeaderLst.Names[j]);
-      If (trim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
-        Str1 := trim(Str1) + ': ' + trim(aRawHeaderLst.ValueFromIndex[j]);
+      Str1 := ALTrim(aRawHeaderLst.Names[j]);
+      If (ALTrim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
+        Str1 := ALTrim(Str1) + ': ' + ALTrim(aRawHeaderLst.ValueFromIndex[j]);
         inc(j);
         While True do begin
           If j >= aRawHeaderLst.Count then break;
           str2 := aRawHeaderLst[j];
           If (str2 = '') or
              (not (str2[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-          Str1 := trim(Str1 + ' ' + trim(str2));
+          Str1 := ALTrim(Str1 + ' ' + ALTrim(str2));
           inc(j);
         end;
         FCustomHeaders.Add(Str1);
@@ -722,13 +712,6 @@ begin
     aRawHeaderLst.Free;
   end;
 end;
-
-
-
-
-//////////////////////////////////
-////// TALNewsArticleHeader //////
-//////////////////////////////////
 
 {*********************************************************}
 procedure TALNewsArticleHeader.AssignTo(Dest: TPersistent);
@@ -797,7 +780,7 @@ end;
 constructor TALNewsArticleHeader.Create;
 begin
   inherited create;
-  FCustomHeaders:= TstringList.create;
+  FCustomHeaders:= TALStringList.create;
   FCustomHeaders.NameValueSeparator := ':';
   clear;
   fMessageID := 'AUTO';
@@ -813,78 +796,78 @@ begin
   inherited;
 end;
 
-{*****************************************************}
-function TALNewsArticleHeader.GetRawHeaderText: String;
+{*********************************************************}
+function TALNewsArticleHeader.GetRawHeaderText: AnsiString;
 Var i : integer;
-    Str: String;
+    Str: AnsiString;
 begin
   Result := '';
-  If Trim(fRelayVersion) <> '' then result := result + 'Relay-Version: ' + trim(fRelayVersion) + #13#10;
-  If Trim(fPostingVersion) <> '' then result := result + 'Posting-Version: ' + trim(fPostingVersion) + #13#10;
-  If Trim(fFrom) <> '' then result := result + 'From: ' + trim(fFrom) + #13#10;
+  If ALTrim(fRelayVersion) <> '' then result := result + 'Relay-Version: ' + ALTrim(fRelayVersion) + #13#10;
+  If ALTrim(fPostingVersion) <> '' then result := result + 'Posting-Version: ' + ALTrim(fPostingVersion) + #13#10;
+  If ALTrim(fFrom) <> '' then result := result + 'From: ' + ALTrim(fFrom) + #13#10;
   Str := fDate;
-  If Trim(str) <> '' then begin
-    If sametext(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
-    result := result + 'Date: ' + trim(str) + #13#10;
+  If ALTrim(str) <> '' then begin
+    If ALSameText(Str, 'NOW') then Str := ALDateTimeToRfc822Str(Now);
+    result := result + 'Date: ' + ALTrim(str) + #13#10;
   end;
-  If Trim(fNewsgroups) <> '' then result := result + 'Newsgroups: ' + trim(fNewsgroups) + #13#10;
-  If Trim(fSubject) <> '' then result := result + 'Subject: ' + trim(fSubject) + #13#10;
+  If ALTrim(fNewsgroups) <> '' then result := result + 'Newsgroups: ' + ALTrim(fNewsgroups) + #13#10;
+  If ALTrim(fSubject) <> '' then result := result + 'Subject: ' + ALTrim(fSubject) + #13#10;
   Str := fMessageID;
-  If Trim(str) <> '' then begin
-    If sametext(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
-    result := result + 'Message-ID: ' + trim(str) + #13#10;
+  If ALTrim(str) <> '' then begin
+    If ALSameText(Str, 'AUTO') then Str := '<' + AlGenerateInternetMessageID + '>';
+    result := result + 'Message-ID: ' + ALTrim(str) + #13#10;
   end;
-  If Trim(fPath) <> '' then result := result + 'Path: ' + trim(fPath) + #13#10;
-  If Trim(fReplyTo) <> '' then result := result + 'Reply-To: ' + trim(fReplyTo) + #13#10;
-  If Trim(fSender) <> '' then result := result + 'Sender: ' + trim(fSender) + #13#10;
-  If Trim(fFollowupTo) <> '' then result := result + 'Followup-To: ' + trim(fFollowupTo) + #13#10;
-  If Trim(fDateReceived) <> '' then result := result + 'Date-Received: ' + trim(fDateReceived) + #13#10;
-  If Trim(fExpires) <> '' then result := result + 'Expires: ' + trim(fExpires) + #13#10;
-  If Trim(fReferences) <> '' then result := result + 'References: ' + trim(fReferences) + #13#10;
-  If Trim(fControl) <> '' then result := result + 'Control: ' + trim(fControl) + #13#10;
-  If Trim(fDistribution) <> '' then result := result + 'Distribution: ' + trim(fDistribution) + #13#10;
-  If Trim(fOrganization) <> '' then result := result + 'Organization: ' + trim(fOrganization) + #13#10;
-  If Trim(fComments) <> '' then result := result + 'Comments: ' + trim(fComments) + #13#10;
-  If Trim(fContentType) <> '' then result := result + 'Content-Type: ' + trim(fContentType) + #13#10;
-  If Trim(fContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + trim(fContentTransferEncoding) + #13#10;
-  If Trim(fMIMEVersion) <> '' then result := result + 'MIME-Version: ' + trim(fMIMEVersion) + #13#10;
-  If Trim(fNNTPPostingHost) <> '' then result := result + 'NNTP-Posting-Host: ' + trim(fNNTPPostingHost) + #13#10;
-  If Trim(fNNTPPostingDate) <> '' then result := result + 'NNTP-Posting-Date: ' + trim(fNNTPPostingDate) + #13#10;
+  If ALTrim(fPath) <> '' then result := result + 'Path: ' + ALTrim(fPath) + #13#10;
+  If ALTrim(fReplyTo) <> '' then result := result + 'Reply-To: ' + ALTrim(fReplyTo) + #13#10;
+  If ALTrim(fSender) <> '' then result := result + 'Sender: ' + ALTrim(fSender) + #13#10;
+  If ALTrim(fFollowupTo) <> '' then result := result + 'Followup-To: ' + ALTrim(fFollowupTo) + #13#10;
+  If ALTrim(fDateReceived) <> '' then result := result + 'Date-Received: ' + ALTrim(fDateReceived) + #13#10;
+  If ALTrim(fExpires) <> '' then result := result + 'Expires: ' + ALTrim(fExpires) + #13#10;
+  If ALTrim(fReferences) <> '' then result := result + 'References: ' + ALTrim(fReferences) + #13#10;
+  If ALTrim(fControl) <> '' then result := result + 'Control: ' + ALTrim(fControl) + #13#10;
+  If ALTrim(fDistribution) <> '' then result := result + 'Distribution: ' + ALTrim(fDistribution) + #13#10;
+  If ALTrim(fOrganization) <> '' then result := result + 'Organization: ' + ALTrim(fOrganization) + #13#10;
+  If ALTrim(fComments) <> '' then result := result + 'Comments: ' + ALTrim(fComments) + #13#10;
+  If ALTrim(fContentType) <> '' then result := result + 'Content-Type: ' + ALTrim(fContentType) + #13#10;
+  If ALTrim(fContentTransferEncoding) <> '' then result := result + 'Content-Transfer-Encoding: ' + ALTrim(fContentTransferEncoding) + #13#10;
+  If ALTrim(fMIMEVersion) <> '' then result := result + 'MIME-Version: ' + ALTrim(fMIMEVersion) + #13#10;
+  If ALTrim(fNNTPPostingHost) <> '' then result := result + 'NNTP-Posting-Host: ' + ALTrim(fNNTPPostingHost) + #13#10;
+  If ALTrim(fNNTPPostingDate) <> '' then result := result + 'NNTP-Posting-Date: ' + ALTrim(fNNTPPostingDate) + #13#10;
   For i := 0 to FCustomHeaders.count - 1 do
-    if (trim(FCustomHeaders.names[i]) <> '') and (trim(FCustomHeaders.ValueFromIndex[i]) <> '') then
-      result := result + FCustomHeaders.names[i] + ': ' + trim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
+    if (ALTrim(FCustomHeaders.names[i]) <> '') and (ALTrim(FCustomHeaders.ValueFromIndex[i]) <> '') then
+      result := result + FCustomHeaders.names[i] + ': ' + ALTrim(FCustomHeaders.ValueFromIndex[i]) + #13#10;
 end;
 
-{****************************************************************************}
-procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: string);
-Var aRawHeaderLst: TstringList;
+{********************************************************************************}
+procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
+Var aRawHeaderLst: TALStringList;
 
-  {-------------------------------------}
-  Function AlG001(aName: String): String;
+  {---------------------------------------------}
+  Function AlG001(aName: AnsiString): AnsiString;
   Var i: Integer;
-      Str: String;
+      Str: AnsiString;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
     If I >= 0 then Begin
-      result := Trim(aRawHeaderLst.ValueFromIndex[i]);
+      result := ALTrim(aRawHeaderLst.ValueFromIndex[i]);
       aRawHeaderLst.Delete(i);
       While True do begin
         If i >= aRawHeaderLst.Count then break;
         str := aRawHeaderLst[i];
         If (str = '') or
            (not (str[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-        Result := trim(result + ' ' + trim(str));
+        Result := ALTrim(result + ' ' + ALTrim(str));
         aRawHeaderLst.Delete(i);
       end;
     end
     else result := '';
   end;
 
-Var Str1, Str2: String;
+Var Str1, Str2: AnsiString;
     j: integer;
 begin
   Clear;
-  aRawHeaderLst := TstringList.create;
+  aRawHeaderLst := TALStringList.create;
   try
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
@@ -916,16 +899,16 @@ begin
     FCustomHeaders.clear;
     J := 0;
     while j <= aRawHeaderLst.count - 1 do begin
-      Str1 := trim(aRawHeaderLst.Names[j]);
-      If (trim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
-        Str1 := trim(Str1) + ': ' + trim(aRawHeaderLst.ValueFromIndex[j]);
+      Str1 := ALTrim(aRawHeaderLst.Names[j]);
+      If (ALTrim(str1) <> '') and (not (str1[1] in [' ',#9])) then begin
+        Str1 := ALTrim(Str1) + ': ' + ALTrim(aRawHeaderLst.ValueFromIndex[j]);
         inc(j);
         While True do begin
           If j >= aRawHeaderLst.Count then break;
           str2 := aRawHeaderLst[j];
           If (str2 = '') or
              (not (str2[1] in [' ',#9])) then break; //(1) an empty line or (2) a line that does not start with a space, a tab, or a field name followed by a colon
-          Str1 := trim(Str1 + ' ' + trim(str2));
+          Str1 := ALTrim(Str1 + ' ' + ALTrim(str2));
           inc(j);
         end;
         FCustomHeaders.Add(Str1);

@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALButton
-Version:      3.50
+Version:      4.00
 
 Description:  TALButton
               Button control with OnPaint event, transparent, glyphs, ...
@@ -34,7 +34,7 @@ Description:  TALButton
                 For exemple we can easily change the font or border color
                 of the control each time the mouse enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2010 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -72,14 +72,15 @@ History :     19/11/2004: change CM_FontChanged and CM_ColorChanged to
                           procedure
               30/11/2004: Remplace refresh by paint in TalGraphicButton
                           if transparent and Not full Repaint
+              26/06/2012: Add xe2 support
 
 Link :
 
 * Please send all your feedback to svanderclock@arkadia.com
-* If you have downloaded this source from a website different from 
+* If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
-  voting on http://www.arkadia.com/html/alcinoe_like.html
+* Please, help us to keep the development of these components free by
+  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 Unit ALButton;
 
@@ -93,7 +94,7 @@ Uses Windows,
      Graphics,
      StdCtrls,
      Buttons,
-     ALCommon;
+     AlFcnSkin;
 
 type
   {-------------------------------------}
@@ -465,8 +466,8 @@ procedure Register;
 begin
   RegisterComponents('Alcinoe', [TAlButton]);
   RegisterComponents('Alcinoe', [TALGraphicButton]);
-  RegisterComponents('alcinoe', [TALRadioButton]);
-  RegisterComponents('alcinoe', [TALCheckBox]);
+  RegisterComponents('Alcinoe', [TALRadioButton]);
+  RegisterComponents('Alcinoe', [TALCheckBox]);
 end;
 
 {**********************************}
@@ -767,13 +768,6 @@ begin
     end;
   End;
 end;
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCustomButton   ////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {*****************************************************}
 constructor TALCustomButton.Create(AOwner: TComponent);
@@ -1110,12 +1104,6 @@ begin
   Refresh;
 end;
 
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCustomGraphicButton   /////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {************************************************************}
 constructor TALCustomGraphicButton.Create(AOwner: TComponent);
 begin
@@ -1430,34 +1418,17 @@ begin
   end;
 end;
 
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALRadioButton           /////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {******************************************************************}
 Function TALCustomRadioButton.GetButtonCategory : TALButtonCategory;
 Begin
   Result := radio;
 End;
 
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALGraficRadioButton           ///////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
 {*************************************************************************}
 Function TALCustomGraphicRadioButton.GetButtonCategory : TALButtonCategory;
 Begin
   Result := radio;
 End;
-
-
-////////////////////////////////////////////////////////////////////////////////
-///////////// TALCheckBox              /////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
 
 {***************************************************************}
 Function TALCustomCheckBox.GetButtonCategory : TALButtonCategory;

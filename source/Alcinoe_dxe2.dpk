@@ -41,11 +41,8 @@ contains
   ALButton in 'ALButton.pas',
   ALCalendar in 'ALCalendar.pas',
   ALComboBox in 'ALComboBox.pas',
-  ALCommon in 'ALCommon.pas',
-  ALDeflate in 'ALDeflate.pas',
   ALDialog in 'ALDialog.pas',
   ALEdit in 'ALEdit.pas',
-  ALFcnCrypt in 'ALFcnCrypt.pas',
   ALFcnHTML in 'ALFcnHTML.pas',
   ALFcnMime in 'ALFcnMime.pas',
   ALFcnMisc in 'ALFcnMisc.pas',
@@ -68,7 +65,6 @@ contains
   ALZLibEx in 'ALZLibEx.pas',
   ALWinHttpClient in 'ALWinHttpClient.pas',
   ALWinHttpWrapper in 'ALWinHttpWrapper.pas',
-  ALFcnUnicode in 'ALFcnUnicode.pas',
   ALSMTPClient in 'ALSMTPClient.pas',
   ALFcnRFC in 'ALFcnRFC.pas',
   ALMultiPartMixedParser in 'ALMultiPartMixedParser.pas',
@@ -84,7 +80,7 @@ contains
   ALFBXError in 'ALFBXError.pas',
   ALWinInetFTPClient in 'ALWinInetFTPClient.pas',
   ALFTPClient in 'ALFTPClient.pas',
-  ALZlibExGZ in 'ALZlibExGZ.pas',
+  ALZLibExGZ in 'ALZLibExGZ.pas',
   ALNNTPClient in 'ALNNTPClient.pas',
   ALInternetMessageCommon in 'ALInternetMessageCommon.pas',
   ALMySqlWrapper in 'ALMySqlWrapper.pas',
@@ -99,7 +95,8 @@ contains
   ALSqlite3Client in 'ALSqlite3Client.pas',
   ALSqlite3Wrapper in 'ALSqlite3Wrapper.pas',
   ALWindows in 'ALWindows.pas',
-  ALSphinxQLClient in 'ALSphinxQLClient.pas';
+  ALSphinxQLClient in 'ALSphinxQLClient.pas',
+  ALZLibExApi in 'ALZLibExApi.pas';
 
 end.
 

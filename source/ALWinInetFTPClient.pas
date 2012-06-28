@@ -66,6 +66,11 @@ uses Windows,
      ALFTPClient,
      WinInet;
 
+{$IF CompilerVersion < 18.5}
+Type
+  DWORD_PTR = DWORD;
+{$IFEND}
+
 type
 
   {---------------------------------------------------}

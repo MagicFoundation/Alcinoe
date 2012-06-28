@@ -1,4 +1,5 @@
-﻿{*************************************************************
+﻿// <- User With delphi < D2007 must manually delete this UTF8 BOM
+{*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
 svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
@@ -213,8 +214,10 @@ function  ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime; const AF
 function  ALStrToDateTime(const S: AnsiString; const AFormatSettings: TALFormatSettings): TDateTime;
 function  ALTryStrToInt(const S: AnsiString; out Value: Integer): Boolean;
 function  ALStrToInt(const S: AnsiString): Integer;
+function  ALStrToIntDef(const S: AnsiString; Default: Integer): Integer;
 function  ALTryStrToInt64(const S: AnsiString; out Value: Int64): Boolean;
 function  ALStrToInt64(const S: AnsiString): Int64;
+function  ALStrToInt64Def(const S: AnsiString; const Default: Int64): Int64;
 function  ALIntToStr(Value: Integer): AnsiString; overload;
 function  ALIntToStr(Value: Int64): AnsiString; overload;
 {$IFDEF UNICODE}
@@ -4315,6 +4318,21 @@ begin
 end;
 {$ENDIF}
 
+{*********************************************************************}
+function ALStrToIntDef(const S: AnsiString; Default: Integer): Integer;
+{$IFDEF UNICODE}
+var
+  E: Integer;
+begin
+  Result := _ALValLong(S, E);
+  if E <> 0 then Result := Default;
+end;
+{$ELSE}
+begin
+  result := StrToIntDef(S, Default);
+end;
+{$ENDIF}
+
 {***********************************************************************}
 function ALTryStrToInt64(const S: AnsiString; out Value: Int64): Boolean;
 {$IFDEF UNICODE}
@@ -4345,6 +4363,22 @@ begin
   result := StrToInt64(S);
 end;
 {$ENDIF}
+
+{*************************************************************************}
+function ALStrToInt64Def(const S: AnsiString; const Default: Int64): Int64;
+{$IFDEF UNICODE}
+var
+  E: Integer;
+begin
+  Result := _ALValInt64(S, E);
+  if E <> 0 then Result := Default;
+end;
+{$ELSE}
+begin
+  result := StrToInt64Def(S, Default);
+end;
+{$ENDIF}
+
 
 {**************}
 {$IFDEF UNICODE}

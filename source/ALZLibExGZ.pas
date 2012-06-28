@@ -1033,10 +1033,15 @@ begin
   inStream := TFileStream.Create(String(inFileName), fmOpenRead or fmShareDenyNone);
 
   try
+    {$IF CompilerVersion < 18.5}
+    dateTime := FileAge(inFileName);
+    if dateTime < 0 then dateTime := 0;
+    {$ELSE}
     if not FileAge(inFileName, dateTime) then
     begin
       dateTime := 0;
     end;
+    {$IFEND}
 
     outStream := TFileStream.Create(outFileName, fmCreate);
 

@@ -205,13 +205,15 @@ type
     //[Deleted from TXMLNodeList] property DefaultNamespaceURI: AnsiString read GetDefaultNamespaceURI;
     //[Deleted from TXMLNodeList] property List: IInterfaceList read FList;
     //[Deleted from TXMLNodeList] property NotificationProc: TNodeListNotification read FNotificationProc;
-    //[Deleted from TXMLNodeList] function GetNode(const IndexOrName: OleVariant): TALXMLNode;
     procedure Grow; // [added from TXMLNodeList]
     procedure SetCapacity(NewCapacity: Integer); // [added from TXMLNodeList]
     procedure SetCount(NewCount: Integer); // [added from TXMLNodeList]
     property Owner: TALXMLNode read FOwner;
     function GetCount: Integer;
     function Get(Index: Integer): TALXMLNode;
+    {$IF CompilerVersion < 18.5}
+    function GetNode(const IndexOrName: OleVariant): TALXMLNode;
+    {$IFEND}
     function GetNodeByIndex(Const Index: Integer): TALXMLNode; // [added from TXMLNodeList]
     function GetNodeByName(Const Name: AnsiString): TALXMLNode; // [added from TXMLNodeList]
     Function InternalInsert(Index: Integer; const Node: TALXMLNode): integer;
@@ -244,8 +246,12 @@ type
     procedure Clear;
     procedure Insert(Index: Integer; const Node: TALXMLNode);
     property Count: Integer read GetCount;
-    property Node[const Name: AnsiString]: TALXMLNode read GetNodeByName; default; //[Replace from TXMLNodeList] property Nodes[const IndexOrName: OleVariant]: TALXMLNode read GetNode; default;
-    property Node[const Index: integer]: TALXMLNode read GetNodeByIndex; default; // [Replace from TXMLNodeList] property Nodes[const IndexOrName: OleVariant]: TALXMLNode read GetNode; default;
+    {$IF CompilerVersion < 18.5}
+    property Nodes[const IndexOrName: OleVariant]: TALXMLNode read GetNode; default;
+    {$ELSE}
+    property Nodes[const Name: AnsiString]: TALXMLNode read GetNodeByName; default;
+    property Nodes[const Index: integer]: TALXMLNode read GetNodeByIndex; default;
+    {$IFEND}
   end;
 
   {TALXMLNode}
@@ -2573,7 +2579,7 @@ Var NodeStack: Tstack;
       If assigned(aNodeList) then
         with aNodeList do
           For i := 0 to Count - 1 do
-            WriteAttributeNode2Stream(Node[i]);
+            WriteAttributeNode2Stream(Nodes[i]);
 
       TagEnclosed := True;
       aNodeList := InternalGetChildNodes;
@@ -2583,7 +2589,7 @@ Var NodeStack: Tstack;
             TagEnclosed := False;
             WriteStr2Stream('>');
             NodeStack.Push(aElementNode);
-            For i := Count - 1 downto 0 do NodeStack.Push(Node[i]);
+            For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
           end
       end;
 
@@ -2608,7 +2614,7 @@ Var NodeStack: Tstack;
       aNodeList := InternalGetChildNodes;
       If assigned(aNodeList) then
         with aNodeList do
-          For i := Count - 1 downto 0 do NodeStack.Push(Node[i]);
+          For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
 
     end;
   end;
@@ -3465,6 +3471,21 @@ begin
   Result := FList^[Index];
 end;
 
+{**************************}
+{$IF CompilerVersion < 18.5}
+{Returns a specified node from the list.
+ GetNode is the read implementation of the Nodes property.
+ *IndexOrName identifies the desired node. It can be The index of the node, where 0 is the index of the first node,
+  1 is the index of the second node, and so on. The LocalName property of a node in the list.
+ If IndexOrName does not identify a node in the list, GetNode tries to create a new node with the name specified by
+ IndexOrName. If it can’t create the new node, GetNode raises an exception.}
+function GetNode(const IndexOrName: OleVariant): TALXMLNode;
+begin
+  if VarIsOrdinal(IndexOrName) then Result := GetNodeByIndex(IndexOrName)
+  else Result := GetNodeByName(TALXMLString(IndexOrName));
+end;
+{$IFEND}
+
 {**************************************}
 {Returns a specified node from the list.
  GetNode is the read implementation of the Nodes property.
@@ -3485,7 +3506,7 @@ function TALXMLNodeList.GetNodeByName(const Name: AnsiString): TALXMLNode;
 begin
   Result := FindNode(Name);
   if (not Assigned(Result)) and
-     (assigned(fOwner.OwnerDocument)) and 
+     (assigned(fOwner.OwnerDocument)) and
      (doNodeAutoCreate in fOwner.OwnerDocument.Options) and
      ((FOwner.GetNodeType <> ntDocument) or (FOwner.OwnerDocument.DocumentElement = nil)) // Don't try to autocreate a second document element !
   then Result := FOwner.AddChild(Name);

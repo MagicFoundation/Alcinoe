@@ -83,6 +83,11 @@ Uses Classes,
 
 Type
 
+  {$IF CompilerVersion < 18.5}
+  TStringsDefined = set of (sdDelimiter, sdQuoteChar, sdNameValueSeparator,
+    sdLineBreak, sdStrictDelimiter);
+  {$IFEND}
+
   {-----------------}
   TALStrings = class;
 
@@ -497,8 +502,10 @@ begin
       FNameValueSeparator := AnsiChar(TStrings(Source).NameValueSeparator);
       FQuoteChar := AnsiChar(TStrings(Source).QuoteChar);
       FDelimiter := AnsiChar(TStrings(Source).Delimiter);
+      {$IF CompilerVersion >= 18.5} {Delphi D2007}
       FLineBreak := AnsiString(TStrings(Source).LineBreak);
       FStrictDelimiter := TStrings(Source).StrictDelimiter;
+      {$IFEND}
       for I := 0 to Tstrings(Source).Count - 1 do
         AddObject(Ansistring(Tstrings(Source)[I]), Tstrings(Source).Objects[I]);
     finally
@@ -521,8 +528,10 @@ begin
       Tstrings(Dest).NameValueSeparator := char(FNameValueSeparator);
       Tstrings(Dest).QuoteChar := char(FQuoteChar);
       Tstrings(Dest).Delimiter := char(FDelimiter);
+      {$IF CompilerVersion >= 18.5} {Delphi D2007}
       Tstrings(Dest).LineBreak := String(FLineBreak);
       Tstrings(Dest).StrictDelimiter := FStrictDelimiter;
+      {$IFEND}
       for I := 0 to Count - 1 do
         Tstrings(Dest).AddObject(string(get(I)), Objects[I]);
     finally

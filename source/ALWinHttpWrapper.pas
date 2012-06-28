@@ -77,6 +77,11 @@ uses Windows;
 
 {$HPPEMIT '#include <winhttp.h>'}
 
+{$IF CompilerVersion < 18.5}
+Type
+  DWORD_PTR = DWORD;
+{$IFEND}
+
 type
   HINTERNET = Pointer;
   {$EXTERNALSYM HINTERNET}

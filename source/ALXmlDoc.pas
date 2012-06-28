@@ -1202,7 +1202,7 @@ Var RawXmlString: AnsiString;
       DoParseProcessingInstruction(aName, aContent);
 
       //calculate the encoding
-      if RawXmlStringPos in [1,4{UTF8 BOOM}] then CodePage := ALGetCodePageFromName(ALExtractAttrValue(CALEncoding, aContent, ''));
+      if RawXmlStringPos in [1,4{UTF8 BOOM}] then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, aContent, ''));
 
       RawXmlStringPos := P2 + 2;
     end

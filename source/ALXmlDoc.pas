@@ -811,6 +811,9 @@ implementation
 
 uses Contnrs,
      AlFcnHTML,
+    {$IF CompilerVersion < 18.5}
+    Variants,
+    {$IFEND}
      AlFcnString;
 
 {$R ..\resource\ALXmlDoc.dcr}

@@ -346,7 +346,7 @@ Function  ALStringToWideString(const S: AnsiString; const aCodePage: Word): Wide
 function  AlWideStringToString(const WS: WideString; const aCodePage: Word): AnsiString;
 Function  ALUTF8Encode(const S: AnsiString; const aCodePage: Word): AnsiString;
 Function  ALUTF8decode(const S: AnsiString; const aCodePage: Word): AnsiString;
-Function  ALGetCodePageFromName(Acharset:AnsiString): Word;
+Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
 Function  ALUTF8ISO91995CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 Function  ALUTF8BGNPCGN1947CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
@@ -7976,11 +7976,25 @@ begin
   Result := ALUTF8UpperFirstChar(AlUtf8LowerCase(S));
 end;
 
-{********************************************************}
-Function ALGetCodePageFromName(Acharset:AnsiString): Word;
+{***************************************************************}
+Function ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
+{$IF CompilerVersion >= 23} {Delphi XE2}
+Var aEncoding: Tencoding;
+begin
+  Try
+    aEncoding := Tencoding.GetEncoding(String(Acharset));
+    Try
+      Result := aEncoding.CodePage;
+    Finally
+      aEncoding.Free;
+    end;
+  Except
+    Result := 0; // Default ansi code page
+  end;
+end;
+{$ELSE}
 begin
   Acharset := ALTrim(AlLowerCase(ACharset));
-
   if acharset='utf-8' then result := 65001 // unicode (utf-8)
   else if acharset='iso-8859-1' then result := 28591 // western european (iso)
   else if acharset='iso-8859-2' then result := 28592 // central european (iso)
@@ -8123,135 +8137,15 @@ begin
   else if acharset='utf-32be' then result := 65006 // unicode (utf-32 big-endian)
   else Result := 0; //Default ansi code page
 end;
+{$IFEND}
 
 {********************************************************}
 Function ALGetCodePageFromLCID(const aLCID:Integer): Word;
-Begin
-  Case aLCID of
-    1025: Result := 1256; //Arabic (Saudi Arabia)
-    1026: Result := 1251; //Bulgarian
-    1027: Result := 1252; //Catalan
-    1028: Result := 950; //Chinese (Taiwan)
-    1029: Result := 1250; //Czech
-    1030: Result := 1252; //Danish
-    1031: Result := 1252; //German (Germany)
-    1032: Result := 1253; //Greek
-    1033: Result := 1252; //English (United States)
-    1034: Result := 1252; //Spanish (Traditional Sort)
-    1035: Result := 1252; //Finnish
-    1036: Result := 1252; //French (France)
-    1037: Result := 1255; //Hebrew
-    1038: Result := 1250; //Hungarian
-    1039: Result := 1252; //Icelandic
-    1040: Result := 1252; //Italian (Italy)
-    1041: Result := 932; //Japanese
-    1042: Result := 949; //Korean
-    1043: Result := 1252; //Dutch (Netherlands)
-    1044: Result := 1252; //Norwegian (Bokmal)
-    1045: Result := 1250; //Polish
-    1046: Result := 1252; //Portuguese (Brazil)
-    1048: Result := 1250; //Romanian
-    1049: Result := 1251; //Russian
-    1050: Result := 1250; //Croatian
-    1051: Result := 1250; //Slovak
-    1052: Result := 1250; //Albanian
-    1053: Result := 1252; //Swedish
-    1054: Result := 874; //Thai
-    1055: Result := 1254; //Turkish
-    1056: Result := 1256; //Urdu
-    1057: Result := 1252; //Indonesian
-    1058: Result := 1251; //Ukrainian
-    1059: Result := 1251; //Belarusian
-    1060: Result := 1250; //Slovenian
-    1061: Result := 1257; //Estonian
-    1062: Result := 1257; //Latvian
-    1063: Result := 1257; //Lithuanian
-    1065: Result := 1256; //Farsi
-    1066: Result := 1258; //Vietnamese
-    1068: Result := 1254; //Azeri (Latin)
-    1069: Result := 1252; //Basque
-    1071: Result := 1251; //FYRO Macedonian
-    1078: Result := 1252; //Afrikaans
-    1080: Result := 1252; //Faroese
-    1086: Result := 1252; //Malay (Malaysia)
-    1087: Result := 1251; //Kazakh
-    1088: Result := 1251; //Kyrgyz (Cyrillic)
-    1089: Result := 1252; //Swahili
-    1091: Result := 1254; //Uzbek (Latin)
-    1092: Result := 1251; //Tatar
-    1104: Result := 1251; //Mongolian (Cyrillic)
-    1110: Result := 1252; //Galician
-    2049: Result := 1256; //Arabic (Iraq)
-    2052: Result := 936; //Chinese (PRC)
-    2055: Result := 1252; //German (Switzerland)
-    2057: Result := 1252; //English (United Kingdom)
-    2058: Result := 1252; //Spanish (Mexico)
-    2060: Result := 1252; //French (Belgium)
-    2064: Result := 1252; //Italian (Switzerland)
-    2067: Result := 1252; //Dutch (Belgium)
-    2068: Result := 1252; //Norwegian (Nynorsk)
-    2070: Result := 1252; //Portuguese (Portugal)
-    2074: Result := 1250; //Serbian (Latin)
-    2077: Result := 1252; //Swedish (Finland)
-    2092: Result := 1251; //Azeri (Cyrillic)
-    2110: Result := 1252; //Malay (Brunei Darussalam)
-    2115: Result := 1251; //Uzbek (Cyrillic)
-    3073: Result := 1256; //Arabic (Egypt)
-    3076: Result := 950; //Chinese (Hong Kong S.A.R.)
-    3079: Result := 1252; //German (Austria)
-    3081: Result := 1252; //English (Australia)
-    3082: Result := 1252; //Spanish (International Sort)
-    3084: Result := 1252; //French (Canada)
-    3098: Result := 1251; //Serbian (Cyrillic)
-    4097: Result := 1256; //Arabic (Libya)
-    4100: Result := 936; //Chinese (Singapore)
-    4103: Result := 1252; //German (Luxembourg)
-    4105: Result := 1252; //English (Canada)
-    4106: Result := 1252; //Spanish (Guatemala)
-    4108: Result := 1252; //French (Switzerland)
-    5121: Result := 1256; //Arabic (Algeria)
-    5124: Result := 950; //Chinese (Macau S.A.R.)
-    5127: Result := 1252; //German (Liechtenstein)
-    5129: Result := 1252; //English (New Zealand)
-    5130: Result := 1252; //Spanish (Costa Rica)
-    5132: Result := 1252; //French (Luxembourg)
-    6145: Result := 1256; //Arabic (Morocco)
-    6153: Result := 1252; //English (Ireland)
-    6154: Result := 1252; //Spanish (Panama)
-    6156: Result := 1252; //French (Monaco)
-    7169: Result := 1256; //Arabic (Tunisia)
-    7177: Result := 1252; //English (South Africa)
-    7178: Result := 1252; //Spanish (Dominican Republic)
-    8193: Result := 1256; //Arabic (Oman)
-    8201: Result := 1252; //English (Jamaica)
-    8202: Result := 1252; //Spanish (Venezuela)
-    9217: Result := 1256; //Arabic (Yemen)
-    9225: Result := 1252; //English (Caribbean)
-    9226: Result := 1252; //Spanish (Colombia)
-    10241: Result := 1256; //Arabic (Syria)
-    10249: Result := 1252; //English (Belize)
-    10250: Result := 1252; //Spanish (Peru)
-    11265: Result := 1256; //Arabic (Jordan)
-    11273: Result := 1252; //English (Trinidad)
-    11274: Result := 1252; //Spanish (Argentina)
-    12289: Result := 1256; //Arabic (Lebanon)
-    12297: Result := 1252; //English (Zimbabwe)
-    12298: Result := 1252; //Spanish (Ecuador)
-    13313: Result := 1256; //Arabic (Kuwait)
-    13321: Result := 1252; //English (Philippines)
-    13322: Result := 1252; //Spanish (Chile)
-    14337: Result := 1256; //Arabic (U.A.E.)
-    14346: Result := 1252; //Spanish (Uruguay)
-    15361: Result := 1256; //Arabic (Bahrain)
-    15370: Result := 1252; //Spanish (Paraguay)
-    16385: Result := 1256; //Arabic (Qatar)
-    16394: Result := 1252; //Spanish (Bolivia)
-    17418: Result := 1252; //Spanish (El Salvador)
-    18442: Result := 1252; //Spanish (Honduras)
-    19466: Result := 1252; //Spanish (Nicaragua)
-    20490: Result := 1252; //Spanish (Puerto Rico)
-    else Result := 0; //Default ansi code page
-  end;
+var
+  Buffer: array [0..6] of AnsiChar;
+begin
+  GetLocaleInfoA(ALcid, LOCALE_IDEFAULTANSICODEPAGE, Buffer, Length(Buffer));
+  Result:= ALStrToIntDef(Buffer, 0);
 end;
 
 {************************************************************************************}

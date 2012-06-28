@@ -141,7 +141,7 @@ type
     NegCurrFormat: Byte;
     // Creates a TALFormatSettings record with current default values provided
     // by the operating system.
-    class function Create: TALFormatSettings; overload; static; inline;
+    class function Create: TALFormatSettings; overload; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
     // Creates a TALFormatSettings record with values provided by the operating
     // system for the specified locale. The locale is an LCID on Windows
     // platforms, or a locale_t on Posix platforms.
@@ -196,7 +196,7 @@ procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormat
 function  ALGUIDToString(const Guid: TGUID): Ansistring;
 Function  ALMakeKeyStrByGUID: AnsiString;
 function  ALMatchesMask(const Filename, Mask: AnsiString): Boolean;
-function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; inline;
+function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
 function  ALFormat(const Format: AnsiString; const Args: array of const): AnsiString; overload;
 function  ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString; overload;
 function  ALTryStrToBool(const S: Ansistring; out Value: Boolean): Boolean;
@@ -217,11 +217,15 @@ function  ALTryStrToInt64(const S: AnsiString; out Value: Int64): Boolean;
 function  ALStrToInt64(const S: AnsiString): Int64;
 function  ALIntToStr(Value: Integer): AnsiString; overload;
 function  ALIntToStr(Value: Int64): AnsiString; overload;
+{$IFDEF UNICODE}
 function  ALUIntToStr(Value: Cardinal): AnsiString; overload;
 function  ALUIntToStr(Value: UInt64): AnsiString; overload;
+{$ENDIF}
 function  ALIntToHex(Value: Integer; Digits: Integer): AnsiString; overload;
 function  ALIntToHex(Value: Int64; Digits: Integer): AnsiString; overload;
+{$IFDEF UNICODE}
 function  ALIntToHex(Value: UInt64; Digits: Integer): AnsiString; overload;
+{$ENDIF}
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
@@ -3936,7 +3940,8 @@ begin
 {$ENDIF}
 end;
 
-{*****************************************************}
+{**************}
+{$IFDEF UNICODE}
 // Hex : ( '$' | 'X' | 'x' | '0X' | '0x' ) [0-9A-Fa-f]*
 // Dec : ( '+' | '-' )? [0-9]*
 function _ALValLong(const s: AnsiString; var code: Integer): Longint;
@@ -4197,8 +4202,10 @@ asm
         POP     EBX
 end;
 {$ENDIF}
+{$ENDIF}
 
-{******************************************************************}
+{**************}
+{$IFDEF UNICODE}
 function _ALValInt64(const s: AnsiString; var code: Integer): Int64;
 var
   i: Integer;
@@ -4276,44 +4283,71 @@ begin
   else
     code := 0;
 end;
+{$ENDIF}
 
 {***********************************************************************}
 function ALTryStrToInt(const S: AnsiString; out Value: Integer): Boolean;
+{$IFDEF UNICODE}
 var
   E: Integer;
 begin
   Value := _ALValLong(S, E);
   Result := E = 0;
 end;
+{$ELSE}
+begin
+  result := TryStrToInt(S, Value);
+end;
+{$ENDIF}
 
 {************************************************}
 function ALStrToInt(const S: AnsiString): Integer;
+{$IFDEF UNICODE}
 var
   E: Integer;
 begin
   Result := _ALValLong(S, E);
   if E <> 0 then raise EConvertError.CreateResFmt(@SysConst.SInvalidInteger, [S]);
 end;
+{$ELSE}
+begin
+  result := StrToInt(S);
+end;
+{$ENDIF}
 
 {***********************************************************************}
 function ALTryStrToInt64(const S: AnsiString; out Value: Int64): Boolean;
+{$IFDEF UNICODE}
 var
   E: Integer;
 begin
   Value := _ALValInt64(S, E);
   Result := E = 0;
 end;
+{$ELSE}
+begin
+  result := TryStrToInt64(S, Value);
+end;
+{$ENDIF}
+
 
 {************************************************}
 function ALStrToInt64(const S: AnsiString): Int64;
+{$IFDEF UNICODE}
 var
   E: Integer;
 begin
   Result := _ALValInt64(S, E);
   if E <> 0 then raise EConvertError.CreateResFmt(@SysConst.SInvalidInteger, [S]);
 end;
+{$ELSE}
+begin
+  result := StrToInt64(S);
+end;
+{$ENDIF}
 
-{***}
+{**************}
+{$IFDEF UNICODE}
 const
   ALTwoDigitLookup : packed array[0..99] of array[1..2] of AnsiChar =
     ('00','01','02','03','04','05','06','07','08','09',
@@ -4326,8 +4360,10 @@ const
      '70','71','72','73','74','75','76','77','78','79',
      '80','81','82','83','84','85','86','87','88','89',
      '90','91','92','93','94','95','96','97','98','99');
+{$ENDIF}
 
-{*********************************************************************}
+{**************}
+{$IFDEF UNICODE}
 function _ALIntToStr32(Value: Cardinal; Negative: Boolean): AnsiString;
 var
   I, J, K : Cardinal;
@@ -4368,8 +4404,10 @@ begin
   else
     PAnsiChar(P)^ := AnsiChar(I or ord(AnsiChar('0')));
 end;
+{$ENDIF}
 
-{*******************************************************************}
+{**************}
+{$IFDEF UNICODE}
 function _ALIntToStr64(Value: UInt64; Negative: Boolean): AnsiString;
 var
   I64, J64, K64      : UInt64;
@@ -4470,38 +4508,56 @@ begin
   else
     P^ := AnsiChar(I32 or ord(AnsiChar('0')));
 end;
+{$ENDIF}
 
 {**********************************************}
 function ALIntToStr(Value: Integer): AnsiString;
+{$IFDEF UNICODE}
 begin
   if Value < 0 then
     Result := _ALIntToStr32(-Value, True)
   else
     Result := _ALIntToStr32(Value, False);
 end;
+{$ELSE}
+begin
+  result := IntToStr(Value);
+end;
+{$ENDIF}
 
 {********************************************}
 function ALIntToStr(Value: Int64): AnsiString;
+{$IFDEF UNICODE}
 begin
   if Value < 0 then
     Result := _ALIntToStr64(-Value, True)
   else
     Result := _ALIntToStr64(Value, False);
 end;
+{$ELSE}
+begin
+  result := IntToStr(Value);
+end;
+{$ENDIF}
 
-{************************************************}
+{**************}
+{$IFDEF UNICODE}
 function ALUIntToStr(Value: Cardinal): AnsiString;
 begin
   Result := _ALIntToStr32(Value, False);
 end;
+{$ENDIF}
 
-{**********************************************}
+{**************}
+{$IFDEF UNICODE}
 function ALUIntToStr(Value: UInt64): AnsiString;
 begin
   Result := _ALIntToStr64(Value, False);
 end;
+{$ENDIF}
 
-{***}
+{**************}
+{$IFDEF UNICODE}
 const
   ALTwoHexLookup : packed array[0..255] of array[1..2] of AnsiChar =
   ('00','01','02','03','04','05','06','07','08','09','0A','0B','0C','0D','0E','0F',
@@ -4520,8 +4576,10 @@ const
    'D0','D1','D2','D3','D4','D5','D6','D7','D8','D9','DA','DB','DC','DD','DE','DF',
    'E0','E1','E2','E3','E4','E5','E6','E7','E8','E9','EA','EB','EC','ED','EE','EF',
    'F0','F1','F2','F3','F4','F5','F6','F7','F8','F9','FA','FB','FC','FD','FE','FF');
+{$ENDIF}
 
-{***************************************************************}
+{**************}
+{$IFDEF UNICODE}
 function _ALIntToHex(Value: UInt64; Digits: Integer): AnsiString;
 var
   I32    : Integer;
@@ -4561,32 +4619,47 @@ begin
   else
     PAnsiChar(P)^ := (PAnsiChar(@ALTwoHexLookup[I])+1)^;
 end;
+{$ENDIF}
 
 {***************************************************************}
 function ALIntToHex(Value: Integer; Digits: Integer): AnsiString;
+{$IFDEF UNICODE}
 begin
   Result := _ALIntToHex(Cardinal(Value), Digits);
 end;
+{$ELSE}
+begin
+  result := IntToHex(Value, Digits);
+end;
+{$ENDIF}
 
 {*************************************************************}
 function ALIntToHex(Value: Int64; Digits: Integer): AnsiString;
+{$IFDEF UNICODE}
 begin
   Result := _ALIntToHex(Value, digits);
 end;
+{$ELSE}
+begin
+  result := IntToHex(Value, Digits);
+end;
+{$ENDIF}
 
-{**************************************************************}
+{**************}
+{$IFDEF UNICODE}
 function ALIntToHex(Value: UInt64; Digits: Integer): AnsiString;
 begin
   Result := _ALIntToHex(Value, digits);
 end;
+{$ENDIF}
 
 {*************************************************}
 function ALIsDecimal(const S: AnsiString): boolean;
-var aChar: AnsiChar;
+var i: integer;
 begin
   result := true;
-  for aChar in S do begin
-    if not (aChar in ['0'..'9','-']) then begin
+  for i := 1 to length(S) do begin
+    if not (S[i] in ['0'..'9','-']) then begin
       result := false;
       break;
     end;
@@ -6287,7 +6360,11 @@ begin
   {$IFDEF UNICODE}
   Result := System.AnsiStrings.SameStr(S1, S2);
   {$ELSE}
-  Result := SameStr(S1, S2);
+    {$IF CompilerVersion >= 18.5} {Delphi 2007}
+    Result := SameStr(S1, S2);
+    {$ELSE}
+    result := S1 = S2;
+    {$IFEND}
   {$ENDIF}
 end;
 

@@ -93,7 +93,7 @@ Type
     FStrings: TALStrings;
   public
     constructor Create(AStrings: TALStrings);
-    function GetCurrent: AnsiString; inline;
+    function GetCurrent: AnsiString; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
     function MoveNext: Boolean;
     property Current: AnsiString read GetCurrent;
   end;

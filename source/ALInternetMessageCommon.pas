@@ -508,7 +508,7 @@ Begin
                 aEncoding := alLowerCase(AlcopyStr(aEncodedText,P2+1,P3-P2-1)); //q
                 If (aEncoding='q') or (aEncoding='b') then begin
                   aCharSet := AlcopyStr(aEncodedText,P1+2,P2-P1-2); //iso-8859-1
-                  aCodePage := ALGetCodePageFromName(Acharset); //28591
+                  aCodePage := ALGetCodePageFromCharSetName(Acharset); //28591
                   aencodedText := AlcopyStr(aEncodedText,P3+1,P4-P3-1); //this=20is=20some=20text
                   If (aEncoding='b') then aencodedText := ALMimeBase64DecodeString(aencodedText)
                   else aencodedText := ALDecodeQuotedPrintableString(aencodedText);

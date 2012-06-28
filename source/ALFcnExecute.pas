@@ -64,6 +64,11 @@ uses windows,
      sysutils,
      messages;
 
+{$IF CompilerVersion < 18.5}
+Type
+  TStartupInfoA = TStartupInfo;
+{$IFEND}
+
 const
   SE_CREATE_TOKEN_NAME = 'SeCreateTokenPrivilege';
   SE_ASSIGNPRIMARYTOKEN_NAME = 'SeAssignPrimaryTokenPrivilege';

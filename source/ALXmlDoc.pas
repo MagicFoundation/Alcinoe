@@ -3482,10 +3482,10 @@ end;
   1 is the index of the second node, and so on. The LocalName property of a node in the list.
  If IndexOrName does not identify a node in the list, GetNode tries to create a new node with the name specified by
  IndexOrName. If it can’t create the new node, GetNode raises an exception.}
-function GetNode(const IndexOrName: OleVariant): TALXMLNode;
+function TALXMLNodeList.GetNode(const IndexOrName: OleVariant): TALXMLNode;
 begin
   if VarIsOrdinal(IndexOrName) then Result := GetNodeByIndex(IndexOrName)
-  else Result := GetNodeByName(TALXMLString(IndexOrName));
+  else Result := GetNodeByName(AnsiString(IndexOrName));
 end;
 {$IFEND}
 

@@ -247,6 +247,11 @@ code of Php5Isapi.dll
   URL
 ###############################################################################}
 
+{$IF CompilerVersion < 18.5}
+Type
+  TStartupInfoA = TStartupInfo;
+{$IFEND}
+
 type
 
   {---------------------------------}

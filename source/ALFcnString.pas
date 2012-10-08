@@ -76,6 +76,7 @@ History:      11/05/2005: Remove the bug in alFastTagReplace that raise
                           the fastcode project
               01/09/2009: Change ALFastTagReplace to launch again ALFastTagReplace
                           on the result of FastTagReplaceProc
+              26/06/2012: Add xe2 support
 
 Link :
 
@@ -202,6 +203,7 @@ function  ALFormat(const Format: AnsiString; const Args: array of const): AnsiSt
 function  ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString; overload;
 function  ALTryStrToBool(const S: Ansistring; out Value: Boolean): Boolean;
 Function  AlStrToBool(Value:AnsiString):Boolean;
+function  ALBoolToStr(B: Boolean): Ansistring;
 function  ALDateToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALDateTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
@@ -306,20 +308,6 @@ function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): S
 function  ALRandomStrU(const aLength: Longint): String; overload;
 function  ALNEVExtractName(const S: AnsiString): AnsiString;
 function  ALNEVExtractValue(const s: AnsiString): AnsiString;
-procedure ALExtractHeaderFields(Separators,
-                                WhiteSpace,
-                                Quotes: TSysCharSet;
-                                Content: PAnsiChar;
-                                Strings: TALStrings;
-                                Decode: Boolean;
-                                StripQuotes: Boolean = False);
-procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
-                                                WhiteSpace,
-                                                Quotes: TSysCharSet;
-                                                Content: PAnsiChar;
-                                                Strings: TALStrings;
-                                                Decode: Boolean;
-                                                StripQuotes: Boolean = False);
 function  ALGetStringFromFile(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 function  ALGetStringFromFileWithoutUTF8BOM(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 procedure ALSaveStringtoFile(Str: AnsiString; filename: AnsiString);
@@ -3010,6 +2998,13 @@ Function AlStrToBool(Value:AnsiString):Boolean;
 Begin
   Result := False;
   ALTryStrtoBool(Value,Result);
+end;
+
+{********************************************}
+function  ALBoolToStr(B: Boolean): Ansistring;
+begin
+  if B then result := '1'
+  else result := '0';
 end;
 
 {**************}
@@ -7261,177 +7256,6 @@ begin
 
   SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,i,maxint), pointer(0));
 
-end;
-
-{********************************************************}
-{Parses a multi-valued string into its constituent fields.
- ExtractHeaderFields is a general utility to parse multi-valued HTTP header strings into separate substrings.
- * Separators is a set of characters that are used to separate individual values within the multi-valued string.
- * WhiteSpace is a set of characters that are to be ignored when parsing the string.
- * Content is the multi-valued string to be parsed.
- * Strings is the TStrings object that receives the individual values that are parsed from Content.
- * StripQuotes determines whether the surrounding quotes are removed from the resulting items. When StripQuotes is true, surrounding quotes are removed
-   before substrings are added to Strings.
- Note:	Characters contained in Separators or WhiteSpace are treated as part of a value substring if the substring is surrounded by single or double quote
- marks. HTTP escape characters are converted using the ALHTTPDecode function.}
-procedure ALExtractHeaderFields(Separators,
-                                WhiteSpace,
-                                Quotes: TSysCharSet;
-                                Content: PAnsiChar;
-                                Strings: TALStrings;
-                                Decode: Boolean;
-                                StripQuotes: Boolean = False);
-
-var Head, Tail: PAnsiChar;
-    EOS, InQuote, LeadQuote: Boolean;
-    QuoteChar: AnsiChar;
-    ExtractedField: AnsiString;
-    SeparatorsWithQuotesAndNulChar: TSysCharSet;
-    QuotesWithNulChar: TSysCharSet;
-
-  {------------------------------------------------------}
-  function DoStripQuotes(const S: AnsiString): AnsiString;
-  var I: Integer;
-      InStripQuote: Boolean;
-      StripQuoteChar: AnsiChar;
-  begin
-    Result := S;
-    InStripQuote := False;
-    StripQuoteChar := #0;
-    if StripQuotes then
-      for I := Length(Result) downto 1 do
-        if Result[I] in Quotes then
-          if InStripQuote and (StripQuoteChar = Result[I]) then begin
-            Delete(Result, I, 1);
-            InStripQuote := False;
-          end
-          else if not InStripQuote then begin
-            StripQuoteChar := Result[I];
-            InStripQuote := True;
-            Delete(Result, I, 1);
-          end
-  end;
-
-Begin
-  if (Content = nil) or (Content^ = #0) then Exit;
-  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
-  QuotesWithNulChar := Quotes + [#0];
-  Tail := Content;
-  QuoteChar := #0;
-  repeat
-    while Tail^ in WhiteSpace do Inc(Tail);
-    Head := Tail;
-    InQuote := False;
-    LeadQuote := False;
-    while True do begin
-      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
-      if Tail^ in Quotes then begin
-        if (QuoteChar <> #0) and (QuoteChar = Tail^) then QuoteChar := #0
-        else If QuoteChar = #0 then begin
-          LeadQuote := Head = Tail;
-          QuoteChar := Tail^;
-          if LeadQuote then Inc(Head);
-        end;
-        InQuote := QuoteChar <> #0;
-        if InQuote then Inc(Tail)
-        else Break;
-      end else Break;
-    end;
-    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
-    EOS := Tail^ = #0;
-    if Head^ <> #0 then begin
-      SetString(ExtractedField, Head, Tail-Head);
-      if Decode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
-      else Strings.Add(DoStripQuotes(ExtractedField));
-    end;
-    Inc(Tail);
-  until EOS;
-end;
-
-{**************************************************************************************}
-{same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
-procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
-                                                WhiteSpace,
-                                                Quotes: TSysCharSet;
-                                                Content: PAnsiChar;
-                                                Strings: TALStrings;
-                                                Decode: Boolean;
-                                                StripQuotes: Boolean = False);
-
-var Head, Tail, NextTail: PAnsiChar;
-    EOS, InQuote, LeadQuote: Boolean;
-    QuoteChar: AnsiChar;
-    ExtractedField: AnsiString;
-    SeparatorsWithQuotesAndNulChar: TSysCharSet;
-    QuotesWithNulChar: TSysCharSet;
-
-  {------------------------------------------------------}
-  function DoStripQuotes(const S: AnsiString): AnsiString;
-  var I: Integer;
-      InStripQuote: Boolean;
-      StripQuoteChar: AnsiChar;
-  begin
-    Result := S;
-    InStripQuote := False;
-    StripQuoteChar := #0;
-    if StripQuotes then begin
-      i := Length(Result);
-      while i > 0 do begin
-        if Result[I] in Quotes then begin
-          if InStripQuote and (StripQuoteChar = Result[I]) then begin
-            Delete(Result, I, 1);
-            if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
-            else InStripQuote := False;
-          end
-          else if not InStripQuote then begin
-            StripQuoteChar := Result[I];
-            InStripQuote := True;
-            Delete(Result, I, 1);
-          end
-        end;
-        dec(i);
-      end;
-    end;
-  end;
-
-Begin
-  if (Content = nil) or (Content^ = #0) then Exit;
-  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
-  QuotesWithNulChar := Quotes + [#0];
-  Tail := Content;
-  QuoteChar := #0;
-  repeat
-    while Tail^ in WhiteSpace do Inc(Tail);
-    Head := Tail;
-    InQuote := False;
-    LeadQuote := False;
-    while True do begin
-      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
-      if Tail^ in Quotes then begin
-        if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
-          NextTail := Tail + 1;
-          if NextTail^ = Tail^ then inc(tail)
-          else QuoteChar := #0;
-        end
-        else If QuoteChar = #0 then begin
-          LeadQuote := Head = Tail;
-          QuoteChar := Tail^;
-          if LeadQuote then Inc(Head);
-        end;
-        InQuote := QuoteChar <> #0;
-        if InQuote then Inc(Tail)
-        else Break;
-      end else Break;
-    end;
-    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
-    EOS := Tail^ = #0;
-    if Head^ <> #0 then begin
-      SetString(ExtractedField, Head, Tail-Head);
-      if Decode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
-      else Strings.Add(DoStripQuotes(ExtractedField));
-    end;
-    Inc(Tail);
-  until EOS;
 end;
 
 {*******************************************************************************************************}

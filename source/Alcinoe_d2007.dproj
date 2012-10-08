@@ -38,24 +38,6 @@
       
       
       
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">Alcinoe_d2007.dpk</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -83,7 +65,6 @@
     <DCCReference Include="ALFcnHTML.pas" />
     <DCCReference Include="ALFcnMime.pas" />
     <DCCReference Include="ALFcnMisc.pas" />
-    <DCCReference Include="ALFcnRFC.pas" />
     <DCCReference Include="ALFcnSkin.pas" />
     <DCCReference Include="ALFcnSQL.pas" />
     <DCCReference Include="ALFcnString.pas" />
@@ -94,6 +75,7 @@
     <DCCReference Include="ALHintballoon.pas" />
     <DCCReference Include="ALHttpClient.pas" />
     <DCCReference Include="ALHttpCommon.pas" />
+    <DCCReference Include="ALIniFiles.pas" />
     <DCCReference Include="ALInternetMessageCommon.pas" />
     <DCCReference Include="ALIsapiHTTP.pas" />
     <DCCReference Include="ALListBox.pas" />
@@ -128,7 +110,6 @@
     <DCCReference Include="ALZlibExGZ.pas" />
     <DCCReference Include="C:\Users\svanderclock\Desktop\dbrtl.dcp" />
     <DCCReference Include="C:\Users\svanderclock\Desktop\inet.dcp" />
-    <DCCReference Include="C:\Users\svanderclock\Desktop\IsapiHTTP" />
     <DCCReference Include="C:\Users\svanderclock\Desktop\rtl.dcp" />
     <DCCReference Include="C:\Users\svanderclock\Desktop\vcl.dcp" />
   </ItemGroup>

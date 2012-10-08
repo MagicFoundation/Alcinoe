@@ -66,15 +66,15 @@ uses windows,
      StdCtrls,
      controls;
 
-function ALInputQuery(const ACaption, APrompt: string; var Value: string; ACancelButton: Boolean): Boolean;
-function ALInputBox(const ACaption, APrompt, ADefault: string; ACancelButton: Boolean): string;
+function ALInputQuery(const ACaption, APrompt: Ansistring; var Value: Ansistring; ACancelButton: Boolean): Boolean;
+function ALInputBox(const ACaption, APrompt, ADefault: Ansistring; ACancelButton: Boolean): Ansistring;
 
 implementation
 
 uses Consts;
 
-{*********************************************************************************************************}
-function ALInputQuery(const ACaption, APrompt: string; var Value: string; ACancelButton: Boolean): Boolean;
+{*****************************************************************************************************************}
+function ALInputQuery(const ACaption, APrompt: Ansistring; var Value: Ansistring; ACancelButton: Boolean): Boolean;
 var
   Form: TForm;
   Prompt: TLabel;
@@ -101,13 +101,13 @@ begin
       Canvas.Font := Font;
       DialogUnits := GetAveCharSize(Canvas);
       BorderStyle := bsDialog;
-      Caption := ACaption;
+      Caption := String(ACaption);
       ClientWidth := MulDiv(180, DialogUnits.X, 4);
       Position := poScreenCenter;
       Prompt := TLabel.Create(Form);
       with Prompt do begin
         Parent := Form;
-        Caption := APrompt;
+        Caption := String(APrompt);
         Left := MulDiv(8, DialogUnits.X, 4);
         Top := MulDiv(8, DialogUnits.Y, 8);
         Constraints.MaxWidth := MulDiv(164, DialogUnits.X, 4);
@@ -120,7 +120,7 @@ begin
         Top := Prompt.Top + Prompt.Height + 5;
         Width := MulDiv(164, DialogUnits.X, 4);
         MaxLength := 255;
-        Text := Value;
+        Text := String(Value);
         SelectAll;
       end;
       ButtonTop := Edit.Top + Edit.Height + 15;
@@ -144,7 +144,7 @@ begin
           SetBounds(MulDiv(92, DialogUnits.X, 4), Edit.Top + Edit.Height + 15, ButtonWidth, ButtonHeight);
         end;
       if ShowModal = mrOk then begin
-        Value := Edit.Text;
+        Value := AnsiString(Edit.Text);
         Result := True;
       end;
     finally
@@ -152,8 +152,8 @@ begin
     end;
 end;
 
-{*********************************************************************************************}
-function ALInputBox(const ACaption, APrompt, ADefault: string; ACancelButton: Boolean): string;
+{*****************************************************************************************************}
+function ALInputBox(const ACaption, APrompt, ADefault: Ansistring; ACancelButton: Boolean): Ansistring;
 begin
   Result := ADefault;
   ALInputQuery(ACaption, APrompt, Result, ACancelButton);

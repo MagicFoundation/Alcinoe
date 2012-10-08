@@ -77,6 +77,7 @@ Function  AlCopyDirectory(SrcDirectory,
 function  ALGetModuleName: ansistring;
 function  ALGetModuleFileNameWithoutExtension: ansistring;
 function  ALGetModulePath: ansiString;
+Function  AlGetFileSize(const AFileName: ansistring): int64;
 Function  AlGetFileVersion(const AFileName: ansistring): ansiString;
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
@@ -182,6 +183,26 @@ begin
       FindClose(sr);
     end;
   end
+end;
+
+{**********************************************************}
+Function  AlGetFileSize(const AFileName: ansistring): int64;
+var
+  Handle: THandle;
+  FindData: TWin32FindDataA;
+begin
+  Handle := FindFirstFileA(PAnsiChar(AFileName), FindData);
+  if Handle <> INVALID_HANDLE_VALUE then
+  begin
+    Windows.FindClose(Handle);
+    if (FindData.dwFileAttributes and FILE_ATTRIBUTE_DIRECTORY) = 0 then
+    begin
+      Int64Rec(Result).Lo := FindData.nFileSizeLow;
+      Int64Rec(Result).Hi := FindData.nFileSizeHigh;
+      Exit;
+    end;
+  end;
+  Result := -1;
 end;
 
 {*****************************************************************}

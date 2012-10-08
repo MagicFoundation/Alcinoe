@@ -160,6 +160,8 @@ begin
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToFloatDef', 'ALStrToFloatDef');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToInt', 'ALStrToInt');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToInt64', 'ALStrToInt64');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToIntDef', 'ALStrToIntDef');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToInt64Def', 'ALStrToInt64Def');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'StrToTime', 'ALStrToTime');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TimeToStr', 'ALTimeToStr');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'Trim', 'ALTrim');
@@ -182,8 +184,8 @@ begin
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'MatchesMask', 'ALMatchesMask');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TFormatSettings', 'TALFormatSettings');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatFloat', 'ALFormatFloat');
-            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatCurr', 'ALFormatFloat');
-
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatCurr', 'ALFormatCurr');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TInifile', 'TALInifile');
 
             AlSaveStringTofile(aFileStr, Directory + AnsiString(aSR.Name));
 

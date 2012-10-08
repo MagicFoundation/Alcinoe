@@ -32,7 +32,6 @@ requires
   dbrtl;
 
 contains
-  IsapiHTTP,
   ALWininetHttpClient in 'ALWininetHttpClient.pas',
   ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
   ALButton in 'ALButton.pas',
@@ -63,7 +62,6 @@ contains
   ALWinHttpClient in 'ALWinHttpClient.pas',
   ALWinHttpWrapper in 'ALWinHttpWrapper.pas',
   ALSMTPClient in 'ALSMTPClient.pas',
-  ALFcnRFC in 'ALFcnRFC.pas',
   ALMultiPartMixedParser in 'ALMultiPartMixedParser.pas',
   ALGSMComm in 'ALGSMComm.pas',
   ALXmlDoc in 'ALXmlDoc.pas',
@@ -93,7 +91,8 @@ contains
   ALSqlite3Wrapper in 'ALSqlite3Wrapper.pas',
   ALWindows in 'ALWindows.pas',
   ALSphinxQLClient in 'ALSphinxQLClient.pas',
-  ALZLibExApi in 'ALZLibExApi.pas';
+  ALZLibExApi in 'ALZLibExApi.pas',
+  ALIniFiles in 'ALIniFiles.pas';
 
 end.
 

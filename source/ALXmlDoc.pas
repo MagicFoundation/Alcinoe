@@ -811,9 +811,10 @@ implementation
 
 uses Contnrs,
      AlFcnHTML,
-    {$IF CompilerVersion < 18.5}
-    Variants,
-    {$IFEND}
+     {$IF CompilerVersion < 18.5}
+     Variants,
+     {$IFEND}
+     ALHttpCommon,
      AlFcnString;
 
 {$R ..\resource\ALXmlDoc.dcr}

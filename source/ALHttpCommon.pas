@@ -84,9 +84,6 @@ uses Windows,
 
 Type
 
-  {---------------------------------------------------}
-  EALHttpClientConnectionDropped = class(EALException);
-
   {-- onchange Event that specify the property index that is just changed --}
   TALHTTPPropertyChangeEvent = procedure(sender: Tobject; Const PropertyIndex: Integer) of object;
 
@@ -94,12 +91,12 @@ Type
   TALHTTPProtocolVersion = (HTTPpv_1_0, HTTPpv_1_1);
 
   {--Request method--}
-  TALHTTPRequestMethod = (HTTPrm_Get,
-                          HTTPrm_Post,
-                          HTTPrm_Head,
-                          HTTPrm_Trace,
-                          HTTPrm_Put,
-                          HTTPrm_Delete);
+  TALHTTPMethod = (HTTPmt_Get,
+                   HTTPmt_Post,
+                   HTTPmt_Head,
+                   HTTPmt_Trace,
+                   HTTPmt_Put,
+                   HTTPmt_Delete);
 
   {--Request header--}
   TALHTTPRequestHeader = Class(Tcomponent)
@@ -203,7 +200,7 @@ Type
   end;
 
   {--TALHTTPCookie--}
-  TALHTTPResponseCookie = class(TCollectionItem)
+  TALHTTPCookie = class(TCollectionItem)
   private
     FName: AnsiString;
     FValue: AnsiString;
@@ -217,25 +214,24 @@ Type
   public
     constructor Create(Collection: TCollection); override;
     procedure AssignTo(Dest: TPersistent); override;
-    property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
-  Published
     property Name: AnsiString read FName write FName;
     property Value: AnsiString read FValue write FValue;
     property Domain: AnsiString read FDomain write FDomain;
     property Path: AnsiString read FPath write FPath;
     property Expires: TDateTime read FExpires write FExpires;
-    property Secure: Boolean read FSecure write FSecure Default False;
+    property Secure: Boolean read FSecure write FSecure;
+    property HeaderValue: AnsiString read GetHeaderValue write SetHeaderValue;
   end;
 
   {--TALCookieCollection--}
-  TALHTTPResponseCookieCollection = class(TOwnedCollection)
+  TALHTTPCookieCollection = class(TCollection)
   private
   protected
-    function GetCookie(Index: Integer): TALHTTPResponseCookie;
-    procedure SetCookie(Index: Integer; Cookie: TALHTTPResponseCookie);
+    function GetCookie(Index: Integer): TALHTTPCookie;
+    procedure SetCookie(Index: Integer; Cookie: TALHTTPCookie);
   public
-    function Add: TALHTTPResponseCookie;
-    property Items[Index: Integer]: TALHTTPResponseCookie read GetCookie write SetCookie; default;
+    function Add: TALHTTPCookie;
+    property Items[Index: Integer]: TALHTTPCookie read GetCookie write SetCookie; default;
   end;
 
   {--Response header--}
@@ -271,7 +267,7 @@ Type
     FWWWAuthenticate: AnsiString;
     FRawHeaderText: AnsiString;
     FCustomHeaders: TALStrings;
-    FCookies: TALHTTPResponseCookieCollection;
+    FCookies: TALHTTPCookieCollection;
     FStatusCode: AnsiString;
     FHttpProtocolVersion: AnsiString;
     FReasonPhrase: AnsiString;
@@ -312,7 +308,7 @@ Type
     property Warning: AnsiString read FWarning; {Warning: 112 Disconnected Operation}
     property WWWAuthenticate: AnsiString read FWWWAuthenticate; {WWW-Authenticate: [challenge]}
     Property CustomHeaders: TALStrings read FCustomHeaders;
-    Property Cookies: TALHTTPResponseCookieCollection read FCookies;
+    Property Cookies: TALHTTPCookieCollection read FCookies;
     property StatusCode: AnsiString read FStatusCode;
     property HttpProtocolVersion: AnsiString read FHttpProtocolVersion;
     Property ReasonPhrase: AnsiString read FReasonPhrase;
@@ -328,6 +324,20 @@ procedure ALExtractHTTPFields(Separators,
                               Content: PAnsiChar;
                               Strings: TALStrings;
                               StripQuotes: Boolean = False);
+procedure ALExtractHeaderFields(Separators,
+                                WhiteSpace,
+                                Quotes: TSysCharSet;
+                                Content: PAnsiChar;
+                                Strings: TALStrings;
+                                Decode: Boolean;
+                                StripQuotes: Boolean = False);
+procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
+                                                WhiteSpace,
+                                                Quotes: TSysCharSet;
+                                                Content: PAnsiChar;
+                                                Strings: TALStrings;
+                                                Decode: Boolean;
+                                                StripQuotes: Boolean = False);
 Function  AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: AnsiString): AnsiString;
 Function  AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
@@ -364,6 +374,33 @@ Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Bo
 Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
 Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
 
+const
+  CAlRfc822DayOfWeekNames: array[1..7] of AnsiString = ('Sun',
+                                                        'Mon',
+                                                        'Tue',
+                                                        'Wed',
+                                                        'Thu',
+                                                        'Fri',
+                                                        'Sat');
+
+  CALRfc822MonthOfTheYearNames: array[1..12] of AnsiString = ('Jan',
+                                                              'Feb',
+                                                              'Mar',
+                                                              'Apr',
+                                                              'May',
+                                                              'Jun',
+                                                              'Jul',
+                                                              'Aug',
+                                                              'Sep',
+                                                              'Oct',
+                                                              'Nov',
+                                                              'Dec');
+
+function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+Function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
+
 type
   TALIPv6Binary = array[1..16] of ansiChar;
 
@@ -381,7 +418,8 @@ ResourceString
 implementation
 
 uses HTTPapp,
-     alFcnRFC,
+     SysConst,
+     DateUtils,
      AlFcnMisc;
 
 {***********************************************************************************}
@@ -390,7 +428,7 @@ var
   LPos: Integer;
 begin
   LPos := AlPos(ADelim, AInput);
-  if LPos = 0 then begin
+  if LPos <= 0 then begin
     Result := AInput;
     AInput := '';
   end
@@ -400,19 +438,23 @@ begin
   end;
 end;
 
-{****************************************************************}
-constructor TALHTTPResponseCookie.Create(Collection: TCollection);
+{********************************************************}
+constructor TALHTTPCookie.Create(Collection: TCollection);
 begin
   inherited Create(Collection);
+  FName := '';
+  FValue := '';
+  FPath := '';
+  FDomain := '';
   FExpires := -1;
   FSecure := False;
 end;
 
-{**********************************************************}
-procedure TALHTTPResponseCookie.AssignTo(Dest: TPersistent);
+{**************************************************}
+procedure TALHTTPCookie.AssignTo(Dest: TPersistent);
 begin
-  if Dest is TALHTTPResponseCookie then
-    with TALHTTPResponseCookie(Dest) do begin
+  if Dest is TALHTTPCookie then
+    with TALHTTPCookie(Dest) do begin
       Name := Self.FName;
       Value := Self.FValue;
       Domain := Self.FDomain;
@@ -423,30 +465,33 @@ begin
     else inherited AssignTo(Dest);
 end;
 
-{********************************************************}
-function TALHTTPResponseCookie.GetHeaderValue: AnsiString;
-var aYear, aMonth, aDay: Word;
+{************************************************}
+function TALHTTPCookie.GetHeaderValue: AnsiString;
 begin
   Result := ALFormat('%s=%s; ', [HTTPEncode(FName), HTTPEncode(FValue)]);
   if Domain <> '' then Result := Result + ALFormat('domain=%s; ', [Domain]);
   if Path <> '' then Result := Result + ALFormat('path=%s; ', [Path]);
   if Expires > -1 then begin
-    DecodeDate(Expires, aYear, aMonth, aDay);
     Result := Result + ALFormat(ALFormatDateTime('"expires=%s, "dd"-%s-"yyyy" "hh":"nn":"ss" GMT; "',
                                                  Expires,
                                                  ALDefaultFormatSettings),
-                                [CAlRfc822DaysOfWeek[DayOfWeek(Expires)],
-                                 CAlRfc822MonthNames[aMonth]]);
+                                [CAlRfc822DayOfWeekNames[DayOfWeek(Expires)],
+                                 CALRfc822MonthOfTheYearNames[MonthOf(Expires)]]);
   end;
   if Secure then Result := Result + 'secure';
   if ALCopyStr(Result, Length(Result) - 1, MaxInt) = '; ' then SetLength(Result, Length(Result) - 2);
 end;
 
-{***********************************************************************}
-procedure TALHTTPResponseCookie.SetHeaderValue(Const aValue: AnsiString);
+{*****************}
+//exemple of value:
+// LSID=DQAAAK…Eaem_vYg; Domain=docs.foo.com; Path=/accounts; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly
+// HSID=AYQEVn….DKrdst; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; HttpOnly
+// SSID=Ap4P….GTEq; Domain=.foo.com; Path=/; Expires=Wed, 13-Jan-2021 22:23:01 GMT; Secure; HttpOnly
+procedure TALHTTPCookie.SetHeaderValue(Const aValue: AnsiString);
 Var aCookieProp: TALStringList;
     aCookieStr: AnsiString;
 begin
+
   FName:= '';
   FValue:= '';
   FPath:= '';
@@ -456,49 +501,48 @@ begin
 
   aCookieProp := TALStringList.Create;
   try
-    aCookieStr := AValue;
 
-    while ALPos(';', aCookieStr) > 0 do begin
+    aCookieStr := ALTrim(AValue);
+    while aCookieStr <> '' do 
       aCookieProp.Add(ALTrim(AlStringFetch(aCookieStr, ';')));
-      if (ALPos(';', aCookieStr) = 0) and (Length(aCookieStr) > 0) then aCookieProp.Add(ALTrim(aCookieStr));
-    end;
-
-    if aCookieProp.Count = 0 then aCookieProp.Text := aCookieStr;
     if aCookieProp.Count = 0 then exit;
 
-    FName := aCookieProp.Names[0];
-    FValue := aCookieProp.Values[aCookieProp.Names[0]];
-    aCookieProp.Delete(0);
+    // Exemple of aCookieProp content :
+    //   LSID=DQAAAK…Eaem_vYg
+    //   Domain=docs.foo.com
+    //   Path=/accounts
+    //   Expires=Wed, 13-Jan-2021 22:23:01 GMT
+    //   Secure
+    //   HttpOnly
 
+    FName := aCookieProp.Names[0];
+    FValue := aCookieProp.ValueFromIndex[0];
     FPath := aCookieProp.values['PATH'];
-    { Tomcat can return SetCookie2 with path wrapped in " }
-    if (Length(FPath) > 0) then begin
-      if FPath[1] = '"' then Delete(FPath, 1, 1);
-      if FPath[Length(FPath)] = '"' then SetLength(FPath, Length(FPath) - 1);
-    end
-    else FPath := '/';
+    if FPath = '' then FPath := '/';
     if not ALTryRfc822StrToGmtDateTime(aCookieProp.values['EXPIRES'], FExpires) then FExpires := -1;
     FDomain := aCookieProp.values['DOMAIN'];
     FSecure := aCookieProp.IndexOf('SECURE') <> -1;
+
   finally
     aCookieProp.free;
   end;
+  
 end;
 
-{******************************************************************}
-function TALHTTPResponseCookieCollection.Add: TALHTTPResponseCookie;
+{**************************************************}
+function TALHTTPCookieCollection.Add: TALHTTPCookie;
 begin
-  Result := TALHTTPResponseCookie(inherited Add);
+  Result := TALHTTPCookie(inherited Add);
 end;
 
-{****************************************************************************************}
-function TALHTTPResponseCookieCollection.GetCookie(Index: Integer): TALHTTPResponseCookie;
+{************************************************************************}
+function TALHTTPCookieCollection.GetCookie(Index: Integer): TALHTTPCookie;
 begin
-  Result := TALHTTPResponseCookie(inherited Items[Index]);
+  Result := TALHTTPCookie(inherited Items[Index]);
 end;
 
-{*************************************************************************************************}
-procedure TALHTTPResponseCookieCollection.SetCookie(Index: Integer; Cookie: TALHTTPResponseCookie);
+{*********************************************************************************}
+procedure TALHTTPCookieCollection.SetCookie(Index: Integer; Cookie: TALHTTPCookie);
 begin
   Items[Index].Assign(Cookie);
 end;
@@ -509,7 +553,7 @@ begin
   inherited;
   FCustomHeaders := TALStringList.create;
   FCustomHeaders.NameValueSeparator := ':';
-  FCookies := TALHTTPResponseCookieCollection.Create(Self, TALHTTPResponseCookie);
+  FCookies := TALHTTPCookieCollection.Create(TALHTTPCookie);
   clear;
 end;
 
@@ -1027,7 +1071,11 @@ begin
   FCustomHeaders.Assign(Value);
 end;
 
-{********************************************************}
+{************************************************************}
+//the difference between this function and the delphi function
+//HttpApp.HttpDecode is that this function will not raise any
+//error (EConvertError) when the url will contain % that
+//are not encoded
 function ALHTTPDecode(const AStr: AnsiString): AnsiString;
 var Sp, Rp, Cp, Tp: PAnsiChar;
     int: integer;
@@ -1103,7 +1151,184 @@ procedure ALExtractHTTPFields(Separators,
                               Strings: TALStrings;
                               StripQuotes: Boolean = False);
 begin
-  ALExtractHeaderFields(Separators, WhiteSpace, Quotes, Content, Strings, True, StripQuotes);
+  ALExtractHeaderFields(Separators,
+                        WhiteSpace,
+                        Quotes,
+                        Content,
+                        Strings,
+                        True,
+                        StripQuotes);
+end;
+
+{********************************************************}
+{Parses a multi-valued string into its constituent fields.
+ ExtractHeaderFields is a general utility to parse multi-valued HTTP header strings into separate substrings.
+ * Separators is a set of characters that are used to separate individual values within the multi-valued string.
+ * WhiteSpace is a set of characters that are to be ignored when parsing the string.
+ * Content is the multi-valued string to be parsed.
+ * Strings is the TStrings object that receives the individual values that are parsed from Content.
+ * StripQuotes determines whether the surrounding quotes are removed from the resulting items. When StripQuotes is true, surrounding quotes are removed
+   before substrings are added to Strings.
+ Note:	Characters contained in Separators or WhiteSpace are treated as part of a value substring if the substring is surrounded by single or double quote
+ marks. HTTP escape characters are converted using the ALHTTPDecode function.}
+procedure ALExtractHeaderFields(Separators,
+                                WhiteSpace,
+                                Quotes: TSysCharSet;
+                                Content: PAnsiChar;
+                                Strings: TALStrings;
+                                Decode: Boolean;
+                                StripQuotes: Boolean = False);
+
+var Head, Tail: PAnsiChar;
+    EOS, InQuote, LeadQuote: Boolean;
+    QuoteChar: AnsiChar;
+    ExtractedField: AnsiString;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
+
+  {------------------------------------------------------}
+  function DoStripQuotes(const S: AnsiString): AnsiString;
+  var I: Integer;
+      InStripQuote: Boolean;
+      StripQuoteChar: AnsiChar;
+  begin
+    Result := S;
+    InStripQuote := False;
+    StripQuoteChar := #0;
+    if StripQuotes then
+      for I := Length(Result) downto 1 do
+        if Result[I] in Quotes then
+          if InStripQuote and (StripQuoteChar = Result[I]) then begin
+            Delete(Result, I, 1);
+            InStripQuote := False;
+          end
+          else if not InStripQuote then begin
+            StripQuoteChar := Result[I];
+            InStripQuote := True;
+            Delete(Result, I, 1);
+          end
+  end;
+
+Begin
+  if (Content = nil) or (Content^ = #0) then Exit;
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
+  Tail := Content;
+  QuoteChar := #0;
+  repeat
+    while Tail^ in WhiteSpace do Inc(Tail);
+    Head := Tail;
+    InQuote := False;
+    LeadQuote := False;
+    while True do begin
+      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if Tail^ in Quotes then begin
+        if (QuoteChar <> #0) and (QuoteChar = Tail^) then QuoteChar := #0
+        else If QuoteChar = #0 then begin
+          LeadQuote := Head = Tail;
+          QuoteChar := Tail^;
+          if LeadQuote then Inc(Head);
+        end;
+        InQuote := QuoteChar <> #0;
+        if InQuote then Inc(Tail)
+        else Break;
+      end else Break;
+    end;
+    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
+    EOS := Tail^ = #0;
+    if Head^ <> #0 then begin
+      SetString(ExtractedField, Head, Tail-Head);
+      if Decode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
+      else Strings.Add(DoStripQuotes(ExtractedField));
+    end;
+    Inc(Tail);
+  until EOS;
+end;
+
+{**************************************************************************************}
+{same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
+procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
+                                                WhiteSpace,
+                                                Quotes: TSysCharSet;
+                                                Content: PAnsiChar;
+                                                Strings: TALStrings;
+                                                Decode: Boolean;
+                                                StripQuotes: Boolean = False);
+
+var Head, Tail, NextTail: PAnsiChar;
+    EOS, InQuote, LeadQuote: Boolean;
+    QuoteChar: AnsiChar;
+    ExtractedField: AnsiString;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
+
+  {------------------------------------------------------}
+  function DoStripQuotes(const S: AnsiString): AnsiString;
+  var I: Integer;
+      InStripQuote: Boolean;
+      StripQuoteChar: AnsiChar;
+  begin
+    Result := S;
+    InStripQuote := False;
+    StripQuoteChar := #0;
+    if StripQuotes then begin
+      i := Length(Result);
+      while i > 0 do begin
+        if Result[I] in Quotes then begin
+          if InStripQuote and (StripQuoteChar = Result[I]) then begin
+            Delete(Result, I, 1);
+            if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
+            else InStripQuote := False;
+          end
+          else if not InStripQuote then begin
+            StripQuoteChar := Result[I];
+            InStripQuote := True;
+            Delete(Result, I, 1);
+          end
+        end;
+        dec(i);
+      end;
+    end;
+  end;
+
+Begin
+  if (Content = nil) or (Content^ = #0) then Exit;
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
+  Tail := Content;
+  QuoteChar := #0;
+  repeat
+    while Tail^ in WhiteSpace do Inc(Tail);
+    Head := Tail;
+    InQuote := False;
+    LeadQuote := False;
+    while True do begin
+      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if Tail^ in Quotes then begin
+        if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
+          NextTail := Tail + 1;
+          if NextTail^ = Tail^ then inc(tail)
+          else QuoteChar := #0;
+        end
+        else If QuoteChar = #0 then begin
+          LeadQuote := Head = Tail;
+          QuoteChar := Tail^;
+          if LeadQuote then Inc(Head);
+        end;
+        InQuote := QuoteChar <> #0;
+        if InQuote then Inc(Tail)
+        else Break;
+      end else Break;
+    end;
+    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
+    EOS := Tail^ = #0;
+    if Head^ <> #0 then begin
+      SetString(ExtractedField, Head, Tail-Head);
+      if Decode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
+      else Strings.Add(DoStripQuotes(ExtractedField));
+    end;
+    Inc(Tail);
+  until EOS;
 end;
 
 {****************************************************************}
@@ -1454,6 +1679,183 @@ begin
   if Anchor <> '' then S1 := S1 + '#' + Anchor;
 
   Result := AlCombineUrl(RelativeUrl + S1, BaseUrl);
+end;
+
+{*********************************************************************}
+{aValue is a GMT TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
+function  ALGMTDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+var aDay, aMonth, aYear: Word;
+begin
+  DecodeDate(aValue,
+             aYear,
+             aMonth,
+             aDay);
+
+  Result := ALFormat('%s, %.2d %s %.4d %s %s',
+                     [CAlRfc822DayOfWeekNames[DayOfWeek(aValue)],
+                      aDay,
+                      CALRfc822MonthOfTheYearNames[aMonth],
+                      aYear,
+                      ALFormatDateTime('hh":"nn":"ss', aValue, ALDefaultFormatSettings),
+                      'GMT']);
+end;
+
+{***********************************************************************}
+{aValue is a Local TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
+function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+begin
+  Result := ALGMTDateTimeToRfc822Str(AlLocalDateTimeToGMTDateTime(aValue));
+end;
+
+{************************************************************}
+{Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
+ the function allow also date like "Sun, 06-Nov-1994 08:49:37 GMT"
+ to be compatible with cookies field (http://wp.netscape.com/newsref/std/cookie_spec.html)
+
+ The "Date" line (formerly "Posted") is the date that the message was
+ originally posted to the network.  Its format must be acceptable
+ both in RFC-822 and to the getdate(3) routine that is provided with
+ the Usenet software.  This date remains unchanged as the message is
+ propagated throughout the network.  One format that is acceptable to
+ both is:
+
+                      Wdy, DD Mon YY HH:MM:SS TIMEZONE
+
+ Several examples of valid dates appear in the sample message above.
+ Note in particular that ctime(3) format:
+
+                      Wdy Mon DD HH:MM:SS YYYY
+
+  is not acceptable because it is not a valid RFC-822 date.  However,
+  since older software still generates this format, news
+  implementations are encouraged to accept this format and translate
+  it into an acceptable format.
+
+  There is no hope of having a complete list of timezones.  Universal
+  Time (GMT), the North American timezones (PST, PDT, MST, MDT, CST,
+  CDT, EST, EDT) and the +/-hhmm offset specifed in RFC-822 should be
+  supported.  It is recommended that times in message headers be
+  transmitted in GMT and displayed in the local time zone.}
+Function  ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+
+  {--------------------------------------------------------------------------}
+  Function InternalMonthWithLeadingChar(const AMonth: AnsiString): AnsiString;
+  Begin
+    If Length(AMonth) = 1 then result := '0' + AMonth
+    else result := aMonth;
+  end;
+
+Var P1,P2: Integer;
+    ADateStr : AnsiString;
+    aLst: TALStringList;
+    aMonthLabel: AnsiString;
+    aFormatSettings: TALformatSettings;
+    aTimeZoneStr: AnsiString;
+    aTimeZoneDelta: TDateTime;
+
+Begin
+
+  ADateStr := S; // Wdy, DD-Mon-YYYY HH:MM:SS GMT
+                 // Wdy, DD-Mon-YYYY HH:MM:SS +0200
+                 // 23 Aug 2004 06:48:46 -0700
+  P1 := AlPos(',',ADateStr);
+  If P1 > 0 then delete(ADateStr,1,P1); // DD-Mon-YYYY HH:MM:SS GMT
+                                        // DD-Mon-YYYY HH:MM:SS +0200
+                                        // 23 Aug 2004 06:48:46 -0700
+  ADateStr := ALTrim(ADateStr); // DD-Mon-YYYY HH:MM:SS GMT
+                                // DD-Mon-YYYY HH:MM:SS +0200
+                                // 23 Aug 2004 06:48:46 -0700
+
+  P1 := AlPos(':',ADateStr);
+  P2 := AlPos('-',ADateStr);
+  While (P2 > 0) and (P2 < P1) do begin
+    aDateStr[P2] := ' ';
+    P2 := AlPosEx('-',ADateStr,P2);
+  end; // DD Mon YYYY HH:MM:SS GMT
+       // DD Mon YYYY HH:MM:SS +0200
+       // 23 Aug 2004 06:48:46 -0700
+  While Alpos('  ',ADateStr) > 0 do ADateStr := AlStringReplace(ADateStr,'  ',' ',[RfReplaceAll]); // DD Mon YYYY HH:MM:SS GMT
+                                                                                                   // DD Mon YYYY HH:MM:SS +0200
+                                                                                                   // 23 Aug 2004 06:48:46 -0700
+
+  Alst := TALStringList.create;
+  Try
+
+    Alst.Text :=  AlStringReplace(ADateStr,' ',#13#10,[RfReplaceall]);
+    If Alst.Count < 5 then begin
+      Result := False;
+      Exit;
+    end;
+
+    aMonthLabel := ALTrim(Alst[1]); // Mon
+                                    // Mon
+                                    // Aug
+    P1 := 1;
+    While (p1 <= 12) and (not ALSameText(CALRfc822MonthOfTheYearNames[P1],aMonthLabel)) do inc(P1);
+    If P1 > 12 then begin
+      Result := False;
+      Exit;
+    end;
+
+    aFormatSettings := ALDefaultFormatSettings;
+    aFormatSettings.DateSeparator := '/';
+    aFormatSettings.TimeSeparator := ':';
+    aFormatSettings.ShortDateFormat := 'dd/mm/yyyy';
+    aFormatSettings.ShortTimeFormat := 'hh:nn:zz';
+
+    aTimeZoneStr := ALTrim(Alst[4]); // GMT
+                                     // +0200
+                                     // -0700
+    aTimeZoneStr := AlStringReplace(aTimeZoneStr,'(','',[]);
+    aTimeZoneStr := AlStringReplace(aTimeZoneStr,')','',[]);
+    aTimeZoneStr := ALTrim(aTimeZoneStr);
+    If aTimeZoneStr = '' then Begin
+      Result := False;
+      Exit;
+    end
+    else If (Length(aTimeZoneStr) >= 5) and
+            (aTimeZoneStr[1] in ['+','-']) and
+            (aTimeZoneStr[2] in ['0'..'9']) and
+            (aTimeZoneStr[3] in ['0'..'9']) and
+            (aTimeZoneStr[4] in ['0'..'9']) and
+            (aTimeZoneStr[5] in ['0'..'9']) then begin
+      aTimeZoneDelta := ALStrToDateTime(AlCopyStr(aTimeZoneStr,2,2) + ':' + AlCopyStr(aTimeZoneStr,4,2) + ':00', aFormatSettings);
+      if aTimeZoneStr[1] = '+' then aTimeZoneDelta := -1*aTimeZoneDelta;
+    end
+    else If ALSameText(aTimeZoneStr,'GMT') then  aTimeZoneDelta := 0
+    else If ALSameText(aTimeZoneStr,'UTC') then  aTimeZoneDelta := 0
+    else If ALSameText(aTimeZoneStr,'UT')  then  aTimeZoneDelta := 0
+    else If ALSameText(aTimeZoneStr,'EST') then aTimeZoneDelta := ALStrToDateTime('05:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'EDT') then aTimeZoneDelta := ALStrToDateTime('04:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'CST') then aTimeZoneDelta := ALStrToDateTime('06:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'CDT') then aTimeZoneDelta := ALStrToDateTime('05:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'MST') then aTimeZoneDelta := ALStrToDateTime('07:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'MDT') then aTimeZoneDelta := ALStrToDateTime('06:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'PST') then aTimeZoneDelta := ALStrToDateTime('08:00:00', aFormatSettings)
+    else If ALSameText(aTimeZoneStr,'PDT') then aTimeZoneDelta := ALStrToDateTime('07:00:00', aFormatSettings)
+    else begin
+      Result := False;
+      Exit;
+    end;
+
+    ADateStr := ALTrim(Alst[0]) + '/' + InternalMonthWithLeadingChar(ALIntToStr(P1)) + '/' + ALTrim(Alst[2]) + ' ' + ALTrim(Alst[3]); // DD/MM/YYYY HH:MM:SS
+    Result := ALTryStrToDateTime(ADateStr,Value,AformatSettings);
+    If Result then Value := Value + aTimeZoneDelta;
+
+  finally
+    aLst.free;
+  end;
+
+end;
+
+{*************************************************************}
+{Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
+ the function allow also date like "Sun, 06-Nov-1994 08:49:37 GMT"
+ to be compatible with cookies field (http://wp.netscape.com/newsref/std/cookie_spec.html)}
+function  ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
+Begin
+  if not ALTryRfc822StrToGMTDateTime(S, Result) then
+    raise EConvertError.CreateResFmt(@SInvalidDateTime, [S]);
 end;
 
 {************************************************************************************}

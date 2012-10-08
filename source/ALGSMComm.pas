@@ -104,16 +104,16 @@ Type
     procedure CheckError(Error: Boolean);
     Function SerialWrite(Var Buffer; Count: Longint): Longint; Virtual;
     Function SerialRead(var Buffer; Count: Longint): Longint; Virtual;
-    procedure SendCmd(aCmd: AnsiString); Virtual;
-    function GetResponse: AnsiString; virtual;
-    Procedure GetATCmdOkResponse(Const ErrorMsg: AnsiString); overload;
-    Procedure GetATCmdOkResponse(Var Response: AnsiString; Const ErrorMsg: AnsiString); overload;
-    Procedure GetATCmdlinefeedResponse(Const ErrorMsg: AnsiString);
   Public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Connect(Serial: AnsiString); virtual;
     Procedure Disconnect; virtual;
+    procedure SendCmd(aCmd: AnsiString); Virtual;
+    function GetResponse: AnsiString; virtual;
+    Procedure GetATCmdOkResponse(Const ErrorMsg: AnsiString); overload;
+    Procedure GetATCmdOkResponse(Var Response: AnsiString; Const ErrorMsg: AnsiString); overload;
+    Procedure GetATCmdlinefeedResponse(Const ErrorMsg: AnsiString);
     procedure SendSMSinPDUMode(aSMSCenter, aSMSAddress, aMessage: AnsiString; const EncodeMessageInPDU: Boolean=True);
     procedure SendSMSinTextMode(aSMSCenter, aSMSAddress, aMessage, aCharset: AnsiString);
     procedure ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: AnsiString);
@@ -361,8 +361,8 @@ Begin
                                  Result,
                                  ResultCurrentIndex))
       then Begin
-       Result[ResultCurrentIndex] := AnsiChar($20); // SPACE
-       inc(ResultCurrentIndex);
+        Result[ResultCurrentIndex] := AnsiChar($20); // SPACE
+        inc(ResultCurrentIndex);
       end
     end;
   end;
@@ -867,8 +867,11 @@ begin
     InitCommState;
 
   except
-    Disconnect;
-    Raise;
+    On E: Exception do begin
+      Disconnect;
+      E.Message := 'Impossible to establish connection to the device. ' + E.Message;
+      Raise;
+    end;
   end;
 end;
 

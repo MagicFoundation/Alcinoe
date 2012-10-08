@@ -65,8 +65,8 @@ uses Windows,
      AlHttpCommon,
      AlStringList;
 
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest; ServerVariables: TALStrings); overload;
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest;
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings); overload;
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                         ServerVariables: TALStrings;
                                                         ScriptName,
                                                         ScriptFileName: AnsiString;
@@ -76,7 +76,7 @@ Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
                                           ScriptName,
                                           ScriptFileName: AnsiString;
                                           Url: AnsiString); overload;
-Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TwebRequest;
+Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                  ServerVariables: TALStrings;
                                                  ScriptName,
                                                  ScriptFileName: AnsiString;
@@ -113,8 +113,8 @@ uses sysutils,
      AlFcnExecute,
      AlFcnString;
 
-{************************************************************************************************************}
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest; ServerVariables: TALStrings);
+{**************************************************************************************************************}
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings);
 Begin
   ServerVariables.Clear;
   {----------}
@@ -133,8 +133,8 @@ Begin
   ServerVariables.Add('HTTP_ACCEPT=*/*');                                                               //HTTP_ACCEPT=*/* | List of acceptable content type
 end;
 
-{******************************************************************************}
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TwebRequest;
+{********************************************************************************}
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                         ServerVariables: TALStrings;
                                                         ScriptName,
                                                         ScriptFileName: AnsiString;
@@ -188,8 +188,8 @@ Begin
   ServerVariables.Values['REQUEST_URI']     := URL;                //REQUEST_URI=/vbseo.php?vbseourl=forum4/discussion98851/showthread.php&bleubleu=24
 end;
 
-{***********************************************************************}
-Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TwebRequest;
+{*************************************************************************}
+Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                  ServerVariables: TALStrings;
                                                  ScriptName,
                                                  ScriptFileName: AnsiString;

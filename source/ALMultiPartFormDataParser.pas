@@ -67,7 +67,6 @@ interface
 
 uses Classes,
      SysUtils,
-     HTTPApp,
      ALHttpCommon,
      AlStringList,
      AlMultiPartBaseParser;
@@ -149,7 +148,6 @@ type
   private
     FContentFiles: TALMultiPartFormDataContents;
     FContentFields: TALStrings;
-    FRemoveDuplicateField: Boolean;
     function GetContentFields: TALStrings;
     function GetContentFiles: TALMultiPartFormDataContents;
   protected
@@ -160,10 +158,9 @@ type
     constructor Create; override;
     destructor  Destroy; override;
     procedure   Decode(aDataStr, aboundary: AnsiString); overload; Override;
-    procedure   Decode(aRequest: TWebRequest; aboundary: AnsiString); overload;
+    procedure   Decode(aDataStr, aboundary: AnsiString; aContentFields: TALStrings; aContentFiles: TALMultiPartFormDataContents); overload;
     property    ContentFiles: TALMultiPartFormDataContents read GetContentFiles;
     property    ContentFields: TALStrings read GetContentFields;
-    property    RemoveDuplicateField: Boolean read FRemoveDuplicateField write FRemoveDuplicateField Default True;
   end;
 
 implementation
@@ -260,7 +257,7 @@ end;
 procedure TAlMultiPartFormDataStream.AddFile(const aFieldName,
                                                    aFileName,
                                                    aContentType: AnsiString;
-                                              aFileData: TStream);
+                                             aFileData: TStream);
 Var aContent: TALMultiPartFormDataContent;
 begin
   aContent := TALMultiPartFormDataContent.Create;
@@ -347,7 +344,6 @@ begin
   inherited;
   FContentFiles := TALMultiPartFormDataContents.Create(False);
   FContentFields := TALStringList.Create;
-  FRemoveDuplicateField := True;
 end;
 
 {*********************************************}
@@ -358,85 +354,47 @@ begin
   inherited;
 end;
 
-{*****************************************************************************************}
-procedure TALMultipartFormDataDecoder.Decode(aRequest: TWebRequest; aboundary: AnsiString);
-var aContentStream: TMemoryStream;
-    aTotalBytes: LongInt;
-    aBytesRead: Longint;
-    aChunkSize: Longint;
-    aBuffer: array of Byte;
-begin
-
-  {Full Extract of the request}
-  aContentStream := TMemoryStream.Create;
-  try
-    aBytesRead := Length(aRequest.Content);
-    aContentStream.Write(aRequest.Content[1], aBytesRead);
-    aTotalBytes := aRequest.ContentLength;
-    if aBytesRead < aTotalBytes then begin
-      SetLength(aBuffer, aTotalBytes);
-      repeat
-        aChunkSize := aRequest.ReadClient(aBuffer[0], aTotalBytes - aBytesRead);
-        if aChunkSize <= 0 then Break;
-        aContentStream.Write(aBuffer[0], aChunkSize);
-        Inc(aBytesRead, aChunkSize);
-      until (aTotalBytes = aBytesRead);
-    end;
-    if aRequest.ContentLength - aBytesRead > 0 then
-      raise EALHttpClientConnectionDropped.Create('Client Dropped Connection.'#13#10 +
-        'Total Bytes indicated by Header: ' + ALIntToStr(aTotalBytes) + #13#10 +
-        'Total Bytes Read: ' + ALIntToStr(aBytesRead));
-
-    {parse the request now}
-    Decode(aContentStream, aBoundary);
-  finally
-    aContentStream.Free;
-  end;
-
-end;
-
 {****************************************************************************}
 procedure TALMultipartFormDataDecoder.Decode(aDataStr, aboundary: AnsiString);
-Var i: integer;
-    aContents: TALMultiPartFormDataContents;
-    CanInsertFile: Boolean;
-    P1: integer;
+Var aContents: TALMultiPartFormDataContents;
+    i: integer;
 begin
+  //Update the Fcontent
   inherited Decode(aDataStr, aboundary);
 
-  {clear the FContentFiles and FContentFields}
+  //clear the FContentFiles and FContentFields
   FContentFiles.Clear;
   FContentFields.Clear;
 
-  {loop on all contents}
+  //loop on all contents
   aContents := GetContents;
   For i := 0 to aContents.Count - 1 do begin
+    If (aContents[i].FileName <> '') then FContentFiles.Add(aContents[i])             // if Filename or contentType set them assume its File
+    else FContentFields.Add(aContents[I].FieldName + '=' + aContents[I].DataString);  // it's a field value
+  end;
+end;
 
-    {if Filename or contentType set them assume its File}
-    If (aContents[i].FileName <> '') then begin
+{***************************************************************************}
+procedure TALMultipartFormDataDecoder.Decode(aDataStr, aboundary: AnsiString;
+                                             aContentFields: TALStrings;
+                                             aContentFiles: TALMultiPartFormDataContents);
+Var aContents: TALMultiPartFormDataContents;
+begin
+  //Update the Fcontent
+  inherited Decode(aDataStr, aboundary);
 
-        CanInsertFile := True;
-        IF FRemoveDuplicateField then
-          For P1 := 0 to fContentFiles.Count - 1 do
-            If ALSameText(fContentfiles[P1].FieldName, aContents[i].fieldName) then begin
-              CanInsertFile := False;
-              {More bigger the file is, more lucky
-               we are that it contain the full data}
-              If (fContentfiles[P1].DataStream.Size < aContents[i].DataStream.size) then FContentFiles[P1] := aContents[i];
-              Break;
-            end;
+  //clear the aContentFiles and aContentFields
+  aContentFields.Clear;
+  aContentFiles.Clear;
 
-        If CanInsertFile then FContentFiles.Add(aContents[i])
-
-    end
-
-    {it's a field value}
-    else Begin
-      P1 := contentFields.IndexOfName(aContents[I].FieldName);
-      If (not FRemoveDuplicateField) or (P1=-1) then ContentFields.Add(aContents[I].FieldName + '=' + aContents[I].DataString)
-      Else If length(ContentFields.ValueFromIndex[P1])<length(aContents[I].DataString) then ContentFields.ValueFromIndex[P1] := aContents[I].DataString;
+  //loop on all contents
+  aContents := GetContents;
+  While aContents.Count > 0 do begin
+    If (aContents[0].FileName <> '') then aContentFiles.Add(aContents.Extract(aContents[0]))  // if Filename or contentType set them assume its File
+    else begin
+      aContentFields.Add(aContents[0].FieldName + '=' + aContents[0].DataString);             // it's a field value
+      aContents.Delete(0);
     end;
-
   end;
 end;
 

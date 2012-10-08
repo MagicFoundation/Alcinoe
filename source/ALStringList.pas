@@ -194,10 +194,10 @@ Type
     function IndexOfObject(AObject: TObject): Integer; virtual;
     procedure Insert(Index: Integer; const S: AnsiString); virtual; abstract;
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); virtual;
-    procedure LoadFromFile(const FileName: String); virtual;
+    procedure LoadFromFile(const FileName: AnsiString); virtual;
     procedure LoadFromStream(Stream: TStream); virtual;
     procedure Move(CurIndex, NewIndex: Integer); virtual;
-    procedure SaveToFile(const FileName: String); virtual;
+    procedure SaveToFile(const FileName: AnsiString); virtual;
     procedure SaveToStream(Stream: TStream); virtual;
     procedure SetText(Text: PAnsiChar); virtual;
     {$IF CompilerVersion >= 23} {Delphi XE2}
@@ -819,12 +819,12 @@ begin
   PutObject(Index, AObject);
 end;
 
-{********************************************************}
-procedure TALStrings.LoadFromFile(const FileName: String);
+{************************************************************}
+procedure TALStrings.LoadFromFile(const FileName: AnsiString);
 var
   Stream: TStream;
 begin
-  Stream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+  Stream := TFileStream.Create(String(FileName), fmOpenRead or fmShareDenyWrite);
   try
     LoadFromStream(Stream);
   finally
@@ -880,12 +880,12 @@ procedure TALStrings.PutObject(Index: Integer; AObject: TObject);
 begin
 end;
 
-{******************************************************}
-procedure TALStrings.SaveToFile(const FileName: String);
+{**********************************************************}
+procedure TALStrings.SaveToFile(const FileName: AnsiString);
 var
   Stream: TStream;
 begin
-  Stream := TFileStream.Create(FileName, fmCreate);
+  Stream := TFileStream.Create(String(FileName), fmCreate);
   try
     SaveToStream(Stream);
   finally

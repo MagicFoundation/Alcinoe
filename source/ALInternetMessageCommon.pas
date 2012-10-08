@@ -190,7 +190,7 @@ implementation
 uses Sysutils,
      Masks,
      ALFcnMisc,
-     AlFcnRfc,
+     ALHttpCommon,
      AlFcnMime,
      AlFcnWinsock,
      AlFcnString;

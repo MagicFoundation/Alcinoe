@@ -181,54 +181,55 @@ Function ALMultipartExtractSubValueFromHeaderLine(aHeaderLine: AnsiString; aName
          (result[1]=result[length(result)]) then result := AlCopyStr(Result,2,length(result)-2);
     end;
 
-Var Lst: TALStringList;
+Var aLst: TALStringList;
     i: integer;
+
 begin
   Result := '';
   aName := AlLowerCase(aName);
-  Lst := TALStringList.Create;
+  aLst := TALStringList.Create;
   Try
-    Lst.Text := AlStringReplace(aHeaderLine,';',#13#10,[RfReplaceAll]);
-    For i := 0 to Lst.Count - 1 do
-      If AlLowerCase(ALTrim(Lst.Names[i])) = aName then begin
-        Result := InternalRemoveQuoteStr(Lst.ValueFromIndex[i]);
+    aLst.Text := AlStringReplace(aHeaderLine,';',#13#10,[RfReplaceAll]);
+    For i := 0 to aLst.Count - 1 do
+      If AlLowerCase(ALTrim(aLst.Names[i])) = aName then begin
+        Result := InternalRemoveQuoteStr(aLst.ValueFromIndex[i]);
         Break;
       end;
   finally
-    Lst.Free;
+    aLst.Free;
   end;
 end;
 
 {**********************************************************************************************************}
 Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: AnsiString; aName, AValue: AnsiString): AnsiString;
-Var Lst: TALStringList;
+Var aLst: TALStringList;
     aLowerCaseName: AnsiString;
+    aFlag: Boolean;
     i: integer;
-    Flag1: Boolean;
 begin
   Result := '';
   aLowerCaseName := AlLowerCase(aName);
   aHeaderLine := AlStringReplace(aHeaderLine, #13#10, ' ', [RfReplaceAll]);
-  Lst := TALStringList.Create;
+  aLst := TALStringList.Create;
   Try
-    Flag1 := False;
-    Lst.Text := AlStringReplace(aHeaderLine,';',#13#10,[RfReplaceAll]);
-    For i := 0 to Lst.Count - 1 do
-      If AlLowerCase(ALTrim(Lst.Names[i])) = aLowerCaseName then begin
-        Lst.ValueFromIndex[i] := '"' + AValue + '"';
-        Flag1 := True;
+    aFlag := False;
+    aLst.Text := AlStringReplace(aHeaderLine,';',#13#10,[RfReplaceAll]);
+    For i := 0 to aLst.Count - 1 do
+      If AlLowerCase(ALTrim(aLst.Names[i])) = aLowerCaseName then begin
+        aLst.ValueFromIndex[i] := '"' + AValue + '"';
+        aFlag := True;
         Break;
       end;
 
-    For i := 0 to Lst.Count - 1 do
-      Result := Result + '; ' + ALTrim(Lst[i]);
+    For i := 0 to aLst.Count - 1 do
+      Result := Result + '; ' + ALTrim(aLst[i]);
 
-    if Not Flag1 then
+    if Not aFlag then
        Result := Result + '; ' + aName + '=' + '"' + aValue + '"';
 
     Delete(Result,1,2);
   finally
-    Lst.Free;
+    aLst.Free;
   end;
 end;
 
@@ -285,6 +286,7 @@ end;
 
 {***********************************************************************************}
 procedure TALMultiPartBaseContent.SetRawHeaderText(const aRawHeaderText: AnsiString);
+
 Var aRawHeaderLst: TALStringList;
 
   {---------------------------------------------}
@@ -310,6 +312,7 @@ Var aRawHeaderLst: TALStringList;
 
 Var Str1, Str2: AnsiString;
     j: integer;
+
 begin
   Clear;
   aRawHeaderLst := TALStringList.create;
@@ -578,7 +581,6 @@ end;
 procedure TALMultipartBaseDecoder.Decode(aDataStream: Tstream; aboundary: AnsiString);
 var sBuffer: AnsiString;
 begin
-  {read the data from the Data}
   aDataStream.Position := 0;
   SetLength(sBuffer, aDataStream.Size);
   aDataStream.Read(Pointer(sBuffer)^, aDataStream.Size);
@@ -587,25 +589,25 @@ end;
 
 {************************************************************************}
 procedure TALMultipartBaseDecoder.Decode(aDataStr, aboundary: AnsiString);
-var P1, P2, P3: Integer;
-    LnBoundary: Integer;
-    Flag1: Boolean;
+var aLnBoundary: Integer;
     aContent: TALMultiPartBaseContent;
+    aFlag: Boolean;
+    P1, P2, P3: Integer;
 begin
 
   {clear the fContent}
   FContents.Clear;
 
   {init LnBoundary}
-  LnBoundary := length(aBoundary);
+  aLnBoundary := length(aBoundary);
 
   {Find the first Boundary}
   P1 := AlPos('--'+aBoundary+#13#10, aDataStr);
-  Flag1 := P1 > 0;
+  aFlag := P1 > 0;
   Dec(P1,2);
 
   {start the loop on all Boundary}
-  While Flag1 Do begin
+  While aFlag Do begin
     aContent := CreateContent;
     With aContent do begin
 
@@ -613,12 +615,12 @@ begin
       FContents.Add(aContent);
 
       {move P1 to the start of the header}
-      P1 := P1 + LnBoundary + 6;
+      P1 := P1 + aLnBoundary + 6;
 
       {Find the next Boundary}
       P3 := AlPosEx(#13#10+'--'+aBoundary+#13#10, aDataStr, P1);
       if P3 <= 0 then Begin
-        Flag1 := False;
+        aFlag := False;
         P3 := AlPosEx(#13#10+'--'+aBoundary+'--', aDataStr, P1);
         if P3 <= 0 then raise Exception.Create('Wrong MultiPart Content');
       end;

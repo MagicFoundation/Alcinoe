@@ -121,7 +121,7 @@ type
     FProxyParams: TALHTTPClientProxyParams;
     FRequestHeader: TALHTTPRequestHeader;
     FProtocolVersion: TALHTTPProtocolVersion;
-    FRequestMethod: TALHTTPRequestMethod;
+    FRequestMethod: TALHTTPMethod;
     FURL: AnsiString;
     FUserName: AnsiString;
     FPassword: AnsiString;
@@ -171,7 +171,7 @@ type
     property  ProxyParams: TALHTTPClientProxyParams read FProxyParams;
     property  RequestHeader: TALHTTPRequestHeader read FRequestHeader;
     Property  ProtocolVersion: TALHTTPProtocolVersion read FProtocolVersion write FProtocolVersion default HTTPpv_1_1;
-    Property  RequestMethod: TALHTTPRequestMethod read FRequestMethod write fRequestMethod default HTTPrm_get;
+    Property  RequestMethod: TALHTTPMethod read FRequestMethod write fRequestMethod default HTTPmt_get;
     property  UserName: AnsiString read FUserName write SetUserName;
     property  Password: AnsiString read FPassword write SetPassword;
     property  OnUploadProgress: TALHTTPClientUploadProgressEvent read FOnUploadProgress write FOnUploadProgress;
@@ -221,7 +221,7 @@ begin
   FRequestHeader := TALHTTPRequestHeader.Create(self);
   FRequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALHTTPClient)';
   FProtocolVersion := HTTPpv_1_1;
-  FRequestMethod := HTTPrm_get;
+  FRequestMethod := HTTPmt_get;
   FrequestHeader.OnChange := OnRequestHeaderChange;
   FProxyParams.OnChange := OnProxyParamsChange;
 end;
@@ -272,7 +272,7 @@ procedure TALHTTPClient.Get(aUrl: AnsiString;
                             aResponseContentHeader: TALHTTPResponseHeader);
 begin
   Url := aURL;
-  RequestMethod := HTTPrm_get;
+  RequestMethod := HTTPmt_get;
   Execute(nil,
           aResponseContentStream,
           aResponseContentHeader);
@@ -286,7 +286,7 @@ procedure TALHTTPClient.Post(aUrl: AnsiString;
 Var OldContentLengthValue: AnsiString;
 begin
   Url := aURL;
-  RequestMethod := HTTPrm_Post;
+  RequestMethod := HTTPmt_Post;
   OldContentLengthValue := FrequestHeader.ContentLength;
   try
     If assigned(aPostDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPostDataStream.Size)
@@ -383,7 +383,7 @@ procedure TALHTTPClient.Head(aUrl: AnsiString;
                              aResponseContentHeader: TALHTTPResponseHeader);
 begin
   Url := aURL;
-  RequestMethod := HTTPrm_head;
+  RequestMethod := HTTPmt_head;
   Execute(nil,
           aResponseContentStream,
           aResponseContentHeader);
@@ -395,7 +395,7 @@ procedure TALHTTPClient.Trace(aUrl: AnsiString;
                               aResponseContentHeader: TALHTTPResponseHeader);
 begin
   Url := aURL;
-  RequestMethod := HTTPrm_Trace;
+  RequestMethod := HTTPmt_Trace;
   Execute(nil,
           aResponseContentStream,
           aResponseContentHeader);
@@ -409,7 +409,7 @@ procedure TALHTTPClient.Put(aUrl:AnsiString;
 Var OldContentLengthValue: AnsiString;
 begin
   Url := aURL;
-  RequestMethod := HTTPrm_Put;
+  RequestMethod := HTTPmt_Put;
   OldContentLengthValue := FrequestHeader.ContentLength;
   try
     If assigned(aPutDataStream) then FrequestHeader.ContentLength := ALIntToStr(aPutDataStream.Size)
@@ -428,7 +428,7 @@ procedure TALHTTPClient.Delete(aUrl: AnsiString;
                                aResponseContentHeader: TALHTTPResponseHeader);
 begin
   Url := aURL;
-  RequestMethod := HTTPrm_Delete;
+  RequestMethod := HTTPmt_Delete;
   Execute(nil,
           aResponseContentStream,
           aResponseContentHeader);

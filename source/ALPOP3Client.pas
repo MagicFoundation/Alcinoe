@@ -58,9 +58,7 @@ unit ALPOP3Client;
 
 interface
 
-uses windows,
-     Classes,
-     WinSock,
+uses WinSock,
      ALStringList,
      ALInternetMessageCommon;
 
@@ -109,7 +107,8 @@ type
 
 implementation
 
-Uses SysUtils,
+Uses Windows,
+     SysUtils,
      AlFcnWinsock,
      AlFcnString;
 

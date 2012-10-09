@@ -59,10 +59,8 @@ unit ALCalendar;
 
 interface
 
-uses windows,
-     types,
+uses types,
      Graphics,
-     SysUtils,
      ALFcnString;
 
 Type
@@ -116,7 +114,9 @@ Function ALDrawCalendar(Canvas:Tcanvas;
 
 implementation
 
-uses dateutils;
+uses windows,
+     SysUtils,
+     dateutils;
 
 {***********************************************************************************}
 Function ALDrawCalendarGetTextSizeW(aCanvas: Tcanvas; const Text: WideString): TSize;

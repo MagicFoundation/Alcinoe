@@ -81,9 +81,8 @@ unit ALFBXBase;
 {$ENDIF}
 
 interface
-uses
-  Windows,
-  SysUtils;
+
+uses Windows;
 
 (* Basic data types *)
 type
@@ -3022,8 +3021,8 @@ type
 
 implementation
 
-uses
-  ALFBXconst;
+uses SysUtils,
+     ALFBXconst;
 
 (*******************************************************************************
  *    MACROS                                                                   *

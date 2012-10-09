@@ -60,9 +60,6 @@ unit ALFcnMisc;
 
 interface
 
-uses Windows,
-     sysutils;
-
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 function AlIsValidEmail(const Value: AnsiString): boolean;
@@ -71,7 +68,8 @@ Function ALInc(var x: integer; Count: integer): Integer;
 
 implementation
 
-uses SysConst,
+uses Windows,
+     sysutils,
      ALFcnString;
 
 {******************************************}

@@ -72,8 +72,7 @@ unit ALComboBox;
 
 interface
 
-uses Windows,
-     Messages,
+uses Messages,
      Classes,
      Controls,
      StdCtrls,
@@ -201,6 +200,8 @@ procedure Register;
 implementation
 
 {$R ..\resource\ALComboBox.dcr}
+
+uses Windows;
 
 {*****************}
 procedure Register;

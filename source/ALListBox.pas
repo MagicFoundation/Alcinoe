@@ -77,10 +77,8 @@ unit ALListBox;
 
 interface
 
-Uses Windows,
-     Messages,
+Uses Messages,
      Types,
-     SysUtils,
      Classes,
      Graphics,
      Controls,
@@ -586,7 +584,9 @@ implementation
 
 {$R ..\resource\ALListBox.dcr}
 
-uses Consts,
+uses Windows,
+     SysUtils,
+     Consts,
      RTLConsts;
 
 {*****************}

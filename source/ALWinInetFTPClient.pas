@@ -61,7 +61,6 @@ unit ALWinInetFTPClient;
 interface
 
 uses Windows,
-     SysUtils,
      Classes,
      ALFTPClient,
      WinInet;
@@ -220,7 +219,8 @@ procedure Register;
 
 implementation
 
-Uses AlFcnString;
+Uses SysUtils,
+     AlFcnString;
 
  {$R ..\resource\ALWinInetFTPClient.dcr}
 

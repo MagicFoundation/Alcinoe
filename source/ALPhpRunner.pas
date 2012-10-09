@@ -117,7 +117,6 @@ interface
 
 uses Windows,
      Classes,
-     sysutils,
      WinSock,
      Contnrs,
      SyncObjs,
@@ -395,7 +394,8 @@ type
 
 implementation
 
-uses ALFcnWinSock,
+uses sysutils,
+     ALFcnWinSock,
      AlFcnString,
      AlFcnExecute,
      ALWindows,

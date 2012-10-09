@@ -60,8 +60,7 @@ unit ALFcnSQL;
 
 interface
 
-uses classes,
-     AlStringList;
+uses AlStringList;
 
 Type
 
@@ -107,8 +106,7 @@ Type
 
 implementation
 
-uses sysutils,
-     AlFcnString;
+uses AlFcnString;
 
 {************************************}
 constructor TAlSelectSQLClause.Create;

@@ -70,7 +70,6 @@ uses Windows,
      ALAVLBinaryTree,
      ALFBXLib,
      ALFBXBase,
-     AlFcnMisc,
      AlFcnString,
      ALStringList;
 
@@ -876,9 +875,7 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
 
 implementation
 
-uses StrUtils,
-     ALWindows,
-     AlFcnHTML,
+uses ALWindows,
      alfbxError;
 
 {*********************************************}

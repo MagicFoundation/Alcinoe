@@ -84,7 +84,6 @@ unit ALGSMComm;
 interface
 
 uses Windows,
-     Classes,
      AlStringList;
 
 Type
@@ -132,7 +131,6 @@ function  AlGSMComm_GSM7BitDefaultAlphabetToUnicode(aMessage: AnsiString; Const 
 implementation
 
 uses SysUtils,
-     Masks,
      AlFcnString;
 
 {***********************************************************************************}

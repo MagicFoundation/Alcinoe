@@ -57,10 +57,7 @@ unit ALFcnWinSock;
 
 interface
 
-uses Windows,
-     sysutils,
-     classes,
-     AlStringList;
+uses AlStringList;
 
 function  ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;
 function  ALIPAddrToName(IPAddr : AnsiString): AnsiString;
@@ -69,7 +66,9 @@ function  ALgetLocalHostName: AnsiString;
 
 implementation
 
-uses Winsock,
+uses Windows,
+     sysutils,
+     Winsock,
      AlFcnString;
 
 {*********************************************************************}

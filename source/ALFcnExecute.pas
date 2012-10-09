@@ -60,9 +60,7 @@ unit ALFcnExecute;
 interface
 
 uses windows,
-     classes,
-     sysutils,
-     messages;
+     classes;
 
 {$IF CompilerVersion < 18.5}
 Type
@@ -108,7 +106,9 @@ function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 
 implementation
 
-uses AlFcnString;
+uses sysutils,
+     messages,
+     AlFcnString;
 
 {******************************************}
 Function AlGetEnvironmentString: AnsiString;

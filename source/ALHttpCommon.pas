@@ -75,11 +75,9 @@ unit ALHttpCommon;
 
 interface
 
-uses Windows,
-     Classes,
+uses Classes,
      sysutils,
      Wininet,
-     ALFcnString,
      AlStringList;
 
 Type
@@ -417,9 +415,11 @@ ResourceString
 
 implementation
 
-uses HTTPapp,
+uses Windows,
+     HTTPapp,
      SysConst,
      DateUtils,
+     ALFcnString,
      AlFcnMisc;
 
 {***********************************************************************************}
@@ -1418,7 +1418,7 @@ Function  AlInternetCrackUrl(aUrl: AnsiString;
                                  UrlPath,
                                  ExtraInfo: AnsiString;
                              var PortNumber: integer): Boolean;
-Var P1: Integer;
+Var P1, P2: Integer;
     S1: AnsiString;
 begin
   SchemeName := '';
@@ -1458,7 +1458,8 @@ begin
         Password := '';
       end;
     end;
-    P1 := AlPos(':',aUrl);
+    P2 := AlPos(']', aUrl); // to handle ipV6 url like [::1]:8080
+    P1 := AlPosEx(':',aUrl, P2+1);
     if P1 > 0 then begin
       S1 := AlCopyStr(aUrl, P1+1, Maxint); // 21
       delete(aUrl, P1, Maxint);            // ftp.yoyo.com

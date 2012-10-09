@@ -77,7 +77,6 @@ unit ALStringList;
 interface
 
 Uses Classes,
-     sysutils,
      Contnrs,
      AlAvlBinaryTRee;
 
@@ -367,7 +366,8 @@ Type
 
 implementation
 
-Uses RTLConsts,
+Uses sysutils,
+     RTLConsts,
      AlFcnString;
 
 {************************************************************}

@@ -66,8 +66,7 @@ unit ALSqlite3Wrapper;
 
 interface
 
-uses Windows,
-     sysutils;
+uses Windows;
 
 const
   cALSqlite3_INVALIDELIBVERSION   = 'Incorrect Sqlite3.dll version';
@@ -772,6 +771,8 @@ type
   end;
 
 implementation
+
+uses sysutils;
 
 {***********************************}
 constructor TALSqlite3Library.Create;

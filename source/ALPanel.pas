@@ -74,13 +74,12 @@ unit ALPanel;
 
 interface
 
-uses Windows,
-     Messages,
+uses Messages,
      Classes,
      Controls,
      ExtCtrls,
+     Windows, // Windows must be place BEFORE graphics because their is also a declaration of TBitmap in windows (D2007 can not compile, but DXE2 can)
      graphics,
-     forms,
      AlFcnSkin;
 
 type
@@ -192,7 +191,8 @@ procedure Register;
 
 implementation
 
-uses AlFcnMisc;
+uses forms,
+     AlFcnMisc;
 
 {$R ..\resource\ALPanel.dcr}
 

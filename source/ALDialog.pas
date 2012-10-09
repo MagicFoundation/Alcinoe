@@ -60,18 +60,17 @@ unit ALDialog;
 
 interface
 
-uses windows,
-     forms,
-     Graphics,
-     StdCtrls,
-     controls;
-
 function ALInputQuery(const ACaption, APrompt: Ansistring; var Value: Ansistring; ACancelButton: Boolean): Boolean;
 function ALInputBox(const ACaption, APrompt, ADefault: Ansistring; ACancelButton: Boolean): Ansistring;
 
 implementation
 
-uses Consts;
+uses windows,
+     forms,
+     Graphics,
+     StdCtrls,
+     controls,
+     Consts;
 
 {*****************************************************************************************************************}
 function ALInputQuery(const ACaption, APrompt: Ansistring; var Value: Ansistring; ACancelButton: Boolean): Boolean;

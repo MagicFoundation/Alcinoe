@@ -82,13 +82,10 @@ interface
 
 uses Windows,
      Messages,
-     SysUtils,
      Classes,
      Controls,
      StdCtrls,
      Graphics,
-     forms,
-     Clipbrd,
      MaskUtils,
      Mask,
      AlFcnSkin;
@@ -373,8 +370,11 @@ procedure Register;
 
 implementation
 
-uses AlFcnMisc,
-     Consts;
+uses SysUtils,
+     forms,
+     Clipbrd,
+     Consts,
+     AlFcnMisc;
 
 {$R ..\resource\ALEdit.dcr}
 

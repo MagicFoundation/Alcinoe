@@ -79,10 +79,11 @@ unit ALFBXLib;
   {$MINENUMSIZE 4}
 
 interface
-uses
-  Windows,
-  Variants,
-  ALFBXbase, ALFBXerror, Classes, SysUtils;
+
+uses Windows,
+     Classes,
+     SysUtils,
+     ALFBXbase;
 
 type
 
@@ -1206,11 +1207,14 @@ const
 
 implementation
 
-uses
-//{$IFDEF UNICODE}
-//  AnsiStrings,
-//{$ENDIF}
-  Math, ALFBXConst, AlFcnString;
+uses //{$IFDEF UNICODE}
+     //  AnsiStrings,
+     //{$ENDIF}
+     Math,
+     Variants,
+     ALFBXerror,
+     ALFBXConst,
+     AlFcnString;
 
 //function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
 //begin

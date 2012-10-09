@@ -74,8 +74,7 @@ unit ALWebSpider;
 
 interface
 
-uses Windows,
-     classes,
+uses classes,
      AlAvlBinaryTree,
      AlHTTPCommon,
      AlHTTPClient,
@@ -266,10 +265,10 @@ implementation
 
 {$R ..\resource\ALWebSpider.dcr}
 
-uses sysutils,
+uses Windows,
+     sysutils,
      WinInet,
      UrlMon,
-     Masks,
      AlFcnHTML,
      AlFcnMime,
      AlFcnString;

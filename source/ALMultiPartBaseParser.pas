@@ -59,9 +59,7 @@ unit ALMultiPartBaseParser;
 interface
 
 uses Classes,
-     SysUtils,
      Contnrs,
-     HTTPApp,
      ALStringList;
 
 type
@@ -166,7 +164,8 @@ Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: AnsiString; aName, AVal
 
 implementation
 
-uses AlFcnString,
+uses SysUtils,
+     AlFcnString,
      AlFcnMime;
 
 {********************************************************************************************************}

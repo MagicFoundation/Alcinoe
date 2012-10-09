@@ -65,8 +65,9 @@ interface
 
 {$I ALZLibEx.inc}
 
-uses
-  ALZLibEx, Windows, SysUtils, Classes {$IFDEF Version6Plus}, DateUtils {$ENDIF};
+uses Classes,
+     {$IFDEF Version6Plus}DateUtils, {$ENDIF}
+     ALZLibEx;
 
 type
   {** TGZHeader *********************************************************************************}
@@ -254,8 +255,8 @@ procedure ALGZDecompressStream(inStream, outStream: TStream);
 
 implementation
 
-uses
-  ALZLibExApi;
+uses SysUtils,
+     ALZLibExApi;
 
 {********************************************************}
 function ALGZCompressStr(const s: AnsiString): AnsiString;

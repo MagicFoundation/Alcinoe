@@ -188,8 +188,6 @@ Function AlDecodeInternetMessageHeaderInUTF8(aHeaderStr: AnsiString; aDefaultCod
 implementation
 
 uses Sysutils,
-     Masks,
-     ALFcnMisc,
      ALHttpCommon,
      AlFcnMime,
      AlFcnWinsock,

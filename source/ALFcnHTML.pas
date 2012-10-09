@@ -66,8 +66,7 @@ unit ALFcnHTML;
 
 interface
 
-uses Classes,
-     AlStringList;
+uses AlStringList;
 
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
                                 LstExtractedResourceText: TALStrings;
@@ -88,7 +87,8 @@ procedure ALCompactHtmlTagParams(TagParams: TALStrings);
 
 implementation
 
-uses sysutils,
+uses Classes,
+     sysutils,
      alFcnString,
      ALQuickSortList;
 

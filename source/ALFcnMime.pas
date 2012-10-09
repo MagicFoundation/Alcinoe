@@ -61,8 +61,7 @@ unit ALFcnMime;
 
 interface
 
-uses Windows,
-     Classes,
+uses Classes,
      Types,
      sysutils,
      ALStringList;
@@ -141,7 +140,8 @@ Var vAlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
 
 implementation
 
-Uses Registry,
+Uses Windows,
+     Registry,
      alFcnString;
 
 // Caution: For MimeEncodeStream and all other kinds of multi-buffered

@@ -57,9 +57,7 @@ unit ALNNTPClient;
 
 interface
 
-uses windows,
-     Classes,
-     WinSock,
+uses WinSock,
      ALInternetMessageCommon,
      ALMultiPartMixedParser,
      ALStringList;
@@ -154,7 +152,9 @@ type
 
 implementation
 
-Uses SysUtils,
+Uses Windows,
+     SysUtils,
+     Classes,
      AlFcnWinsock,
      AlFcnString;
 

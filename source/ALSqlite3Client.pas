@@ -64,9 +64,7 @@ unit AlSqlite3Client;
 
 interface
 
-uses Windows,
-     SysUtils,
-     classes,
+uses SysUtils,
      Contnrs,
      SyncObjs,
      AlXmlDoc,
@@ -311,7 +309,8 @@ Type
 
 implementation
 
-Uses ALWindows;
+Uses classes,
+     ALWindows;
 
 {*****************************************************************************}
 constructor EALSqlite3Error.Create(aErrorMsg: AnsiString; aErrorCode: Integer);

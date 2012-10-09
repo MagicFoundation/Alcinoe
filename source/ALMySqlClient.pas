@@ -59,8 +59,6 @@ unit AlMySqlClient;
 interface
 
 uses Windows,
-     SysUtils,
-     classes,
      Contnrs,
      SyncObjs,
      AlXmlDoc,
@@ -335,7 +333,9 @@ Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 
 implementation
 
-Uses ALWindows;
+Uses SysUtils,
+     classes,
+     ALWindows;
 
 {******************************************************************}
 Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;

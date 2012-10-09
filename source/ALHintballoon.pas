@@ -59,15 +59,11 @@ unit ALHintBalloon;
 
 interface
 
-uses Windows,
-     Forms,
+uses Forms,
      Classes,
      Controls,
-     StdCtrls,
      ExtCtrls,
-     Graphics,
-     Messages,
-     SysUtils;
+     Messages;
 
 type
 
@@ -130,7 +126,11 @@ implementation
 {$R ..\resource\ALHintBalloon.res}
 {$R ..\resource\ALHintballoon.dcr}
 
-uses math;
+uses Windows,
+     SysUtils,
+     StdCtrls,
+     Graphics,
+     math;
 
 {*****************}
 procedure Register;

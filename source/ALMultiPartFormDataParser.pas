@@ -66,8 +66,6 @@ unit ALMultiPartFormDataParser;
 interface
 
 uses Classes,
-     SysUtils,
-     ALHttpCommon,
      AlStringList,
      AlMultiPartBaseParser;
 

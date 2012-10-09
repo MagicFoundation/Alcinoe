@@ -70,10 +70,8 @@ unit ALMemo;
 
 interface
 
-uses Windows,
-     Classes,
+uses Classes,
      Messages,
-     Forms,
      Graphics,
      StdCtrls,
      Controls,
@@ -237,6 +235,9 @@ procedure Register;
 implementation
 
 {$R ..\resource\ALMemo.dcr}
+
+uses Windows,
+     Forms;
 
 {*****************}
 procedure Register;

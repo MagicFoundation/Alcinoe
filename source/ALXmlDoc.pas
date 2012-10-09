@@ -103,8 +103,7 @@ unit ALXmlDoc;
 
 interface
 
-uses Windows,
-     Classes,
+uses Classes,
      sysutils,
      AlStringList;
 
@@ -809,7 +808,8 @@ procedure Register;
 
 implementation
 
-uses Contnrs,
+uses Windows,
+     Contnrs,
      AlFcnHTML,
      {$IF CompilerVersion < 18.5}
      Variants,

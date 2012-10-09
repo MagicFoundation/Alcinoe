@@ -81,7 +81,6 @@ unit ALWininetHttpClient;
 interface
 
 uses Windows,
-     SysUtils,
      Classes,
      ALHttpCommon,
      ALHttpClient,
@@ -320,7 +319,8 @@ procedure Register;
 
 implementation
 
-uses AlFcnString;
+uses SysUtils,
+     AlFcnString;
 
 {$R ..\resource\ALWininetHttpClient.dcr}
 

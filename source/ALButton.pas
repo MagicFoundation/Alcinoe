@@ -86,11 +86,9 @@ Unit ALButton;
 
 interface
 
-Uses Windows,
-     Messages,
+Uses Messages,
      Classes,
      Controls,
-     Forms,
      Graphics,
      StdCtrls,
      Buttons,
@@ -456,7 +454,9 @@ procedure Register;
 
 implementation
 
-uses Math,
+uses Windows,
+     Math,
+     Forms,
      AlFcnMisc;
 
 {$R ..\resource\ALButton.dcr}

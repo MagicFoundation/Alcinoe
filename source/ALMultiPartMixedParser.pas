@@ -62,7 +62,6 @@ unit ALMultiPartMixedParser;
 interface
 
 uses Classes,
-     SysUtils,
      ALMultiPartBaseParser;
 
 {Below a sample of multipart/mixed message :
@@ -153,7 +152,8 @@ type
 
 implementation
 
-uses AlFcnString,
+uses SysUtils,
+     AlFcnString,
      ALStringList;
 
 {*******************************************************}

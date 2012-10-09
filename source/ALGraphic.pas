@@ -59,8 +59,6 @@ unit ALGraphic;
 interface
 
 uses Windows,
-     SysUtils,
-     Classes,
      Graphics;
 
 {$if CompilerVersion<=18.5}
@@ -103,7 +101,9 @@ procedure ALRotateBMP270(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
 
 implementation
 
-uses math;
+uses SysUtils,
+     Classes,
+     math;
 
 Const
   cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.

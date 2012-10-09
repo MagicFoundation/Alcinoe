@@ -58,9 +58,7 @@ unit ALFcnCGI;
 
 interface
 
-uses Windows,
-     Classes,
-     HttpApp,
+uses Classes,
      ALIsapiHTTP,
      AlHttpCommon,
      AlStringList;
@@ -109,8 +107,7 @@ Procedure AlCGIExec(ScriptName,
 
 implementation
 
-uses sysutils,
-     AlFcnExecute,
+uses AlFcnExecute,
      AlFcnString;
 
 {**************************************************************************************************************}

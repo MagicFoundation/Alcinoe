@@ -80,9 +80,7 @@ unit ALAVLBinaryTree;
 
 interface
 
-uses classes,
-     sysUtils,
-     syncObjs;
+uses classes;
 
 type
 
@@ -286,6 +284,7 @@ type
 implementation
 
 uses Contnrs,
+     sysUtils,
      ALFcnString;
 
 {Following stack declarations are used to avoid recursion in all tree

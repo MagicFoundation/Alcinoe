@@ -58,8 +58,7 @@ unit ALMySqlWrapper;
 
 interface
 
-uses Windows,
-     sysutils;
+uses Windows;
 
 {$IF CompilerVersion < 18.5}
   // from http://stackoverflow.com/questions/6378107/how-to-define-an-unsigned-64-bit-integer-in-delphi7
@@ -718,6 +717,8 @@ TMYSQL_CLIENT_OPTIONS =
   end;
 
 implementation
+
+uses sysutils;
 
 {**************************************************************}
 constructor TALMySqlLibrary.Create(ApiVer: TALMySqlVersion_API);

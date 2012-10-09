@@ -74,12 +74,9 @@ unit ALStaticText;
 
 interface
 
-uses Windows,
-     Messages,
+uses Messages,
      Classes,
      Controls,
-     Graphics,
-     forms,
      AlFcnSkin;
 
 type
@@ -178,6 +175,10 @@ procedure Register;
 implementation
 
 {$R ..\resource\ALStaticText.dcr}
+
+uses Windows,
+     Graphics,
+     forms;
 
 {*****************}
 procedure Register;

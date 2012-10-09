@@ -61,9 +61,6 @@ unit ALFcnFile;
 
 interface
 
-uses Windows,
-     sysutils;
-
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
                            Const RemoveEmptySubDirectory: Boolean = True;
@@ -87,8 +84,9 @@ function  ALIsDirectoryEmpty(const directory: ansiString) : boolean;
 
 implementation
 
-uses Masks,
-     DateUtils,
+uses Windows,
+     Masks,
+     sysutils,
      alFcnString;
 
 {**********************************************}

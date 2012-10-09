@@ -65,7 +65,6 @@ interface
 
 uses Windows,
      Classes,
-     sysutils,
      AlFcnString;
 
 const
@@ -270,7 +269,8 @@ function  ALStringHashMix128(const Str : AnsiString): LongInt; overload;
 
 implementation
 
-uses MMSystem,
+uses sysutils,
+     MMSystem,
      Math;
 
 type
@@ -1104,7 +1104,7 @@ var
 begin
   Randomize;
   for I := 0 to KeySize - 1 do
-    TByteArray(Key)[I] := System.Random(256);                        
+    TByteArray(Key)[I] := System.Random(256);
 end;
 
 {**********************************************************************************}

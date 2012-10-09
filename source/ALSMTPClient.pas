@@ -72,9 +72,7 @@ unit ALSMTPClient;
 
 interface
 
-uses windows,
-     Classes,
-     WinSock,
+uses WinSock,
      ALStringList,
      ALInternetMessageCommon,
      ALMultiPartMixedParser;
@@ -134,7 +132,9 @@ type
 
 implementation
 
-Uses SysUtils,
+Uses Windows,
+     Classes,
+     SysUtils,
      AlFcnMime,
      AlFcnWinsock,
      AlFcnString;

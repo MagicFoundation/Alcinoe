@@ -56,8 +56,7 @@ unit ALWindows;
 
 interface
 
-uses Windows,
-     sysutils;
+uses Windows;
 
 type
   _ALMEMORYSTATUSEX = record
@@ -81,6 +80,8 @@ function ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLON
 const cALINVALID_SET_FILE_POINTER = DWORD(-1);
 
 implementation
+
+uses sysutils;
 
 {*****************************************************************************}
 function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';

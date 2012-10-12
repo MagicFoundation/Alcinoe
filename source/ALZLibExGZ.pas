@@ -255,7 +255,8 @@ procedure ALGZDecompressStream(inStream, outStream: TStream);
 
 implementation
 
-uses SysUtils,
+uses Windows, // if we don't add this use clause we have a warning that inline function (renamefile) have not been expended
+     SysUtils,
      ALZLibExApi;
 
 {********************************************************}

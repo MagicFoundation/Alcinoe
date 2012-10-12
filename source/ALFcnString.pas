@@ -5678,10 +5678,10 @@ asm
         MOV     EDI,EDX
         MOV     EBX,ECX
         MOV     EAX,AFormatSettings
-        MOV     AL,AnsiChar([EAX].TFormatSettings.DecimalSeparator)
+        MOV     AL,AnsiChar([EAX].TALFormatSettings.DecimalSeparator)
         MOV     DecimalSep,AL
         MOV     EAX,AFormatSettings
-        MOV     AL,AnsiChar([EAX].TFormatSettings.ThousandSeparator)
+        MOV     AL,AnsiChar([EAX].TALFormatSettings.ThousandSeparator)
         MOV     ThousandsSep,AL
         MOV     ECX,2
         CMP     BL,fvExtended

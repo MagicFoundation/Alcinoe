@@ -304,8 +304,7 @@ resourcestring
 
 implementation
 
-uses SYSutils,
-     AlFcnString;
+uses AlFcnString;
 
 {***********************************************************************************}
 function AlBaseQuickSortListCompare(List: TObject; Index1, Index2: Integer): Integer;

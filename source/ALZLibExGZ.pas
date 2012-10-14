@@ -65,9 +65,8 @@ interface
 
 {$I ALZLibEx.inc}
 
-uses Classes,
-     {$IFDEF Version6Plus}DateUtils, {$ENDIF}
-     ALZLibEx;
+uses
+  ALZLibEx, Windows, SysUtils, Classes {$IFDEF Version6Plus}, DateUtils {$ENDIF};
 
 type
   {** TGZHeader *********************************************************************************}
@@ -255,9 +254,8 @@ procedure ALGZDecompressStream(inStream, outStream: TStream);
 
 implementation
 
-uses Windows, // if we don't add this use clause we have a warning that inline function (renamefile) have not been expended
-     SysUtils,
-     ALZLibExApi;
+uses
+  ALZLibExApi;
 
 {********************************************************}
 function ALGZCompressStr(const s: AnsiString): AnsiString;

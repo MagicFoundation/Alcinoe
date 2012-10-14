@@ -334,7 +334,6 @@ Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 implementation
 
 Uses SysUtils,
-     classes,
      ALWindows;
 
 {******************************************************************}

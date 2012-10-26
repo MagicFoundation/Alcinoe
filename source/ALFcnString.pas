@@ -342,11 +342,11 @@ Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
 Function  ALUTF8ISO91995CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 Function  ALUTF8BGNPCGN1947CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 
-Const cAlUTF8Bom = #$EF#$BB#$BF;
-      cAlUTF16LittleEndianBom = #$FF#$FE;
-      cAlUTF16bigEndianBom = #$FE#$FF;
-      cAlUTF32LittleEndianBom = #$FF#$FE#$00#$00;
-      cAlUTF32BigEndianBom = #$00#$00#$FE#$FF;
+Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
+      cAlUTF16LittleEndianBom = ansiString(#$FF) + ansiString(#$FE);
+      cAlUTF16bigEndianBom = ansiString(#$FE) + ansiString(#$FF);
+      cAlUTF32LittleEndianBom = ansiString(#$FF) + ansiString(#$FE) + ansiString(#$00) + ansiString(#$00);
+      cAlUTF32BigEndianBom = ansiString(#$00) + ansiString(#$00) + ansiString(#$FE) + ansiString(#$FF);
 
 var
   ALDefaultFormatSettings: TALformatSettings;

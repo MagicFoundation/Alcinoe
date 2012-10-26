@@ -1364,7 +1364,7 @@ Var aNode: TALAVLInt64ListBinaryTreeNode;
     i: integer;
 begin
   aNode := TALAVLInt64ListBinaryTreeNode.Create;
-  aNode.ID := item;
+  aNode.ID  := item;
   aNode.Obj := AObject;
   aNode.Idx := Index;
   if not FAVLBinTree.AddNode(aNode) then begin
@@ -1398,7 +1398,7 @@ end;
 {******************************************************}
 function TALInt64AVLList.GetItem(Index: Integer): Int64;
 begin
-  Result := TALAVLInt64ListBinaryTreeNode(Get(index)^).ID
+  Result := TALAVLInt64ListBinaryTreeNode(Get(index)).ID
 end;
 
 {*****************************************************}
@@ -1414,7 +1414,7 @@ begin
   FAVLBinTree.DeleteNode(GetItem(Index));
 
   for i := Index + 1 to Count - 1 do
-    dec(TALAVLInt64ListBinaryTreeNode(Get(i)^).Idx);
+    dec(TALAVLInt64ListBinaryTreeNode(Get(i)).Idx);
 
   inherited Delete(Index);
 end;
@@ -1423,7 +1423,7 @@ end;
 function TALInt64AVLList.GetObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
-  Result :=  TALAVLInt64ListBinaryTreeNode(Get(index)^).Obj;
+  Result :=  TALAVLInt64ListBinaryTreeNode(Get(index)).Obj;
 end;
 
 {****************************************************************}
@@ -1438,7 +1438,7 @@ end;
 procedure TALInt64AVLList.PutObject(Index: Integer; AObject: TObject);
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
-  TALAVLInt64ListBinaryTreeNode(Get(index)^).Obj := AObject;
+  TALAVLInt64ListBinaryTreeNode(Get(index)).Obj := AObject;
 end;
 
 end.

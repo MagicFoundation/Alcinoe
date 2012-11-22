@@ -63,6 +63,13 @@ unit ALCipher;
 
 interface
 
+{$A+} {Word Align Data}
+{$Q-} {Overflow Checking}
+{.$R-} {Range-Checking}
+{.$V-} {Var-String Checking}
+{.$B-} {Complete Boolean Evaluation}
+{.$I+} {Input/Output-Checking}
+
 uses Windows,
      Classes,
      AlFcnString;

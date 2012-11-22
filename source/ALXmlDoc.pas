@@ -1119,7 +1119,9 @@ Var RawXmlString: AnsiString;
       SetLength(RawXmlString, RawXmlStringLength);
     end;
 
-    ByteReaded := RawXmlStream.Read(RawXmlString[RawXmlStringLength - Byte2Read + 1],Byte2Read);
+    //range check error is we not do so
+    if RawXmlStream.Position < RawXmlStream.Size then ByteReaded := RawXmlStream.Read(RawXmlString[RawXmlStringLength - Byte2Read + 1],Byte2Read)
+    else ByteReaded := 0;
 
     If ByteReaded <> Byte2Read then begin
       RawXmlStringLength := RawXmlStringLength - Byte2Read + ByteReaded;
@@ -1162,7 +1164,7 @@ Var RawXmlString: AnsiString;
     end;
   end;
 
-  {---------------------------------------------}
+  {-----------------------------------------------}
   Procedure CheckAttributes(TagParams: TALStrings);
   Var i: integer;
       S1, S2, S3: AnsiString;

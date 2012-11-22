@@ -90,6 +90,7 @@ History :     27/05/2006: Add loadfromstream, loadfromfile,
                           Finally the OLE variant is not usefull so i decide to
                           remove it
               20/06/2012: Add xe2 support
+              11/11/2012: add the function ALFindXmlNodeByNameAndAttribute
 
 Link :
 
@@ -793,14 +794,19 @@ Const cAlXMLUTF8EncodingStr = 'UTF-8';
       CALXmlDocument        = 'DOCUMENT';
 
 {misc function}
-Function  ALCreateEmptyXMLDocument(Rootname:AnsiString):TalXMLDocument;
-procedure ALClearXMLDocument(rootname:AnsiString; xmldoc: TalXMLDocument; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
+Function  ALCreateEmptyXMLDocument(Const Rootname:AnsiString):TalXMLDocument;
+procedure ALClearXMLDocument(Const rootname:AnsiString;
+                             xmldoc: TalXMLDocument;
+                             const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
+Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
+                                          Const NodeName: ansiString;
+                                          Const AttributeName, AttributeValue: AnsiString;
+                                          Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
-                                   AttributeName, AttributeValue : AnsiString;
+                                   Const AttributeName, AttributeValue : AnsiString;
                                    Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
-                                        ChildNodeName,
-                                        ChildNodeValue : AnsiString): TalxmlNode;
+                                        Const ChildNodeName, ChildNodeValue : AnsiString): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default: AnsiString = ''): AnsiString;
 
 
@@ -3765,8 +3771,8 @@ begin
   FCount := NewCount;
 end;
 
-{********************************************************************}
-Function ALCreateEmptyXMLDocument(Rootname:AnsiString):TalXMLDocument;
+{**************************************************************************}
+Function ALCreateEmptyXMLDocument(Const Rootname:AnsiString):TalXMLDocument;
 begin
   Result := TAlXMLDocument.Create(nil);
   with result do begin
@@ -3776,8 +3782,10 @@ begin
   ALClearXMLDocument(rootname,Result);
 End;
 
-{*******************************************************************************************************************************}
-procedure ALClearXMLDocument(rootname:AnsiString; xmldoc: TalXMLDocument; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
+{*****************************************************}
+procedure ALClearXMLDocument(Const rootname:AnsiString;
+                             xmldoc: TalXMLDocument;
+                             const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
 begin
   with xmlDoc do begin
     Active := False;
@@ -3793,8 +3801,7 @@ End;
 
 {********************************************************}
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
-                                        ChildNodeName,
-                                        ChildNodeValue : AnsiString): TalxmlNode;
+                                        Const ChildNodeName, ChildNodeValue : AnsiString): TalxmlNode;
 var i : integer;
 Begin
   result := nil;
@@ -3817,9 +3824,35 @@ Begin
   end;
 end;
 
+{**********************************************************}
+Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
+                                          Const NodeName: ansiString;
+                                          Const AttributeName, AttributeValue: AnsiString;
+                                          Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+var i : integer;
+Begin
+  result := nil;
+  if not (xmlrec is TalXmlElementNode) then Exit;
+  for i := 0 to xmlrec.ChildNodes.Count - 1 do begin
+    If ALSametext(xmlrec.ChildNodes[i].NodeName, NodeName) and
+       ALSametext(xmlrec.ChildNodes[i].Attributes[AttributeName], AttributeValue) then begin
+      result := xmlrec.ChildNodes[i];
+      break;
+    end;
+    if SearchAlsoInChildNodes then begin
+      result := ALFindXmlNodeByNameAndAttribute(xmlrec.ChildNodes[i],
+                                                NodeName,
+                                                AttributeName,
+                                                AttributeValue,
+                                                SearchAlsoInChildNodes);
+      if assigned(Result) then break;
+    end;
+  end;
+end;
+
 {***************************************************}
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
-                                   AttributeName, AttributeValue : AnsiString;
+                                   Const AttributeName, AttributeValue : AnsiString;
                                    Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
 
 var i : integer;

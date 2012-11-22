@@ -77,6 +77,7 @@ History:      11/05/2005: Remove the bug in alFastTagReplace that raise
               01/09/2009: Change ALFastTagReplace to launch again ALFastTagReplace
                           on the result of FastTagReplaceProc
               26/06/2012: Add xe2 support
+              15/11/2012: Improve the ALFastTagReplace Functions
 
 Link :
 
@@ -192,7 +193,16 @@ type
     function Matches(const Filename: AnsiString): Boolean;
   end;
 
-  TALHandleTagfunct = function(const TagString: AnsiString; TagParams: TALStrings; ExtData: pointer; Var Handled: Boolean): AnsiString;
+  TALHandleTagfunct = function(const TagString: AnsiString;
+                               TagParams: TALStrings;
+                               ExtData: pointer;
+                               Var Handled: Boolean): AnsiString;
+  TALHandleTagExtendedfunct = function(const TagString: AnsiString;
+                                       TagParams: TALStrings;
+                                       ExtData: pointer;
+                                       Var Handled: Boolean;
+                                       Const SourceString: AnsiString;
+                                       Var TagPosition, TagLength: integer): AnsiString;
 
 procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
 function  ALGUIDToString(const Guid: TGUID): Ansistring;
@@ -274,29 +284,23 @@ procedure ALMove(const Source; var Dest; Count: {$if CompilerVersion >= 23}{Delp
 procedure ALStrMove(const Source: PAnsiChar; var Dest: PAnsiChar; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
 function  ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString;
 function  ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
-function  ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
-                           FastTagReplaceProc: TALHandleTagFunct;
-                           ReplaceStrParamName,
-                           ReplaceWith: AnsiString;
-                           AStripParamQuotes: Boolean;
-                           Flags: TReplaceFlags;
-                           ExtData: Pointer;
-                           const ReProcessReplaceProcResult: Boolean = False): AnsiString; overload;
 function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
-                           ReplaceWith: AnsiString;
-                           const Flags: TReplaceFlags=[rfreplaceall]): AnsiString; overload;
-function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
-                           ReplaceStrParamName: AnsiString;
-                           AStripParamQuotes: Boolean;
-                           const Flags: TReplaceFlags=[rfreplaceall]): AnsiString; overload;
-function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
-                           FastTagReplaceProc: TALHandleTagFunct;
-                           AStripParamQuotes: Boolean;
+                           ReplaceProc: TALHandleTagFunct;
+                           StripParamQuotes: Boolean;
                            ExtData: Pointer;
                            Const flags: TReplaceFlags=[rfreplaceall];
-                           const ReProcessReplaceProcResult: Boolean = False): AnsiString; overload;
+                           const TagReplaceProcResult: Boolean = False): AnsiString; overload;
+function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
+                           ReplaceExtendedProc: TALHandleTagExtendedfunct;
+                           StripParamQuotes: Boolean;
+                           ExtData: Pointer;
+                           Const flags: TReplaceFlags=[rfreplaceall];
+                           const TagReplaceProcResult: Boolean = False): AnsiString; overload;
+function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
+                           const ReplaceWith: AnsiString;
+                           const Flags: TReplaceFlags=[rfreplaceall]): AnsiString; overload;
 function  ALExtractTagParams(Const SourceString, TagStart, TagEnd: AnsiString;
-                             AStripParamQuotes: Boolean;
+                             StripParamQuotes: Boolean;
                              TagParams: TALStrings;
                              IgnoreCase: Boolean): Boolean;
 Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: AnsiString;
@@ -3829,6 +3833,13 @@ end;
 {********************************************************************}
 function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean;
+// correct a not rang check error
+// replace
+// while (S[BlankPos] <> ' ') and (BlankPos <= Length(S)) do
+//            Inc(BlankPos);
+// by
+// while (BlankPos <= Length(S)) and (S[BlankPos] <> ' ') do
+//            Inc(BlankPos);
 {$IFDEF UNICODE}
 var
   Pos: Integer;
@@ -3881,7 +3892,7 @@ begin
         // search of the next blank if no AM/PM string has been found
         if not Stop then
         begin
-          while (S[BlankPos] <> ' ') and (BlankPos <= Length(S)) do
+          while (BlankPos <= Length(S)) and (S[BlankPos] <> ' ') do
             Inc(BlankPos);
           if BlankPos > Length(S) then
             BlankPos := 0;
@@ -4205,8 +4216,11 @@ end;
 {**************}
 {$IFDEF UNICODE}
 function _ALValInt64(const s: AnsiString; var code: Integer): Int64;
+// the original implementation was with lot of "RANGE CHECK ERROR"
+// Exemple: while s[i] = AnsiChar(' ') do Inc(i);
 var
   i: Integer;
+  len: Integer;
   dig: Integer;
   sign: Boolean;
   empty: Boolean;
@@ -4216,70 +4230,71 @@ begin
   dig := 0;
   {$ENDIF}
   Result := 0;
-  if s = '' then
-  begin
+  if s = '' then begin
     code := i;
     exit;
   end;
-  while s[i] = AnsiChar(' ') do
-    Inc(i);
+  len := Length(S);
+  while (i <= Len) and (s[i] = ' ') do Inc(i);
+  if i > len then begin
+    code := i;
+    exit;
+  end;
   sign := False;
-  if s[i] =  AnsiChar('-') then
-  begin
+  if s[i] = '-' then begin
     sign := True;
     Inc(i);
+    if i > len then begin
+      code := i;
+      exit;
+    end;
   end
-  else if s[i] =  AnsiChar('+') then
+  else if s[i] = '+' then begin
     Inc(i);
+    if i > len then begin
+      code := i;
+      exit;
+    end;
+  end;
   empty := True;
-  if (s[i] =  AnsiChar('$')) or (Upcase(s[i]) =  AnsiChar('X'))
-    or ((s[i] =  AnsiChar('0')) and (I < Length(S)) and (Upcase(s[i+1]) =  AnsiChar('X'))) then
+  if (s[i] = '$') or
+     (Upcase(s[i]) = 'X') or
+     ((s[i] = '0') and
+      (I < Len) and
+      (Upcase(s[i+1]) = 'X')) then
   begin
-    if s[i] =  AnsiChar('0') then
-      Inc(i);
+    if s[i] = '0' then Inc(i);
     Inc(i);
-    while True do
-    begin
-      case   AnsiChar(s[i]) of
-       AnsiChar('0').. AnsiChar('9'): dig := Ord(s[i]) -  Ord('0');
-       AnsiChar('A').. AnsiChar('F'): dig := Ord(s[i]) - (Ord('A') - 10);
-       AnsiChar('a').. AnsiChar('f'): dig := Ord(s[i]) - (Ord('a') - 10);
-      else
-        break;
+    while (i <= Len) do begin
+      case s[i] of
+        '0'..'9': dig := Ord(s[i]) - (Ord('0'));
+        'A'..'F': dig := Ord(s[i]) - (Ord('A') - 10);
+        'a'..'f': dig := Ord(s[i]) - (Ord('a') - 10);
+        else break;
       end;
-      if (Result < 0) or (Result > (High(Int64) shr 3)) then
-        Break;
+      if (Result < 0) or (Result > (High(Int64) shr 3)) then Break;
       Result := Result shl 4 + dig;
       Inc(i);
       empty := False;
     end;
-    if sign then
-      Result := - Result;
+    if sign then Result := - Result;
   end
-  else
-  begin
-    while True do
-    begin
-      case  AnsiChar(s[i]) of
-        AnsiChar('0').. AnsiChar('9'): dig := Ord(s[i]) - Ord('0');
-      else
-        break;
+  else begin
+    while (i <= Len) do begin
+      case s[i] of
+        '0'..'9': dig := Ord(s[i]) - Ord('0');
+        else break;
       end;
-      if (Result < 0) or (Result > (High(Int64) div 10)) then
-        break;
+      if (Result < 0) or (Result > (High(Int64) div 10)) then break;
       Result := Result*10 + dig;
       Inc(i);
       empty := False;
     end;
-    if sign then
-      Result := - Result;
-    if (Result <> 0) and (sign <> (Result < 0)) then
-      Dec(i);
+    if sign then Result := - Result;
+    if (Result <> 0) and (sign <> (Result < 0)) then Dec(i);
   end;
-  if (s[i] <> AnsiChar(#0)) or empty then
-    code := i
-  else
-    code := 0;
+  if (i <= len) or empty then code := i
+  else code := 0;
 end;
 {$ENDIF}
 
@@ -6829,63 +6844,65 @@ end;
 
 {*************************************************************************}
 function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
-                          FastTagReplaceProc: TALHandleTagFunct;
-                          ReplaceStrParamName,
-                          ReplaceWith: AnsiString;
-                          AStripParamQuotes: Boolean;
+                          ReplaceProc: TALHandleTagFunct;
+                          ReplaceExtendedProc: TALHandleTagExtendedfunct;
+                          Const ReplaceWith: AnsiString;
+                          StripParamQuotes: Boolean;
                           Flags: TReplaceFlags;
                           ExtData: Pointer;
-                          const ReProcessReplaceProcResult: Boolean = False): AnsiString;
+                          const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 
-var i: integer;
-    ReplaceString: AnsiString;
-    Token, FirstTagEndChar: AnsiChar;
+var ReplaceString: AnsiString;
+    Token: AnsiChar;
+    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
     ParamList: TALStringList;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
-    T1,T2: Integer;
     InDoubleQuote: Boolean;
     InsingleQuote: Boolean;
-    Work_SourceString: AnsiString;
-    Work_TagStart: AnsiString;
-    Work_TagEnd: AnsiString;
     TagHandled: Boolean;
+    SourceCurrentPos: integer;
     ResultCurrentPos: integer;
     ResultCurrentLength: integer;
+    IgnoreCase: Boolean;
+    PosExFunct: Function(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
+    T1,T2: Integer;
 
 Const ResultBuffSize: integer = 16384;
 
-     {-----------------------------------}
-     Function ExtractTokenStr: AnsiString;
-     var x: Integer;
-     Begin
-       x := AlPos(' ',ReplaceString);
-       if x > 0 then Result := ALTrim( AlcopyStr(ReplaceString,1,x) )
-       else Result := ALTrim(ReplaceString);
-     end;
+    {------------------------------------}
+    Function _ExtractTokenStr: AnsiString;
+    var x: Integer;
+    Begin
+      X := 1;
+      while (x <= length(ReplaceString)) and
+            (not (ReplaceString[x] in [' ', #9, #13, #10])) do inc(x);
+      if x > length(ReplaceString) then Result := ReplaceString
+      else Result := AlcopyStr(ReplaceString,1,x-1);
+    end;
 
-     {------------------------------------}
-     Function ExtractParamsStr: AnsiString;
-     Begin
-       Result := ALTrim( AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt) );
-     end;
+    {-------------------------------------}
+    Function _ExtractParamsStr: AnsiString;
+    Begin
+      Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
+    end;
 
-     {---------------------------------------}
-     Procedure MoveStr2Result(Src:AnsiString);
-     Var l: integer;
-     Begin
-       If Src <> '' then begin
-         L := Length(Src);
-         If L+ResultCurrentPos-1>ResultCurrentLength Then begin
-           ResultCurrentLength := ResultCurrentLength + L + ResultBuffSize;
-           SetLength(Result,ResultCurrentLength);
-         end;
-         AlMove(Src[1],Result[ResultCurrentPos],L);
-         ResultCurrentPos := ResultCurrentPos + L;
-       end;
-     end;
+    {----------------------------------------}
+    Procedure _MoveStr2Result(Src:AnsiString);
+    Var l: integer;
+    Begin
+      If Src <> '' then begin
+        L := Length(Src);
+        If L+ResultCurrentPos-1>ResultCurrentLength Then begin
+          ResultCurrentLength := ResultCurrentLength + L + ResultBuffSize;
+          SetLength(Result,ResultCurrentLength);
+        end;
+        AlMove(Src[1],Result[ResultCurrentPos],L);
+        ResultCurrentPos := ResultCurrentPos + L;
+      end;
+    end;
 
 begin
   if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
@@ -6893,55 +6910,67 @@ begin
     Exit;
   end;
 
-  If rfIgnoreCase in flags then begin
-    Work_SourceString := ALUppercase(SourceString);
-    Work_TagStart := ALuppercase(TagStart);
-    Work_TagEnd := ALUppercase(TagEnd);
-  end
-  Else begin
-    Work_SourceString := SourceString;
-    Work_TagStart := TagStart;
-    Work_TagEnd := TagEnd;
-  end;
+  IgnoreCase := rfIgnoreCase in flags;
+  If IgnoreCase then PosExFunct := ALPosExIgnoreCase
+  Else PosExFunct := ALPosEx;
 
-  SourceStringLength := length(Work_SourceString);
+  SourceStringLength := length(SourceString);
   ResultCurrentLength := SourceStringLength;
   SetLength(Result,ResultCurrentLength);
   ResultCurrentPos := 1;
-  TagStartLength := Length(Work_TagStart);
-  TagEndLength := Length(Work_TagEnd);
-  FirstTagEndChar := Work_TagEnd[1];
-  i := 1;
+  TagStartLength := Length(TagStart);
+  TagEndLength := Length(TagEnd);
+  TagEndFirstChar := TagEnd[1];
+  TagEndFirstCharLower := ALLowerCase(TagEnd[1])[1];
+  TagEndFirstCharUpper := ALUpperCase(TagEnd[1])[1];
+  SourceCurrentPos := 1;
 
-  T1 := ALPosEx(Work_TagStart,Work_SourceString,i);
+  T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
   T2 := T1 + TagStartLength;
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
     InDoubleQuote := False;
     InsingleQuote := False;
-    Token := Work_SourceString[T2];
+    Token := SourceString[T2];
     if token = '"' then InDoubleQuote := True
     else if token = '''' then InSingleQuote := True;
-    While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+    While (T2 < SourceStringLength) and
+          (InDoubleQuote or
+           InSingleQuote or
+           (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+           ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+           (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
       inc(T2);
-      Token := Work_SourceString[T2];
+      Token := SourceString[T2];
       If Token = '"' then begin
-        if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+        if (not InDoubleQuote) or
+           (T2 = SourceStringLength) or
+           (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
         else inc(t2);
       end
       else If Token = '''' then begin
-        if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+        if (not InSingleQuote) or
+           (T2 = SourceStringLength) or
+           (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
         else inc(t2);
       end;
     end;
+    if (T2 = SourceStringLength) and
+       (InDoubleQuote or
+        InSingleQuote or
+        (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+        ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+        (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
   end;
+
 
   While (T1 > 0) and (T2 > T1) do begin
     ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
+    T2 := T2 + TagEndLength;
 
     TagHandled := True;
-    If assigned(FastTagReplaceProc) or (ReplaceStrParamName <> '') then begin
-      TokenStr := ExtractTokenStr;
-      ParamStr := ExtractParamsStr;
+    If assigned(ReplaceProc) or (assigned(ReplaceExtendedProc)) then begin
+      TokenStr := _ExtractTokenStr;
+      ParamStr := _ExtractParamsStr;
       ParamList := TALStringList.Create;
       try
         ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
@@ -6950,115 +6979,134 @@ begin
                                               PAnsiChar(ParamStr),
                                               ParamList,
                                               False,
-                                              AStripParamQuotes);
-        If assigned(FastTagReplaceProc) then begin
-          ReplaceString := FastTagReplaceProc(TokenStr, ParamList, ExtData, TagHandled);
-          if TagHandled and
-             ReProcessReplaceProcResult and
-             (rfreplaceAll in flags) then ReplaceString := ALFastTagReplace(ReplaceString,
-                                                                            TagStart,
-                                                                            TagEnd,
-                                                                            FastTagReplaceProc,
-                                                                            ReplaceStrParamName,
-                                                                            ReplaceWith,
-                                                                            AStripParamQuotes,
-                                                                            Flags,
-                                                                            ExtData,
-                                                                            ReProcessReplaceProcResult);
+                                              StripParamQuotes);
+        if assigned(ReplaceExtendedProc) then begin
+          T2 := T2 - T1;
+          ReplaceString := ReplaceExtendedProc(TokenStr, ParamList, ExtData, TagHandled, SourceString, T1, T2);
+          T2 := T2 + T1;
         end
-        else ReplaceString := ParamList.Values[ReplaceStrParamName];
+        else ReplaceString := ReplaceProc(TokenStr, ParamList, ExtData, TagHandled);
+        if (TagHandled) and
+           (TagReplaceProcResult) and
+           (rfreplaceAll in flags) then ReplaceString := ALFastTagReplace(ReplaceString,
+                                                                          TagStart,
+                                                                          TagEnd,
+                                                                          ReplaceProc,
+                                                                          ReplaceExtendedProc,
+                                                                          ReplaceWith,
+                                                                          StripParamQuotes,
+                                                                          Flags,
+                                                                          ExtData,
+                                                                          TagReplaceProcResult);
       finally
         ParamList.Free;
       end;
     end
     else ReplaceString := ReplaceWith;
 
-    If tagHandled then MoveStr2Result(AlcopyStr(SourceString,i,T1 - i) + ReplaceString)
-    else MoveStr2Result(AlcopyStr(SourceString,i,T2 + TagEndLength - i));
-    i := T2 + TagEndLength;
+    If tagHandled then _MoveStr2Result(AlcopyStr(SourceString,SourceCurrentPos,T1 - SourceCurrentPos) + ReplaceString)
+    else _MoveStr2Result(AlcopyStr(SourceString,SourceCurrentPos,T2 - SourceCurrentPos));
+    SourceCurrentPos := T2;
 
     If TagHandled and (not (rfreplaceAll in flags)) then Break;
 
-    T1 := ALPosEx(Work_TagStart,Work_SourceString,i);
+    T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
     T2 := T1 + TagStartLength;
     If (T1 > 0) and (T2 <= SourceStringLength) then begin
       InDoubleQuote := False;
       InsingleQuote := False;
-      Token := Work_SourceString[T2];
+      Token := SourceString[T2];
       if token = '"' then InDoubleQuote := True
       else if token = '''' then InSingleQuote := True;
-      While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+      While (T2 < SourceStringLength) and
+            (InDoubleQuote or
+             InSingleQuote or
+             (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+             ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+             (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
         inc(T2);
-        Token := Work_SourceString[T2];
+        Token := SourceString[T2];
         If Token = '"' then begin
-          if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+          if (not InDoubleQuote) or
+             (T2 = SourceStringLength) or
+             (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
           else inc(t2);
         end
         else If Token = '''' then begin
-          if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+          if (not InSingleQuote) or
+             (T2 = SourceStringLength) or
+             (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
           else inc(t2);
         end;
       end;
+      if (T2 = SourceStringLength) and
+         (InDoubleQuote or
+          InSingleQuote or
+          (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+          ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+          (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
     end;
   end;
 
-  MoveStr2Result(AlcopyStr(SourceString,i,maxint));
+  _MoveStr2Result(AlcopyStr(SourceString,SourceCurrentPos,maxint));
   SetLength(Result,ResultCurrentPos-1);
 end;
 
 {*************************************************************************}
 function ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
-                          ReplaceWith: AnsiString;
+                          ReplaceProc: TALHandleTagFunct;
+                          StripParamQuotes: Boolean;
+                          ExtData: Pointer;
+                          Const flags: TReplaceFlags=[rfreplaceall];
+                          const TagReplaceProcResult: Boolean = False): AnsiString;
+Begin
+  result := ALFastTagReplace(SourceString,
+                             TagStart,
+                             TagEnd,
+                             ReplaceProc,
+                             nil,
+                             '',
+                             StripParamQuotes,
+                             flags,
+                             extdata,
+                             TagReplaceProcResult);
+end;
+
+{*************************************************************************}
+function ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
+                          ReplaceExtendedProc: TALHandleTagExtendedfunct;
+                          StripParamQuotes: Boolean;
+                          ExtData: Pointer;
+                          Const flags: TReplaceFlags=[rfreplaceall];
+                          const TagReplaceProcResult: Boolean = False): AnsiString;
+Begin
+  result := ALFastTagReplace(SourceString,
+                             TagStart,
+                             TagEnd,
+                             nil,
+                             ReplaceExtendedProc,
+                             '',
+                             StripParamQuotes,
+                             flags,
+                             extdata,
+                             TagReplaceProcResult);
+end;
+
+{*************************************************************************}
+function ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
+                          const ReplaceWith: AnsiString;
                           const Flags: TReplaceFlags=[rfreplaceall]): AnsiString;
 Begin
   Result := ALFastTagReplace(SourceString,
                              TagStart,
                              TagEnd,
                              nil,
-                             '',
+                             nil,
                              ReplaceWith,
                              True,
                              flags,
                              nil,
                              false);
-end;
-
-{*************************************************************************}
-function ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
-                          ReplaceStrParamName: AnsiString;
-                          AStripParamQuotes: Boolean;
-                          const Flags: TReplaceFlags=[rfreplaceall]): AnsiString;
-Begin
-  Result := ALFastTagReplace(SourceString,
-                             TagStart,
-                             TagEnd,
-                             nil,
-                             ReplaceStrParamName,
-                             '',
-                             AStripParamQuotes,
-                             flags,
-                             nil,
-                             false);
-end;
-
-{*************************************************************************}
-function ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
-                          FastTagReplaceProc: TALHandleTagFunct;
-                          AStripParamQuotes: Boolean;
-                          ExtData: Pointer;
-                          Const flags: TReplaceFlags=[rfreplaceall];
-                          const ReProcessReplaceProcResult: Boolean = False): AnsiString;
-Begin
-  result := ALFastTagReplace(SourceString,
-                             TagStart,
-                             TagEnd,
-                             FastTagReplaceProc,
-                             '',
-                             '',
-                             AStripParamQuotes,
-                             flags,
-                             extdata,
-                             ReProcessReplaceProcResult);
 end;
 
 {**************************************************}
@@ -7068,89 +7116,101 @@ end;
 //then the ALExtractTagParams(str, '<#mytag', '>' ... ) will not work like we expect
 //because it's will extract the params of the <#mytagwww
 function ALExtractTagParams(Const SourceString, TagStart, TagEnd: AnsiString;
-                            AStripParamQuotes: Boolean;
+                            StripParamQuotes: Boolean;
                             TagParams: TALStrings;
                             IgnoreCase: Boolean): Boolean;
 
-var  ReplaceString: AnsiString;
-     Token, FirstTagEndChar: AnsiChar;
-     TokenStr, ParamStr: AnsiString;
-     TagStartLength: integer;
-     SourceStringLength: Integer;
-     T1,T2: Integer;
-     InDoubleQuote: Boolean;
-     InsingleQuote: Boolean;
-     Work_SourceString: AnsiString;
-     Work_TagStart: AnsiString;
-     Work_TagEnd: AnsiString;
+var ReplaceString: AnsiString;
+    Token: AnsiChar;
+    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
+    TokenStr, ParamStr: AnsiString;
+    TagStartLength: integer;
+    TagEndLength: integer;
+    SourceStringLength: Integer;
+    InDoubleQuote: Boolean;
+    InsingleQuote: Boolean;
+    PosExFunct: Function(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
+    T1,T2: Integer;
 
-     {-----------------------------------}
-     Function ExtractTokenStr: AnsiString;
-     var x: Integer;
-     Begin
-       x := AlPos(' ',ReplaceString);
-       if x > 0 then Result := ALTrim( AlcopyStr(ReplaceString,1,x) )
-       else Result := ALTrim(ReplaceString);
-     end;
+    {------------------------------------}
+    Function _ExtractTokenStr: AnsiString;
+    var x: Integer;
+    Begin
+      X := 1;
+      while (x <= length(ReplaceString)) and
+            (not (ReplaceString[x] in [' ', #9, #13, #10])) do inc(x);
+      if x > length(ReplaceString) then Result := ReplaceString
+      else Result := AlcopyStr(ReplaceString,1,x-1);
+    end;
 
-     {------------------------------------}
-     Function ExtractParamsStr: AnsiString;
-     Begin
-       Result := ALTrim( AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt) );
-     end;
+    {-------------------------------------}
+    Function _ExtractParamsStr: AnsiString;
+    Begin
+      Result := ALTrim( AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt) );
+    end;
 
 begin
   Result := False;
   if (SourceString = '') or (TagStart = '') or (TagEnd = '') then Exit;
 
-  If IgnoreCase then begin
-    Work_SourceString := ALUppercase(SourceString);
-    Work_TagStart := ALuppercase(TagStart);
-    Work_TagEnd := ALUppercase(TagEnd);
-  end
-  Else begin
-    Work_SourceString := SourceString;
-    Work_TagStart := TagStart;
-    Work_TagEnd := TagEnd;
-  end;
+  If IgnoreCase then PosExFunct := ALPosExIgnoreCase
+  Else PosExFunct := ALPosEx;
 
-  TagStartLength := Length(Work_TagStart);
   SourceStringLength := length(SourceString);
-  FirstTagEndChar := tagEnd[1];
+  TagStartLength := Length(TagStart);
+  TagEndLength := Length(TagEnd);
+  TagEndFirstChar := TagEnd[1];
+  TagEndFirstCharLower := ALLowerCase(TagEnd[1])[1];
+  TagEndFirstCharUpper := ALUpperCase(TagEnd[1])[1];
 
-  T1 := ALPosEx(Work_TagStart,Work_SourceString,1);
+  T1 := PosExFunct(TagStart,SourceString,1);
   T2 := T1 + TagStartLength;
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
     InDoubleQuote := False;
     InsingleQuote := False;
-    Token := Work_SourceString[T2];
+    Token := SourceString[T2];
     if token = '"' then InDoubleQuote := True
     else if token = '''' then InSingleQuote := True;
-    While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+    While (T2 < SourceStringLength) and
+          (InDoubleQuote or
+           InSingleQuote or
+           (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+           ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+           (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
       inc(T2);
-      Token := Work_SourceString[T2];
+      Token := SourceString[T2];
       If Token = '"' then begin
-        if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+        if (not InDoubleQuote) or
+           (T2 = SourceStringLength) or
+           (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
         else inc(t2);
       end
       else If Token = '''' then begin
-        if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+        if (not InSingleQuote) or
+           (T2 = SourceStringLength) or
+           (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
         else inc(t2);
       end;
     end;
+    if (T2 = SourceStringLength) and
+       (InDoubleQuote or
+        InSingleQuote or
+        (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+        ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+        (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
   end;
 
   If (T1 > 0) and (T2 > T1) Then begin
     ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
-    TokenStr := ExtractTokenStr;
-    ParamStr := ExtractParamsStr;
+    TokenStr := _ExtractTokenStr;
+    ParamStr := _ExtractParamsStr;
     ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
                                           [' ', #9, #13, #10],
                                           ['"', ''''],
                                           PAnsiChar(ParamStr),
                                           TagParams,
                                           False,
-                                          AStripParamQuotes);
+                                          StripParamQuotes);
     Result := True
   end;
 end;
@@ -7166,95 +7226,117 @@ Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: AnsiString;
                             SplitTextAndTagLst: TALStrings;
                             IgnoreCase: Boolean);
 
-var i: integer;
-    Token, FirstTagEndChar: AnsiChar;
+var Token: AnsiChar;
+    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
-    T1,T2: Integer;
+    SourceCurrentPos: integer;
     InDoubleQuote: Boolean;
     InsingleQuote: Boolean;
-    Work_SourceString: AnsiString;
-    Work_TagStart: AnsiString;
-    Work_TagEnd: AnsiString;
+    PosExFunct: Function(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
+    T1,T2: Integer;
 
 begin
 
-  SplitTextAndTagLst.Clear;
   if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
     if SourceString <> '' then SplitTextAndTagLst.Add(SourceString);
     Exit;
   end;
 
-  If IgnoreCase then begin
-    Work_SourceString := ALUppercase(SourceString);
-    Work_TagStart := ALuppercase(TagStart);
-    Work_TagEnd := ALUppercase(TagEnd);
-  end
-  Else begin
-    Work_SourceString := SourceString;
-    Work_TagStart := TagStart;
-    Work_TagEnd := TagEnd;
-  end;
+  If IgnoreCase then PosExFunct := ALPosExIgnoreCase
+  Else PosExFunct := ALPosEx;
 
-  SourceStringLength := length(Work_SourceString);
-  TagStartLength := Length(Work_TagStart);
-  TagEndLength := Length(Work_TagEnd);
-  FirstTagEndChar := Work_TagEnd[1];
-  i := 1;
+  SourceStringLength := length(SourceString);
+  TagStartLength := Length(TagStart);
+  TagEndLength := Length(TagEnd);
+  TagEndFirstChar := TagEnd[1];
+  TagEndFirstCharLower := ALLowerCase(TagEnd[1])[1];
+  TagEndFirstCharUpper := ALUpperCase(TagEnd[1])[1];
+  SourceCurrentPos := 1;
 
-  T1 := ALPosEx(Work_TagStart,Work_SourceString,i);
+  T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
   T2 := T1 + TagStartLength;
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
     InDoubleQuote := False;
     InsingleQuote := False;
-    Token := Work_SourceString[T2];
+    Token := SourceString[T2];
     if token = '"' then InDoubleQuote := True
     else if token = '''' then InSingleQuote := True;
-    While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+    While (T2 < SourceStringLength) and
+          (InDoubleQuote or
+           InSingleQuote or
+           (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+           ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+           (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
       inc(T2);
-      Token := Work_SourceString[T2];
+      Token := SourceString[T2];
       If Token = '"' then begin
-        if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+        if (not InDoubleQuote) or
+           (T2 = SourceStringLength) or
+           (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
         else inc(t2);
       end
       else If Token = '''' then begin
-        if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+        if (not InSingleQuote) or
+           (T2 = SourceStringLength) or
+           (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
         else inc(t2);
       end;
     end;
+    if (T2 = SourceStringLength) and
+       (InDoubleQuote or
+        InSingleQuote or
+        (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+        ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+        (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
   end;
 
   While (T1 > 0) and (T2 > T1) do begin
-    SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,i,T1 - i), pointer(0));
+    SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,SourceCurrentPos,T1 - SourceCurrentPos), pointer(0));
     SplitTextAndTagLst.AddObject(AlCopyStr(SourceString,T1,T2 - T1 + TagEndLength), pointer(1));
 
-    i := T2 + TagEndLength;
+    SourceCurrentPos := T2 + TagEndLength;
 
-    T1 := ALPosEx(Work_TagStart,Work_SourceString,i);
+    T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
     T2 := T1 + TagStartLength;
     If (T1 > 0) and (T2 <= SourceStringLength) then begin
       InDoubleQuote := False;
       InsingleQuote := False;
-      Token := Work_SourceString[T2];
+      Token := SourceString[T2];
       if token = '"' then InDoubleQuote := True
       else if token = '''' then InSingleQuote := True;
-      While (T2 < SourceStringLength) and (InDoubleQuote or InSingleQuote or (Token <> FirstTagEndChar) or (ALPosEx(Work_TagEnd,Work_SourceString,T2) <> T2)) do begin
+      While (T2 < SourceStringLength) and
+            (InDoubleQuote or
+             InSingleQuote or
+             (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+             ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+             (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
         inc(T2);
-        Token := Work_SourceString[T2];
+        Token := SourceString[T2];
         If Token = '"' then begin
-          if (not InDoubleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InDoubleQuote := not InDoubleQuote and not InSingleQuote
+          if (not InDoubleQuote) or
+             (T2 = SourceStringLength) or
+             (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
           else inc(t2);
         end
         else If Token = '''' then begin
-          if (not InSingleQuote) or (T2 = SourceStringLength) or (Work_SourceString[T2 + 1] <> Token) then InSingleQuote := not InSingleQuote and not InDoubleQuote
+          if (not InSingleQuote) or
+             (T2 = SourceStringLength) or
+             (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
           else inc(t2);
         end;
       end;
+      if (T2 = SourceStringLength) and
+         (InDoubleQuote or
+          InSingleQuote or
+          (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+          ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+          (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
     end;
   end;
 
-  SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,i,maxint), pointer(0));
+  SplitTextAndTagLst.AddObject(AlcopyStr(SourceString,SourceCurrentPos,maxint), pointer(0));
 
 end;
 

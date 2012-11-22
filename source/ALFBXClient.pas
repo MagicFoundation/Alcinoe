@@ -5236,8 +5236,8 @@ begin
   //EventThread.Free will never return !
   //Priority := tpNormal;
   FreeOnTerminate := False;
-  FConnectionMaxIdleTime := aConnectionMaxIdleTime;
-  if FConnectionMaxIdleTime <= 0 then FConnectionMaxIdleTime := INFINITE;
+  if FConnectionMaxIdleTime <= 0 then FConnectionMaxIdleTime := INFINITE
+  else FConnectionMaxIdleTime := aConnectionMaxIdleTime;
   FDBHandle := nil;
   FQueueEvent := False;
   fResultBuffer := Nil;

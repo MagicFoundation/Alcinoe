@@ -92,7 +92,8 @@ contains
   ALWindows in 'ALWindows.pas',
   ALSphinxQLClient in 'ALSphinxQLClient.pas',
   ALZLibExApi in 'ALZLibExApi.pas',
-  ALIniFiles in 'ALIniFiles.pas';
+  ALIniFiles in 'ALIniFiles.pas',
+  ALExprEval in 'ALExprEval.pas';
 
 end.
 

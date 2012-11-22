@@ -390,7 +390,7 @@ begin
   With contentStream do begin
     Position := 0;
     SetLength(Result,Size);
-    Read(Result[1],size);
+    if Size > 0 then Read(Result[1],size);
   end;
 end;
 

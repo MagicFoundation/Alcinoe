@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe File Management Routines
-Version:      4.00
+Version:      4.01
 
 Description:  Alcinoe file Management Routines
 
@@ -44,6 +44,7 @@ Know bug :
 
 History :     15/04/2008: Add AlIsEmptyDirectory Function
               15/06/2012: Add XE2 support
+              01/12/2012: Add ALFileExists function
 
 Note :        I know that most of the function here will be more efficient
               to be in unicode, but i leave it in AnsiString for the compatiblity
@@ -80,11 +81,13 @@ function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
 Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
-function  ALIsDirectoryEmpty(const directory: ansiString) : boolean;
+function  ALIsDirectoryEmpty(const directory: ansiString): boolean;
+function  ALFileExists(const Path: ansiString): boolean;
 
 implementation
 
 uses Windows,
+     ShLwApi,
      Masks,
      sysutils,
      alFcnString;
@@ -315,23 +318,16 @@ Begin
   end;
 End;
 
-{*****************************************************************}
-function ALIsDirectoryEmpty(const directory: ansiString) : boolean;
-var SR: TSearchRec;
+{****************************************************************}
+function ALIsDirectoryEmpty(const directory: ansiString): boolean;
 begin
-  Result := True;
-  if FindFirst(IncludeTrailingPathDelimiter(String(Directory)) + '*', faAnyFile, sr) = 0 then begin
-    Try
-      repeat
-        If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
-          Result := False;
-          break;
-        end;
-      until FindNext(sr) <> 0;
-    finally
-      FindClose(sr);
-    end;
-  end
+  Result := PathIsDirectoryEmptyA(PansiChar(directory));
+end;
+
+{******************************************************}
+function  ALFileExists(const Path: ansiString): boolean;
+begin
+  result := PathFileExistsA(PansiChar(Path)) and (not PathIsDirectoryA(PansiChar(Path)));
 end;
 
 end.

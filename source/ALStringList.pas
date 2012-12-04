@@ -5,7 +5,7 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALStringList
-Version:      4.00
+Version:      4.01
 
 Description:  *TALStringList Work the same as Delphi TstringList except
                that it's allow to search a name=value using a quicksort
@@ -63,6 +63,7 @@ History :     27/10/2007: add ForceValues and ForceValueFromIndex
                           ForceValueFromIndex by PersistentValues and
                           PersistentValueFromIndex
               26/06/2012: Add xe2 support
+              03/12/2012: Add StrictNames property
 
 Link :
 
@@ -123,6 +124,7 @@ Type
     function GetCommaText: AnsiString;
     function GetDelimitedText: AnsiString;
     function GetName(Index: Integer): AnsiString;
+    function GetStrictName(Index: Integer): AnsiString; // [added from Tstrings]
     function GetValue(const Name: AnsiString): AnsiString;
     procedure SetCommaText(const Value: AnsiString);
     procedure SetDelimitedText(const Value: AnsiString);
@@ -210,6 +212,7 @@ Type
     property DelimitedText: AnsiString read GetDelimitedText write SetDelimitedText;
     property LineBreak: AnsiString read GetLineBreak write SetLineBreak;
     property Names[Index: Integer]: AnsiString read GetName;
+    property StrictNames[Index: Integer]: AnsiString read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
     property QuoteChar: AnsiChar read GetQuoteChar write SetQuoteChar;
     property Values[const Name: AnsiString]: AnsiString read GetValue write SetValue;
@@ -622,6 +625,33 @@ begin
   // item1
   // item1=Value1
   //
+  // also when MyTStrings contain
+  //
+  // item1=Value1
+  // item2=Value2
+  // item3=Value3
+  // item4
+  // item5=Value5
+  //
+  // then doing
+  // MyTStrings.valueFromIndex[4] := 'value4'
+  // must result in
+  //
+  // item1=Value1
+  // item2=Value2
+  // item3=Value3
+  // item4=Value4
+  // item5=Value5
+  //
+  // instead of the current behavior of Tstrings
+  //
+  // item1=Value1
+  // item2=Value2
+  // item3=Value3
+  // =Value4
+  // item5=Value5
+  //
+  //
   // Original function:
   //
   // if P <> 0 then
@@ -698,6 +728,16 @@ end;
 function TALStrings.GetName(Index: Integer): AnsiString;
 begin
   Result := ExtractName(Get(Index));
+end;
+
+{************************************************************}
+function TALStrings.GetStrictName(Index: Integer): AnsiString;
+var P: Integer;
+begin
+  Result := Get(Index);
+  P := ALPos(NameValueSeparator, Result);
+  if P <> 0 then SetLength(Result, P-1)
+  else SetLength(Result, 0);
 end;
 
 {*****************************************************}
@@ -783,6 +823,33 @@ begin
   //
   // item1
   // item1=Value1
+  //
+  // also when MyTStrings contain
+  //
+  // item1=Value1
+  // item2=Value2
+  // item3=Value3
+  // item4
+  // item5=Value5
+  //
+  // then doing
+  // MyTStrings.valueFromIndex[4] := 'value4'
+  // must result in
+  //
+  // item1=Value1
+  // item2=Value2
+  // item3=Value3
+  // item4=Value4
+  // item5=Value5
+  //
+  // instead of the current behavior of Tstrings
+  //
+  // item1=Value1
+  // item2=Value2
+  // item3=Value3
+  // =Value4
+  // item5=Value5
+  //
   //
   // Original function:
   //

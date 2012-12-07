@@ -801,10 +801,10 @@ procedure ALClearXMLDocument(Const rootname:AnsiString;
 Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
                                           Const NodeName: ansiString;
                                           Const AttributeName, AttributeValue: AnsiString;
-                                          Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+                                          Const Recurse: Boolean = False): TalxmlNode;
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
                                    Const AttributeName, AttributeValue : AnsiString;
-                                   Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+                                   Const Recurse: Boolean = False): TalxmlNode;
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
                                         Const ChildNodeName, ChildNodeValue : AnsiString): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default: AnsiString = ''): AnsiString;
@@ -3830,7 +3830,7 @@ end;
 Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
                                           Const NodeName: ansiString;
                                           Const AttributeName, AttributeValue: AnsiString;
-                                          Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+                                          Const Recurse: Boolean = False): TalxmlNode;
 var i : integer;
 Begin
   result := nil;
@@ -3841,12 +3841,12 @@ Begin
       result := xmlrec.ChildNodes[i];
       break;
     end;
-    if SearchAlsoInChildNodes then begin
+    if Recurse then begin
       result := ALFindXmlNodeByNameAndAttribute(xmlrec.ChildNodes[i],
                                                 NodeName,
                                                 AttributeName,
                                                 AttributeValue,
-                                                SearchAlsoInChildNodes);
+                                                Recurse);
       if assigned(Result) then break;
     end;
   end;
@@ -3855,7 +3855,7 @@ end;
 {***************************************************}
 Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
                                    Const AttributeName, AttributeValue : AnsiString;
-                                   Const SearchAlsoInChildNodes: Boolean = False): TalxmlNode;
+                                   Const Recurse: Boolean = False): TalxmlNode;
 
 var i : integer;
 Begin
@@ -3866,11 +3866,11 @@ Begin
       result := xmlrec.ChildNodes[i];
       break;
     end;
-    if SearchAlsoInChildNodes then begin
+    if Recurse then begin
       result := ALFindXmlNodeByAttribute(xmlrec.ChildNodes[i],
                                          AttributeName,
                                          AttributeValue,
-                                         SearchAlsoInChildNodes);
+                                         Recurse);
       if assigned(Result) then break;
     end;
   end;

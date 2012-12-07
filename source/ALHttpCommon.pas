@@ -368,10 +368,6 @@ Function  AlCombineUrl(RelativeUrl,
                        Anchor: AnsiString;
                        Query: TALStrings): AnsiString; overload;
 
-Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
-Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
-Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
-
 const
   CAlRfc822DayOfWeekNames: array[1..7] of AnsiString = ('Sun',
                                                         'Mon',
@@ -398,6 +394,10 @@ function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 Function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
+
+Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
+Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
+Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
 
 type
   TALIPv6Binary = array[1..16] of ansiChar;
@@ -1913,7 +1913,7 @@ Begin
 
   //----------
   Result := True;
-  aIPv4Num := (I1*256*256*256) + (I2*256*256) +  (I3*256) + (I4);
+  aIPv4Num := (cardinal(I1)*256*256*256) + (cardinal(I2)*256*256) +  (cardinal(I3)*256) + (cardinal(I4));
 
 End;
 

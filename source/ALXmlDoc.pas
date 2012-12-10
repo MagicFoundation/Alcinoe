@@ -2723,15 +2723,14 @@ end;
 {Returns the XML that corresponds to the subtree rooted at this node.
  GetXML returns the XML that corresponds to this node and any child nodes it contains.}
 function TALXMLNode.GetXML: AnsiString;
-Var aMemoryStream: TMemoryStream;
+Var aStringStream: TALStringStream;
 begin
-  aMemoryStream := TMemoryStream.Create;
+  aStringStream := TALStringStream.Create('');
   Try
-    SaveToStream(aMemoryStream);
-    setlength(Result,aMemoryStream.Size);
-    aMemoryStream.Read(Result[1], length(Result));
+    SaveToStream(aStringStream);
+    result := aStringStream.DataString;
   finally
-    aMemoryStream.Free;
+    aStringStream.Free;
   end;
 end;
 

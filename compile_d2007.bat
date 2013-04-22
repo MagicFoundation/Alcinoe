@@ -46,9 +46,9 @@ IF ERRORLEVEL 1 goto ERROR
 
 pause
 
-del release\Alcinoe.rar
+del release\Alcinoe.zip
 
-C:\Progra~1\WinRAR\RAR.exe a -ep1 -r release\Alcinoe.rar -x*\_svn* -x*.dcu -x*.bpl -x*\__history* -x*\release\* *.*
+C:\Progra~1\7-Zip\7za.exe a -tzip -r release\Alcinoe.zip * -x!_svn* -x!.svn* -x!*.dcu -x!*.bpl -x!*__history* -x!release*
 IF ERRORLEVEL 1 goto ERROR
 
 del *.dcu /s

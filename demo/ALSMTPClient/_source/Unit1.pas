@@ -322,7 +322,7 @@ begin
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
-  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;
 end;

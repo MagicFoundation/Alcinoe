@@ -75,6 +75,7 @@
     <DCCReference Include="ALIniFiles.pas" />
     <DCCReference Include="ALInternetMessageCommon.pas" />
     <DCCReference Include="ALIsapiHTTP.pas" />
+    <DCCReference Include="ALJSONDoc.pas" />
     <DCCReference Include="ALListBox.pas" />
     <DCCReference Include="ALMemo.pas" />
     <DCCReference Include="ALMultiPartAlternativeParser.pas" />

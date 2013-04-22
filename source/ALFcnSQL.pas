@@ -12,7 +12,7 @@ Description:  SQL function to create easily sql string without
               just add the value in a tstringList like
               fieldname=value and at the end contruct the sql string
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -54,18 +54,20 @@ Link :
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnSQL;
 
 interface
 
-uses AlStringList;
+uses AlStringList,
+     ALFbxClient,
+     Contnrs;
 
 Type
 
-  {--------------------------------------------------------------}
-  TALSQLClauseUpdateKind = (alUpdate, AlInsert, AlUpdateOrInsert);
+  {------------------------------------------------------------------------}
+  TALSQLClauseUpdateKind = (alDelete, alUpdate, AlInsert, AlUpdateOrInsert);
   TALSQLClauseServerType = (alFirebird, AlSphinx, AlMySql);
 
   {---------------------------------}
@@ -81,27 +83,77 @@ Type
     Join: TALStrings;
     GroupBy: TALStrings;
     Having: TALStrings;
-    Plan: ansiString;
+    Plan: ansiString; // dedicated to Firebird
     OrderBy: TALStrings;
-    Custom: TALStrings;
+    Customs: TALStrings;
+    FBXClientSQLParams: TALFBXClientSQLParams; // dedicated to Firebird
     Constructor Create; Virtual;
     Destructor Destroy; override;
+    Procedure clear; virtual;
     procedure Assign(Source: TAlSelectSQLClause); virtual;
     function SQLText: AnsiString; virtual;
-    Procedure clear; virtual;
+    function FBXClientSelectDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQL; overload;
+    function FBXClientSelectDataSQL(const RowTag: AnsiString): TALFBXClientSelectDataSQL; overload;
+    function FBXClientSelectDataSQL: TALFBXClientSelectDataSQL; overload;
   end;
+
+  {--------------------------------------}
+  TAlSelectSQLClauses = class(TObjectList)
+  private
+  protected
+    function GetItems(Index: Integer): TAlSelectSQLClause;
+    procedure SetItems(Index: Integer; aSelectSQLClause: TAlSelectSQLClause);
+  public
+    function Add(aSelectSQLClause: TAlSelectSQLClause): Integer;
+    function Extract(Item: TAlSelectSQLClause): TAlSelectSQLClause;
+    function Remove(aSelectSQLClause: TAlSelectSQLClause): Integer;
+    function IndexOf(aSelectSQLClause: TAlSelectSQLClause): Integer;
+    function First: TAlSelectSQLClause;
+    function Last: TAlSelectSQLClause;
+    procedure Insert(Index: Integer; aSelectSQLClause: TAlSelectSQLClause);
+    property Items[Index: Integer]: TAlSelectSQLClause read GetItems write SetItems; default;
+    function FBXClientSelectDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQLs; overload;
+    function FBXClientSelectDataSQLs(const RowTag: AnsiString): TALFBXClientSelectDataSQLs; overload;
+    function FBXClientSelectDataSQLs: TALFBXClientSelectDataSQLs; overload;
+  end;
+
+  {---------------------------------}
   TALUpdateSQLClause = Class(Tobject)
     ServerType: TALSQLClauseServerType;
     Kind: TALSQLClauseUpdateKind;
     Table: ansiString;
     Value: TALStrings;
     Where: TALStrings;
-    Custom: TALStrings;
+    Customs: TALStrings;
+    FBXClientSQLParams: TALFBXClientSQLParams; // dedicated to Firebird
     Constructor Create; Virtual;
     Destructor Destroy; override;
+    Procedure clear; virtual;
     procedure Assign(Source: TALUpdateSQLClause); virtual;
     function SQLText: AnsiString; virtual;
-    Procedure clear; virtual;
+    function FBXClientUpdateDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQL; overload;
+    function FBXClientUpdateDataSQL(const RowTag: AnsiString): TALFBXClientUpdateDataSQL; overload;
+    function FBXClientUpdateDataSQL: TALFBXClientUpdateDataSQL; overload;
+  end;
+
+  {--------------------------------------}
+  TAlUpdateSQLClauses = class(TObjectList)
+  private
+  protected
+    function GetItems(Index: Integer): TAlUpdateSQLClause;
+    procedure SetItems(Index: Integer; aUpdateSQLClause: TAlUpdateSQLClause);
+  public
+    function Add(aUpdateSQLClause: TAlUpdateSQLClause): Integer;
+    function Extract(Item: TAlUpdateSQLClause): TAlUpdateSQLClause;
+    function Remove(aUpdateSQLClause: TAlUpdateSQLClause): Integer;
+    function IndexOf(aUpdateSQLClause: TAlUpdateSQLClause): Integer;
+    function First: TAlUpdateSQLClause;
+    function Last: TAlUpdateSQLClause;
+    procedure Insert(Index: Integer; aUpdateSQLClause: TAlUpdateSQLClause);
+    property Items[Index: Integer]: TAlUpdateSQLClause read GetItems write SetItems; default;
+    function FBXClientUpdateDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQLs; overload;
+    function FBXClientUpdateDataSQLs(const RowTag: AnsiString): TALFBXClientUpdateDataSQLs; overload;
+    function FBXClientUpdateDataSQLs: TALFBXClientUpdateDataSQLs; overload;
   end;
 
 implementation
@@ -123,7 +175,8 @@ Begin
   Having:= TALStringList.create;
   Plan := '';
   OrderBy := TALStringList.create;
-  Custom := TALStringList.create;
+  Customs := TALStringList.create;
+  setlength(FBXClientSQLParams, 0);
 end;
 
 {************************************}
@@ -136,7 +189,7 @@ begin
   GroupBy.free;
   Having.free;
   OrderBy.free;
-  Custom.free;  
+  Customs.free;
   inherited;
 end;
 
@@ -155,7 +208,8 @@ begin
   Having.Assign(source.Having);
   Plan := source.Plan;
   OrderBy.Assign(source.OrderBy);
-  Custom.Assign(source.Custom);
+  Customs.Assign(source.Customs);
+  FBXClientSQLParams := Source.FBXClientSQLParams;
 end;
 
 {**********************************************}
@@ -260,6 +314,30 @@ Begin
 
 End;
 
+{***************************************************************************************************************}
+function TAlSelectSQLClause.FBXClientSelectDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQL;
+begin
+  result.SQL := SQLText;
+  result.Params := FBXClientSQLParams;
+  result.RowTag := RowTag;
+  result.ViewTag := ViewTag;
+  result.Skip := Skip;
+  result.First := First;
+  result.CacheThreshold := 0;
+end;
+
+{******************************************************************************************************}
+function TAlSelectSQLClause.FBXClientSelectDataSQL(const RowTag: AnsiString): TALFBXClientSelectDataSQL;
+begin
+  result := FBXClientSelectDataSQL('', RowTag);
+end;
+
+{****************************************************************************}
+function TAlSelectSQLClause.FBXClientSelectDataSQL: TALFBXClientSelectDataSQL;
+begin
+  result := FBXClientSelectDataSQL('', '');
+end;
+
 {*********************************}
 procedure TAlSelectSQLClause.Clear;
 Begin
@@ -275,8 +353,84 @@ Begin
   Having.clear;
   Plan := '';
   OrderBy.clear;
-  Custom.clear;
+  Customs.clear;
+  setlength(FBXClientSQLParams,0);
 End;
+
+{******************************************************************************}
+function TAlSelectSQLClauses.Add(aSelectSQLClause: TAlSelectSQLClause): Integer;
+begin
+  Result := inherited Add(aSelectSQLClause);
+end;
+
+{*********************************************************************************}
+function TAlSelectSQLClauses.Extract(Item: TAlSelectSQLClause): TAlSelectSQLClause;
+begin
+  Result := TAlSelectSQLClause(inherited Extract(Item));
+end;
+
+{*****************************************************}
+function TAlSelectSQLClauses.First: TAlSelectSQLClause;
+begin
+  Result := TAlSelectSQLClause(inherited First);
+end;
+
+{************************************************************************}
+function TAlSelectSQLClauses.GetItems(Index: Integer): TAlSelectSQLClause;
+begin
+  Result := TAlSelectSQLClause(inherited Items[Index]);
+end;
+
+{**********************************************************************************}
+function TAlSelectSQLClauses.IndexOf(aSelectSQLClause: TAlSelectSQLClause): Integer;
+begin
+  Result := inherited IndexOf(aSelectSQLClause);
+end;
+
+{*****************************************************************************************}
+procedure TAlSelectSQLClauses.Insert(Index: Integer; aSelectSQLClause: TAlSelectSQLClause);
+begin
+  inherited Insert(Index, aSelectSQLClause);
+end;
+
+{****************************************************}
+function TAlSelectSQLClauses.Last: TAlSelectSQLClause;
+begin
+  Result := TAlSelectSQLClause(inherited Last);
+end;
+
+{*********************************************************************************}
+function TAlSelectSQLClauses.Remove(aSelectSQLClause: TAlSelectSQLClause): Integer;
+begin
+  Result := inherited Remove(aSelectSQLClause);
+end;
+
+{*******************************************************************************************}
+procedure TAlSelectSQLClauses.SetItems(Index: Integer; aSelectSQLClause: TAlSelectSQLClause);
+begin
+  inherited Items[Index] := aSelectSQLClause;
+end;
+
+{******************************************************************************************************************}
+function TAlSelectSQLClauses.FBXClientSelectDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQLs;
+var i: integer;
+begin
+  setlength(Result, count);
+  for I := 0 to count-1 do
+    result[i] := GetItems(i).FBXClientSelectDataSQL(ViewTag, RowTag);
+end;
+
+{*********************************************************************************************************}
+function TAlSelectSQLClauses.FBXClientSelectDataSQLs(const RowTag: AnsiString): TALFBXClientSelectDataSQLs;
+begin
+  result := FBXClientSelectDataSQLs('', RowTag);
+end;
+
+{*******************************************************************************}
+function TAlSelectSQLClauses.FBXClientSelectDataSQLs: TALFBXClientSelectDataSQLs;
+begin
+  result := FBXClientSelectDataSQLs('', '');
+end;
 
 {************************************}
 constructor TALUpdateSQLClause.Create;
@@ -286,7 +440,8 @@ Begin
   table:= '';
   Value:= TALStringList.create;
   Where:= TALStringList.create;
-  Custom := TALStringList.create;
+  Customs := TALStringList.create;
+  setlength(FBXClientSQLParams, 0);
 end;
 
 {************************************}
@@ -294,7 +449,7 @@ destructor TALUpdateSQLClause.Destroy;
 begin
   Value.free;
   Where.free;
-  Custom.free;
+  Customs.free;
   inherited;
 end;
 
@@ -306,7 +461,8 @@ begin
   table:= source.Table;
   Value.Assign(source.Value);
   Where.Assign(source.Where);
-  Custom.Assign(source.Custom);
+  Customs.Assign(source.Customs);
+  FBXClientSQLParams := Source.FBXClientSQLParams;
 end;
 
 {**********************************************}
@@ -316,12 +472,13 @@ var i: integer;
 Begin
 
   //empty result if Value.Count = 0
-  if Value.Count = 0 then begin
+  if (Kind <> AlDelete) and
+     (Value.Count = 0) then begin
     result := '';
     exit;
   end;
 
-  //Update
+  //AlUpdate
   If Kind = AlUpdate then Begin
     Result := '';
     for i := 0 to Value.Count- 1 do
@@ -338,7 +495,19 @@ Begin
     end;
   end
 
-  //Insert
+  //AlDelete
+  else If Kind = AlDelete then Begin
+    Result := 'delete from ' + Table;
+
+    If where.Count > 0 then begin
+      Result := Result + ' Where ';
+      For i := 0 to where.Count - 1 do
+        If ALTrim(where[i]) <> '' then Result := Result + '(' + ALTrim(where[i]) + ') and ';
+      delete(Result,length(result)-4,5);
+    end;
+  end
+
+  //AlInsert, AlUpdateOrInsert
   else Begin
     S1 := '';
     S2 :='';
@@ -358,6 +527,25 @@ Begin
 
 end;
 
+{***************************************************************************************************************}
+function TAlUpdateSQLClause.FBXClientUpdateDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQL;
+begin
+  result.SQL := SQLText;
+  result.Params := FBXClientSQLParams;
+end;
+
+{******************************************************************************************************}
+function TAlUpdateSQLClause.FBXClientUpdateDataSQL(const RowTag: AnsiString): TALFBXClientUpdateDataSQL;
+begin
+  result := FBXClientUpdateDataSQL('', RowTag);
+end;
+
+{****************************************************************************}
+function TAlUpdateSQLClause.FBXClientUpdateDataSQL: TALFBXClientUpdateDataSQL;
+begin
+  result := FBXClientUpdateDataSQL('', '');
+end;
+
 {*********************************}
 procedure TALUpdateSQLClause.clear;
 begin
@@ -366,8 +554,83 @@ begin
   Table:= '';
   Value.clear;
   Where.clear;
-  Custom.clear;
+  Customs.clear;
+  setlength(FBXClientSQLParams, 0);
 end;
 
+{******************************************************************************}
+function TAlUpdateSQLClauses.Add(aUpdateSQLClause: TAlUpdateSQLClause): Integer;
+begin
+  Result := inherited Add(aUpdateSQLClause);
+end;
+
+{*********************************************************************************}
+function TAlUpdateSQLClauses.Extract(Item: TAlUpdateSQLClause): TAlUpdateSQLClause;
+begin
+  Result := TAlUpdateSQLClause(inherited Extract(Item));
+end;
+
+{*****************************************************}
+function TAlUpdateSQLClauses.First: TAlUpdateSQLClause;
+begin
+  Result := TAlUpdateSQLClause(inherited First);
+end;
+
+{************************************************************************}
+function TAlUpdateSQLClauses.GetItems(Index: Integer): TAlUpdateSQLClause;
+begin
+  Result := TAlUpdateSQLClause(inherited Items[Index]);
+end;
+
+{**********************************************************************************}
+function TAlUpdateSQLClauses.IndexOf(aUpdateSQLClause: TAlUpdateSQLClause): Integer;
+begin
+  Result := inherited IndexOf(aUpdateSQLClause);
+end;
+
+{*****************************************************************************************}
+procedure TAlUpdateSQLClauses.Insert(Index: Integer; aUpdateSQLClause: TAlUpdateSQLClause);
+begin
+  inherited Insert(Index, aUpdateSQLClause);
+end;
+
+{****************************************************}
+function TAlUpdateSQLClauses.Last: TAlUpdateSQLClause;
+begin
+  Result := TAlUpdateSQLClause(inherited Last);
+end;
+
+{*********************************************************************************}
+function TAlUpdateSQLClauses.Remove(aUpdateSQLClause: TAlUpdateSQLClause): Integer;
+begin
+  Result := inherited Remove(aUpdateSQLClause);
+end;
+
+{*******************************************************************************************}
+procedure TAlUpdateSQLClauses.SetItems(Index: Integer; aUpdateSQLClause: TAlUpdateSQLClause);
+begin
+  inherited Items[Index] := aUpdateSQLClause;
+end;
+
+{******************************************************************************************************************}
+function TAlUpdateSQLClauses.FBXClientUpdateDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQLs;
+var i: integer;
+begin
+  setlength(Result, count);
+  for I := 0 to count-1 do
+    result[i] := GetItems(i).FBXClientUpdateDataSQL(ViewTag, RowTag);
+end;
+
+{*********************************************************************************************************}
+function TAlUpdateSQLClauses.FBXClientUpdateDataSQLs(const RowTag: AnsiString): TALFBXClientUpdateDataSQLs;
+begin
+  result := FBXClientUpdateDataSQLs('', RowTag);
+end;
+
+{*******************************************************************************}
+function TAlUpdateSQLClauses.FBXClientUpdateDataSQLs: TALFBXClientUpdateDataSQLs;
+begin
+  result := FBXClientUpdateDataSQLs('', '');
+end;
 
 end.

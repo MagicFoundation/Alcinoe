@@ -23,6 +23,7 @@ uses Windows,
      OleCtrls,
      SHDocVw,
      ComObj,
+     ALFcnFile,
      ALStringList;
 
 {------------------------------------}
@@ -210,6 +211,10 @@ begin
         MemoLoadXmlWithALXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
         MemoLoadXmlWithALXmlDocument.Lines.Add('Number of nodes created: ' + IntToStr(aNodeCount));
         MemoLoadXmlWithALXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+        aStartDate := GetTickCount;
+        aALXMLDocument.SaveToFile(ALGetModulePath + 'sample.xml');
+        MemoLoadXmlWithALXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+        ALDeleteFile(ALGetModulePath + 'sample.xml');
       finally
         aALXMLDocument.Free;
       end;
@@ -244,6 +249,10 @@ begin
       MemoLoadXmlWithXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
       MemoLoadXmlWithXmlDocument.Lines.Add('Number of nodes created: ' + IntToStr(aNodeCount));
       MemoLoadXmlWithXmlDocument.Lines.Add('Time to load and scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+      aStartDate := GetTickCount;
+      aXMLDocument.SaveToFile(String(ALGetModulePath + 'sample.xml'));
+      MemoLoadXmlWithXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+      ALDeleteFile(ALGetModulePath + 'sample.xml');
 
     except
       on E: Exception do
@@ -284,6 +293,12 @@ begin
 
       MemoGenerate100000NodeWithALXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
       MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to create all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+
+      aStartDate := GetTickCount;
+      aALXMLDocument.SaveToFile(ALGetModulePath + 'sample.xml');
+      MemoGenerate100000NodeWithAlXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+      ALDeleteFile(ALGetModulePath + 'sample.xml');
+
     finally
       aALXMLDocument.Free;
     end;
@@ -322,6 +337,11 @@ begin
       end;
       MemoGenerate100000NodeWithXmlDocument.Lines.Add('Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
       MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to create all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+
+      aStartDate := GetTickCount;
+      aXMLDocument.SaveToFile(string(ALGetModulePath + 'sample.xml'));
+      MemoGenerate100000NodeWithXmlDocument.Lines.Add('Time to save the xml to disk: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+      ALDeleteFile(ALGetModulePath + 'sample.xml');
 
   except
     on E: Exception do
@@ -402,7 +422,7 @@ begin
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
-  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;
 end;

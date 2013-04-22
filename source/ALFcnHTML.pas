@@ -12,7 +12,7 @@ Description:  Functions to work on Html Tag (extract Text, HTML Encode,
               ALHTMLEncode is to encode decode HTML entity
               like &nbsp;
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -53,6 +53,7 @@ History :     19/10/2005: Make The code independant of the current local
               						to ALUTF8XMLTextElementDecode
               						add support for reference like &#x20AC; and &#39;
               26/06/2012: Add xe2 support
+              28/01/2013: Add xe2 ALJavascriptEncode / ALUTF8JavascriptDecode
 
 Link :
 
@@ -60,7 +61,7 @@ Link :
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnHTML;
 
@@ -80,6 +81,8 @@ function  ALUTF8HTMLEncode(const Src: AnsiString;
                            const EncodeASCIIHtmlEntities: Boolean = True;
                            const useNumericReference: boolean = True): AnsiString;
 function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
+function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
+function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
@@ -87,7 +90,8 @@ procedure ALCompactHtmlTagParams(TagParams: TALStrings);
 
 implementation
 
-uses Classes,
+uses Math,
+     Classes,
      sysutils,
      alFcnString,
      ALQuickSortList;
@@ -354,130 +358,6 @@ Begin
 
 end;
 
-{*********************************************}
-{ because of such link: <A HREF = "obie2.html">
-  that is split in 3 line in TagParams}
-Procedure ALCompactHtmlTagParams(TagParams: TALStrings);
-Var i: integer;
-    S1, S2, S3: AnsiString;
-    P1, P2, P3: integer;
-    Flag2, Flag3: boolean;
-Begin
-  i := 0;
-  While i <= TagParams.Count - 2 do begin
-    S1 := TagParams[i];
-    S2 := TagParams[i+1];
-    if i <= TagParams.Count - 3 then S3 := TagParams[i+2]
-    else S3 := '';
-    P1 := AlPos('=',S1);
-    P2 := AlPos('=',S2);
-    P3 := AlPos('=',S3);
-    Flag2 := (S2 <> '') and (S2[1] in ['''','"']);
-    Flag3 := (S3 <> '') and (S3[1] in ['''','"']);
-    IF (P1 <= 0) and
-       (S2 = '=') then begin {<A HREF = "obie2.html">}
-      If (i <= TagParams.Count - 2) and
-         (flag3 or (P3 <= 0))
-      then begin
-        TagParams[i] := S1 + S2 + S3;
-        tagParams.Delete(i+2);
-      end
-      else TagParams[i] := S1 + S2;
-      tagParams.Delete(i+1);
-    end
-    else if (S1 <> '') and
-            (P1 = length(S1)) and
-            (flag2 or (P2 <=0)) then begin {<A HREF= "obie2.html">}
-      TagParams[i] := S1 + S2;
-      tagParams.Delete(i+1);
-    end
-    else if (S1 <> '') and
-            (P1 <= 0) and
-            (AlPos('=',S2) = 1)  then begin {<A HREF ="obie2.html">}
-      TagParams[i] := S1 + S2;
-      tagParams.Delete(i+1);
-    end;
-    inc(i);
-  end;
-end;
-
-{******************************************************}
-procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                LstExtractedResourceText : TALStrings;
-                                Const DecodeHTMLText: Boolean = True);
-
-  {-----------------------------------------------------------}
-  procedure intenalAdd2LstExtractedResourceText(S: AnsiString);
-  Begin
-    If DecodeHTMLText then Begin
-      S := alUTF8HtmlDecode(ALTrim(S));
-      S := AlStringReplace(S,
-                           #13,
-                           ' ',
-                           [rfreplaceAll]);
-      S := AlStringReplace(S,
-                           #10,
-                           ' ',
-                           [rfreplaceAll]);
-      S := AlStringReplace(S,
-                           #9,
-                           ' ',
-                           [rfreplaceAll]);
-      While AlPos('  ',S) > 0 Do
-        S := AlStringReplace(S,
-                             '  ',
-                             ' ',
-                             [rfreplaceAll]);
-      S := ALTrim(S);
-    end;
-    If S <> '' then LstExtractedResourceText.add(S);
-  end;
-
-Var P1, P2: integer;
-Begin
-  ALHideHtmlUnwantedTagForHTMLHandleTagfunct(HtmlContent, True);
-  HtmlContent := ALFastTagReplace(HtmlContent,
-                                  '<',
-                                  '>',
-                                  #2, {this char is not use in html}
-                                  [rfreplaceall]);
-  HtmlContent := ALStringReplace(HtmlContent,
-                                 #1, {default ReplaceUnwantedTagCharBy use by ALHideHtmlUnwantedTagForHTMLHandleTagfunct ; this char is not use in html}
-                                 '<',
-                                 [rfreplaceall]);
-  HtmlContent := HtmlContent + #2;
-
-  LstExtractedResourceText.Clear;
-  P1 := 1;
-  P2 := ALpos(#2,HtmlContent);
-  While P2 > 0 do begin
-    If P2 > P1 then intenalAdd2LstExtractedResourceText(ALCopyStr(HtmlContent,
-                                                                  P1,
-                                                                  p2-P1));
-    P1 := P2+1;
-    P2 := ALposEX(#2,HtmlContent, P1);
-  end;
-end;
-
-{******************************************************}
-function  ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
-                                Const DecodeHTMLText: Boolean = True): AnsiString;
-Var LstExtractedResourceText: TALStrings;
-Begin
-  LstExtractedResourceText := TALStringList.Create;
-  Try
-    ALUTF8ExtractHTMLText(HtmlContent,
-                          LstExtractedResourceText,
-                          DecodeHTMLText);
-    Result := ALTrim(AlStringReplace(LstExtractedResourceText.Text,
-                                   #13#10,
-                                   ' ',
-                                   [rfReplaceAll]));
-  finally
-    LstExtractedResourceText.free;
-  end;
-end;
-
 {*************************************************************}
 function  ALXMLCDataElementEncode(Src: AnsiString): AnsiString;
 Begin
@@ -576,16 +456,16 @@ var CurrentSrcPos, CurrentResultPos : Integer;
     SrcLength: integer;
     aEntity: AnsiString;
 
-    {--------------------------------------}
-    procedure CopyCurrentSrcPosCharToResult;
+    {---------------------------------------}
+    procedure _CopyCurrentSrcPosCharToResult;
     Begin
       result[CurrentResultPos] := src[CurrentSrcPos];
       inc(CurrentResultPos);
       inc(CurrentSrcPos);
     end;
 
-    {---------------------------------------------------------------------------------}
-    procedure CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
+    {----------------------------------------------------------------------------------}
+    procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
     Var aUTF8String: AnsiString;
         K: integer;
     Begin
@@ -626,8 +506,8 @@ begin
                                              CurrentSrcPos+3,
                                              j-CurrentSrcPos-3),
                              aTmpInteger)
-            then CopyCharToResult(aTmpInteger, J+1)
-            else CopyCurrentSrcPosCharToResult;
+            then _CopyCharToResult(aTmpInteger, J+1)
+            else _CopyCurrentSrcPosCharToResult;
           end
 
           {HTML entity is numeric}
@@ -638,8 +518,8 @@ begin
                                        CurrentSrcPos+2,
                                        j-CurrentSrcPos-2),
                              aTmpInteger)
-            then CopyCharToResult(aTmpInteger, J+1)
-            else CopyCurrentSrcPosCharToResult;
+            then _CopyCharToResult(aTmpInteger, J+1)
+            else _CopyCurrentSrcPosCharToResult;
 
           end;
 
@@ -653,20 +533,20 @@ begin
                                CurrentSrcPos+1,
                                j-CurrentSrcPos-1);
 
-          If aEntity ='quot' then CopyCharToResult(34, J+1) // "
-          else if aEntity = 'apos' then CopyCharToResult(39, J+1) // '
-          else if aEntity = 'amp' then CopyCharToResult(38, J+1) // &
-          else if aEntity = 'lt' then CopyCharToResult(60, J+1) // <
-          else if aEntity = 'gt' then CopyCharToResult(62, J+1) // >
-          else CopyCurrentSrcPosCharToResult;
+          If aEntity ='quot' then _CopyCharToResult(34, J+1) // "
+          else if aEntity = 'apos' then _CopyCharToResult(39, J+1) // '
+          else if aEntity = 'amp' then _CopyCharToResult(38, J+1) // &
+          else if aEntity = 'lt' then _CopyCharToResult(60, J+1) // <
+          else if aEntity = 'gt' then _CopyCharToResult(62, J+1) // >
+          else _CopyCurrentSrcPosCharToResult;
 
         end;
 
       end
-      else CopyCurrentSrcPosCharToResult;
+      else _CopyCurrentSrcPosCharToResult;
 
     end
-    else CopyCurrentSrcPosCharToResult;
+    else _CopyCurrentSrcPosCharToResult;
 
   end;
 
@@ -827,16 +707,16 @@ function ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
 
 var CurrentSrcPos, CurrentResultPos : Integer;
 
-  {--------------------------------------}
-  procedure CopyCurrentSrcPosCharToResult;
+  {---------------------------------------}
+  procedure _CopyCurrentSrcPosCharToResult;
   Begin
     result[CurrentResultPos] := src[CurrentSrcPos];
     inc(CurrentResultPos);
     inc(CurrentSrcPos);
   end;
 
-  {---------------------------------------------------------------------------------}
-  procedure CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
+  {----------------------------------------------------------------------------------}
+  procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
   Var aUTF8String: AnsiString;
       K: integer;
   Begin
@@ -881,8 +761,8 @@ begin
                                              CurrentSrcPos+3,
                                              j-CurrentSrcPos-3),
                              aTmpInteger)
-            then CopyCharToResult(aTmpInteger, J+1)
-            else CopyCurrentSrcPosCharToResult;
+            then _CopyCharToResult(aTmpInteger, J+1)
+            else _CopyCurrentSrcPosCharToResult;
           end
 
           {HTML entity is numeric}
@@ -893,8 +773,8 @@ begin
                                        CurrentSrcPos+2,
                                        j-CurrentSrcPos-2),
                              aTmpInteger)
-            then CopyCharToResult(aTmpInteger, J+1)
-            else CopyCurrentSrcPosCharToResult;
+            then _CopyCharToResult(aTmpInteger, J+1)
+            else _CopyCurrentSrcPosCharToResult;
 
           end;
 
@@ -906,20 +786,302 @@ begin
           aTmpInteger := vALhtml_LstEntities.IndexOf(ALCopyStr(Src,
                                                                CurrentSrcPos+1,
                                                                j-CurrentSrcPos-1));
-          If aTmpInteger >= 0 then CopyCharToResult(integer(vALhtml_LstEntities.Objects[aTmpInteger]),J+1)
-          else CopyCurrentSrcPosCharToResult;
+          If aTmpInteger >= 0 then _CopyCharToResult(integer(vALhtml_LstEntities.Objects[aTmpInteger]),J+1)
+          else _CopyCurrentSrcPosCharToResult;
 
         end;
 
       end
-      else CopyCurrentSrcPosCharToResult;
+      else _CopyCurrentSrcPosCharToResult;
 
     end
-    else CopyCurrentSrcPosCharToResult;
+    else _CopyCurrentSrcPosCharToResult;
 
   end;
 
   setLength(Result,CurrentResultPos-1);
+end;
+
+{******************************************************************************************}
+// https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
+function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+var i, l: integer;
+    Buf, P: PAnsiChar;
+    ch: Integer;
+begin
+  Result := '';
+  L := Length(src);
+  if L = 0 then exit;
+  if useNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
+  else GetMem(Buf, L * 2); // to be on the *very* safe side
+  try
+    P := Buf;
+    for i := 1 to L do begin
+      ch := Ord(src[i]);
+      case ch of
+        8: begin // Backspace
+             if useNumericReference then begin
+               ALStrMove('\u0008', P, 6);
+               Inc(P, 6);
+             end
+             else begin
+               ALStrMove('\b', P, 2);
+               Inc(P, 2);
+             end;
+           end;
+        9: begin // Tab
+             if useNumericReference then begin
+               ALStrMove('\u0009', P, 6);
+               Inc(P, 6);
+             end
+             else begin
+               ALStrMove('\t', P, 2);
+               Inc(P, 2);
+             end;
+           end;
+        10: begin // New line
+              if useNumericReference then begin
+                ALStrMove('\u000A', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\n', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        11: begin // Vertical tab
+              if useNumericReference then begin
+                ALStrMove('\u000B', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\v', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        12: begin // Form feed
+              if useNumericReference then begin
+                ALStrMove('\u000C', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\f', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        13: begin // Carriage return
+              if useNumericReference then begin
+                ALStrMove('\u000D', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\r', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        34: begin // Double quote
+              if useNumericReference then begin
+                ALStrMove('\u0022', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\"', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        38: begin // & ... we need to encode it because in javascript &#39; or &amp; will be converted to ' and error unterminated string
+              ALStrMove('\u0026', P, 6);
+              Inc(P, 6);
+            end;
+        39: begin // Apostrophe or single quote
+              if useNumericReference then begin
+                ALStrMove('\u0027', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\''', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        60: begin // < (to hide all </script> tag inside javascript)
+                  // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
+              If (i <= L - 7) and
+                 (src[i+1] = '/') and
+                 (src[i+2] in ['S','s']) and
+                 (src[i+3] in ['C','c']) and
+                 (src[i+4] in ['R','r']) and
+                 (src[i+5] in ['I','i']) and
+                 (src[i+6] in ['P','p']) and
+                 (src[i+7] in ['t','t']) then begin
+                  ALStrMove('\u003C', P, 6);
+                  Inc(P, 6);
+                end
+                else Begin
+                  P^:= AnsiChar(ch);
+                  Inc(P);
+                end;
+            end;
+        92: begin // Backslash character (\).
+              if useNumericReference then begin
+                ALStrMove('\u005C', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMove('\\', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        else Begin
+          P^:= AnsiChar(ch);
+          Inc(P);
+        end;
+      end;
+    end;
+    SetString(Result, Buf, P - Buf);
+  finally
+    FreeMem(Buf);
+  end;
+end;
+
+{******************************************************************}
+function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+
+var CurrentSrcPos, CurrentResultPos : Integer;
+    aTmpInteger: Integer;
+    SrcLength: integer;
+
+    {---------------------------------------}
+    procedure _CopyCurrentSrcPosCharToResult;
+    Begin
+      result[CurrentResultPos] := src[CurrentSrcPos];
+      inc(CurrentResultPos);
+      inc(CurrentSrcPos);
+    end;
+
+    {----------------------------------------------------------------------------------}
+    procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
+    Var aUTF8String: AnsiString;
+        K: integer;
+    Begin
+      aUTF8String := UTF8Encode(WideChar(aUnicodeOrdEntity));
+      For k := 1 to length(aUTF8String) do begin
+        result[CurrentResultPos] := aUTF8String[k];
+        inc(CurrentResultPos);
+      end;
+      CurrentSrcPos := aNewCurrentSrcPos;
+    end;
+
+    {--------------------------------------------------}
+    // convert number in octal format to decimat format.
+    // It is not very difficult, because 217 in octal is
+    // 2*8*8+1*8+7 in decimal format.
+    function _OctToDec(OctStr: ansistring): integer;
+    var i: Integer;
+    begin
+      Result:=0;
+      for i:=Length(OctStr) downto 1 do
+        Result:=Result+ALStrToInt(OctStr[i])*Trunc(Power(8, Length(OctStr)-i));
+    end;
+
+
+begin
+
+  {init var}
+  CurrentSrcPos := 1;
+  CurrentResultPos := 1;
+  SrcLength := Length(src);
+  SetLength(Result,SrcLength);
+
+  {start loop}
+  while (CurrentSrcPos <= SrcLength) do begin
+
+    {escape char detected}
+    If src[CurrentSrcPos]='\' then begin
+
+      // Backspace
+      if (CurrentSrcPos <= SrcLength - 1) and
+         (src[CurrentSrcPos + 1] = 'b')  then _CopyCharToResult(8, CurrentSrcPos + 2)
+
+      // Tab
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = 't')  then _CopyCharToResult(9, CurrentSrcPos + 2)
+
+      // New line
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = 'n')  then _CopyCharToResult(10, CurrentSrcPos + 2)
+
+      // Vertical tab
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = 'v')  then _CopyCharToResult(11, CurrentSrcPos + 2)
+
+      // Form feed
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = 'f')  then _CopyCharToResult(12, CurrentSrcPos + 2)
+
+      // Carriage return
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = 'r')  then _CopyCharToResult(13, CurrentSrcPos + 2)
+
+      // Double quote
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = '"')  then _CopyCharToResult(34, CurrentSrcPos + 2)
+
+      // Apostrophe or single quote
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = '''') then _CopyCharToResult(39, CurrentSrcPos + 2)
+
+      // Backslash character (\).
+      else if (CurrentSrcPos <= SrcLength - 1) and
+              (src[CurrentSrcPos + 1] = '\')  then _CopyCharToResult(92, CurrentSrcPos + 2)
+
+      // The character with the Latin-1 encoding specified by up to three octal digits XXX between 0 and 377
+      else if (CurrentSrcPos <= SrcLength - 3) and
+              (src[CurrentSrcPos+1] in ['0'..'7']) and
+              (src[CurrentSrcPos+2] in ['0'..'7']) and
+              (src[CurrentSrcPos+3] in ['0'..'7']) then begin
+
+        aTmpInteger := _OctToDec(ALCopyStr(Src, CurrentSrcPos+1, 3));
+        if aTmpInteger in [0..255] then _CopyCharToResult(Integer(ALStringToWideString(ansichar(aTmpInteger), 28591{iso-8859-1})[1]), CurrentSrcPos+4)
+        else inc(CurrentSrcPos); // delete the \
+
+      end
+
+      // The character with the Latin-1 encoding specified by the two hexadecimal digits XX between 00 and FF
+      else if (CurrentSrcPos <= SrcLength - 3) and
+              (src[CurrentSrcPos+1] = 'x') and
+              (src[CurrentSrcPos+2] in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (src[CurrentSrcPos+3] in ['A'..'F', 'a'..'f', '0'..'9']) then begin
+
+        if ALTryStrToInt('$' + ALCopyStr(Src, CurrentSrcPos+2, 2), aTmpInteger)
+        then _CopyCharToResult(Integer(ALStringToWideString(ansichar(aTmpInteger), 28591{iso-8859-1})[1]), CurrentSrcPos+4)
+        else inc(CurrentSrcPos); // delete the \
+
+      end
+
+      // The Unicode character specified by the four hexadecimal digits XXXX.
+      else if (CurrentSrcPos <= SrcLength - 3) and
+              (src[CurrentSrcPos+1] = 'u') and
+              (src[CurrentSrcPos+2] in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (src[CurrentSrcPos+3] in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (src[CurrentSrcPos+4] in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (src[CurrentSrcPos+5] in ['A'..'F', 'a'..'f', '0'..'9']) then begin
+
+        if ALTryStrToInt('$' + ALCopyStr(Src, CurrentSrcPos+2, 4), aTmpInteger)
+        then _CopyCharToResult(aTmpInteger, CurrentSrcPos+6)
+        else inc(CurrentSrcPos); // delete the \
+
+      end
+
+      // delete the \
+      else inc(CurrentSrcPos);
+
+    end
+    else _CopyCurrentSrcPosCharToResult;
+
+  end;
+
+  setLength(Result,CurrentResultPos-1);
+
 end;
 
 {*******************************************************************************}
@@ -1057,6 +1219,131 @@ Begin
 
     end
     else inc(p1);
+  end;
+end;
+
+{*********************************************}
+{ because of such link: <A HREF = "obie2.html">
+  that is split in 3 line in TagParams}
+Procedure ALCompactHtmlTagParams(TagParams: TALStrings);
+Var i: integer;
+    S1, S2, S3: AnsiString;
+    P1, P2, P3: integer;
+    Flag2, Flag3: boolean;
+Begin
+  i := 0;
+  While i <= TagParams.Count - 2 do begin
+    S1 := TagParams[i];
+    S2 := TagParams[i+1];
+    if i <= TagParams.Count - 3 then S3 := TagParams[i+2]
+    else S3 := '';
+    P1 := AlPos('=',S1);
+    P2 := AlPos('=',S2);
+    P3 := AlPos('=',S3);
+    Flag2 := (S2 <> '') and (S2[1] in ['''','"']);
+    Flag3 := (S3 <> '') and (S3[1] in ['''','"']);
+    IF (P1 <= 0) and
+       (S2 = '=') then begin {<A HREF = "obie2.html">}
+      If (i <= TagParams.Count - 2) and
+         (flag3 or (P3 <= 0))
+      then begin
+        TagParams[i] := S1 + S2 + S3;
+        tagParams.Delete(i+2);
+      end
+      else TagParams[i] := S1 + S2;
+      tagParams.Delete(i+1);
+    end
+    else if (S1 <> '') and
+            (P1 = length(S1)) and
+            (flag2 or (P2 <=0)) then begin {<A HREF= "obie2.html">}
+      TagParams[i] := S1 + S2;
+      tagParams.Delete(i+1);
+    end
+    else if (S1 <> '') and
+            (P1 <= 0) and
+            (AlPos('=',S2) = 1)  then begin {<A HREF ="obie2.html">}
+      TagParams[i] := S1 + S2;
+      tagParams.Delete(i+1);
+    end;
+    inc(i);
+  end;
+end;
+
+{******************************************************}
+procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
+                                LstExtractedResourceText : TALStrings;
+                                Const DecodeHTMLText: Boolean = True);
+
+  {-----------------------------------------------------}
+  procedure _Add2LstExtractedResourceText(S: AnsiString);
+  Begin
+    If DecodeHTMLText then Begin
+      S := alUTF8HtmlDecode(ALTrim(S));
+      S := AlStringReplace(S,
+                           #13,
+                           ' ',
+                           [rfreplaceAll]);
+      S := AlStringReplace(S,
+                           #10,
+                           ' ',
+                           [rfreplaceAll]);
+      S := AlStringReplace(S,
+                           #9,
+                           ' ',
+                           [rfreplaceAll]);
+      While AlPos('  ',S) > 0 Do
+        S := AlStringReplace(S,
+                             '  ',
+                             ' ',
+                             [rfreplaceAll]);
+      S := ALTrim(S);
+    end;
+    If S <> '' then LstExtractedResourceText.add(S);
+  end;
+
+Var P1, P2: integer;
+
+Begin
+  ALHideHtmlUnwantedTagForHTMLHandleTagfunct(HtmlContent, True);
+  HtmlContent := ALFastTagReplace(HtmlContent,
+                                  '<',
+                                  '>',
+                                  #2, {this char is not use in html}
+                                  [rfreplaceall]);
+  HtmlContent := ALStringReplace(HtmlContent,
+                                 #1, {default ReplaceUnwantedTagCharBy use by ALHideHtmlUnwantedTagForHTMLHandleTagfunct ; this char is not use in html}
+                                 '<',
+                                 [rfreplaceall]);
+  HtmlContent := HtmlContent + #2;
+
+  LstExtractedResourceText.Clear;
+  P1 := 1;
+  P2 := ALpos(#2,HtmlContent);
+  While P2 > 0 do begin
+    If P2 > P1 then _Add2LstExtractedResourceText(ALCopyStr(HtmlContent,
+                                                            P1,
+                                                            p2-P1));
+    P1 := P2+1;
+    P2 := ALposEX(#2,HtmlContent, P1);
+  end;
+end;
+
+{******************************************************}
+function  ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
+                                Const DecodeHTMLText: Boolean = True): AnsiString;
+Var LstExtractedResourceText: TALStrings;
+Begin
+  LstExtractedResourceText := TALStringList.Create;
+  Try
+    ALUTF8ExtractHTMLText(HtmlContent,
+                          LstExtractedResourceText,
+                          DecodeHTMLText);
+    Result := ALTrim(AlStringReplace(LstExtractedResourceText.Text,
+                                   #13#10,
+                                   ' ',
+                                   [rfReplaceAll]));
+  finally
+    LstExtractedResourceText.free;
   end;
 end;
 

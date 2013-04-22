@@ -9,7 +9,7 @@ Version:      4.00
 
 Description:  Alcinoe Misc Functions
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -54,7 +54,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnMisc;
 
@@ -89,13 +89,25 @@ End;
 function AlIsValidEmail(const Value: AnsiString): boolean;
 
  {------------------------------------------------------}
- function CheckAllowedname(const s: AnsiString): boolean;
+ function CheckAllowedName(const s: AnsiString): boolean;
  var i: integer;
  begin
    Result:= false;
    for i:= 1 to Length(s) do begin
      // illegal char in s -> no valid address
-     if not (s[i] in ['a'..'z','A'..'Z','0'..'9','_','-','.']) then Exit;
+     if not (s[i] in ['a'..'z','A'..'Z','0'..'9','_','-','.','+']) then Exit;
+   end;
+   Result:= true;
+ end;
+
+ {----------------------------------------------------------}
+ function CheckAllowedHostname(const s: AnsiString): boolean;
+ var i: integer;
+ begin
+   Result:= false;
+   for i:= 1 to Length(s) do begin
+     // illegal char in s -> no valid address
+     if not (s[i] in ['a'..'z','A'..'Z','0'..'9','-','.']) then Exit;
    end;
    Result:= true;
  end;
@@ -115,13 +127,13 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
 var i, j: integer;
     namePart, serverPart, extPart: AnsiString;
 begin
-  Result:= false;
+  Result := false;
 
   // Value can not be < 6 char (ex: a@b.fr)
   if length(Value) < 6 then exit;
 
   // must have the '@' char inside
-  i:= AlPos('@', Value);
+  i := AlPos('@', Value);
   if (i <= 1) or (i > length(Value)-4) then exit;
 
   //can not have @. or .@
@@ -142,10 +154,13 @@ begin
     I := AlPosEx('.', serverPart, i + 1);
   end;
   if (j <= 1) then Exit; // no dot at all so exit !
-  extPart := AlCopyStr(ServerPart,J+1,Maxint);
+  extPart    := AlCopyStr(ServerPart,J+1,Maxint);
+  serverPart := ALCopyStr(ServerPart, 1, J - 1);
   If not (Length(ExtPart) in [2..6]) then exit;
 
-  Result:= CheckAllowedname(namePart) and CheckAllowedname(serverPart) and CheckAllowedExt(ExtPart);
+  Result:= CheckAllowedname(namePart) and
+           CheckAllowedHostname(serverPart) and
+           CheckAllowedExt(ExtPart);
 end;
 
 {********************************************************************************}

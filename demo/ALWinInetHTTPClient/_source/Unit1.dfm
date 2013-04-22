@@ -267,20 +267,16 @@ object Form1: TForm1
           end
         end
         object Panel6: TPanel
-          Left = 278
+          Left = 277
           Top = 15
-          Width = 505
+          Width = 506
           Height = 311
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
-          ExplicitLeft = 294
-          ExplicitTop = 21
-          ExplicitWidth = 185
-          ExplicitHeight = 167
           DesignSize = (
-            505
+            506
             311)
           object Label3: TcxLabel
             Left = 2
@@ -304,11 +300,9 @@ object Form1: TForm1
         object cxSplitter1: TcxSplitter
           Left = 270
           Top = 15
-          Width = 8
+          Width = 7
           Height = 311
-          ExplicitLeft = 384
-          ExplicitTop = 24
-          ExplicitHeight = 100
+          Control = Panel5
         end
       end
       object Panel3: TPanel
@@ -369,6 +363,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
           OnClick = OnCfgEditCHange
           Width = 200
@@ -377,6 +372,7 @@ object Form1: TForm1
           Left = 73
           Top = 42
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 1
           OnClick = OnCfgEditCHange
           Width = 200
@@ -421,6 +417,7 @@ object Form1: TForm1
           Left = 73
           Top = 42
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
           Text = '0'
           OnClick = OnCfgEditCHange
@@ -430,6 +427,7 @@ object Form1: TForm1
           Left = 73
           Top = 66
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 1
           Text = '0'
           OnClick = OnCfgEditCHange
@@ -439,6 +437,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 2
           Text = '0'
           OnClick = OnCfgEditCHange
@@ -884,6 +883,7 @@ object Form1: TForm1
           Left = 73
           Top = 42
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
           Text = '80'
           OnClick = OnCfgEditCHange
@@ -893,6 +893,7 @@ object Form1: TForm1
           Left = 73
           Top = 66
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 1
           OnClick = OnCfgEditCHange
           Width = 200
@@ -901,6 +902,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 2
           OnClick = OnCfgEditCHange
           Width = 200
@@ -909,6 +911,7 @@ object Form1: TForm1
           Left = 73
           Top = 90
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 3
           OnClick = OnCfgEditCHange
           Width = 200
@@ -917,6 +920,7 @@ object Form1: TForm1
           Left = 73
           Top = 114
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 4
           Text = '<local>'
           OnClick = OnCfgEditCHange
@@ -948,6 +952,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
           Text = '32768'
           OnClick = OnCfgEditCHange
@@ -980,6 +985,7 @@ object Form1: TForm1
           Top = 38
           ParentFont = False
           Properties.ScrollBars = ssVertical
+          Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
           OnClick = OnCfgEditCHange
           Height = 312

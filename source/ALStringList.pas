@@ -21,7 +21,7 @@ Description:  *TALStringList Work the same as Delphi TstringList except
                internaly an AVL binary Tree to speed up the
                insert / delete / lookup.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -71,7 +71,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALStringList;
 
@@ -279,6 +279,7 @@ Type
     procedure Assign(Source: TPersistent); override;
     procedure Clear; override;
     procedure Delete(Index: Integer); override;
+    function  ExtractObject(Index: Integer): TObject; overload; virtual;
     procedure Exchange(Index1, Index2: Integer); override;
     function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
     function FindName(const S: AnsiString; var Index: Integer): Boolean; // [added from TStringList]
@@ -286,6 +287,7 @@ Type
     function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
     procedure Insert(Index: Integer; const S: AnsiString); override;
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
+    procedure Move(CurIndex, NewIndex: Integer); override;
     procedure Sort; virtual;
     procedure CustomSort(Compare: TALStringListSortCompare); virtual;
     property Duplicates: TDuplicates read FDuplicates write FDuplicates;
@@ -354,11 +356,13 @@ Type
     procedure Assign(Source: TPersistent); override;
     procedure Clear; override;
     procedure Delete(Index: Integer); override;
+    function  ExtractObject(Index: Integer): TObject; overload; virtual;
     procedure Exchange(Index1, Index2: Integer); override;
     function IndexOf(const S: AnsiString): Integer; override;
     function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
     procedure Insert(Index: Integer; const S: AnsiString); override;
     procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
+    procedure Move(CurIndex, NewIndex: Integer); override;
     procedure CustomSort(Compare: TALAVLStringListSortCompare); virtual;
     property Duplicates: TDuplicates read FDuplicates write SetDuplicates;
     property CaseSensitive: Boolean read GetCaseSensitive write SetCaseSensitive;
@@ -1442,6 +1446,14 @@ begin
   Changed;
 end;
 
+{*************************************************************}
+function  TALStringList.ExtractObject(Index: Integer): TObject;
+begin
+  if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
+  result := FList[Index].FObject;
+  FList[Index].FObject := nil;
+end;
+
 {********************************************************}
 procedure TALStringList.Exchange(Index1, Index2: Integer);
 begin
@@ -1585,6 +1597,27 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
+{********************************************************}
+procedure TALStringList.Move(CurIndex, NewIndex: Integer);
+var
+  TempObject: TObject;
+  TempString: AnsiString;
+begin
+  if CurIndex <> NewIndex then
+  begin
+    BeginUpdate;
+    try
+      TempString := Get(CurIndex);
+      TempObject := GetObject(CurIndex);
+      FList[CurIndex].FObject := nil;
+      Delete(CurIndex);
+      InsertObject(NewIndex, TempString, TempObject);
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
 {****************************************************************************************}
 procedure TALStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
 begin
@@ -1621,11 +1654,25 @@ end;
 
 {******************************************************************}
 procedure TALStringList.PutObject(Index: Integer; AObject: TObject);
+var
+  Obj: TObject;
 begin
   if Cardinal(Index) >= Cardinal(FCount) then
     Error(@SListIndexError, Index);
   Changing;
+
+  // Change from orignal TStringList
+  // If this list owns its objects then free the associated TObject with this index
+  if OwnsObjects then
+    Obj := FList[Index].FObject
+  else
+    Obj := nil;
+
   FList[Index].FObject := AObject;
+
+  if Obj <> nil then
+    Obj.Free;
+
   Changed;
 end;
 
@@ -2051,6 +2098,16 @@ begin
   Changed;
 end;
 
+{****************************************************************}
+function  TALAVLStringList.ExtractObject(Index: Integer): TObject;
+begin
+  if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  with TALAVLStringListBinaryTreeNode(FNodeList[Index]) do begin
+    result := Obj;
+    Obj := nil;
+  end;
+end;
+
 {***********************************************************}
 procedure TALAVLStringList.Exchange(Index1, Index2: Integer);
 begin
@@ -2143,6 +2200,27 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
+{***********************************************************}
+procedure TALAVLStringList.Move(CurIndex, NewIndex: Integer);
+var
+  TempObject: TObject;
+  TempString: AnsiString;
+begin
+  if CurIndex <> NewIndex then
+  begin
+    BeginUpdate;
+    try
+      TempString := Get(CurIndex);
+      TempObject := GetObject(CurIndex);
+      TALAVLStringListBinaryTreeNode(FNodeList[CurIndex]).Obj := nil;
+      Delete(CurIndex);
+      InsertObject(NewIndex, TempString, TempObject);
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
 {*******************************************************************************************}
 procedure TALAVLStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
 Var aName, AValue: AnsiString;
@@ -2213,11 +2291,25 @@ end;
 
 {*********************************************************************}
 procedure TALAVLStringList.PutObject(Index: Integer; AObject: TObject);
+var
+  Obj: TObject;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
     Error(@SListIndexError, Index);
   Changing;
+
+  // Change from orignal TStringList
+  // If this list owns its objects then free the associated TObject with this index
+  if OwnsObjects then
+    Obj := TALAVLStringListBinaryTreeNode(FNodeList[Index]).Obj
+  else
+    Obj := nil;
+
   TALAVLStringListBinaryTreeNode(FNodeList[Index]).Obj := AObject;
+
+  if Obj <> nil then
+    Obj.Free;
+
   Changed;
 end;
 

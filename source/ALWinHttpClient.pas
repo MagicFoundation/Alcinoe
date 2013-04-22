@@ -28,7 +28,7 @@ Description:  Description:  TALWinHttpClient is a is easy to use WinHTTP-based
               or downlevel platform support should still consider
               using WinInet.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -74,7 +74,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALWinHttpClient;
 
@@ -246,9 +246,11 @@ type
     destructor Destroy; override;
     procedure Connect;
     procedure Disconnect;
-    function  Send(const aRequestDataStream: TStream): Integer; virtual;
+    function  Send(aRequestDataStream: TStream): Integer; virtual;
     procedure Receive(aContext: Dword; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); virtual;
-    procedure Execute(const aRequestDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); override;
+    procedure Execute(aRequestDataStream: TStream;
+                      aResponseContentStream: TStream;
+                      aResponseContentHeader: TALHTTPResponseHeader); override;
   published
     property  AccessType: TALWinHttpClientInternetOpenAccessType read FAccessType write SetAccessType default wHttpAt_NO_PROXY;
     property  InternetOptions: TALWinHttpClientInternetOptionSet read FInternetOptions write FInternetOptions default [wHttpIo_Keep_connection];
@@ -483,8 +485,8 @@ begin
   FConnected := False;
 end;
 
-{*************************************************************************}
-function TALWinHttpClient.Send(const aRequestDataStream: TStream): Integer;
+{*******************************************************************}
+function TALWinHttpClient.Send(aRequestDataStream: TStream): Integer;
 
   {----------------------------------------------}
   Function InternalGetHttpOpenRequestFlags: DWord;
@@ -747,8 +749,8 @@ begin
   until Size = 0;
 end;
 
-{*******************************************************************}
-procedure TALWinHttpClient.Execute(const aRequestDataStream: TStream;
+{*************************************************************}
+procedure TALWinHttpClient.Execute(aRequestDataStream: TStream;
                                    aResponseContentStream: TStream;
                                    aResponseContentHeader: TALHTTPResponseHeader);
 var Context: Integer;
@@ -759,7 +761,7 @@ begin
     try
       Receive(Context, aResponseContentStream, aResponseContentHeader);
     except
-      If fDisconnectOnError then Disconnect;
+        If fDisconnectOnError then Disconnect;
       raise;
     end;
   finally

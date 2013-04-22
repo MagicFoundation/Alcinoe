@@ -399,6 +399,7 @@ object Form1: TForm1
     Height = 21
     OnPaint = ComboBox_apiVerPaint
     Style = csDropDownList
+    ItemHeight = 13
     ItemIndex = 4
     TabOrder = 0
     Text = 'FB25'

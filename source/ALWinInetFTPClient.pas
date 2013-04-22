@@ -10,7 +10,7 @@ Version:      4.00
 Description:  TALWinInetFTPClient is a is easy to use WinInet-based
               FTP client component.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -54,7 +54,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALWinInetFTPClient;
 
@@ -192,20 +192,28 @@ type
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
-    procedure CreateDirectory(Directory: AnsiString); override;
-    procedure DeleteFile(FileName: AnsiString); override;
-    Function  FindFirst(const Path: AnsiString; Attr: Integer; var F: TALFtpclientSearchRec): Integer; override;
+    procedure CreateDirectory(const Directory: AnsiString); override;
+    procedure DeleteFile(const FileName: AnsiString); override;
+    Function  FindFirst(const Path: AnsiString;
+                        const Attr: Integer;
+                        var F: TALFtpclientSearchRec): Integer; override;
     Function  FindNext(var F: TALFtpclientSearchRec): Integer; override;
     procedure FindClose(var F: TALFtpclientSearchRec); override;
     Function  GetCurrentDirectory: AnsiString; override;
-    Procedure GetFile(RemoteFile: AnsiString; LocalFile: AnsiString; FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
-    Procedure GetFile(RemoteFile: AnsiString; DataStream: Tstream); overload; override;
-    Function  GetFileSize(filename: AnsiString): Longword; override;
-    Procedure PutFile(LocalFile: AnsiString; Remotefile: AnsiString); overload; override;
-    Procedure PutFile(DataStream: TStream; Remotefile: AnsiString); overload; override;
-    Procedure RemoveDirectory(Directory: AnsiString); override;
-    Procedure RenameFile(ExistingFile, NewFile: AnsiString); override;
-    Procedure SetCurrentDirectory(Directory: AnsiString); override;
+    Procedure GetFile(const RemoteFile: AnsiString;
+                      const LocalFile: AnsiString;
+                      FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
+    Procedure GetFile(const RemoteFile: AnsiString;
+                      DataStream: Tstream); overload; override;
+    Function  GetFileSize(const filename: AnsiString): Longword; override;
+    Procedure PutFile(const LocalFile: AnsiString;
+                      const Remotefile: AnsiString); overload; override;
+    Procedure PutFile(DataStream: TStream;
+                      const Remotefile: AnsiString); overload; override;
+    Procedure RemoveDirectory(const Directory: AnsiString); override;
+    Procedure RenameFile(const ExistingFile: AnsiString;
+                         const NewFile: AnsiString); override;
+    Procedure SetCurrentDirectory(const Directory: AnsiString); override;
     procedure Connect; override;
     procedure Disconnect; override;
   published
@@ -451,15 +459,15 @@ begin
 
 end;
 
-{*******************************************************************}
-procedure TALWinInetFTPClient.CreateDirectory(Directory: AnsiString);
+{*************************************************************************}
+procedure TALWinInetFTPClient.CreateDirectory(const Directory: AnsiString);
 begin
   If Not fconnected then raise EALFTPClientException.Create(CALFTPCLient_MsgNotConnected);
   CheckError(not FtpCreateDirectoryA(FInetConnect, PAnsiChar(Directory)));
 end;
 
-{*************************************************************}
-procedure TALWinInetFTPClient.DeleteFile(FileName: AnsiString);
+{*******************************************************************}
+procedure TALWinInetFTPClient.DeleteFile(const FileName: AnsiString);
 begin
   If Not fconnected then raise EALFTPClientException.Create(CALFTPCLient_MsgNotConnected);
   CheckError(not FtpDeleteFileA(FInetConnect, PAnsiChar(FileName)));
@@ -484,8 +492,10 @@ begin
   Result := 0;
 end;
 
-{*******************************************************************************************************************}
-function TALWinInetFTPClient.FindFirst(const Path: AnsiString; Attr: Integer; var F: TALFtpclientSearchRec): Integer;
+{************************************************************}
+function TALWinInetFTPClient.FindFirst(const Path: AnsiString;
+                                       const Attr: Integer;
+                                       var F: TALFtpclientSearchRec): Integer;
 
   {-----------------------------------------------}
   Function InternalGetFtpFindFirstFileFlags: DWord;
@@ -550,8 +560,9 @@ begin
   end;
 end;
 
-{*********************************************************************************}
-procedure TALWinInetFTPClient.GetFile(RemoteFile: AnsiString; DataStream: Tstream);
+{*****************************************************************}
+procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
+                                      DataStream: Tstream);
 
   {------------------------------------------}
   Function InternalGetFtpOpenFileFlags: DWord;
@@ -615,8 +626,10 @@ begin
 
 end;
 
-{**********************************************************************************************}
-procedure TALWinInetFTPClient.GetFile(RemoteFile, LocalFile: AnsiString; FailIfExists: Boolean);
+{*****************************************************************}
+procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
+                                      const LocalFile: AnsiString;
+                                      FailIfExists: Boolean);
 
   {-----------------------------------------}
   Function InternalGetFtpGetFileFlags: DWord;
@@ -642,8 +655,8 @@ begin
                              DWORD_PTR(Self)));
 end;
 
-{***********************************************************************}
-function TALWinInetFTPClient.GetFileSize(filename: AnsiString): Longword;
+{*****************************************************************************}
+function TALWinInetFTPClient.GetFileSize(const filename: AnsiString): Longword;
 
   {------------------------------------------}
   Function InternalGetFtpOpenFileFlags: DWord;
@@ -675,8 +688,9 @@ begin
   end;
 end;
 
-{*********************************************************************************}
-procedure TALWinInetFTPClient.PutFile(DataStream: TStream; Remotefile: AnsiString);
+{********************************************************}
+procedure TALWinInetFTPClient.PutFile(DataStream: TStream;
+                                      const Remotefile: AnsiString);
 
   {------------------------------------------}
   Function InternalGetFtpOpenFileFlags: DWord;
@@ -738,8 +752,9 @@ begin
 
 end;
 
-{***********************************************************************}
-procedure TALWinInetFTPClient.PutFile(LocalFile, Remotefile: AnsiString);
+{****************************************************************}
+procedure TALWinInetFTPClient.PutFile(const LocalFile: AnsiString;
+                                      const Remotefile: AnsiString);
 
   {-----------------------------------------}
   Function InternalGetFtpPutFileFlags: DWord;
@@ -763,15 +778,16 @@ begin
                              DWORD_PTR(Self)));
 end;
 
-{*******************************************************************}
-procedure TALWinInetFTPClient.RemoveDirectory(Directory: AnsiString);
+{*************************************************************************}
+procedure TALWinInetFTPClient.RemoveDirectory(const Directory: AnsiString);
 begin
   If Not fconnected then raise EALFTPClientException.Create(CALFTPCLient_MsgNotConnected);
   CheckError(not FtpRemoveDirectoryA(FInetConnect, PAnsiChar(Directory)));
 end;
 
-{**************************************************************************}
-procedure TALWinInetFTPClient.RenameFile(ExistingFile, NewFile: AnsiString);
+{**********************************************************************}
+procedure TALWinInetFTPClient.RenameFile(const ExistingFile: AnsiString;
+                                         const NewFile: AnsiString);
 begin
   If Not fconnected then raise EALFTPClientException.Create(CALFTPCLient_MsgNotConnected);
   CheckError(not FtpRenameFileA(FInetConnect,
@@ -779,8 +795,8 @@ begin
                                 PAnsiChar(NewFile)));
 end;
 
-{***********************************************************************}
-procedure TALWinInetFTPClient.SetCurrentDirectory(Directory: AnsiString);
+{*****************************************************************************}
+procedure TALWinInetFTPClient.SetCurrentDirectory(const Directory: AnsiString);
 begin
   If Not fconnected then raise EALFTPClientException.Create(CALFTPCLient_MsgNotConnected);
   CheckError(not FtpSetCurrentDirectoryA(FInetConnect,PAnsiChar(Directory)));

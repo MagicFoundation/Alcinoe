@@ -21,7 +21,7 @@ Description:  TALWinInetHttpClient is a is easy to use WinInet-based
               protected directories and supports basic proxy
               authentication scheme.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -74,7 +74,7 @@ Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALWininetHttpClient;
 
@@ -305,9 +305,9 @@ type
     destructor Destroy; override;
     procedure Connect;
     procedure Disconnect;
-    function  Send(const aRequestDataStream: TStream): Integer; virtual;
+    function  Send(aRequestDataStream: TStream): Integer; virtual;
     procedure Receive(aContext: Dword; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); virtual;
-    procedure Execute(const aRequestDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); override;
+    procedure Execute(aRequestDataStream: TStream; aResponseContentStream: TStream; aResponseContentHeader: TALHTTPResponseHeader); override;
   published
     property  AccessType: TALWinInetHttpInternetOpenAccessType read FAccessType write SetAccessType default wHttpAt_Preconfig;
     property  InternetOptions: TAlWininetHTTPClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wHttpIo_Keep_connection];
@@ -559,8 +559,8 @@ begin
   FConnected := False;
 end;
 
-{*****************************************************************************}
-function TALWinInetHTTPClient.Send(const aRequestDataStream: TStream): Integer;
+{***********************************************************************}
+function TALWinInetHTTPClient.Send(aRequestDataStream: TStream): Integer;
 
   {----------------------------------------------}
   Function InternalGetHttpOpenRequestFlags: DWord;
@@ -838,8 +838,8 @@ begin
   until Size = 0;
 end;
 
-{***********************************************************************}
-procedure TALWinInetHTTPClient.Execute(const aRequestDataStream: TStream;
+{*****************************************************************}
+procedure TALWinInetHTTPClient.Execute(aRequestDataStream: TStream;
                                        aResponseContentStream: TStream;
                                        aResponseContentHeader: TALHTTPResponseHeader);
 var Context: Integer;

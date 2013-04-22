@@ -5,11 +5,11 @@ Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Common Http Functions
-Version:      4.00
+Version:      4.01
 
 Description:  Common http functions that can be use by HTTP Components
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -61,6 +61,7 @@ History :     04/10/2005: * Move ALTryGMTHeaderHttpStrToDateTime to
               03/01/2008: * Better handle of the status line in TALHTTPResponseHeader
               22/02/2008: * Update AlHttpEncode
               26/06/2012: * Add xe2 support
+              10/01/2012: * update AlExtractDomainNameFromUrl to support ipv4 url
 
 Link :        http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
               http://wp.netscape.com/newsref/std/cookie_spec.html
@@ -69,7 +70,7 @@ Link :        http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALHttpCommon;
 
@@ -336,6 +337,7 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 Strings: TALStrings;
                                                 Decode: Boolean;
                                                 StripQuotes: Boolean = False);
+Function  AlRemoveShemeFromUrl(aUrl: AnsiString): ansiString;
 Function  AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
 Function  AlExtractHostNameFromUrl(aUrl: AnsiString): AnsiString;
 Function  AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
@@ -1331,6 +1333,15 @@ Begin
   until EOS;
 end;
 
+{***********************************************************}
+Function  AlRemoveShemeFromUrl(aUrl: AnsiString): ansiString;
+Var P: integer;
+begin
+  P := AlPos('://', aUrl);
+  if P > 0 then result := ALcopyStr(aUrl, P+3, maxint)
+  else result := aUrl;
+end;
+
 {****************************************************************}
 Function AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
 Var SchemeName,
@@ -1380,12 +1391,15 @@ end;
 
 {****************************************************************}
 Function AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
+var aIPv4Num: Cardinal;
 begin
   Result := AlExtractHostNameFromUrl(aUrl);
-  while length(AlStringReplace(Result,
-                               '.',
-                               '',
-                               [rfReplaceALL])) < length(result) - 1 do delete(Result, 1, ALpos('.',result));
+  if not ALTryIPV4StrToNumeric(Result, aIPv4Num) then begin
+    while length(AlStringReplace(Result,
+                                 '.',
+                                 '',
+                                 [rfReplaceALL])) < length(result) - 1 do delete(Result, 1, ALpos('.',result));
+  end;
 end;
 
 {**************************************************************}

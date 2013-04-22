@@ -23,7 +23,7 @@ Description:  Tpanel with special feature :
                 we can easily change the font or border color of the
                 control each time the mouse enter or leave the control.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -68,7 +68,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALPanel;
 

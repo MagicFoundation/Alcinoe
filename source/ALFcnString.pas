@@ -18,7 +18,7 @@ Description:  Powerfull stringreplace, Pos, Move, comparetext,
               like <#tagname params1="value1" params2="value2">
               by custom value
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -85,7 +85,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALfcnString;
 
@@ -193,6 +193,207 @@ type
     function Matches(const Filename: AnsiString): Boolean;
   end;
 
+{$if CompilerVersion >= 23}{Delphi XE2}
+
+type
+  TALPerlRegExOptions = set of (
+    preCaseLess,       // /i -> Case insensitive
+    preMultiLine,      // /m -> ^ and $ also match before/after a newline, not just at the beginning and the end of the string
+    preSingleLine,     // /s -> Dot matches any character, including \n (newline). Otherwise, it matches anything except \n
+    preExtended,       // /x -> Allow regex to contain extra whitespace, newlines and Perl-style comments, all of which will be filtered out
+    preAnchored,       // /A -> Successful match can only occur at the start of the subject or right after the previous match
+    preUnGreedy,       // Repeat operators (+, *, ?) are not greedy by default (i.e. they try to match the minimum number of characters instead of the maximum)
+    preNoAutoCapture   // (group) is a non-capturing group; only named groups capture
+  );
+
+type
+  TALPerlRegExState = set of (
+    preNotBOL,         // Not Beginning Of Line: ^ does not match at the start of Subject
+    preNotEOL,         // Not End Of Line: $ does not match at the end of Subject
+    preNotEmpty        // Empty matches not allowed
+  );
+
+const
+  // Maximum number of subexpressions (backreferences)
+  // Subexpressions are created by placing round brackets in the regex, and are referenced by \1, \2, ...
+  // In Perl, they are available as $1, $2, ... after the regex matched; with TALPerlRegEx, use the Subexpressions property
+  // You can also insert \1, \2, ... in the replacement string; \0 is the complete matched expression
+  cALPerlRegExMAXSUBEXPRESSIONS = 99;
+
+// All implicit string casts have been verified to be correct
+{ $WARN IMPLICIT_STRING_CAST OFF}
+
+type
+  TALPerlRegExReplaceEvent = procedure(Sender: TObject; var ReplaceWith: AnsiString) of object;
+
+type
+  TALPerlRegEx = class
+  private    // *** Property storage, getters and setters
+    FCompiled, FStudied: Boolean;
+    FOptions: TALPerlRegExOptions;
+    FState: TALPerlRegExState;
+    FRegEx: AnsiString;
+    FReplacement: AnsiString;
+    FSubject: AnsiString;
+    FStart, FStop: Integer;
+    FOnMatch: TNotifyEvent;
+    FOnReplace: TALPerlRegExReplaceEvent;
+    function GetMatchedText: AnsiString;
+    function GetMatchedLength: Integer;
+    function GetMatchedOffset: Integer;
+    procedure SetOptions(Value: TALPerlRegExOptions);
+    procedure SetRegEx(const Value: AnsiString);
+    function GetGroupCount: Integer;
+    function GetGroups(Index: Integer): AnsiString;
+    function GetGroupLengths(Index: Integer): Integer;
+    function GetGroupOffsets(Index: Integer): Integer;
+    procedure SetSubject(const Value: AnsiString);
+    procedure SetStart(const Value: Integer);
+    procedure SetStop(const Value: Integer);
+    function GetFoundMatch: Boolean;
+  private    // *** Variables used by PCRE
+    Offsets: array[0..(cALPerlRegExMAXSUBEXPRESSIONS+1)*3] of Integer;
+    OffsetCount: Integer;
+    FPCREOptions: Integer;
+    FPattern: Pointer;
+    FHints: Pointer;
+    FCharTable: Pointer;
+    FSubjectPChar: PAnsiChar;
+    FHasStoredGroups: Boolean;
+    FStoredGroups: array of AnsiString;
+    function GetSubjectLeft: AnsiString;
+    function GetSubjectRight: AnsiString;
+  protected
+    procedure CleanUp;
+        // Dispose off whatever we created, so we can start over. Called automatically when needed, so it is not made public
+    procedure ClearStoredGroups;
+  public
+    constructor Create;
+        // Come to life
+    destructor Destroy; override;
+        // Clean up after ourselves
+    class function EscapeRegExChars(const S: AnsiString): AnsiString;
+        // Escapes regex characters in S so that the regex engine can be used to match S as plain text
+    procedure Compile;
+        // Compile the regex. Called automatically by Match
+    procedure Study;
+        // Study the regex. Studying takes time, but will make the execution of the regex a lot faster.
+        // Call study if you will be using the same regex many times
+    function Match: Boolean;
+        // Attempt to match the regex, starting the attempt from the beginning of Subject
+    function MatchAgain: Boolean;
+        // Attempt to match the regex to the remainder of Subject after the previous match (as indicated by Start)
+    function Replace: AnsiString;
+        // Replace matched expression in Subject with ComputeReplacement.  Returns the actual replacement text from ComputeReplacement
+    function ReplaceAll: Boolean;
+        // Repeat MatchAgain and Replace until you drop.  Returns True if anything was replaced at all.
+    function ComputeReplacement: AnsiString;
+        // Returns Replacement with backreferences filled in
+    procedure StoreGroups;
+        // Stores duplicates of Groups[] so they and ComputeReplacement will still return the proper strings
+        // even if FSubject is changed or cleared
+    function NamedGroup(const Name: AnsiString): Integer;
+        // Returns the index of the named group Name
+    procedure Split(Strings: TALStrings; Limit: Integer);
+        // Split Subject along regex matches.  Capturing groups are ignored.
+    procedure SplitCapture(Strings: TALStrings; Limit: Integer); overload;
+    procedure SplitCapture(Strings: TALStrings; Limit: Integer; Offset : Integer); overload;
+        // Split Subject along regex matches.  Capturing groups are added to Strings as well.
+    property Compiled: Boolean read FCompiled;
+        // True if the RegEx has already been compiled.
+    property FoundMatch: Boolean read GetFoundMatch;
+        // Returns True when Matched* and Group* indicate a match
+    property Studied: Boolean read FStudied;
+        // True if the RegEx has already been studied
+    property MatchedText: AnsiString read GetMatchedText;
+        // The matched text
+    property MatchedLength: Integer read GetMatchedLength;
+        // Length of the matched text
+    property MatchedOffset: Integer read GetMatchedOffset;
+        // Character offset in the Subject string at which MatchedText starts
+    property Start: Integer read FStart write SetStart;
+        // Starting position in Subject from which MatchAgain begins
+    property Stop: Integer read FStop write SetStop;
+        // Last character in Subject that Match and MatchAgain search through
+    property State: TALPerlRegExState read FState write FState;
+        // State of Subject
+    property GroupCount: Integer read GetGroupCount;
+        // Number of matched capturing groups
+    property Groups[Index: Integer]: AnsiString read GetGroups;
+        // Text matched by capturing groups
+    property GroupLengths[Index: Integer]: Integer read GetGroupLengths;
+        // Lengths of the text matched by capturing groups
+    property GroupOffsets[Index: Integer]: Integer read GetGroupOffsets;
+        // Character offsets in Subject at which the capturing group matches start
+    property Subject: AnsiString read FSubject write SetSubject;
+        // The string on which Match() will try to match RegEx
+    property SubjectLeft: AnsiString read GetSubjectLeft;
+        // Part of the subject to the left of the match
+    property SubjectRight: AnsiString read GetSubjectRight;
+        // Part of the subject to the right of the match
+  public
+    property Options: TALPerlRegExOptions read FOptions write SetOptions;
+        // Options
+    property RegEx: AnsiString read FRegEx write SetRegEx;
+        // The regular expression to be matched
+    property Replacement: AnsiString read FReplacement write FReplacement;
+        // Text to replace matched expression with. \number and $number backreferences will be substituted with Groups
+        // TALPerlRegEx supports the "JGsoft" replacement text flavor as explained at http://www.regular-expressions.info/refreplace.html
+    property OnMatch: TNotifyEvent read FOnMatch write FOnMatch;
+        // Triggered by Match and MatchAgain after a successful match
+    property OnReplace: TALPerlRegExReplaceEvent read FOnReplace write FOnReplace;
+        // Triggered by Replace and ReplaceAll just before the replacement is done, allowing you to determine the new AnsiString
+  end;
+
+{
+  You can add TALPerlRegEx instances to a TALPerlRegExList to match them all together on the same subject,
+  as if they were one regex regex1|regex2|regex3|...
+  TALPerlRegExList does not own the TALPerlRegEx components, just like a TList
+  If a TALPerlRegEx has been added to a TALPerlRegExList, it should not be used in any other situation
+  until it is removed from the list
+}
+
+type
+  TALPerlRegExList = class
+  private
+    FList: TList;
+    FSubject: AnsiString;
+    FMatchedRegEx: TALPerlRegEx;
+    FStart, FStop: Integer;
+    function GetRegEx(Index: Integer): TALPerlRegEx;
+    procedure SetRegEx(Index: Integer; Value: TALPerlRegEx);
+    procedure SetSubject(const Value: AnsiString);
+    procedure SetStart(const Value: Integer);
+    procedure SetStop(const Value: Integer);
+    function GetCount: Integer;
+  protected
+    procedure UpdateRegEx(ARegEx: TALPerlRegEx);
+  public
+    constructor Create;
+    destructor Destroy; override;
+  public
+    function Add(ARegEx: TALPerlRegEx): Integer;
+    procedure Clear;
+    procedure Delete(Index: Integer);
+    function IndexOf(ARegEx: TALPerlRegEx): Integer;
+    procedure Insert(Index: Integer; ARegEx: TALPerlRegEx);
+  public
+    function Match: Boolean;
+    function MatchAgain: Boolean;
+    property RegEx[Index: Integer]: TALPerlRegEx read GetRegEx write SetRegEx;
+    property Count: Integer read GetCount;
+    property Subject: AnsiString read FSubject write SetSubject;
+    property Start: Integer read FStart write SetStart;
+    property Stop: Integer read FStop write SetStop;
+    property MatchedRegEx: TALPerlRegEx read FMatchedRegEx;
+  end;
+
+  ERegularExpressionError = class(Exception);
+
+{$ifend}
+
+type
+
   TALHandleTagfunct = function(const TagString: AnsiString;
                                TagParams: TALStrings;
                                ExtData: pointer;
@@ -208,7 +409,13 @@ procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormat
 function  ALGUIDToString(const Guid: TGUID): Ansistring;
 Function  ALMakeKeyStrByGUID: AnsiString;
 function  ALMatchesMask(const Filename, Mask: AnsiString): Boolean;
-function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
 function  ALFormat(const Format: AnsiString; const Args: array of const): AnsiString; overload;
 function  ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString; overload;
 function  ALTryStrToBool(const S: Ansistring; out Value: Boolean): Boolean;
@@ -268,6 +475,8 @@ function  ALSameText(const S1, S2: AnsiString): Boolean;
 function  ALTrim(const S: AnsiString): AnsiString;
 function  ALTrimLeft(const S: AnsiString): AnsiString;
 function  ALTrimRight(const S: AnsiString): AnsiString;
+function  ALPadLeft(const S: AnsiString; Const Width: Integer): AnsiString;
+function  ALPadRight(const S: AnsiString; Const Width: Integer): AnsiString;
 function  ALQuotedStr(const S: AnsiString; const Quote: AnsiChar = ''''): AnsiString;
 function  ALDequotedStr(const S: AnsiString; AQuote: AnsiChar): AnsiString;
 function  ALExtractQuotedStr(var Src: PAnsiChar; Quote: AnsiChar): AnsiString;
@@ -358,6 +567,10 @@ var
 implementation
 
 uses SysConst,
+     {$if CompilerVersion >= 23}{Delphi XE2}
+     System.RegularExpressionsAPI,
+     System.RegularExpressionsConsts,
+     {$ifend}
      RTLConsts,
      {$IFDEF UNICODE}
      Ansistrings,
@@ -822,8 +1035,1014 @@ begin
   end;
 end;
 
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function ALPerlRegExFirstCap(const S: string): string;
+begin
+  if S = '' then
+    Result := ''
+  else
+  begin
+    Result := LowerCase(S);
+    Result[1] := UpperCase(S[1])[1];
+  end
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function ALPerlRegExInitialCaps(const S: string): string;
+var
+  I: Integer;
+  Up: Boolean;
+begin
+  Result := LowerCase(S);
+  Up := True;
+  for I := 1 to Length(Result) do
+  begin
+    case Result[I] of
+      #0..'&', '(', '*', '+', ',', '-', '.', '?', '<', '[', '{', #$00B7:
+        Up := True
+      else
+        if Up and (Result[I] <> '''') then
+        begin
+          Result[1] := UpperCase(S[1])[1];
+          Up := False
+        end
+    end;
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.CleanUp;
+begin
+  FCompiled := False;
+  FStudied := False;
+  pcre_dispose(FPattern, FHints, nil);
+  FPattern := nil;
+  FHints := nil;
+  ClearStoredGroups;
+  OffsetCount := 0;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.ClearStoredGroups;
+begin
+  FHasStoredGroups := False;
+  FStoredGroups := nil;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.Compile;
+var
+  Error: PAnsiChar;
+  ErrorOffset: Integer;
+begin
+  if FRegEx = '' then
+    raise ERegularExpressionError.CreateRes(@SRegExMissingExpression);
+  CleanUp;
+  FPattern := pcre_compile(PAnsiChar(FRegEx), FPCREOptions, @Error, @ErrorOffset, FCharTable);
+  if FPattern = nil then
+    raise ERegularExpressionError.CreateResFmt(@SRegExExpressionError, [ErrorOffset, String(Error)]);
+  FCompiled := True
+end;
+{$ifend}
+
+(* Backreference overview:
+
+Assume there are 13 backreferences:
+
+Text        TALPerlRegEx    .NET      Java       ECMAScript
+$17         $1 + "7"      "$17"     $1 + "7"   $1 + "7"
+$017        $1 + "7"      "$017"    $1 + "7"   $1 + "7"
+$12         $12           $12       $12        $12
+$012        $1 + "2"      $12       $12        $1 + "2"
+${1}2       $1 + "2"      $1 + "2"  error      "${1}2"
+$$          "$"           "$"       error      "$"
+\$          "$"           "\$"      "$"        "\$"
+*)
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.ComputeReplacement: AnsiString;
+var
+  Mode: AnsiChar;
+  S: AnsiString;
+  I, J, N: Integer;
+
+  procedure ReplaceBackreference(Number: Integer);
+  var
+    Backreference: AnsiString;
+  begin
+    Delete(S, I, J-I);
+    if Number <= GroupCount then
+    begin
+      Backreference := Groups[Number];
+      if Backreference <> '' then
+      begin
+        // Ignore warnings; converting to UTF-8 does not cause data loss
+        case Mode of
+          'L', 'l': Backreference := AnsiString(LowerCase(String(Backreference)));
+          'U', 'u': Backreference := AnsiString(UpperCase(String(Backreference)));
+          'F', 'f': Backreference := AnsiString(ALPerlRegExFirstCap(String(Backreference)));
+          'I', 'i': Backreference := AnsiString(ALPerlRegExInitialCaps(String(Backreference)));
+        end;
+        if S <> '' then
+        begin
+          Insert(Backreference, S, I);
+          I := I + Length(Backreference);
+        end
+        else
+        begin
+          S := Backreference;
+          I := MaxInt;
+        end
+      end;
+    end
+  end;
+
+  procedure ProcessBackreference(NumberOnly, Dollar: Boolean);
+  var
+    Number, Number2: Integer;
+    Group: AnsiString;
+  begin
+    Number := -1;
+    if (J <= Length(S)) and (S[J] in ['0'..'9']) then
+    begin
+      // Get the number of the backreference
+      Number := Ord(S[J]) - Ord('0');
+      Inc(J);
+      if (J <= Length(S)) and (S[J] in ['0'..'9']) then
+      begin
+        // Expand it to two digits only if that would lead to a valid backreference
+        Number2 := Number*10 + Ord(S[J]) - Ord('0');
+        if Number2 <= GroupCount then
+        begin
+          Number := Number2;
+          Inc(J)
+        end;
+      end;
+    end
+    else if not NumberOnly then
+    begin
+      if Dollar and (J < Length(S)) and (S[J] = '{') then
+      begin
+        // Number or name in curly braces
+        Inc(J);
+        case S[J] of
+          '0'..'9':
+            begin
+              Number := Ord(S[J]) - Ord('0');
+              Inc(J);
+              while (J <= Length(S)) and (S[J] in ['0'..'9']) do
+              begin
+                Number := Number*10 + Ord(S[J]) - Ord('0');
+                Inc(J)
+              end;
+            end;
+          'A'..'Z', 'a'..'z', '_':
+            begin
+              Inc(J);
+              while (J <= Length(S)) and (S[J] in ['A'..'Z', 'a'..'z', '0'..'9', '_']) do
+                Inc(J);
+              if (J <= Length(S)) and (S[J] = '}') then
+              begin
+                Group := ALCopyStr(S, I+2, J-I-2);
+                Number := NamedGroup(Group);
+              end
+            end;
+        end;
+        if (J > Length(S)) or (S[J] <> '}') then
+          Number := -1
+        else
+          Inc(J);
+      end
+      else if Dollar and (S[J] = '_') then
+      begin
+        // $_ (whole subject)
+        Delete(S, I, J+1-I);
+        Insert(Subject, S, I);
+        I := I + Length(Subject);
+        Exit;
+      end
+      else
+      case S[J] of
+        '&':
+          begin
+            // \& or $& (whole regex match)
+            Number := 0;
+            Inc(J);
+          end;
+        '+':
+          begin
+            // \+ or $+ (highest-numbered participating group)
+            Number := GroupCount;
+            Inc(J);
+          end;
+        '`':
+          begin
+            // \` or $` (backtick; subject to the left of the match)
+            Delete(S, I, J+1-I);
+            Insert(SubjectLeft, S, I);
+            I := I + Offsets[0] - 1;
+            Exit;
+          end;
+        '''':
+          begin
+            // \' or $' (straight quote; subject to the right of the match)
+            Delete(S, I, J+1-I);
+            Insert(SubjectRight, S, I);
+            I := I + Length(Subject) - Offsets[1];
+            Exit;
+          end
+      end;
+    end;
+    if Number >= 0 then
+      ReplaceBackreference(Number)
+    else
+      Inc(I)
+  end;
+
+begin
+  S := FReplacement;
+  I := 1;
+  while I < Length(S) do
+  begin
+    case S[I] of
+      '\':
+        begin
+          J := I + 1;
+          // We let I stop one character before the end, so J cannot point
+          // beyond the end of the AnsiString here
+          if J > Length(S) then
+            raise ERegularExpressionError.CreateResFmt(@SRegExIndexOutOfBounds, [J]);
+          case S[J] of
+            '$', '\':
+              begin
+                Delete(S, I, 1);
+                Inc(I);
+              end;
+            'g':
+              begin
+                if (J < Length(S)-1) and (S[J+1] = '<') and (S[J+2] in ['A'..'Z', 'a'..'z', '_']) then
+                begin
+                  // Python-style named group reference \g<name>
+                  J := J+3;
+                  while (J <= Length(S)) and (S[J] in ['0'..'9', 'A'..'Z', 'a'..'z', '_']) do
+                    Inc(J);
+                  if (J <= Length(S)) and (S[J] = '>') then
+                  begin
+                    N := NamedGroup(ALCopyStr(S, I+3, J-I-3));
+                    Inc(J);
+                    Mode := #0;
+                    if N > 0 then
+                      ReplaceBackreference(N)
+                    else
+                      Delete(S, I, J-I);
+                  end
+                  else
+                    I := J
+                end
+                else
+                  I := I+2;
+              end;
+            'l', 'L', 'u', 'U', 'f', 'F', 'i', 'I':
+              begin
+                Mode := S[J];
+                Inc(J);
+                ProcessBackreference(True, False);
+              end;
+          else
+            Mode := #0;
+            ProcessBackreference(False, False);
+          end;
+        end;
+      '$':
+        begin
+          J := I + 1;
+          // We let I stop one character before the end, so J cannot point
+          // beyond the end of the AnsiString here
+          if J > Length(S) then
+            raise ERegularExpressionError.CreateResFmt(@SRegExIndexOutOfBounds, [J]);
+          if S[J] = '$' then
+          begin
+            Delete(S, J, 1);
+            Inc(I);
+          end
+          else
+          begin
+            Mode := #0;
+            ProcessBackreference(False, True);
+          end
+        end;
+    else
+      Inc(I);
+    end
+  end;
+  Result := S
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+constructor TALPerlRegEx.Create;
+begin
+  inherited Create;
+  FState := [preNotEmpty];
+  FCharTable := pcre_maketables;
+  FPCREOptions := PCRE_UTF8 or PCRE_NEWLINE_ANY;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+destructor TALPerlRegEx.Destroy;
+begin
+  pcre_dispose(FPattern, FHints, FCharTable);
+  inherited Destroy;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+class function TALPerlRegEx.EscapeRegExChars(const S: AnsiString): AnsiString;
+var
+  I: Integer;
+begin
+  Result := S;
+  I := Length(Result);
+  while I > 0 do
+  begin
+    case Result[I] of
+      '.', '[', ']', '(', ')', '?', '*', '+', '{', '}', '^', '$', '|', '\':
+        Insert('\', Result, I);
+      #0:
+        begin
+          Result[I] := '0';
+          Insert('\', Result, I);
+        end;
+    end;
+    Dec(I);
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetFoundMatch: Boolean;
+begin
+  Result := OffsetCount > 0;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetMatchedText: AnsiString;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+  Result := GetGroups(0);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetMatchedLength: Integer;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+  Result := GetGroupLengths(0)
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetMatchedOffset: Integer;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+  Result := GetGroupOffsets(0)
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetGroupCount: Integer;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+  Result := OffsetCount-1
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetGroupLengths(Index: Integer): Integer;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+
+  if (Index >= 0) and (Index <= GroupCount) then
+    Result := Offsets[Index*2+1]-Offsets[Index*2]
+  else
+    raise ERegularExpressionError.CreateResFmt(@SRegExIndexOutOfBounds, [Index]);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetGroupOffsets(Index: Integer): Integer;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+
+  if (Index >= 0) and (Index <= GroupCount) then
+    Result := Offsets[Index*2]
+  else
+    raise ERegularExpressionError.CreateResFmt(@SRegExIndexOutOfBounds, [Index]);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetGroups(Index: Integer): AnsiString;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+  if Index > GroupCount then
+    Result := ''
+  else if FHasStoredGroups then
+    Result := FStoredGroups[Index]
+  else
+    Result := ALCopyStr(FSubject, Offsets[Index*2], Offsets[Index*2+1]-Offsets[Index*2]);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetSubjectLeft: AnsiString;
+begin
+  Result := ALCopyStr(Subject, 1, Offsets[0]-1);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.GetSubjectRight: AnsiString;
+begin
+  Result := ALCopyStr(Subject, Offsets[1], MaxInt);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.Match: Boolean;
+var
+  I, Opts: Integer;
+begin
+  ClearStoredGroups;
+  if not Compiled then
+    Compile;
+  if preNotBOL in State then
+    Opts := PCRE_NOTBOL
+  else
+    Opts := 0;
+  if preNotEOL in State then
+    Opts := Opts or PCRE_NOTEOL;
+  if preNotEmpty in State then
+    Opts := Opts or PCRE_NOTEMPTY;
+  OffsetCount := pcre_exec(FPattern, FHints, FSubjectPChar, FStop, 0, Opts, @Offsets[0], High(Offsets));
+  Result := OffsetCount > 0;
+  // Convert offsets into AnsiString indices
+  if Result then
+  begin
+    for I := 0 to OffsetCount*2-1 do
+      Inc(Offsets[I]);
+    FStart := Offsets[1];
+    if Offsets[0] = Offsets[1] then
+      Inc(FStart); // Make sure we don't get stuck at the same position
+    if Assigned(OnMatch) then
+      OnMatch(Self)
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.MatchAgain: Boolean;
+var
+  I, Opts: Integer;
+begin
+  ClearStoredGroups;
+  if not Compiled then
+    Compile;
+  if preNotBOL in State then
+    Opts := PCRE_NOTBOL
+  else
+    Opts := 0;
+  if preNotEOL in State then
+    Opts := Opts or PCRE_NOTEOL;
+  if preNotEmpty in State then
+    Opts := Opts or PCRE_NOTEMPTY;
+  if FStart-1 > FStop then
+    OffsetCount := -1
+  else
+    OffsetCount := pcre_exec(FPattern, FHints, FSubjectPChar, FStop, FStart-1, Opts, @Offsets[0], High(Offsets));
+  Result := OffsetCount > 0;
+  // Convert offsets into AnsiString indices
+  if Result then
+  begin
+    for I := 0 to OffsetCount*2-1 do
+      Inc(Offsets[I]);
+    FStart := Offsets[1];
+    if Offsets[0] = Offsets[1] then
+      Inc(FStart); // Make sure we don't get stuck at the same position
+    if Assigned(OnMatch) then
+      OnMatch(Self)
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.NamedGroup(const Name: AnsiString): Integer;
+begin
+  Result := pcre_get_stringnumber(FPattern, PAnsiChar(Name));
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.Replace: AnsiString;
+begin
+  if not FoundMatch then
+    raise ERegularExpressionError.CreateRes(@SRegExMatchRequired);
+  // Substitute backreferences
+  Result := ComputeReplacement;
+  // Allow for just-in-time substitution determination
+  if Assigned(OnReplace) then
+    OnReplace(Self, Result);
+  // Perform substitution
+  Delete(FSubject, MatchedOffset, MatchedLength);
+  if Result <> '' then
+    Insert(Result, FSubject, MatchedOffset);
+  FSubjectPChar := PAnsiChar(FSubject);
+  // Position to continue search
+  FStart := FStart - MatchedLength + Length(Result);
+  FStop := FStop - MatchedLength + Length(Result);
+  // Replacement no longer matches regex, we assume
+  ClearStoredGroups;
+  OffsetCount := 0;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.ReplaceAll: Boolean;
+begin
+  if Match then
+  begin
+    Result := True;
+    repeat
+      Replace
+    until not MatchAgain;
+  end
+  else
+    Result := False;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SetOptions(Value: TALPerlRegExOptions);
+begin
+  if (FOptions <> Value) then
+  begin
+    FOptions := Value;
+    FPCREOptions := PCRE_UTF8 or PCRE_NEWLINE_ANY;
+    if (preCaseLess in Value) then
+      FPCREOptions := FPCREOptions or PCRE_CASELESS;
+    if (preMultiLine in Value) then
+      FPCREOptions := FPCREOptions or PCRE_MULTILINE;
+    if (preSingleLine in Value) then
+      FPCREOptions := FPCREOptions or PCRE_DOTALL;
+    if (preExtended in Value) then
+      FPCREOptions := FPCREOptions or PCRE_EXTENDED;
+    if (preAnchored in Value) then
+      FPCREOptions := FPCREOptions or PCRE_ANCHORED;
+    if (preUnGreedy in Value) then
+      FPCREOptions := FPCREOptions or PCRE_UNGREEDY;
+    if (preNoAutoCapture in Value) then
+      FPCREOptions := FPCREOptions or PCRE_NO_AUTO_CAPTURE;
+    CleanUp
+  end
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SetRegEx(const Value: AnsiString);
+begin
+  if FRegEx <> Value then
+  begin
+    FRegEx := Value;
+    CleanUp
+  end
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SetStart(const Value: Integer);
+begin
+  if Value < 1 then
+    FStart := 1
+  else
+    FStart := Value;
+  // If FStart > Length(Subject), MatchAgain() will simply return False
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SetStop(const Value: Integer);
+begin
+  if Value > Length(Subject) then
+    FStop := Length(Subject)
+  else
+    FStop := Value;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SetSubject(const Value: AnsiString);
+begin
+  FSubject := Value;
+  FSubjectPChar := PAnsiChar(Value);
+  FStart := 1;
+  FStop := Length(Subject);
+  if not FHasStoredGroups then
+    OffsetCount := 0;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.Split(Strings: TALStrings; Limit: Integer);
+var
+  Offset, Count: Integer;
+begin
+  if Strings = nil then
+    raise ERegularExpressionError.CreateRes(@SRegExStringsRequired);
+
+  if (Limit = 1) or not Match then
+    Strings.Add(Subject)
+  else
+  begin
+    Offset := 1;
+    Count := 1;
+    repeat
+      Strings.Add(ALCopyStr(Subject, Offset, MatchedOffset - Offset));
+      Inc(Count);
+      Offset := MatchedOffset + MatchedLength;
+    until ((Limit > 1) and (Count >= Limit)) or not MatchAgain;
+    Strings.Add(ALCopyStr(Subject, Offset, MaxInt));
+  end
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SplitCapture(Strings: TALStrings; Limit, Offset: Integer);
+var
+  Count: Integer;
+  LUseOffset: Boolean;
+  LOffset: Integer;
+begin
+  if Strings = nil then
+    raise ERegularExpressionError.CreateRes(@SRegExStringsRequired);
+
+  if (Limit = 1) or not Match then
+    Strings.Add(Subject)
+  else
+  begin
+    LUseOffset := Offset <> 1;
+    if Offset <> 1 then
+      Dec(Limit);
+    LOffset := 1;
+    Count := 1;
+    repeat
+      if LUseOffset then
+      begin
+        if MatchedOffset >= Offset then
+        begin
+          LUseOffset := False;
+          Strings.Add(ALCopyStr(Subject, 1, MatchedOffset -1));
+          if Self.GroupCount > 0 then
+            Strings.Add(Self.Groups[Self.GroupCount]);
+        end;
+      end
+      else
+      begin
+        Strings.Add(ALCopyStr(Subject, LOffset, MatchedOffset - LOffset));
+        Inc(Count);
+        if Self.GroupCount > 0 then
+          Strings.Add(Self.Groups[Self.GroupCount]);
+      end;
+      LOffset := MatchedOffset + MatchedLength;
+    until ((Limit > 1) and (Count >= Limit)) or not MatchAgain;
+    Strings.Add(ALCopyStr(Subject, LOffset, MaxInt));
+  end
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.SplitCapture(Strings: TALStrings; Limit: Integer);
+begin
+  SplitCapture(Strings,Limit,1);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.StoreGroups;
+var
+  I: Integer;
+begin
+  if OffsetCount > 0 then
+  begin
+    ClearStoredGroups;
+    SetLength(FStoredGroups, GroupCount+1);
+    for I := GroupCount downto 0 do
+      FStoredGroups[I] := Groups[I];
+    FHasStoredGroups := True;
+  end
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegEx.Study;
+var
+  Error: PAnsiChar;
+begin
+  if not FCompiled then
+    Compile;
+  FHints := pcre_study(FPattern, 0, @Error);
+  if Error <> nil then
+    raise ERegularExpressionError.CreateResFmt(@SRegExStudyError, [String(Error)]);
+  FStudied := True
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegExList.Add(ARegEx: TALPerlRegEx): Integer;
+begin
+  Result := FList.Add(ARegEx);
+  UpdateRegEx(ARegEx);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.Clear;
+begin
+  FList.Clear;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+constructor TALPerlRegExList.Create;
+begin
+  inherited Create;
+  FList := TList.Create;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.Delete(Index: Integer);
+begin
+  FList.Delete(Index);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+destructor TALPerlRegExList.Destroy;
+begin
+  FList.Free;
+  inherited
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegExList.GetCount: Integer;
+begin
+  Result := FList.Count;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegExList.GetRegEx(Index: Integer): TALPerlRegEx;
+begin
+  Result := TALPerlRegEx(Pointer(FList[Index]));
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegExList.IndexOf(ARegEx: TALPerlRegEx): Integer;
+begin
+  Result := FList.IndexOf(ARegEx);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.Insert(Index: Integer; ARegEx: TALPerlRegEx);
+begin
+  FList.Insert(Index, ARegEx);
+  UpdateRegEx(ARegEx);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegExList.Match: Boolean;
+begin
+  SetStart(1);
+  FMatchedRegEx := nil;
+  Result := MatchAgain;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegExList.MatchAgain: Boolean;
+var
+  I, MatchStart, MatchPos: Integer;
+  ARegEx: TALPerlRegEx;
+begin
+  if FMatchedRegEx <> nil then
+    MatchStart := FMatchedRegEx.MatchedOffset + FMatchedRegEx.MatchedLength
+  else
+    MatchStart := FStart;
+  FMatchedRegEx := nil;
+  MatchPos := MaxInt;
+  for I := 0 to Count-1 do
+  begin
+    ARegEx := RegEx[I];
+    if (not ARegEx.FoundMatch) or (ARegEx.MatchedOffset < MatchStart) then
+    begin
+      ARegEx.Start := MatchStart;
+      ARegEx.MatchAgain;
+    end;
+    if ARegEx.FoundMatch and (ARegEx.MatchedOffset < MatchPos) then
+    begin
+      MatchPos := ARegEx.MatchedOffset;
+      FMatchedRegEx := ARegEx;
+    end;
+    if MatchPos = MatchStart then Break;
+  end;
+  Result := MatchPos < MaxInt;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.SetRegEx(Index: Integer; Value: TALPerlRegEx);
+begin
+  FList[Index] := Value;
+  UpdateRegEx(Value);
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.SetStart(const Value: Integer);
+var
+  I: Integer;
+begin
+  if FStart <> Value then
+  begin
+    FStart := Value;
+    for I := Count-1 downto 0 do
+      RegEx[I].Start := Value;
+    FMatchedRegEx := nil;
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.SetStop(const Value: Integer);
+var
+  I: Integer;
+begin
+  if FStop <> Value then
+  begin
+    FStop := Value;
+    for I := Count-1 downto 0 do
+      RegEx[I].Stop := Value;
+    FMatchedRegEx := nil;
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.SetSubject(const Value: AnsiString);
+var
+  I: Integer;
+begin
+  if FSubject <> Value then
+  begin
+    FSubject := Value;
+    for I := Count-1 downto 0 do
+      RegEx[I].Subject := Value;
+    FMatchedRegEx := nil;
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+procedure TALPerlRegExList.UpdateRegEx(ARegEx: TALPerlRegEx);
+begin
+  ARegEx.Subject := FSubject;
+  ARegEx.Start := FStart;
+end;
+{$ifend}
+
 {***********************************************************************************************}
 function ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{***************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{*********************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64): Int64;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64): UInt64;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): Single;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double;
+begin
+  if AValue then
+    Result := ATrue
+  else
+    Result := AFalse;
+end;
+
+{******************************************************************************************}
+function ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended;
 begin
   if AValue then
     Result := ATrue
@@ -6462,6 +7681,18 @@ begin
   {$ENDIF}
 end;
 
+{*************************************************************************}
+function  ALPadLeft(const S: AnsiString; Const Width: Integer): AnsiString;
+begin
+  result := ALFormat('%'+ALIntToStr(Width)+'s', [S]);
+end;
+
+{**************************************************************************}
+function  ALPadRight(const S: AnsiString; Const Width: Integer): AnsiString;
+begin
+  result := ALFormat('%-'+ALIntToStr(Width)+'s', [S]);
+end;
+
 {***********************************************************************************}
 function  ALQuotedStr(const S: AnsiString; const Quote: AnsiChar = ''''): AnsiString;
 var
@@ -6853,7 +8084,6 @@ function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
                           const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 
 var ReplaceString: AnsiString;
-    Token: AnsiChar;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
     ParamList: TALStringList;
@@ -6930,36 +8160,17 @@ begin
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
     InDoubleQuote := False;
     InsingleQuote := False;
-    Token := SourceString[T2];
-    if token = '"' then InDoubleQuote := True
-    else if token = '''' then InSingleQuote := True;
-    While (T2 < SourceStringLength) and
+    While (T2 <= SourceStringLength) and
           (InDoubleQuote or
            InSingleQuote or
-           (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-           ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+           (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
            (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
+      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
       inc(T2);
-      Token := SourceString[T2];
-      If Token = '"' then begin
-        if (not InDoubleQuote) or
-           (T2 = SourceStringLength) or
-           (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else inc(t2);
-      end
-      else If Token = '''' then begin
-        if (not InSingleQuote) or
-           (T2 = SourceStringLength) or
-           (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
-        else inc(t2);
-      end;
     end;
-    if (T2 = SourceStringLength) and
-       (InDoubleQuote or
-        InSingleQuote or
-        (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-        ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
-        (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
+    if (T2 > SourceStringLength) then T2 := 0;
   end;
 
 
@@ -7015,36 +8226,17 @@ begin
     If (T1 > 0) and (T2 <= SourceStringLength) then begin
       InDoubleQuote := False;
       InsingleQuote := False;
-      Token := SourceString[T2];
-      if token = '"' then InDoubleQuote := True
-      else if token = '''' then InSingleQuote := True;
-      While (T2 < SourceStringLength) and
+      While (T2 <= SourceStringLength) and
             (InDoubleQuote or
              InSingleQuote or
-             (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-             ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+             (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
              (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
+        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
         inc(T2);
-        Token := SourceString[T2];
-        If Token = '"' then begin
-          if (not InDoubleQuote) or
-             (T2 = SourceStringLength) or
-             (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-          else inc(t2);
-        end
-        else If Token = '''' then begin
-          if (not InSingleQuote) or
-             (T2 = SourceStringLength) or
-             (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
-          else inc(t2);
-        end;
       end;
-      if (T2 = SourceStringLength) and
-         (InDoubleQuote or
-          InSingleQuote or
-          (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-          ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
-          (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
+      if (T2 > SourceStringLength) then T2 := 0;
     end;
   end;
 
@@ -7121,7 +8313,6 @@ function ALExtractTagParams(Const SourceString, TagStart, TagEnd: AnsiString;
                             IgnoreCase: Boolean): Boolean;
 
 var ReplaceString: AnsiString;
-    Token: AnsiChar;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
     TagStartLength: integer;
@@ -7168,36 +8359,17 @@ begin
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
     InDoubleQuote := False;
     InsingleQuote := False;
-    Token := SourceString[T2];
-    if token = '"' then InDoubleQuote := True
-    else if token = '''' then InSingleQuote := True;
-    While (T2 < SourceStringLength) and
+    While (T2 <= SourceStringLength) and
           (InDoubleQuote or
            InSingleQuote or
-           (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-           ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+           (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
            (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
+      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
       inc(T2);
-      Token := SourceString[T2];
-      If Token = '"' then begin
-        if (not InDoubleQuote) or
-           (T2 = SourceStringLength) or
-           (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else inc(t2);
-      end
-      else If Token = '''' then begin
-        if (not InSingleQuote) or
-           (T2 = SourceStringLength) or
-           (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
-        else inc(t2);
-      end;
     end;
-    if (T2 = SourceStringLength) and
-       (InDoubleQuote or
-        InSingleQuote or
-        (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-        ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
-        (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
+    if (T2 > SourceStringLength) then T2 := 0;
   end;
 
   If (T1 > 0) and (T2 > T1) Then begin
@@ -7226,8 +8398,7 @@ Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: AnsiString;
                             SplitTextAndTagLst: TALStrings;
                             IgnoreCase: Boolean);
 
-var Token: AnsiChar;
-    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
+var TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
@@ -7260,36 +8431,17 @@ begin
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
     InDoubleQuote := False;
     InsingleQuote := False;
-    Token := SourceString[T2];
-    if token = '"' then InDoubleQuote := True
-    else if token = '''' then InSingleQuote := True;
-    While (T2 < SourceStringLength) and
+    While (T2 <= SourceStringLength) and
           (InDoubleQuote or
            InSingleQuote or
-           (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-           ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+           (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
            (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
+      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
       inc(T2);
-      Token := SourceString[T2];
-      If Token = '"' then begin
-        if (not InDoubleQuote) or
-           (T2 = SourceStringLength) or
-           (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else inc(t2);
-      end
-      else If Token = '''' then begin
-        if (not InSingleQuote) or
-           (T2 = SourceStringLength) or
-           (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
-        else inc(t2);
-      end;
     end;
-    if (T2 = SourceStringLength) and
-       (InDoubleQuote or
-        InSingleQuote or
-        (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-        ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
-        (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
+    if (T2 > SourceStringLength) then T2 := 0;
   end;
 
   While (T1 > 0) and (T2 > T1) do begin
@@ -7303,36 +8455,17 @@ begin
     If (T1 > 0) and (T2 <= SourceStringLength) then begin
       InDoubleQuote := False;
       InsingleQuote := False;
-      Token := SourceString[T2];
-      if token = '"' then InDoubleQuote := True
-      else if token = '''' then InSingleQuote := True;
-      While (T2 < SourceStringLength) and
+      While (T2 <= SourceStringLength) and
             (InDoubleQuote or
              InSingleQuote or
-             (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-             ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
+             (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
+             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
              (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
+        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
         inc(T2);
-        Token := SourceString[T2];
-        If Token = '"' then begin
-          if (not InDoubleQuote) or
-             (T2 = SourceStringLength) or
-             (SourceString[T2 + 1] <> Token) then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-          else inc(t2);
-        end
-        else If Token = '''' then begin
-          if (not InSingleQuote) or
-             (T2 = SourceStringLength) or
-             (SourceString[T2 + 1] <> Token) then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote)
-          else inc(t2);
-        end;
       end;
-      if (T2 = SourceStringLength) and
-         (InDoubleQuote or
-          InSingleQuote or
-          (IgnoreCase and (not (Token in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-          ((not IgnoreCase) and (Token <> TagEndFirstChar)) or
-          (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) then T2 := 0;
+      if (T2 > SourceStringLength) then T2 := 0;
     end;
   end;
 

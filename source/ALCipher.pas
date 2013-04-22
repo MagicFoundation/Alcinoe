@@ -11,7 +11,7 @@ Version:      4.00
 Description:  Delphi library for cryptography. It provides support for
               AES, Blowfish, SHA, MD5
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -57,7 +57,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALCipher;
 
@@ -195,10 +195,6 @@ function  AlCipherBufferToHex(const Buf; BufSize : Cardinal) : AnsiString;
 procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
 function  ALCipherRolX(I, C : DWord) : DWord; register;
 
-{ Xor }
-function  ALXorEncrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
-function  ALXorDecrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
-
 { Blowfish }
 procedure ALCipherInitEncryptBF(Key : TALCipherKey128; var Context : TALCipherBFContext);
 procedure ALCipherEncryptBF(const Context : TALCipherBFContext; var Block : TALCipherBFBlock; Encrypt : Boolean);
@@ -265,6 +261,10 @@ function  ALStreamHashSHA1(AStream : TStream): AnsiString; overload;
 procedure ALStringHashSHA1(var Digest : TALCipherSHA1Digest; const Str : AnsiString); overload;
 function  ALStringHashSHA1(const Str : AnsiString): AnsiString; overload;
 
+{ HMAC algorithms }
+function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
+function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
+
 { Miscellaneous hash algorithms }
 procedure ALCipherHashELF(var Digest : LongInt; const Buf;  BufSize : LongInt);
 procedure ALCipherHashMix128(var Digest : LongInt; const Buf;  BufSize : LongInt);
@@ -272,7 +272,6 @@ procedure ALStringHashELF(var Digest : LongInt; const Str : AnsiString); overloa
 function  ALStringHashELF(const Str : AnsiString): LongInt; overload;
 procedure ALStringHashMix128(var Digest : LongInt; const Str : AnsiString); overload;
 function  ALStringHashMix128(const Str : AnsiString): LongInt; overload;
-
 
 implementation
 
@@ -1873,59 +1872,9 @@ begin
   end;
 end;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 {***}
 const
   cAlCryptInvalidFileFormat = 'Invalid file format';
-
-{********************************************************************************************}
-function ALXorEncrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
-var c : Byte;
-    I:Integer;
-begin
-  Result := '';
-  for I := 1 to Length(InString) do
-  begin
-    C := Byte(InString[I]) xor (StartKey shr 8);
-    Result := Result + ALIntToHex(c ,2);
-    StartKey := (c + StartKey) * MultKey + AddKey;
-  end;
-end;
-
-{********************************************************************************************}
-function ALXorDecrypt(const InString:AnsiString; StartKey,MultKey,AddKey:Integer): AnsiString;
-Var C : AnsiChar;
-    I:Integer;
-begin
-  Result := '';
-  I := 1;
-  While I < Length(InString) do begin
-    C := AnsiChar(ALStrToInt('$' + ALCopyStr(InString,I,2)));
-    Result := Result + AnsiChar(Byte(C) xor (StartKey shr 8));
-    StartKey := (Byte(C) + StartKey) * MultKey + AddKey;
-    Inc(i,2);
-  end;
-end;
 
 {*****Blowfish****************************************}
 procedure ALBFEncryptString(const InString: AnsiString;
@@ -2709,6 +2658,89 @@ Var aSHA1Digest: TAlCipherSHA1Digest;
 Begin
   AlStringHashSHA1(aSHA1Digest, Str);
   Result := AlCipherBufferToHex(ASHA1Digest, SizeOf(aSHA1Digest));
+end;
+
+{****************************************************************}
+function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
+Const BlockSize = 64; // Blocksize is 64 (bytes) when using one of the following hash functions: SHA-1, MD5, RIPEMD-128/160.[2]
+Var TmpKey: AnsiString;
+    o_key_pad: ansiString;
+    i_key_pad: ansiString;
+    Digest: TALCipherSHA1Digest;
+    i: integer;
+begin
+  TmpKey := Key;
+  if length(TmpKey) > BlockSize then begin
+    ALStringHashSHA1(Digest, TmpKey);
+    setlength(TmpKey, length(Digest));
+    for I := 0 to high(Digest) do
+      TmpKey[i+1] := AnsiChar(Digest[i]); // keys longer than blocksize are shortened
+  end;
+  if (length(TmpKey) < BlockSize) then begin
+    i := length(TmpKey) + 1;
+    Setlength(TmpKey, BlockSize);
+    while i <= length(TmpKey) do begin
+      TmpKey[i] := #0; // keys shorter than blocksize are zero-padded
+      inc(i);
+    end;
+  end;
+
+  setlength(o_key_pad, blocksize);
+  for I := 1 to blocksize do
+    o_key_pad[I] := ansiChar($5C xor ord(TmpKey[i]));
+
+  setlength(i_key_pad, blocksize);
+  for I := 1 to blocksize do
+    i_key_pad[I] := ansiChar($36 xor ord(TmpKey[i]));
+
+  ALStringHashSHA1(Digest, i_key_pad + Str);
+  setlength(i_key_pad, length(Digest));
+  for I := 0 to high(Digest) do
+    i_key_pad[i+1] := AnsiChar(Digest[i]);
+
+  result := ALStringHashSHA1(o_key_pad + i_key_pad); // result := hash(o_key_pad + hash(i_key_pad + message))
+end;
+
+
+{***************************************************************}
+function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
+Const BlockSize = 64; // Blocksize is 64 (bytes) when using one of the following hash functions: SHA-1, MD5, RIPEMD-128/160.[2]
+Var TmpKey: AnsiString;
+    o_key_pad: ansiString;
+    i_key_pad: ansiString;
+    Digest: TALCipherMD5Digest;
+    i: integer;
+begin
+  TmpKey := Key;
+  if length(TmpKey) > BlockSize then begin
+    ALStringHashMD5(Digest, TmpKey);
+    setlength(TmpKey, length(Digest));
+    for I := 0 to high(Digest) do
+      TmpKey[i+1] := AnsiChar(Digest[i]); // keys longer than blocksize are shortened
+  end;
+  if (length(TmpKey) < BlockSize) then begin
+    i := length(TmpKey) + 1;
+    Setlength(TmpKey, BlockSize);
+    while i <= length(TmpKey) do begin
+      TmpKey[i] := #0; // keys shorter than blocksize are zero-padded
+      inc(i);
+    end;
+  end;
+
+  setlength(o_key_pad, blocksize);
+  for I := 1 to blocksize do
+    o_key_pad[I] := ansiChar($5C xor ord(TmpKey[i]));
+
+  setlength(i_key_pad, blocksize);
+  for I := 1 to blocksize do
+    i_key_pad[I] := ansiChar($36 xor ord(TmpKey[i]));
+
+  ALStringHashMD5(Digest, i_key_pad + Str);
+  setlength(i_key_pad, length(Digest));
+  for I := 0 to high(Digest) do
+    i_key_pad[i+1] := AnsiChar(Digest[i]);
+
+  result := ALStringHashMD5(o_key_pad + i_key_pad); // result := hash(o_key_pad + hash(i_key_pad + message))
 end;
 
 end.

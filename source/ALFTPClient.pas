@@ -10,7 +10,7 @@ Version:      4.00
 Description:  TALFTPClient is a ancestor base class of
               TALWinInetFTPClient
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -51,7 +51,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFTPClient;
 
@@ -142,20 +142,28 @@ type
   public
     constructor Create(Owner: TComponent); override;
     destructor Destroy; override;
-    procedure CreateDirectory(Directory: AnsiString); virtual;
-    procedure DeleteFile(FileName: AnsiString); virtual;
-    Function  FindFirst(const Path: AnsiString; Attr: Integer; var F: TALFtpclientSearchRec): Integer; virtual;
+    procedure CreateDirectory(const Directory: AnsiString); virtual;
+    procedure DeleteFile(const FileName: AnsiString); virtual;
+    Function  FindFirst(const Path: AnsiString;
+                        const Attr: Integer;
+                        var F: TALFtpclientSearchRec): Integer; virtual;
     Function  FindNext(var F: TALFtpclientSearchRec): Integer; virtual;
     procedure FindClose(var F: TALFtpclientSearchRec); virtual;
     Function  GetCurrentDirectory: AnsiString; virtual;
-    Procedure GetFile(RemoteFile: AnsiString; LocalFile: AnsiString; FailIfExists: Boolean); overload; virtual;
-    Procedure GetFile(RemoteFile: AnsiString; DataStream: Tstream); overload; virtual;
-    Function  GetFileSize(filename: AnsiString): Longword; virtual;
-    Procedure PutFile(LocalFile: AnsiString; Remotefile: AnsiString); overload; virtual;
-    Procedure PutFile(DataStream: TStream; Remotefile: AnsiString); overload; virtual;
-    Procedure RemoveDirectory(Directory: AnsiString); virtual;
-    Procedure RenameFile(ExistingFile, NewFile: AnsiString); virtual;
-    Procedure SetCurrentDirectory(Directory: AnsiString); virtual;
+    Procedure GetFile(const RemoteFile: AnsiString;
+                      const LocalFile: AnsiString;
+                      FailIfExists: Boolean); overload; virtual;
+    Procedure GetFile(const RemoteFile: AnsiString;
+                      DataStream: Tstream); overload; virtual;
+    Function  GetFileSize(const filename: AnsiString): Longword; virtual;
+    Procedure PutFile(const LocalFile: AnsiString;
+                      const Remotefile: AnsiString); overload; virtual;
+    Procedure PutFile(DataStream: TStream;
+                      const Remotefile: AnsiString); overload; virtual;
+    Procedure RemoveDirectory(const Directory: AnsiString); virtual;
+    Procedure RenameFile(const ExistingFile: AnsiString;
+                         const NewFile: AnsiString); virtual;
+    Procedure SetCurrentDirectory(const Directory: AnsiString); virtual;
     procedure Connect; virtual;
     procedure Disconnect; virtual;
   published
@@ -240,20 +248,22 @@ begin
   If Value >= 0 then FUploadBufferSize := Value;
 end;
 
+{******************************************************************}
+procedure TALFTPClient.CreateDirectory(const Directory: AnsiString);
+begin
+//virtual
+end;
+
 {************************************************************}
-procedure TALFTPClient.CreateDirectory(Directory: AnsiString);
+procedure TALFTPClient.DeleteFile(const FileName: AnsiString);
 begin
 //virtual
 end;
 
-{******************************************************}
-procedure TALFTPClient.DeleteFile(FileName: AnsiString);
-begin
-//virtual
-end;
-
-{************************************************************************************************************}
-function TALFTPClient.FindFirst(const Path: AnsiString; Attr: Integer; var F: TALFtpclientSearchRec): Integer;
+{*****************************************************}
+function TALFTPClient.FindFirst(const Path: AnsiString;
+                                const Attr: Integer;
+                                var F: TALFtpclientSearchRec): Integer;
 begin
   //virtual
   Result := 0;
@@ -279,51 +289,57 @@ begin
   Result := '';
 end;
 
-{**************************************************************************}
-procedure TALFTPClient.GetFile(RemoteFile: AnsiString; DataStream: Tstream);
+{**********************************************************}
+procedure TALFTPClient.GetFile(const RemoteFile: AnsiString;
+                               DataStream: Tstream);
 begin
   //virtual
 end;
 
-{***************************************************************************************}
-procedure TALFTPClient.GetFile(RemoteFile, LocalFile: AnsiString; FailIfExists: Boolean);
+{**********************************************************}
+procedure TALFTPClient.GetFile(const RemoteFile: AnsiString;
+                               const LocalFile: AnsiString;
+                               FailIfExists: Boolean);
 begin
 //virtual
 end;
 
-{****************************************************************}
-function TALFTPClient.GetFileSize(filename: AnsiString): Longword;
+{**********************************************************************}
+function TALFTPClient.GetFileSize(const filename: AnsiString): Longword;
 begin
   //virtual
   Result := 0;
 end;
 
-{**************************************************************************}
-procedure TALFTPClient.PutFile(DataStream: TStream; Remotefile: AnsiString);
+{*************************************************}
+procedure TALFTPClient.PutFile(DataStream: TStream;
+                               const Remotefile: AnsiString);
 begin
 //virtual
 end;
 
-{****************************************************************}
-procedure TALFTPClient.PutFile(LocalFile, Remotefile: AnsiString);
+{*********************************************************}
+procedure TALFTPClient.PutFile(const LocalFile: AnsiString;
+                               const Remotefile: AnsiString);
 begin
 //virtual
 end;
 
-{************************************************************}
-procedure TALFTPClient.RemoveDirectory(Directory: AnsiString);
+{******************************************************************}
+procedure TALFTPClient.RemoveDirectory(const Directory: AnsiString);
 begin
 //virtual
 end;
 
-{*******************************************************************}
-procedure TALFTPClient.RenameFile(ExistingFile, NewFile: AnsiString);
+{***************************************************************}
+procedure TALFTPClient.RenameFile(const ExistingFile: AnsiString;
+                                  const NewFile: AnsiString);
 begin
 //virtual
 end;
 
-{****************************************************************}
-procedure TALFTPClient.SetCurrentDirectory(Directory: AnsiString);
+{**********************************************************************}
+procedure TALFTPClient.SetCurrentDirectory(const Directory: AnsiString);
 begin
 //virtual
 end;

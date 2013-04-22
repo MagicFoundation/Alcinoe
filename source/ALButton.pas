@@ -95,6 +95,7 @@ Uses Messages,
      AlFcnSkin;
 
 type
+
   {-------------------------------------}
   TALFocusStyle = (ALFSNone, ALFSBorder);
 

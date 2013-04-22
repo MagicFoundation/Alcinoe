@@ -9,7 +9,7 @@ Version:      4.01
 
 Description:  Alcinoe file Management Routines
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -56,7 +56,7 @@ Link :
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFcnFile;
 
@@ -64,14 +64,20 @@ interface
 
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
+                           IgnoreFiles: Array of AnsiString;
                            Const RemoveEmptySubDirectory: Boolean = True;
                            Const FileNameMask: ansiString = '*';
-                           Const MinFileAge: TdateTime = 0): Boolean;
+                           Const MinFileAge: TdateTime = 0): Boolean; overload;
+Function  AlEmptyDirectory(Directory: ansiString;
+                           SubDirectory: Boolean;
+                           Const RemoveEmptySubDirectory: Boolean = True;
+                           Const FileNameMask: ansiString = '*';
+                           Const MinFileAge: TdateTime = 0): Boolean; overload;
 Function  AlCopyDirectory(SrcDirectory,
                           DestDirectory: ansiString;
                           SubDirectory: Boolean;
                           Const FileNameMask: ansiString = '*';
-                          Const ErraseIfExist: Boolean = False): Boolean;
+                          Const FailIfExists: Boolean = True): Boolean;
 function  ALGetModuleName: ansistring;
 function  ALGetModuleFileNameWithoutExtension: ansistring;
 function  ALGetModulePath: ansiString;
@@ -83,14 +89,77 @@ function  ALGetFileLastAccessDateTime(const aFileName: Ansistring): TDateTime;
 Procedure ALSetFileCreationDateTime(Const aFileName: Ansistring; Const aCreationDateTime: TDateTime);
 function  ALIsDirectoryEmpty(const directory: ansiString): boolean;
 function  ALFileExists(const Path: ansiString): boolean;
+function  ALDirectoryExists(const Directory: Ansistring): Boolean;
+function  ALCreateDir(const Dir: Ansistring): Boolean;
+function  ALRemoveDir(const Dir: Ansistring): Boolean;
+function  ALDeleteFile(const FileName: Ansistring): Boolean;
+function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
 
 implementation
 
 uses Windows,
+     Classes,
      ShLwApi,
      Masks,
      sysutils,
+     alStringList,
      alFcnString;
+
+{***********************************************}
+Function  AlEmptyDirectory(Directory: ansiString;
+                           SubDirectory: Boolean;
+                           IgnoreFiles: Array of AnsiString;
+                           Const RemoveEmptySubDirectory: Boolean = True;
+                           Const FileNameMask: ansiString = '*';
+                           Const MinFileAge: TdateTime = 0): Boolean;
+var sr: TSearchRec;
+    aIgnoreFilesLst: TalStringList;
+    i: integer;
+begin
+  {$WARN SYMBOL_DEPRECATED OFF}
+  {$WARN SYMBOL_PLATFORM OFF}
+  Result := True;
+  Directory := ALIncludeTrailingPathDelimiter(Directory);
+  aIgnoreFilesLst := TalStringList.Create;
+  try
+    for I := 0 to length(IgnoreFiles) - 1 do aIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[i]));
+    aIgnoreFilesLst.Duplicates := DupIgnore;
+    aIgnoreFilesLst.Sorted := True;
+    if FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
+      Try
+        repeat
+          If (sr.Name <> '.') and
+             (sr.Name <> '..') and
+             (aIgnoreFilesLst.IndexOf(Directory + ansistring(sr.Name)) < 0) Then Begin
+            If ((sr.Attr and faDirectory) <> 0) then begin
+              If SubDirectory then begin
+                Result := AlEmptyDirectory(Directory + ansistring(sr.Name),
+                                           True,
+                                           IgnoreFiles,
+                                           RemoveEmptySubDirectory,
+                                           fileNameMask,
+                                           MinFileAge);
+                If result and RemoveEmptySubDirectory then RemoveDir(string(Directory) + sr.Name);
+              end;
+            end
+            else If ((FileNameMask = '*') or
+                     ALMatchesMask(AnsiString(sr.Name), FileNameMask))
+                    and
+                    ((MinFileAge<=0) or
+                     (FileDateToDateTime(sr.Time) < MinFileAge))
+            then Result := Deletefile(string(Directory) + sr.Name);
+          end;
+        until (not result) or (FindNext(sr) <> 0);
+      finally
+        FindClose(sr);
+      end;
+    end;
+  finally
+    aIgnoreFilesLst.Free;
+  end;
+  {$WARN SYMBOL_DEPRECATED ON}
+  {$WARN SYMBOL_PLATFORM ON}
+end;
 
 {**********************************************}
 Function AlEmptyDirectory(Directory: ansiString;
@@ -98,46 +167,13 @@ Function AlEmptyDirectory(Directory: ansiString;
                           Const RemoveEmptySubDirectory: Boolean = True;
                           Const FileNameMask: ansiString = '*';
                           Const MinFileAge: TdateTime = 0): Boolean;
-var sr: TSearchRec;
-    aBool: Boolean;
 begin
-  {$WARN SYMBOL_DEPRECATED OFF}
-  {$WARN SYMBOL_PLATFORM OFF}
-  Result := True;
-  Directory := ALIncludeTrailingPathDelimiter(Directory);
-  if FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
-    Try
-      repeat
-        If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
-          If ((sr.Attr and faDirectory) <> 0) then begin
-            If SubDirectory then begin
-              Result := AlEmptyDirectory(Directory + ansistring(sr.Name),
-                                         True,
-                                         RemoveEmptySubDirectory,
-                                         fileNameMask,
-                                         MinFileAge) and Result;
-              If RemoveEmptySubDirectory then begin
-                Abool := RemoveDir(string(Directory) + sr.Name);
-                If result and (fileNameMask = '*') then Result := Abool;
-              end;
-            end;
-          end
-          else If ((FileNameMask = '*') or
-                   MatchesMask(sr.Name, string(FileNameMask)))
-                  and
-                  ((MinFileAge<=0) or
-                   (FileDateToDateTime(sr.Time) < MinFileAge))
-          then begin
-            Result := Deletefile(string(Directory) + sr.Name) and result;
-          end;
-        end;
-      until FindNext(sr) <> 0;
-    finally
-      FindClose(sr);
-    end;
-  end;
-  {$WARN SYMBOL_DEPRECATED ON}
-  {$WARN SYMBOL_PLATFORM ON}
+  result := AlEmptyDirectory(Directory,
+                             SubDirectory,
+                             [],
+                             RemoveEmptySubDirectory,
+                             FileNameMask,
+                             MinFileAge);
 end;
 
 {************************************}
@@ -145,9 +181,8 @@ Function AlCopyDirectory(SrcDirectory,
                          DestDirectory: ansiString;
                          SubDirectory: Boolean;
                          Const FileNameMask: ansiString = '*';
-                         Const ErraseIfExist: Boolean = False): Boolean;
+                         Const FailIfExists: Boolean = True): Boolean;
 var sr: TSearchRec;
-    aBool: Boolean;
 begin
   Result := True;
   SrcDirectory := ALIncludeTrailingPathDelimiter(SrcDirectory);
@@ -162,24 +197,20 @@ begin
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
           If ((sr.Attr and faDirectory) <> 0) then begin
-            If SubDirectory and
-               (not AlCopyDirectory(SrcDirectory + ansiString(sr.Name),
-                                    DestDirectory + ansiString(sr.Name),
-                                    SubDirectory,
-                                    FileNameMask,
-                                    ErraseIfExist))
-            then Result := False;
+            If SubDirectory then Result := AlCopyDirectory(SrcDirectory + ansiString(sr.Name),
+                                                           DestDirectory + ansiString(sr.Name),
+                                                           SubDirectory,
+                                                           FileNameMask,
+                                                           FailIfExists);
           end
-          else If ((FileNameMask = '*') or
-                   MatchesMask(sr.Name, string(FileNameMask))) then begin
-            If (not fileExists(String(DestDirectory) + sr.Name)) or ErraseIfExist then abool := Copyfile(PChar(String(SrcDirectory) + sr.Name),
-                                                                                                         PChar(String(DestDirectory) + sr.Name),
-                                                                                                         not ErraseIfExist)
-            else aBool := True;
-            If result then result := aBool;
+          else If (FileNameMask = '*') or
+                  (ALMatchesMask(AnsiString(sr.Name), FileNameMask)) then begin
+            result := CopyfileA(PAnsiChar(SrcDirectory + AnsiString(sr.Name)),
+                                PAnsiChar(DestDirectory + AnsiString(sr.Name)),
+                                FailIfExists);
           end;
         end;
-      until FindNext(sr) <> 0;
+      until (not result) or (FindNext(sr) <> 0);
     finally
       FindClose(sr);
     end;
@@ -328,6 +359,36 @@ end;
 function  ALFileExists(const Path: ansiString): boolean;
 begin
   result := PathFileExistsA(PansiChar(Path)) and (not PathIsDirectoryA(PansiChar(Path)));
+end;
+
+{****************************************************************}
+function  ALDirectoryExists(const Directory: Ansistring): Boolean;
+begin
+  result := PathFileExistsA(PansiChar(Directory)) and (PathIsDirectoryA(PansiChar(Directory)));
+end;
+
+{****************************************************}
+function  ALCreateDir(const Dir: Ansistring): Boolean;
+begin
+  Result := CreateDirectoryA(PAnsiChar(Dir), nil);
+end;
+
+{****************************************************}
+function  ALRemoveDir(const Dir: Ansistring): Boolean;
+begin
+  Result := RemoveDirectoryA(PansiChar(Dir));
+end;
+
+{**********************************************************}
+function  ALDeleteFile(const FileName: Ansistring): Boolean;
+begin
+  Result := DeleteFileA(PAnsiChar(FileName));
+end;
+
+{******************************************************************}
+function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
+begin
+  Result := MoveFileA(PansiChar(OldName), PansiChar(NewName));
 end;
 
 end.

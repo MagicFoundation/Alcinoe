@@ -10,7 +10,7 @@ Version:      4.00
 Description:  TALIntegerList or TALDoubleList that work exactly
               like TstringList but with integer or Double.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -50,8 +50,8 @@ Link :
 * Please send all your feedback to svanderclock@arkadia.com
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+* Please, help us to keep the development of these components free by
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALQuickSortList;
 
@@ -739,11 +739,13 @@ end;
 
 {****************************************************************************}
 function TALCardinalList.CompareItems(const Index1, Index2: integer): Integer;
-var aInt: Integer;
+var aCard1: Cardinal;
+    aCard2: Cardinal;
 begin
-  aInt := PALCardinalListItem(Get(Index1))^.FCardinal - PALCardinalListItem(Get(Index2))^.FCardinal;
-  if aInt < 0 then result := -1
-  else if aInt > 0 then result := 1
+  aCard1 := PALCardinalListItem(Get(Index1))^.FCardinal;
+  aCard2 := PALCardinalListItem(Get(Index2))^.FCardinal;
+  if aCard1 < aCard2 then result := -1
+  else if aCard1 > aCard2 then result := 1
   else result := 0;
 end;
 
@@ -751,13 +753,11 @@ end;
 function TALCardinalList.Find(item: Cardinal; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {---------------------------------------------------------}
-  Function internalCompareCardinal(D1,D2: Cardinal): Integer;
-  Var aInt: Integer;
+  {--------------------------------------------------}
+  Function _CompareCardinal(D1,D2: Cardinal): Integer;
   Begin
-    aInt := D1 - D2;
-    if aInt < 0 then result := -1
-    else if aInt > 0 then result := 1
+    if D1 < D2 then result := -1
+    else if D1 > D2 then result := 1
     else result := 0;
   end;
 
@@ -767,7 +767,7 @@ begin
   H := FCount - 1;
   while L <= H do begin
     I := (L + H) shr 1;
-    C := internalCompareCardinal(GetItem(I),item);
+    C := _CompareCardinal(GetItem(I),item);
     if C < 0 then L := I + 1
     else begin
       H := I - 1;
@@ -909,13 +909,11 @@ end;
 function TALInt64List.Find(item: Int64; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {---------------------------------------------------}
-  Function internalCompareInt64(D1,D2: Int64): Integer;
-  Var aInt64: Int64;
+  {--------------------------------------------}
+  Function _CompareInt64(D1,D2: Int64): Integer;
   Begin
-    aInt64 := D1 - D2;
-    if aInt64 < 0 then result := -1
-    else if aInt64 > 0 then result := 1
+    if D1 < D2 then result := -1
+    else if D1 > D2 then result := 1
     else result := 0;
   end;
 
@@ -925,7 +923,7 @@ begin
   H := FCount - 1;
   while L <= H do begin
     I := (L + H) shr 1;
-    C := internalCompareInt64(GetItem(I),item);
+    C := _CompareInt64(GetItem(I),item);
     if C < 0 then L := I + 1
     else begin
       H := I - 1;
@@ -1067,13 +1065,11 @@ end;
 function TALDoubleList.Find(item: Double; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {-----------------------------------------------------}
-  Function internalCompareDouble(D1,D2: Double): Integer;
-  Var aDouble: Double;
+  {----------------------------------------------}
+  Function _CompareDouble(D1,D2: Double): Integer;
   Begin
-    aDouble := D1 - D2;
-    if adouble < 0 then result := -1
-    else if adouble > 0 then result := 1
+    if D1 < D2 then result := -1
+    else if D1 > D2 then result := 1
     else result := 0;
   end;
 
@@ -1083,7 +1079,7 @@ begin
   H := FCount - 1;
   while L <= H do begin
     I := (L + H) shr 1;
-    C := internalCompareDouble(GetItem(I),item);
+    C := _CompareDouble(GetItem(I),item);
     if C < 0 then L := I + 1
     else begin
       H := I - 1;

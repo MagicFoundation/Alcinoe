@@ -437,22 +437,20 @@ begin
     end;
 
     if ALMemoFireBirdParams.Lines.Count > 0 then begin
-      Setlength(aSQL.Params, 1);
-      Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
+      Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
       for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
         aLst1 := TALStringList.create;
         try
-          aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                             '<#',
-                                                             '>',
-                                                             SQLFastTagReplaceFunct,
-                                                             True,
-                                                             @aLst1)
+          aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   @aLst1)
         finally
           aLst1.free;
         end;
-        aSQL.Params[0].fields[i].isnull := False;
-        aSQL.Params[0].fields[i].isblob := False;
+        aSQL.Params[i].isnull := False;
       end;
     end
     else Setlength(aSQL.Params, 0);
@@ -536,22 +534,20 @@ begin
   end;
 
   if ALMemoFireBirdParams.Lines.Count > 0 then begin
-    Setlength(aSQL.Params, 1);
-    Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
+    Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
     for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
       aLst1 := TALStringList.create;
       try
-        aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                           '<#',
-                                                           '>',
-                                                           SQLFastTagReplaceFunct,
-                                                           True,
-                                                           @aLst1)
+        aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 @aLst1)
       finally
         aLst1.free;
       end;
-      aSQL.Params[0].fields[i].isnull := False;
-      aSQL.Params[0].fields[i].isblob := False;
+      aSQL.Params[i].isnull := False;
     end;
   end
   else Setlength(aSQL.Params, 0);
@@ -959,7 +955,7 @@ begin
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
-  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;
 end;

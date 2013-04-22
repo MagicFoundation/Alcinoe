@@ -23,13 +23,17 @@ type
     ALButton5: TALButton;
     ALButton6: TALButton;
     ALButton7: TALButton;
-    ALButton8: TALButton;
-    ALButton9: TALButton;
     Panel2: TPanel;
     Label7: TLabel;
     Label8: TLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
+    ALButton10: TALButton;
+    ALButton11: TALButton;
+    ALButton8: TALButton;
+    ALButton9: TALButton;
+    ALButton12: TALButton;
+    ALButton13: TALButton;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton1Paint(Sender: TObject; var continue: Boolean);
     procedure ALButton3Click(Sender: TObject);
@@ -42,10 +46,14 @@ type
     procedure EditKeyPaint(Sender: TObject; var continue: Boolean);
     procedure ALButton6Click(Sender: TObject);
     procedure ALButton7Click(Sender: TObject);
-    procedure ALButton8Click(Sender: TObject);
-    procedure ALButton9Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure ALButton10Click(Sender: TObject);
+    procedure ALButton11Click(Sender: TObject);
+    procedure ALButton8Click(Sender: TObject);
+    procedure ALButton9Click(Sender: TObject);
+    procedure ALButton12Click(Sender: TObject);
+    procedure ALButton13Click(Sender: TObject);
   private
   public
   end;
@@ -54,7 +62,8 @@ var Form1: TForm1;
 
 implementation
 
-uses alFcnSkin,
+uses math,
+     alFcnSkin,
      alFcnMisc,
      AlAVLBinaryTree,
      alFcnString,
@@ -72,15 +81,91 @@ begin
   for X:=1 to aLength do Result[X] := ansiChar(Random(256));
 end;
 
+{************************************************}
+procedure TForm1.ALButton10Click(Sender: TObject);
+Var Data: AnsiString;
+    Counter: integer;
+    StartTime: DWORD;
+begin
+  if (Sender as TALButton).Tag = 1 then begin
+    (Sender as TALButton).Tag := 0;
+    (Sender as TALButton).Caption := 'Bench MD5';
+    exit;
+  end;
+  (Sender as TALButton).Tag := 1;
+  (Sender as TALButton).Caption := 'Stop';
+  randomize;
+  Counter := 0;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
+  Data := ALRandomStr(250);
+  while True do begin
+    ALStringHashMD5(Data);
+    inc(counter);
+    if counter mod 1000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'MD5';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
+      if (Sender as TALButton).Tag = 0 then break;
+      application.ProcessMessages;
+    end;
+  end;
+end;
+
+{***********************************************}
+procedure TForm1.ALButton11Click(Sender: TObject);
+Var Data: AnsiString;
+    Counter: integer;
+    StartTime: DWORD;
+begin
+  if (Sender as TALButton).Tag = 1 then begin
+    (Sender as TALButton).Tag := 0;
+    (Sender as TALButton).Caption := 'Bench SHA1';
+    exit;
+  end;
+  (Sender as TALButton).Tag := 1;
+  (Sender as TALButton).Caption := 'Stop';
+  randomize;
+  Counter := 0;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
+  Data := ALRandomStr(250);
+  while True do begin
+    ALStringHashSHA1(Data);
+    inc(counter);
+    if counter mod 1000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'SHA1';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
+      if (Sender as TALButton).Tag = 0 then break;
+      application.ProcessMessages;
+    end;
+  end;
+end;
+
+{************************************************}
+procedure TForm1.ALButton12Click(Sender: TObject);
+begin
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA1(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
+end;
+
+{************************************************}
+procedure TForm1.ALButton13Click(Sender: TObject);
+begin
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA1(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
+end;
+
 {***********************************************}
 procedure TForm1.ALButton1Click(Sender: TObject);
-Var Key: AnsiString;
-    Data: AnsiString;
-    Str1, Str2: AnsiString;
+Var Data: AnsiString;
+    Key: AnsiString;
     Counter: integer;
-    DataCount: longint;
     StartTime: DWORD;
-    RemoveTime: DWORD;
+    Str1, Str2: AnsiString;
 begin
   if (Sender as TALButton).Tag = 1 then begin
     (Sender as TALButton).Tag := 0;
@@ -91,23 +176,22 @@ begin
   (Sender as TALButton).Caption := 'Stop';
   randomize;
   Counter := 0;
-  DataCount := 0;
-  StartTime := GetTickCount;
   StatusBar1.Panels[0].Text := '';
-  ALMemoDecryptedData.SetFocus;
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
   while True do begin
-    RemoveTime := GetTickCount;
-    if (Sender as TALButton).Tag = 0 then break;
-    Data := internalRandomStr(random(32768));
-    datacount := datacount + length(data);
-    Key := AlRandomStr(Random(40));
-    StartTime := StartTime + (GetTickCount - RemoveTime);
+    Data := ALRandomStr(250);
+    Key := AlRandomStr(40);
     ALRDLEncryptString(Data, Str1, Key, True);
     ALRDLEncryptString(Str1, Str2, Key, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
-    if counter mod 100 = 0 then begin
-      StatusBar1.Panels[0].Text := 'AES (EBC): ' + IntToStr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
+    if counter mod 1000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'AES (EBC)';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' encrypts & decrypts /s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes - Key: '+inttostr(length(Key))+' bytes';
+      if (Sender as TALButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -115,13 +199,11 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton3Click(Sender: TObject);
-Var Key: AnsiString;
-    Data: AnsiString;
-    Str1, Str2: AnsiString;
+Var Data: AnsiString;
+    Key: AnsiString;
     Counter: integer;
-    DataCount: longint;
     StartTime: DWORD;
-    RemoveTime: DWORD;
+    Str1, Str2: AnsiString;
 begin
   if (Sender as TALButton).Tag = 1 then begin
     (Sender as TALButton).Tag := 0;
@@ -132,23 +214,22 @@ begin
   (Sender as TALButton).Caption := 'Stop';
   randomize;
   Counter := 0;
-  DataCount := 0;
-  StartTime := GetTickCount;
+  StatusBar1.Panels[0].Text := '';
   StatusBar1.Panels[1].Text := '';
-  ALMemoDecryptedData.SetFocus;
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
   while True do begin
-    RemoveTime := GetTickCount;
-    if (Sender as TALButton).Tag = 0 then break;
-    Data := internalRandomStr(random(32768));
-    datacount := datacount + length(data);
-    Key := AlRandomStr(Random(40));
-    StartTime := StartTime + (GetTickCount - RemoveTime);
+    Data := ALRandomStr(250);
+    Key := AlRandomStr(40);
     ALRDLEncryptStringCBC(Data, Str1, Key, True);
     ALRDLEncryptStringCBC(Str1, Str2, Key, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
-    if counter mod 100 = 0 then begin
-      StatusBar1.Panels[1].Text := 'AES (CBC): ' + IntToStr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
+    if counter mod 1000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'AES (CBC)';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' encrypts & decrypts /s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes - Key: '+inttostr(length(Key))+' bytes';
+      if (Sender as TALButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -156,13 +237,11 @@ end;
 
 {***********************************************}
 procedure TForm1.ALButton4Click(Sender: TObject);
-Var Key: AnsiString;
-    Data: AnsiString;
-    Str1, Str2: AnsiString;
+Var Data: AnsiString;
+    Key: AnsiString;
     Counter: integer;
-    DataCount: longint;
     StartTime: DWORD;
-    RemoveTime: DWORD;
+    Str1, Str2: AnsiString;
 begin
   if (Sender as TALButton).Tag = 1 then begin
     (Sender as TALButton).Tag := 0;
@@ -173,23 +252,22 @@ begin
   (Sender as TALButton).Caption := 'Stop';
   randomize;
   Counter := 0;
-  DataCount := 0;
-  StartTime := GetTickCount;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
   StatusBar1.Panels[2].Text := '';
-  ALMemoDecryptedData.SetFocus;
+  StartTime := GetTickCount;
   while True do begin
-    RemoveTime := GetTickCount;
-    if (Sender as TALButton).Tag = 0 then break;
-    Data := internalRandomStr(random(32768));
-    datacount := datacount + length(data);
-    Key := AlRandomStr(Random(40));
-    StartTime := StartTime + (GetTickCount - RemoveTime);
+    Data := ALRandomStr(250);
+    Key := AlRandomStr(40);
     ALBFEncryptString(Data, Str1, Key, True);
     ALBFEncryptString(Str1, Str2, Key, false);
     if str2 <> Data then Raise Exception.Create('!!Abnormal Error!!');
     inc(counter);
-    if counter mod 100 = 0 then begin
-      StatusBar1.Panels[2].Text := 'BF (EBC): ' + IntToStr(round((datacount / 1000) / ((GetTickCount - StartTime) / 1000))) + ' ko/s';
+    if counter mod 1000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'Blowfish (EBC)';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' encrypts & decrypts /s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes - Key: '+inttostr(length(Key))+' bytes';
+      if (Sender as TALButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -207,7 +285,7 @@ end;
 procedure TForm1.ALButton6Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), True);
+  ALRDLEncryptString(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), True);
   ALMemoCryptedData.Lines.Text := String(ALMimeBase64EncodeStringNoCRLF(outString));
 end;
 
@@ -215,78 +293,24 @@ end;
 procedure TForm1.ALButton7Click(Sender: TObject);
 Var outString: AnsiString;
 begin
-  ALRDLEncryptStringCBC(ALMimeBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), False);
+  ALRDLEncryptString(ALMimeBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), False);
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
 {***********************************************}
 procedure TForm1.ALButton8Click(Sender: TObject);
-Var aBinTree: TALStringKeyAVLBinaryTree;
-    aNode: TALStringKeyAVLBinaryTreeNode;
-    Counter: Integer;
+Var outString: AnsiString;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Check SHA1 Hash';
-    exit;
-  end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
-
-  StatusBar1.Panels[0].Text := '';
-  aBinTree := TALStringKeyAVLBinaryTree.Create;
-  counter := 0;
-  while true do begin
-    if (Sender as TALButton).Tag = 0 then break;
-    aNode := TALStringKeyAVLBinaryTreeNode.Create;
-    ANode.ID := ALStringHashSHA1(ALMakeKeyStrByGUID + ' ' + internalRandomStr(random(8192)));
-    if not aBinTree.AddNode(aNode) then begin
-      Showmessage('1 Collision Found!');
-      aNode.free;
-      Exit;
-    end;
-    inc(counter);
-    if (counter mod 1000 = 0) then begin
-      StatusBar1.Panels[0].Text := IntToStr(counter) + ' items generated';
-      application.ProcessMessages;
-    end;
-  end;
-  aBinTree.free;
+  ALRDLEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), True);
+  ALMemoCryptedData.Lines.Text := String(ALMimeBase64EncodeStringNoCRLF(outString));
 end;
 
 {***********************************************}
 procedure TForm1.ALButton9Click(Sender: TObject);
-Var aBinTree: TALStringKeyAVLBinaryTree;
-    aNode: TALStringKeyAVLBinaryTreeNode;
-    Counter: Integer;
+Var outString: AnsiString;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Check MD5 Hash';
-    exit;
-  end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
-
-  aBinTree := TALStringKeyAVLBinaryTree.Create;
-  counter := 0;
-  StatusBar1.Panels[1].Text := '';
-  while true do begin
-    if (Sender as TALButton).Tag = 0 then break;
-    aNode := TALStringKeyAVLBinaryTreeNode.Create;
-    ANode.ID := ALStringHashMD5(ALMakeKeyStrByGUID + ' ' + internalRandomStr(random(2048)));
-    if not aBinTree.AddNode(aNode) then begin
-      Showmessage('1 Collision Found!');
-      aNode.free;
-      Exit;
-    end;
-    inc(counter);
-    if (counter mod 1000 = 0) then begin
-      StatusBar1.Panels[1].Text := IntToStr(counter) + ' items generated';
-      application.ProcessMessages;
-    end;
-  end;
-  aBinTree.free;
+  ALRDLEncryptStringCBC(ALMimeBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), False);
+  ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
 {********************************************************************************}
@@ -344,7 +368,7 @@ begin
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
-  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;
 end;

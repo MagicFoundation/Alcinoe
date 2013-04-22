@@ -17,7 +17,7 @@ Description:  An object to query Sqlite3 database and get
               SQLite is the most widely deployed SQL database engine
               in the world.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -58,7 +58,7 @@ Link :        http://www.sqlite.org/
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit AlSqlite3Client;
 
@@ -94,8 +94,10 @@ Type
     SQL: AnsiString;
     RowTag: AnsiString;
     ViewTag: AnsiString;
-    Skip: integer;
-    First: Integer;
+    Skip: integer;  // used only if value is > 0
+    First: Integer; // used only if value is > 0
+    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                             // cache or not. Values <= 0 deactivate the cache
   end;
   TalSqlite3ClientSelectDataSQLs = array of TalSqlite3ClientSelectDataSQL;
 
@@ -675,9 +677,6 @@ begin
             inc(aRecIndex);
             If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-              //stop if no row are requested
-              If (SQLs[aSQLsindex].First = 0) then break;
-
               //init NewRec
               if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
               Else aNewRec := aViewRec;
@@ -703,7 +702,7 @@ begin
 
               //handle the First
               inc(aRecAdded);
-              If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+              If (SQLs[aSQLsindex].First > 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
 
             end;
 
@@ -758,6 +757,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -776,8 +776,9 @@ begin
   aSelectDataSQLs[0].Sql := Sql;
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -829,6 +830,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -847,8 +849,9 @@ begin
   aSelectDataSQLs[0].Sql := Sql;
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -866,8 +869,9 @@ begin
   aSelectDataSQLs[0].Sql := Sql;
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1457,9 +1461,6 @@ begin
               inc(aRecIndex);
               If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-                //stop if no row are requested
-                If (SQLs[aSQLsindex].First = 0) then break;
-
                 //init NewRec
                 if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument))  then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
                 Else aNewRec := aViewRec;
@@ -1485,7 +1486,7 @@ begin
 
                 //handle the First
                 inc(aRecAdded);
-                If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+                If (SQLs[aSQLsindex].First > 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
 
               end;
 
@@ -1558,6 +1559,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -1578,8 +1580,9 @@ begin
   aSelectDataSQLs[0].Sql := Sql;
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -1635,6 +1638,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1655,8 +1659,9 @@ begin
   aSelectDataSQLs[0].Sql := Sql;
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1676,8 +1681,9 @@ begin
   aSelectDataSQLs[0].Sql := Sql;
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,

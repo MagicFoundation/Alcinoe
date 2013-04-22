@@ -1,5 +1,5 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
+www:          http://sourceforge.net/projects/alcinoe/
 svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
 Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
@@ -9,7 +9,7 @@ Version:      4.00
 
 Description:  Retrieving Data as XML from Firebird Server.
 
-Legal issues: Copyright (C) 1999-2012 by Arkadia Software Engineering
+Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
               This software is provided 'as-is', without any express
               or implied warranty.  In no event will the author be
@@ -48,6 +48,7 @@ History :     02/03/2010: add aNumbuffers: Integer to the connect
                           field xxx
               29/01/2012: Add also a way to do Update SQL with params
               26/06/2012: Add xe2 support
+              03/03/2013: remove TALFBXClientSQLParam.isBlob => useless !
 
 Link :        http://www.progdigy.com/modules.php?name=UIB
 
@@ -55,7 +56,7 @@ Link :        http://www.progdigy.com/modules.php?name=UIB
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
-  promoting the sponsor on http://www.arkadia.com/html/alcinoe_like.html
+  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALFBXClient;
 
@@ -82,33 +83,32 @@ Type
                                                   Var Continue: Boolean);
 
 
-  {--------------------------------}
-  TALFBXClientSQLParamField = record
+  {----------------------------}
+  TALFBXClientSQLParam = record
     Value: AnsiString;
     IsNull: Boolean;
-    IsBlob: Boolean;
   end;
-  TALFBXClientSQLParam = record
-    fields: array of TALFBXClientSQLParamField;
-  end;
+  TALFBXClientSQLParams = array of TALFBXClientSQLParam;
 
   {--------------------------------}
   TALFBXClientSelectDataSQL = record
     SQL: AnsiString;
-    Params: array of TALFBXClientSQLParam; // use to replace the ? in SQL like
-                                           // Select ... from TableA(FieldA) where Values = ?
+    Params: TALFBXClientSQLParams; // use to replace the ? in SQL like
+                                   // Select ... from TableA(FieldA) where Values = ?
     RowTag: AnsiString;
     ViewTag: AnsiString;
-    Skip: integer;
-    First: Integer;
+    Skip: integer; // used only if value is > 0
+    First: Integer; // used only if value is > 0
+    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                             // cache or not. Values <= 0 deactivate the cache
   end;
   TALFBXClientSelectDataSQLs = array of TALFBXClientSelectDataSQL;
 
   {--------------------------------}
   TALFBXClientUpdateDataSQL = record
     SQL: AnsiString;
-    Params: array of TALFBXClientSQLParam; // use to replace the ? in SQL like
-                                           // insert into TableA(FieldA) Values(?)
+    Params: TALFBXClientSQLParams; // use to replace the ? in SQL like
+                                   // insert into TableA(FieldA) Values(?)
   end;
   TALFBXClientUpdateDataSQLs = array of TALFBXClientUpdateDataSQL;
 
@@ -241,19 +241,19 @@ Type
                          XMLDATA: TalXMLNode;
                          FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TALFormatSettings); overload;
     Procedure SelectData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TALFormatSettings); overload;
     procedure UpdateData(SQLs: TALFBXClientUpdateDataSQLs); overload;
@@ -261,7 +261,7 @@ Type
     procedure UpdateData(SQLs: TALStrings); overload;
     procedure UpdateData(SQL: AnsiString); overload;
     procedure UpdateData(SQL: AnsiString;
-                         Param: Array of AnsiString); overload;
+                         Params: Array of AnsiString); overload;
     procedure UpdateData(SQLs: Array of AnsiString); overload;
     Property  Connected: Boolean Read GetConnected;
     property  SqlDialect: word read FSqlDialect;
@@ -441,7 +441,7 @@ Type
                        const aNumbuffers: integer = -1;
                        const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
     Destructor  Destroy; Override;
-    Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;    
+    Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     procedure GetMonitoringInfos(ConnectionID,
                                  TransactionID: int64;
                                  StatementSQL: AnsiString;
@@ -563,7 +563,7 @@ Type
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
@@ -574,7 +574,7 @@ Type
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TALFormatSettings;
@@ -583,7 +583,7 @@ Type
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          XMLDATA: TalXMLNode;
                          FormatSettings: TALFormatSettings;
                          const DBHandle: IscDbHandle = nil;
@@ -611,7 +611,7 @@ Type
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
                          const TPB: AnsiString = ''); overload; virtual;
     procedure UpdateData(SQL: AnsiString;
-                         Param: Array of AnsiString;
+                         Params: Array of AnsiString;
                          const DBHandle: IscDbHandle = nil;
                          const TraHandle: IscTrHandle = nil;
                          const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -1476,7 +1476,6 @@ procedure TALFBXClient.SelectData(SQLs: TALFBXClientSelectDataSQLs;
                                   FormatSettings: TALFormatSettings);
 
 Var aSqlpa: TALFBXSQLParams;
-    aSqlsParamsIndex: integer;
     aSqlsParamsFieldsIndex: integer;
     aBlobhandle: IscBlobHandle;
     aSQLsindex: integer;
@@ -1515,9 +1514,6 @@ Var aSqlpa: TALFBXSQLParams;
         inc(aRecIndex);
         If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-          //stop if no row are requested
-          If (SQLs[aSQLsindex].First = 0) then break;
-
           //init NewRec
           if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
           Else aNewRec := aViewRec;
@@ -1555,7 +1551,7 @@ Var aSqlpa: TALFBXSQLParams;
 
           //handle the First
           inc(aRecAdded);
-          If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+          If (SQLs[aSQLsindex].First > 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
 
         end;
 
@@ -1602,52 +1598,45 @@ begin
 
           try
 
-            //loop throught all Params
-            for aSqlsParamsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
+            //loop throught all Params Fields
+            for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
 
-              //loop throught all Params Fields
-              for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) - 1 do begin
+              //with current Params Fields
+              with SQLs[aSQLsindex].Params[aSqlsParamsFieldsIndex] do begin
 
-                //with current Params Fields
-                with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+                //isnull
+                if IsNull then begin
+                  aSqlpa.AddFieldType('', uftVarchar);
+                  aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True;
+                end
 
-                  //init the aSqlpa fields definition
-                  if aSqlsParamsIndex = 0 then begin
-                    if IsBlob then aSqlpa.AddFieldType('', uftBlob)
-                    else aSqlpa.AddFieldType('', uftVarchar);
-                  end;
+                //IsBlob
+                else if length(value) > high(smallint) then begin
+                  aSqlpa.AddFieldType('', uftBlob);
+                  aBlobhandle := nil;
+                  aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
+                  Try
+                    FLibrary.BlobWriteString(aBlobHandle,Value);
+                  Finally
+                    FLibrary.BlobClose(aBlobHandle);
+                  End;
+                end
 
-                  //isnull
-                  if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
-
-                  //IsBlob
-                  else if IsBlob then begin
-                    aBlobhandle := nil;
-                    aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
-                    Try
-                      FLibrary.BlobWriteString(aBlobHandle,Value);
-                    Finally
-                      FLibrary.BlobClose(aBlobHandle);
-                    End;
-                  end
-
-                  //all the other
-                  else aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
-
+                //all the other
+                else begin
+                  aSqlpa.AddFieldType('', uftVarchar);
+                  aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
                 end;
 
               end;
 
-              //execute the sql with the params
-              FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, asqlpa);
-
-              //fetch the rows
-              InternalSelectDataFetchRows;
-
-              //close the cursor for next loop but only is we are not in last loop
-              if aSqlsParamsIndex < length(SQLs[aSQLsindex].Params) - 1 then Flibrary.DSQLFreeStatement(fStmtHandle, DSQL_close);
-
             end;
+
+            //execute the sql with the params
+            FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, asqlpa);
+
+            //fetch the rows
+            InternalSelectDataFetchRows;
 
           finally
             asqlpa.free;
@@ -1740,6 +1729,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -1759,8 +1749,9 @@ begin
   setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -1813,6 +1804,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1832,8 +1824,9 @@ begin
   setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1852,8 +1845,9 @@ begin
   setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1863,7 +1857,7 @@ end;
 
 {************************************************}
 procedure TALFBXClient.SelectData(SQL: AnsiString;
-                                  Param: Array of AnsiString;
+                                  Params: Array of AnsiString;
                                   RowTag: AnsiString;
                                   Skip: Integer;
                                   First: Integer;
@@ -1874,20 +1868,16 @@ var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
-  if length(Param) > 0 then begin
-    setlength(aSelectDataSQLs[0].params, 1);
-    setlength(aSelectDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aSelectDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aSelectDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aSelectDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aSelectDataSQLs[0].params, 0);
+  setlength(aSelectDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aSelectDataSQLs[0].params[i].Value := Params[i];
+    aSelectDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1897,7 +1887,7 @@ end;
 
 {************************************************}
 procedure TALFBXClient.SelectData(SQL: AnsiString;
-                                  Param: Array of AnsiString;
+                                  Params: Array of AnsiString;
                                   RowTag: AnsiString;
                                   XMLDATA: TalXMLNode;
                                   FormatSettings: TALFormatSettings);
@@ -1906,20 +1896,16 @@ var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
-  if length(Param) > 0 then begin
-    setlength(aSelectDataSQLs[0].params, 1);
-    setlength(aSelectDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aSelectDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aSelectDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aSelectDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aSelectDataSQLs[0].params, 0);
+  setlength(aSelectDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aSelectDataSQLs[0].params[i].Value := Params[i];
+    aSelectDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1929,7 +1915,7 @@ end;
 
 {************************************************}
 procedure TALFBXClient.SelectData(SQL: AnsiString;
-                                  Param: Array of AnsiString;
+                                  Params: Array of AnsiString;
                                   XMLDATA: TalXMLNode;
                                   FormatSettings: TALFormatSettings);
 var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
@@ -1937,20 +1923,16 @@ var aSelectDataSQLs: TALFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
-  if length(Param) > 0 then begin
-    setlength(aSelectDataSQLs[0].params, 1);
-    setlength(aSelectDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aSelectDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aSelectDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aSelectDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aSelectDataSQLs[0].params, 0);
+  setlength(aSelectDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aSelectDataSQLs[0].params[i].Value := Params[i];
+    aSelectDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -1962,7 +1944,6 @@ end;
 procedure TALFBXClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs);
 Var aSqlpa: TALFBXSQLParams;
     aBlobhandle: IscBlobHandle;
-    aSqlsParamsIndex: integer;
     aSqlsParamsFieldsIndex: integer;
     aSQLsindex: integer;
     aDropStmt: Boolean;
@@ -1995,46 +1976,42 @@ begin
         aSqlpa := TALFBXSQLParams.Create(fCharSet);
         try
 
-          //loop throught all Params
-          for aSqlsParamsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
+          //loop throught all Params Fields
+          for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
 
-            //loop throught all Params Fields
-            for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) - 1 do begin
+            //with current Params Fields
+            with SQLs[aSQLsindex].Params[aSqlsParamsFieldsIndex] do begin
 
-              //with current Params Fields
-              with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+              //isnull
+              if IsNull then begin
+                aSqlpa.AddFieldType('', uftVarchar);
+                aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True;
+              end
 
-                //init the aSqlpa fields definition
-                if aSqlsParamsIndex = 0 then begin
-                  if IsBlob then aSqlpa.AddFieldType('', uftBlob)
-                  else aSqlpa.AddFieldType('', uftVarchar);
-                end;
+              //IsBlob
+              else if length(value) > high(smallint) then begin
+                aSqlpa.AddFieldType('', uftBlob);
+                aBlobhandle := nil;
+                aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
+                Try
+                  FLibrary.BlobWriteString(aBlobHandle,Value);
+                Finally
+                  FLibrary.BlobClose(aBlobHandle);
+                End;
+              end
 
-                //isnull
-                if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
-
-                //IsBlob
-                else if IsBlob then begin
-                  aBlobhandle := nil;
-                  aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(fDBHandle,fTraHandle,aBlobHandle);
-                  Try
-                    FLibrary.BlobWriteString(aBlobHandle,Value);
-                  Finally
-                    FLibrary.BlobClose(aBlobHandle);
-                  End;
-                end
-
-                //all the other
-                else aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
-
+              //all the other
+              else begin
+                aSqlpa.AddFieldType('', uftVarchar);
+                aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
               end;
 
             end;
 
-            //execute the SQL
-            FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, aSqlpa);
-
           end;
+
+          //execute the SQL
+          FLibrary.DSQLExecute(fTraHandle, fStmtHandle, FSQLDIALECT, aSqlpa);
 
         finally
           aSqlpa.free;
@@ -2123,22 +2100,17 @@ end;
 
 {************************************************}
 procedure TALFBXClient.UpdateData(SQL: AnsiString;
-                                  Param: Array of AnsiString);
+                                  Params: Array of AnsiString);
 Var aUpdateDataSQLs: TALFBXClientUpdateDataSQLs;
     i: integer;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  if length(Param) > 0 then begin
-    setlength(aUpdateDataSQLs[0].params, 1);
-    setlength(aUpdateDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aUpdateDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aUpdateDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aUpdateDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aUpdateDataSQLs[0].params, 0);
+  setlength(aUpdateDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aUpdateDataSQLs[0].params[i].Value := Params[i];
+    aUpdateDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   UpdateData(aUpdateDataSQLs);
 end;
 
@@ -2780,7 +2752,7 @@ Begin
   finally
     FConnectionWithoutStmtPoolCS.Release;
   end;
-  
+
 End;
 
 {******************************************************************************************}
@@ -2882,7 +2854,7 @@ begin
         End;
 
         //free the TransactionPoolContainer
-        aReadTransactionPool.Delete(0); 
+        aReadTransactionPool.Delete(0);
 
       end
 
@@ -3093,7 +3065,7 @@ procedure ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct(aTree: TALBase
 
 Var aReadStatementPool: TobjectList;
     aReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
-    
+
 begin
 
   //typecast the aExtData
@@ -3280,7 +3252,7 @@ procedure TALFBXConnectionPoolClient.ReleaseReadStatement(SQL: AnsiString;
 
 Var aReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
     aStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
-    
+
 begin
 
   //security check
@@ -3651,7 +3623,7 @@ begin
   //security check
   if not assigned(DBHandle) then raise exception.Create('Connection handle can not be null');
   if not assigned(TraHandle) then raise exception.Create('Transaction handle can not be null');
-  if not assigned(StatementPool) then raise exception.Create('Statement pool object can not be null');  
+  if not assigned(StatementPool) then raise exception.Create('Statement pool object can not be null');
 
   //rollback the connection
   aTmpCloseConnection := CloseConnection;
@@ -3872,7 +3844,6 @@ procedure TALFBXConnectionPoolClient.SelectData(SQLs: TALFBXClientSelectDataSQLs
 
   {$IFDEF undef}{$REGION 'Var Declarations'}{$ENDIF}
   Var aSqlpa: TALFBXSQLParams;
-      aSqlsParamsIndex: integer;
       aSqlsParamsFieldsIndex: integer;
       aBlobhandle: IscBlobHandle;
       aSQLsindex: integer;
@@ -3922,9 +3893,6 @@ procedure TALFBXConnectionPoolClient.SelectData(SQLs: TALFBXClientSelectDataSQLs
       inc(aRecIndex);
       If aRecIndex > SQLs[aSQLsindex].Skip then begin
 
-        //stop if no row are requested
-        If (SQLs[aSQLsindex].First = 0) then break;
-
         //init NewRec
         if (SQLs[aSQLsindex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(SQLs[aSQLsindex].RowTag)
         Else aNewRec := aViewRec;
@@ -3962,7 +3930,7 @@ procedure TALFBXConnectionPoolClient.SelectData(SQLs: TALFBXClientSelectDataSQLs
 
         //handle the First
         inc(aRecAdded);
-        If (SQLs[aSQLsindex].First >= 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
+        If (SQLs[aSQLsindex].First > 0) and (aRecAdded >= SQLs[aSQLsindex].First) then Break;
 
       end;
 
@@ -4149,52 +4117,45 @@ begin
 
             try
 
-              //loop throught all Params
-              for aSqlsParamsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
+              //loop throught all Params Fields
+              for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
 
-                //loop throught all Params Fields
-                for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) - 1 do begin
+                //with current Params Fields
+                with SQLs[aSQLsindex].Params[aSqlsParamsFieldsIndex] do begin
 
-                  //with current Params Fields
-                  with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+                  //isnull
+                  if IsNull then begin
+                    aSqlpa.AddFieldType('', uftVarchar);
+                    aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True;
+                  end
 
-                    //init the aSqlpa fields definition
-                    if aSqlsParamsIndex = 0 then begin
-                      if IsBlob then aSqlpa.AddFieldType('', uftBlob)
-                      else aSqlpa.AddFieldType('', uftVarchar);
-                    end;
+                  //IsBlob
+                  else if length(value) > high(smallint) then begin
+                    aSqlpa.AddFieldType('', uftBlob);
+                    aBlobhandle := nil;
+                    aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
+                    Try
+                      FLibrary.BlobWriteString(aBlobHandle,Value);
+                    Finally
+                      FLibrary.BlobClose(aBlobHandle);
+                    End;
+                  end
 
-                    //isnull
-                    if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
-
-                    //IsBlob
-                    else if IsBlob then begin
-                      aBlobhandle := nil;
-                      aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
-                      Try
-                        FLibrary.BlobWriteString(aBlobHandle,Value);
-                      Finally
-                        FLibrary.BlobClose(aBlobHandle);
-                      End;
-                    end
-
-                    //all the other
-                    else aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
-
+                  //all the other
+                  else begin
+                    aSqlpa.AddFieldType('', uftVarchar);
+                    aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
                   end;
 
                 end;
 
-                //execute the sql with the params
-                FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, asqlpa);
-
-                //fetch the rows
-                InternalSelectDataFetchRows;
-
-                //close the cursor for next loop but only is we are not in last loop
-                if aSqlsParamsIndex < length(SQLs[aSQLsindex].Params) - 1 then Flibrary.DSQLFreeStatement(aTmpStmtHandle, DSQL_close);
-
               end;
+
+              //execute the sql with the params
+              FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, asqlpa);
+
+              //fetch the rows
+              InternalSelectDataFetchRows;
 
             finally
               asqlpa.free;
@@ -4428,6 +4389,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -4455,8 +4417,9 @@ begin
   setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              nil,
              OnNewRowFunct,
@@ -4533,6 +4496,7 @@ begin
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -4560,8 +4524,9 @@ begin
   setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -4588,8 +4553,9 @@ begin
   setlength(aSelectDataSQLs[0].params, 0);
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -4603,7 +4569,7 @@ end;
 
 {**************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(SQL: AnsiString;
-                                                Param: array of AnsiString;
+                                                Params: array of AnsiString;
                                                 RowTag: AnsiString;
                                                 Skip: integer;
                                                 First: Integer;
@@ -4618,20 +4584,16 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
-  if length(Param) > 0 then begin
-    setlength(aSelectDataSQLs[0].params, 1);
-    setlength(aSelectDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aSelectDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aSelectDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aSelectDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aSelectDataSQLs[0].params, 0);
+  setlength(aSelectDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aSelectDataSQLs[0].params[i].Value := Params[i];
+    aSelectDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
   aSelectDataSQLs[0].skip := Skip;
   aSelectDataSQLs[0].First := First;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -4645,7 +4607,7 @@ end;
 
 {**************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(SQL: AnsiString;
-                                                Param: array of AnsiString;
+                                                Params: array of AnsiString;
                                                 RowTag: AnsiString;
                                                 XMLDATA: TalXMLNode;
                                                 FormatSettings: TALFormatSettings;
@@ -4658,20 +4620,16 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
-  if length(Param) > 0 then begin
-    setlength(aSelectDataSQLs[0].params, 1);
-    setlength(aSelectDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aSelectDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aSelectDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aSelectDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aSelectDataSQLs[0].params, 0);
+  setlength(aSelectDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aSelectDataSQLs[0].params[i].Value := Params[i];
+    aSelectDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   aSelectDataSQLs[0].RowTag := RowTag;
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -4685,7 +4643,7 @@ end;
 
 {**************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(SQL: AnsiString;
-                                                Param: array of AnsiString;
+                                                Params: array of AnsiString;
                                                 XMLDATA: TalXMLNode;
                                                 FormatSettings: TALFormatSettings;
                                                 const DBHandle: IscDbHandle = nil;
@@ -4697,20 +4655,16 @@ var aSelectDataSQLs: TalFBXClientSelectDataSQLs;
 begin
   setlength(aSelectDataSQLs,1);
   aSelectDataSQLs[0].Sql := Sql;
-  if length(Param) > 0 then begin
-    setlength(aSelectDataSQLs[0].params, 1);
-    setlength(aSelectDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aSelectDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aSelectDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aSelectDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aSelectDataSQLs[0].params, 0);
+  setlength(aSelectDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aSelectDataSQLs[0].params[i].Value := Params[i];
+    aSelectDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   aSelectDataSQLs[0].RowTag := '';
   aSelectDataSQLs[0].viewTag := '';
-  aSelectDataSQLs[0].skip := -1;
-  aSelectDataSQLs[0].First := -1;
+  aSelectDataSQLs[0].skip := 0;
+  aSelectDataSQLs[0].First := 0;
+  aSelectDataSQLs[0].CacheThreshold := 0;
   SelectData(aSelectDataSQLs,
              XMLDATA,
              nil,
@@ -4732,7 +4686,6 @@ procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs
   {$IFDEF undef}{$REGION 'Var Declarations'}{$ENDIF}
   Var aSqlpa: TALFBXSQLParams;
       aBlobhandle: IscBlobHandle;
-      aSqlsParamsIndex: integer;
       aSqlsParamsFieldsIndex: integer;
       aSQLsindex: integer;
       aTmpDBHandle: IscDbHandle;
@@ -4745,7 +4698,7 @@ procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALFBXClientUpdateDataSQLs
       aGDSCode: integer;
       aConnectionWasAcquiredFromPool: Boolean;
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
-  
+
 begin
 
   {$IFDEF undef}{$REGION 'Exit if no SQL'}{$ENDIF}
@@ -4832,46 +4785,42 @@ begin
           aSqlpa := TALFBXSQLParams.Create(fCharSet);
           try
 
-            //loop throught all Params
-            for aSqlsParamsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
+            //loop throught all Params Fields
+            for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params) - 1 do begin
 
-              //loop throught all Params Fields
-              for aSqlsParamsFieldsIndex := 0 to length(SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields) - 1 do begin
+              //with current Params Fields
+              with SQLs[aSQLsindex].Params[aSqlsParamsFieldsIndex] do begin
 
-                //with current Params Fields
-                with SQLs[aSQLsindex].Params[aSqlsParamsIndex].fields[aSqlsParamsFieldsIndex] do begin
+                //isnull
+                if IsNull then begin
+                  aSqlpa.AddFieldType('', uftVarchar);
+                  aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True;
+                end
 
-                  //init the aSqlpa fields definition
-                  if aSqlsParamsIndex = 0 then begin
-                    if IsBlob then aSqlpa.AddFieldType('', uftBlob)
-                    else aSqlpa.AddFieldType('', uftVarchar);
-                  end;
+                //IsBlob
+                else if length(value) > high(smallint) then begin
+                  aSqlpa.AddFieldType('', uftBlob);
+                  aBlobhandle := nil;
+                  aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
+                  Try
+                    FLibrary.BlobWriteString(aBlobHandle,Value);
+                  Finally
+                    FLibrary.BlobClose(aBlobHandle);
+                  End;
+                end
 
-                  //isnull
-                  if IsNull then aSqlpa.IsNull[aSqlsParamsFieldsIndex] := True
-
-                  //IsBlob
-                  else if IsBlob then begin
-                    aBlobhandle := nil;
-                    aSqlpa.AsQuad[aSqlsParamsFieldsIndex] := Flibrary.BlobCreate(aTmpDBHandle,aTmpTraHandle,aBlobHandle);
-                    Try
-                      FLibrary.BlobWriteString(aBlobHandle,Value);
-                    Finally
-                      FLibrary.BlobClose(aBlobHandle);
-                    End;
-                  end
-
-                  //all the other
-                  else aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
-
+                //all the other
+                else begin
+                  aSqlpa.AddFieldType('', uftVarchar);
+                  aSqlpa.AsAnsiString[aSqlsParamsFieldsIndex] := Value;
                 end;
 
               end;
 
-              //execute the SQL
-              FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, aSqlpa);
-
             end;
+
+            //execute the SQL
+            FLibrary.DSQLExecute(aTmpTraHandle, aTmpStmtHandle, FSQLDIALECT, aSqlpa);
 
           finally
             aSqlpa.free;
@@ -5031,7 +4980,7 @@ end;
 
 {**************************************************************}
 procedure TALFBXConnectionPoolClient.UpdateData(SQL: AnsiString;
-                                                Param: Array of AnsiString;
+                                                Params: Array of AnsiString;
                                                 const DBHandle: IscDbHandle = nil;
                                                 const TraHandle: IscTrHandle = nil;
                                                 const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
@@ -5041,16 +4990,11 @@ Var aUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
 begin
   setlength(aUpdateDataSQLs,1);
   aUpdateDataSQLs[0].SQL := SQL;
-  if length(Param) > 0 then begin
-    setlength(aUpdateDataSQLs[0].params, 1);
-    setlength(aUpdateDataSQLs[0].params[0].fields, length(Param));
-    for i := 0 to length(Param) - 1 do begin
-      aUpdateDataSQLs[0].params[0].fields[i].Value := Param[i];
-      aUpdateDataSQLs[0].params[0].fields[i].IsNull := Param[i] = fNullString;
-      aUpdateDataSQLs[0].params[0].fields[i].IsBlob := False;
-    end;
-  end
-  else setlength(aUpdateDataSQLs[0].params, 0);
+  setlength(aUpdateDataSQLs[0].params, length(Params));
+  for i := 0 to length(Params) - 1 do begin
+    aUpdateDataSQLs[0].params[i].Value := Params[i];
+    aUpdateDataSQLs[0].params[i].IsNull := Params[i] = fNullString;
+  end;
   UpdateData(aUpdateDataSQLs,
              DBHandle,
              TraHandle,
@@ -5412,7 +5356,7 @@ var aEventBuffer: PAnsiChar;
 
 var aCurrentEventIdx: integer;
     aMustResetDBHandle: Boolean;
-    
+
 begin
   //to be sure that the thread was stated
   fStarted := True;

@@ -185,8 +185,12 @@ begin
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TFormatSettings', 'TALFormatSettings');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatFloat', 'ALFormatFloat');
             aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FormatCurr', 'ALFormatCurr');
-            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TInifile', 'TALInifile');
-
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'TInifile', 'TALInifile');            
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'FileExists', 'ALFileExists');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'DirectoryExists', 'ALDirectoryExists');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'CreateDir', 'ALCreateDir');
+            aFileStr := ALStringToAnsiString_UpdateFile(aFileStr, 'RemoveDir', 'ALRemoveDir');
+                                   
             AlSaveStringTofile(aFileStr, Directory + AnsiString(aSR.Name));
 
           end;

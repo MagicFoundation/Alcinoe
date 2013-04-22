@@ -471,22 +471,20 @@ begin
         end;
 
         if ALMemoFireBirdParams.Lines.Count > 0 then begin
-          Setlength(aSQL.Params, 1);
-          Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
+          Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
           for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
             aLst1 := TALStringList.create;
             try
-              aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                                 '<#',
-                                                                 '>',
-                                                                 SQLFastTagReplaceFunct,
-                                                                 True,
-                                                                 @aLst1)
+              aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                       '<#',
+                                                       '>',
+                                                       SQLFastTagReplaceFunct,
+                                                       True,
+                                                       @aLst1)
             finally
               aLst1.free;
             end;
-            aSQL.Params[0].fields[i].isnull := False;
-            aSQL.Params[0].fields[i].isblob := False;
+            aSQL.Params[i].isnull := False;
           end;
         end
         else Setlength(aSQL.Params, 0);
@@ -655,22 +653,20 @@ begin
       end;
 
       if ALMemoFireBirdParams.Lines.Count > 0 then begin
-        Setlength(aSQL.Params, 1);
-        Setlength(aSQL.Params[0].fields, ALMemoFireBirdParams.Lines.Count);
+        Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
         for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
           aLst1 := TALStringList.create;
           try
-            aSQL.Params[0].fields[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                               '<#',
-                                                               '>',
-                                                               SQLFastTagReplaceFunct,
-                                                               True,
-                                                               @aLst1)
+            aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                     '<#',
+                                                     '>',
+                                                     SQLFastTagReplaceFunct,
+                                                     True,
+                                                     @aLst1)
           finally
             aLst1.free;
           end;
-          aSQL.Params[0].fields[i].isnull := False;
-          aSQL.Params[0].fields[i].isblob := False;
+          aSQL.Params[i].isnull := False;
         end;
       end
       else Setlength(aSQL.Params, 0);
@@ -2296,7 +2292,7 @@ Var aDBHandle: IscDbHandle;
     aStmtHandle: IscStmtHandle;
     aSqlda: TALFBXSQLResult;
     S1: AnsiString;
-    j, k, l: integer;
+    j, k: integer;
     aLst1: TALStringList;
 
 begin
@@ -2350,23 +2346,19 @@ begin
             aLst1.Text := ALTrim(fParams);
             if fUpdateSQL then begin
               setlength(aUpdateDataSQLs,1);
-              setlength(aUpdateDataSQLs[0].Params,1);
-              setlength(aUpdateDataSQLs[0].Params[0].fields,aLst1.Count);
+              setlength(aUpdateDataSQLs[0].Params,aLst1.Count);
               for J := 0 to aLst1.Count - 1 do begin
-                aUpdateDataSQLs[0].Params[0].fields[j].Value := aLst1[j];
-                aUpdateDataSQLs[0].Params[0].fields[j].isnull := false;
-                aUpdateDataSQLs[0].Params[0].fields[j].isblob := False;
+                aUpdateDataSQLs[0].Params[j].Value := aLst1[j];
+                aUpdateDataSQLs[0].Params[j].isnull := false;
               end;
               aUpdateDataSQLs[0].Sql := fSQL;
             end
             else begin
               setlength(aSelectDataSQLs,1);
-              setlength(aSelectDataSQLs[0].Params,1);
-              setlength(aSelectDataSQLs[0].Params[0].fields,aLst1.Count);
+              setlength(aSelectDataSQLs[0].Params,aLst1.Count);
               for J := 0 to aLst1.Count - 1 do begin
-                aSelectDataSQLs[0].Params[0].fields[j].Value := aLst1[j];
-                aSelectDataSQLs[0].Params[0].fields[j].isnull := false;
-                aSelectDataSQLs[0].Params[0].fields[j].isblob := False;
+                aSelectDataSQLs[0].Params[j].Value := aLst1[j];
+                aSelectDataSQLs[0].Params[j].isnull := false;
               end;
               aSelectDataSQLs[0].Sql := fSQL;
               aSelectDataSQLs[0].RowTag := '';
@@ -2424,12 +2416,8 @@ begin
                 aTmpSelectDataSQLs[j].SQL := internalDoTagReplace(aSelectDataSQLs[j].SQL);
                 setlength(aTmpSelectDataSQLs[j].Params, length(aSelectDataSQLs[j].Params));
                 for k := 0 to length(aTmpSelectDataSQLs[j].Params) - 1 do begin
-                  setlength(aTmpSelectDataSQLs[j].Params[k].fields, length(aSelectDataSQLs[j].Params[k].fields));
-                  for l := 0 to length(aTmpSelectDataSQLs[j].Params[k].fields) - 1 do begin
-                    aTmpSelectDataSQLs[j].Params[k].fields[l].Value := internalDoTagReplace(aSelectDataSQLs[j].Params[k].fields[l].Value);
-                    aTmpSelectDataSQLs[j].Params[k].fields[l].isnull := aSelectDataSQLs[j].Params[k].fields[l].isnull;
-                    aTmpSelectDataSQLs[j].Params[k].fields[l].isblob := aSelectDataSQLs[j].Params[k].fields[l].isblob;
-                  end;
+                  aTmpSelectDataSQLs[j].Params[k].Value := internalDoTagReplace(aSelectDataSQLs[j].Params[k].Value);
+                  aTmpSelectDataSQLs[j].Params[k].isnull := aSelectDataSQLs[j].Params[k].isnull;
                 end;
                 aTmpSelectDataSQLs[j].RowTag := aSelectDataSQLs[j].RowTag;
                 aTmpSelectDataSQLs[j].ViewTag := aSelectDataSQLs[j].ViewTag;
@@ -2441,12 +2429,8 @@ begin
                 aTmpUpdateDataSQLs[j].SQL := internalDoTagReplace(aUpdateDataSQLs[j].SQL);
                 setlength(aTmpUpdateDataSQLs[j].Params, length(aUpdateDataSQLs[j].Params));
                 for k := 0 to length(aTmpUpdateDataSQLs[j].Params) - 1 do begin
-                  setlength(aTmpUpdateDataSQLs[j].Params[k].fields, length(aUpdateDataSQLs[j].Params[k].fields));
-                  for l := 0 to length(aTmpUpdateDataSQLs[j].Params[k].fields) - 1 do begin
-                    aTmpUpdateDataSQLs[j].Params[k].fields[l].Value := internalDoTagReplace(aUpdateDataSQLs[j].Params[k].fields[l].Value);
-                    aTmpUpdateDataSQLs[j].Params[k].fields[l].isnull := aUpdateDataSQLs[j].Params[k].fields[l].isnull;
-                    aTmpUpdateDataSQLs[j].Params[k].fields[l].isblob := aUpdateDataSQLs[j].Params[k].fields[l].isblob;
-                  end;
+                  aTmpUpdateDataSQLs[j].Params[k].Value := internalDoTagReplace(aUpdateDataSQLs[j].Params[k].Value);
+                  aTmpUpdateDataSQLs[j].Params[k].isnull := aUpdateDataSQLs[j].Params[k].isnull;
                 end;
               end;
 
@@ -2836,7 +2820,7 @@ begin
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
-  Url := 'http://www.arkadia.com/html/alcinoe_like.html';
+  Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;
 end;

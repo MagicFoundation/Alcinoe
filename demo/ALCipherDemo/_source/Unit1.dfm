@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 442
   Top = 108
   Caption = 'Form1'
-  ClientHeight = 508
+  ClientHeight = 561
   ClientWidth = 610
   Color = 15986666
   Font.Charset = DEFAULT_CHARSET
@@ -17,7 +17,7 @@ object Form1: TForm1
   TextHeight = 13
   object Label1: TLabel
     Left = 24
-    Top = 169
+    Top = 222
     Width = 22
     Height = 13
     Caption = 'Key'
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 24
-    Top = 225
+    Top = 345
     Width = 104
     Height = 13
     Caption = 'Unencrypted Data'
@@ -43,7 +43,7 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 296
-    Top = 225
+    Top = 345
     Width = 187
     Height = 13
     Caption = 'Crypted Data (BASE64 Encoded)'
@@ -66,15 +66,15 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 489
+    Top = 542
     Width = 610
     Height = 19
     Panels = <
       item
-        Width = 160
+        Width = 140
       end
       item
-        Width = 160
+        Width = 200
       end
       item
         Width = 50
@@ -85,7 +85,7 @@ object Form1: TForm1
     Top = 39
     Width = 124
     Height = 25
-    Caption = 'Bench AES (EBC)'
+    Caption = 'Bench AES (CBC)'
     TabOrder = 2
     OnClick = ALButton3Click
     OnPaint = ALButton1Paint
@@ -102,7 +102,7 @@ object Form1: TForm1
   end
   object EditKey: TALEdit
     Left = 24
-    Top = 188
+    Top = 241
     Width = 266
     Height = 19
     GlyphIndex = 0
@@ -116,32 +116,32 @@ object Form1: TForm1
   end
   object ALMemoDecryptedData: TALMemo
     Left = 24
-    Top = 244
+    Top = 364
     Width = 266
-    Height = 229
+    Height = 165
     OnPaint = ALMemoDecryptedDataPaint
     OnPaintScrollBar = ALMemoDecryptedDataPaintScrollBar
     TabOrder = 5
     DesignSize = (
       266
-      229)
+      165)
   end
   object ALMemoCryptedData: TALMemo
     Left = 296
-    Top = 244
+    Top = 364
     Width = 290
-    Height = 229
+    Height = 165
     OnPaint = ALMemoDecryptedDataPaint
     OnPaintScrollBar = ALMemoDecryptedDataPaintScrollBar
     TabOrder = 6
     DesignSize = (
       290
-      229)
+      165)
   end
   object ALButton2: TALButton
     Left = 296
-    Top = 183
-    Width = 57
+    Top = 177
+    Width = 97
     Height = 25
     Caption = 'Crypt (BF)'
     TabOrder = 7
@@ -149,9 +149,9 @@ object Form1: TForm1
     OnPaint = ALButton1Paint
   end
   object ALButton5: TALButton
-    Left = 359
-    Top = 183
-    Width = 74
+    Left = 399
+    Top = 177
+    Width = 115
     Height = 25
     Caption = 'DeCrypt (BF)'
     TabOrder = 8
@@ -159,43 +159,23 @@ object Form1: TForm1
     OnPaint = ALButton1Paint
   end
   object ALButton6: TALButton
-    Left = 439
-    Top = 183
-    Width = 66
+    Left = 296
+    Top = 208
+    Width = 97
     Height = 25
-    Caption = 'Crypt (AES)'
+    Caption = 'Crypt (AES - EBC)'
     TabOrder = 9
     OnClick = ALButton6Click
     OnPaint = ALButton1Paint
   end
   object ALButton7: TALButton
-    Left = 511
-    Top = 183
-    Width = 75
+    Left = 399
+    Top = 208
+    Width = 115
     Height = 25
-    Caption = 'DeCrypt (AES)'
+    Caption = 'DeCrypt (AES - EBC)'
     TabOrder = 10
     OnClick = ALButton7Click
-    OnPaint = ALButton1Paint
-  end
-  object ALButton8: TALButton
-    Left = 164
-    Top = 8
-    Width = 116
-    Height = 25
-    Caption = 'Check SHA1 Hash'
-    TabOrder = 11
-    OnClick = ALButton8Click
-    OnPaint = ALButton1Paint
-  end
-  object ALButton9: TALButton
-    Left = 164
-    Top = 39
-    Width = 116
-    Height = 25
-    Caption = 'Check MD5 Hash'
-    TabOrder = 12
-    OnClick = ALButton9Click
     OnPaint = ALButton1Paint
   end
   object Panel2: TPanel
@@ -209,7 +189,7 @@ object Form1: TForm1
     Ctl3D = False
     ParentBackground = False
     ParentCtl3D = False
-    TabOrder = 13
+    TabOrder = 11
     object Label7: TLabel
       Left = 5
       Top = 8
@@ -265,5 +245,65 @@ object Form1: TForm1
         TabOrder = 0
       end
     end
+  end
+  object ALButton10: TALButton
+    Left = 159
+    Top = 8
+    Width = 124
+    Height = 25
+    Caption = 'Bench MD5'
+    TabOrder = 12
+    OnClick = ALButton10Click
+    OnPaint = ALButton1Paint
+  end
+  object ALButton11: TALButton
+    Left = 159
+    Top = 39
+    Width = 124
+    Height = 25
+    Caption = 'Bench SHA1'
+    TabOrder = 13
+    OnClick = ALButton11Click
+    OnPaint = ALButton1Paint
+  end
+  object ALButton8: TALButton
+    Left = 296
+    Top = 239
+    Width = 97
+    Height = 25
+    Caption = 'Crypt (AES - CBC)'
+    TabOrder = 14
+    OnClick = ALButton8Click
+    OnPaint = ALButton1Paint
+  end
+  object ALButton9: TALButton
+    Left = 399
+    Top = 239
+    Width = 115
+    Height = 25
+    Caption = 'DeCrypt (AES - CBC)'
+    TabOrder = 15
+    OnClick = ALButton9Click
+    OnPaint = ALButton1Paint
+  end
+  object ALButton12: TALButton
+    Left = 296
+    Top = 270
+    Width = 218
+    Height = 25
+    Caption = 'Generate HMAC (SHA1)'
+    TabOrder = 16
+    OnClick = ALButton12Click
+    OnPaint = ALButton1Paint
+  end
+  object ALButton13: TALButton
+    Left = 296
+    Top = 301
+    Width = 218
+    Height = 25
+    Caption = 'Generate HMAC (MD5)'
+    TabOrder = 17
+    OnClick = ALButton13Click
+    OnPaint = ALButton1Paint
   end
 end

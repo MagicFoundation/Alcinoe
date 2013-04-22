@@ -32,7 +32,9 @@ requires
   vcl,
   rtl,
   inet,
-  dbrtl;
+  dbrtl,
+  dsnap,
+  DbxCommonDriver;
 
 contains
   IsapiHTTP,
@@ -97,7 +99,8 @@ contains
   ALSphinxQLClient in 'ALSphinxQLClient.pas',
   ALZLibExApi in 'ALZLibExApi.pas',
   ALIniFiles in 'ALIniFiles.pas',
-  ALExprEval in 'ALExprEval.pas';
+  ALExprEval in 'ALExprEval.pas',
+  ALJSONDoc in 'ALJSONDoc.pas';
 
 end.
 

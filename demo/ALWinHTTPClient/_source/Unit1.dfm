@@ -33,7 +33,6 @@ object Form1: TForm1
       item
         Width = 50
       end>
-    ExplicitTop = 583
   end
   object PageControl1: TcxPageControl
     Left = 0
@@ -43,14 +42,12 @@ object Form1: TForm1
     Align = alClient
     TabOrder = 1
     Properties.ActivePage = TabSheet1
-    ExplicitHeight = 583
     ClientRectBottom = 577
     ClientRectLeft = 5
     ClientRectRight = 785
     ClientRectTop = 26
     object TabSheet1: TcxTabSheet
       Caption = 'Main'
-      ExplicitHeight = 552
       object GroupBox9: TcxGroupBox
         Left = 0
         Top = 10
@@ -234,7 +231,6 @@ object Form1: TForm1
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 1
-        ExplicitTop = 198
       end
       object Panel4: TPanel
         Left = 0
@@ -260,8 +256,6 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 3
-        ExplicitTop = 223
-        ExplicitHeight = 328
         Height = 327
         Width = 780
         object Panel5: TPanel
@@ -272,7 +266,6 @@ object Form1: TForm1
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitHeight = 304
           DesignSize = (
             267
             303)
@@ -296,17 +289,16 @@ object Form1: TForm1
           end
         end
         object Panel6: TPanel
-          Left = 278
+          Left = 277
           Top = 15
-          Width = 499
+          Width = 500
           Height = 303
           Align = alClient
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
-          ExplicitHeight = 304
           DesignSize = (
-            499
+            500
             303)
           object Label3: TcxLabel
             Left = 2
@@ -330,17 +322,15 @@ object Form1: TForm1
         object cxSplitter1: TcxSplitter
           Left = 270
           Top = 15
-          Width = 8
+          Width = 7
           Height = 303
           Control = Panel5
-          ExplicitHeight = 304
         end
       end
     end
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
-      ExplicitHeight = 552
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -373,6 +363,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Width = 200
         end
@@ -380,6 +371,7 @@ object Form1: TForm1
           Left = 73
           Top = 42
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 1
           Width = 200
         end
@@ -423,6 +415,7 @@ object Form1: TForm1
           Left = 73
           Top = 42
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Text = '0'
           Width = 200
@@ -431,6 +424,7 @@ object Form1: TForm1
           Left = 73
           Top = 66
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 1
           Text = '0'
           Width = 200
@@ -439,6 +433,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 2
           Text = '0'
           Width = 200
@@ -757,6 +752,7 @@ object Form1: TForm1
           Left = 73
           Top = 42
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Text = '80'
           Width = 200
@@ -765,6 +761,7 @@ object Form1: TForm1
           Left = 73
           Top = 66
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 1
           Width = 200
         end
@@ -772,13 +769,15 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 2
           Width = 200
         end
         object EdProxyPassword: TcxTextEdit
-          Left = 73
+          Left = 75
           Top = 90
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 3
           Width = 200
         end
@@ -786,6 +785,7 @@ object Form1: TForm1
           Left = 73
           Top = 114
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 4
           Text = '<local>'
           Width = 200
@@ -816,6 +816,7 @@ object Form1: TForm1
           Left = 73
           Top = 18
           ParentFont = False
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Text = '32768'
           Width = 200
@@ -847,6 +848,7 @@ object Form1: TForm1
           Top = 38
           ParentFont = False
           Properties.ScrollBars = ssVertical
+          Properties.OnChange = OnCfgEditChange
           TabOrder = 0
           Height = 176
           Width = 459

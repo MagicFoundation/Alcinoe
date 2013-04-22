@@ -250,6 +250,10 @@ object Form1: TForm1
     object Firebird: TTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label2: TLabel
         Left = 68
         Top = 101
@@ -746,6 +750,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
+        ItemHeight = 13
         ItemIndex = 4
         TabOrder = 0
         Text = 'FB25'
@@ -1247,6 +1252,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
+        ItemHeight = 13
         ItemIndex = 1
         TabOrder = 15
         Text = 'MYSQL55'
@@ -2119,6 +2125,7 @@ object Form1: TForm1
         Height = 21
         OnPaint = ALComboBoxPaint
         Style = csDropDownList
+        ItemHeight = 13
         ItemIndex = 0
         TabOrder = 11
         Text = 'MYSQL50'

@@ -1995,6 +1995,7 @@ begin
   P1 := 0;
   P2 := 1;
   While P2 <= length(Result) do begin
+
     if (Result[P2] = '"') then begin
       aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
       if aInDoubleQuote then P1 := P2;
@@ -2003,7 +2004,6 @@ begin
         inc(P2);
         aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
       end;
-      inc(P2);
     end
     else if (Result[P2] = '''') then begin
       aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote);
@@ -2013,21 +2013,22 @@ begin
         inc(P2);
         aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote);
       end;
-      inc(P2);
-    end
-    else if (not aInSingleQuote) and
-            (not aInDoubleQuote) and
-            (P1 > 0) then begin
-      S1 := AlCopyStr(result,P1, P2 - P1);
+    end;
+
+    if (not aInSingleQuote) and
+       (not aInDoubleQuote) and
+       (P1 > 0) then begin
+      S1 := AlCopyStr(result,P1, P2 - P1 + 1);
       S1 := ALDequotedStr(S1, S1[1]);
       if S1 = '' then aCrc := 0
       else aCrc := ZCrc32(0, S1[1], length(S1));
-      Delete(result, P1, P2 - P1);
+      Delete(result, P1, P2 - P1 + 1);
       Insert(ALIntToStr(aCrc), result, P1);
       P2 := P1 + length(ALIntToStr(aCrc));
       P1 := 0;
     end
     else inc(P2);
+
   end;
   if P1 > 0 then raise EALException.Create('Wrong expression (unterminated string): '+ AExpr);
 

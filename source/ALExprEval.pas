@@ -11,7 +11,7 @@ Author(s):    Jedi Project - JCL
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      Alcinoe Expression Evaluator
-Version:      4.00
+Version:      4.01
 
 Description:  This unit contains expression evaluators, each tailored for different usage
               patterns. It also contains the component objects, so that a customized
@@ -975,6 +975,7 @@ implementation
 
 uses Contnrs,
      AlFcnString,
+     ALZLibExAPI,
      ALZLibEx;
 
 {***************************************}
@@ -1906,18 +1907,89 @@ end;
 
 {*****************************************************************}
 function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _handleIn(const aOpeningBracketChar, aClosingBracketChar: Ansichar);
+  var aLvalue: ansiString;
+      aSquareBracketCounter: integer;
+      aRoundBracketCounter: integer;
+      aArguments: ansiString;
+      P1, P2, P4, P3: integer;
+  begin
+    // space before to avoid something like "sin(...)"
+    P1 := ALPosExIgnoreCase(ansiString(' in')+aOpeningBracketChar, result);  // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                                                                 //                    ^P1
+    while P1 > 0 do begin
+
+      // init the aLvalue
+      P2 := (P1 - 1); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                      //                  ^P2
+      while (P2 > 0) and
+            (result[P2] in ['a'..'z', 'A'..'Z', '0'..'9', '_']) do Dec(P2); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                                                                            //             ^^^^^^P2
+      aLvalue := AlCopyStr(result, P2 + 1, P1 - P2 - 1); // MyVar
+      if aLValue = '' then raise EALException.Create('Wrong expression (cannot assign left value for operator IN): ' + AExpr);
+      P4 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                    //              ^P4
+
+      // build aArguments
+      P1 := P1 + 4; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                    //                       ^P1
+      P2 := P1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                //                       ^P2
+      P3 := P1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                //                       ^P3
+      aRoundBracketCounter := 0;
+      aSquareBracketCounter := 0;
+      if aOpeningBracketChar = '(' then inc(aRoundBracketCounter)
+      else inc(aSquareBracketCounter);
+      aArguments := '';
+      while P2 <= length(result) do begin
+        if result[P2] = '(' then Inc(aRoundBracketCounter)
+        else if result[P2] = '[' then Inc(aSquareBracketCounter)
+        else if result[P2] = ')' then begin
+          Dec(aRoundBracketCounter);
+          if (aRoundBracketCounter + aSquareBracketCounter <= 0) then break;
+        end
+        else if result[P2] = ']' then begin
+          Dec(aSquareBracketCounter);
+          if (aRoundBracketCounter + aSquareBracketCounter <= 0) then break;
+        end
+        else if (result[P2] = ',') and
+                (aRoundBracketCounter + aSquareBracketCounter = 1) then begin // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                                                                              //                       ^^P2
+          if aArguments <> '' then aArguments := aArguments + ' or ';
+          aArguments := aArguments + '(' + aLValue + ' = ' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
+          P3 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
+                        //                         ^P3
+        end;
+        Inc(P2);
+      end;
+      if P2 > length(result) then raise EALException.Create('Wrong expression (missing closing bracket): ' + AExpr);
+      if aArguments <> '' then aArguments := aArguments + ' or ';
+      aArguments := aArguments + '(' + aLValue + '=' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
+
+      Delete(result, P4, P2 - P4 + 1);
+      Insert('(' + aArguments + ')', result, P4);
+
+      //calculate again P1
+      P1 := ALPosExIgnoreCase(ansiString(' in')+aOpeningBracketChar, result, P4);
+
+    end;
+  end;
+
 var aInSingleQuote, aInDoubleQuote: Boolean;
-    aRoundBracketCounter: integer;
-    aLValue: AnsiString;
-    aArguments: AnsiString;
     aCrc: LongInt;
-    P1, P2, P3, P4: integer;
+    P1, P2: integer;
+    S1: ansiString;
+
 begin
 
   //init result
   result := AExpr;
 
   //Replace all the strings by their CRC - to compare them as numbers
+  //but replace empty string '' by 0 instead of the CRC of an empty string
   aInSingleQuote := False;
   aInDoubleQuote := False;
   P1 := 0;
@@ -1931,6 +2003,7 @@ begin
         inc(P2);
         aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
       end;
+      inc(P2);
     end
     else if (Result[P2] = '''') then begin
       aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote);
@@ -1938,21 +2011,25 @@ begin
       if (P2 < length(Result)) and
          (Result[P2 + 1] = '''') then begin
         inc(P2);
-        aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
+        aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote);
       end;
+      inc(P2);
     end
     else if (not aInSingleQuote) and
             (not aInDoubleQuote) and
             (P1 > 0) then begin
-      aCrc := ZCrc32(0, result[P1+1], P2 - P1);
-      Delete(result, P1, P2 - P1 + 1);
+      S1 := AlCopyStr(result,P1, P2 - P1);
+      S1 := ALDequotedStr(S1, S1[1]);
+      if S1 = '' then aCrc := 0
+      else aCrc := ZCrc32(0, S1[1], length(S1));
+      Delete(result, P1, P2 - P1);
       Insert(ALIntToStr(aCrc), result, P1);
       P2 := P1 + length(ALIntToStr(aCrc));
       P1 := 0;
     end
     else inc(P2);
   end;
-  if P1 > 0 then raise Exception.Create('Wrong expression (unterminated string): '+ AExpr);
+  if P1 > 0 then raise EALException.Create('Wrong expression (unterminated string): '+ AExpr);
 
   //Clear non-useful white spaces
   setlength(result, Length(Result));
@@ -1970,60 +2047,9 @@ begin
   setlength(Result, P1);
   result := ALTrim(result);
 
-  // space before to avoid something like "sin(...)"
-  P1 := ALPosExIgnoreCase(' in(', result);  // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                            //                    ^P1
-  while P1 > 0 do begin
-
-    // init the aLvalue
-    P2 := (P1 - 2); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                    //                  ^P2
-    while (P2 > 0) and
-          (result[P2] in ['a'..'z', 'A'..'Z', '0'..'9', '_']) do Dec(P2); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                                                          //             ^^^^^^P2
-    aLvalue := AlCopyStr(result, P2 + 1, P1 - P2 - 1); // MyVar
-    if aLValue = '' then raise EALException.Create('Wrong expression (cannot assign left value for operator IN): ' + AExpr);
-    P4 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                  //              ^P4
-
-    // scroll all internals of IN(...) and reach final bracket ")" being
-    // sure that we lost nothing in "IN(func(1,2), 3)"
-    P1 := P1 + 3; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                  //                       ^P1
-    P2 := P1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-              //                       ^P2
-    P3 := P1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-              //                       ^P3
-    aRoundBracketCounter := 1;
-    aArguments := '';
-    while P2 <= length(result) do begin
-      if result[P2] = '(' then Inc(aRoundBracketCounter)
-      else if result[P2] = ')' then begin
-        Dec(aRoundBracketCounter);
-        if aRoundBracketCounter <= 0 then break;
-      end
-      else if (result[P2] = ',') and
-              (aRoundBracketCounter = 1) then begin // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                                    //                       ^^P2
-        if aArguments <> '' then aArguments := aArguments + ' or ';
-        aArguments := aArguments + '(' + aLValue + '=' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
-        P3 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                      //                       ^P3
-      end;
-      Inc(P2);
-    end;
-    if P2 > length(result) then raise EALException.Create('Wrong expression (missing closing bracket): ' + AExpr);
-    if aArguments <> '' then aArguments := aArguments + ' or ';
-    aArguments := aArguments + '(' + aLValue + '=' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
-    P3 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                  //                                        ^P2
-
-    Delete(result, P4, P2 - P4 + 1);
-    Insert('(' + aArguments + ')', result, P4);
-
-    P1 := ALPosExIgnoreCase(' in(', result, P4);
-
-  end;
+  //handle the in (x, y, z)
+  _handleIn('(',')');
+  _handleIn('[',']');
 
 end;
 

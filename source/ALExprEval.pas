@@ -61,7 +61,7 @@ Note :        operator priority (as implemented in this unit)
              (highest) not bnot(bitwise) +(unary) -(unary)            (level 3)
              * / div mod and band(bitwise) shl shr                    (level 2)
              +(binary) -(binary) or xor bor(bitwise) bxor(bitwise)    (level 1)
-             (lowest)  < <= > >= cmp = <> is                          (level 0)
+             (lowest)  < <= > >= cmp = <>                             (level 0)
 
              details on cmp operator:
              "1.5 cmp 2.0" returns -1.0 because 1.5 < 2.0
@@ -80,8 +80,7 @@ interface
 
 uses SysUtils,
      Classes,
-     ALStringList,
-     ALFcnString;
+     ALStringList;
 
 type
   EALExprEvalError = class(Exception);
@@ -138,8 +137,6 @@ type
   {$IFDEF SUPPORTS_EXTENDED}
   TALTernary80Func = function(X, Y, Z: TALFloat80): TALFloat80;
   {$ENDIF SUPPORTS_EXTENDED}
-
-  TALVariableArgumentCount32Func = function(Args: array of TALFloat32): TALFloat32;
 
 type
   { Forward Declarations }
@@ -398,9 +395,9 @@ type
 
   TALExprLexer = class(TObject)
   protected
-    FCurrTok:           TALExprToken;
-    FTokenAsNumber:     TALFloat;
-    FTokenAsString:     AnsiString;
+    FCurrTok: TALExprToken;
+    FTokenAsNumber: TALFloat;
+    FTokenAsString: AnsiString;
   public
     constructor Create;
     procedure NextTok; virtual; abstract;
@@ -462,7 +459,6 @@ type
     {$IFDEF SUPPORTS_EXTENDED}
     function CallTernary80Func(AFunc: TALTernary80Func; X, Y, Z: TALExprNode): TALExprNode; virtual; abstract;
     {$ENDIF SUPPORTS_EXTENDED}
-    function CallVariableArgumentsCount32Func(AFunc: TALVariableArgumentCount32Func; AArgs: array of TALExprNode): TALExprNode; virtual; abstract;
 
     function Add(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
     function Subtract(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
@@ -629,7 +625,6 @@ type
     {$IFDEF SUPPORTS_EXTENDED}
     function CallTernary80Func(AFunc: TALTernary80Func; X, Y, Z: TALExprNode): TALExprNode; override;
     {$ENDIF SUPPORTS_EXTENDED}
-    function CallVariableArgumentsCount32Func(AFunc: TALVariableArgumentCount32Func; AArgs: array of TALExprNode): TALExprNode; override;
 
     function Add(ALeft, ARight: TALExprNode): TALExprNode; override;
     function Subtract(ALeft, ARight: TALExprNode): TALExprNode; override;
@@ -892,16 +887,6 @@ type
   end;
   {$ENDIF SUPPORTS_EXTENDED}
 
-  TALExprVariableArgumentsCount32FuncSym = class(TALExprAbstractFuncSym)
-  private
-    FFunc:    TALVariableArgumentCount32Func;
-  protected
-  public
-    constructor Create(const AIdent: AnsiString; AFunc: TALVariableArgumentCount32Func);
-    function Evaluate: TALFloat; override;
-    function Compile: TALExprNode; override;
-  end;
-
   TALEasyEvaluator = class(TObject)
   private
     FOwnContext: TALExprHashContext;
@@ -945,7 +930,6 @@ type
     {$IFDEF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALTernary80Func); overload;
     {$ENDIF SUPPORTS_EXTENDED}
-    procedure AddFunc(const AName: AnsiString; AFunc: TALVariableArgumentCount32Func); overload;
     procedure Remove(const AName: AnsiString);
 
     procedure Clear; virtual;
@@ -954,14 +938,13 @@ type
 
   TALEvaluator = class(TALEasyEvaluator)
   private
-    FLexer:  TALExprSimpleLexer;
-    FParser: TALExprEvalParser;
-    FRegEx:  TALPerlRegEx;
-    function Prepare(const AExpr: AnsiString): AnsiString;
+    FLexer:     TALExprSimpleLexer;
+    FParser:    TALExprEvalParser;
+    function    Prepare(const AExpr: AnsiString): AnsiString;
   public
     constructor Create;
-    destructor Destroy; override;
-    function Evaluate(const AExpr: AnsiString): TALFloat;
+    destructor  Destroy; override;
+    function    Evaluate(const AExpr: AnsiString): TALFloat;
   end;
 
   TALCompiledEvaluator = class(TALEasyEvaluator)
@@ -990,7 +973,9 @@ resourcestring
 
 implementation
 
-uses Contnrs;
+uses Contnrs,
+     AlFcnString,
+     ALZLibEx;
 
 {***************************************}
 procedure ALClearObjectList(List: TList);
@@ -1443,7 +1428,7 @@ begin
           Result := 1.0
         else
           Result := 0.0;
-      etIdentifier: // cmp, is
+      etIdentifier: // cmp
         if ALSameText(Lexer.TokenAsString, 'cmp') then
         begin
           RightValue := EvalExprLevel1(True);
@@ -1454,14 +1439,6 @@ begin
             Result := 0.0
           else
             Result := -1.0;
-        end
-        else
-        if ALSameText(Lexer.TokenAsString, 'is') then
-        begin
-          if Result = EvalExprLevel3(true) then
-            Result := 1.0
-          else
-            Result := 0.0;
         end
         else
           Break;
@@ -1521,7 +1498,7 @@ begin
         Result := Result * EvalExprLevel3(True);
       etForwardSlash:
         Result := Result / EvalExprLevel3(True);
-      etIdentifier: // div, mod, and, shl, shr, band, is
+      etIdentifier: // div, mod, and, shl, shr, band
         if ALSameText(Lexer.TokenAsString, 'div') then
           Result := Round(Result) div Round(EvalExprLevel3(True))
         else
@@ -1719,7 +1696,7 @@ const
   );
 var
   { register variable optimization }
-  cp:    PAnsiChar;
+  cp: PAnsiChar;
   start: PAnsiChar;
 begin
   cp := FCurrPos;
@@ -1906,15 +1883,8 @@ constructor TALEvaluator.Create;
 begin
   inherited Create;
 
-  FLexer  := TALExprSimpleLexer.Create('');
+  FLexer := TALExprSimpleLexer.Create('');
   FParser := TALExprEvalParser.Create(FLexer);
-
-  FRegEx         := TALPerlRegEx.Create;
-  FRegEx.Options := FRegEx.Options + [ preCaseLess ];
-  FRegEx.RegEx   := '\b(\w+) in\(([\w,]+)\)';
-
-  // compile the regular expression to improve future performance
-  FRegEx.Study;
 
   FParser.Context := InternalContextSet;
 end;
@@ -1922,9 +1892,8 @@ end;
 {******************************}
 destructor TALEvaluator.Destroy;
 begin
-  FLexer.Free;
   FParser.Free;
-  FRegEx.Free;
+  FLexer.Free;
   inherited Destroy;
 end;
 
@@ -1937,13 +1906,15 @@ end;
 
 {*****************************************************************}
 function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
-var i: integer;
-    LValue: AnsiString;
-    RValue: TALStringList;
-    ATmp:   AnsiString;
+var i,
+    aCrc,
+    P1, P2, P3:           integer;
+    aRoundBracketCounter: integer;
+    LValue:               AnsiString;
+    aArguments:           AnsiString;
 begin
 
-  // clean non-useful white spaces
+  {$REGION 'Clear non-useful white spaces'}
   result := '';
   for i := 1 to Length(AExpr) do begin
     if (ALCharIsWhiteSpace(AExpr[i])) and
@@ -1953,59 +1924,81 @@ begin
     end
     else result := result + AExpr[i];
   end;
-
   result := ALTrim(result);
+  {$ENDREGION}
 
-  // transform operator IN to multiply equations
+  {$REGION 'Replace all the double quotes to single quotes '}
+  result := ALStringReplace(result, '"', '''', [rfReplaceAll]);
+  {$ENDREGION}
+
+  {$REGION 'Replace all the strings by their CRC - to compare them as numbers '}
+  P1 := AlPos('''', result);
+  while P1 > 0 do begin
+    P2 := ALPosEx('''', result, P1 + 1);
+    if P2 < P1 then raise EALException.Create('Wrong expression, single quote '' could be lost: ' + ALTrim(AExpr));
+    if P2 - P1 - 1 = 0 then aCrc := 0
+    else aCrc := ZCrc32(0, result[P1 + 1], P2 - P1 - 1);
+    Delete(result, P1, P2 - P1 + 1);
+    Insert(ALIntToStr(aCrc), result, P1);
+    P1 := AlPos('''', result);
+  end;
+  {$ENDREGION}
+
+  {$REGION 'Transform operator IN to multiply expressions merged by OR'}
   result := ALStringReplace(result,
                             ' in (',
                             ' in(',
                             [rfReplaceAll, rfIgnoreCase]);
 
-  FRegEx.Subject := result;
-  RValue := TALStringList.Create;
-  try
+  // space before to avoid something like "sin(...)"
+  P1 := ALPos(' in(', result);
+  aRoundBracketCounter := 1;
+  while P1 > 0 do begin
 
-    // find all patterns like "x IN (.., .., ..)"
-    while FRegEx.MatchAgain do begin
-
-      // take part of expression from the left of matching text
-      ATmp := FRegEx.SubjectLeft;
-
-      // x in (1,2,3)
-      //  LValue      = x
-      //  RValue.Text = 1 #13#10 2 #13#10 3
-      LValue      := FRegEx.Groups[1];
-      RValue.Text := ALStringReplace(FRegEx.Groups[2], ',', #13#10, [rfReplaceAll]);
-
-      // open group of operators, finally it will be like:
-      //  x in (1,2,3) => ( (x = 1) or (x = 2) or (x = 3) )
-      // the groups connected with "or" must be bounded by round brackets,
-      // else it's not possible correctly apply the operator IN inside
-      // some complex expression like: x IS NULL or x IN (1,2,3)
-      ATmp := ATmp + '(';
-      for i := 0 to RValue.Count - 1 do begin
-        ATmp := ATmp + '(' + ALTrim(LValue) + ' = ' + ALTrim(RValue[i]) + ') or '; // (1 = 2) or
-      end;
-
-      // skip trailing "or"
-      if (Length(ATmp) > 3) and
-         (ATmp[Length(ATmp) - 1] = 'r') and
-         (ATmp[Length(ATmp) - 2] = 'o') then Delete(ATmp, Length(ATmp) - 2, maxint);
-
-      ATmp := ATmp + ')' + FRegEx.SubjectRight;
-
-      // change subject, if there's many operators IN we will handle this situation
-      // on next attempting of the loop
-      FRegEx.Subject := ATmp;
-
+    // get X from "X in (1,0)"
+    LValue := '';
+    P3 := (P1 - 1);
+    while (P3 > 0) and
+          (result[P3] in ['0'..'9']) do begin
+      LValue := result[P3] + LValue;
+      Dec(P3);
     end;
+    if LValue = '' then raise EALException.Create('Wrong expression, cannot assign left value for operator IN: ' + ALTrim(AExpr));
 
-    result := FRegEx.Subject;
+    P1 := P1 + Length(' in(');
 
-  finally
-    RValue.Free;
+    // scroll all internals of IN(...) and reach final bracket ")" being
+    // sure that we lost nothing in "IN(func(1,2), 3)"
+    P2 := P1;
+    P3 := P1;
+    while true do begin
+      if      result[P2] = '(' then Inc(aRoundBracketCounter)
+      else if result[P2] = ')' then Dec(aRoundBracketCounter)
+      else if (result[P2] = ',') and
+              (aRoundBracketCounter = 1) then begin
+        aArguments := aArguments + '(' + LValue + ' = ' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ') or ';
+        P3 := P2 + 1;
+      end;
+      Inc(P2);
+
+      // check if we reach end of IN(...)
+      if (Length(result) < P2) or
+         (
+          (result[P2]           = ')') and
+          (aRoundBracketCounter = 0)
+         ) then break;
+    end;
+    if aRoundBracketCounter <> 0 then raise EALException.Create('Wrong expression, bracket ) could be lost: ' + ALTrim(AExpr))
+    else aArguments := aArguments + '(' + LValue + ' = ' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
+
+    // replace "X IN (1,2)" by "(X = 1) or (X = 2)"
+    P1 := P1 - Length(' in(') - Length(LValue);
+    Delete(result, P1, P2 - P1 + 1);
+    Insert(aArguments, result, P1);
+
+    P1 := ALPosEx(' in(', result, P1 + 1);
   end;
+  {$ENDREGION}
 
 end;
 
@@ -2234,7 +2227,6 @@ type
     procedure Execute; override;
   end;
 
-
   { function calls }
 
   {---------------------------------------------}
@@ -2400,16 +2392,6 @@ type
     procedure Execute; override;
   end;
   {$ENDIF SUPPORTS_EXTENDED}
-
-  {----------------------------------------------------------------}
-  TALExprCallVariableArgumentsCount32VmOp = class(TALExprVirtMachOp)
-  private
-    FFunc: TALVariableArgumentCount32Func;
-    FArgs: array of PALFloat;
-  public
-    constructor Create(AFunc: TALVariableArgumentCount32Func; AArgs: array of PALFloat);
-    procedure Execute; override;
-  end;
 
 {*********************************}
 procedure TALExprVar32VmOp.Execute;
@@ -2893,32 +2875,6 @@ end;
 
 {$ENDIF SUPPORTS_EXTENDED}
 
-{**************************************************************************************************************************}
-constructor TALExprCallVariableArgumentsCount32VmOp.Create(AFunc: TALVariableArgumentCount32Func; AArgs: array of PALFloat);
-var i: integer;
-begin
-  inherited Create;
-  FFunc := AFunc;
-
-  for i := 0 to Length(AArgs) - 1 do begin
-    SetLength(FArgs, Length(FArgs) + 1);
-    FArgs[High(FArgs)] := AArgs[i];
-  end;
-end;
-
-{********************************************************}
-procedure TALExprCallVariableArgumentsCount32VmOp.Execute;
-var LocalArgs: array of TALFloat32;
-    i: integer;
-begin
-  for i := 0 to Length(FArgs) - 1 do begin
-    SetLength(LocalArgs, Length(LocalArgs) + 1);
-    LocalArgs[High(LocalArgs)] := (FArgs[i])^;
-  end;
-
-  FOutput := FFunc(LocalArgs);
-end;
-
 { End of virtual machine operators }
 
 {*********************************}
@@ -3002,7 +2958,6 @@ type
 
     { this property saves typecasting to access ExprVmCode }
     property VmDeps[AIndex: Integer]: TALExprVirtMachNode read GetVmDeps; default;
-    property GetVmDepsCount: integer read GetDepCount;
   end;
 
 {***************************************************************************}
@@ -3224,15 +3179,6 @@ type
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
   {$ENDIF SUPPORTS_EXTENDED}
-
-  {--------------------------------------------------------------------}
-  TALExprCallVariableArgumentsCount32VmNode = class(TALExprVirtMachNode)
-  private
-    FFunc: TALVariableArgumentCount32Func;
-  public
-    constructor Create(AFunc: TALVariableArgumentCount32Func; AArgs: array of TALExprNode);
-    procedure GenCode(AVirtMach: TALExprVirtMach); override;
-  end;
 
 {***********************************************************************************************************}
 constructor TALExprUnaryVmNode.Create(AUnaryClass: TALExprUnaryVmOpClass; const ADeps: array of TALExprNode);
@@ -3590,13 +3536,6 @@ begin
   Result := AddNode(TALExprCallTernary80VmNode.Create(AFunc, X, Y, Z));
 end;
 {$ENDIF SUPPORTS_EXTENDED}
-
-{*********************************************************************************************************}
-function TALExprVirtMachNodeFactory.CallVariableArgumentsCount32Func(AFunc: TALVariableArgumentCount32Func;
-                                                                     AArgs: array of TALExprNode): TALExprNode;
-begin
-  Result := AddNode(TALExprCallVariableArgumentsCount32VmNode.Create(AFunc, AArgs));
-end;
 
 {***********************************************************************************}
 function TALExprVirtMachNodeFactory.Compare(ALeft, ARight: TALExprNode): TALExprNode;
@@ -4088,29 +4027,6 @@ begin
 end;
 
 {$ENDIF SUPPORTS_EXTENDED}
-
-{*******************************************************************************************************************************}
-constructor TALExprCallVariableArgumentsCount32VmNode.Create(AFunc: TALVariableArgumentCount32Func; AArgs: array of TALExprNode);
-begin
-  FFunc := AFunc;
-  inherited Create(AArgs);
-end;
-
-{**************************************************************************************}
-procedure TALExprCallVariableArgumentsCount32VmNode.GenCode(AVirtMach: TALExprVirtMach);
-var LocalArgs: array of PALFloat;
-    i: integer;
-begin
-  for i := 0 to GetVmDepsCount - 1 do begin
-    SetLength(LocalArgs, Length(LocalArgs) + 1);
-    LocalArgs[High(LocalArgs)] := VmDeps[i].ExprVmCode.OutputLoc;
-  end;
-
-  FExprVmCode := TALExprCallVariableArgumentsCount32VmOp.Create(
-    FFunc,
-    LocalArgs);
-  AVirtMach.Add(FExprVmCode);
-end;
 
 {***********************************************************}
 function TALExprAbstractFuncSym.CompileFirstArg: TALExprNode;
@@ -4611,70 +4527,6 @@ end;
 
 {$ENDIF SUPPORTS_EXTENDED}
 
-{**************************************************************************************************************************}
-constructor TALExprVariableArgumentsCount32FuncSym.Create(const AIdent: AnsiString; AFunc: TALVariableArgumentCount32Func);
-begin
-  Assert(Assigned(AFunc));
-  inherited Create(AIdent);
-  FFunc := AFunc;
-end;
-
-{*****************************************************************}
-function TALExprVariableArgumentsCount32FuncSym.Evaluate: TALFloat;
-var
-  LocalArgs: array of TALFloat32;
-
-  {--------------------------------------------}
-  procedure _AddToLocalArgs(AValue: TALFloat32);
-  begin
-    if Length(LocalArgs) = MaxInt then
-      raise Exception.Create('Local array of arguments is overflow');
-
-    SetLength(LocalArgs, Length(LocalArgs) + 1);
-    LocalArgs[High(LocalArgs)] := AValue;
-  end;
-
-begin
-  // evaluate first argument
-  _AddToLocalArgs(EvalFirstArg);
-
-  // evaluate all the other arguments
-  while Lexer.FCurrTok = etComma do begin
-    _AddToLocalArgs(EvalNextArg);
-  end;
-
-  EndArgs;
-  Result := FFunc(LocalArgs);
-end;
-
-{*******************************************************************}
-function TALExprVariableArgumentsCount32FuncSym.Compile: TALExprNode;
-var
-  LocalArgs: array of TALExprNode;
-
-  {--------------------------------------------}
-  procedure _AddToLocalArgs(AValue: TALExprNode);
-  begin
-    if Length(LocalArgs) = MaxInt then
-      raise Exception.Create('Local array of arguments is overflow');
-
-    SetLength(LocalArgs, Length(LocalArgs) + 1);
-    LocalArgs[High(LocalArgs)] := AValue;
-  end;
-
-begin
-  // compile first argument
-  _AddToLocalArgs(CompileFirstArg);
-
-  // compile all the other arguments
-  while Lexer.FCurrTok = etComma do begin
-    _AddToLocalArgs(CompileNextArg);
-  end;
-
-  EndArgs;
-  Result := NodeFactory.CallVariableArgumentsCount32Func(FFunc, LocalArgs);
-end;
-
 {*****************************************************************************}
 constructor TALExprConstSym.Create(const AIdent: AnsiString; AValue: TALFloat);
 begin
@@ -4897,12 +4749,6 @@ begin
 end;
 {$ENDIF SUPPORTS_EXTENDED}
 
-{*************************************************************************************************}
-procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALVariableArgumentCount32Func);
-begin
-  FOwnContext.Add(TALExprVariableArgumentsCount32FuncSym.Create(AName, AFunc));
-end;
-
 {*******************************}
 procedure TALEasyEvaluator.Clear;
 begin
@@ -4916,4 +4762,5 @@ begin
 end;
 
 end.
+
 

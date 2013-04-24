@@ -102,12 +102,18 @@ function ALWinExec32(const FileName, CurrentDirectory, Environment: AnsiString; 
 function ALWinExec32(const FileName: AnsiString; InputStream: Tstream; OutputStream: TStream): Dword; overload;
 function ALWinExecAndWait32(FileName:AnsiString; Visibility : integer):DWORD;
 Function ALWinExecAndWait32V2(FileName: AnsiString; Visibility: integer): DWORD;
+function ALWinExecAsUser(const aUserName: ANSIString;
+                         const aPassword: ANSIString;
+                         const aAppName: ANSIString;
+                         aCommandLine: ANSIString;
+                         aCurrentDirectory: ANSIString = ''): boolean;
 function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 
 implementation
 
 uses sysutils,
      messages,
+     ALWindows,
      AlFcnString;
 
 {******************************************}
@@ -374,6 +380,58 @@ Begin
      CloseHandle( ProcessInfo.hThread );
   End;
 End;
+
+{***************************************************}
+function ALWinExecAsUser(const aUserName: ANSIString;
+                         const aPassword: ANSIString;
+                         const aAppName: ANSIString;
+                         aCommandLine: ANSIString;
+                         aCurrentDirectory: ANSIString = ''): boolean;
+var aStartupInfo: TStartupInfoW;
+    aProcessInformation: TProcessInformation;
+    aUserNameW:    WideString;
+    aPasswordW:    WideString;
+    aAppNameW:     WideString;
+    aCommandLineW: WideString;
+begin
+
+  // clear the startup info and set count of bytes to read
+  ZeroMemory(@aStartupInfo, SizeOf(TStartupInfoW));
+  aStartupInfo.cb := SizeOf(TStartupInfoW);
+
+  // get the widestring presentation of incoming params
+  aUserNameW    := ALStringToWideString(aUserName, 65001);
+  aPasswordW    := ALStringToWideString(aPassword, 65001);
+  aAppNameW     := ALStringToWideString(aAppName, 65001);
+
+  // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682431(v=vs.85).aspx
+  // The function can modify the contents of this string. Therefore, this parameter cannot be a pointer
+  // to read-only memory (such as a const variable or a literal string). If this parameter is a
+  // constant string, the function may cause an access violation.
+  // ...
+  // Because argv[0] is the module name, C programmers typically repeat the module name as the first
+  // token in the command line.
+  aCommandLineW := aAppNameW + ' ' + ALStringToWideString(aCommandLine, 65001);
+
+  // try to create the process under specified user
+  result := ALCreateProcessWithLogonW(PWideChar(aUserNameW),
+                                      nil,
+                                      PWideChar(aPasswordW),
+                                      LOGON_WITH_PROFILE,
+                                      PWideChar(aAppNameW),
+                                      PWideChar(aCommandLineW),
+                                      0,
+                                      nil,
+                                      nil,
+                                      aStartupInfo,
+                                      aProcessInformation);
+
+  if result then begin
+    CloseHandle(aProcessInformation.hProcess);
+    CloseHandle(aProcessInformation.hThread);
+  end
+  else raise Exception.Create(SysErrorMessage(GetLastError));
+end;
 
 {*******************************************************************************************************************}
 // taken from http://www.delphi-zone.com/2010/02/how-to-use-the-adjusttokenprivileges-function-to-enable-a-privilege/

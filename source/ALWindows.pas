@@ -78,12 +78,21 @@ Var ALInterlockedCompareExchange64: function(var Destination: LONGLONG; Exchange
 Var ALGetTickCount64: function: int64; stdcall; // from Windows Vista / Windows Server 2008
 Var ALSetProcessWorkingSetSizeEx: function(hProcess: THandle; dwMinimumWorkingSetSize, dwMaximumWorkingSetSize: {$if CompilerVersion >= 23}{Delphi XE2}Size_T{$ELSE}Cardinal{$IFEND}; Flags: DWORD): BOOL; stdcall; // from Windows Vista / Windows Server 2003
 function ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
+function ALCreateProcessWithLogonW(lpUsername: PWideChar; lpDomain: PWideChar; lpPassword: PWideChar; dwLogonFlags: DWORD;
+                                   lpApplicationName: PWideChar; lpCommandLine: PWideChar; dwCreationFlags: DWORD; lpEnvironment: Pointer;
+                                   lpCurrentDirectory: PWideChar; const lpStartupInfo: TStartupInfo;
+                                   var lpProcessInfo: TProcessInformation): BOOL; stdcall;
+function ALUserExists(aUserName: WideString): boolean;
+
 
 const INVALID_SET_FILE_POINTER = DWORD(-1);
       QUOTA_LIMITS_HARDWS_MIN_DISABLE = $2;
       QUOTA_LIMITS_HARDWS_MIN_ENABLE  = $1;
       QUOTA_LIMITS_HARDWS_MAX_DISABLE = $8;
       QUOTA_LIMITS_HARDWS_MAX_ENABLE  = $4;
+      LOGON_WITH_PROFILE        = $1;
+      LOGON_NETCREDENTIALS_ONLY = $2;
+
 
 implementation
 
@@ -91,6 +100,9 @@ uses sysutils;
 
 {*****************************************************************************}
 function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
+
+{***********************************************************************************}
+function ALCreateProcessWithLogonW; external advapi32 name 'CreateProcessWithLogonW';
 
 {*********************************************************************************}
 function  ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
@@ -118,6 +130,48 @@ begin
   if not Assigned(ALGetTickCount64) then ALGetTickCount64 := ALGetTickCount64XP;
   @ALInterlockedCompareExchange64 := GetProcAddress(kernel32, 'InterlockedCompareExchange64');
   @ALSetProcessWorkingSetSizeEx := GetProcAddress(kernel32, 'SetProcessWorkingSetSizeEx');
+end;
+
+{****************************************************}
+function ALUserExists(aUserName: WideString): boolean;
+var SID: Pointer;
+    szDomain: PChar;
+    cbDomain, cbSID: Cardinal;
+    NameUse: Cardinal;
+begin
+  // initial values, reset them
+  SID      := nil;
+  szDomain := '';
+  cbDomain := 0;
+  cbSID    := 0;
+
+  // first attempt to get the buffer sizes
+  LookupAccountName('',
+                    PWideChar(aUserName),
+                    SID,
+                    cbSID,
+                    szDomain,
+                    cbDomain,
+                    NameUse);
+
+  // init buffers according to retrieved data
+  szDomain := StrAlloc(cbDomain);
+  SID      := AllocMem(cbSID);
+
+  try
+    // check if user exists
+    result := LookupAccountName('',
+                                PWideChar(aUserName),
+                                SID,
+                                cbSID,
+                                szDomain,
+                                cbDomain,
+                                NameUse);
+  finally
+    StrDispose(szDomain);
+    FreeMem(SID);
+  end;
+
 end;
 
 initialization

@@ -50,7 +50,10 @@ Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
 Know bug :
 
-History :
+History :     25/04/2013: add support to 's1' <> 's2'
+                          add support to z in (x, y, z)
+                          add support to max(x, y)
+                          add support to min(x,y)
 
 Link :
 
@@ -973,10 +976,31 @@ resourcestring
 
 implementation
 
-uses Contnrs,
+uses Math,
+     Contnrs,
      AlFcnString,
      ALZLibExAPI,
      ALZLibEx;
+
+{************************}
+{$IFDEF SUPPORTS_EXTENDED}
+function ALEvaluator_Max(A, B: TALFloat80): TALFloat80;
+{$ELSE}
+function ALEvaluator_Max(X, Y: TALFloat64): TALFloat64;
+{$ENDIF}
+begin
+  Result := Max(A, B);
+end;
+
+{************************}
+{$IFDEF SUPPORTS_EXTENDED}
+function ALEvaluator_Min(A, B: TALFloat80): TALFloat80;
+{$ELSE}
+function ALEvaluator_Min(X, Y: TALFloat64): TALFloat64;
+{$ENDIF}
+begin
+  Result := Min(A, B);
+end;
 
 {***************************************}
 procedure ALClearObjectList(List: TList);
@@ -1888,6 +1912,9 @@ begin
   FParser := TALExprEvalParser.Create(FLexer);
 
   FParser.Context := InternalContextSet;
+
+  addfunc('max',ALEvaluator_max);
+  addfunc('min',ALEvaluator_min);
 end;
 
 {******************************}

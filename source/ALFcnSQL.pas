@@ -321,8 +321,8 @@ begin
   result.Params := FBXClientSQLParams;
   result.RowTag := RowTag;
   result.ViewTag := ViewTag;
-  result.Skip := Skip;
-  result.First := First;
+  result.Skip := -1; // because it's added in the SQL
+  result.First := -1; // because it's added in the SQL
   result.CacheThreshold := 0;
 end;
 

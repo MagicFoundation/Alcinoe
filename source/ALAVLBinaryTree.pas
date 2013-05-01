@@ -1,24 +1,15 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALAVLBinaryTree (Self-Balancing Binary Trees)
 Version:      4.00
 
-Description:  - These binary trees are self-balancing in the AVL sense
-                (the depth of any left branch differs by no more than
-                one from the depth of the right branch).
-
-              - Duplicate data is not allowed in a tree.
-
-              - Nodes can be of type TALBaseAVLBinaryTreeNode or any
-                descendant.
-
-              - Next and Prev should not be used to iterate through an
-                entire tree. This is much slower than calling the Iterate
-                method.
+Description:  These binary trees are self-balancing in the AVL sense
+              (the depth of any left branch differs by no more than
+              one from the depth of the right branch).
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
@@ -70,7 +61,7 @@ History :     27/10/2005: Rebuild of the unit
 
 Link :
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 

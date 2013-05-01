@@ -1,7 +1,7 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALWinInetHttpClient
@@ -70,7 +70,7 @@ Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
               http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wininet/wininet/about_wininet.asp
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 

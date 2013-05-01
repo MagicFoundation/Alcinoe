@@ -151,7 +151,7 @@ end;
 
 procedure TfrmMain.LblAuthorNameClick(Sender: TObject);
 begin
-  ShellApi.ShellExecute(Handle, 'open', 'mailto:SVanderClock@arkadia.com', nil, nil, 0);
+  ShellApi.ShellExecute(Handle, 'open', 'mailto:alcinoe@arkadia.com', nil, nil, 0);
 end;
 
 procedure TfrmMain.LblMeClick(Sender: TObject);

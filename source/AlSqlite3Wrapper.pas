@@ -1,6 +1,6 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Yury Plashenkov (yury@plashenkov.com)
               based on http://code.google.com/p/sqlite3delphi/
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
@@ -56,7 +56,7 @@ Link :        http://www.sqlite.org/
               http://code.google.com/p/sqlite3delphi/
               svn checkout http://sqlite3delphi.googlecode.com/svn/trunk/
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 

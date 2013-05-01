@@ -2,7 +2,7 @@ You can download the latest version available at
 http://sourceforge.net/projects/alcinoe/
 
 you can access the last svn version at:
-svn co https://alcinoe.svn.sourceforge.net/svnroot/alcinoe alcinoe 
+svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code 
 or with a web browser at:
 http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
 

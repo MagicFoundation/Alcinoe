@@ -3,4 +3,4 @@ individuals via your internet connected computer. This Software
 can send bulk SMS (Mailing SMS, Alert SMS or Newsletter SMS) using 
 normal Mobile phone connected via bluetooth 
 
-The source code is available on request: svanderclock@arkadia.com
+The source code is available on request: alcinoe@arkadia.com

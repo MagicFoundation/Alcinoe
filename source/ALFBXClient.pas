@@ -1,7 +1,7 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBXClient (Alcinoe FireBird Express Client)
@@ -52,7 +52,7 @@ History :     02/03/2010: add aNumbuffers: Integer to the connect
 
 Link :        http://www.progdigy.com/modules.php?name=UIB
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by

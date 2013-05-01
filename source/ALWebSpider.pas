@@ -141,8 +141,8 @@ Type
   {--------------------------------------------------------------------------------}
   TAlWebSpiderUpdateLinkToLocalPathEndEvent = Procedure (Sender: TObject) of object;
 
-  {------------------------------}
-  TAlWebSpider = Class(TComponent)
+  {---------------------------}
+  TAlWebSpider = Class(TObject)
   Private
     fOnUpdateLinkToLocalPathEnd: TAlWebSpiderUpdateLinkToLocalPathEndEvent;
     fOnUpdateLinkToLocalPathFindLink: TAlWebSpiderUpdateLinkToLocalPathFindLinkEvent;
@@ -156,11 +156,9 @@ Type
     FHttpClient: TalHttpClient;
     fOnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent;
     fOnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent;
-  Protected
   Public
     Procedure Crawl; {Launch the Crawling of the page}
     Procedure UpdateLinkToLocalPath; {Update the link of downloaded page to local path}
-  published
     Property  OnCrawlBeforeDownload: TAlWebSpiderCrawlBeforeDownloadEvent read fOnCrawlBeforeDownload write fOnCrawlBeforeDownload; {When a page is successfully downloaded}
     Property  OnCrawlAfterDownload: TAlWebSpiderCrawlAfterDownloadEvent read fOnCrawlAfterDownload write fOnCrawlAfterDownload; {When a page is successfully downloaded}
     Property  OnCrawlDownloadSuccess: TAlWebSpiderCrawlDownloadSuccessEvent read fOnCrawlDownloadSuccess write fOnCrawlDownloadSuccess; {When a page is successfully downloaded}
@@ -259,11 +257,7 @@ Type
     DeepLevel: Integer;
   end;
 
-procedure Register;
-
 implementation
-
-{$R ..\resource\ALWebSpider.dcr}
 
 uses Windows,
      sysutils,
@@ -272,12 +266,6 @@ uses Windows,
      AlFcnHTML,
      AlFcnMime,
      AlFcnString;
-
-{*****************}
-procedure Register;
-begin
-  RegisterComponents('Alcinoe', [TALWebSpider]);
-end;
 
 type
 
@@ -783,7 +771,7 @@ end;
 {*************************************}
 constructor TAlTrivialWebSpider.Create;
 begin
-  FWebSpider := TalWebSpider.Create(nil);
+  FWebSpider := TalWebSpider.Create;
   fStartUrl := '';
   fLstUrlCrawled := nil;
   fLstErrorEncountered := nil;

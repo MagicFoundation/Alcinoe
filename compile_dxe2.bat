@@ -66,6 +66,72 @@ IF ERRORLEVEL 1 goto ERROR
 
 pause
 
+if exist ..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
+
+  del ..\..\BlowPipeEmail\*.rsm /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeEmail\*.dcu /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeEmail\*.exe /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeEmail\*.ini /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeEmail\*.identcache /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeEmail\*.dproj.local /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  MSBuild ..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj /t:build /p:Config=Release /p:Platform=Win32
+  IF ERRORLEVEL 1 goto ERROR
+  
+  pause
+  
+  xcopy ..\..\BlowPipeEmail\BlowPipeEmail.exe demo\BlowPipeEmail /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeEmail\*.dcu /s
+  IF ERRORLEVEL 1 goto ERROR
+
+)  
+
+if exist ..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
+
+  del ..\..\BlowPipeSMS\*.rsm /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeSMS\*.dcu /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeSMS\*.exe /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeSMS\*.ini /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeSMS\*.identcache /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeSMS\*.dproj.local /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  MSBuild ..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj /t:build /p:Config=Release /p:Platform=Win32
+  IF ERRORLEVEL 1 goto ERROR
+  
+  pause
+  
+  xcopy ..\..\BlowPipeSMS\BlowPipeSMS.exe demo\BlowPipeSMS /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\..\BlowPipeSMS\*.dcu /s
+  IF ERRORLEVEL 1 goto ERROR
+
+)  
+
 del Release\Alcinoe.zip
 
 C:\Progra~1\7-Zip\7za.exe a -tzip -r release\Alcinoe.zip * -x!_svn* -x!.svn* -x!*.dcu -x!*.bpl -x!*__history* -x!release*

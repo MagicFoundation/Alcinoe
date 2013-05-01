@@ -94,7 +94,8 @@ contains
   ALZLibExApi in 'ALZLibExApi.pas',
   ALIniFiles in 'ALIniFiles.pas',
   ALExprEval in 'ALExprEval.pas',
-  ALJSONDoc in 'ALJSONDoc.pas';
+  ALJSONDoc in 'ALJSONDoc.pas',
+  ALMemCachedClient in 'ALMemCachedClient.pas';
 
 end.
 

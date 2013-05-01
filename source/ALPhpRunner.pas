@@ -117,7 +117,11 @@ interface
 
 uses Windows,
      Classes,
+     {$IF CompilerVersion >= 23} {Delphi XE2}
+     WinSock2,
+     {$ELSE}
      WinSock,
+     {$IFEND}
      Contnrs,
      SyncObjs,
      ALHttpCommon,
@@ -283,8 +287,8 @@ type
   private
   protected
     procedure CheckError(Error: Boolean); virtual; abstract;
-    Function  IOWrite(Var Buffer; Count: Longint): Longint; virtual; abstract;
-    Function  IORead(var Buffer; Count: Longint): Longint; virtual; abstract;
+    Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; virtual; abstract;
+    Function  IORead(var buf; len: Integer): Integer; virtual; abstract;
     Procedure SendRequest(aRequest:AnsiString); virtual;
     function  ReadResponse: AnsiString; virtual;
   public
@@ -297,23 +301,31 @@ type
   {----------------------------------------------------------------}
   TALPhpSocketFastCgiRunnerEngine = class(TALPhpFastCgiRunnerEngine)
   private
-    FWSAData : TWSAData;
     Fconnected: Boolean;
-    FSocketDescriptor: Integer;
-    Ftimeout: integer;
-    procedure Settimeout(const Value: integer);
+    FSocketDescriptor: TSocket;
+    FSendTimeout: Integer;
+    FReceiveTimeout: Integer;
+    fKeepAlive: Boolean;
+    fTCPNoDelay: Boolean;
+    procedure SetSendTimeout(const Value: integer);
+    procedure SetReceiveTimeout(const Value: integer);
+    procedure SetKeepAlive(const Value: boolean);
+    procedure SetTCPNoDelay(const Value: boolean);
   protected
     procedure CheckError(Error: Boolean); override;
-    Function  IOWrite(Var Buffer; Count: Longint): Longint; override;
-    Function  IORead(var Buffer; Count: Longint): Longint; override;
+    Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; override;
+    Function  IORead(var buf; len: Integer): Integer; override;
   public
     constructor Create; overload; virtual;
-    constructor Create(aHost: AnsiString; APort: integer); overload; virtual;
+    constructor Create(const aHost: AnsiString; const APort: integer); overload; virtual;
     destructor  Destroy; override;
-    Procedure Connect(aHost: AnsiString; APort: integer); virtual;
+    Procedure Connect(const aHost: AnsiString; const APort: integer); virtual;
     Procedure Disconnect; virtual;
     property Connected: Boolean read FConnected;
-    Property Timeout: integer read Ftimeout write Settimeout default 60000;
+    property SendTimeout: Integer read FSendTimeout write SetSendTimeout;
+    property ReceiveTimeout: Integer read FReceiveTimeout write SetReceiveTimeout;
+    property KeepAlive: Boolean read fKeepAlive write SetKeepAlive;
+    property TcpNoDelay: Boolean read fTCPNoDelay write fTCPNoDelay;
   end;
 
   {-------------------------------------------------------------------}
@@ -331,8 +343,8 @@ type
     Ftimeout: integer;
   protected
     procedure CheckError(Error: Boolean); override;
-    Function  IOWrite(Var Buffer; Count: Longint): Longint; override;
-    Function  IORead(var Buffer; Count: Longint): Longint; override;
+    Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; override;
+    Function  IORead(var buf; len: Integer): Integer; override;
     Property  RequestCount: Integer read FRequestCount;
   public
     constructor Create; overload; virtual;
@@ -727,8 +739,8 @@ begin
 
 end;
 
-{************************************************************************************}
-constructor TALPhpSocketFastCgiRunnerEngine.Create(aHost: AnsiString; APort: integer);
+{************************************************************************************************}
+constructor TALPhpSocketFastCgiRunnerEngine.Create(const aHost: AnsiString; const APort: integer);
 Begin
   create;
   Connect(aHost, APort);
@@ -736,39 +748,52 @@ End;
 
 {*************************************************}
 constructor TALPhpSocketFastCgiRunnerEngine.Create;
+var aWSAData: TWSAData;
 begin
-  FWSAData.wVersion := 0;
+  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
   Fconnected:= False;
   FSocketDescriptor:= INVALID_SOCKET;
-  Ftimeout:= 60000;
+  FSendTimeout := 60000; // 60 seconds
+  FReceiveTimeout := 60000; // 60 seconds
+  FKeepAlive := True;
+  fTCPNoDelay := True;
 end;
 
 {*************************************************}
 destructor TALPhpSocketFastCgiRunnerEngine.Destroy;
 begin
   If Fconnected then Disconnect;
+  WSACleanup;
   inherited;
 end;
 
-{***********************************************************************************}
-procedure TALPhpSocketFastCgiRunnerEngine.Connect(aHost: AnsiString; APort: integer);
+{***********************************************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.Connect(const aHost: AnsiString; const APort: integer);
 
-  {-------------------------------------------------}
-  procedure CallServer(Server:AnsiString; Port:word);
+  {--------------------------------------------------------------}
+  procedure _CallServer(const Server:AnsiString; const Port:word);
   var SockAddr:Sockaddr_in;
       IP: AnsiString;
   begin
-    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
+    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
     CheckError(FSocketDescriptor=INVALID_SOCKET);
     FillChar(SockAddr,SizeOf(SockAddr),0);
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+    {$ELSE}
     If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
+    {$IFEND}
       checkError(ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    CheckError(WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
+    {$ELSE}
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
+    {$IFEND}
   end;
 
 begin
@@ -777,11 +802,12 @@ begin
 
   Try
 
-    WSAStartup (MAKEWORD(2,2), FWSAData);
-    CallServer(aHost,aPort);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    _CallServer(aHost,aPort);
     Fconnected := True;
+    SetSendTimeout(FSendTimeout);
+    SetReceiveTimeout(FReceiveTimeout);
+    SetKeepAlive(FKeepAlive);
+    SetTCPNoDelay(fTCPNoDelay);
 
   Except
     Disconnect;
@@ -797,8 +823,6 @@ begin
     ShutDown(FSocketDescriptor,SD_BOTH);
     CloseSocket(FSocketDescriptor);
     FSocketDescriptor := INVALID_SOCKET;
-    if FWSAData.wVersion = 2 then WSACleanup;
-    FWSAData.wVersion := 0;
     Fconnected := False;
   end;
 end;
@@ -809,29 +833,63 @@ begin
   if Error then RaiseLastOSError;
 end;
 
-{*************************************************************************}
-procedure TALPhpSocketFastCgiRunnerEngine.Settimeout(const Value: integer);
+{*****************************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.SetSendTimeout(const Value: integer);
 begin
-  If Value <> Ftimeout then begin
-    if FConnected then begin
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    end;
-    Ftimeout := Value;
+  FSendTimeout := Value;
+  if FConnected then CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FSendTimeout),SizeOf(FSendTimeout))=SOCKET_ERROR);
+end;
+
+{********************************************************************************}
+procedure TALPhpSocketFastCgiRunnerEngine.SetReceiveTimeout(const Value: integer);
+begin
+  FReceiveTimeout := Value;
+  if FConnected then CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FReceiveTimeout),SizeOf(FReceiveTimeout))=SOCKET_ERROR);
+end;
+
+{*******************************************************************************************************************}
+// http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
+procedure TALPhpSocketFastCgiRunnerEngine.SetKeepAlive(const Value: boolean);
+var aIntBool: integer;
+begin
+  FKeepAlive := Value;
+  if FConnected then begin
+    // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
+    // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
+    // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
+    if FKeepAlive then aIntBool := 1
+    else aIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
   end;
 end;
 
-{***********************************************************************************}
-function TALPhpSocketFastCgiRunnerEngine.IORead(var Buffer; Count: Longint): Longint;
+{***************************************************************************************************************************************************************************************************************}
+// https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
+procedure TALPhpSocketFastCgiRunnerEngine.SetTCPNoDelay(const Value: boolean);
+var aIntBool: integer;
 begin
-  Result := Recv(FSocketDescriptor,Buffer,Count,0);
+  fTCPNoDelay := Value;
+  if FConnected then begin
+    // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
+    // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
+    // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
+    if fTCPNoDelay then aIntBool := 1
+    else aIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+  end;
+end;
+
+{******************************************************************************}
+function TALPhpSocketFastCgiRunnerEngine.IORead(var buf; len: Integer): Integer;
+begin
+  Result := Recv(FSocketDescriptor,buf,len,0);
   CheckError(Result = SOCKET_ERROR);
 end;
 
-{************************************************************************************}
-function TALPhpSocketFastCgiRunnerEngine.IOWrite(Var Buffer; Count: Longint): Longint;
+{******************************************************************************************************************************}
+function TALPhpSocketFastCgiRunnerEngine.IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
 begin
-  Result := Send(FSocketDescriptor,Buffer,Count,0);
+  Result := Send(FSocketDescriptor,buf,len,0);
   CheckError(Result =  SOCKET_ERROR);
 end;
 
@@ -1003,8 +1061,8 @@ begin
   if Error then RaiseLastOSError
 end;
 
-{**************************************************************************************}
-function TALPhpNamedPipeFastCgiRunnerEngine.IORead(var Buffer; Count: Longint): Longint;
+{*********************************************************************************}
+function TALPhpNamedPipeFastCgiRunnerEngine.IORead(var buf; len: Integer): Integer;
 Var lpNumberOfBytesRead: DWORD;
     StartTickCount: Int64;
 begin
@@ -1020,7 +1078,7 @@ begin
                                  @lpNumberOfBytesRead,   // pointer to total number of bytes available
                                  nil));                     // pointer to unread bytes in this message
     if lpNumberOfBytesRead > 0 then begin
-      CheckError(not ReadFile(FClientPipe,Buffer,count,lpNumberOfBytesRead,nil));
+      CheckError(not ReadFile(FClientPipe,buf,len,lpNumberOfBytesRead,nil));
       result := lpNumberOfBytesRead;
       break;
     end
@@ -1029,11 +1087,11 @@ begin
   Until ALGetTickCount64 - StartTickCount > fTimeout;
 end;
 
-{***************************************************************************************}
-function TALPhpNamedPipeFastCgiRunnerEngine.IOWrite(Var Buffer; Count: Longint): Longint;
+{*********************************************************************************************************************************}
+function TALPhpNamedPipeFastCgiRunnerEngine.IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
 Var lpNumberOfBytesWritten: DWORD;
 begin
-  CheckError(not WriteFile(FClientPipe,Buffer,Count,lpNumberOfBytesWritten,nil));
+  CheckError(not WriteFile(FClientPipe,Buf,len,lpNumberOfBytesWritten,nil));
   result := lpNumberOfBytesWritten;
 end;
 

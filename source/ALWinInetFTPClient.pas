@@ -190,7 +190,7 @@ type
     procedure SetConnected(const Value: Boolean); override;
     procedure OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer); override;
   public
-    constructor Create(Owner: TComponent); override;
+    constructor Create; override;
     destructor Destroy; override;
     procedure CreateDirectory(const Directory: AnsiString); override;
     procedure DeleteFile(const FileName: AnsiString); override;
@@ -216,27 +216,16 @@ type
     Procedure SetCurrentDirectory(const Directory: AnsiString); override;
     procedure Connect; override;
     procedure Disconnect; override;
-  published
     property  TransferType: TALWinInetFtpTransferType read FTranferType write FTranferType default wFtpTt_BINARY;
     property  AccessType: TALWinInetFtpInternetOpenAccessType read FAccessType write SetAccessType default wFtpAt_Preconfig;
     property  InternetOptions: TAlWininetFtpClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wftpIo_No_cache_write];
     property  OnStatusChange: TAlWinInetFtpClientStatusChangeEvent read FOnStatusChange write SetOnStatusChange;
   end;
 
-procedure Register;
-
 implementation
 
 Uses SysUtils,
      AlFcnString;
-
- {$R ..\resource\ALWinInetFTPClient.dcr}
-
-{*****************}
-procedure Register;
-begin
-  RegisterComponents('Alcinoe', [TALWinInetFTPClient]);
-end;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}
@@ -261,8 +250,8 @@ begin
   end;
 end;
 
-{********************************************************}
-constructor TALWinInetFTPClient.Create(Owner: TComponent);
+{*************************************}
+constructor TALWinInetFTPClient.Create;
 begin
   inherited;
   FInetRoot := nil;

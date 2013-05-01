@@ -1,6 +1,6 @@
 ﻿{*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      Alcinoe Unicode Functions
@@ -55,7 +55,7 @@ History :     14/11/2005: Add Function ALStringToWideString,
 
 Link :
 
-Please send all your feedback to svanderclock@arkadia.com
+Please send all your feedback to alcinoe@arkadia.com
 **************************************************************}
 unit ALFcnUnicode;
 

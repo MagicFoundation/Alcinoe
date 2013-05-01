@@ -1,8 +1,8 @@
 ﻿// <- User With delphi < D2007 must manually delete this UTF8 BOM
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
               John O'Harrow (john@elmcrest.demon.co.uk)
               Charalabos Michael (chmichael@creationpower.com)
               Aleksandr Sharahov
@@ -81,7 +81,7 @@ History:      11/05/2005: Remove the bug in alFastTagReplace that raise
 
 Link :
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by

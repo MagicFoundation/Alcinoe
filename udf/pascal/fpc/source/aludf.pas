@@ -1,7 +1,7 @@
 {*************************************************************
-Author:       Stéphane Vander Clock (SVanderClock@Arkadia.com)
+Author:       Stéphane Vander Clock (alcinoe@arkadia.com)
 www:          http://www.arkadia.com
-EMail:        SVanderClock@Arkadia.com
+EMail:        alcinoe@arkadia.com
 
 product:      ALudf
 Version:      1.52
@@ -47,7 +47,7 @@ History :     20/11/2006: replace msvcrt.dll by msvcr71.dll do work with
 
 Link :
 
-Please send all your feedback to SVanderClock@Arkadia.com
+Please send all your feedback to alcinoe@arkadia.com
 **************************************************************}
 library aludf;
 

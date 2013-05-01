@@ -1,6 +1,6 @@
 {*****************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALPhpRunner
@@ -105,7 +105,7 @@ History :     29/01/2007: correct status missed in ALPhpRunnerECBServerSupportFu
 
 Link :
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 

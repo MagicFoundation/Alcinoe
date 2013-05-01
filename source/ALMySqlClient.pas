@@ -1,7 +1,7 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALMySqlClient
@@ -48,7 +48,7 @@ History :     26/06/2012: Add xe2 support
 Link :        http://dev.mysql.com/doc/refman/5.0/en/
               http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by 

@@ -1,32 +1,25 @@
 {*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/              
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe              
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
-							Dean Mustakinov (dejanm73@gmail.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
+              Dean Mustakinov (dejanm73@gmail.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
 product:      ALXmlDocument
 Version:      4.01
 
-Description:  TALXmlDocument is exactly like Delphi TXmlDocument (Same functions 
-              and procedures) but 10 to 100 times more fastly (see demo) and can 
-              work in sax mode ! 
+Description:  TALXmlDocument is exactly like Delphi TXmlDocument 
+              (Same functions and procedures) but 10 to 100 times more 
+              faster (see demo) and can work even in sax mode ! 
 
-              Use TAlXMLDocument to represent an XML document. TAlXMLDocument can
-              read an existing XML document from a file, it can be associated with
-              an in-memory string that is the contents of an XML document, or it 
-              can create a new, empty XML document.
+              Use TAlXMLDocument to represent an XML document. 
+              TAlXMLDocument can read an existing XML document from a 
+              file, it can be associated with an in-memory string that is 
+              the contents of an XML document, or it can create a new, 
+              empty XML document.
 
-              You can use TALXMLDocument directly to load an XML document, read and 
-              edit it, and save any changes.
-
-              TALXMLDocument uses an internal parser to analyze the XML document.
-
-              When you set the Active property to true, TALXMLDocument parse the XML
-              document so that you can examine or modify it. In particular, the
-              DocumentElement property provides an interface to the root node of the
-              document. You can use that interface to access its child nodes and to
-              add or delete child nodes.
+              TALXMLDocument uses it's own internal parser to analyze 
+              the XML document.
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
@@ -96,7 +89,7 @@ History :     27/05/2006: Add loadfromstream, loadfromfile,
 
 Link :
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by

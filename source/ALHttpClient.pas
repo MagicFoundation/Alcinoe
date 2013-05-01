@@ -81,8 +81,8 @@ type
     property StatusCode: Integer read FStatusCode write FStatusCode;
   end;
 
-  {-------------------------------------------}
-  TALHTTPClientProxyParams = Class(TPersistent)
+  {---------------------------------------}
+  TALHTTPClientProxyParams = Class(Tobject)
   Private
     FProxyBypass: AnsiString;
     FproxyServer: AnsiString;
@@ -96,12 +96,9 @@ type
     procedure SetProxyServer(const Value: AnsiString);
     procedure SetProxyUserName(const Value: AnsiString);
     Procedure DoChange(propertyIndex: Integer);
-  protected
-    procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create; virtual;
     procedure Clear;
-  published
     Property ProxyBypass: AnsiString read FProxyBypass write SetProxyBypass; //index 0
     property ProxyServer: AnsiString read FProxyServer write SetProxyServer; //index 1
     property ProxyPort: integer read FProxyPort write SetProxyPort default 0; //index 2
@@ -115,8 +112,8 @@ type
   TALHTTPClientUploadProgressEvent   = procedure(sender: Tobject; Sent: Integer; Total: Integer) of object;
   TALHTTPClientDownloadProgressEvent = procedure(sender: Tobject; Read: Integer; Total: Integer) of object;
 
-  {-------------------------------}
-  TALHTTPClient = class(TComponent)
+  {----------------------------}
+  TALHTTPClient = class(TObject)
   private
     FProxyParams: TALHTTPClientProxyParams;
     FRequestHeader: TALHTTPRequestHeader;
@@ -141,7 +138,7 @@ type
     procedure SetUploadBufferSize(const Value: Integer); virtual;
     procedure SetOnRedirect(const Value: TAlHTTPClientRedirectEvent); virtual;
   public
-    constructor Create(Owner: TComponent); override;
+    constructor Create; virtual;
     destructor Destroy; override;
     procedure Execute(aRequestDataStream: TStream;
                       aResponseContentStream: TStream;
@@ -200,7 +197,6 @@ type
     Function  trace(const aUrl:AnsiString): AnsiString; overload;
     function  Put(const aURL: Ansistring; aPutDataStream: TStream): AnsiString; overload;
     function  Delete(const aURL: Ansistring): AnsiString; overload;
-  published
     property  URL: AnsiString read FURL write SetURL;
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
     property  SendTimeout: Integer read FSendTimeout write FSendTimeout default 0;
@@ -241,8 +237,8 @@ begin
   FStatusCode := SCode;
 end;
 
-{**************************************************}
-constructor TALHTTPClient.Create(Owner: TComponent);
+{*******************************}
+constructor TALHTTPClient.Create;
 begin
   inherited;
   FUploadBufferSize := $8000;
@@ -256,7 +252,7 @@ begin
   FOnDownloadProgress := nil;
   FOnRedirect := nil;
   FProxyParams := TALHTTPClientProxyParams.Create;
-  FRequestHeader := TALHTTPRequestHeader.Create(self);
+  FRequestHeader := TALHTTPRequestHeader.Create;
   FRequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALHTTPClient)';
   FProtocolVersion := HTTPpv_1_1;
   FRequestMethod := HTTPmt_get;
@@ -698,21 +694,6 @@ end;
 procedure TALHTTPClient.SetUploadBufferSize(const Value: Integer);
 begin
   If Value >= 0 then FUploadBufferSize := Value;
-end;
-
-{*************************************************************}
-procedure TALHTTPClientProxyParams.AssignTo(Dest: TPersistent);
-begin
-  if Dest is TALHTTPClientProxyParams then begin
-    with Dest as TALHTTPClientProxyParams do begin
-      FProxyBypass := self.FProxyBypass;
-      FproxyServer := self.FproxyServer;
-      FProxyUserName := self.FProxyUserName;
-      FProxyPassword := self.FProxyPassword;
-      FproxyPort := self.FproxyPort;
-    end;
-  end
-  else inherited AssignTo(Dest);
 end;
 
 {***************************************}

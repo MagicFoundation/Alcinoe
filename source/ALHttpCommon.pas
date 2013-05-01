@@ -98,7 +98,7 @@ Type
                    HTTPmt_Delete);
 
   {--Request header--}
-  TALHTTPRequestHeader = Class(Tcomponent)
+  TALHTTPRequestHeader = Class(TObject)
   Private
     fAccept: AnsiString;
     fAcceptCharSet: AnsiString;
@@ -147,14 +147,11 @@ Type
     procedure SetCookies(const Value: TALStrings);
     procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
     procedure SetCustomHeaders(const Value: TALStrings);
-  protected
-    procedure AssignTo(Dest: TPersistent); override;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
     Property RawHeaderText: AnsiString read GetRawHeaderText write SetRawHeaderText;
-  Published
     property Accept: AnsiString index 0 read FAccept write SetHeaderValueByPropertyIndex; {Accept: audio/*; q=0.2, audio/basic}
     property AcceptCharSet: AnsiString index 1 read FAcceptCharSet write SetHeaderValueByPropertyIndex; {Accept-Charset: iso-8859-5, unicode-1-1;q=0.8}
     property AcceptEncoding: AnsiString index 2 read FAcceptEncoding write SetHeaderValueByPropertyIndex; {Accept-Encoding: gzip;q=1.0, identity; q=0.5, *;q=0}
@@ -234,7 +231,7 @@ Type
   end;
 
   {--Response header--}
-  TALHTTPResponseHeader = Class(TPersistent)
+  TALHTTPResponseHeader = Class(TObject)
   Private
     FAcceptRanges: AnsiString;
     FAge: AnsiString;
@@ -272,8 +269,6 @@ Type
     FReasonPhrase: AnsiString;
     procedure SetRawHeaderText(const aRawHeaderText: AnsiString);
     Function GetRawHeaderText: AnsiString;
-  protected
-    procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -709,54 +704,10 @@ begin
   end;
 end;
 
-{**********************************************************}
-procedure TALHTTPResponseHeader.AssignTo(Dest: TPersistent);
-begin
-  if Dest is TALHTTPResponseHeader then begin
-    with Dest as TALHTTPResponseHeader do begin
-      FAcceptRanges := Self.FAcceptRanges;
-      FAge := Self.FAge;
-      FAllow := Self.FAllow;
-      FCacheControl := Self.FCacheControl;
-      FConnection := Self.FConnection;
-      FContentEncoding := Self.FContentEncoding;
-      FContentLanguage := Self.FContentLanguage;
-      FContentLength := Self.FContentLength;
-      FContentLocation := Self.FContentLocation;
-      FContentMD5 := Self.FContentMD5;
-      FContentRange := Self.FContentRange;
-      FContentType := Self.FContentType;
-      FDate := Self.FDate;
-      FETag := Self.FETag;
-      FExpires := Self.FExpires;
-      FLastModified := Self.FLastModified;
-      FLocation := Self.FLocation;
-      FPragma := Self.FPragma;
-      FProxyAuthenticate := Self.FProxyAuthenticate;
-      FRetryAfter := Self.FRetryAfter;
-      FServer := Self.FServer;
-      FTrailer := Self.FTrailer;
-      FTransferEncoding := Self.FTransferEncoding;
-      FUpgrade := Self.FUpgrade;
-      FVary := Self.FVary;
-      FVia := Self.FVia;
-      FWarning := Self.FWarning;
-      FWWWAuthenticate := Self.FWWWAuthenticate;
-      FRawHeaderText := Self.FRawHeaderText;
-      FStatusCode := Self.FStatusCode;
-      FHttpProtocolVersion := Self.FHttpProtocolVersion;
-      FReasonPhrase := Self.FReasonPhrase;
-      FCustomHeaders.Assign(Self.FCustomHeaders);
-      FCookies.Assign(Self.FCookies);
-    end;
-  end
-  else inherited AssignTo(Dest);
-end;
-
-{**********************************************************}
-constructor TALHTTPRequestHeader.Create(AOwner: TComponent);
+{**************************************}
+constructor TALHTTPRequestHeader.Create;
 Begin
-  inherited create(AOwner);
+  inherited;
   fCustomHeaders:= TALStringList.create;
   fCustomHeaders.NameValueSeparator := ':';
   FCookies := TALStringList.create;
@@ -1008,57 +959,6 @@ begin
   finally
     aRawHeaderLst.Free;
   end;
-end;
-
-{*********************************************************}
-procedure TALHTTPRequestHeader.AssignTo(Dest: TPersistent);
-begin
-  if Dest is TALHTTPRequestHeader then begin
-    with Dest as TALHTTPRequestHeader do begin
-      fAccept := self.fAccept;
-      fAcceptCharSet := self.fAcceptCharSet;
-      fAcceptEncoding := self.fAcceptEncoding;
-      fAcceptLanguage := self.fAcceptLanguage;
-      fAllow := self.fAllow;
-      fAuthorization := self.fAuthorization;
-      fCacheControl := self.fCacheControl;
-      fConnection := self.fConnection;
-      fContentEncoding := self.fContentEncoding;
-      fContentLanguage := self.fContentLanguage;
-      fContentLength := self.fContentLength;
-      fContentLocation := self.fContentLocation;
-      fContentMD5 := self.fContentMD5;
-      fContentRange := self.fContentRange;
-      fContentType := self.fContentType;
-      fDate := self.fDate;
-      fExpect := self.fExpect;
-      fExpires := self.fExpires;
-      fFrom := self.fFrom;
-      fHost := self.fHost;
-      fIfMatch := self.fIfMatch;
-      fIfModifiedSince := self.fIfModifiedSince;
-      fIfNoneMatch := self.fIfNoneMatch;
-      fIfRange := self.fIfRange;
-      fIfUnmodifiedSince := self.fIfUnmodifiedSince;
-      fLastModified := self.fLastModified;
-      fMaxForwards := self.fMaxForwards;
-      fPragma := self.fPragma;
-      fProxyAuthorization := self.fProxyAuthorization;
-      fRange := self.fRange;
-      fReferer := self.fReferer;
-      fTE := self.fTE;
-      fTrailer := self.fTrailer;
-      fTransferEncoding := self.fTransferEncoding;
-      fUpgrade := self.fUpgrade;
-      fUserAgent := self.fUserAgent;
-      fVia := self.fVia;
-      fWarning := self.fWarning;
-      fCustomHeaders.assign(self.fCustomHeaders);
-      FCookies.Assign(self.fCookies);
-      Dochange(-1);
-    end;
-  end
-  else inherited AssignTo(Dest);
 end;
 
 {*****************************************************************}

@@ -21,6 +21,7 @@ object Form1: TForm1
     Top = 745
     Width = 1007
     Height = 19
+    Color = 15525605
     Panels = <
       item
         Width = 150
@@ -54,25 +55,23 @@ object Form1: TForm1
       Align = alRight
       Caption = 'Panel2'
       TabOrder = 0
-      object ALMemoResult: TALMemo
+      object ALMemoResult: TcxMemo
         Left = 1
         Top = 1
-        Width = 292
-        Height = 259
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
         Align = alClient
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
         ParentFont = False
+        Properties.ReadOnly = True
+        Properties.ScrollBars = ssVertical
+        Style.Color = clBtnFace
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'Tahoma'
+        Style.Font.Style = []
+        Style.IsFontAssigned = True
         TabOrder = 0
-        WordWrap = False
-        DesignSize = (
-          292
-          259)
+        Height = 259
+        Width = 292
       end
       object Panel2: TPanel
         Left = 1
@@ -87,36 +86,6 @@ object Form1: TForm1
         ParentBackground = False
         ParentCtl3D = False
         TabOrder = 1
-        object Label5: TLabel
-          Left = 5
-          Top = 8
-          Width = 132
-          Height = 45
-          Caption = 'Please help us to keep the development of these components free'
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clMaroon
-          Font.Height = -12
-          Font.Name = 'Arial'
-          Font.Style = [fsBold]
-          ParentFont = False
-          WordWrap = True
-        end
-        object Label35: TLabel
-          Left = 5
-          Top = 63
-          Width = 125
-          Height = 75
-          Caption = 
-            'If you like these components please simply click on each button ' +
-            'below ... thanks for your support !'
-          Font.Charset = ANSI_CHARSET
-          Font.Color = clBlack
-          Font.Height = -12
-          Font.Name = 'Arial'
-          Font.Style = []
-          ParentFont = False
-          WordWrap = True
-        end
         object Panel4: TPanel
           Left = 151
           Top = 8
@@ -141,6 +110,37 @@ object Form1: TForm1
             ParentCtl3D = False
             TabOrder = 0
           end
+        end
+        object cxLabel1: TcxLabel
+          Left = 4
+          Top = 3
+          Caption = 'Please help us to keep the development of these components free'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clMaroon
+          Style.Font.Height = -12
+          Style.Font.Name = 'Tahoma'
+          Style.Font.Style = [fsBold]
+          Style.TextColor = clMaroon
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          Width = 145
+        end
+        object cxLabel2: TcxLabel
+          Left = 4
+          Top = 68
+          Caption = 
+            'If you like these components please simply click on each button ' +
+            'below ... thanks for your support !'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWindowText
+          Style.Font.Height = -12
+          Style.Font.Name = 'Tahoma'
+          Style.Font.Style = []
+          Style.IsFontAssigned = True
+          Properties.WordWrap = True
+          Width = 135
         end
       end
     end
@@ -200,6 +200,7 @@ object Form1: TForm1
           OptionsView.ColumnAutoWidth = True
           OptionsView.GroupByBox = False
           OptionsView.HeaderEndEllipsis = True
+          Styles.Background = cxStyle1
           object TableViewThreadNumber: TcxGridColumn
             Caption = 'Thread #'
             Width = 61
@@ -239,1904 +240,1225 @@ object Form1: TForm1
       end
     end
   end
-  object PageControl1: TPageControl
+  object PageControl1: TcxPageControl
     Left = 0
     Top = 0
     Width = 1007
     Height = 329
-    ActivePage = Firebird
     Align = alTop
+    Color = clBtnFace
+    ParentBackground = False
+    ParentColor = False
     TabOrder = 0
-    object Firebird: TTabSheet
+    Properties.ActivePage = Firebird
+    ClientRectBottom = 324
+    ClientRectLeft = 5
+    ClientRectRight = 1002
+    ClientRectTop = 26
+    object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
-      object Label2: TLabel
-        Left = 68
-        Top = 101
-        Width = 32
-        Height = 13
+      object Label2: TcxLabel
+        Left = 71
+        Top = 93
         Caption = 'Login'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label4: TLabel
-        Left = 44
-        Top = 126
-        Width = 55
-        Height = 13
+      object Label4: TcxLabel
+        Left = 50
+        Top = 118
         Caption = 'Password'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label15: TLabel
-        Left = 56
-        Top = 151
-        Width = 44
-        Height = 13
+      object Label15: TcxLabel
+        Left = 58
+        Top = 143
         Caption = 'Charset'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label16: TLabel
-        Left = 25
-        Top = 51
-        Width = 75
-        Height = 13
+      object Label16: TcxLabel
+        Left = 37
+        Top = 43
         Caption = 'FBClient DLL'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label17: TLabel
-        Left = 401
-        Top = 27
-        Width = 25
-        Height = 13
+      object Label17: TcxLabel
+        Left = 404
+        Top = 19
         Caption = 'SQL'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label18: TLabel
-        Left = 45
-        Top = 77
-        Width = 55
-        Height = 13
+      object Label18: TcxLabel
+        Left = 50
+        Top = 69
         Caption = 'Database'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label13: TLabel
-        Left = 836
-        Top = 210
-        Width = 53
-        Height = 13
-        Caption = 'Nb Loop:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label26: TLabel
-        Left = 808
-        Top = 235
-        Width = 80
-        Height = 13
-        Caption = 'Commit every:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label29: TLabel
-        Left = 823
-        Top = 185
-        Width = 65
-        Height = 13
-        Caption = 'Nb Thread:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label30: TLabel
-        Left = 27
-        Top = 175
-        Width = 72
-        Height = 13
-        Caption = 'Num_buffers'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label31: TLabel
-        Left = 11
-        Top = 27
-        Width = 89
-        Height = 13
-        Caption = 'Firebird Version'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label1: TLabel
-        Left = 384
-        Top = 154
-        Width = 42
-        Height = 13
-        Caption = 'Params'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label14: TLabel
-        Left = 380
-        Top = 173
-        Width = 46
-        Height = 13
-        Caption = '(1 by row)'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
-      end
-      object Label27: TLabel
-        Left = 75
+      object Label13: TcxLabel
+        Left = 841
         Top = 202
-        Width = 25
-        Height = 13
+        Caption = 'Nb Loop:'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label26: TcxLabel
+        Left = 814
+        Top = 227
+        Caption = 'Commit every:'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label29: TcxLabel
+        Left = 830
+        Top = 177
+        Caption = 'Nb Thread:'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label30: TcxLabel
+        Left = 34
+        Top = 167
+        Caption = 'Num_buffers'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label31: TcxLabel
+        Left = 22
+        Top = 19
+        Caption = 'Firebird Version'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label1: TcxLabel
+        Left = 387
+        Top = 146
+        Caption = 'Params'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label14: TcxLabel
+        Left = 373
+        Top = 161
+        Caption = '(1 by row)'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label27: TcxLabel
+        Left = 78
+        Top = 194
         Caption = 'TPB'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object ALButtonFirebirdSelect: TALButton
+      object ALButtonFirebirdSelect: TcxButton
         Left = 807
-        Top = 58
+        Top = 50
         Width = 161
         Height = 25
-        Caption = 'Execute SELECT via FireBird'
-        TabOrder = 11
-        OnClick = ALButtonFirebirdSelectClick
-        OnPaint = ALButtonPaint
-      end
-      object ALEditFirebirdLogin: TALEdit
-        Left = 106
-        Top = 101
-        Width = 249
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 3
-        Text = 'SYSDBA'
-      end
-      object ALEditFirebirdPassword: TALEdit
-        Left = 106
-        Top = 126
-        Width = 249
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 4
-      end
-      object ALEditFirebirdCharset: TALEdit
-        Left = 106
-        Top = 151
-        Width = 72
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 5
-        Text = 'NONE'
-      end
-      object ALEditFirebirdLib: TALEdit
-        Left = 106
-        Top = 51
-        Width = 249
-        Height = 19
-        Cursor = crArrow
-        OnButtonClick = ALEditButtonFindFileClick
-        btnVisible = True
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 1
-        Text = 'FBClient.dll'
-      end
-      object ALMemoFireBirdQuery: TALMemo
-        Left = 432
-        Top = 24
-        Width = 338
-        Height = 121
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
-        Lines.Strings = (
-          '***********************************'
-          'Exemple step 1 create the database: '
-          '***********************************'
-          ''
-          'CREATE DATABASE '#39'c:\test.fdb'#39' '
-          '              USER '#39'sysdba'#39' '
-          '              PASSWORD '#39'masterkey'#39' '
-          '              PAGE_SIZE 4096 '
-          '              DEFAULT CHARACTER SET ISO8859_1;'
-          ''
-          ''
-          '********************************'
-          'Exemple step 2 create the Table: '
-          '********************************'
-          ''
-          'CREATE TABLE HASH('
-          '  ID INTEGER NOT NULL,  '
-          '  x1_y1 SMALLINT NOT NULL,'
-          '  x1_y2 SMALLINT NOT NULL,'
-          '  x1_y3 SMALLINT NOT NULL,'
-          '  x1_y4 SMALLINT NOT NULL,'
-          '  x1_y5 SMALLINT NOT NULL,'
-          ' PRIMARY KEY (ID)  '
-          ');'
-          'CREATE INDEX HASH_X1_Y1_IDX ON HASH (X1_Y1);'
-          'CREATE INDEX HASH_X1_Y2_IDX ON HASH (X1_Y2);'
-          'CREATE INDEX HASH_X1_Y3_IDX ON HASH (X1_Y3);'
-          'CREATE INDEX HASH_X1_Y4_IDX ON HASH (X1_Y4);'
-          'CREATE INDEX HASH_X1_Y5_IDX ON HASH (X1_Y5);'
-          'CREATE GENERATOR HASH_GEN;'
-          ''
-          ''
-          '**********************************'
-          'Exemple step 3 create the trigger: '
-          'Note: we must create the trigger alone'
-          'because their is the char ; inside the'
-          'trigger and the set term is not yet '
-          'implemented.'
-          '**********************************'
-          ''
-          'CREATE OR ALTER TRIGGER OnBeforeInsertHash FOR HASH'
-          'BEFORE INSERT POSITION 0'
-          'AS BEGIN'
-          ''
-          '  NEW.ID = GEN_ID(HASH_GEN, 1);'
-          ''
-          'END;'
-          ''
-          ''
-          '********************************'
-          'Exemple step 4 add rows in loop:'
-          '********************************'
-          ''
-          'SQL Text:'
-          'INSERT INTO HASH('
-          '  x1_y1,'
-          '  x1_y2,'
-          '  x1_y3,'
-          '  x1_y4,'
-          '  x1_y5'
-          ') '
-          'VALUES (?,?,?,?,?);'
-          ''
-          'Params Text: '
-          '<#randomnumber min="0" max="255">'
-          '<#randomnumber min="0" max="255">'
-          '<#randomnumber min="0" max="255">'
-          '<#randomnumber min="0" max="255">'
-          '<#randomnumber min="0" max="255">'
-          ''
-          ''
-          '***********************************'
-          'Exemple step 5 select rows in loop:'
-          '***********************************'
-          ''
-          'Select '
-          '  ID '
-          'from '
-          '  HASH '
-          'where '
-          '  x1_y1 >= <#randomnumber min="0" max="255" index="1"> and '
-          '  x1_y1 <= <#randomnumber min="0" max="255" index="1"> + 20 and '
-          '  x1_y2 >= <#randomnumber min="0" max="255" index="2"> and '
-          '  x1_y2 <= <#randomnumber min="0" max="255" index="2"> + 20 and '
-          '  x1_y3 >= <#randomnumber min="0" max="255" index="3"> and '
-          '  x1_y3 <= <#randomnumber min="0" max="255" index="3"> + 20 and '
-          '  x1_y4 >= <#randomnumber min="0" max="255" index="4"> and '
-          '  x1_y4 <= <#randomnumber min="0" max="255" index="4"> + 20 and '
-          '  x1_y5 >= <#randomnumber min="0" max="255" index="5"> and '
-          '  x1_y5 <= <#randomnumber min="0" max="255" index="5"> + 20;')
-        ParentFont = False
-        TabOrder = 8
-        WordWrap = False
-        DesignSize = (
-          338
-          121)
-      end
-      object ALEditFirebirdDatabase: TALEdit
-        Left = 106
-        Top = 77
-        Width = 249
-        Height = 19
-        OnButtonClick = ALEditButtonFindFileClick
-        btnVisible = True
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 2
-      end
-      object ALButtonFirebirdLoopSelect: TALButton
-        Left = 807
-        Top = 120
-        Width = 161
-        Height = 25
-        Caption = 'Loop SELECT via FireBird'
-        TabOrder = 13
-        OnClick = ALButtonFirebirdLoopSelectClick
-        OnPaint = ALButtonPaint
-      end
-      object ALButtonFirebirdUpdate: TALButton
-        Left = 807
-        Top = 89
-        Width = 161
-        Height = 25
-        Caption = 'Execute UPDATE via FireBird'
-        TabOrder = 12
-        OnClick = ALButtonFirebirdUpdateClick
-        OnPaint = ALButtonPaint
-      end
-      object ALButtonFirebirdLoopUpdate: TALButton
-        Left = 807
-        Top = 151
-        Width = 161
-        Height = 25
-        Caption = 'Loop UPDATE via FireBird'
-        TabOrder = 14
-        OnClick = ALButtonFirebirdLoopUpdateClick
-        OnPaint = ALButtonPaint
-      end
-      object ALEditFirebirdNBLoop: TALEdit
-        Left = 894
-        Top = 207
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 16
-        Text = '1000000'
-      end
-      object ALEditFirebirdNbLoopBeforeCommit: TALEdit
-        Left = 894
-        Top = 232
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 17
-        Text = '1'
-      end
-      object ALEditFirebirdNBThread: TALEdit
-        Left = 894
-        Top = 182
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 15
-        Text = '1'
-      end
-      object ALEditFireBirdNum_buffers: TALEdit
-        Left = 106
-        Top = 175
-        Width = 46
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 6
-        Text = '0'
-      end
-      object ALButtonFirebirdCreateDatabase: TALButton
-        Left = 807
-        Top = 27
-        Width = 161
-        Height = 25
-        Caption = 'Create Database via FireBird'
+        Caption = 'SELECT'
         TabOrder = 10
-        OnClick = ALButtonFirebirdCreateDatabaseClick
-        OnPaint = ALButtonPaint
+        OnClick = ALButtonFirebirdSelectClick
       end
-      object ALComboBoxFirebirdapiVer: TALComboBox
+      object ALEditFirebirdLogin: TcxTextEdit
         Left = 106
-        Top = 24
-        Width = 145
-        Height = 21
-        OnPaint = ALComboBoxPaint
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 4
-        TabOrder = 0
-        Text = 'FB25'
-        Items.Strings = (
-          'FB102'
-          'FB103'
-          'FB15'
-          'FB20'
-          'FB25')
-      end
-      object ALMemoFireBirdParams: TALMemo
-        Left = 432
-        Top = 151
-        Width = 338
-        Height = 134
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 9
-        WordWrap = False
-        DesignSize = (
-          338
-          134)
-      end
-      object ALMemoFirebirdTPB: TALMemo
-        Left = 106
-        Top = 200
+        Top = 93
+        TabOrder = 2
+        Text = 'SYSDBA'
         Width = 249
-        Height = 85
+      end
+      object ALEditFirebirdPassword: TcxTextEdit
+        Left = 106
+        Top = 118
+        TabOrder = 3
+        Width = 249
+      end
+      object ALEditFirebirdCharset: TcxTextEdit
+        Left = 106
+        Top = 143
+        TabOrder = 4
+        Text = 'NONE'
+        Width = 72
+      end
+      object ALEditFirebirdLib: TcxButtonEdit
+        Left = 106
+        Top = 43
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.OnButtonClick = ALEditButtonFindFileClick
+        TabOrder = 0
+        Text = 'FBClient.dll'
+        Width = 249
+      end
+      object ALMemoFireBirdQuery: TcxMemo
+        Left = 432
+        Top = 16
+        Lines.Strings = (
+          'Select '
+          '  FieldA'
+          'From'
+          '  TableSample'
+          'Where'
+          '  fieldB = ? or'
+          '  fieldC= ?'
+          '  ')
+        ParentFont = False
+        Properties.ScrollBars = ssVertical
+        TabOrder = 7
+        Height = 121
+        Width = 338
+      end
+      object ALEditFirebirdDatabase: TcxButtonEdit
+        Left = 106
+        Top = 69
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.OnButtonClick = ALEditButtonFindFileClick
+        TabOrder = 1
+        Width = 249
+      end
+      object ALButtonFirebirdLoopSelect: TcxButton
+        Left = 807
+        Top = 112
+        Width = 161
+        Height = 25
+        Caption = 'Loop SELECT'
+        TabOrder = 12
+        OnClick = ALButtonFirebirdLoopSelectClick
+      end
+      object ALButtonFirebirdUpdate: TcxButton
+        Left = 807
+        Top = 81
+        Width = 161
+        Height = 25
+        Caption = 'UPDATE'
+        TabOrder = 11
+        OnClick = ALButtonFirebirdUpdateClick
+      end
+      object ALButtonFirebirdLoopUpdate: TcxButton
+        Left = 807
+        Top = 143
+        Width = 161
+        Height = 25
+        Caption = 'Loop UPDATE'
+        TabOrder = 13
+        OnClick = ALButtonFirebirdLoopUpdateClick
+      end
+      object ALEditFirebirdNBLoop: TcxTextEdit
+        Left = 894
+        Top = 199
+        TabOrder = 15
+        Text = '1000000'
+        Width = 74
+      end
+      object ALEditFirebirdNbLoopBeforeCommit: TcxTextEdit
+        Left = 894
+        Top = 224
+        TabOrder = 16
+        Text = '1'
+        Width = 74
+      end
+      object ALEditFirebirdNBThread: TcxTextEdit
+        Left = 894
+        Top = 174
+        TabOrder = 14
+        Text = '1'
+        Width = 74
+      end
+      object ALEditFireBirdNum_buffers: TcxTextEdit
+        Left = 106
+        Top = 167
+        TabOrder = 5
+        Text = '0'
+        Width = 46
+      end
+      object ALButtonFirebirdCreateDatabase: TcxButton
+        Left = 807
+        Top = 19
+        Width = 161
+        Height = 25
+        Caption = 'Create Database'
+        TabOrder = 9
+        OnClick = ALButtonFirebirdCreateDatabaseClick
+      end
+      object ALMemoFireBirdParams: TcxMemo
+        Left = 432
+        Top = 143
+        Lines.Strings = (
+          '<#randomString maxlength=50>'
+          '<#randomNumber>')
+        ParentFont = False
+        Properties.ScrollBars = ssVertical
+        TabOrder = 8
+        Height = 134
+        Width = 338
+      end
+      object ALMemoFirebirdTPB: TcxMemo
+        Left = 106
+        Top = 192
         Lines.Strings = (
           'isc_tpb_version3'
           'isc_tpb_write'
           'isc_tpb_read_committed'
           'isc_tpb_no_rec_version'
           'isc_tpb_nowait')
-        TabOrder = 7
-        WordWrap = False
-        DesignSize = (
-          249
-          85)
+        Properties.ScrollBars = ssVertical
+        TabOrder = 6
+        Height = 85
+        Width = 249
+      end
+      object ALComboBoxFirebirdapiVer: TcxComboBox
+        Left = 106
+        Top = 17
+        Properties.DropDownListStyle = lsFixedList
+        Properties.Items.Strings = (
+          'FB102'
+          'FB103'
+          'FB15'
+          'FB20'
+          'FB25')
+        TabOrder = 31
+        Text = 'FB25'
+        Width = 121
       end
     end
-    object MySQL: TTabSheet
+    object MySQL: TcxTabSheet
       Caption = 'MySQL'
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
-      object Label3: TLabel
-        Left = 50
-        Top = 78
-        Width = 63
-        Height = 13
+      object Label3: TcxLabel
+        Left = 45
+        Top = 74
         Caption = 'Host Name'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label6: TLabel
-        Left = 81
-        Top = 152
-        Width = 32
-        Height = 13
+      object Label6: TcxLabel
+        Left = 72
+        Top = 148
         Caption = 'Login'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label7: TLabel
-        Left = 57
-        Top = 177
-        Width = 55
-        Height = 13
+      object Label7: TcxLabel
+        Left = 51
+        Top = 173
         Caption = 'Password'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label8: TLabel
-        Left = 42
-        Top = 103
-        Width = 71
-        Height = 13
+      object Label8: TcxLabel
+        Left = 37
+        Top = 99
         Caption = 'Port Number'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label10: TLabel
-        Left = 69
-        Top = 202
-        Width = 44
-        Height = 13
+      object Label10: TcxLabel
+        Left = 59
+        Top = 198
         Caption = 'Charset'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label11: TLabel
-        Left = 44
-        Top = 53
-        Width = 69
-        Height = 13
+      object Label11: TcxLabel
+        Left = 43
+        Top = 49
         Caption = 'LibMySql dll'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label9: TLabel
+      object Label9: TcxLabel
         Left = 377
-        Top = 26
-        Width = 25
-        Height = 13
+        Top = 22
         Caption = 'SQL'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label12: TLabel
-        Left = 58
-        Top = 128
-        Width = 55
-        Height = 13
+      object Label12: TcxLabel
+        Left = 51
+        Top = 124
         Caption = 'Database'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label32: TLabel
-        Left = 831
-        Top = 186
-        Width = 53
-        Height = 13
+      object Label32: TcxLabel
+        Left = 839
+        Top = 182
         Caption = 'Nb Loop:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label33: TLabel
-        Left = 804
-        Top = 211
-        Width = 80
-        Height = 13
+      object Label33: TcxLabel
+        Left = 812
+        Top = 207
         Caption = 'Commit every:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label34: TLabel
-        Left = 819
-        Top = 161
-        Width = 65
-        Height = 13
+      object Label34: TcxLabel
+        Left = 828
+        Top = 157
         Caption = 'Nb Thread:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label40: TLabel
-        Left = 15
-        Top = 27
-        Width = 98
-        Height = 13
+      object Label40: TcxLabel
+        Left = 18
+        Top = 23
         Caption = 'LibMySql Version'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object ALEditMySqlHost: TALEdit
-        Left = 119
-        Top = 75
-        Width = 218
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditMySqlHost: TcxTextEdit
+        Left = 106
+        Top = 71
         TabOrder = 1
         Text = 'localhost'
-      end
-      object ALEditMySqlLogin: TALEdit
-        Left = 119
-        Top = 149
         Width = 218
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      end
+      object ALEditMySqlLogin: TcxTextEdit
+        Left = 106
+        Top = 145
         TabOrder = 4
         Text = 'root'
-      end
-      object ALEditMySqlPassword: TALEdit
-        Left = 119
-        Top = 174
         Width = 218
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 5
       end
-      object ALEditMySqlPort: TALEdit
-        Left = 119
-        Top = 100
-        Width = 88
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditMySqlPassword: TcxTextEdit
+        Left = 106
+        Top = 170
+        TabOrder = 5
+        Width = 218
+      end
+      object ALEditMySqlPort: TcxTextEdit
+        Left = 106
+        Top = 96
         TabOrder = 2
         Text = '3306'
+        Width = 88
       end
-      object ALEditMySqlCharset: TALEdit
-        Left = 119
-        Top = 199
-        Width = 218
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditMySqlCharset: TcxTextEdit
+        Left = 106
+        Top = 195
         TabOrder = 6
         Text = 'utf8'
-      end
-      object ALEditMysqlLib: TALEdit
-        Left = 119
-        Top = 50
         Width = 218
-        Height = 19
-        OnButtonClick = ALEditButtonFindFileClick
-        btnVisible = True
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      end
+      object ALEditMysqlLib: TcxButtonEdit
+        Left = 106
+        Top = 46
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.OnButtonClick = ALEditButtonFindFileClick
         TabOrder = 0
         Text = 'libmysql.dll'
+        Width = 218
       end
-      object ALMemoMySqlQuery: TALMemo
-        Left = 408
-        Top = 23
-        Width = 338
-        Height = 258
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
+      object ALMemoMySqlQuery: TcxMemo
+        Left = 406
+        Top = 21
         Lines.Strings = (
-          '***********************************'
-          'Exemple step 1 create the database: '
-          '***********************************'
-          ''
-          'CREATE DATABASE TEST;'
-          ''
-          ''
-          '********************************'
-          'Exemple step 2 create the Table: '
-          '********************************'
-          ''
-          'CREATE TABLE HASH('
-          '  ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY,'
-          '  x1_y1 SMALLINT NOT NULL,'
-          '  x1_y2 SMALLINT NOT NULL,'
-          '  x1_y3 SMALLINT NOT NULL,'
-          '  x1_y4 SMALLINT NOT NULL,'
-          '  x1_y5 SMALLINT NOT NULL'
-          ');'
-          'CREATE INDEX HASH_X1_Y1_IDX ON HASH (X1_Y1);'
-          'CREATE INDEX HASH_X1_Y2_IDX ON HASH (X1_Y2);'
-          'CREATE INDEX HASH_X1_Y3_IDX ON HASH (X1_Y3);'
-          'CREATE INDEX HASH_X1_Y4_IDX ON HASH (X1_Y4);'
-          'CREATE INDEX HASH_X1_Y5_IDX ON HASH (X1_Y5);'
-          ''
-          ''
-          '********************************'
-          'Exemple step 3 add rows in loop:'
-          '********************************'
-          ''
-          'INSERT INTO HASH('
-          '  x1_y1,'
-          '  x1_y2,'
-          '  x1_y3,'
-          '  x1_y4,'
-          '  x1_y5'
-          ') '
-          'VALUES ('
-          '  <#randomnumber min="0" max="255">,'
-          '  <#randomnumber min="0" max="255">,'
-          '  <#randomnumber min="0" max="255">,'
-          '  <#randomnumber min="0" max="255">,'
-          '  <#randomnumber min="0" max="255">'
-          ');'
-          ''
-          ''
-          '***********************************'
-          'Exemple step 4 select rows in loop:'
-          '***********************************'
-          ''
           'Select '
-          '  ID '
-          'from '
-          '  HASH '
-          'where '
-          '  x1_y1 >= <#randomnumber min="0" max="255" index="1"> and '
-          '  x1_y1 <= <#randomnumber min="0" max="255" index="1"> + 20 and '
-          '  x1_y2 >= <#randomnumber min="0" max="255" index="2"> and '
-          '  x1_y2 <= <#randomnumber min="0" max="255" index="2"> + 20 and '
-          '  x1_y3 >= <#randomnumber min="0" max="255" index="3"> and '
-          '  x1_y3 <= <#randomnumber min="0" max="255" index="3"> + 20 and '
-          '  x1_y4 >= <#randomnumber min="0" max="255" index="4"> and '
-          '  x1_y4 <= <#randomnumber min="0" max="255" index="4"> + 20 and '
-          '  x1_y5 >= <#randomnumber min="0" max="255" index="5"> and '
-          '  x1_y5 <= <#randomnumber min="0" max="255" index="5"> + 20;')
+          '  FieldA'
+          'From'
+          '  TableSample'
+          'Where'
+          '  fieldB = '#39'<#randomString maxlength=50>'#39' or'
+          '  fieldC= <#randomNumber>')
         ParentFont = False
+        Properties.ScrollBars = ssVertical
         TabOrder = 7
-        WordWrap = False
-        DesignSize = (
-          338
-          258)
+        Height = 258
+        Width = 338
       end
-      object ALButtonMySQLSelect: TALButton
+      object ALButtonMySQLSelect: TcxButton
         Left = 803
-        Top = 26
+        Top = 22
         Width = 161
         Height = 25
-        Caption = 'Execute SELECT via MySql'
+        Caption = 'SELECT'
         TabOrder = 8
         OnClick = ALButtonMySqlSelectClick
-        OnPaint = ALButtonPaint
       end
-      object ALEditMySqlDatabaseName: TALEdit
-        Left = 119
-        Top = 125
-        Width = 218
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditMySqlDatabaseName: TcxTextEdit
+        Left = 106
+        Top = 121
         TabOrder = 3
+        Width = 218
       end
-      object ALEditMySqlNBLoop: TALEdit
+      object ALEditMySqlNBLoop: TcxTextEdit
         Left = 890
-        Top = 183
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+        Top = 179
         TabOrder = 13
         Text = '1000000'
-      end
-      object ALEditMySqlNbLoopBeforeCommit: TALEdit
-        Left = 890
-        Top = 208
         Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      end
+      object ALEditMySqlNbLoopBeforeCommit: TcxTextEdit
+        Left = 890
+        Top = 204
         TabOrder = 14
         Text = '1'
-      end
-      object ALEditMySqlNBThread: TALEdit
-        Left = 890
-        Top = 158
         Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      end
+      object ALEditMySqlNBThread: TcxTextEdit
+        Left = 890
+        Top = 154
         TabOrder = 12
         Text = '1'
+        Width = 74
       end
-      object ALButtonMysqlUpdate: TALButton
+      object ALButtonMysqlUpdate: TcxButton
         Left = 803
-        Top = 57
+        Top = 53
         Width = 161
         Height = 25
-        Caption = 'Execute UPDATE via MySql'
+        Caption = 'UPDATE'
         TabOrder = 9
         OnClick = ALButtonMysqlUpdateClick
-        OnPaint = ALButtonPaint
       end
-      object ALButtonMySqlLoopUpdate: TALButton
+      object ALButtonMySqlLoopUpdate: TcxButton
         Left = 803
-        Top = 119
+        Top = 115
         Width = 161
         Height = 25
-        Caption = 'Loop UPDATE via MySql'
+        Caption = 'Loop UPDATE'
         TabOrder = 11
         OnClick = ALButtonMySqlLoopUpdateClick
-        OnPaint = ALButtonPaint
       end
-      object ALButtonMysqlLoopSelect: TALButton
+      object ALButtonMysqlLoopSelect: TcxButton
         Left = 803
-        Top = 88
+        Top = 84
         Width = 161
         Height = 25
-        Caption = 'Loop SELECT via MySql'
+        Caption = 'Loop SELECT'
         TabOrder = 10
         OnClick = ALButtonMysqlLoopSelectClick
-        OnPaint = ALButtonPaint
       end
-      object ALComboBoxMySqlApiVer: TALComboBox
-        Left = 119
-        Top = 23
-        Width = 145
-        Height = 21
-        OnPaint = ALComboBoxPaint
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 1
-        TabOrder = 15
-        Text = 'MYSQL55'
-        Items.Strings = (
+      object ALComboBoxMySqlApiVer: TcxComboBox
+        Left = 106
+        Top = 21
+        Properties.DropDownListStyle = lsFixedList
+        Properties.Items.Strings = (
           'MYSQL50'
           'MYSQL55')
+        TabOrder = 27
+        Text = 'MYSQL50'
+        Width = 121
       end
     end
-    object SQLLite3: TTabSheet
+    object SQLLite3: TcxTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
-      object Label24: TLabel
-        Left = 16
-        Top = 26
-        Width = 57
-        Height = 13
+      object Label24: TcxLabel
+        Left = 17
+        Top = 21
         Caption = 'Sqlite3.dll'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label25: TLabel
-        Left = 380
-        Top = 26
-        Width = 25
-        Height = 13
+      object Label25: TcxLabel
+        Left = 378
+        Top = 21
         Caption = 'SQL'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label19: TLabel
-        Left = 23
-        Top = 51
-        Width = 55
-        Height = 13
+      object Label19: TcxLabel
+        Left = 17
+        Top = 46
         Caption = 'Database'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label20: TLabel
+      object Label20: TcxLabel
         Left = 831
-        Top = 178
-        Width = 53
-        Height = 13
+        Top = 173
         Caption = 'Nb Loop:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label21: TLabel
-        Left = 91
-        Top = 187
-        Width = 65
-        Height = 13
+      object Label21: TcxLabel
+        Left = 11
+        Top = 235
         Caption = 'cache_size'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label22: TLabel
-        Left = 223
-        Top = 187
-        Width = 58
-        Height = 13
+      object Label22: TcxLabel
+        Left = 15
+        Top = 260
         Caption = 'page_size'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label23: TLabel
+      object Label23: TcxLabel
         Left = 804
-        Top = 203
-        Width = 80
-        Height = 13
+        Top = 198
         Caption = 'Commit every:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label28: TLabel
+      object Label28: TcxLabel
         Left = 819
-        Top = 153
-        Width = 65
-        Height = 13
+        Top = 148
         Caption = 'Nb Thread:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object ALEditSqlite3Lib: TALEdit
-        Left = 84
-        Top = 23
-        Width = 249
-        Height = 19
-        OnButtonClick = ALEditButtonFindFileClick
-        btnVisible = True
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditSqlite3Lib: TcxButtonEdit
+        Left = 73
+        Top = 18
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.OnButtonClick = ALEditButtonFindFileClick
         TabOrder = 0
         Text = 'Sqlite3.dll'
+        Width = 249
       end
-      object ALMemoSqlite3Query: TALMemo
-        Left = 411
-        Top = 23
-        Width = 338
-        Height = 258
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
+      object ALMemoSqlite3Query: TcxMemo
+        Left = 409
+        Top = 18
         Lines.Strings = (
-          '*********************************** '
-          'Exemple step 1 create the database:'
-          '***********************************'
-          ''
-          'The database will be created automatiquelly '
-          'on the First Create Table Statement '
-          ''
-          ''
-          '********************************'
-          'Exemple step 2 create the Table: '
-          '********************************'
-          ''
-          'CREATE VIRTUAL TABLE HASH USING rtree('
-          '  ID INTEGER PRIMARY KEY ASC,'
-          '  x1_y1_min UNSIGNED SMALLINT, x1_y1_max UNSIGNED SMALLINT,'
-          '  x1_y2_min UNSIGNED SMALLINT, x1_y2_max UNSIGNED SMALLINT,'
-          '  x1_y3_min UNSIGNED SMALLINT, x1_y3_max UNSIGNED SMALLINT,'
-          '  x1_y4_min UNSIGNED SMALLINT, x1_y4_max UNSIGNED SMALLINT,'
-          '  x1_y5_min UNSIGNED SMALLINT, x1_y5_max UNSIGNED SMALLINT'
-          ');'
-          ''
-          ''
-          '********************************'
-          'Exemple step 3 add rows in loop:'
-          '********************************'
-          ''
-          'INSERT INTO HASH('
-          '  ID,'
-          '  x1_y1_min, x1_y1_max,'
-          '  x1_y2_min, x1_y2_max,'
-          '  x1_y3_min, x1_y3_max,'
-          '  x1_y4_min, x1_y4_max,'
-          '  x1_y5_min, x1_y5_max) '
-          'VALUES ('
-          '  null,'
-          '  <#randomnumber min="0" max="255" index="1">,'
-          '  <#randomnumber min="0" max="255" index="1"> + 20,'
-          '  <#randomnumber min="0" max="255" index="2">,'
-          '  <#randomnumber min="0" max="255" index="2"> + 20,'
-          '  <#randomnumber min="0" max="255" index="3">,'
-          '  <#randomnumber min="0" max="255" index="3"> + 20,'
-          '  <#randomnumber min="0" max="255" index="4">,'
-          '  <#randomnumber min="0" max="255" index="4"> + 20,'
-          '  <#randomnumber min="0" max="255" index="5">,'
-          '  <#randomnumber min="0" max="255" index="5"> + 20'
-          ');'
-          ''
-          ''
-          '***********************************'
-          'Exemple step 4 select rows in loop:'
-          'Note: take in account that when the '
-          'File system start put in cache the '
-          'database file, the speed can change'
-          'a lot... Do some select in loop for '
-          '10-20 min to see the difference'
-          '***********************************'
-          ''
           'Select '
-          '  H1.ID '
-          'from '
-          '  HASH H1'
-          'where '
-          '  x1_y1_min >= <#randomnumber min="0" max="255" index="1"> and '
-          '  x1_y1_max <= <#randomnumber min="0" max="255" index="1"> and '
-          '  x1_y2_min >= <#randomnumber min="0" max="255" index="2"> and '
-          '  x1_y2_max <= <#randomnumber min="0" max="255" index="2"> and '
-          '  x1_y3_min >= <#randomnumber min="0" max="255" index="3"> and '
-          '  x1_y3_max <= <#randomnumber min="0" max="255" index="3"> and '
-          '  x1_y4_min >= <#randomnumber min="0" max="255" index="4"> and '
-          '  x1_y4_max <= <#randomnumber min="0" max="255" index="4"> and '
-          '  x1_y5_min >= <#randomnumber min="0" max="255" index="5"> and '
-          '  x1_y5_max <= <#randomnumber min="0" max="255" index="5">;')
+          '  FieldA'
+          'From'
+          '  TableSample'
+          'Where'
+          '  fieldB = '#39'<#randomString maxlength=50>'#39' or'
+          '  fieldC= <#randomNumber>')
         ParentFont = False
+        Properties.ScrollBars = ssVertical
         TabOrder = 9
-        WordWrap = False
-        DesignSize = (
-          338
-          258)
+        Height = 258
+        Width = 338
       end
-      object ALButtonSqlLite3Select: TALButton
+      object ALButtonSqlLite3Select: TcxButton
         Left = 803
-        Top = 24
+        Top = 19
         Width = 161
         Height = 25
-        Caption = 'Execute SELECT via SqlLite3'
+        Caption = 'SELECT'
         TabOrder = 10
         OnClick = ALButtonSqlLite3SelectClick
-        OnPaint = ALButtonPaint
       end
-      object ALEditSqlite3Database: TALEdit
-        Left = 84
-        Top = 48
-        Width = 249
-        Height = 19
-        OnButtonClick = ALEditButtonFindFileClick
-        btnVisible = True
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditSqlite3Database: TcxButtonEdit
+        Left = 73
+        Top = 43
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.OnButtonClick = ALEditButtonFindFileClick
         TabOrder = 1
+        Width = 249
       end
-      object ALButtonSqlite3LoopSelect: TALButton
+      object ALButtonSqlite3LoopSelect: TcxButton
         Left = 803
-        Top = 88
+        Top = 83
         Width = 161
         Height = 25
-        Caption = 'Loop SELECTs via SqlLite3'
+        Caption = 'Loop SELECT'
         TabOrder = 12
         OnClick = ALButtonSqlite3LoopSelectClick
-        OnPaint = ALButtonPaint
       end
-      object ALButtonSqlite3Update: TALButton
+      object ALButtonSqlite3Update: TcxButton
         Left = 803
-        Top = 57
+        Top = 52
         Width = 161
         Height = 25
-        Caption = 'Execute UPDATE via SqlLite3'
+        Caption = 'UPDATE'
         TabOrder = 11
         OnClick = ALButtonSqlite3UpdateClick
-        OnPaint = ALButtonPaint
       end
-      object ALButtonSqlite3LoopUpdate: TALButton
+      object ALButtonSqlite3LoopUpdate: TcxButton
         Left = 803
-        Top = 119
+        Top = 114
         Width = 161
         Height = 25
-        Caption = 'Loop UPDATEs via SqlLite3'
+        Caption = 'Loop UPDATE'
         TabOrder = 13
         OnClick = ALButtonSqlite3LoopUpdateClick
-        OnPaint = ALButtonPaint
       end
-      object ALEditSQLite3NBLoop: TALEdit
+      object ALEditSQLite3NBLoop: TcxTextEdit
         Left = 890
-        Top = 175
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+        Top = 170
         TabOrder = 15
         Text = '1000000'
+        Width = 74
       end
-      object RadioGroupSqlite3Journal_Mode: TRadioGroup
+      object RadioGroupSqlite3Journal_Mode: TcxRadioGroup
         Left = 9
-        Top = 73
-        Width = 104
-        Height = 105
+        Top = 79
         Caption = 'journal_mode'
+        ParentFont = False
+        Properties.Items = <
+          item
+            Caption = 'DELETE'
+          end
+          item
+            Caption = 'TRUNCATE'
+          end
+          item
+            Caption = 'PERSIST'
+          end
+          item
+            Caption = 'MEMORY'
+          end
+          item
+            Caption = 'WAL'
+          end
+          item
+            Caption = 'OFF'
+          end>
         ItemIndex = 0
-        Items.Strings = (
-          'DELETE'
-          'TRUNCATE '
-          'PERSIST '
-          'MEMORY '
-          'WAL '
-          'OFF')
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'MS Sans Serif'
+        Style.Font.Style = []
+        Style.IsFontAssigned = True
         TabOrder = 2
+        Height = 148
+        Width = 104
       end
-      object RadioGroupSQLite3Temp_Store: TRadioGroup
+      object RadioGroupSQLite3Temp_Store: TcxRadioGroup
         Left = 119
-        Top = 73
-        Width = 104
-        Height = 105
+        Top = 78
         Caption = 'temp_store'
+        Properties.Items = <
+          item
+            Caption = 'DEFAULT'
+          end
+          item
+            Caption = 'FILE'
+          end
+          item
+            Caption = 'MEMORY'
+          end>
         ItemIndex = 0
-        Items.Strings = (
-          'DEFAULT '
-          'FILE '
-          'MEMORY')
         TabOrder = 3
-      end
-      object RadioGroupSqlite3Synhcronous: TRadioGroup
-        Left = 229
-        Top = 73
+        Height = 89
         Width = 104
-        Height = 105
-        Caption = 'synchronous '
-        ItemIndex = 2
-        Items.Strings = (
-          'OFF '
-          'NORMAL '
-          'FULL')
-        TabOrder = 4
       end
-      object ALEditSqlite3Cache_Size: TALEdit
-        Left = 162
-        Top = 184
-        Width = 43
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object RadioGroupSqlite3Synhcronous: TcxRadioGroup
+        Left = 229
+        Top = 78
+        Caption = 'synchronous '
+        Properties.Items = <
+          item
+            Caption = 'OFF'
+          end
+          item
+            Caption = 'NORMAL'
+          end
+          item
+            Caption = 'FULL'
+          end>
+        ItemIndex = 2
+        TabOrder = 4
+        Height = 89
+        Width = 104
+      end
+      object ALEditSqlite3Cache_Size: TcxTextEdit
+        Left = 73
+        Top = 232
         TabOrder = 5
         Text = '2000'
+        Width = 43
       end
-      object ALEditSqlite3Page_Size: TALEdit
-        Left = 287
-        Top = 184
-        Width = 46
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditSqlite3Page_Size: TcxTextEdit
+        Left = 73
+        Top = 257
         TabOrder = 6
         Text = '1024'
+        Width = 46
       end
-      object ALEditSQLite3NbLoopBeforeCommit: TALEdit
+      object ALEditSQLite3NbLoopBeforeCommit: TcxTextEdit
         Left = 890
-        Top = 200
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+        Top = 195
         TabOrder = 16
         Text = '1'
-      end
-      object ALEditSqlite3NBThread: TALEdit
-        Left = 890
-        Top = 150
         Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      end
+      object ALEditSqlite3NBThread: TcxTextEdit
+        Left = 890
+        Top = 145
         TabOrder = 14
         Text = '1'
+        Width = 74
       end
-      object ALCheckBoxSqlite3SharedCache: TALCheckBox
-        Left = 91
-        Top = 207
-        Width = 97
-        Height = 19
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
+      object ALCheckBoxSqlite3SharedCache: TcxCheckBox
+        Left = 141
+        Top = 235
         Caption = 'shared cache'
-        TabOrder = 7
-        OnPaint = ALCheckBoxSqlite3SharedCachePaint
-      end
-      object ALCheckBoxSqlite3ReadUncommited: TALCheckBox
-        Left = 208
-        Top = 207
-        Width = 124
-        Height = 19
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        TabOrder = 7
+        Transparent = True
+        Width = 97
+      end
+      object ALCheckBoxSqlite3ReadUncommited: TcxCheckBox
+        Left = 141
+        Top = 257
         Caption = 'read uncommitted'
+        ParentFont = False
         TabOrder = 8
-        OnPaint = ALCheckBoxSqlite3SharedCachePaint
+        Transparent = True
+        Width = 124
       end
     end
-    object Sphinx: TTabSheet
+    object Sphinx: TcxTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
+      ExplicitLeft = 7
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object Label36: TcxLabel
+        Left = 38
+        Top = 49
+        Caption = 'LibMysql dll'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label37: TcxLabel
+        Left = 39
+        Top = 75
+        Caption = 'Host Name'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label38: TcxLabel
+        Left = 31
+        Top = 100
+        Caption = 'Port Number'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label43: TcxLabel
+        Left = 372
+        Top = 21
+        Caption = 'SQL'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label44: TcxLabel
+        Left = 819
+        Top = 156
+        Caption = 'Nb Thread:'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label45: TcxLabel
+        Left = 831
+        Top = 181
+        Caption = 'Nb Loop:'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label46: TcxLabel
+        Left = 804
+        Top = 206
+        Caption = 'Commit every:'
+        ParentFont = False
+        Transparent = True
+      end
+      object Label39: TcxLabel
+        Left = 12
+        Top = 24
+        Caption = 'LibMySql Version'
+        ParentFont = False
+        Transparent = True
+      end
+      object ALEditSphinxLib: TcxButtonEdit
+        Left = 104
+        Top = 47
+        Properties.Buttons = <
+          item
+            Default = True
+            Kind = bkEllipsis
+          end>
+        Properties.OnButtonClick = ALEditButtonFindFileClick
+        TabOrder = 0
+        Text = 'libmysql.dll'
+        Width = 221
+      end
+      object ALEditSphinxHost: TcxTextEdit
+        Left = 104
+        Top = 72
+        TabOrder = 1
+        Text = 'localhost'
+        Width = 221
+      end
+      object ALEditSphinxPort: TcxTextEdit
+        Left = 104
+        Top = 97
+        TabOrder = 2
+        Text = '9306'
+        Width = 88
+      end
+      object ALMemoSphinxQuery: TcxMemo
+        Left = 403
+        Top = 18
+        Lines.Strings = (
+          'Select '
+          '  FieldA'
+          'From'
+          '  TableSample'
+          'Where'
+          '  fieldC= <#randomNumber>')
+        ParentFont = False
+        Properties.ScrollBars = ssVertical
+        TabOrder = 3
+        Height = 258
+        Width = 338
+      end
+      object ALButtonSphinxSelect: TcxButton
+        Left = 803
+        Top = 21
+        Width = 161
+        Height = 25
+        Caption = 'SELECT'
+        TabOrder = 4
+        OnClick = ALButtonSphinxSelectClick
+      end
+      object ALButtonSphinxUpdate: TcxButton
+        Left = 804
+        Top = 52
+        Width = 161
+        Height = 25
+        Caption = 'UPDATE'
+        TabOrder = 5
+        OnClick = ALButtonSphinxUpdateClick
+      end
+      object ALButtonSphinxLoopSelect: TcxButton
+        Left = 803
+        Top = 83
+        Width = 161
+        Height = 25
+        Caption = 'Loop SELECT'
+        TabOrder = 6
+        OnClick = ALButtonSphinxLoopSelectClick
+      end
+      object ALButtonSphinxLoopUpdate: TcxButton
+        Left = 803
+        Top = 114
+        Width = 161
+        Height = 25
+        Caption = 'Loop UPDATE'
+        TabOrder = 7
+        OnClick = ALButtonSphinxLoopUpdateClick
+      end
+      object ALEditSphinxNBThread: TcxTextEdit
+        Left = 890
+        Top = 153
+        TabOrder = 8
+        Text = '1'
+        Width = 74
+      end
+      object ALEditSphinxNBLoop: TcxTextEdit
+        Left = 890
+        Top = 178
+        TabOrder = 9
+        Text = '1000000'
+        Width = 74
+      end
+      object ALEditSphinxNbLoopBeforeCommit: TcxTextEdit
+        Left = 891
+        Top = 205
+        TabOrder = 10
+        Text = '1'
+        Width = 74
+      end
+      object ALComboBoxSphinxApiVer: TcxComboBox
+        Left = 104
+        Top = 22
+        Properties.DropDownListStyle = lsFixedList
+        Properties.Items.Strings = (
+          'MYSQL50'
+          'MYSQL55')
+        TabOrder = 19
+        Text = 'MYSQL50'
+        Width = 121
+      end
+    end
+    object MemCached: TcxTabSheet
+      Caption = 'MemCached'
+      ImageIndex = 4
       ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
-      object Label36: TLabel
-        Left = 38
-        Top = 54
-        Width = 67
-        Height = 13
-        Caption = 'LibMysql dll'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label37: TLabel
-        Left = 42
-        Top = 80
-        Width = 63
-        Height = 13
+      object Label41: TcxLabel
+        Left = 25
+        Top = 21
         Caption = 'Host Name'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label38: TLabel
-        Left = 34
-        Top = 105
-        Width = 71
-        Height = 13
+      object Label42: TcxLabel
+        Left = 17
+        Top = 46
         Caption = 'Port Number'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label43: TLabel
-        Left = 377
-        Top = 26
-        Width = 25
-        Height = 13
-        Caption = 'SQL'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
+      object Label47: TcxLabel
+        Left = 365
+        Top = 97
+        Caption = 'DATA'
         ParentFont = False
+        Transparent = True
       end
-      object Label44: TLabel
-        Left = 819
-        Top = 161
-        Width = 65
-        Height = 13
+      object Label48: TcxLabel
+        Left = 820
+        Top = 196
         Caption = 'Nb Thread:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label45: TLabel
-        Left = 831
-        Top = 186
-        Width = 53
-        Height = 13
+      object Label49: TcxLabel
+        Left = 832
+        Top = 221
         Caption = 'Nb Loop:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
         ParentFont = False
+        Transparent = True
       end
-      object Label46: TLabel
-        Left = 804
-        Top = 211
-        Width = 80
-        Height = 13
-        Caption = 'Commit every:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object Label39: TLabel
-        Left = 7
-        Top = 29
-        Width = 98
-        Height = 13
-        Caption = 'LibMySql Version'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object ALEditSphinxLib: TALEdit
-        Left = 111
-        Top = 52
-        Width = 221
-        Height = 19
-        OnButtonClick = ALEditButtonFindFileClick
-        btnVisible = True
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
+      object ALEditMemCachedHost: TcxTextEdit
+        Left = 94
+        Top = 18
         TabOrder = 0
-        Text = 'libmysql.dll'
-      end
-      object ALEditSphinxHost: TALEdit
-        Left = 111
-        Top = 77
-        Width = 221
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 1
         Text = 'localhost'
+        Width = 221
       end
-      object ALEditSphinxPort: TALEdit
-        Left = 111
-        Top = 102
+      object ALEditMemCachedPort: TcxTextEdit
+        Left = 94
+        Top = 43
+        TabOrder = 1
+        Text = '11211'
         Width = 88
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 2
-        Text = '9306'
       end
-      object ALMemoSphinxQuery: TALMemo
-        Left = 408
-        Top = 23
-        Width = 338
-        Height = 258
-        OnPaint = ALMemoPaint
-        OnPaintScrollBar = ALMemoPaintScrollBar
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'Courier New'
-        Font.Style = []
+      object ALMemoMemCachedData: TcxMemo
+        Left = 405
+        Top = 96
         Lines.Strings = (
-          '************************************'
-          'Exemple step 1 init the sphinx.conf: '
-          '************************************'
-          ''
-          'index HASH'
-          '{'
-          '  type               = rt'
-          '  path               = c:\sphinxdata\HASH'
-          '  rt_mem_limit       = 32M'
-          '  rt_field           = x1_y1'
-          '  rt_field           = x1_y2'
-          '  rt_field           = x1_y3'
-          '  rt_field           = x1_y4'
-          '  rt_field           = x1_y5'
-          '  charset_type       = utf-8'
-          '}'
-          ''
-          '********************************'
-          'Exemple step 2 add rows in loop:'
-          '********************************'
-          ''
-          'INSERT INTO HASH('
-          '  ID,'
-          '  x1_y1,'
-          '  x1_y2,'
-          '  x1_y3,'
-          '  x1_y4,'
-          '  x1_y5'
-          ') '
-          'VALUES ('
-          '  <#incnumber>,'
-          '  '#39'<#randomnumber min=0 max=235 index=1>'
-          '   <#randomnumber min=0 max=235 index=1 incby=1>'
-          '   <#randomnumber min=0 max=235 index=1 incby=2>'
-          '   <#randomnumber min=0 max=235 index=1 incby=3>'
-          '   <#randomnumber min=0 max=235 index=1 incby=4>'
-          '   <#randomnumber min=0 max=235 index=1 incby=5>'
-          '   <#randomnumber min=0 max=235 index=1 incby=6>'
-          '   <#randomnumber min=0 max=235 index=1 incby=7>'
-          '   <#randomnumber min=0 max=235 index=1 incby=8>'
-          '   <#randomnumber min=0 max=235 index=1 incby=9>'
-          '   <#randomnumber min=0 max=235 index=1 incby=10>'
-          '   <#randomnumber min=0 max=235 index=1 incby=11>'
-          '   <#randomnumber min=0 max=235 index=1 incby=12>'
-          '   <#randomnumber min=0 max=235 index=1 incby=13>'
-          '   <#randomnumber min=0 max=235 index=1 incby=14>'
-          '   <#randomnumber min=0 max=235 index=1 incby=15>'
-          '   <#randomnumber min=0 max=235 index=1 incby=16>'
-          '   <#randomnumber min=0 max=235 index=1 incby=17>'
-          '   <#randomnumber min=0 max=235 index=1 incby=18>'
-          '   <#randomnumber min=0 max=235 index=1 incby=19>'
-          '   <#randomnumber min=0 max=235 index=1 incby=20>'#39','
-          ''
-          '  '#39'<#randomnumber min=0 max=235 index=2>'
-          '   <#randomnumber min=0 max=235 index=2 incby=1>'
-          '   <#randomnumber min=0 max=235 index=2 incby=2>'
-          '   <#randomnumber min=0 max=235 index=2 incby=3>'
-          '   <#randomnumber min=0 max=235 index=2 incby=4>'
-          '   <#randomnumber min=0 max=235 index=2 incby=5>'
-          '   <#randomnumber min=0 max=235 index=2 incby=6>'
-          '   <#randomnumber min=0 max=235 index=2 incby=7>'
-          '   <#randomnumber min=0 max=235 index=2 incby=8>'
-          '   <#randomnumber min=0 max=235 index=2 incby=9>'
-          '   <#randomnumber min=0 max=235 index=2 incby=10>'
-          '   <#randomnumber min=0 max=235 index=2 incby=11>'
-          '   <#randomnumber min=0 max=235 index=2 incby=12>'
-          '   <#randomnumber min=0 max=235 index=2 incby=13>'
-          '   <#randomnumber min=0 max=235 index=2 incby=14>'
-          '   <#randomnumber min=0 max=235 index=2 incby=15>'
-          '   <#randomnumber min=0 max=235 index=2 incby=16>'
-          '   <#randomnumber min=0 max=235 index=2 incby=17>'
-          '   <#randomnumber min=0 max=235 index=2 incby=18>'
-          '   <#randomnumber min=0 max=235 index=2 incby=19>'
-          '   <#randomnumber min=0 max=235 index=2 incby=20>'#39','
-          '   '
-          '  '#39'<#randomnumber min=0 max=235 index=3>'
-          '   <#randomnumber min=0 max=235 index=3 incby=1>'
-          '   <#randomnumber min=0 max=235 index=3 incby=2>'
-          '   <#randomnumber min=0 max=235 index=3 incby=3>'
-          '   <#randomnumber min=0 max=235 index=3 incby=4>'
-          '   <#randomnumber min=0 max=235 index=3 incby=5>'
-          '   <#randomnumber min=0 max=235 index=3 incby=6>'
-          '   <#randomnumber min=0 max=235 index=3 incby=7>'
-          '   <#randomnumber min=0 max=235 index=3 incby=8>'
-          '   <#randomnumber min=0 max=235 index=3 incby=9>'
-          '   <#randomnumber min=0 max=235 index=3 incby=10>'
-          '   <#randomnumber min=0 max=235 index=3 incby=11>'
-          '   <#randomnumber min=0 max=235 index=3 incby=12>'
-          '   <#randomnumber min=0 max=235 index=3 incby=13>'
-          '   <#randomnumber min=0 max=235 index=3 incby=14>'
-          '   <#randomnumber min=0 max=235 index=3 incby=15>'
-          '   <#randomnumber min=0 max=235 index=3 incby=16>'
-          '   <#randomnumber min=0 max=235 index=3 incby=17>'
-          '   <#randomnumber min=0 max=235 index=3 incby=18>'
-          '   <#randomnumber min=0 max=235 index=3 incby=19>'
-          '   <#randomnumber min=0 max=235 index=3 incby=20>'#39','
-          '   '
-          '  '#39'<#randomnumber min=0 max=235 index=4>'
-          '   <#randomnumber min=0 max=235 index=4 incby=1>'
-          '   <#randomnumber min=0 max=235 index=4 incby=2>'
-          '   <#randomnumber min=0 max=235 index=4 incby=3>'
-          '   <#randomnumber min=0 max=235 index=4 incby=4>'
-          '   <#randomnumber min=0 max=235 index=4 incby=5>'
-          '   <#randomnumber min=0 max=235 index=4 incby=6>'
-          '   <#randomnumber min=0 max=235 index=4 incby=7>'
-          '   <#randomnumber min=0 max=235 index=4 incby=8>'
-          '   <#randomnumber min=0 max=235 index=4 incby=9>'
-          '   <#randomnumber min=0 max=235 index=4 incby=10>'
-          '   <#randomnumber min=0 max=235 index=4 incby=11>'
-          '   <#randomnumber min=0 max=235 index=4 incby=12>'
-          '   <#randomnumber min=0 max=235 index=4 incby=13>'
-          '   <#randomnumber min=0 max=235 index=4 incby=14>'
-          '   <#randomnumber min=0 max=235 index=4 incby=15>'
-          '   <#randomnumber min=0 max=235 index=4 incby=16>'
-          '   <#randomnumber min=0 max=235 index=4 incby=17>'
-          '   <#randomnumber min=0 max=235 index=4 incby=18>'
-          '   <#randomnumber min=0 max=235 index=4 incby=19>'
-          '   <#randomnumber min=0 max=235 index=4 incby=20>'#39','
-          '   '
-          '  '#39'<#randomnumber min=0 max=235 index=5>'
-          '   <#randomnumber min=0 max=235 index=5 incby=1>'
-          '   <#randomnumber min=0 max=235 index=5 incby=2>'
-          '   <#randomnumber min=0 max=235 index=5 incby=3>'
-          '   <#randomnumber min=0 max=235 index=5 incby=4>'
-          '   <#randomnumber min=0 max=235 index=5 incby=5>'
-          '   <#randomnumber min=0 max=235 index=5 incby=6>'
-          '   <#randomnumber min=0 max=235 index=5 incby=7>'
-          '   <#randomnumber min=0 max=235 index=5 incby=8>'
-          '   <#randomnumber min=0 max=235 index=5 incby=9>'
-          '   <#randomnumber min=0 max=235 index=5 incby=10>'
-          '   <#randomnumber min=0 max=235 index=5 incby=11>'
-          '   <#randomnumber min=0 max=235 index=5 incby=12>'
-          '   <#randomnumber min=0 max=235 index=5 incby=13>'
-          '   <#randomnumber min=0 max=235 index=5 incby=14>'
-          '   <#randomnumber min=0 max=235 index=5 incby=15>'
-          '   <#randomnumber min=0 max=235 index=5 incby=16>'
-          '   <#randomnumber min=0 max=235 index=5 incby=17>'
-          '   <#randomnumber min=0 max=235 index=5 incby=18>'
-          '   <#randomnumber min=0 max=235 index=5 incby=19>'
-          '   <#randomnumber min=0 max=235 index=5 incby=20>'#39
-          '      '
-          ');'
-          ''
-          '***********************************'
-          'Exemple step 3 select rows in loop:'
-          '***********************************'
-          ''
-          'Select '
-          '  ID '
-          'from '
-          '  HASH '
-          'where '
-          '  match('#39'@x1_y1 <#randomnumber min="0" max="255"> '
-          '         @x1_y2 <#randomnumber min="0" max="255">'
-          '         @x1_y3 <#randomnumber min="0" max="255">'
-          '         @x1_y4 <#randomnumber min="0" max="255">'
-          '         @x1_y5 <#randomnumber min="0" max="255">'#39');')
+          '<#randomString maxlength=100000>')
         ParentFont = False
+        Properties.ScrollBars = ssVertical
+        TabOrder = 2
+        Height = 180
+        Width = 338
+      end
+      object ALButtonMemcachedGet: TcxButton
+        Left = 803
+        Top = 18
+        Width = 161
+        Height = 25
+        Caption = 'GET'
         TabOrder = 3
-        WordWrap = False
-        DesignSize = (
-          338
-          258)
+        OnClick = ALButtonMemcachedGetClick
       end
-      object ALButtonSphinxSelect: TALButton
-        Left = 803
-        Top = 26
-        Width = 161
-        Height = 25
-        Caption = 'Execute SELECT via Sphinx'
-        TabOrder = 4
-        OnClick = ALButtonSphinxSelectClick
-        OnPaint = ALButtonPaint
-      end
-      object ALButtonSphinxUpdate: TALButton
+      object ALButtonMemcachedSet: TcxButton
         Left = 804
-        Top = 57
+        Top = 49
         Width = 161
         Height = 25
-        Caption = 'Execute UPDATE via Sphinx'
+        Caption = 'SET'
+        TabOrder = 4
+        OnClick = ALButtonMemcachedSetClick
+      end
+      object ALButtonMemcachedLoopGet: TcxButton
+        Left = 805
+        Top = 112
+        Width = 161
+        Height = 25
+        Caption = 'Loop GET'
         TabOrder = 5
-        OnClick = ALButtonSphinxUpdateClick
-        OnPaint = ALButtonPaint
+        OnClick = ALButtonMemcachedLoopGetClick
       end
-      object ALButtonSphinxLoopSelect: TALButton
-        Left = 803
-        Top = 88
+      object ALButtonMemcachedLoopSet: TcxButton
+        Left = 805
+        Top = 143
         Width = 161
         Height = 25
-        Caption = 'Loop SELECT via Sphinx'
+        Caption = 'Loop SET'
         TabOrder = 6
-        OnClick = ALButtonSphinxLoopSelectClick
-        OnPaint = ALButtonPaint
+        OnClick = ALButtonMemcachedLoopSetClick
       end
-      object ALButtonSphinxLoopUpdate: TALButton
-        Left = 803
-        Top = 119
+      object ALEditMemcachedNBThread: TcxTextEdit
+        Left = 892
+        Top = 191
+        TabOrder = 7
+        Text = '1'
+        Width = 74
+      end
+      object ALEditMemCachedNBLoop: TcxTextEdit
+        Left = 891
+        Top = 218
+        TabOrder = 8
+        Text = '1000000'
+        Width = 74
+      end
+      object ALButtonMemcachedStats: TcxButton
+        Left = 17
+        Top = 97
+        Width = 88
+        Height = 25
+        Caption = 'STATS'
+        TabOrder = 9
+        OnClick = ALButtonMemcachedStatsClick
+      end
+      object ALButtonMemcachedStatsSettings: TcxButton
+        Left = 17
+        Top = 128
+        Width = 88
+        Height = 25
+        Caption = 'STATS Settings'
+        TabOrder = 10
+        OnClick = ALButtonMemcachedStatsSettingsClick
+      end
+      object ALButtonMemcachedStatsItems: TcxButton
+        Left = 17
+        Top = 159
+        Width = 88
+        Height = 25
+        Caption = 'STATS items'
+        TabOrder = 11
+        OnClick = ALButtonMemcachedStatsItemsClick
+      end
+      object ALButtonMemcachedStatsSizes: TcxButton
+        Left = 17
+        Top = 221
+        Width = 88
+        Height = 25
+        Caption = 'STATS sizes'
+        TabOrder = 12
+        OnClick = ALButtonMemcachedStatsSizesClick
+      end
+      object ALButtonMemcachedStatsSlabs: TcxButton
+        Left = 17
+        Top = 190
+        Width = 88
+        Height = 25
+        Caption = 'STATS slabs'
+        TabOrder = 13
+        OnClick = ALButtonMemcachedStatsSlabsClick
+      end
+      object ALButtonMemcachedFLush_ALL: TcxButton
+        Left = 131
+        Top = 94
+        Width = 88
+        Height = 25
+        Caption = 'FLUSH_ALL'
+        TabOrder = 19
+        OnClick = ALButtonMemcachedFLush_ALLClick
+      end
+      object ALButtonMemcachedVersion: TcxButton
+        Left = 131
+        Top = 128
+        Width = 88
+        Height = 25
+        Caption = 'VERSION'
+        TabOrder = 20
+        OnClick = ALButtonMemcachedVersionClick
+      end
+      object ALEditMemCachedKey: TcxTextEdit
+        Left = 405
+        Top = 18
+        TabOrder = 21
+        Text = '<#randomString maxlength=250>'
+        Width = 338
+      end
+      object ALlabel123123: TcxLabel
+        Left = 374
+        Top = 19
+        Caption = 'Key'
+        ParentFont = False
+        Transparent = True
+      end
+      object ALLabel43234: TcxLabel
+        Left = 367
+        Top = 46
+        Caption = 'Flags'
+        ParentFont = False
+        Transparent = True
+      end
+      object ALEditMemCachedFlags: TcxTextEdit
+        Left = 402
+        Top = 45
+        TabOrder = 24
+        Text = '<#randomnumber>'
+        Width = 215
+      end
+      object cxLabel5: TcxLabel
+        Left = 344
+        Top = 70
+        Caption = 'Expiration'
+        ParentFont = False
+        Transparent = True
+      end
+      object ALEditMemCachedExpTime: TcxTextEdit
+        Left = 403
+        Top = 69
+        TabOrder = 26
+        Text = '<#randomnumber>'
+        Width = 214
+      end
+      object ALButtonMemcachedDelete: TcxButton
+        Left = 805
+        Top = 80
         Width = 161
         Height = 25
-        Caption = 'Loop UPDATE via Sphinx'
-        TabOrder = 7
-        OnClick = ALButtonSphinxLoopUpdateClick
-        OnPaint = ALButtonPaint
-      end
-      object ALEditSphinxNBThread: TALEdit
-        Left = 890
-        Top = 158
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 8
-        Text = '1'
-      end
-      object ALEditSphinxNBLoop: TALEdit
-        Left = 890
-        Top = 183
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 9
-        Text = '1000000'
-      end
-      object ALEditSphinxNbLoopBeforeCommit: TALEdit
-        Left = 890
-        Top = 208
-        Width = 74
-        Height = 19
-        btnCaption = '...'
-        GlyphIndex = 0
-        btnFont.Charset = DEFAULT_CHARSET
-        btnFont.Color = clWindowText
-        btnFont.Height = -11
-        btnFont.Name = 'MS Sans Serif'
-        btnFont.Style = []
-        OnPaint = ALEditPaint
-        TabOrder = 10
-        Text = '1'
-      end
-      object ALComboBoxSphinxApiVer: TALComboBox
-        Left = 111
-        Top = 25
-        Width = 145
-        Height = 21
-        OnPaint = ALComboBoxPaint
-        Style = csDropDownList
-        ItemHeight = 13
-        ItemIndex = 0
-        TabOrder = 11
-        Text = 'MYSQL50'
-        Items.Strings = (
-          'MYSQL50'
-          'MYSQL55')
+        Caption = 'DELETE'
+        TabOrder = 27
+        OnClick = ALButtonMemcachedDeleteClick
       end
     end
   end
   object OpenDialog1: TOpenDialog
-    Left = 944
-    Top = 8
+    Left = 144
+    Top = 656
+  end
+  object dxSkinController1: TdxSkinController
+    NativeStyle = False
+    SkinName = 'Foggy'
+    Left = 56
+    Top = 648
+  end
+  object cxStyleRepository1: TcxStyleRepository
+    Left = 328
+    Top = 560
+    PixelsPerInch = 96
+    object cxStyle1: TcxStyle
+      AssignedValues = [svColor]
+      Color = clWhite
+    end
   end
 end

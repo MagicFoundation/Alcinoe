@@ -42,8 +42,6 @@ type
     StatusBar2: TStatusBar;
     BtnChooseSaveDirectory: TButton;
     MemoErrorMsg: TMemo;
-    MainWebSpider: TAlWebSpider;
-    MainHttpClient: TALWinHttpClient;
     ButtonStop: TButton;
     EditIncludeLink: TEdit;
     Label4: TLabel;
@@ -71,6 +69,8 @@ type
     FPageNotYetDownloadedBinTree: TAlStringKeyAVLBinaryTree;
     FCurrentDeepLevel: Integer;
     FCurrentLocalFileNameIndex: integer;
+    fMainWebSpider: TAlWebSpider;
+    fMainHttpClient: TALWinHttpClient;
     function GetNextLocalFileName(aContentType: AnsiString): AnsiString;
   public
   end;
@@ -173,13 +173,13 @@ Begin
       FPageNotYetDownloadedBinTree.AddNode(aNode);
 
       {start the crawl}
-      MainWebSpider.Crawl;
+      fMainWebSpider.Crawl;
 
       {exit if the user click on the stop button}
       If not ButtonStop.Enabled then exit;
 
       {update the link on downloaded page to local path}
-      if CheckBoxUpdateHref.Checked then MainWebSpider.UpdateLinkToLocalPath;
+      if CheckBoxUpdateHref.Checked then fMainWebSpider.UpdateLinkToLocalPath;
 
     finally
       FPageDownloadedBinTree.Free;
@@ -594,6 +594,19 @@ var ie: IWebBrowser2;
 procedure TForm1.FormCreate(Sender: TObject);
 var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
 begin
+  fMainHttpClient := TALWinHttpClient.Create;
+  fMainHttpClient.InternetOptions := [wHttpIo_REFRESH, wHttpIo_Keep_connection];
+
+  fMainWebSpider := TAlWebSpider.Create;
+  fMainWebSpider.OnCrawlDownloadSuccess := MainWebSpiderCrawlDownloadSuccess;
+  fMainWebSpider.OnCrawlDownloadRedirect := MainWebSpiderCrawlDownloadRedirect;
+  fMainWebSpider.OnCrawlDownloadError := MainWebSpiderCrawlDownloadError;
+  fMainWebSpider.OnCrawlGetNextLink := MainWebSpiderCrawlGetNextLink;
+  fMainWebSpider.OnCrawlFindLink := MainWebSpiderCrawlFindLink;
+  fMainWebSpider.OnUpdateLinkToLocalPathGetNextFile := MainWebSpiderUpdateLinkToLocalPathGetNextFile;
+  fMainWebSpider.OnUpdateLinkToLocalPathFindLink := MainWebSpiderUpdateLinkToLocalPathFindLink;
+  fMainWebSpider.HttpClient := fMainHttpClient;
+
   ie := CreateOleObject('InternetExplorer.Application') as IWebBrowser2;
   SetWindowLong(ie.hwnd, GWL_STYLE, GetWindowLong(ie.hwnd, GWL_STYLE) and not WS_BORDER and not WS_SIZEBOX and not WS_DLGFRAME );
   SetWindowPos(ie.hwnd, HWND_TOP, Left, Top, Width, Height, SWP_FRAMECHANGED);
@@ -615,6 +628,9 @@ end;
 {********************************************************************}
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  fMainHttpClient.Free;
+  fMainWebSpider.Free;
+
   try
     ie.quit;
   except

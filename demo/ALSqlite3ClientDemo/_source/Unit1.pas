@@ -270,7 +270,7 @@ begin
 
         ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + IntToStr(aEndDate - aStartDate) + ' ms' + #13#10 +
                                    #13#10 +
-                                   String(ALTrim(aXMLDATA.XML.Text));
+                                   String(ALTrim(aXMLDATA.XML));
 
       Finally
         aXMLDATA.free;

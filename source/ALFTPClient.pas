@@ -72,8 +72,8 @@ type
   {-- onchange Event that specify the property index that is just changed --}
   TALFTPPropertyChangeEvent = procedure(sender: Tobject; Const PropertyIndex: Integer) of object;
 
-  {------------------------------------------}
-  TALFTPClientProxyParams = Class(TPersistent)
+  {--------------------------------------}
+  TALFTPClientProxyParams = Class(TObject)
   Private
     FProxyBypass: AnsiString;
     FproxyServer: AnsiString;
@@ -87,12 +87,9 @@ type
     procedure SetProxyServer(const Value: AnsiString);
     procedure SetProxyUserName(const Value: AnsiString);
     Procedure DoChange(propertyIndex: Integer);
-  protected
-    procedure AssignTo(Dest: TPersistent); override;
   public
     constructor Create; virtual;
     procedure Clear;
-  published
     Property ProxyBypass: AnsiString read FProxyBypass write SetProxyBypass; //index 0
     property ProxyServer: AnsiString read FProxyServer write SetProxyServer; //index 1
     property ProxyPort: integer read FProxyPort write SetProxyPort default 0; //index 2
@@ -116,8 +113,8 @@ type
     FindData: TWin32FindDataA;
   end;
 
-  {------------------------------}
-  TALFTPClient = class(TComponent)
+  {---------------------------}
+  TALFTPClient = class(TObject)
   private
     FProxyParams: TALFTPClientProxyParams;
     FServerName: AnsiString;
@@ -140,7 +137,7 @@ type
     procedure OnProxyParamsChange(sender: Tobject; Const PropertyIndex: Integer); virtual;
     procedure SetUploadBufferSize(const Value: Integer); virtual;
   public
-    constructor Create(Owner: TComponent); override;
+    constructor Create; virtual;
     destructor Destroy; override;
     procedure CreateDirectory(const Directory: AnsiString); virtual;
     procedure DeleteFile(const FileName: AnsiString); virtual;
@@ -166,7 +163,6 @@ type
     Procedure SetCurrentDirectory(const Directory: AnsiString); virtual;
     procedure Connect; virtual;
     procedure Disconnect; virtual;
-  published
     Property  connected: Boolean read GetConnected write SetConnected default False;
     property  ServerName: AnsiString read FServerName write SetServerName;
     property  ServerPort: integer read FServerPort write SetServerPort default 21;
@@ -187,8 +183,8 @@ ResourceString
 
 implementation
 
-{*************************************************}
-constructor TALFTPClient.Create(Owner: TComponent);
+{******************************}
+constructor TALFTPClient.Create;
 begin
   inherited;
   FUploadBufferSize := $8000;
@@ -354,21 +350,6 @@ end;
 procedure TALFTPClient.Disconnect;
 begin
 //virtual
-end;
-
-{************************************************************}
-procedure TALFTPClientProxyParams.AssignTo(Dest: TPersistent);
-begin
-  if Dest is TALFTPClientProxyParams then begin
-    with Dest as TALFTPClientProxyParams do begin
-      FProxyBypass := self.FProxyBypass;
-      FproxyServer := self.FproxyServer;
-      FProxyUserName := self.FProxyUserName;
-      FProxyPassword := self.FProxyPassword;
-      FproxyPort := self.FproxyPort;
-    end;
-  end
-  else inherited AssignTo(Dest);
 end;
 
 {**************************************}

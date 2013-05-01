@@ -56,7 +56,6 @@ type
     MemoGenerate100000NodeWithALXmlDocument: TMemo;
     MemoGenerate100000NodeWithXmlDocument: TMemo;
     ButtonGenerate100000NodeWithXmlDocument: TButton;
-    ALXMLDocumentSaxMode: TALXMLDocument;
     ButtonParseXMLWithALXmlDocumentInSaxMode: TButton;
     MemoParseXmlWithALXmlDocumentInSaxMode: TMemo;
     Panel1: TPanel;
@@ -203,7 +202,7 @@ begin
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
     Try
 
-      aALXMLDocument:= TALXmlDocument.Create(nil);
+      aALXMLDocument:= TALXmlDocument.Create;
       Try
         aStartDate := GetTickCount;
         aALXMLDocument.LoadFromFile(AnsiString(MainOpenDialog.FileName));
@@ -276,7 +275,7 @@ begin
 
   Try
 
-    aALXMLDocument:= TALXmlDocument.Create(nil);
+    aALXMLDocument:= TALXmlDocument.Create;
     Try
       aStartDate := GetTickCount;
       aALXMLDocument.Active := True;
@@ -376,31 +375,40 @@ end;
 {******************************************************************************}
 procedure TForm1.ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
 var aStartDate: cardinal;
+    aXMLDocument: TalXmlDocument;
 begin
   If MainOpenDialog.Execute then begin
 
     MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Clear;
 
-    Try
+    aXMLDocument := ALcreateEmptyXmlDocument('root');
+    try
 
-      FnodeCount := 0;
-      ALXMLDocumentSaxMode.filename := AnsiString(MainOpenDialog.FileName);
-      aStartDate := GetTickCount;
-      ALXMLDocumentSaxMode.parseXML;
-      MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Number of nodes crawled: ' + IntToStr(FNodeCount));
-      MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Time to scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+      Try
 
-    except
-      on E: Exception do
-        MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Error: ' + E.Message);
+        aXMLDocument.OnParseProcessingInstruction := ALXMLDocumentSaxModeParseProcessingInstruction;
+        aXMLDocument.OnParseStartElement := ALXMLDocumentSaxModeParseStartElement;
+        aXMLDocument.OnParseText := ALXMLDocumentSaxModeParseText;
+        aXMLDocument.OnParseComment := ALXMLDocumentSaxModeParseComment;
+
+        FnodeCount := 0;
+        aStartDate := GetTickCount;
+        aXMLDocument.LoadFromFile(AnsiString(MainOpenDialog.FileName), True);
+        MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Number of nodes crawled: ' + IntToStr(FNodeCount));
+        MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Time to scroll all nodes: ' + IntToStr(GetTickCount - aStartDate) + ' ms');
+
+      except
+        on E: Exception do
+          MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Add('Error: ' + E.Message);
+      end;
+
+    finally
+      aXMLDocument.Free;
     end;
 
   end;
 
 end;
-
-
-
 
 {-------------------}
 var ie: IWebBrowser2;

@@ -68,7 +68,11 @@ implementation
 
 uses Windows,
      sysutils,
-     Winsock,
+     {$IF CompilerVersion >= 23} {Delphi XE2}
+     WinSock2,
+     {$ELSE}
+     WinSock,
+     {$IFEND}
      AlFcnString;
 
 {*********************************************************************}
@@ -77,8 +81,7 @@ var WSAData : TWSAData;
     hostEnt : PHostEnt;
     addr : PAnsiChar;
 begin
-  WSAData.wVersion := 0;
-  WSAStartup (MAKEWORD(2,2), WSAData);
+  if WSAStartup(MAKEWORD(2,2), WSAData) <> 0 then raiseLastOsError;
   try
 
     hostEnt := gethostbyname(PAnsiChar(hostName));
@@ -97,7 +100,7 @@ begin
     else Result := False;
 
   finally
-    if WSAData.wVersion = 2 then WSACleanup;
+    WSACleanup;
   end
 end;
 
@@ -107,15 +110,14 @@ var SockAddrIn: TSockAddrIn;
     HostEnt: PHostEnt;
     WSAData: TWSAData;
 begin
-  WSAData.wVersion := 0;
-  WSAStartup(MAKEWORD(2,2), WSAData);
+  if WSAStartup(MAKEWORD(2,2), WSAData) <> 0 then raiseLastOsError;
   Try
     SockAddrIn.sin_addr.s_addr:= inet_addr(PAnsiChar(IPAddr));
     HostEnt:= gethostbyaddr(@SockAddrIn.sin_addr.S_addr, 4, AF_INET);
     if HostEnt<>nil then result:=StrPas(Hostent^.h_name)
     else result:='';
   finally
-    if WSAData.wVersion = 2 then WSACleanup;
+    WSACleanup;
   end;
 end;
 
@@ -131,8 +133,7 @@ var
   I: Integer;
   WSAData: TWSAData;
 begin
-  WSAData.wVersion := 0;
-  WSAStartup(MAKEWORD(2,2), WSAData);
+  if WSAStartup(MAKEWORD(2,2), WSAData) <> 0 then raiseLastOsError;
   Try
     Result := TALStringList.Create;
     Result.Clear;
@@ -146,7 +147,7 @@ begin
       Inc(I);
     end;
   finally
-    if WSAData.wVersion = 2 then WSACleanup;
+    WSACleanup;
   end;
 end;
 
@@ -155,16 +156,14 @@ function  ALgetLocalHostName: AnsiString;
 var Buffer: array [0..255] of AnsiChar;
     WSAData: TWSAData;
 begin
-  WSAData.wVersion := 0;
-  WSAStartup(MAKEWORD(2,2), WSAData);
+  if WSAStartup(MAKEWORD(2,2), WSAData) <> 0 then raiseLastOsError;
   Try
 
-    if gethostname(Buffer, SizeOf(Buffer)) <> 0 then
-        raise EALException.Create('Winsock GetHostName failed');
+    if gethostname(Buffer, SizeOf(Buffer)) <> 0 then raise EALException.Create('Winsock GetHostName failed');
     Result := StrPas(Buffer);
 
   finally
-    if WSAData.wVersion = 2 then WSACleanup;
+    WSACleanup;
   end;
 end;
 

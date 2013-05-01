@@ -337,21 +337,4 @@ object Form1: TForm1
       end
     end
   end
-  object MainWebSpider: TAlWebSpider
-    OnCrawlDownloadSuccess = MainWebSpiderCrawlDownloadSuccess
-    OnCrawlDownloadRedirect = MainWebSpiderCrawlDownloadRedirect
-    OnCrawlDownloadError = MainWebSpiderCrawlDownloadError
-    OnCrawlGetNextLink = MainWebSpiderCrawlGetNextLink
-    OnCrawlFindLink = MainWebSpiderCrawlFindLink
-    OnUpdateLinkToLocalPathGetNextFile = MainWebSpiderUpdateLinkToLocalPathGetNextFile
-    OnUpdateLinkToLocalPathFindLink = MainWebSpiderUpdateLinkToLocalPathFindLink
-    HttpClient = MainHttpClient
-    Left = 32
-    Top = 136
-  end
-  object MainHttpClient: TALWinHttpClient
-    InternetOptions = [wHttpIo_REFRESH, wHttpIo_Keep_connection]
-    Left = 64
-    Top = 136
-  end
 end

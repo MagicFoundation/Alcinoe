@@ -500,7 +500,7 @@ begin
     ALMemoFirebirdStats.Lines.Add('max_memory_used:      ' + IntToStr(aMemoryUsage.max_memory_used));
     ALMemoFirebirdStats.Lines.Add('max_memory_allocated: ' + IntToStr(aMemoryUsage.max_memory_allocated));
 
-    ALMemoFirebirdResult.Lines.Text := String(aXMLDATA.XML.Text);
+    ALMemoFirebirdResult.Lines.Text := String(aXMLDATA.XML);
 
   Finally
     aXMLDATA.free;

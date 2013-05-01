@@ -486,7 +486,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 var Url, Flags, TargetFrameName, PostData, Headers: OleVariant;
 begin
   fMustInitWinHTTP := True;
-  FWinInetHttpClient := TaLWinInetHttpClient.Create(self);
+  FWinInetHttpClient := TaLWinInetHttpClient.Create;
   with FWinInetHttpClient do begin
     AccessType := wHttpAt_Preconfig;
     InternetOptions := [wHttpIo_Keep_connection];

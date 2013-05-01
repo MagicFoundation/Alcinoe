@@ -544,7 +544,7 @@ begin
     FHttpStatusStartTime := AlGetTickCount64;
     try
 
-      aHttpClient := TaLWinHttpClient.Create(nil);
+      aHttpClient := TaLWinHttpClient.Create;
       try
 
         with aHttpClient do begin

@@ -242,7 +242,7 @@ type
     procedure OnRequestHeaderChange(sender: Tobject; Const PropertyIndex: Integer); override;
     procedure SetOnRedirect(const Value: TAlHTTPClientRedirectEvent); override;
   public
-    constructor Create(Owner: TComponent); override;
+    constructor Create; override;
     destructor Destroy; override;
     procedure Connect;
     procedure Disconnect;
@@ -251,27 +251,16 @@ type
     procedure Execute(aRequestDataStream: TStream;
                       aResponseContentStream: TStream;
                       aResponseContentHeader: TALHTTPResponseHeader); override;
-  published
     property  AccessType: TALWinHttpClientInternetOpenAccessType read FAccessType write SetAccessType default wHttpAt_NO_PROXY;
     property  InternetOptions: TALWinHttpClientInternetOptionSet read FInternetOptions write FInternetOptions default [wHttpIo_Keep_connection];
     property  DisconnectOnError: Boolean read FDisconnectOnError write FDisconnectOnError default False; // Winhttp seam to handle internally the disconnection/reconnection !
     property  OnStatusChange: TALWinHttpClientStatusChangeEvent read FOnStatusChange write SetOnStatusChange;
   end;
 
-procedure Register;
-
 implementation
-
-{$R ..\resource\ALWinHttpClient.dcr}
 
 Uses SysUtils,
      AlFcnString;
-
-{*****************}
-procedure Register;
-begin
-  RegisterComponents('Alcinoe', [TALWinHttpClient]);
-end;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}
@@ -301,8 +290,8 @@ begin
   end;
 end;
 
-{*****************************************************}
-constructor TALWinHttpClient.Create(Owner: TComponent);
+{**********************************}
+constructor TALWinHttpClient.Create;
 begin
   inherited;
   FInetRoot := nil;

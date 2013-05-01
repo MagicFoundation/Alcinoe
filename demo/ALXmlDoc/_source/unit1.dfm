@@ -169,12 +169,4 @@ object Form1: TForm1
     Left = 432
     Top = 384
   end
-  object ALXMLDocumentSaxMode: TALXMLDocument
-    OnParseProcessingInstruction = ALXMLDocumentSaxModeParseProcessingInstruction
-    OnParseStartElement = ALXMLDocumentSaxModeParseStartElement
-    OnParseText = ALXMLDocumentSaxModeParseText
-    OnParseComment = ALXMLDocumentSaxModeParseComment
-    Left = 392
-    Top = 384
-  end
 end

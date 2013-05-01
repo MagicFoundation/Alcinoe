@@ -72,7 +72,11 @@ unit ALSMTPClient;
 
 interface
 
-uses WinSock,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     WinSock2,
+     {$ELSE}
+     WinSock,
+     {$IFEND}
      ALStringList,
      ALInternetMessageCommon,
      ALMultiPartMixedParser;
@@ -93,22 +97,27 @@ type
     {----------------------------}
     TAlSmtpClient = class(TObject)
     Private
-      FWSAData : TWSAData;
       Fconnected: Boolean;
-      FSocketDescriptor: Integer;
+      FSocketDescriptor: TSocket;
       FAuthTypesSupported: TAlSmtpClientAuthTypeSet;
-      Ftimeout: integer;
-      procedure Settimeout(const Value: integer);
+      FSendTimeout: Integer;
+      FReceiveTimeout: Integer;
+      fKeepAlive: Boolean;
+      fTCPNoDelay: Boolean;
+      procedure SetSendTimeout(const Value: integer);
+      procedure SetReceiveTimeout(const Value: integer);
+      procedure SetKeepAlive(const Value: boolean);
+      procedure SetTCPNoDelay(const Value: boolean);
     protected
       procedure CheckError(Error: Boolean);
       Function SendCmd(aCmd:AnsiString; OkResponses: array of Word): AnsiString; virtual;
       Function GetResponse(OkResponses: array of Word): AnsiString;
-      Function SocketWrite(Var Buffer; Count: Longint): Longint; Virtual;
-      Function SocketRead(var Buffer; Count: Longint): Longint; Virtual;
+      Function SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
+      Function SocketRead(var buf; len: Integer): Integer; Virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
-      Function Connect(aHost: AnsiString; APort: integer): AnsiString; virtual;
+      Function Connect(const aHost: AnsiString; const APort: integer): AnsiString; virtual;
       Function Helo: AnsiString; virtual;
       Function Ehlo: AnsiString; virtual;
       Function Auth(AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString; virtual;
@@ -127,7 +136,10 @@ type
       Procedure Disconnect; virtual;
       Function GetAuthTypeFromEhloResponse(EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet; virtual;
       property Connected: Boolean read FConnected;
-      Property Timeout: integer read Ftimeout write Settimeout default 60000;
+      property SendTimeout: Integer read FSendTimeout write SetSendTimeout;
+      property ReceiveTimeout: Integer read FReceiveTimeout write SetReceiveTimeout;
+      property KeepAlive: Boolean read fKeepAlive write SetKeepAlive;
+      property TcpNoDelay: Boolean read fTCPNoDelay write fTCPNoDelay;
     end;
 
 implementation
@@ -141,19 +153,23 @@ Uses Windows,
 
 {*******************************}
 constructor TAlSmtpClient.Create;
+var aWSAData: TWSAData;
 begin
-  FWSAData.wVersion := 0;
+  CheckError(WSAStartup(MAKEWORD(2,2), aWSAData) <> 0);
   Fconnected:= False;
   FSocketDescriptor:= INVALID_SOCKET;
   FAuthTypesSupported:= [];
-  Ftimeout:= 60000;
-  Randomize;
+  FSendTimeout := 60000; // 60 seconds
+  FReceiveTimeout := 60000; // 60 seconds
+  FKeepAlive := True;
+  fTCPNoDelay := True;
 end;
 
 {*******************************}
 destructor TAlSmtpClient.Destroy;
 begin
   If Fconnected then Disconnect;
+  WSACleanup;
   inherited;
 end;
 
@@ -163,25 +179,33 @@ begin
   if Error then RaiseLastOSError;
 end;
 
-{****************************************************************************}
-Function TAlSmtpClient.Connect(aHost: AnsiString; APort: integer): AnsiString;
+{****************************************************************************************}
+Function TAlSmtpClient.Connect(const aHost: AnsiString; const APort: integer): AnsiString;
 
-  {-------------------------------------------------}
-  procedure CallServer(Server:AnsiString; Port:word);
+  {--------------------------------------------------------------}
+  procedure _CallServer(const Server:AnsiString; const Port:word);
   var SockAddr:Sockaddr_in;
       IP: AnsiString;
   begin
-    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_IP);
+    FSocketDescriptor:=Socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
     CheckError(FSocketDescriptor=INVALID_SOCKET);
     FillChar(SockAddr,SizeOf(SockAddr),0);
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
+    {$ELSE}
     If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
+    {$IFEND}
       checkError(not ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    CheckError(WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
+    {$ELSE}
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
+    {$IFEND}
   end;
 
 begin
@@ -190,11 +214,12 @@ begin
 
   Try
 
-    WSAStartup (MAKEWORD(2,2), FWSAData);
-    CallServer(aHost,aPort);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
+    _CallServer(aHost,aPort);
     Fconnected := True;
+    SetSendTimeout(FSendTimeout);
+    SetReceiveTimeout(FReceiveTimeout);
+    SetKeepAlive(FKeepAlive);
+    SetTCPNoDelay(fTCPNoDelay);
     FAuthTypesSupported := [];
     Result := GetResponse([220]);
 
@@ -212,8 +237,6 @@ begin
     ShutDown(FSocketDescriptor,SD_BOTH);
     CloseSocket(FSocketDescriptor);
     FSocketDescriptor := INVALID_SOCKET;
-    if FWSAData.wVersion = 2 then WSACleanup;
-    FWSAData.wVersion := 0;
     Fconnected := False;
   end;
 end;
@@ -727,31 +750,63 @@ begin
   end;
 end;
 
-{**********************************************************************}
-Function TAlSmtpClient.SocketWrite(Var Buffer; Count: Longint): Longint;
+{******************************************************************************************************************}
+Function TAlSmtpClient.SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
 begin
-  if not FConnected then raise EALException.Create('Not Connected');
-  Result := Send(FSocketDescriptor,Buffer,Count,0);
+  Result := Send(FSocketDescriptor,Buf,len,0);
   CheckError(Result =  SOCKET_ERROR);
 end;
 
-{*********************************************************************}
-function TAlSmtpClient.SocketRead(var Buffer; Count: Longint): Longint;
+{****************************************************************}
+function TAlSmtpClient.SocketRead(var buf; len: Integer): Integer;
 begin
-  if not FConnected then raise EALException.Create('Not Connected');
-  Result := Recv(FSocketDescriptor,Buffer,Count,0);
+  Result := Recv(FSocketDescriptor,Buf,len,0);
   CheckError(Result = SOCKET_ERROR);
 end;
 
-{*******************************************************}
-procedure TAlSmtpClient.Settimeout(const Value: integer);
+{***********************************************************}
+procedure TAlSmtpClient.SetSendTimeout(const Value: integer);
 begin
-  If Value <> Ftimeout then begin
-    if FConnected then begin
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-      CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FTimeOut),SizeOf(Integer))=SOCKET_ERROR);
-    end;
-    Ftimeout := Value;
+  FSendTimeout := Value;
+  if FConnected then CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_SNDTIMEO,PAnsiChar(@FSendTimeout),SizeOf(FSendTimeout))=SOCKET_ERROR);
+end;
+
+{**************************************************************}
+procedure TAlSmtpClient.SetReceiveTimeout(const Value: integer);
+begin
+  FReceiveTimeout := Value;
+  if FConnected then CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@FReceiveTimeout),SizeOf(FReceiveTimeout))=SOCKET_ERROR);
+end;
+
+{*******************************************************************************************************************}
+// http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
+procedure TAlSmtpClient.SetKeepAlive(const Value: boolean);
+var aIntBool: integer;
+begin
+  FKeepAlive := Value;
+  if FConnected then begin
+    // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
+    // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
+    // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
+    if FKeepAlive then aIntBool := 1
+    else aIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,SO_KEEPALIVE,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
+  end;
+end;
+
+{***************************************************************************************************************************************************************************************************************}
+// https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_MRG/1.1/html/Realtime_Tuning_Guide/sect-Realtime_Tuning_Guide-Application_Tuning_and_Deployment-TCP_NODELAY_and_Small_Buffer_Writes.html
+procedure TAlSmtpClient.SetTCPNoDelay(const Value: boolean);
+var aIntBool: integer;
+begin
+  fTCPNoDelay := Value;
+  if FConnected then begin
+    // warning the winsock seam buggy because the getSockOpt return optlen = 1 (byte) intead of 4 (dword)
+    // so the getSockOpt work only if aIntBool = byte ! (i see this on windows vista)
+    // but this is only for getSockOpt, for setsockopt it's seam to work OK so i leave it like this
+    if fTCPNoDelay then aIntBool := 1
+    else aIntBool := 0;
+    CheckError(setsockopt(FSocketDescriptor,SOL_SOCKET,TCP_NODELAY,PAnsiChar(@aIntBool),SizeOf(aIntBool))=SOCKET_ERROR);
   end;
 end;
 

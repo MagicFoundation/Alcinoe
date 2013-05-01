@@ -19,7 +19,6 @@
     <Projects Include="ALPOP3Client\_source\POP3ClientDemo.d2007.dproj" />
     <Projects Include="ALSMTPClient\_source\ALSMTPClientDemo.d2007.dproj" />
     <Projects Include="ALSortedListBenchmark\_source\ALSortedListBenchmark.d2007.dproj" />
-    <Projects Include="ALSQLBenchmark\_source\ALSQLBenchmark.d2007.dproj" />
     <Projects Include="ALSqlite3ClientDemo\_source\ALSqlite3clientDemo.d2007.dproj" />
     <Projects Include="ALStressHTTPServer\_source\ALStressHTTPServer.d2007.dproj" />
     <Projects Include="ALStringBenchmark\_source\ALStringBenchmark.d2007.dproj" />
@@ -161,15 +160,6 @@
   <Target Name="ALSMTPClientDemo_d2007:Make">
     <MSBuild Projects="ALSMTPClient\_source\ALSMTPClientDemo.d2007.dproj" Targets="Make" />
   </Target>
-  <Target Name="ALSQLBenchmark_d2007">
-    <MSBuild Projects="ALSQLBenchmark\_source\ALSQLBenchmark.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALSQLBenchmark_d2007:Clean">
-    <MSBuild Projects="ALSQLBenchmark\_source\ALSQLBenchmark.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALSQLBenchmark_d2007:Make">
-    <MSBuild Projects="ALSQLBenchmark\_source\ALSQLBenchmark.d2007.dproj" Targets="Make" />
-  </Target>
   <Target Name="ALSqlite3clientDemo_d2007">
     <MSBuild Projects="ALSqlite3ClientDemo\_source\ALSqlite3clientDemo.d2007.dproj" Targets="" />
   </Target>
@@ -252,13 +242,13 @@
     <MSBuild Projects="ALSortedListBenchmark\_source\ALSortedListBenchmark.d2007.dproj" Targets="Make" />
   </Target>
   <Target Name="Build">
-    <CallTarget Targets="ALButtonDemo_d2007;ALCipherDemo_d2007;ALComboBoxDemo_d2007;ALEditDemo_d2007;ALFBXDemo_d2007;ALFBXEvent_d2007;ALFBXMonitoringStats_d2007;ALHintBalloonDemo_d2007;ALListBoxDemo_d2007;ALMemoDemo_d2007;ALNNTPClientDemo_d2007;ALPhpRunnerDemo_d2007;POP3ClientDemo_d2007;ALSMTPClientDemo_d2007;ALSQLBenchmark_d2007;ALSqlite3clientDemo_d2007;ALStressHTTPServer_d2007;ALStringBenchmark_d2007;ALStringToAnsiString_d2007;ALWebSpiderDemo_d2007;ALWinHTTPClientDemo_d2007;ALWinInetHTTPClientDemo_d2007;AlXmlDocDemo_d2007;ALSortedListBenchmark_d2007" />
+    <CallTarget Targets="ALButtonDemo_d2007;ALCipherDemo_d2007;ALComboBoxDemo_d2007;ALEditDemo_d2007;ALFBXDemo_d2007;ALFBXEvent_d2007;ALFBXMonitoringStats_d2007;ALHintBalloonDemo_d2007;ALListBoxDemo_d2007;ALMemoDemo_d2007;ALNNTPClientDemo_d2007;ALPhpRunnerDemo_d2007;POP3ClientDemo_d2007;ALSMTPClientDemo_d2007;ALSqlite3clientDemo_d2007;ALStressHTTPServer_d2007;ALStringBenchmark_d2007;ALStringToAnsiString_d2007;ALWebSpiderDemo_d2007;ALWinHTTPClientDemo_d2007;ALWinInetHTTPClientDemo_d2007;AlXmlDocDemo_d2007;ALSortedListBenchmark_d2007" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="ALButtonDemo_d2007:Clean;ALCipherDemo_d2007:Clean;ALComboBoxDemo_d2007:Clean;ALEditDemo_d2007:Clean;ALFBXDemo_d2007:Clean;ALFBXEvent_d2007:Clean;ALFBXMonitoringStats_d2007:Clean;ALHintBalloonDemo_d2007:Clean;ALListBoxDemo_d2007:Clean;ALMemoDemo_d2007:Clean;ALNNTPClientDemo_d2007:Clean;ALPhpRunnerDemo_d2007:Clean;POP3ClientDemo_d2007:Clean;ALSMTPClientDemo_d2007:Clean;ALSQLBenchmark_d2007:Clean;ALSqlite3clientDemo_d2007:Clean;ALStressHTTPServer_d2007:Clean;ALStringBenchmark_d2007:Clean;ALStringToAnsiString_d2007:Clean;ALWebSpiderDemo_d2007:Clean;ALWinHTTPClientDemo_d2007:Clean;ALWinInetHTTPClientDemo_d2007:Clean;AlXmlDocDemo_d2007:Clean;ALSortedListBenchmark_d2007:Clean" />
+    <CallTarget Targets="ALButtonDemo_d2007:Clean;ALCipherDemo_d2007:Clean;ALComboBoxDemo_d2007:Clean;ALEditDemo_d2007:Clean;ALFBXDemo_d2007:Clean;ALFBXEvent_d2007:Clean;ALFBXMonitoringStats_d2007:Clean;ALHintBalloonDemo_d2007:Clean;ALListBoxDemo_d2007:Clean;ALMemoDemo_d2007:Clean;ALNNTPClientDemo_d2007:Clean;ALPhpRunnerDemo_d2007:Clean;POP3ClientDemo_d2007:Clean;ALSMTPClientDemo_d2007:Clean;ALSqlite3clientDemo_d2007:Clean;ALStressHTTPServer_d2007:Clean;ALStringBenchmark_d2007:Clean;ALStringToAnsiString_d2007:Clean;ALWebSpiderDemo_d2007:Clean;ALWinHTTPClientDemo_d2007:Clean;ALWinInetHTTPClientDemo_d2007:Clean;AlXmlDocDemo_d2007:Clean;ALSortedListBenchmark_d2007:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="ALButtonDemo_d2007:Make;ALCipherDemo_d2007:Make;ALComboBoxDemo_d2007:Make;ALEditDemo_d2007:Make;ALFBXDemo_d2007:Make;ALFBXEvent_d2007:Make;ALFBXMonitoringStats_d2007:Make;ALHintBalloonDemo_d2007:Make;ALListBoxDemo_d2007:Make;ALMemoDemo_d2007:Make;ALNNTPClientDemo_d2007:Make;ALPhpRunnerDemo_d2007:Make;POP3ClientDemo_d2007:Make;ALSMTPClientDemo_d2007:Make;ALSQLBenchmark_d2007:Make;ALSqlite3clientDemo_d2007:Make;ALStressHTTPServer_d2007:Make;ALStringBenchmark_d2007:Make;ALStringToAnsiString_d2007:Make;ALWebSpiderDemo_d2007:Make;ALWinHTTPClientDemo_d2007:Make;ALWinInetHTTPClientDemo_d2007:Make;AlXmlDocDemo_d2007:Make;ALSortedListBenchmark_d2007:Make" />
+    <CallTarget Targets="ALButtonDemo_d2007:Make;ALCipherDemo_d2007:Make;ALComboBoxDemo_d2007:Make;ALEditDemo_d2007:Make;ALFBXDemo_d2007:Make;ALFBXEvent_d2007:Make;ALFBXMonitoringStats_d2007:Make;ALHintBalloonDemo_d2007:Make;ALListBoxDemo_d2007:Make;ALMemoDemo_d2007:Make;ALNNTPClientDemo_d2007:Make;ALPhpRunnerDemo_d2007:Make;POP3ClientDemo_d2007:Make;ALSMTPClientDemo_d2007:Make;ALSqlite3clientDemo_d2007:Make;ALStressHTTPServer_d2007:Make;ALStringBenchmark_d2007:Make;ALStringToAnsiString_d2007:Make;ALWebSpiderDemo_d2007:Make;ALWinHTTPClientDemo_d2007:Make;ALWinInetHTTPClientDemo_d2007:Make;AlXmlDocDemo_d2007:Make;ALSortedListBenchmark_d2007:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

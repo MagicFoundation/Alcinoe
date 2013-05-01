@@ -158,10 +158,10 @@ type
                     ntDocFragment,      //[not implemented yet !] The node represents a document fragment. A document fragment node associates a node or subtree with a document without actually being contained in the document. Document fragment nodes can have child nodes of type ntElement, ntProcessingInstr, ntComment, ntText, ntCData, and ntEntityRef. It never appears as the child of another node.
                     ntNotation);        //[not implemented yet !] A node represents a notation in the document type declaration. It always appears as the child of an ntDocType node and never has any child nodes.
 
-  TALXMLDocOption = (//doAttrNull,     //[deleted from TALXMLDocOption] When reading the value of an attribute that does not exist, the value is given as a Null Variant (as opposed to a value of an empty string).
-                     doNodeAutoCreate, //If the application tries to read a node by name, using the Nodes property of an IXMLNodeList interface, and that node does not exist, then the application creates a new node using the specified name.
-                     doNodeAutoIndent, //When formatting the XML text from the parsed set of nodes, child nodes are automatically indented from their parent nodes.
-                     doAutoSave);      //When the XML document closes, any changes are automatically saved back to the XML document file or to the XML property.
+  TALXMLDocOption = (//doAttrNull,      //[deleted from TALXMLDocOption] When reading the value of an attribute that does not exist, the value is given as a Null Variant (as opposed to a value of an empty string).
+                     //doAutoSave,      //[deleted from TALXMLDocOption] When the XML document closes, any changes are automatically saved back to the XML document file or to the XML property.
+                     doNodeAutoCreate,  //If the application tries to read a node by name, using the Nodes property of an IXMLNodeList interface, and that node does not exist, then the application creates a new node using the specified name.
+                     doNodeAutoIndent); //When formatting the XML text from the parsed set of nodes, child nodes are automatically indented from their parent nodes.
   TALXMLDocOptions = set of TALXMLDocOption;
 
   TALXMLParseOption = (//poResolveExternals,   //[not implemented yet !] External definitions (resolvable namespaces, DTD external subsets, and external entity references) are resolved at parse time
@@ -170,11 +170,6 @@ type
                        poPreserveWhiteSpace,   //White space in the text of the XML document is not stripped off.
                        poIgnoreXMLReferences); //[added from TParseOption] don't decode xml entities (like &amp;) and not encode them also (when save / load)
   TALXMLParseOptions = set of TALXMLParseOption;
-
-  TALXMLDocumentSource = (xdsNone,
-                          xdsXMLProperty,
-                          xdsFile,
-                          xdsStream);
 
   TALXMLPrologItem = (xpVersion,
                       xpEncoding,
@@ -607,7 +602,7 @@ type
 
 
   {TALXMLDocument}
-  TALXMLDocument = class(Tcomponent)
+  TALXMLDocument = class(TObject)
   private
     //[Deleted from TXMLDocument] FXMLData: AnsiString;
     //[Deleted from TXMLDocument] FDOMVendor: TDOMVendor;
@@ -628,19 +623,21 @@ type
     //[Deleted from TXMLDocument] function GetDOMParseOptions: IDOMParseOptions;
     //[Deleted from TXMLDocument] procedure SetDOMImplementation(const Value: IDOMImplementation);
     //[Deleted from TXMLDocument] procedure SetDOMVendor(const Value: TDOMVendor);
-    FSrcStream: TStream;
-    FXMLStrings: TALStringList;
-    FAfterClose: TNotifyEvent;
-    FAfterOpen: TNotifyEvent;
-    FBeforeClose: TNotifyEvent;
-    FBeforeOpen: TNotifyEvent;
-    FDocSource: TalXMLDocumentSource;
+    //[Deleted from TXMLDocument] function IsXMLStored: Boolean;
+    //[Deleted from TXMLDocument] function NodeIndentStored: Boolean;
+    //[Deleted from TXMLDocument] FXMLStrings: TALStringList;
+    //[Deleted from TXMLDocument] FFileName: AnsiString;
+    //[Deleted from TXMLDocument] FDocSource: TalXMLDocumentSource;
+    //[Deleted from TXMLDocument] FSrcStream: TStream;
+    //[Deleted from TXMLDocument] FAfterClose: TNotifyEvent;
+    //[Deleted from TXMLDocument] FAfterOpen: TNotifyEvent;
+    //[Deleted from TXMLDocument] FBeforeClose: TNotifyEvent;
+    //[Deleted from TXMLDocument] FBeforeOpen: TNotifyEvent;
+    FTag: NativeInt;
     FDocumentNode: TALXMLNode;
-    FFileName: AnsiString;
     FNodeIndentStr: AnsiString;
     FOptions: TALXMLDocOptions;
     FParseOptions: TALXMLParseOptions;
-    FStreamedActive: Boolean;
     FOnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent; // [added from TXMLDocument]
     FOnParseStartDocument: TNotifyEvent; // [added from TXMLDocument]
     FOnParseEndDocument: TNotifyEvent; // [added from TXMLDocument]
@@ -649,8 +646,6 @@ type
     FonParseText: TAlXMLParseTextEvent; // [added from TXMLDocument]
     FonParseComment: TAlXMLParseTextEvent; // [added from TXMLDocument]
     FonParseCData: TAlXMLParseTextEvent; // [added from TXMLDocument]
-    function IsXMLStored: Boolean;
-    function NodeIndentStored: Boolean;
   protected
     //[Deleted from TXMLDocument] function _AddRef: Integer; stdcall;
     //[Deleted from TXMLDocument] function _Release: Integer; stdcall;
@@ -676,15 +671,21 @@ type
     //[Deleted from TXMLDocument] property DOMPersist: IDOMPersist read GetDOMPersist;
     //[Deleted from TXMLDocument] property PrefixID: Integer read FPrefixID write FPrefixID;
     //[Deleted from TXMLDocument] property DocumentObject: TXMLDocument read GetDocumentObject;
+    //[Deleted from TXMLDocument] procedure CheckAutoSave;
+    //[Deleted from TXMLDocument] procedure SaveToXMLStrings;
+    //[Deleted from TXMLDocument] procedure SetXMLStrings(const Value: AnsiString);
+    //[Deleted from TXMLDocument] procedure XMLStringsChanging(Sender: TObject);
+    //[Deleted from TXMLDocument] function GetFileName: AnsiString;
+    //[Deleted from TXMLDocument] procedure SetFileName(const Value: AnsiString);
+    //[Deleted from TXMLDocument] property DocSource: TALXMLDocumentSource read FDocSource write FDocSource;
+    //[Deleted from TXMLDocument] procedure DoAfterClose;
+    //[Deleted from TXMLDocument] procedure DoAfterOpen;
+    //[Deleted from TXMLDocument] procedure DoBeforeClose;
+    //[Deleted from TXMLDocument] procedure DoBeforeOpen;
     function GetPrologNode: TALXMLNode;
     function GetPrologValue(PrologItem: TALXMLPrologItem; const Default: AnsiString = ''): AnsiString;
     function InternalSetPrologValue(const PrologNode: TALXMLNode; const Value: AnsiString; PrologItem: TALXMLPrologItem): AnsiString; //[Replace from TXMLNodeList] function InternalSetPrologValue(const PrologNode: IXMLNode; const Value: Variant; PrologItem: TXMLPrologItem): string;
     procedure CheckActive;
-    procedure CheckAutoSave;
-    procedure DoAfterClose;
-    procedure DoAfterOpen;
-    procedure DoBeforeClose;
-    procedure DoBeforeOpen;
     procedure DoParseProcessingInstruction(const Target, Data: AnsiString); // [added from TXMLDocument]
     procedure DoParseStartDocument; // [added from TXMLDocument]
     procedure DoParseEndDocument; // [added from TXMLDocument]
@@ -693,37 +694,29 @@ type
     procedure DoParseText(const str: AnsiString); // [added from TXMLDocument]
     procedure DoParseComment(const str: AnsiString); // [added from TXMLDocument]
     procedure DoParseCData(const str: AnsiString); // [added from TXMLDocument]
-    procedure LoadData;
-    procedure Loaded; override;
     Procedure InternalParseXml(Const RawXmlStream: TStream; Const FirstNode: TALXmlNode; Const SkipFirstNode: Boolean=False); // [added from TXMLDocument]
-    procedure ReleaseDoc(const CheckSave: Boolean = True);
-    procedure SaveToXMLStrings;
+    procedure ReleaseDoc;
     procedure SetPrologValue(const Value: AnsiString; PrologItem: TALXMLPrologItem); //[Replace from TXMLNodeList] procedure SetPrologValue(const Value: Variant; PrologItem: TXMLPrologItem);
-    procedure SetXMLStrings(const Value: AnsiString);
     function GetActive: Boolean;
+    procedure SetActive(const Value: Boolean);
     function GetChildNodes: TALXMLNodeList;
     function GetDocumentElement: TALXMLNode;
     function GetDocumentNode: TALXMLNode;
     function GetEncoding: AnsiString;
-    function GetFileName: AnsiString;
     function GetNodeIndentStr: AnsiString;
     function GetOptions: TALXMLDocOptions;
     function GetParseOptions: TALXMLParseOptions;
     function GetStandAlone: AnsiString;
     function GetVersion: AnsiString;
-    function GetXML: TALStrings;
-    procedure SetActive(const Value: Boolean);
+    function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStrings;
     procedure SetDocumentElement(const Value: TALXMLNode);
     procedure SetOptions(const Value: TALXMLDocOptions);
     procedure SetParseOptions(const Value: TALXMLParseOptions);
     procedure SetStandAlone(const Value: AnsiString);
     procedure SetVersion(const Value: AnsiString);
-    procedure SetXML(const Value: TALStrings);
+    procedure SetXML(const Value: ansiString); //[Replace from TXMLDocument] procedure SetXML(const Value: TALStrings);
     procedure SetEncoding(const Value: AnsiString);
-    procedure SetFileName(const Value: AnsiString);
     procedure SetNodeIndentStr(const Value: AnsiString);
-    procedure XMLStringsChanging(Sender: TObject);
-    property DocSource: TALXMLDocumentSource read FDocSource write FDocSource;
   public
     //[Deleted from TXMLDocument] class function NewInstance: TObject; override;
     //[Deleted from TXMLDocument] function AddChild(const TagName, NamespaceURI: AnsiString): TALXMLNode; overload;
@@ -739,43 +732,41 @@ type
     //[Deleted from TXMLDocument] property Modified: Boolean read GetModified;
     //[Deleted from TXMLDocument] property NSPrefixBase: AnsiString read FNSPrefixBase write FNSPrefixBase;
     //[Deleted from TXMLDocument] property SchemaRef: AnsiString read GetSchemaRef;
-    constructor Create(AOwner: TComponent); overload; override;
-    constructor Create(const AFileName: AnsiString); reintroduce; overload;
-    procedure AfterConstruction; override;
+    //[Deleted from TXMLDocument] procedure Refresh;
+    //[Deleted from TXMLDocument] property XML: TALStrings read GetXML write SetXML;
+    //[Deleted from TXMLDocument] property FileName: AnsiString read GetFileName write SetFileName;
+    //[Deleted from TXMLDocument] procedure parseXML;
+    //[Deleted from TXMLDocument] property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
+    //[Deleted from TXMLDocument] property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
+    //[Deleted from TXMLDocument] property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
+    //[Deleted from TXMLDocument] property AfterClose: TNotifyEvent read FAfterClose write FAfterClose;
+    //[Deleted from TXMLDocument] property DOMVendor: TDOMVendor read FDOMVendor write SetDOMVendor;
+    //[Deleted from TXMLDocument] property BeforeNodeChange: TNodeChangeEvent read FBeforeNodeChange write FBeforeNodeChange;
+    //[Deleted from TXMLDocument] property AfterNodeChange: TNodeChangeEvent read FAfterNodeChange write FAfterNodeChange;
+    //[Deleted from TXMLDocument] property OnAsyncLoad: TAsyncEventHandler read FOnAsyncLoad write SetOnAsyncLoad;
+    constructor Create; virtual;
     destructor Destroy; override;
-    function AddChild(const TagName: AnsiString): TALXMLNode; overload;
+    function AddChild(const TagName: AnsiString): TALXMLNode;
     function CreateElement(const TagOrData: AnsiString): TALXMLNode;  //[Replace from TXMLDocument] function CreateElement(const TagOrData, NamespaceURI: AnsiString): TALXMLNode;
     function CreateNode(const NameOrData: AnsiString; NodeType: TALXMLNodeType = ntElement; const AddlData: AnsiString = ''): TALXMLNode;
     function IsEmptyDoc: Boolean;
-    procedure LoadFromFile(const AFileName: AnsiString = '');
-    procedure LoadFromStream(const Stream: TStream); //[Replace from TXMLNodeList] procedure LoadFromStream(const Stream: TStream; EncodingType: TALXMLEncodingType = xetUnknown);
-    procedure LoadFromXML(const XML: AnsiString); overload;
-    procedure Refresh;
+    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False); //[Replace from TXMLDocument]  procedure LoadFromFile(const AFileName: AnsiString = '');
+    procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False); //[Replace from TXMLDocument] procedure LoadFromStream(const Stream: TStream; EncodingType: TALXMLEncodingType = xetUnknown);
+    procedure LoadFromXML(const XML: AnsiString; const saxMode: Boolean = False); //[Replace from TXMLDocument]  procedure LoadFromXML(const XML: AnsiString); overload;
     procedure SaveToFile(const AFileName: AnsiString = '');
     procedure SaveToStream(const Stream: TStream);
     procedure SaveToXML(var XML: AnsiString);
-    procedure parseXML;
     property ChildNodes: TALXMLNodeList read GetChildNodes;
     property DocumentElement: TALXMLNode read GetDocumentElement write SetDocumentElement;
     property Encoding: AnsiString read GetEncoding write SetEncoding;
     property Node: TALXMLNode read GetDocumentNode;
     property StandAlone: AnsiString read GetStandAlone write SetStandAlone;
     property Version: AnsiString read GetVersion write SetVersion;
-  published
-    //[Deleted from TXMLDocument] property DOMVendor: TDOMVendor read FDOMVendor write SetDOMVendor;
-    //[Deleted from TXMLDocument] property BeforeNodeChange: TNodeChangeEvent read FBeforeNodeChange write FBeforeNodeChange;
-    //[Deleted from TXMLDocument] property AfterNodeChange: TNodeChangeEvent read FAfterNodeChange write FAfterNodeChange;
-    //[Deleted from TXMLDocument] property OnAsyncLoad: TAsyncEventHandler read FOnAsyncLoad write SetOnAsyncLoad;
-    property Active: Boolean read GetActive write SetActive default False;
-    property FileName: AnsiString read GetFileName write SetFileName;
-    property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr stored NodeIndentStored;
-    property Options: TALXMLDocOptions read GetOptions write SetOptions default [];
-    property ParseOptions: TALXMLParseOptions read GetParseOptions write SetParseOptions default [];
-    property XML: TALStrings read GetXML write SetXML stored IsXMLStored;
-    property BeforeOpen: TNotifyEvent read FBeforeOpen write FBeforeOpen;
-    property AfterOpen: TNotifyEvent read FAfterOpen write FAfterOpen;
-    property BeforeClose: TNotifyEvent read FBeforeClose write FBeforeClose;
-    property AfterClose: TNotifyEvent read FAfterClose write FAfterClose;
+    property Active: Boolean read GetActive write SetActive;
+    property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr;
+    property Options: TALXMLDocOptions read GetOptions write SetOptions;
+    property ParseOptions: TALXMLParseOptions read GetParseOptions write SetParseOptions;
+    property XML: AnsiString read GetXML write SetXML;
     property OnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent read FOnParseProcessingInstruction write FOnParseProcessingInstruction; // [added from TXMLDocument]
     property OnParseStartDocument: TNotifyEvent read FOnParseStartDocument write FOnParseStartDocument; // [added from TXMLDocument]
     property OnParseEndDocument: TNotifyEvent read FOnParseEndDocument write FOnParseEndDocument; // [added from TXMLDocument]
@@ -784,6 +775,7 @@ type
     property OnParseText: TAlXMLParseTextEvent read FonParseText Write FonParseText; // [added from TXMLDocument]
     property OnParseComment: TAlXMLParseTextEvent read FonParseComment Write FonParseComment; // [added from TXMLDocument]
     property OnParseCData: TAlXMLParseTextEvent read FonParseCData Write FonParseCData; // [added from TXMLDocument]
+    property Tag: NativeInt read FTag write FTag;
   end;
 
 {misc constante}
@@ -818,9 +810,6 @@ Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
                                           Const Recurse: Boolean = False): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default: AnsiString = ''): AnsiString;
 
-
-procedure Register;
-
 implementation
 
 uses Windows,
@@ -831,14 +820,6 @@ uses Windows,
      {$IFEND}
      ALHttpCommon,
      AlFcnString;
-
-{$R ..\resource\ALXmlDoc.dcr}
-
-{*****************}
-procedure Register;
-begin
-  RegisterComponents('Alcinoe', [TALXMLDocument]);
-end;
 
 {**********************************}
 {Raises an EALXMLDocError exception.
@@ -984,37 +965,11 @@ end;
 {************************************}
 {Instantiates a TALXMLDocument object.
  Call Create to instantiate a TALXMLDocument component at runtime.}
-constructor TALXMLDocument.create(AOwner: TComponent);
-begin
-  { Need to have this to make this constructor visible to C++ classes }
-  inherited;
-  FFileName:= '';  
-end;
-
-{************************************}
-{Instantiates a TALXMLDocument object.
- Call Create to instantiate a TALXMLDocument component at runtime.
- *AFileName specifies the file that the new TALXMLDocument instance represents.}
-constructor TALXMLDocument.Create(const AFileName: AnsiString);
-begin
-  inherited Create(nil);
-  FFileName := AFileName;
-end;
-
-{*****************************************}
-procedure TALXMLDocument.AfterConstruction;
+constructor TALXMLDocument.create;
 begin
   inherited;
-
-  FAfterClose:= nil;
-  FAfterOpen:= nil;
-  FBeforeClose:= nil;
-  FBeforeOpen:= nil;
-  FStreamedActive := False;
-  FDocSource:= xdsNone;
   FDocumentNode:= nil;
   FParseOptions:= [];
-  FSrcStream := nil;
   FOnParseProcessingInstruction:= nil;
   FOnParseStartDocument:= nil;
   FOnParseEndDocument:= nil;
@@ -1023,39 +978,17 @@ begin
   FonParseText:= nil;
   FonParseComment:= nil;
   FonParseCData:= nil;
-
   FOptions := [];
   NodeIndentStr := CALDefaultNodeIndent;
-  FXMLStrings := TALStringList.Create;
-  FXMLStrings.OnChanging := XMLStringsChanging;
-  if FFileName <> '' then SetActive(True);
+  FTag := 0;
 end;
 
 {************************************}
 {Disposes of a TALXMLDocument object.}
 destructor TALXMLDocument.Destroy;
 begin
-  Destroying;
-  SetActive(False);
-  FreeAndNil(FXMLStrings);
+  ReleaseDoc;
   inherited;
-end;
-
-{******************************}
-procedure TALXMLDocument.Loaded;
-begin
-  inherited;
-  try
-    if FStreamedActive then SetActive(True);
-  except
-    if csDesigning in ComponentState then
-      if Assigned(Classes.ApplicationHandleException) then
-        Classes.ApplicationHandleException(ExceptObject)
-      else
-        ShowException(ExceptObject, ExceptAddr)
-    else
-      raise;
-  end;
 end;
 
 {****************************************}
@@ -1072,24 +1005,9 @@ end;
  *Value is the new value to set.}
 procedure TALXMLDocument.SetActive(const Value: Boolean);
 begin
-  if (csReading in ComponentState) then FStreamedActive := Value
-  else if Value <> GetActive then begin
-    if Value then begin
-      DoBeforeOpen;
-      FDocumentNode := TALXmlDocumentNode.Create(self);
-      try
-        LoadData;
-      except
-        ReleaseDoc(False);
-        raise;
-      end;
-      DoAfterOpen;
-    end
-    else begin
-      DoBeforeClose;
-      ReleaseDoc;
-      DoAfterClose;
-    end;
+  if Value <> GetActive then begin
+    if Value then FDocumentNode := TALXmlDocumentNode.Create(self)
+    else ReleaseDoc;
   end;
 end;
 
@@ -1511,83 +1429,10 @@ Begin
   end;
 end;
 
-{********************************}
-procedure TALXMLDocument.ParseXml;
+{**********************************}
+procedure TALXMLDocument.ReleaseDoc;
 begin
-  If active then alXmldocError(cALXmlActive);
-  LoadData;
-end;
-
-{********************************}
-procedure TALXMLDocument.LoadData;
-var StringStream: TALStringStream;
-    FileStream: TfileStream;
-begin
-
-  Try
-
-    DocSource := xdsNone;
-    if (FXMLStrings.Count > 0) then begin
-      StringStream := TALStringStream.Create(FXMLStrings.Text);
-      try
-        InternalParseXml(StringStream, FDocumentNode);
-      finally
-        StringStream.Free;
-      end;
-      DocSource := xdsXMLProperty;
-    end
-    else if Assigned(FSrcStream) then begin
-      FSrcStream.Seek(0, 0);
-      InternalParseXml(FSrcStream, FDocumentNode);
-      DocSource := xdsStream;
-      FSrcStream := nil;
-    end
-    else if FFileName <> '' then begin
-      FileStream := TfileStream.Create(String(FFilename),fmOpenRead or fmShareDenyWrite);
-      Try
-        InternalParseXml(FileStream, FDocumentNode);
-      finally
-        FileStream.Free;
-      end;
-      DocSource := xdsFile;
-    end;
-
-  except
-    DocSource := xdsNone;
-    raise;
-  end;
-
-end;
-
-{*******************************************************************}
-procedure TALXMLDocument.ReleaseDoc(const CheckSave: Boolean = True);
-begin
-  if CheckSave then CheckAutoSave;
   if assigned(FDocumentNode) then FreeAndNil(FDocumentNode);
-  if not (DocSource in [xdsNone, xdsXMLProperty]) then SetXMLStrings('');
-end;
-
-{***********************************************************}
-{Updates the parsed XML document to reflect external changes.
- Call Refresh when the XML document specified by FileName has changed due to an external cause. Refresh updates the parsed version of the XML
- document (which can be traversed starting with DocumentElement) to reflect the current contents of the file specified by FileName.
- The Active property must be true when you call Refresh. If the XML document is not active when you call Refresh, TALXMLDocument raises
- an EALXMLDocError exception.
- Note:	Do not call Refresh after making changes directly to the XML property, because assigning a value to XML automatically closes the XML document.
- To refresh the XML document after assigning a new value to XML, set the Active property to true.}
-procedure TALXMLDocument.Refresh;
-begin
-  CheckActive;
-  ReleaseDoc(False); //=> at the same time set active to False !!
-  if not (DocSource in [xdsXMLProperty, xdsFile]) then ALXMLDocError(CALXmlNoRefresh);
-
-  FDocumentNode := TALXmlDocumentNode.Create(self);
-  try
-    LoadData;
-  except
-    ReleaseDoc(False);
-    raise;
-  end;
 end;
 
 {**************************************}
@@ -1597,13 +1442,15 @@ end;
  *AFileName is the name of the XML document to load from disk. If AFileName is an empty string, TALXMLDocument uses the value of the
   FileName property. If AFileName is not an empty string, TALXMLDocument changes the FileName property to AFileName.
  Once you have loaded an XML document, any changes you make to the document are not saved back to disk until you call the SaveToFile method.}
-procedure TALXMLDocument.LoadFromFile(const AFileName: AnsiString = '');
+procedure TALXMLDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False);
+var FileStream: TFileStream;
 begin
-  SetActive(False);
-  if AFileName <> '' then FileName := AFileName;
-  if FileName = '' then ALXMLDocError(CALXmlMissingFileName);
-  SetXMLStrings('');
-  SetActive(True);
+  FileStream := TFileStream.Create(string(aFileName), fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromStream(FileStream, saxMode);
+  finally
+    FileStream.Free;
+  end;
 end;
 
 {****************************************************}
@@ -1611,12 +1458,14 @@ end;
  Call LoadFromStream to load the XML document from a stream.
  *Stream is a stream object that can be used to read the string of XML that makes up the document.
  After loading the document from Stream, LoadFromStream sets the Active property to true.}
-procedure TALXMLDocument.LoadFromStream(const Stream: TStream);
+procedure TALXMLDocument.LoadFromStream(const Stream: TStream; const saxMode: Boolean = False);
 begin
-  SetActive(False);
-  SetXMLStrings('');
-  FSrcStream := Stream;
-  SetActive(True);
+  if saxMode then SetActive(False)
+  else begin
+    releaseDoc;
+    SetActive(True);
+  end;
+  InternalParseXml(Stream, FDocumentNode);
 end;
 
 {*****************************************************************}
@@ -1625,12 +1474,12 @@ end;
  basis, LoadFromXML treats the text of the XML document as a whole.
  The XML parameter is a string containing the text of an XML document. It should represent the XML text encoded using 8 bits char (utf-8, iso-8859-1, etc)
  After assigning the XML property as the contents of the document, LoadFromXML sets the Active property to true.}
-procedure TALXMLDocument.LoadFromXML(const XML: AnsiString);
+procedure TALXMLDocument.LoadFromXML(const XML: AnsiString; const saxMode: Boolean = False);
 var StringStream: TALStringStream;
 begin
   StringStream := TALStringStream.Create(XML);
   try
-    LoadFromStream(StringStream);
+    LoadFromStream(StringStream, saxMode);
   finally
     StringStream.Free;
   end;
@@ -1643,21 +1492,12 @@ end;
 procedure TALXMLDocument.SaveToFile(const AFileName: AnsiString = '');
 Var afileStream: TfileStream;
 begin
-  if AFileName = '' then aFileStream := TfileStream.Create(String(FFilename),fmCreate)
-  else aFileStream := TfileStream.Create(String(AFileName),fmCreate);
+  aFileStream := TfileStream.Create(String(AFileName),fmCreate);
   Try
     SaveToStream(aFileStream);
   finally
     aFileStream.Free;
   end;
-end;
-
-{****************************************}
-procedure TALXMLDocument.SaveToXMLStrings;
-var XMLData: AnsiString;
-begin
-  SaveToXML(XMLData);
-  SetXMLStrings(XMLData);
 end;
 
 {************************************************}
@@ -1686,57 +1526,27 @@ begin
   node.SaveToStream(Stream);
 end;
 
-{***********************************************************}
-procedure TALXMLDocument.XMLStringsChanging(Sender: TObject);
-begin
-  if not (csLoading in ComponentState) and Active then SetActive(False);
-  FFileName := '';
-end;
-
-{**************************************************************}
-procedure TALXMLDocument.SetXMLStrings(const Value: AnsiString);
-begin
-  { Unhook the OnChanging event so we don't close the doc when refreshing }
-  FXMLStrings.OnChanging := nil;
-  try
-    FXMLStrings.Text := Value;
-  finally
-    FXMLStrings.OnChanging := XMLStringsChanging;
-  end;
-end;
-
 {*************************************}
 {Returns the value of the XML property.
  GetXML is the read implementation of the XML property.}
-function TALXMLDocument.GetXML: TALStrings;
+function TALXMLDocument.GetXML: AnsiString;
 begin
-  if Active then SaveToXMLStrings;
-  Result := FXMLStrings;
+  SaveToXML(Result);
 end;
 
 {**********************************}
 {Sets the value of the XML property.
  SetXML is the write implementation of the XML property.
  *Value contains the raw (unparsed) XML to assign.}
-procedure TALXMLDocument.SetXML(const Value: TALStrings);
+procedure TALXMLDocument.SetXML(const Value: AnsiString);
 begin
-  FXMLStrings.Assign(Value);
+ LoadFromXML(XML, False);
 end;
 
 {***********************************}
 procedure TALXMLDocument.CheckActive;
 begin
   if not Assigned(FDocumentNode) then ALXMLDocError(CALXmlNotActive);
-end;
-
-{*************************************}
-procedure TALXMLDocument.CheckAutoSave;
-begin
-  if (doAutoSave in FOptions) then
-    case DocSource of
-      xdsXMLProperty: SaveToXMLStrings;
-      xdsFile: SaveToFile(FileName);
-    end;
 end;
 
 {***********************************************************}
@@ -1849,27 +1659,6 @@ begin
   else Node.ChildNodes.Add(Value);
 end;
 
-{******************************************}
-{Returns the value of the FileName property.
- GetFileName is the read implementation of the FileName property.}
-function TALXMLDocument.GetFileName: AnsiString;
-begin
-  Result := FFileName;
-end;
-
-{***************************************}
-{Sets the value of the FileName property.
- SetFileName is the write implementation of the FileName property.
- *Value is the name of an XML document.}
-procedure TALXMLDocument.SetFileName(const Value: AnsiString);
-begin
-  if Value <> FFileName then begin
-    if Active and (DocSource = xdsFile) then SetActive(False)
-    else SetXMLStrings('');
-    FFileName := Value;
-  end;
-end;
-
 {***********************************************}
 {Returns the value of the NodeIndentStr property.
  GetNodeIndentStr is the read implementation of the NodeIndentStr property.}
@@ -1919,19 +1708,6 @@ end;
 procedure TALXMLDocument.SetParseOptions(const Value: TALXMLParseOptions);
 begin
   FParseOptions := Value;
-end;
-
-{*******************************************}
-function TALXMLDocument.IsXMLStored: Boolean;
-begin
-  Result := (Active and (DocSource = xdsXMLProperty)) or
-      	    ((not Active) and (FXMLStrings.Count > 0));
-end;
-
-{************************************************}
-function TALXMLDocument.NodeIndentStored: Boolean;
-begin
-  Result := NodeIndentStr <> cALDefaultNodeIndent;
 end;
 
 {************************************************}
@@ -2049,30 +1825,6 @@ end;
 procedure TALXMLDocument.SetStandAlone(const Value: AnsiString);
 begin
   SetPrologValue(Value, xpStandalone);
-end;
-
-{************************************}
-procedure TALXMLDocument.DoAfterClose;
-begin
-  if Assigned(FAfterClose) then FAfterClose(Self);
-end;
-
-{***********************************}
-procedure TALXMLDocument.DoAfterOpen;
-begin
-  if Assigned(FAfterOpen) then FAfterOpen(Self);
-end;
-
-{*************************************}
-procedure TALXMLDocument.DoBeforeClose;
-begin
-  if Assigned(FBeforeClose) then FBeforeClose(Self);
-end;
-
-{************************************}
-procedure TALXMLDocument.DoBeforeOpen;
-begin
-  if Assigned(FBeforeOpen) then FBeforeOpen(Self);
 end;
 
 {*************************************************************}
@@ -3864,11 +3616,7 @@ end;
 {**************************************************************************}
 Function ALCreateEmptyXMLDocument(Const Rootname:AnsiString):TalXMLDocument;
 begin
-  Result := TAlXMLDocument.Create(nil);
-  with result do begin
-    Options := [];
-    ParseOptions := [];
-  end;
+  Result := TAlXMLDocument.Create;
   ALClearXMLDocument(rootname,Result);
 End;
 
@@ -3878,9 +3626,7 @@ procedure ALClearXMLDocument(Const rootname:AnsiString;
                              const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
 begin
   with xmlDoc do begin
-    Active := False;
-    XML.clear;
-    FileName := '';
+    releaseDoc;
     Active := true;
     version := '1.0';
     standalone := 'yes';

@@ -10,7 +10,7 @@ Version:      4.01
 
 Description:  TALXmlDocument is exactly like Delphi TXmlDocument 
               (Same functions and procedures) but 10 to 100 times more 
-              faster (see demo) and can work even in sax mode ! 
+              faster (see demo) and can work even in sax mode !
 
               Use TAlXMLDocument to represent an XML document. 
               TAlXMLDocument can read an existing XML document from a 
@@ -104,7 +104,6 @@ uses Classes,
      AlStringList;
 
 resourcestring
-  cALXmlActive               = 'Document is active';
   cALXmlNotActive            = 'No active document';
   cAlXmlNodeNotFound         = 'Node "%s" not found';
   cALXmlInvalidNodeType      = 'Invalid node type';
@@ -112,8 +111,6 @@ resourcestring
   cALXmlListCapacityError    = 'Node list capacity out of bounds (%d)';
   cALXmlListCountError       = 'Node list count out of bounds (%d)';
   cALXmlListIndexError       = 'Node list index out of bounds (%d)';
-  cALXmlMissingFileName      = 'FileName cannot be blank';
-  cALXmlNoRefresh            = 'Refresh is only supported if the FileName or XML properties are set';
   cALXmlOperationError       = 'This operation can not be performed with a node of type %s';
   cALXmlParseError           = 'Xml Parse error';
   CALXMLOnlyOneTopLevelError = 'Only one top level element is allowed in an XML document';
@@ -130,15 +127,14 @@ type
   TALXMLNodeList= Class;
   TALXMLDocument= Class;
 
-  TAlXMLParseProcessingInstructionEvent = procedure (Sender: TObject; const Target, Data: AnsiString) of object;
-  TAlXMLParseTextEvent = procedure (Sender: TObject; const str: AnsiString) of object;
-  TAlXMLParseStartElementEvent = procedure (Sender: TObject; const Name: AnsiString; const Attributes: TALStrings) of object;
-  TAlXMLParseEndElementEvent = procedure (Sender: TObject; const Name: AnsiString) of object;
+  TAlXMLParseProcessingInstructionEvent = procedure (Sender: TObject; const Path, Target, Data: AnsiString) of object;
+  TAlXMLParseTextEvent = procedure (Sender: TObject; const Path, Str: AnsiString) of object;
+  TAlXMLParseStartElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings) of object;
+  TAlXMLParseEndElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString) of object;
 
   TALXMLNodeListSortCompare = function(List: TALXMLNodeList; Index1, Index2: Integer): Integer;
 
-  TALXmlNodeType = (ntReserved,         //Not used
-                    ntElement,          //The node represents an element. Element nodes represent simple tags that have child nodes. The child nodes of an element node can have the following node types: ntElement, ntText, ntCData, ntEntityRef, ntProcessingInstr, and ntComment. Element nodes can also have attributes (ntAttribute). Element nodes can be the child of a node of type ntDocument, ntDocFragment, ntEntityRef, and ntElement.
+  TALXmlNodeType = (ntElement,          //The node represents an element. Element nodes represent simple tags that have child nodes. The child nodes of an element node can have the following node types: ntElement, ntText, ntCData, ntEntityRef, ntProcessingInstr, and ntComment. Element nodes can also have attributes (ntAttribute). Element nodes can be the child of a node of type ntDocument, ntDocFragment, ntEntityRef, and ntElement.
                     ntAttribute,        //The node represents an attribute of an element. It is not the child of another node, but its value can be accessed using the Attribute property of the element node. An attribute node can have child nodes of type ntText and ntEntityRef.
                     ntText,             //The node represents the text content of a tag. A text node cannot have any child nodes, but can appear as the child node of a node of type ntAttribute, ntDocFragment, ntElement, or ntEntityRef.
                     ntCData,            //The node represents a CDATA section in the XML source. CDATA sections identify blocks of text that would otherwise be interpreted as markup. An ntCData node can’t have any child nodes. They can appear as the child of an ntDocFragment, ntEntityRef, or ntElement node.
@@ -312,6 +308,7 @@ type
     //[Deleted from TXMLNode] property HostNode: TALXMLNode read GetHostNode;
     //[Deleted from TXMLNode] function GetChildValue(const IndexOrName: OleVariant): OleVariant;
     //[Deleted from TXMLNode] procedure SetChildValue(const IndexOrName, Value: OleVariant);
+    //[Deleted from TXMLNode] function InternalAddChild(NodeClass: TALXMLNodeClass; const NodeName, NamespaceURI: AnsiString; Index: Integer): TALXMLNode;
     procedure DoBeforeChildNodesInsert(Index: Integer; const Node: TALXMLNode); virtual; // [added from TXMLNode]
     function CreateAttributeList: TALXMLNodeList;
     function CreateChildList: TALXMLNodeList;
@@ -326,7 +323,8 @@ type
     function GetIsTextElement: Boolean;
     function GetLocalName: AnsiString;
     function GetNodeName: AnsiString;
-    function GetNodeType: TALXMLNodeType; virtual;
+    function GetNodeType: TALXMLNodeType; virtual; abstract;
+    function GetNodeTypeStr: AnsiString;
     function GetNodeValue: AnsiString;
     function GetOwnerDocument: TALXMLDocument;
     function GetParentNode: TALXMLNode; virtual;
@@ -334,13 +332,10 @@ type
     function GetText: AnsiString;
     function GetXML: AnsiString;
     procedure SetXML(const Value: AnsiString);  // [added from TXMLNode]
-    function InternalAddChild(const NodeName: AnsiString; Index: Integer): TALXMLNode; //[Replace from TXMLNode] function InternalAddChild(NodeClass: TALXMLNodeClass; const NodeName, NamespaceURI: AnsiString; Index: Integer): TALXMLNode;
     function NestingLevel: Integer;
     procedure CheckTextNode;
-    procedure ClearDocumentRef;
     procedure SetAttributeNodes(const Value: TALXMLNodeList); virtual;
     procedure SetChildNodes(const Value: TALXMLNodeList); virtual;
-    procedure SetDocumentRef(ADocumentRef: TALXmlDocument); // [added from TXMLNode]
     procedure SetInternalChildValue(const Value: AnsiString); virtual; // [added from TXMLNode]
     procedure SetInternalValue(const Value: AnsiString); virtual; // [added from TXMLNode]
     procedure SetNodeName(const Value: AnsiString); // [added from TXMLNode]
@@ -391,12 +386,13 @@ type
     property Prefix: AnsiString read GetPrefix;
     property Text: AnsiString read GetText write SetText;
     property XML: AnsiString read GetXML write SetXML;
-    procedure SaveToStream(const Stream: TStream; Const SaveOnlyChildNode: Boolean=False); // [added from TXMLNode]
-    procedure SaveToFile(const AFileName: AnsiString; Const SaveOnlyChildNode: Boolean=False); // [added from TXMLNode]
-    procedure LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNode: Boolean=False); // [added from TXMLNode]
-    procedure LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNode: Boolean=False); // [added from TXMLNode]
+    procedure SaveToStream(const Stream: TStream; Const SaveOnlyChildNodes: Boolean=False); // [added from TXMLNode]
+    procedure SaveToFile(const AFileName: AnsiString; Const SaveOnlyChildNodes: Boolean=False); // [added from TXMLNode]
+    procedure SaveToXML(var Xml: AnsiString; Const SaveOnlyChildNodes: Boolean=False); // [added from TXMLNode]
+    procedure LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNodes: Boolean=False); // [added from TXMLNode]
+    procedure LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNodes: Boolean=False); // [added from TXMLNode]
+    procedure LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False); // [added from TXMLNode]
   end;
-
 
   {The node represents an element. Element nodes represent simple tags that have child nodes.
    The child nodes of an element node can have the following node types: ntElement, ntText,
@@ -521,8 +517,6 @@ type
     Destructor Destroy; override;
   end;
 
-
-  //[not implemented yet !]
   {The node represents a CDATA section in the XML source. CDATA sections identify blocks of
    text that would otherwise be interpreted as markup. An ntCData node can’t have any child
    nodes. They can appear as the child of an ntDocFragment, ntEntityRef, or ntElement node.}
@@ -547,52 +541,51 @@ type
    be of the following types: ntElement, ntProcessingInstr, ntComment, ntText, ntCData, and
    ntEntityRef. The entity reference node can appear as the child of an ntAttribute, ntDocFragment,
    ntElement, or ntEntityRef node.}
-  TALXmlEntityRefNode = Class(TALXMLNode)
-  private
-  protected
-  public
-  end;
+  //TALXmlEntityRefNode = Class(TALXMLNode)
+  //private
+  //protected
+  //public
+  //end;
 
   //[not implemented yet !]
   {The node represents an expanded entity. Entity nodes can have child nodes that represent the
    expanded entity (for example, ntText and ntEntityRef nodes). Entity nodes only appear as the
    child of an ntDocType node.}
-  TALXmlEntityNode = Class(TALXMLNode)
-  private
-  protected
-  public
-  end;
+  //TALXmlEntityNode = Class(TALXMLNode)
+  //private
+  //protected
+  //public
+  //end;
 
   //[not implemented yet !]
   {The node represents the document type declaration, indicated by the <!DOCTYPE > tag. The document
    type node can child nodes of type ntNotation and ntEntity. It always appears as the child of the
    document node.}
-  TALXmlDocTypeNode = Class(TALXMLNode)
-  private
-  protected
-  public
-  end;
+  //TALXmlDocTypeNode = Class(TALXMLNode)
+  //private
+  //protected
+  //public
+  //end;
 
   //[not implemented yet !]
   {The node represents a document fragment. A document fragment node associates a node or subtree
    with a document without actually being contained in the document. Document fragment nodes can
    have child nodes of type ntElement, ntProcessingInstr, ntComment, ntText, ntCData, and ntEntityRef.
    It never appears as the child of another node.}
-  TALXmlDocFragmentNode = Class(TALXMLNode)
-  private
-  protected
-  public
-  end;
+  //TALXmlDocFragmentNode = Class(TALXMLNode)
+  //private
+  //protected
+  //public
+  //end;
 
   //[not implemented yet !]
   {A node represents a notation in the document type declaration. It always appears as the child of an
    ntDocType node and never has any child nodes.}
-  TALXmlNotationNode = Class(TALXMLNode)
-  private
-  protected
-  public
-  end;
-
+  //TALXmlNotationNode = Class(TALXMLNode)
+  //private
+  //protected
+  //public
+  //end;
 
   {TALXMLDocument}
   TALXMLDocument = class(TObject)
@@ -631,6 +624,7 @@ type
     FNodeIndentStr: AnsiString;
     FOptions: TALXMLDocOptions;
     FParseOptions: TALXMLParseOptions;
+    fPathSeparator: AnsiString;
     FOnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent; // [added from TXMLDocument]
     FOnParseStartDocument: TNotifyEvent; // [added from TXMLDocument]
     FOnParseEndDocument: TNotifyEvent; // [added from TXMLDocument]
@@ -679,15 +673,15 @@ type
     function GetPrologValue(PrologItem: TALXMLPrologItem; const Default: AnsiString = ''): AnsiString;
     function InternalSetPrologValue(const PrologNode: TALXMLNode; const Value: AnsiString; PrologItem: TALXMLPrologItem): AnsiString; //[Replace from TXMLNodeList] function InternalSetPrologValue(const PrologNode: IXMLNode; const Value: Variant; PrologItem: TXMLPrologItem): string;
     procedure CheckActive;
-    procedure DoParseProcessingInstruction(const Target, Data: AnsiString); // [added from TXMLDocument]
+    procedure DoParseProcessingInstruction(const Path, Target, Data: AnsiString); // [added from TXMLDocument]
     procedure DoParseStartDocument; // [added from TXMLDocument]
     procedure DoParseEndDocument; // [added from TXMLDocument]
-    procedure DoParseStartElement(const Name: AnsiString; const Attributes: TALStrings); // [added from TXMLDocument]
-    procedure DoParseEndElement(const Name: AnsiString); // [added from TXMLDocument]
-    procedure DoParseText(const str: AnsiString); // [added from TXMLDocument]
-    procedure DoParseComment(const str: AnsiString); // [added from TXMLDocument]
-    procedure DoParseCData(const str: AnsiString); // [added from TXMLDocument]
-    Procedure InternalParseXml(Const RawXmlStream: TStream; Const FirstNode: TALXmlNode; Const SkipFirstNode: Boolean=False); // [added from TXMLDocument]
+    procedure DoParseStartElement(const Path, Name: AnsiString; const Attributes: TALStrings); // [added from TXMLDocument]
+    procedure DoParseEndElement(const Path, Name: AnsiString); // [added from TXMLDocument]
+    procedure DoParseText(const Path, Str: AnsiString); // [added from TXMLDocument]
+    procedure DoParseComment(const Path, Str: AnsiString); // [added from TXMLDocument]
+    procedure DoParseCData(const Path, Str: AnsiString); // [added from TXMLDocument]
+    Procedure InternalParseXml(RawXmlStream: TStream; ContainerNode: TALXmlNode; StreamContainOnlyChildNodes: Boolean=False); // [added from TXMLDocument]
     procedure ReleaseDoc;
     procedure SetPrologValue(const Value: AnsiString; PrologItem: TALXMLPrologItem); //[Replace from TXMLNodeList] procedure SetPrologValue(const Value: Variant; PrologItem: TXMLPrologItem);
     function GetActive: Boolean;
@@ -699,6 +693,8 @@ type
     function GetNodeIndentStr: AnsiString;
     function GetOptions: TALXMLDocOptions;
     function GetParseOptions: TALXMLParseOptions;
+    function GetPathSeparator: AnsiString;
+    procedure SetPathSeparator(const Value: AnsiString);
     function GetStandAlone: AnsiString;
     function GetVersion: AnsiString;
     function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStrings;
@@ -759,6 +755,7 @@ type
     property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALXMLDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALXMLParseOptions read GetParseOptions write SetParseOptions;
+    property PathSeparator: AnsiString read GetPathSeparator write SetPathSeparator;
     property XML: AnsiString read GetXML write SetXML;
     property OnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent read FOnParseProcessingInstruction write FOnParseProcessingInstruction; // [added from TXMLDocument]
     property OnParseStartDocument: TNotifyEvent read FOnParseStartDocument write FOnParseStartDocument; // [added from TXMLDocument]
@@ -963,6 +960,7 @@ begin
   inherited;
   FDocumentNode:= nil;
   FParseOptions:= [];
+  fPathSeparator := '.';
   FOnParseProcessingInstruction:= nil;
   FOnParseStartDocument:= nil;
   FOnParseEndDocument:= nil;
@@ -1004,10 +1002,12 @@ begin
   end;
 end;
 
-{********************************************************************}
-Procedure TALXMLDocument.InternalParseXml(Const RawXmlStream: TStream;
-                                          Const FirstNode: TALXmlNode;
-                                          Const SkipFirstNode: Boolean=False);
+{****************************************************************************************************************************}
+{StreamContainOnlyChildNodes mean that the stream contain ONLY the child node of ContainerNode, so it's not a valid xml stream
+ like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
+Procedure TALXMLDocument.InternalParseXml(RawXmlStream: TStream;
+                                          ContainerNode: TALXmlNode;
+                                          StreamContainOnlyChildNodes: Boolean=False);
 
 Const BufferSize: integer = 8192;
 Var RawXmlString: AnsiString;
@@ -1015,11 +1015,11 @@ Var RawXmlString: AnsiString;
     RawXmlStringPos: Integer;
     PreserveWhiteSpace: Boolean;
     LstParams: TALStringList;
-    NodeStack: TStack;
     NotSaxMode: Boolean;
-    CurrentNode: TALXmlNode;
-    FirstTagElement: Boolean;
+    WorkingNode: TALXmlNode;
     DecodeXmlReferences: Boolean;
+    UseContainerNodeInsteadOfAddingChildNode: Boolean;
+    Paths: TALStringList;
     CodePage: Word;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1119,41 +1119,79 @@ Var RawXmlString: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {Analyze Processing Instructions (PI)}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function GetPathStr(Const ExtraItems: ansiString = ''): ansiString;
+  var I, L, Size, Count: Integer;
+      P: PAnsiChar;
+      S, LB: AnsiString;
+  begin
+    Count := Paths.Count;
+    LB := PathSeparator;
+    Size := length(ExtraItems);
+    if size <> 0 then Inc(Size, Length(LB));
+    for I := 0 to Count - 1 do Inc(Size, Length(Paths[I]) + Length(LB));
+    if size <> 0 then dec(Size, Length(LB));
+    SetLength(Result, Size);
+    P := Pointer(Result);
+    for I := 0 to Count - 1 do begin
+      S := Paths[I];
+      L := Length(S);
+      if L <> 0 then begin
+        ALMove(Pointer(S)^, P^, L);
+        Inc(P, L);
+      end;
+      L := Length(LB);
+      if (L <> 0) and ((i <> Count - 1) or (ExtraItems <> '')) then begin
+        ALMove(Pointer(LB)^, P^, L);
+        Inc(P, L);
+      end;
+    end;
+    if ExtraItems <> '' then begin
+      L := length(ExtraItems);
+      ALMove(Pointer(ExtraItems)^, P^, L);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~}
   procedure AnalyzePI;
   Var P1, P2: Integer;
       aName, aContent: AnsiString;
   Begin
     { <?name?>...
       <?name content?>... }
-    If FirstTagElement then ALXmlDocError(CALXmlParseError);
     P2 := PosInXmlString('?>', RawXmlStringPos + 2);
     If P2 > 0 then begin
+
       P1 := CharPosInString([' ',#9,#13,#10],RawXmlString, RawXmlStringPos+2);
       If (P1 <= 0) or (P1 > P2) then P1 := P2;
       aName := ALCopyStr(RawXmlString,RawXmlStringPos + 2,P1-RawXmlStringPos - 2);
       aContent := ALCopyStr(RawXmlString,P1+1,P2-P1-1);
-      If NotSaxMode then CurrentNode.ChildNodes.Add(CreateNode(aName,
-                                                    ntProcessingInstr,
-                                                    aContent));
-      DoParseProcessingInstruction(aName, aContent);
+      If NotSaxMode then begin
+        if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
+        If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
+        WorkingNode.ChildNodes.Add(CreateNode(aName, ntProcessingInstr, aContent));
+      end;
 
       //calculate the encoding
-      if RawXmlStringPos in [1,4{UTF8 BOOM}] then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, aContent, ''));
+      //note: The XML Declaration at the beginning of an XML document (shown below) is not a processing instruction, however its similar
+      //      syntax has often resulted in it being referred to as a processing instruction
+      if ((not notSaxMode) or
+          (ContainerNode.NodeType=ntDocument)) and
+         (RawXmlStringPos in [1,4{UTF8 BOOM}]) then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, aContent, ''));
+
+      DoParseProcessingInstruction(GetPathStr(aName), aName, aContent);
 
       RawXmlStringPos := P2 + 2;
+
     end
     else ALXmlDocError(CALXmlParseError);
   end;
 
-  {~~~~~~~~~~~~~~~}
-  {Analyze DOCTYPE}
+  {~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeDOCTYPE;
   Var P1: Integer;
   Begin
     { <!DOCTYPE ....> }
-    If FirstTagElement then ALXmlDocError(CALXmlParseError);
     P1 := PosInXmlString('>', RawXmlStringPos + 9);
     If P1 > 0 then begin
       //not yet implemented - simply skip the tag
@@ -1162,57 +1200,52 @@ Var RawXmlString: AnsiString;
     else ALXmlDocError(CALXmlParseError);
   end;
 
-  {~~~~~~~~~~~~~~~}
-  {Analyze comment}
+  {~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeComment;
   Var P1: Integer;
       aContent: AnsiString;
   Begin
     { <!-- name -->... }
-    If FirstTagElement then ALXmlDocError(CALXmlParseError);
     P1 := PosInXmlString('-->',RawXmlStringPos + 4);
     If P1 > 0 then begin
       aContent := ALCopyStr(RawXmlString,RawXmlStringPos + 4,P1-RawXmlStringPos - 4);
-      if NotSaxMode then
-        CurrentNode.ChildNodes.Add(CreateNode(acontent,
-                                              ntcomment,
-                                              ''
-                                             ));
-      DoParseComment(aContent);
+      if NotSaxMode then begin
+        if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
+        If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
+        WorkingNode.ChildNodes.Add(CreateNode(acontent, ntcomment, ''));
+      end;
+      DoParseComment(GetPathStr, aContent);
       RawXmlStringPos := P1 + 3;
     end
     else ALXmlDocError(CALXmlParseError);
   end;
 
-  {~~~~~~~~~~~~~}
-  {Analyze cdata}
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeCDATA;
   Var P1: Integer;
       aContent: AnsiString;
   Begin
-    { <![CDATA]...]]> }
-    If FirstTagElement then ALXmlDocError(CALXmlParseError);
+    { <![CDATA[...]]> }
     P1 := PosInXmlString(']]>',RawXmlStringPos + 9);
     If P1 > 0 then begin
       aContent := ALCopyStr(RawXmlString,RawXmlStringPos + 9,P1-RawXmlStringPos - 9);
-      if NotSaxMode then
-        CurrentNode.ChildNodes.Add(CreateNode(acontent,
-                                              ntcdata,
-                                              ''));
-      DoParseCdata(aContent);
+      if NotSaxMode then begin
+        if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
+        If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
+        WorkingNode.ChildNodes.Add(CreateNode(acontent, ntcdata, ''));
+      end;
+      DoParseCdata(GetPathStr, aContent);
       RawXmlStringPos := P1 + 3;
     end
     else ALXmlDocError(CALXmlParseError);
   end;
 
-  {~~~~~~~~~~~}
-  {Analyze tag}
+  {~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeTag;
   Var TagEnclosed : Boolean;
       aName, aContent: AnsiString;
       aContentLn: Integer;
       aNode: TALXmlNode;
-      P: PAnsiChar;
       P1, P2: Integer;
       i:Integer;
   Begin
@@ -1227,24 +1260,16 @@ Var RawXmlString: AnsiString;
       //end tag
       If RawXmlString[RawXmlStringPos + 1] = '/' then begin
         aName := ALtrimRight(ALCopyStr(RawXmlString,RawXmlStringPos + 2,P1-RawXmlStringPos - 2));
+        if (Paths.Count = 0) or
+           (Paths[paths.Count - 1] <> aName) then ALXmlDocError(CALXmlParseError);
         if NotSaxMode then begin
-          if NodeStack.Count = 0 then ALXmlDocError(CALXmlParseError);
-          aNode := TALXmlNode(NodeStack.pop);
-          if (aNode <> currentNode) or
-             (aNode.NodeName <> aName) then ALXmlDocError(CALXmlParseError);
-          If CurrentNode<>FirstNode then CurrentNode := currentNode.ParentNode
-          Else FirstTagElement := not SkipFirstNode;
-        end
-        else begin
-          if NodeStack.Count = 0 then ALXmlDocError(CALXmlParseError);
-          P := NodeStack.pop;
-          if (p <> aName) then begin
-            strDispose(P);
-            ALXmlDocError(CALXmlParseError);
-          end
-          else strDispose(P);
+          aNode := TALXmlNode(Paths.Objects[paths.Count - 1]);
+          if (aNode <> WorkingNode) then ALXmlDocError(CALXmlParseError);
+          If WorkingNode<>ContainerNode then WorkingNode := WorkingNode.ParentNode
+          Else WorkingNode := nil;
         end;
-        DoParseEndElement(aName);
+        DoParseEndElement(GetPathStr, aName);
+        paths.Delete(paths.Count - 1);
         RawXmlStringPos := P1 + 1;
         exit;
       end;
@@ -1264,15 +1289,16 @@ Var RawXmlString: AnsiString;
       aContent := ALCopyStr(RawXmlString,P2+1,P1-P2-1);
 
       if NotSaxMode then begin
-        If FirstTagElement then begin
-          aNode := FirstNode;
-          FirstTagElement := False
+        if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
+        If UseContainerNodeInsteadOfAddingChildNode then begin
+          aNode := ContainerNode;
+          aNode.NodeName := aName;
+          UseContainerNodeInsteadOfAddingChildNode := False;
+          if TagEnclosed then WorkingNode := nil;
         end
         else begin
-          aNode := CreateNode(aName,
-                              ntelement,
-                              '');
-          CurrentNode.ChildNodes.Add(aNode);
+          aNode := CreateNode(aName, ntelement, '');
+          WorkingNode.ChildNodes.Add(aNode);
         end
       end
       else aNode := nil; //for hide warning
@@ -1307,28 +1333,26 @@ Var RawXmlString: AnsiString;
             aNode.Attributes[LstParams.Names[i]] := LstParams.ValueFromIndex[i];
       end;
 
-      DoParseStartElement(aName,LstParams);
+      DoParseStartElement(GetPathStr(aName), aName, LstParams);
 
       if not TagEnclosed then begin
         if NotSaxMode then begin
-          CurrentNode := aNode;
-          NodeStack.Push(CurrentNode);
+          WorkingNode := aNode;
+          Paths.AddObject(aName, WorkingNode);
         end
-        else NodeStack.Push(StrNew(PansiChar(aName)));
+        else Paths.Add(aName);
         RawXmlStringPos := P1+1;
       end
       else begin
-        DoParseEndElement(aName);
+        DoParseEndElement(GetPathStr(aName), aName);
         RawXmlStringPos := P1+2;
-        If NotSaxMode and (aNode = FirstNode) and (not SkipFirstNode) then FirstTagElement := true;
       end;
 
     end
     else ALXmlDocError(CALXmlParseError);
   end;
 
-  {~~~~~~~~~~~~}
-  {Analyze text}
+  {~~~~~~~~~~~~~~~~~~~~}
   Procedure AnalyzeText;
   Var P1: Integer;
       Str1: AnsiString;
@@ -1338,41 +1362,57 @@ Var RawXmlString: AnsiString;
 
     Str1 := ALCopyStr(RawXmlString,RawXmlStringPos,P1-RawXmlStringPos);
     If (PreserveWhiteSpace) or (ALTrim(Str1) <> '') then Begin
-      If FirstTagElement then ALXmlDocError(CALXmlParseError);
 
       if DecodeXmlReferences then begin
         if CodePage = CP_UTF8 then str1 := ALUTF8XMLTextElementDecode(Str1)
         else str1 := ALUTF8decode(ALUTF8XMLTextElementDecode(ALUTF8Encode(Str1, CodePage)), Codepage);
       end;
 
-      if (notSaxMode) and
-         (currentNode.NodeType <> ntdocument) then
-        CurrentNode.ChildNodes.Add(CreateNode(Str1,
-                                              ntText,
-                                              ''));
-      DoParseText(Str1);
+      if (notSaxMode) then begin
+        if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
+        if (WorkingNode.NodeType <> ntdocument) then begin  // ntdocument can not have any text node, so simply skip whiteSpace comment (else error)
+          If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
+          WorkingNode.ChildNodes.Add(CreateNode(Str1, ntText, ''));
+        end
+        else if (ALTrim(Str1) <> '') then ALXmlDocError(CALXmlParseError);
+      end;
+
+      DoParseText(GetPathStr, Str1);
+
     end;
 
     RawXmlStringPos := P1;
   end;
 
 Begin
+
+  //
+  // NOTE: the childNodes and the AttributesNodes of the ContainerNode
+  // must have been cleared by the calling function!
+  //
+  // NOTE: ContainerNode must have fDocument assigned
+  //
+  // NOTE: ContainerNode must be TDocument or TElement or nil (sax mode)
+  //
+
   LstParams := TALStringList.Create;
-  NodeStack := Tstack.create;
+  Paths := TALStringList.Create;
   Try
 
     DoParseStartDocument;
+
+    PreserveWhiteSpace := (poPreserveWhiteSpace in ParseOptions) and (not (doNodeAutoIndent in Options));
+    WorkingNode := ContainerNode;
+    NotSaxMode := assigned(ContainerNode);
+    UseContainerNodeInsteadOfAddingChildNode := NotSaxMode and (ContainerNode.NodeType <> ntdocument) and (not StreamContainOnlyChildNodes);
+    DecodeXmlReferences := not (poIgnoreXmlReferences in ParseOptions);
+    if NotSaxMode then CodePage := ALGetCodePageFromCharSetName(Encoding)
+    else CodePage := 0;
     RawXmlString := '';
     RawXmlStringLength := 0;
     RawXmlStringPos := 1;
-    if not ExpandRawXmlString then exit;
+    ExpandRawXmlString;
     if AlUTF8DetectBOM(PansiChar(RawXmlString),length(RawXmlString)) then RawXmlStringPos := 4;
-    PreserveWhiteSpace := (poPreserveWhiteSpace in ParseOptions) and (not (doNodeAutoIndent in Options));
-    CurrentNode := FirstNode;
-    NotSaxMode := assigned(FirstNode);
-    FirstTagElement := NotSaxMode and (FirstNode.NodeType <> ntdocument) and (not SkipFirstNode);
-    DecodeXmlReferences := not (poIgnoreXmlReferences in ParseOptions);
-    CodePage := 0;
 
     While RawXmlStringPos <= RawXmlStringLength do begin
 
@@ -1409,16 +1449,17 @@ Begin
 
     end;
 
-    if NodeStack.Count > 0 then ALXmlDocError(CALXmlParseError);
+    //some tags are not closed
+    if Paths.Count > 0 then ALXmlDocError(CALXmlParseError);
+
+    //mean the node was not update (empty stream?)
+    if UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError);
 
     DoParseEndDocument;
 
   finally
+    Paths.Free;
     LstParams.Free;
-    if not NotSaxMode then
-      while NodeStack.Count > 0 do
-        strDispose(PAnsiChar(NodeStack.pop));
-    NodeStack.Free;
   end;
 end;
 
@@ -1703,6 +1744,18 @@ begin
   FParseOptions := Value;
 end;
 
+{*****************************************************************}
+procedure TALXMLDocument.SetPathSeparator(const Value: AnsiString);
+begin
+  FPathSeparator := Value;
+end;
+
+{***************************************************}
+function TALXMLDocument.GetPathSeparator: AnsiString;
+begin
+  result := fPathSeparator;
+end;
+
 {************************************************}
 function TALXMLDocument.GetPrologNode: TALXMLNode;
 begin
@@ -1820,16 +1873,16 @@ begin
   SetPrologValue(Value, xpStandalone);
 end;
 
-{*************************************************************}
-procedure TALXMLDocument.DoParseComment(const str: AnsiString);
+{*******************************************************************}
+procedure TALXMLDocument.DoParseComment(const Path, Str: AnsiString);
 begin
-  if Assigned(FOnParseComment) then FOnParseComment(Self, Str);
+  if Assigned(FOnParseComment) then FOnParseComment(Self, Path, Str);
 end;
 
-{***********************************************************}
-procedure TALXMLDocument.DoParseCData(const str: AnsiString);
+{*****************************************************************}
+procedure TALXMLDocument.DoParseCData(const Path, Str: AnsiString);
 begin
-  if Assigned(FOnParseCData) then FOnParseCData(Self, Str);
+  if Assigned(FOnParseCData) then FOnParseCData(Self, Path, Str);
 end;
 
 {******************************************}
@@ -1838,16 +1891,16 @@ begin
   if Assigned(FOnParseEndDocument) then FOnParseEndDocument(Self);
 end;
 
-{*****************************************************************}
-procedure TALXMLDocument.DoParseEndElement(const Name: AnsiString);
+{***********************************************************************}
+procedure TALXMLDocument.DoParseEndElement(const Path, Name: AnsiString);
 begin
-  if Assigned(FOnParseEndElement) then FOnParseEndElement(Self, Name);
+  if Assigned(FOnParseEndElement) then FOnParseEndElement(Self, Path, Name);
 end;
 
-{************************************************************************************}
-procedure TALXMLDocument.DoParseProcessingInstruction(const Target, Data: AnsiString);
+{******************************************************************************************}
+procedure TALXMLDocument.DoParseProcessingInstruction(const Path, Target, Data: AnsiString);
 begin
-  if Assigned(FOnParseProcessingInstruction) then FOnParseProcessingInstruction(Self, Target, Data);
+  if Assigned(FOnParseProcessingInstruction) then FOnParseProcessingInstruction(Self, Path, Target, Data);
 end;
 
 {********************************************}
@@ -1856,16 +1909,16 @@ begin
   if Assigned(FOnParseStartDocument) then FOnParseStartDocument(Self);
 end;
 
-{*************************************************************************************************}
-procedure TALXMLDocument.DoParseStartElement(const Name: AnsiString; const Attributes: TALStrings);
+{*******************************************************************************************************}
+procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; const Attributes: TALStrings);
 begin
-  if Assigned(FOnParseStartElement) then FOnParseStartElement(Self, Name, Attributes);
+  if Assigned(FOnParseStartElement) then FOnParseStartElement(Self, Path, Name, Attributes);
 end;
 
-{**********************************************************}
-procedure TALXMLDocument.DoParseText(const str: AnsiString);
+{****************************************************************}
+procedure TALXMLDocument.DoParseText(const Path, Str: AnsiString);
 begin
-  if Assigned(FOnParseText) then FOnParseText(Self, Str);
+  if Assigned(FOnParseText) then FOnParseText(Self, Path, Str);
 end;
 
 {********************************}
@@ -1941,36 +1994,6 @@ begin
   result := InternalCloneNode(self, nil);
 end;
 
-{*************************************************************}
-{Sets the value of OwnerDocument to nil (Delphi) or NULL (C++).
- In addition to setting the OwnerDocument property to nil (Delphi) or NULL (C++),
- ClearDocumentRef propagates this call to all of this nodes child nodes and attribute nodes.}
-procedure TALXMLNode.ClearDocumentRef;
-begin
-  SetDocumentRef(nil);
-end;
-
-{******************************}
-{Sets the value of OwnerDocument
- In addition to setting the OwnerDocument property, ClearDocumentRef propagates this call to all
- of this nodes child nodes and attribute nodes.}
-procedure TALXMLNode.SetDocumentRef(ADocumentRef: TALXmlDocument);
-var I: Integer;
-    aNodeList: TALXmlNodeList;
-begin
-  FDocument := ADocumentRef;
-
-  aNodeList := InternalGetChildNodes;
-  if Assigned(aNodeList) then
-    for I := 0 to aNodeList.Count - 1 do
-      aNodeList[I].SetDocumentRef(ADocumentRef);
-
-  aNodeList := InternalGetAttributeNodes;
-  if Assigned(aNodeList) then
-    for I := 0 to aNodeList.Count - 1 do
-      aNodeList[I].SetDocumentRef(ADocumentRef);
-end;
-
 {**************************************************************}
 {Creates the object that implements the AttributeNodes property.
  Applications can’t call the protected CreateAttributeList method. This method is used internally the
@@ -1993,7 +2016,8 @@ end;
  reads the AttributeNodes property.}
 function TALXMLNode.GetAttributeNodes: TALXMLNodeList;
 begin
-  Result := nil; //Virtual;
+  Result := nil; // hide warning
+  ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]);
 end;
 
 {*********************************************}
@@ -2002,7 +2026,7 @@ end;
  AttributeNodes property to supply the interface that implements that property.}
 procedure TALXMLNode.SetAttributeNodes(const Value: TALXMLNodeList);
 begin
-  //Virtual;
+  ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]);
 end;
 
 {*****************************************************************}
@@ -2054,9 +2078,7 @@ begin
   aNodeList := AttributeNodes;
   aNode := aNodeList.FindNode(attrName);
   if not assigned(aNode) then begin
-    ANode := ALCreateXmlNode(AttrName,
-                             ntattribute,
-                             '');
+    ANode := ALCreateXmlNode(AttrName, ntattribute, '');
     aNode.Text := Value;
     aNodeList.Add(aNode);
   end
@@ -2092,7 +2114,8 @@ end;
  reads the ChildNodes property.}
 function TALXMLNode.GetChildNodes: TALXMLNodeList;
 begin
-  result := nil; //virtual
+  Result := nil; // hide warning
+  ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]);
 end;
 
 {*****************************************}
@@ -2101,27 +2124,18 @@ end;
  property to supply the interface that implements that property.}
 procedure TALXMLNode.SetChildNodes(const Value: TALXMLNodeList);
 begin
-  //virtual
+  ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]);
 end;
 
-{***************************************************************************************}
-function TALXMLNode.AddChild(const TagName: AnsiString; Index: Integer = -1): TALXMLNode;
-begin
-  Result := InternalAddChild(TagName, Index);
-end;
-
-{**************************************************************}
-{Provides the underlying implementation for the AddChild method.
- Applications can’t call the protected InternalAddChild method. It is used internally to perform all the tasks common to
- the various overloads of the AddChild method. InternalAddChild creates a new element node as the child of this node and
+{****************************************************************}
+{AddChild creates a new element node as the child of this node and
  returns its interface.
- *NodeName specifies the tag name of the newly created node.
- *NamespaceURI identifies the namespace that includes the new node’s definition.
+ *TagName specifies the tag name of the newly created node.
  *Index indicates the position of the child node in this node’s list of children, where 0 is the first position, 1 is the second
  position, and so on. If Index is –1, the new node is added to the end.}
-function TALXMLNode.InternalAddChild(const NodeName: AnsiString; Index: Integer): TALXMLNode;
+function TALXMLNode.AddChild(const TagName: AnsiString; Index: Integer = -1): TALXMLNode;
 begin
-  Result := ALCreateXmlNode(NodeName,ntElement,'');
+  Result := ALCreateXmlNode(TagName,ntElement,'');
   Try
     ChildNodes.Insert(Index, Result);
   except
@@ -2201,6 +2215,10 @@ begin
     ntDocType:         result := '';//todo
     ntDocFragment:	   result := '';//todo
     ntNotation:	       result := '';//todo
+    else begin
+      Result := ''; //for hide warning
+      AlXMLDocError(cAlXmlInvalidNodeType);
+    end;
   end;
 end;
 
@@ -2232,6 +2250,7 @@ begin
     //ntDocType:         ;todo
     //ntDocFragment:	   ;todo
     //ntNotation:	       ;todo
+    else AlXMLDocError(cAlXmlInvalidNodeType);
   end;
 end;
 
@@ -2275,7 +2294,7 @@ end;
 
 {******************************************************************************}
 {Returns the XML that corresponds to this node and any child nodes it contains.}
-procedure TALXMLNode.SaveToStream(const Stream: TStream; Const SaveOnlyChildNode: Boolean=False);
+procedure TALXMLNode.SaveToStream(const Stream: TStream; Const SaveOnlyChildNodes: Boolean=False);
 
 Const BufferSize: integer = 32768;
 Var NodeStack: Tstack;
@@ -2424,8 +2443,8 @@ begin
     {EncodeXmlReferences from ParseOptions}
     EncodeXmlReferences := not (poIgnoreXmlReferences in FDocument.ParseOptions);
 
-    {SaveOnlyChildNode}
-    If SaveOnlyChildNode or (NodeType = ntDocument) then WriteDocumentNode2Stream(self)
+    {SaveOnlyChildNodes}
+    If SaveOnlyChildNodes or (NodeType = ntDocument) then WriteDocumentNode2Stream(self)
     else NodeStack.Push(self);
 
     {loop on all nodes}
@@ -2447,6 +2466,7 @@ begin
           //ntDocType:         ;todo
           //ntDocFragment:	   ;todo
           //ntNotation:	       ;todo
+          else AlXMLDocError(cAlXMLInvalidNodeType);
         end;
 
       CurrentParentNode := CurrentNode.ParentNode;
@@ -2463,46 +2483,73 @@ begin
   end;
 end;
 
-{***************************************************************************************************}
-procedure TALXMLNode.SaveToFile(const AFileName: AnsiString; Const SaveOnlyChildNode: Boolean=False);
-Var afileStream: TfileStream;
-begin
-  aFileStream := TfileStream.Create(String(AFileName),fmCreate);
-  Try
-    SaveToStream(aFileStream, SaveOnlyChildNode);
-  finally
-    aFileStream.Free;
-  end;
-end;
-
-{*************************************************************************************************}
-{load OnlyChildNode mean the the stream contain ONLY the child node, so it's not a valid xml stream
+{***********************************************************************************************************}
+{StreamContainOnlyChildNodes mean that the stream contain ONLY the child node, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-procedure TALXMLNode.LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNode: Boolean=False);
-Var afileStream: TfileStream;
+procedure TALXMLNode.LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNodes: Boolean=False);
 Begin
-  aFileStream := TfileStream.Create(string(AFileName), fmOpenRead or fmShareDenyWrite);
-  Try
-    LoadFromStream(aFileStream, FileContainOnlyChildNode);
-  finally
-    aFileStream.Free;
-  end;
-end;
-
-{*************************************************************************************************}
-{load OnlyChildNode mean the the stream contain ONLY the child node, so it's not a valid xml stream
- like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-procedure TALXMLNode.LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNode: Boolean=False);
-Begin
-  If not (NodeType in [ntElement, ntDocument]) then exit;
+  If not (NodeType in [ntElement, ntDocument]) then ALXmlDocError(CALXMLOperationError,[GetNodeTypeStr]);
   ChildNodes.Clear;
   AttributeNodes.Clear;
   Try
-    FDocument.InternalParseXml(Stream, self, StreamContainOnlyChildNode);
+    FDocument.InternalParseXml(Stream, self, StreamContainOnlyChildNodes);
   except
     ChildNodes.Clear;
     AttributeNodes.Clear;
     raise;
+  end;
+end;
+
+{****************************************************************************************************}
+procedure TALXMLNode.SaveToFile(const AFileName: AnsiString; Const SaveOnlyChildNodes: Boolean=False);
+Var afileStream: TfileStream;
+begin
+  aFileStream := TfileStream.Create(String(AFileName),fmCreate);
+  Try
+    SaveToStream(aFileStream, SaveOnlyChildNodes);
+  finally
+    aFileStream.Free;
+  end;
+end;
+
+{*************************************************************************************************************}
+{load FileContainOnlyChildNodes mean the the stream contain ONLY the child node, so it's not a valid xml stream
+ like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
+procedure TALXMLNode.LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNodes: Boolean=False);
+Var afileStream: TfileStream;
+Begin
+  aFileStream := TfileStream.Create(string(AFileName), fmOpenRead or fmShareDenyWrite);
+  Try
+    LoadFromStream(aFileStream, FileContainOnlyChildNodes);
+  finally
+    aFileStream.Free;
+  end;
+end;
+
+{*******************************************************************************************}
+procedure TALXMLNode.SaveToXML(var Xml: AnsiString; Const SaveOnlyChildNodes: Boolean=False);
+Var aStringStream: TALStringStream;
+begin
+  aStringStream := TALStringStream.Create('');
+  Try
+    SaveToStream(aStringStream, SaveOnlyChildNodes);
+    Xml := aStringStream.DataString;
+  finally
+    aStringStream.Free;
+  end;
+end;
+
+{************************************************************************************************************}
+{load XmlContainOnlyChildNodes mean the the stream contain ONLY the child node, so it's not a valid xml stream
+ like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
+procedure TALXMLNode.LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False);
+Var aStringStream: TALStringStream;
+Begin
+  aStringStream := TALStringStream.Create(Xml);
+  Try
+    LoadFromStream(aStringStream, XmlContainOnlyChildNodes);
+  finally
+    aStringStream.Free;
   end;
 end;
 
@@ -2514,7 +2561,7 @@ Var aStringStream: TALStringStream;
 begin
   aStringStream := TALStringStream.Create('');
   Try
-    SaveToStream(aStringStream);
+    SaveToStream(aStringStream, false);
     result := aStringStream.DataString;
   finally
     aStringStream.Free;
@@ -2528,17 +2575,10 @@ Var aStringStream: TALStringStream;
 Begin
   aStringStream := TALStringStream.Create(Value);
   Try
-    LoadFromStream(aStringStream, true);
+    LoadFromStream(aStringStream, false);
   finally
     aStringStream.Free;
   end;
-end;
-
-{*****************************}
-{Returns the type of the node.}
-function TALXMLNode.GetNodeType: TALXMLNodeType;
-begin
-  Result := ntReserved //virtual
 end;
 
 {*********************************************************}
@@ -2592,6 +2632,33 @@ begin
     ntDocType:         result := ''; //todo;
     ntDocFragment:	   Result := '#document-fragment';
     ntNotation:	       result := ''; //todo;
+    else begin
+      Result := ''; //for hide warning
+      AlXMLDocError(cAlXmlInvalidNodeType);
+    end;
+  end;
+end;
+
+{*********************************************}
+function TALXMLNode.GetNodeTypeStr: AnsiString;
+begin
+  case NodeType of
+    ntElement: result := 'ntElement';
+    ntAttribute: result := 'ntAttribute';
+    ntText: result := 'ntText';
+    ntCData: result := 'ntCData';
+    ntEntityRef: result := 'ntEntityRef';
+    ntEntity: result := 'ntEntity';
+    ntProcessingInstr: result := 'ntProcessingInstr';
+    ntComment: result := 'ntComment';
+    ntDocument: result := 'ntDocument';
+    ntDocType: result := 'ntDocType';
+    ntDocFragment: result := 'ntDocFragment';
+    ntNotation: result := 'ntNotation';
+    else begin
+      Result := ''; //for hide warning
+      AlXMLDocError(cAlXmlInvalidNodeType);
+    end;
   end;
 end;
 
@@ -2619,6 +2686,7 @@ begin
     ntDocType:         ;//todo
     ntDocFragment:	   ALXmlDocError(CALXmlOperationError,['DOCFRAGMENT']);
     ntNotation:	       ;//todo
+    else AlXMLDocError(cAlXmlInvalidNodeType);
   end;
 
 end;
@@ -2678,9 +2746,8 @@ end;
 {Sets the value of the ParentNode property.}
 procedure TALXMLNode.SetParentNode(const Value: TALXMLNode);
 begin
-  //virtual;
-  If assigned(Value) then setDocumentRef(Value.OwnerDocument)
-  else ClearDocumentRef;
+  If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
+  else SetOwnerDocument(nil);
 end;
 
 {****************************************************}
@@ -2723,8 +2790,20 @@ end;
 
 {*****************************************************************}
 procedure TALXMLNode.SetOwnerDocument(const Value: TALXMLDocument);
+var I: Integer;
+    aNodeList: TALXmlNodeList;
 begin
   FDocument := Value;
+
+  aNodeList := InternalGetChildNodes;
+  if Assigned(aNodeList) then
+    for I := 0 to aNodeList.Count - 1 do
+      aNodeList[I].SetOwnerDocument(Value);
+
+  aNodeList := InternalGetAttributeNodes;
+  if Assigned(aNodeList) then
+    for I := 0 to aNodeList.Count - 1 do
+      aNodeList[I].SetOwnerDocument(Value);
 end;
 
 {*****************************************************************}
@@ -2756,7 +2835,13 @@ end;
 {*******************************************************************************************}
 procedure TALXmlElementNode.DoBeforeChildNodesInsert(Index: Integer; const Node: TALXMLNode);
 begin
-  If Not (Node.NodeType in [ntElement, ntText, ntAttribute, ntCData, ntEntityRef, ntProcessingInstr, ntComment]) then ALXmlDocError(CALXMLParameterIsIncorrect);
+  If Not (Node.NodeType in [ntElement,
+                            ntText,
+                            ntAttribute,
+                            ntCData,
+                            ntEntityRef,
+                            ntProcessingInstr,
+                            ntComment]) then ALXmlDocError(CALXMLParameterIsIncorrect);
 end;
 
 

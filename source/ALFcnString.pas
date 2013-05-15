@@ -9055,12 +9055,19 @@ Function ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 Var aEncoding: Tencoding;
 begin
   Try
+
+    if Acharset = '' then begin
+      result := 0; // Default ansi code page
+      exit;
+    end;
+
     aEncoding := Tencoding.GetEncoding(String(Acharset));
     Try
       Result := aEncoding.CodePage;
     Finally
       aEncoding.Free;
     end;
+
   Except
     Result := 0; // Default ansi code page
   end;

@@ -78,7 +78,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      WinSock,
      {$IFEND}
      ALStringList,
-     ALInternetMessageCommon,
+     ALInternetMessages,
      ALMultiPartMixedParser;
 
 type

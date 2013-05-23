@@ -119,6 +119,15 @@ resourcestring
 
 const
   cALXMLNodeMaxListSize = Maxint div 16;
+  cAlXMLUTF8EncodingStr = 'UTF-8';
+  cALXmlUTF8HeaderStr   = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
+  CALNSDelim            = ':';
+  CALXML                = 'xml';
+  CALVersion            = 'version';
+  CALEncoding           = 'encoding';
+  CALStandalone         = 'standalone';
+  CALDefaultNodeIndent  = '  '; { 2 spaces }
+  CALXmlDocument        = 'DOCUMENT';
 
 type
 
@@ -733,8 +742,10 @@ type
     //[Deleted from TXMLDocument] property BeforeNodeChange: TNodeChangeEvent read FBeforeNodeChange write FBeforeNodeChange;
     //[Deleted from TXMLDocument] property AfterNodeChange: TNodeChangeEvent read FAfterNodeChange write FAfterNodeChange;
     //[Deleted from TXMLDocument] property OnAsyncLoad: TAsyncEventHandler read FOnAsyncLoad write SetOnAsyncLoad;
-    constructor Create; virtual;
+    constructor Create(const aActive: Boolean = True); overload; virtual; //[Replace from TXMLDocument]  constructor Create
+    constructor Create(const Rootname:AnsiString; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr); overload; virtual; // [added from TXMLDocument]
     destructor Destroy; override;
+    procedure Clear(const Rootname:AnsiString; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr); // [added from TXMLDocument]
     function AddChild(const TagName: AnsiString): TALXMLNode;
     function CreateElement(const TagOrData: AnsiString): TALXMLNode;  //[Replace from TXMLDocument] function CreateElement(const TagOrData, NamespaceURI: AnsiString): TALXMLNode;
     function CreateNode(const NameOrData: AnsiString; NodeType: TALXMLNodeType = ntElement; const AddlData: AnsiString = ''): TALXMLNode;
@@ -768,22 +779,7 @@ type
     property Tag: NativeInt read FTag write FTag;
   end;
 
-{misc constante}
-Const cAlXMLUTF8EncodingStr = 'UTF-8';
-      cALXmlUTF8HeaderStr   = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
-      CALNSDelim            = ':';
-      CALXML                = 'xml';
-      CALVersion            = 'version';
-      CALEncoding           = 'encoding';
-      CALStandalone         = 'standalone';
-      CALDefaultNodeIndent  = '  '; { 2 spaces }
-      CALXmlDocument        = 'DOCUMENT';
-
 {misc function}
-Function  ALCreateEmptyXMLDocument(Const Rootname:AnsiString):TalXMLDocument;
-procedure ALClearXMLDocument(Const rootname:AnsiString;
-                             xmldoc: TalXMLDocument;
-                             const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
                                         Const ChildNodeName, ChildNodeValue : AnsiString;
                                         Const Recurse: Boolean = False): TalxmlNode;
@@ -955,9 +951,9 @@ end;
 {************************************}
 {Instantiates a TALXMLDocument object.
  Call Create to instantiate a TALXMLDocument component at runtime.}
-constructor TALXMLDocument.create;
+constructor TALXMLDocument.create(const aActive: Boolean = True);
 begin
-  inherited;
+  inherited create;
   FDocumentNode:= nil;
   FParseOptions:= [];
   fPathSeparator := '.';
@@ -972,6 +968,17 @@ begin
   FOptions := [];
   NodeIndentStr := CALDefaultNodeIndent;
   FTag := 0;
+  SetActive(aActive);
+end;
+
+{******************************************************************************************************************}
+constructor TALXMLDocument.Create(const Rootname:AnsiString; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
+begin
+  create(true);
+  version := '1.0';
+  standalone := 'yes';
+  Encoding := EncodingStr;
+  AddChild(Rootname);
 end;
 
 {************************************}
@@ -980,6 +987,17 @@ destructor TALXMLDocument.Destroy;
 begin
   ReleaseDoc;
   inherited;
+end;
+
+{***************************************************************************************************************}
+procedure TALXMLDocument.Clear(const Rootname:AnsiString; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
+begin
+  releaseDoc;
+  Active := true;
+  version := '1.0';
+  standalone := 'yes';
+  Encoding := EncodingStr;
+  AddChild(Rootname);
 end;
 
 {****************************************}
@@ -1298,7 +1316,12 @@ Var RawXmlString: AnsiString;
         end
         else begin
           aNode := CreateNode(aName, ntelement, '');
-          WorkingNode.ChildNodes.Add(aNode);
+          try
+            WorkingNode.ChildNodes.Add(aNode);
+          Except
+            aNode.Free;
+            raise;
+          end;
         end
       end
       else aNode := nil; //for hide warning
@@ -1461,6 +1484,7 @@ Begin
     Paths.Free;
     LstParams.Free;
   end;
+
 end;
 
 {**********************************}
@@ -3690,28 +3714,6 @@ begin
   else for I := FCount - 1 downto NewCount do Delete(I);
   FCount := NewCount;
 end;
-
-{**************************************************************************}
-Function ALCreateEmptyXMLDocument(Const Rootname:AnsiString):TalXMLDocument;
-begin
-  Result := TAlXMLDocument.Create;
-  ALClearXMLDocument(rootname,Result);
-End;
-
-{*****************************************************}
-procedure ALClearXMLDocument(Const rootname:AnsiString;
-                             xmldoc: TalXMLDocument;
-                             const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr);
-begin
-  with xmlDoc do begin
-    releaseDoc;
-    Active := true;
-    version := '1.0';
-    standalone := 'yes';
-    Encoding := EncodingStr;
-  end;
-  If RootName <> '' then XMLDoc.AddChild(rootname);
-End;
 
 {********************************************************}
 Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;

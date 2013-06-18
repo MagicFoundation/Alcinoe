@@ -77,7 +77,6 @@ contains
   ALFTPClient in 'ALFTPClient.pas',
   ALZlibExGZ in 'ALZlibExGZ.pas',
   ALNNTPClient in 'ALNNTPClient.pas',
-  ALInternetMessageCommon in 'ALInternetMessageCommon.pas',
   ALMySqlWrapper in 'ALMySqlWrapper.pas',
   ALMySqlClient in 'ALMySqlClient.pas',
   ALMultiPartBaseParser in 'ALMultiPartBaseParser.pas',
@@ -95,7 +94,8 @@ contains
   ALIniFiles in 'ALIniFiles.pas',
   ALExprEval in 'ALExprEval.pas',
   ALJSONDoc in 'ALJSONDoc.pas',
-  ALMemCachedClient in 'ALMemCachedClient.pas';
+  ALMemCachedClient in 'ALMemCachedClient.pas',
+  ALInternetMessages in 'ALInternetMessages.pas';
 
 end.
 

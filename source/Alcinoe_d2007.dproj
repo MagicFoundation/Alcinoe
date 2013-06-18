@@ -40,10 +40,6 @@
       
       
       
-      
-      
-      
-      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">Alcinoe_d2007.dpk</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -83,7 +79,7 @@
     <DCCReference Include="ALHttpClient.pas" />
     <DCCReference Include="ALHttpCommon.pas" />
     <DCCReference Include="ALIniFiles.pas" />
-    <DCCReference Include="ALInternetMessageCommon.pas" />
+    <DCCReference Include="ALInternetMessages.pas" />
     <DCCReference Include="ALIsapiHTTP.pas" />
     <DCCReference Include="ALJSONDoc.pas" />
     <DCCReference Include="ALListBox.pas" />

@@ -243,7 +243,7 @@ begin
       end;
 
       //the sql
-      aXMLDATA := ALCreateEmptyXMLDocument('root');
+      aXMLDATA := TALXmlDocument.create('root');
       Try
 
         With aXMLDATA Do Begin
@@ -364,13 +364,13 @@ begin
   windows.setparent(ie.hwnd, PanelWebBrowser.handle);
   ie.Left := maxint; // don't understand why it's look impossible to setup the position
   ie.Top  := maxint; // don't understand why it's look impossible to setup the position
-  ie.Width := 100;
-  ie.Height := 300;
   ie.MenuBar := false;
   ie.AddressBar := false;
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
+  ie.Width := 100;
+  ie.Height := 300;
   Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;

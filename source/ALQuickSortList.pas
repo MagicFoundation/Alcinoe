@@ -55,6 +55,50 @@ Link :
 **************************************************************}
 unit ALQuickSortList;
 
+{Exemple of a QuickSort Algorithm :
+
+procedure _SampleQuickSort(aArray: TArrayOfxxx; L, R: Integer);
+
+  Function _Compare(I1,I2: xxx): Integer;
+  Begin
+    if I1 < I2 then result := -1
+    else if I1 > I2 then result := 1
+    else result := 0;
+  end;
+
+var aItem: xxx;
+    I, J, P: Integer;
+
+begin
+  repeat
+    I := L;
+    J := R;
+    P := (L + R) shr 1;
+    repeat
+      while _Compare(aArray[I], aArray[P]) < 0 do Inc(I);
+      while _Compare(aArray[J], aArray[P]) > 0 do Dec(J);
+      if I <= J then
+      begin
+        if I <> J then begin
+          aItem := aArray[i];
+          aArray[i] := aArray[j];
+          aArray[j] := aItem;
+        end;
+        if P = I then
+          P := J
+        else if P = J then
+          P := I;
+        Inc(I);
+        Dec(J);
+      end;
+    until I > J;
+    if L < J then _SampleQuickSort(L, J);
+    L := I;
+  until I >= R;
+end;
+
+}
+
 interface
 
 uses Classes,

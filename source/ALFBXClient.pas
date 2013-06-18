@@ -1016,7 +1016,7 @@ Begin
     Try
 
       //get the data from the monitoring table
-      aXMLDATA := TALXMLDocument.Create('root');
+      aXMLDATA := TALXmlDocument.create('root');
       try
 
         SelectData('SELECT '+
@@ -1570,7 +1570,7 @@ begin
     aXmlDocument := Nil;
   end
   else begin
-    aXmlDocument := TALXMLDocument.Create('root');
+    aXmlDocument := TALXmlDocument.create('root');
     XMLDATA := aXmlDocument.DocumentElement;
   end;
 
@@ -2216,7 +2216,7 @@ Begin
   Try
 
     //get the data from the monitoring table
-    aXMLDATA := TALXMLDocument.Create('root');
+    aXMLDATA := TALXmlDocument.create('root');
     try
 
       SelectData('SELECT '+
@@ -3965,7 +3965,7 @@ begin
     aXmlDocument := Nil;
   end
   else begin
-    aXmlDocument := TALXMLDocument.Create('root');
+    aXmlDocument := TALXmlDocument.create('root');
     XMLDATA := aXmlDocument.DocumentElement;
   end;
   {$IFDEF undef}{$ENDREGION}{$ENDIF}

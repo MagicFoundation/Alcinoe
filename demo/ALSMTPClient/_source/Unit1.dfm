@@ -309,6 +309,7 @@ object Form1: TForm1
       Width = 121
       Height = 21
       Style = csDropDownList
+      ItemHeight = 13
       ItemIndex = 1
       TabOrder = 10
       Text = 'Plain'
@@ -372,6 +373,7 @@ object Form1: TForm1
       Width = 121
       Height = 21
       Style = csDropDownList
+      ItemHeight = 13
       ItemIndex = 2
       TabOrder = 7
       Text = 'normal'

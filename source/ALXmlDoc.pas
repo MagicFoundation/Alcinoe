@@ -136,10 +136,19 @@ type
   TALXMLNodeList= Class;
   TALXMLDocument= Class;
 
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TAlXMLParseDocument = reference to procedure (Sender: TObject);
+  TAlXMLParseProcessingInstructionEvent = reference to procedure (Sender: TObject; const Path, Target, Data: AnsiString);
+  TAlXMLParseTextEvent = reference to procedure (Sender: TObject; const Path, Str: AnsiString);
+  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings);
+  TAlXMLParseEndElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString);
+  {$ELSE}
+  TAlXMLParseDocument = procedure (Sender: TObject) of object;
   TAlXMLParseProcessingInstructionEvent = procedure (Sender: TObject; const Path, Target, Data: AnsiString) of object;
   TAlXMLParseTextEvent = procedure (Sender: TObject; const Path, Str: AnsiString) of object;
   TAlXMLParseStartElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings) of object;
   TAlXMLParseEndElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString) of object;
+  {$IFEND}
 
   TALXMLNodeListSortCompare = function(List: TALXMLNodeList; Index1, Index2: Integer): Integer;
 
@@ -635,8 +644,8 @@ type
     FParseOptions: TALXMLParseOptions;
     fPathSeparator: AnsiString;
     FOnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent; // [added from TXMLDocument]
-    FOnParseStartDocument: TNotifyEvent; // [added from TXMLDocument]
-    FOnParseEndDocument: TNotifyEvent; // [added from TXMLDocument]
+    FOnParseStartDocument: TAlXMLParseDocument; // [added from TXMLDocument]
+    FOnParseEndDocument: TAlXMLParseDocument; // [added from TXMLDocument]
     FOnParseStartElement: TAlXMLParseStartElementEvent; // [added from TXMLDocument]
     FOnParseEndElement: TAlXMLParseEndElementEVent; // [added from TXMLDocument]
     FonParseText: TAlXMLParseTextEvent; // [added from TXMLDocument]
@@ -769,8 +778,8 @@ type
     property PathSeparator: AnsiString read GetPathSeparator write SetPathSeparator;
     property XML: AnsiString read GetXML write SetXML;
     property OnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent read FOnParseProcessingInstruction write FOnParseProcessingInstruction; // [added from TXMLDocument]
-    property OnParseStartDocument: TNotifyEvent read FOnParseStartDocument write FOnParseStartDocument; // [added from TXMLDocument]
-    property OnParseEndDocument: TNotifyEvent read FOnParseEndDocument write FOnParseEndDocument; // [added from TXMLDocument]
+    property OnParseStartDocument: TAlXMLParseDocument read FOnParseStartDocument write FOnParseStartDocument; // [added from TXMLDocument]
+    property OnParseEndDocument: TAlXMLParseDocument read FOnParseEndDocument write FOnParseEndDocument; // [added from TXMLDocument]
     property OnParseStartElement: TAlXMLParseStartElementEvent read FOnParseStartElement write FOnParseStartElement; // [added from TXMLDocument]
     property OnParseEndElement: TAlXMLParseEndElementEVent read FOnParseEndElement Write FOnParseEndElement; // [added from TXMLDocument]
     property OnParseText: TAlXMLParseTextEvent read FonParseText Write FonParseText; // [added from TXMLDocument]

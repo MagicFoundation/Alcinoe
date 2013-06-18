@@ -105,7 +105,7 @@ Begin
   if aFbClientdllPath = '' then aFbClientdllPath := 'fbclient.dll';
 
   aFbxClient := TalFbxClient.Create(FB25,aFbClientdllPath);
-  aXmlData:= ALCreateEmptyXMLDocument('root');
+  aXmlData:= TALXmlDocument.create('root');
   Try
 
     aFbxClient.Connect(InternalExtractParamFileName('-database'),

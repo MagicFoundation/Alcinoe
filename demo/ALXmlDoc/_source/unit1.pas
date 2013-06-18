@@ -67,10 +67,10 @@ type
     procedure ButtonLoadXmlWithXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
-    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject;const str: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
-    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
-    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; const Attributes: TALStrings);
-    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const str: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure ALXMLDocumentSaxModeParseComment(Sender: TObject; const Path, Str: AnsiString);
+    procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Path, Target, Data: AnsiString);
+    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings);
+    procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const Path, Str: AnsiString);
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -348,26 +348,26 @@ begin
   end;
 end;
 
-{****************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const str: AnsiString);
+{**********************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseComment(Sender: TObject; const Path, Str: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
-{***************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Target, Data: AnsiString);
+{*********************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Path, Target, Data: AnsiString);
 begin
   inc(FNodeCount);
 end;
 
-{****************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Name: AnsiString; const Attributes: TALStrings);
+{**********************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;
 end;
 
-{*************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const str: AnsiString);
+{*******************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseText(Sender: TObject; const Path, Str: AnsiString);
 begin
   inc(FNodeCount);
 end;
@@ -381,7 +381,7 @@ begin
 
     MemoParseXmlWithALXmlDocumentInSaxMode.Lines.Clear;
 
-    aXMLDocument := ALcreateEmptyXmlDocument('root');
+    aXMLDocument := TALXmlDocument.create('root');
     try
 
       Try
@@ -423,13 +423,13 @@ begin
   windows.setparent(ie.hwnd, PanelWebBrowser.handle);
   ie.Left := maxint; // don't understand why it's look impossible to setup the position
   ie.Top  := maxint; // don't understand why it's look impossible to setup the position
-  ie.Width := 100;
-  ie.Height := 300;
   ie.MenuBar := false;
   ie.AddressBar := false;
   ie.Resizable := false;
   ie.StatusBar := false;
   ie.ToolBar := 0;
+  ie.Width := 100;
+  ie.Height := 300;
   Url := 'http://static.arkadia.com/html/alcinoe_like.html';
   ie.Navigate2(Url,Flags,TargetFrameName,PostData,Headers);
   ie.Visible := true;

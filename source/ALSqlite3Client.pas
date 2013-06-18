@@ -624,7 +624,7 @@ begin
     aXmlDocument := Nil;
   end
   else begin
-    aXmlDocument := ALCreateEmptyXMLDocument('root');
+    aXmlDocument := TALXmlDocument.create('root');
     XMLDATA := aXmlDocument.DocumentElement;
   end;
   
@@ -1402,7 +1402,7 @@ begin
     aXmlDocument := Nil;
   end
   else begin
-    aXmlDocument := ALCreateEmptyXMLDocument('root');
+    aXmlDocument := TALXmlDocument.create('root');
     XMLDATA := aXmlDocument.DocumentElement;
   end;
 

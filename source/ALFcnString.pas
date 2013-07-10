@@ -420,7 +420,7 @@ function  ALFormat(const Format: AnsiString; const Args: array of const): AnsiSt
 function  ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString; overload;
 function  ALTryStrToBool(const S: Ansistring; out Value: Boolean): Boolean;
 Function  AlStrToBool(Value:AnsiString):Boolean;
-function  ALBoolToStr(B: Boolean; const trueStr='1'; const falseStr='0'): Ansistring;
+function  ALBoolToStr(B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'): Ansistring;
 function  ALDateToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALDateTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
@@ -4223,8 +4223,8 @@ Begin
   ALTryStrtoBool(Value,Result);
 end;
 
-{***********************************************************************************}
-function  ALBoolToStr(B: Boolean; const trueStr='1'; const falseStr='0'): Ansistring;
+{***********************************************************************************************************}
+function  ALBoolToStr(B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'): Ansistring;
 begin
   if B then result := trueStr
   else result := falseStr;

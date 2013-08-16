@@ -903,23 +903,14 @@ begin
                 Inc(P, 2);
               end;
             end;
-        60: begin // < (to hide all </script> tag inside javascript)
+        60: begin // < ... mostly to hide all </script> tag inside javascript.
                   // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
-              If (i <= L - 7) and
-                 (src[i+1] = '/') and
-                 (src[i+2] in ['S','s']) and
-                 (src[i+3] in ['C','c']) and
-                 (src[i+4] in ['R','r']) and
-                 (src[i+5] in ['I','i']) and
-                 (src[i+6] in ['P','p']) and
-                 (src[i+7] in ['t','t']) then begin
-                  ALStrMove('\u003C', P, 6);
-                  Inc(P, 6);
-                end
-                else Begin
-                  P^:= AnsiChar(ch);
-                  Inc(P);
-                end;
+              ALStrMove('\u003C', P, 6);
+              Inc(P, 6);
+            end;
+        62: begin // > ... mostly to hide all HTML tag inside javascript.
+              ALStrMove('\u003E', P, 6);
+              Inc(P, 6);
             end;
         92: begin // Backslash character (\).
               if useNumericReference then begin

@@ -411,6 +411,7 @@ type
     procedure DoParseStartArray(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseEndArray(const Path: AnsiString; const Name: AnsiString);
     Procedure InternalParseJSON(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
+    Procedure InternalParseBSON(Const RawBSONStream: TStream; Const ContainerNode: TALJSONNode);
     procedure ReleaseDoc;
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
@@ -421,7 +422,7 @@ type
     function GetParseOptions: TALJSONParseOptions;
     function GetPathSeparator: AnsiString;
     procedure SetPathSeparator(const Value: AnsiString);
-    function GetJSON: AnsiString;
+    function  GetJSON: AnsiString;
     procedure SetOptions(const Value: TALJSONDocOptions);
     procedure SetParseOptions(const Value: TALJSONParseOptions);
     procedure SetJSON(const Value: ansiString);
@@ -435,9 +436,11 @@ type
     procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False);
     procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False);
     procedure LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False);
+    procedure LoadFromBSON(const BSON: AnsiString);
     procedure SaveToFile(const AFileName: AnsiString = '');
     procedure SaveToStream(const Stream: TStream);
     procedure SaveToJSON(var JSON: AnsiString);
+    procedure SaveToBSON(var BSON: AnsiString);
     property ChildNodes: TALJSONNodeList read GetChildNodes;
     property Node: TALJSONNode read GetDocumentNode;
     property Active: Boolean read GetActive write SetActive;
@@ -473,6 +476,37 @@ implementation
 uses Contnrs,
      AlFcnHTML,
      AlFcnString;
+
+type
+
+  {----------------------------}
+  TALBSONReader = class(TObject)
+  private
+    FStream:       TStream;
+    FDocumentNode: TALJSONNode;
+    FActiveNode:   TALJSONNode;
+    function _ReadInteger: integer;
+    function _ReadByte: byte;
+    function _ReadName: AnsiString;
+    function _ReadInt64: Int64;
+    function _ReadDouble: double;
+    function _ReadString(aCount: integer): AnsiString;
+    function _ReadBinaryData(aCount: integer): TBytes;
+  protected
+  public
+    procedure   ParseElement(aByte: byte);
+    procedure   ParseEList;
+    procedure   ParseDocument(aContainerNode: TALJSONNode);
+    constructor Create(aStream: TStream; aDocumentNode: TALJSONNode); virtual;
+  end;
+
+  {----------------------------}
+  TALBSONWriter = class(TObject)
+  private
+  protected
+  public
+    function ParseObject(const aContainerNode: TALJSONNode; const aArrayLength: integer = 0): AnsiString;
+  end;
 
 {****************************************************}
 procedure ALJSONDocError(const Msg: String); overload;
@@ -1306,6 +1340,25 @@ Begin
 
 end;
 
+{*************************************************************}
+{Last version of the spec: http://bsonspec.org/#/specification}
+procedure TALJSONDocument.InternalParseBSON(const RawBSONStream: TStream; const ContainerNode: TALJSONNode);
+var aBSONReader: TALBSONReader;
+begin
+  // start to parse BSON
+  DoParseStartDocument;
+
+  aBSONReader := TALBSONReader.Create(RawBSONStream, ContainerNode);
+  try
+    aBSONReader.ParseDocument(ContainerNode);
+  finally
+    aBSONReader.Free;
+  end;
+
+  // finish to parse BSON
+  DoParseEndDocument;
+end;
+
 {***********************************}
 procedure TALJSONDocument.ReleaseDoc;
 begin
@@ -1362,6 +1415,20 @@ begin
   end;
 end;
 
+{*************************************************************}
+procedure TALJSONDocument.LoadFromBSON(const BSON: AnsiString);
+var StringStream: TALStringStream;
+begin
+  StringStream := TALStringStream.Create(BSON);
+  try
+    releaseDoc;
+    SetActive(True);
+    InternalParseBSON(StringStream, FDocumentNode);
+  finally
+    StringStream.Free;
+  end;
+end;
+
 {******************************}
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
@@ -1391,6 +1458,26 @@ begin
     JSON := StringStream.DataString;
   finally
     StringStream.Free;
+  end;
+end;
+
+{**********************************************************}
+{Saves the JSON document to binary representation of JSON -
+ BSON. Specification of this format can be found here:
+  http://bsonspec.org/#/specification.
+
+ Format BSON is mostly using for the purposes of
+ MongoDB interconnection.}
+procedure TALJSONDocument.SaveToBSON(var BSON: AnsiString);
+Var aBSONWriter: TALBSONWriter;
+begin
+  CheckActive;
+
+  aBSONWriter := TALBSONWriter.Create;
+  try
+    BSON := aBSONWriter.ParseObject(FDocumentNode);
+  finally
+    aBSONWriter.Free;
   end;
 end;
 
@@ -2591,6 +2678,554 @@ begin
   if NewCount > FCount then FillChar(FList^[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
   else for I := FCount - 1 downto NewCount do Delete(I);
   FCount := NewCount;
+end;
+
+{*****************************************************************************}
+constructor TALBSONReader.Create(aStream: TStream; aDocumentNode: TALJSONNode);
+begin
+  FStream       := aStream;
+  FDocumentNode := aDocumentNode;
+  FActiveNode   := aDocumentNode;
+end;
+
+{*************************************}
+function TALBSONReader._ReadByte: byte;
+begin
+  FStream.ReadBuffer(result, SizeOf(byte));
+end;
+
+{**************************************************************}
+function TALBSONReader._ReadBinaryData(aCount: integer): TBytes;
+begin
+  SetLength(result, aCount);
+  FStream.ReadBuffer(result[1], aCount);
+end;
+
+{*****************************************}
+function TALBSONReader._ReadDouble: double;
+begin
+  FStream.ReadBuffer(result, SizeOf(double));
+end;
+
+{***************************************}
+function TALBSONReader._ReadInt64: Int64;
+begin
+  FStream.ReadBuffer(result, SizeOf(Int64));
+end;
+
+{*******************************************}
+function TALBSONReader._ReadInteger: integer;
+begin
+  FStream.ReadBuffer(result, SizeOf(integer));
+end;
+
+{**************************************************************}
+function TALBSONReader._ReadString(aCount: integer): AnsiString;
+begin
+  SetLength(result, aCount);
+  FStream.ReadBuffer(result[1], aCount);
+
+  // remove ending #$00
+  SetLength(result, aCount - 1);
+end;
+
+{********************}
+{e_name	  ::=	cstring
+ cstring	::=	(byte*) "\x00"}
+function TALBSONReader._ReadName: AnsiString;
+var aByte: byte;
+begin
+  result := '';
+  aByte := _ReadByte;
+  while aByte <> 0 do begin
+    result := result + AnsiChar(Chr(aByte));
+    aByte  := _ReadByte;
+  end;
+end;
+
+{************************************************}
+{element	::=	"\x01" e_name double	Floating point
+            |	"\x02" e_name string	UTF-8 string
+            |	"\x03" e_name document	Embedded document
+            |	"\x04" e_name document	Array
+            |	"\x05" e_name binary	Binary data
+            |	"\x06" e_name	Undefined — Deprecated
+            |	"\x07" e_name (byte*12)	ObjectId
+            |	"\x08" e_name "\x00"	Boolean "false"
+            |	"\x08" e_name "\x01"	Boolean "true"
+            |	"\x09" e_name int64	UTC datetime
+            |	"\x0A" e_name	Null value
+            |	"\x0B" e_name cstring cstring	Regular expression
+            |	"\x0C" e_name string (byte*12)	DBPointer — Deprecated
+            |	"\x0D" e_name string	JavaScript code
+            |	"\x0E" e_name string	Symbol — Deprecated
+            |	"\x0F" e_name code_w_s	JavaScript code w/ scope
+            |	"\x10" e_name int32	32-bit Integer
+            |	"\x11" e_name int64	Timestamp
+            |	"\x12" e_name int64	64-bit integer
+            |	"\xFF" e_name	Min key
+            |	"\x7F" e_name	Max key}
+procedure TALBSONReader.ParseElement(aByte: byte);
+var aName:              AnsiString;
+    aStringLength:      integer;
+    aString:            AnsiString;
+    aDouble:            double;
+    aInteger:           integer;
+    aBoolean:           byte;
+    aInt64:             Int64;
+    aBinaryLength:      integer;
+    aBinarySubtype:     byte;
+    aBinaryData:        TBytes;
+    aRegExpPattern:     AnsiString;
+    aRegExpOptions:     AnsiString;
+    aNode:              TALJSONNode;
+    FCurrentActiveNode: TALJSONNode;
+    aChar:              AnsiChar;
+begin
+  aName := _ReadName;
+
+  {$REGION 'Floating point'}
+  if aByte = 1 then begin
+    aDouble := _ReadDouble;
+    with FActiveNode.AddChild(aName) do begin
+      Float := aDouble;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'UTF-8 string'}
+  else if aByte = 2 then begin
+    aStringLength := _ReadInteger;
+    aString       := _ReadString(aStringLength);
+    with FActiveNode.AddChild(aName) do begin
+      Text := aString;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Embedded document'}
+  else if aByte = 3 then begin
+    FCurrentActiveNode := FActiveNode;
+    aNode := FActiveNode.AddChild(aName, ntObject);
+    ParseDocument(aNode);
+    FActiveNode := FCurrentActiveNode;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Array'}
+  else if aByte = 4 then begin
+    FCurrentActiveNode := FActiveNode;
+    aNode := FActiveNode.AddChild(aName, ntArray);
+    ParseDocument(aNode);
+    FActiveNode := FCurrentActiveNode;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Binary data'}
+  {"\x05" e_name binary
+   binary	  ::=	int32 subtype (byte*)
+   subtype	::=	"\x00"	Binary / Generic
+              |	"\x01"	Function
+              |	"\x02"	Binary (Old)
+              |	"\x03"	UUID (Old)
+              |	"\x04"	UUID
+              |	"\x05"	MD5
+              |	"\x80"	User defined}
+  else if aByte = 5 then begin
+    aBinaryLength  := _ReadInteger;
+    aBinarySubtype := _ReadByte;
+
+    // security check
+    if (aBinarySubtype <> 0) and
+       (aBinarySubtype <> 1) and
+       (aBinarySubtype <> 2) and
+       (aBinarySubtype <> 3) and
+       (aBinarySubtype <> 4) and
+       (aBinarySubtype <> 5) and
+       (aBinarySubtype <> 128) then raise EALJSONDocError.Create('Unknown type of binary data: ' + IntToStr(aBinarySubtype));
+
+    // TODO -oIgor: think what specific we have to do to handle binary data
+    aBinaryData := _ReadBinaryData(aBinaryLength);
+    with FActiveNode.AddChild(aName) do begin
+
+      // save function as statement
+      if aBinarySubtype <> 1 then Statement := AnsiString(StringOf(aBinaryData))
+
+      // save other formats as text
+      else Text := AnsiString(StringOf(aBinaryData));
+
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Undefined — Deprecated'}
+  // nothing to handle here, some undefined type of data
+  else if aByte = 6 then Exit
+  {$ENDREGION}
+
+  {$REGION 'ObjectID'}
+  {http://docs.mongodb.org/manual/reference/object-id/
+   e_name (byte*12)	ObjectId}
+  else if aByte = 7 then begin
+    aBinaryData := _ReadBinaryData(12);
+    with FActiveNode.AddChild(aName) do begin
+      Text := AnsiString(StringOf(aBinaryData));
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Boolean false and true'}
+  {"\x08" e_name "\x00"}
+  else if aByte = 8 then begin
+    aBoolean := _ReadByte;
+    with FActiveNode.AddChild(aName) do begin
+      Bool := (aBoolean = 1);
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'UTC datetime'}
+  {"\x09" e_name int64}
+  else if aByte = 9 then begin
+    aInt64 := _ReadInt64;
+    with FActiveNode.AddChild(aName) do begin
+      int64 := aInt64;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Null value'}
+  {"\x0A" e_name}
+  else if aByte = 10 then begin
+    with FActiveNode.AddChild(aName) do begin
+      Null := true;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Regular expression'}
+  {"\x0B" e_name cstring cstring
+   The first cstring is the regex pattern, the second is the regex options string. Options are
+   identified by characters, which must be stored in alphabetical order. Valid options are 'i' for
+   case insensitive matching, 'm' for multiline matching, 'x' for verbose mode, 'l' to make \w, \W,
+   etc. locale dependent, 's' for dotall mode ('.' matches everything), and 'u' to make \w, \W,
+   etc. match unicode.}
+  else if aByte = 11 then begin
+    aRegExpPattern := _ReadName;
+    aRegExpOptions := _ReadName;
+
+    // security check for options
+    for aChar in aRegExpOptions do begin
+      if (aChar <> 'i') and
+         (aChar <> 'm') and
+         (aChar <> 'x') and
+         (aChar <> 'l') and
+         (aChar <> 's') and
+         (aChar <> 'u') then raise EALJSONDocError.Create('Unknown reg exp option: ' + aChar);
+    end;
+
+    // save as regular expression statement
+    with FActiveNode.AddChild(aName) do begin
+      Statement := '/' + aRegExpPattern + '/' + aRegExpOptions;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'DBPointer — Deprecated'}
+  {"\x0C" e_name string (byte*12)}
+  else if aByte = 12 then begin
+    aStringLength := _ReadInteger;
+    aString       := _ReadString(aStringLength);
+    aBinaryData   := _ReadBinaryData(12);
+
+    // DBPointer is not described. It's only stated that it's deprecated.
+    // So we cannot be sure how we need to build the JSON node with this
+    // data. I prefer to make an exception here if we will found such data,
+    // so when we will get this kind of exception, we could be able to
+    // investigate it.
+    raise EALJSONDocError.Create('DBPointer found. Data: ' + String(aString) + #13#10 + 'Binary data: ' + StringOf(aBinaryData));
+  end
+  {$ENDREGION}
+
+  {$REGION 'JavaScript code'}
+  {"\x0D" e_name string}
+  else if aByte = 13 then begin
+    aStringLength := _ReadInteger;
+    aString       := _ReadString(aStringLength);
+
+    // save javascript code as statement
+    with FActiveNode.AddChild(aName) do begin
+      Statement := aString;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Symbol — Deprecated'}
+  {"\x0E" e_name string}
+  else if aByte = 14 then begin
+    aStringLength := _ReadInteger;
+    aString       := _ReadString(aStringLength);
+
+    // Normally it is just a deprecated form to describe UTF-8 string,
+    // so we just save it as text
+    with FActiveNode.AddChild(aName) do begin
+      Text := aString;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'JavaScript code w/ scope'}
+  {"\x0F" e_name code_w_s
+   code_w_s	::=	int32 string document
+   Code w/ scope - The int32 is the length in bytes of the entire code_w_s value.
+   The string is JavaScript code. The document is a mapping from identifiers to values,
+   representing the scope in which the string should be evaluated.}
+  else if aByte = 15 then begin
+    _ReadInteger;
+    aStringLength := _ReadInteger;
+    aString       := _ReadString(aStringLength);
+
+    // parse internal document
+    FCurrentActiveNode := FActiveNode;
+    aNode := FActiveNode.AddChild(aName, ntObject);
+    ParseDocument(aNode);
+    FActiveNode := FCurrentActiveNode;
+
+    // NOTICE: i did not found good example how it looks like
+    // if there's some javascript code with document with mapping,
+    // so i will put this javascript just as one more statement
+    // inside created node
+    with FActiveNode.AddChild('statement') do begin
+      Statement := aString;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION '32-bit Integer'}
+  else if aByte = 16 then begin
+    aInteger := _ReadInteger;
+    with FActiveNode.AddChild(aName) do begin
+      int := aInteger;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Timestamp'}
+  {"\x11" e_name int64}
+  else if aByte = 17 then begin
+    aInt64 := _ReadInt64;
+    with FActiveNode.AddChild(aName) do begin
+      int64 := aInt64;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION '64-bit integer'}
+  {"\x12" e_name int64}
+  else if aByte = 18 then begin
+    aInt64 := _ReadInt64;
+    with FActiveNode.AddChild(aName) do begin
+      int64 := aInt64;
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Min key'}
+  {"\xFF" e_name}
+  else if aByte = 255 then begin
+    with FActiveNode.AddChild(aName) do begin
+      Statement := 'MinKey';  // try to type in browser console > MinKey, it will shows the BSON-function
+    end;
+  end
+  {$ENDREGION}
+
+  {$REGION 'Max key'}
+  {"\x7F" e_name}
+  else if aByte = 127 then begin
+    with FActiveNode.AddChild(aName) do begin
+      Statement := 'MaxKey';  // try to type in browser console > MaxKey, it will shows the BSON-function
+    end;
+  end;
+  {$ENDREGION}
+
+end;
+
+{******************************}
+{e_list	::=	element e_list | ""}
+procedure TALBSONReader.ParseEList;
+var aByte: byte;
+begin
+  aByte := _ReadByte;
+  if aByte = 0 then Exit
+  else begin
+    ParseElement(aByte);
+    ParseEList;
+  end;
+end;
+
+{********************************}
+{document	::=	int32 e_list "\x00"
+ The int32 is the total number of bytes comprising the document.}
+procedure TALBSONReader.ParseDocument(aContainerNode: TALJSONNode);
+var aLengthOfDocument: integer;
+    aInitialPosition:  integer;
+    aFinalPosition:    integer;
+begin
+  FActiveNode       := aContainerNode;
+  aInitialPosition  := FStream.Position;
+  aLengthOfDocument := _ReadInteger;
+  if aLengthOfDocument > 5 then ParseEList;
+  aFinalPosition := FStream.Position;
+  if aFinalPosition - aInitialPosition <> aLengthOfDocument then raise EALJSONDocError.Create('Incorrect length of document, ' + IntToStr(aLengthOfDocument) + ' expected');
+end;
+
+{********************************************************************}
+function TALBSONWriter.ParseObject(const aContainerNode: TALJSONNode;
+                                   const aArrayLength: integer = 0): AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _clearStream(aStream: TStream);
+  begin
+    aStream.Position := 0;
+    aStream.Size     := 0;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~}
+  // "\x02" e_name string
+  // e_name	 ::=	cstring
+  // cstring ::=	(byte*) "\x00"
+  procedure _writeUTF8String(aStream: TStream; aNode: TALJSONNode; aArrayIndex: integer = -1);
+  var aName:   AnsiString;
+      aText:   AnsiString;
+      aLength: integer;
+  begin
+    if aArrayIndex > -1 then aName := #2 + ALIntToStr(aArrayIndex) + #0
+    else aName   := #2 + aNode.NodeName + #0;
+
+    aLength := Length(aNode.Text) + 1; // +1 for trailing zero according the spec
+    aText   := aNode.Text + #0;
+
+    aStream.Write(aName[1], Length(aName));
+    aStream.Write(aLength,  Sizeof(integer));
+    aStream.Write(aText[1], Length(aText));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  // "\x04" e_name document
+  // e_name	  ::=	cstring
+  // document	::=	int32 e_list "\x00"
+  {The document for an array is a normal BSON document with integer values for the keys, starting with 0 and
+   continuing sequentially. For example, the array ['red', 'blue'] would be encoded as the document '0':
+   'red', '1': 'blue'. The keys must be in ascending numerical order.}
+  procedure _writeEmbeddedArray(aStream: TStream; aNode: TALJSONNode; aArrayLength: integer = 0; aArrayIndex: integer = -1);
+  var aName:     AnsiString;
+      aDocument: AnsiString;
+  begin
+    if aArrayIndex > -1 then aName := #4 + ALIntToStr(aArrayIndex) + #0
+    else aName   := #4 + aNode.NodeName + #0;
+    aDocument := ParseObject(aNode, aArrayLength);
+
+    aStream.Write(aName[1],     Length(aName));
+    aStream.Write(aDocument[1], Length(aDocument));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  // "\x03" e_name document
+  // e_name	  ::=	cstring
+  // document	::=	int32 e_list "\x00"
+  procedure _writeEmbeddedObject(aStream: TStream; aNode: TALJSONNode; aArrayLength: integer = 0; aArrayIndex: integer = -1);
+  var aName:     AnsiString;
+      aDocument: AnsiString;
+  begin
+    if aArrayIndex > -1 then aName := #3 + ALIntToStr(aArrayIndex) + #0
+    else aName   := #3 + aNode.NodeName + #0;
+    aDocument := ParseObject(aNode, aArrayLength);
+
+    aStream.Write(aName[1],     Length(aName));
+    aStream.Write(aDocument[1], Length(aDocument));
+  end;
+
+var aNode:         TALJSONNode;
+    i:             integer;
+    aStr:          AnsiString;
+    aLocalStream:  TALStringStream;
+    aObjectLength: integer;
+    aArrayIndex:   integer;
+begin
+  aStr         := '';
+  aLocalStream := TALStringStream.Create('');
+  aArrayIndex  := -1;
+
+  try
+
+    // scroll all child nodes
+    for i := 0 to aContainerNode.ChildNodes.Count - 1 do begin
+
+      // get current node
+      aNode := aContainerNode.ChildNodes[i];
+
+      // reset stream
+      _clearStream(aLocalStream);
+
+      {$REGION 'Process ntText-node'}
+      if aNode.NodeType = ntText then begin
+
+        // save UTF-8 string
+        if aArrayLength > 0 then begin
+          Inc(aArrayIndex);
+          _writeUTF8String(aLocalStream, aNode, aArrayIndex);
+        end
+
+        else _writeUTF8String(aLocalStream, aNode);
+
+      end
+      {$ENDREGION}
+
+      {$REGION 'Process ntObject-node'}
+      else if aNode.NodeType = ntArray then begin
+
+        // save embedded array
+        if aArrayLength > 0 then begin
+          Inc(aArrayIndex);
+          _writeEmbeddedArray(aLocalStream, aNode, aNode.ChildNodes.Count, aArrayIndex);
+        end
+
+        else _writeEmbeddedArray(aLocalStream, aNode, aNode.ChildNodes.Count);
+
+      end
+      {$ENDREGION}
+
+      {$REGION 'Process ntObject-node'}
+      else if aNode.NodeType = ntObject then begin
+
+        // save embedded object
+        if aArrayLength > 0 then begin
+          Inc(aArrayIndex);
+          _writeEmbeddedObject(aLocalStream, aNode, aArrayIndex);
+        end
+        else _writeEmbeddedObject(aLocalStream, aNode);
+
+      end;
+      {$ENDREGION}
+
+      // save currently processed data
+      aStr := aStr + aLocalStream.DataString;
+
+    end;
+
+    // Write the whole object with its size
+    // document	 ::=	int32 e_list "\x00"
+    _clearStream(aLocalStream);
+    aObjectLength := Length(aStr) + 5; // 5 - it's trailing zero of document + 4 bytes to save the size of document
+    aStr          := aStr + #0;
+    aLocalStream.Write(aObjectLength, Sizeof(integer));
+    aLocalStream.Write(aStr[1],       Length(aStr));
+
+    result := aLocalStream.DataString;
+
+  finally
+    aLocalStream.Free;
+  end;
 end;
 
 {****************************************}

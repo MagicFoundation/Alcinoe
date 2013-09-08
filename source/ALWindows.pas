@@ -1,7 +1,7 @@
 {*****************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
-svn:          https://alcinoe.svn.sourceforge.net/svnroot/alcinoe
-Author(s):    Stéphane Vander Clock (svanderclock@arkadia.com)
+svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
+Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      AlWindows
@@ -46,7 +46,7 @@ History :     26/06/2012: Add xe2 support
 
 Link :
 
-* Please send all your feedback to svanderclock@arkadia.com
+* Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
@@ -78,11 +78,18 @@ Var ALInterlockedCompareExchange64: function(var Destination: LONGLONG; Exchange
 Var ALGetTickCount64: function: int64; stdcall; // from Windows Vista / Windows Server 2008
 Var ALSetProcessWorkingSetSizeEx: function(hProcess: THandle; dwMinimumWorkingSetSize, dwMaximumWorkingSetSize: {$if CompilerVersion >= 23}{Delphi XE2}Size_T{$ELSE}Cardinal{$IFEND}; Flags: DWORD): BOOL; stdcall; // from Windows Vista / Windows Server 2003
 function ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
-function ALCreateProcessWithLogonW(lpUsername: PWideChar; lpDomain: PWideChar; lpPassword: PWideChar; dwLogonFlags: DWORD;
-                                   lpApplicationName: PWideChar; lpCommandLine: PWideChar; dwCreationFlags: DWORD; lpEnvironment: Pointer;
-                                   lpCurrentDirectory: PWideChar; const lpStartupInfo: TStartupInfo;
-                                   var lpProcessInfo: TProcessInformation): BOOL; stdcall;
-function ALUserExists(aUserName: WideString): boolean;
+function ALCreateProcessWithLogonW(lpUsername: LPCWSTR;  // LPCWSTR
+                                   lpDomain: LPCWSTR;  // LPCWSTR
+                                   lpPassword: LPCWSTR; // LPCWSTR
+                                   dwLogonFlags: DWORD; // DWORD
+                                   lpApplicationName: LPCWSTR; // LPCWSTR
+                                   lpCommandLine: LPWSTR;  // LPWSTR
+                                   dwCreationFlags: DWORD; // DWORD
+                                   lpEnvironment: LPVOID; // LPVOID
+                                   lpCurrentDirectory: LPCWSTR;  // LPCWSTR
+                                   const lpStartupInfo: TStartupInfoW;  // LPSTARTUPINFOW
+                                   var lpProcessInfo: TProcessInformation): BOOL; stdcall; // LPPROCESS_INFORMATION
+function ALUserExists(aUserName: AnsiString): boolean;
 
 
 const INVALID_SET_FILE_POINTER = DWORD(-1);
@@ -133,40 +140,42 @@ begin
 end;
 
 {****************************************************}
-function ALUserExists(aUserName: WideString): boolean;
-var SID: Pointer;
-    szDomain: PChar;
-    cbDomain, cbSID: Cardinal;
-    NameUse: Cardinal;
+function ALUserExists(aUserName: AnsiString): boolean;
+var SID: PSID;
+    szDomain: PansiChar;
+    cbDomain, cbSID: DWORD;
+    NameUse: SID_NAME_USE;
 begin
+
   // initial values, reset them
   SID      := nil;
+  cbSID    := 0;
   szDomain := '';
   cbDomain := 0;
-  cbSID    := 0;
 
   // first attempt to get the buffer sizes
-  LookupAccountName('',
-                    PWideChar(aUserName),
-                    SID,
-                    cbSID,
-                    szDomain,
-                    cbDomain,
-                    NameUse);
+  LookupAccountNameA(nil,  // lpSystemName
+                     PAnsiChar(aUserName), // lpAccountName: PAnsiChar;
+                     SID, //  Sid: PSID;
+                     cbSID,  // var cbSid: DWORD;
+                     szDomain, // ReferencedDomainName: PAnsiChar;
+                     cbDomain, // var cbReferencedDomainName: DWORD;
+                     NameUse); // var peUse: SID_NAME_USE
 
   // init buffers according to retrieved data
-  szDomain := StrAlloc(cbDomain);
+  szDomain := AnsiStrAlloc(cbDomain);
   SID      := AllocMem(cbSID);
-
   try
+
     // check if user exists
-    result := LookupAccountName('',
-                                PWideChar(aUserName),
-                                SID,
-                                cbSID,
-                                szDomain,
-                                cbDomain,
-                                NameUse);
+    result := LookupAccountNameA(nil,
+                                 PAnsiChar(aUserName),
+                                 SID,
+                                 cbSID,
+                                 szDomain,
+                                 cbDomain,
+                                 NameUse);
+
   finally
     StrDispose(szDomain);
     FreeMem(SID);

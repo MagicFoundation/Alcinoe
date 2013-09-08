@@ -60,8 +60,8 @@ interface
 uses SysUtils,
      Classes,
      Isapi2,
-     ALMultiPartFormDataParser,
-     ALHttpCommon,
+     ALMultiPartParser,
+     ALHttpClient,
      ALStringList;
 
 type
@@ -282,8 +282,7 @@ implementation
 
 uses Windows,
      DateUtils,
-     ALMultiPartBaseParser,
-     AlFcnString;
+     ALString;
 
 const
   CALWebRequestServerVariables: array[0..28] of AnsiString = ('',

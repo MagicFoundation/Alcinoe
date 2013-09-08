@@ -124,7 +124,7 @@ uses Windows,
      {$IFEND}
      Contnrs,
      SyncObjs,
-     ALHttpCommon,
+     ALHttpClient,
      ALStringList;
 
 {###############################################################################
@@ -407,11 +407,11 @@ type
 implementation
 
 uses sysutils,
-     ALFcnWinSock,
-     AlFcnString,
-     AlFcnExecute,
+     ALWinSock,
+     ALString,
+     AlExecute,
      ALWindows,
-     AlFcnCGI;
+     AlCGI;
 
 {*****************************************************************************}
 procedure TALPhpRunnerEngine.ExecutePostUrlEncoded(ServerVariables: TALStrings;

@@ -1214,7 +1214,7 @@ uses //{$IFDEF UNICODE}
      Variants,
      ALFBXerror,
      ALFBXConst,
-     AlFcnString;
+     ALString;
 
 //function ALFBXMBUEncode(const str: UnicodeString; cp: Word): RawByteString;
 //begin

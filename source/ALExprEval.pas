@@ -978,7 +978,7 @@ implementation
 
 uses Math,
      Contnrs,
-     AlFcnString,
+     ALString,
      ALZLibExAPI,
      ALZLibEx;
 

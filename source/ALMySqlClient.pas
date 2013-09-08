@@ -63,7 +63,7 @@ uses Windows,
      SyncObjs,
      AlXmlDoc,
      ALStringList,
-     ALFcnString,
+     ALString,
      AlMySqlWrapper;
 
 Type

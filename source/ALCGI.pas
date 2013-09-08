@@ -4,7 +4,7 @@ svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
-product:      AlFcnCGI
+product:      CGI functions
 Version:      4.00
 
 Description:  Function to run CGI application like PHP-CGI.exe or
@@ -54,13 +54,13 @@ Link :
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 
-unit ALFcnCGI;
+unit ALCGI;
 
 interface
 
 uses Classes,
      ALIsapiHTTP,
-     AlHttpCommon,
+     AlHttpClient,
      AlStringList;
 
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings); overload;
@@ -107,8 +107,8 @@ Procedure AlCGIExec(ScriptName,
 
 implementation
 
-uses AlFcnExecute,
-     AlFcnString;
+uses AlExecute,
+     ALString;
 
 {**************************************************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings);

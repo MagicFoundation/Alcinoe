@@ -79,7 +79,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
      ALStringList,
      ALInternetMessages,
-     ALMultiPartMixedParser;
+     ALMultiPartParser;
 
 type
 
@@ -147,9 +147,9 @@ implementation
 Uses Windows,
      Classes,
      SysUtils,
-     AlFcnMime,
-     AlFcnWinsock,
-     AlFcnString;
+     ALMime,
+     ALWinsock,
+     ALString;
 
 {*******************************}
 constructor TAlSmtpClient.Create;

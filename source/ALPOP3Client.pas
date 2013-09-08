@@ -121,8 +121,8 @@ implementation
 
 Uses Windows,
      SysUtils,
-     AlFcnWinsock,
-     AlFcnString;
+     AlWinsock,
+     ALString;
 
 {*******************************************************************************}
 Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);

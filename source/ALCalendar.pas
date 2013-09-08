@@ -61,7 +61,7 @@ interface
 
 uses types,
      Graphics,
-     ALFcnString;
+     ALString;
 
 Type
 

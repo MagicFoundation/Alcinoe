@@ -57,7 +57,7 @@ Link :
 * Please, help us to keep the development of these components free by 
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
-unit ALFcnMime;
+unit ALMime;
 
 interface
 
@@ -142,7 +142,7 @@ implementation
 
 Uses Windows,
      Registry,
-     alFcnString;
+     ALString;
 
 // Caution: For MimeEncodeStream and all other kinds of multi-buffered
 // Mime encodings (i.e. Files etc.), BufferSize must be set to a multiple of 3.

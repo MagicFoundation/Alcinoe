@@ -58,7 +58,7 @@ Link :
 * Please, help us to keep the development of these components free by 
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
-unit ALFcnFile;
+unit ALFiles;
 
 interface
 
@@ -102,8 +102,8 @@ uses Windows,
      ShLwApi,
      Masks,
      sysutils,
-     alStringList,
-     alFcnString;
+     ALStringList,
+     ALString;
 
 {***********************************************}
 Function  AlEmptyDirectory(Directory: ansiString;

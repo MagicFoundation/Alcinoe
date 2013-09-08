@@ -60,7 +60,7 @@ interface
 
 uses SysUtils,
      Classes,
-     ALFcnString,
+     ALString,
      ALStringList;
 
 type
@@ -120,7 +120,7 @@ implementation
 
 uses RTLConsts,
      Windows,
-     ALFcnFile;
+     ALFiles;
 
 {**************************************************************}
 constructor TALCustomIniFile.Create(const FileName: AnsiString);

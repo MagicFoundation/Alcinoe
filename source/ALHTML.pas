@@ -63,7 +63,7 @@ Link :
 * Please, help us to keep the development of these components free by
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
-unit ALFcnHTML;
+unit ALHTML;
 
 interface
 
@@ -93,7 +93,7 @@ implementation
 uses Math,
      Classes,
      sysutils,
-     alFcnString,
+     ALString,
      ALQuickSortList;
 
 Var vALhtml_LstEntities: TALStrings;

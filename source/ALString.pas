@@ -87,7 +87,7 @@ Link :
 * Please, help us to keep the development of these components free by
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
-unit ALfcnString;
+unit ALString;
 
 interface
 
@@ -579,7 +579,7 @@ uses SysConst,
      Strutils,
      {$ENDIF}
      Math,
-     AlHTTPCommon;
+     AlHTTPClient;
 
 {*****************************************************}
 constructor EALException.Create(const Msg: AnsiString);

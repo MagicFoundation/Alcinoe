@@ -76,7 +76,6 @@ interface
 
 uses classes,
      AlAvlBinaryTree,
-     AlHTTPCommon,
      AlHTTPClient,
      AlStringList;
 
@@ -263,9 +262,9 @@ uses Windows,
      sysutils,
      WinInet,
      UrlMon,
-     AlFcnHTML,
-     AlFcnMime,
-     AlFcnString;
+     AlHTML,
+     AlMime,
+     ALString;
 
 type
 

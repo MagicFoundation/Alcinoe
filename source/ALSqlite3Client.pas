@@ -69,7 +69,7 @@ uses SysUtils,
      SyncObjs,
      AlXmlDoc,
      AlSqlite3Wrapper,
-     ALFcnString,
+     ALString,
      ALStringList;
 
 Type

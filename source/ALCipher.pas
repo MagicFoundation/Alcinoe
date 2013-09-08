@@ -72,7 +72,7 @@ interface
 
 uses Windows,
      Classes,
-     AlFcnString;
+     ALString;
 
 const
 

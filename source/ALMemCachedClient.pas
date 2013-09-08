@@ -76,7 +76,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
      Contnrs,
      SyncObjs,
-     AlFcnString;
+     ALString;
 
 type
 
@@ -358,7 +358,7 @@ implementation
 Uses Windows,
      SysUtils,
      ALStringList,
-     AlFcnWinsock,
+     AlWinsock,
      ALWindows;
 
 {**************************************************************************************************************}

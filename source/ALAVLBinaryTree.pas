@@ -7,7 +7,7 @@ Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 product:      ALAVLBinaryTree (Self-Balancing Binary Trees)
 Version:      4.00
 
-Description:  These binary trees are self-balancing in the AVL sense
+Description:  Binary trees that are self-balancing in the AVL sense
               (the depth of any left branch differs by no more than
               one from the depth of the right branch).
 
@@ -276,7 +276,7 @@ implementation
 
 uses Contnrs,
      sysUtils,
-     ALFcnString;
+     ALString;
 
 {Following stack declarations are used to avoid recursion in all tree
  routines. Because the tree is AVL-balanced, a stack size of 40

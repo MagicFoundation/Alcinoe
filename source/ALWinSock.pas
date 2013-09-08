@@ -53,7 +53,7 @@ Link :
 * Please, help us to keep the development of these components free by 
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
-unit ALFcnWinSock;
+unit ALWinSock;
 
 interface
 
@@ -73,7 +73,7 @@ uses Windows,
      {$ELSE}
      WinSock,
      {$IFEND}
-     AlFcnString;
+     ALString;
 
 {*********************************************************************}
 function ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;

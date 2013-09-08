@@ -131,7 +131,7 @@ function  AlGSMComm_GSM7BitDefaultAlphabetToUnicode(aMessage: AnsiString; Const 
 implementation
 
 uses SysUtils,
-     AlFcnString;
+     ALString;
 
 {***********************************************************************************}
 function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(aMessage: WideString): AnsiString;

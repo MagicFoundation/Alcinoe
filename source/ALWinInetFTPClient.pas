@@ -225,7 +225,7 @@ type
 implementation
 
 Uses SysUtils,
-     AlFcnString;
+     ALString;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}

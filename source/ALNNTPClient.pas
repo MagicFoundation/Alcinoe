@@ -63,7 +63,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      WinSock,
      {$IFEND}
      ALInternetMessages,
-     ALMultiPartMixedParser,
+     ALMultiPartParser,
      ALStringList;
 
 type
@@ -167,8 +167,8 @@ implementation
 Uses Windows,
      SysUtils,
      Classes,
-     AlFcnWinsock,
-     AlFcnString;
+     AlWinsock,
+     ALString;
 
 {*******************************************************************************}
 Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStrings);

@@ -40,6 +40,8 @@
       
       
       
+      
+      
       <Excluded_Packages Name="$(BDS)\bin\dcloffice2k100.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
       <Excluded_Packages Name="$(BDS)\bin\dclofficexp100.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
     </Excluded_Packages><Source><Source Name="MainSource">Alcinoe_d2007.dpk</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
@@ -52,10 +54,12 @@
     <DCCReference Include="ALAVLBinaryTree.pas" />
     <DCCReference Include="ALButton.pas" />
     <DCCReference Include="ALCalendar.pas" />
+    <DCCReference Include="ALCGI.pas" />
     <DCCReference Include="ALCipher.pas" />
     <DCCReference Include="ALComboBox.pas" />
     <DCCReference Include="ALDialog.pas" />
     <DCCReference Include="ALEdit.pas" />
+    <DCCReference Include="ALExecute.pas" />
     <DCCReference Include="ALExprEval.pas" />
     <DCCReference Include="ALFBXBase.pas" />
     <DCCReference Include="ALFBXClient.pas" />
@@ -72,10 +76,12 @@
     <DCCReference Include="ALFcnSQL.pas" />
     <DCCReference Include="ALFcnString.pas" />
     <DCCReference Include="ALFcnWinSock.pas" />
+    <DCCReference Include="ALFiles.pas" />
     <DCCReference Include="ALFTPClient.pas" />
     <DCCReference Include="ALGraphic.pas" />
     <DCCReference Include="ALGSMComm.pas" />
     <DCCReference Include="ALHintballoon.pas" />
+    <DCCReference Include="ALHTML.pas" />
     <DCCReference Include="ALHttpClient.pas" />
     <DCCReference Include="ALHttpCommon.pas" />
     <DCCReference Include="ALIniFiles.pas" />
@@ -85,10 +91,13 @@
     <DCCReference Include="ALListBox.pas" />
     <DCCReference Include="ALMemCachedClient.pas" />
     <DCCReference Include="ALMemo.pas" />
+    <DCCReference Include="ALMime.pas" />
+    <DCCReference Include="ALMisc.pas" />
     <DCCReference Include="ALMultiPartAlternativeParser.pas" />
     <DCCReference Include="ALMultiPartBaseParser.pas" />
     <DCCReference Include="ALMultiPartFormDataParser.pas" />
     <DCCReference Include="ALMultiPartMixedParser.pas" />
+    <DCCReference Include="ALMultiPartParser.pas" />
     <DCCReference Include="ALMySqlClient.pas" />
     <DCCReference Include="ALMySqlWrapper.pas" />
     <DCCReference Include="ALNNTPClient.pas" />
@@ -99,9 +108,11 @@
     <DCCReference Include="ALScrollBar.pas" />
     <DCCReference Include="ALSMTPClient.pas" />
     <DCCReference Include="ALSphinxQLClient.pas" />
+    <DCCReference Include="ALSQLClauses.pas" />
     <DCCReference Include="ALSqlite3Client.pas" />
-    <DCCReference Include="ALSqlite3Wrapper.pas" />
+    <DCCReference Include="AlSqlite3Wrapper.pas" />
     <DCCReference Include="ALStaticText.pas" />
+    <DCCReference Include="ALString.pas" />
     <DCCReference Include="ALStringList.pas" />
     <DCCReference Include="ALWebSpider.pas" />
     <DCCReference Include="ALWindows.pas" />
@@ -109,13 +120,12 @@
     <DCCReference Include="ALWinHttpWrapper.pas" />
     <DCCReference Include="ALWinInetFTPClient.pas" />
     <DCCReference Include="ALWininetHttpClient.pas" />
+    <DCCReference Include="ALWinSock.pas" />
     <DCCReference Include="ALXmlDoc.pas" />
     <DCCReference Include="ALZLibEx.pas" />
     <DCCReference Include="ALZLibExApi.pas" />
-    <DCCReference Include="ALZlibExGZ.pas" />
-    <DCCReference Include="C:\Users\svanderclock\Desktop\dbrtl.dcp" />
+    <DCCReference Include="ALZLibExGZ.pas" />
     <DCCReference Include="C:\Users\svanderclock\Desktop\inet.dcp" />
-    <DCCReference Include="C:\Users\svanderclock\Desktop\rtl.dcp" />
     <DCCReference Include="C:\Users\svanderclock\Desktop\vcl.dcp" />
   </ItemGroup>
 </Project>

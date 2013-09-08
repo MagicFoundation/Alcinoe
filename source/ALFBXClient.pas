@@ -71,7 +71,7 @@ uses Windows,
      ALAVLBinaryTree,
      ALFBXLib,
      ALFBXBase,
-     AlFcnString,
+     ALString,
      ALStringList;
 
 Type

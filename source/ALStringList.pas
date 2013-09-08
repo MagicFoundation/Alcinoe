@@ -375,7 +375,7 @@ implementation
 
 Uses sysutils,
      RTLConsts,
-     AlFcnString;
+     ALString;
 
 {************************************************************}
 constructor TALStringsEnumerator.Create(AStrings: TALStrings);

@@ -809,12 +809,12 @@ implementation
 
 uses Windows,
      Contnrs,
-     AlFcnHTML,
+     AlHTML,
      {$IF CompilerVersion < 18.5}
      Variants,
      {$IFEND}
-     ALHttpCommon,
-     AlFcnString;
+     ALHttpClient,
+     ALString;
 
 {**********************************}
 {Raises an EALXMLDocError exception.

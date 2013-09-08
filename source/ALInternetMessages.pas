@@ -177,14 +177,15 @@ Function AlGenerateInternetMessageID: AnsiString; overload;
 Function AlGenerateInternetMessageID(ahostname: AnsiString): AnsiString; overload;
 Function ALDecodeQuotedPrintableString(src: AnsiString): AnsiString;
 Function AlDecodeInternetMessageHeaderInUTF8(const aHeaderStr: AnsiString; aDefaultCodePage: Integer): AnsiString;
+function AlIsValidEmail(const Value: AnsiString): boolean;
 
 implementation
 
 uses Sysutils,
-     ALHttpCommon,
-     AlFcnMime,
-     AlFcnWinsock,
-     AlFcnString;
+     ALHttpClient,
+     ALMime,
+     ALWinsock,
+     ALString;
 
 {***************************************************************************}
 { FriendlyEmail                  RealName       Result                      }
@@ -851,5 +852,82 @@ begin
   end;
 end;
 
+{********************************************************}
+function AlIsValidEmail(const Value: AnsiString): boolean;
+
+ {------------------------------------------------------}
+ function CheckAllowedName(const s: AnsiString): boolean;
+ var i: integer;
+ begin
+   Result:= false;
+   for i:= 1 to Length(s) do begin
+     // illegal char in s -> no valid address
+     if not (s[i] in ['a'..'z','A'..'Z','0'..'9','_','-','.','+']) then Exit;
+   end;
+   Result:= true;
+ end;
+
+ {----------------------------------------------------------}
+ function CheckAllowedHostname(const s: AnsiString): boolean;
+ var i: integer;
+ begin
+   Result:= false;
+   for i:= 1 to Length(s) do begin
+     // illegal char in s -> no valid address
+     if not (s[i] in ['a'..'z','A'..'Z','0'..'9','-','.']) then Exit;
+   end;
+   Result:= true;
+ end;
+
+ {-----------------------------------------------------}
+ function CheckAllowedExt(const s: AnsiString): boolean;
+ var i: integer;
+ begin
+   Result:= false;
+   for i:= 1 to Length(s) do begin
+     // illegal char in s -> no valid address
+     if not (s[i] in ['a'..'z','A'..'Z']) then Exit;
+   end;
+   Result:= true;
+ end;
+
+var i, j: integer;
+    namePart, serverPart, extPart: AnsiString;
+begin
+  Result := false;
+
+  // Value can not be < 6 char (ex: a@b.fr)
+  if length(Value) < 6 then exit;
+
+  // must have the '@' char inside
+  i := AlPos('@', Value);
+  if (i <= 1) or (i > length(Value)-4) then exit;
+
+  //can not have @. or .@
+  if (value[i-1] = '.') or (value[i+1] = '.') then exit;
+
+  //can not have 2 ..
+  If (ALpos('..', Value) > 0) then Exit;
+
+  //extract namePart and serverPart
+  namePart:= AlCopyStr(Value, 1, i - 1);
+  serverPart:= AlCopyStr(Value, i + 1, Length(Value));
+
+  // Extension (.fr, .com, etc..) must be betwen 2 to 6 char
+  i:= AlPos('.', serverPart);
+  j := 0;
+  While I > 0 do begin
+    j := i;
+    I := AlPosEx('.', serverPart, i + 1);
+  end;
+  if (j <= 1) then Exit; // no dot at all so exit !
+  extPart    := AlCopyStr(ServerPart,J+1,Maxint);
+  serverPart := ALCopyStr(ServerPart, 1, J - 1);
+  If not (Length(ExtPart) in [2..6]) then exit;
+
+  Result:= CheckAllowedname(namePart) and
+           CheckAllowedHostname(serverPart) and
+           CheckAllowedExt(ExtPart);
+end;
+
 end.
- 

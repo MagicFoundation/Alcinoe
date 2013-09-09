@@ -301,11 +301,11 @@ begin
     Environment := Environment + #0;
 
     {----------}
-    ALWinExec32(ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
-                ALExtractFileDir(InterpreterFilename),
-                Environment,
-                RequestContentStream,
-                aStream);
+    ALWinExec(ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
+              ALExtractFileDir(InterpreterFilename),
+              Environment,
+              RequestContentStream,
+              aStream);
 
     {----------}
     S1 := aStream.DataString;

@@ -46,13 +46,15 @@ History:      04/05/2007: overload the function ALWinExec32;
               01/01/2010: add ALNTSetPrivilege
               05/03/2012: Correct a 100% CPU usage in ALWinExec32
               26/06/2012: Add xe2 support
+              01/09/2013: rename ALWinExec32 and ALWinExecAndWait32 to
+                          ALWinExec and ALWinExecAndWait
 
 Link:
 
 * Please send all your feedback to alcinoe@arkadia.com
 * If you have downloaded this source from a website different from 
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
+* Please, help us to keep the development of these components free by
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALExecute;
@@ -98,15 +100,21 @@ const
   SE_MANAGE_VOLUME_NAME = 'SeManageVolumePrivilege';
 
 Function AlGetEnvironmentString: AnsiString;
-function ALWinExec32(const FileName, CurrentDirectory, Environment: AnsiString; InputStream: Tstream; OutputStream: TStream): Dword; overload;
-function ALWinExec32(const FileName: AnsiString; InputStream: Tstream; OutputStream: TStream): Dword; overload;
-function ALWinExecAndWait32(FileName:AnsiString; Visibility : integer):DWORD;
-Function ALWinExecAndWait32V2(FileName: AnsiString; Visibility: integer): DWORD;
-function ALWinExecAsUser(const aUserName: ANSIString;
-                         const aPassword: ANSIString;
-                         const aAppName: ANSIString;
-                         aCommandLine: ANSIString;
-                         aCurrentDirectory: ANSIString = ''): boolean;
+function ALWinExec(const aCommandLine: AnsiString;
+                   const aCurrentDirectory: AnsiString;
+                   const aEnvironment: AnsiString;
+                   aInputStream: Tstream;
+                   aOutputStream: TStream): Dword; overload;
+function ALWinExec(const aCommandLine: AnsiString;
+                   aInputStream: Tstream;
+                   aOutputStream: TStream): Dword; overload;
+Procedure ALWinExec(const aUserName: ANSIString;
+                    const aPassword: ANSIString;
+                    const aCommandLine: ANSIString;
+                    const aCurrentDirectory: AnsiString;
+                    const aLogonFlags: dword = 0); overload;
+function ALWinExecAndWait(aCommandLine:AnsiString; aVisibility : integer):DWORD;
+Function ALWinExecAndWaitV2(aCommandLine: AnsiString; aVisibility: integer): DWORD;
 function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 
 implementation
@@ -144,12 +152,12 @@ begin
   end;
 end;
 
-{**********************************}
-function ALWinExec32(const FileName,
-                           CurrentDirectory,
-                           Environment: AnsiString;
-                     InputStream: Tstream;
-                     OutputStream: TStream): Dword;
+{************************************************}
+function ALWinExec(const aCommandLine: AnsiString;
+                   const aCurrentDirectory: AnsiString;
+                   const aEnvironment: AnsiString;
+                   aInputStream: Tstream;
+                   aOutputStream: TStream): Dword;
 
 var aOutputReadPipe,aOutputWritePipe: THANDLE;
     aInputReadPipe,aInputWritePipe: THANDLE;
@@ -159,9 +167,9 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   var aBytesWritten: Dword;
       aStrBuffer: AnsiString;
   begin
-    If InputStream.size > 0 then begin
-      SetLength(aStrBuffer,InputStream.size);
-      InputStream.read(aStrBuffer[1],InputStream.size);
+    If aInputStream.size > 0 then begin
+      SetLength(aStrBuffer,aInputStream.size);
+      aInputStream.read(aStrBuffer[1],aInputStream.size);
       While true do begin
         if not WriteFile(aInputWritePipe,            // handle to file to write to
                          aStrBuffer[1],              // pointer to data to write to file
@@ -196,7 +204,7 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
                         AstrBufferSize,              // number of bytes to read
                         aBytesRead,                  // address of number of bytes read
                         nil) then RaiseLastOSError;  // address of structure for data
-        If aBytesRead > 0 then OutputStream.Write(aStrBuffer[1], aBytesRead);
+        If aBytesRead > 0 then aOutputStream.Write(aStrBuffer[1], aBytesRead);
       end
       else break;
     end;
@@ -239,15 +247,15 @@ begin
       aStartupInfo.hStdInput  := aInputReadPipe;
       aStartupInfo.hStdError  := aOutputWritePipe;
 
-      if Environment <> '' then aPEnvironment := PAnsiChar(Environment)
+      if aEnvironment <> '' then aPEnvironment := PAnsiChar(aEnvironment)
       else aPEnvironment := nil;
-      if CurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(CurrentDirectory)
+      if aCurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(aCurrentDirectory)
       else aPCurrentDirectory := nil;
 
 
       // Launch the process that you want to redirect.
       if not CreateProcessA(nil,                     // pointer to name of executable module
-                            PAnsiChar(FileName),     // pointer to command line string
+                            PAnsiChar(aCommandLine), // pointer to command line string
                             @aSecurityAttributes,    // pointer to process security attributes
                             NiL,                     // pointer to thread security attributes
                             TrUE,                    // handle inheritance flag
@@ -259,7 +267,7 @@ begin
       then RaiseLastOSError;
       Try
 
-        InputStream.Position := 0;
+        aInputStream.Position := 0;
         InternalProcessInput;
         while (WaitForSingleObject(aProcessInformation.hProcess, 0) = WAIT_TIMEOUT) do begin
           InternalProcessOutput;
@@ -284,29 +292,71 @@ begin
   end;
 end;
 
-{**********************************************}
-function ALWinExec32(const FileName: AnsiString;
-                     InputStream: Tstream;
-                     OutputStream: TStream): Dword;
+{************************************************}
+function ALWinExec(const aCommandLine: AnsiString;
+                   aInputStream: Tstream;
+                   aOutputStream: TStream): Dword;
 Begin
-  Result := ALWinExec32(FileName,
-                        '',
-                        '',
-                        InputStream,
-                        OutputStream);
+  Result := ALWinExec(aCommandLine,
+                      '',
+                      '',
+                      aInputStream,
+                      aOutputStream);
 End;
 
-{***************************************************************************}
-function ALWinExecAndWait32(FileName:AnsiString; Visibility : integer):DWORD;
+{**********************************************}
+Procedure ALWinExec(const aUserName: ANSIString;
+                    const aPassword: ANSIString;
+                    const aCommandLine: ANSIString;
+                    const aCurrentDirectory: AnsiString;
+                    const aLogonFlags: dword = 0);
+var aStartupInfo: TStartupInfoW;
+    aProcessInformation: TProcessInformation;
+    aCommandLineW: WideString;
+begin
+
+  // clear the startup info and set count of bytes to read
+  ZeroMemory(@aStartupInfo, SizeOf(TStartupInfoW));
+  aStartupInfo.cb := SizeOf(TStartupInfoW);
+
+  // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682431(v=vs.85).aspx
+  // The function can modify the contents of this string. Therefore, this parameter cannot be a pointer
+  // to read-only memory (such as a const variable or a literal string). If this parameter is a
+  // constant string, the function may cause an access violation.
+  // ...
+  // Because argv[0] is the module name, C programmers typically repeat the module name as the first
+  // token in the command line.
+  aCommandLineW := String(aCommandLine);
+
+  // try to create the process under specified user
+  if not ALCreateProcessWithLogonW(PWideChar(String(aUserName)), // The name of the user.
+                                   nil, // The name of the domain or server whose account database contains the lpUsername account
+                                   PWideChar(String(aPassword)), // The clear-text password for the lpUsername account.
+                                   aLogonFlags, // The logon option.
+                                   nil, // The name of the module to be executed.
+                                   PWideChar(aCommandLineW), // The command line to be executed.
+                                   0, // The flags that control how the process is created.
+                                   nil, // a pointer to an environment block for the new process. If this parameter is NULL, the new process uses an environment created from the profile of the user specified by lpUsername.
+                                   PwideChar(string(aCurrentDirectory)), // The full path to the current directory for the process.
+                                   aStartupInfo, // a pointer to a STARTUPINFO or STARTUPINFOEX structure.
+                                   aProcessInformation) // A pointer to a PROCESS_INFORMATION structure that receives identification information for the new process
+  then raiseLastOsError;
+  CloseHandle(aProcessInformation.hProcess);
+  CloseHandle(aProcessInformation.hThread);
+
+end;
+
+{******************************************************************************}
+function ALWinExecAndWait(aCommandLine:AnsiString; aVisibility : integer):DWORD;
 var StartupInfo:TStartupInfoA;
     ProcessInfo:TProcessInformation;
 begin
   FillChar(StartupInfo,Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  StartupInfo.wShowWindow := Visibility;
+  StartupInfo.wShowWindow := aVisibility;
   if not CreateProcessA(nil,
-                        PAnsiChar(FileName),           { pointer to command line string }
+                        PAnsiChar(aCommandLine),       { pointer to command line string }
                         nil,                           { pointer to process security attributes}
                         nil,                           { pointer to thread security attributes }
                         false,                         { handle inheritance flag }
@@ -325,12 +375,11 @@ begin
   end;
 end;
 
-
-{**************************************************************************}
-{*  ALWinExecAndWait32V2:                                                  }
-{*  The routine will process paint messages and messages                   }
-{*  send from other threads while it waits.                                }
-Function ALWinExecAndWait32V2(FileName: AnsiString; Visibility: integer): DWORD;
+{************************************************************************}
+{*  ALWinExecAndWaitV2:                                                  }
+{*  The routine will process paint messages and messages                 }
+{*  send from other threads while it waits.                              }
+Function ALWinExecAndWaitV2(aCommandLine: AnsiString; aVisibility: integer): DWORD;
 
   {------------------------------------------}
   Procedure WaitFor( processHandle: THandle );
@@ -360,9 +409,9 @@ Begin
   FillChar(StartupInfo,Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
-  StartupInfo.wShowWindow := Visibility;
+  StartupInfo.wShowWindow := aVisibility;
   If not CreateProcessA(nil,
-                        PAnsiChar(FileName),      { pointer to command line string }
+                        PAnsiChar(aCommandLine),  { pointer to command line string }
                         nil,                      { pointer to process security attributes }
                         nil,                      { pointer to thread security attributes }
                         false,                    { handle inheritance flag }
@@ -380,58 +429,6 @@ Begin
      CloseHandle( ProcessInfo.hThread );
   End;
 End;
-
-{***************************************************}
-function ALWinExecAsUser(const aUserName: ANSIString;
-                         const aPassword: ANSIString;
-                         const aAppName: ANSIString;
-                         aCommandLine: ANSIString;
-                         aCurrentDirectory: ANSIString = ''): boolean;
-var aStartupInfo: TStartupInfoW;
-    aProcessInformation: TProcessInformation;
-    aUserNameW:    WideString;
-    aPasswordW:    WideString;
-    aAppNameW:     WideString;
-    aCommandLineW: WideString;
-begin
-
-  // clear the startup info and set count of bytes to read
-  ZeroMemory(@aStartupInfo, SizeOf(TStartupInfoW));
-  aStartupInfo.cb := SizeOf(TStartupInfoW);
-
-  // get the widestring presentation of incoming params
-  aUserNameW    := ALStringToWideString(aUserName, 65001);
-  aPasswordW    := ALStringToWideString(aPassword, 65001);
-  aAppNameW     := ALStringToWideString(aAppName, 65001);
-
-  // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682431(v=vs.85).aspx
-  // The function can modify the contents of this string. Therefore, this parameter cannot be a pointer
-  // to read-only memory (such as a const variable or a literal string). If this parameter is a
-  // constant string, the function may cause an access violation.
-  // ...
-  // Because argv[0] is the module name, C programmers typically repeat the module name as the first
-  // token in the command line.
-  aCommandLineW := aAppNameW + ' ' + ALStringToWideString(aCommandLine, 65001);
-
-  // try to create the process under specified user
-  result := ALCreateProcessWithLogonW(PWideChar(aUserNameW),
-                                      nil,
-                                      PWideChar(aPasswordW),
-                                      LOGON_WITH_PROFILE,
-                                      PWideChar(aAppNameW),
-                                      PWideChar(aCommandLineW),
-                                      0,
-                                      nil,
-                                      nil,
-                                      aStartupInfo,
-                                      aProcessInformation);
-
-  if result then begin
-    CloseHandle(aProcessInformation.hProcess);
-    CloseHandle(aProcessInformation.hThread);
-  end
-  else raise Exception.Create(SysErrorMessage(GetLastError));
-end;
 
 {*******************************************************************************************************************}
 // taken from http://www.delphi-zone.com/2010/02/how-to-use-the-adjusttokenprivileges-function-to-enable-a-privilege/

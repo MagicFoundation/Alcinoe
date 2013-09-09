@@ -209,7 +209,7 @@ type
                      ntText);  //The node represents a text content (statement, string, number, true, false, null): "..." or "name": "..."
 
   TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node !
-                      doNodeAutoIndent); // affect only the savetoStream
+                      doNodeAutoIndent); // affect only the SaveToStream
   TALJSONDocOptions = set of TALJSONDocOption;
 
   TALJSONParseOption = (poIgnoreControlCharacters); // don't decode escaped characters (like \") and not encode them also (when save / load)
@@ -474,8 +474,8 @@ Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
 implementation
 
 uses Contnrs,
-     AlFcnHTML,
-     AlFcnString;
+     AlHTML,
+     ALString;
 
 type
 

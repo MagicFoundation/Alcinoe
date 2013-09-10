@@ -43,7 +43,7 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
               {
                 _id: 1,
                 name: { first: "John", last: "Backus" },
-                birth: new Date('Dec 03, 1924'),
+                birth: new Date('1999-10-21T21:04:54.234Z'),
                 contribs: [ "Fortran", "ALGOL", "Backus-Naur Form", "FP" ],
                 awards: [
                           { award: "National Medal of Science",
@@ -82,7 +82,7 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
                 addchild('first').text := 'John';
                 addchild('last').text := 'Backus';
               end;
-              MyJsonDoc.addchild('birth').statement := 'new Date(''Dec 03, 1924'')';
+              MyJsonDoc.addchild('birth').dateTime := Now;
               with MyJsonDoc.addchild('contribs', ntArray) do begin
                 addchild.text := 'Fortran';
                 addchild.text := 'ALGOL';
@@ -171,14 +171,19 @@ uses Classes,
      AlStringList;
 
 resourcestring
-  cALJSONNotActive             = 'No active document';
-  cAlJSONNodeNotFound          = 'Node "%s" not found';
-  cALJSONInvalidNodeType       = 'Invalid node type';
-  cALJSONListCapacityError     = 'Node list capacity out of bounds (%d)';
-  cALJSONListCountError        = 'Node list count out of bounds (%d)';
-  cALJSONListIndexError        = 'Node list index out of bounds (%d)';
-  cALJSONOperationError        = 'This operation can not be performed with a node of type %s';
-  cALJSONParseError            = 'JSON Parse error';
+  cALJSONNotActive              = 'No active document';
+  cAlJSONNodeNotFound           = 'Node "%s" not found';
+  cALJSONInvalidNodeType        = 'Invalid node type';
+  cALJSONInvalidBSONNodeSubType = 'Invalid node sub type. '+
+                                  'BSON contains extensions that allow representation of data types that '+
+                                  'are not part of JSON and you need to manually set the type of each text node '+
+                                  'through the property NodeSubType of by assigning value via the property '+
+                                  'text, int, int64, float, bool, datetime, etc.) ';
+  cALJSONListCapacityError      = 'Node list capacity out of bounds (%d)';
+  cALJSONListCountError         = 'Node list count out of bounds (%d)';
+  cALJSONListIndexError         = 'Node list index out of bounds (%d)';
+  cALJSONOperationError         = 'This operation can not be performed with a node of type %s';
+  cALJSONParseError             = 'JSON Parse error';
 
 const
   cALJSONNodeMaxListSize = Maxint div 16;
@@ -207,6 +212,29 @@ type
   TALJSONNodeType = (ntObject, //The node represents an object: { ... } or "name": { ... }
                      ntArray,  //The node represents an array: [ ... ] or "name": [ ... ]
                      ntText);  //The node represents a text content (statement, string, number, true, false, null): "..." or "name": "..."
+
+  //from http://bsonspec.org/#/specification
+  TALJSONNodeSubType = (nstFloat, // \x01 | Floating point
+                        nstText, // \x02 | UTF-8 string
+                        nstObject, // \x03 | Embedded document
+                        nstArray, // \x04 | Array
+                        // \x05 | Binary data
+                        nstUndefined, // \x06 | Undefined — Deprecated
+                        // \x07 | ObjectId
+                        nstBoolean, // \x08 | Boolean "false"
+                                    // \x08 | Boolean "true"
+                        nstDateTime, // \x09 | UTC datetime
+                        nstNull, // \x0A | Null value
+                        // \x0B | Regular expression
+                        // \x0C | DBPointer — Deprecated
+                        nstJavascriptCode, // \x0D | JavaScript code
+                        // \x0E | Symbol — Deprecated
+                        // \x0F | JavaScript code w/ scope
+                        nstInt32, // \x10 | 32-bit Integer
+                        // \x11 | Timestamp
+                        nstInt64); // \x12 | 64-bit integer
+                        // \xFF | Min key
+                        // \x7F | Max key
 
   TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node !
                       doNodeAutoIndent); // affect only the SaveToStream
@@ -290,6 +318,8 @@ type
     function GetNodeName: AnsiString;
     procedure SetNodeName(const Value: AnsiString);
     function GetNodeType: TALJSONNodeType; virtual; abstract;
+    function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
+    procedure SetNodeSubType(const Value: TALJSONNodeSubType); virtual; abstract;
     function GetNodeTypeStr: AnsiString;
     function GetNodeValue: ansiString; virtual;
     procedure SetNodeValue(const Value: AnsiString; const NeedQuotes: Boolean); virtual;
@@ -298,6 +328,8 @@ type
     procedure SetText(const Value: AnsiString);
     function GetFloat: Double;
     procedure SetFloat(const Value: Double);
+    function GetDateTime: TDateTime;
+    procedure SetDateTime(const Value: TDateTime);
     function GetInt: Integer;
     procedure SetInt(const Value: Integer);
     function GetInt64: Int64;
@@ -314,6 +346,8 @@ type
     procedure SetParentNode(const Value: TALJSONNode);
     function GetJSON: AnsiString;
     procedure SetJSON(const Value: AnsiString);
+    function GetBSON: AnsiString;
+    procedure SetBSON(const Value: AnsiString);
     function NestingLevel: Integer;
   public
     constructor Create(const NodeName: AnsiString); virtual;
@@ -321,26 +355,29 @@ type
     function AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function NextSibling: TALJSONNode;
     function PreviousSibling: TALJSONNode;
-    procedure SaveToStream(const Stream: TStream);
-    procedure SaveToFile(const AFileName: AnsiString);
+    procedure SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
+    procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure SaveToJSON(var JSON: AnsiString);
-    procedure LoadFromFile(const AFileName: AnsiString);
-    procedure LoadFromStream(const Stream: TStream);
+    procedure LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False);
+    procedure LoadFromStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure LoadFromJSON(const JSON: AnsiString);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read GetNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
+    property NodeSubType: TALJSONNodeSubType read GetNodeSubType write SetNodeSubType;
     property OwnerDocument: TALJSONDocument read GetOwnerDocument Write SetOwnerDocument;
     property ParentNode: TALJSONNode read GetParentNode;
     property Text: AnsiString read GetText write SetText;
     property int: integer read GetInt write SetInt;
     property int64: int64 read Getint64 write Setint64;
     property Float: Double read GetFloat write SetFloat;
+    property DateTime: TDateTime read GetDateTime write SetDateTime;
     property Bool: Boolean read GetBool write SetBool;
     property Null: Boolean read GetNull write SetNull;
     property Statement: AnsiString read GetStatement write SetStatement;
     property JSON: AnsiString read GetJSON write SetJSON;
+    property BSON: AnsiString read GetBSON write SetBSON;
   end;
 
   //JSON object represents {} or { members }
@@ -349,6 +386,8 @@ type
     FChildNodes: TALJSONNodeList;
   protected
     function GetNodeType: TALJSONNodeType; override;
+    function GetNodeSubType: TALJSONNodeSubType; override;
+    procedure SetNodeSubType(const Value: TALJSONNodeSubType); override;
     function InternalGetChildNodes: TALJSONNodeList; override;
     function GetChildNodes: TALJSONNodeList; override;
     procedure SetChildNodes(const Value: TALJSONNodeList); override;
@@ -363,6 +402,8 @@ type
     FChildNodes: TALJSONNodeList;
   protected
     function GetNodeType: TALJSONNodeType; override;
+    function GetNodeSubType: TALJSONNodeSubType; override;
+    procedure SetNodeSubType(const Value: TALJSONNodeSubType); override;
     function InternalGetChildNodes: TALJSONNodeList; override;
     function GetChildNodes: TALJSONNodeList; override;
     procedure SetChildNodes(const Value: TALJSONNodeList); override;
@@ -374,10 +415,13 @@ type
   {Groups statement, string, number, true, false, null}
   TALJSONTextNode = Class(TALJSONNode)
   private
+    fNodeSubType: TALJSONNodeSubType;
     fNodeValue: AnsiString;
     fNodeValueNeedQuotes: Boolean;
   protected
     function GetNodeType: TALJSONNodeType; override;
+    function GetNodeSubType: TALJSONNodeSubType; override;
+    procedure SetNodeSubType(const Value: TALJSONNodeSubType); override;
     function GetNodeValue: ansiString; override;
     procedure SetNodeValue(const Value: AnsiString; const NeedQuotes: Boolean); override;
     function GetNodeValueNeedQuotes: Boolean; override;
@@ -423,9 +467,11 @@ type
     function GetPathSeparator: AnsiString;
     procedure SetPathSeparator(const Value: AnsiString);
     function  GetJSON: AnsiString;
+    function  GetBSON: AnsiString;
     procedure SetOptions(const Value: TALJSONDocOptions);
     procedure SetParseOptions(const Value: TALJSONParseOptions);
     procedure SetJSON(const Value: ansiString);
+    procedure SetBSON(const Value: ansiString);
     procedure SetNodeIndentStr(const Value: AnsiString);
   public
     constructor Create(const aActive: Boolean = True); virtual;
@@ -433,12 +479,12 @@ type
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
     function IsEmptyDoc: Boolean;
-    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False);
-    procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False);
+    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False);
+    procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False);
     procedure LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False);
-    procedure LoadFromBSON(const BSON: AnsiString);
-    procedure SaveToFile(const AFileName: AnsiString = '');
-    procedure SaveToStream(const Stream: TStream);
+    procedure LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False);
+    procedure SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
+    procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure SaveToJSON(var JSON: AnsiString);
     procedure SaveToBSON(var BSON: AnsiString);
     property ChildNodes: TALJSONNodeList read GetChildNodes;
@@ -449,6 +495,7 @@ type
     property ParseOptions: TALJSONParseOptions read GetParseOptions write SetParseOptions;
     property PathSeparator: AnsiString read GetPathSeparator write SetPathSeparator;
     property JSON: AnsiString read GetJSON write SetJSON;
+    property BSON: AnsiString read GetBSON write SetBSON;
     property OnParseStartDocument: TAlJSONParseDocument read fOnParseStartDocument write fOnParseStartDocument;
     property OnParseEndDocument: TAlJSONParseDocument read fOnParseEndDocument write fOnParseEndDocument;
     property onParseText: TAlJSONParseTextEvent read fonParseText write fonParseText;
@@ -474,6 +521,7 @@ Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
 implementation
 
 uses Contnrs,
+     DateUtils,
      AlHTML,
      ALString;
 
@@ -498,14 +546,6 @@ type
     procedure   ParseEList;
     procedure   ParseDocument(aContainerNode: TALJSONNode);
     constructor Create(aStream: TStream; aDocumentNode: TALJSONNode); virtual;
-  end;
-
-  {----------------------------}
-  TALBSONWriter = class(TObject)
-  private
-  protected
-  public
-    function ParseObject(const aContainerNode: TALJSONNode; const aArrayLength: integer = 0): AnsiString;
   end;
 
 {****************************************************}
@@ -1372,12 +1412,12 @@ end;
  *AFileName is the name of the JSON document to load from disk. If AFileName is an empty string, TALJSONDocument uses the value of the
   FileName property. If AFileName is not an empty string, TALJSONDocument changes the FileName property to AFileName.
  Once you have loaded an JSON document, any changes you make to the document are not saved back to disk until you call the SaveToFile method.}
-procedure TALJSONDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False);
+procedure TALJSONDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False);
 var FileStream: TFileStream;
 begin
   FileStream := TFileStream.Create(string(aFileName), fmOpenRead or fmShareDenyWrite);
   try
-    LoadFromStream(FileStream, saxMode);
+    LoadFromStream(FileStream, saxMode, BSONFile);
   finally
     FileStream.Free;
   end;
@@ -1388,14 +1428,15 @@ end;
  Call LoadFromStream to load the JSON document from a stream.
  *Stream is a stream object that can be used to read the string of JSON that makes up the document.
  After loading the document from Stream, LoadFromStream sets the Active property to true.}
-procedure TALJSONDocument.LoadFromStream(const Stream: TStream; const saxMode: Boolean = False);
+procedure TALJSONDocument.LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False);
 begin
   if saxMode then SetActive(False)
   else begin
     releaseDoc;
     SetActive(True);
   end;
-  InternalParseJSON(Stream, FDocumentNode);
+  if BSONStream then InternalParseBSON(Stream, FDocumentNode)
+  else InternalParseJSON(Stream, FDocumentNode);
 end;
 
 {*****************************************************************}
@@ -1409,21 +1450,19 @@ var StringStream: TALStringStream;
 begin
   StringStream := TALStringStream.Create(JSON);
   try
-    LoadFromStream(StringStream, saxMode);
+    LoadFromStream(StringStream, saxMode, False {BSONStream});
   finally
     StringStream.Free;
   end;
 end;
 
-{*************************************************************}
-procedure TALJSONDocument.LoadFromBSON(const BSON: AnsiString);
+{*********************************************************************************************}
+procedure TALJSONDocument.LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False);
 var StringStream: TALStringStream;
 begin
   StringStream := TALStringStream.Create(BSON);
   try
-    releaseDoc;
-    SetActive(True);
-    InternalParseBSON(StringStream, FDocumentNode);
+    LoadFromStream(StringStream, saxMode, True {BSONStream});
   finally
     StringStream.Free;
   end;
@@ -1432,13 +1471,13 @@ end;
 {******************************}
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
- AFileName is the name of the file to save. If AFileName is an empty string, TJSONDocument uses the value of the FileName property.}
-procedure TALJSONDocument.SaveToFile(const AFileName: AnsiString = '');
+ AFileName is the name of the file to save.}
+procedure TALJSONDocument.SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
 Var afileStream: TfileStream;
 begin
   aFileStream := TfileStream.Create(String(AFileName),fmCreate);
   Try
-    SaveToStream(aFileStream);
+    SaveToStream(aFileStream, BSONFile);
   finally
     aFileStream.Free;
   end;
@@ -1454,7 +1493,7 @@ Var StringStream: TALStringStream;
 begin
   StringStream := TALstringStream.Create('');
   Try
-    SaveToStream(StringStream);
+    SaveToStream(StringStream, False {BSONStream});
     JSON := StringStream.DataString;
   finally
     StringStream.Free;
@@ -1469,25 +1508,24 @@ end;
  Format BSON is mostly using for the purposes of
  MongoDB interconnection.}
 procedure TALJSONDocument.SaveToBSON(var BSON: AnsiString);
-Var aBSONWriter: TALBSONWriter;
+Var StringStream: TALStringStream;
 begin
-  CheckActive;
-
-  aBSONWriter := TALBSONWriter.Create;
-  try
-    BSON := aBSONWriter.ParseObject(FDocumentNode);
+  StringStream := TALstringStream.Create('');
+  Try
+    SaveToStream(StringStream, True {BSONStream});
+    BSON := StringStream.DataString;
   finally
-    aBSONWriter.Free;
+    StringStream.Free;
   end;
 end;
 
 {**********************************}
 {Saves the JSON document to a stream.
  Call SaveToStream to save the contents of the JSON document to the stream specified by Stream.}
-procedure TALJSONDocument.SaveToStream(const Stream: TStream);
+procedure TALJSONDocument.SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
 begin
   CheckActive;
-  node.SaveToStream(Stream);
+  node.SaveToStream(Stream, BSONStream);
 end;
 
 {*************************************}
@@ -1498,6 +1536,14 @@ begin
   SaveToJSON(Result);
 end;
 
+{*************************************}
+{Returns the value of the BSON property.
+ GetBSON is the read implementation of the BSON property.}
+function TALJSONDocument.GetBSON: AnsiString;
+begin
+  SaveToBSON(Result);
+end;
+
 {**********************************}
 {Sets the value of the JSON property.
  SetJSON is the write implementation of the JSON property.
@@ -1505,6 +1551,15 @@ end;
 procedure TALJSONDocument.SetJSON(const Value: AnsiString);
 begin
  LoadFromJSON(JSON, False);
+end;
+
+{**********************************}
+{Sets the value of the BSON property.
+ SetBSON is the write implementation of the BSON property.
+ *Value contains the raw (unparsed) BSON to assign.}
+procedure TALJSONDocument.SetBSON(const Value: AnsiString);
+begin
+ LoadFromBSON(JSON, False);
 end;
 
 {***********************************}
@@ -1750,7 +1805,8 @@ end;
 {Sets the text value of the node.}
 procedure TALJSONNode.SetText(const Value: AnsiString);
 begin
-  setNodeValue(Value, True{QuotedValue});
+  setNodeValue(Value, True{NeedQuotes});
+  NodeSubType := nstText;
 end;
 
 {************************************}
@@ -1762,7 +1818,47 @@ end;
 {**************************************************}
 procedure TALJSONNode.SetFloat(const Value: Double);
 begin
-  setNodeValue(ALFloatToStr(Value, ALDefaultFormatSettings), False{QuotedValue});
+  setNodeValue(ALFloatToStr(Value, ALDefaultFormatSettings), False{NeedQuotes});
+  NodeSubType := nstFloat;
+end;
+
+{******************************************}
+function TALJSONNode.GetDateTime: TDateTime;
+var aFormatSettings: TALFormatSettings;
+    aDateStr: AnsiString;
+begin
+  aFormatSettings := ALDefaultFormatSettings;
+  aFormatSettings.DateSeparator := '-';
+  aFormatSettings.TimeSeparator := ':';
+  aFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
+  aFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
+  aDateStr := AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(GetNodeValue,
+                                                                                                              '''',
+                                                                                                              '',
+                                                                                                              [rfReplaceALL]),
+                                                                                              '"',
+                                                                                              '',
+                                                                                              [rfReplaceALL]),
+                                                                              'new Date(',
+                                                                              '',
+                                                                              []),
+                                                              'T',
+                                                              ' ',
+                                                              []),
+                                              'Z',
+                                              '',
+                                              []),
+                              ')',
+                              '',
+                              []);
+  Result := ALStrToDateTime(aDateStr, aFormatSettings);
+end;
+
+{********************************************************}
+procedure TALJSONNode.SetDateTime(const Value: TDateTime);
+begin
+  setNodeValue(ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', Value, ALDefaultFormatSettings), False{NeedQuotes});
+  NodeSubType := nstDateTime;
 end;
 
 {***********************************}
@@ -1774,7 +1870,8 @@ end;
 {*************************************************}
 procedure TALJSONNode.SetInt(const Value: Integer);
 begin
-  setNodeValue(ALIntToStr(Value), False{QuotedValue});
+  setNodeValue(ALIntToStr(Value), False{NeedQuotes});
+  NodeSubType := nstInt32;
 end;
 
 {***********************************}
@@ -1786,7 +1883,8 @@ end;
 {*************************************************}
 procedure TALJSONNode.SetInt64(const Value: Int64);
 begin
-  setNodeValue(ALIntToStr(Value), False{QuotedValue});
+  setNodeValue(ALIntToStr(Value), False{NeedQuotes});
+  NodeSubType := nstInt64;
 end;
 
 {************************************}
@@ -1798,8 +1896,9 @@ end;
 {**************************************************}
 procedure TALJSONNode.SetBool(const Value: Boolean);
 begin
-  if Value then setNodeValue('true', False{QuotedValue})
-  else setNodeValue('false', False{QuotedValue})
+  if Value then setNodeValue('true', False{NeedQuotes})
+  else setNodeValue('false', False{NeedQuotes});
+  NodeSubType := nstBoolean;
 end;
 
 {************************************}
@@ -1812,8 +1911,9 @@ end;
 {**************************************************}
 procedure TALJSONNode.SetNull(const Value: Boolean);
 begin
-  if Value then setNodeValue('null', False{QuotedValue})
+  if Value then setNodeValue('null', False{NeedQuotes})
   else ALJSONDocError('Only "true" is allowed for setNull property');
+  NodeSubType := nstNull;
 end;
 
 {********************************************}
@@ -1825,7 +1925,8 @@ end;
 {**********************************************************}
 procedure TALJSONNode.SetStatement(const Value: AnsiString);
 begin
-  setNodeValue(Value, False{QuotedValue});
+  setNodeValue(Value, False{NeedQuotes});
+  NodeSubType := nstJavascriptCode;
 end;
 
 {*******************************************************}
@@ -1871,7 +1972,7 @@ Var aStringStream: TALStringStream;
 begin
   aStringStream := TALStringStream.Create('');
   Try
-    SaveToStream(aStringStream);
+    SaveToStream(aStringStream, false {BSONStream});
     result := aStringStream.DataString;
   finally
     aStringStream.Free;
@@ -1885,7 +1986,35 @@ Var aStringStream: TALStringStream;
 Begin
   aStringStream := TALStringStream.Create(Value);
   Try
-    LoadFromStream(aStringStream);
+    LoadFromStream(aStringStream, False {BSONStream});
+  finally
+    aStringStream.Free;
+  end;
+end;
+
+{*******************************************************************}
+{Returns the BSON that corresponds to the subtree rooted at this node.
+ GetBSON returns the BSON that corresponds to this node and any child nodes it contains.}
+function TALJSONNode.GetBSON: AnsiString;
+Var aStringStream: TALStringStream;
+begin
+  aStringStream := TALStringStream.Create('');
+  Try
+    SaveToStream(aStringStream, True {BSONStream});
+    result := aStringStream.DataString;
+  finally
+    aStringStream.Free;
+  end;
+end;
+
+{************************************************}
+{SetBSON reload the node with the new given value }
+procedure TALJSONNode.SetBSON(const Value: AnsiString);
+Var aStringStream: TALStringStream;
+Begin
+  aStringStream := TALStringStream.Create(Value);
+  Try
+    LoadFromStream(aStringStream, True {BSONStream});
   finally
     aStringStream.Free;
   end;
@@ -1953,246 +2082,551 @@ end;
 
 {******************************************************************************}
 {Returns the JSON that corresponds to this node and any child nodes it contains.}
-procedure TALJSONNode.SaveToStream(const Stream: TStream);
+procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
 
-Const BufferSize: integer = 32768;
-Var NodeStack: Tstack;
-    CurrentNode: TalJSONNode;
-    CurrentParentNode: TalJSONNode;
-    CurrentIndentStr: AnsiString;
-    IndentStr: AnsiString;
-    EncodeControlCharacters: Boolean;
-    AutoIndentNode: Boolean;
-    BufferString: AnsiString;
-    BufferStringPos: Integer;
-    LastWrittenChar: AnsiChar;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _SaveToJSONStream;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
-  Begin
-    If BufferLength > 0 then stream.Write(buffer[1],BufferLength);
-  end;
+  Const BufferSize: integer = 32768;
+  Var NodeStack: Tstack;
+      CurrentNode: TalJSONNode;
+      CurrentParentNode: TalJSONNode;
+      CurrentIndentStr: AnsiString;
+      IndentStr: AnsiString;
+      EncodeControlCharacters: Boolean;
+      AutoIndentNode: Boolean;
+      BufferString: AnsiString;
+      BufferStringPos: Integer;
+      LastWrittenChar: AnsiChar;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteStr2Buffer(const str:AnsiString);
-  var l: integer;
-  Begin
-    L := Length(Str);
-    if l = 0 then exit;
-    LastWrittenChar := Str[L];
-    if L >= BufferSize then WriteBuffer2Stream(str, l)
-    else begin
-      if L + BufferStringPos > length(BufferString) then setlength(BufferString, L + BufferStringPos);
-      ALMove(str[1], BufferString[BufferStringPos + 1], L);
-      BufferStringPos := BufferStringPos + L;
-      if BufferStringPos >= BufferSize then begin
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
+    Begin
+      If BufferLength > 0 then stream.Write(buffer[1],BufferLength);
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteStr2Buffer(const str:AnsiString);
+    var l: integer;
+    Begin
+      L := Length(Str);
+      if l = 0 then exit;
+      LastWrittenChar := Str[L];
+      if L >= BufferSize then begin
         WriteBuffer2Stream(BufferString,BufferStringPos);
         BufferStringPos := 0;
-      end;
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteTextNode2Stream(aTextNode:TALJSONNode);
-  Begin
-    with aTextNode do begin
-
-      if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
-
-      if AutoIndentNode then WriteStr2Buffer(#13#10 + CurrentIndentStr);
-
-      if (assigned(ParentNode)) and
-         (ParentNode.NodeType <> ntArray) then begin
-        if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":')
-        else WriteStr2Buffer('"'+NodeName+'":');
-      end;
-
-      if GetNodeValueNeedQuotes then begin
-        if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(Text)+'"')
-        else WriteStr2Buffer('"'+Text+'"');
+        WriteBuffer2Stream(str, l)
       end
-      else WriteStr2Buffer(Text);
-
+      else begin
+        if L + BufferStringPos > length(BufferString) then setlength(BufferString, L + BufferStringPos);
+        ALMove(str[1], BufferString[BufferStringPos + 1], L);
+        BufferStringPos := BufferStringPos + L;
+        if BufferStringPos >= BufferSize then begin
+          WriteBuffer2Stream(BufferString,BufferStringPos);
+          BufferStringPos := 0;
+        end;
+      end;
     end;
-  end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteStartObjectNode2Stream(aObjectNode:TALJSONNode);
-  var ANodeList: TALJSONNodeList;
-      aEmptyNode: Boolean;
-      i: integer;
-  Begin
-    with aObjectNode do begin
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteTextNode2Stream(aTextNode:TALJSONNode);
+    Begin
+      with aTextNode do begin
 
-      if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
+        if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
 
-      if AutoIndentNode and (CurrentIndentStr <> '') then WriteStr2Buffer(#13#10 + CurrentIndentStr);
+        if AutoIndentNode then WriteStr2Buffer(#13#10 + CurrentIndentStr);
 
-      if (assigned(ParentNode)) and
-         (ParentNode.NodeType <> ntArray) then begin
-        if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":{')
-        else WriteStr2Buffer('"'+NodeName+'":{');
-      end
-      else WriteStr2Buffer('{');
+        if (assigned(ParentNode)) and
+           (ParentNode.NodeType <> ntArray) then begin
+          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":')
+          else WriteStr2Buffer('"'+NodeName+'":');
+        end;
 
-      aEmptyNode := True;
-      aNodeList := InternalGetChildNodes;
-      If assigned(aNodeList) then begin
-        with aNodeList do
-          If count > 0 then begin
-            aEmptyNode := False;
-            NodeStack.Push(aObjectNode);
-            For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
-          end
+        if GetNodeValueNeedQuotes then begin
+          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(Text)+'"')
+          else WriteStr2Buffer('"'+Text+'"');
+        end
+        else WriteStr2Buffer(Text);
+
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteStartObjectNode2Stream(aObjectNode:TALJSONNode);
+    var ANodeList: TALJSONNodeList;
+        aEmptyNode: Boolean;
+        i: integer;
+    Begin
+      with aObjectNode do begin
+
+        if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
+
+        if AutoIndentNode and (CurrentIndentStr <> '') then WriteStr2Buffer(#13#10 + CurrentIndentStr);
+
+        if aObjectNode = self then WriteStr2Buffer('{')
+        else if (assigned(ParentNode)) and
+                (ParentNode.NodeType <> ntArray) then begin
+          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":{')
+          else WriteStr2Buffer('"'+NodeName+'":{');
+        end
+        else WriteStr2Buffer('{');
+
+        aEmptyNode := True;
+        aNodeList := InternalGetChildNodes;
+        If assigned(aNodeList) then begin
+          with aNodeList do
+            If count > 0 then begin
+              aEmptyNode := False;
+              NodeStack.Push(aObjectNode);
+              For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
+            end
+        end;
+
+        If aEmptyNode then WriteStr2Buffer('}')
+        else CurrentIndentStr := CurrentIndentStr + IndentStr;
+
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteEndObjectNode2Stream(aObjectNode:TALJSONNode);
+    Begin
+      if AutoIndentNode then begin
+        delete(CurrentIndentStr,length(CurrentIndentStr) - length(IndentStr)+1, maxint);
+        WriteStr2Buffer(#13#10 + CurrentIndentStr);
+      end;
+      WriteStr2Buffer('}');
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteStartArrayNode2Stream(aArrayNode:TALJSONNode);
+    var ANodeList: TALJSONNodeList;
+        aEmptyNode: Boolean;
+        i: integer;
+    Begin
+      with aArrayNode do begin
+
+        if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
+
+        if AutoIndentNode then WriteStr2Buffer(#13#10 + CurrentIndentStr);
+
+        if (assigned(ParentNode)) and
+           (ParentNode.NodeType <> ntArray) then begin
+          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":[')
+          else WriteStr2Buffer('"'+NodeName+'":[');
+        end
+        else WriteStr2Buffer('[');
+
+        aEmptyNode := True;
+        aNodeList := InternalGetChildNodes;
+        If assigned(aNodeList) then begin
+          with aNodeList do
+            If count > 0 then begin
+              aEmptyNode := False;
+              NodeStack.Push(aArrayNode);
+              For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
+            end
+        end;
+
+        If aEmptyNode then WriteStr2Buffer(']')
+        else CurrentIndentStr := CurrentIndentStr + IndentStr;
+
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteEndArrayNode2Stream(aArrayNode:TALJSONNode);
+    Begin
+      if AutoIndentNode then begin
+        delete(CurrentIndentStr,length(CurrentIndentStr) - length(IndentStr) + 1, maxint);
+        WriteStr2Buffer(#13#10 + CurrentIndentStr);
+      end;
+      WriteStr2Buffer(']');
+    end;
+
+  begin
+    If NodeType <> ntobject then exit;
+
+    CurrentParentNode := nil;
+    NodeStack := Tstack.Create;
+    Try
+
+      {init buffer string}
+      Setlength(BufferString, bufferSize);
+      BufferStringPos := 0;
+      LastWrittenChar := '{';
+      EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
+      AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
+      IndentStr := FDocument.NodeIndentStr;
+      CurrentIndentStr := '';
+
+      {SaveOnlyChildNode}
+      NodeStack.Push(self);
+
+      {loop on all nodes}
+      While NodeStack.Count > 0 Do begin
+        CurrentNode := TAlJSONNode(NodeStack.Pop);
+
+        with CurrentNode do
+          case NodeType of
+            ntObject: begin
+                        if currentNode = CurrentParentNode then WriteEndObjectNode2Stream(CurrentNode)
+                        else WriteStartObjectNode2Stream(CurrentNode);
+                      end;
+            ntArray: begin
+                        if currentNode = CurrentParentNode then WriteEndArrayNode2Stream(CurrentNode)
+                        else WriteStartArrayNode2Stream(CurrentNode);
+                     end;
+            ntText: WriteTextNode2Stream(CurrentNode);
+            else AlJSONDocError(cAlJSONInvalidNodeType);
+          end;
+
+        CurrentParentNode := CurrentNode.ParentNode;
       end;
 
-      If aEmptyNode then WriteStr2Buffer('}')
-      else CurrentIndentStr := CurrentIndentStr + IndentStr;
+      {Write the buffer}
+      WriteBuffer2Stream(BufferString, BufferStringPos);
 
+    finally
+      NodeStack.Free;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteEndObjectNode2Stream(aObjectNode:TALJSONNode);
-  Begin
-    if AutoIndentNode then begin
-      delete(CurrentIndentStr,length(CurrentIndentStr) - length(IndentStr)+1, maxint);
-      WriteStr2Buffer(#13#10 + CurrentIndentStr);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _SaveToBSONStream;
+
+  Const BufferSize: integer = 32768;
+  Var NodeStack: Tstack;
+      NodeIndexStack: Tstack;
+      NodeStartPosStack: Tstack;
+      CurrentNode: TalJSONNode;
+      CurrentParentNode: TalJSONNode;
+      CurrentNodeIndex: integer;
+      CurrentNodeStartPos: System.int64;
+      BufferString: AnsiString;
+      BufferStringPos: Integer;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
+    Begin
+      If BufferLength > 0 then stream.Write(buffer[1],BufferLength);
     end;
-    WriteStr2Buffer('}');
-  end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteStartArrayNode2Stream(aArrayNode:TALJSONNode);
-  var ANodeList: TALJSONNodeList;
-      aEmptyNode: Boolean;
-      i: integer;
-  Begin
-    with aArrayNode do begin
-
-      if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
-
-      if AutoIndentNode then WriteStr2Buffer(#13#10 + CurrentIndentStr);
-
-      if (assigned(ParentNode)) and
-         (ParentNode.NodeType <> ntArray) then begin
-        if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":[')
-        else WriteStr2Buffer('"'+NodeName+'":[');
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteStr2Buffer(const str:AnsiString);
+    var l: integer;
+    Begin
+      L := Length(Str);
+      if l = 0 then exit;
+      if L >= BufferSize then begin
+        WriteBuffer2Stream(BufferString,BufferStringPos);
+        BufferStringPos := 0;
+        WriteBuffer2Stream(str, l);
       end
-      else WriteStr2Buffer('[');
+      else begin
+        if L + BufferStringPos > length(BufferString) then setlength(BufferString, L + BufferStringPos);
+        ALMove(str[1], BufferString[BufferStringPos + 1], L);
+        BufferStringPos := BufferStringPos + L;
+        if BufferStringPos >= BufferSize then begin
+          WriteBuffer2Stream(BufferString,BufferStringPos);
+          BufferStringPos := 0;
+        end;
+      end;
+    end;
 
-      aEmptyNode := True;
-      aNodeList := InternalGetChildNodes;
-      If assigned(aNodeList) then begin
-        with aNodeList do
-          If count > 0 then begin
-            aEmptyNode := False;
-            NodeStack.Push(aArrayNode);
-            For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
-          end
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteInt2Pos(const aInt:integer; const aPos: system.Int64);
+    var aTmpPos: System.int64;
+    Begin
+      if aPos < Stream.position then begin
+        aTmpPos := Stream.position;
+        Stream.position := aPos;
+        stream.Write(aInt,sizeof(aInt));
+        Stream.position := aTmpPos;
+      end
+      else ALMove(aInt, BufferString[aPos - Stream.position + 1], sizeOf(aInt));
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteTextNode2Stream(aTextNode:TALJSONNode; aNodeIndex: integer);
+    var aBinStr: AnsiString;
+        aNodeName: AnsiString;
+        aDouble: Double;
+        aInt32: Integer;
+        aInt64: system.Int64;
+    Begin
+      with aTextNode do begin
+
+        // calculate the aNodeName
+        if (assigned(ParentNode)) and
+           (ParentNode.NodeType = ntArray) then aNodeName := ALInttostr(aNodeIndex)
+        else aNodeName := NodeName;
+
+        // add the nodevalue to the buffer
+        case NodeSubType of
+
+          // \x01 + name + \x00 + double
+          nstFloat: begin
+                      aDouble := Float;
+                      setlength(aBinStr,sizeOf(aDouble));
+                      ALMove(aDouble, aBinStr[1], sizeOf(aDouble));
+                      WriteStr2Buffer(#$01 + aNodeName + #$00 + aBinStr);
+                    end;
+
+          // \x02 + name + \x00 + length (int32) + string + \x00
+          nstText: begin
+                      aInt32 := length(text) + 1 {for the trailing #0};
+                      setlength(aBinStr,sizeOf(aInt32));
+                      ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
+                      WriteStr2Buffer(#$02 + aNodeName + #$00 + aBinStr + text + #$00);
+                   end;
+
+          // Deprecated
+          nstUndefined: begin
+                          AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+                        end;
+
+          // \x08 + name + \x00 + \x00 => Boolean "false"
+          // \x08 + name + \x00 + \x01	=> Boolean "true"
+          nstBoolean: begin
+                        if not bool then WriteStr2Buffer(#$08 + aNodeName + #$00 + #$00)
+                        else WriteStr2Buffer(#$08 + aNodeName + #$00 + #$01);
+                      end;
+
+          // \x09 + name + \x00 + int64
+          nstDateTime: begin
+                         aInt64 := DateTimeToUnix(DateTime);
+                         setlength(aBinStr,sizeOf(aInt64));
+                         ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
+                         WriteStr2Buffer(#$09 + aNodeName + #$00 + aBinStr);
+                       end;
+
+          // \x0A + name + \x00
+          nstNull: begin
+                     WriteStr2Buffer(#$0A + aNodeName + #$00);
+                   end;
+
+          // \x0D + name + \x00 + length (int32) + string + \x00
+          nstJavascriptCode: begin
+                               aInt32 := length(text) + 1 {for the trailing #0};
+                               setlength(aBinStr,sizeOf(aInt32));
+                               ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
+                               WriteStr2Buffer(#$0D + aNodeName + #$00 + aBinStr + text + #$00);
+                             end;
+
+          // \x10 + name + \x00 + int32
+          nstInt32: begin
+                      aInt32 := int;
+                      setlength(aBinStr,sizeOf(aInt32));
+                      ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
+                      WriteStr2Buffer(#$10 + aNodeName + #$00 + aBinStr);
+                    end;
+
+          // \x12 + name + \x00 + int64
+          nstInt64: begin
+                      aInt64 := int;
+                      setlength(aBinStr,sizeOf(aInt64));
+                      ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
+                      WriteStr2Buffer(#$12 + aNodeName + #$00 + aBinStr);
+                    end
+
+          else AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+
+        end;
+
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteStartObjectNode2Stream(aObjectNode:TALJSONNode; aNodeIndex: integer);
+    var ANodeList: TALJSONNodeList;
+        aEmptyNode: Boolean;
+        aPos: system.int64;
+        i: integer;
+    Begin
+      with aObjectNode do begin
+
+        if aObjectNode = self then WriteStr2Buffer(#$00+#$00+#$00+#$00)
+        else if (assigned(ParentNode)) and
+                (ParentNode.NodeType = ntArray) then WriteStr2Buffer(#$03 + ALInttostr(aNodeIndex) + #$00 + #$00+#$00+#$00+#$00)
+        else WriteStr2Buffer(#$03 + NodeName + #$00 + #$00+#$00+#$00+#$00);
+
+        aPos := Stream.Position + BufferStringPos - 4{length of the #$00+#$00+#$00+#$00};
+
+        aEmptyNode := True;
+        aNodeList := InternalGetChildNodes;
+        If assigned(aNodeList) then begin
+          with aNodeList do
+            If count > 0 then begin
+              aEmptyNode := False;
+              NodeStack.Push(aObjectNode);
+              NodeIndexStack.Push(pointer(aNodeIndex));
+              NodeStartPosStack.Push(pointer(aPos));
+              For i := Count - 1 downto 0 do begin
+                NodeStack.Push(Nodes[i]);
+                NodeIndexStack.Push(pointer(i));
+                NodeStartPosStack.Push(pointer(-1));
+              end;
+            end
+        end;
+
+        If aEmptyNode then begin
+          WriteStr2Buffer(#$00);
+          WriteInt2Pos(5{length of the object},aPos);
+        end;
+
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteEndObjectNode2Stream(aObjectNode:TALJSONNode; aNodeStartPos: system.Int64);
+    Begin
+      WriteStr2Buffer(#$00);
+      WriteInt2Pos(Stream.Position + BufferStringPos - aNodeStartPos, aNodeStartPos);
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteStartArrayNode2Stream(aArrayNode:TALJSONNode; aNodeIndex: integer);
+    var ANodeList: TALJSONNodeList;
+        aEmptyNode: Boolean;
+        aPos: system.int64;
+        i: integer;
+    Begin
+      with aArrayNode do begin
+
+        if (assigned(ParentNode)) and
+           (ParentNode.NodeType = ntArray) then WriteStr2Buffer(#$04 + ALInttostr(aNodeIndex) + #$00 + #$00+#$00+#$00+#$00)
+        else WriteStr2Buffer(#$04 + NodeName + #$00 + #$00+#$00+#$00+#$00);
+
+        aPos := Stream.Position + BufferStringPos - 4{length of the #$00+#$00+#$00+#$00};
+
+        aEmptyNode := True;
+        aNodeList := InternalGetChildNodes;
+        If assigned(aNodeList) then begin
+          with aNodeList do
+            If count > 0 then begin
+              aEmptyNode := False;
+              NodeStack.Push(aArrayNode);
+              NodeIndexStack.Push(pointer(aNodeIndex));
+              NodeStartPosStack.Push(pointer(aPos));
+              For i := Count - 1 downto 0 do begin
+                NodeStack.Push(Nodes[i]);
+                NodeIndexStack.Push(pointer(i));
+                NodeStartPosStack.Push(pointer(-1));
+              end;
+            end
+        end;
+
+        If aEmptyNode then begin
+          WriteStr2Buffer(#$00);
+          WriteInt2Pos(5{length of the object},aPos);
+        end;
+
+      end;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    Procedure WriteEndArrayNode2Stream(aArrayNode:TALJSONNode; aNodeStartPos: system.Int64);
+    Begin
+      WriteStr2Buffer(#$00);
+      WriteInt2Pos(Stream.Position + BufferStringPos - aNodeStartPos, aNodeStartPos);
+    end;
+
+  begin
+    If NodeType <> ntobject then exit;
+
+    CurrentParentNode := nil;
+    NodeStack := Tstack.Create;
+    NodeIndexStack := Tstack.Create;
+    NodeStartPosStack := Tstack.Create;
+    Try
+
+      {init buffer string}
+      Setlength(BufferString, bufferSize);
+      BufferStringPos := 0;
+
+      {SaveOnlyChildNode}
+      NodeStack.Push(self);
+      NodeIndexStack.Push(pointer(0));
+      NodeStartPosStack.Push(pointer(Stream.Position));
+
+
+      {loop on all nodes}
+      While NodeStack.Count > 0 Do begin
+        CurrentNode := TAlJSONNode(NodeStack.Pop);
+        CurrentNodeIndex := integer(NodeIndexStack.Pop);
+        CurrentNodeStartPos := system.int64(NodeStartPosStack.Pop);
+
+        with CurrentNode do
+          case NodeType of
+            ntObject: begin
+                        if currentNode = CurrentParentNode then WriteEndObjectNode2Stream(CurrentNode, CurrentNodeStartPos)
+                        else WriteStartObjectNode2Stream(CurrentNode, CurrentNodeIndex);
+                      end;
+            ntArray: begin
+                        if currentNode = CurrentParentNode then WriteEndArrayNode2Stream(CurrentNode, CurrentNodeStartPos)
+                        else WriteStartArrayNode2Stream(CurrentNode, CurrentNodeIndex);
+                     end;
+            ntText: WriteTextNode2Stream(CurrentNode, CurrentNodeIndex);
+            else AlJSONDocError(cAlJSONInvalidNodeType);
+          end;
+
+        CurrentParentNode := CurrentNode.ParentNode;
       end;
 
-      If aEmptyNode then WriteStr2Buffer(']')
-      else CurrentIndentStr := CurrentIndentStr + IndentStr;
+      {Write the buffer}
+      WriteBuffer2Stream(BufferString, BufferStringPos);
 
+    finally
+      NodeStack.Free;
+      NodeIndexStack.Free;
+      NodeStartPosStack.Free;
     end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Procedure WriteEndArrayNode2Stream(aArrayNode:TALJSONNode);
-  Begin
-    if AutoIndentNode then begin
-      delete(CurrentIndentStr,length(CurrentIndentStr) - length(IndentStr) + 1, maxint);
-      WriteStr2Buffer(#13#10 + CurrentIndentStr);
-    end;
-    WriteStr2Buffer(']');
   end;
 
 begin
-  If NodeType <> ntobject then exit;
-
-  CurrentParentNode := nil;
-  NodeStack := Tstack.Create;
-  Try
-
-    {init buffer string}
-    Setlength(BufferString, bufferSize);
-    BufferStringPos := 0;
-    LastWrittenChar := '{';
-    EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
-    AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
-    IndentStr := FDocument.NodeIndentStr;
-    CurrentIndentStr := '';
-
-    {SaveOnlyChildNode}
-    NodeStack.Push(self);
-
-    {loop on all nodes}
-    While NodeStack.Count > 0 Do begin
-      CurrentNode := TAlJSONNode(NodeStack.Pop);
-
-      with CurrentNode do
-        case NodeType of
-          ntObject: begin
-                      if currentNode = CurrentParentNode then WriteEndObjectNode2Stream(CurrentNode)
-                      else WriteStartObjectNode2Stream(CurrentNode);
-                    end;
-          ntArray: begin
-                      if currentNode = CurrentParentNode then WriteEndArrayNode2Stream(CurrentNode)
-                      else WriteStartArrayNode2Stream(CurrentNode);
-                   end;
-          ntText: WriteTextNode2Stream(CurrentNode);
-          else AlJSONDocError(cAlJSONInvalidNodeType);
-        end;
-
-      CurrentParentNode := CurrentNode.ParentNode;
-    end;
-
-    {Write the buffer}
-    WriteBuffer2Stream(BufferString, BufferStringPos);
-
-  finally
-    NodeStack.Free;
-  end;
+  if BSONStream then _SaveToBSONStream
+  else _SaveToJSONStream;
 end;
 
-{**********************************************************}
-procedure TALJSONNode.LoadFromStream(const Stream: TStream);
+{*********************************************************************************************}
+procedure TALJSONNode.LoadFromStream(const Stream: TStream; const BSONStream: boolean = False);
 Begin
   If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   ChildNodes.Clear;
   Try
-    FDocument.InternalParseJSON(Stream, self);
+    if BSONStream then FDocument.InternalParseBSON(Stream, self)
+    else FDocument.InternalParseJSON(Stream, self);
   except
     ChildNodes.Clear;
     raise;
   end;
 end;
 
-{************************************************************}
-procedure TALJSONNode.SaveToFile(const AFileName: AnsiString);
+{*********************************************************************************************}
+procedure TALJSONNode.SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
 Var afileStream: TfileStream;
 begin
   aFileStream := TfileStream.Create(String(AFileName),fmCreate);
   Try
-    SaveToStream(aFileStream);
+    SaveToStream(aFileStream, BSONFile);
   finally
     aFileStream.Free;
   end;
 end;
 
-{**************************************************************}
-procedure TALJSONNode.LoadFromFile(const AFileName: AnsiString);
+{***********************************************************************************************}
+procedure TALJSONNode.LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False);
 Var afileStream: TfileStream;
 Begin
   aFileStream := TfileStream.Create(string(AFileName), fmOpenRead or fmShareDenyWrite);
   Try
-    LoadFromStream(aFileStream);
+    LoadFromStream(aFileStream, BSONFile);
   finally
     aFileStream.Free;
   end;
 end;
-
 
 {*****************************************************}
 procedure TALJSONNode.SaveToJSON(var JSON: AnsiString);
@@ -2200,7 +2634,7 @@ Var aStringStream: TALStringStream;
 begin
   aStringStream := TALStringStream.Create('');
   Try
-    SaveToStream(aStringStream);
+    SaveToStream(aStringStream, false {BSONStream});
     JSON := aStringStream.DataString;
   finally
     aStringStream.Free;
@@ -2213,7 +2647,7 @@ Var aStringStream: TALStringStream;
 Begin
   aStringStream := TALStringStream.Create(JSON);
   Try
-    LoadFromStream(aStringStream);
+    LoadFromStream(aStringStream, False {BSONStream});
   finally
     aStringStream.Free;
   end;
@@ -2251,6 +2685,18 @@ end;
 function TALJSONObjectNode.GetNodeType: TALJSONNodeType;
 begin
   Result := NtObject;
+end;
+
+{************************************************************}
+function TALJSONObjectNode.GetNodeSubType: TALJSONNodeSubType;
+begin
+  Result := NstObject;
+end;
+
+{**************************************************************************}
+procedure TALJSONObjectNode.SetNodeSubType(const Value: TALJSONNodeSubType);
+begin
+  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
 end;
 
 {********************************************}
@@ -2294,6 +2740,18 @@ begin
   Result := NtArray;
 end;
 
+{***********************************************************}
+function TALJSONArrayNode.GetNodeSubType: TALJSONNodeSubType;
+begin
+  Result := NstArray;
+end;
+
+{*************************************************************************}
+procedure TALJSONArrayNode.SetNodeSubType(const Value: TALJSONNodeSubType);
+begin
+  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
+end;
+
 {********************************************}
 {Get Childnode without create it if not exist}
 function TALJSONArrayNode.InternalGetChildNodes: TALJSONNodeList;
@@ -2305,6 +2763,7 @@ end;
 constructor TALJSONTextNode.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
+  fNodeSubType := nstUndefined;
   fNodeValue := '';
   fNodeValueNeedQuotes := true;
 end;
@@ -2313,6 +2772,19 @@ end;
 function TALJSONTextNode.GetNodeType: TALJSONNodeType;
 begin
   Result := NtText;
+end;
+
+{**********************************************************}
+function TALJSONTextNode.GetNodeSubType: TALJSONNodeSubType;
+begin
+  Result := fNodeSubType;
+end;
+
+{************************************************************************}
+procedure TALJSONTextNode.SetNodeSubType(const Value: TALJSONNodeSubType);
+begin
+  if Value in [nstObject, nstArray] then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  fNodeSubType := Value;
 end;
 
 {************************************************}
@@ -2324,6 +2796,7 @@ end;
 {*****************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: AnsiString; const NeedQuotes: Boolean);
 begin
+  fNodeSubType := nstUndefined;
   fNodeValue := Value;
   fNodeValueNeedQuotes := NeedQuotes;
 end;
@@ -3077,155 +3550,6 @@ begin
   if aLengthOfDocument > 5 then ParseEList;
   aFinalPosition := FStream.Position;
   if aFinalPosition - aInitialPosition <> aLengthOfDocument then raise EALJSONDocError.Create('Incorrect length of document, ' + IntToStr(aLengthOfDocument) + ' expected');
-end;
-
-{********************************************************************}
-function TALBSONWriter.ParseObject(const aContainerNode: TALJSONNode;
-                                   const aArrayLength: integer = 0): AnsiString;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _clearStream(aStream: TStream);
-  begin
-    aStream.Position := 0;
-    aStream.Size     := 0;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~}
-  // "\x02" e_name string
-  // e_name	 ::=	cstring
-  // cstring ::=	(byte*) "\x00"
-  procedure _writeUTF8String(aStream: TStream; aNode: TALJSONNode; aArrayIndex: integer = -1);
-  var aName:   AnsiString;
-      aText:   AnsiString;
-      aLength: integer;
-  begin
-    if aArrayIndex > -1 then aName := #2 + ALIntToStr(aArrayIndex) + #0
-    else aName   := #2 + aNode.NodeName + #0;
-
-    aLength := Length(aNode.Text) + 1; // +1 for trailing zero according the spec
-    aText   := aNode.Text + #0;
-
-    aStream.Write(aName[1], Length(aName));
-    aStream.Write(aLength,  Sizeof(integer));
-    aStream.Write(aText[1], Length(aText));
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  // "\x04" e_name document
-  // e_name	  ::=	cstring
-  // document	::=	int32 e_list "\x00"
-  {The document for an array is a normal BSON document with integer values for the keys, starting with 0 and
-   continuing sequentially. For example, the array ['red', 'blue'] would be encoded as the document '0':
-   'red', '1': 'blue'. The keys must be in ascending numerical order.}
-  procedure _writeEmbeddedArray(aStream: TStream; aNode: TALJSONNode; aArrayLength: integer = 0; aArrayIndex: integer = -1);
-  var aName:     AnsiString;
-      aDocument: AnsiString;
-  begin
-    if aArrayIndex > -1 then aName := #4 + ALIntToStr(aArrayIndex) + #0
-    else aName   := #4 + aNode.NodeName + #0;
-    aDocument := ParseObject(aNode, aArrayLength);
-
-    aStream.Write(aName[1],     Length(aName));
-    aStream.Write(aDocument[1], Length(aDocument));
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~}
-  // "\x03" e_name document
-  // e_name	  ::=	cstring
-  // document	::=	int32 e_list "\x00"
-  procedure _writeEmbeddedObject(aStream: TStream; aNode: TALJSONNode; aArrayLength: integer = 0; aArrayIndex: integer = -1);
-  var aName:     AnsiString;
-      aDocument: AnsiString;
-  begin
-    if aArrayIndex > -1 then aName := #3 + ALIntToStr(aArrayIndex) + #0
-    else aName   := #3 + aNode.NodeName + #0;
-    aDocument := ParseObject(aNode, aArrayLength);
-
-    aStream.Write(aName[1],     Length(aName));
-    aStream.Write(aDocument[1], Length(aDocument));
-  end;
-
-var aNode:         TALJSONNode;
-    i:             integer;
-    aStr:          AnsiString;
-    aLocalStream:  TALStringStream;
-    aObjectLength: integer;
-    aArrayIndex:   integer;
-begin
-  aStr         := '';
-  aLocalStream := TALStringStream.Create('');
-  aArrayIndex  := -1;
-
-  try
-
-    // scroll all child nodes
-    for i := 0 to aContainerNode.ChildNodes.Count - 1 do begin
-
-      // get current node
-      aNode := aContainerNode.ChildNodes[i];
-
-      // reset stream
-      _clearStream(aLocalStream);
-
-      {$REGION 'Process ntText-node'}
-      if aNode.NodeType = ntText then begin
-
-        // save UTF-8 string
-        if aArrayLength > 0 then begin
-          Inc(aArrayIndex);
-          _writeUTF8String(aLocalStream, aNode, aArrayIndex);
-        end
-
-        else _writeUTF8String(aLocalStream, aNode);
-
-      end
-      {$ENDREGION}
-
-      {$REGION 'Process ntObject-node'}
-      else if aNode.NodeType = ntArray then begin
-
-        // save embedded array
-        if aArrayLength > 0 then begin
-          Inc(aArrayIndex);
-          _writeEmbeddedArray(aLocalStream, aNode, aNode.ChildNodes.Count, aArrayIndex);
-        end
-
-        else _writeEmbeddedArray(aLocalStream, aNode, aNode.ChildNodes.Count);
-
-      end
-      {$ENDREGION}
-
-      {$REGION 'Process ntObject-node'}
-      else if aNode.NodeType = ntObject then begin
-
-        // save embedded object
-        if aArrayLength > 0 then begin
-          Inc(aArrayIndex);
-          _writeEmbeddedObject(aLocalStream, aNode, aArrayIndex);
-        end
-        else _writeEmbeddedObject(aLocalStream, aNode);
-
-      end;
-      {$ENDREGION}
-
-      // save currently processed data
-      aStr := aStr + aLocalStream.DataString;
-
-    end;
-
-    // Write the whole object with its size
-    // document	 ::=	int32 e_list "\x00"
-    _clearStream(aLocalStream);
-    aObjectLength := Length(aStr) + 5; // 5 - it's trailing zero of document + 4 bytes to save the size of document
-    aStr          := aStr + #0;
-    aLocalStream.Write(aObjectLength, Sizeof(integer));
-    aLocalStream.Write(aStr[1],       Length(aStr));
-
-    result := aLocalStream.DataString;
-
-  finally
-    aLocalStream.Free;
-  end;
 end;
 
 {****************************************}

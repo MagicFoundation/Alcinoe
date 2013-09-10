@@ -762,7 +762,7 @@ type
     procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False); //[Replace from TXMLDocument]  procedure LoadFromFile(const AFileName: AnsiString = '');
     procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False); //[Replace from TXMLDocument] procedure LoadFromStream(const Stream: TStream; EncodingType: TALXMLEncodingType = xetUnknown);
     procedure LoadFromXML(const XML: AnsiString; const saxMode: Boolean = False); //[Replace from TXMLDocument]  procedure LoadFromXML(const XML: AnsiString); overload;
-    procedure SaveToFile(const AFileName: AnsiString = '');
+    procedure SaveToFile(const AFileName: AnsiString);
     procedure SaveToStream(const Stream: TStream);
     procedure SaveToXML(var XML: AnsiString);
     property ChildNodes: TALXMLNodeList read GetChildNodes;
@@ -1556,7 +1556,7 @@ end;
 {Saves the XML document to disk.
  Call SaveToFile to save any modifications you have made to the parsed XML document.
  AFileName is the name of the file to save. If AFileName is an empty string, TXMLDocument uses the value of the FileName property.}
-procedure TALXMLDocument.SaveToFile(const AFileName: AnsiString = '');
+procedure TALXMLDocument.SaveToFile(const AFileName: AnsiString);
 Var afileStream: TfileStream;
 begin
   aFileStream := TfileStream.Create(String(AFileName),fmCreate);
@@ -2349,7 +2349,11 @@ Var NodeStack: Tstack;
   Begin
     L := Length(Str);
     if l = 0 then exit;
-    if L >= BufferSize then WriteBuffer2Stream(str, l)
+    if L >= BufferSize then begin
+      WriteBuffer2Stream(BufferString,BufferStringPos);
+      BufferStringPos := 0;
+      WriteBuffer2Stream(str, l)
+    end
     else begin
       if L + BufferStringPos > length(BufferString) then setlength(BufferString, L + BufferStringPos);
       ALMove(str[1], BufferString[BufferStringPos + 1], L);

@@ -607,7 +607,11 @@ end;
 function TALStringStream.Write(const Buffer; Count: Longint): Longint;
 begin
   Result := Count;
-  SetLength(FDataString, (FPosition + Result));
+
+  // a little modification from the original TStringStream
+  // because in original it's crazy we can not update the datastring !!
+  if FPosition + Result > length(FDataString) then SetLength(FDataString, (FPosition + Result));
+
   ALMove(Buffer, PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Result * SizeOf(AnsiChar));
   Inc(FPosition, Result);
 end;

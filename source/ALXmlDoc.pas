@@ -1609,7 +1609,7 @@ end;
  *Value contains the raw (unparsed) XML to assign.}
 procedure TALXMLDocument.SetXML(const Value: AnsiString);
 begin
- LoadFromXML(XML, False);
+ LoadFromXML(Value, False);
 end;
 
 {***********************************}
@@ -2596,28 +2596,15 @@ end;
 {Returns the XML that corresponds to the subtree rooted at this node.
  GetXML returns the XML that corresponds to this node and any child nodes it contains.}
 function TALXMLNode.GetXML: AnsiString;
-Var aStringStream: TALStringStream;
 begin
-  aStringStream := TALStringStream.Create('');
-  Try
-    SaveToStream(aStringStream, false);
-    result := aStringStream.DataString;
-  finally
-    aStringStream.Free;
-  end;
+  SaveToXML(Result,false);
 end;
 
 {************************************************}
 {SetXML reload the node with the new given value }
 procedure TALXMLNode.SetXML(const Value: AnsiString);
-Var aStringStream: TALStringStream;
 Begin
-  aStringStream := TALStringStream.Create(Value);
-  Try
-    LoadFromStream(aStringStream, false);
-  finally
-    aStringStream.Free;
-  end;
+  LoadFromXML(Value,False);
 end;
 
 {*********************************************************}

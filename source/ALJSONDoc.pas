@@ -62,10 +62,10 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
               To access the document nodes :
 
               MyJsonDoc.loadFromJson(AJsonStr, False);
-              MyJsonDoc.childnodes['_id'].text;
+              MyJsonDoc.childnodes['_id'].int32;
               MyJsonDoc.childnodes['name'].childnodes['first'].text;
               MyJsonDoc.childnodes['name'].childnodes['last'].text;
-              MyJsonDoc.childnodes['birth'].text;
+              MyJsonDoc.childnodes['birth'].datetime;
               for i := 0 to MyJsonDoc.childnodes['contribs'].ChildNodes.count - 1 do
                 MyJsonDoc.childnodes['contribs'].childnodes[i].text;
               for i := 0 to MyJsonDoc.childnodes['awards'].ChildNodes.count - 1 do begin
@@ -360,9 +360,11 @@ type
     procedure SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
     procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure SaveToJSON(var JSON: AnsiString);
+    procedure SaveToBSON(var BSON: AnsiString);
     procedure LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False);
     procedure LoadFromStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure LoadFromJSON(const JSON: AnsiString);
+    procedure LoadFromBSON(const BSON: AnsiString);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read GetNodeName write SetNodeName;
@@ -2047,7 +2049,7 @@ end;
  *Value contains the raw (unparsed) JSON to assign.}
 procedure TALJSONDocument.SetJSON(const Value: AnsiString);
 begin
- LoadFromJSON(JSON, False);
+  LoadFromJSON(Value, False);
 end;
 
 {**********************************}
@@ -2056,7 +2058,7 @@ end;
  *Value contains the raw (unparsed) BSON to assign.}
 procedure TALJSONDocument.SetBSON(const Value: AnsiString);
 begin
- LoadFromBSON(JSON, False);
+  LoadFromBSON(Value, False);
 end;
 
 {***********************************}
@@ -2424,56 +2426,30 @@ end;
 {Returns the JSON that corresponds to the subtree rooted at this node.
  GetJSON returns the JSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNode.GetJSON: AnsiString;
-Var aStringStream: TALStringStream;
 begin
-  aStringStream := TALStringStream.Create('');
-  Try
-    SaveToStream(aStringStream, false {BSONStream});
-    result := aStringStream.DataString;
-  finally
-    aStringStream.Free;
-  end;
+  SaveToJSON(result);
 end;
 
 {************************************************}
 {SetJSON reload the node with the new given value }
 procedure TALJSONNode.SetJSON(const Value: AnsiString);
-Var aStringStream: TALStringStream;
 Begin
-  aStringStream := TALStringStream.Create(Value);
-  Try
-    LoadFromStream(aStringStream, False {BSONStream});
-  finally
-    aStringStream.Free;
-  end;
+  LoadFromJSON(Value);
 end;
 
 {*******************************************************************}
 {Returns the BSON that corresponds to the subtree rooted at this node.
  GetBSON returns the BSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNode.GetBSON: AnsiString;
-Var aStringStream: TALStringStream;
 begin
-  aStringStream := TALStringStream.Create('');
-  Try
-    SaveToStream(aStringStream, True {BSONStream});
-    result := aStringStream.DataString;
-  finally
-    aStringStream.Free;
-  end;
+  SaveToBSON(result);
 end;
 
 {************************************************}
 {SetBSON reload the node with the new given value }
 procedure TALJSONNode.SetBSON(const Value: AnsiString);
-Var aStringStream: TALStringStream;
 Begin
-  aStringStream := TALStringStream.Create(Value);
-  Try
-    LoadFromStream(aStringStream, True {BSONStream});
-  finally
-    aStringStream.Free;
-  end;
+  LoadFromBSON(Value);
 end;
 
 {*****************************************************************}
@@ -3092,6 +3068,19 @@ begin
   end;
 end;
 
+{*****************************************************}
+procedure TALJSONNode.SaveToBSON(var BSON: AnsiString);
+Var aStringStream: TALStringStream;
+begin
+  aStringStream := TALStringStream.Create('');
+  Try
+    SaveToStream(aStringStream, True {BSONStream});
+    BSON := aStringStream.DataString;
+  finally
+    aStringStream.Free;
+  end;
+end;
+
 {*********************************************************}
 procedure TALJSONNode.LoadFromJSON(const JSON: AnsiString);
 Var aStringStream: TALStringStream;
@@ -3099,6 +3088,18 @@ Begin
   aStringStream := TALStringStream.Create(JSON);
   Try
     LoadFromStream(aStringStream, False {BSONStream});
+  finally
+    aStringStream.Free;
+  end;
+end;
+
+{*********************************************************}
+procedure TALJSONNode.LoadFromBSON(const BSON: AnsiString);
+Var aStringStream: TALStringStream;
+Begin
+  aStringStream := TALStringStream.Create(BSON);
+  Try
+    LoadFromStream(aStringStream, True {BSONStream});
   finally
     aStringStream.Free;
   end;

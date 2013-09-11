@@ -451,6 +451,7 @@ function  ALIntToHex(Value: UInt64; Digits: Integer): AnsiString; overload;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
+Function  ALIsFloat (const S: AnsiString; const AFormatSettings: TALFormatSettings): Boolean;
 function  ALFloatToStr(Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALCurrToStr(Value: Currency; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALFormatFloat(const Format: AnsiString; Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;
@@ -5953,6 +5954,21 @@ var i : Integer;
 Begin
   Result := ALIsDecimal(S) and ALTryStrToInt(S, I) and (i <= 32767) and (I >= -32768);
 End;
+
+{*******************************************************************************************}
+Function  ALIsFloat (const S: AnsiString; const AFormatSettings: TALFormatSettings): Boolean;
+var i: integer;
+    aDouble: Double;
+begin
+  for i := 1 to length(S) do begin
+    if not (S[i] in ['0'..'9','-',AFormatSettings.DecimalSeparator]) then begin
+      result := false;
+      exit;
+    end;
+  end;
+  result := ALTryStrToFloat(s,aDouble,AFormatSettings);
+end;
+
 
 {*******************************************************************************************}
 function ALFloatToStr(Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;

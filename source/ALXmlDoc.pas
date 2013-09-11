@@ -807,7 +807,8 @@ function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default
 
 implementation
 
-uses Windows,
+uses Math,
+     Windows,
      Contnrs,
      AlHTML,
      {$IF CompilerVersion < 18.5}
@@ -1053,8 +1054,9 @@ Var RawXmlString: AnsiString;
   function ExpandRawXmlString: boolean;
   Var ByteReaded, Byte2Read: Integer;
   Begin
-    If RawXmlStringPos > 1 then begin
-      Byte2Read := RawXmlStringPos - 1;
+    If (RawXmlStringLength > 0) and (RawXmlStringPos > 1) then begin
+      if (RawXmlStringPos > RawXmlStringLength) then RawXmlStream.Position := RawXmlStream.Position - RawXmlStringLength + RawXmlStringPos - 1;
+      Byte2Read := min(RawXmlStringPos - 1, RawXmlStringLength);
       if RawXmlStringPos <= length(RawXmlString) then ALMove(RawXmlString[RawXmlStringPos],
                                                              RawXmlString[1],
                                                              RawXmlStringLength-RawXmlStringPos+1);

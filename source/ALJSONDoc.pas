@@ -77,7 +77,7 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
               ------------------------------
               To create the document nodes :
 
-              MyJsonDoc.addchild('_id').int := 1;
+              MyJsonDoc.addchild('_id').int32 := 1;
               with MyJsonDoc.addchild('name', ntObject) do begin
                 addchild('first').text := 'John';
                 addchild('last').text := 'Backus';
@@ -92,18 +92,24 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
               with MyJsonDoc.addchild('awards', ntArray) do begin
                 with addchild(ntObject) do begin
                   addchild('award').text := 'National Medal of Science';
-                  addchild('year').int := 1975;
+                  addchild('year').int32 := 1975;
                   addchild('by').text := 'National Science Foundation';
                 end;
                 with addchild(ntObject) do begin
                   addchild('award').text := 'Turing Award';
-                  addchild('year').int := 1977;
+                  addchild('year').int32 := 1977;
                   addchild('by').text := 'ACM';
                 end;
               end;
               MyJsonDoc.addchild('spouse');
               MyJsonDoc.addchild('address', ntObject);
               MyJsonDoc.addchild('phones', ntArray);
+
+              ----------------------------
+              To load and save from BSON :
+
+              MyJsonDoc.LoadFromFile(aBSONFileName, False{saxMode}, True{BSON});
+              MyJsonDoc.SaveToFile(aBSONFileName, False{saxMode}, True{BSON});
 
               ---------------------------------------
               To parse an JSON document in Sax Mode :
@@ -116,7 +122,7 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
                                        begin
                                          Writeln(Path + '=' + str);
                                        end;
-              MyJsonDoc.LoadFromJSON(AJsonStr, true);
+              MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
@@ -184,6 +190,7 @@ resourcestring
   cALJSONListIndexError         = 'Node list index out of bounds (%d)';
   cALJSONOperationError         = 'This operation can not be performed with a node of type %s';
   cALJSONParseError             = 'JSON Parse error';
+  cALBSONParseError             = 'BSON Parse error';
 
 const
   cALJSONNodeMaxListSize = Maxint div 16;
@@ -330,8 +337,8 @@ type
     procedure SetFloat(const Value: Double);
     function GetDateTime: TDateTime;
     procedure SetDateTime(const Value: TDateTime);
-    function GetInt: Integer;
-    procedure SetInt(const Value: Integer);
+    function GetInt32: Integer;
+    procedure SetInt32(const Value: Integer);
     function GetInt64: Int64;
     procedure SetInt64(const Value: Int64);
     function GetBool: Boolean;
@@ -369,7 +376,7 @@ type
     property OwnerDocument: TALJSONDocument read GetOwnerDocument Write SetOwnerDocument;
     property ParentNode: TALJSONNode read GetParentNode;
     property Text: AnsiString read GetText write SetText;
-    property int: integer read GetInt write SetInt;
+    property int32: integer read GetInt32 write SetInt32;
     property int64: int64 read Getint64 write Setint64;
     property Float: Double read GetFloat write SetFloat;
     property DateTime: TDateTime read GetDateTime write SetDateTime;
@@ -520,33 +527,11 @@ Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
 
 implementation
 
-uses Contnrs,
+uses Math,
+     Contnrs,
      DateUtils,
      AlHTML,
      ALString;
-
-type
-
-  {----------------------------}
-  TALBSONReader = class(TObject)
-  private
-    FStream:       TStream;
-    FDocumentNode: TALJSONNode;
-    FActiveNode:   TALJSONNode;
-    function _ReadInteger: integer;
-    function _ReadByte: byte;
-    function _ReadName: AnsiString;
-    function _ReadInt64: Int64;
-    function _ReadDouble: double;
-    function _ReadString(aCount: integer): AnsiString;
-    function _ReadBinaryData(aCount: integer): TBytes;
-  protected
-  public
-    procedure   ParseElement(aByte: byte);
-    procedure   ParseEList;
-    procedure   ParseDocument(aContainerNode: TALJSONNode);
-    constructor Create(aStream: TStream; aDocumentNode: TALJSONNode); virtual;
-  end;
 
 {****************************************************}
 procedure ALJSONDocError(const Msg: String); overload;
@@ -670,8 +655,9 @@ Var RawJSONString: AnsiString;
   function ExpandRawJSONString: boolean; overload;
   Var ByteReaded, Byte2Read: Integer;
   Begin
-    If RawJSONStringPos > 1 then begin
-      Byte2Read := RawJSONStringPos - 1;
+    If (RawJSONStringLength > 0) and (RawJSONStringPos > 1) then begin
+      if (RawJSONStringPos > RawJSONStringLength) then RawJSONStream.Position := RawJSONStream.Position - RawJSONStringLength + RawJSONStringPos - 1;
+      Byte2Read := min(RawJSONStringPos - 1, RawJSONStringLength);
       if RawJSONStringPos <= length(RawJSONString) then ALMove(RawJSONString[RawJSONStringPos],
                                                                RawJSONString[1],
                                                                RawJSONStringLength-RawJSONStringPos+1);
@@ -1383,20 +1369,456 @@ end;
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
 procedure TALJSONDocument.InternalParseBSON(const RawBSONStream: TStream; const ContainerNode: TALJSONNode);
-var aBSONReader: TALBSONReader;
-begin
-  // start to parse BSON
-  DoParseStartDocument;
 
-  aBSONReader := TALBSONReader.Create(RawBSONStream, ContainerNode);
-  try
-    aBSONReader.ParseDocument(ContainerNode);
-  finally
-    aBSONReader.Free;
+Const BufferSize: integer = 8192;
+Var RawBSONString: AnsiString;
+    RawBSONStringLength: Integer;
+    RawBSONStringPos: Integer;
+    LstParams: TALStringList;
+    NotSaxMode: Boolean;
+    WorkingNode: TALJSONNode;
+    Paths: TALStringList;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ExpandRawBSONString: boolean; overload;
+  Var ByteReaded, Byte2Read: Integer;
+  Begin
+    If (RawBSONStringLength > 0) and (RawBSONStringPos > 1) then begin
+      if (RawBSONStringPos > RawBSONStringLength) then RawBSONStream.Position := RawBSONStream.Position - RawBSONStringLength + RawBSONStringPos - 1;
+      Byte2Read := min(RawBSONStringPos - 1, RawBSONStringLength);
+      if RawBSONStringPos <= length(RawBSONString) then ALMove(RawBSONString[RawBSONStringPos],
+                                                               RawBSONString[1],
+                                                               RawBSONStringLength-RawBSONStringPos+1);
+      RawBSONStringPos := 1;
+    end
+    else begin
+      Byte2Read := BufferSize;
+      RawBSONStringLength := RawBSONStringLength + BufferSize;
+      SetLength(RawBSONString, RawBSONStringLength);
+    end;
+
+    //range check error is we not do so
+    if RawBSONStream.Position < RawBSONStream.Size then ByteReaded := RawBSONStream.Read(RawBSONString[RawBSONStringLength - Byte2Read + 1],Byte2Read)
+    else ByteReaded := 0;
+
+    If ByteReaded <> Byte2Read then begin
+      RawBSONStringLength := RawBSONStringLength - Byte2Read + ByteReaded;
+      SetLength(RawBSONString, RawBSONStringLength);
+      Result := ByteReaded > 0;
+    end
+    else result := True;
   end;
 
-  // finish to parse BSON
-  DoParseEndDocument;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ExpandRawBSONString(var PosToKeepSync: Integer): boolean; overload;
+  var P1: integer;
+  begin
+    P1 := RawBSONStringPos;
+    result := ExpandRawBSONString;
+    PosToKeepSync := PosToKeepSync - (P1 - RawBSONStringPos);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function GetPathStr(Const ExtraItems: ansiString = ''): ansiString;
+  var I, L, P, Size: Integer;
+      S, LB: AnsiString;
+  begin
+    LB := PathSeparator;
+    Size := length(ExtraItems);
+    if size <> 0 then Inc(Size, Length(LB));
+    for I := 1 to Paths.Count - 1 do Inc(Size, Length(Paths[I]) + Length(LB));
+    SetLength(Result, Size);
+    P := 1;
+    for I := 1 to Paths.Count - 1 do begin
+      S := Paths[I];
+      L := Length(S);
+      if L <> 0 then begin
+        ALMove(S[1], Result[P], L);
+        Inc(P, L);
+      end;
+      L := Length(LB);
+      if (L <> 0) and
+         ((i <> Paths.Count - 1) or
+          (ExtraItems <> '')) and
+         (((NotSaxMode) and (TALJSONNode(Paths.Objects[I]).nodetype <> ntarray)) or
+          ((not NotSaxMode) and (integer(Paths.Objects[I]) <> 2{ntarray}))) then begin
+        ALMove(LB[1], result[P], L);
+        Inc(P, L);
+      end;
+    end;
+    if ExtraItems <> '' then begin
+      L := length(ExtraItems);
+      ALMove(ExtraItems[1], result[P], L);
+      Inc(P, L);
+    end;
+    setlength(result,P-1);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~}
+  procedure AnalyzeNode;
+  Var aNode: TALJsonNode;
+      aNodeTypeInt: integer;
+      aNodeSubType: AnsiChar;
+      aName: AnsiString;
+      aDouble: Double;
+      aInt32: Integer;
+      aInt64: Int64;
+      aDateTime: TdateTime;
+      aBool: Boolean;
+      aTextValue: AnsiString;
+      P1: Integer;
+  Begin
+
+    {$IFDEF undef}{$REGION 'Get the node sub type'}{$ENDIF}
+    aNodeSubType := RawBSONString[RawBSONStringPos];
+    RawBSONStringPos := RawBSONStringPos + 1;
+    If RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'End Object/Array'}{$ENDIF}
+    // ... } ....
+    // ... ] ....
+    if aNodeSubType = #$00 then begin
+
+      //error if Paths.Count = 0 (mean one end object/array without any starting)
+      if (Paths.Count = 0) then ALJSONDocError(cALBSONParseError);
+
+      //fucking warning
+      anodeTypeInt := 0;
+
+      //if we are not in sax mode
+      if NotSaxMode then begin
+
+        //init anode to one level up
+        aNode := TALJSONNode(Paths.Objects[paths.Count - 1]);
+
+        //if anode <> workingNode aie aie aie
+        if (aNode <> WorkingNode) then ALJSONDocError(cALBSONParseError);
+
+        //calculate anodeTypeInt
+        if aNode.NodeType = ntObject then aNodeTypeInt := 1
+        else if aNode.NodeType = ntarray then aNodeTypeInt := 2
+        else ALJSONDocError(cALBSONParseError);
+
+        //if working node <> containernode then we can go to one level up
+        If WorkingNode<>ContainerNode then begin
+
+          //init WorkingNode to the parentNode
+          WorkingNode := WorkingNode.ParentNode;
+
+        end
+
+        //if working node = containernode then we can no go to the parent node so set WorkingNode to nil
+        Else WorkingNode := nil;
+
+      end
+
+      //if we are in sax mode
+      else begin
+
+        //calculate anodeTypeInt
+        anodeTypeInt := integer(Paths.Objects[paths.Count - 1]);
+        if not (anodeTypeInt in [1,2]) then ALJSONDocError(cALBSONParseError);
+
+      end;
+
+      //call the DoParseEndObject/array event
+      if anodeTypeInt = 1 then DoParseEndObject(GetPathStr, Paths[paths.Count - 1])
+      else DoParseEndArray(GetPathStr, Paths[paths.Count - 1]);
+
+      //delete the last entry from the path
+      paths.Delete(paths.Count - 1);
+
+      //finallly exit from this procedure, everything was done
+      exit;
+
+    end;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Get the node name'}{$ENDIF}
+    P1 := RawBSONStringPos;
+    While P1 <= RawBSONStringLength do begin
+      If RawBSONString[P1] <> #$00 then inc(P1)
+      else begin
+        aName := AlCopyStr(RawBSONString, RawBSONStringPos, P1-RawBSONStringPos);
+        break;
+      end;
+      if P1 > RawBSONStringLength then ExpandRawBSONString(P1);
+    end;
+    if P1 > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
+    RawBSONStringPos := P1 + 1;
+    if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Begin Object/Array'}{$ENDIF}
+    // ... { ....
+    // ... [ ....
+    if aNodeSubType in [#$03,#$04] then begin
+
+      //if we are not in sax mode
+      if NotSaxMode then begin
+
+        //if workingnode = nil then it's mean we are outside the containerNode
+        if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+
+        //create the node according the the braket char and add it to the workingnode
+        if aNodeSubType = #$03 then aNode := CreateNode(ALIfThen(WorkingNode.nodetype=ntarray, '', aName), ntObject)
+        else aNode := CreateNode(ALIfThen(WorkingNode.nodetype=ntarray, '', aName), ntarray);
+        try
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+
+        //set that the current working node will be now the new node newly created
+        WorkingNode := aNode;
+
+        //update the path
+        Paths.AddObject(ALIfThen(WorkingNode.nodetype=ntarray, '[' + aName + ']', aName), WorkingNode);
+
+      end
+
+      //if we are in sax mode
+      else begin
+
+        //update the path
+        if aNodeSubType = #$03 then aNodeTypeInt := 1
+        else aNodeTypeInt := 2;
+        Paths.AddObject(ALIfThen((Paths.Count > 0) and (integer(Paths.Objects[paths.Count - 1]) = 2{array}), '[' + aName + ']', aName), pointer(aNodeTypeInt));
+
+      end;
+
+      //call the DoParseStartObject/array event
+      if aNodeSubType = #$03 then DoParseStartObject(GetPathStr,'')
+      else DoParseStartArray(GetPathStr, '');
+
+      //update RawBSONStringPos
+      RawBSONStringPos := RawBSONStringPos + 4;
+
+      //finallly exit from this procedure, everything was done
+      exit;
+
+    end;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Remove Delphi warning'}{$ENDIF}
+    aBool := False;
+    aDateTime := 0;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: Floating point'}{$ENDIF}
+    // \x01 + name + \x00 + double
+    if aNodeSubType = #$01 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(Double) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(Double) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aDouble, sizeof(Double));
+      aTextValue := ALFloatToStr(aDouble, ALDefaultFormatSettings);
+      RawBSONStringPos := RawBSONStringPos + sizeof(Double);
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: UTF-8 string'}{$ENDIF}
+    // \x02 + name + \x00 + length (int32) + string + \x00
+    else if aNodeSubType = #$02 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aInt32, sizeof(aInt32));
+      RawBSONStringPos := RawBSONStringPos + sizeof(aInt32);
+      while (RawBSONStringPos + aInt32 - 1 > RawBSONStringLength) do
+        if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
+      aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
+      RawBSONStringPos := RawBSONStringPos + aInt32;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: Boolean'}{$ENDIF}
+    // \x08 + name + \x00 + \x00 => Boolean "false"
+    // \x08 + name + \x00 + \x01	=> Boolean "true"
+    else if aNodeSubType = #$08 then begin
+      if RawBSONStringPos > RawBSONStringLength then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
+      end;
+      if RawBSONString[RawBSONStringPos] = #$00 then begin
+        aBool := False;
+        aTextValue := 'false';
+      end
+      else if RawBSONString[RawBSONStringPos] = #$01 then begin
+        aBool := true;
+        aTextValue := 'true';
+      end
+      else ALJSONDocError(cALBSONParseError);
+      RawBSONStringPos := RawBSONStringPos + 1;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: UTC datetime'}{$ENDIF}
+    // \x09 + name + \x00 + int64
+    else if aNodeSubType = #$09 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(Int64));
+      aDateTime := UnixToDateTime(aInt64);
+      aTextValue := ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', aDateTime, ALDefaultFormatSettings);
+      RawBSONStringPos := RawBSONStringPos + sizeof(Int64);
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: Null value'}{$ENDIF}
+    // \x0A + name + \x00
+    else if aNodeSubType = #$0A then begin
+      aTextValue := 'null';
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: JavaScript code'}{$ENDIF}
+    // \x0D + name + \x00 + length (int32) + string + \x00
+    else if aNodeSubType = #$0D then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aInt32, sizeof(aInt32));
+      RawBSONStringPos := RawBSONStringPos + sizeof(aInt32);
+      while (RawBSONStringPos + aInt32 - 1 > RawBSONStringLength) do
+        if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
+      aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
+      RawBSONStringPos := RawBSONStringPos + aInt32;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: 32-bit Integer'}{$ENDIF}
+    // \x10 + name + \x00 + int32
+    else if aNodeSubType = #$10 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(int32) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(int32) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aint32, sizeof(int32));
+      aTextValue := ALIntToStr(aint32);
+      RawBSONStringPos := RawBSONStringPos + sizeof(int32);
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: 64-bit integer'}{$ENDIF}
+    // \x12 + name + \x00 + int64
+    else if aNodeSubType = #$12 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(Int64));
+      aTextValue := ALIntToStr(aint64);
+      RawBSONStringPos := RawBSONStringPos + sizeof(Int64);
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: Undefined'}{$ENDIF}
+    else ALJSONDocError(cALBSONParseError);
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'create the named text node'}{$ENDIF}
+    if NotSaxMode then begin
+
+      //if workingnode = nil then it's mean we are outside the containerNode
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+
+      //create the node and add it to the workingnode
+      aNode := CreateNode(ALIfThen(WorkingNode.nodetype=ntarray, '', aName), nttext);
+      try
+        case aNodeSubType of
+          #$01: aNode.Float := ADouble;
+          #$02: aNode.text := aTextValue;
+          #$08: aNode.Bool := aBool;
+          #$09: aNode.DateTime := aDateTime;
+          #$0A: aNode.null := true;
+          #$0D: aNode.Statement := aTextValue;
+          #$10: aNode.int32 := aInt32;
+          #$12: aNode.int64 := aInt64;
+          else ALJSONDocError(cALBSONParseError);
+        end;
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+
+      //call the DoParseStartObject/array event
+      if WorkingNode.nodetype=ntarray then DoParseText(GetPathStr('[' + aName + ']'), '', aTextValue, aNodeSubType = #$02)
+      else DoParseText(GetPathStr(aName), aName, aTextValue, aNodeSubType = #$02);
+
+    end
+
+    //if we are in sax mode
+    else begin
+
+      //call the DoParseStartObject/array event
+      if (Paths.Count > 0) and (integer(Paths.Objects[paths.Count - 1]) = 2{array}) then DoParseText(GetPathStr('[' + aName + ']'), '', aTextValue, aNodeSubType = #$02)
+      else DoParseText(GetPathStr(aName), aName, aTextValue, aNodeSubType = #$02);
+
+    end;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+  end;
+
+Begin
+
+  //
+  // NOTE: the childNodes of the ContainerNode
+  //       must have been cleared by the calling function!
+  //
+  // NOTE: ContainerNode must have fDocument assigned
+  //
+  // NOTE: ContainerNode must be ntobject or nil (sax mode)
+  //
+
+  LstParams := TALStringList.Create;
+  Paths := TALStringList.Create;
+  Try
+
+    DoParseStartDocument;
+
+    WorkingNode := ContainerNode;
+    NotSaxMode := assigned(ContainerNode);
+    RawBSONString := '';
+    RawBSONStringLength := 0;
+    RawBSONStringPos := 5; // the first 4 bytes are the length of the document and we don't need it
+    ExpandRawBSONString;
+    if NotSaxMode then Paths.AddObject('[-1]', WorkingNode)
+    else Paths.AddObject('[-1]', pointer(1));
+
+    While RawBSONStringPos <= RawBSONStringLength do begin
+      AnalyzeNode;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end;
+
+    //some tags are not closed
+    if Paths.Count > 0 then ALJSONDocError(cALBSONParseError);
+
+    //mean the node was not update (empty stream?) or not weel closed
+    if WorkingNode <> nil then ALJSONDocError(cALBSONParseError);
+
+    DoParseEndDocument;
+
+  finally
+    Paths.Free;
+    LstParams.Free;
+  end;
+
 end;
 
 {***********************************}
@@ -1832,20 +2254,29 @@ begin
   aFormatSettings.TimeSeparator := ':';
   aFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
   aFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
-  aDateStr := AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(GetNodeValue,
-                                                                                                              '''',
+  aDateStr := AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(GetNodeValue,
+                                                                                                                                                              '''',
+                                                                                                                                                              '',
+                                                                                                                                                              [rfReplaceALL]),
+                                                                                                                                              '"',
+                                                                                                                                              '',
+                                                                                                                                              [rfReplaceALL]),
+                                                                                                                              'new',
+                                                                                                                              '',
+                                                                                                                              []),
+                                                                                                              'Date',
                                                                                                               '',
-                                                                                                              [rfReplaceALL]),
-                                                                                              '"',
+                                                                                                              []),
+                                                                                              ' ',
                                                                                               '',
                                                                                               [rfReplaceALL]),
-                                                                              'new Date(',
-                                                                              '',
+                                                                              'T',
+                                                                              ' ',
                                                                               []),
-                                                              'T',
-                                                              ' ',
+                                                              'Z',
+                                                              '',
                                                               []),
-                                              'Z',
+                                              '(',
                                               '',
                                               []),
                               ')',
@@ -1861,14 +2292,14 @@ begin
   NodeSubType := nstDateTime;
 end;
 
-{***********************************}
-function TALJSONNode.GetInt: Integer;
+{*************************************}
+function TALJSONNode.GetInt32: Integer;
 begin
   Result := ALStrToInt(GetNodeValue);
 end;
 
-{*************************************************}
-procedure TALJSONNode.SetInt(const Value: Integer);
+{***************************************************}
+procedure TALJSONNode.SetInt32(const Value: Integer);
 begin
   setNodeValue(ALIntToStr(Value), False{NeedQuotes});
   NodeSubType := nstInt32;
@@ -2417,7 +2848,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
 
           // \x10 + name + \x00 + int32
           nstInt32: begin
-                      aInt32 := int;
+                      aInt32 := int32;
                       setlength(aBinStr,sizeOf(aInt32));
                       ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
                       WriteStr2Buffer(#$10 + aNodeName + #$00 + aBinStr);
@@ -2425,7 +2856,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
 
           // \x12 + name + \x00 + int64
           nstInt64: begin
-                      aInt64 := int;
+                      aInt64 := int64;
                       setlength(aBinStr,sizeOf(aInt64));
                       ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
                       WriteStr2Buffer(#$12 + aNodeName + #$00 + aBinStr);
@@ -3151,405 +3582,6 @@ begin
   if NewCount > FCount then FillChar(FList^[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
   else for I := FCount - 1 downto NewCount do Delete(I);
   FCount := NewCount;
-end;
-
-{*****************************************************************************}
-constructor TALBSONReader.Create(aStream: TStream; aDocumentNode: TALJSONNode);
-begin
-  FStream       := aStream;
-  FDocumentNode := aDocumentNode;
-  FActiveNode   := aDocumentNode;
-end;
-
-{*************************************}
-function TALBSONReader._ReadByte: byte;
-begin
-  FStream.ReadBuffer(result, SizeOf(byte));
-end;
-
-{**************************************************************}
-function TALBSONReader._ReadBinaryData(aCount: integer): TBytes;
-begin
-  SetLength(result, aCount);
-  FStream.ReadBuffer(result[1], aCount);
-end;
-
-{*****************************************}
-function TALBSONReader._ReadDouble: double;
-begin
-  FStream.ReadBuffer(result, SizeOf(double));
-end;
-
-{***************************************}
-function TALBSONReader._ReadInt64: Int64;
-begin
-  FStream.ReadBuffer(result, SizeOf(Int64));
-end;
-
-{*******************************************}
-function TALBSONReader._ReadInteger: integer;
-begin
-  FStream.ReadBuffer(result, SizeOf(integer));
-end;
-
-{**************************************************************}
-function TALBSONReader._ReadString(aCount: integer): AnsiString;
-begin
-  SetLength(result, aCount);
-  FStream.ReadBuffer(result[1], aCount);
-
-  // remove ending #$00
-  SetLength(result, aCount - 1);
-end;
-
-{********************}
-{e_name	  ::=	cstring
- cstring	::=	(byte*) "\x00"}
-function TALBSONReader._ReadName: AnsiString;
-var aByte: byte;
-begin
-  result := '';
-  aByte := _ReadByte;
-  while aByte <> 0 do begin
-    result := result + AnsiChar(Chr(aByte));
-    aByte  := _ReadByte;
-  end;
-end;
-
-{************************************************}
-{element	::=	"\x01" e_name double	Floating point
-            |	"\x02" e_name string	UTF-8 string
-            |	"\x03" e_name document	Embedded document
-            |	"\x04" e_name document	Array
-            |	"\x05" e_name binary	Binary data
-            |	"\x06" e_name	Undefined — Deprecated
-            |	"\x07" e_name (byte*12)	ObjectId
-            |	"\x08" e_name "\x00"	Boolean "false"
-            |	"\x08" e_name "\x01"	Boolean "true"
-            |	"\x09" e_name int64	UTC datetime
-            |	"\x0A" e_name	Null value
-            |	"\x0B" e_name cstring cstring	Regular expression
-            |	"\x0C" e_name string (byte*12)	DBPointer — Deprecated
-            |	"\x0D" e_name string	JavaScript code
-            |	"\x0E" e_name string	Symbol — Deprecated
-            |	"\x0F" e_name code_w_s	JavaScript code w/ scope
-            |	"\x10" e_name int32	32-bit Integer
-            |	"\x11" e_name int64	Timestamp
-            |	"\x12" e_name int64	64-bit integer
-            |	"\xFF" e_name	Min key
-            |	"\x7F" e_name	Max key}
-procedure TALBSONReader.ParseElement(aByte: byte);
-var aName:              AnsiString;
-    aStringLength:      integer;
-    aString:            AnsiString;
-    aDouble:            double;
-    aInteger:           integer;
-    aBoolean:           byte;
-    aInt64:             Int64;
-    aBinaryLength:      integer;
-    aBinarySubtype:     byte;
-    aBinaryData:        TBytes;
-    aRegExpPattern:     AnsiString;
-    aRegExpOptions:     AnsiString;
-    aNode:              TALJSONNode;
-    FCurrentActiveNode: TALJSONNode;
-    aChar:              AnsiChar;
-begin
-  aName := _ReadName;
-
-  {$REGION 'Floating point'}
-  if aByte = 1 then begin
-    aDouble := _ReadDouble;
-    with FActiveNode.AddChild(aName) do begin
-      Float := aDouble;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'UTF-8 string'}
-  else if aByte = 2 then begin
-    aStringLength := _ReadInteger;
-    aString       := _ReadString(aStringLength);
-    with FActiveNode.AddChild(aName) do begin
-      Text := aString;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Embedded document'}
-  else if aByte = 3 then begin
-    FCurrentActiveNode := FActiveNode;
-    aNode := FActiveNode.AddChild(aName, ntObject);
-    ParseDocument(aNode);
-    FActiveNode := FCurrentActiveNode;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Array'}
-  else if aByte = 4 then begin
-    FCurrentActiveNode := FActiveNode;
-    aNode := FActiveNode.AddChild(aName, ntArray);
-    ParseDocument(aNode);
-    FActiveNode := FCurrentActiveNode;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Binary data'}
-  {"\x05" e_name binary
-   binary	  ::=	int32 subtype (byte*)
-   subtype	::=	"\x00"	Binary / Generic
-              |	"\x01"	Function
-              |	"\x02"	Binary (Old)
-              |	"\x03"	UUID (Old)
-              |	"\x04"	UUID
-              |	"\x05"	MD5
-              |	"\x80"	User defined}
-  else if aByte = 5 then begin
-    aBinaryLength  := _ReadInteger;
-    aBinarySubtype := _ReadByte;
-
-    // security check
-    if (aBinarySubtype <> 0) and
-       (aBinarySubtype <> 1) and
-       (aBinarySubtype <> 2) and
-       (aBinarySubtype <> 3) and
-       (aBinarySubtype <> 4) and
-       (aBinarySubtype <> 5) and
-       (aBinarySubtype <> 128) then raise EALJSONDocError.Create('Unknown type of binary data: ' + IntToStr(aBinarySubtype));
-
-    // TODO -oIgor: think what specific we have to do to handle binary data
-    aBinaryData := _ReadBinaryData(aBinaryLength);
-    with FActiveNode.AddChild(aName) do begin
-
-      // save function as statement
-      if aBinarySubtype <> 1 then Statement := AnsiString(StringOf(aBinaryData))
-
-      // save other formats as text
-      else Text := AnsiString(StringOf(aBinaryData));
-
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Undefined — Deprecated'}
-  // nothing to handle here, some undefined type of data
-  else if aByte = 6 then Exit
-  {$ENDREGION}
-
-  {$REGION 'ObjectID'}
-  {http://docs.mongodb.org/manual/reference/object-id/
-   e_name (byte*12)	ObjectId}
-  else if aByte = 7 then begin
-    aBinaryData := _ReadBinaryData(12);
-    with FActiveNode.AddChild(aName) do begin
-      Text := AnsiString(StringOf(aBinaryData));
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Boolean false and true'}
-  {"\x08" e_name "\x00"}
-  else if aByte = 8 then begin
-    aBoolean := _ReadByte;
-    with FActiveNode.AddChild(aName) do begin
-      Bool := (aBoolean = 1);
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'UTC datetime'}
-  {"\x09" e_name int64}
-  else if aByte = 9 then begin
-    aInt64 := _ReadInt64;
-    with FActiveNode.AddChild(aName) do begin
-      int64 := aInt64;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Null value'}
-  {"\x0A" e_name}
-  else if aByte = 10 then begin
-    with FActiveNode.AddChild(aName) do begin
-      Null := true;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Regular expression'}
-  {"\x0B" e_name cstring cstring
-   The first cstring is the regex pattern, the second is the regex options string. Options are
-   identified by characters, which must be stored in alphabetical order. Valid options are 'i' for
-   case insensitive matching, 'm' for multiline matching, 'x' for verbose mode, 'l' to make \w, \W,
-   etc. locale dependent, 's' for dotall mode ('.' matches everything), and 'u' to make \w, \W,
-   etc. match unicode.}
-  else if aByte = 11 then begin
-    aRegExpPattern := _ReadName;
-    aRegExpOptions := _ReadName;
-
-    // security check for options
-    for aChar in aRegExpOptions do begin
-      if (aChar <> 'i') and
-         (aChar <> 'm') and
-         (aChar <> 'x') and
-         (aChar <> 'l') and
-         (aChar <> 's') and
-         (aChar <> 'u') then raise EALJSONDocError.Create('Unknown reg exp option: ' + aChar);
-    end;
-
-    // save as regular expression statement
-    with FActiveNode.AddChild(aName) do begin
-      Statement := '/' + aRegExpPattern + '/' + aRegExpOptions;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'DBPointer — Deprecated'}
-  {"\x0C" e_name string (byte*12)}
-  else if aByte = 12 then begin
-    aStringLength := _ReadInteger;
-    aString       := _ReadString(aStringLength);
-    aBinaryData   := _ReadBinaryData(12);
-
-    // DBPointer is not described. It's only stated that it's deprecated.
-    // So we cannot be sure how we need to build the JSON node with this
-    // data. I prefer to make an exception here if we will found such data,
-    // so when we will get this kind of exception, we could be able to
-    // investigate it.
-    raise EALJSONDocError.Create('DBPointer found. Data: ' + String(aString) + #13#10 + 'Binary data: ' + StringOf(aBinaryData));
-  end
-  {$ENDREGION}
-
-  {$REGION 'JavaScript code'}
-  {"\x0D" e_name string}
-  else if aByte = 13 then begin
-    aStringLength := _ReadInteger;
-    aString       := _ReadString(aStringLength);
-
-    // save javascript code as statement
-    with FActiveNode.AddChild(aName) do begin
-      Statement := aString;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Symbol — Deprecated'}
-  {"\x0E" e_name string}
-  else if aByte = 14 then begin
-    aStringLength := _ReadInteger;
-    aString       := _ReadString(aStringLength);
-
-    // Normally it is just a deprecated form to describe UTF-8 string,
-    // so we just save it as text
-    with FActiveNode.AddChild(aName) do begin
-      Text := aString;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'JavaScript code w/ scope'}
-  {"\x0F" e_name code_w_s
-   code_w_s	::=	int32 string document
-   Code w/ scope - The int32 is the length in bytes of the entire code_w_s value.
-   The string is JavaScript code. The document is a mapping from identifiers to values,
-   representing the scope in which the string should be evaluated.}
-  else if aByte = 15 then begin
-    _ReadInteger;
-    aStringLength := _ReadInteger;
-    aString       := _ReadString(aStringLength);
-
-    // parse internal document
-    FCurrentActiveNode := FActiveNode;
-    aNode := FActiveNode.AddChild(aName, ntObject);
-    ParseDocument(aNode);
-    FActiveNode := FCurrentActiveNode;
-
-    // NOTICE: i did not found good example how it looks like
-    // if there's some javascript code with document with mapping,
-    // so i will put this javascript just as one more statement
-    // inside created node
-    with FActiveNode.AddChild('statement') do begin
-      Statement := aString;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION '32-bit Integer'}
-  else if aByte = 16 then begin
-    aInteger := _ReadInteger;
-    with FActiveNode.AddChild(aName) do begin
-      int := aInteger;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Timestamp'}
-  {"\x11" e_name int64}
-  else if aByte = 17 then begin
-    aInt64 := _ReadInt64;
-    with FActiveNode.AddChild(aName) do begin
-      int64 := aInt64;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION '64-bit integer'}
-  {"\x12" e_name int64}
-  else if aByte = 18 then begin
-    aInt64 := _ReadInt64;
-    with FActiveNode.AddChild(aName) do begin
-      int64 := aInt64;
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Min key'}
-  {"\xFF" e_name}
-  else if aByte = 255 then begin
-    with FActiveNode.AddChild(aName) do begin
-      Statement := 'MinKey';  // try to type in browser console > MinKey, it will shows the BSON-function
-    end;
-  end
-  {$ENDREGION}
-
-  {$REGION 'Max key'}
-  {"\x7F" e_name}
-  else if aByte = 127 then begin
-    with FActiveNode.AddChild(aName) do begin
-      Statement := 'MaxKey';  // try to type in browser console > MaxKey, it will shows the BSON-function
-    end;
-  end;
-  {$ENDREGION}
-
-end;
-
-{******************************}
-{e_list	::=	element e_list | ""}
-procedure TALBSONReader.ParseEList;
-var aByte: byte;
-begin
-  aByte := _ReadByte;
-  if aByte = 0 then Exit
-  else begin
-    ParseElement(aByte);
-    ParseEList;
-  end;
-end;
-
-{********************************}
-{document	::=	int32 e_list "\x00"
- The int32 is the total number of bytes comprising the document.}
-procedure TALBSONReader.ParseDocument(aContainerNode: TALJSONNode);
-var aLengthOfDocument: integer;
-    aInitialPosition:  integer;
-    aFinalPosition:    integer;
-begin
-  FActiveNode       := aContainerNode;
-  aInitialPosition  := FStream.Position;
-  aLengthOfDocument := _ReadInteger;
-  if aLengthOfDocument > 5 then ParseEList;
-  aFinalPosition := FStream.Position;
-  if aFinalPosition - aInitialPosition <> aLengthOfDocument then raise EALJSONDocError.Create('Incorrect length of document, ' + IntToStr(aLengthOfDocument) + ' expected');
 end;
 
 {****************************************}

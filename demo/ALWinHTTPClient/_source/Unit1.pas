@@ -138,13 +138,13 @@ implementation
 
 Uses DateUtils,
      HttpApp,
-     ALMultiPartFormDataParser,
-     AlFcnFile,
-     AlFcnMisc,
-     AlFcnMime,
-     ALFcnString,
+     ALMultiPartParser,
+     AlFiles,
+     AlMisc,
+     AlMime,
+     ALString,
      ALStringList,
-     AlHttpCommon;
+     AlHttpClient;
 
 {$R *.dfm}
 

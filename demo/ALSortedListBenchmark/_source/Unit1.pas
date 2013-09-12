@@ -4,25 +4,23 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, AlScrollBar, ALMemo, ALButton,
-  OleCtrls, SHDocVw, ComObj;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, OleCtrls, SHDocVw, ComObj;
 
 type
   TForm1 = class(TForm)
-    ALButton1: TALButton;
+    ALButton1: TButton;
     Panel2: TPanel;
     Label7: TLabel;
     Label8: TLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
-    ALButton2: TALButton;
-    ALButton5: TALButton;
-    ALButton6: TALButton;
-    ALButton10: TALButton;
-    ALButton11: TALButton;
-    ALButton33: TALButton;
-    ALButton34: TALButton;
-    procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
+    ALButton2: TButton;
+    ALButton5: TButton;
+    ALButton6: TButton;
+    ALButton10: TButton;
+    ALButton11: TButton;
+    ALButton33: TButton;
+    ALButton34: TButton;
     procedure FormClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -41,8 +39,7 @@ var Form1: TForm1;
 
 implementation
 
-uses alFcnSkin,
-     AlFcnString,
+uses ALString,
      alQuickSortList,
      ALStringList,
      alavlBinaryTree;
@@ -87,12 +84,6 @@ begin
   finally
     CloseHandle(ProcessHandle);
   end;
-end;
-
-{*********************************************************************}
-procedure TForm1.ALButtonPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlButtonBlueSkin(sender, Continue);
 end;
 
 {******************************************}

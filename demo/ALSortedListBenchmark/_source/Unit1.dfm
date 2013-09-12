@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 331
   ClientWidth = 500
-  Color = 15986666
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -16,7 +16,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object ALButton1: TALButton
+  object ALButton1: TButton
     Left = 16
     Top = 17
     Width = 220
@@ -24,7 +24,6 @@ object Form1: TForm1
     Caption = 'Benchmark TALStringKeyAVLBinaryTree'
     TabOrder = 0
     OnClick = ALButton3Click
-    OnPaint = ALButtonPaint
   end
   object Panel2: TPanel
     Left = 80
@@ -94,7 +93,7 @@ object Form1: TForm1
       end
     end
   end
-  object ALButton2: TALButton
+  object ALButton2: TButton
     Left = 258
     Top = 17
     Width = 220
@@ -102,9 +101,8 @@ object Form1: TForm1
     Caption = 'Benchmark TStringList'
     TabOrder = 2
     OnClick = ALButton4Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton5: TALButton
+  object ALButton5: TButton
     Left = 16
     Top = 49
     Width = 220
@@ -112,9 +110,8 @@ object Form1: TForm1
     Caption = 'Benchmark TALInt64AVLList'
     TabOrder = 3
     OnClick = ALButton5Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton6: TALButton
+  object ALButton6: TButton
     Left = 258
     Top = 49
     Width = 220
@@ -122,9 +119,8 @@ object Form1: TForm1
     Caption = 'Benchmark TALInt64List'
     TabOrder = 4
     OnClick = ALButton6Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton10: TALButton
+  object ALButton10: TButton
     Left = 16
     Top = 80
     Width = 220
@@ -132,9 +128,8 @@ object Form1: TForm1
     Caption = 'Benchmark TALStringList'
     TabOrder = 5
     OnClick = ALButton10Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton11: TALButton
+  object ALButton11: TButton
     Left = 258
     Top = 80
     Width = 220
@@ -142,9 +137,8 @@ object Form1: TForm1
     Caption = 'Benchmark TStringList'
     TabOrder = 6
     OnClick = ALButton11Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton33: TALButton
+  object ALButton33: TButton
     Left = 16
     Top = 112
     Width = 220
@@ -152,9 +146,8 @@ object Form1: TForm1
     Caption = 'Benchmark TALAVLStringList'
     TabOrder = 7
     OnClick = ALButton33Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton34: TALButton
+  object ALButton34: TButton
     Left = 258
     Top = 111
     Width = 220
@@ -162,6 +155,5 @@ object Form1: TForm1
     Caption = 'Benchmark TStringList'
     TabOrder = 8
     OnClick = ALButton4Click
-    OnPaint = ALButtonPaint
   end
 end

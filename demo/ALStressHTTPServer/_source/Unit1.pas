@@ -3,7 +3,7 @@ unit Unit1;
 interface
 
 uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-     Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, AlHttpCommon, AlWinHttpClient,
+     Dialogs, StdCtrls, shellapi, ExtCtrls, ComCtrls, AlHttpClient, AlWinHttpClient,
      AlStringList, AlWinHttpWrapper, cxStyles, cxCustomData, cxGraphics, cxFilter,
      cxData, cxDataStorage, cxEdit, cxDropDownEdit, cxImageComboBox, cxSpinEdit,
      cxGridLevel, cxGridCustomTableView, cxGridTableView, cxClasses, cxControls,
@@ -202,13 +202,13 @@ implementation
 
 Uses Math,
      DateUtils,
-     ALMultiPartFormDataParser,
-     AlFcnFile,
-     AlFcnMisc,
+     ALMultiPartParser,
+     AlFiles,
+     AlMisc,
      ALWindows,
-     AlfcnHtml,
-     AlFcnMime,
-     AlFcnString;
+     AlHtml,
+     AlMime,
+     ALString;
 
 {$R *.dfm}
 

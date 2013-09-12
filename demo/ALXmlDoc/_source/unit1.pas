@@ -17,13 +17,13 @@ uses Windows,
      XMLIntf,
      msxmldom,
      XMLDoc,
-     AlFcnString,
+     ALString,
      AlXmlDoc,
      ExtCtrls,
      OleCtrls,
      SHDocVw,
      ComObj,
-     ALFcnFile,
+     ALFiles,
      ALStringList;
 
 {------------------------------------}

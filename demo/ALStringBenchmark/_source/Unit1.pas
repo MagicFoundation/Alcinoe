@@ -4,64 +4,62 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, AlScrollBar, ALMemo, ALButton,
-  OleCtrls, SHDocVw, ComObj;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, OleCtrls, SHDocVw, ComObj;
 
 type
   TForm1 = class(TForm)
-    ALButton1: TALButton;
-    ALButton2: TALButton;
-    ALButton3: TALButton;
-    ALButton4: TALButton;
-    ALButton5: TALButton;
-    ALButton6: TALButton;
-    ALButton7: TALButton;
-    ALButton8: TALButton;
-    ALButton9: TALButton;
-    ALButton10: TALButton;
-    ALButton11: TALButton;
-    ALButton12: TALButton;
-    ALButton13: TALButton;
-    ALButton14: TALButton;
+    ALButton1: TButton;
+    ALButton2: TButton;
+    ALButton3: TButton;
+    ALButton4: TButton;
+    ALButton5: TButton;
+    ALButton6: TButton;
+    ALButton7: TButton;
+    ALButton8: TButton;
+    ALButton9: TButton;
+    ALButton10: TButton;
+    ALButton11: TButton;
+    ALButton12: TButton;
+    ALButton13: TButton;
+    ALButton14: TButton;
     Panel2: TPanel;
     Label7: TLabel;
     Label8: TLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
-    ALButton15: TALButton;
-    ALButton16: TALButton;
-    ALButton17: TALButton;
-    ALButton18: TALButton;
-    ALButton19: TALButton;
-    ALButton20: TALButton;
-    ALButton21: TALButton;
-    ALButton22: TALButton;
-    ALButton23: TALButton;
-    ALButton24: TALButton;
-    ALButton25: TALButton;
-    ALButton26: TALButton;
-    ALButton27: TALButton;
-    ALButton28: TALButton;
-    ALButton29: TALButton;
-    ALButton30: TALButton;
-    ALButton31: TALButton;
-    ALButton32: TALButton;
-    ALButton33: TALButton;
-    ALButton34: TALButton;
-    ALButton35: TALButton;
-    ALButton36: TALButton;
-    ALButton37: TALButton;
-    ALButton38: TALButton;
-    ALButton39: TALButton;
-    ALButton41: TALButton;
-    ALButton42: TALButton;
-    ALButton40: TALButton;
-    ALButton43: TALButton;
-    ALButton44: TALButton;
-    ALButton45: TALButton;
-    ALButton46: TALButton;
-    ALButton47: TALButton;
-    procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
+    ALButton15: TButton;
+    ALButton16: TButton;
+    ALButton17: TButton;
+    ALButton18: TButton;
+    ALButton19: TButton;
+    ALButton20: TButton;
+    ALButton21: TButton;
+    ALButton22: TButton;
+    ALButton23: TButton;
+    ALButton24: TButton;
+    ALButton25: TButton;
+    ALButton26: TButton;
+    ALButton27: TButton;
+    ALButton28: TButton;
+    ALButton29: TButton;
+    ALButton30: TButton;
+    ALButton31: TButton;
+    ALButton32: TButton;
+    ALButton33: TButton;
+    ALButton34: TButton;
+    ALButton35: TButton;
+    ALButton36: TButton;
+    ALButton37: TButton;
+    ALButton38: TButton;
+    ALButton39: TButton;
+    ALButton41: TButton;
+    ALButton42: TButton;
+    ALButton40: TButton;
+    ALButton43: TButton;
+    ALButton44: TButton;
+    ALButton45: TButton;
+    ALButton46: TButton;
+    ALButton47: TButton;
     procedure FormClick(Sender: TObject);
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton2Click(Sender: TObject);
@@ -126,15 +124,9 @@ implementation
 uses {$IFDEF UNICODE}
      ansiStrings,
      {$ENDIF}
-     alFcnSkin,
-     alFcnString;
+     ALString;
 
 {$R *.dfm}
-
-procedure TForm1.ALButtonPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlButtonBlueSkin(sender, Continue);
-end;
 
 procedure TForm1.FormClick(Sender: TObject);
 begin

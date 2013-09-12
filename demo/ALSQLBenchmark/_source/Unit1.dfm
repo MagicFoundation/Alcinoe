@@ -250,7 +250,7 @@ object Form1: TForm1
     ParentBackground = False
     ParentColor = False
     TabOrder = 0
-    Properties.ActivePage = Firebird
+    Properties.ActivePage = MongoDB
     ClientRectBottom = 324
     ClientRectLeft = 5
     ClientRectRight = 1002
@@ -1037,7 +1037,7 @@ object Form1: TForm1
     object Sphinx: TcxTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
-      ExplicitLeft = 7
+      ExplicitLeft = 0
       ExplicitTop = 0
       ExplicitWidth = 0
       ExplicitHeight = 0
@@ -1238,15 +1238,15 @@ object Form1: TForm1
         Transparent = True
       end
       object Label48: TcxLabel
-        Left = 820
-        Top = 196
+        Left = 819
+        Top = 244
         Caption = 'Nb Thread:'
         ParentFont = False
         Transparent = True
       end
       object Label49: TcxLabel
-        Left = 832
-        Top = 221
+        Left = 831
+        Top = 269
         Caption = 'Nb Loop:'
         ParentFont = False
         Transparent = True
@@ -1313,15 +1313,15 @@ object Form1: TForm1
         OnClick = ALButtonMemcachedLoopSetClick
       end
       object ALEditMemcachedNBThread: TcxTextEdit
-        Left = 892
-        Top = 191
+        Left = 891
+        Top = 239
         TabOrder = 7
         Text = '1'
         Width = 74
       end
       object ALEditMemCachedNBLoop: TcxTextEdit
-        Left = 891
-        Top = 218
+        Left = 890
+        Top = 266
         TabOrder = 8
         Text = '1000000'
         Width = 74
@@ -1439,6 +1439,274 @@ object Form1: TForm1
         Caption = 'DELETE'
         TabOrder = 27
         OnClick = ALButtonMemcachedDeleteClick
+      end
+      object ALButtonMemcachedLoopIncr: TcxButton
+        Left = 805
+        Top = 174
+        Width = 161
+        Height = 25
+        Caption = 'Loop INCR'
+        TabOrder = 28
+        OnClick = ALButtonMemcachedLoopIncrClick
+      end
+      object ALButtonMemcachedLoopDecr: TcxButton
+        Left = 804
+        Top = 205
+        Width = 161
+        Height = 25
+        Caption = 'Loop DECR'
+        TabOrder = 29
+        OnClick = ALButtonMemcachedLoopDecrClick
+      end
+    end
+    object MongoDB: TcxTabSheet
+      Caption = 'MongoDB'
+      ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
+      object cxLabel3: TcxLabel
+        Left = 25
+        Top = 21
+        Caption = 'Host Name'
+        ParentFont = False
+        Transparent = True
+      end
+      object ALEditMongoDBHost: TcxTextEdit
+        Left = 94
+        Top = 18
+        TabOrder = 1
+        Text = 'localhost'
+        Width = 221
+      end
+      object cxLabel4: TcxLabel
+        Left = 17
+        Top = 46
+        Caption = 'Port Number'
+        ParentFont = False
+        Transparent = True
+      end
+      object ALEditMongoDBPort: TcxTextEdit
+        Left = 94
+        Top = 43
+        TabOrder = 3
+        Text = '27017'
+        Width = 88
+      end
+      object cxLabel6: TcxLabel
+        Left = 374
+        Top = 19
+        Caption = 'Key'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxTextEdit3: TcxTextEdit
+        Left = 405
+        Top = 18
+        TabOrder = 5
+        Text = '<#randomString maxlength=250>'
+        Width = 338
+      end
+      object cxTextEdit4: TcxTextEdit
+        Left = 402
+        Top = 45
+        TabOrder = 6
+        Text = '<#randomnumber>'
+        Width = 215
+      end
+      object cxLabel7: TcxLabel
+        Left = 367
+        Top = 46
+        Caption = 'Flags'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxLabel8: TcxLabel
+        Left = 344
+        Top = 70
+        Caption = 'Expiration'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxTextEdit5: TcxTextEdit
+        Left = 403
+        Top = 69
+        TabOrder = 9
+        Text = '<#randomnumber>'
+        Width = 214
+      end
+      object cxLabel9: TcxLabel
+        Left = 365
+        Top = 97
+        Caption = 'DATA'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxMemo1: TcxMemo
+        Left = 405
+        Top = 96
+        Lines.Strings = (
+          '<#randomString maxlength=100000>')
+        ParentFont = False
+        Properties.ScrollBars = ssVertical
+        TabOrder = 11
+        Height = 180
+        Width = 338
+      end
+      object ALButtonMongoDBFind: TcxButton
+        Left = 803
+        Top = 18
+        Width = 161
+        Height = 25
+        Caption = 'FIND'
+        TabOrder = 12
+        OnClick = ALButtonMongoDBFindClick
+      end
+      object cxButton2: TcxButton
+        Left = 804
+        Top = 49
+        Width = 161
+        Height = 25
+        Caption = 'SET'
+        TabOrder = 13
+        OnClick = ALButtonMemcachedSetClick
+      end
+      object cxButton3: TcxButton
+        Left = 805
+        Top = 80
+        Width = 161
+        Height = 25
+        Caption = 'DELETE'
+        TabOrder = 14
+        OnClick = ALButtonMemcachedDeleteClick
+      end
+      object cxButton4: TcxButton
+        Left = 805
+        Top = 112
+        Width = 161
+        Height = 25
+        Caption = 'Loop GET'
+        TabOrder = 15
+        OnClick = ALButtonMemcachedLoopGetClick
+      end
+      object cxButton5: TcxButton
+        Left = 805
+        Top = 143
+        Width = 161
+        Height = 25
+        Caption = 'Loop SET'
+        TabOrder = 16
+        OnClick = ALButtonMemcachedLoopSetClick
+      end
+      object cxButton6: TcxButton
+        Left = 805
+        Top = 174
+        Width = 161
+        Height = 25
+        Caption = 'Loop INCR'
+        TabOrder = 17
+        OnClick = ALButtonMemcachedLoopIncrClick
+      end
+      object cxButton7: TcxButton
+        Left = 804
+        Top = 205
+        Width = 161
+        Height = 25
+        Caption = 'Loop DECR'
+        TabOrder = 18
+        OnClick = ALButtonMemcachedLoopDecrClick
+      end
+      object cxTextEdit6: TcxTextEdit
+        Left = 891
+        Top = 239
+        TabOrder = 19
+        Text = '1'
+        Width = 74
+      end
+      object cxLabel10: TcxLabel
+        Left = 819
+        Top = 244
+        Caption = 'Nb Thread:'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxLabel11: TcxLabel
+        Left = 831
+        Top = 269
+        Caption = 'Nb Loop:'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxTextEdit7: TcxTextEdit
+        Left = 890
+        Top = 266
+        TabOrder = 22
+        Text = '1000000'
+        Width = 74
+      end
+      object cxButton8: TcxButton
+        Left = 17
+        Top = 97
+        Width = 88
+        Height = 25
+        Caption = 'STATS'
+        TabOrder = 23
+        OnClick = ALButtonMemcachedStatsClick
+      end
+      object cxButton9: TcxButton
+        Left = 131
+        Top = 94
+        Width = 88
+        Height = 25
+        Caption = 'FLUSH_ALL'
+        TabOrder = 24
+        OnClick = ALButtonMemcachedFLush_ALLClick
+      end
+      object cxButton10: TcxButton
+        Left = 131
+        Top = 128
+        Width = 88
+        Height = 25
+        Caption = 'VERSION'
+        TabOrder = 25
+        OnClick = ALButtonMemcachedVersionClick
+      end
+      object cxButton11: TcxButton
+        Left = 17
+        Top = 128
+        Width = 88
+        Height = 25
+        Caption = 'STATS Settings'
+        TabOrder = 26
+        OnClick = ALButtonMemcachedStatsSettingsClick
+      end
+      object cxButton12: TcxButton
+        Left = 17
+        Top = 159
+        Width = 88
+        Height = 25
+        Caption = 'STATS items'
+        TabOrder = 27
+        OnClick = ALButtonMemcachedStatsItemsClick
+      end
+      object cxButton13: TcxButton
+        Left = 17
+        Top = 190
+        Width = 88
+        Height = 25
+        Caption = 'STATS slabs'
+        TabOrder = 28
+        OnClick = ALButtonMemcachedStatsSlabsClick
+      end
+      object cxButton14: TcxButton
+        Left = 17
+        Top = 221
+        Width = 88
+        Height = 25
+        Caption = 'STATS sizes'
+        TabOrder = 29
+        OnClick = ALButtonMemcachedStatsSizesClick
       end
     end
   end

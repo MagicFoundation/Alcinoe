@@ -93,10 +93,10 @@ var
 
 implementation
 
-Uses alFcnString,
+Uses ALString,
      ALStringList,
      ALInternetMessages,
-     ALMultiPartMixedParser;
+     ALMultiPartParser;
 
 {$R *.DFM}
 

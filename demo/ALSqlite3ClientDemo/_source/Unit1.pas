@@ -4,42 +4,39 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, AlScrollBar, ALMemo, ALButton,
-  ALEdit, ALComboBox, OleCtrls, SHDocVw, ComObj;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, OleCtrls, SHDocVw, ComObj;
 
 type
   TForm1 = class(TForm)
     Panel1: TPanel;
     Label5: TLabel;
-    ALMemoResult: TALMemo;
+    ALMemoResult: TMemo;
     Label6: TLabel;
     Label24: TLabel;
     Label25: TLabel;
     Label19: TLabel;
     Label21: TLabel;
     Label22: TLabel;
-    ALEditSqlite3Lib: TALEdit;
-    ALMemoSqlite3Query: TALMemo;
-    ALButtonSqlLite3Select: TALButton;
-    ALEditSqlite3Database: TALEdit;
-    ALButtonSqlite3Update: TALButton;
+    ALEditSqlite3Lib: TEdit;
+    ALMemoSqlite3Query: TMemo;
+    ALButtonSqlLite3Select: TButton;
+    ALEditSqlite3Database: TEdit;
+    ALButtonSqlite3Update: TButton;
     RadioGroupSqlite3Journal_Mode: TRadioGroup;
     RadioGroupSQLite3Temp_Store: TRadioGroup;
     RadioGroupSqlite3Synhcronous: TRadioGroup;
-    ALEditSqlite3Cache_Size: TALEdit;
-    ALEditSqlite3Page_Size: TALEdit;
-    ALCheckBoxSqlite3SharedCache: TALCheckBox;
-    ALCheckBoxSqlite3ReadUncommited: TALCheckBox;
+    ALEditSqlite3Cache_Size: TEdit;
+    ALEditSqlite3Page_Size: TEdit;
+    ALCheckBoxSqlite3SharedCache: TCheckbox;
+    ALCheckBoxSqlite3ReadUncommited: TCheckbox;
     OpenDialog1: TOpenDialog;
-    ALButtonSqlLite3Vacuum: TALButton;
+    ALButtonSqlLite3Vacuum: TButton;
     OpenDialog2: TOpenDialog;
     Label1: TLabel;
     Panel2: TPanel;
     PanelWebBrowser: TPanel;
-    procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
-    procedure ALMemoPaint(Sender: TObject; var continue: Boolean);
-    procedure ALMemoPaintScrollBar(Sender: TObject; var continue: Boolean; Area: TALScrollbarArea);
-    procedure ALEditPaint(Sender: TObject; var continue: Boolean);
+    Button1: TButton;
+    Button2: TButton;
     procedure ALButtonSqlLite3SelectClick(Sender: TObject);
     procedure ALButtonSqlite3UpdateClick(Sender: TObject);
     procedure ALButtonSqlLite3VacuumClick(Sender: TObject);
@@ -55,50 +52,25 @@ var Form1: TForm1;
 
 implementation
 
-uses alFcnSkin,
-     AlSqlite3client,
+uses AlSqlite3client,
      alStringList,
-     ALFcnHTML,
+     ALHTML,
      alXmlDoc,
      ALWindows,
-     alFcnString;
+     ALString;
 
 {$R *.dfm}
-
-{*********************************************************************}
-procedure TForm1.ALButtonPaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlButtonBlueSkin(Sender, Continue);
-end;
-
-{*******************************************************************}
-procedure TForm1.ALMemoPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlMemoBlueSkin(sender, Continue);
-end;
-
-{****************************************************************************************************}
-procedure TForm1.ALMemoPaintScrollBar(Sender: TObject; var continue: Boolean; Area: TALScrollbarArea);
-begin
-  paintAlMemoScrollBarBlueSkin(sender, Continue, area);
-end;
-
-{*******************************************************************}
-procedure TForm1.ALEditPaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlEditBlueSkin(Sender, Continue);
-end;
 
 {*****************************************************************}
 procedure TForm1.ALEditSqlite3DatabaseButtonClick(Sender: TObject);
 begin
-  If OpenDialog1.Execute then (Sender as TALedit).Text := OpenDialog1.FileName;
+  If OpenDialog1.Execute then (Sender as TEdit).Text := OpenDialog1.FileName;
 end;
 
 {************************************************************}
 procedure TForm1.ALEditSqlite3LibButtonClick(Sender: TObject);
 begin
-  If OpenDialog2.Execute then (Sender as TALedit).Text := OpenDialog2.FileName;
+  If OpenDialog2.Execute then (Sender as TEdit).Text := OpenDialog2.FileName;
 end;
 
 {***********************************************************}

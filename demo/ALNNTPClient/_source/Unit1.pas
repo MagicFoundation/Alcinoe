@@ -90,9 +90,9 @@ var
 
 implementation
 
-Uses alFcnString,
+Uses ALString,
      ALInternetMessages,
-     ALMultiPartMixedParser;
+     ALMultiPartParser;
 
 {$R *.DFM}
 

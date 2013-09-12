@@ -17,7 +17,6 @@ uses Windows,
      ALWinHttpClient,
      ALWebSpider,
      AlAVLBinaryTree,
-     AlHttpCommon,
      ExtCtrls,
      OleCtrls,
      SHDocVw,
@@ -100,9 +99,9 @@ implementation
 uses FileCtrl,
      Masks,
      UrlMon,
-     AlFcnFile,
-     AlFcnString,
-     AlFcnMime;
+     AlFiles,
+     ALString,
+     AlMime;
 
 Const SplitDirectoryAmount = 5000;
 

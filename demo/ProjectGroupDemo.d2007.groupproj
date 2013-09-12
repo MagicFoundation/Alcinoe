@@ -4,16 +4,10 @@
   </PropertyGroup>
   <ItemGroup />
   <ItemGroup>
-    <Projects Include="ALButton\_source\ALButtonDemo.d2007.dproj" />
     <Projects Include="ALCipherDemo\_source\ALCipherDemo.d2007.dproj" />
-    <Projects Include="ALComboBox\_source\ALComboBoxDemo.d2007.dproj" />
-    <Projects Include="ALEdit\_source\ALEditDemo.d2007.dproj" />
     <Projects Include="ALFBXDemo\_source\ALFBXDemo.d2007.dproj" />
     <Projects Include="ALFBXEvent\_source\ALFBXEvent.d2007.dproj" />
     <Projects Include="ALFBXMonitoringStats\_source\ALFBXMonitoringStats.d2007.dproj" />
-    <Projects Include="ALHintBalloon\_source\ALHintBalloonDemo.d2007.dproj" />
-    <Projects Include="ALListBox\_source\ALListBoxDemo.d2007.dproj" />
-    <Projects Include="ALMemo\_source\ALMemoDemo.d2007.dproj" />
     <Projects Include="ALNNTPClient\_source\ALNNTPClientDemo.d2007.dproj" />
     <Projects Include="ALPhpRunner\_source\ALPhpRunnerDemo.d2007.dproj" />
     <Projects Include="ALPOP3Client\_source\POP3ClientDemo.d2007.dproj" />
@@ -34,15 +28,6 @@
     <BorlandProject>
 <BorlandProject xmlns=""><Default.Personality></Default.Personality></BorlandProject></BorlandProject>
   </ProjectExtensions>
-  <Target Name="ALButtonDemo_d2007">
-    <MSBuild Projects="ALButton\_source\ALButtonDemo.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALButtonDemo_d2007:Clean">
-    <MSBuild Projects="ALButton\_source\ALButtonDemo.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALButtonDemo_d2007:Make">
-    <MSBuild Projects="ALButton\_source\ALButtonDemo.d2007.dproj" Targets="Make" />
-  </Target>
   <Target Name="ALCipherDemo_d2007">
     <MSBuild Projects="ALCipherDemo\_source\ALCipherDemo.d2007.dproj" Targets="" />
   </Target>
@@ -51,24 +36,6 @@
   </Target>
   <Target Name="ALCipherDemo_d2007:Make">
     <MSBuild Projects="ALCipherDemo\_source\ALCipherDemo.d2007.dproj" Targets="Make" />
-  </Target>
-  <Target Name="ALComboBoxDemo_d2007">
-    <MSBuild Projects="ALComboBox\_source\ALComboBoxDemo.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALComboBoxDemo_d2007:Clean">
-    <MSBuild Projects="ALComboBox\_source\ALComboBoxDemo.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALComboBoxDemo_d2007:Make">
-    <MSBuild Projects="ALComboBox\_source\ALComboBoxDemo.d2007.dproj" Targets="Make" />
-  </Target>
-  <Target Name="ALEditDemo_d2007">
-    <MSBuild Projects="ALEdit\_source\ALEditDemo.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALEditDemo_d2007:Clean">
-    <MSBuild Projects="ALEdit\_source\ALEditDemo.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALEditDemo_d2007:Make">
-    <MSBuild Projects="ALEdit\_source\ALEditDemo.d2007.dproj" Targets="Make" />
   </Target>
   <Target Name="ALFBXDemo_d2007">
     <MSBuild Projects="ALFBXDemo\_source\ALFBXDemo.d2007.dproj" Targets="" />
@@ -96,33 +63,6 @@
   </Target>
   <Target Name="ALFBXMonitoringStats_d2007:Make">
     <MSBuild Projects="ALFBXMonitoringStats\_source\ALFBXMonitoringStats.d2007.dproj" Targets="Make" />
-  </Target>
-  <Target Name="ALHintBalloonDemo_d2007">
-    <MSBuild Projects="ALHintBalloon\_source\ALHintBalloonDemo.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALHintBalloonDemo_d2007:Clean">
-    <MSBuild Projects="ALHintBalloon\_source\ALHintBalloonDemo.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALHintBalloonDemo_d2007:Make">
-    <MSBuild Projects="ALHintBalloon\_source\ALHintBalloonDemo.d2007.dproj" Targets="Make" />
-  </Target>
-  <Target Name="ALListBoxDemo_d2007">
-    <MSBuild Projects="ALListBox\_source\ALListBoxDemo.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALListBoxDemo_d2007:Clean">
-    <MSBuild Projects="ALListBox\_source\ALListBoxDemo.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALListBoxDemo_d2007:Make">
-    <MSBuild Projects="ALListBox\_source\ALListBoxDemo.d2007.dproj" Targets="Make" />
-  </Target>
-  <Target Name="ALMemoDemo_d2007">
-    <MSBuild Projects="ALMemo\_source\ALMemoDemo.d2007.dproj" Targets="" />
-  </Target>
-  <Target Name="ALMemoDemo_d2007:Clean">
-    <MSBuild Projects="ALMemo\_source\ALMemoDemo.d2007.dproj" Targets="Clean" />
-  </Target>
-  <Target Name="ALMemoDemo_d2007:Make">
-    <MSBuild Projects="ALMemo\_source\ALMemoDemo.d2007.dproj" Targets="Make" />
   </Target>
   <Target Name="ALNNTPClientDemo_d2007">
     <MSBuild Projects="ALNNTPClient\_source\ALNNTPClientDemo.d2007.dproj" Targets="" />
@@ -242,13 +182,13 @@
     <MSBuild Projects="ALSortedListBenchmark\_source\ALSortedListBenchmark.d2007.dproj" Targets="Make" />
   </Target>
   <Target Name="Build">
-    <CallTarget Targets="ALButtonDemo_d2007;ALCipherDemo_d2007;ALComboBoxDemo_d2007;ALEditDemo_d2007;ALFBXDemo_d2007;ALFBXEvent_d2007;ALFBXMonitoringStats_d2007;ALHintBalloonDemo_d2007;ALListBoxDemo_d2007;ALMemoDemo_d2007;ALNNTPClientDemo_d2007;ALPhpRunnerDemo_d2007;POP3ClientDemo_d2007;ALSMTPClientDemo_d2007;ALSqlite3clientDemo_d2007;ALStressHTTPServer_d2007;ALStringBenchmark_d2007;ALStringToAnsiString_d2007;ALWebSpiderDemo_d2007;ALWinHTTPClientDemo_d2007;ALWinInetHTTPClientDemo_d2007;AlXmlDocDemo_d2007;ALSortedListBenchmark_d2007" />
+    <CallTarget Targets="ALCipherDemo_d2007;ALFBXDemo_d2007;ALFBXEvent_d2007;ALFBXMonitoringStats_d2007;ALNNTPClientDemo_d2007;ALPhpRunnerDemo_d2007;POP3ClientDemo_d2007;ALSMTPClientDemo_d2007;ALSqlite3clientDemo_d2007;ALStressHTTPServer_d2007;ALStringBenchmark_d2007;ALStringToAnsiString_d2007;ALWebSpiderDemo_d2007;ALWinHTTPClientDemo_d2007;ALWinInetHTTPClientDemo_d2007;AlXmlDocDemo_d2007;ALSortedListBenchmark_d2007" />
   </Target>
   <Target Name="Clean">
-    <CallTarget Targets="ALButtonDemo_d2007:Clean;ALCipherDemo_d2007:Clean;ALComboBoxDemo_d2007:Clean;ALEditDemo_d2007:Clean;ALFBXDemo_d2007:Clean;ALFBXEvent_d2007:Clean;ALFBXMonitoringStats_d2007:Clean;ALHintBalloonDemo_d2007:Clean;ALListBoxDemo_d2007:Clean;ALMemoDemo_d2007:Clean;ALNNTPClientDemo_d2007:Clean;ALPhpRunnerDemo_d2007:Clean;POP3ClientDemo_d2007:Clean;ALSMTPClientDemo_d2007:Clean;ALSqlite3clientDemo_d2007:Clean;ALStressHTTPServer_d2007:Clean;ALStringBenchmark_d2007:Clean;ALStringToAnsiString_d2007:Clean;ALWebSpiderDemo_d2007:Clean;ALWinHTTPClientDemo_d2007:Clean;ALWinInetHTTPClientDemo_d2007:Clean;AlXmlDocDemo_d2007:Clean;ALSortedListBenchmark_d2007:Clean" />
+    <CallTarget Targets="ALCipherDemo_d2007:Clean;ALFBXDemo_d2007:Clean;ALFBXEvent_d2007:Clean;ALFBXMonitoringStats_d2007:Clean;ALNNTPClientDemo_d2007:Clean;ALPhpRunnerDemo_d2007:Clean;POP3ClientDemo_d2007:Clean;ALSMTPClientDemo_d2007:Clean;ALSqlite3clientDemo_d2007:Clean;ALStressHTTPServer_d2007:Clean;ALStringBenchmark_d2007:Clean;ALStringToAnsiString_d2007:Clean;ALWebSpiderDemo_d2007:Clean;ALWinHTTPClientDemo_d2007:Clean;ALWinInetHTTPClientDemo_d2007:Clean;AlXmlDocDemo_d2007:Clean;ALSortedListBenchmark_d2007:Clean" />
   </Target>
   <Target Name="Make">
-    <CallTarget Targets="ALButtonDemo_d2007:Make;ALCipherDemo_d2007:Make;ALComboBoxDemo_d2007:Make;ALEditDemo_d2007:Make;ALFBXDemo_d2007:Make;ALFBXEvent_d2007:Make;ALFBXMonitoringStats_d2007:Make;ALHintBalloonDemo_d2007:Make;ALListBoxDemo_d2007:Make;ALMemoDemo_d2007:Make;ALNNTPClientDemo_d2007:Make;ALPhpRunnerDemo_d2007:Make;POP3ClientDemo_d2007:Make;ALSMTPClientDemo_d2007:Make;ALSqlite3clientDemo_d2007:Make;ALStressHTTPServer_d2007:Make;ALStringBenchmark_d2007:Make;ALStringToAnsiString_d2007:Make;ALWebSpiderDemo_d2007:Make;ALWinHTTPClientDemo_d2007:Make;ALWinInetHTTPClientDemo_d2007:Make;AlXmlDocDemo_d2007:Make;ALSortedListBenchmark_d2007:Make" />
+    <CallTarget Targets="ALCipherDemo_d2007:Make;ALFBXDemo_d2007:Make;ALFBXEvent_d2007:Make;ALFBXMonitoringStats_d2007:Make;ALNNTPClientDemo_d2007:Make;ALPhpRunnerDemo_d2007:Make;POP3ClientDemo_d2007:Make;ALSMTPClientDemo_d2007:Make;ALSqlite3clientDemo_d2007:Make;ALStressHTTPServer_d2007:Make;ALStringBenchmark_d2007:Make;ALStringToAnsiString_d2007:Make;ALWebSpiderDemo_d2007:Make;ALWinHTTPClientDemo_d2007:Make;ALWinInetHTTPClientDemo_d2007:Make;AlXmlDocDemo_d2007:Make;ALSortedListBenchmark_d2007:Make" />
   </Target>
   <Import Condition="Exists('$(MSBuildBinPath)\Borland.Group.Targets')" Project="$(MSBuildBinPath)\Borland.Group.Targets" />
 </Project>

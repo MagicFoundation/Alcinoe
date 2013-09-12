@@ -6,9 +6,9 @@ uses
   Windows,
   Masks,
   SysUtils,
-  AlFcnFile,
+  AlFiles,
   ALStringList,
-  ALFcnString;
+  ALString;
 
 {************************************************************}
 function ALStringToAnsiString_UpdateFile(aBodyStr: AnsiString;

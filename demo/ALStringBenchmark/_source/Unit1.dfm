@@ -4,7 +4,7 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 704
   ClientWidth = 763
-  Color = 15986666
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -16,7 +16,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object ALButton1: TALButton
+  object ALButton1: TButton
     Left = 16
     Top = 16
     Width = 230
@@ -24,9 +24,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALStringReplace (AnsiString)'
     TabOrder = 0
     OnClick = ALButton1Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton2: TALButton
+  object ALButton2: TButton
     Left = 266
     Top = 16
     Width = 230
@@ -34,9 +33,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StringReplace (Unicode)'
     TabOrder = 1
     OnClick = ALButton2Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton3: TALButton
+  object ALButton3: TButton
     Left = 16
     Top = 48
     Width = 230
@@ -44,9 +42,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALPosEx (AnsiString)'
     TabOrder = 2
     OnClick = ALButton3Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton4: TALButton
+  object ALButton4: TButton
     Left = 266
     Top = 48
     Width = 230
@@ -54,9 +51,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi PosEx (Unicode)'
     TabOrder = 3
     OnClick = ALButton4Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton5: TALButton
+  object ALButton5: TButton
     Left = 16
     Top = 80
     Width = 230
@@ -64,9 +60,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALPos (AnsiString)'
     TabOrder = 4
     OnClick = ALButton5Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton6: TALButton
+  object ALButton6: TButton
     Left = 266
     Top = 80
     Width = 230
@@ -74,9 +69,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi Pos (Unicode)'
     TabOrder = 5
     OnClick = ALButton6Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton7: TALButton
+  object ALButton7: TButton
     Left = 16
     Top = 112
     Width = 230
@@ -84,9 +78,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALCompareText (AnsiString)'
     TabOrder = 6
     OnClick = ALButton7Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton8: TALButton
+  object ALButton8: TButton
     Left = 266
     Top = 112
     Width = 230
@@ -94,9 +87,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi CompareText (Unicode)'
     TabOrder = 7
     OnClick = ALButton8Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton9: TALButton
+  object ALButton9: TButton
     Left = 16
     Top = 144
     Width = 230
@@ -104,9 +96,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALUpperCase (AnsiString)'
     TabOrder = 8
     OnClick = ALButton9Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton10: TALButton
+  object ALButton10: TButton
     Left = 266
     Top = 145
     Width = 230
@@ -114,9 +105,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi UpperCase (Unicode)'
     TabOrder = 9
     OnClick = ALButton10Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton11: TALButton
+  object ALButton11: TButton
     Left = 16
     Top = 176
     Width = 230
@@ -124,9 +114,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALLowerCase (AnsiString)'
     TabOrder = 10
     OnClick = ALButton11Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton12: TALButton
+  object ALButton12: TButton
     Left = 266
     Top = 176
     Width = 230
@@ -134,9 +123,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi LowerCase (Unicode)'
     TabOrder = 11
     OnClick = ALButton12Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton13: TALButton
+  object ALButton13: TButton
     Left = 16
     Top = 208
     Width = 230
@@ -144,9 +132,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALCopyStr (AnsiString)'
     TabOrder = 12
     OnClick = ALButton13Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton14: TALButton
+  object ALButton14: TButton
     Left = 266
     Top = 208
     Width = 230
@@ -154,7 +141,6 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi Copy (Unicode)'
     TabOrder = 13
     OnClick = ALButton14Click
-    OnPaint = ALButtonPaint
   end
   object Panel2: TPanel
     Left = 16
@@ -224,7 +210,7 @@ object Form1: TForm1
       end
     end
   end
-  object ALButton15: TALButton
+  object ALButton15: TButton
     Left = 16
     Top = 240
     Width = 230
@@ -232,9 +218,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALIntToStr (AnsiString)'
     TabOrder = 15
     OnClick = ALButton15Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton16: TALButton
+  object ALButton16: TButton
     Left = 266
     Top = 240
     Width = 230
@@ -242,9 +227,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi IntToStr (Unicode)'
     TabOrder = 16
     OnClick = ALButton16Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton17: TALButton
+  object ALButton17: TButton
     Left = 16
     Top = 272
     Width = 230
@@ -252,9 +236,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALStrToInt (AnsiString)'
     TabOrder = 17
     OnClick = ALButton17Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton18: TALButton
+  object ALButton18: TButton
     Left = 266
     Top = 272
     Width = 230
@@ -262,9 +245,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToInt (Unicode)'
     TabOrder = 18
     OnClick = ALButton18Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton19: TALButton
+  object ALButton19: TButton
     Left = 16
     Top = 304
     Width = 230
@@ -272,9 +254,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALStrToInt64 (AnsiString)'
     TabOrder = 19
     OnClick = ALButton19Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton20: TALButton
+  object ALButton20: TButton
     Left = 266
     Top = 304
     Width = 230
@@ -282,9 +263,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToInt64 (Unicode)'
     TabOrder = 20
     OnClick = ALButton20Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton21: TALButton
+  object ALButton21: TButton
     Left = 16
     Top = 336
     Width = 230
@@ -292,9 +272,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALDateToStr (AnsiString)'
     TabOrder = 21
     OnClick = ALButton21Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton22: TALButton
+  object ALButton22: TButton
     Left = 266
     Top = 336
     Width = 230
@@ -302,9 +281,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi DateToStr (Unicode)'
     TabOrder = 22
     OnClick = ALButton22Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton23: TALButton
+  object ALButton23: TButton
     Left = 16
     Top = 496
     Width = 230
@@ -312,9 +290,8 @@ object Form1: TForm1
     Caption = 'Benchmark AnsiString Memory Usage'
     TabOrder = 23
     OnClick = ALButton23Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton24: TALButton
+  object ALButton24: TButton
     Left = 266
     Top = 496
     Width = 230
@@ -322,9 +299,8 @@ object Form1: TForm1
     Caption = 'Benchmark UnicodeString Memory Usage'
     TabOrder = 24
     OnClick = ALButton24Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton25: TALButton
+  object ALButton25: TButton
     Left = 16
     Top = 400
     Width = 230
@@ -332,9 +308,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALFloatToStr (AnsiString)'
     TabOrder = 25
     OnClick = ALButton25Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton26: TALButton
+  object ALButton26: TButton
     Left = 266
     Top = 400
     Width = 230
@@ -342,9 +317,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi FloatToStr (Unicode)'
     TabOrder = 26
     OnClick = ALButton26Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton27: TALButton
+  object ALButton27: TButton
     Left = 16
     Top = 368
     Width = 230
@@ -352,9 +326,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALStrToDateTime (AnsiString)'
     TabOrder = 27
     OnClick = ALButton27Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton28: TALButton
+  object ALButton28: TButton
     Left = 266
     Top = 368
     Width = 230
@@ -362,9 +335,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToDateTime (Unicode)'
     TabOrder = 28
     OnClick = ALButton28Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton29: TALButton
+  object ALButton29: TButton
     Left = 516
     Top = 16
     Width = 230
@@ -372,9 +344,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StringReplace (AnsiString)'
     TabOrder = 29
     OnClick = ALButton29Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton30: TALButton
+  object ALButton30: TButton
     Left = 516
     Top = 48
     Width = 230
@@ -382,9 +353,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi PosEx (AnsiString)'
     TabOrder = 30
     OnClick = ALButton30Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton31: TALButton
+  object ALButton31: TButton
     Left = 516
     Top = 80
     Width = 230
@@ -392,9 +362,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi Pos (AnsiString)'
     TabOrder = 31
     OnClick = ALButton31Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton32: TALButton
+  object ALButton32: TButton
     Left = 516
     Top = 112
     Width = 230
@@ -402,9 +371,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi CompareText (AnsiString)'
     TabOrder = 32
     OnClick = ALButton32Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton33: TALButton
+  object ALButton33: TButton
     Left = 516
     Top = 145
     Width = 230
@@ -412,9 +380,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi UpperCase (AnsiString)'
     TabOrder = 33
     OnClick = ALButton33Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton34: TALButton
+  object ALButton34: TButton
     Left = 516
     Top = 176
     Width = 230
@@ -422,9 +389,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi LowerCase (AnsiString)'
     TabOrder = 34
     OnClick = ALButton34Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton35: TALButton
+  object ALButton35: TButton
     Left = 516
     Top = 208
     Width = 230
@@ -432,9 +398,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi Copy (AnsiString)'
     TabOrder = 35
     OnClick = ALButton35Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton36: TALButton
+  object ALButton36: TButton
     Left = 516
     Top = 240
     Width = 230
@@ -442,9 +407,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi IntToStr (AnsiString)'
     TabOrder = 36
     OnClick = ALButton36Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton37: TALButton
+  object ALButton37: TButton
     Left = 516
     Top = 272
     Width = 230
@@ -452,9 +416,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToInt (AnsiString)'
     TabOrder = 37
     OnClick = ALButton37Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton38: TALButton
+  object ALButton38: TButton
     Left = 516
     Top = 304
     Width = 230
@@ -462,9 +425,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToInt64 (AnsiString)'
     TabOrder = 38
     OnClick = ALButton38Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton39: TALButton
+  object ALButton39: TButton
     Left = 516
     Top = 336
     Width = 230
@@ -472,9 +434,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi DateToStr (AnsiString)'
     TabOrder = 39
     OnClick = ALButton39Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton41: TALButton
+  object ALButton41: TButton
     Left = 516
     Top = 400
     Width = 230
@@ -482,9 +443,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi FloatToStr (AnsiString)'
     TabOrder = 40
     OnClick = ALButton41Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton42: TALButton
+  object ALButton42: TButton
     Left = 516
     Top = 368
     Width = 230
@@ -492,9 +452,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToDateTime (AnsiString)'
     TabOrder = 41
     OnClick = ALButton42Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton40: TALButton
+  object ALButton40: TButton
     Left = 16
     Top = 432
     Width = 230
@@ -502,9 +461,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALFormat (AnsiString)'
     TabOrder = 42
     OnClick = ALButton40Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton43: TALButton
+  object ALButton43: TButton
     Left = 266
     Top = 432
     Width = 230
@@ -512,9 +470,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi Format (Unicode)'
     TabOrder = 43
     OnClick = ALButton43Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton44: TALButton
+  object ALButton44: TButton
     Left = 516
     Top = 432
     Width = 230
@@ -522,9 +479,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi Format (AnsiString)'
     TabOrder = 44
     OnClick = ALButton44Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton45: TALButton
+  object ALButton45: TButton
     Left = 16
     Top = 464
     Width = 230
@@ -532,9 +488,8 @@ object Form1: TForm1
     Caption = 'Benchmark ALStrToFloat (AnsiString)'
     TabOrder = 45
     OnClick = ALButton45Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton46: TALButton
+  object ALButton46: TButton
     Left = 266
     Top = 464
     Width = 230
@@ -542,9 +497,8 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToFloat (Unicode)'
     TabOrder = 46
     OnClick = ALButton46Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton47: TALButton
+  object ALButton47: TButton
     Left = 516
     Top = 464
     Width = 230
@@ -552,6 +506,5 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToFloat (AnsiString)'
     TabOrder = 47
     OnClick = ALButton47Click
-    OnPaint = ALButtonPaint
   end
 end

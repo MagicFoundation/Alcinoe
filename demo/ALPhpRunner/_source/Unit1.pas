@@ -101,12 +101,12 @@ var
 
 implementation
 
-Uses ALMultiPartFormDataParser,
-     AlFcnFile,
-     AlFcnMisc,
-     ALFcnString,
-     AlFcnMime,
-     AlHttpCommon;
+Uses ALMultiPartParser,
+     AlFiles,
+     AlMisc,
+     ALString,
+     AlMime,
+     AlHttpClient;
 
 {$R *.dfm}
 {***************************************************}

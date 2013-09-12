@@ -61,7 +61,7 @@ var
 
 implementation
 
-uses AlFcnString;
+uses ALString;
 
 {$R *.dfm}
 

@@ -209,7 +209,7 @@ type
                         nstArray, // \x04 | Array
                         // \x05 | Binary data
                         // \x06 | Undefined — Deprecated
-                        // \x07 | ObjectId
+                        nstObjectID, // \x07 | ObjectId
                         nstBoolean, // \x08 | Boolean "false"
                                     // \x08 | Boolean "true"
                         nstDateTime, // \x09 | UTC datetime
@@ -1511,6 +1511,18 @@ Var RawBSONString: AnsiString;
     setlength(result,P-1);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {It looks like ObjectId("522dc32f0fe27d96c301f98d"), so each
+   byte is representing by 2-digits hex number.}
+  function _ObjectIDToHexString(aObjectID: AnsiString): AnsiString;
+  var aChar: AnsiChar;
+  begin
+    result := '';
+    for aChar in aObjectID do begin
+      result := result + ALIntToHex(Ord(aChar), 2);
+    end;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeNode;
   Var aNode: TALJsonNode;
@@ -1596,13 +1608,14 @@ Var RawBSONString: AnsiString;
       #$02: aNodeSubType := nstText;
       #$03: aNodeSubType := nstObject;
       #$04: aNodeSubType := nstArray;
+      #$07: aNodeSubType := nstObjectID;
       #$08: aNodeSubType := nstBoolean;
       #$09: aNodeSubType := nstDateTime;
       #$0A: aNodeSubType := nstnull;
       #$0D: aNodeSubType := nstJavascript;
       #$10: aNodeSubType := nstint32;
       #$12: aNodeSubType := nstint64;
-      else ALJSONDocError(cALBSONParseError);
+      else ALJSONDocError(cALBSONParseError + #13#10 + 'Unknown subtype: ' + Char(RawBSONString[RawBSONStringPos]));
     end;
     RawBSONStringPos := RawBSONStringPos + 1;
     If RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
@@ -1751,6 +1764,20 @@ Var RawBSONString: AnsiString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
+    {$IFDEF undef}{$REGION 'Extract value: ObjectID'}{$ENDIF}
+    // \x07 + name + (byte*12)
+    // It looks like - ObjectId("522dc32f0fe27d96c301f98d")
+    else if aNodeSubType = nstObjectID then begin
+      if RawBSONStringPos > RawBSONStringLength - 12 + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - 12 + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      aTextValue := 'ObjectId("' + _ObjectIDToHexString(ALCopyStr(RawBSONString, RawBSONStringPos, 12)) + '")';
+      RawBSONStringPos := RawBSONStringPos + 12;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
     {$IFDEF undef}{$REGION 'Extract value: JavaScript code'}{$ENDIF}
     // \x0D + name + \x00 + length (int32) + string + \x00
     else if aNodeSubType = nstJavascript then begin
@@ -1811,6 +1838,7 @@ Var RawBSONString: AnsiString;
           nstText: aNode.text := aTextValue;
           nstBoolean: aNode.Bool := aBool;
           nstDateTime: aNode.DateTime := aDateTime;
+          nstObjectID: aNode.Javascript := aTextValue;
           nstNull: aNode.null := true;
           nstJavascript: aNode.Javascript := aTextValue;
           nstInt32: aNode.int32 := aInt32;

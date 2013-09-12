@@ -456,8 +456,8 @@ type
     procedure DoParseEndObject(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseStartArray(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseEndArray(const Path: AnsiString; const Name: AnsiString);
-    Procedure InternalParseJSON(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
-    Procedure InternalParseBSON(Const RawBSONStream: TStream; Const ContainerNode: TALJSONNode);
+    Procedure ParseJSONStream(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
+    Procedure ParseBSONStream(Const RawBSONStream: TStream; Const ContainerNode: TALJSONNode);
     procedure ReleaseDoc;
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
@@ -674,13 +674,12 @@ end;
  *Each member of an object or each array value must be followed by a comma if it's not the last one
  *The common extension for json files is '.json'
  *The mime type for json files is 'application/json'}
-Procedure TALJSONDocument.InternalParseJSON(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
+Procedure TALJSONDocument.ParseJSONStream(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
 
 Const BufferSize: integer = 8192;
 Var RawJSONString: AnsiString;
     RawJSONStringLength: Integer;
     RawJSONStringPos: Integer;
-    LstParams: TALStringList;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNode;
     DecodeJSONReferences: Boolean;
@@ -772,8 +771,8 @@ Var RawJSONString: AnsiString;
     else if ALIsInt64(aStrValue) then result := NstInt64
     else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
     else if alSameText(aStrValue, 'null') then result := nstNull
-    else if ALSametext(aStrValue,'True') or
-            ALSametext(aStrValue,'False') then result := nstBoolean
+    else if ALSametext(aStrValue,'true') or
+            ALSametext(aStrValue,'false') then result := nstBoolean
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
     else result := nstJavascript;
   end;
@@ -1386,7 +1385,6 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  LstParams := TALStringList.Create;
   Paths := TALStringList.Create;
   Try
 
@@ -1422,20 +1420,18 @@ Begin
 
   finally
     Paths.Free;
-    LstParams.Free;
   end;
 
 end;
 
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
-procedure TALJSONDocument.InternalParseBSON(const RawBSONStream: TStream; const ContainerNode: TALJSONNode);
+procedure TALJSONDocument.ParseBSONStream(const RawBSONStream: TStream; const ContainerNode: TALJSONNode);
 
 Const BufferSize: integer = 8192;
 Var RawBSONString: AnsiString;
     RawBSONStringLength: Integer;
     RawBSONStringPos: Integer;
-    LstParams: TALStringList;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNode;
     Paths: TALStringList;
@@ -1671,7 +1667,7 @@ Var RawBSONString: AnsiString;
       else DoParseStartArray(GetPathStr, '');
 
       //update RawBSONStringPos
-      RawBSONStringPos := RawBSONStringPos + 4;
+      RawBSONStringPos := RawBSONStringPos + 4; // we don't need the size of the object/array (4 bytes)
 
       //finallly exit from this procedure, everything was done
       exit;
@@ -1694,7 +1690,6 @@ Var RawBSONString: AnsiString;
       ALMove(RawBSONString[RawBSONStringPos], aDouble, sizeof(Double));
       aTextValue := ALFloatToStr(aDouble, ALDefaultFormatSettings);
       RawBSONStringPos := RawBSONStringPos + sizeof(Double);
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -1711,7 +1706,6 @@ Var RawBSONString: AnsiString;
         if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
       aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
       RawBSONStringPos := RawBSONStringPos + aInt32;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -1733,22 +1727,20 @@ Var RawBSONString: AnsiString;
       end
       else ALJSONDocError(cALBSONParseError);
       RawBSONStringPos := RawBSONStringPos + 1;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'Extract value: UTC datetime'}{$ENDIF}
     // \x09 + name + \x00 + int64
     else if aNodeSubType = nstDateTime then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
         ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then ALJSONDocError(cALBSONParseError);
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
       end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(Int64));
+      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
       aDateTime := UnixToDateTime(aInt64);
       aTextValue := ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', aDateTime, ALDefaultFormatSettings);
-      RawBSONStringPos := RawBSONStringPos + sizeof(Int64);
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -1772,35 +1764,32 @@ Var RawBSONString: AnsiString;
         if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
       aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
       RawBSONStringPos := RawBSONStringPos + aInt32;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'Extract value: 32-bit Integer'}{$ENDIF}
     // \x10 + name + \x00 + int32
     else if aNodeSubType = nstint32 then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(int32) + 1 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aint32) + 1 then begin
         ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(int32) + 1 then ALJSONDocError(cALBSONParseError);
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aint32) + 1 then ALJSONDocError(cALBSONParseError);
       end;
-      ALMove(RawBSONString[RawBSONStringPos], aint32, sizeof(int32));
+      ALMove(RawBSONString[RawBSONStringPos], aint32, sizeof(aint32));
       aTextValue := ALIntToStr(aint32);
-      RawBSONStringPos := RawBSONStringPos + sizeof(int32);
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+      RawBSONStringPos := RawBSONStringPos + sizeof(aint32);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'Extract value: 64-bit integer'}{$ENDIF}
     // \x12 + name + \x00 + int64
     else if aNodeSubType = nstint64 then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
         ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(Int64) + 1 then ALJSONDocError(cALBSONParseError);
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
       end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(Int64));
+      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
       aTextValue := ALIntToStr(aint64);
-      RawBSONStringPos := RawBSONStringPos + sizeof(Int64);
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -1863,7 +1852,6 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  LstParams := TALStringList.Create;
   Paths := TALStringList.Create;
   Try
 
@@ -1893,7 +1881,6 @@ Begin
 
   finally
     Paths.Free;
-    LstParams.Free;
   end;
 
 end;
@@ -1934,8 +1921,8 @@ begin
     releaseDoc;
     SetActive(True);
   end;
-  if BSONStream then InternalParseBSON(Stream, FDocumentNode)
-  else InternalParseJSON(Stream, FDocumentNode);
+  if BSONStream then ParseBSONStream(Stream, FDocumentNode)
+  else ParseJSONStream(Stream, FDocumentNode);
 end;
 
 {*****************************************************************}
@@ -2002,8 +1989,7 @@ end;
 {**********************************************************}
 {Saves the JSON document to binary representation of JSON -
  BSON. Specification of this format can be found here:
-  http://bsonspec.org/#/specification.
-
+ http://bsonspec.org/#/specification.
  Format BSON is mostly using for the purposes of
  MongoDB interconnection.}
 procedure TALJSONDocument.SaveToBSON(var BSON: AnsiString);
@@ -2303,6 +2289,7 @@ end;
 {************************************}
 function TALJSONNode.GetFloat: Double;
 begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   Result := ALStrToFloat(GetNodeValue, ALDefaultFormatSettings);
 end;
 
@@ -2315,6 +2302,7 @@ end;
 {******************************************}
 function TALJSONNode.GetDateTime: TDateTime;
 begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   if not ALJSONDocTryStrToDateTime(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid date and time');
 end;
 
@@ -2327,6 +2315,7 @@ end;
 {*************************************}
 function TALJSONNode.GetInt32: Integer;
 begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   Result := ALStrToInt(GetNodeValue);
 end;
 
@@ -2339,6 +2328,7 @@ end;
 {***********************************}
 function TALJSONNode.GetInt64: Int64;
 begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   Result := ALStrToInt64(GetNodeValue);
 end;
 
@@ -2351,6 +2341,7 @@ end;
 {************************************}
 function TALJSONNode.GetBool: Boolean;
 begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   Result := ALStrToBool(GetNodeValue);
 end;
 
@@ -2364,7 +2355,7 @@ end;
 {************************************}
 function TALJSONNode.GetNull: Boolean;
 begin
-  Result := (NodeSubType = nstNull) and
+  Result := (NodeSubType <> nstText) and
             (AlSameText(GetNodeValue, 'null'));
 end;
 
@@ -2378,6 +2369,7 @@ end;
 {*********************************************}
 function TALJSONNode.GetJavascript: AnsiString;
 begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   Result := GetNodeValue;
 end;
 
@@ -2685,7 +2677,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
     Try
 
       {init buffer string}
-      Setlength(BufferString, bufferSize);
+      Setlength(BufferString, BufferSize * 2);
       BufferStringPos := 0;
       LastWrittenChar := '{';
       EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
@@ -2768,6 +2760,9 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
     end;
 
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    //take care because fucking TStringStream (for exemple) do not permit
+    //to write previous to the current position (it's set the size of the
+    //new stream to the current position ... unbelievable!)
     Procedure WriteInt2Pos(const aInt:integer; const aPos: system.Int64);
     var aTmpPos: System.int64;
     Begin
@@ -2970,7 +2965,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
     Try
 
       {init buffer string}
-      Setlength(BufferString, bufferSize);
+      Setlength(BufferString, BufferSize * 2);
       BufferStringPos := 0;
 
       {SaveOnlyChildNode}
@@ -3023,8 +3018,8 @@ Begin
   If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   ChildNodes.Clear;
   Try
-    if BSONStream then FDocument.InternalParseBSON(Stream, self)
-    else FDocument.InternalParseJSON(Stream, self);
+    if BSONStream then FDocument.ParseBSONStream(Stream, self)
+    else FDocument.ParseJSONStream(Stream, self);
   except
     ChildNodes.Clear;
     raise;

@@ -56,7 +56,7 @@ uses
   sysutils,
   HttpApp,
   alfcnUnicode,
-  alfcnstring;
+  ALString;
 
 function ib_util_malloc(l: integer): pointer; cdecl; external 'ib_util.dll';
 

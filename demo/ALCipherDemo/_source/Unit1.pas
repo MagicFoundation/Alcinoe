@@ -4,46 +4,40 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, ALListBox, StdCtrls, AlScrollBar, ALButton, ComCtrls,
-  ALMemo, ALEdit, OleCtrls, SHDocVw, ComObj;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, OleCtrls, SHDocVw, ComObj;
 
 type
   TForm1 = class(TForm)
-    ALButton1: TALButton;
+    ALButton1: TButton;
     StatusBar1: TStatusBar;
-    ALButton3: TALButton;
-    ALButton4: TALButton;
+    ALButton3: TButton;
+    ALButton4: TButton;
     Label1: TLabel;
-    EditKey: TALEdit;
-    ALMemoDecryptedData: TALMemo;
+    EditKey: TEdit;
+    ALMemoDecryptedData: TMemo;
     Label2: TLabel;
-    ALMemoCryptedData: TALMemo;
+    ALMemoCryptedData: TMemo;
     Label3: TLabel;
-    ALButton2: TALButton;
-    ALButton5: TALButton;
-    ALButton6: TALButton;
-    ALButton7: TALButton;
+    ALButton2: TButton;
+    ALButton5: TButton;
+    ALButton6: TButton;
+    ALButton7: TButton;
     Panel2: TPanel;
     Label7: TLabel;
     Label8: TLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
-    ALButton10: TALButton;
-    ALButton11: TALButton;
-    ALButton8: TALButton;
-    ALButton9: TALButton;
-    ALButton12: TALButton;
-    ALButton13: TALButton;
+    ALButton10: TButton;
+    ALButton11: TButton;
+    ALButton8: TButton;
+    ALButton9: TButton;
+    ALButton12: TButton;
+    ALButton13: TButton;
     procedure ALButton1Click(Sender: TObject);
-    procedure ALButton1Paint(Sender: TObject; var continue: Boolean);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
     procedure ALButton2Click(Sender: TObject);
     procedure ALButton5Click(Sender: TObject);
-    procedure ALMemoDecryptedDataPaint(Sender: TObject; var continue: Boolean);
-    procedure ALMemoDecryptedDataPaintScrollBar(Sender: TObject; var continue: Boolean;
-      Area: TALScrollbarArea);
-    procedure EditKeyPaint(Sender: TObject; var continue: Boolean);
     procedure ALButton6Click(Sender: TObject);
     procedure ALButton7Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -63,11 +57,10 @@ var Form1: TForm1;
 implementation
 
 uses math,
-     alFcnSkin,
-     alFcnMisc,
+     alMisc,
      AlAVLBinaryTree,
-     alFcnString,
-     alFcnMime,
+     ALString,
+     alMime,
      alCipher;
 
 {$R *.dfm}
@@ -87,13 +80,13 @@ Var Data: AnsiString;
     Counter: integer;
     StartTime: DWORD;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Bench MD5';
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench MD5';
     exit;
   end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
   randomize;
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
@@ -108,7 +101,7 @@ begin
       StatusBar1.Panels[0].Text := 'MD5';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TALButton).Tag = 0 then break;
+      if (Sender as TButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -120,13 +113,13 @@ Var Data: AnsiString;
     Counter: integer;
     StartTime: DWORD;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Bench SHA1';
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench SHA1';
     exit;
   end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
   randomize;
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
@@ -141,7 +134,7 @@ begin
       StatusBar1.Panels[0].Text := 'SHA1';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TALButton).Tag = 0 then break;
+      if (Sender as TButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -156,7 +149,7 @@ end;
 {************************************************}
 procedure TForm1.ALButton13Click(Sender: TObject);
 begin
-  ALMemoCryptedData.Lines.Text := String(ALCalcHMACSHA1(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
+  ALMemoCryptedData.Lines.Text := String(ALCalcHMACMD5(AnsiString(ALMemoDecryptedData.Lines.Text), AnsiString(EditKey.Text)));
 end;
 
 {***********************************************}
@@ -167,13 +160,13 @@ Var Data: AnsiString;
     StartTime: DWORD;
     Str1, Str2: AnsiString;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Bench AES (EBC)';
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench AES (EBC)';
     exit;
   end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
   randomize;
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
@@ -191,7 +184,7 @@ begin
       StatusBar1.Panels[0].Text := 'AES (EBC)';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' encrypts & decrypts /s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes - Key: '+inttostr(length(Key))+' bytes';
-      if (Sender as TALButton).Tag = 0 then break;
+      if (Sender as TButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -205,13 +198,13 @@ Var Data: AnsiString;
     StartTime: DWORD;
     Str1, Str2: AnsiString;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Bench AES (CBC)';
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench AES (CBC)';
     exit;
   end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
   randomize;
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
@@ -229,7 +222,7 @@ begin
       StatusBar1.Panels[0].Text := 'AES (CBC)';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' encrypts & decrypts /s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes - Key: '+inttostr(length(Key))+' bytes';
-      if (Sender as TALButton).Tag = 0 then break;
+      if (Sender as TButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -243,13 +236,13 @@ Var Data: AnsiString;
     StartTime: DWORD;
     Str1, Str2: AnsiString;
 begin
-  if (Sender as TALButton).Tag = 1 then begin
-    (Sender as TALButton).Tag := 0;
-    (Sender as TALButton).Caption := 'Bench Blowfish (EBC)';
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench Blowfish (EBC)';
     exit;
   end;
-  (Sender as TALButton).Tag := 1;
-  (Sender as TALButton).Caption := 'Stop';
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
   randomize;
   Counter := 0;
   StatusBar1.Panels[0].Text := '';
@@ -267,7 +260,7 @@ begin
       StatusBar1.Panels[0].Text := 'Blowfish (EBC)';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' encrypts & decrypts /s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes - Key: '+inttostr(length(Key))+' bytes';
-      if (Sender as TALButton).Tag = 0 then break;
+      if (Sender as TButton).Tag = 0 then break;
       application.ProcessMessages;
     end;
   end;
@@ -313,37 +306,12 @@ begin
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
-{********************************************************************************}
-procedure TForm1.ALMemoDecryptedDataPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlMemoBlueSkin(sender, Continue);
-end;
-
-{****************************************************************************************}
-procedure TForm1.ALMemoDecryptedDataPaintScrollBar(Sender: TObject; var continue: Boolean;
-  Area: TALScrollbarArea);
-begin
-  paintAlMemoScrollBarBlueSkin(sender, Continue, area);
-end;
-
-{********************************************************************}
-procedure TForm1.EditKeyPaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlEditBlueSkin(Sender, Continue);
-end;
-
 {***********************************************}
 procedure TForm1.ALButton2Click(Sender: TObject);
 Var outString: AnsiString;
 begin
   ALBFEncryptStringCBC(AnsiString(ALMemoDecryptedData.Lines.Text), outString, AnsiString(EditKey.Text), True);
   ALMemoCryptedData.Lines.Text := String(ALMimeBase64EncodeStringNoCRLF(outString));
-end;
-
-{**********************************************************************}
-procedure TForm1.ALButton1Paint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlButtonBlueSkin(Sender, Continue);
 end;
 
 

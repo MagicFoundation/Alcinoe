@@ -4,8 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, AlScrollBar, ALMemo, ALButton,
-  ALEdit, ALComboBox, OleCtrls, SHDocVw, ComObj, ALFbxClient;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, OleCtrls, SHDocVw, ComObj, ALFbxClient;
 
 type
   TForm1 = class(TForm)
@@ -23,39 +22,36 @@ type
     Label18: TLabel;
     Label30: TLabel;
     Label31: TLabel;
-    ALButtonFirebirdStartTransaction: TALButton;
-    ALEditFirebirdLogin: TALEdit;
-    ALEditFirebirdPassword: TALEdit;
-    ALEditFirebirdCharset: TALEdit;
-    ALEditFirebirdLib: TALEdit;
-    ALMemoFireBirdQuery: TALMemo;
-    ALEditFirebirdDatabase: TALEdit;
-    ALButtonFirebirdCommit: TALButton;
-    ALButtonFirebirdSelect: TALButton;
-    ALButtonFirebirdRollBack: TALButton;
-    ALEditFireBirdNum_buffers: TALEdit;
-    ALButtonFirebirdCreateDatabase: TALButton;
-    ALComboBoxFirebirdapiVer: TALComboBox;
+    ALButtonFirebirdStartTransaction: TButton;
+    ALEditFirebirdLogin: TEdit;
+    ALEditFirebirdPassword: TEdit;
+    ALEditFirebirdCharset: TEdit;
+    ALEditFirebirdLib: TEdit;
+    ALMemoFireBirdQuery: TMemo;
+    ALEditFirebirdDatabase: TEdit;
+    ALButtonFirebirdCommit: TButton;
+    ALButtonFirebirdSelect: TButton;
+    ALButtonFirebirdRollBack: TButton;
+    ALEditFireBirdNum_buffers: TEdit;
+    ALButtonFirebirdCreateDatabase: TButton;
+    ALComboBoxFirebirdapiVer: TCombobox;
     Label1: TLabel;
-    ALMemoFirebirdTPB: TALMemo;
-    ALButtonFirebirdUpdate: TALButton;
-    ALButtonFirebirdOpenConnection: TALButton;
-    ALButtonCloseConnection: TALButton;
-    ALButtonFirebirdPrepare: TALButton;
+    ALMemoFirebirdTPB: TMemo;
+    ALButtonFirebirdUpdate: TButton;
+    ALButtonFirebirdOpenConnection: TButton;
+    ALButtonCloseConnection: TButton;
+    ALButtonFirebirdPrepare: TButton;
     Label3: TLabel;
     Label5: TLabel;
     Panel3: TPanel;
-    ALMemoFireBirdParams: TALMemo;
-    ALMemoFirebirdResult: TALMemo;
-    ALMemoFirebirdStats: TALMemo;
+    ALMemoFireBirdParams: TMemo;
+    ALMemoFirebirdResult: TMemo;
+    ALMemoFirebirdStats: TMemo;
     Splitter1: TSplitter;
-    ALButtonFirebirdCommitRetaining: TALButton;
-    ALButtonFirebirdRollBackRetaining: TALButton;
-    procedure ALButtonFirebirdUpdatePaint(Sender: TObject; var continue: Boolean);
-    procedure Memo_SQLPaint(Sender: TObject; var continue: Boolean);
-    procedure Memo_SQLPaintScrollBar(Sender: TObject; var continue: Boolean; Area: TALScrollbarArea);
-    procedure ALEdit1Paint(Sender: TObject; var continue: Boolean);
-    procedure ComboBox_apiVerPaint(Sender: TObject; var continue: Boolean);
+    ALButtonFirebirdCommitRetaining: TButton;
+    ALButtonFirebirdRollBackRetaining: TButton;
+    Button1: TButton;
+    Button2: TButton;
     procedure ALButtonFirebirdUpdateClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -79,13 +75,12 @@ var Form1: TForm1;
 
 implementation
 
-uses alFcnSkin,
-     AlFbxBase,
+uses AlFbxBase,
      ALWindows,
      AlFbxLib,
-     ALfcnString,
+     ALString,
      alStringList,
-     ALFcnHTML,
+     ALHTML,
      ALXmlDoc;
 
 {$R *.dfm}
@@ -899,41 +894,13 @@ begin
 
 end;
 
-{***********************************************************************************}
-procedure TForm1.ALButtonFirebirdUpdatePaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlButtonBlueSkin(Sender, Continue);
-end;
-
-{********************************************************************}
-procedure TForm1.Memo_SQLPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlMemoBlueSkin(sender, Continue);
-end;
-
-{*****************************************************************************************************}
-procedure TForm1.Memo_SQLPaintScrollBar(Sender: TObject; var continue: Boolean; Area: TALScrollbarArea);
-begin
-  paintAlMemoScrollBarBlueSkin(sender, Continue, area);
-end;
-
-{********************************************************************}
-procedure TForm1.ALEdit1Paint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlEditBlueSkin(Sender, Continue);
-end;
-
 {*************************************************************}
 procedure TForm1.ALEditFirebirdLibButtonClick(Sender: TObject);
 begin
-  if OpenDialog1.Execute then (Sender as TalEdit).Text := OpenDialog1.FileName;
+  if OpenDialog1.Execute then (Sender as TEdit).Text := OpenDialog1.FileName;
 end;
 
-{****************************************************************************}
-procedure TForm1.ComboBox_apiVerPaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlComboBoxBlueSkin(Sender, Continue);
-end;
+
 
 {-------------------}
 var ie: IWebBrowser2;

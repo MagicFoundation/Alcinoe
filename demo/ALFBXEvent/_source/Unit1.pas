@@ -4,8 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ALComboBox, ALEdit, ALMemo, ALButton, ExtCtrls, AlScrollBar,
-  ALFBXclient, OleCtrls, SHDocVw, ComObj;
+  Dialogs, StdCtrls, ExtCtrls, ALFBXclient, OleCtrls, SHDocVw, ComObj;
 
 type
 
@@ -21,10 +20,10 @@ type
   TForm1 = class(TForm)
     Label3: TLabel;
     Label6: TLabel;
-    ALButton1: TALButton;
-    ALButton2: TALButton;
-    ALComboBoxFirebirdapiVer: TALComboBox;
-    ALMemoResult: TALMemo;
+    ALButton1: TButton;
+    ALButton2: TButton;
+    ALComboBoxFirebirdapiVer: TCombobox;
+    ALMemoResult: TMemo;
     OpenDialog1: TOpenDialog;
     Label2: TLabel;
     Label4: TLabel;
@@ -32,13 +31,13 @@ type
     Label16: TLabel;
     Label18: TLabel;
     Label30: TLabel;
-    ALEditFirebirdLogin: TALEdit;
-    ALEditFirebirdPassword: TALEdit;
-    ALEditFirebirdCharset: TALEdit;
-    ALEditFirebirdLib: TALEdit;
-    ALEditFirebirdDatabase: TALEdit;
-    ALEditFireBirdNum_buffers: TALEdit;
-    ALMemoFireBirdEventName: TALMemo;
+    ALEditFirebirdLogin: TEdit;
+    ALEditFirebirdPassword: TEdit;
+    ALEditFirebirdCharset: TEdit;
+    ALEditFirebirdLib: TEdit;
+    ALEditFirebirdDatabase: TEdit;
+    ALEditFireBirdNum_buffers: TEdit;
+    ALMemoFireBirdEventName: TMemo;
     Label1: TLabel;
     OpenDialog2: TOpenDialog;
     Panel2: TPanel;
@@ -46,12 +45,9 @@ type
     Label8: TLabel;
     Panel3: TPanel;
     PanelWebBrowser: TPanel;
+    Button2: TButton;
+    Button1: TButton;
     procedure ALButton1Click(Sender: TObject);
-    procedure ALComboBoxPaint(Sender: TObject; var continue: Boolean);
-    procedure ALEditPaint(Sender: TObject; var continue: Boolean);
-    procedure ALMemoPaint(Sender: TObject; var continue: Boolean);
-    procedure ALMemoPaintScrollBar(Sender: TObject; var continue: Boolean; Area: TALScrollbarArea);
-    procedure ALButtonPaint(Sender: TObject; var continue: Boolean);
     procedure ALButton2Click(Sender: TObject);
     procedure ALEditFirebirdLibButtonClick(Sender: TObject);
     procedure ALEditFirebirdDatabaseButtonClick(Sender: TObject);
@@ -68,8 +64,7 @@ var
 
 implementation
 
-uses ALFcnString,
-     ALFcnSkin,
+uses ALString,
      ALFbxBase;
 
 {$R *.dfm}
@@ -133,45 +128,14 @@ end;
 {*************************************************************}
 procedure TForm1.ALEditFirebirdLibButtonClick(Sender: TObject);
 begin
-  If OpenDialog1.Execute then (Sender as TALEdit).Text := OpenDialog1.FileName;
+  If OpenDialog1.Execute then (Sender as TEdit).Text := OpenDialog1.FileName;
 end;
 
 {******************************************************************}
 procedure TForm1.ALEditFirebirdDatabaseButtonClick(Sender: TObject);
 begin
-  If OpenDialog2.Execute then (Sender as TALEdit).Text := OpenDialog2.FileName;
+  If OpenDialog2.Execute then (Sender as TEdit).Text := OpenDialog2.FileName;
 end;
-
-{*********************************************************************}
-procedure TForm1.ALButtonPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlButtonBlueSkin(sender, Continue);
-end;
-
-{*******************************************************************}
-procedure TForm1.ALEditPaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintAlEditBlueSkin(Sender, Continue);
-end;
-
-{*******************************************************************}
-procedure TForm1.ALMemoPaint(Sender: TObject; var continue: Boolean);
-begin
-  PaintALMemoBlueSkin(Sender, continue);
-end;
-
-{****************************************************************************************************}
-procedure TForm1.ALMemoPaintScrollBar(Sender: TObject; var continue: Boolean; Area: TALScrollbarArea);
-begin
-  PaintALMemoScrollBarBlueSkin(Sender, continue, Area);
-end;
-
-{***********************************************************************}
-procedure TForm1.ALComboBoxPaint(Sender: TObject; var continue: Boolean);
-begin
-  paintAlComboBoxBlueSkin(sender, Continue);
-end;
-
 
 
 

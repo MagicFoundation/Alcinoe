@@ -2,9 +2,9 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 562
+  ClientHeight = 567
   ClientWidth = 698
-  Color = 15986666
+  Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
@@ -30,7 +30,7 @@ object Form1: TForm1
   end
   object Label6: TLabel
     Left = 18
-    Top = 360
+    Top = 370
     Width = 37
     Height = 13
     Caption = 'Result'
@@ -43,7 +43,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 75
-    Top = 93
+    Top = 103
     Width = 32
     Height = 13
     Caption = 'Login'
@@ -56,7 +56,7 @@ object Form1: TForm1
   end
   object Label4: TLabel
     Left = 51
-    Top = 118
+    Top = 132
     Width = 55
     Height = 13
     Caption = 'Password'
@@ -69,7 +69,7 @@ object Form1: TForm1
   end
   object Label15: TLabel
     Left = 63
-    Top = 143
+    Top = 161
     Width = 44
     Height = 13
     Caption = 'Charset'
@@ -82,7 +82,7 @@ object Form1: TForm1
   end
   object Label16: TLabel
     Left = 32
-    Top = 43
+    Top = 45
     Width = 75
     Height = 13
     Caption = 'FBClient DLL'
@@ -95,7 +95,7 @@ object Form1: TForm1
   end
   object Label18: TLabel
     Left = 52
-    Top = 69
+    Top = 76
     Width = 55
     Height = 13
     Caption = 'Database'
@@ -108,7 +108,7 @@ object Form1: TForm1
   end
   object Label30: TLabel
     Left = 34
-    Top = 167
+    Top = 190
     Width = 72
     Height = 13
     Caption = 'Num_buffers'
@@ -121,7 +121,7 @@ object Form1: TForm1
   end
   object Label1: TLabel
     Left = 18
-    Top = 210
+    Top = 222
     Width = 76
     Height = 13
     Caption = 'Event Names'
@@ -132,32 +132,29 @@ object Form1: TForm1
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object ALButton1: TALButton
+  object ALButton1: TButton
     Left = 18
-    Top = 320
+    Top = 332
     Width = 121
     Height = 25
     Caption = 'Start Listenig'
     TabOrder = 8
     OnClick = ALButton1Click
-    OnPaint = ALButtonPaint
   end
-  object ALButton2: TALButton
+  object ALButton2: TButton
     Left = 145
-    Top = 320
+    Top = 332
     Width = 225
     Height = 25
     Caption = 'Stop Listening'
     TabOrder = 9
     OnClick = ALButton2Click
-    OnPaint = ALButtonPaint
   end
-  object ALComboBoxFirebirdapiVer: TALComboBox
+  object ALComboBoxFirebirdapiVer: TComboBox
     Left = 113
     Top = 13
     Width = 145
     Height = 21
-    OnPaint = ALComboBoxPaint
     Style = csDropDownList
     ItemIndex = 0
     TabOrder = 0
@@ -169,129 +166,67 @@ object Form1: TForm1
       'FB20'
       'FB25')
   end
-  object ALMemoResult: TALMemo
+  object ALMemoResult: TMemo
     Left = 18
-    Top = 376
+    Top = 386
     Width = 353
     Height = 169
     TabStop = False
-    OnPaint = ALMemoPaint
-    OnPaintScrollBar = ALMemoPaintScrollBar
     TabOrder = 10
-    DesignSize = (
-      353
-      169)
   end
-  object ALEditFirebirdLogin: TALEdit
+  object ALEditFirebirdLogin: TEdit
     Left = 113
-    Top = 90
+    Top = 100
     Width = 249
-    Height = 19
-    btnCaption = '...'
-    GlyphIndex = 0
-    btnFont.Charset = DEFAULT_CHARSET
-    btnFont.Color = clWindowText
-    btnFont.Height = -11
-    btnFont.Name = 'MS Sans Serif'
-    btnFont.Style = []
-    OnPaint = ALEditPaint
+    Height = 21
     TabOrder = 3
     Text = 'SYSDBA'
   end
-  object ALEditFirebirdPassword: TALEdit
+  object ALEditFirebirdPassword: TEdit
     Left = 113
-    Top = 115
+    Top = 129
     Width = 249
-    Height = 19
-    btnCaption = '...'
-    GlyphIndex = 0
-    btnFont.Charset = DEFAULT_CHARSET
-    btnFont.Color = clWindowText
-    btnFont.Height = -11
-    btnFont.Name = 'MS Sans Serif'
-    btnFont.Style = []
-    OnPaint = ALEditPaint
+    Height = 21
     TabOrder = 4
   end
-  object ALEditFirebirdCharset: TALEdit
+  object ALEditFirebirdCharset: TEdit
     Left = 113
-    Top = 140
+    Top = 158
     Width = 72
-    Height = 19
-    btnCaption = '...'
-    GlyphIndex = 0
-    btnFont.Charset = DEFAULT_CHARSET
-    btnFont.Color = clWindowText
-    btnFont.Height = -11
-    btnFont.Name = 'MS Sans Serif'
-    btnFont.Style = []
-    OnPaint = ALEditPaint
+    Height = 21
     TabOrder = 5
     Text = 'NONE'
   end
-  object ALEditFirebirdLib: TALEdit
+  object ALEditFirebirdLib: TEdit
     Left = 113
-    Top = 40
-    Width = 249
-    Height = 19
-    OnButtonClick = ALEditFirebirdLibButtonClick
-    btnVisible = True
-    btnCaption = '...'
-    GlyphIndex = 0
-    btnFont.Charset = DEFAULT_CHARSET
-    btnFont.Color = clWindowText
-    btnFont.Height = -11
-    btnFont.Name = 'MS Sans Serif'
-    btnFont.Style = []
-    OnPaint = ALEditPaint
+    Top = 42
+    Width = 222
+    Height = 21
     TabOrder = 1
     Text = 'FBClient.dll'
   end
-  object ALEditFirebirdDatabase: TALEdit
+  object ALEditFirebirdDatabase: TEdit
     Left = 113
-    Top = 66
-    Width = 249
-    Height = 19
+    Top = 71
+    Width = 222
+    Height = 21
     Cursor = crArrow
-    OnButtonClick = ALEditFirebirdDatabaseButtonClick
-    btnVisible = True
-    btnCaption = '...'
-    GlyphIndex = 0
-    btnFont.Charset = DEFAULT_CHARSET
-    btnFont.Color = clWindowText
-    btnFont.Height = -11
-    btnFont.Name = 'MS Sans Serif'
-    btnFont.Style = []
-    OnPaint = ALEditPaint
     TabOrder = 2
   end
-  object ALEditFireBirdNum_buffers: TALEdit
+  object ALEditFireBirdNum_buffers: TEdit
     Left = 113
-    Top = 164
+    Top = 187
     Width = 46
-    Height = 19
-    btnCaption = '...'
-    GlyphIndex = 0
-    btnFont.Charset = DEFAULT_CHARSET
-    btnFont.Color = clWindowText
-    btnFont.Height = -11
-    btnFont.Name = 'MS Sans Serif'
-    btnFont.Style = []
-    OnPaint = ALEditPaint
+    Height = 21
     TabOrder = 6
     Text = '0'
   end
-  object ALMemoFireBirdEventName: TALMemo
+  object ALMemoFireBirdEventName: TMemo
     Left = 18
-    Top = 229
+    Top = 241
     Width = 353
     Height = 79
-    OnPaint = ALMemoPaint
-    OnPaintScrollBar = ALMemoPaintScrollBar
     TabOrder = 7
-    DesignSize = (
-      353
-      79)
   end
   object Panel2: TPanel
     Left = 389
@@ -361,12 +296,30 @@ object Form1: TForm1
       end
     end
   end
+  object Button2: TButton
+    Left = 335
+    Top = 71
+    Width = 27
+    Height = 21
+    Caption = '...'
+    TabOrder = 12
+    OnClick = ALEditFirebirdDatabaseButtonClick
+  end
+  object Button1: TButton
+    Left = 335
+    Top = 42
+    Width = 27
+    Height = 21
+    Caption = '...'
+    TabOrder = 13
+    OnClick = ALEditFirebirdLibButtonClick
+  end
   object OpenDialog1: TOpenDialog
-    Left = 354
-    Top = 32
+    Left = 570
+    Top = 304
   end
   object OpenDialog2: TOpenDialog
-    Left = 354
-    Top = 64
+    Left = 570
+    Top = 248
   end
 end

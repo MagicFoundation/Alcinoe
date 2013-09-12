@@ -7,7 +7,7 @@ uses Windows,
      SysUtils,
      ALFbxBase,
      ALXmldoc,
-     ALFcnString,
+     ALString,
      ALStringList,
      ALFBXClient;
 

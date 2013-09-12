@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 438
   Top = 209
   Caption = 'Form1'
-  ClientHeight = 488
-  ClientWidth = 792
+  ClientHeight = 697
+  ClientWidth = 806
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,12 +15,19 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
+  object Label1: TLabel
+    Left = 414
+    Top = 28
+    Width = 82
+    Height = 13
+    Caption = 'Sax mode events'
+  end
   object ButtonLoadXmlWithALXmlDocument: TButton
     Left = 16
     Top = 16
-    Width = 265
+    Width = 377
     Height = 25
-    Caption = 'Load Json Document'
+    Caption = 'Load Json Document From the Content Below'
     TabOrder = 0
     OnClick = ButtonLoadXmlWithALXmlDocumentClick
   end
@@ -32,18 +39,18 @@ object Form1: TForm1
     Lines.Strings = (
       
         '{"_id":1.32,"name":{"first":"John","last":"Backus"},"birth":new ' +
-        'Date('#39'Dec 03, 1924'#39'),"contribs":["Fortran","ALGOL","Backus-Naur ' +
-        'Form","FP"],"awards":[{"award":"National Medal of Science","year' +
-        '":1975,"by":"National Science Foundation"},{"award":"Turing Awar' +
-        'd","year":1977,"by":"ACM"}],"spouse":"","address":{},"phones":[]' +
-        '}')
+        'Date('#39'2013-09-10T17:20:25.178Z'#39'),"contribs":["Fortran","ALGOL","' +
+        'Backus-Naur Form","FP"],"awards":[{"award":"National Medal of Sc' +
+        'ience","year":1975,"by":"National Science Foundation"},{"award":' +
+        '"Turing Award","year":1977,"by":"ACM"}],"spouse":"","address":{}' +
+        ',"phones":[]}')
     ScrollBars = ssBoth
     TabOrder = 1
   end
   object ButtonCreateDynamicallyJsonDocument: TButton
     Left = 16
-    Top = 231
-    Width = 265
+    Top = 245
+    Width = 377
     Height = 25
     Caption = 'Create Dynamically Json Document'
     TabOrder = 2
@@ -51,23 +58,24 @@ object Form1: TForm1
   end
   object MemoCreateDynamicallyJsonDocument: TMemo
     Left = 16
-    Top = 263
+    Top = 277
     Width = 377
     Height = 170
-    ScrollBars = ssVertical
+    ScrollBars = ssBoth
     TabOrder = 3
   end
-  object ButtonParseXMLWithALXmlDocumentInSaxMode: TButton
+  object ButtonSaveToBson: TButton
     Left = 16
-    Top = 448
-    Width = 265
+    Top = 474
+    Width = 377
     Height = 25
-    Caption = 'Parse Xml using TALXmlDocument in SAX mode'
+    Caption = 'Save Dynamically created JSON To BSON'
     TabOrder = 4
+    OnClick = ButtonSaveToBsonClick
   end
   object Panel1: TPanel
-    Left = 453
-    Top = 269
+    Left = 468
+    Top = 265
     Width = 292
     Height = 161
     BevelOuter = bvNone
@@ -134,11 +142,36 @@ object Form1: TForm1
     end
   end
   object MemoLoadJsonDocumentSAXMODEResult: TMemo
-    Left = 399
+    Left = 414
     Top = 47
     Width = 378
     Height = 170
     ScrollBars = ssBoth
     TabOrder = 6
+  end
+  object MemoBSON1: TMemo
+    Left = 16
+    Top = 507
+    Width = 377
+    Height = 170
+    ScrollBars = ssBoth
+    TabOrder = 7
+  end
+  object MemoBSON2: TMemo
+    Left = 414
+    Top = 507
+    Width = 378
+    Height = 170
+    ScrollBars = ssBoth
+    TabOrder = 8
+  end
+  object Button1: TButton
+    Left = 414
+    Top = 474
+    Width = 378
+    Height = 25
+    Caption = 'Load JSON Document from BSON Content Below'
+    TabOrder = 9
+    OnClick = Button1Click
   end
 end

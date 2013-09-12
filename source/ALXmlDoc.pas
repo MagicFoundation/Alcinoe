@@ -699,7 +699,7 @@ type
     procedure DoParseText(const Path, Str: AnsiString); // [added from TXMLDocument]
     procedure DoParseComment(const Path, Str: AnsiString); // [added from TXMLDocument]
     procedure DoParseCData(const Path, Str: AnsiString); // [added from TXMLDocument]
-    Procedure InternalParseXml(RawXmlStream: TStream; ContainerNode: TALXmlNode; StreamContainOnlyChildNodes: Boolean=False); // [added from TXMLDocument]
+    Procedure ParseXmlStream(RawXmlStream: TStream; ContainerNode: TALXmlNode; StreamContainOnlyChildNodes: Boolean=False); // [added from TXMLDocument]
     procedure ReleaseDoc;
     procedure SetPrologValue(const Value: AnsiString; PrologItem: TALXMLPrologItem); //[Replace from TXMLNodeList] procedure SetPrologValue(const Value: Variant; PrologItem: TXMLPrologItem);
     function GetActive: Boolean;
@@ -1033,9 +1033,9 @@ end;
 {****************************************************************************************************************************}
 {StreamContainOnlyChildNodes mean that the stream contain ONLY the child node of ContainerNode, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-Procedure TALXMLDocument.InternalParseXml(RawXmlStream: TStream;
-                                          ContainerNode: TALXmlNode;
-                                          StreamContainOnlyChildNodes: Boolean=False);
+Procedure TALXMLDocument.ParseXmlStream(RawXmlStream: TStream;
+                                        ContainerNode: TALXmlNode;
+                                        StreamContainOnlyChildNodes: Boolean=False);
 
 Const BufferSize: integer = 8192;
 Var RawXmlString: AnsiString;
@@ -1534,7 +1534,7 @@ begin
     releaseDoc;
     SetActive(True);
   end;
-  InternalParseXml(Stream, FDocumentNode);
+  ParseXmlStream(Stream, FDocumentNode);
 end;
 
 {*****************************************************************}
@@ -2476,7 +2476,7 @@ begin
   Try
 
     {init buffer string}
-    Setlength(BufferString, bufferSize);
+    Setlength(BufferString, BufferSize * 2);
     BufferStringPos := 0;
 
     {EncodeXmlReferences from ParseOptions}
@@ -2531,7 +2531,7 @@ Begin
   ChildNodes.Clear;
   AttributeNodes.Clear;
   Try
-    FDocument.InternalParseXml(Stream, self, StreamContainOnlyChildNodes);
+    FDocument.ParseXmlStream(Stream, self, StreamContainOnlyChildNodes);
   except
     ChildNodes.Clear;
     AttributeNodes.Clear;

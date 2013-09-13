@@ -209,7 +209,7 @@ type
                         nstArray, // \x04 | Array
                         // \x05 | Binary data
                         // \x06 | Undefined — Deprecated
-                        nstObjectID, // \x07 | ObjectId
+                        nstObjectId, // \x07 | ObjectId
                         nstBoolean, // \x08 | Boolean "false"
                                     // \x08 | Boolean "true"
                         nstDateTime, // \x09 | UTC datetime
@@ -332,6 +332,8 @@ type
     procedure SetFloat(const Value: Double);
     function GetDateTime: TDateTime;
     procedure SetDateTime(const Value: TDateTime);
+    function GetObjectId: AnsiString;
+    procedure SetObjectId(const Value: AnsiString);
     function GetInt32: Integer;
     procedure SetInt32(const Value: Integer);
     function GetInt64: Int64;
@@ -375,6 +377,7 @@ type
     property Text: AnsiString read GetText write SetText;
     property int32: integer read GetInt32 write SetInt32;
     property int64: int64 read Getint64 write Setint64;
+    property ObjectId: AnsiString read GetObjectId write SetObjectId;
     property Float: Double read GetFloat write SetFloat;
     property DateTime: TDateTime read GetDateTime write SetDateTime;
     property Bool: Boolean read GetBool write SetBool;
@@ -771,9 +774,10 @@ Var RawJSONString: AnsiString;
     else if ALIsInt64(aStrValue) then result := NstInt64
     else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
     else if alSameText(aStrValue, 'null') then result := nstNull
-    else if ALSametext(aStrValue,'true') or
-            ALSametext(aStrValue,'false') then result := nstBoolean
+    else if ALSametext(aStrValue,'True') or
+            ALSametext(aStrValue,'False') then result := nstBoolean
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
+    else if ALPos('ObjectId("', aStrValue) = 1 then result := nstObjectId
     else result := nstJavascript;
   end;
 
@@ -1608,7 +1612,7 @@ Var RawBSONString: AnsiString;
       #$02: aNodeSubType := nstText;
       #$03: aNodeSubType := nstObject;
       #$04: aNodeSubType := nstArray;
-      #$07: aNodeSubType := nstObjectID;
+      #$07: aNodeSubType := nstObjectId;
       #$08: aNodeSubType := nstBoolean;
       #$09: aNodeSubType := nstDateTime;
       #$0A: aNodeSubType := nstnull;
@@ -1767,7 +1771,7 @@ Var RawBSONString: AnsiString;
     {$IFDEF undef}{$REGION 'Extract value: ObjectID'}{$ENDIF}
     // \x07 + name + (byte*12)
     // It looks like - ObjectId("522dc32f0fe27d96c301f98d")
-    else if aNodeSubType = nstObjectID then begin
+    else if aNodeSubType = nstObjectId then begin
       if RawBSONStringPos > RawBSONStringLength - 12 + 1 then begin
         ExpandRawBSONString;
         if RawBSONStringPos > RawBSONStringLength - 12 + 1 then ALJSONDocError(cALBSONParseError);
@@ -1838,7 +1842,7 @@ Var RawBSONString: AnsiString;
           nstText: aNode.text := aTextValue;
           nstBoolean: aNode.Bool := aBool;
           nstDateTime: aNode.DateTime := aDateTime;
-          nstObjectID: aNode.Javascript := aTextValue;
+          nstObjectId: aNode.ObjectId := aTextValue;
           nstNull: aNode.null := true;
           nstJavascript: aNode.Javascript := aTextValue;
           nstInt32: aNode.int32 := aInt32;
@@ -2017,7 +2021,8 @@ end;
 {**********************************************************}
 {Saves the JSON document to binary representation of JSON -
  BSON. Specification of this format can be found here:
- http://bsonspec.org/#/specification.
+  http://bsonspec.org/#/specification.
+
  Format BSON is mostly using for the purposes of
  MongoDB interconnection.}
 procedure TALJSONDocument.SaveToBSON(var BSON: AnsiString);
@@ -2394,6 +2399,21 @@ begin
   else ALJSONDocError('Only "true" is allowed for setNull property');
 end;
 
+{*******************************************}
+function TALJSONNode.GetObjectId: AnsiString;
+begin
+  Result := GetNodeValue;
+end;
+
+{*********************************************************}
+procedure TALJSONNode.SetObjectID(const Value: AnsiString);
+begin
+  // ObjectId("522dc32f0fe27d96c301f98d")
+  if Length(Value) <> (24 + Length('ObjectId("")')) then ALJSONDocError('Unknown format of ObjectId: ' + String(Value) + ', expected the value like ObjectId("522dc32f0fe27d96c301f98d")');
+
+  setNodeValue(Value, nstObjectId);
+end;
+
 {*********************************************}
 function TALJSONNode.GetJavascript: AnsiString;
 begin
@@ -2759,6 +2779,26 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
       BufferString: AnsiString;
       BufferStringPos: Integer;
 
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    {We need to get 12 bytes (so, 12-character AnsiString) to convert it
+     in BSON representation of ObjectId.}
+    function _ObjectIdToBinaryStr(const aObjectId: AnsiString): AnsiString;
+    var aTmpStr: AnsiString;
+        i:       integer;
+    begin
+      // ObjectId("522dc32f0fe27d96c301f98d")
+      aTmpStr := ALLowerCase(aObjectID);
+      aTmpStr := ALStringReplace(aTmpStr, 'objectid("', '', [rfReplaceAll]);
+      aTmpStr := ALStringReplace(aTmpStr, '")',         '', [rfReplaceAll]); // aTmpStr => 522dc32f0fe27d96c301f98d
+
+      i := 1;
+      while i < Length(aTmpStr) do begin
+                                             // $  + 'FF'
+        result := result + AnsiChar(ALStrToInt('$' + ALCopyStr(aTmpStr, i, 2)));
+        Inc(i, 2);
+      end;
+    end;
+
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
     Begin
@@ -2836,6 +2876,12 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
                       ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
                       WriteStr2Buffer(#$02 + aNodeName + #$00 + aBinStr + text + #$00);
                    end;
+
+          // \x07 + name + (byte * 12)
+          nstObjectId: begin
+                         aBinStr := _ObjectIdToBinaryStr(Text);
+                         WriteStr2Buffer(#$07 + aNodeName + #$00 + aBinStr);
+                       end;
 
           // \x08 + name + \x00 + \x00 => Boolean "false"
           // \x08 + name + \x00 + \x01	=> Boolean "true"

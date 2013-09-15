@@ -209,7 +209,7 @@ type
                         nstArray, // \x04 | Array
                         // \x05 | Binary data
                         // \x06 | Undefined — Deprecated
-                        nstObjectId, // \x07 | ObjectId
+                        nstObjectID, // \x07 | ObjectId
                         nstBoolean, // \x08 | Boolean "false"
                                     // \x08 | Boolean "true"
                         nstDateTime, // \x09 | UTC datetime
@@ -224,6 +224,12 @@ type
                         nstInt64); // \x12 | 64-bit integer
                         // \xFF | Min key
                         // \x7F | Max key
+
+  TALJSONObjectID = Array[1..12] of AnsiChar; // ObjectId is a 12-byte BSON type, constructed using:
+                                              // a 4-byte value representing the seconds since the Unix epoch,
+                                              // a 3-byte machine identifier,
+                                              // a 2-byte process id, and
+                                              // a 3-byte counter, starting with a random value.
 
   {$IF CompilerVersion >= 23} {Delphi XE2}
   TAlJSONParseDocument = reference to procedure (Sender: TObject);
@@ -332,8 +338,8 @@ type
     procedure SetFloat(const Value: Double);
     function GetDateTime: TDateTime;
     procedure SetDateTime(const Value: TDateTime);
-    function GetObjectId: AnsiString;
-    procedure SetObjectId(const Value: AnsiString);
+    function GetObjectID: TALJSONObjectID;
+    procedure SetObjectID(const Value: TALJSONObjectID);
     function GetInt32: Integer;
     procedure SetInt32(const Value: Integer);
     function GetInt64: Int64;
@@ -377,9 +383,9 @@ type
     property Text: AnsiString read GetText write SetText;
     property int32: integer read GetInt32 write SetInt32;
     property int64: int64 read Getint64 write Setint64;
-    property ObjectId: AnsiString read GetObjectId write SetObjectId;
     property Float: Double read GetFloat write SetFloat;
     property DateTime: TDateTime read GetDateTime write SetDateTime;
+    property ObjectID: TALJSONObjectID read GetObjectID write SetObjectID;
     property Bool: Boolean read GetBool write SetBool;
     property Null: Boolean read GetNull write SetNull;
     property Javascript: AnsiString read GetJavascript write SetJavascript;
@@ -535,43 +541,107 @@ uses Math,
 function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 var aFormatSettings: TALFormatSettings;
     aDateStr: AnsiString;
+    aQuoteChar: ansiChar;
+    P1, P2: integer;
 begin
+
+  // s must look like
+  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+  result := false;
+  aDateStr := ALTrim(S); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+  if alpos('new', aDateStr) <> 1 then exit;
+  P1 := 4{length('new') + 1}; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                              //    ^P1
+  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aDateStr) - 3) or (aDateStr[P1] <> 'D') or
+                                    (aDateStr[P1+1] <> 'a') or
+                                    (aDateStr[P1+2] <> 't') or
+                                    (aDateStr[P1+3] <> 'e') then exit;
+  inc(p1, 4);  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+               //          ^P1
+  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aDateStr)) or (aDateStr[P1] <> '(') then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                                                 //           ^P1
+  inc(P1); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+           //            ^P1
+  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aDateStr)) or (not (aDateStr[P1] in ['''','"'])) then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                                                              //             ^P1
+  aQuoteChar := aDateStr[P1]; // "
+  inc(p1); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+           //              ^P1
+  P2 := P1;
+  while (P1 <= length(aDateStr)) and (aDateStr[P1] <> aQuoteChar) do inc(P1);
+  if (P1 > length(aDateStr)) then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                        //                                      ^P1
   aFormatSettings := ALDefaultFormatSettings;
   aFormatSettings.DateSeparator := '-';
   aFormatSettings.TimeSeparator := ':';
   aFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
   aFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
-  aDateStr := AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(AlStringReplace(S,
-                                                                                                                                                              '''',
-                                                                                                                                                              '',
-                                                                                                                                                              [rfReplaceALL]),
-                                                                                                                                              '"',
-                                                                                                                                              '',
-                                                                                                                                              [rfReplaceALL]),
-                                                                                                                              'new',
-                                                                                                                              '',
-                                                                                                                              []),
-                                                                                                              'Date',
-                                                                                                              '',
-                                                                                                              []),
-                                                                                              ' ',
-                                                                                              '',
-                                                                                              [rfReplaceALL]),
-                                                                              'T',
-                                                                              ' ',
-                                                                              []),
-                                                              'Z',
-                                                              '',
-                                                              []),
-                                              '(',
-                                              '',
-                                              []),
-                              ')',
-                              '',
-                              []);
-  Result := ALTryStrToDateTime(aDateStr, Value, aFormatSettings);
+  result := ALTryStrToDateTime(alStringReplace(alStringReplace(AlcopyStr(aDateStr,P2,P1-P2),
+                                               'T',
+                                               ' ',
+                                               []),
+                               'Z',
+                               '',
+                               []),
+                               Value,
+                               aFormatSettings);
+  if not result then exit;
+
+  inc(p1);  // // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+            //                                          ^P1
+  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 <> length(aDateStr)) or (aDateStr[P1] <> ')') then begin
+    result := false;
+    exit;
+  end;
+
 end;
 
+{*******************************************************************************************}
+function ALJSONDocTryStrToObjectID(const S: AnsiString; out Value: TALJSONObjectID): Boolean;
+var aObjectIDStr: AnsiString;
+    aObjectIDhex: AnsiString;
+    aQuoteChar: ansiChar;
+    P1: integer;
+begin
+
+  // s must look like
+  // ObjectId ( "507f1f77bcf86cd799439011" )
+  result := false;
+  aObjectIDStr := ALTrim(S); // ObjectId ( "507f1f77bcf86cd799439011" )
+  if alpos('ObjectId', aObjectIDStr) <> 1 then exit;
+  P1 := 9{length('ObjectId') + 1}; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                   //         ^P1
+  while (P1 <= length(aObjectIDStr)) and (aObjectIDStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aObjectIDStr)) or (aObjectIDStr[P1] <> '(') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                                                         //          ^P1
+  inc(p1);  // ObjectId ( "507f1f77bcf86cd799439011" )
+            //           ^P1
+  while (P1 <= length(aObjectIDStr)) and (aObjectIDStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aObjectIDStr)) or (not (aObjectIDStr[P1] in ['''','"'])) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                                                                      //            ^P1
+  aQuoteChar := aObjectIDStr[P1]; // "
+  inc(p1); // ObjectId ( "507f1f77bcf86cd799439011" )
+           //             ^P1
+  if (P1 + 23{(length(aObjectIDhex)) - 1} > length(aObjectIDStr)) then exit;
+  setlength(aObjectIDhex,24);
+  aObjectIDhex := allowerCase(ALcopyStr(aObjectIDStr,P1,24{length(aObjectIDhex)})); // 507f1f77bcf86cd799439011
+  inc(P1, 24{length(aObjectIDhex)}); // ObjectId ( "507f1f77bcf86cd799439011" )
+                                     //                                     ^P1
+  if (P1 > length(aObjectIDStr)) or (aObjectIDStr[P1] <> aQuoteChar) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                                                                //                                     ^P1
+  inc(p1);  // ObjectId ( "507f1f77bcf86cd799439011" )
+            //                                      ^P1
+  while (P1 <= length(aObjectIDStr)) and (aObjectIDStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 <> length(aObjectIDStr)) or (aObjectIDStr[P1] <> ')') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                                                          //                                       ^P1
+  //convert 507f1f77bcf86cd799439011 to binary
+  result := HexToBin(PansiChar(aObjectIDhex),@Value[1],length(value)) = length(Value);
+
+end;
 
 {****************************************************}
 procedure ALJSONDocError(const Msg: String); overload;
@@ -768,16 +838,17 @@ Var RawJSONString: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function GetNodeSubTypeFromStrValue(const aStrValue: AnsiString; const AQuotedValue: Boolean): TALJSONNodeSubType;
   var aDT: TdateTime;
+      aObjectID: TALJSONObjectID;
   begin
     if AQuotedValue then result := NstText
     else if ALIsInteger(aStrValue) then result := NstInt32
     else if ALIsInt64(aStrValue) then result := NstInt64
     else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
     else if alSameText(aStrValue, 'null') then result := nstNull
-    else if ALSametext(aStrValue,'True') or
-            ALSametext(aStrValue,'False') then result := nstBoolean
+    else if ALSametext(aStrValue,'true') or
+            ALSametext(aStrValue,'false') then result := nstBoolean
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
-    else if ALPos('ObjectId("', aStrValue) = 1 then result := nstObjectId
+    else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
     else result := nstJavascript;
   end;
 
@@ -1515,18 +1586,6 @@ Var RawBSONString: AnsiString;
     setlength(result,P-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {It looks like ObjectId("522dc32f0fe27d96c301f98d"), so each
-   byte is representing by 2-digits hex number.}
-  function _ObjectIDToHexString(aObjectID: AnsiString): AnsiString;
-  var aChar: AnsiChar;
-  begin
-    result := '';
-    for aChar in aObjectID do begin
-      result := result + ALIntToHex(Ord(aChar), 2);
-    end;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeNode;
   Var aNode: TALJsonNode;
@@ -1537,6 +1596,7 @@ Var RawBSONString: AnsiString;
       aInt32: Integer;
       aInt64: Int64;
       aDateTime: TdateTime;
+      aObjectID: TALJSONObjectID;
       aBool: Boolean;
       aTextValue: AnsiString;
       P1: Integer;
@@ -1612,14 +1672,14 @@ Var RawBSONString: AnsiString;
       #$02: aNodeSubType := nstText;
       #$03: aNodeSubType := nstObject;
       #$04: aNodeSubType := nstArray;
-      #$07: aNodeSubType := nstObjectId;
+      #$07: aNodeSubType := nstObjectID;
       #$08: aNodeSubType := nstBoolean;
       #$09: aNodeSubType := nstDateTime;
       #$0A: aNodeSubType := nstnull;
       #$0D: aNodeSubType := nstJavascript;
       #$10: aNodeSubType := nstint32;
       #$12: aNodeSubType := nstint64;
-      else ALJSONDocError(cALBSONParseError + #13#10 + 'Unknown subtype: ' + Char(RawBSONString[RawBSONStringPos]));
+      else ALJSONDocError(cALBSONParseError);
     end;
     RawBSONStringPos := RawBSONStringPos + 1;
     If RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
@@ -1726,6 +1786,21 @@ Var RawBSONString: AnsiString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
+    {$IFDEF undef}{$REGION 'Extract value: ObjectId'}{$ENDIF}
+    // \x07 + name + \x00 + (byte*12)
+    else if aNodeSubType = nstObjectID then begin
+      if RawBSONStringPos > RawBSONStringLength - length(aObjectID) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - length(aObjectID) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aObjectID[1], length(aObjectID));
+      setlength(aTextValue, length(aObjectID) * 2);
+      BintoHex(@aObjectID[1],pansichar(aTextValue),length(aObjectID));
+      aTextValue := 'ObjectId("'+ AllowerCase(aTextValue) + '")';
+      RawBSONStringPos := RawBSONStringPos + length(aObjectID);
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
     {$IFDEF undef}{$REGION 'Extract value: Boolean'}{$ENDIF}
     // \x08 + name + \x00 + \x00 => Boolean "false"
     // \x08 + name + \x00 + \x01	=> Boolean "true"
@@ -1765,20 +1840,6 @@ Var RawBSONString: AnsiString;
     // \x0A + name + \x00
     else if aNodeSubType = nstnull then begin
       aTextValue := 'null';
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: ObjectID'}{$ENDIF}
-    // \x07 + name + (byte*12)
-    // It looks like - ObjectId("522dc32f0fe27d96c301f98d")
-    else if aNodeSubType = nstObjectId then begin
-      if RawBSONStringPos > RawBSONStringLength - 12 + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - 12 + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      aTextValue := 'ObjectId("' + _ObjectIDToHexString(ALCopyStr(RawBSONString, RawBSONStringPos, 12)) + '")';
-      RawBSONStringPos := RawBSONStringPos + 12;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -1840,9 +1901,9 @@ Var RawBSONString: AnsiString;
         case aNodeSubType of
           nstFloat: aNode.Float := ADouble;
           nstText: aNode.text := aTextValue;
+          nstObjectID: aNode.ObjectID := aObjectID;
           nstBoolean: aNode.Bool := aBool;
           nstDateTime: aNode.DateTime := aDateTime;
-          nstObjectId: aNode.ObjectId := aTextValue;
           nstNull: aNode.null := true;
           nstJavascript: aNode.Javascript := aTextValue;
           nstInt32: aNode.int32 := aInt32;
@@ -2021,8 +2082,7 @@ end;
 {**********************************************************}
 {Saves the JSON document to binary representation of JSON -
  BSON. Specification of this format can be found here:
-  http://bsonspec.org/#/specification.
-
+ http://bsonspec.org/#/specification.
  Format BSON is mostly using for the purposes of
  MongoDB interconnection.}
 procedure TALJSONDocument.SaveToBSON(var BSON: AnsiString);
@@ -2345,6 +2405,22 @@ begin
   setNodeValue(ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', Value, ALDefaultFormatSettings), nstDateTime);
 end;
 
+{************************************************}
+function TALJSONNode.GetObjectID: TALJSONObjectID;
+begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  if not ALJSONDocTryStrToObjectID(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid ObjectID');
+end;
+
+{*************************************************************}
+procedure TALJSONNode.SetObjectID(const Value: TALJSONObjectID);
+var aStr: AnsiString;
+begin
+  setlength(aStr, length(Value) * 2);
+  BintoHex(@Value[1],pansiChar(aStr),length(Value));
+  setNodeValue('ObjectId("'+ALLowerCase(aStr)+'")', nstObjectID);
+end;
+
 {*************************************}
 function TALJSONNode.GetInt32: Integer;
 begin
@@ -2397,21 +2473,6 @@ procedure TALJSONNode.SetNull(const Value: Boolean);
 begin
   if Value then setNodeValue('null', nstNull)
   else ALJSONDocError('Only "true" is allowed for setNull property');
-end;
-
-{*******************************************}
-function TALJSONNode.GetObjectId: AnsiString;
-begin
-  Result := GetNodeValue;
-end;
-
-{*********************************************************}
-procedure TALJSONNode.SetObjectID(const Value: AnsiString);
-begin
-  // ObjectId("522dc32f0fe27d96c301f98d")
-  if Length(Value) <> (24 + Length('ObjectId("")')) then ALJSONDocError('Unknown format of ObjectId: ' + String(Value) + ', expected the value like ObjectId("522dc32f0fe27d96c301f98d")');
-
-  setNodeValue(Value, nstObjectId);
 end;
 
 {*********************************************}
@@ -2779,26 +2840,6 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
       BufferString: AnsiString;
       BufferStringPos: Integer;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    {We need to get 12 bytes (so, 12-character AnsiString) to convert it
-     in BSON representation of ObjectId.}
-    function _ObjectIdToBinaryStr(const aObjectId: AnsiString): AnsiString;
-    var aTmpStr: AnsiString;
-        i:       integer;
-    begin
-      // ObjectId("522dc32f0fe27d96c301f98d")
-      aTmpStr := ALLowerCase(aObjectID);
-      aTmpStr := ALStringReplace(aTmpStr, 'objectid("', '', [rfReplaceAll]);
-      aTmpStr := ALStringReplace(aTmpStr, '")',         '', [rfReplaceAll]); // aTmpStr => 522dc32f0fe27d96c301f98d
-
-      i := 1;
-      while i < Length(aTmpStr) do begin
-                                             // $  + 'FF'
-        result := result + AnsiChar(ALStrToInt('$' + ALCopyStr(aTmpStr, i, 2)));
-        Inc(i, 2);
-      end;
-    end;
-
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
     Begin
@@ -2850,6 +2891,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
         aDouble: Double;
         aInt32: Integer;
         aInt64: system.Int64;
+        aObjectID: TALJSONObjectID;
     Begin
       with aTextNode do begin
 
@@ -2877,9 +2919,11 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
                       WriteStr2Buffer(#$02 + aNodeName + #$00 + aBinStr + text + #$00);
                    end;
 
-          // \x07 + name + (byte * 12)
-          nstObjectId: begin
-                         aBinStr := _ObjectIdToBinaryStr(Text);
+          // \x07 + name + \x00 + (byte*12)
+          nstObjectID: begin
+                         aObjectID := ObjectID;
+                         setlength(aBinStr,sizeOf(aObjectID));
+                         ALMove(aObjectID[1], aBinStr[1], sizeOf(aObjectID));
                          WriteStr2Buffer(#$07 + aNodeName + #$00 + aBinStr);
                        end;
 

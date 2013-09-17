@@ -1462,10 +1462,6 @@ object Form1: TForm1
     object MongoDB: TcxTabSheet
       Caption = 'MongoDB'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object cxLabel3: TcxLabel
         Left = 25
         Top = 21
@@ -1494,74 +1490,32 @@ object Form1: TForm1
         Text = '27017'
         Width = 88
       end
-      object cxLabel6: TcxLabel
-        Left = 374
-        Top = 19
-        Caption = 'Key'
-        ParentFont = False
-        Transparent = True
-      end
-      object cxTextEdit3: TcxTextEdit
-        Left = 405
-        Top = 18
-        TabOrder = 5
-        Text = '<#randomString maxlength=250>'
-        Width = 338
-      end
-      object cxTextEdit4: TcxTextEdit
-        Left = 402
-        Top = 45
-        TabOrder = 6
-        Text = '<#randomnumber>'
-        Width = 215
-      end
-      object cxLabel7: TcxLabel
-        Left = 367
-        Top = 46
-        Caption = 'Flags'
-        ParentFont = False
-        Transparent = True
-      end
-      object cxLabel8: TcxLabel
-        Left = 344
-        Top = 70
-        Caption = 'Expiration'
-        ParentFont = False
-        Transparent = True
-      end
-      object cxTextEdit5: TcxTextEdit
-        Left = 403
-        Top = 69
-        TabOrder = 9
-        Text = '<#randomnumber>'
-        Width = 214
-      end
       object cxLabel9: TcxLabel
-        Left = 365
-        Top = 97
-        Caption = 'DATA'
+        Left = 394
+        Top = 47
+        Caption = 'Query'
         ParentFont = False
         Transparent = True
       end
-      object cxMemo1: TcxMemo
-        Left = 405
-        Top = 96
+      object MemoMongoDBQuery: TcxMemo
+        Left = 435
+        Top = 46
         Lines.Strings = (
-          '<#randomString maxlength=100000>')
+          '{FieldC: {'#39'$gt'#39': <#randomnumber>}}')
         ParentFont = False
         Properties.ScrollBars = ssVertical
-        TabOrder = 11
-        Height = 180
-        Width = 338
+        TabOrder = 5
+        Height = 86
+        Width = 326
       end
-      object ALButtonMongoDBFind: TcxButton
+      object ALButtonMongoDBSelect: TcxButton
         Left = 803
         Top = 18
         Width = 161
         Height = 25
-        Caption = 'FIND'
-        TabOrder = 12
-        OnClick = ALButtonMongoDBFindClick
+        Caption = 'SELECT'
+        TabOrder = 6
+        OnClick = ALButtonMongoDBSelectClick
       end
       object cxButton2: TcxButton
         Left = 804
@@ -1569,7 +1523,7 @@ object Form1: TForm1
         Width = 161
         Height = 25
         Caption = 'SET'
-        TabOrder = 13
+        TabOrder = 7
         OnClick = ALButtonMemcachedSetClick
       end
       object cxButton3: TcxButton
@@ -1578,7 +1532,7 @@ object Form1: TForm1
         Width = 161
         Height = 25
         Caption = 'DELETE'
-        TabOrder = 14
+        TabOrder = 8
         OnClick = ALButtonMemcachedDeleteClick
       end
       object cxButton4: TcxButton
@@ -1587,7 +1541,7 @@ object Form1: TForm1
         Width = 161
         Height = 25
         Caption = 'Loop GET'
-        TabOrder = 15
+        TabOrder = 9
         OnClick = ALButtonMemcachedLoopGetClick
       end
       object cxButton5: TcxButton
@@ -1596,7 +1550,7 @@ object Form1: TForm1
         Width = 161
         Height = 25
         Caption = 'Loop SET'
-        TabOrder = 16
+        TabOrder = 10
         OnClick = ALButtonMemcachedLoopSetClick
       end
       object cxButton6: TcxButton
@@ -1605,7 +1559,7 @@ object Form1: TForm1
         Width = 161
         Height = 25
         Caption = 'Loop INCR'
-        TabOrder = 17
+        TabOrder = 11
         OnClick = ALButtonMemcachedLoopIncrClick
       end
       object cxButton7: TcxButton
@@ -1614,13 +1568,13 @@ object Form1: TForm1
         Width = 161
         Height = 25
         Caption = 'Loop DECR'
-        TabOrder = 18
+        TabOrder = 12
         OnClick = ALButtonMemcachedLoopDecrClick
       end
       object cxTextEdit6: TcxTextEdit
         Left = 891
         Top = 239
-        TabOrder = 19
+        TabOrder = 13
         Text = '1'
         Width = 74
       end
@@ -1641,74 +1595,89 @@ object Form1: TForm1
       object cxTextEdit7: TcxTextEdit
         Left = 890
         Top = 266
-        TabOrder = 22
+        TabOrder = 16
         Text = '1000000'
         Width = 74
       end
-      object cxButton8: TcxButton
-        Left = 17
-        Top = 97
+      object cxLabel6: TcxLabel
+        Left = 325
+        Top = 140
+        Caption = 'ReturnFieldsSelector'
+        ParentFont = False
+        Transparent = True
+      end
+      object MemoMongoDBReturnFieldSelector: TcxMemo
+        Left = 435
+        Top = 139
+        Lines.Strings = (
+          '{'#39'FieldA'#39': 1}')
+        ParentFont = False
+        Properties.ScrollBars = ssVertical
+        TabOrder = 18
+        Height = 103
+        Width = 326
+      end
+      object cxLabel7: TcxLabel
+        Left = 335
+        Top = 21
+        Caption = 'FullCollectionName'
+        ParentFont = False
+        Transparent = True
+      end
+      object EditMongoDBFullCollectionName: TcxTextEdit
+        Left = 435
+        Top = 18
+        TabOrder = 20
+        Text = 'test.TableSample'
+        Width = 326
+      end
+      object cxLabel8: TcxLabel
+        Left = 433
+        Top = 249
+        Caption = 'Skip'
+        ParentFont = False
+        Transparent = True
+      end
+      object EditMongoDBSkip: TcxTextEdit
+        Left = 462
+        Top = 248
+        TabOrder = 22
+        Text = '0'
         Width = 88
-        Height = 25
-        Caption = 'STATS'
+      end
+      object CheckBoxMongoDBSlaveOk: TcxCheckBox
+        Left = 94
+        Top = 74
+        Caption = 'SlaveOk'
+        ParentFont = False
         TabOrder = 23
-        OnClick = ALButtonMemcachedStatsClick
+        Transparent = True
+        Width = 97
       end
-      object cxButton9: TcxButton
-        Left = 131
-        Top = 94
-        Width = 88
-        Height = 25
-        Caption = 'FLUSH_ALL'
+      object CheckBoxMongoDBPartial: TcxCheckBox
+        Left = 94
+        Top = 95
+        Caption = 'Partial'
+        ParentFont = False
         TabOrder = 24
-        OnClick = ALButtonMemcachedFLush_ALLClick
-      end
-      object cxButton10: TcxButton
-        Left = 131
-        Top = 128
-        Width = 88
-        Height = 25
-        Caption = 'VERSION'
-        TabOrder = 25
-        OnClick = ALButtonMemcachedVersionClick
-      end
-      object cxButton11: TcxButton
-        Left = 17
-        Top = 128
-        Width = 88
-        Height = 25
-        Caption = 'STATS Settings'
-        TabOrder = 26
-        OnClick = ALButtonMemcachedStatsSettingsClick
-      end
-      object cxButton12: TcxButton
-        Left = 17
-        Top = 159
-        Width = 88
-        Height = 25
-        Caption = 'STATS items'
-        TabOrder = 27
-        OnClick = ALButtonMemcachedStatsItemsClick
-      end
-      object cxButton13: TcxButton
-        Left = 17
-        Top = 190
-        Width = 88
-        Height = 25
-        Caption = 'STATS slabs'
-        TabOrder = 28
-        OnClick = ALButtonMemcachedStatsSlabsClick
-      end
-      object cxButton14: TcxButton
-        Left = 17
-        Top = 221
-        Width = 88
-        Height = 25
-        Caption = 'STATS sizes'
-        TabOrder = 29
-        OnClick = ALButtonMemcachedStatsSizesClick
+        Transparent = True
+        Width = 97
       end
     end
+  end
+  object cxLabel12: TcxLabel
+    Left = 572
+    Top = 275
+    Caption = 'First'
+    ParentFont = False
+    Transparent = True
+  end
+  object EditMongoDBFirst: TcxTextEdit
+    Left = 603
+    Top = 274
+    TabOrder = 4
+    Text = '200'
+    Width = 88
   end
   object OpenDialog1: TOpenDialog
     Left = 144

@@ -13,7 +13,7 @@ uses
   dxSkinFoggy, dxSkinscxPCPainter, dxSkinsForm, Vcl.Menus, cxButtons,
   cxPCdxBarPopupMenu, cxPC, cxContainer, cxLabel, cxTextEdit, cxMaskEdit,
   cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, AlMemCachedClient,
-  ALMongoDBClient;
+  ALMongoDBClient, ALJsonDoc;
 
 type
 
@@ -203,15 +203,9 @@ type
     ALEditMongoDBHost: TcxTextEdit;
     cxLabel4: TcxLabel;
     ALEditMongoDBPort: TcxTextEdit;
-    cxLabel6: TcxLabel;
-    cxTextEdit3: TcxTextEdit;
-    cxTextEdit4: TcxTextEdit;
-    cxLabel7: TcxLabel;
-    cxLabel8: TcxLabel;
-    cxTextEdit5: TcxTextEdit;
     cxLabel9: TcxLabel;
-    cxMemo1: TcxMemo;
-    ALButtonMongoDBFind: TcxButton;
+    MemoMongoDBQuery: TcxMemo;
+    ALButtonMongoDBSelect: TcxButton;
     cxButton2: TcxButton;
     cxButton3: TcxButton;
     cxButton4: TcxButton;
@@ -222,13 +216,16 @@ type
     cxLabel10: TcxLabel;
     cxLabel11: TcxLabel;
     cxTextEdit7: TcxTextEdit;
-    cxButton8: TcxButton;
-    cxButton9: TcxButton;
-    cxButton10: TcxButton;
-    cxButton11: TcxButton;
-    cxButton12: TcxButton;
-    cxButton13: TcxButton;
-    cxButton14: TcxButton;
+    cxLabel6: TcxLabel;
+    MemoMongoDBReturnFieldSelector: TcxMemo;
+    cxLabel7: TcxLabel;
+    EditMongoDBFullCollectionName: TcxTextEdit;
+    cxLabel8: TcxLabel;
+    EditMongoDBSkip: TcxTextEdit;
+    cxLabel12: TcxLabel;
+    EditMongoDBFirst: TcxTextEdit;
+    CheckBoxMongoDBSlaveOk: TcxCheckBox;
+    CheckBoxMongoDBPartial: TcxCheckBox;
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlSelectClick(Sender: TObject);
     procedure ALButtonFirebirdSelectClick(Sender: TObject);
@@ -264,7 +261,7 @@ type
     procedure ALButtonMemcachedLoopSetClick(Sender: TObject);
     procedure ALButtonMemcachedLoopIncrClick(Sender: TObject);
     procedure ALButtonMemcachedLoopDecrClick(Sender: TObject);
-    procedure ALButtonMongoDBFindClick(Sender: TObject);
+    procedure ALButtonMongoDBSelectClick(Sender: TObject);
   private
   public
     Sqlite3ConnectionPoolClient: TalSqlite3ConnectionPoolClient;
@@ -3349,41 +3346,84 @@ begin
   end;
 end;
 
-{*********************************************************}
-procedure TForm1.ALButtonMongoDBFindClick(Sender: TObject);
+{***********************************************************}
+procedure TForm1.ALButtonMongoDBSelectClick(Sender: TObject);
 Var aMongoDBClient: TAlMongoDBClient;
-    aStopWatch: TStopWatch;
-    aKey: AnsiString;
-    aflags: integer;
-    aData: AnsiString;
-    aFound: boolean;
+    aJSONDATA: TalJSONDocument;
+    aStopWatch: TstopWatch;
+    Query: TALMongoDBClientSelectDataQUERY;
 begin
+
   Screen.Cursor := CrHourGlass;
   try
 
     aMongoDBClient := TAlMongoDBClient.create;
     Try
       aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
-      aStopWatch := TStopWatch.StartNew;
-      aMongoDBClient.DoRunDBCommand(aMongoDBClient.FSocketDescriptor, 'mwx1.items', '');
-      aStopWatch.Stop;
-      TableViewThread.DataController.RecordCount := 1;
-      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
-      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
-      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
-      AlMemoResult.Lines.Clear;
-      if aFound then begin
-        AlMemoResult.Lines.Add('Found: true');
-        AlMemoResult.Lines.Add('Flags: ' + intToStr(aFlags));
-        AlMemoResult.Lines.Add('Data: ' + string(aData));
-      end
-      else AlMemoResult.Lines.Add('Found: false');
-      aMongoDBClient.disconnect;
+
+      aJSONDATA := TALJSONDocument.create;
+      Try
+
+        With aJSONDATA Do Begin
+          Options := [TALJSONDocOption(doNodeAutoIndent)];
+          ParseOptions := [];
+        end;
+
+        Query := TALMongoDBClientSelectDataQUERY.Create;
+        Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                     '<#',
+                                                     '>',
+                                                     SQLFastTagReplaceFunct,
+                                                     True,
+                                                     nil);
+        Query.Query := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil);
+        Query.ReturnFieldsSelector := ALFastTagReplace(AnsiString(MemoMongoDBReturnFieldSelector.Lines.Text),
+                                                       '<#',
+                                                       '>',
+                                                       SQLFastTagReplaceFunct,
+                                                       True,
+                                                       nil);
+        Query.Skip := ALstrToInt(ALFastTagReplace(AnsiString(EditMongoDBSkip.Text),
+                                                  '<#',
+                                                  '>',
+                                                  SQLFastTagReplaceFunct,
+                                                  True,
+                                                  nil));
+        Query.First := ALstrToInt(ALFastTagReplace(AnsiString(EditMongoDBFirst.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil));
+        Query.RowTag := 'rec';
+        Query.flags.SlaveOk := checkBoxMongoDBSlaveOK.Checked;
+        Query.flags.Partial := checkBoxMongoDBPartial.Checked;
+
+        aStopWatch:= TstopWatch.StartNew;
+        aMongoDBClient.SelectData(Query, aJSONDATA.Node);
+        aStopWatch.Stop;
+
+        TableViewThread.DataController.RecordCount := 1;
+        TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+        TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+        TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+        StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+        AlMemoResult.Lines.Text := String(aJSONDATA.JSON);
+
+      Finally
+        aJSONDATA.free;
+      End;
+
     Finally
+      aMongoDBClient.disconnect;
       aMongoDBClient.free;
     End;
 
@@ -3391,6 +3431,7 @@ begin
     Screen.Cursor := CrDefault;
   End;
 end;
+
 
 {****************************************************************}
 procedure TForm1.ALButtonMemcachedFLush_ALLClick(Sender: TObject);

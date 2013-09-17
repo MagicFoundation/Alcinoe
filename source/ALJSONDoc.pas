@@ -369,10 +369,10 @@ type
     procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure SaveToJSON(var JSON: AnsiString);
     procedure SaveToBSON(var BSON: AnsiString);
-    procedure LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False);
-    procedure LoadFromStream(const Stream: TStream; const BSONStream: boolean = False);
-    procedure LoadFromJSON(const JSON: AnsiString);
-    procedure LoadFromBSON(const BSON: AnsiString);
+    procedure LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromStream(const Stream: TStream; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromJSON(const JSON: AnsiString; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSON(const BSON: AnsiString; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read GetNodeName write SetNodeName;
@@ -490,10 +490,10 @@ type
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
     function IsEmptyDoc: Boolean;
-    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False);
-    procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False);
-    procedure LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False);
-    procedure LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False);
+    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
     procedure SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
     procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
     procedure SaveToJSON(var JSON: AnsiString);
@@ -1991,12 +1991,12 @@ end;
  *AFileName is the name of the JSON document to load from disk. If AFileName is an empty string, TALJSONDocument uses the value of the
   FileName property. If AFileName is not an empty string, TALJSONDocument changes the FileName property to AFileName.
  Once you have loaded an JSON document, any changes you make to the document are not saved back to disk until you call the SaveToFile method.}
-procedure TALJSONDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False);
+procedure TALJSONDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False; Const ClearChildNodes: Boolean = True);
 var FileStream: TFileStream;
 begin
   FileStream := TFileStream.Create(string(aFileName), fmOpenRead or fmShareDenyWrite);
   try
-    LoadFromStream(FileStream, saxMode, BSONFile);
+    LoadFromStream(FileStream, saxMode, BSONFile, ClearChildNodes);
   finally
     FileStream.Free;
   end;
@@ -2007,11 +2007,11 @@ end;
  Call LoadFromStream to load the JSON document from a stream.
  *Stream is a stream object that can be used to read the string of JSON that makes up the document.
  After loading the document from Stream, LoadFromStream sets the Active property to true.}
-procedure TALJSONDocument.LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False);
+procedure TALJSONDocument.LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   if saxMode then SetActive(False)
   else begin
-    releaseDoc;
+    if ClearChildNodes then releaseDoc;
     SetActive(True);
   end;
   if BSONStream then ParseBSONStream(Stream, FDocumentNode)
@@ -2024,24 +2024,24 @@ end;
  basis, LoadFromJSON treats the text of the JSON document as a whole.
  The JSON parameter is a string containing the text of an JSON document. It should represent the JSON text encoded using 8 bits char (utf-8, iso-8859-1, etc)
  After assigning the JSON property as the contents of the document, LoadFromJSON sets the Active property to true.}
-procedure TALJSONDocument.LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False);
+procedure TALJSONDocument.LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 var StringStream: TALStringStream;
 begin
   StringStream := TALStringStream.Create(JSON);
   try
-    LoadFromStream(StringStream, saxMode, False {BSONStream});
+    LoadFromStream(StringStream, saxMode, False {BSONStream}, ClearChildNodes);
   finally
     StringStream.Free;
   end;
 end;
 
-{*********************************************************************************************}
-procedure TALJSONDocument.LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False);
+{************************************************************************************************************************************}
+procedure TALJSONDocument.LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 var StringStream: TALStringStream;
 begin
   StringStream := TALStringStream.Create(BSON);
   try
-    LoadFromStream(StringStream, saxMode, True {BSONStream});
+    LoadFromStream(StringStream, saxMode, True {BSONStream}, ClearChildNodes);
   finally
     StringStream.Free;
   end;
@@ -2128,7 +2128,7 @@ end;
  *Value contains the raw (unparsed) JSON to assign.}
 procedure TALJSONDocument.SetJSON(const Value: AnsiString);
 begin
-  LoadFromJSON(Value, False);
+  LoadFromJSON(Value, False{saxMode}, true{ClearChildNodes});
 end;
 
 {**********************************}
@@ -2137,7 +2137,7 @@ end;
  *Value contains the raw (unparsed) BSON to assign.}
 procedure TALJSONDocument.SetBSON(const Value: AnsiString);
 begin
-  LoadFromBSON(Value, False);
+  LoadFromBSON(Value, False{saxMode}, true{ClearChildNodes});
 end;
 
 {***********************************}
@@ -2535,7 +2535,7 @@ end;
 {SetJSON reload the node with the new given value }
 procedure TALJSONNode.SetJSON(const Value: AnsiString);
 Begin
-  LoadFromJSON(Value);
+  LoadFromJSON(Value, true{ClearChildNodes});
 end;
 
 {*******************************************************************}
@@ -2550,7 +2550,7 @@ end;
 {SetBSON reload the node with the new given value }
 procedure TALJSONNode.SetBSON(const Value: AnsiString);
 Begin
-  LoadFromBSON(Value);
+  LoadFromBSON(Value, true{ClearChildNodes});
 end;
 
 {*****************************************************************}
@@ -3130,11 +3130,11 @@ begin
   else _SaveToJSONStream;
 end;
 
-{*********************************************************************************************}
-procedure TALJSONNode.LoadFromStream(const Stream: TStream; const BSONStream: boolean = False);
+{************************************************************************************************************************************}
+procedure TALJSONNode.LoadFromStream(const Stream: TStream; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
 Begin
   If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  ChildNodes.Clear;
+  if ClearChildNodes then ChildNodes.Clear;
   Try
     if BSONStream then FDocument.ParseBSONStream(Stream, self)
     else FDocument.ParseJSONStream(Stream, self);
@@ -3156,13 +3156,13 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
-procedure TALJSONNode.LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False);
+{**************************************************************************************************************************************}
+procedure TALJSONNode.LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False; Const ClearChildNodes: Boolean = True);
 Var afileStream: TfileStream;
 Begin
   aFileStream := TfileStream.Create(string(AFileName), fmOpenRead or fmShareDenyWrite);
   Try
-    LoadFromStream(aFileStream, BSONFile);
+    LoadFromStream(aFileStream, BSONFile, ClearChildNodes);
   finally
     aFileStream.Free;
   end;
@@ -3194,25 +3194,25 @@ begin
   end;
 end;
 
-{*********************************************************}
-procedure TALJSONNode.LoadFromJSON(const JSON: AnsiString);
+{************************************************************************************************}
+procedure TALJSONNode.LoadFromJSON(const JSON: AnsiString; Const ClearChildNodes: Boolean = True);
 Var aStringStream: TALStringStream;
 Begin
   aStringStream := TALStringStream.Create(JSON);
   Try
-    LoadFromStream(aStringStream, False {BSONStream});
+    LoadFromStream(aStringStream, False {BSONStream}, ClearChildNodes);
   finally
     aStringStream.Free;
   end;
 end;
 
-{*********************************************************}
-procedure TALJSONNode.LoadFromBSON(const BSON: AnsiString);
+{************************************************************************************************}
+procedure TALJSONNode.LoadFromBSON(const BSON: AnsiString; Const ClearChildNodes: Boolean = True);
 Var aStringStream: TALStringStream;
 Begin
   aStringStream := TALStringStream.Create(BSON);
   Try
-    LoadFromStream(aStringStream, True {BSONStream});
+    LoadFromStream(aStringStream, True {BSONStream}, ClearChildNodes);
   finally
     aStringStream.Free;
   end;

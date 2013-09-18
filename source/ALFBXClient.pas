@@ -206,63 +206,63 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: TALFBXClientSelectDataSQL;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQLs: TALFBXClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: TALFBXClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          Params: Array of AnsiString;
                          RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          Params: Array of AnsiString;
                          RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          Params: Array of AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
-    procedure UpdateData(SQLs: TALFBXClientUpdateDataSQLs); overload;
-    procedure UpdateData(SQL: TALFBXClientUpdateDataSQL); overload;
-    procedure UpdateData(SQLs: TALStrings); overload;
-    procedure UpdateData(SQL: AnsiString); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
+    procedure UpdateData(SQLs: TALFBXClientUpdateDataSQLs); overload; virtual;
+    procedure UpdateData(SQL: TALFBXClientUpdateDataSQL); overload; virtual;
+    procedure UpdateData(SQLs: TALStrings); overload; virtual;
+    procedure UpdateData(SQL: AnsiString); overload; virtual;
     procedure UpdateData(SQL: AnsiString;
-                         Params: Array of AnsiString); overload;
-    procedure UpdateData(SQLs: Array of AnsiString); overload;
+                         Params: Array of AnsiString); overload; virtual;
+    procedure UpdateData(SQLs: Array of AnsiString); overload; virtual;
     Property  Connected: Boolean Read GetConnected;
     property  SqlDialect: word read FSqlDialect;
     Property  InTransaction: Boolean read GetInTransaction;
@@ -1501,7 +1501,7 @@ Var aSqlpa: TALFBXSQLParams;
       //init aUpdateRowTagByFieldValue
       if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
         delete(SQLs[aSQLsindex].RowTag, 1, 2);
-        aUpdateRowTagByFieldValue := True;
+        aUpdateRowTagByFieldValue := SQLs[aSQLsindex].RowTag <> '';
       end
       else aUpdateRowTagByFieldValue := False;
 
@@ -1561,8 +1561,14 @@ Var aSqlpa: TALFBXSQLParams;
 
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
+
+  //only OnNewRowFunct / XMLDATA can be used
+  if assigned(OnNewRowFunct) then XMLDATA := nil;
 
   //clear the XMLDATA
   if assigned(XMLDATA) then begin
@@ -3880,7 +3886,7 @@ procedure TALFBXConnectionPoolClient.SelectData(SQLs: TALFBXClientSelectDataSQLs
     //init aUpdateRowTagByFieldValue
     if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
       delete(SQLs[aSQLsindex].RowTag, 1, 2);
-      aUpdateRowTagByFieldValue := True;
+      aUpdateRowTagByFieldValue := SQLs[aSQLsindex].RowTag <> '';
     end
     else aUpdateRowTagByFieldValue := False;
 
@@ -3941,6 +3947,10 @@ procedure TALFBXConnectionPoolClient.SelectData(SQLs: TALFBXClientSelectDataSQLs
 
 begin
 
+  {$IFDEF undef}{$REGION 'exit if no SQL'}{$ENDIF}
+  if length(SQLs) = 0 then Exit;
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
   {$IFDEF undef}{$REGION 'Check the params'}{$ENDIF}
   if (
       (not assigned(DBHandle)) and
@@ -3957,6 +3967,10 @@ begin
       (not assigned(DBHandle))
      )
   then raise Exception.Create('Wrong Params');
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+  {$IFDEF undef}{$REGION 'init OnNewRowFunct/XMLDATA'}{$ENDIF}
+  if assigned(OnNewRowFunct) then XMLDATA := nil;
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
   {$IFDEF undef}{$REGION 'clear the XMLDATA'}{$ENDIF}

@@ -151,45 +151,45 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQLs: TalMySqlClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: TalMySqlClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
-    procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs); overload;
-    procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL); overload;
-    procedure UpdateData(SQLs: TALStrings); overload;
-    procedure UpdateData(SQL: AnsiString); overload;
-    procedure UpdateData(SQLs: array of AnsiString); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
+    procedure UpdateData(SQLs: TalMySqlClientUpdateDataSQLs); overload; virtual;
+    procedure UpdateData(SQL: TalMySqlClientUpdateDataSQL); overload; virtual;
+    procedure UpdateData(SQLs: TALStrings); overload; virtual;
+    procedure UpdateData(SQL: AnsiString); overload; virtual;
+    procedure UpdateData(SQLs: array of AnsiString); overload; virtual;
     function  insert_id(SQL: AnsiString): ULongLong;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
@@ -601,8 +601,14 @@ Var aMySqlRes: PMYSQL_RES;
 
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
+
+  //only OnNewRowFunct / XMLDATA can be used
+  if assigned(OnNewRowFunct) then XMLDATA := nil;
 
   //clear the XMLDATA
   if assigned(XMLDATA) then begin
@@ -642,7 +648,7 @@ begin
         //init aUpdateRowTagByFieldValue
         if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
           delete(SQLs[aSQLsindex].RowTag, 1, 2);
-          aUpdateRowTagByFieldValue := True;
+          aUpdateRowTagByFieldValue := SQLs[aSQLsindex].RowTag <> '';
         end
         else aUpdateRowTagByFieldValue := False;
 
@@ -1471,6 +1477,12 @@ Var aMySqlRes: PMYSQL_RES;
 
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
+  //only OnNewRowFunct / XMLDATA can be used
+  if assigned(OnNewRowFunct) then XMLDATA := nil;
+
   //clear the XMLDATA
   if assigned(XMLDATA) then begin
     XMLDATA.ChildNodes.Clear;
@@ -1515,7 +1527,7 @@ begin
           //init aUpdateRowTagByFieldValue
           if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
             delete(SQLs[aSQLsindex].RowTag, 1, 2);
-            aUpdateRowTagByFieldValue := True;
+            aUpdateRowTagByFieldValue := SQLs[aSQLsindex].RowTag <> '';
           end
           else aUpdateRowTagByFieldValue := False;
 

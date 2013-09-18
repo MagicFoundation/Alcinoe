@@ -13,7 +13,7 @@ uses
   dxSkinFoggy, dxSkinscxPCPainter, dxSkinsForm, Vcl.Menus, cxButtons,
   cxPCdxBarPopupMenu, cxPC, cxContainer, cxLabel, cxTextEdit, cxMaskEdit,
   cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, AlMemCachedClient,
-  ALMongoDBClient, ALJsonDoc;
+  ALMongoDBClient, ALJsonDoc, cxCheckGroup;
 
 type
 
@@ -206,26 +206,33 @@ type
     cxLabel9: TcxLabel;
     MemoMongoDBQuery: TcxMemo;
     ALButtonMongoDBSelect: TcxButton;
-    cxButton2: TcxButton;
-    cxButton3: TcxButton;
-    cxButton4: TcxButton;
-    cxButton5: TcxButton;
-    cxButton6: TcxButton;
-    cxButton7: TcxButton;
-    cxTextEdit6: TcxTextEdit;
+    ALButtonMongoDBINSERT: TcxButton;
+    ALButtonMongoDBUpdate: TcxButton;
+    ALButtonMongoDBDelete: TcxButton;
+    ALButtonMongoDBLOOPSELECT: TcxButton;
+    ALButtonMongoDBLOOPINSERT: TcxButton;
+    ALButtonMongoDBLOOPUPDATE: TcxButton;
+    ALEditMongoDBNBThread: TcxTextEdit;
     cxLabel10: TcxLabel;
     cxLabel11: TcxLabel;
-    cxTextEdit7: TcxTextEdit;
+    ALEditMongoDBNBLoop: TcxTextEdit;
     cxLabel6: TcxLabel;
-    MemoMongoDBReturnFieldSelector: TcxMemo;
+    MemoMongoDBSelector: TcxMemo;
     cxLabel7: TcxLabel;
     EditMongoDBFullCollectionName: TcxTextEdit;
     cxLabel8: TcxLabel;
     EditMongoDBSkip: TcxTextEdit;
     cxLabel12: TcxLabel;
     EditMongoDBFirst: TcxTextEdit;
-    CheckBoxMongoDBSlaveOk: TcxCheckBox;
-    CheckBoxMongoDBPartial: TcxCheckBox;
+    cxLabel13: TcxLabel;
+    cxLabel14: TcxLabel;
+    cxLabel15: TcxLabel;
+    cxLabel16: TcxLabel;
+    CheckGroupMongoDBSelectFlags: TcxCheckGroup;
+    CheckGroupMongoDBINSERTFlags: TcxCheckGroup;
+    CheckGroupMongoDBUpdateFlags: TcxCheckGroup;
+    CheckGroupMongoDBDeleteFlags: TcxCheckGroup;
+    ALButtonMongoDBLOOPDELETE: TcxButton;
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlSelectClick(Sender: TObject);
     procedure ALButtonFirebirdSelectClick(Sender: TObject);
@@ -262,12 +269,20 @@ type
     procedure ALButtonMemcachedLoopIncrClick(Sender: TObject);
     procedure ALButtonMemcachedLoopDecrClick(Sender: TObject);
     procedure ALButtonMongoDBSelectClick(Sender: TObject);
+    procedure ALButtonMongoDBINSERTClick(Sender: TObject);
+    procedure ALButtonMongoDBUpdateClick(Sender: TObject);
+    procedure ALButtonMongoDBDeleteClick(Sender: TObject);
+    procedure ALButtonMongoDBLOOPSELECTClick(Sender: TObject);
+    procedure ALButtonMongoDBLOOPINSERTClick(Sender: TObject);
+    procedure ALButtonMongoDBLOOPUPDATEClick(Sender: TObject);
+    procedure ALButtonMongoDBLOOPDELETEClick(Sender: TObject);
   private
   public
     Sqlite3ConnectionPoolClient: TalSqlite3ConnectionPoolClient;
     FirebirdConnectionPoolClient: TalFBXConnectionPoolClient;
     MySqlConnectionPoolClient: TalMySqlConnectionPoolClient;
     MemcachedConnectionPoolClient: TALMemcachedConnectionPoolClient;
+    MongoDBConnectionPoolClient: TALMongoDBConnectionPoolClient;
     NBActiveThread: integer;
   end;
 
@@ -394,6 +409,49 @@ type
                        aCmd: AnsiString);
     destructor Destroy; override;
   End;
+
+  {--------------------------------------}
+  TMongoDBBenchmarkThread = Class(Tthread)
+  private
+    fcmd: AnsiString;
+    ffullCollectionName: AnsiString;
+    fQuery: AnsiString;
+    fSelector: AnsiString;
+    fSkip: ansiString;
+    fFirst: ansiString;
+    fInsertIfNotFound: boolean;
+    fMultiUpdate: boolean;
+    fContinueOnError: boolean;
+    fSingleRemove: boolean;
+    fOn: Boolean;
+    fMaxLoop: integer;
+    FErrorMsg: AnsiString;
+    FTotalExecuteTimeTaken: int64;
+    FTotalLoop: integer;
+    fOwner: TWinControl;
+    fRank: integer;
+    Procedure UpdateGUI;
+  protected
+    procedure Execute; override;
+  protected
+  Public
+    constructor Create(CreateSuspended: Boolean;
+                       AOwner: TwinControl;
+                       aRank: integer;
+                       aMaxLoop: integer;
+                       acmd: AnsiString;
+                       afullCollectionName: AnsiString;
+                       aQuery: AnsiString;
+                       aSelector: AnsiString;
+                       aInsertIfNotFound: boolean;
+                       aMultiUpdate: boolean;
+                       aContinueOnError: boolean;
+                       aSingleRemove: boolean;
+                       aSkip: ansiString;
+                       aFirst: ansiString);
+    destructor Destroy; override;
+  End;
+
 
 function GetProcessMemoryInfo(Process : THandle; var MemoryCounters : TProcessMemoryCounters; cb : DWORD) : BOOL; stdcall;
 function ProcessMemoryUsage(ProcessID : DWORD): DWORD;
@@ -1956,7 +2014,6 @@ begin
   If OpenDialog1.Execute then (Sender as TcxButtonEdit).Text := OpenDialog1.FileName;
 end;
 
-
 {******************************************}
 procedure TForm1.FormClick(Sender: TObject);
 begin
@@ -2871,6 +2928,194 @@ begin
   application.ProcessMessages;
 end;
 
+{******************************************************************}
+constructor TMongoDBBenchmarkThread.Create(CreateSuspended: Boolean;
+                                           AOwner: TwinControl;
+                                           aRank: integer;
+                                           aMaxLoop: integer;
+                                           acmd: AnsiString;
+                                           afullCollectionName: AnsiString;
+                                           aQuery: AnsiString;
+                                           aSelector: AnsiString;
+                                           aInsertIfNotFound: boolean;
+                                           aMultiUpdate: boolean;
+                                           aContinueOnError: boolean;
+                                           aSingleRemove: boolean;
+                                           aSkip: ansiString;
+                                           aFirst: ansiString);
+begin
+  inherited Create(CreateSuspended);
+  ffullCollectionName := afullCollectionName;
+  fQuery := aQuery;
+  fSelector := aSelector;
+  fSkip := aSkip;
+  fFirst := aFirst;
+  fOn:= true;
+  fMaxLoop:= aMaxLoop;
+  if fMaxLoop <= 0 then fMaxLoop := MaxInt;
+  FErrorMsg := '';
+  FTotalExecuteTimeTaken := 0;
+  FTotalLoop := 0;
+  fOwner := AOwner;
+  fRank := aRank;
+  fCMD := aCMD;
+  fInsertIfNotFound := aInsertIfNotFound;
+  fMultiUpdate := aMultiUpdate;
+  fContinueOnError := aContinueOnError;
+  fSingleRemove := aSingleRemove;
+end;
+
+{*******************************************}
+destructor TMongoDBBenchmarkThread.Destroy;
+begin
+  fOn := False;
+  Synchronize(UpdateGUI);
+  inherited;
+end;
+
+{******************************************}
+procedure TMongoDBBenchmarkThread.Execute;
+Var aStopWatch: TStopWatch;
+    aFullCollectionName: AnsiString;
+    aQuery: AnsiString;
+    aSelector: AnsiString;
+    aSkip: integer;
+    aFirst: integer;
+    aJSONDATA: TALJSONDocument;
+begin
+
+  aJSONDATA := TALJSONDocument.create;
+  Try
+
+    //start the loop;
+    while FTotalLoop < fMaxLoop do begin
+      try
+
+        //update the params
+        aFullCollectionName := ALFastTagReplace(fFullCollectionName,
+                                 '<#',
+                                 '>',
+                                 SQLFastTagReplaceFunct,
+                                 True,
+                                 nil);
+        aQuery := ALFastTagReplace(fQuery,
+                                   '<#',
+                                   '>',
+                                   SQLFastTagReplaceFunct,
+                                   True,
+                                   nil);
+        aSelector := ALFastTagReplace(fSelector,
+                                      '<#',
+                                      '>',
+                                      SQLFastTagReplaceFunct,
+                                      True,
+                                      nil);
+        if fSkip = '' then aSkip := 0
+        else aSkip := ALStrToInt(ALFastTagReplace(fSkip,
+                                                  '<#',
+                                                  '>',
+                                                  SQLFastTagReplaceFunct,
+                                                  True,
+                                                  nil));
+        if fFirst = '' then aFirst := 0
+        else aFirst := ALStrToInt(ALFastTagReplace(fFirst,
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil));
+
+        //update the data
+        aStopWatch := TStopWatch.StartNew;
+        if fCMD = 'SELECT' then Tform1(fOwner).MongoDBConnectionPoolClient.SelectData(aFullCollectionName,
+                                                                                      aQuery,
+                                                                                      aSelector,
+                                                                                      '', // rowtag
+                                                                                      aSkip,
+                                                                                      aFirst,
+                                                                                      aJSONDATA.Node)
+        else if fCMD = 'UPDATE' then Tform1(fOwner).MongoDBConnectionPoolClient.UpdateData(aFullCollectionName,
+                                                                                           aQuery,
+                                                                                           aSelector,
+                                                                                           fInsertIfNotFound,
+                                                                                           fMultiUpdate)
+        else if fCMD = 'INSERT' then Tform1(fOwner).MongoDBConnectionPoolClient.InsertData(aFullCollectionName,
+                                                                                           aQuery,
+                                                                                           fContinueOnError)
+        else if fCMD = 'DELETE' then Tform1(fOwner).MongoDBConnectionPoolClient.DeleteData(aFullCollectionName,
+                                                                                           aQuery,
+                                                                                           fSingleRemove);
+        aStopWatch.Stop;
+        FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+
+        //update FTotalLoop
+        inc(FTotalLoop);
+
+      Except
+        on e: Exception do begin
+          FErrorMsg := AnsiString(E.message);
+          Synchronize(UpdateGUI);
+          Exit;
+        end;
+      end;
+      if (FTotalLoop mod 100 = 0) or (FTotalLoop = fMaxLoop) then Synchronize(UpdateGUI);
+      If (Tform1(fOwner).ALButtonMongoDBLoopSELECT.tag = 2) or
+         (Tform1(fOwner).ALButtonMongoDBLoopINSERT.tag = 2) or
+         (Tform1(fOwner).ALButtonMongoDBLoopUPDATE.tag = 2) or
+         (Tform1(fOwner).ALButtonMongoDBLoopDELETE.tag = 2) then Break;
+    end;
+
+  Finally
+    aJSONDATA.Free;
+  End;
+
+end;
+
+{********************************************}
+procedure TMongoDBBenchmarkThread.UpdateGUI;
+begin
+
+  TForm1(fOwner).TableViewThread.BeginUpdate;
+  try
+    if not fOn then begin
+      dec(TForm1(fOwner).NBActiveThread);
+      TForm1(fOwner).StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(TForm1(fOwner).NBActiveThread);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(frank-1,TForm1(fOwner).TableViewThreadNumber.Index,ALIntToStr(frank) + ' (off)');
+      if TForm1(fOwner).NBActiveThread = 0 then begin
+        if fCMD = 'SELECT' then begin
+          TForm1(fOwner).ALButtonMongoDBLoopSELECT.Tag := 0;
+          TForm1(fOwner).ALButtonMongoDBLoopSELECT.Caption := 'Loop SELECT';
+        end
+        else if fCMD = 'UPDATE' then begin
+          TForm1(fOwner).ALButtonMongoDBLoopUPDATE.Tag := 0;
+          TForm1(fOwner).ALButtonMongoDBLoopUPDATE.Caption := 'Loop UPDATE';
+        end
+        else if fCMD = 'INSERT' then begin
+          TForm1(fOwner).ALButtonMongoDBLoopINSERT.Tag := 0;
+          TForm1(fOwner).ALButtonMongoDBLoopINSERT.Caption := 'Loop INSERT';
+        end
+        else if fCMD = 'DELETE' then begin
+          TForm1(fOwner).ALButtonMongoDBLoopDELETE.Tag := 0;
+          TForm1(fOwner).ALButtonMongoDBLoopDELETE.Caption := 'Loop DELETE';
+        end
+      end;
+      if TForm1(fOwner).NBActiveThread = 0 then begin
+        TForm1(fOwner).MongoDBConnectionPoolClient.Free;
+        TForm1(fOwner).MongoDBConnectionPoolClient := nil;
+      end;
+    end;
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,ALIfThen(FTotalLoop > 0, FTotalExecuteTimeTaken / FTotalLoop, 0));
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,0/0);
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
+    TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
+  finally
+    TForm1(fOwner).TableViewThread.EndUpdate;
+  end;
+  application.ProcessMessages;
+end;
+
 {**************************************************************}
 procedure TForm1.ALButtonMemcachedLoopGetClick(Sender: TObject);
 Var aMemcachedBenchmarkThread: TMemcachedBenchmarkThread;
@@ -3382,7 +3627,7 @@ begin
                                                    SQLFastTagReplaceFunct,
                                                    True,
                                                    nil);
-        Query.ReturnFieldsSelector := ALFastTagReplace(AnsiString(MemoMongoDBReturnFieldSelector.Lines.Text),
+        Query.ReturnFieldsSelector := ALFastTagReplace(AnsiString(MemoMongoDBSelector.Lines.Text),
                                                        '<#',
                                                        '>',
                                                        SQLFastTagReplaceFunct,
@@ -3401,8 +3646,8 @@ begin
                                                    True,
                                                    nil));
         Query.RowTag := 'rec';
-        Query.flags.SlaveOk := checkBoxMongoDBSlaveOK.Checked;
-        Query.flags.Partial := checkBoxMongoDBPartial.Checked;
+        Query.flags.SlaveOk := CheckGroupMongoDBSelectFlags.States[0] = cbsChecked;
+        Query.flags.Partial := CheckGroupMongoDBSelectFlags.States[1] = cbsChecked;
 
         aStopWatch:= TstopWatch.StartNew;
         aMongoDBClient.SelectData(Query, aJSONDATA.Node);
@@ -3430,6 +3675,436 @@ begin
   Finally
     Screen.Cursor := CrDefault;
   End;
+end;
+
+{***********************************************************}
+procedure TForm1.ALButtonMongoDBINSERTClick(Sender: TObject);
+Var aMongoDBClient: TAlMongoDBClient;
+    aStopWatch: TstopWatch;
+    Query: TALMongoDBClientINSERTDataQUERY;
+begin
+
+  Screen.Cursor := CrHourGlass;
+  try
+
+    aMongoDBClient := TAlMongoDBClient.create;
+    Try
+      aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
+
+      Query := TALMongoDBClientInsertDataQUERY.Create;
+      Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil);
+      Query.documents := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                          '<#',
+                                          '>',
+                                          SQLFastTagReplaceFunct,
+                                          True,
+                                          nil);
+      Query.flags.ContinueOnError := CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked;
+
+      aStopWatch:= TstopWatch.StartNew;
+      aMongoDBClient.InsertData(Query);
+      aStopWatch.Stop;
+
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      AlMemoResult.Lines.Clear;
+
+    Finally
+      aMongoDBClient.disconnect;
+      aMongoDBClient.free;
+    End;
+
+  Finally
+    Screen.Cursor := CrDefault;
+  End;
+end;
+
+{***********************************************************}
+procedure TForm1.ALButtonMongoDBUpdateClick(Sender: TObject);
+Var aMongoDBClient: TAlMongoDBClient;
+    aStopWatch: TstopWatch;
+    Query: TALMongoDBClientUpdateDataQUERY;
+    NumberOfDocumentsUpdatedOrRemoved: integer;
+    updatedExisting: Boolean;
+    upserted: TALJsonObjectID;
+begin
+
+  Screen.Cursor := CrHourGlass;
+  try
+
+    aMongoDBClient := TAlMongoDBClient.create;
+    Try
+      aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
+
+      Query := TALMongoDBClientUpdateDataQUERY.Create;
+      Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil);
+      Query.selector := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                          '<#',
+                                          '>',
+                                          SQLFastTagReplaceFunct,
+                                          True,
+                                          nil);
+
+      Query.update := ALFastTagReplace(AnsiString(MemoMongoDBSelector.Lines.Text),
+                                          '<#',
+                                          '>',
+                                          SQLFastTagReplaceFunct,
+                                          True,
+                                          nil);
+      Query.flags.Upsert := CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked;
+      Query.flags.MultiUpdate := CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked;
+
+
+      aStopWatch:= TstopWatch.StartNew;
+      aMongoDBClient.UpdateData(Query,
+                                NumberOfDocumentsUpdatedOrRemoved,
+                                updatedExisting,
+                                upserted);
+      aStopWatch.Stop;
+
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      AlMemoResult.Lines.clear;
+      AlMemoResult.Lines.add('Number Of Documents Updated: ' + intToStr(NumberOfDocumentsUpdatedOrRemoved));
+      AlMemoResult.Lines.add('updated Existing: ' + String(ALBoolToStr(updatedExisting)));
+      AlMemoResult.Lines.add('upserted: ' + string(ALBinToHex(upserted)));
+
+    Finally
+      aMongoDBClient.disconnect;
+      aMongoDBClient.free;
+    End;
+
+  Finally
+    Screen.Cursor := CrDefault;
+  End;
+end;
+
+{***********************************************************}
+procedure TForm1.ALButtonMongoDBDeleteClick(Sender: TObject);
+Var aMongoDBClient: TAlMongoDBClient;
+    aStopWatch: TstopWatch;
+    Query: TALMongoDBClientDeleteDataQUERY;
+    NumberOfDocumentsUpdatedOrRemoved: integer;
+begin
+
+  Screen.Cursor := CrHourGlass;
+  try
+
+    aMongoDBClient := TAlMongoDBClient.create;
+    Try
+      aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
+
+      Query := TALMongoDBClientDeleteDataQUERY.Create;
+      Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil);
+      Query.selector := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                         '<#',
+                                         '>',
+                                         SQLFastTagReplaceFunct,
+                                         True,
+                                         nil);
+      Query.flags.SingleRemove := CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked;
+
+      aStopWatch:= TstopWatch.StartNew;
+      aMongoDBClient.DeleteData(Query, NumberOfDocumentsUpdatedOrRemoved);
+      aStopWatch.Stop;
+
+      TableViewThread.DataController.RecordCount := 1;
+      TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
+      TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
+      TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
+      StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
+      AlMemoResult.Lines.clear;
+      AlMemoResult.Lines.add('Number Of Documents removed: ' + intToStr(NumberOfDocumentsUpdatedOrRemoved));
+
+    Finally
+      aMongoDBClient.disconnect;
+      aMongoDBClient.free;
+    End;
+
+  Finally
+    Screen.Cursor := CrDefault;
+  End;
+end;
+
+{***************************************************************}
+procedure TForm1.ALButtonMongoDBLOOPSELECTClick(Sender: TObject);
+Var aMongoDBBenchmarkThread: TMongoDBBenchmarkThread;
+    i: integer;
+begin
+
+  {init button action}
+  If ALButtonMongoDBLoopSelect.tag = 0 then begin
+    ALButtonMongoDBLoopSelect.Tag := 1;
+    ALButtonMongoDBLoopSelect.Caption := 'STOP';
+  end
+  else If ALButtonMongoDBLoopSelect.tag = 1 then begin
+    ALButtonMongoDBLoopSelect.Tag := 2;
+    ALButtonMongoDBLoopSelect.Caption := 'STOPPING';
+    exit;
+  end
+  else exit;
+
+  //init local variable
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditMongoDBNBThread.Text);
+
+  //create the fMongoDBConnectionPoolClient
+  if not assigned(MongoDBConnectionPoolClient) then begin
+    MongoDBConnectionPoolClient := TALMongoDBConnectionPoolClient.Create(AnsiString(ALEditMongoDBHost.Text),
+                                                                         StrToInt(ALEditMongoDBPort.Text));
+  end;
+
+  //clear the status bar
+  StatusBar1.Panels[1].Text := '';
+
+  //launch all the thread
+  for i := 1 to StrToInt(ALEditMongoDBNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
+    aMongoDBBenchmarkThread := TMongoDBBenchmarkThread.Create(True,
+                                                              self,
+                                                              i,
+                                                              StrToInt(ALEditMongoDBNBLoop.Text),
+                                                              'SELECT',
+                                                              ALTrim(AnsiString(EditMongoDBfullCollectionName.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBQuery.Lines.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBSelector.Lines.Text)),
+                                                              CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked,
+                                                              CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked,
+                                                              ALTrim(AnsiString(EditMongoDBSkip.Text)),
+                                                              ALTrim(AnsiString(EditMongoDBFirst.Text)));
+
+    inc(NBActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
+    StatusBar1.Repaint;
+    aMongoDBBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aMongoDBBenchmarkThread.Start;
+    {$ELSE}
+    aMongoDBBenchmarkThread.Resume;
+    {$IFEND}
+
+  end;
+
+end;
+
+{***************************************************************}
+procedure TForm1.ALButtonMongoDBLOOPUPDATEClick(Sender: TObject);
+Var aMongoDBBenchmarkThread: TMongoDBBenchmarkThread;
+    i: integer;
+begin
+
+  {init button action}
+  If ALButtonMongoDBLoopUpdate.tag = 0 then begin
+    ALButtonMongoDBLoopUpdate.Tag := 1;
+    ALButtonMongoDBLoopUpdate.Caption := 'STOP';
+  end
+  else If ALButtonMongoDBLoopUpdate.tag = 1 then begin
+    ALButtonMongoDBLoopUpdate.Tag := 2;
+    ALButtonMongoDBLoopUpdate.Caption := 'STOPPING';
+    exit;
+  end
+  else exit;
+
+  //init local variable
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditMongoDBNBThread.Text);
+
+  //create the fMongoDBConnectionPoolClient
+  if not assigned(MongoDBConnectionPoolClient) then begin
+    MongoDBConnectionPoolClient := TALMongoDBConnectionPoolClient.Create(AnsiString(ALEditMongoDBHost.Text),
+                                                                         StrToInt(ALEditMongoDBPort.Text));
+  end;
+
+  //clear the status bar
+  StatusBar1.Panels[1].Text := '';
+
+  //launch all the thread
+  for i := 1 to StrToInt(ALEditMongoDBNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
+    aMongoDBBenchmarkThread := TMongoDBBenchmarkThread.Create(True,
+                                                              self,
+                                                              i,
+                                                              StrToInt(ALEditMongoDBNBLoop.Text),
+                                                              'UPDATE',
+                                                              ALTrim(AnsiString(EditMongoDBfullCollectionName.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBQuery.Lines.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBSelector.Lines.Text)),
+                                                              CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked,
+                                                              CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked,
+                                                              ALTrim(AnsiString(EditMongoDBSkip.Text)),
+                                                              ALTrim(AnsiString(EditMongoDBFirst.Text)));
+
+    inc(NBActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
+    StatusBar1.Repaint;
+    aMongoDBBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aMongoDBBenchmarkThread.Start;
+    {$ELSE}
+    aMongoDBBenchmarkThread.Resume;
+    {$IFEND}
+
+  end;
+
+end;
+
+{***************************************************************}
+procedure TForm1.ALButtonMongoDBLOOPINSERTClick(Sender: TObject);
+Var aMongoDBBenchmarkThread: TMongoDBBenchmarkThread;
+    i: integer;
+begin
+
+  {init button action}
+  If ALButtonMongoDBLoopInsert.tag = 0 then begin
+    ALButtonMongoDBLoopInsert.Tag := 1;
+    ALButtonMongoDBLoopInsert.Caption := 'STOP';
+  end
+  else If ALButtonMongoDBLoopInsert.tag = 1 then begin
+    ALButtonMongoDBLoopInsert.Tag := 2;
+    ALButtonMongoDBLoopInsert.Caption := 'STOPPING';
+    exit;
+  end
+  else exit;
+
+  //init local variable
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditMongoDBNBThread.Text);
+
+  //create the fMongoDBConnectionPoolClient
+  if not assigned(MongoDBConnectionPoolClient) then begin
+    MongoDBConnectionPoolClient := TALMongoDBConnectionPoolClient.Create(AnsiString(ALEditMongoDBHost.Text),
+                                                                         StrToInt(ALEditMongoDBPort.Text));
+  end;
+
+  //clear the status bar
+  StatusBar1.Panels[1].Text := '';
+
+  //launch all the thread
+  for i := 1 to StrToInt(ALEditMongoDBNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
+    aMongoDBBenchmarkThread := TMongoDBBenchmarkThread.Create(True,
+                                                              self,
+                                                              i,
+                                                              StrToInt(ALEditMongoDBNBLoop.Text),
+                                                              'INSERT',
+                                                              ALTrim(AnsiString(EditMongoDBfullCollectionName.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBQuery.Lines.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBSelector.Lines.Text)),
+                                                              CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked,
+                                                              CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked,
+                                                              ALTrim(AnsiString(EditMongoDBSkip.Text)),
+                                                              ALTrim(AnsiString(EditMongoDBFirst.Text)));
+
+    inc(NBActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
+    StatusBar1.Repaint;
+    aMongoDBBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aMongoDBBenchmarkThread.Start;
+    {$ELSE}
+    aMongoDBBenchmarkThread.Resume;
+    {$IFEND}
+
+  end;
+
+end;
+
+procedure TForm1.ALButtonMongoDBLOOPDELETEClick(Sender: TObject);
+Var aMongoDBBenchmarkThread: TMongoDBBenchmarkThread;
+    i: integer;
+begin
+
+  {init button action}
+  If ALButtonMongoDBLoopDelete.tag = 0 then begin
+    ALButtonMongoDBLoopDelete.Tag := 1;
+    ALButtonMongoDBLoopDelete.Caption := 'STOP';
+  end
+  else If ALButtonMongoDBLoopDelete.tag = 1 then begin
+    ALButtonMongoDBLoopDelete.Tag := 2;
+    ALButtonMongoDBLoopDelete.Caption := 'STOPPING';
+    exit;
+  end
+  else exit;
+
+  //init local variable
+  TableViewThread.DataController.RecordCount := StrToInt(ALEditMongoDBNBThread.Text);
+
+  //create the fMongoDBConnectionPoolClient
+  if not assigned(MongoDBConnectionPoolClient) then begin
+    MongoDBConnectionPoolClient := TALMongoDBConnectionPoolClient.Create(AnsiString(ALEditMongoDBHost.Text),
+                                                                         StrToInt(ALEditMongoDBPort.Text));
+  end;
+
+  //clear the status bar
+  StatusBar1.Panels[1].Text := '';
+
+  //launch all the thread
+  for i := 1 to StrToInt(ALEditMongoDBNBThread.Text) do begin
+    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStr(i) + ' (on)');
+    aMongoDBBenchmarkThread := TMongoDBBenchmarkThread.Create(True,
+                                                              self,
+                                                              i,
+                                                              StrToInt(ALEditMongoDBNBLoop.Text),
+                                                              'DELETE',
+                                                              ALTrim(AnsiString(EditMongoDBfullCollectionName.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBQuery.Lines.Text)),
+                                                              ALTrim(AnsiString(MemoMongoDBSelector.Lines.Text)),
+                                                              CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked,
+                                                              CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked,
+                                                              CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked,
+                                                              ALTrim(AnsiString(EditMongoDBSkip.Text)),
+                                                              ALTrim(AnsiString(EditMongoDBFirst.Text)));
+
+    inc(NBActiveThread);
+    StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
+    StatusBar1.Repaint;
+    aMongoDBBenchmarkThread.FreeOnTerminate := True;
+
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    aMongoDBBenchmarkThread.Start;
+    {$ELSE}
+    aMongoDBBenchmarkThread.Resume;
+    {$IFEND}
+
+  end;
+
 end;
 
 

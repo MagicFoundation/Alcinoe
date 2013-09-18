@@ -174,6 +174,7 @@ interface
 
 uses Classes,
      sysutils,
+     ALString,
      AlStringList;
 
 resourcestring
@@ -233,9 +234,9 @@ type
 
   TALBSONTimestamp = packed record      // Special internal type used by MongoDB replication and sharding.
     case X: integer of                  // First 4 bytes are an increment, second 4 are a timestamp. Setting the
-      0: (I64:    Int64);               // timestamp to 0 has special semantics.
-      1: (Word1,
-          Word2: LongWord);
+      0: (I64: Int64);                  // timestamp to 0 has special semantics.
+      1: (W1:  LongWord;
+          W2:  LongWord);
   end;
 
   {$IF CompilerVersion >= 23} {Delphi XE2}
@@ -345,10 +346,10 @@ type
     procedure SetFloat(const Value: Double);
     function GetDateTime: TDateTime;
     procedure SetDateTime(const Value: TDateTime);
-    function GetObjectID: TALJSONObjectID;
-    procedure SetObjectID(const Value: TALJSONObjectID);
     function GetTimestamp: TALBSONTimestamp;
     procedure SetTimestamp(const Value: TALBSONTimestamp);
+    function GetObjectID: TALJSONObjectID;
+    procedure SetObjectID(const Value: TALJSONObjectID);
     function GetInt32: Integer;
     procedure SetInt32(const Value: Integer);
     function GetInt64: Int64;
@@ -386,6 +387,7 @@ type
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read GetNodeName write SetNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
+    property NodeValue: AnsiString read GetNodeValue; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType write SetNodeSubType;
     property OwnerDocument: TALJSONDocument read GetOwnerDocument Write SetOwnerDocument;
     property ParentNode: TALJSONNode read GetParentNode;
@@ -394,8 +396,8 @@ type
     property int64: int64 read Getint64 write Setint64;
     property Float: Double read GetFloat write SetFloat;
     property DateTime: TDateTime read GetDateTime write SetDateTime;
+    property Timestamp: TALBSONTimestamp read GetTimestamp write SetTimestamp; // Use only by MongoDB, do not use it, use DateTime instead !
     property ObjectID: TALJSONObjectID read GetObjectID write SetObjectID;
-    property Timestamp: TALBSONTimestamp read GetTimestamp write SetTimestamp;
     property Bool: Boolean read GetBool write SetBool;
     property Null: Boolean read GetNull write SetNull;
     property Javascript: AnsiString read GetJavascript write SetJavascript;
@@ -466,6 +468,7 @@ type
     FonParseEndObject: TAlJSONParseObjectEvent;
     FonParseStartArray: TAlJSONParseArrayEvent;
     FonParseEndArray: TAlJSONParseArrayEvent;
+    fFormatSettings: TALFormatSettings;
   protected
     procedure CheckActive;
     procedure DoParseStartDocument;
@@ -495,7 +498,8 @@ type
     procedure SetBSON(const Value: ansiString);
     procedure SetNodeIndentStr(const Value: AnsiString);
   public
-    constructor Create(const aActive: Boolean = True); virtual;
+    constructor Create(const aActive: Boolean = True); overload; virtual;
+    constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
@@ -524,6 +528,7 @@ type
     property onParseEndObject: TAlJSONParseObjectEvent read fonParseEndObject write fonParseEndObject;
     property onParseStartArray: TAlJSONParseArrayEvent read fonParseStartArray write fonParseStartArray;
     property onParseEndArray: TAlJSONParseArrayEvent read fonParseEndArray write fonParseEndArray;
+    property FormatSettings: TALFormatSettings read fFormatSettings write fFormatSettings;
     property Tag: NativeInt read FTag write FTag;
   end;
 
@@ -544,8 +549,7 @@ implementation
 uses Math,
      Contnrs,
      DateUtils,
-     AlHTML,
-     ALString;
+     AlHTML;
 
 {*************************************************************************************}
 function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
@@ -665,14 +669,10 @@ begin
   // s must look like
   // Timestamp(0, 0)
   result        := false;
-  Value.I64     := 0;
   aTimestampStr := ALTrim(S);
-
-  // immediately go out if there's no Timestamp
   if ALPos('Timestamp', aTimestampStr) <> 1 then Exit;
-
-  P1 := Length('Timestamp') + 1; // Timestamp(0, 0)
-                                 //          ^
+  P1 := 10{Length('Timestamp') + 1}; // Timestamp(0, 0)
+                                     //          ^
   while (P1 <= length(aTimestampStr)) and (aTimestampStr[P1] in [#9, ' ']) do inc(P1);
   if (P1 > length(aTimestampStr)) or (aTimestampStr[P1] <> '(') then exit; // Timestamp(0, 0)
                                                                            //          ^P1
@@ -688,8 +688,8 @@ begin
 
   // build result
   result := true;
-  Value.Word1 := aArg1; // higher 4 bytes - increment
-  Value.Word2 := aArg2; // lower  4 bytes - timestamp
+  Value.W1 := aArg1; // higher 4 bytes - increment
+  Value.W2 := aArg2; // lower  4 bytes - timestamp
 end;
 
 {****************************************************}
@@ -742,8 +742,16 @@ begin
   FonParseEndArray := nil;
   FOptions := [];
   NodeIndentStr := CALDefaultNodeIndent;
+  fFormatSettings := ALDefaultFormatSettings;
   FTag := 0;
   SetActive(aActive);
+end;
+
+{**********************************************************************************************************}
+constructor TALJSONDocument.Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True);
+begin
+  create(aActive);
+  fFormatSettings := aFormatSettings;
 end;
 
 {*********************************}
@@ -898,8 +906,8 @@ Var RawJSONString: AnsiString;
     else if ALSametext(aStrValue,'true') or
             ALSametext(aStrValue,'false') then result := nstBoolean
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
-    else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
     else if ALJSONDocTryStrToTimestamp(aStrValue, aTimestamp) then result := nstTimestamp
+    else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
     else result := nstJavascript;
   end;
 
@@ -1854,21 +1862,6 @@ Var RawBSONString: AnsiString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
-    {$IFDEF undef}{$REGION 'Extract value: Timestamp'}{$ENDIF}
-    // \x11 + name + \x00 + int64
-    else if aNodeSubType = nstTimestamp then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aTimestamp.I64 := aInt64;
-      // Timestamp(0, 0)
-      aTextValue := 'Timestamp(' + ALUIntToStr(aTimestamp.Word1) + ', ' + ALUIntToStr(aTimestamp.Word2) + ')';
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
     {$IFDEF undef}{$REGION 'Extract value: Boolean'}{$ENDIF}
     // \x08 + name + \x00 + \x00 => Boolean "false"
     // \x08 + name + \x00 + \x01	=> Boolean "true"
@@ -1900,6 +1893,20 @@ Var RawBSONString: AnsiString;
       ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
       aDateTime := UnixToDateTime(aInt64);
       aTextValue := ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', aDateTime, ALDefaultFormatSettings);
+      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: Timestamp'}{$ENDIF}
+    // \x11 + name + \x00 + int64
+    else if aNodeSubType = nstTimestamp then begin
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
+      aTimestamp.I64 := aInt64;
+      aTextValue := 'Timestamp(' + ALUIntToStr(aTimestamp.W1) + ', ' + ALUIntToStr(aTimestamp.W2) + ')';
       RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
@@ -1970,9 +1977,9 @@ Var RawBSONString: AnsiString;
           nstFloat: aNode.Float := ADouble;
           nstText: aNode.text := aTextValue;
           nstObjectID: aNode.ObjectID := aObjectID;
-          nstTimestamp: aNode.Timestamp := aTimestamp;
           nstBoolean: aNode.Bool := aBool;
           nstDateTime: aNode.DateTime := aDateTime;
+          nstTimestamp: aNode.Timestamp := aTimestamp;
           nstNull: aNode.null := true;
           nstJavascript: aNode.Javascript := aTextValue;
           nstInt32: aNode.int32 := aInt32;
@@ -2437,8 +2444,32 @@ end;
 {***********************************}
 {Returns the text value of the node.}
 function TALJSONNode.GetText: AnsiString;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _GetFormatSettings: TALFormatSettings;
+  begin
+    if assigned(FDocument) then result := Fdocument.FormatSettings
+    else result := ALDefaultFormatSettings;
+  end;
+
 begin
-  result := GetNodeValue;
+
+  case NodeSubType of
+    nstFloat: result := ALFloatToStr(GetFloat,_GetFormatSettings);
+    nstText: result := GetNodeValue;
+    nstObject: result := GetNodeValue;
+    nstArray: result := GetNodeValue;
+    nstObjectID: result := ALBinToHex(GetObjectID);
+    nstBoolean: result := GetNodeValue;
+    nstDateTime: result := ALDateTimeToStr(GetDateTime,_GetFormatSettings);
+    nstNull: result := GetNodeValue;
+    nstJavascript: result := GetNodeValue;
+    nstInt32: result := GetNodeValue;
+    nstTimestamp: result := GetNodeValue;
+    nstInt64: result := GetNodeValue;
+    else AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+  end;
+
 end;
 
 {********************************}
@@ -2474,6 +2505,19 @@ begin
   setNodeValue(ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', Value, ALDefaultFormatSettings), nstDateTime);
 end;
 
+{**************************************************}
+function TALJSONNode.GetTimestamp: TALBSONTimestamp;
+begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  if not ALJSONDocTryStrToTimestamp(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid BSON-Timestamp');
+end;
+
+{***************************************************************}
+procedure TALJSONNode.SetTimestamp(const Value: TALBSONTimestamp);
+begin
+  setNodeValue('Timestamp(' + ALUIntToStr(Value.W1) + ', ' + ALUIntToStr(Value.W2) + ')', nstTimestamp);
+end;
+
 {************************************************}
 function TALJSONNode.GetObjectID: TALJSONObjectID;
 begin
@@ -2488,20 +2532,6 @@ begin
   setlength(aStr, length(Value) * 2);
   BintoHex(@Value[1],pansiChar(aStr),length(Value));
   setNodeValue('ObjectId("'+ALLowerCase(aStr)+'")', nstObjectID);
-end;
-
-{**************************************************}
-function TALJSONNode.GetTimestamp: TALBSONTimestamp;
-begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToTimestamp(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid BSON-Timestamp');
-end;
-
-{***************************************************************}
-procedure TALJSONNode.SetTimestamp(const Value: TALBSONTimestamp);
-begin
-  // Timestamp(0, 0)
-  setNodeValue('Timestamp(' + ALUIntToStr(Value.Word1) + ', ' + ALUIntToStr(Value.Word2) + ')', nstTimestamp);
 end;
 
 {*************************************}
@@ -3011,14 +3041,6 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
                          WriteStr2Buffer(#$07 + aNodeName + #$00 + aBinStr);
                        end;
 
-          // \x11 + name + \x00 + int64
-          nstTimestamp: begin
-                          aTimestamp := Timestamp;
-                          setlength(aBinStr,sizeOf(aInt64));
-                          ALMove(aTimestamp.I64, aBinStr[1], sizeOf(aInt64));
-                          WriteStr2Buffer(#$11 + aNodeName + #$00 + aBinStr);
-                        end;
-
           // \x08 + name + \x00 + \x00 => Boolean "false"
           // \x08 + name + \x00 + \x01	=> Boolean "true"
           nstBoolean: begin
@@ -3033,6 +3055,14 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
                          ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
                          WriteStr2Buffer(#$09 + aNodeName + #$00 + aBinStr);
                        end;
+
+          // \x11 + name + \x00 + int64
+          nstTimestamp: begin
+                          aTimestamp := Timestamp;
+                          setlength(aBinStr,sizeOf(aInt64));
+                          ALMove(aTimestamp.I64, aBinStr[1], sizeOf(aInt64));
+                          WriteStr2Buffer(#$11 + aNodeName + #$00 + aBinStr);
+                        end;
 
           // \x0A + name + \x00
           nstNull: begin

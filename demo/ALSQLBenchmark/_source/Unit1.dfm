@@ -250,7 +250,7 @@ object Form1: TForm1
     ParentBackground = False
     ParentColor = False
     TabOrder = 0
-    Properties.ActivePage = MongoDB
+    Properties.ActivePage = Firebird
     ClientRectBottom = 324
     ClientRectLeft = 5
     ClientRectRight = 1002
@@ -258,10 +258,6 @@ object Form1: TForm1
     object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label2: TcxLabel
         Left = 71
         Top = 93
@@ -539,10 +535,6 @@ object Form1: TForm1
     end
     object MySQL: TcxTabSheet
       Caption = 'MySQL'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TcxLabel
         Left = 45
         Top = 74
@@ -769,10 +761,6 @@ object Form1: TForm1
     object SQLLite3: TcxTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label24: TcxLabel
         Left = 17
         Top = 21
@@ -1037,10 +1025,6 @@ object Form1: TForm1
     object Sphinx: TcxTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label36: TcxLabel
         Left = 38
         Top = 49
@@ -1212,10 +1196,6 @@ object Form1: TForm1
     object MemCached: TcxTabSheet
       Caption = 'MemCached'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label41: TcxLabel
         Left = 25
         Top = 21
@@ -1470,9 +1450,9 @@ object Form1: TForm1
         Transparent = True
       end
       object ALEditMongoDBHost: TcxTextEdit
-        Left = 94
+        Left = 87
         Top = 18
-        TabOrder = 1
+        TabOrder = 0
         Text = 'localhost'
         Width = 221
       end
@@ -1484,16 +1464,16 @@ object Form1: TForm1
         Transparent = True
       end
       object ALEditMongoDBPort: TcxTextEdit
-        Left = 94
+        Left = 87
         Top = 43
-        TabOrder = 3
+        TabOrder = 1
         Text = '27017'
         Width = 88
       end
       object cxLabel9: TcxLabel
-        Left = 394
+        Left = 341
         Top = 47
-        Caption = 'Query'
+        Caption = 'For Select: Query'
         ParentFont = False
         Transparent = True
       end
@@ -1504,121 +1484,121 @@ object Form1: TForm1
           '{FieldC: {'#39'$gt'#39': <#randomnumber>}}')
         ParentFont = False
         Properties.ScrollBars = ssVertical
-        TabOrder = 5
+        TabOrder = 3
         Height = 86
         Width = 326
       end
       object ALButtonMongoDBSelect: TcxButton
-        Left = 803
-        Top = 18
+        Left = 802
+        Top = 4
         Width = 161
         Height = 25
         Caption = 'SELECT'
-        TabOrder = 6
+        TabOrder = 7
         OnClick = ALButtonMongoDBSelectClick
       end
-      object cxButton2: TcxButton
-        Left = 804
-        Top = 49
+      object ALButtonMongoDBINSERT: TcxButton
+        Left = 803
+        Top = 35
         Width = 161
         Height = 25
-        Caption = 'SET'
-        TabOrder = 7
-        OnClick = ALButtonMemcachedSetClick
+        Caption = 'INSERT'
+        TabOrder = 8
+        OnClick = ALButtonMongoDBINSERTClick
       end
-      object cxButton3: TcxButton
-        Left = 805
-        Top = 80
+      object ALButtonMongoDBUpdate: TcxButton
+        Left = 804
+        Top = 66
+        Width = 161
+        Height = 25
+        Caption = 'UPDATE'
+        TabOrder = 9
+        OnClick = ALButtonMongoDBUpdateClick
+      end
+      object ALButtonMongoDBDelete: TcxButton
+        Left = 804
+        Top = 98
         Width = 161
         Height = 25
         Caption = 'DELETE'
-        TabOrder = 8
-        OnClick = ALButtonMemcachedDeleteClick
-      end
-      object cxButton4: TcxButton
-        Left = 805
-        Top = 112
-        Width = 161
-        Height = 25
-        Caption = 'Loop GET'
-        TabOrder = 9
-        OnClick = ALButtonMemcachedLoopGetClick
-      end
-      object cxButton5: TcxButton
-        Left = 805
-        Top = 143
-        Width = 161
-        Height = 25
-        Caption = 'Loop SET'
         TabOrder = 10
-        OnClick = ALButtonMemcachedLoopSetClick
+        OnClick = ALButtonMongoDBDeleteClick
       end
-      object cxButton6: TcxButton
-        Left = 805
-        Top = 174
-        Width = 161
-        Height = 25
-        Caption = 'Loop INCR'
-        TabOrder = 11
-        OnClick = ALButtonMemcachedLoopIncrClick
-      end
-      object cxButton7: TcxButton
+      object ALButtonMongoDBLOOPSELECT: TcxButton
         Left = 804
-        Top = 205
+        Top = 129
         Width = 161
         Height = 25
-        Caption = 'Loop DECR'
-        TabOrder = 12
-        OnClick = ALButtonMemcachedLoopDecrClick
+        Caption = 'Loop SELECT'
+        TabOrder = 11
+        OnClick = ALButtonMongoDBLOOPSELECTClick
       end
-      object cxTextEdit6: TcxTextEdit
-        Left = 891
-        Top = 239
+      object ALButtonMongoDBLOOPINSERT: TcxButton
+        Left = 804
+        Top = 160
+        Width = 161
+        Height = 25
+        Caption = 'Loop INSERT'
+        TabOrder = 12
+        OnClick = ALButtonMongoDBLOOPINSERTClick
+      end
+      object ALButtonMongoDBLOOPUPDATE: TcxButton
+        Left = 803
+        Top = 191
+        Width = 161
+        Height = 25
+        Caption = 'Loop UPDATE'
         TabOrder = 13
+        OnClick = ALButtonMongoDBLOOPUPDATEClick
+      end
+      object ALEditMongoDBNBThread: TcxTextEdit
+        Left = 891
+        Top = 253
+        TabOrder = 14
         Text = '1'
         Width = 74
       end
       object cxLabel10: TcxLabel
         Left = 819
-        Top = 244
+        Top = 254
         Caption = 'Nb Thread:'
         ParentFont = False
         Transparent = True
       end
       object cxLabel11: TcxLabel
         Left = 831
-        Top = 269
+        Top = 280
         Caption = 'Nb Loop:'
         ParentFont = False
         Transparent = True
       end
-      object cxTextEdit7: TcxTextEdit
+      object ALEditMongoDBNBLoop: TcxTextEdit
         Left = 890
-        Top = 266
-        TabOrder = 16
+        Top = 277
+        TabOrder = 15
         Text = '1000000'
         Width = 74
       end
       object cxLabel6: TcxLabel
-        Left = 325
+        Left = 273
         Top = 140
-        Caption = 'ReturnFieldsSelector'
+        Caption = 'For select: ReturnFieldsSelector'
         ParentFont = False
         Transparent = True
       end
-      object MemoMongoDBReturnFieldSelector: TcxMemo
+      object MemoMongoDBSelector: TcxMemo
         Left = 435
         Top = 139
         Lines.Strings = (
           '{'#39'FieldA'#39': 1}')
         ParentFont = False
         Properties.ScrollBars = ssVertical
-        TabOrder = 18
+        TabOrder = 4
         Height = 103
         Width = 326
       end
       object cxLabel7: TcxLabel
-        Left = 335
+        Left = 337
         Top = 21
         Caption = 'FullCollectionName'
         ParentFont = False
@@ -1627,7 +1607,7 @@ object Form1: TForm1
       object EditMongoDBFullCollectionName: TcxTextEdit
         Left = 435
         Top = 18
-        TabOrder = 20
+        TabOrder = 2
         Text = 'test.TableSample'
         Width = 326
       end
@@ -1641,43 +1621,123 @@ object Form1: TForm1
       object EditMongoDBSkip: TcxTextEdit
         Left = 462
         Top = 248
-        TabOrder = 22
+        TabOrder = 5
         Text = '0'
         Width = 88
       end
-      object CheckBoxMongoDBSlaveOk: TcxCheckBox
-        Left = 94
-        Top = 74
-        Caption = 'SlaveOk'
+      object cxLabel12: TcxLabel
+        Left = 572
+        Top = 249
+        Caption = 'First'
         ParentFont = False
-        TabOrder = 23
         Transparent = True
-        Width = 97
       end
-      object CheckBoxMongoDBPartial: TcxCheckBox
-        Left = 94
-        Top = 95
-        Caption = 'Partial'
+      object EditMongoDBFirst: TcxTextEdit
+        Left = 603
+        Top = 248
+        TabOrder = 6
+        Text = '200'
+        Width = 88
+      end
+      object cxLabel13: TcxLabel
+        Left = 327
+        Top = 78
+        Caption = 'For update: Selector'
         ParentFont = False
-        TabOrder = 24
         Transparent = True
-        Width = 97
+      end
+      object cxLabel14: TcxLabel
+        Left = 331
+        Top = 156
+        Caption = 'For update: Update'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxLabel15: TcxLabel
+        Left = 320
+        Top = 62
+        Caption = 'For insert: Documents'
+        ParentFont = False
+        Transparent = True
+      end
+      object cxLabel16: TcxLabel
+        Left = 331
+        Top = 95
+        Caption = 'For delete: Selector'
+        ParentFont = False
+        Transparent = True
+      end
+      object CheckGroupMongoDBSelectFlags: TcxCheckGroup
+        Left = 17
+        Top = 87
+        Caption = 'SELECT flags'
+        Properties.Items = <
+          item
+            Caption = 'SalveOK'
+          end
+          item
+            Caption = 'Partial'
+          end>
+        TabOrder = 29
+        Height = 67
+        Width = 93
+      end
+      object CheckGroupMongoDBINSERTFlags: TcxCheckGroup
+        Left = 129
+        Top = 87
+        Caption = 'INSERT flags'
+        Properties.Items = <
+          item
+            Caption = 'ContinueOnError'
+          end>
+        TabOrder = 30
+        Height = 47
+        Width = 112
+      end
+      object CheckGroupMongoDBUpdateFlags: TcxCheckGroup
+        Left = 17
+        Top = 174
+        Caption = 'UPDATE flags'
+        ParentFont = False
+        Properties.Items = <
+          item
+            Caption = 'Upsert'
+          end
+          item
+            Caption = 'MultiUpdate'
+          end>
+        Style.Font.Charset = DEFAULT_CHARSET
+        Style.Font.Color = clWindowText
+        Style.Font.Height = -11
+        Style.Font.Name = 'MS Sans Serif'
+        Style.Font.Style = []
+        Style.IsFontAssigned = True
+        TabOrder = 31
+        Height = 67
+        Width = 93
+      end
+      object CheckGroupMongoDBDeleteFlags: TcxCheckGroup
+        Left = 129
+        Top = 172
+        Caption = 'DELETE flags'
+        Properties.Items = <
+          item
+            Caption = 'SingleRemove'
+          end>
+        TabOrder = 32
+        Height = 46
+        Width = 112
+      end
+      object ALButtonMongoDBLOOPDELETE: TcxButton
+        Left = 802
+        Top = 222
+        Width = 161
+        Height = 25
+        Caption = 'Loop DELETE'
+        TabOrder = 33
+        OnClick = ALButtonMongoDBLOOPDELETEClick
       end
     end
-  end
-  object cxLabel12: TcxLabel
-    Left = 572
-    Top = 275
-    Caption = 'First'
-    ParentFont = False
-    Transparent = True
-  end
-  object EditMongoDBFirst: TcxTextEdit
-    Left = 603
-    Top = 274
-    TabOrder = 4
-    Text = '200'
-    Width = 88
   end
   object OpenDialog1: TOpenDialog
     Left = 144

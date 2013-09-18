@@ -448,6 +448,8 @@ function  ALIntToHex(Value: Int64; Digits: Integer): AnsiString; overload;
 {$IFDEF UNICODE}
 function  ALIntToHex(Value: UInt64; Digits: Integer): AnsiString; overload;
 {$ENDIF}
+Function  ALBinToHex(const aBin: AnsiString): AnsiString;
+Function  ALHexToBin(const aHex: AnsiString): AnsiString;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
@@ -5920,6 +5922,29 @@ begin
   Result := _ALIntToHex(Value, digits);
 end;
 {$ENDIF}
+
+
+{*******************************************************}
+Function  ALBinToHex(const aBin: AnsiString): AnsiString;
+begin
+  if aBin = '' then begin
+    result := '';
+    exit;
+  end;
+  setlength(result,length(aBin) * 2);
+  BintoHex(@aBin[1],pansiChar(result),length(aBin));
+end;
+
+{*******************************************************}
+Function  ALHexToBin(const aHex: AnsiString): AnsiString;
+begin
+  if (aHex = '') or (length(aHex) mod 2 <> 0) then begin
+    result := '';
+    exit;
+  end;
+  setlength(result,length(aHex) div 2);
+  if HexToBin(PansiChar(aHex),pansiChar(result),length(result)) <> length(result) then result := '';
+end;
 
 {*************************************************}
 function ALIsDecimal(const S: AnsiString): boolean;

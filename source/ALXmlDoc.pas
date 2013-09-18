@@ -12,7 +12,7 @@ Description:  TALXmlDocument is exactly like Delphi TXmlDocument
               (Same functions and procedures) but 10 to 100 times more 
               faster (see demo) and can work even in sax mode !
 
-              Use TAlXMLDocument to represent an XML document. 
+              Use TAlXMLDocument to represent an XML document.
               TAlXMLDocument can read an existing XML document from a 
               file, it can be associated with an in-memory string that is 
               the contents of an XML document, or it can create a new, 
@@ -407,9 +407,9 @@ type
     procedure SaveToStream(const Stream: TStream; Const SaveOnlyChildNodes: Boolean=False); // [added from TXMLNode]
     procedure SaveToFile(const AFileName: AnsiString; Const SaveOnlyChildNodes: Boolean=False); // [added from TXMLNode]
     procedure SaveToXML(var Xml: AnsiString; Const SaveOnlyChildNodes: Boolean=False); // [added from TXMLNode]
-    procedure LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNodes: Boolean=False); // [added from TXMLNode]
-    procedure LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNodes: Boolean=False); // [added from TXMLNode]
-    procedure LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False); // [added from TXMLNode]
+    procedure LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True); // [added from TXMLNode]
+    procedure LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True); // [added from TXMLNode]
+    procedure LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True); // [added from TXMLNode]
   end;
 
   {The node represents an element. Element nodes represent simple tags that have child nodes.
@@ -1609,7 +1609,7 @@ end;
  *Value contains the raw (unparsed) XML to assign.}
 procedure TALXMLDocument.SetXML(const Value: AnsiString);
 begin
- LoadFromXML(Value, False);
+  LoadFromXML(Value, False);
 end;
 
 {***********************************}
@@ -2525,11 +2525,13 @@ end;
 {***********************************************************************************************************}
 {StreamContainOnlyChildNodes mean that the stream contain ONLY the child node, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-procedure TALXMLNode.LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNodes: Boolean=False);
+procedure TALXMLNode.LoadFromStream(const Stream: TStream; Const StreamContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True);
 Begin
   If not (NodeType in [ntElement, ntDocument]) then ALXmlDocError(CALXMLOperationError,[GetNodeTypeStr]);
-  ChildNodes.Clear;
-  AttributeNodes.Clear;
+  if (not StreamContainOnlyChildNodes) or ClearChildNodes then begin
+    ChildNodes.Clear;
+    AttributeNodes.Clear;
+  end;
   Try
     FDocument.ParseXmlStream(Stream, self, StreamContainOnlyChildNodes);
   except
@@ -2554,12 +2556,12 @@ end;
 {*************************************************************************************************************}
 {load FileContainOnlyChildNodes mean the the stream contain ONLY the child node, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-procedure TALXMLNode.LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNodes: Boolean=False);
+procedure TALXMLNode.LoadFromFile(const AFileName: AnsiString; Const FileContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True);
 Var afileStream: TfileStream;
 Begin
   aFileStream := TfileStream.Create(string(AFileName), fmOpenRead or fmShareDenyWrite);
   Try
-    LoadFromStream(aFileStream, FileContainOnlyChildNodes);
+    LoadFromStream(aFileStream, FileContainOnlyChildNodes, ClearChildNodes);
   finally
     aFileStream.Free;
   end;
@@ -2581,12 +2583,12 @@ end;
 {************************************************************************************************************}
 {load XmlContainOnlyChildNodes mean the the stream contain ONLY the child node, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-procedure TALXMLNode.LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False);
+procedure TALXMLNode.LoadFromXML(const Xml: AnsiString; Const XmlContainOnlyChildNodes: Boolean=False; Const ClearChildNodes: Boolean = True);
 Var aStringStream: TALStringStream;
 Begin
   aStringStream := TALStringStream.Create(Xml);
   Try
-    LoadFromStream(aStringStream, XmlContainOnlyChildNodes);
+    LoadFromStream(aStringStream, XmlContainOnlyChildNodes, ClearChildNodes);
   finally
     aStringStream.Free;
   end;
@@ -2604,7 +2606,7 @@ end;
 {SetXML reload the node with the new given value }
 procedure TALXMLNode.SetXML(const Value: AnsiString);
 Begin
-  LoadFromXML(Value,False);
+  LoadFromXML(Value,False{XmlContainOnlyChildNodes},true{ClearChildNodes});
 end;
 
 {*********************************************************}

@@ -549,7 +549,8 @@ implementation
 uses Math,
      Contnrs,
      DateUtils,
-     AlHTML;
+     AlHTML,
+     ALMisc;
 
 {*************************************************************************************}
 function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
@@ -1891,7 +1892,7 @@ Var RawBSONString: AnsiString;
         if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
       end;
       ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aDateTime := UnixToDateTime(aInt64);
+      aDateTime := ALUnixToDateTime(aInt64);
       aTextValue := ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', aDateTime, ALDefaultFormatSettings);
       RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
@@ -3050,7 +3051,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
 
           // \x09 + name + \x00 + int64
           nstDateTime: begin
-                         aInt64 := DateTimeToUnix(DateTime);
+                         aInt64 := ALDateTimeToUnix(DateTime);
                          setlength(aBinStr,sizeOf(aInt64));
                          ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
                          WriteStr2Buffer(#$09 + aNodeName + #$00 + aBinStr);

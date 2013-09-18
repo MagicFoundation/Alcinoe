@@ -561,19 +561,33 @@ var aFormatSettings: TALFormatSettings;
 begin
 
   // s must look like
-  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+  // new Date('yyyy-mm-ddThh:nn:ss.zzzZ')
+  // Date('yyyy-mm-ddThh:nn:ss.zzzZ')
+  // new ISODate('yyyy-mm-ddThh:nn:ss.zzzZ')
+  // ISODate('yyyy-mm-ddThh:nn:ss.zzzZ')
   result := false;
   aDateStr := ALTrim(S); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-  if alpos('new', aDateStr) <> 1 then exit;
-  P1 := 4{length('new') + 1}; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                              //    ^P1
+  if alpos('new', aDateStr) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                                                //    ^P1
+  else P1 := 1;// Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+               // ^P1
   while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aDateStr) - 3) or (aDateStr[P1] <> 'D') or
-                                    (aDateStr[P1+1] <> 'a') or
-                                    (aDateStr[P1+2] <> 't') or
-                                    (aDateStr[P1+3] <> 'e') then exit;
-  inc(p1, 4);  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-               //          ^P1
+  if (P1 <= length(aDateStr) - 3) or
+     (aDateStr[P1]   = 'D') or
+     (aDateStr[P1+1] = 'a') or
+     (aDateStr[P1+2] = 't') or
+     (aDateStr[P1+3] = 'e') then inc(p1, 4)  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                             //          ^P1
+  else if (P1 <= length(aDateStr) - 6) or
+          (aDateStr[P1]   = 'I') or
+          (aDateStr[P1+1] = 'S') or
+          (aDateStr[P1+2] = 'O') or
+          (aDateStr[P1+3] = 'D') or
+          (aDateStr[P1+4] = 'a') or
+          (aDateStr[P1+5] = 't') or
+          (aDateStr[P1+6] = 'e') then inc(p1, 7)  // ISODate ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                                  //        ^P1
+  else exit;
   while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
   if (P1 > length(aDateStr)) or (aDateStr[P1] <> '(') then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                                                                  //           ^P1
@@ -1892,7 +1906,7 @@ Var RawBSONString: AnsiString;
         if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
       end;
       ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aDateTime := ALUnixToDateTime(aInt64);
+      aDateTime := ALUnixMsToDateTime(aInt64);
       aTextValue := ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', aDateTime, ALDefaultFormatSettings);
       RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
@@ -3051,7 +3065,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
 
           // \x09 + name + \x00 + int64
           nstDateTime: begin
-                         aInt64 := ALDateTimeToUnix(DateTime);
+                         aInt64 := ALDateTimeToUnixMs(DateTime);
                          setlength(aBinStr,sizeOf(aInt64));
                          ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
                          WriteStr2Buffer(#$09 + aNodeName + #$00 + aBinStr);

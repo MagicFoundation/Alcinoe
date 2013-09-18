@@ -63,9 +63,9 @@ interface
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
+function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
+function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
-function ALUnixToDateTime(const aValue: Int64): TDateTime;
-function ALDateTimeToUnix(const aValue: TDateTime): Int64;
 
 implementation
 
@@ -121,7 +121,7 @@ end;
 {*******************************************************}
 {Accepts number of milliseconds in the parameter aValue,
  provides 1000 times more precise value of TDateTime}
-function ALUnixToDateTime(const aValue: Int64): TDateTime;
+function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 begin
   Result := IncMilliSecond(UnixDateDelta, aValue);
 end;
@@ -130,7 +130,7 @@ end;
 {Returns UNIX-time as the count of milliseconds since the
  UNIX epoch. Can be very useful for the purposes of
  special precision.}
-function ALDateTimeToUnix(const aValue: TDateTime): Int64;
+function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 begin
   result := MilliSecondsBetween(UnixDateDelta, aValue);
   if aValue < UnixDateDelta then result := -result;

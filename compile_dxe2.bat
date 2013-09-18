@@ -22,16 +22,6 @@ del lib\dxe2\*.dcu /s
 del source\*.dcu /s
 IF ERRORLEVEL 1 goto ERROR
 
-del demo\*.bpl /s
-del lib\dxe2\*.bpl /s
-del source\*.bpl /s
-IF ERRORLEVEL 1 goto ERROR
-
-del demo\*.~bpl /s
-del lib\dxe2\*.~bpl /s
-del source\*.~bpl /s
-IF ERRORLEVEL 1 goto ERROR
-
 del demo\*.exe /s
 del lib\dxe2\*.exe /s
 del source\*.exe /s
@@ -42,16 +32,6 @@ IF ERRORLEVEL 1 goto ERROR
 
 del demo\*.html /s
 IF ERRORLEVEL 1 goto ERROR
-
-MSBuild source\Alcinoe_dxe2.dproj /t:build /p:Config=Release /p:Platform=Win32
-IF ERRORLEVEL 1 goto ERROR
-
-pause
-
-MSBuild source\Alcinoe_dxe2.dproj /t:build /p:Config=Release /p:Platform=Win64
-IF ERRORLEVEL 1 goto ERROR
-
-pause
 
 MSBuild demo\ProjectGroupDemo.dxe2.groupproj /t:build /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 goto ERROR

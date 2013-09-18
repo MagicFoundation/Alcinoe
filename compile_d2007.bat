@@ -21,25 +21,10 @@ del lib\d2007\*.dcu /s
 del source\*.dcu /s
 IF ERRORLEVEL 1 goto ERROR
 
-del demo\*.bpl /s
-del lib\d2007\*.bpl /s
-del source\*.bpl /s
-IF ERRORLEVEL 1 goto ERROR
-
-del demo\*.~bpl /s
-del lib\d2007\*.~bpl /s
-del source\*.~bpl /s
-IF ERRORLEVEL 1 goto ERROR
-
 del demo\*.exe /s
 del lib\d2007\*.exe /s
 del source\*.exe /s
 IF ERRORLEVEL 1 goto ERROR
-
-MSBuild source\Alcinoe_d2007.dproj /t:build /p:Configuration=RELEASE
-IF ERRORLEVEL 1 goto ERROR
-
-pause
 
 MSBuild demo\ProjectGroupDemo.d2007.groupproj /t:build /p:Configuration=RELEASE
 IF ERRORLEVEL 1 goto ERROR

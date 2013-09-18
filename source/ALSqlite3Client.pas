@@ -142,45 +142,45 @@ Type
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          OnNewRowFunct: TalSqlite3ClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQLs: TalSqlite3ClientSelectDataSQLs;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: TalSqlite3ClientSelectDataSQL;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
     Procedure SelectData(SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload;
-    procedure UpdateData(SQLs: TalSqlite3ClientUpdateDataSQLs); overload;
-    procedure UpdateData(SQL: TalSqlite3ClientUpdateDataSQL); overload;
-    procedure UpdateData(SQLs: TALStrings); overload;
-    procedure UpdateData(SQL: AnsiString); overload;
-    procedure UpdateData(SQLs: array of AnsiString); overload;
+                         FormatSettings: TALFormatSettings); overload; virtual;
+    procedure UpdateData(SQLs: TalSqlite3ClientUpdateDataSQLs); overload; virtual;
+    procedure UpdateData(SQL: TalSqlite3ClientUpdateDataSQL); overload; virtual;
+    procedure UpdateData(SQLs: TALStrings); overload; virtual;
+    procedure UpdateData(SQL: AnsiString); overload; virtual;
+    procedure UpdateData(SQLs: array of AnsiString); overload; virtual;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
     Property  NullString: AnsiString Read fNullString Write fNullString;
@@ -615,8 +615,14 @@ Var astmt: PSQLite3Stmt;
 
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
+
+  //only OnNewRowFunct / XMLDATA can be used
+  if assigned(OnNewRowFunct) then XMLDATA := nil;
 
   //clear the XMLDATA
   if assigned(XMLDATA) then begin
@@ -655,7 +661,7 @@ begin
         //init aUpdateRowTagByFieldValue
         if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
           delete(SQLs[aSQLsindex].RowTag, 1, 2);
-          aUpdateRowTagByFieldValue := True;
+          aUpdateRowTagByFieldValue := SQLs[aSQLsindex].RowTag <> '';
         end
         else aUpdateRowTagByFieldValue := False;
 
@@ -1396,6 +1402,12 @@ Var astmt: PSQLite3Stmt;
 
 begin
 
+  //exit if no SQL
+  if length(SQLs) = 0 then Exit;
+
+  //only OnNewRowFunct / XMLDATA can be used
+  if assigned(OnNewRowFunct) then XMLDATA := nil;
+
   //clear the XMLDATA
   if assigned(XMLDATA) then begin
     XMLDATA.ChildNodes.Clear;
@@ -1439,7 +1451,7 @@ begin
           //init aUpdateRowTagByFieldValue
           if AlPos('&>',SQLs[aSQLsindex].RowTag) = 1 then begin
             delete(SQLs[aSQLsindex].RowTag, 1, 2);
-            aUpdateRowTagByFieldValue := True;
+            aUpdateRowTagByFieldValue := SQLs[aSQLsindex].RowTag <> '';
           end
           else aUpdateRowTagByFieldValue := False;
 

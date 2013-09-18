@@ -574,8 +574,7 @@ begin
   While True do begin
 
     //expnd the buffer
-    if aResultPos = length(Result) then
-      setlength(Result, length(Result) + aBuffSize);
+    if aResultPos = length(Result) then setlength(Result, length(Result) + aBuffSize);
 
     //read string from socket
     aBytesReceived := SocketRead(aSocketDescriptor, Result[aResultPos+1], length(Result) - aResultPos);

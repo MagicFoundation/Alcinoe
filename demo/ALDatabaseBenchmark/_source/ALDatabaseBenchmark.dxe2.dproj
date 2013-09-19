@@ -1,7 +1,7 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
 			<ProjectGuid>{AF5199C5-7FF2-40D2-8262-CDD785CBFD9E}</ProjectGuid>
-			<MainSource>ALSQLBenchmark.dpr</MainSource>
+			<MainSource>ALDatabaseBenchmark.dpr</MainSource>
 			<Base>True</Base>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<TargetedPlatforms>3</TargetedPlatforms>
@@ -42,7 +42,7 @@
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<DCC_DcuOutput>.\dcu\</DCC_DcuOutput>
 			<Manifest_File>None</Manifest_File>
-			<Icon_MainIcon>ALSQLBenchmark_Icon.ico</Icon_MainIcon>
+			<Icon_MainIcon>ALDatabaseBenchmark_Icon.ico</Icon_MainIcon>
 			<DCC_CodePage>65001</DCC_CodePage>
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 			<VerInfo_Locale>1033</VerInfo_Locale>
@@ -105,7 +105,7 @@
 			<BorlandProject>
 				<Delphi.Personality>
 					<Source>
-						<Source Name="MainSource">ALSQLBenchmark.dpr</Source>
+						<Source Name="MainSource">ALDatabaseBenchmark.dpr</Source>
 					</Source>
 					<VersionInfo>
 						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>

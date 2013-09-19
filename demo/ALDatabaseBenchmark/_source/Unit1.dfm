@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 445
   Top = 202
-  Caption = 'ALSQLBenchmark'
+  Caption = 'ALDatabaseBenchmark'
   ClientHeight = 764
   ClientWidth = 1007
   Color = 15986666

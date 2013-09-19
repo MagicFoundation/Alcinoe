@@ -1,4 +1,4 @@
-program ALSQLBenchmark;
+program ALDatabaseBenchmark;
 
 uses
   Forms,

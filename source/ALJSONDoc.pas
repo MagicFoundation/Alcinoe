@@ -204,27 +204,27 @@ type
                      ntText);  //The node represents a text content (javascript, string, number, true, false, null): "..." or "name": "..."
 
   //from http://bsonspec.org/#/specification
-  TALJSONNodeSubType = (nstFloat, // \x01 | Floating point
-                        nstText, // \x02 | UTF-8 string
-                        nstObject, // \x03 | Embedded document
-                        nstArray, // \x04 | Array
-                        // \x05 | Binary data
-                        // \x06 | Undefined — Deprecated
-                        nstObjectID, // \x07 | ObjectId
-                        nstBoolean, // \x08 | Boolean "false"
-                                    // \x08 | Boolean "true"
-                        nstDateTime, // \x09 | UTC datetime
-                        nstNull, // \x0A | Null value
-                        // \x0B | Regular expression
-                        // \x0C | DBPointer — Deprecated
-                        nstJavascript, // \x0D | JavaScript code
-                        // \x0E | Symbol — Deprecated
-                        // \x0F | JavaScript code w/ scope
-                        nstInt32,     // \x10 | 32-bit Integer
-                        nstTimestamp, // \x11 | Timestamp
-                        nstInt64);    // \x12 | 64-bit integer
-                        // \xFF | Min key
-                        // \x7F | Max key
+  TALJSONNodeSubType = (nstFloat,      // \x01 | Floating point             | ex { a: 123.4 }
+                        nstText,       // \x02 | UTF-8 string               | ex { a: "xxx" }
+                        nstObject,     // \x03 | Embedded document          | ex { a: {} }
+                        nstArray,      // \x04 | Array                      | ex { a: [] }
+                                       // \x05 | Binary data
+                                       // \x06 | Undefined — Deprecated
+                        nstObjectID,   // \x07 | ObjectId                   | ex { a: ObjectId("507f1f77bcf86cd799439011") }
+                        nstBoolean,    // \x08 | Boolean "false"            | ex { a: False }
+                                       // \x08 | Boolean "true"             | ex { a: true }
+                        nstDateTime,   // \x09 | UTC datetime               | ex { a: ISODate("yyyy-mm-ddThh:nn:ss.zzzZ") }
+                        nstNull,       // \x0A | Null value                 | ex { a: null }
+                                       // \x0B | Regular expression
+                                       // \x0C | DBPointer — Deprecated
+                        nstJavascript, // \x0D | JavaScript code            | ex { a: function() }
+                                       // \x0E | Symbol — Deprecated
+                                       // \x0F | JavaScript code w/ scope
+                        nstInt32,      // \x10 | 32-bit Integer             | ex { a: NumberInt(123) }
+                        nstTimestamp,  // \x11 | Timestamp                  | ex { a: Timestamp(0, 0) }
+                        nstInt64);     // \x12 | 64-bit integer             | ex { a: NumberLong(123) }
+                                       // \xFF | Min key
+                                       // \x7F | Max key
 
   TALJSONObjectID = Array[1..12] of AnsiChar; // ObjectId is a 12-byte BSON type, constructed using:
                                               // a 4-byte value representing the seconds since the Unix epoch,
@@ -257,7 +257,12 @@ type
                       doNodeAutoIndent); // affect only the SaveToStream
   TALJSONDocOptions = set of TALJSONDocOption;
 
-  TALJSONParseOption = (poIgnoreControlCharacters); // don't decode escaped characters (like \") and not encode them also (when save / load)
+  TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
+                        poAddNodeSubTypeHelperFunct); // By default json (ie: javascript) treats all numbers as floating-point values.
+                                                      // To let other system (ie: mongoDB) understand the type of the number
+                                                      // we provide the helper functions NumberLong() to handle 64-bit integers
+                                                      // and NumberInt() to handle 64-bit integers. theses helper functions are
+                                                      // used when saving the json document.
   TALJSONParseOptions = set of TALJSONParseOption;
 
   PALPointerJSONNodeList = ^TALPointerJSONNodeList;
@@ -707,6 +712,126 @@ begin
   Value.W2 := aArg2; // lower  4 bytes - timestamp
 end;
 
+{**********************************************************************************}
+function ALJSONDocTryStrToInteger(const S: AnsiString; out Value: integer): Boolean;
+var aNumberStr: AnsiString;
+    aTmpStr: AnsiString;
+    aQuoteChar: ansiChar;
+    P1, P2: integer;
+begin
+
+  // s must look like
+  // NumberInt ( "12391293" )
+  // NumberInt ( 12391293 )
+  // 12391293
+  result := ALTryStrToInt(S, Value);
+  if result then exit;
+  aNumberStr := ALTrim(S); // NumberInt ( "12391293" )
+  if alpos('NumberInt', aNumberStr) <> 1 then exit;
+  P1 := 10{length('NumberInt') + 1}; // NumberInt ( "12391293" )
+                                     //          ^P1
+  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aNumberStr)) or (aNumberStr[P1] <> '(') then exit; // NumberInt ( "12391293" )
+                                                                     //           ^P1
+  inc(p1);  // NumberInt ( "12391293" )
+            //            ^P1
+  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aNumberStr)) then exit
+  else if (not (aNumberStr[P1] in ['''','"'])) then begin // NumberInt ( 12391293 )
+                                                          //             ^P1
+    P2 := P1+1;
+    while (P2 <= length(aNumberStr)) and (aNumberStr[P2] in ['0'..'9']) do inc(P2); // NumberInt ( 12391293 )
+                                                                                    //                     ^P2
+    if P2 > length(aNumberStr) then exit;
+    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    P1 := P2; // NumberInt ( 12391293 )
+              //                     ^P2
+
+    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberInt ( "12391293" )
+                                                                        //                        ^P1
+  end
+  else begin // NumberInt ( "12391293" )
+             //             ^P1
+
+    aQuoteChar := aNumberStr[P1]; // "
+    inc(p1); // NumberInt ( "12391293" )
+             //              ^P1
+    P2 := ALPosEx(aQuoteChar, aNumberStr, P1);
+    if P2 <= P1 then exit;
+    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    P1 := P2 + 1; // NumberInt ( "12391293" )
+                  //                       ^P1
+    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberInt ( "12391293" )
+                                                                        //                        ^P1
+  end;
+
+  //convert 12391293 to integer
+  result := ALTryStrToInt(aTmpStr, Value);
+
+end;
+
+{******************************************************************************}
+function ALJSONDocTryStrToInt64(const S: AnsiString; out Value: int64): Boolean;
+var aNumberStr: AnsiString;
+    aTmpStr: AnsiString;
+    aQuoteChar: ansiChar;
+    P1, P2: integer;
+begin
+
+  // s must look like
+  // NumberLong ( "12391293" )
+  // NumberLong ( 12391293 )
+  // 12391293
+  result := ALTryStrToInt64(S, Value);
+  if result then exit;
+  aNumberStr := ALTrim(S); // NumberLong ( "12391293" )
+  if alpos('NumberLong', aNumberStr) <> 1 then exit;
+  P1 := 11{length('NumberLong') + 1}; // NumberLong ( "12391293" )
+                                      //           ^P1
+  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aNumberStr)) or (aNumberStr[P1] <> '(') then exit; // NumberLong ( "12391293" )
+                                                                     //            ^P1
+  inc(p1);  // NumberLong ( "12391293" )
+            //             ^P1
+  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(aNumberStr)) then exit
+  else if (not (aNumberStr[P1] in ['''','"'])) then begin // NumberLong ( 12391293 )
+                                                          //              ^P1
+    P2 := P1+1;
+    while (P2 <= length(aNumberStr)) and (aNumberStr[P2] in ['0'..'9']) do inc(P2); // NumberLong ( 12391293 )
+                                                                                    //                      ^P2
+    if P2 > length(aNumberStr) then exit;
+    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    P1 := P2; // NumberLong ( 12391293 )
+              //                      ^P2
+
+    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberLong ( "12391293" )
+                                                                        //                         ^P1
+  end
+  else begin // NumberLong ( "12391293" )
+             //              ^P1
+
+    aQuoteChar := aNumberStr[P1]; // "
+    inc(p1); // NumberLong ( "12391293" )
+             //               ^P1
+    P2 := ALPosEx(aQuoteChar, aNumberStr, P1);
+    if P2 <= P1 then exit;
+    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    P1 := P2 + 1; // NumberLong ( "12391293" )
+                  //                        ^P1
+    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberLong ( "12391293" )
+                                                                        //                         ^P1
+  end;
+
+  //convert 12391293 to integer
+  result := ALTryStrToInt64(aTmpStr, Value);
+
+end;
+
 {****************************************************}
 procedure ALJSONDocError(const Msg: String); overload;
 begin
@@ -912,11 +1037,13 @@ Var RawJSONString: AnsiString;
   var aDT:        TDateTime;
       aObjectID:  TALJSONObjectID;
       aTimestamp: TALBSONTimestamp;
+      aInt32: integer;
+      aInt64: int64;
   begin
     if AQuotedValue then result := NstText
-    else if ALIsInteger(aStrValue) then result := NstInt32
-    else if ALIsInt64(aStrValue) then result := NstInt64
     else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
+    else if ALJSONDocTryStrToInteger(aStrValue, aInt32) then result := NstInt32
+    else if ALJSONDocTryStrToInt64(aStrValue, aInt64) then result := NstInt64
     else if alSameText(aStrValue, 'null') then result := nstNull
     else if ALSametext(aStrValue,'true') or
             ALSametext(aStrValue,'false') then result := nstBoolean
@@ -1907,7 +2034,7 @@ Var RawBSONString: AnsiString;
       end;
       ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
       aDateTime := ALUnixMsToDateTime(aInt64);
-      aTextValue := ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', aDateTime, ALDefaultFormatSettings);
+      aTextValue := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aDateTime, ALDefaultFormatSettings);
       RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
@@ -1957,7 +2084,7 @@ Var RawBSONString: AnsiString;
         if RawBSONStringPos > RawBSONStringLength - sizeof(aint32) + 1 then ALJSONDocError(cALBSONParseError);
       end;
       ALMove(RawBSONString[RawBSONStringPos], aint32, sizeof(aint32));
-      aTextValue := ALIntToStr(aint32);
+      aTextValue := 'NumberInt(' + ALIntToStr(aint32) + ')';
       RawBSONStringPos := RawBSONStringPos + sizeof(aint32);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
@@ -1970,7 +2097,7 @@ Var RawBSONString: AnsiString;
         if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
       end;
       ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aTextValue := ALIntToStr(aint64);
+      aTextValue := 'NumberLong(' + ALIntToStr(aint64) + ')';
       RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
@@ -2498,7 +2625,7 @@ end;
 function TALJSONNode.GetFloat: Double;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  Result := ALStrToFloat(GetNodeValue, ALDefaultFormatSettings);
+  If not ALTryStrToFloat(GetNodeValue, Result, ALDefaultFormatSettings) then ALJSONDocError(String(GetNodeValue) + ' is not a valid float');
 end;
 
 {**************************************************}
@@ -2517,7 +2644,7 @@ end;
 {********************************************************}
 procedure TALJSONNode.SetDateTime(const Value: TDateTime);
 begin
-  setNodeValue(ALFormatDateTime('"new Date(''"yyyy"-"mm"-"dd"T"hh":"nn":"ss"."zzz"Z'')"', Value, ALDefaultFormatSettings), nstDateTime);
+  setNodeValue(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Value, ALDefaultFormatSettings), nstDateTime);
 end;
 
 {**************************************************}
@@ -2553,7 +2680,7 @@ end;
 function TALJSONNode.GetInt32: Integer;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  Result := ALStrToInt(GetNodeValue);
+  if not ALJSONDocTryStrToInteger(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid Int32');
 end;
 
 {***************************************************}
@@ -2566,7 +2693,7 @@ end;
 function TALJSONNode.GetInt64: Int64;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  Result := ALStrToInt64(GetNodeValue);
+  if not ALJSONDocTryStrToInt64(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid Int64');
 end;
 
 {*************************************************}
@@ -2579,7 +2706,7 @@ end;
 function TALJSONNode.GetBool: Boolean;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  Result := ALStrToBool(GetNodeValue);
+  If not ALTryStrToBool(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid Boolean');
 end;
 
 {**************************************************}
@@ -2755,6 +2882,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
       CurrentIndentStr: AnsiString;
       IndentStr: AnsiString;
       EncodeControlCharacters: Boolean;
+      AddNodeSubTypeHelperFunct: Boolean;
       AutoIndentNode: Boolean;
       BufferString: AnsiString;
       BufferStringPos: Integer;
@@ -2791,6 +2919,8 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
 
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Procedure WriteTextNode2Stream(aTextNode:TALJSONNode);
+    var aInt32: integer;
+        aInt64: system.int64;
     Begin
       with aTextNode do begin
 
@@ -2808,7 +2938,13 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
           if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(Text)+'"')
           else WriteStr2Buffer('"'+Text+'"');
         end
-        else WriteStr2Buffer(Text);
+        else if (NodeSubType = NstInt32) and
+                (AddNodeSubTypeHelperFunct) and
+                (ALTryStrToInt(NodeValue, aInt32)) then WriteStr2Buffer('NumberInt('+ALInttostr(aInt32)+')')
+        else if (NodeSubType = NstInt64) and
+                (AddNodeSubTypeHelperFunct) and
+                (ALTryStrToInt64(NodeValue, aInt64)) then WriteStr2Buffer('NumberLong('+ALInttostr(aInt64)+')')
+        else WriteStr2Buffer(NodeValue);
 
       end;
     end;
@@ -2918,6 +3054,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
       BufferStringPos := 0;
       LastWrittenChar := '{';
       EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
+      AddNodeSubTypeHelperFunct := (poAddNodeSubTypeHelperFunct in FDocument.ParseOptions);
       AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
       IndentStr := FDocument.NodeIndentStr;
       CurrentIndentStr := '';

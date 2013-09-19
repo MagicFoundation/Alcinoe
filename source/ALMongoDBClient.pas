@@ -1,4 +1,4 @@
-{*************************************************************
+(*************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
 svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
@@ -8,19 +8,58 @@ product:      ALMongoDBClient
 Version:      4.00
 
 Description:  Delphi Client for MongoDB database.
+              A Delphi driver (with connection pool) to access a
+              mongoDB server. a connection pool is a cache of database
+              connections maintained so that the connections can be reused
+              when future requests to the database are required.
+              In connection pooling, after a connection is created,
+              it is placed in the pool and it is used over again so that a
+              new connection does not have to be established. If all the
+              connections are being used, a new connection is made and is
+              added to the pool. Connection pooling also cuts down on the
+              amount of time a user must wait to establish a connection
+              to the database.
 
-              What is MongoDB?  Free & open source, high-performance,
-              distributed memory object caching system, generic in
-              nature, but intended for use in speeding up dynamic web
-              applications by alleviating database load.
+              exemple :
 
-              MongoDB is an in-memory key-value store for small chunks
-              of arbitrary data (strings, objects) from results of
-              database calls, API calls, or page rendering.
+              aJSONDoc := TALJSONDocument.create;
+              aMongoDBClient := TAlMongoDBClient.create;
+              try
+                aMongoDBClient.Connect('', 0);
+                aMongoDBClient.SelectData('test.exemple',
+                                          '{fieldA:123}', // the query
+                                          '{fieldA:1, fieldB:1}', // the return fields selector
+                                          aJSONDoc.node);
+                aMongoDBClient.disconnect;
+                for i := 0 to aJSONDoc.node.childnodes.count - 1 do
+                  with aJSONDoc.node.childnodes[i] do
+                    writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
+              finally
+                aMongoDBClient.free;
+                aJSONDoc.free;
+              end;
 
-              MongoDB is simple yet powerful. Its simple design promotes
-              quick deployment, ease of development, and solves many
-              problems facing large data caches.
+              and with connection pool :
+
+              aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
+              try
+
+                ::Thread1::
+                aMongoDBConnectionPoolClient.SelectData('test.exemple',
+                                                        '{fieldA:123}', // the query
+                                                        '{fieldA:1, fieldB:1}', // the return fields selector
+                                                        aLocalVarJSONDOC.node);
+
+                ::Thread2::
+                aMongoDBConnectionPoolClient.SelectData('test.exemple',
+                                                        '{fieldA:999}', // the query
+                                                        '{fieldA:1, fieldB:1}', // the return fields selector
+                                                        aLocalVarJSONDOC.node);
+
+              finally
+                aMongoDBClient.free;
+              end;
+
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
@@ -64,7 +103,7 @@ Link :
   sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
 * Please, help us to keep the development of these components free by
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
-**************************************************************}
+**************************************************************)
 unit ALMongoDBClient;
 
 interface

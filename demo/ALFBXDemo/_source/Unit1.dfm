@@ -432,8 +432,6 @@ object Form1: TForm1
       Height = 323
       Align = alClient
       TabOrder = 0
-      ExplicitLeft = -1
-      ExplicitHeight = 315
     end
     object ALMemoFirebirdStats: TMemo
       Left = 419
@@ -448,7 +446,6 @@ object Form1: TForm1
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitHeight = 331
     end
   end
   object ALMemoFireBirdParams: TMemo

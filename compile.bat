@@ -33,16 +33,14 @@ IF ERRORLEVEL 1 goto ERROR
 del demo\*.html /s
 IF ERRORLEVEL 1 goto ERROR
 
-MSBuild demo\ProjectGroupDemo.dxe2.groupproj /t:build /p:Config=Release /p:Platform=Win32
-IF ERRORLEVEL 1 goto ERROR
-
-pause
-
-del demo\*.dcu /s
-IF ERRORLEVEL 1 goto ERROR
-
-MSBuild demo\ProjectGroupDemo.dxe2.groupproj /t:build /p:Config=Release /p:Platform=Win64
-IF ERRORLEVEL 1 goto ERROR
+for /d %%I in (demo\*) do (
+  CHDIR %%I\_source\
+	FOR /R %%J IN (*.dproj) DO (				
+		MSBuild %%J /t:build /p:Config=Release /p:Platform=Win32
+		MSBuild %%J /t:build /p:Config=RELEASE /p:Platform=Win64
+		IF ERRORLEVEL 1 pause
+	)	
+)
 
 pause
 

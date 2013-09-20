@@ -92,9 +92,9 @@ Type
     Procedure clear; virtual;
     procedure Assign(Source: TAlSelectSQLClause); virtual;
     function SQLText: AnsiString; virtual;
-    function FBXClientSelectDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQL; overload;
-    function FBXClientSelectDataSQL(const RowTag: AnsiString): TALFBXClientSelectDataSQL; overload;
-    function FBXClientSelectDataSQL: TALFBXClientSelectDataSQL; overload;
+    function FBXClientSelectDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataQUERY; overload;
+    function FBXClientSelectDataSQL(const RowTag: AnsiString): TALFBXClientSelectDataQUERY; overload;
+    function FBXClientSelectDataSQL: TALFBXClientSelectDataQUERY; overload;
   end;
 
   {--------------------------------------}
@@ -112,9 +112,9 @@ Type
     function Last: TAlSelectSQLClause;
     procedure Insert(Index: Integer; aSelectSQLClause: TAlSelectSQLClause);
     property Items[Index: Integer]: TAlSelectSQLClause read GetItems write SetItems; default;
-    function FBXClientSelectDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQLs; overload;
-    function FBXClientSelectDataSQLs(const RowTag: AnsiString): TALFBXClientSelectDataSQLs; overload;
-    function FBXClientSelectDataSQLs: TALFBXClientSelectDataSQLs; overload;
+    function FBXClientSelectDataQUERIES(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataQUERIES; overload;
+    function FBXClientSelectDataQUERIES(const RowTag: AnsiString): TALFBXClientSelectDataQUERIES; overload;
+    function FBXClientSelectDataQUERIES: TALFBXClientSelectDataQUERIES; overload;
   end;
 
   {---------------------------------}
@@ -131,9 +131,9 @@ Type
     Procedure clear; virtual;
     procedure Assign(Source: TALUpdateSQLClause); virtual;
     function SQLText: AnsiString; virtual;
-    function FBXClientUpdateDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQL; overload;
-    function FBXClientUpdateDataSQL(const RowTag: AnsiString): TALFBXClientUpdateDataSQL; overload;
-    function FBXClientUpdateDataSQL: TALFBXClientUpdateDataSQL; overload;
+    function FBXClientUpdateDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataQUERY; overload;
+    function FBXClientUpdateDataSQL(const RowTag: AnsiString): TALFBXClientUpdateDataQUERY; overload;
+    function FBXClientUpdateDataSQL: TALFBXClientUpdateDataQUERY; overload;
   end;
 
   {--------------------------------------}
@@ -151,9 +151,9 @@ Type
     function Last: TAlUpdateSQLClause;
     procedure Insert(Index: Integer; aUpdateSQLClause: TAlUpdateSQLClause);
     property Items[Index: Integer]: TAlUpdateSQLClause read GetItems write SetItems; default;
-    function FBXClientUpdateDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQLs; overload;
-    function FBXClientUpdateDataSQLs(const RowTag: AnsiString): TALFBXClientUpdateDataSQLs; overload;
-    function FBXClientUpdateDataSQLs: TALFBXClientUpdateDataSQLs; overload;
+    function FBXClientUpdateDataQUERIES(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataQUERIES; overload;
+    function FBXClientUpdateDataQUERIES(const RowTag: AnsiString): TALFBXClientUpdateDataQUERIES; overload;
+    function FBXClientUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES; overload;
   end;
 
 implementation
@@ -314,8 +314,8 @@ Begin
 
 End;
 
-{***************************************************************************************************************}
-function TAlSelectSQLClause.FBXClientSelectDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQL;
+{*****************************************************************************************************************}
+function TAlSelectSQLClause.FBXClientSelectDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataQUERY;
 begin
   result.SQL := SQLText;
   result.Params := FBXClientSQLParams;
@@ -326,14 +326,14 @@ begin
   result.CacheThreshold := 0;
 end;
 
-{******************************************************************************************************}
-function TAlSelectSQLClause.FBXClientSelectDataSQL(const RowTag: AnsiString): TALFBXClientSelectDataSQL;
+{********************************************************************************************************}
+function TAlSelectSQLClause.FBXClientSelectDataSQL(const RowTag: AnsiString): TALFBXClientSelectDataQUERY;
 begin
   result := FBXClientSelectDataSQL('', RowTag);
 end;
 
-{****************************************************************************}
-function TAlSelectSQLClause.FBXClientSelectDataSQL: TALFBXClientSelectDataSQL;
+{******************************************************************************}
+function TAlSelectSQLClause.FBXClientSelectDataSQL: TALFBXClientSelectDataQUERY;
 begin
   result := FBXClientSelectDataSQL('', '');
 end;
@@ -411,8 +411,8 @@ begin
   inherited Items[Index] := aSelectSQLClause;
 end;
 
-{******************************************************************************************************************}
-function TAlSelectSQLClauses.FBXClientSelectDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataSQLs;
+{************************************************************************************************************************}
+function TAlSelectSQLClauses.FBXClientSelectDataQUERIES(const ViewTag, RowTag: AnsiString): TALFBXClientSelectDataQUERIES;
 var i: integer;
 begin
   setlength(Result, count);
@@ -420,16 +420,16 @@ begin
     result[i] := GetItems(i).FBXClientSelectDataSQL(ViewTag, RowTag);
 end;
 
-{*********************************************************************************************************}
-function TAlSelectSQLClauses.FBXClientSelectDataSQLs(const RowTag: AnsiString): TALFBXClientSelectDataSQLs;
+{***************************************************************************************************************}
+function TAlSelectSQLClauses.FBXClientSelectDataQUERIES(const RowTag: AnsiString): TALFBXClientSelectDataQUERIES;
 begin
-  result := FBXClientSelectDataSQLs('', RowTag);
+  result := FBXClientSelectDataQUERIES('', RowTag);
 end;
 
-{*******************************************************************************}
-function TAlSelectSQLClauses.FBXClientSelectDataSQLs: TALFBXClientSelectDataSQLs;
+{*************************************************************************************}
+function TAlSelectSQLClauses.FBXClientSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
-  result := FBXClientSelectDataSQLs('', '');
+  result := FBXClientSelectDataQUERIES('', '');
 end;
 
 {************************************}
@@ -527,21 +527,21 @@ Begin
 
 end;
 
-{***************************************************************************************************************}
-function TAlUpdateSQLClause.FBXClientUpdateDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQL;
+{*****************************************************************************************************************}
+function TAlUpdateSQLClause.FBXClientUpdateDataSQL(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataQUERY;
 begin
   result.SQL := SQLText;
   result.Params := FBXClientSQLParams;
 end;
 
-{******************************************************************************************************}
-function TAlUpdateSQLClause.FBXClientUpdateDataSQL(const RowTag: AnsiString): TALFBXClientUpdateDataSQL;
+{********************************************************************************************************}
+function TAlUpdateSQLClause.FBXClientUpdateDataSQL(const RowTag: AnsiString): TALFBXClientUpdateDataQUERY;
 begin
   result := FBXClientUpdateDataSQL('', RowTag);
 end;
 
-{****************************************************************************}
-function TAlUpdateSQLClause.FBXClientUpdateDataSQL: TALFBXClientUpdateDataSQL;
+{******************************************************************************}
+function TAlUpdateSQLClause.FBXClientUpdateDataSQL: TALFBXClientUpdateDataQUERY;
 begin
   result := FBXClientUpdateDataSQL('', '');
 end;
@@ -612,8 +612,8 @@ begin
   inherited Items[Index] := aUpdateSQLClause;
 end;
 
-{******************************************************************************************************************}
-function TAlUpdateSQLClauses.FBXClientUpdateDataSQLs(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataSQLs;
+{************************************************************************************************************************}
+function TAlUpdateSQLClauses.FBXClientUpdateDataQUERIES(const ViewTag, RowTag: AnsiString): TALFBXClientUpdateDataQUERIES;
 var i: integer;
 begin
   setlength(Result, count);
@@ -621,16 +621,16 @@ begin
     result[i] := GetItems(i).FBXClientUpdateDataSQL(ViewTag, RowTag);
 end;
 
-{*********************************************************************************************************}
-function TAlUpdateSQLClauses.FBXClientUpdateDataSQLs(const RowTag: AnsiString): TALFBXClientUpdateDataSQLs;
+{***************************************************************************************************************}
+function TAlUpdateSQLClauses.FBXClientUpdateDataQUERIES(const RowTag: AnsiString): TALFBXClientUpdateDataQUERIES;
 begin
-  result := FBXClientUpdateDataSQLs('', RowTag);
+  result := FBXClientUpdateDataQUERIES('', RowTag);
 end;
 
-{*******************************************************************************}
-function TAlUpdateSQLClauses.FBXClientUpdateDataSQLs: TALFBXClientUpdateDataSQLs;
+{*************************************************************************************}
+function TAlUpdateSQLClauses.FBXClientUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
 begin
-  result := FBXClientUpdateDataSQLs('', '');
+  result := FBXClientUpdateDataQUERIES('', '');
 end;
 
 end.

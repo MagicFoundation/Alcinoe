@@ -5181,7 +5181,7 @@ end;
 // Dec : ( '+' | '-' )? [0-9]*
 function _ALValLong(const s: AnsiString; var code: Integer): Longint;
 {$IFDEF PUREPASCAL}
-// ! FIXME ! FIXME ! FIXME ! FIXME ! FIXME ! FIXME ! FIXME !
+// TODO
 // this implementation is buggy
 // showmessage(inttostr(strtoint('2147483649'))); => NO ERROR and result is -2147483647
 // this because of

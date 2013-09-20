@@ -531,7 +531,7 @@ Var aFBXClient: TALFbxClient;
     aTKCommit: TStopWatch;
     aFormatSettings: TALFormatSettings;
     aFBAPiVersion: TALFBXVersion_API;
-    aSQL: TALFBXClientSelectDataSQL;
+    aQuery: TALFBXClientSelectDataQuery;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
@@ -583,30 +583,30 @@ begin
           ParseOptions := [poPreserveWhiteSpace];
         end;
 
-        aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
-                                     '<#',
-                                     '>',
-                                     SQLFastTagReplaceFunct,
-                                     True,
-                                     nil);
+        aQuery.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+                                       '<#',
+                                       '>',
+                                       SQLFastTagReplaceFunct,
+                                       True,
+                                       nil);
 
         if ALMemoFireBirdParams.Lines.Count > 0 then begin
-          Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
+          Setlength(aQuery.Params, ALMemoFireBirdParams.Lines.Count);
           for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-            aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                     '<#',
-                                                     '>',
-                                                     SQLFastTagReplaceFunct,
-                                                     True,
-                                                     nil);
-            aSQL.Params[i].isnull := False;
+            aQuery.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                       '<#',
+                                                       '>',
+                                                       SQLFastTagReplaceFunct,
+                                                       True,
+                                                       nil);
+            aQuery.Params[i].isnull := False;
           end;
         end
-        else Setlength(aSQL.Params, 0);
-        aSQL.RowTag := 'rec';
-        aSQL.ViewTag := '';
-        aSQL.Skip := 0;
-        aSQL.First := 200;
+        else Setlength(aQuery.Params, 0);
+        aQuery.RowTag := 'rec';
+        aQuery.ViewTag := '';
+        aQuery.Skip := 0;
+        aQuery.First := 200;
 
         aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
                                       -1,
@@ -622,11 +622,11 @@ begin
         try
 
           aTKPrepare := TStopWatch.StartNew;
-          aFBXClient.Prepare(aSQL.SQL);
+          aFBXClient.Prepare(aQuery.SQL);
           aTKPrepare.Stop;
 
           aTKSelect := TStopWatch.StartNew;
-          aFBXClient.SelectData(aSQL,
+          aFBXClient.SelectData(aQuery,
                                 aXMLDATA.DocumentElement,
                                 aFormatSettings);
           aTKSelect.Stop;
@@ -705,7 +705,7 @@ Var aFBXClient: TALFbxClient;
     aTKCommit: TStopWatch;
     aFormatSettings: TALFormatSettings;
     aFBAPiVersion: TALFBXVersion_API;
-    aSQL: TALFBXClientUpdateDataSQL;
+    aQuery: TALFBXClientUpdateDataQUERY;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
@@ -752,34 +752,34 @@ begin
                          AnsiString(ALEditFireBirdCharset.Text),
                          StrToInt(ALEditFireBirdNum_buffers.Text));
 
-      aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
-                                   '<#',
-                                   '>',
-                                   SQLFastTagReplaceFunct,
-                                   True,
-                                   nil);
+      aQuery.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+                                     '<#',
+                                     '>',
+                                     SQLFastTagReplaceFunct,
+                                     True,
+                                     nil);
 
       if ALMemoFireBirdParams.Lines.Count > 0 then begin
-        Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
+        Setlength(aQuery.Params, ALMemoFireBirdParams.Lines.Count);
         for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
-          aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   nil);
-          aSQL.Params[i].isnull := False;
+          aQuery.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                     '<#',
+                                                     '>',
+                                                     SQLFastTagReplaceFunct,
+                                                     True,
+                                                     nil);
+          aQuery.Params[i].isnull := False;
         end;
       end
-      else Setlength(aSQL.Params, 0);
+      else Setlength(aQuery.Params, 0);
 
       if ALMemoFireBirdParams.Lines.Count <= 0 then begin
-        if (AlPos('begin',AllowerCase(aSQL.SQL)) <= 0) or
-           (AlPos('end',AllowerCase(aSQL.SQL)) <= 0) then begin
-          S1 := AlStringReplace(aSQL.SQL,#13#10,' ',[RfReplaceALL]);
+        if (AlPos('begin',AllowerCase(aQuery.SQL)) <= 0) or
+           (AlPos('end',AllowerCase(aQuery.SQL)) <= 0) then begin
+          S1 := AlStringReplace(aQuery.SQL,#13#10,' ',[RfReplaceALL]);
           aLstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
         end
-        else aLstSql.Add(aSQL.SQL);
+        else aLstSql.Add(aQuery.SQL);
       end;
 
       aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
@@ -797,12 +797,12 @@ begin
 
         aTKPrepare := TStopWatch.StartNew;
         if aLstSql.Count = 1 then aFBXClient.Prepare(aLstSql[0])
-        else if aLstSql.Count <= 0 then aFBXClient.Prepare(aSQL.SQL);
+        else if aLstSql.Count <= 0 then aFBXClient.Prepare(aQuery.SQL);
         aTKPrepare.Stop;
 
         aTKUpdate := TStopWatch.StartNew;
         if aLstSql.Count > 0 then aFBXClient.UpdateData(aLstSql)
-        else aFBXClient.UpdateData(aSQL);
+        else aFBXClient.UpdateData(aQuery);
         aTKUpdate.Stop;
 
         aTKCommit := TStopWatch.StartNew;
@@ -2062,7 +2062,7 @@ Var aconnectionHandle: PSQLite3;
     aLstSql: TALStrings;
     aTmpLstSql: TALStrings;
     aXMLDATA: TalXmlDocument;
-    aSelectDataSQLs: TalSqlite3ClientSelectDataSQLs;
+    aSelectDataQueries: TalSqlite3ClientSelectDataQUERIES;
     aFormatSettings: TALFormatSettings;
     S1: AnsiString;
     j: integer;
@@ -2086,7 +2086,7 @@ begin
 
         //update the aLstSql
         aLstSql.clear;
-        setlength(aSelectDataSQLs,0);
+        setlength(aSelectDataQueries,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
           aTmpLstSql := TALStringList.Create;
           Try
@@ -2101,12 +2101,12 @@ begin
                                      True,
                                      nil);
               aLstSql.Add(S1);
-              setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
+              setlength(aSelectDataQueries,length(aSelectDataQueries)+1);
+              aSelectDataQueries[length(aSelectDataQueries)-1].Sql := S1;
+              aSelectDataQueries[length(aSelectDataQueries)-1].RowTag := '';
+              aSelectDataQueries[length(aSelectDataQueries)-1].viewTag := '';
+              aSelectDataQueries[length(aSelectDataQueries)-1].skip := 0;
+              aSelectDataQueries[length(aSelectDataQueries)-1].First := 0;
             end;
             inc(aLoopIndex);
             inc(FTotalLoop);
@@ -2123,7 +2123,7 @@ begin
           //update the data
           aStopWatch := TStopWatch.StartNew;
           if fUpdateSQL then Tform1(fOwner).Sqlite3ConnectionPoolClient.UpdateData(aLstSql, aconnectionHandle)
-          else Tform1(fOwner).Sqlite3ConnectionPoolClient.SelectData(aSelectDataSQLs,
+          else Tform1(fOwner).Sqlite3ConnectionPoolClient.SelectData(aSelectDataQueries,
                                                                      aXMLDATA.documentElement,
                                                                      aFormatSettings,
                                                                      aconnectionHandle);
@@ -2277,10 +2277,10 @@ Var aDBHandle: IscDbHandle;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
     aXMLDATA: TalXmlDocument;
-    aSelectDataSQLs: TalFBXClientSelectDataSQLs;
-    aUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
-    aTmpSelectDataSQLs: TalFBXClientSelectDataSQLs;
-    aTmpUpdateDataSQLs: TalFBXClientUpdateDataSQLs;
+    aSelectDataQueries: TalFBXClientSelectDataQUERIES;
+    aUpdateDataQueries: TalFBXClientUpdateDataQUERIES;
+    aTmpSelectDataQueries: TalFBXClientSelectDataQUERIES;
+    aTmpUpdateDataQueries: TalFBXClientUpdateDataQUERIES;
     aStatementPool: TALFBXConnectionStatementPoolBinTree;
     aStatementPoolNode: TALStringKeyAVLBinaryTreeNode;
     aFormatSettings: TALFormatSettings;
@@ -2308,8 +2308,8 @@ begin
       try
 
         //update the aLstSql
-        setlength(aSelectDataSQLs,0);
-        setlength(aUpdateDataSQLs,0);
+        setlength(aSelectDataQueries,0);
+        setlength(aUpdateDataQueries,0);
         if fParams = '' then begin
           aLst1 := TALStringList.Create;
           Try
@@ -2317,18 +2317,18 @@ begin
             aLst1.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
             for J := 0 to aLst1.Count - 1 do begin
               if fUpdateSQL then begin
-                setlength(aUpdateDataSQLs,length(aUpdateDataSQLs)+1);
-                setlength(aUpdateDataSQLs[length(aUpdateDataSQLs)-1].Params,0);
-                aUpdateDataSQLs[length(aUpdateDataSQLs)-1].Sql := S1;
+                setlength(aUpdateDataQueries,length(aUpdateDataQueries)+1);
+                setlength(aUpdateDataQueries[length(aUpdateDataQueries)-1].Params,0);
+                aUpdateDataQueries[length(aUpdateDataQueries)-1].Sql := S1;
               end
               else begin
-                setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-                setlength(aSelectDataSQLs[length(aSelectDataSQLs)-1].Params,0);
-                aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-                aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-                aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-                aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-                aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
+                setlength(aSelectDataQueries,length(aSelectDataQueries)+1);
+                setlength(aSelectDataQueries[length(aSelectDataQueries)-1].Params,0);
+                aSelectDataQueries[length(aSelectDataQueries)-1].Sql := S1;
+                aSelectDataQueries[length(aSelectDataQueries)-1].RowTag := '';
+                aSelectDataQueries[length(aSelectDataQueries)-1].viewTag := '';
+                aSelectDataQueries[length(aSelectDataQueries)-1].skip := 0;
+                aSelectDataQueries[length(aSelectDataQueries)-1].First := 0;
               end;
             end;
           Finally
@@ -2340,26 +2340,26 @@ begin
           Try
             aLst1.Text := ALTrim(fParams);
             if fUpdateSQL then begin
-              setlength(aUpdateDataSQLs,1);
-              setlength(aUpdateDataSQLs[0].Params,aLst1.Count);
+              setlength(aUpdateDataQueries,1);
+              setlength(aUpdateDataQueries[0].Params,aLst1.Count);
               for J := 0 to aLst1.Count - 1 do begin
-                aUpdateDataSQLs[0].Params[j].Value := aLst1[j];
-                aUpdateDataSQLs[0].Params[j].isnull := false;
+                aUpdateDataQueries[0].Params[j].Value := aLst1[j];
+                aUpdateDataQueries[0].Params[j].isnull := false;
               end;
-              aUpdateDataSQLs[0].Sql := fSQL;
+              aUpdateDataQueries[0].Sql := fSQL;
             end
             else begin
-              setlength(aSelectDataSQLs,1);
-              setlength(aSelectDataSQLs[0].Params,aLst1.Count);
+              setlength(aSelectDataQueries,1);
+              setlength(aSelectDataQueries[0].Params,aLst1.Count);
               for J := 0 to aLst1.Count - 1 do begin
-                aSelectDataSQLs[0].Params[j].Value := aLst1[j];
-                aSelectDataSQLs[0].Params[j].isnull := false;
+                aSelectDataQueries[0].Params[j].Value := aLst1[j];
+                aSelectDataQueries[0].Params[j].isnull := false;
               end;
-              aSelectDataSQLs[0].Sql := fSQL;
-              aSelectDataSQLs[0].RowTag := '';
-              aSelectDataSQLs[0].viewTag := '';
-              aSelectDataSQLs[0].skip := 0;
-              aSelectDataSQLs[0].First := 0;
+              aSelectDataQueries[0].Sql := fSQL;
+              aSelectDataQueries[0].RowTag := '';
+              aSelectDataQueries[0].viewTag := '';
+              aSelectDataQueries[0].skip := 0;
+              aSelectDataQueries[0].First := 0;
             end;
           Finally
             aLst1.Free;
@@ -2374,9 +2374,9 @@ begin
           aStmtHandle := nil;
           aSqlda := nil;
           if fUpdateSQL then begin
-            if (length(aUpdateDataSQLs) = 1) and (alPos('<#', aUpdateDataSQLs[0].SQL) <= 0) then begin
+            if (length(aUpdateDataQueries) = 1) and (alPos('<#', aUpdateDataQueries[0].SQL) <= 0) then begin
               aStopWatch := TStopWatch.StartNew;
-              Tform1(fOwner).FirebirdConnectionPoolClient.Prepare(aUpdateDataSQLs[0].SQL,
+              Tform1(fOwner).FirebirdConnectionPoolClient.Prepare(aUpdateDataQueries[0].SQL,
                                                                   aDBHandle,
                                                                   aTraHandle,
                                                                   aStmtHandle,
@@ -2388,9 +2388,9 @@ begin
             end;
           end
           else begin
-            if (length(aSelectDataSQLs) = 1) and (alPos('<#', aSelectDataSQLs[0].SQL) <= 0) then begin
+            if (length(aSelectDataQueries) = 1) and (alPos('<#', aSelectDataQueries[0].SQL) <= 0) then begin
               aStopWatch := TStopWatch.StartNew;
-              Tform1(fOwner).FirebirdConnectionPoolClient.Prepare(aSelectDataSQLs[0].SQL,
+              Tform1(fOwner).FirebirdConnectionPoolClient.Prepare(aSelectDataQueries[0].SQL,
                                                                   aDBHandle,
                                                                   aTraHandle,
                                                                   aStmtHandle,
@@ -2406,34 +2406,34 @@ begin
 
             //Execute the SQL
             for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-              setlength(aTmpSelectDataSQLs, length(aSelectDataSQLs));
-              for j := 0 to length(aTmpSelectDataSQLs) - 1 do begin
-                aTmpSelectDataSQLs[j].SQL := internalDoTagReplace(aSelectDataSQLs[j].SQL);
-                setlength(aTmpSelectDataSQLs[j].Params, length(aSelectDataSQLs[j].Params));
-                for k := 0 to length(aTmpSelectDataSQLs[j].Params) - 1 do begin
-                  aTmpSelectDataSQLs[j].Params[k].Value := internalDoTagReplace(aSelectDataSQLs[j].Params[k].Value);
-                  aTmpSelectDataSQLs[j].Params[k].isnull := aSelectDataSQLs[j].Params[k].isnull;
+              setlength(aTmpSelectDataQueries, length(aSelectDataQueries));
+              for j := 0 to length(aTmpSelectDataQueries) - 1 do begin
+                aTmpSelectDataQueries[j].SQL := internalDoTagReplace(aSelectDataQueries[j].SQL);
+                setlength(aTmpSelectDataQueries[j].Params, length(aSelectDataQueries[j].Params));
+                for k := 0 to length(aTmpSelectDataQueries[j].Params) - 1 do begin
+                  aTmpSelectDataQueries[j].Params[k].Value := internalDoTagReplace(aSelectDataQueries[j].Params[k].Value);
+                  aTmpSelectDataQueries[j].Params[k].isnull := aSelectDataQueries[j].Params[k].isnull;
                 end;
-                aTmpSelectDataSQLs[j].RowTag := aSelectDataSQLs[j].RowTag;
-                aTmpSelectDataSQLs[j].ViewTag := aSelectDataSQLs[j].ViewTag;
-                aTmpSelectDataSQLs[j].Skip := aSelectDataSQLs[j].Skip;
-                aTmpSelectDataSQLs[j].First := aSelectDataSQLs[j].First;
+                aTmpSelectDataQueries[j].RowTag := aSelectDataQueries[j].RowTag;
+                aTmpSelectDataQueries[j].ViewTag := aSelectDataQueries[j].ViewTag;
+                aTmpSelectDataQueries[j].Skip := aSelectDataQueries[j].Skip;
+                aTmpSelectDataQueries[j].First := aSelectDataQueries[j].First;
               end;
-              setlength(aTmpUpdateDataSQLs, length(aUpdateDataSQLs));
-              for j := 0 to length(aTmpUpdateDataSQLs) - 1 do begin
-                aTmpUpdateDataSQLs[j].SQL := internalDoTagReplace(aUpdateDataSQLs[j].SQL);
-                setlength(aTmpUpdateDataSQLs[j].Params, length(aUpdateDataSQLs[j].Params));
-                for k := 0 to length(aTmpUpdateDataSQLs[j].Params) - 1 do begin
-                  aTmpUpdateDataSQLs[j].Params[k].Value := internalDoTagReplace(aUpdateDataSQLs[j].Params[k].Value);
-                  aTmpUpdateDataSQLs[j].Params[k].isnull := aUpdateDataSQLs[j].Params[k].isnull;
+              setlength(aTmpUpdateDataQueries, length(aUpdateDataQueries));
+              for j := 0 to length(aTmpUpdateDataQueries) - 1 do begin
+                aTmpUpdateDataQueries[j].SQL := internalDoTagReplace(aUpdateDataQueries[j].SQL);
+                setlength(aTmpUpdateDataQueries[j].Params, length(aUpdateDataQueries[j].Params));
+                for k := 0 to length(aTmpUpdateDataQueries[j].Params) - 1 do begin
+                  aTmpUpdateDataQueries[j].Params[k].Value := internalDoTagReplace(aUpdateDataQueries[j].Params[k].Value);
+                  aTmpUpdateDataQueries[j].Params[k].isnull := aUpdateDataQueries[j].Params[k].isnull;
                 end;
               end;
 
               if assigned(aStmtHandle) then begin
                 aStatementPool := TALFBXConnectionStatementPoolBinTree.Create;
                 aStatementPoolNode := TALFBXConnectionStatementPoolBinTreeNode.Create;
-                if fUpdateSQL then aStatementPoolNode.ID := aTmpUpdateDataSQLs[0].SQL
-                else aStatementPoolNode.ID := aTmpSelectDataSQLs[0].SQL;
+                if fUpdateSQL then aStatementPoolNode.ID := aTmpUpdateDataQueries[0].SQL
+                else aStatementPoolNode.ID := aTmpSelectDataQueries[0].SQL;
                 TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).Lib := Tform1(fOwner).FirebirdConnectionPoolClient.Lib;
                 TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).StmtHandle := aStmtHandle;
                 TALFBXConnectionStatementPoolBinTreeNode(aStatementPoolNode).Sqlda := aSqlda;
@@ -2444,7 +2444,7 @@ begin
               try
                 if fUpdateSQL then begin
                   aStopWatch := TStopWatch.StartNew;
-                  if fUpdateSQL then Tform1(fOwner).FirebirdConnectionPoolClient.UpdateData(aTmpUpdateDataSQLs,
+                  if fUpdateSQL then Tform1(fOwner).FirebirdConnectionPoolClient.UpdateData(aTmpUpdateDataQueries,
                                                                                             aDBHandle,
                                                                                             aTraHandle,
                                                                                             aStatementPool,
@@ -2454,7 +2454,7 @@ begin
                 end
                 else begin
                   aStopWatch := TStopWatch.StartNew;
-                  Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aTmpSelectDataSQLs,
+                  Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aTmpSelectDataQueries,
                                                                          aXMLDATA.documentElement,
                                                                          aFormatSettings,
                                                                          aDbHandle,
@@ -2622,7 +2622,7 @@ Var aConnectionHandle: PMySql;
     aLstSql: TALStrings;
     aTmpLstSql: TALStrings;
     aXMLDATA: TalXmlDocument;
-    aSelectDataSQLs: TalMySqlClientSelectDataSQLs;
+    aSelectDataQueries: TalMySqlClientSelectDataQUERIES;
     aFormatSettings: TALFormatSettings;
     S1: AnsiString;
     j: integer;
@@ -2646,7 +2646,7 @@ begin
 
         //update the aLstSql
         aLstSql.clear;
-        setlength(aSelectDataSQLs,0);
+        setlength(aSelectDataQueries,0);
         for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
           aTmpLstSql := TALStringList.Create;
           Try
@@ -2661,12 +2661,12 @@ begin
                                      True,
                                      nil);
               aLstSql.Add(S1);
-              setlength(aSelectDataSQLs,length(aSelectDataSQLs)+1);
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].Sql := S1;
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].RowTag := '';
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].viewTag := '';
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].skip := 0;
-              aSelectDataSQLs[length(aSelectDataSQLs)-1].First := 0;
+              setlength(aSelectDataQueries,length(aSelectDataQueries)+1);
+              aSelectDataQueries[length(aSelectDataQueries)-1].Sql := S1;
+              aSelectDataQueries[length(aSelectDataQueries)-1].RowTag := '';
+              aSelectDataQueries[length(aSelectDataQueries)-1].viewTag := '';
+              aSelectDataQueries[length(aSelectDataQueries)-1].skip := 0;
+              aSelectDataQueries[length(aSelectDataQueries)-1].First := 0;
             end;
             inc(aLoopIndex);
             inc(FTotalLoop);
@@ -2683,7 +2683,7 @@ begin
           //update the data
           aStopWatch := TStopWatch.StartNew;
           if fUpdateSQL then Tform1(fOwner).MySqlConnectionPoolClient.UpdateData(aLstSql, aConnectionHandle)
-          else Tform1(fOwner).MySqlConnectionPoolClient.SelectData(aSelectDataSQLs,
+          else Tform1(fOwner).MySqlConnectionPoolClient.SelectData(aSelectDataQueries,
                                                                    aXMLDATA.documentElement,
                                                                    aFormatSettings,
                                                                    aConnectionHandle);

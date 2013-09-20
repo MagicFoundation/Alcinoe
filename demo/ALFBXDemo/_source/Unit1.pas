@@ -399,7 +399,7 @@ end;
 procedure TForm1.ALButtonFirebirdSelectClick(Sender: TObject);
 var aXMLDATA: TalXmlDocument;
     aFormatSettings: TALFormatSettings;
-    aSQL: TALFBXClientSelectDataSQL;
+    aQuery: TALFBXClientSelectDataQuery;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
@@ -421,38 +421,39 @@ begin
 
     aLst1 := TALStringList.create;
     try
-      aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
-                                   '<#',
-                                   '>',
-                                   SQLFastTagReplaceFunct,
-                                   True,
-                                   @aLst1)
+      aQuery := TALFBXClientSelectDataQuery.Create;
+      aQuery.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+                                     '<#',
+                                     '>',
+                                     SQLFastTagReplaceFunct,
+                                     True,
+                                     @aLst1)
     finally
       aLst1.free;
     end;
 
     if ALMemoFireBirdParams.Lines.Count > 0 then begin
-      Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
+      Setlength(aQuery.Params, ALMemoFireBirdParams.Lines.Count);
       for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
         aLst1 := TALStringList.create;
         try
-          aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   @aLst1)
+          aQuery.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                     '<#',
+                                                     '>',
+                                                     SQLFastTagReplaceFunct,
+                                                     True,
+                                                     @aLst1)
         finally
           aLst1.free;
         end;
-        aSQL.Params[i].isnull := False;
+        aQuery.Params[i].isnull := False;
       end;
     end
-    else Setlength(aSQL.Params, 0);
-    aSQL.RowTag := 'rec';
-    aSQL.ViewTag := '';
-    aSQL.Skip := 0;
-    aSQL.First := 200;
+    else Setlength(aQuery.Params, 0);
+    aQuery.RowTag := 'rec';
+    aQuery.ViewTag := '';
+    aQuery.Skip := 0;
+    aQuery.First := 200;
 
     FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                     -1,
@@ -464,7 +465,7 @@ begin
                                     False,
                                     True);
     aTickCount := ALGetTickCount64;
-    FAlFBXClient.SelectData(aSQL,
+    FAlFBXClient.SelectData(aQuery,
                             aXMLDATA.DocumentElement,
                             aFormatSettings);
     ALMemoFirebirdStats.Clear;
@@ -505,7 +506,7 @@ end;
 
 {************************************************************}
 procedure TForm1.ALButtonFirebirdUpdateClick(Sender: TObject);
-var aSQL: TALFBXClientUpdateDataSQL;
+var aQuery: TALFBXClientUpdateDataQuery;
     aIOStats_1: TALFBXClientMonitoringIOStats;
     aRecordStats_1: TALFBXClientMonitoringRecordStats;
     aIOStats_2: TALFBXClientMonitoringIOStats;
@@ -518,34 +519,35 @@ begin
 
   aLst1 := TALStringList.create;
   try
-    aSQL.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
-                                 '<#',
-                                 '>',
-                                 SQLFastTagReplaceFunct,
-                                 True,
-                                 @aLst1)
+    aQuery := TALFBXClientUpdateDataQuery.Create;
+    aQuery.SQL := ALFastTagReplace(AnsiString(AlMemoFireBirdQuery.Lines.Text),
+                                   '<#',
+                                   '>',
+                                   SQLFastTagReplaceFunct,
+                                   True,
+                                   @aLst1)
   finally
     aLst1.free;
   end;
 
   if ALMemoFireBirdParams.Lines.Count > 0 then begin
-    Setlength(aSQL.Params, ALMemoFireBirdParams.Lines.Count);
+    Setlength(aQuery.Params, ALMemoFireBirdParams.Lines.Count);
     for I := 0 to ALMemoFireBirdParams.Lines.Count - 1 do begin
       aLst1 := TALStringList.create;
       try
-        aSQL.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
-                                                 '<#',
-                                                 '>',
-                                                 SQLFastTagReplaceFunct,
-                                                 True,
-                                                 @aLst1)
+        aQuery.Params[i].Value := ALFastTagReplace(AnsiString(ALMemoFireBirdParams.Lines[i]),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   @aLst1)
       finally
         aLst1.free;
       end;
-      aSQL.Params[i].isnull := False;
+      aQuery.Params[i].isnull := False;
     end;
   end
-  else Setlength(aSQL.Params, 0);
+  else Setlength(aQuery.Params, 0);
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,
                                   -1,
                                   '',
@@ -556,7 +558,7 @@ begin
                                   False,
                                   True);
   aTickCount := ALGetTickCount64;
-  FAlFBXClient.UpdateData(aSQL);
+  FAlFBXClient.UpdateData(aQuery);
   ALMemoFirebirdStats.Clear;
   ALMemoFirebirdStats.Lines.Add('Time Taken: ' + IntToStr(ALGetTickCount64 - aTickCount) + ' ms');
   FAlFBXClient.GetMonitoringInfos(FAlFBXClient.ConnectionID,

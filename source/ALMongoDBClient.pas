@@ -1056,6 +1056,7 @@ var aCurrPos: integer;
     aOPCode: integer;
     aBsonDocuments: ansiString;
     aJsonDocument: TALJsonDocument;
+    i: integer;
 begin
 
   //
@@ -1080,8 +1081,16 @@ begin
       (documents[length(documents)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON(documents);        // if documents is given as JSON then it's must contain only 1 document
-      aJsonDocument.SaveToBSON(aBsonDocuments);
+      aJsonDocument.LoadFromJSON('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
+                                                                     // [{ ... }, { ... }, { ... }]   => {"documents":[{ ... }, { ... }, { ... }] }
+      aBsonDocuments := '';
+      with aJsonDocument.Node.ChildNodes['documents'] do begin
+        if nodeType = ntObject then aBsonDocuments := BSON  // {"documents":{ .... } }
+        else begin  // {"documents":[{ ... }, { ... }, { ... }] }
+          for I := 0 to ChildNodes.Count - 1 do
+            aBsonDocuments := aBsonDocuments + ChildNodes[i].BSON;
+        end;
+      end;
     finally
       aJsonDocument.Free;
     end;

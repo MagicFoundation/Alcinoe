@@ -557,6 +557,12 @@ Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
 Function  ALUTF8ISO91995CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 Function  ALUTF8BGNPCGN1947CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
+function ALExtractExpression(const S: AnsiString;
+                             const OpenChar, CloseChar: AnsiChar; // ex: '(' and ')'
+                             Const QuoteChars: Array of ansiChar; // ex: ['''', '"']
+                             Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
+                             var StartPos: integer;
+                             var EndPos: integer): boolean;
 
 Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF16LittleEndianBom = ansiString(#$FF) + ansiString(#$FE);
@@ -9762,6 +9768,64 @@ Begin
   SetLength(aLatinWideStr,aLatinWideStrCurrentPos);
   Result := UTF8Encode(aLatinWideStr);
 End;
+
+{***********************************************}
+function ALExtractExpression(const S: AnsiString;
+                             const OpenChar, CloseChar: AnsiChar; // ex: '(' and ')'
+                             Const QuoteChars: Array of ansiChar; // ex: ['''', '"']
+                             Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
+                             var StartPos: integer;
+                             var EndPos: integer): boolean;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _IsQuote(aChar: ansiChar): Boolean;
+  var i: integer;
+  begin
+    result := False;
+    for I := Low(QuoteChars) to High(QuoteChars) do
+      if aChar = QuoteChars[i] then begin
+        result := true;
+        break;
+      end;
+    if (result) and
+       (EscapeQuoteChar <> #0) and
+       (S[EndPos - 1] = EscapeQuoteChar) then result := False;
+  end;
+
+var aCurInQuote: boolean;
+    aCurQuoteChar: AnsiChar;
+    aOpenCount: integer;
+
+begin
+  result := false;
+  if StartPos <= 0 then StartPos := 1;
+  while (StartPos <= length(S)) and
+        (s[StartPos] <> OpenChar) do inc(StartPos);
+  if StartPos > length(S) then exit;
+  aOpenCount := 1;
+  aCurInQuote := False;
+  aCurQuoteChar := #0;
+  EndPos := StartPos + 1;
+  while (EndPos <= length(S)) and
+        (aOpenCount > 0) do begin
+    if _IsQuote(s[EndPos]) then begin
+      if aCurInQuote then begin
+        if (s[EndPos] = aCurQuoteChar) then aCurInQuote := False
+      end
+      else begin
+        aCurInQuote := True;
+        aCurQuoteChar := s[EndPos];
+      end;
+    end
+    else if not aCurInQuote then begin
+      if s[EndPos] = OpenChar then inc(aOpenCount)
+      else if s[EndPos] = CloseChar then dec(aOpenCount);
+    end;
+    if aOpenCount <> 0 then inc(EndPos);
+  end;
+  result := EndPos <= length(S);
+end;
+
 
 initialization
   ALPosExIgnoreCaseInitialiseLookupTable;

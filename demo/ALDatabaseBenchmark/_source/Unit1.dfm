@@ -27,7 +27,10 @@ object Form1: TForm1
         Width = 150
       end
       item
-        Width = 700
+        Width = 600
+      end
+      item
+        Width = 200
       end>
   end
   object Panel3: TPanel
@@ -258,10 +261,6 @@ object Form1: TForm1
     object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label2: TcxLabel
         Left = 71
         Top = 93
@@ -539,10 +538,6 @@ object Form1: TForm1
     end
     object MySQL: TcxTabSheet
       Caption = 'MySQL'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TcxLabel
         Left = 45
         Top = 74
@@ -769,10 +764,6 @@ object Form1: TForm1
     object SQLLite3: TcxTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label24: TcxLabel
         Left = 17
         Top = 21
@@ -1037,10 +1028,6 @@ object Form1: TForm1
     object Sphinx: TcxTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label36: TcxLabel
         Left = 38
         Top = 49
@@ -1212,10 +1199,6 @@ object Form1: TForm1
     object MemCached: TcxTabSheet
       Caption = 'MemCached'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label41: TcxLabel
         Left = 25
         Top = 21
@@ -1462,10 +1445,6 @@ object Form1: TForm1
     object MongoDB: TcxTabSheet
       Caption = 'MongoDB'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object cxLabel3: TcxLabel
         Left = 25
         Top = 21

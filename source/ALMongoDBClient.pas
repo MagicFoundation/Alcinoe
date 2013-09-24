@@ -20,7 +20,9 @@ Description:  Delphi Client for MongoDB database.
               amount of time a user must wait to establish a connection
               to the database.
 
-              exemple :
+
+              ---------
+              Exemple :
 
               aJSONDoc := TALJSONDocument.create;
               aMongoDBClient := TAlMongoDBClient.create;
@@ -39,7 +41,9 @@ Description:  Delphi Client for MongoDB database.
                 aJSONDoc.free;
               end;
 
-              and with connection pool :
+
+              ------------------------------
+              Exemple with connection pool :
 
               aMongoDBConnectionPoolClient := TAlMongoDBConnectionPoolClient.create(aDBHost, aDBPort);
               try
@@ -59,6 +63,29 @@ Description:  Delphi Client for MongoDB database.
               finally
                 aMongoDBClient.free;
               end;
+
+
+              -------------------------
+              Exemple tail monitoring :
+
+              aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(aDBHost,
+                                                                                    aDBPort,
+                                                                                    'test.cappedCollectionExemple'
+                                                                                    '{}', // the query
+                                                                                    '{fieldA:1, fieldB:1}', // the return fields selector
+
+                                                                                    Procedure (Sender: TObject; JSONRowData: TALJSONNode)
+                                                                                    begin
+                                                                                      writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
+                                                                                    end,
+
+                                                                                    procedure (Sender: TObject; Error: Exception)
+                                                                                    begin
+                                                                                      writeln(Error.message);
+                                                                                    end);
+              ....
+              aMongoDBTailMonitoringThread.free;
+
 
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
@@ -114,7 +141,9 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      WinSock,
      {$IFEND}
      Contnrs,
+     Classes,
      SyncObjs,
+     SysUtils,
      ALString,
      ALStringList,
      ALJSONDoc;
@@ -131,11 +160,18 @@ const MONGO_OP_REPLY = 1; //Reply to a client request. responseTo is set
 
 type
 
-    {-------------------------------------------------------------------------------}
+    {--------------------------------------}
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    TALMongoDBClientSelectDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNode;
+                                                                     ViewTag: AnsiString;
+                                                                     ExtData: Pointer;
+                                                                     Var Continue: Boolean);
+    {$ELSE}
     TALMongoDBClientSelectDataOnNewRowFunct = Procedure(JSONRowData: TALJSONNode;
                                                         ViewTag: AnsiString;
                                                         ExtData: Pointer;
                                                         Var Continue: Boolean);
+    {$IFEND}
 
     {---------------------------------------}
     //bit num     name            description
@@ -394,6 +430,14 @@ type
                           const fullCollectionName: ansiString;   // "dbname.collectionname"
                           const selector: ansiString;             // query object.
                           var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
+      procedure OnSelectDataDone(Query: TALMongoDBClientSelectDataQUERY;
+                                 TimeTaken: Integer); virtual;
+      procedure OnUpdateDataDone(Query: TALMongoDBClientUpdateDataQUERY;
+                                 TimeTaken: Integer); virtual;
+      procedure OnDeleteDataDone(Query: TALMongoDBClientDeleteDataQUERY;
+                                 TimeTaken: Integer); virtual;
+      procedure OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
+                                 TimeTaken: Integer); virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
@@ -423,26 +467,22 @@ type
       Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
                            JSONDATA: TALJSONNode;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                           ExtData: Pointer;
-                           FormatSettings: TALFormatSettings); overload; virtual;
+                           ExtData: Pointer); overload; virtual;
       Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                           ExtData: Pointer;
-                           FormatSettings: TALFormatSettings); overload; virtual;
+                           ExtData: Pointer); overload; virtual;
       Procedure SelectData(FullCollectionName: AnsiString;
                            Query: AnsiString;
                            ReturnFieldsSelector: AnsiString;
                            Skip: integer;
                            First: Integer;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                           ExtData: Pointer;
-                           FormatSettings: TALFormatSettings); overload; virtual;
+                           ExtData: Pointer); overload; virtual;
       Procedure SelectData(FullCollectionName: AnsiString;
                            Query: AnsiString;
                            ReturnFieldsSelector: AnsiString;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                           ExtData: Pointer;
-                           FormatSettings: TALFormatSettings); overload; virtual;
+                           ExtData: Pointer); overload; virtual;
       Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
                            JSONDATA: TALJSONNode); overload; virtual;
       Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
@@ -540,12 +580,10 @@ type
                            JSONDATA: TALJSONNode;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
-                           FormatSettings: TALFormatSettings;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
-                           FormatSettings: TALFormatSettings;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       Procedure SelectData(FullCollectionName: AnsiString;
                            Query: AnsiString;
@@ -554,14 +592,12 @@ type
                            First: Integer;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
-                           FormatSettings: TALFormatSettings;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       Procedure SelectData(FullCollectionName: AnsiString;
                            Query: AnsiString;
                            ReturnFieldsSelector: AnsiString;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
-                           FormatSettings: TALFormatSettings;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
                            JSONDATA: TALJSONNode;
@@ -644,10 +680,49 @@ type
       property Port: integer read fPort;
     end;
 
+    {$IF CompilerVersion >= 23} {Delphi XE2}
+    TAlMongoDBTailMonitoringThreadEvent = reference to Procedure (Sender: TObject; JSONRowData: TALJSONNode);
+    TAlMongoDBTailMonitoringThreadException = reference to procedure (Sender: TObject; Error: Exception);
+    {$ELSE}
+    TAlMongoDBTailMonitoringThreadEvent = Procedure (Sender: TObject; JSONRowData: TALJSONNode) of object;
+    TAlMongoDBTailMonitoringThreadException = procedure (Sender: TObject; Error: Exception) of object;
+    {$IFEND}
+
+    {---------------------------------------------}
+    TAlMongoDBTailMonitoringThread = class(TThread)
+    private
+      fMongoDBClient: TALMongoDBClient;
+      FHost: AnsiString;
+      fPort: integer;
+      fFullCollectionName: AnsiString;
+      fQuery: AnsiString;
+      fReturnFieldsSelector: AnsiString;
+      FStarted: Boolean;
+      FCompleted: Boolean;
+      fOnEvent: TAlMongoDBTailMonitoringThreadEvent;
+      fOnException: TAlMongoDBTailMonitoringThreadException;
+    protected
+      Procedure DoEvent(JSONRowData: TALJSONNode); virtual;
+      procedure DoException(Error: Exception); virtual;
+    public
+      constructor Create(const aHost: AnsiString;
+                         const aPort: integer;
+                         const aFullCollectionName: AnsiString;
+                         const aQuery: AnsiString;
+                         const aReturnFieldsSelector: AnsiString;
+                         aOnEvent: TAlMongoDBTailMonitoringThreadEvent;
+                         aOnError: TAlMongoDBTailMonitoringThreadException); virtual;
+      procedure AfterConstruction; override;
+      Destructor Destroy; override;
+      procedure Execute; override;
+      property OnEvent: TAlMongoDBTailMonitoringThreadEvent read fOnEvent write fOnEvent;
+      property OnException: TAlMongoDBTailMonitoringThreadException read fOnException write fOnException;
+    end;
+
 implementation
 
 Uses Windows,
-     SysUtils,
+     Diagnostics,
      AlWinsock,
      ALWindows;
 
@@ -1839,6 +1914,34 @@ begin
                        upserted);
 end;
 
+{*************************************************************************************}
+procedure TAlBaseMongoDBClient.OnSelectDataDone(Query: TALMongoDBClientSelectDataQUERY;
+                                                TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*************************************************************************************}
+procedure TAlBaseMongoDBClient.OnUpdateDataDone(Query: TALMongoDBClientUpdateDataQUERY;
+                                                TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*************************************************************************************}
+procedure TAlBaseMongoDBClient.OnDeleteDataDone(Query: TALMongoDBClientDeleteDataQUERY;
+                                                TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*************************************************************************************}
+procedure TAlBaseMongoDBClient.OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
+                                                TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {***************************************************************************************************************************************************}
 Function TAlBaseMongoDBClient.SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
 begin
@@ -1988,8 +2091,7 @@ end;
 Procedure TAlMongoDBClient.SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
                                       JSONDATA: TALJSONNode;
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                      ExtData: Pointer;
-                                      FormatSettings: TALFormatSettings);
+                                      ExtData: Pointer);
 
 Var aQueriesIndex: integer;
     aViewRec: TalJSONNode;
@@ -2001,6 +2103,7 @@ Var aQueriesIndex: integer;
     aFlags: integer;
     aRecAdded: integer;
     aContinue: boolean;
+    aStopWatch: TStopWatch;
 
 begin
 
@@ -2016,14 +2119,21 @@ begin
   //clear the JSONDATA
   if assigned(JSONDATA) then aJSONDocument := Nil
   else begin
-    aJSONDocument := TALJSONDocument.create(FormatSettings);
+    aJSONDocument := TALJSONDocument.create;
     JSONDATA := aJSONDocument.Node;
   end;
 
   Try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     //loop on all the Queries
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //build the flag integer
       //bit num	   name	            description
@@ -2150,6 +2260,11 @@ begin
             ((Queries[aQueriesIndex].First > 0) and
              (aRecAdded >= Queries[aQueriesIndex].First));
 
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
+
     End;
 
   Finally
@@ -2161,8 +2276,7 @@ end;
 {***************************************************************************}
 Procedure TAlMongoDBClient.SelectData(Query: TALMongoDBClientSelectDataQUERY;
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                      ExtData: Pointer;
-                                      FormatSettings: TALFormatSettings);
+                                      ExtData: Pointer);
 var aSelectDataQueries: TALMongoDBClientSelectDataQUERIES;
 begin
   setlength(aSelectDataQueries,1);
@@ -2170,8 +2284,7 @@ begin
   SelectData(aSelectDataQueries,
              nil, // JSONDATA
              OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+             ExtData);
 end;
 
 {*******************************************************************}
@@ -2181,8 +2294,7 @@ Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
                                       Skip: integer;
                                       First: Integer;
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                      ExtData: Pointer;
-                                      FormatSettings: TALFormatSettings);
+                                      ExtData: Pointer);
 var aQuery: TALMongoDBClientSelectDataQUERY;
 begin
   aQuery := TALMongoDBClientSelectDataQUERY.Create;
@@ -2193,8 +2305,7 @@ begin
   aQuery.First := First;
   SelectData(aQuery,
              OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+             ExtData);
 end;
 
 {*******************************************************************}
@@ -2202,8 +2313,7 @@ Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
                                       Query: AnsiString;
                                       ReturnFieldsSelector: AnsiString;
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                      ExtData: Pointer;
-                                      FormatSettings: TALFormatSettings);
+                                      ExtData: Pointer);
 begin
   SelectData(FullCollectionName,
              Query,
@@ -2211,8 +2321,7 @@ begin
              0, // skip
              0, // first
              OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+             ExtData);
 end;
 
 {*******************************************************************************}
@@ -2222,8 +2331,7 @@ begin
   SelectData(Queries,
              JSONDATA,
              nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-             nil, // ExtData: Pointer
-             ALDefaultFormatSettings); // we don't care it's just use for the OnNewRowFunct
+             nil); // ExtData: Pointer
 end;
 
 {***************************************************************************}
@@ -2236,8 +2344,7 @@ begin
   SelectData(aSelectDataQueries,
              JSONDATA,
              nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-             nil, // ExtData: Pointer
-             ALDefaultFormatSettings); // we don't care it's just use for the OnNewRowFunct
+             nil); // ExtData: Pointer
 end;
 
 {*******************************************************************}
@@ -2299,6 +2406,7 @@ Var aQueriesIndex: integer;
     aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
     aObjectID: TALJSONObjectID;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no query
@@ -2307,8 +2415,15 @@ begin
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
+  //init the TstopWatch
+  aStopWatch := TstopWatch.Create;
+
   //loop on all the Queries
   For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
     //bit num	  name	        description
     //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
@@ -2327,6 +2442,11 @@ begin
               aupdatedExisting,
               aObjectID);
 
+    //do the OnUpdateDataDone
+    aStopWatch.Stop;
+    OnUpdateDataDone(Queries[aQueriesIndex],
+                     aStopWatch.ElapsedMilliseconds);
+
   end;
 
 end;
@@ -2337,10 +2457,14 @@ procedure TAlMongoDBClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
                                       var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                       var ObjectID: TALJSONObjectID); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 Var aFlags: integer;
+    aStopWatch: TStopWatch;
 begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
+
+  //init the TstopWatch
+  aStopWatch := TstopWatch.StartNew;
 
   //bit num	  name	        description
   //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
@@ -2358,6 +2482,11 @@ begin
             NumberOfDocumentsUpdated,
             updatedExisting,
             ObjectID);
+
+  //do the OnUpdateDataDone
+  aStopWatch.Stop;
+  OnUpdateDataDone(Query,
+                   aStopWatch.ElapsedMilliseconds);
 
 end;
 
@@ -2420,6 +2549,7 @@ end;
 Procedure TAlMongoDBClient.InsertData(Queries: TALMongoDBClientInsertDataQUERIES);
 Var aQueriesIndex: integer;
     aFlags: integer;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no Query
@@ -2428,8 +2558,15 @@ begin
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
+  //init the TstopWatch
+  aStopWatch := TstopWatch.Create;
+
   //loop on all the queries
   For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
     //bit num	 name	            description
     //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
@@ -2444,6 +2581,11 @@ begin
               aflags,
               Queries[aQueriesIndex].FullCollectionName,
               Queries[aQueriesIndex].documents);
+
+    //do the OnInsertDataDone
+    aStopWatch.Stop;
+    OnInsertDataDone(Queries[aQueriesIndex],
+                     aStopWatch.ElapsedMilliseconds);
 
   end;
 
@@ -2476,6 +2618,7 @@ Procedure TAlMongoDBClient.DeleteData(Queries: TALMongoDBClientDeleteDataQUERIES
 Var aQueriesIndex: integer;
     aFlags: integer;
     aNumberOfDocumentsRemoved: integer;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no query
@@ -2484,8 +2627,15 @@ begin
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
+  //init the TstopWatch
+  aStopWatch := TstopWatch.Create;
+
   //loop on all the Queries
   For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
     //bit num	   name	          description
     //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
@@ -2499,6 +2649,11 @@ begin
               Queries[aQueriesIndex].selector,
               aNumberOfDocumentsRemoved);
 
+    //do the OnDeleteDataDone
+    aStopWatch.Stop;
+    OnDeleteDataDone(Queries[aQueriesIndex],
+                     aStopWatch.ElapsedMilliseconds);
+
   end;
 
 end;
@@ -2507,10 +2662,14 @@ end;
 Procedure TAlMongoDBClient.DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
                                       var NumberOfDocumentsRemoved: integer);
 Var aFlags: integer;
+    aStopWatch: TStopWatch;
 begin
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
+
+  //init the TstopWatch
+  aStopWatch := TstopWatch.StartNew;
 
   //bit num	   name	          description
   //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
@@ -2523,6 +2682,11 @@ begin
             Query.FullCollectionName,
             Query.selector,
             NumberOfDocumentsRemoved);
+
+  //do the OnDeleteDataDone
+  aStopWatch.Stop;
+  OnDeleteDataDone(Query,
+                   aStopWatch.ElapsedMilliseconds);
 
 end;
 
@@ -2784,7 +2948,6 @@ Procedure TAlMongoDBConnectionPoolClient.SelectData(Queries: TALMongoDBClientSel
                                                     JSONDATA: TALJSONNode;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 
 Var aQueriesIndex: integer;
@@ -2799,6 +2962,7 @@ Var aQueriesIndex: integer;
     aContinue: boolean;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 
 begin
 
@@ -2823,14 +2987,21 @@ begin
     //clear the JSONDATA
     if assigned(JSONDATA) then aJSONDocument := Nil
     else begin
-      aJSONDocument := TALJSONDocument.create(FormatSettings);
+      aJSONDocument := TALJSONDocument.create;
       JSONDATA := aJSONDocument.Node;
     end;
 
     Try
 
+      //init the TstopWatch
+      aStopWatch := TstopWatch.Create;
+
       //loop on all the Queries
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        //start the TstopWatch
+        aStopWatch.Reset;
+        aStopWatch.Start;
 
         //build the flag integer
         //bit num	   name	            description
@@ -2935,6 +3106,11 @@ begin
 
         end;
 
+        //do the OnSelectDataDone
+        aStopWatch.Stop;
+        OnSelectDataDone(Queries[aQueriesIndex],
+                         aStopWatch.ElapsedMilliseconds);
+
       End;
 
     Finally
@@ -2959,7 +3135,6 @@ end;
 Procedure TAlMongoDBConnectionPoolClient.SelectData(Query: TALMongoDBClientSelectDataQUERY;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aSelectDataQueries: TALMongoDBClientSelectDataQUERIES;
 begin
@@ -2969,7 +3144,6 @@ begin
              nil, // JSONDATA
              OnNewRowFunct,
              ExtData,
-             FormatSettings,
              ConnectionSocket);
 end;
 
@@ -2981,7 +3155,6 @@ Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiStri
                                                     First: Integer;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aQuery: TALMongoDBClientSelectDataQUERY;
 begin
@@ -2994,7 +3167,6 @@ begin
   SelectData(aQuery,
              OnNewRowFunct,
              ExtData,
-             FormatSettings,
              ConnectionSocket);
 end;
 
@@ -3004,7 +3176,6 @@ Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiStri
                                                     ReturnFieldsSelector: AnsiString;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
-                                                    FormatSettings: TALFormatSettings;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 begin
   SelectData(FullCollectionName,
@@ -3014,7 +3185,6 @@ begin
              0, // first
              OnNewRowFunct,
              ExtData,
-             FormatSettings,
              ConnectionSocket);
 end;
 
@@ -3027,7 +3197,6 @@ begin
              JSONDATA,
              nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
              nil, // ExtData: Pointer
-             ALDefaultFormatSettings, // we don't care it's just use for the OnNewRowFunct
              ConnectionSocket);
 end;
 
@@ -3043,7 +3212,6 @@ begin
              JSONDATA,
              nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
              nil, // ExtData: Pointer
-             ALDefaultFormatSettings, // we don't care it's just use for the OnNewRowFunct
              ConnectionSocket);
 end;
 
@@ -3115,6 +3283,7 @@ Var aQueriesIndex: integer;
     aObjectID: TALJSONObjectID;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no query
@@ -3132,8 +3301,15 @@ begin
 
   try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     //loop on all the Queries
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //bit num	  name	        description
       //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
@@ -3151,6 +3327,11 @@ begin
                 aNumberOfDocumentsUpdated,
                 aupdatedExisting,
                 aObjectID);
+
+      //do the OnUpdateDataDone
+      aStopWatch.Stop;
+      OnUpdateDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     end;
 
@@ -3177,6 +3358,7 @@ procedure TAlMongoDBConnectionPoolClient.UpdateData(Query: TALMongoDBClientUpdat
 Var aFlags: integer;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //acquire a connection
@@ -3190,6 +3372,9 @@ begin
   end;
 
   try
+
+    //init the TstopWatch
+    aStopWatch := TstopWatch.StartNew;
 
     //bit num	  name	        description
     //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
@@ -3207,6 +3392,11 @@ begin
               NumberOfDocumentsUpdated,
               updatedExisting,
               ObjectID);
+
+    //do the OnUpdateDataDone
+    aStopWatch.Stop;
+    OnUpdateDataDone(Query,
+                     aStopWatch.ElapsedMilliseconds);
 
     //Release the Connection
     if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
@@ -3290,6 +3480,7 @@ Var aQueriesIndex: integer;
     aFlags: integer;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no Query
@@ -3307,8 +3498,15 @@ begin
 
   try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     //loop on all the queries
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //bit num	 name	            description
       //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
@@ -3323,6 +3521,11 @@ begin
                 aflags,
                 Queries[aQueriesIndex].FullCollectionName,
                 Queries[aQueriesIndex].documents);
+
+      //do the OnInsertDataDone
+      aStopWatch.Stop;
+      OnInsertDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     end;
 
@@ -3374,6 +3577,7 @@ Var aQueriesIndex: integer;
     aNumberOfDocumentsRemoved: integer;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no query
@@ -3391,8 +3595,15 @@ begin
 
   try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     //loop on all the Queries
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //bit num	   name	          description
       //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
@@ -3405,6 +3616,11 @@ begin
                 Queries[aQueriesIndex].FullCollectionName,
                 Queries[aQueriesIndex].selector,
                 aNumberOfDocumentsRemoved);
+
+      //do the OnDeleteDataDone
+      aStopWatch.Stop;
+      OnDeleteDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     end;
 
@@ -3429,6 +3645,7 @@ Procedure TAlMongoDBConnectionPoolClient.DeleteData(Query: TALMongoDBClientDelet
 Var aFlags: integer;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //acquire a connection
@@ -3443,6 +3660,9 @@ begin
 
   try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.StartNew;
+
     //bit num	   name	          description
     //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
     //1-31	     Reserved	      Must be set to 0.
@@ -3454,6 +3674,11 @@ begin
               Query.FullCollectionName,
               Query.selector,
               NumberOfDocumentsRemoved);
+
+    //do the OnDeleteDataDone
+    aStopWatch.Stop;
+    OnDeleteDataDone(Query,
+                     aStopWatch.ElapsedMilliseconds);
 
     //Release the Connection
     if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
@@ -3508,6 +3733,124 @@ begin
              SingleRemove,
              aNumberOfDocumentsRemoved,
              ConnectionSocket);
+end;
+
+{************************************************************************}
+constructor TAlMongoDBTailMonitoringThread.Create(const aHost: AnsiString;
+                                                  const aPort: integer;
+                                                  const aFullCollectionName: AnsiString;
+                                                  const aQuery: AnsiString;
+                                                  const aReturnFieldsSelector: AnsiString;
+                                                  aOnEvent: TAlMongoDBTailMonitoringThreadEvent;
+                                                  aOnError: TAlMongoDBTailMonitoringThreadException);
+begin
+  fMongoDBClient := TalMongoDBClient.Create;
+  FHost := aHost;
+  fPort := aPort;
+  fFullCollectionName := aFullCollectionName;
+  fQuery := aQuery;
+  fReturnFieldsSelector := aReturnFieldsSelector;
+  fStarted := False;
+  fcompleted := False;
+  fOnEvent := aOnEvent;
+  fOnException := aOnError;
+  inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
+end;
+
+{*********************************************************}
+procedure TAlMongoDBTailMonitoringThread.AfterConstruction;
+begin
+  inherited;
+  while (not fStarted) do sleep(1);
+end;
+
+{************************************************}
+destructor TAlMongoDBTailMonitoringThread.Destroy;
+begin
+
+  //first set terminated to true
+  If not Terminated then Terminate;
+
+  //in case the execute in waiting fire the Fsignal
+  fMongoDBClient.StopTailMonitoring := True;
+  while (not fCompleted) do sleep(1);
+
+  //free the fMongoDBClient
+  fMongoDBClient.Free;
+
+  //destroy the object
+  inherited;
+
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBTailMonitoringThread.DoEvent(JSONRowData: TALJSONNode);
+begin
+  if assigned(fOnEvent) then fOnEvent(self, JSONRowData);
+end;
+
+{*********************************************************************}
+procedure TAlMongoDBTailMonitoringThread.DoException(Error: Exception);
+begin
+  if assigned(fonException) then fonException(self, Error);
+end;
+
+{***********************************************}
+procedure TAlMongoDBTailMonitoringThread.Execute;
+var aExtData: Pointer;
+    aQuery: TALMongoDBClientSelectDataQUERY;
+begin
+  //to be sure that the thread was stated
+  fStarted := True;
+
+  //init aQuery
+  aQuery := TALMongoDBClientSelectDataQUERY.Create;
+  aQuery.FullCollectionName := fFullCollectionName;
+  aQuery.Query := fQuery;
+  aQuery.ReturnFieldsSelector := fReturnFieldsSelector;
+  aQuery.flags.TailMonitoring := True;
+
+  //loop still not terminated
+  while not Terminated do begin
+    Try
+
+      //if terminated then exit;
+      if Terminated then Break;
+
+      //disconnect
+      fMongoDBClient.Disconnect;
+
+      //connect
+      fMongoDBClient.Connect(fHost, fPort);
+
+      //select the data
+      aExtData := nil;
+      fMongoDBClient.SelectData(aQuery,
+                                Procedure (JSONRowData: TALJSONNode;
+                                           ViewTag: AnsiString;
+                                           ExtData: Pointer;
+                                           Var Continue: Boolean)
+                                begin
+                                  doEvent(JSONRowData);
+                                end,
+                                aExtData);
+
+    Except
+      on E: Exception do begin
+        DoException(E);
+        sleep(1);
+      end;
+    End;
+  end;
+
+  //set completed to true
+  //we need to to this because i don't know why
+  //but on isapi the waitfor (call in thread.free)
+  //never return.
+  //but i don't remenbered if the free was call in the initialization
+  //section of the ISAPI DLL (and that bad to do something like this
+  //in initialization or finalization).
+  fcompleted := True;
 end;
 
 end.

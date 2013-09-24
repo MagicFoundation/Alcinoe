@@ -76,12 +76,17 @@ uses Windows,
 
 Type
 
-  {---------------------------------------------------------------------}
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALFBXClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
+                                                               ViewTag: AnsiString;
+                                                               ExtData: Pointer;
+                                                               Var Continue: Boolean);
+  {$ELSE}
   TALFBXClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
                                                   ViewTag: AnsiString;
                                                   ExtData: Pointer;
                                                   Var Continue: Boolean);
-
+  {$IFEND}
 
   {----------------------------}
   TALFBXClientSQLParam = record
@@ -640,6 +645,14 @@ Type
     property  DefaultWriteTPB: AnsiString read fDefaultWriteTPB write fDefaultWriteTPB;
   end;
 
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALFBXEventThreadEvent = reference to Procedure (Sender: TObject; const EventName: AnsiString; Count: Integer);
+  TALFBXEventThreadException = reference to procedure (Sender: TObject; Error: Exception);
+  {$ELSE}
+  TALFBXEventThreadEvent = Procedure (Sender: TObject; const EventName: AnsiString; Count: Integer) of object;
+  TALFBXEventThreadException = procedure (Sender: TObject; Error: Exception) of object;
+  {$IFEND}
+
   {--------------------------------}
   TALFBXEventThread = class(TThread)
   private
@@ -659,6 +672,8 @@ Type
     fOpenConnectionParams: AnsiString;
     fEventNamesArr: array[0..14] of AnsiString;
     fEventNamesCount: integer;
+    fOnEvent: TALFBXEventThreadEvent;
+    fOnException: TALFBXEventThreadException;
   protected
     procedure initObject(aDataBaseName,
                          aLogin,
@@ -667,10 +682,35 @@ Type
                          aEventNames: AnsiString;
                          aConnectionMaxIdleTime: integer;
                          aNumbuffers: integer;
-                         aOpenConnectionExtraParams: AnsiString); virtual;
-    procedure DoEvent(const EventName: AnsiString; Count: Integer); virtual; abstract;
-    procedure DoException(Error: Exception); virtual; abstract;
+                         aOpenConnectionExtraParams: AnsiString;
+                         aOnEvent: TALFBXEventThreadEvent;
+                         aOnException: TALFBXEventThreadException); virtual;
+    procedure DoEvent(const EventName: AnsiString; Count: Integer); virtual;
+    procedure DoException(Error: Exception); virtual;
   public
+    constructor Create(aDataBaseName,
+                       aLogin,
+                       aPassword,
+                       aCharSet: AnsiString;
+                       aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                       aApiVer: TALFBXVersion_API;
+                       aOnEvent: TALFBXEventThreadEvent;
+                       aOnException: TALFBXEventThreadException;
+                       const alib: AnsiString = GDS32DLL;
+                       const aConnectionMaxIdleTime: integer = -1;
+                       const aNumbuffers: integer = -1;
+                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    Constructor Create(aDataBaseName,
+                       aLogin,
+                       aPassword,
+                       aCharSet: AnsiString;
+                       aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                       alib: TALFBXLibrary;
+                       aOnEvent: TALFBXEventThreadEvent;
+                       aOnException: TALFBXEventThreadException;
+                       const aConnectionMaxIdleTime: integer = -1;
+                       const aNumbuffers: integer = -1;
+                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
     constructor Create(aDataBaseName,
                        aLogin,
                        aPassword,
@@ -694,6 +734,8 @@ Type
     procedure AfterConstruction; override;
     procedure Execute; override;
     property  Signal: Thandle read FSignal;
+    property  OnEvent: TALFBXEventThreadEvent read fOnEvent write fOnEvent;
+    property  OnException: TALFBXEventThreadException read fOnException write fOnException;
   end;
 
 Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction version number is used internally by the InterBase engine. It is always be
@@ -5171,7 +5213,9 @@ procedure TALFBXEventThread.initObject(aDataBaseName,
                                        aEventNames: AnsiString;
                                        aConnectionMaxIdleTime: integer;
                                        aNumbuffers: integer;
-                                       aOpenConnectionExtraParams: AnsiString);
+                                       aOpenConnectionExtraParams: AnsiString;
+                                       aOnEvent: TALFBXEventThreadEvent;
+                                       aOnException: TALFBXEventThreadException);
 Var aLst: TALStrings;
     i: integer;
 begin
@@ -5189,6 +5233,8 @@ begin
   fStarted := False;
   FEventCanceled := False;
   FWaitingSignal := False;
+  fOnEvent := aOnEvent;
+  fOnException := aOnException;
   FDataBaseName:= aDataBaseName;
   FCharset:= ALFBXStrToCharacterSet(aCharSet);
   fOpenConnectionParams := 'user_name = '+aLogin+'; '+
@@ -5221,6 +5267,8 @@ constructor TALFBXEventThread.Create(aDataBaseName,
                                      aCharSet: AnsiString;
                                      aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
                                      aApiVer: TALFBXVersion_API;
+                                     aOnEvent: TALFBXEventThreadEvent;
+                                     aOnException: TALFBXEventThreadException;
                                      const alib: AnsiString = GDS32DLL;
                                      const aConnectionMaxIdleTime: integer = -1;
                                      const aNumbuffers: integer = -1;
@@ -5236,7 +5284,65 @@ begin
              aEventNames,
              aConnectionMaxIdleTime,
              aNumbuffers,
-             aOpenConnectionExtraParams);
+             aOpenConnectionExtraParams,
+             aOnEvent,
+             aOnException);
+  inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
+end;
+
+{*************************************************}
+Constructor TALFBXEventThread.Create(aDataBaseName,
+                                     aLogin,
+                                     aPassword,
+                                     aCharSet: AnsiString;
+                                     aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                                     alib: TALFBXLibrary;
+                                     aOnEvent: TALFBXEventThreadEvent;
+                                     aOnException: TALFBXEventThreadException;
+                                     const aConnectionMaxIdleTime: integer = -1;
+                                     const aNumbuffers: integer = -1;
+                                     const aOpenConnectionExtraParams: AnsiString = '');
+begin
+  fLibrary := alib;
+  FownLibrary := False;
+  initObject(aDataBaseName,
+             aLogin,
+             aPassword,
+             aCharSet,
+             aEventNames,
+             aConnectionMaxIdleTime,
+             aNumbuffers,
+             aOpenConnectionExtraParams,
+             aOnEvent,
+             aOnException);
+  inherited Create(False);  // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
+end;
+
+{*************************************************}
+constructor TALFBXEventThread.Create(aDataBaseName,
+                                     aLogin,
+                                     aPassword,
+                                     aCharSet: AnsiString;
+                                     aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                                     aApiVer: TALFBXVersion_API;
+                                     const alib: AnsiString = GDS32DLL;
+                                     const aConnectionMaxIdleTime: integer = -1;
+                                     const aNumbuffers: integer = -1;
+                                     const aOpenConnectionExtraParams: AnsiString = '');
+begin
+  fLibrary := TALFBXLibrary.Create(aApiVer);
+  fLibrary.Load(alib);
+  FownLibrary := True;
+  initObject(aDataBaseName,
+             aLogin,
+             aPassword,
+             aCharSet,
+             aEventNames,
+             aConnectionMaxIdleTime,
+             aNumbuffers,
+             aOpenConnectionExtraParams,
+             nil,
+             nil);
   inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
@@ -5260,7 +5366,9 @@ begin
              aEventNames,
              aConnectionMaxIdleTime,
              aNumbuffers,
-             aOpenConnectionExtraParams);
+             aOpenConnectionExtraParams,
+             nil,
+             nil);
   inherited Create(False);  // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
@@ -5292,6 +5400,18 @@ begin
   //destroy the object
   inherited;
 
+end;
+
+{*******************************************************************************}
+procedure TALFBXEventThread.DoEvent(const EventName: AnsiString; Count: Integer);
+begin
+  if assigned(fOnEvent) then fOnEvent(self, EventName, Count);
+end;
+
+{********************************************************}
+procedure TALFBXEventThread.DoException(Error: Exception);
+begin
+  if assigned(fonException) then fonException(self, Error);
 end;
 
 {**********************************}

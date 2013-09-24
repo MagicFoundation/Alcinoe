@@ -68,11 +68,18 @@ uses Windows,
 
 Type
 
-  {-----------------------------------------------------------------------}
+  {--------------------------------------}
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TalMySqlClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
+                                                                 ViewTag: AnsiString;
+                                                                 ExtData: Pointer;
+                                                                 Var Continue: Boolean);
+  {$ELSE}
   TalMySqlClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
                                                     ViewTag: AnsiString;
                                                     ExtData: Pointer;
                                                     Var Continue: Boolean);
+  {$IFEND}
 
   {---------------------------------}
   EALMySqlError = class(EALException)

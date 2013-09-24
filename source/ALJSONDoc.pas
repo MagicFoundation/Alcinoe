@@ -577,19 +577,19 @@ begin
   else P1 := 1;// Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                // ^P1
   while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 <= length(aDateStr) - 3) or
-     (aDateStr[P1]   = 'D') or
-     (aDateStr[P1+1] = 'a') or
-     (aDateStr[P1+2] = 't') or
+  if (P1 <= length(aDateStr) - 3) and
+     (aDateStr[P1]   = 'D') and
+     (aDateStr[P1+1] = 'a') and
+     (aDateStr[P1+2] = 't') and
      (aDateStr[P1+3] = 'e') then inc(p1, 4)  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                                              //          ^P1
-  else if (P1 <= length(aDateStr) - 6) or
-          (aDateStr[P1]   = 'I') or
-          (aDateStr[P1+1] = 'S') or
-          (aDateStr[P1+2] = 'O') or
-          (aDateStr[P1+3] = 'D') or
-          (aDateStr[P1+4] = 'a') or
-          (aDateStr[P1+5] = 't') or
+  else if (P1 <= length(aDateStr) - 6) and
+          (aDateStr[P1]   = 'I') and
+          (aDateStr[P1+1] = 'S') and
+          (aDateStr[P1+2] = 'O') and
+          (aDateStr[P1+3] = 'D') and
+          (aDateStr[P1+4] = 'a') and
+          (aDateStr[P1+5] = 't') and
           (aDateStr[P1+6] = 'e') then inc(p1, 7)  // ISODate ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                                                   //        ^P1
   else exit;

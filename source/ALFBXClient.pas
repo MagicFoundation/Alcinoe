@@ -174,6 +174,10 @@ Type
                            aIndex: Integer;
                            aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
+    procedure OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
+                               TimeTaken: Integer); virtual;
+    procedure OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
+                               TimeTaken: Integer); virtual;
   Public
     Constructor Create(ApiVer: TALFBXVersion_API; const lib: AnsiString = GDS32DLL); overload; virtual;
     Constructor Create(lib: TALFBXLibrary); overload; virtual;
@@ -432,6 +436,10 @@ Type
                          aCharSet: AnsiString;
                          const aNumbuffers: integer = -1;
                          const aOpenConnectionExtraParams: AnsiString = ''); virtual;
+    procedure OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
+                               TimeTaken: Integer); virtual;
+    procedure OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
+                               TimeTaken: Integer); virtual;
   Public
     Constructor Create(aDataBaseName,
                        aLogin,
@@ -920,7 +928,8 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
 
 implementation
 
-uses ALWindows,
+uses Diagnostics,
+     ALWindows,
      alfbxError;
 
 {***************************************************************}
@@ -1545,6 +1554,20 @@ begin
 
 end;
 
+{*************************************************************************}
+procedure TALFBXClient.OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
+                                        TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*************************************************************************}
+procedure TALFBXClient.OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
+                                        TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {***********************************************************************}
 procedure TALFBXClient.SelectData(Queries: TALFBXClientSelectDataQUERIES;
                                   XMLDATA: TalXMLNode;
@@ -1559,6 +1582,7 @@ Var aSqlpa: TALFBXSQLParams;
     aViewRec: TalXmlNode;
     aDropStmt: Boolean;
     aXmlDocument: TalXmlDocument;
+    aStopWatch: TStopWatch;
 
     {------------------------------------}
     Procedure InternalSelectDataFetchRows;
@@ -1656,8 +1680,15 @@ begin
 
   Try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     //loop on all the SQL
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //prepare if neccessary
       if (not assigned(fSqlda)) or
@@ -1768,6 +1799,11 @@ begin
         end;
 
       end;
+
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     End;
 
@@ -2003,6 +2039,7 @@ Var aSqlpa: TALFBXSQLParams;
     aParamsIndex: integer;
     aQueriesIndex: integer;
     aDropStmt: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no SQL
@@ -2011,8 +2048,15 @@ begin
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
+  //init the TstopWatch
+  aStopWatch := TstopWatch.Create;
+
   {loop on all the SQL}
   For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
     //if their is params
     if length(Queries[aQueriesIndex].Params) > 0 then begin
@@ -2117,6 +2161,11 @@ begin
       end;
 
     end;
+
+    //do the OnUpdateDataDone
+    aStopWatch.Stop;
+    OnUpdateDataDone(Queries[aQueriesIndex],
+                     aStopWatch.ElapsedMilliseconds);
 
   end;
 
@@ -3889,6 +3938,20 @@ begin
 
 end;
 
+{***************************************************************************************}
+procedure TALFBXConnectionPoolClient.OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
+                                                      TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{***************************************************************************************}
+procedure TALFBXConnectionPoolClient.OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
+                                                      TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {*************************************************************************************}
 procedure TALFBXConnectionPoolClient.SelectData(Queries: TALFBXClientSelectDataQUERIES;
                                                 XMLDATA: TalXMLNode;
@@ -3918,6 +3981,7 @@ procedure TALFBXConnectionPoolClient.SelectData(Queries: TALFBXClientSelectDataQ
       aConnectionWasAcquiredFromPool: Boolean;
       aTransactionWasAcquiredFromPool: Boolean;
       aStatementWasAcquiredFromPool: Boolean;
+      aStopWatch: TStopWatch;
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
   {$IFDEF undef}{$REGION 'InternalSelectDataFetchRows'}{$ENDIF}
@@ -4052,8 +4116,17 @@ begin
 
     Try
 
+      {$IFDEF undef}{$REGION 'init aStopWatch'}{$ENDIF}
+      aStopWatch := TstopWatch.Create;
+      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
       {$IFDEF undef}{$REGION 'loop on all the SQL'}{$ENDIF}
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        {$IFDEF undef}{$REGION 'Reset aStopWatch'}{$ENDIF}
+        aStopWatch.Reset;
+        aStopWatch.Start;
+        {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
         {$IFDEF undef}{$REGION 'Create/acquire the connection/transaction/statement'}{$ENDIF}
 
@@ -4355,6 +4428,12 @@ begin
           {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
         end;
+
+        {$IFDEF undef}{$REGION 'do the OnSelectDataDone'}{$ENDIF}
+        aStopWatch.Stop;
+        OnSelectDataDone(Queries[aQueriesIndex],
+                         aStopWatch.ElapsedMilliseconds);
+        {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
       End;
       {$IFDEF undef}{$ENDREGION}{$ENDIF}
@@ -4736,6 +4815,7 @@ procedure TALFBXConnectionPoolClient.UpdateData(Queries: TALFBXClientUpdateDataQ
       aTmpTPB: AnsiString;
       aGDSCode: integer;
       aConnectionWasAcquiredFromPool: Boolean;
+      aStopWatch: TStopWatch;
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
 begin
@@ -4785,8 +4865,17 @@ begin
 
   try
 
+    {$IFDEF undef}{$REGION 'init aStopWatch'}{$ENDIF}
+    aStopWatch := TstopWatch.Create;
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
     {$IFDEF undef}{$REGION 'loop on all the SQL'}{$ENDIF}
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      {$IFDEF undef}{$REGION 'Reset aStopWatch'}{$ENDIF}
+      aStopWatch.Reset;
+      aStopWatch.Start;
+      {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
       {$IFDEF undef}{$REGION 'init aTmpStatementPoolNode'}{$ENDIF}
       if assigned(aTmpStatementPool) then aTmpStatementPoolNode := aTmpStatementPool.FindNode(Queries[aQueriesIndex].SQL)
@@ -4916,6 +5005,12 @@ begin
         Flibrary.DSQLExecuteImmediate(aTmpDBHandle, aTmpTraHandle, Queries[aQueriesIndex].SQL, FSQLDIALECT, nil);
 
       end;
+      {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+      {$IFDEF undef}{$REGION 'do the OnUpdateDataDone'}{$ENDIF}
+      aStopWatch.Stop;
+      OnUpdateDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
       {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     end;

@@ -74,11 +74,18 @@ uses SysUtils,
 
 Type
 
-  {-------------------------------------------------------------------------}
+  {--------------------------------------}
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TalSqlite3ClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
+                                                                   ViewTag: AnsiString;
+                                                                   ExtData: Pointer;
+                                                                   Var Continue: Boolean);
+  {$ELSE}
   TalSqlite3ClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
                                                       ViewTag: AnsiString;
                                                       ExtData: Pointer;
                                                       Var Continue: Boolean);
+  {$IFEND}
 
   {--------------------------------}
   EALSqlite3Error = class(Exception)

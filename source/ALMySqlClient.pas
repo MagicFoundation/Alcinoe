@@ -139,6 +139,10 @@ Type
                             aFieldLength: integer;
                             aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
+    procedure OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+                               TimeTaken: Integer); virtual;
+    procedure OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+                               TimeTaken: Integer); virtual;
   Public
     Constructor Create(ApiVer: TALMySqlVersion_API;
                        const lib: AnsiString = 'libmysql.dll'); overload; virtual;
@@ -252,6 +256,10 @@ Type
                          aCharSet: AnsiString;
                          Const aOpenConnectionClientFlag: Cardinal = 0;
                          Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
+    procedure OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+                               TimeTaken: Integer); virtual;
+    procedure OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+                               TimeTaken: Integer); virtual;
   Public
     Constructor Create(aHost: AnsiString;
                        aPort: integer;
@@ -345,6 +353,7 @@ Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 implementation
 
 Uses SysUtils,
+     Diagnostics,
      ALWindows;
 
 {*********************************************************************************}
@@ -607,6 +616,20 @@ begin
 
 end;
 
+{*****************************************************************************}
+procedure TalMySqlClient.OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+                                          TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*****************************************************************************}
+procedure TalMySqlClient.OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+                                          TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {***************************************************************************}
 procedure TalMySqlClient.SelectData(Queries: TalMySqlClientSelectDataQUERIES;
                                     XMLDATA: TalXMLNode;
@@ -628,6 +651,7 @@ Var aMySqlRes: PMYSQL_RES;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
+    aStopWatch: TStopWatch;
 
 begin
 
@@ -649,8 +673,15 @@ begin
 
   Try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     {loop on all the SQL}
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //prepare the query
       CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
@@ -755,6 +786,11 @@ begin
         //Frees the memory allocated to aMySqlRes
         fLibrary.mysql_free_result(aMySqlRes);
       End;
+
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     End;
 
@@ -907,6 +943,7 @@ end;
 {****************************************************************************}
 procedure TalMySqlClient.UpdateData(Queries: TalMySqlClientUpdateDataQUERIES);
 Var aQueriesIndex: integer;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no SQL
@@ -915,11 +952,23 @@ begin
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
+  //init the TstopWatch
+  aStopWatch := TstopWatch.Create;
+
   //loop on all the SQL
   For aQueriesIndex := 0 to length(Queries) - 1 do begin
 
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
+
     //do the query
     CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
+
+    //do the OnUpdateDataDone
+    aStopWatch.Stop;
+    OnUpdateDataDone(Queries[aQueriesIndex],
+                     aStopWatch.ElapsedMilliseconds);
 
   end;
 
@@ -1465,6 +1514,20 @@ begin
 
 end;
 
+{*******************************************************************************************}
+procedure TalMySqlConnectionPoolClient.OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+                                                        TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*******************************************************************************************}
+procedure TalMySqlConnectionPoolClient.OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+                                                        TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {*****************************************************************************************}
 procedure TalMySqlConnectionPoolClient.SelectData(Queries: TalMySqlClientSelectDataQUERIES;
                                                   XMLDATA: TalXMLNode;
@@ -1490,6 +1553,7 @@ Var aMySqlRes: PMYSQL_RES;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
+    aStopWatch: TStopWatch;
 
 begin
 
@@ -1514,8 +1578,15 @@ begin
     if aOwnConnection then TransactionStart(aTmpConnectionHandle);
     Try
 
+      //init the TstopWatch
+      aStopWatch := TstopWatch.Create;
+
       //loop on all the SQL
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        //start the TstopWatch
+        aStopWatch.Reset;
+        aStopWatch.Start;
 
         //prepare the query
         CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
@@ -1620,6 +1691,11 @@ begin
           //Frees the memory allocated to aMySqlRes
           fLibrary.mysql_free_result(aMySqlRes);
         End;
+
+        //do the OnSelectDataDone
+        aStopWatch.Stop;
+        OnSelectDataDone(Queries[aQueriesIndex],
+                         aStopWatch.ElapsedMilliseconds);
 
       End;
 
@@ -1808,6 +1884,7 @@ procedure TalMySqlConnectionPoolClient.UpdateData(Queries: TalMySqlClientUpdateD
 Var aQueriesIndex: integer;
     aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no SQL
@@ -1819,11 +1896,23 @@ begin
   if aOwnConnection then TransactionStart(aTmpConnectionHandle);
   Try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     //loop on all the SQL
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
 
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
+
       //do the query
       CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
+
+      //do the OnUpdateDataDone
+      aStopWatch.Stop;
+      OnUpdateDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     end;
 

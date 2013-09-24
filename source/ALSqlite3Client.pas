@@ -132,6 +132,10 @@ Type
                             aIndex: Integer;
                             aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
+    procedure OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
+                               TimeTaken: Integer); virtual;
+    procedure OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
+                               TimeTaken: Integer); virtual;
   Public
     Constructor Create(const lib: AnsiString = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
     Constructor Create(lib: TALSqlite3Library); overload; virtual;
@@ -231,6 +235,10 @@ Type
     Function  AcquireConnection(const readonly: boolean = False): PSQLite3; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PSQLite3;
                                 const CloseConnection: Boolean = False); virtual;
+    procedure OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
+                               TimeTaken: Integer); virtual;
+    procedure OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
+                               TimeTaken: Integer); virtual;
   Public
     Constructor Create(aDataBaseName: AnsiString;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
@@ -321,6 +329,7 @@ Type
 implementation
 
 Uses classes,
+     Diagnostics,
      ALWindows;
 
 {*************************************************************************************}
@@ -622,6 +631,20 @@ begin
 
 end;
 
+{*********************************************************************************}
+procedure TalSqlite3Client.OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
+                                            TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{*********************************************************************************}
+procedure TalSqlite3Client.OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
+                                            TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {*******************************************************************************}
 procedure TalSqlite3Client.SelectData(Queries: TalSqlite3ClientSelectDataQUERIES;
                                       XMLDATA: TalXMLNode;
@@ -642,6 +665,7 @@ Var astmt: PSQLite3Stmt;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
+    aStopWatch: TStopWatch;
 
 begin
 
@@ -663,8 +687,15 @@ begin
   
   try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     {loop on all the SQL}
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //prepare the query
       astmt := nil;
@@ -750,6 +781,11 @@ begin
         //free the memory used by the API
         CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
       End;
+
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     End;
 
@@ -902,6 +938,7 @@ end;
 procedure TalSqlite3Client.UpdateData(Queries: TalSqlite3ClientUpdateDataQUERIES);
 Var astmt: PSQLite3Stmt;
     aQueriesIndex: integer;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no SQL
@@ -910,8 +947,15 @@ begin
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
 
+  //init the TstopWatch
+  aStopWatch := TstopWatch.Create;
+
   {loop on all the SQL}
   For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
     //prepare the query
     CheckAPIError(FLibrary.sqlite3_prepare_v2(FSqlite3, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL), astmt, nil) <> SQLITE_OK);
@@ -924,6 +968,11 @@ begin
       //free the memory used by the API
       CheckAPIError(FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
     End;
+
+    //do the OnUpdateDataDone
+    aStopWatch.Stop;
+    OnUpdateDataDone(Queries[aQueriesIndex],
+                     aStopWatch.ElapsedMilliseconds);
 
   end;
 
@@ -1391,6 +1440,20 @@ begin
 
 end;
 
+{***********************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
+                                                          TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{***********************************************************************************************}
+procedure TalSqlite3ConnectionPoolClient.OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
+                                                          TimeTaken: Integer);
+begin
+  // virtual
+end;
+
 {*********************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.SelectData(Queries: TalSqlite3ClientSelectDataQUERIES;
                                                     XMLDATA: TalXMLNode;
@@ -1415,6 +1478,7 @@ Var astmt: PSQLite3Stmt;
     aContinue: Boolean;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
+    aStopWatch: TStopWatch;
 
 begin
 
@@ -1439,8 +1503,15 @@ begin
     if aOwnConnection then TransactionStart(aTmpConnectionHandle, True);
     Try
 
+      //init the TstopWatch
+      aStopWatch := TstopWatch.Create;
+
       {loop on all the SQL}
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        //start the TstopWatch
+        aStopWatch.Reset;
+        aStopWatch.Start;
 
         //prepare the query
         astmt := nil;
@@ -1526,6 +1597,11 @@ begin
           //free the memory used by the API
           CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
         End;
+
+        //do the OnSelectDataDone
+        aStopWatch.Stop;
+        OnSelectDataDone(Queries[aQueriesIndex],
+                         aStopWatch.ElapsedMilliseconds);
 
       end;
 
@@ -1710,6 +1786,7 @@ Var astmt: PSQLite3Stmt;
     aQueriesIndex: integer;
     aTmpConnectionHandle: PSQLite3;
     aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
 begin
 
   //exit if no SQL
@@ -1721,8 +1798,15 @@ begin
   if aOwnConnection then TransactionStart(aTmpConnectionHandle, False);
   Try
 
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
     {loop on all the SQL}
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
       //prepare the query
       CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_prepare_v2(aTmpConnectionHandle, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL), astmt, nil) <> SQLITE_OK);
@@ -1735,6 +1819,11 @@ begin
         //free the memory used by the API
         CheckAPIError(aTmpConnectionHandle, FLibrary.sqlite3_finalize(astmt) <> SQLITE_OK);
       End;
+
+      //do the OnUpdateDataDone
+      aStopWatch.Stop;
+      OnUpdateDataDone(Queries[aQueriesIndex],
+                       aStopWatch.ElapsedMilliseconds);
 
     end;
 

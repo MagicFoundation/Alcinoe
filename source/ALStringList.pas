@@ -237,7 +237,11 @@ Type
 
   {-----------------------------------------}
   TALStringItemList = array of TALStringItem;
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALStringListSortCompare = reference to function(List: TALStringList; Index1, Index2: Integer): Integer;
+  {$ELSE}
   TALStringListSortCompare = function(List: TALStringList; Index1, Index2: Integer): Integer;
+  {$IFEND}
 
   {-------------------------------}
   TALStringList = class(TALStrings)

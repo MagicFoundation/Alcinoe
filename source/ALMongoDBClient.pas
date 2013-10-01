@@ -1738,7 +1738,8 @@ begin
       setlength(adocumentStr, aMessageLength);
       ALMove(OpReplyMsg[aCurrPos], adocumentStr[1], aMessageLength);
       inc(aCurrPos,aMessageLength);
-      if aTmpRowTag <> '' then aJsonNode1 := documents.AddChild(aTmpRowTag, ntobject)
+      if (aTmpRowTag <> '') or
+         (documents.NodeType = ntarray) then aJsonNode1 := documents.AddChild(aTmpRowTag, ntobject)
       else aJsonNode1 := documents;
       aJsonNode1.LoadFromBSON(adocumentStr, False{ClearChildNodes});
       if aUpdateRowTagByFieldValue then begin
@@ -2189,9 +2190,9 @@ begin
                  Queries[aQueriesIndex].fullCollectionName,
                  ALIfThen(Queries[aQueriesIndex].Skip >= 0, Queries[aQueriesIndex].Skip, 0),
                  ALIfThen(Queries[aQueriesIndex].First >= 0, Queries[aQueriesIndex].First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
-                                                                                         // the maximum BSON document size. For most queries, the first batch returns 101
-                                                                                         // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
-                                                                                         // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
+                                                                                               // the maximum BSON document size. For most queries, the first batch returns 101
+                                                                                               // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
+                                                                                               // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
                  Queries[aQueriesIndex].query,
                  Queries[aQueriesIndex].ReturnFieldsSelector,
                  aResponseFlags,

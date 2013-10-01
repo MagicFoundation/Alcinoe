@@ -175,7 +175,8 @@ interface
 uses Classes,
      sysutils,
      ALString,
-     AlStringList;
+     AlStringList,
+     ALXmlDoc;
 
 resourcestring
   cALJSONNotActive              = 'No active document';
@@ -251,7 +252,11 @@ type
   TAlJSONParseArrayEvent = procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString) of object;
   {$IFEND}
 
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALJSONNodeListSortCompare = reference to function(List: TALJSONNodeList; Index1, Index2: Integer): Integer;
+  {$ELSE}
   TALJSONNodeListSortCompare = function(List: TALJSONNodeList; Index1, Index2: Integer): Integer;
+  {$IFEND}
 
   TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node !
                       doNodeAutoIndent); // affect only the SaveToStream
@@ -548,6 +553,14 @@ Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
 {$ifend}
+Procedure ALJSONToXML(aJSONNode: TALJsonNode;
+                      aXMLNode: TALXmlNode;
+                      aXMLElementNameForJSONArrayEntries: TalStrings; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
+                                                                      //                                  |     features=feature
+                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
+Procedure ALJSONToXML(aJSONNode: TALJsonNode;
+                      aXMLNode: TALXmlNode;
+                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
 
 implementation
 
@@ -3006,10 +3019,11 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
 
         if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
 
-        if AutoIndentNode then WriteStr2Buffer(#13#10 + CurrentIndentStr);
+        if AutoIndentNode and (CurrentIndentStr <> '') then WriteStr2Buffer(#13#10 + CurrentIndentStr);
 
-        if (assigned(ParentNode)) and
-           (ParentNode.NodeType <> ntArray) then begin
+        if aArrayNode = self then WriteStr2Buffer('[')
+        else if (assigned(ParentNode)) and
+                (ParentNode.NodeType <> ntArray) then begin
           if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":[')
           else WriteStr2Buffer('"'+NodeName+'":[');
         end
@@ -3043,8 +3057,9 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
     end;
 
   begin
-    If NodeType <> ntobject then exit;
-
+    If not (NodeType in [ntObject, ntArray]) then exit;  // normally only Object node can gave a valid json stream
+                                                         // but their is some situation where the array (containing json node)
+                                                         // is also usefull
     CurrentParentNode := nil;
     NodeStack := Tstack.Create;
     Try
@@ -4009,5 +4024,40 @@ begin
   end;
 end;
 {$ifend}
+
+{*******************************************}
+Procedure ALJSONToXML(aJSONNode: TALJsonNode;
+                      aXMLNode: TALXmlNode;
+                      aXMLElementNameForJSONArrayEntries: TalStrings; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
+                                                                      //                                  |     features=feature
+                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
+var aNodeName: AnsiString;
+    i: integer;
+begin
+  for I := 0 to aJSONNode.ChildNodes.Count - 1 do begin
+
+    if (aJSONNode.NodeType = ntarray) then begin
+      if assigned(aXMLElementNameForJSONArrayEntries) then aNodeName := aXMLElementNameForJSONArrayEntries.Values[aJSONNode.NodeName]
+      else aNodeName := '';
+      if aNodeName = '' then aNodeName := aDefaultXMLElementNameForJSONArrayEntries;
+    end
+    else aNodeName := aJSONNode.ChildNodes[i].NodeName;
+
+    if aJSONNode.ChildNodes[i].NodeType = ntText then aXMLNode.AddChild(aNodeName).text := aJSONNode.ChildNodes[i].text
+    else ALJsonToXML(aJSONNode.ChildNodes[i], aXMLNode.AddChild(aNodeName));
+
+  end;
+end;
+
+{*******************************************}
+Procedure ALJSONToXML(aJSONNode: TALJsonNode;
+                      aXMLNode: TALXmlNode;
+                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
+begin
+  ALJSONToXML(aJSONNode,
+              aXMLNode,
+              nil,
+              aDefaultXMLElementNameForJSONArrayEntries);
+end;
 
 end.

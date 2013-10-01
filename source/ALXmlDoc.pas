@@ -150,7 +150,11 @@ type
   TAlXMLParseEndElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString) of object;
   {$IFEND}
 
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALXMLNodeListSortCompare = reference to function(List: TALXMLNodeList; Index1, Index2: Integer): Integer;
+  {$ELSE}
   TALXMLNodeListSortCompare = function(List: TALXMLNodeList; Index1, Index2: Integer): Integer;
+  {$IFEND}
 
   TALXmlNodeType = (ntElement,          //The node represents an element. Element nodes represent simple tags that have child nodes. The child nodes of an element node can have the following node types: ntElement, ntText, ntCData, ntEntityRef, ntProcessingInstr, and ntComment. Element nodes can also have attributes (ntAttribute). Element nodes can be the child of a node of type ntDocument, ntDocFragment, ntEntityRef, and ntElement.
                     ntAttribute,        //The node represents an attribute of an element. It is not the child of another node, but its value can be accessed using the Attribute property of the element node. An attribute node can have child nodes of type ntText and ntEntityRef.

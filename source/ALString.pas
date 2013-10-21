@@ -279,8 +279,10 @@ type
     procedure Study;
         // Study the regex. Studying takes time, but will make the execution of the regex a lot faster.
         // Call study if you will be using the same regex many times
-    function Match: Boolean;
+    function Match: Boolean; overload;
         // Attempt to match the regex, starting the attempt from the beginning of Subject
+    function Match(const aSubject: ansiString; aGroups: TalStrings): Boolean; overload;
+        // Thread Safe version of Match
     function MatchAgain: Boolean;
         // Attempt to match the regex to the remainder of Subject after the previous match (as indicated by Start)
     function Replace: AnsiString;
@@ -1542,6 +1544,33 @@ begin
       Inc(FStart); // Make sure we don't get stuck at the same position
     if Assigned(OnMatch) then
       OnMatch(Self)
+  end;
+end;
+{$ifend}
+
+{*************************************}
+{$if CompilerVersion >= 23}{Delphi XE2}
+function TALPerlRegEx.Match(const aSubject: ansiString; aGroups: TalStrings): Boolean;
+var aOpts: Integer;
+    aSubjectPChar: PAnsiChar;
+    aStop: Integer;
+    aOffsetCount: Integer;
+    aOffsets: array[0..(cALPerlRegExMAXSUBEXPRESSIONS+1)*3] of Integer;
+    i: integer;
+begin
+  aSubjectPChar := PAnsiChar(aSubject);
+  aStop := Length(aSubject);
+  if not Compiled then raise ERegularExpressionError.Create('You must compile first to call the thread safe version of Match');
+  if preNotBOL in State then aOpts := PCRE_NOTBOL
+  else aOpts := 0;
+  if preNotEOL in State then aOpts := aOpts or PCRE_NOTEOL;
+  if preNotEmpty in State then aOpts := aOpts or PCRE_NOTEMPTY;
+  aOffsetCount := pcre_exec(FPattern, FHints, aSubjectPChar, aStop, 0, aOpts, @aOffsets[0], High(aOffsets));
+  Result := aOffsetCount > 0;
+  aGroups.Clear;
+  if Result then begin
+    for I := 0 to aOffsetCount*2-1 do Inc(aOffsets[I]);
+    for I := 0 to aOffsetCount-1 do aGroups.Add(ALCopyStr(aSubject, aOffsets[I*2], aOffsets[I*2+1]-aOffsets[I*2]))
   end;
 end;
 {$ifend}

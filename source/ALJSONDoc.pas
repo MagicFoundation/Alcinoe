@@ -216,7 +216,7 @@ type
                                        // \x08 | Boolean "true"             | ex { a: true }
                         nstDateTime,   // \x09 | UTC datetime               | ex { a: ISODate("yyyy-mm-ddThh:nn:ss.zzzZ") }
                         nstNull,       // \x0A | Null value                 | ex { a: null }
-                                       // \x0B | Regular expression
+                        nstRegEx,      // \x0B | Regular expression
                                        // \x0C | DBPointer — Deprecated
                         nstJavascript, // \x0D | JavaScript code            | ex { a: function() }
                                        // \x0E | Symbol — Deprecated
@@ -238,6 +238,11 @@ type
       0: (I64: Int64);                  // timestamp to 0 has special semantics.
       1: (W1:  LongWord;
           W2:  LongWord);
+  end;
+
+  TALJSONRegEx = record
+    Expression: AnsiString;
+    Options:    AnsiString;
   end;
 
   {$IF CompilerVersion >= 23} {Delphi XE2}
@@ -370,6 +375,8 @@ type
     procedure SetNull(const Value: Boolean);
     function GetJavascript: AnsiString;
     procedure SetJavascript(const Value: AnsiString);
+    function GetRegEx: TALJSONRegEx;
+    procedure SetRegEx(const Value: TALJSONRegEx);
     function GetOwnerDocument: TALJSONDocument;
     procedure SetOwnerDocument(const Value: TALJSONDocument);
     function GetParentNode: TALJSONNode;
@@ -411,6 +418,7 @@ type
     property Bool: Boolean read GetBool write SetBool;
     property Null: Boolean read GetNull write SetNull;
     property Javascript: AnsiString read GetJavascript write SetJavascript;
+    property RegEx: TALJSONRegEx read GetRegEx write SetRegEx;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
   end;
@@ -569,6 +577,62 @@ uses Math,
      DateUtils,
      AlHTML,
      ALMisc;
+
+{*************************************************************************************}
+function ALJSONDocTryStrToRegEx(const S: AnsiString; out Value: TALJSONRegEx): boolean;
+var P1:          integer;
+    i:           integer;
+    aRegEx:      TALPerlRegEx;
+begin
+  // regular expression in JSON must look like: /pattern/options
+  // list of valid options is:
+  //  'i' for case insensitive matching,
+  //  'm' for multiline matching,
+  //  'x' for verbose mode,
+  //  'l' to make \w, \W, etc. locale dependent,
+  //  's' for dotall mode ('.' matches everything),
+  //  'u' to make \w, \W, etc. match unicode.
+  result := false;
+  if S <> '' then begin
+
+    // check that first character is /
+    if S[1] = '/' then begin
+      P1 := ALLastDelimiter('/', S);
+      if P1 <> 1 then begin
+        Value.Options    := ALCopyStr(S, P1 + 1, maxint);
+        Value.Expression := ALCopyStr(S, 2, P1 - 2);
+
+        // loop on all the options characters
+        // to check if they are allowed.
+        for i := 1 to Length(Value.Options ) do begin
+          if not (Value.Options [i] in ['i','m','x','l','s','u']) then Exit;
+        end;
+
+        // check if it's compiling
+        aRegEx := TALPerlRegEx.Create;
+        try
+          aRegEx.RegEx := Value.Expression;
+          try
+            aRegEx.Compile;
+
+            // ok, we are here, all the options are allowed;
+            // now check if it's compiling successfully
+            result := aRegEx.Compiled;
+          except
+            on E: Exception do begin
+              // skip it silently, we need to check if it's compiling,
+              // nothing else.
+            end;
+          end;
+        finally
+          aRegEx.Free;
+        end;
+
+      end;
+    end;
+
+  end;
+end;
 
 {*************************************************************************************}
 function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
@@ -1050,8 +1114,9 @@ Var RawJSONString: AnsiString;
   var aDT:        TDateTime;
       aObjectID:  TALJSONObjectID;
       aTimestamp: TALBSONTimestamp;
-      aInt32: integer;
-      aInt64: int64;
+      aRegEx:     TALJSONRegEx;
+      aInt32:     integer;
+      aInt64:     int64;
   begin
     if AQuotedValue then result := NstText
     else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
@@ -1063,6 +1128,7 @@ Var RawJSONString: AnsiString;
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
     else if ALJSONDocTryStrToTimestamp(aStrValue, aTimestamp) then result := nstTimestamp
     else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
+    else if ALJSONDocTryStrToRegEx(aStrValue, aRegEx) then result := nstRegEx
     else result := nstJavascript;
   end;
 
@@ -1814,6 +1880,7 @@ Var RawBSONString: AnsiString;
       aTimestamp: TALBSONTimestamp;
       aBool: Boolean;
       aTextValue: AnsiString;
+      aRegEx: TALJSONRegEx;
       P1: Integer;
   Begin
 
@@ -1891,6 +1958,7 @@ Var RawBSONString: AnsiString;
       #$08: aNodeSubType := nstBoolean;
       #$09: aNodeSubType := nstDateTime;
       #$0A: aNodeSubType := nstNull;
+      #$0B: aNodeSubType := nstRegEx;
       #$0D: aNodeSubType := nstJavascript;
       #$10: aNodeSubType := nstint32;
       #$11: aNodeSubType := nstTimestamp;
@@ -2073,6 +2141,43 @@ Var RawBSONString: AnsiString;
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
+    {$IFDEF undef}{$REGION 'Extract value: Regular expression'}{$ENDIF}
+    // \x0B + name + \x00 + (byte*) + \x00 + (byte*) + \x00
+    else if aNodeSubType = nstRegEx then begin
+
+      {$REGION 'Get pattern'}
+      P1 := RawBSONStringPos;
+      While P1 <= RawBSONStringLength do begin
+        If RawBSONString[P1] <> #$00 then inc(P1)
+        else begin
+          aRegEx.Expression := AlCopyStr(RawBSONString, RawBSONStringPos, P1 - RawBSONStringPos);
+          break;
+        end;
+        if P1 > RawBSONStringLength then ExpandRawBSONString(P1);
+      end;
+      if P1 > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
+      RawBSONStringPos := P1 + 1;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+      {$ENDREGION}
+
+      {$REGION 'Get options'}
+      P1 := RawBSONStringPos;
+      While P1 <= RawBSONStringLength do begin
+        If RawBSONString[P1] <> #$00 then inc(P1)
+        else begin
+          aRegEx.Options := AlCopyStr(RawBSONString, RawBSONStringPos, P1 - RawBSONStringPos);
+          break;
+        end;
+        if P1 > RawBSONStringLength then ExpandRawBSONString(P1);
+      end;
+      if P1 > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
+      RawBSONStringPos := P1 + 1;
+      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+      {$ENDREGION}
+
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
     {$IFDEF undef}{$REGION 'Extract value: JavaScript code'}{$ENDIF}
     // \x0D + name + \x00 + length (int32) + string + \x00
     else if aNodeSubType = nstJavascript then begin
@@ -2136,6 +2241,7 @@ Var RawBSONString: AnsiString;
           nstDateTime: aNode.DateTime := aDateTime;
           nstTimestamp: aNode.Timestamp := aTimestamp;
           nstNull: aNode.null := true;
+          nstRegEx: aNode.RegEx := aRegEx;
           nstJavascript: aNode.Javascript := aTextValue;
           nstInt32: aNode.int32 := aInt32;
           nstInt64: aNode.int64 := aInt64;
@@ -2607,6 +2713,14 @@ function TALJSONNode.GetText: AnsiString;
     else result := ALDefaultFormatSettings;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _getRegExStr: AnsiString;
+  var aRegEx: TALJSONRegEx;
+  begin
+    aRegEx := GetRegEx;
+    result := '/' + aRegEx.Expression + '/' + aRegEx.Options;
+  end;
+
 begin
 
   case NodeSubType of
@@ -2618,6 +2732,7 @@ begin
     nstBoolean: result := GetNodeValue;
     nstDateTime: result := ALDateTimeToStr(GetDateTime,_GetFormatSettings);
     nstNull: result := GetNodeValue;
+    nstRegEx: result := _getRegExStr;
     nstJavascript: result := GetNodeValue;
     nstInt32: result := GetNodeValue;
     nstTimestamp: result := GetNodeValue;
@@ -2754,6 +2869,19 @@ end;
 procedure TALJSONNode.SetJavascript(const Value: AnsiString);
 begin
   setNodeValue(Value, nstJavascript);
+end;
+
+{******************************************}
+function TALJSONNode.GetRegEx: TALJSONRegEx;
+begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  if not ALJSONDocTryStrToRegEx(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid regular expression');
+end;
+
+{********************************************************}
+procedure TALJSONNode.SetRegEx(const Value: TALJSONRegEx);
+begin
+  setNodeValue('/' + Value.Expression + '/' + Value.Options, nstRegEx);
 end;
 
 {*******************************************************}
@@ -3173,6 +3301,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
         aInt64: system.Int64;
         aObjectID: TALJSONObjectID;
         aTimestamp: TALBSONTimestamp;
+        aRegEx: TALJSONRegEx;
     Begin
       with aTextNode do begin
 
@@ -3235,6 +3364,12 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
           nstNull: begin
                      WriteStr2Buffer(#$0A + aNodeName + #$00);
                    end;
+
+          // \xOB + name + \x00 + (byte*) + \x00 + (byte*) + \x00
+          nstRegEx: begin
+                      aRegEx := RegEx;
+                      WriteStr2Buffer(#$0B + aNodeName + #$00 + aRegEx.Expression + #$00 + aRegEx.Options + #$00);
+                    end;
 
           // \x0D + name + \x00 + length (int32) + string + \x00
           nstJavascript: begin

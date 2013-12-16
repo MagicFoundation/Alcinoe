@@ -1188,8 +1188,8 @@ end;
 Procedure TAlGSMComm.GetATCmdOkResponse(var Response: AnsiString; Const ErrorMsg: AnsiString);
 Var aStart: Cardinal;
     aTmpErrorMsg: AnsiString;
+    ln: integer;
     P1: Integer;
-
 Begin
   aStart := GetTickCount;
   Response := alUppercase(GetResponse);
@@ -1201,7 +1201,9 @@ Begin
       else aTmpErrorMsg := ErrorMsg;
       raise EALException.Create(aTmpErrorMsg);
     end;
+    ln := length(Response);
     Response := Response + alUppercase(GetResponse);
+    if ln = length(Response) then sleep(1); // to not have 100% CPU usage
   end;
 end;
 

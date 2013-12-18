@@ -70,7 +70,9 @@ interface
 {.$B-} {Complete Boolean Evaluation}
 {.$I+} {Input/Output-Checking}
 
-{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IF CompilerVersion >= 25} {Delphi XE4}
+  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IFEND}
 
 uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Winapi.Windows,

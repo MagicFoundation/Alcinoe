@@ -1,0 +1,11 @@
+/***********************************************************/
+/* Resources for UIB enduser components for FastReport 3.0 */
+/*                                                         */
+/* Created by : Pierre Y.                                  */
+/* Email : pierre@levosgien.net                            */
+/* Based on images provided by Henri Gourvest              */
+/***********************************************************/
+frxUIBMenu BITMAP "frxUIBMenu_FR4.bmp"
+TfrxUIBDataBase BITMAP "TUIBDataBase_FR4.bmp"
+TfrxUIBTransaction BITMAP "TUIBTransaction_FR4.bmp"
+TfrxUIBQuery BITMAP "TUIBDataset_FR4.bmp"

@@ -1,0 +1,1 @@
+FPC -B -dCONSOLEAPP AppServer.dpr

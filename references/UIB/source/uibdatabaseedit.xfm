@@ -1,0 +1,237 @@
+object UIBDatabaseEditForm: TUIBDatabaseEditForm
+  Left = 367
+  Top = 222
+  Width = 352
+  Height = 346
+  HorzScrollBar.Range = 343
+  VertScrollBar.Range = 341
+  ActiveControl = Mode
+  Caption = 'UIB Database Editor'
+  Color = clButton
+  Constraints.MinHeight = 330
+  Constraints.MinWidth = 352
+  Font.Color = clBlack
+  Font.Height = 10
+  Font.Name = 'Sans'
+  Font.Pitch = fpVariable
+  Font.Style = []
+  ParentFont = False
+  Position = poDesktopCenter
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 18
+  TextWidth = 5
+  object UserNameLbl: TLabel
+    Left = 8
+    Top = 152
+    Width = 51
+    Height = 18
+    Caption = '&User Name'
+  end
+  object PasswordLbl: TLabel
+    Left = 8
+    Top = 192
+    Width = 46
+    Height = 18
+    Caption = 'Pass&word'
+  end
+  object SQLRoleLbl: TLabel
+    Left = 8
+    Top = 232
+    Width = 44
+    Height = 18
+    Caption = 'SQL &Role'
+  end
+  object CharacterSetLbl: TLabel
+    Left = 8
+    Top = 272
+    Width = 65
+    Height = 18
+    Caption = '&Character Set'
+  end
+  object Connection: TGroupBox
+    Left = 0
+    Top = 0
+    Width = 343
+    Height = 145
+    Caption = 'Connection'
+    TabOrder = 0
+    object ModeLbl: TLabel
+      Left = 8
+      Top = 16
+      Width = 26
+      Height = 18
+      Caption = '&Mode'
+    end
+    object ServerLbl: TLabel
+      Left = 128
+      Top = 16
+      Width = 31
+      Height = 18
+      Caption = '&Server'
+    end
+    object PortLbl: TLabel
+      Left = 270
+      Top = 16
+      Width = 21
+      Height = 18
+      Caption = '&Port'
+    end
+    object DatabaseLbl: TLabel
+      Left = 8
+      Top = 56
+      Width = 70
+      Height = 18
+      Caption = '&Database name'
+    end
+    object LibraryNameLbl: TLabel
+      Left = 8
+      Top = 96
+      Width = 59
+      Height = 18
+      Caption = '&Library name'
+    end
+    object Mode: TComboBox
+      Left = 8
+      Top = 32
+      Width = 113
+      Height = 26
+      Style = csDropDownList
+      ItemHeight = 20
+      Items.Strings = (
+        '[Local]'
+        'TCP/IP'
+        'NamedPipe'
+        'IPX/SPX')
+      TabOrder = 0
+      OnChange = ModeChange
+    end
+    object ServerName: TEdit
+      Left = 128
+      Top = 32
+      Width = 135
+      Height = 26
+      TabOrder = 1
+    end
+    object DatabaseName: TEdit
+      Left = 8
+      Top = 72
+      Width = 295
+      Height = 26
+      TabOrder = 3
+    end
+    object PortName: TEdit
+      Left = 270
+      Top = 32
+      Width = 57
+      Height = 26
+      TabOrder = 2
+    end
+    object Browse: TButton
+      Left = 303
+      Top = 72
+      Width = 25
+      Height = 21
+      Caption = '...'
+      TabOrder = 4
+      OnClick = BrowseClick
+    end
+  end
+  object OkBtn: TButton
+    Left = 8
+    Top = 316
+    Width = 75
+    Height = 25
+    Caption = '&Ok'
+    ModalResult = 1
+    TabOrder = 6
+    OnClick = OkBtnClick
+  end
+  object CancelBtn: TButton
+    Left = 262
+    Top = 316
+    Width = 75
+    Height = 25
+    Caption = '&Cancel'
+    ModalResult = 2
+    TabOrder = 8
+  end
+  object Parametters: TMemo
+    Left = 144
+    Top = 152
+    Width = 199
+    Height = 157
+    TabOrder = 5
+    OnExit = ParamettersExit
+  end
+  object UserName: TEdit
+    Left = 8
+    Top = 168
+    Width = 121
+    Height = 25
+    TabOrder = 1
+    OnChange = UserNameChange
+    OnExit = UserNameChange
+  end
+  object Password: TEdit
+    Left = 8
+    Top = 208
+    Width = 121
+    Height = 26
+    TabOrder = 2
+    OnChange = PasswordChange
+    OnExit = PasswordChange
+  end
+  object SQLRole: TEdit
+    Left = 8
+    Top = 248
+    Width = 121
+    Height = 26
+    TabOrder = 3
+    OnChange = SQLRoleChange
+    OnExit = SQLRoleChange
+  end
+  object CharacterSet: TComboBox
+    Left = 8
+    Top = 288
+    Width = 121
+    Height = 26
+    Style = csDropDownList
+    ItemHeight = 20
+    TabOrder = 4
+    OnChange = CharacterSetChange
+    OnExit = CharacterSetChange
+  end
+  object Test: TButton
+    Left = 136
+    Top = 316
+    Width = 75
+    Height = 25
+    Caption = '&Test'
+    TabOrder = 7
+    OnClick = TestClick
+  end
+  object LibraryName: TEdit
+    Left = 8
+    Top = 112
+    Width = 295
+    Height = 26
+    TabOrder = 9
+  end
+  object BrowseLib: TButton
+    Left = 303
+    Top = 112
+    Width = 25
+    Height = 21
+    Caption = '...'
+    TabOrder = 10
+    OnClick = BrowseLibClick
+  end
+  object OpenDialog: TOpenDialog
+    FilterIndex = 0
+    Height = 0
+    Width = 0
+    Left = 152
+    Top = 160
+  end
+end

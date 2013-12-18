@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+  <PersonalityInfo>
+    <Option>
+      <Option Name="Personality">Default.Personality</Option>
+      <Option Name="ProjectType"></Option>
+      <Option Name="Version">1.0</Option>
+      <Option Name="GUID">{951C3AD0-922E-4121-8F71-4E90F2EC08A0}</Option>
+    </Option>
+  </PersonalityInfo>
+  <Default.Personality>
+    
+    <Projects>
+      <Projects Name="UIBD10Win32R.bpl">UIBD10Win32R.bdsproj</Projects>
+      <Projects Name="UIBD10Win32D.bpl">UIBD10Win32D.bdsproj</Projects>
+      <Projects Name="Targets">UIBD10Win32R.bpl UIBD10Win32D.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

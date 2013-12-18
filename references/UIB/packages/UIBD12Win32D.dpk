@@ -1,0 +1,48 @@
+package UIBD12Win32D;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'UIB Components for Delphi/RAD Studio 2009'}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  vcl,
+  dbrtl,
+  dcldb,
+  vcldesigner,
+  designide,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  dclstd,
+  vcldb,
+  UIBD12Win32R;
+
+contains
+  uibreg in '..\source\uibreg.pas',
+  uibtransactionedit in '..\source\uibtransactionedit.pas',
+  uibdatabaseedit in '..\source\uibdatabaseedit.pas' {UIBDatabaseEditForm};
+
+end.

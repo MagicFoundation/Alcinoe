@@ -1,0 +1,41 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1116986                      Priority      : 5
+Submitted by         : fduenas                      Date Submitted: 2005-02-05 20:43
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-09 12:09
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : MySQL
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+using
+Delphi 7
+MySQL 4.1.9
+Windows 2000
+Zeos 6.5.1-alpha
+
+Hi:
+i have detected that when posting a new record on a 
+table that table has a date type field and it has a 
+default value of '0000-00-00', after posting the record, 
+the value of this field must this '0000-00-00' but instead 
+it has the value '1899-12-30'. is there any fast fix for it?.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Fixed as described in Patch 1216552.
+
+================================================================================
+
+

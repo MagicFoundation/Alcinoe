@@ -1,0 +1,47 @@
+20060608 : Applied PostgreSQL encodestring - patch by cnliou - See http://zeos.firmos.at/viewtopic.php?t=589
+
+20060616 : Change to function TZPostgreSQLDatabaseMetadata.GetIndexInfo - Patch by Sandeep - See http://zeos.firmos.at/viewtopic.php?t=600
+
+20061029 : Change to function TZPostgreSQLDatabaseMetadata.GetTables - Patch by Sandeep - See http://zeos.firmos.at/viewtopic.php?t=864
+
+20061031 : Range Check Error in ZPlainPostgresqlDriver - Patch by plamendp - See http://zeos.firmos.at/viewtopic.php?t=763
+
+20061207 : Change to function TZPostgreSQLDatabaseMetadata.GetTables - Patch by Damien666 - See http://zeos.firmos.at/viewtopic.php?t=839
+
+20070124 : Array support for PostgresSQL - Patch by Malvo - See http://zeos.firmos.at/viewtopic.php?t=1044
+
+20070418 : Memory leak in CheckPostgreSQLError - Patch by sfxhomer - Mantis Bug 5
+
+20070731 : 'Access Violation' error on ZQuery.Open on table that has columns with non-standard type - by shader - Mantis Bug 50
+
+20071016 : ZTestPlainPerformance.pas : QueryHandle is declared as PZMySQLResult instead of PZPostgreSQLResult. - by fx - Mantis Bug 68
+
+20071222 : Wrong behaviour for EscapeQuotes - by pgimeno - Mantis Bug 83
+
+20080116 : PostgreSql 8.1 Backslash problem - by btrewern - Mantis Bug 87
+
+20080326 : Added SSL support - by ldcbl - See http://zeos.firmos.at/viewtopic.php?t=1531
+
+20080330 : Fields default expresion is determined from the wrong source  - by Wild_Pointer - Mantis Bug 105
+
+20080721 : Updated PostgreSQL keywords list - by pawelsel - Mantis Bug 122
+
+20080816 : Added postgres specific (Metadata) quoting functions - by pawelsel - Mantis Bug 126
+
+20080820 : Part 2 : Added postgres specific (Metadata) quoting functions - by pawelsel - Mantis Bug 126
+
+20080820 : Limited default output of TZPostgresSQLDatabaseMetadata.GetTables to 'TABLE', 'VIEW' and 'TEMPORARY TABLE' - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=1960
+
+20081008 : Wrote a replacement for the default notice processor which printed to stderr in console applications (and the test suite) - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2021
+
+20081015 : Fixed memory leak when connection failed - by mdaems - Mantis Bug 136
+
+20081213 : Implemented Pingserver for Postgres - by seawolf/mdaems - See http://zeos.firmos.at/viewtopic.php?t=2156
+
+20081213 : Implemented ZConnection.ServerVersion for Postgres - by mdaems
+
+20090220 : PostgresSQL EncodeString Bug Delphi 2009 - by cyberal77 - See http://zeos.firmos.at/viewtopic.php?t=2290
+
+20090222 : Postgres Bit type fields were not found - by seawolf - See http://zeos.firmos.at/viewtopic.php?t=2260
+
+20090504 : Postgres Encodestring error for D2009 - by seawolf - See http://zeos.firmos.at/viewtopic.php?t=2290 - Mantis Bug 181

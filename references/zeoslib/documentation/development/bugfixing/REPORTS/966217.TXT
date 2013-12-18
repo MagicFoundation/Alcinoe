@@ -1,0 +1,45 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 966217                       Priority      : 5
+Submitted by         : dpremus                      Date Submitted: 2004-06-04 03:00
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-03 14:57
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : ADO (Access)
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZUpdateSQL
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+Database: MsAccess (DAO 3.6 In Access 2000 Mode)
+Zeos Controls ver: zeosdbo-6.1.5-stable
+Protocol: Ado
+
+When I try to post changes on MsAccess table
+this exception was occured:
+'No value given for one or more required parameters'.
+
+Problem occured because
+stUnicodeString support is missing in procedure
+TZUpdateSQL.FillStatement in ZSqlUpdate unit.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Added "stUnicodeString" word in CASE command
+in TZUpdateSQL.FillStatement in ZSqlUpdate unit.
+
+stString, stUnicodeString:
+Statement.SetString(I + 1,
+RowAccessor.GetString(ColumnIndex, WasNull));
+
+================================================================================
+
+

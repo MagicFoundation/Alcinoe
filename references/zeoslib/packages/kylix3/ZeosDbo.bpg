@@ -1,0 +1,31 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.02.5
+#------------------------------------------------------------------------------
+MAKE = make -$(MAKEFLAGS) -f$**
+DCC =dcc $<
+#------------------------------------------------------------------------------
+PROJECTS = bplZCore.so bplZPlain.so bplZParseSql.so bplZDbc.so bplZComponent.so \
+  bplZComponentDesignk3.so
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+bplZCore.so: ZCore.dpk
+	$(DCC)
+
+bplZParseSql.so: ZParseSql.dpk
+	$(DCC)
+
+bplZPlain.so: ZPlain.dpk
+	$(DCC)
+
+bplZDbc.so: ZDbc.dpk
+	$(DCC)
+
+bplZComponent.so: ZComponent.dpk
+	$(DCC)
+
+bplZComponentDesignk3.so: ZComponentDesign.dpk
+	$(DCC)
+
+

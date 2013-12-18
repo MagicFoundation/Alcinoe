@@ -1,0 +1,19 @@
+20070609 : Fix opening databases with UTF8 characters in filename - by benstadin - Mantis Bug 38
+
+20071010 : Memory leak - by Spongebob/mdaems - see http://zeos.firmos.at/viewtopic.php?t=1408 - Mantis Bug 60
+
+20071020 : Memory leak, part II - by Spongebob/mdaems - see http://zeos.firmos.at/viewtopic.php?t=1408 - Mantis Bug 60
+
+20071121 : FastMM has detected an error during a free block scan operation. - by bernhard geyer - Mantis Bug 75
+
+20080130 : Added support for encrypted sqlite databases - by ehoffman - see http://zeos.firmos.at/viewtopic.php?t=1674
+
+20080604 : Improve Sqlite3 Column Affinity - by mdaems - see http://zeos.firmos.at/viewtopic.php?t=1605
+
+20080710 : Completed fix for Mantis Bug 75 - by olivluca - Mantis Bug 119
+
+20081001 : Fixed updates to tables from attached databases - by mariuszekpl - see http://zeos.firmos.at/viewtopic.php?t=2025
+
+20081124 : Unicode fix - by mariuszekpl - see http://zeos.firmos.at/viewtopic.php?t=2113
+
+20090406 : Removed SQLite 2 driver - by mdaems

@@ -1,0 +1,337 @@
+20060414 : Updated lazarus package for correct compilation. (Missing packages, corrupt package file,...) - Asked by IgD
+
+20060414 : Const modifier added to function definitions where possible to improve speed. - Patch by AHUser - See  http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=519
+
+20060415 : Removed old CVS related files/directories from the source tree.  - Asked by IgD
+
+20060415 : Some more Lazarus package modifications.  - Patch by IgD
+
+20060417 : Memory leak bug fixed by DavidVTailor - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=461
+
+20060429 : Delimiter problem in ZSQLProcessor fixed - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=527
+
+20060430 : Fixed wrong line breaks in source files - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=553
+
+20060503 : MissingConsts, Inlining, SilentException patch - Sent by AHUser - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=566
+
+20060505 : Fixed Delphi 5 install problems - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=335
+
+20060506 : Added {$LIBSUFFIX 'X0'} to projectfiles of D7 and D2006 - http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=561
+
+20060508 : Removed ASA driver from Lazarus packages because not compilable in Lazarus.
+
+20060517 : Bug in GetIndexInfo - Patch by the_kique - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=196
+
+20060520 : Translated some dutch strings in ZMessages
+           Added patch from Paulonki for Delphi 2005 / Portuguese - See http://seegernet.koolhost.de/zeosforum/viewtopic.php?t=586
+
+20060531 : Delphi 6 project filetuning, asked by tomazzupan. - See : http://zeos.firmos.at/viewtopic.php?t=577
+           Can still be bugged. I hope he keeps me informed.
+
+20060616 : Date, Time and Float on Lazarus - Patch by fbaqui - See http://zeos.firmos.at/viewtopic.php?t=598
+
+20060620 : Added GetClientVersion and GetServerVersion to Connection/Driver interfaces - Modification by fduenas
+
+20060710 : Integrated contribution from Terence : Added more specific metadata clearcache possibilities.
+
+20060811 : Updated some message translations - German versions by wdbrmpft (Klaus) - See http://zeos.firmos.at/viewtopic.php?t=704
+           Synchronized Trunk change by Helmut (Firmos)
+
+20060913 : Delphi 7 : Split up Component Package into Component and ComponentDesign - See http://zeos.firmos.at/viewtopic.php?t=726
+           Delphi 7 : Added compiler directives to avoid inclusion of not wanted database drivers. - See http://zeos.firmos.at/viewtopic.php?t=746
+
+20061003 : New Dataset features : BeforeApplyUpdates (event), AfterApplyUpdates (event), SortType (property), EmptyDataSet (procedure) 
+           Bugfix InternalPost (Procedure) - Written by Bangfauzan - See http://zeos.firmos.at/viewtopic.php?t=781
+
+20061007 : New embedded mysql server example
+           Bugfix Updatesql component (OnUpdate event)
+           Added D2006 Project Group  - All written by fduenas
+
+20061010 : Bug fix for Mssql Memory leak
+           Bug fix for Mssql Select * error - Written by rautgigi - See http://zeos.firmos.at/viewtopic.php?t=788
+
+20061010 : New feature : LinkedFieldNames vs. IndexFieldnames - Written by Bangfauzan - See http://zeos.firmos.at/viewtopic.php?t=796
+
+20061011 : Added Lazarus fixes : ASA support did not compile well.
+
+20061015 : Added Indonesian messages - Written by tohenk
+
+20061024 : Changed Test suite to accept Connection properties. (eg for mysqld testing) - By mdaems
+
+20061025 : Added Sqlite 3 driver dll's (Windows+Linux) - Send by Michael
+
+20061109 : Treat identifiers starting with numeric characters as 'specialcase' -> quote them when used in generated statements - See http://zeos.firmos.at/viewtopic.php?t=882
+
+20061113 : Fixed Delphi5 compilation of PLongword type. - Patch by gto - See http://zeos.firmos.at/viewtopic.php?t=886
+
+20061124 : Sortfields fix for Bangfauzan Patch - By Bangfauzan - See http://zeos.firmos.at/viewtopic.php?t=920
+
+20061127 : Sorting features finetuning - By Bangfauzan - See http://zeos.firmos.at/viewtopic.php?t=935
+
+20061220 : Sorting features finetuning - By Bangfauzan and Pawelsel - See http://zeos.firmos.at/viewtopic.php?t=984
+
+20061220 : One token could be skipped during creation of FieldRefs - See http://zeos.firmos.at/viewtopic.php?t=974 - Mantis Bug 3
+
+20061227 : StoredProc fixes - By Ochnap2 - See http://zeos.firmos.at/viewtopic.php?t=990
+
+20070102 : Modification of copyright statement
+
+20070110 : Kickoff for mysql prepared statements : Changed TZMysqlPreparedStatement to TZMysqlEmulatedPreparedStatement and added TZDataset option doPreferPrepared.
+
+20070111 : Integrated 3 patches - Written by tohenk
+           - Indonesian translations
+           - Missing IFDEF for ENABLE_ADO in property-editor
+           - Missing res/dof/cfg files for ComponentDesign in D7-> wrong build dir.
+           
+20070117 : BDS 2006 WideString error - Patch by fduenas/cariad - See http://zeos.firmos.at/viewtopic.php?t=972 - Mantis Bug 10
+
+20070220 : Corrected GetServerVersion and GetClientVersion properties of ZConnection. Added String versions of these properties. By mdaems
+
+20070224 : BDS 2006 Problem using WideStrings and ADO protocol when changing WideString Field Data, same nature as Mantis Bug 10 - Mantis Bug 23 - Patch by Fduenas
+
+20070224 : GenericSqlAnalyser error when analysing functions calls with multiple input parameters - By mdaems - Mantis Bug 16
+
+20070227 : Added Russian translation - Translated by Ormada
+
+20070304 : FreeAndNil fix in ZSequence - Patch by madh - See http://zeos.firmos.at/viewtopic.php?t=1108
+
+20070307 : Avoid open/close of detail dataset on edit of master dataset- Patch by Edwin - See http://zeos.firmos.at/viewtopic.php?t=1093
+
+20070307 : Required should be false if a field is not writable - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=767
+
+20070308 : ZDataset Events in Lazarus - Patch by Edwin - See http://zeos.firmos.at/viewtopic.php?t=1130
+
+20070317 : TZConnection.Reconnect added - By HeidiSQL Team - See http://www.heidisql.com/forum/viewtopic.php?t=53
+
+20070331 : Ignore columns that do not originate from the table when resolving updates - By HeidiSQL Team - See http://fisheye3.cenqua.com/changelog/heidisql?cs=555
+
+20070412 : Added Delphi2007 package files - Patch by mosca_morta - See http://zeos.firmos.at/viewtopic.php?t=1173
+
+20070430 : Added TZConnection.GetColumnNames function - by Simpsomboy/mdaems - See http://zeos.firmos.at/viewtopic.php?t=1127
+
+20070509 : Added new field types for FPC2.1.4 - by leiteiro/mdaems - Mantis Bug 37
+
+20070522 : Bad CalcFields initialization after column reordering while a dataset is still open - by mdaems - Mantis Bug 34
+
+20070528 : Statement parameter initialization missing at second call - by cipto_kh - Mantis Bug 20
+
+20070528 : Delphi 5 conversion error when getting sequence in ZAbstractDataset.InternalPost - by shader - Mantis Bug 40
+
+20070529 : Close/Open sequence replaced by refresh in TZAbstractRODataset.RefreshParams - by zx - See http://zeos.firmos.at/viewtopic.php?t=1093
+
+20070530 : Crash when using the same component (TZStoredProcedure) after ExecProc then using Open - by cipto_kh - Mantis Bug 42
+
+20070530 : TZSQLStrings.StatementCount = 1 when the statement is empty - by aducom/mdaems - See http://zeos.firmos.at/viewtopic.php?t=1228
+            -> this had implications on ZZSqlMetadata component : Failed as there SQL is empty.
+
+20070531 : Some people find maximum number of columns in rowbuffer should be more than 32k. Now it's 128k. - by xtra/mdaems - See http://zeos.firmos.at/viewtopic.php?t=1241
+
+20070603 : Rolled back last change. This used to much memory... - mdaems
+
+20070603 : TZRowAccessor.CompareBuffers didn't work for stUnicodeStreams - by zx - See http://zeos.firmos.at/viewtopic.php?t=1254
+
+20070609 : When schema/catalog properties are not set for the connection the selection list for TZSequence.SequenceName could have ambigious entries in case a sequence name was used in more tan 1 schema. Now 'schema.sequencename' is added to the list when Connection.Catalog and Connection.Schemaname are both empty. - patch by shader - Mantis Bug 41
+
+20070613 : Changed compiler directive {$IFDEF VER2_1_3} to {$IFDEF VER2_1} - by mdaems - Mantis Bug 46
+
+20070730 : FPC changes -> now zeoslib also works with MSEIDE - patches by MSEIDE team
+
+20070731 : Wrong index variable used when doing "refresh" in ZUpdateSQL component - by tweidelt - Mantis Bug 55
+
+20070731 : Lookup fields with int64 data type not work in Delphi/C++Builder 5 - by shader - Mantis Bug 49
+
+20070802 : TZSequence error, value from prior database - by cipto_kh - Mantis Bug 7
+
+20070806 : Correction patch by shader for Mantis Bug 49. Lazarus didn't compile anymore - by mdaems
+
+20070806 : Processing of scripts without final delimiter by TZSQLProcessor - by mdaems - Mantis Bug 48
+
+20070808 : Added Delphi 10 zeosDBODev projectgroup - by mdaems
+
+20070808 : Fixed the automatic build system. Works now certainly for D5, D7, D2006 - by mdaems
+
+20070808 : Fixed the test suite to work with Delphi 5 - by mdaems
+
+20070809 : Added Lazarus/Fpc to the automatic build system. Test suite is not available, however - by mdaems
+
+20070817 : Correction of child dataset refresh - by gto - See http://zeos.firmos.at/viewtopic.php?t=1381
+
+20070822 : Added IZConnection.EscapeString function. This funtion returns a string that can be used in SQL statements. Uses Mysql_real_escape_string or Mysql_escape_string functions for mysql databases and EncodeCString function for other databases - by mdaems
+
+20070823 : Removed interception of EAbort after TZConnection.BeforeConnect - by tweidelt/mdaems - Mantis Bug 56
+
+20070926 : Changed Tokenizer : Line comment tokens now include the final line feed to avoid that they are stripped away when unifying whitespace - by mdaems - Mantis Bug 63
+
+20070929 : SqlAnalyser got confused. In case of a from clause like 'from a left join b on a.id=b.id,c' table c was not recognised - by mdaems - Mantis Bug 61
+
+20070929 : Fixed fpc 2.2 compilation - by mdaems - Mantis Bug 65
+
+20071003 : Added Delphi 2007 to the automatic build system - by mdaems
+
+20071016 : Code cleaning. Removed unused uses clauses. Compiler warnings/hints. - by mdaems
+
+20071024 : Fixed DatasetProvider bug. dsBlockRead dataset state was not handled. - by mdaems - Mantis Bug 43 - Mantis Bug 59
+
+20071102 : DIV doesn't seem to be exactly equal to / (floating point errors) - by cipto_kh - Mantis Bug 71
+
+20071112 : Avoid an access violation within a for loop which got run once even when there were 0 columns in a result. - By HeidiSQL Team - See http://fisheye3.cenqua.com/changelog/heidisql?cs=993
+
+20071223 : Incorrect TZTableRef.FullName when no schema present and incorrect order - by pgimeno - Mantis Bug 82
+
+20080116 : ant build support for Linux added - by mdaems
+
+20080119 : Added *.dproj files for test packages for D2007 - Mantis Bug 88
+
+20080121 : Added ZConnection.ExecuteDirect and ZConnection.ExecuteUpdateDirect functions - by mdaems/wahono - See http://zeos.firmos.at/viewtopic.php?t=1656
+
+20080220 : Corrected Null fields handling in combination with autoinc and default values - by mdaems - Mantis Bug 90 - See http://zeos.firmos.at/viewtopic.php?p=6540
+
+20080226 : Added tablename quoting to TZTable component - by mdaems - Mantis Bug 97
+
+20080312 : Enabled BeforeRefresh and AfterRefresh Dataset properties for FPC2 - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=1749
+
+20080316 : Setting fields to ReadOnly didn't really block setting the field value - by btrewern - Mantis Bug 99 - See http://zeos.firmos.at/viewtopic.php?t=1742
+
+20080328 : Automatically generated updates could update more than 1 row at once or no row at all - by sandeep_c24 - See http://zeos.firmos.at/viewtopic.php?t=1757
+
+20080409 : Quoted Aliases in queries were not recognised - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=1797
+
+20080512 : Added ZIBEventAlerter to the components package - by mdaems
+
+20080513 : Lookup field value disappear on insert and edit and reappear after post or cancel - by mdaems - Mantis Bug 111
+
+20080513 : Duplicated result when using locate, loPartialKey and Filter - by gto - Mantis Bug 108 -See http://zeos.firmos.at/viewtopic.php?t=1831
+
+20080514 : In Delphi 2006 and FPC 2.1 TWideStringField.SetAsWideString() puts a PWideChar into the buffer, so deserializing it as a PWideString is probably wrong. - By HeidiSQL Team - See http://fisheye3.cenqua.com/changelog/heidisql?cs=1383
+
+20080607 : Remove "TextHeight = 13" from UpdateSql Editor in Lazarus - by Edwin - see http://zeos.firmos.at/viewtopic.php?t=1872
+
+20080616 : patch for table.exists - by technobot - See http://zeos.firmos.at/viewtopic.php?t=1879
+
+20080617 : Added GetXxxCacheKey functions - by technobot - See http://zeos.firmos.at/viewtopic.php?t=1881
+
+20080623 : Removed caching code that was identical between all descendent classes of TZAbstractDatabaseMetadata - by technobot/mdaems - See http://zeos.firmos.at/viewtopic.php?t=1881
+
+20080625 : Don't use ASM call in TZCollection.Error when using FPC. FPC should be able to do this platform independent - by gto - See http://zeos.firmos.at/viewtopic.php?t=1882
+
+20080711 : Fixed Delphi5 compilation - by mdaems
+
+20080711 : After Post of DataSet with Filtered=True, SortedFields defined, Row position was changed unexpectedly - by mangwills - Mantis Bug 106
+
+20080714 : Join two tokens if the first is a ttInteger and the next a ttWord - by FrankSL - See http://zeos.firmos.at/viewtopic.php?t=1897
+
+20080722 : Added polish translation - by pawelsel
+
+20080728 : Replaced fix for Mantis Bug 97 by a more correct one - by pawelsel - Mantis Bug 123
+
+20080806 : New property FetchRow in ZDataSet - by patyi - See http://zeos.firmos.at/viewtopic.php?t=1857 
+
+20080806 : New dataset option doDontSortOnPost - by karpik - See http://zeos.firmos.at/viewtopic.php?t=1931
+
+20080811 : Access Violation due to forget to assign Connection in TZQuery - by pjonard - Mantis Bug 129
+
+20080813 : Only link TZIBEventAlerter when ENABLE_INTERBASE is defined - by trupka - See http://zeos.firmos.at/viewtopic.php?t=1949
+
+20080813 : Removed packages for Delphi 5 and 6, Kylix 2 and CBuilder 5 - by mdaems
+
+20080813 : PostgreSQL UTF8 Charset Patch - by whitekid - See http://zeos.firmos.at/viewtopic.php?t=1946
+
+20080813 : ZIBEventAlerter compile error in Lazarus/Linux ('infinite' defined twice) - by lichtmannls - Mantis bug 131
+
+20080816 : Splitted IZDatabaseMetadata into IZDatabaseMetadata (retrieves info about DB content) and IZDatabaseInfo (retrieves info about server properties) - by technobot
+
+20080817 : Sanity check: assert that row buffer length is not exceeded at a proper time - by HeidiSQL Team (Heidisql SVN Rev.1410)
+
+20080820 : Memory Leak in TZIBEventAlerter - by magnomp - See http://zeos.firmos.at/viewtopic.php?t=1962
+
+20080820 : Added overloaded version of ZConnection.GetTablenNames, allowing the user to specify the table types. - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=1960
+
+20080822 : Removed conditional coding for the compiler versions that are not longer supported - by mdaems
+
+20080829 : Adjusted fix for Mantis Bug 99 - by mdaems/karpik - Mantis Bug 137
+
+20080831 : TZSQLProcessor Tokenizer problem - by GeorgeKP - See http://zeos.firmos.at/viewtopic.php?t=1977
+
+20080917 : Removed the unused Db2 plain drivers - by mdaems
+
+20080917 : "List out of bounds" in Metadata - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=1995
+
+20080924 : Added Prepared property and Prepare/Unprepare methods to TZAbstractRODataset - by mdaems
+
+20080924 : Integrated various bugfixes from DRD, Willian Jhonnes and Silvio Clecio
+
+20081005 : Removed table prefixes in generated insert/update statements in property editor for TZSQLUpdate - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2023
+
+20081005 : Escape underscores from the stored procedure name before looking up it's parameters - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2035
+
+20081010 : Some MySQL units are still being compiled when only the SQLite protocol is enabled- by mdaems - Mantis Bug 139
+
+20081015 : Added function debug_get_memorydiff to ZSysUtils - by mdaems
+
+20081024 : Column mapping problem with TZUpdateSql and Refreshing data - by jay - Mantis Bug 147
+
+20081030 : TZTable and TZQuery Filter property do not work correctly with datetime fields - by seawolf - See http://zeos.firmos.at/viewtopic.php?t=2055
+
+20081102 : Removed some compiler warnings - by Faceker - See http://zeos.firmos.at/viewtopic.php?t=2081
+
+20081105 : (Delphi only issue) Added a test to avoid opening a dataset when ComponentState=csDestroying - by mdaems
+
+20081108 : Added support for DefaultExpression TField property - by mdaems - Mantis Bug 146
+
+20081112 : Some dates of form 2008-1-1 seem not to work good with function TimestampStrToDateTime - by niek - See http://zeos.firmos.at/viewtopic.php?t=2093
+
+20081126 : Added Delphi2009 to the automated build scripts and test suite - by mdaems
+
+20081203 : Precision issue when recording values from TClientDataSet - by magnomp - Mantis Bug 162
+
+20081206 : Removed conditional compilation of database dependent Tokenizers - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2138
+
+20081208 : Fixed bug in UpdateSQLeditor that resulted from commit 481 - by mdaems - Mantis Bug 165
+
+20081210 : Removed debug_get_memorydiff from ZSysUtils again - by mdaems
+
+20081213 : Default strings to TWideString fields on Delphi 2009 - by mariuszekpl/mdaems - See http://zeos.firmos.at/viewtopic.php?t=2119
+
+20081225 : VarChar / Char fields last character chopped off - by TheEdge - See http://zeos.firmos.at/viewtopic.php?t=2165
+
+20081225 : New TObject Methods in D2009 (Tostring, GetHashCode and Equals) - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2131
+
+20090111 : Removed T***IntDynArray types from ZCompatibility as FPC 2 and higher also defines these - by mdaems
+
+20090114 : Added ZEOS_DISABLE_XXXXX 'Conditional Defines' to Zeos.inc to allow compiling out database support on a per project basis - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2195
+
+20090117 : Second JOIN in from clause was stripped by the SQL parser after ON or USING clause - by mdaems/DarthWombat - Mantis Bug 150
+
+20090121 : Removed libc from uses clauses when using fpc - by mdaems/piper62 - See http://zeos.firmos.at/viewtopic.php?t=2196
+
+20090131 : FPC - Float Fields with null values produce many exceptions - by papelhigienico - Mantis Bug 117
+
+20090131 : TZSQLMonitor access violation when destroying - by mturecki - Mantis Bug 124
+
+20090213 : Added BCB2009 packages (cbuilder12) - by bulktrasher
+
+20090218 : Fixed a big memory leak introduced by the DatabaseMetadata object split - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2177
+
+20090220 : Replaced some GetXXXByName and UpdateXXXByName calls in the Metadata classes to avoid repeated name lookups - by mdaems
+
+20090220 : Get reference to ResultsetMetadata only once in TZCachedResultSet.Open - by mdaems
+
+20090225 : Query property ‘ValidateUpdateCount=true/false’ was not added for TZUpdateSQL - by ddantoni - See http://zeos.firmos.at/viewtopic.php?t=2249
+
+20090305 : Reworked the PlainLoader and AbstractPlainDriver classes to make the loader class part of the plaindriver - by mdaems/gto
+
+20090320 : Moved setting FConnection to nil in the finally past of TZConnection.Disconnect - by MerijnB - See http://zeos.firmos.at/viewtopic.php?t=2275
+
+20090321 : Overflow while converting variant of type (Int64) into type (Integer) when deleting a record - by alquimista - See http://zeos.firmos.at/viewtopic.php?t=2286
+
+20090322 : Removed some new methods from the IZPreparedStatement interface to stay as jdbc compliant as possible - by mdaems - See http://zeos.firmos.at/viewtopic.php?t=2234
+
+20090330 : Bug in conditional directive SHOW_WARNING - by seawolf - See http://zeos.firmos.at/viewtopic.php?t=2312
+
+20090402 : TZConnection.Pingserver now resets the ZConnection state when failing - by seawolf - See http://zeos.firmos.at/viewtopic.php?t=2293
+
+20090402 : Compilation error with SHOW_WARNING directive - by seawolf - See http://zeos.firmos.at/viewtopic.php?t=2312
+
+20090507 : Fixed case of ZPlainMySqlConstants unit name on Linux - by mdaems - Mantis Bug 179
+
+20090529 : Added ZURL unit to core package - by fabiano_bonin

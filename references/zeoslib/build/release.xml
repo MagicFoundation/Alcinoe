@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+
+<!--
+  Project: Zeos Database Objects.
+  Module: Build & Test Environment.
+  Copyrights: (c) Zeos Development Group 1999-2003
+-->
+
+<project name="release" default="main" basedir=".">
+
+  <property file="build.properties" />
+
+  <property name="root.dir" value="${project.home}"/>
+  <property name="packages.dir" value="${root.dir}/packages"/>
+  <property name="src.dir" value="${root.dir}/src"/>
+  <property name="test.dir" value="${root.dir}/test"/>
+  <property name="doc.dir" value="${root.dir}/documentation/articles_generated/output"/>
+  <property name="examples.dir" value="${root.dir}/examples"/>
+  <property name="lib.dir" value="${root.dir}/lib"/>
+  <property name="temp.dir" value="${root.dir}/temp"/>
+  <property name="release.dir" value="${root.dir}/releases"/>
+  <property name="logs.dir" value="${root.dir}/build/logs"/>
+  <tstamp>
+    <format property="timestamp" pattern="yyyy-MM-dd hh:mm:ss" />
+  </tstamp>
+  <tstamp>
+    <format property="tstamp" pattern="yyyyMMdd" />
+  </tstamp>
+  <property name="log.file" value="${logs.dir}/release-${tstamp}.log"/>
+
+  <target name="prepare">
+    <echo message="Releasing Zeos DBO Project ... Version ${release.version}"/>
+    <echo message="Releasing Zeos DBO Project ... Version ${release.version}"
+      file="${log.file}" append="true"/>
+
+    <delete dir="${temp.dir}"/>
+    <mkdir dir="${temp.dir}"/>
+    <mkdir dir="${release.dir}"/>
+    <mkdir dir="${logs.dir}" />
+
+  </target>
+
+  <target name="prepare_doc">
+
+    <echo message ="Generating documentation ... 'Changes'"/>
+    <exec dir="." executable="${ede.home}/bat/docbook_html.bat">
+      <arg value="changes"/>
+    </exec>
+
+    <echo message ="Generating documentation ... 'Installation'"/>
+        <exec dir="." executable="${ede.home}/bat/docbook_html.bat">
+      <arg value="installation"/>
+    </exec>
+
+    <echo message ="Generating documentation ... 'Known Bugx'"/>
+    <exec dir="." executable="${ede.home}/bat/docbook_html.bat">
+      <arg value="knownbugs"/>
+    </exec>
+
+    <echo message ="Generating documentation ... 'License'"/>
+    <exec dir="." executable="${ede.home}/bat/docbook_html.bat">
+      <arg value="license"/>
+    </exec>
+
+    <echo message ="Generating documentation ... 'Parameters'"/>
+    <exec dir="." executable="${ede.home}/bat/docbook_html.bat">
+      <arg value="parameters"/>
+    </exec>
+
+    <echo message ="Generating documentation ... 'ReadMe'"/>
+    <exec dir="." executable="${ede.home}/bat/docbook_html.bat">
+      <arg value="readme"/>
+    </exec>
+
+    <copyfile src="${doc.dir}/changes/html/changes.html" dest="${temp.dir}/changes.html"/>
+    <copyfile src="${doc.dir}/changes/html/ede.css" dest="${temp.dir}/ede.css"/>
+    <copyfile src="${doc.dir}/installation/html/installation.html" dest="${temp.dir}/installation.html"/>
+    <copyfile src="${doc.dir}/knownbugs/html/knownbugs.html" dest="${temp.dir}/knownbugs.html"/>
+    <copyfile src="${doc.dir}/license/html/license.html" dest="${temp.dir}/license.html"/>
+    <copyfile src="${doc.dir}/readme/html/readme.html" dest="${temp.dir}/readme.html"/>
+    <copyfile src="${doc.dir}/parameters/html/parameters.html" dest="${temp.dir}/documentation/parameters.html"/>
+    <copyfile src="${doc.dir}/parameters/html/ede.css" dest="${temp.dir}/documentation/ede.css"/>
+
+  </target>
+
+  <target name="main" depends="prepare, prepare_doc">
+
+    <copy todir="${temp.dir}/examples">
+      <fileset dir="${examples.dir}">
+        <exclude name="**/CVS/**" />
+        <exclude name="**/dummy.txt" />
+	     <exclude name="**/*.dcu" />
+	     <exclude name="**/*.rsm" />
+	     <exclude name="**/*.obj" />
+	     <exclude name="**/*.exe" />
+	     <exclude name="**/*.dll" />
+	     <exclude name="**/*.~*" />
+      </fileset>
+    </copy>
+
+    <copy todir="${temp.dir}/lib">
+      <fileset dir="${lib.dir}">
+        <exclude name="**/CVS/**" />
+        <exclude name="**/dummy.txt" />
+      </fileset>
+    </copy>
+
+    <copy todir="${temp.dir}/packages">
+      <fileset dir="${packages.dir}">
+        <exclude name="**/CVS/**" />
+        <exclude name="**/ZeosDboDevel.*" />
+        <exclude name="**/ZTestFramework.*" />
+	     <exclude name="**/*.dcu" />
+	     <exclude name="**/*.rsm" />
+	     <exclude name="**/*.dcp" />
+	     <exclude name="**/*.bpl" />
+	     <exclude name="**/*.obj" />
+	     <exclude name="**/*.exe" />
+	     <exclude name="**/*.dll" />
+	     <exclude name="**/*.~*" />
+        <exclude name="**/ZTest*.*" />
+	     <exclude name="**/ZExecuteSql.*" />
+      </fileset>
+    </copy>
+
+    <copy todir="${temp.dir}/src">
+      <fileset dir="${src.dir}">
+        <exclude name="**/CVS/**" />
+        <exclude name="**/dummy.txt" />
+	     <exclude name="**/*.dcu" />
+	     <exclude name="**/*.rsm" />
+	     <exclude name="**/*.dcp" />
+	     <exclude name="**/*.bpl" />
+	     <exclude name="**/*.obj" />
+	     <exclude name="**/*.exe" />
+	     <exclude name="**/*.dll" />
+	     <exclude name="**/*.~*" />
+      </fileset>
+    </copy>
+
+    <echo message="${release.version} build at ${timestamp}" file="${temp.dir}/VERSION"/>
+
+    <zip zipfile="${release.dir}/zeosdbo-${release.version}.zip">
+      <fileset dir="${temp.dir}"/>
+    </zip>
+
+    <delete dir="${temp.dir}" />
+
+  </target>
+
+</project>

@@ -1,0 +1,30 @@
+================================================================================
+//                        ZEOS Library Feature add Form                       //
+================================================================================
+
+Bug ID               : n/a                          Priority      : n/a
+Submitted by         : n/a                          Date Submitted: n/a
+Quality assurance by : stefanglienke                Closed as of  : n/a
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Requested Feature:
+
+- Add properties to TSqlProcessor
+
+--------------------------------------------------------------------------------
+
+Actions done for adding the new feature:
+
+- Changed FScript from TStrings to TZSqlStrings
+- Added property Params and ParamCheck (works in the same way as in TZQuery)
+- Added several methods taken from TZAbstractRODataset to handle parameters
+
+================================================================================

@@ -1,0 +1,50 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1113393                      Priority      : 5
+Submitted by         : fabianbecker                 Date Submitted: 2005-01-31 20:22
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-08 14:08
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+I'm working with ZEOSDBO 6.5.1 + ADO + ACCESS. If a
+table has
+widestring columns (and all String columns are mapped
+as WideString), these columns are never updated, even
+if UpdateMode = umUpdateAll. I found the problem at
+line 569 of ZDbcCache.pas (at method CompareBuffers of
+TZRowAccessor), that needs to be changed from
+
+Result := WideCompareStr(PChar(ValuePtr1),
+PChar(ValuePtr2));
+
+to 
+
+Result := WideCompareStr(PWideChar(ValuePtr1),
+PWideChar(ValuePtr2));
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Changed line 569 of ZDbcCache.pas from:
+
+Result := WideCompareStr(PChar(ValuePtr1), PChar(ValuePtr2));
+
+to 
+
+Result := WideCompareStr(PWideChar(ValuePtr1), PWideChar(ValuePtr2));
+
+================================================================================
+
+

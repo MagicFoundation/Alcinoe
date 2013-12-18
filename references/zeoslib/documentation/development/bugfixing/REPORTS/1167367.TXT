@@ -1,0 +1,57 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1167367                      Priority      : 5
+Submitted by         : avee                         Date Submitted: 2005-03-21 09:35
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-08 17:13
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZAbstractRODataset
+
+--------------------------------------------------------------------------------
+
+Error Description:
+Using: 
+Zeos 6.1.5 patch 2
+Delphi 6, with all updates
+MySql 4.0.18
+
+I'm updating a field of type MySql type 'text' in a 
+TZQuery. When assigning a new value to this field i'm 
+getting Access Violations wich i've traced back to 
+TZAbstractRODataset.SetFieldData. This function copies 
+the data from an incoming buffer pointer to the row data. 
+For a text field in mysql the maximum size is 64k and 
+the function therfore tries to move 64k bytes from the 
+buffer to the row data. This causes an accessviolation 
+because, apparently, less then 64k bytes is allocated to 
+hold the new data. 
+When (close to) 64k of data is inserted there is never a 
+problem, it only happens when the ammount of text 
+assigned to the value is significantly smaller then the 
+maximum of 64k. 
+So the buffer allocated for the new data is only as large 
+as it needs to be wich sounds logical. Yet the Zeos code 
+assumes the size of the buffer is always the same as 
+Field.Size.
+
+There's a forum thread about this problem here: 
+http://www.zeoslib.net/modules.php?
+name=Forums&file=viewtopic&t=1958
+
+I will try to produce a small test project.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Added changed described by fduenas in patch 1167379.
+
+================================================================================
+
+

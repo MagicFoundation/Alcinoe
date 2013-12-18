@@ -1,0 +1,74 @@
+<!-- #Blog Template File# -->
+
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<!DOCTYPE article
+  PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" "file:/c:/docbook/dtd/docbookx.dtd"
+  [
+    <!ENTITY % global.entities SYSTEM "file:/c:/docbook/include/global.xml">
+    %global.entities;
+
+    <!ENTITY % entities SYSTEM "entities.xml">
+    %entities;
+  ]
+>
+
+<article>
+
+  <!--[*ArticleInfo]-->
+  <articleinfo><title>{%ArticleTitle%}</title>
+  <!--[/*ArticleInfo]-->
+
+    <!--[*AuthorList]-->
+    <author>
+    <!--[/*AuthorList]-->
+
+      <!--[Authordata]-->
+      <firstname>{%AuthorFirstname%}</firstname>
+      <surname>{%AuthorSurname%}</surname>
+      <email>{%AuthorEmail%}</email>
+      <!--[Authordata]-->
+
+    <!--[AuthorList*]-->
+    </author>
+    <!--[/AuthorList*]-->
+
+    <!--[Author]-->
+    <author>
+      <firstname>{%AuthorFirstname%}</firstname>
+      <surname>{%AuthorSurname%}</surname>
+      <email>{%AuthorEmail%}</email>
+    </author>
+    <!--[/Author]-->
+
+  <!--[ArticleInfo*]-->
+  </articleinfo>
+  <!--[/ArticleInfo*]-->
+
+  <!--[Section]-->
+  <section id="{%SectionID%}"><title>{%SectionTitle%}</title>
+    <para>
+      {%Content%}
+    </para>
+  </section>
+  <!--[/Section]-->
+
+  <!--[*Section]-->
+  <section id="{%SectionID%}"><title>{%SectionTitle%}</title>
+  <!--[/*Section]-->
+
+  <!--[Section*]-->
+  </section>
+  <!--[/Section*]-->
+
+  <!--[Paragraph]-->
+  <para>
+    {%Content%}
+  </para>
+  <!--[/Paragraph]-->
+  
+  <!--[FlexParagraph]-->
+  {%FlexParagraphContent%}
+  <!--[/FlexParagraph]-->
+
+</article>

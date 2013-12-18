@@ -1,0 +1,57 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1006438                      Priority      : 5
+Submitted by         : fduenas                      Date Submitted: 2004-08-10 09:16
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-03 15:08
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : ADO (MSAccess)
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+using Delphi 7
+Zeoslib 6.1.5 and latest 6.5 from cvs.
+ADO and MSAccess database
+
+Hi this strange issue occurs when i create a field by a 
+select clause and using ADO connection with an 
+MSAccess database.
+
+if i use a select clause like this:
+SELECT id, FALSE AS import FROM
+Table1.
+
+When i add all fields at design time to the TZquery, the 
+field 'import' is of type SmallInt instead of Boolean.
+
+Even if I use a parameter:
+
+Select is, :false_value AS import FROM
+Table1.
+
+And assign a value as Boolean, even that way it returns 
+me a SmallInt Type field.
+
+
+Is that a normal behaviour? or should i have to use a 
+CAST function to force the convertion to boolean 
+DataType?
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+This is not a bug of Zeos but the "normal" behaiviour of ado.
+I tested it with a TADODataSet and it also created a TSmallIntField.
+
+================================================================================
+
+

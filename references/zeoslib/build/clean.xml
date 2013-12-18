@@ -1,0 +1,209 @@
+﻿<?xml version="1.0"?>
+
+<!--
+  Project: Zeos Database Objects.
+  Module: Build & Test Environment.
+  Copyrights: (c) Zeos Development Group 1999-2003
+-->
+
+<project name="clean" default="main" basedir=".">
+
+  <property file="build.properties" />
+
+  <property name="root.dir" value="${project.home}"/>
+  <property name="packages.dir" value="${root.dir}/packages"/>
+  <property name="src.dir" value="${root.dir}/src"/>
+  <property name="test.dir" value="${root.dir}/test"/>
+  <property name="examples.dir" value="${root.dir}/examples"/>
+
+  <target name="main">
+
+    <echo message="Cleaning Zeos DBO Project... Sources" />
+
+    <delete>
+      <fileset dir="${src.dir}">
+	<include name="**/*.hpp" />
+	<include name="**/*.dcu" />
+	<include name="**/*.obj" />
+	<include name="**/*.ddp" />
+	<include name="**/*.~*" />
+	<include name="**/*.*~" />
+	<include name="**/*.ppu" />
+	<include name="**/*.o" />
+      </fileset>
+    </delete>
+
+    <echo message="Cleaning Zeos DBO Project... Test Sources" />
+
+    <delete>
+      <fileset dir="${test.dir}">
+	<include name="**/*.hpp" />
+	<include name="**/*.cpp" />
+	<include name="**/*.exe" />
+	<include name="**/*.dcu" />
+	<include name="**/*.obj" />
+	<include name="**/*.ddp" />
+	<include name="**/*.~*" />
+	<include name="**/*.*~" />
+      </fileset>
+    </delete>
+
+    <echo message="Cleaning Zeos DBO Project... Examples" />
+
+    <delete>
+      <fileset dir="${examples.dir}">
+	<include name="**/*.hpp" />
+	<include name="**/*.cpp" />
+	<include name="**/*.exe" />
+	<include name="**/*.dcu" />
+	<include name="**/*.obj" />
+	<include name="**/*.ddp" />
+	<include name="**/*.~*" />
+	<include name="**/*.*~" />
+      </fileset>
+    </delete>
+
+    <antcall target="clean_delphi7"/>
+    <antcall target="clean_delphi9"/>
+    <antcall target="clean_delphi10"/>
+    <antcall target="clean_delphi11"/>
+    <antcall target="clean_delphi12"/>
+    <antcall target="clean_cbuilder6"/>
+    <antcall target="clean_kylix3"/>
+    <antcall target="clean_lazarus"/>
+  </target>
+
+  <target name="clean_delphi7">
+    <condition property="do_clean">
+      <istrue value="${delphi7.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="delphi7"/>
+    </antcall>
+  </target>
+
+  <target name="clean_delphi9">
+    <condition property="do_clean">
+      <istrue value="${delphi9.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="delphi9"/>
+    </antcall>
+  </target>
+
+  <target name="clean_delphi10">
+    <condition property="do_clean">
+      <istrue value="${delphi10.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="delphi10"/>
+    </antcall>
+  </target>
+
+  <target name="clean_delphi11">
+    <condition property="do_clean">
+      <istrue value="${delphi11.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="delphi11"/>
+    </antcall>
+  </target>
+
+  <target name="clean_delphi12">
+    <condition property="do_clean">
+      <istrue value="${delphi12.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="delphi12"/>
+    </antcall>
+  </target>
+
+  <target name="clean_cbuilder6">
+    <condition property="do_clean">
+      <istrue value="${cbuilder6.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="cbuilder6"/>
+    </antcall>
+  </target>
+
+ <target name="clean_kylix3">
+    <condition property="do_clean">
+      <istrue value="${kylix3.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="kylix3"/>
+    </antcall>
+  </target>
+
+  <target name="clean_lazarus">
+    <condition property="do_clean">
+      <istrue value="${lazarus.active}"/>
+    </condition>
+    <antcall target="clean_package_build">
+      <param name="compiler" value="lazarus"/>
+    </antcall>
+  </target>
+
+  <target name="clean_package_build" if="do_clean">
+
+    <echo message="Cleaning Zeos DBO Project...  ${compiler}/build " />
+
+    <delete>
+       <fileset dir="${packages.dir}\${compiler}">
+	<include name="build/*.dcu" />
+	<include name="build/*.ppu" />
+	<include name="build/*.o" />
+	<include name="build/*.exe" />
+	<include name="build/*.~*" />
+	<include name="build/*.*~" />
+	<include name="build/*.dcp" />
+	<include name="build/*.dpl" />
+	<include name="build/*.dsk" />
+	<include name="build/*.lib" />
+	<include name="build/*.obj" />
+	<include name="build/*.bpl" />
+	<include name="build/*.bpi" />
+	<include name="build/*.ilc" />
+	<include name="build/*.ild" />
+	<include name="build/*.ilf" />
+	<include name="build/*.ils" />
+	<include name="build/*.tds" />
+	<include name="build/*.csm" />
+	<include name="build/*.#??" />
+	<include name="build/*.map" />
+	<include name="*.~*" />
+	<include name="*.*~" />
+	<include name="*.dcu" />
+	<include name="*.ppu" />
+	<include name="*.o" />
+	<include name="*.dcp" />
+	<include name="*.dpl" />
+	<include name="*.dsk" />
+	<include name="*.lib" />
+	<include name="*.obj" />
+	<include name="*.exe" />
+	<include name="*.bpl" />
+	<include name="*.bpi" />
+	<include name="*.ilc" />
+	<include name="*.ild" />
+	<include name="*.ilf" />
+	<include name="*.ils" />
+	<include name="*.tds" />
+	<include name="*.csm" />
+	<include name="*.#??" />
+	<include name="*.bat" />
+	<include name="*.map" />
+	<exclude name=".svn/**" />
+	<exclude name="build/share/**" />
+	<exclude name="build/data/**" />
+	<exclude name="build/libmysql*.dll" />
+	<exclude name="build/sqlite*.dll" />
+	<exclude name="build/fbclient*.dll" />
+	<exclude name="build/*.dll" />
+	<exclude name="**/dummy.txt" />
+      </fileset>
+    </delete>
+
+  </target>
+</project>

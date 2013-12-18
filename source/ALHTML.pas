@@ -67,6 +67,8 @@ unit ALHTML;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 uses AlStringList;
 
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
@@ -90,9 +92,15 @@ procedure ALCompactHtmlTagParams(TagParams: TALStrings);
 
 implementation
 
-uses Math,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Math,
+     System.Classes,
+     System.sysutils,
+     {$ELSE}
+     Math,
      Classes,
      sysutils,
+     {$IFEND}
      ALString,
      ALQuickSortList;
 

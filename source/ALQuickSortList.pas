@@ -101,7 +101,13 @@ end;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     {$ELSE}
+     Classes,
+     {$IFEND}
      ALAVLBinaryTree;
 
 {$if CompilerVersion<=18.5}

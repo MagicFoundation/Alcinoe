@@ -64,9 +64,17 @@ unit AlSqlite3Client;
 
 interface
 
-uses SysUtils,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Contnrs,
+     System.SyncObjs,
+     {$ELSE}
+     SysUtils,
      Contnrs,
      SyncObjs,
+     {$IFEND}
      AlXmlDoc,
      AlSqlite3Wrapper,
      ALString,
@@ -328,8 +336,13 @@ Type
 
 implementation
 
-Uses classes,
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.classes,
+     System.Diagnostics,
+     {$ELSE}
+     classes,
      Diagnostics,
+     {$IFEND}
      ALWindows;
 
 {*************************************************************************************}

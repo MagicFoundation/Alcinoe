@@ -58,9 +58,17 @@ unit AlMySqlClient;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Contnrs,
+     System.SyncObjs,
+     {$ELSE}
+     Windows,
      Contnrs,
      SyncObjs,
+     {$IFEND}
      AlXmlDoc,
      ALStringList,
      ALString,
@@ -352,8 +360,15 @@ Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 
 implementation
 
-Uses SysUtils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     System.SysUtils,
+     System.Diagnostics,
+     {$ELSE}
+     Classes,
+     SysUtils,
      Diagnostics,
+     {$IFEND}
      ALWindows;
 
 {*********************************************************************************}

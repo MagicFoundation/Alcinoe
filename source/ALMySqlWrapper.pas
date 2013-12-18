@@ -58,7 +58,13 @@ unit ALMySqlWrapper;
 
 interface
 
-uses Windows;
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows;
+     {$ELSE}
+     Windows;
+     {$IFEND}
 
 {$IF CompilerVersion < 18.5}
   // from http://stackoverflow.com/questions/6378107/how-to-define-an-unsigned-64-bit-integer-in-delphi7
@@ -718,7 +724,11 @@ TMYSQL_CLIENT_OPTIONS =
 
 implementation
 
-uses sysutils;
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.sysutils;
+     {$ELSE}
+     sysutils;
+     {$IFEND}
 
 {**************************************************************}
 constructor TALMySqlLibrary.Create(ApiVer: TALMySqlVersion_API);

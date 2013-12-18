@@ -74,7 +74,13 @@ unit ALWebSpider;
 
 interface
 
-uses classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.classes,
+     {$ELSE}
+     classes,
+     {$IFEND}
      AlAvlBinaryTree,
      AlHTTPClient,
      AlStringList;
@@ -258,10 +264,17 @@ Type
 
 implementation
 
-uses Windows,
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.sysutils,
+     Winapi.WinInet,
+     Winapi.UrlMon,
+     {$ELSE}
+     Windows,
      sysutils,
      WinInet,
      UrlMon,
+     {$IFEND}
      AlHTML,
      AlMime,
      ALString;

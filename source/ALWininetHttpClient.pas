@@ -80,10 +80,18 @@ unit ALWininetHttpClient;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Classes,
+     WinApi.WinInet,
+     {$ELSE}
+     Windows,
      Classes,
-     ALHttpClient,
-     WinInet;
+     WinInet,
+     {$IFEND}
+     ALHttpClient;
 
 (*$HPPEMIT '#pragma link "wininet.lib"' *)
 
@@ -315,7 +323,12 @@ type
 
 implementation
 
-uses SysUtils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     {$ELSE}
+     SysUtils,
+     {$IFEND}
      ALString;
 
 {********************************************************************}
@@ -389,7 +402,7 @@ begin
                    PAnsiChar(S),
                    Length(S),
                    nil);
-    SetLength(S, StrLen(PAnsiChar(S)));
+    SetLength(S, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(S)));
     raise EALHTTPClientException.CreateFmt('%s - URL:%s', [ALtrim(S), URL]);      { Do not localize }
   end;
 end;
@@ -498,7 +511,7 @@ begin
   if (FConnected) then Exit;
 
   { Also, could switch to new API introduced in IE4/Preview2}
-  if InternetAttemptConnect(0) <> ERROR_SUCCESS then SysUtils.Abort;
+  if InternetAttemptConnect(0) <> ERROR_SUCCESS then {$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysUtils.Abort;
 
   {init FInetRoot}
   FInetRoot := InternetOpenA(PAnsiChar(RequestHeader.UserAgent),

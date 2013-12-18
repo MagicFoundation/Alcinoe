@@ -69,13 +69,17 @@ unit ALMemCachedClient;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     WinSock2,
+     Winapi.WinSock2,
+     System.Contnrs,
+     System.SyncObjs,
      {$ELSE}
      WinSock,
-     {$IFEND}
      Contnrs,
      SyncObjs,
+     {$IFEND}
      ALString;
 
 type
@@ -355,8 +359,15 @@ type
 
 implementation
 
-Uses Windows,
-     SysUtils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Classes,
+     System.SysUtils,
+     {$ELSE}
+     Windows,
+     Classes,
+     SysUtils
+     {$IFEND}
      ALStringList,
      AlWinsock,
      ALWindows;
@@ -437,7 +448,7 @@ procedure TAlBaseMemCachedClient.DoConnect(var aSocketDescriptor: TSocket;
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
     {$IF CompilerVersion >= 23} {Delphi XE2}
-    CheckError(WinSock2.Connect(aSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
+    CheckError(WinApi.WinSock2.Connect(aSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
     {$ELSE}
     CheckError(WinSock.Connect(aSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
     {$IFEND}

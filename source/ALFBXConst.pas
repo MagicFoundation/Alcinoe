@@ -70,6 +70,8 @@ unit ALFBXConst;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 const
   cALFBXBreakLine = #13;
   cALFBXNewLine = #13#10;

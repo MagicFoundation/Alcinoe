@@ -59,8 +59,15 @@ unit ALCalendar;
 
 interface
 
-uses types,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.types,
+     Vcl.Graphics,
+     {$ELSE}
+     types,
      Graphics,
+     {$IFEND}
      ALString;
 
 Type
@@ -114,16 +121,22 @@ Function ALDrawCalendar(Canvas:Tcanvas;
 
 implementation
 
-uses windows,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.windows,
+     System.SysUtils,
+     System.dateutils;
+     {$ELSE}
+     windows,
      SysUtils,
      dateutils;
+     {$IFEND}
 
 {***********************************************************************************}
 Function ALDrawCalendarGetTextSizeW(aCanvas: Tcanvas; const Text: WideString): TSize;
 begin
   Result.cX := 0;
   Result.cY := 0;
-  Windows.GetTextExtentPoint32w(aCanvas.Handle, PWideChar(text), Length(Text), Result);
+  GetTextExtentPoint32w(aCanvas.Handle, PWideChar(text), Length(Text), Result);
 end;
 
 {****************************************************************************************}

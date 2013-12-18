@@ -62,6 +62,8 @@ unit ALFiles;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
                            IgnoreFiles: Array of AnsiString;
@@ -97,11 +99,19 @@ function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
 
 implementation
 
-uses Windows,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Classes,
+     Winapi.ShLwApi,
+     System.Masks,
+     System.sysutils,
+     {$ELSE}
+     Windows,
      Classes,
      ShLwApi,
      Masks,
      sysutils,
+     {$IFEND}
      ALStringList,
      ALString;
 
@@ -226,7 +236,7 @@ begin
   Handle := FindFirstFileA(PAnsiChar(AFileName), FindData);
   if Handle <> INVALID_HANDLE_VALUE then
   begin
-    Windows.FindClose(Handle);
+    {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(Handle);
     if (FindData.dwFileAttributes and FILE_ATTRIBUTE_DIRECTORY) = 0 then
     begin
       Int64Rec(Result).Lo := FindData.nFileSizeLow;
@@ -275,7 +285,7 @@ end;
 function ALGetModuleName: ansiString;
 var ModName: array[0..MAX_PATH] of AnsiChar;
 begin
-  SetString(Result, ModName, Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
+  SetString(Result, ModName, {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.GetModuleFileNameA(HInstance, ModName, SizeOf(ModName)));
   If ALpos('\\?\',result) = 1 then delete(Result,1,4);
 end;
 
@@ -295,7 +305,7 @@ var aHandle: THandle;
 begin
   aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
   if (aHandle = INVALID_HANDLE_VALUE) or
-     (not Windows.FindClose(aHandle)) or
+     (not {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(aHandle)) or
      (not FileTimeToLocalFileTime(aFindData.ftCreationTime, aLocalFileTime)) or
      (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
   Result := filedatetodatetime(aFileDate);
@@ -310,7 +320,7 @@ var aHandle: THandle;
 begin
   aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
   if (aHandle = INVALID_HANDLE_VALUE) or
-     (not Windows.FindClose(aHandle)) or
+     (not {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(aHandle)) or
      (not FileTimeToLocalFileTime(aFindData.ftLastWriteTime, aLocalFileTime)) or
      (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
   Result := filedatetodatetime(aFileDate);
@@ -325,7 +335,7 @@ var aHandle: THandle;
 begin
   aHandle := FindFirstFileA(PAnsiChar(aFileName), aFindData);
   if (aHandle = INVALID_HANDLE_VALUE) or
-     (not Windows.FindClose(aHandle)) or
+     (not {$IF CompilerVersion >= 23}{Delphi XE2}Winapi.{$IFEND}Windows.FindClose(aHandle)) or
      (not FileTimeToLocalFileTime(aFindData.ftLastAccessTime, aLocalFileTime)) or
      (not FileTimeToDosDateTime(aLocalFileTime, LongRec(aFileDate).Hi, LongRec(aFileDate).Lo)) then raiselastOsError;
   Result := filedatetodatetime(aFileDate);
@@ -337,7 +347,7 @@ Var ahandle: Thandle;
     aSystemTime: TsystemTime;
     afiletime: TfileTime;
 Begin
-  aHandle := sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
+  aHandle := {$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}sysUtils.fileOpen(String(aFileName), fmOpenWrite or fmShareDenyNone);
   if aHandle = INVALID_HANDLE_VALUE then raiseLastOsError;
   Try
     dateTimeToSystemTime(aCreationDateTime, aSystemTime);

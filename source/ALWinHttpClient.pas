@@ -80,8 +80,15 @@ unit ALWinHttpClient;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Classes,
+     {$ELSE}
+     Windows,
      Classes,
+     {$IFEND}
      ALHttpClient,
      ALWinHttpWrapper;
 
@@ -258,7 +265,12 @@ type
 
 implementation
 
-Uses SysUtils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     {$ELSE}
+     SysUtils,
+     {$IFEND}
      ALString;
 
 {********************************************************************}
@@ -329,7 +341,7 @@ begin
                    PAnsiChar(S),
                    Length(S),
                    nil);
-    SetLength(S, StrLen(PAnsiChar(S)));
+    SetLength(S, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(S)));
     raise EALHTTPClientException.CreateFmt('%s - URL:%s', [ALTrim(S), URL]);      { Do not localize }
   end;
 end;

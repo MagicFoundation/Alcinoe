@@ -61,8 +61,15 @@ unit ALExecute;
 
 interface
 
-uses windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     winapi.windows,
+     system.classes;
+     {$ELSE}
+     windows,
      classes;
+     {$IFEND}
 
 {$IF CompilerVersion < 18.5}
 Type
@@ -119,8 +126,13 @@ function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 
 implementation
 
-uses sysutils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.sysutils,
+     winapi.messages,
+     {$ELSE}
+     sysutils,
      messages,
+     {$IFEND}
      ALWindows,
      ALString;
 
@@ -129,7 +141,7 @@ Function AlGetEnvironmentString: AnsiString;
 var P, Q : PAnsiChar;
     I : Integer;
 begin
-  P := PAnsiChar(Windows.GetEnvironmentStringsA);
+  P := PAnsiChar(GetEnvironmentStringsA);
   try
 
     I := 0;

@@ -62,8 +62,15 @@ unit ALMultiPartParser;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     System.Contnrs,
+     {$ELSE}
+     Classes,
      Contnrs,
+     {$IFEND}
      ALStringList;
 
 type
@@ -432,7 +439,13 @@ Function ALMultipartSetSubValueInHeaderLine(aHeaderLine: AnsiString; aName, AVal
 
 implementation
 
-uses SysUtils,
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Types, // to expand the inline function
+     {$ELSE}
+     SysUtils,
+     Types, // to expand the inline function
+     {$IFEND}
      ALString,
      ALMime;
 

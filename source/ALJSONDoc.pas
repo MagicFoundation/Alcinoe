@@ -172,8 +172,15 @@ unit ALJSONDoc;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.Classes,
+     system.sysutils,
+     {$ELSE}
+     Classes,
      sysutils,
+     {$IFEND}
      ALString,
      AlStringList,
      ALXmlDoc;
@@ -572,18 +579,25 @@ Procedure ALJSONToXML(aJSONNode: TALJsonNode;
 
 implementation
 
-uses Math,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Math,
+     System.Contnrs,
+     System.DateUtils,
+     {$ELSE}
+     Math,
      Contnrs,
      DateUtils,
+     {$IFEND}
      AlHTML,
      ALMisc;
 
 {*************************************************************************************}
 function ALJSONDocTryStrToRegEx(const S: AnsiString; out Value: TALJSONRegEx): boolean;
-var P1:          integer;
-    i:           integer;
-    aRegEx:      TALPerlRegEx;
+var aRegEx: TALPerlRegEx;
+    P1: integer;
+    i: integer;
 begin
+
   // regular expression in JSON must look like: /pattern/options
   // list of valid options is:
   //  'i' for case insensitive matching,
@@ -593,45 +607,35 @@ begin
   //  's' for dotall mode ('.' matches everything),
   //  'u' to make \w, \W, etc. match unicode.
   result := false;
-  if S <> '' then begin
 
-    // check that first character is /
-    if S[1] = '/' then begin
-      P1 := ALLastDelimiter('/', S);
-      if P1 <> 1 then begin
-        Value.Options    := ALCopyStr(S, P1 + 1, maxint);
-        Value.Expression := ALCopyStr(S, 2, P1 - 2);
+  // check that first character is /
+  if (S <> '') and (S[1] = '/') then begin
 
-        // loop on all the options characters
-        // to check if they are allowed.
-        for i := 1 to Length(Value.Options ) do begin
-          if not (Value.Options [i] in ['i','m','x','l','s','u']) then Exit;
-        end;
+    P1 := ALLastDelimiter('/', S);
+    if P1 <> 1 then begin
 
-        // check if it's compiling
-        aRegEx := TALPerlRegEx.Create;
-        try
-          aRegEx.RegEx := Value.Expression;
-          try
-            aRegEx.Compile;
+      //init Value
+      Value.Options    := ALCopyStr(S, P1 + 1, maxint);
+      Value.Expression := ALCopyStr(S, 2, P1 - 2);
 
-            // ok, we are here, all the options are allowed;
-            // now check if it's compiling successfully
-            result := aRegEx.Compiled;
-          except
-            on E: Exception do begin
-              // skip it silently, we need to check if it's compiling,
-              // nothing else.
-            end;
-          end;
-        finally
-          aRegEx.Free;
-        end;
+      // loop on all the options characters
+      // to check if they are allowed.
+      for i := 1 to Length(Value.Options ) do
+        if not (Value.Options[i] in ['i','m','x','l','s','u']) then Exit;
 
+      // check if it's compiling
+      aRegEx := TALPerlRegEx.Create;
+      try
+        aRegEx.RegEx := Value.Expression;
+        result := aRegEx.Compile(false{RaiseException});
+      finally
+        aRegEx.Free;
       end;
+
     end;
 
   end;
+
 end;
 
 {*************************************************************************************}
@@ -2713,14 +2717,6 @@ function TALJSONNode.GetText: AnsiString;
     else result := ALDefaultFormatSettings;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _getRegExStr: AnsiString;
-  var aRegEx: TALJSONRegEx;
-  begin
-    aRegEx := GetRegEx;
-    result := '/' + aRegEx.Expression + '/' + aRegEx.Options;
-  end;
-
 begin
 
   case NodeSubType of
@@ -2732,7 +2728,7 @@ begin
     nstBoolean: result := GetNodeValue;
     nstDateTime: result := ALDateTimeToStr(GetDateTime,_GetFormatSettings);
     nstNull: result := GetNodeValue;
-    nstRegEx: result := _getRegExStr;
+    nstRegEx: result := GetNodeValue;
     nstJavascript: result := GetNodeValue;
     nstInt32: result := GetNodeValue;
     nstTimestamp: result := GetNodeValue;

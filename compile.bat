@@ -1,9 +1,9 @@
-@SET BDS=C:\Program Files\Embarcadero\RAD Studio\9.0
-@SET BDSCOMMONDIR=C:\Users\Public\Documents\RAD Studio\9.0
+@SET BDS=C:\Program Files (x86)\Embarcadero\RAD Studio\11.0
+@SET BDSCOMMONDIR=C:\Users\Public\Documents\RAD Studio\11.0
 @SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v3.5
 @SET FrameworkVersion=v3.5
 @SET FrameworkSDKDir=
-@SET PATH=%FrameworkDir%;%FrameworkSDKDir%;C:\Program Files\Embarcadero\RAD Studio\9.0\bin;C:\Program Files\Embarcadero\RAD Studio\9.0\bin64;%PATH%
+@SET PATH=%FrameworkDir%;%FrameworkSDKDir%;C:\Program Files (x86)\Embarcadero\RAD Studio\11.0\bin;C:\Program Files (x86)\Embarcadero\RAD Studio\11.0\bin64;%PATH%
 @SET LANGDIR=EN
 
 @echo off
@@ -17,24 +17,33 @@ IF ERRORLEVEL 1 goto ERROR
 del *.dproj.local /s
 IF ERRORLEVEL 1 goto ERROR
 
-del demo\*.dcu /s
-del lib\dxe2\*.dcu /s
-del source\*.dcu /s
+del *.dcu /s
 IF ERRORLEVEL 1 goto ERROR
 
-del demo\*.exe /s
-del lib\dxe2\*.exe /s
-del source\*.exe /s
+del demos\*.exe /s
 IF ERRORLEVEL 1 goto ERROR
 
-del demo\*.ini /s
+del demos\*.vlb /s
 IF ERRORLEVEL 1 goto ERROR
 
-del demo\*.html /s
+del demos\*.ini /s
 IF ERRORLEVEL 1 goto ERROR
 
-CHDIR demo\
-FOR /R %%J IN (*.dproj) DO (				
+del demos\*.html /s
+IF ERRORLEVEL 1 goto ERROR
+
+del *.skincfg /s
+IF ERRORLEVEL 1 goto ERROR
+
+del demos\ALCheckSource\*.dproj /s
+IF ERRORLEVEL 1 goto ERROR
+
+del demos\ALCheckSource\*.res /s
+IF ERRORLEVEL 1 goto ERROR
+
+CHDIR demos\
+FOR /R %%J IN (*.dproj) DO (	
+  echo %%J			
   MSBuild %%J /t:build /p:Config=Release /p:Platform=Win32
   MSBuild %%J /t:build /p:Config=RELEASE /p:Platform=Win64
   IF ERRORLEVEL 1 pause
@@ -43,75 +52,81 @@ CHDIR ..
 
 pause
 
-if exist ..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
+if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
 
-  del ..\..\BlowPipeEmail\*.rsm /s
+  del ..\BlowPipeEmail\*.rsm /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeEmail\*.dcu /s
+  del ..\BlowPipeEmail\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeEmail\*.exe /s
+  del ..\BlowPipeEmail\*.exe /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeEmail\*.ini /s
+  del ..\BlowPipeEmail\*.identcache /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeEmail\*.identcache /s
+  del ..\BlowPipeEmail\*.dproj.local /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeEmail\*.dproj.local /s
+  del ..\BlowPipeEmail\*.vlb /s
   IF ERRORLEVEL 1 goto ERROR
   
-  MSBuild ..\..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj /t:build /p:Config=Release /p:Platform=Win32
+  del ..\BlowPipeEmail\*.skincfg /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  MSBuild ..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj /t:build /p:Config=Release /p:Platform=Win32
   IF ERRORLEVEL 1 goto ERROR
   
   pause
   
-  xcopy ..\..\BlowPipeEmail\BlowPipeEmail.exe demo\BlowPipeEmail /s
+  xcopy ..\BlowPipeEmail\BlowPipeEmail.exe demos\BlowPipeEmail /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeEmail\*.dcu /s
+  del ..\BlowPipeEmail\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
 
 )  
 
-if exist ..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
+if exist ..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
 
-  del ..\..\BlowPipeSMS\*.rsm /s
+  del ..\BlowPipeSMS\*.rsm /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeSMS\*.dcu /s
+  del ..\BlowPipeSMS\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeSMS\*.exe /s
+  del ..\BlowPipeSMS\*.exe /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeSMS\*.ini /s
+  del ..\BlowPipeSMS\*.identcache /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeSMS\*.identcache /s
+  del ..\BlowPipeSMS\*.dproj.local /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeSMS\*.dproj.local /s
+  del ..\BlowPipeSMS\*.vlb /s
   IF ERRORLEVEL 1 goto ERROR
   
-  MSBuild ..\..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj /t:build /p:Config=Release /p:Platform=Win32
+  del ..\BlowPipeSMS\*.skincfg /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  MSBuild ..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj /t:build /p:Config=Release /p:Platform=Win32
   IF ERRORLEVEL 1 goto ERROR
   
   pause
   
-  xcopy ..\..\BlowPipeSMS\BlowPipeSMS.exe demo\BlowPipeSMS /s
+  xcopy ..\BlowPipeSMS\BlowPipeSMS.exe demos\BlowPipeSMS /s
   IF ERRORLEVEL 1 goto ERROR
   
-  del ..\..\BlowPipeSMS\*.dcu /s
+  del ..\BlowPipeSMS\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
 
 )  
 
-del Release\Alcinoe.zip
+del Alcinoe.zip
 
-C:\Progra~1\7-Zip\7za.exe a -tzip -r release\Alcinoe.zip * -x!_svn* -x!.svn* -x!*.dcu -x!*.bpl -x!*__history* -x!release*
+C:\Progra~2\7-Zip\7za.exe a -tzip -r Alcinoe.zip * -x!_svn* -x!.svn* -x!*.dcu -x!*.bpl -x!*__history* -x!references* -x!archive*
 IF ERRORLEVEL 1 goto ERROR
 
 del *.dcu /s

@@ -60,7 +60,9 @@ unit ALDialog;
 
 interface
 
-{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IF CompilerVersion >= 25} {Delphi XE4}
+  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IFEND}
 
 function ALInputQuery(const ACaption, APrompt: Ansistring; var Value: Ansistring; ACancelButton: Boolean): Boolean;
 function ALInputBox(const ACaption, APrompt, ADefault: Ansistring; ACancelButton: Boolean): Ansistring;

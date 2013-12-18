@@ -60,7 +60,9 @@ unit ALMisc;
 
 interface
 
-{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IF CompilerVersion >= 25} {Delphi XE4}
+  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IFEND}
 
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;

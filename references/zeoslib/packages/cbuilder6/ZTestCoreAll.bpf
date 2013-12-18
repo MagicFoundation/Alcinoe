@@ -1,0 +1,10 @@
+USEUNIT("ZTestCoreAll.cpp");
+USEUNIT("..\..\test\external\TestFrameWork.pas");
+USEUNIT("..\..\test\external\TextTestRunner.pas");
+USEUNIT("..\..\test\core\ZTestSysUtils.pas");
+USEUNIT("..\..\test\core\ZTestList.pas");
+USEUNIT("..\..\test\core\ZTestFramework.pas");
+//---------------------------------------------------------------------------
+This file is used by the project manager only and should be treated like the project file
+
+main

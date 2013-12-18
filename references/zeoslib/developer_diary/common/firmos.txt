@@ -1,0 +1,3 @@
+13032006 - Removed Rangecheck Directive (all files) (FPC 2.0.2 is buggy)
+07112006 - Added RefreshCurrentRow Method in conjunction with UpdateObject to make it possible to 
+           refresh only one Row 

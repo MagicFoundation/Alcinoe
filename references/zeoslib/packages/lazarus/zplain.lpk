@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<CONFIG>
+  <Package Version="3">
+    <Name Value="zplain"/>
+    <CompilerOptions>
+      <Version Value="8"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="../../src/plain/"/>
+        <UnitOutputDirectory Value="build"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+        </SyntaxOptions>
+      </Parsing>
+      <Other>
+        <CompilerPath Value="$(CompPath)"/>
+      </Other>
+    </CompilerOptions>
+    <Description Value="Zeos Plain Database API"/>
+    <Version Major="7"/>
+    <Files Count="17">
+      <Item1>
+        <Filename Value="../../src/plain/ZPlainDbLibDriver.pas"/>
+        <UnitName Value="ZPlainDbLibDriver"/>
+      </Item1>
+      <Item2>
+        <Filename Value="../../src/plain/ZPlainDbLibMsSql7.pas"/>
+        <UnitName Value="ZPlainDbLibMsSql7"/>
+      </Item2>
+      <Item3>
+        <Filename Value="../../src/plain/ZPlainDbLibSybaseAse125.pas"/>
+        <UnitName Value="ZPlainDbLibSybaseAse125"/>
+      </Item3>
+      <Item4>
+        <Filename Value="../../src/plain/ZPlainDriver.pas"/>
+        <UnitName Value="ZPlainDriver"/>
+      </Item4>
+      <Item5>
+        <Filename Value="../../src/plain/ZPlainLoader.pas"/>
+        <UnitName Value="ZPlainLoader"/>
+      </Item5>
+      <Item6>
+        <Filename Value="../../src/plain/ZPlainMySqlConstants.pas"/>
+        <UnitName Value="ZPlainMySqlConstants"/>
+      </Item6>
+      <Item7>
+        <Filename Value="../../src/plain/ZPlainMySqlDriver.pas"/>
+        <UnitName Value="ZPlainMySqlDriver"/>
+      </Item7>
+      <Item8>
+        <Filename Value="../../src/plain/ZPlainOracle9i.pas"/>
+        <UnitName Value="ZPlainOracle9i"/>
+      </Item8>
+      <Item9>
+        <Filename Value="../../src/plain/ZPlainOracleDriver.pas"/>
+        <UnitName Value="ZPlainOracleDriver"/>
+      </Item9>
+      <Item10>
+        <Filename Value="../../src/plain/ZPlainPostgreSqlDriver.pas"/>
+        <UnitName Value="ZPlainPostgreSqlDriver"/>
+      </Item10>
+      <Item11>
+        <Filename Value="../../src/plain/ZPlainSqLiteDriver.pas"/>
+        <UnitName Value="ZPlainSqLiteDriver"/>
+      </Item11>
+      <Item12>
+        <Filename Value="../../src/plain/ZPlainASADriver.pas"/>
+        <UnitName Value="ZPlainASADriver"/>
+      </Item12>
+      <Item13>
+        <Filename Value="../../src/plain/ZPlainASA9.pas"/>
+        <UnitName Value="ZPlainASA9"/>
+      </Item13>
+      <Item14>
+        <Filename Value="../../src/plain/ZPlainASA8.pas"/>
+        <UnitName Value="ZPlainASA8"/>
+      </Item14>
+      <Item15>
+        <Filename Value="../../src/plain/ZPlainASA7.pas"/>
+        <UnitName Value="ZPlainASA7"/>
+      </Item15>
+      <Item16>
+        <Filename Value="../../src/plain/ZPlainFirebirdDriver.pas"/>
+        <UnitName Value="ZPlainFirebirdDriver"/>
+      </Item16>
+      <Item17>
+        <Filename Value="../../src/plain/ZPlainFirebirdInterbaseConstants.pas"/>
+        <UnitName Value="ZPlainFirebirdInterbaseConstants"/>
+      </Item17>
+    </Files>
+    <RequiredPkgs Count="3">
+      <Item1>
+        <PackageName Value="zcore"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+        <MinVersion Major="1" Valid="True"/>
+      </Item3>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)/"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+  </Package>
+</CONFIG>

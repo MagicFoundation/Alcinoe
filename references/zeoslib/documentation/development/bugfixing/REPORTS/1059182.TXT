@@ -1,0 +1,54 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1059182                      Priority      : 5
+Submitted by         : nobody                       Date Submitted: 2004-11-03 01:34
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-06 13:42
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : Firebird 1.5
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+I'm using ZeosDBO 6.1.5 to create a database for my 
+application, and I'm having the following problem: I 
+cannot create a Foreign Key (FK) constraint in my DB. 
+What happens is that to create FKs in FB 1.5 (and 
+Interbase 6 too) you must be the only user connected 
+to the DB. That is a limitation of FB and IB. 
+
+The DSQL statement for that would be something like 
+this: 
+
+ALTER TABLE PESSOA ADD CONSTRAINT 
+FK_PESSOA_CIDADE FOREIGN KEY (IDCIDADE) 
+REFERENCES CIDADE (IDCIDADE); 
+
+If I use isql to do that, it works fine. 
+
+Well, I got the connected users list (from here), and as 
+soon as you Connect with a ZConnection component, 
+you always have 2 connected users. 
+
+Is that correct? That would prevent me from creating 
+FKs with Zeos.
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Did you start your application in delphi?
+Then you have two connections (1. the connection set to 
+connected=true on the form within the ide; 2. the connection 
+within your application)
+
+================================================================================
+
+

@@ -1,0 +1,47 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1177394                      Priority      : 5
+Submitted by         : bycabral                     Date Submitted: 2005-04-06 00:00
+Quality assurance by : stefanglienke                Closed as of  : 2005-08-24 13:23
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : n/a
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+ I've created a View named "vwVendaItem" witn 6
+fields, I have a field named "STATUS_REG" that don't
+show in TZDataSet, I tryed using IBX 6 and it works file.
+
+
+I'm using:
+
+Delphi 6.02
+Windows XP pro
+Firebird 1.5
+zeosdbo-6.5.1-alpha
+Protocol: firebird-1.5
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Very strange ...
+
+IB/FB returns an unknown field_sub_type for this column.
+Due to this fieldtype is set to ftUnknown and persistent
+fields with this fieldtype are not created.
+
+I fixed this by setting fieldtype to ftString for this.
+
+================================================================================
+
+

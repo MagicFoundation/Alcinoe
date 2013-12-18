@@ -1,0 +1,1 @@
+ant -buildfile release_svn.xml buildTagged

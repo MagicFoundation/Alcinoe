@@ -1,0 +1,88 @@
+Using the Internal RDB$DB_KEY
+=============================
+
+
+About RDB$DB_KEY
+----------------
+The first lesson to learn is that RDB$DB_KEY is a *raw* position, related to the database
+itself and not to a physical address on disk. The second is that the numbers do not
+progress in a predictable sequence. Don't consider performing calculations involving
+their relative positions! The third lesson is that they are volatile - they change after a
+backup and subsequent restore and sometimes, after the transaction is committed. It is
+essential to unterstand the transience of the db_key and to make no assumptions about its
+existence once an operation that refers to it is committed or rolled back.
+
+Size of RBD$DB_KEY
+------------------
+For tables RDB$DB_KEY uses 8 bytes. For view, it uses as many multiples of 8 bytes as
+there are underlying tables. For example, if a view joins three tables, its RDB$DB_KEY uses
+24 bytes. This is importantn if you are working with stored procedures and want to sotre
+RDB$DB_KEY in a variable. You must use a CHAR(n) data type of the correct length.
+
+By default, db_keys are returned as hex values - 2 hex digits represent each byte, causing
+16 hex to be returned for 8 bytes. Try it on one of your sample tables in isql:
+
+SQL> SELECT RDB$DB_KEY FROM MYTABLE;
+RDB$DB_KEY
+================
+000000B600000002
+000000B600000004
+000000B600000006
+000000B600000008
+000000B60000000A
+
+Benefits
+--------
+Because an RDB$DB_KEY marks the raw position of a row, it is faster for search than even
+a primary key. If for some special reason a table has no primary key or active unique
+index, or it is primed on a unique index that is allowed to contain nulls, it is possible
+for exact diplicate rows to exist. Under such conditions, an RDB$DB_KEY is the only way
+to identify each row unequivocally. ...
+
+Duration of Validity
+--------------------
+By default, the scope of a db_key is the current transaction. You can count on it to remain 
+valid for the duration of the current transaction. A commit or rollback will cause the RDB$DB_KEY
+values you had to become unpredictable. If you are using CommitRetaining, the transaction context 
+is retained, blocking garbage collection and thus preventing the old db_key from being "recuceled".
+Under these conditions, the RDB$DB_KEY values of any rows affected by your transaction remain 
+valit until a "hard" commit or rollback occurs.
+
+After the hard commit or rollback, another transaction might delete a row that was isolated 
+inside your transaction's context and was thus considered "existent" by your application. Any
+RDB$DB_KEY value might now pint to a non-existient row. If there is a long interval between the 
+moment when your transaction began and when your work completes, you should check that the row 
+has not been changed or locked by another transaction in the meantime.
+
+Some application interfaces, for example, IB Objects, are super-smart about inserts and can 
+prepare a "slot" for a newly inserted row inthe client buffer to short-circuit the refresh 
+following the commit. Such features are important for performance across the network. However, 
+"smarts" like this are based on exact, real keys. Since the db_key is mereley a proxy key for 
+a set that has been derived frompreviously committed data, it has no meaning for a new row - 
+is is not avalilable for spot updates of the client buffers.
+
+Changing the Scope of Duration
+------------------------------
+The default duration of RDB$DB_KEY values can be cnanged at connection time, by using the 
+API parameter isc_dpb_dbkey_scope. Some development - for example, the IB Objects componentes 
+in Borland ObjectPascal environment tools - surface it in a connectivity class. However it is 
+not recommended to extend the scope of db_keys in a highly interactive environment, since it 
+will disable garbage collection, with the unwanted sind effect of causing your database file 
+to grow at an alarming rate and slowing down performance until the system hangs or crashes. 
+Don not pool connection shaving non-default db_key scope.
+
+RDB$DB_KEY with Multi-Table Sets
+--------------------------------
+All tables maintain thir own distinct, 8-byte RDB$DB_KEY columns. Views and joins generate 
+runtime db_keys by concatenating those of the rows in the source tabels. If you use RDB$DB_KEY 
+in multi-table sets, be very careful of qualify each one accurately.
+
+RDB$DB_KEY cannot be used across tables. There is no possibility of establishing a dependence 
+relationship bewseen the RDB$DB_KEY of one table and another, except in re-entrant (self-
+referencing) joins.
+
+
+
+
+
+

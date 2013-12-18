@@ -1,0 +1,37 @@
+================================================================================
+//                        ZEOS Library Feature add Form                       //
+================================================================================
+
+Bug ID               : 1100120                      Priority      : 5
+Submitted by         : nobody                       Date Submitted: 2005-01-11 13:53
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-02 13:45
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZConnection
+
+--------------------------------------------------------------------------------
+
+Requested Feature:
+
+I would like to have to following feature:
+
+The TZConnection should have a published read-only 
+property 'Version', showin the actual version.
+It´s very difficult when you work in a team to check, if 
+everybody is using the same Version of ZEOS DBO.
+
+I think many other users would confirm.
+
+--------------------------------------------------------------------------------
+
+Actions done for adding the new feature:
+
+Added const ZEOS_VERSION to ZClasses and added property Version to TZConnection.
+
+================================================================================
+
+

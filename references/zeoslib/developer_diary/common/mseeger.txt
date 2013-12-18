@@ -1,0 +1,3 @@
+20061030 : Added Sqlite (2.8.16) driver dll's (only Windows)
+
+20081123 : Updated ZUpdateSqlEditor.lrs to be compatible with the newest Lazarus release

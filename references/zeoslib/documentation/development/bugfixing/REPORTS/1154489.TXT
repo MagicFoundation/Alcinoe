@@ -1,0 +1,40 @@
+================================================================================
+//               ZEOS Library Bug Reporting / Bug Fixing Form                 //
+================================================================================
+
+Bug ID               : 1154489                      Priority      : 5
+Submitted by         : fduenas                      Date Submitted: 2005-03-01 20:18
+Quality assurance by : stefanglienke                Closed as of  : 2005-06-08 13:08
+Assigned to          : stefanglienke                Closed by     : stefanglienke
+
+--------------------------------------------------------------------------------
+
+Server (and Version) : n/a
+ZEOSLib Version      : 6.5.1 alpha
+Component/Class      : TZQuery
+
+--------------------------------------------------------------------------------
+
+Error Description:
+
+Delphi 7 Enterprise
+MySQL 4.1.10
+ZeosLib 6.5.1-alpha
+
+When using a DML that will not return any result set, 
+an AV error occurs when open the TZQuery, using a 
+TZreadOnlyQuery doesn't occurs.
+
+I have found the error so i will post the fix in 
+the 'Patches' section
+
+--------------------------------------------------------------------------------
+
+Actions done form Bugfixing:
+
+Added following line to TZAbstractDataset.CreateResultSet (ZAbstractDataset.pas):
+if not Assigned(Result) then Exit;
+
+================================================================================
+
+

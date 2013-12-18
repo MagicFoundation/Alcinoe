@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{10B5E976-7D62-44F7-970A-730F53878649}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  
+    
+    
+    
+    <Projects>
+      <Projects Name="UIBD2005Win32R.bpl">UIBD2005Win32R.bdsproj</Projects>
+      <Projects Name="UIBD2005Win32D.bpl">UIBD2005Win32D.bdsproj</Projects>
+      <Projects Name="Targets">UIBD2005Win32R.bpl uibD2005Win32D.bpl</Projects>
+    </Projects>
+    <Dependencies>
+      <Dependency GUID="{83CD355F-C7E4-4B0D-9E8B-E84CD07A3FC8}">
+        <Dependency GUID="{C04D112D-7E5E-463F-A781-0E3B10350BF7}"/>
+      </Dependency>
+    </Dependencies>
+  </Default.Personality>
+</BorlandProject>

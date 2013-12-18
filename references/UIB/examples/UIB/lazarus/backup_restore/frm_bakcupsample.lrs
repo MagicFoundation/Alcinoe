@@ -1,0 +1,94 @@
+{ Ceci est un fichier ressource généré automatiquement par Lazarus }
+
+LazarusResources.Add('TfrmBakcup','FORMDATA',[
+  'TPF0'#10'TfrmBakcup'#9'frmBakcup'#7'Caption'#6#17'IB/FB Backup tool'#12'Clie'
+  +'ntHeight'#3','#1#11'ClientWidth'#3'1'#2#6'OnShow'#7#9'Form1Show'#13'PixelsP'
+  +'erInch'#2'`'#7'Visible'#9#18'HorzScrollBar.Page'#3'2'#2#18'VertScrollBar.Pa'
+  +'ge'#3'-'#1#4'Left'#3'$'#1#6'Height'#3','#1#3'Top'#3#168#0#5'Width'#3'1'#2#0
+  +#6'TPanel'#6'Panel1'#5'Align'#7#5'alTop'#12'ClientHeight'#2'I'#11'ClientWidt'
+  +'h'#3'1'#2#11'FullRepaint'#8#8'TabOrder'#2#0#7'TabStop'#9#6'Height'#2'I'#5'W'
+  +'idth'#3'1'#2#0#12'TSpeedButton'#8'btnStart'#10'Glyph.Data'#10#210#4#0#0#206
+  +#4#0#0'BM'#206#4#0#0#0#0#0#0'6'#0#0#0'('#0#0#0#28#0#0#0#14#0#0#0#1#0#24#0#0#0
+  +#0#0#152#4#0#0'V'#0#0#0'T'#0#0#0#0#0#0#0#0#0#0#0#255#255#255#0#5#3#0#12#10#0
+  +#0#4#0#0#3#0#4#7#2#1#5#11#0#3#12#0#1#9#2#5#0#8#7#0#4#0#0#4#0#0#0#0#195#195
+  +#195'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'#0#3#1'H'#131'=xt'#0#5#10#0#1#6
+  +#0#0#4#0#0#4#14#0#5#14#0#1#199#194#196#177#191#190#0#9#4'W{u'#0#1#0'XXX'#128
+  +#128#128#128#128#128'XXXXXXXXXXXXXXXXXX'#195#195#195#195#195#195'XXX'#128#128
+  +#128'XXX'#0#6#4'2x5'#130'~'#0#2#6#0#6#13#0#0#6#0#3#8#14#0#4#16#0#3#198#194
+  +#199#188#209#207#0#19#12'<lf'#1#9#8'XXX'#128#128#128#128#128#128'XXXXXXXXXXX'
+  +'XXXXXXX'#195#195#195#195#195#195'XXX'#128#128#128'XXX'#0#5#2''''#129'{,'#136
+  +#131#0#3#7#0#3#9#0#1#6#0#0#4#14#0#4#25#2#10#199#198#202#178#204#204#0#10#1'O'
+  +#138#130#0#1#1'XXX'#128#128#128#128#128#128'XXXXXXXXXXXXXXXXXX'#195#195#195
+  +#195#195#195'XXX'#128#128#128'XXX'#0#5#1'#'#131'|'#25#129'z'#0#7#9#0#1#7#0#4
+  +#9#0#9#13#0#0#6#0#0#5#0#2#5#0#11#8#0#12#3'3t'#0#9#7'XXX'#128#128#128#128#128
+  +#128'XXXXXXXXXXXXXXXXXXXXXXXXXXX'#128#128#128'XXX'#0#5#1#30#129'y!'#145#138
+  +'.xxAyzBz{DwyN{~Lz{N'#128#128'5}w'#31#139''#30#128't'#0#6#3'XXX'#128#128#128
+  +#128#128#128#128#128#128#128#128#128#128#128#128#128#128#128#128#128#128#128
+  +#128#128#128#128#128#128#128#128#128#128#128#128#128#128'XXX'#0#4#1'(~x'#31
+  +#128'|'#0#7#8#0#12#14#0#18#20#0#5#7#0#5#7#0#10#10#0#6#6#0#14#8#23'}r.'#138''
+  +#0#8#6'XXX'#128#128#128#128#128#128'XXXXXXXXXXXXXXXXXXXXXXXX'#128#128#128#128
+  +#128#128'XXX'#0#3#1'G'#129#128#0#7#7#171#203#208#171#189#196#173#189#196#190
+  +#204#210#188#202#208#180#194#200#179#195#201#168#202#202#0#20#15':rm'#4#9#12
+  +'XXX'#128#128#128'XXX'#195#195#195#195#195#195#195#195#195#195#195#195#195
+  +#195#195#195#195#195#195#195#195#195#195#195'XXX'#128#128#128'XXX'#0#2#1'Ixv'
+  +#0#10#11#182#200#207#189#192#200#205#204#213#190#189#198#195#192#201#200#198
+  +#204#190#190#196#184#202#203#0#6#3'Lto'#12#5#8'XXX'#128#128#128'XXX'#195#195
+  +#195#195#195#195#195#195#195#190#189#198#195#192#201#200#198#204#190#190#196
+  +#195#195#195'XXX'#128#128#128'XXX'#0#2#1'L{y'#0#9#7#168#188#193#193#202#206
+  +#188#192#197#206#209#214#189#189#195#199#200#204#198#201#205#180#201#199#0#7
+  +#1'^'#134#129#0#0#1'XXX'#128#128#128'XXX'#195#195#195#195#195#195#195#195#195
+  +#195#195#195#189#189#195#195#195#195#195#195#195#195#195#195'XXX'#128#128#128
+  +'XXX'#0#2#1'N{x'#0#6#4#186#209#211#187#196#199#193#199#204#188#193#196#196
+  +#195#199#199#198#200#194#198#199#183#201#200#0#6#1'Pvp'#0#1#0'XXX'#128#128
+  +#128'XXX'#195#195#195#195#195#195#195#195#195#195#195#195#196#195#199#195#195
+  +#195#195#195#195#195#195#195'XXX'#128#128#128'XXX'#0#2#1'T|z'#0#6#3#176#197
+  +#198#189#199#199#189#196#199#203#207#208#199#196#198#199#194#196#196#198#199
+  +#178#192#190#0#18#12#0#6#0#0#3#2'XXX'#128#128#128'XXX'#195#195#195#195#195
+  +#195#195#195#195#195#195#195#195#195#195#199#194#196#196#198#199#195#195#195
+  +'XXXXXXXXX'#0#2#0'[|x'#0#6#2#182#198#197#196#201#202#193#197#198#191#190#192
+  +#205#196#199#210#201#204#203#201#201#188#196#195#0#4#0#178#201#197#0#2#0'XXX'
+  +#128#128#128'XXX'#195#195#195#195#195#195#195#195#195#195#195#195#195#195#195
+  +#195#195#195#195#195#195#195#195#195'XXX'#195#195#195'XXX'#0#0#0#0#0#0#0#0#0
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0
+  +#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#0#9
+  +'NumGlyphs'#2#2#7'OnClick'#7#13'btnStartClick'#4'Left'#3#10#2#6'Height'#2#22
+  +#3'Top'#2#10#5'Width'#2' '#0#0#6'TLabel'#6'Label1'#7'Caption'#6#15'DataBase '
+  +'source'#4'Left'#2#8#6'Height'#2#17#3'Top'#2#15#5'Width'#2'h'#0#0#5'TEdit'#10
+  +'edDatabase'#8'AutoSize'#9#8'TabOrder'#2#1#4'Text'#6#15'd:\employee.fdb'#4'L'
+  +'eft'#2'p'#6'Height'#2#25#3'Top'#2#8#5'Width'#3#152#1#0#0#6'TLabel'#6'Label3'
+  +#7'Caption'#6#11'Destination'#4'Left'#2#8#6'Height'#2#17#3'Top'#2'('#5'Width'
+  +#2'A'#0#0#5'TEdit'#7'edDesti'#8'TabOrder'#2#3#4'Text'#6#15'd:\employee.gbk'#4
+  +'Left'#2'p'#6'Height'#2#23#3'Top'#2'('#5'Width'#3#152#1#0#0#0#6'TPanel'#10'p'
+  +'anOptions'#5'Align'#7#6'alLeft'#12'ClientHeight'#3#227#0#11'ClientWidth'#3
+  +#153#0#11'FullRepaint'#8#8'TabOrder'#2#1#7'TabStop'#9#6'Height'#3#227#0#3'To'
+  +'p'#2'I'#5'Width'#3#153#0#0#6'TLabel'#6'Label2'#7'Caption'#6#7'Options'#4'Le'
+  +'ft'#2#8#6'Height'#2#17#3'Top'#2#7#5'Width'#2'A'#0#0#9'TCheckBox'#9'optChksu'
+  +'m'#11'AllowGrayed'#9#8'AutoSize'#9#7'Caption'#6#15'Ignore checksum'#10'Drag'
+  +'Cursor'#7#9'crDefault'#8'TabOrder'#2#1#4'Left'#2#16#6'Height'#2#20#3'Top'#2
+  ,#23#5'Width'#2'x'#0#0#9'TCheckBox'#8'OptLimbo'#11'AllowGrayed'#9#8'AutoSize'
+  +#9#7'Caption'#6#12'Ignore limbo'#10'DragCursor'#7#9'crDefault'#8'TabOrder'#2
+  +#2#4'Left'#2#16#6'Height'#2#20#3'Top'#2'/'#5'Width'#2'p'#3'Tag'#2#1#0#0#9'TC'
+  +'heckBox'#15'OptMetadataOnly'#11'AllowGrayed'#9#8'AutoSize'#9#7'Caption'#6#14
+  +'Meta data only'#10'DragCursor'#7#9'crDefault'#8'TabOrder'#2#3#4'Left'#2#16#6
+  +'Height'#2#20#3'Top'#2'G'#5'Width'#2'x'#3'Tag'#2#2#0#0#9'TCheckBox'#7'optGar'
+  +'b'#11'AllowGrayed'#9#8'AutoSize'#9#7'Caption'#6#18'Garbage collection'#10'D'
+  +'ragCursor'#7#9'crDefault'#8'TabOrder'#2#4#4'Left'#2#16#6'Height'#2#20#3'Top'
+  +#2'a'#5'Width'#3#131#0#3'Tag'#2#3#0#0#9'TCheckBox'#15'chkMetadatadesc'#11'Al'
+  +'lowGrayed'#9#8'AutoSize'#9#7'Caption'#6#14'Meta data desc'#10'DragCursor'#7
+  +#9'crDefault'#8'TabOrder'#2#5#4'Left'#2#16#6'Height'#2#20#3'Top'#2'x'#5'Widt'
+  +'h'#2'}'#3'Tag'#2#4#0#0#9'TCheckBox'#16'chkTransportable'#11'AllowGrayed'#9#8
+  +'AutoSize'#9#7'Caption'#6#17'Non Transportable'#10'DragCursor'#7#9'crDefault'
+  +#8'TabOrder'#2#6#4'Left'#2#16#6'Height'#2#20#3'Top'#3#143#0#5'Width'#3#131#0
+  +#3'Tag'#2#5#0#0#9'TCheckBox'#10'chkConvert'#11'AllowGrayed'#9#8'AutoSize'#9#7
+  +'Caption'#6#18'Convert Ext Tables'#10'DragCursor'#7#9'crDefault'#8'TabOrder'
+  +#2#7#4'Left'#2#16#6'Height'#2#20#3'Top'#3#165#0#5'Width'#3#134#0#3'Tag'#2#7#0
+  +#0#9'TCheckBox'#9'chkExpand'#11'AllowGrayed'#9#8'AutoSize'#9#7'Caption'#6#6
+  +'Expand'#10'DragCursor'#7#9'crDefault'#8'TabOrder'#2#8#4'Left'#2#16#6'Height'
+  +#2#21#3'Top'#3#183#0#5'Width'#2''#3'Tag'#2#8#0#0#0#5'TMemo'#8'moResult'#5'A'
+  +'lign'#7#8'alClient'#8'ReadOnly'#9#10'ScrollBars'#7#6'ssBoth'#8'TabOrder'#2#2
+  +#8'WordWrap'#8#4'Left'#3#153#0#6'Height'#3#227#0#3'Top'#2'I'#5'Width'#3#152#1
+  +#0#0#12'TUIBBackup'#3'Bak'#9'OnVerbose'#7#10'BakVerbose'#7'Verbose'#9#8'Us'
+  +'erName'#6#6'SYSDBA'#8'PassWord'#6#9'masterkey'#4'Host'#6#9'127.0.0.1'#8'Pro'
+  +'tocol'#7#8'proTCPIP'#11'LibraryName'#6#9'gds32.dll'#4'left'#2'X'#3'top'#2'h'
+  +#0#0#0
+]);

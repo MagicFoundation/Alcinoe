@@ -1,0 +1,49 @@
+// Package file for Delphi 7
+
+package frxUIB7;
+
+{$I frx.inc}
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  VCL,
+  VCLDB,
+  uibD7R,
+  frx7,
+  frxDB7,
+{$IFDEF QBUILDER}
+  fqb70,
+{$ENDIF}
+  fs7;
+
+contains
+  frxrcUIB in 'frxrcUIB.pas', 
+  frxUIBComponents in 'frxUIBComponents.pas',
+  frxUIBEditor in 'frxUIBEditor.pas',
+  frxUIBRTTI in 'frxUIBRTTI.pas';
+
+end.

@@ -1,0 +1,1 @@
+del *.dcu;*.o;*.~*;*.a;*.ppu;*.map;*.mad;*.or;*.ddp

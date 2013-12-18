@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{081A4431-35CE-4E2D-B1B7-7F3DD1255CC0}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  
+    <Projects>
+      <Projects Name="frxUIB10.bpl">frxUIB10.bdsproj</Projects>
+      <Projects Name="dclfrxUIB10.bpl">dclfrxUIB10.bdsproj</Projects>
+      <Projects Name="Targets">frxUIB10.bpl dclfrxUIB10.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

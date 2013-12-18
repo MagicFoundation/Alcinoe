@@ -1,0 +1,43 @@
+UIB 2.5 Release
+
+- Delphi 2009, 2010, XE 
+- Unicode
+- Optimized for FB25
+
+UIB 2.1 Release
+
+New features:
+- New FB2 Database properties:
+    .InfoActiveTransactionsCount
+    .InfoCreationDate
+- Support for quoted parametters (:"my param").
+- Metadata explorer now read roles (Pierre Yager).
+- New Lazarus sample to explore metadatas.
+
+bug fixes:
+- TUIBEvent bug when destroying component is fixed.
+- ExecSQL now call Execute when query is prepared;
+- When a query don't return fields, a call to next don't raise exception anymore.
+- TUIBDataSet: a bug was fixed when the query return only one record.
+- RowsAffected now support stored procedures.
+- Parsing error corrected with stored procedure.
+- Removed Fastcode unit because of bug in asm code.
+- bug with "isc_reset_fpe" function that don't exist on unix plateforms is corrected.
+- Some bug fixes with Appserver samples.
+
+UIB 2.1 Release Candidate
+
+New features:
+
+- TimeOut on transactions (FB2)
+- new asGUID property (PierreY)
+- TUIBServerInfo (PierreY)
+- UIB_NO_COMPONENT compiler option, this remove TComponent heritage.
+- removed uibobj.pas and uibsrv.pas, for server application example take a look in the misc/appserver directory.
+- various examples of use and third party applications in the misc directory.
+
+bug fixes:
+- setting an invalid parametter name don't raise exception
+- First and last functions in some case don't work when there is only one result.
+- using UIB now automatically set IsMultiThread value to true for thread safe memory.
+- some FB2 compatibility issues.

@@ -1,0 +1,13 @@
+/* UIB components */
+TUIBDataBase BITMAP "TUIBDataBase.bmp"
+TUIBTransaction BITMAP "TUIBTransaction.bmp"
+TUIBQuery BITMAP "TUIBQuery.bmp"
+TUIBBackup BITMAP "TUIBBackup.bmp"
+TUIBRestore BITMAP "TUIBRestore.bmp"
+TUIBSCRIPT BITMAP "TUIBScript.bmp"
+TUIBDATASET BITMAP "TUIBDataSet.bmp"
+TUIBSecurity BITMAP "TUIBSecurity.bmp"
+TUIBEvents BITMAP "TUIBEvents.bmp"
+TUIBRepair BITMAP "TUIBRepair.bmp"
+TUIBConfig BITMAP "TUIBConfig.bmp"
+TUIBServerInfo BITMAP "TUIBServerInfo.bmp"

@@ -1,0 +1,8 @@
+/***********************************************************/
+/* Resources for the Delphi IDE                            */
+/*          UIB components for FastReport 3.0              */
+/*                                                         */
+/* Created by : Pierre Y.                                  */
+/* Email : pierre@levosgien.net                            */
+/***********************************************************/
+TfrxUIBComponents BITMAP "TfrxUIBComponents.bmp"

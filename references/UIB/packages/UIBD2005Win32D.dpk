@@ -1,0 +1,51 @@
+package uibD2005Win32D;
+
+{$I ..\source\uib.inc}
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  uibD2005Win32R,
+  designide,
+  dcldb,
+{$IFDEF HAVE_SYNEDIT}
+  SynEdit_R2005,
+{$ENDIF}
+  rtl,
+  vcl,
+  vclx,
+  vcldb,
+  dbrtl;
+
+contains
+  uibreg in '..\source\uibreg.pas',
+{$IFDEF HAVE_SYNEDIT}
+  uibsqledit in '..\source\uibsqledit.pas',
+  uibsynedit in '..\source\uibsynedit.pas',  
+{$ENDIF}
+  uibtransactionedit in '..\source\uibtransactionedit.pas';
+
+end.

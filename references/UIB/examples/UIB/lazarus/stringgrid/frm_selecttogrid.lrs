@@ -1,0 +1,40 @@
+{ Ceci est un fichier ressource généré automatiquement par Lazarus }
+
+LazarusResources.Add('TForm1','FORMDATA',[
+  'TPF0'#6'TForm1'#5'Form1'#7'Caption'#6#5'Form1'#12'ClientHeight'#3#195#1#11'C'
+  +'lientWidth'#3'@'#2#13'PixelsPerInch'#2'`'#7'Visible'#9#18'HorzScrollBar.Pag'
+  +'e'#3'A'#2#23'VertScrollBar.Increment'#2'-'#18'VertScrollBar.Page'#3#196#1#20
+  +'VertScrollBar.Smooth'#9#4'Left'#3';'#1#6'Height'#3#195#1#3'Top'#3'n'#1#5'Wi'
+  +'dth'#3'@'#2#0#6'TPanel'#6'Panel1'#5'Align'#7#5'alTop'#12'ClientHeight'#2')'
+  +#11'ClientWidth'#3'@'#2#11'FullRepaint'#8#8'TabOrder'#2#0#7'TabStop'#9#6'Hei'
+  +'ght'#2')'#5'Width'#3'@'#2#0#12'TSpeedButton'#10'btnConnect'#7'Caption'#6#7
+  +'Connect'#9'NumGlyphs'#2#0#7'OnClick'#7#17'SpeedButton1Click'#4'Left'#3#180#1
+  +#6'Height'#2#22#3'Top'#2#8#5'Width'#2'l'#0#0#6'TLabel'#6'Label1'#7'Caption'#6
+  +#8'DataBase'#4'Left'#2#16#6'Height'#2#17#3'Top'#2#10#5'Width'#2'A'#0#0#5'TEd'
+  +'it'#10'edDataBase'#8'TabOrder'#2#1#4'Text'#6'$/opt/interbase/examples/emplo'
+  +'yee.gdb'#4'Left'#2'P'#6'Height'#2#19#3'Top'#2#8#5'Width'#3'`'#1#0#0#0#6'TPa'
+  +'nel'#6'Panel2'#5'Align'#7#5'alTop'#10'BevelOuter'#7#6'bvNone'#7'Caption'#6#6
+  +'Panel2'#12'ClientHeight'#2'W'#11'ClientWidth'#3'@'#2#11'FullRepaint'#8#8'Ta'
+  +'bOrder'#2#1#7'TabStop'#9#6'Height'#2'W'#3'Top'#2')'#5'Width'#3'@'#2#0#6'TPa'
+  +'nel'#6'Panel3'#5'Align'#7#7'alRight'#12'ClientHeight'#2'W'#11'ClientWidth'#2
+  +'w'#11'FullRepaint'#8#8'TabOrder'#2#0#7'TabStop'#9#4'Left'#3#201#1#6'Height'
+  +#2'W'#5'Width'#2'w'#0#7'TButton'#7'btnOpen'#7'Caption'#6#5'Open '#7'Enabled'
+  +#8#7'OnClick'#7#12'btnOpenClick'#8'TabOrder'#2#0#4'Left'#2#12#6'Height'#2#25
+  +#3'Top'#2#17#5'Width'#2'c'#0#0#0#5'TMemo'#5'moSQL'#5'Align'#7#8'alClient'#8
+  +'TabOrder'#2#1#6'Height'#2'W'#5'Width'#3#201#1#0#0#0#11'TStringGrid'#2'SG'#5
+  +'Color'#7#7'clWhite'#8'ColCount'#2#5#15'DefaultColWidth'#2'@'#16'DefaultRowH'
+  +'eight'#2#24#10'FixedColor'#7#9'clBtnFace'#13'GridLineWidth'#2#0#7'Options'
+  +#11#15'goFixedVertLine'#15'goFixedHorzLine'#10'goVertLine'#10'goHorzLine'#13
+  +'goRangeSelect'#14'goSmoothScroll'#0#8'RowCount'#2#5#10'ScrollBars'#7#10'ssA'
+  +'utoBoth'#8'TabOrder'#2#2#7'TabStop'#9#15'VisibleColCount'#2#4#15'VisibleRow'
+  +'Count'#2#4#6'Height'#3'C'#1#3'Top'#3#128#0#5'Width'#3'@'#2#5'Cells'#1#2#0#0
+  +#0#0#14'TUIBDataBase'#7'UIBBase'#14'Params.Strings'#1#6#13'sql_dialect=3'#6
+  +#13'lc_ctype=NONE'#6#18'password=masterkey'#6#16'user_name=SYSDBA'#0#8'UserN'
+  +'ame'#6#6'SYSDBA'#8'PassWord'#6#9'masterkey'#11'LibraryName'#6#9'gds32.dll'#4
+  +'left'#3#152#0#3'top'#3#130#1#0#0#17'TUIBTransaction'#6'UIBTrs'#8'DataBase'
+  +#7#7'UIBBase'#7'Options'#11#13'tpConcurrency'#6'tpWait'#7'tpWrite'#15'tpRead'
+  +'Committed'#0#4'left'#3#152#0#3'top'#3#166#1#0#0#11'TUIBQuery'#3'Qry'#11'S'
+  +'QL.Strings'#1#6#6'select'#6#1'*'#6#4'from'#6#6'street'#6#5'where'#6#23'stre'
+  +'et_id = :street_id2'#0#11'Transaction'#7#6'UIBTrs'#4'left'#3#152#0#3'top'#3
+  +#200#1#0#0#0
+]);

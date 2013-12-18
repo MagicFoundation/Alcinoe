@@ -1,0 +1,46 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = dbexpUIBfire15.dll dbexpUIBfire102.dll dbexpUIBfire103.dll \
+  dbexpUIBint6.dll dbexpUIBint7.dll dbexpUIBint65.dll dbexpUIBint71.dll \
+  dbexpUIByaffil.dll Install.exe
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+dbexpUIBfire15.dll: dbexpUIBfire15.dpr
+  $(DCC)
+
+dbexpUIBfire102.dll: dbexpUIBfire102.dpr
+  $(DCC)
+
+dbexpUIBfire103.dll: dbexpUIBfire103.dpr
+  $(DCC)
+
+dbexpUIBint6.dll: dbexpUIBint6.dpr
+  $(DCC)
+
+dbexpUIBint7.dll: dbexpUIBint7.dpr
+  $(DCC)
+
+dbexpUIBint65.dll: dbexpUIBint65.dpr
+  $(DCC)
+
+dbexpUIBint71.dll: dbexpUIBint71.dpr
+  $(DCC)
+
+dbexpUIByaffil.dll: dbexpUIByaffil.dpr
+  $(DCC)
+
+Install.exe: Install.dpr
+  $(DCC)
+
+

@@ -108,10 +108,18 @@ unit ALZLibEx;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 {$I ALZLibEx.inc}
 
-uses
-  SysUtils, Classes, ALZLibExApi;
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Classes,
+     {$ELSE}
+     SysUtils,
+     Classes,
+     {$IFEND}
+     ALZLibExApi;
 
 type
 

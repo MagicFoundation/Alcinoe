@@ -60,9 +60,15 @@ unit ALSQLClauses;
 
 interface
 
-uses AlStringList,
-     ALFbxClient,
-     Contnrs;
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Contnrs,
+     {$ELSE}
+     Contnrs,
+     {$IFEND}
+     AlStringList,
+     ALFbxClient;
 
 Type
 
@@ -158,7 +164,14 @@ Type
 
 implementation
 
-uses ALString;
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     System.Types,
+     {$ELSE}
+     Classes,
+     Types,
+     {$IFEND}
+     AlString;
 
 {************************************}
 constructor TAlSelectSQLClause.Create;

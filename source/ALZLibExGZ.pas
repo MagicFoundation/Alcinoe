@@ -63,10 +63,22 @@ unit ALZLibExGZ;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 {$I ALZLibEx.inc}
 
-uses
-  ALZLibEx, Windows, SysUtils, Classes {$IFDEF Version6Plus}, DateUtils {$ENDIF};
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     system.SysUtils,
+     System.Classes,
+     System.DateUtils,
+     {$ELSE}
+     Windows,
+     SysUtils,
+     Classes,
+     {$IFDEF Version6Plus}DateUtils,{$ENDIF}
+     {$IFEND}
+     ALZLibEx;
 
 type
   {** TGZHeader *********************************************************************************}
@@ -254,8 +266,7 @@ procedure ALGZDecompressStream(inStream, outStream: TStream);
 
 implementation
 
-uses
-  ALZLibExApi;
+uses ALZLibExApi;
 
 {********************************************************}
 function ALGZCompressStr(const s: AnsiString): AnsiString;

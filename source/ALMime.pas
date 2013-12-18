@@ -61,9 +61,17 @@ unit ALMime;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     System.Types,
+     System.sysutils,
+     {$ELSE}
+     Classes,
      Types,
      sysutils,
+     {$IFEND}
      ALStringList;
 
 {$if CompilerVersion<=18.5}
@@ -140,8 +148,13 @@ Var vAlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
 
 implementation
 
-Uses Windows,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.win.Registry,
+     {$ELSE}
+     Windows,
      Registry,
+     {$IFEND}
      ALString;
 
 // Caution: For MimeEncodeStream and all other kinds of multi-buffered

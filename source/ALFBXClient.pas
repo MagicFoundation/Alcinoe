@@ -62,11 +62,21 @@ unit ALFBXClient;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.classes,
+     System.SysUtils,
+     System.Contnrs,
+     System.SyncObjs,
+     {$ELSE}
+     Windows,
      classes,
      SysUtils,
      Contnrs,
      SyncObjs,
+     {$IFEND}
      AlXmlDoc,
      ALAVLBinaryTree,
      ALFBXLib,
@@ -928,7 +938,11 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
 
 implementation
 
-uses Diagnostics,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Diagnostics,
+     {$ELSE}
+     Diagnostics,
+     {$IFEND}
      ALWindows,
      alfbxError;
 

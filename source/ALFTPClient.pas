@@ -57,9 +57,17 @@ unit ALFTPClient;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.SysUtils,
+     System.Classes;
+     {$ELSE}
+     Windows,
      SysUtils,
      Classes;
+     {$IFEND}
 
 type
 

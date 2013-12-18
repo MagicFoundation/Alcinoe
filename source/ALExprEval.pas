@@ -81,8 +81,15 @@ unit ALExprEval;
 
 interface
 
-uses SysUtils,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Classes,
+     {$ELSE}
+     SysUtils,
      Classes,
+     {$IFEND}
      ALStringList;
 
 type
@@ -976,8 +983,15 @@ resourcestring
 
 implementation
 
-uses Math,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Types,
+     System.Math,
+     System.Contnrs,
+     {$ELSE}
+     Types,
+     Math,
      Contnrs,
+     {$IFEND}
      ALString,
      ALZLibExAPI,
      ALZLibEx;

@@ -70,8 +70,15 @@ interface
 {.$B-} {Complete Boolean Evaluation}
 {.$I+} {Input/Output-Checking}
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Classes,
+     {$ELSE}
+     Windows,
      Classes,
+     {$IFEND}
      ALString;
 
 const
@@ -275,9 +282,15 @@ function  ALStringHashMix128(const Str : AnsiString): LongInt; overload;
 
 implementation
 
-uses sysutils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.sysutils,
+     winapi.MMSystem,
+     system.Math;
+     {$ELSE}
+     sysutils,
      MMSystem,
      Math;
+     {$IFEND}
 
 type
   pALCipherMD5ContextEx = ^TALCipherMD5ContextEx;

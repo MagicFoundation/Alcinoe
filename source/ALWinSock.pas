@@ -57,6 +57,8 @@ unit ALWinSock;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 uses AlStringList;
 
 function  ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;
@@ -66,11 +68,14 @@ function  ALgetLocalHostName: AnsiString;
 
 implementation
 
-uses Windows,
-     sysutils,
-     {$IF CompilerVersion >= 23} {Delphi XE2}
-     WinSock2,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.SysUtils,
+     Winapi.WinSock2,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
      {$ELSE}
+     Windows,
+     SysUtils,
      WinSock,
      {$IFEND}
      ALString;
@@ -114,7 +119,7 @@ begin
   Try
     SockAddrIn.sin_addr.s_addr:= inet_addr(PAnsiChar(IPAddr));
     HostEnt:= gethostbyaddr(@SockAddrIn.sin_addr.S_addr, 4, AF_INET);
-    if HostEnt<>nil then result:=StrPas(Hostent^.h_name)
+    if HostEnt<>nil then result:={$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPas(Hostent^.h_name)
     else result:='';
   finally
     WSACleanup;
@@ -160,7 +165,7 @@ begin
   Try
 
     if gethostname(Buffer, SizeOf(Buffer)) <> 0 then raise EALException.Create('Winsock GetHostName failed');
-    Result := StrPas(Buffer);
+    Result := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPas(Buffer);
 
   finally
     WSACleanup;

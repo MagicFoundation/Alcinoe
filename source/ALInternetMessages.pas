@@ -58,7 +58,13 @@ unit ALInternetMessages;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.Classes,
+     {$ELSE}
+     Classes,
+     {$IFEND}
      AlStringList;
 
 Type
@@ -181,7 +187,11 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
 
 implementation
 
-uses Sysutils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.Sysutils,
+     {$ELSE}
+     Sysutils,
+     {$IFEND}
      ALHttpClient,
      ALMime,
      ALWinsock,

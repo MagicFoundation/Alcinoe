@@ -60,10 +60,18 @@ unit ALWinInetFTPClient;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     WinApi.Windows,
+     System.Classes,
+     Winapi.WinInet,
+     {$ELSE}
+     Windows,
      Classes,
-     ALFTPClient,
-     WinInet;
+     WinInet,
+     {$IFEND}
+     ALFTPClient;
 
 {$IF CompilerVersion < 18.5}
 Type
@@ -224,7 +232,12 @@ type
 
 implementation
 
-Uses SysUtils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     {$ELSE}
+     SysUtils,
+     {$IFEND}
      ALString;
 
 {********************************************************************}
@@ -287,7 +300,7 @@ var ErrCode: DWord;
                      PAnsiChar(ErrMsg),
                      Length(ErrMsg),
                      nil);
-      SetLength(ErrMsg, StrLen(PAnsiChar(ErrMsg)));
+      SetLength(ErrMsg, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(ErrMsg)));
     end;
 
 begin
@@ -305,11 +318,11 @@ begin
           InternetGetLastResponseInfoA(ErrCode,
                                        PAnsiChar(ErrMsg),
                                        ErrMsgln);
-          SetLength(ErrMsg, StrLen(PAnsiChar(ErrMsg)));
+          SetLength(ErrMsg, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(ErrMsg)));
         end
         else internalFormatMessageFromErrCode;
       end
-      else SetLength(ErrMsg, StrLen(PAnsiChar(ErrMsg)));
+      else SetLength(ErrMsg, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(PAnsiChar(ErrMsg)));
     end
     else internalFormatMessageFromErrCode;
 
@@ -394,7 +407,7 @@ begin
   if (FConnected) then Exit;
 
   { Also, could switch to new API introduced in IE4/Preview2}
-  if InternetAttemptConnect(0) <> ERROR_SUCCESS then SysUtils.Abort;
+  if InternetAttemptConnect(0) <> ERROR_SUCCESS then {$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysUtils.Abort;
 
   {init FInetRoot}
   FInetRoot := InternetOpenA(PAnsiChar(''),

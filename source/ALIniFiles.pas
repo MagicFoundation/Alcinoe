@@ -58,8 +58,15 @@ unit ALIniFiles;
 
 interface
 
-uses SysUtils,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Classes,
+     {$ELSE}
+     SysUtils,
      Classes,
+     {$IFEND}
      ALString,
      ALStringList;
 
@@ -118,8 +125,14 @@ type
 
 implementation
 
-uses RTLConsts,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.RTLConsts,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     {$ELSE}
      Windows,
+     RTLConsts,
+     {$IFEND}
      ALFiles;
 
 {**************************************************************}
@@ -454,7 +467,7 @@ begin
         P := LBuffer;
         while P^ <> #0 do begin
           Strings.Add(P);
-          Inc(P, StrLen(P) + 1);
+          Inc(P, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(P) + 1);
         end;
       end;
     finally
@@ -481,7 +494,7 @@ var
         P := Buffer;
         while P^ <> #0 do begin
           Strings.Add(P);
-          Inc(P, StrLen(P) + 1);
+          Inc(P, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(P) + 1);
         end;
       end;
     finally

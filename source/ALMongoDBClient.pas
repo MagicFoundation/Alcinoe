@@ -135,15 +135,21 @@ unit ALMongoDBClient;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     WinSock2,
+     winapi.WinSock2,
+     system.Contnrs,
+     system.Classes,
+     System.SyncObjs,
+     System.SysUtils,
      {$ELSE}
      WinSock,
-     {$IFEND}
      Contnrs,
      Classes,
      SyncObjs,
      SysUtils,
+     {$IFEND}
      ALString,
      ALStringList,
      ALJSONDoc;
@@ -721,8 +727,13 @@ type
 
 implementation
 
-Uses Windows,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Diagnostics,
+     {$ELSE}
+     Windows,
      Diagnostics,
+     {$IFEND}
      AlWinsock,
      ALWindows;
 
@@ -870,7 +881,7 @@ procedure TAlBaseMongoDBClient.DoConnect(var aSocketDescriptor: TSocket;
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
     {$IF CompilerVersion >= 23} {Delphi XE2}
-    CheckError(WinSock2.Connect(aSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
+    CheckError(Winapi.WinSock2.Connect(aSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
     {$ELSE}
     CheckError(WinSock.Connect(aSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
     {$IFEND}

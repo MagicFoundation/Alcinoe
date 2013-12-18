@@ -60,6 +60,8 @@ unit ALMisc;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
@@ -69,9 +71,15 @@ Function ALInc(var x: integer; Count: integer): Integer;
 
 implementation
 
-uses Windows,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     system.sysutils,
+     system.DateUtils,
+     {$ELSE}
+     Windows,
      sysutils,
      DateUtils,
+     {$IFEND}
      ALString;
 
 {******************************************}

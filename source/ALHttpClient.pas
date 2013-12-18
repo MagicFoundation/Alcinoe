@@ -65,9 +65,17 @@ unit ALHttpClient;
 
 interface
 
-uses SysUtils,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Classes,
+     Winapi.Wininet,
+     {$ELSE}
+     SysUtils,
      Classes,
      Wininet,
+     {$IFEND}
      ALStringList,
      ALMultiPartParser;
 
@@ -544,10 +552,17 @@ Const
 
 implementation
 
-uses Windows,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     Web.HttpApp,
+     System.DateUtils,
+     System.SysConst,
+     {$ELSE}
+     Windows,
      HttpApp,
      DateUtils,
      SysConst,
+     {$IFEND}
      AlMisc,
      ALString;
 

@@ -58,8 +58,15 @@ unit ALGraphic;
 
 interface
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     Vcl.Graphics;
+     {$ELSE}
+     Windows,
      Graphics;
+     {$IFEND}
 
 {$if CompilerVersion<=18.5}
 //http://stackoverflow.com/questions/7630781/delphi-2007-and-xe2-using-nativeint
@@ -101,9 +108,15 @@ procedure ALRotateBMP270(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
 
 implementation
 
-uses SysUtils,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.Classes,
+     System.math;
+     {$ELSE}
+     SysUtils,
      Classes,
      math;
+     {$IFEND}
 
 Const
   cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.

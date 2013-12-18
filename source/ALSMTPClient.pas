@@ -72,8 +72,10 @@ unit ALSMTPClient;
 
 interface
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     WinSock2,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.WinSock2,
      {$ELSE}
      WinSock,
      {$IFEND}
@@ -144,9 +146,15 @@ type
 
 implementation
 
-Uses Windows,
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.Classes,
+     System.SysUtils,
+     {$ELSE}
+     Windows,
      Classes,
      SysUtils,
+     {$IFEND}
      ALMime,
      ALWinsock,
      ALString;
@@ -202,7 +210,7 @@ Function TAlSmtpClient.Connect(const aHost: AnsiString; const APort: integer): A
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
     {$IF CompilerVersion >= 23} {Delphi XE2}
-    CheckError(WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
+    CheckError(Winapi.WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
     {$ELSE}
     CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
     {$IFEND}

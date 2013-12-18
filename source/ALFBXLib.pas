@@ -80,9 +80,17 @@ unit ALFBXLib;
 
 interface
 
-uses Windows,
-     Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.SysUtils,
+     System.Classes,
+     {$ELSE}
+     Windows,
      SysUtils,
+     Classes,
+     {$IFEND}
      ALFBXbase;
 
 type
@@ -1207,11 +1215,14 @@ const
 
 implementation
 
-uses //{$IFDEF UNICODE}
-     //  AnsiStrings,
-     //{$ENDIF}
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Math,
+     System.Variants,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     {$ELSE}
      Math,
      Variants,
+     {$IFEND}
      ALFBXerror,
      ALFBXConst,
      ALString;
@@ -1489,7 +1500,7 @@ const
     CurPos  := PAnsiChar(Params);
     while (CurPos <> nil) do
     begin
-      NextPos := StrScan(CurPos, Delimiter);
+      NextPos := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(CurPos, Delimiter);
       if (NextPos = nil) then
         CurStr := CurPos else
         begin
@@ -1506,7 +1517,7 @@ const
           CurValue := ALCopyStr(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
           CurStr   := ALCopyStr(CurStr, 0, EqualPos-1);
         end;
-        StrLower(PAnsiChar(CurStr));
+        {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLower(PAnsiChar(CurStr));
         CurStr := ALTrim(CurStr);
         CurValue := ALTrim(CurValue);
         for Code := 1 to isc_dpb_Max_Value do
@@ -1741,7 +1752,7 @@ const
     begin
       for Result := low(TALFBXCharacterSet) to High(TALFBXCharacterSet) do
         if (len = Length(cALFBXCharacterSetStr[Result])) and
-          (StrIComp(PAnsiChar(cALFBXCharacterSetStr[Result]), PAnsiChar(CharacterSet)) = 0) then
+          ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrIComp(PAnsiChar(cALFBXCharacterSetStr[Result]), PAnsiChar(CharacterSet)) = 0) then
             Exit;
       raise Exception.CreateFmt(cALFBX_CHARSETNOTFOUND, [CharacterSet]);
     end;
@@ -2463,7 +2474,7 @@ const
     CurPos  := PAnsiChar(Params);
     while (CurPos <> nil) do
     begin
-      NextPos := StrScan(CurPos, Delimiter);
+      NextPos := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(CurPos, Delimiter);
       if (NextPos = nil) then
         CurStr := CurPos else
         begin
@@ -2480,7 +2491,7 @@ const
           CurValue := ALCopyStr(CurStr, EqualPos+1, Length(CurStr) - EqualPos);
           CurStr   := ALCopyStr(CurStr, 0, EqualPos-1);
         end;
-        StrLower(PAnsiChar(CurStr));
+        {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLower(PAnsiChar(CurStr));
         CurStr := ALTrim(CurStr);
         CurValue := ALTrim(CurValue);
         for Code := 1 to isc_bpb_Max_Value do
@@ -4766,7 +4777,7 @@ end;
   begin
     for i := 0 to GetAllocatedFields - 1 do
       if FXSQLDA.sqlvar[i].AliasNameLength = Length(name) then
-        if StrLIComp(PansiChar(@FXSQLDA.sqlvar[i].aliasname), PAnsiChar(Name),
+        if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(PansiChar(@FXSQLDA.sqlvar[i].aliasname), PAnsiChar(Name),
           FXSQLDA.sqlvar[i].AliasNameLength) = 0 then
           begin
             index := i;
@@ -5779,7 +5790,7 @@ end;
     if FXSQLDA.sqln > 1 then
       for i := 0 to FXSQLDA.sqln - 2 do
         if not ((FXSQLDA.sqlvar[i].RelNameLength = FXSQLDA.sqlvar[i+1].RelNameLength) and
-          (StrIComp(FXSQLDA.sqlvar[i].RelName, FXSQLDA.sqlvar[i+1].RelName) = 0)) then
+          ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrIComp(FXSQLDA.sqlvar[i].RelName, FXSQLDA.sqlvar[i+1].RelName) = 0)) then
             exit;
     if FXSQLDA.sqln > 0 then
       SetString(Result, FXSQLDA.sqlvar[0].RelName, FXSQLDA.sqlvar[0].RelNameLength);
@@ -6289,7 +6300,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: AnsiString; FieldType: TALFBX
         'b','B':
           begin
             if not ((dest > 0) and (AnsiChar(src[-1])
-              in Identifiers)) and (StrIComp(PAnsiChar(AlCopyStr(Src, 0, 5)), 'begin') = 0) and
+              in Identifiers)) and ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrIComp(PAnsiChar(AlCopyStr(Src, 0, 5)), 'begin') = 0) and
                 not (AnsiChar(Src[5]) in Identifiers) then
                   while (Src^ <> #0) do Next else next;
           end;
@@ -6298,7 +6309,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: AnsiString; FieldType: TALFBX
         'd','D':
           begin
             if not ((dest > 0) and (AnsiChar(src[-1])
-              in Identifiers)) and (StrIComp(PAnsiChar(AlCopyStr(Src, 0, 7)), 'declare') = 0) and
+              in Identifiers)) and ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrIComp(PAnsiChar(AlCopyStr(Src, 0, 7)), 'declare') = 0) and
                 not (AnsiChar(Src[7]) in Identifiers) then
                   while (Src^ <> #0) do Next else next;
           end;
@@ -6338,7 +6349,7 @@ procedure TALFBXSQLParams.AddFieldType(const Name: AnsiString; FieldType: TALFBX
   begin
     for Field := 0 to FXSQLDA.sqln - 1 do
       if FXSQLDA.sqlvar[Field].ParamNameLength = Length(name) then
-        if StrLIComp(@FXSQLDA.sqlvar[Field].ParamName, PAnsiChar(Name),
+        if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(@FXSQLDA.sqlvar[Field].ParamName, PAnsiChar(Name),
           FXSQLDA.sqlvar[Field].ParamNameLength) = 0 then
           begin
             Result := true;

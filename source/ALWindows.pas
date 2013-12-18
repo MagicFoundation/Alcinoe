@@ -56,7 +56,13 @@ unit ALWindows;
 
 interface
 
-uses Windows;
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows;
+     {$ELSE}
+     Windows;
+     {$IFEND}
 
 type
 
@@ -103,7 +109,12 @@ const INVALID_SET_FILE_POINTER = DWORD(-1);
 
 implementation
 
-uses sysutils;
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     System.SysUtils;
+     {$ELSE}
+     SysUtils;
+     {$IFEND}
 
 {*****************************************************************************}
 function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
@@ -163,7 +174,7 @@ begin
                      NameUse); // var peUse: SID_NAME_USE
 
   // init buffers according to retrieved data
-  szDomain := AnsiStrAlloc(cbDomain);
+  szDomain := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}AnsiStrAlloc(cbDomain);
   SID      := AllocMem(cbSID);
   try
 
@@ -177,7 +188,7 @@ begin
                                  NameUse);
 
   finally
-    StrDispose(szDomain);
+    {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrDispose(szDomain);
     FreeMem(SID);
   end;
 

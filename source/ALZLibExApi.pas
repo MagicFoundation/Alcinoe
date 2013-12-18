@@ -44,6 +44,8 @@ unit ALZLibExApi;
 
 interface
 
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
 {$I ALZLibEx.inc}
 
 const

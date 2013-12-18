@@ -71,7 +71,13 @@ unit ALAVLBinaryTree;
 
 interface
 
-uses classes;
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.classes;
+     {$ELSE}
+     classes;
+     {$IFEND}
 
 type
 
@@ -274,8 +280,13 @@ type
 
 implementation
 
-uses Contnrs,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Contnrs,
+     System.sysUtils,
+     {$ELSE}
+     Contnrs,
      sysUtils,
+     {$IFEND}
      ALString;
 
 {Following stack declarations are used to avoid recursion in all tree

@@ -58,7 +58,13 @@ unit ALCGI;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     system.classes,
+     {$ELSE}
+     classes,
+     {$IFEND}
      ALIsapiHTTP,
      AlHttpClient,
      AlStringList;

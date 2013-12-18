@@ -106,9 +106,17 @@ interface
 
 {$DEFINE LEGACY_FORMAT} // Define this to enable the old ASM code for Win32.
 
-uses Windows,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     Winapi.Windows,
+     System.SysUtils,
+     System.Classes,
+     {$ELSE}
+     Windows,
      SysUtils,
      Classes,
+     {$IFEND}
      ALStringList;
 
 resourcestring
@@ -274,7 +282,7 @@ type
         // Clean up after ourselves
     class function EscapeRegExChars(const S: AnsiString): AnsiString;
         // Escapes regex characters in S so that the regex engine can be used to match S as plain text
-    procedure Compile;
+    function Compile(const RaiseException: boolean = True): boolean;
         // Compile the regex. Called automatically by Match
     procedure Study;
         // Study the regex. Studying takes time, but will make the execution of the regex a lot faster.
@@ -577,19 +585,25 @@ var
 
 implementation
 
-uses SysConst,
-     {$if CompilerVersion >= 23}{Delphi XE2}
-     System.RegularExpressionsAPI,
-     System.RegularExpressionsConsts,
-     {$ifend}
-     RTLConsts,
-     {$IFDEF UNICODE}
-     Ansistrings,
-     Character,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+       System.SysConst,
+       System.RTLConsts,
+       System.RegularExpressionsAPI,
+       System.RegularExpressionsConsts,
+       System.Ansistrings,
+       System.Character,
+       System.Math,
      {$ELSE}
-     Strutils,
-     {$ENDIF}
-     Math,
+       SysConst,
+       RTLConsts,
+       {$IFDEF UNICODE}
+         Ansistrings,
+         Character,
+       {$ELSE}
+         Strutils,
+       {$ENDIF}
+       Math,
+     {$IFEND}
      AlHTTPClient;
 
 {*****************************************************}
@@ -771,7 +785,7 @@ end;
 function ALGUIDToString(const Guid: TGUID): Ansistring;
 begin
   SetLength(Result, 38);
-  StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+  {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
     [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
     Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
 end;
@@ -1114,18 +1128,24 @@ end;
 
 {*************************************}
 {$if CompilerVersion >= 23}{Delphi XE2}
-procedure TALPerlRegEx.Compile;
+function TALPerlRegEx.Compile(const RaiseException: boolean = True): boolean;
 var
   Error: PAnsiChar;
   ErrorOffset: Integer;
 begin
-  if FRegEx = '' then
-    raise ERegularExpressionError.CreateRes(@SRegExMissingExpression);
+  result := False;
   CleanUp;
+  if FRegEx = '' then begin
+    if RaiseException then raise ERegularExpressionError.CreateRes(@SRegExMissingExpression)
+    else exit;
+  end;
   FPattern := pcre_compile(PAnsiChar(FRegEx), FPCREOptions, @Error, @ErrorOffset, FCharTable);
-  if FPattern = nil then
-    raise ERegularExpressionError.CreateResFmt(@SRegExExpressionError, [ErrorOffset, String(Error)]);
-  FCompiled := True
+  if FPattern = nil then begin
+    if RaiseException then raise ERegularExpressionError.CreateResFmt(@SRegExExpressionError, [ErrorOffset, String(Error)])
+    else exit;
+  end;
+  FCompiled := True;
+  result := True;
 end;
 {$ifend}
 
@@ -2375,7 +2395,7 @@ var
 
   function GetDigit: AnsiChar;
   begin
-    Result := FloatRec.Digits[LFloatRecDigit];
+    Result := AnsiChar(FloatRec.Digits[LFloatRecDigit]);
 
     if Result = #0 then
       Result := '0'
@@ -2484,7 +2504,7 @@ var
         AppendChar(CPlusSign);
     end;
  }
-    if FloatRec.Digits[0] <> #0 then
+    if FloatRec.Digits[0] <> ord(#0) then
     begin
       if LExponent < 0 then
       begin
@@ -2586,12 +2606,12 @@ begin
         end;
 
         { Append the decimal separator and the following digit }
-        if FloatRec.Digits[LFloatRecDigit] <> #0 then
+        if FloatRec.Digits[LFloatRecDigit] <> ord(#0) then
         begin
           AppendAnsiChar(AFormatSettings.DecimalSeparator);
 
           { Append the ADigits that come after the decimal separator }
-          while FloatRec.Digits[LFloatRecDigit] <> #0 do
+          while FloatRec.Digits[LFloatRecDigit] <> ord(#0) do
             AppendAnsiChar(GetDigit);
         end;
 
@@ -2601,7 +2621,7 @@ begin
       begin
         AppendAnsiChar(CZero);
 
-        if FloatRec.Digits[0] <> #0 then
+        if FloatRec.Digits[0] <> ord(#0) then
         begin
           AppendAnsiChar(AFormatSettings.DecimalSeparator);
           LDigits := -LDigits;
@@ -2614,7 +2634,7 @@ begin
           end;
 
           { Attach all the other ADigits now }
-          while FloatRec.Digits[LFloatRecDigit] <> #0 do
+          while FloatRec.Digits[LFloatRecDigit] <> ord(#0) do
             AppendAnsiChar(GetDigit);
         end;
       end;
@@ -3307,7 +3327,7 @@ var
   begin
     Item := AItem;
     if Assigned(AItem) then
-      NumChar := StrLen(Item)
+      NumChar := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLen(Item)
     else
       NumChar := 0;
     if (ItemLen > -1) and (NumChar > ItemLen) then
@@ -3411,14 +3431,14 @@ begin
       Width := 0;
       // Gather Index
       Inc(ArgsIndex);
-      if TCharacter.IsNumber(Char(FormatPtr^)) then
+      if {$IF CompilerVersion >= 25}{Delphi XE4} Char(FormatPtr^).IsNumber {$ELSE} TCharacter.IsNumber(Char(FormatPtr^)) {$IFEND} then
       begin
         FormatStartPtr := FormatPtr;
-        while (FormatPtr < FormatEndPtr) and (TCharacter.IsNumber(Char(FormatPtr^)))  do
+        while (FormatPtr < FormatEndPtr) and {$IF CompilerVersion >= 25}{Delphi XE4} (Char(FormatPtr^).IsNumber) {$ELSE} (TCharacter.IsNumber(Char(FormatPtr^))) {$IFEND}  do
           Inc(FormatPtr);
         if FormatStartPtr <> FormatPtr then
         begin
-          StrLCopy(StrBuf, FormatStartPtr, Integer(FormatPtr - FormatStartPtr));
+          {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLCopy(StrBuf, FormatStartPtr, Integer(FormatPtr - FormatStartPtr));
           if not ALTryStrToInt(AnsiString(StrBuf), FirstNumber) then
             ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
           if FormatPtr^ = ':' then
@@ -3450,13 +3470,13 @@ begin
         Width := -2;
         Inc(FormatPtr);
       end
-      else if TCharacter.IsNumber(Char(FormatPtr^)) then
+      else if {$IF CompilerVersion >= 25}{Delphi XE4} Char(FormatPtr^).IsNumber {$ELSE} TCharacter.IsNumber(Char(FormatPtr^)) {$IFEND} then
       begin
-        while (FormatPtr < FormatEndPtr) and (TCharacter.IsNumber(Char(FormatPtr^)))  do
+        while (FormatPtr < FormatEndPtr) and {$IF CompilerVersion >= 25}{Delphi XE4} (Char(FormatPtr^).IsNumber) {$ELSE} (TCharacter.IsNumber(Char(FormatPtr^))) {$IFEND} do
           Inc(FormatPtr);
         if FormatStartPtr <> FormatPtr then
         begin
-          StrLCopy(StrBuf, FormatStartPtr, Integer(FormatPtr - FormatStartPtr));
+          {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLCopy(StrBuf, FormatStartPtr, Integer(FormatPtr - FormatStartPtr));
           if not ALTryStrToInt(AnsiString(StrBuf), Width) then
             ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
         end
@@ -3475,9 +3495,9 @@ begin
         else
         begin
           FormatStartPtr := FormatPtr;
-          while (FormatPtr < FormatEndPtr) and (TCharacter.IsNumber(Char(FormatPtr^)))  do
+          while (FormatPtr < FormatEndPtr) and {$IF CompilerVersion >= 25}{Delphi XE4} (Char(FormatPtr^).IsNumber) {$ELSE} (TCharacter.IsNumber(Char(FormatPtr^))) {$IFEND} do
             Inc(FormatPtr);
-          StrLCopy(StrBuf, FormatStartPtr, Integer(FormatPtr - FormatStartPtr));
+          {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLCopy(StrBuf, FormatStartPtr, Integer(FormatPtr - FormatStartPtr));
           if not ALTryStrToInt(AnsiString(StrBuf), Precision) then
             ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
         end;
@@ -3486,7 +3506,7 @@ begin
         Precision := -1;
 
       // Gather Conversion Character
-      if not TCharacter.IsLetter(Char(FormatPtr^)) then
+      if not {$IF CompilerVersion >= 25}{Delphi XE4} Char(FormatPtr^).IsLetter {$ELSE} TCharacter.IsLetter(Char(FormatPtr^)) {$IFEND} then
         Break;
       case FormatPtr^ of
         'a'..'z':
@@ -4392,13 +4412,13 @@ var
         begin
           case SysLocale.PriLangID of
             LANG_JAPANESE:
-              Result := ALCopyStr(Result, 1, CharToBytelen(Result, 1));
+              Result := ALCopyStr(Result, 1, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}CharToElementLen(Result, 1));
             LANG_CHINESE:
               if (SysLocale.SubLangID = SUBLANG_CHINESE_TRADITIONAL)
-                and (ByteToCharLen(Result, Length(Result)) = 4) then
+                and ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}ElementToCharLen(Result, Length(Result)) = 4) then
               begin
-                P := Buffer + CharToByteIndex(Result, 3) - 1;
-                SetString(Result, P, CharToByteLen(P, 2));
+                P := Buffer + {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}CharToElementIndex(Result, 3) - 1;
+                SetString(Result, P, {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}CharToElementLen(P, 2));
               end;
           end;
         end;
@@ -4497,7 +4517,7 @@ var
         //  LastToken := ' ';
         //  Continue;
         //end;
-        ALFormat := StrNextChar(ALFormat);
+        ALFormat := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrNextChar(ALFormat);
         Token := Starter;
         if Token in ['a'..'z'] then Dec(Token, 32);
         if Token in ['A'..'Z'] then
@@ -4570,9 +4590,9 @@ var
                   'A', 'a':
                     if not BetweenQuotes then
                     begin
-                      if ( (StrLIComp(P, 'AM/PM', 5) = 0)
-                        or (StrLIComp(P, 'A/P',   3) = 0)
-                        or (StrLIComp(P, 'AMPM',  4) = 0) ) then
+                      if ( ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'AM/PM', 5) = 0)
+                        or ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'A/P',   3) = 0)
+                        or ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'AMPM',  4) = 0) ) then
                         Use12HourClock := True;
                       Break;
                     end;
@@ -4620,21 +4640,21 @@ var
             begin
               GetTime;
               P := ALFormat - 1;
-              if StrLIComp(P, 'AM/PM', 5) = 0 then
+              if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'AM/PM', 5) = 0 then
               begin
                 if Hour >= 12 then Inc(P, 3);
                 AppendChars(P, 2);
                 Inc(ALFormat, 4);
                 Use12HourClock := TRUE;
               end else
-              if StrLIComp(P, 'A/P', 3) = 0 then
+              if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'A/P', 3) = 0 then
               begin
                 if Hour >= 12 then Inc(P, 2);
                 AppendChars(P, 1);
                 Inc(ALFormat, 2);
                 Use12HourClock := TRUE;
               end else
-              if StrLIComp(P, 'AMPM', 4) = 0 then
+              if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'AMPM', 4) = 0 then
               begin
                 if Hour < 12 then
                   AppendString(AFormatSettings.TimeAMString) else
@@ -4642,13 +4662,13 @@ var
                 Inc(ALFormat, 3);
                 Use12HourClock := TRUE;
               end else
-              if StrLIComp(P, 'AAAA', 4) = 0 then
+              if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'AAAA', 4) = 0 then
               begin
                 GetDate;
                 AppendString(AFormatSettings.LongDayNames[DayOfWeek(DateTime)]);
                 Inc(ALFormat, 3);
               end else
-              if StrLIComp(P, 'AAA', 3) = 0 then
+              if {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLIComp(P, 'AAA', 3) = 0 then
               begin
                 GetDate;
                 AppendString(AFormatSettings.ShortDayNames[DayOfWeek(DateTime)]);
@@ -5057,7 +5077,7 @@ function ALStrToDate(const S: AnsiString;
 begin
 {$IFDEF UNICODE}
   if not ALTryStrToDate(S, Result, AFormatSettings) then
-    ALConvertErrorFmt(@SysConst.SInvalidDate, [S]);
+    ALConvertErrorFmt(@{$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysConst.SInvalidDate, [S]);
 {$ELSE}
   result := StrToDate(S, AFormatSettings);
 {$ENDIF}
@@ -5085,7 +5105,7 @@ function ALStrToTime(const S: AnsiString;
 begin
 {$IFDEF UNICODE}
   if not ALTryStrToTime(S, Result, AFormatSettings) then
-    ALConvertErrorFmt(@SysConst.SInvalidTime, [S]);
+    ALConvertErrorFmt(@{$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysConst.SInvalidTime, [S]);
 {$ELSE}
   result := StrToTime(S, AFormatSettings);
 {$ENDIF}
@@ -5204,7 +5224,7 @@ function ALStrToDateTime(const S: AnsiString;
 begin
 {$IFDEF UNICODE}
   if not ALTryStrToDateTime(S, Result, AFormatSettings) then
-    ALConvertErrorFmt(@SysConst.SInvalidDateTime, [S]);
+    ALConvertErrorFmt(@{$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysConst.SInvalidDateTime, [S]);
 {$ELSE}
   Result := StrToDateTime(S, AFormatSettings);
 {$ENDIF}
@@ -5581,7 +5601,7 @@ var
   E: Integer;
 begin
   Result := _ALValLong(S, E);
-  if E <> 0 then raise EConvertError.CreateResFmt(@SysConst.SInvalidInteger, [S]);
+  if E <> 0 then raise EConvertError.CreateResFmt(@{$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysConst.SInvalidInteger, [S]);
 end;
 {$ELSE}
 begin
@@ -5627,7 +5647,7 @@ var
   E: Integer;
 begin
   Result := _ALValInt64(S, E);
-  if E <> 0 then raise EConvertError.CreateResFmt(@SysConst.SInvalidInteger, [S]);
+  if E <> 0 then raise EConvertError.CreateResFmt(@{$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysConst.SInvalidInteger, [S]);
 end;
 {$ELSE}
 begin
@@ -6726,7 +6746,7 @@ var
   begin
     Result := 0;
     C := Low(FloatValue.Digits);
-    while (C <= High(FloatValue.Digits)) and (FloatValue.Digits[C] <> #0) do
+    while (C <= High(FloatValue.Digits)) and (FloatValue.Digits[C] <> ord(#0)) do
     begin
       Inc(C);
       Inc(Result);
@@ -6767,7 +6787,7 @@ var
     begin
       if DigitsC <= DigitsLimit then
       begin
-        AChar := FloatValue.Digits[DigitsC];
+        AChar := AnsiChar(FloatValue.Digits[DigitsC]);
         Inc(DigitsC);
         WriteDigit(AChar);
       end
@@ -6942,7 +6962,7 @@ begin
     if Unicode then
       Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0)
     else
-      Result := FloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+      Result := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}FloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0)
   else
     ApplyFormat;
 end;
@@ -7796,17 +7816,17 @@ begin
   Inc(Src);
   DropCount := 1;
   P := Src;
-  Src := StrScan(Src, Quote);
+  Src := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(Src, Quote);
   while Src <> nil do   // count adjacent pairs of quote chars
   begin
     Inc(Src);
     if Src^ <> Quote then Break;
     Inc(Src);
     Inc(DropCount);
-    Src := StrScan(Src, Quote);
+    Src := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(Src, Quote);
   end;
   EndSuffix := Ord(Src = nil); // Has an ending quoatation mark?
-  if Src = nil then Src := StrEnd(P);
+  if Src = nil then Src := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrEnd(P);
   if ((Src - P) <= 1 - EndSuffix) or ((Src - P - DropCount) = EndSuffix) then Exit;
   if DropCount = 1 then
     SetString(Result, P, Src - P - 1 + EndSuffix)
@@ -7814,7 +7834,7 @@ begin
   begin
     SetLength(Result, Src - P - DropCount + EndSuffix);
     Dest := PAnsiChar(Result);
-    Src := StrScan(P, Quote);
+    Src := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(P, Quote);
     while Src <> nil do
     begin
       Inc(Src);
@@ -7823,9 +7843,9 @@ begin
       Inc(Dest, Src - P);
       Inc(Src);
       P := Src;
-      Src := StrScan(Src, Quote);
+      Src := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(Src, Quote);
     end;
-    if Src = nil then Src := StrEnd(P);
+    if Src = nil then Src := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrEnd(P);
     ALMove(P^, Dest^, Src - P - 1 + EndSuffix);
   end;
 end;
@@ -7901,7 +7921,7 @@ begin
   P := PAnsiChar(Delimiters);
   while Result > 0 do
   begin
-    if (S[Result] <> #0) and (StrScan(P, S[Result]) <> nil) then
+    if (S[Result] <> #0) and ({$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrScan(P, S[Result]) <> nil) then
       Exit;
     Dec(Result);
   end;

@@ -77,13 +77,20 @@ unit ALStringList;
 
 interface
 
-Uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     System.Contnrs,
+     {$ELSE}
+     Classes,
      Contnrs,
+     {$IFEND}
      AlAvlBinaryTRee;
 
 Type
 
-  {$IF CompilerVersion < 18.5}
+  {$IF CompilerVersion < 18.5} {Delphi 2007}
   TStringsDefined = set of (sdDelimiter, sdQuoteChar, sdNameValueSeparator,
     sdLineBreak, sdStrictDelimiter);
   {$IFEND}
@@ -377,8 +384,14 @@ Type
 
 implementation
 
-Uses sysutils,
+Uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Sysutils,
+     System.RTLConsts,
+     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+     {$ELSE}
+     sysutils,
      RTLConsts,
+     {$IFEND}
      ALString;
 
 {************************************************************}
@@ -757,7 +770,7 @@ end;
 {*************************************}
 function TALStrings.GetText: PAnsiChar;
 begin
-  Result := StrNew(PAnsiChar(GetTextStr));
+  Result := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrNew(PAnsiChar(GetTextStr));
 end;
 
 {*****************************************}
@@ -1042,7 +1055,7 @@ begin
         while P^ <> #0 do
         begin
           Start := P;
-          LB := StrPos(P, PAnsiChar(LineBreak));
+          LB := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPos(P, PAnsiChar(LineBreak));
           while (P^ <> #0) and (P <> LB) do Inc(P);
           SetString(S, Start, P - Start);
           Add(S);

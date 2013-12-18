@@ -99,8 +99,15 @@ unit ALXmlDoc;
 
 interface
 
-uses Classes,
+{$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Classes,
+     System.sysutils,
+     {$ELSE}
+     Classes,
      sysutils,
+     {$IFEND}
      AlStringList;
 
 resourcestring
@@ -811,13 +818,17 @@ function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default
 
 implementation
 
-uses Math,
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.Math,
+     Winapi.Windows,
+     System.Contnrs,
+     {$ELSE}
+     Math,
      Windows,
      Contnrs,
-     AlHTML,
-     {$IF CompilerVersion < 18.5}
-     Variants,
+     {$IF CompilerVersion < 18.5}Variants,{$IFEND}
      {$IFEND}
+     AlHTML,
      ALHttpClient,
      ALString;
 

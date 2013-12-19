@@ -1,10 +1,7 @@
 @SET BDS=C:\Program Files (x86)\Embarcadero\RAD Studio\11.0
-@SET BDSCOMMONDIR=C:\Users\Public\Documents\RAD Studio\11.0
 @SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v3.5
 @SET FrameworkVersion=v3.5
-@SET FrameworkSDKDir=
-@SET PATH=%FrameworkDir%;%FrameworkSDKDir%;C:\Program Files (x86)\Embarcadero\RAD Studio\11.0\bin;C:\Program Files (x86)\Embarcadero\RAD Studio\11.0\bin64;%PATH%
-@SET LANGDIR=EN
+@SET PATH=%FrameworkDir%;%PATH%
 
 @echo off
 

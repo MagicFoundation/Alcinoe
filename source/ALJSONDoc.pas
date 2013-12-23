@@ -218,7 +218,7 @@ type
                         nstText,       // \x02 | UTF-8 string               | ex { a: "xxx" }
                         nstObject,     // \x03 | Embedded document          | ex { a: {} }
                         nstArray,      // \x04 | Array                      | ex { a: [] }
-                                       // \x05 | Binary data
+                        nstBinary,     // \x05 | Binary data
                                        // \x06 | Undefined — Deprecated
                         nstObjectID,   // \x07 | ObjectId                   | ex { a: ObjectId("507f1f77bcf86cd799439011") }
                         nstBoolean,    // \x08 | Boolean "false"            | ex { a: False }
@@ -252,6 +252,11 @@ type
   TALJSONRegEx = record
     Expression: AnsiString;
     Options:    AnsiString;
+  end;
+
+  TALJSONBinary = record
+    Subtype: byte;
+    Data:    AnsiString;
   end;
 
   {$IF CompilerVersion >= 23} {Delphi XE2}
@@ -386,6 +391,8 @@ type
     procedure SetJavascript(const Value: AnsiString);
     function GetRegEx: TALJSONRegEx;
     procedure SetRegEx(const Value: TALJSONRegEx);
+    function GetBinary: TALJSONBinary;
+    procedure SetBinary(const Value: TALJSONBinary);
     function GetOwnerDocument: TALJSONDocument;
     procedure SetOwnerDocument(const Value: TALJSONDocument);
     function GetParentNode: TALJSONNode;
@@ -428,6 +435,7 @@ type
     property Null: Boolean read GetNull write SetNull;
     property Javascript: AnsiString read GetJavascript write SetJavascript;
     property RegEx: TALJSONRegEx read GetRegEx write SetRegEx;
+    property Binary: TALJSONBinary read GetBinary write SetBinary;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
   end;
@@ -591,6 +599,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      DateUtils,
      {$IFEND}
      AlHTML,
+     ALMime,
      ALMisc;
 
 {*************************************************************************************}
@@ -637,6 +646,66 @@ begin
     end;
 
   end;
+
+end;
+
+{***************************************************************************************}
+function ALJSONDocTryStrTobinary(const S: AnsiString; out Value: TALJSONBinary): boolean;
+var P1, P2: integer;
+    aInt: integer;
+begin
+
+  // s must look like
+  // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+  // BinData ( 0 , "JliB6gIMRuSphAD2KmhzgQ==" )
+  result := false;
+  P1 := 1;
+  while (P1 <= length(s)) and (s[P1] in [#9, ' ']) do inc(P1);
+  if (P1 + 6 > length(s)) or
+     (s[P1] <> 'B') or
+     (s[P1+1] <> 'i') or
+     (s[P1+2] <> 'n') or
+     (s[P1+3] <> 'D') or
+     (s[P1+4] <> 'a') or
+     (s[P1+5] <> 't') or
+     (s[P1+6] <> 'a') then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                 // ^
+  P1 := p1 + 7{Length('BinData')}; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                   //        ^
+  while (P1 <= length(s)) and (s[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(s)) or (s[P1] <> '(') then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                                   //        ^P1
+  inc(P1); // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+           //         ^P1
+  if (P1 > length(s)) then exit;
+  P2 := ALPosEx(',', s, P1);
+  if P2 <= P1 then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                         //          ^P2
+
+  // init Value.subtype
+  if not ALTryStrToInt(ALTrim(ALCopyStr(s, P1, P2 - P1)), aInt) then Exit;
+  Value.subtype := aInt;
+
+  // init Value.Data
+  p1 := P2 + 1; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                //           ^P1
+  while (P1 <= length(s)) and (s[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > length(s)) or (not (s[P1] in ['"',''''])) then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                                                //            ^P1
+  P2 := length(s);
+  while (P2 > p1) and (s[P2] in [#9, ' ']) do dec(P2);
+  if (P2 <= p1) or (s[P2] <> ')') then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                             //                                      ^P2
+  dec(p2);
+  if (P2 <= p1) then exit;
+  while (P2 > p1) and (s[P2] in [#9, ' ']) do dec(P2);
+  if (P2 <= p1) or (s[P2] <> s[P1]) then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                               //                                     ^P2
+  inc(p1);
+  Value.Data := ALMimeBase64DecodeString(ALTrim(ALCopyStr(s, P1, P2-P1)));
+
+  // set the result
+  result := true;
 
 end;
 
@@ -1121,6 +1190,7 @@ Var RawJSONString: AnsiString;
       aObjectID:  TALJSONObjectID;
       aTimestamp: TALBSONTimestamp;
       aRegEx:     TALJSONRegEx;
+      aBinary:    TALJSONBinary;
       aInt32:     integer;
       aInt64:     int64;
   begin
@@ -1134,6 +1204,7 @@ Var RawJSONString: AnsiString;
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
     else if ALJSONDocTryStrToTimestamp(aStrValue, aTimestamp) then result := nstTimestamp
     else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
+    else if ALJSONDocTryStrToBinary(aStrValue, aBinary) then result := nstBinary
     else if ALJSONDocTryStrToRegEx(aStrValue, aRegEx) then result := nstRegEx
     else result := nstJavascript;
   end;
@@ -1887,6 +1958,7 @@ Var RawBSONString: AnsiString;
       aBool: Boolean;
       aTextValue: AnsiString;
       aRegEx: TALJSONRegEx;
+      aBinary: TALJSONBinary;
       P1: Integer;
   Begin
 
@@ -1960,6 +2032,7 @@ Var RawBSONString: AnsiString;
       #$02: aNodeSubType := nstText;
       #$03: aNodeSubType := nstObject;
       #$04: aNodeSubType := nstArray;
+      #$05: aNodeSubType := nstbinary;
       #$07: aNodeSubType := nstObjectID;
       #$08: aNodeSubType := nstBoolean;
       #$09: aNodeSubType := nstDateTime;
@@ -2073,6 +2146,38 @@ Var RawBSONString: AnsiString;
         if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
       aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
       RawBSONStringPos := RawBSONStringPos + aInt32;
+    end
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'Extract value: Binary data'}{$ENDIF}
+    // \x05 + name + \x00 + int32 + subtype + (byte*)
+    else if aNodeSubType = nstbinary then begin
+
+      {$REGION 'Get size'}
+      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
+      end;
+      ALMove(RawBSONString[RawBSONStringPos], aInt32, sizeof(aInt32));
+      RawBSONStringPos := RawBSONStringPos + sizeof(aInt32);
+      {$ENDREGION}
+
+      {$REGION 'Get the subtype'}
+      if RawBSONStringPos > RawBSONStringLength then begin
+        ExpandRawBSONString;
+        if RawBSONStringPos > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
+      end;
+      aBinary.Subtype := Byte(RawBSONString[RawBSONStringPos]);
+      RawBSONStringPos := RawBSONStringPos + 1;
+      {$ENDREGION}
+
+      {$REGION 'Get the data'}
+      while (RawBSONStringPos + aInt32 - 1 > RawBSONStringLength) do
+        if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
+      aBinary.Data := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32);
+      RawBSONStringPos := RawBSONStringPos + aInt32;
+      {$ENDREGION}
+
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -2248,6 +2353,7 @@ Var RawBSONString: AnsiString;
           nstTimestamp: aNode.Timestamp := aTimestamp;
           nstNull: aNode.null := true;
           nstRegEx: aNode.RegEx := aRegEx;
+          nstBinary: aNode.binary := aBinary;
           nstJavascript: aNode.Javascript := aTextValue;
           nstInt32: aNode.int32 := aInt32;
           nstInt64: aNode.int64 := aInt64;
@@ -2731,6 +2837,7 @@ begin
     nstDateTime: result := ALDateTimeToStr(GetDateTime,_GetFormatSettings);
     nstNull: result := GetNodeValue;
     nstRegEx: result := GetNodeValue;
+    nstBinary: result := GetNodeValue;
     nstJavascript: result := GetNodeValue;
     nstInt32: result := GetNodeValue;
     nstTimestamp: result := GetNodeValue;
@@ -2880,6 +2987,19 @@ end;
 procedure TALJSONNode.SetRegEx(const Value: TALJSONRegEx);
 begin
   setNodeValue('/' + Value.Expression + '/' + Value.Options, nstRegEx);
+end;
+
+{********************************************}
+function TALJSONNode.GetBinary: TALJSONBinary;
+begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  if not ALJSONDocTryStrToBinary(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid binary');
+end;
+
+{**********************************************************}
+procedure TALJSONNode.SetBinary(const Value: TALJSONBinary);
+begin
+  setNodeValue('BinData(' + ALInttostr(Value.Subtype) + ', "' + ALMimeBase64EncodeStringNoCRLF(Value.Data) + '")', nstBinary);
 end;
 
 {*******************************************************}
@@ -3300,6 +3420,7 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
         aObjectID: TALJSONObjectID;
         aTimestamp: TALBSONTimestamp;
         aRegEx: TALJSONRegEx;
+        aBinary: TALJSONBinary;
     Begin
       with aTextNode do begin
 
@@ -3326,6 +3447,15 @@ procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: bool
                       ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
                       WriteStr2Buffer(#$02 + aNodeName + #$00 + aBinStr + text + #$00);
                    end;
+
+          // \x05 + name + \x00 + int32 + subtype + (byte*)
+          nstbinary: begin
+                       aBinary := Binary;
+                       aInt32 := length(aBinary.Data);
+                       setlength(aBinStr,sizeOf(aInt32));
+                       ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
+                       WriteStr2Buffer(#$05 + aNodeName + #$00 + aBinStr + ansiChar(aBinary.Subtype) + aBinary.Data);
+                     end;
 
           // \x07 + name + \x00 + (byte*12)
           nstObjectID: begin

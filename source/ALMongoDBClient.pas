@@ -2225,8 +2225,8 @@ begin
           aRecAdded := aRecAdded + aNumberReturned;
 
           //loop still the cursorID > 0
-          while ((Queries[aQueriesIndex].flags.TailMonitoring) and
-                 (assigned(OnNewRowFunct)) and
+          while (((Queries[aQueriesIndex].flags.TailMonitoring) or
+                  (assigned(OnNewRowFunct))) and
                  (not fStopTailMonitoring)) and
                 (aContinue) and
                 (aCursorID <> 0) and
@@ -2261,16 +2261,17 @@ begin
         end;
 
       //sleep for TailMonitoring to not use 100% CPU
-      if (Queries[aQueriesIndex].flags.TailMonitoring) and
-         (assigned(OnNewRowFunct)) and
+      if ((Queries[aQueriesIndex].flags.TailMonitoring) or
+          (assigned(OnNewRowFunct))) and
          (not fStopTailMonitoring) and
          ((Queries[aQueriesIndex].First <= 0) or
           (aRecAdded < Queries[aQueriesIndex].First)) then sleep(1);
 
       //loop for the TailMonitoring
-      until (not Queries[aQueriesIndex].flags.TailMonitoring) or
-            (not assigned(OnNewRowFunct)) or
+      until ((not Queries[aQueriesIndex].flags.TailMonitoring) and
+             (not assigned(OnNewRowFunct))) or
             (fStopTailMonitoring) or
+            (aCursorID = 0) or
             ((Queries[aQueriesIndex].First > 0) and
              (aRecAdded >= Queries[aQueriesIndex].First));
 

@@ -386,14 +386,14 @@ end;
 {***********************************************}
 Function AlGenerateInternetMessageID: AnsiString;
 Begin
-  Result := AlStringReplace(ALMakeKeyStrByGUID,'-','',[rfReplaceAll]) + '@' + ALTrim(AlGetLocalHostName);
+  Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + ALTrim(AlGetLocalHostName);
 end;
 
 {**********************************************************************}
 Function AlGenerateInternetMessageID(ahostname: AnsiString): AnsiString;
 Begin
   ahostname := ALTrim(ahostname);
-  If ahostname <> '' then Result := AlStringReplace(ALMakeKeyStrByGUID,'-','',[rfReplaceAll]) + '@' + ahostname
+  If ahostname <> '' then Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + ahostname
   else Result := AlGenerateInternetMessageID;
 end;
 

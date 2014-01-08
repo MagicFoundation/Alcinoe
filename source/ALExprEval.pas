@@ -910,12 +910,17 @@ type
     constructor Create;
     destructor Destroy; override;
 
+    //Adds a variable to the internal context. Whenever the variable is found in
+    //an expression, its current value will be inserted.
     procedure AddVar(const AName: AnsiString; var AVar: TALFloat32); overload;
     procedure AddVar(const AName: AnsiString; var AVar: TALFloat64); overload;
     {$IFDEF SUPPORTS_EXTENDED}
     procedure AddVar(const AName: AnsiString; var AVar: TALFloat80); overload;
     {$ENDIF SUPPORTS_EXTENDED}
 
+    //Adds a constant to the internal context. Constants are different from variables
+    //because sub-expressions made entirely from constants may be evaluated only once
+    //(at compile time), and that value used for all subsequent evaluations.
     procedure AddConst(const AName: AnsiString; AConst: TALFloat32); overload;
     procedure AddConst(const AName: AnsiString; AConst: TALFloat64); overload;
     {$IFDEF SUPPORTS_EXTENDED}

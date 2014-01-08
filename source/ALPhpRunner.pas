@@ -946,7 +946,7 @@ begin
   //create the pipepath here because if we do it in the oncreate the
   //fpipepath can survive few seconds after the disconnection, making
   //some trouble in the next execute loop (pipe has been ended)
-  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALMakeKeyStrByGUID;
+  FPipePath := '\\.\pipe\ALPhpFastCGIRunner-' + ALNewGUIDString(true{WithoutBracket});
 
   //create the server pipe
   FServerPipe := CreateNamedPipeA(PAnsiChar(fpipePath),                              //lpName

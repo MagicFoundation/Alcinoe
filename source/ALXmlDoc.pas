@@ -2069,7 +2069,10 @@ end;
 function TALXMLNode.GetAttributeNodes: TALXMLNodeList;
 begin
   Result := nil; // hide warning
-  ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]);
+  //ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]); => with this exception it's not possible to do something like
+  //                                                         If assigned(ANode.AttributeNodes) then ...
+  //                                                         and the only option we have is to check the nodetype to know if the GetAttributeNodes is implemented
+  //                                                         and anyway TXMLNodeList don't raise any exception here so i prefer to stay compatible
 end;
 
 {*********************************************}
@@ -2167,7 +2170,11 @@ end;
 function TALXMLNode.GetChildNodes: TALXMLNodeList;
 begin
   Result := nil; // hide warning
-  ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]);
+  //ALXMLDocError(CALXMLOperationError,[GetNodeTypeStr]); => with this exception it's not possible to do something like
+  //                                                         If assigned(ANode.ChildNodes) then ...
+  //                                                         and the only option we have is to check the nodetype to know if the GetChildNodes is implemented
+  //                                                         other option is to use HasChildNodes but anyway TXMLNodeList don't raise any exception here
+  //                                                         so i prefer to stay compatible
 end;
 
 {*****************************************}

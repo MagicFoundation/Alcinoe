@@ -573,11 +573,29 @@ Const CALDefaultNodeIndent  = '  '; { 2 spaces }
 {misc function}
 {$IF CompilerVersion >= 23} {Delphi XE2}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           const aPath: AnsiString;
                            aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false');
+                           Const aFalseStr: AnsiString = 'false'); overload;
+Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           aLst: TALStrings;
+                           Const aNullStr: AnsiString = 'null';
+                           Const aTrueStr: AnsiString = 'true';
+                           Const aFalseStr: AnsiString = 'false'); overload;
 {$ifend}
+Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
+                           Const aPath: AnsiString;
+                           aLst: TALStrings;
+                           Const aNullStr: AnsiString = 'null';
+                           Const aTrueStr: AnsiString = 'true';
+                           Const aFalseStr: AnsiString = 'false'); overload;
+Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
+                           aLst: TALStrings;
+                           Const aNullStr: AnsiString = 'null';
+                           Const aTrueStr: AnsiString = 'true';
+                           Const aFalseStr: AnsiString = 'false'); overload;
+
 Procedure ALJSONToXML(aJSONNode: TALJsonNode;
                       aXMLNode: TALXmlNode;
                       aXMLElementNameForJSONArrayEntries: TalStrings; // JSONArrayNodeName=XMLElementName | ex: transactions=transaction
@@ -586,6 +604,10 @@ Procedure ALJSONToXML(aJSONNode: TALJsonNode;
 Procedure ALJSONToXML(aJSONNode: TALJsonNode;
                       aXMLNode: TALXmlNode;
                       const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
+
+function ALJsonEncodeWithNodeSubTypeHelperFunction(aValue: AnsiString;
+                                                   aNodeSubType: TALJSONNodeSubType;
+                                                   aFormatSettings: TALFormatSettings): AnsiString;
 
 implementation
 
@@ -2832,12 +2854,12 @@ begin
     nstText: result := GetNodeValue;
     nstObject: result := GetNodeValue;
     nstArray: result := GetNodeValue;
-    nstObjectID: result := ALBinToHex(GetObjectID);
+    nstObjectID: result := GetObjectID;
     nstBoolean: result := GetNodeValue;
     nstDateTime: result := ALDateTimeToStr(GetDateTime,_GetFormatSettings);
     nstNull: result := GetNodeValue;
     nstRegEx: result := GetNodeValue;
-    nstBinary: result := GetNodeValue;
+    nstBinary: result := Getbinary.Data;
     nstJavascript: result := GetNodeValue;
     nstInt32: result := GetNodeValue;
     nstTimestamp: result := GetNodeValue;
@@ -4262,9 +4284,10 @@ begin
   FCount := NewCount;
 end;
 
-{****************************************}
-  {$IF CompilerVersion >= 23} {Delphi XE2}
+{**************************************}
+{$IF CompilerVersion >= 23} {Delphi XE2}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           const aPath: AnsiString;
                            aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
@@ -4276,10 +4299,10 @@ begin
   try
     aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType)
                                    begin
-                                     if (NodeSubType = nstBoolean) and (ALSameText(str, 'true')) then aLst.Add(Path + aLst.NameValueSeparator + aTrueStr)
-                                     else if (NodeSubType = nstBoolean) and (ALSameText(str, 'false')) then aLst.Add(Path + aLst.NameValueSeparator + aFalseStr)
-                                     else if (NodeSubType = nstnull) and (ALSameText(str, 'null')) then aLst.Add(Path + aLst.NameValueSeparator + aNullStr)
-                                     else aLst.Add(Path + aLst.NameValueSeparator + str);
+                                     if (NodeSubType = nstBoolean) and (ALSameText(str, 'true')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aTrueStr)
+                                     else if (NodeSubType = nstBoolean) and (ALSameText(str, 'false')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aFalseStr)
+                                     else if (NodeSubType = nstnull) and (ALSameText(str, 'null')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
+                                     else aLst.Add(aPath+ Path + aLst.NameValueSeparator + str);
                                    end;
     aALJsonDocument.LoadFromJSON(AJsonStr, true{saxMode});
   finally
@@ -4287,6 +4310,77 @@ begin
   end;
 end;
 {$ifend}
+
+{**************************************}
+{$IF CompilerVersion >= 23} {Delphi XE2}
+Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           aLst: TALStrings;
+                           Const aNullStr: AnsiString = 'null';
+                           Const aTrueStr: AnsiString = 'true';
+                           Const aFalseStr: AnsiString = 'false');
+begin
+ ALJSONToTStrings(AJsonStr,
+                  '',
+                  aLst,
+                  aNullStr,
+                  aTrueStr,
+                  aFalseStr);
+end;
+{$ifend}
+
+{******************************************************}
+Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
+                           Const aPath: AnsiString;
+                           aLst: TALStrings;
+                           Const aNullStr: AnsiString = 'null';
+                           Const aTrueStr: AnsiString = 'true';
+                           Const aFalseStr: AnsiString = 'false');
+var aTmpPath: AnsiString;
+    i: integer;
+begin
+  for I := 0 to aJsonNode.ChildNodes.Count - 1 do begin
+
+    if aJsonNode.NodeType = ntArray then aTmpPath := aPath + '[' + alinttostr(i) + ']'
+    else aTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[i].NodeName;
+
+    case aJsonNode.ChildNodes[i].NodeType of
+
+      ntObject: ALJSONToTStrings(aJsonNode.ChildNodes[i],
+                                 aTmpPath,
+                                 aLst,
+                                 aNullStr,
+                                 aTrueStr,
+                                 aFalseStr);
+
+      ntArray: ALJSONToTStrings(aJsonNode.ChildNodes[i],
+                                aTmpPath,
+                                aLst,
+                                aNullStr,
+                                aTrueStr,
+                                aFalseStr);
+
+      ntText: aLst.Add(aTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[i].Text);
+
+      else raise Exception.Create('Unknown NodeType');
+
+    end;
+  end;
+end;
+
+{******************************************************}
+Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
+                           aLst: TALStrings;
+                           Const aNullStr: AnsiString = 'null';
+                           Const aTrueStr: AnsiString = 'true';
+                           Const aFalseStr: AnsiString = 'false');
+begin
+  ALJSONToTStrings(aJsonNode,
+                   '',
+                   aLst,
+                   aNullStr,
+                   aTrueStr,
+                   aFalseStr)
+end;
 
 {*******************************************}
 Procedure ALJSONToXML(aJSONNode: TALJsonNode;
@@ -4321,6 +4415,36 @@ begin
               aXMLNode,
               nil,
               aDefaultXMLElementNameForJSONArrayEntries);
+end;
+
+{********************************************************************}
+function ALJsonEncodeWithNodeSubTypeHelperFunction(aValue: AnsiString;
+                                                   aNodeSubType: TALJSONNodeSubType;
+                                                   aFormatSettings: TALFormatSettings): AnsiString;
+var aStr: AnsiString;
+begin
+  case aNodeSubType of
+    nstFloat:      result := ALFloatToStr(ALStrToFloat(aValue, aFormatSettings), ALDefaultFormatSettings);
+    nstText:       result := '"'+ALJavascriptEncode(aValue)+'"';
+    nstBinary:     result := 'BinData(0, "' + ALMimeBase64EncodeStringNoCRLF(aValue) + '")';
+    nstObjectID:   begin
+                     setlength(aStr, length(aValue) * 2);
+                     BintoHex(@aValue[1],pansiChar(aStr),length(aValue));
+                     result := 'ObjectId("'+ALLowerCase(aStr)+'")';
+                   end;
+    nstBoolean:    if ALStrToBool(aValue) then result := 'true'
+                   else result := 'false';
+    nstDateTime:   result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTime(aValue, aFormatSettings), ALDefaultFormatSettings);
+    nstJavascript: result := aValue;
+    nstInt32:      result := 'NumberInt(' + ALIntToStr(ALstrToInt64(aValue)) + ')';
+    nstInt64:      result := 'NumberLong(' + ALIntToStr(ALstrToInt(aValue)) + ')';
+    nstNull:       result := 'null';
+    nstObject:     raise Exception.Create('Unsupported Node SubType');
+    nstArray:      raise Exception.Create('Unsupported Node SubType');
+    nstRegEx:      raise Exception.Create('Unsupported Node SubType');
+    nstTimestamp:  raise Exception.Create('Unsupported Node SubType');
+    else raise Exception.Create('Unknown Node SubType');
+  end;
 end;
 
 end.

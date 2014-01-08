@@ -418,8 +418,10 @@ type
                                        Var TagPosition, TagLength: integer): AnsiString;
 
 procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
-function  ALGUIDToString(const Guid: TGUID): Ansistring;
-Function  ALMakeKeyStrByGUID: AnsiString;
+function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
+function  ALNewGUIDByteString: Ansistring;
+function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false): Ansistring;
+Function  ALNewGUIDString(const WithoutBracket: boolean = false): AnsiString;
 function  ALMatchesMask(const Filename, Mask: AnsiString): Boolean;
 function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
 function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
@@ -783,23 +785,45 @@ begin
   {$WARN SYMBOL_DEPRECATED ON}
 end;
 
-{*****************************************************}
-function ALGUIDToString(const Guid: TGUID): Ansistring;
+{**********************************************************}
+function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
+var aByteArray: TBytes;
 begin
-  SetLength(Result, 38);
-  {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
-    [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
-    Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+  aByteArray := Guid.ToByteArray;
+  SetString(result, PAnsiChar(@aByteArray[0]), length(aByteArray));
 end;
 
-{***************************************}
-Function  ALMakeKeyStrByGUID: AnsiString;
+{****************************************}
+function  ALNewGUIDByteString: Ansistring;
+var aGuid: TGUID;
+begin
+  if CreateGUID(aGUID) <> S_OK then RaiseLastOSError;
+  result := ALGUIDToByteString(aGuid);
+end;
+
+{*********************************************************************************************}
+function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false): Ansistring;
+begin
+  if WithoutBracket then begin
+    SetLength(Result, 36);
+    {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+      [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+      Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+  end
+  else begin
+    SetLength(Result, 38);
+    {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+      [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+      Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+  end;
+end;
+
+{***************************************************************************}
+Function  ALNewGUIDString(const WithoutBracket: boolean = false): AnsiString;
 Var aGUID: TGUID;
 Begin
-  CreateGUID(aGUID);
-  Result := ALGUIDToString(aGUID);
-  Delete(Result,1,1);
-  Delete(Result,Length(result),1);
+  if CreateGUID(aGUID) <> S_OK then RaiseLastOSError;
+  Result := ALGUIDToString(aGUID, WithoutBracket);
 End;
 
 {***}

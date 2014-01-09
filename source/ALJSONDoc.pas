@@ -4359,7 +4359,14 @@ begin
                                 aTrueStr,
                                 aFalseStr);
 
-      ntText: aLst.Add(aTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[i].Text);
+      ntText: begin
+                if (aJsonNode.ChildNodes[i].NodeSubType = nstBoolean) then begin
+                  if aJsonNode.ChildNodes[i].Bool then                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aTrueStr)
+                  else                                                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aFalseStr);
+                end
+                else if (aJsonNode.ChildNodes[i].NodeSubType = nstnull) then aLst.Add(aTmpPath + aLst.NameValueSeparator + aNullStr)
+                else                                                         aLst.Add(aTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[i].Text);
+              end;
 
       else raise Exception.Create('Unknown NodeType');
 

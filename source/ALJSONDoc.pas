@@ -4294,16 +4294,41 @@ Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            Const aFalseStr: AnsiString = 'false');
 
 var aALJsonDocument: TALJsonDocument;
+    aFieldsAddedOnParseStart: integer;
 begin
   aALJsonDocument := TALJsonDocument.Create;
   try
     aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType)
                                    begin
-                                     if (NodeSubType = nstBoolean) and (ALSameText(str, 'true')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aTrueStr)
+                                     if      (NodeSubType = nstBoolean) and (ALSameText(str, 'true'))  then aLst.Add(aPath + Path + aLst.NameValueSeparator + aTrueStr)
                                      else if (NodeSubType = nstBoolean) and (ALSameText(str, 'false')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aFalseStr)
-                                     else if (NodeSubType = nstnull) and (ALSameText(str, 'null')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
-                                     else aLst.Add(aPath+ Path + aLst.NameValueSeparator + str);
+                                     else if (NodeSubType = nstnull)    and (ALSameText(str, 'null'))  then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
+                                     else aLst.Add(aPath + Path + aLst.NameValueSeparator + str);
                                    end;
+
+    aALJsonDocument.onParseStartObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+                                          begin
+                                            aFieldsAddedOnParseStart := aLst.Count;
+                                          end;
+
+    aALJsonDocument.OnParseEndObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+                                        begin
+                                          // handle the case like {field1:[{a:2},{}]}
+                                          if (aFieldsAddedOnParseStart = aLst.Count) and
+                                             (Path <> '') then aLst.Add(aPath + Path + aLst.NameValueSeparator + '{}');
+                                        end;
+
+    aALJsonDocument.onParseStartArray := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+                                         begin
+                                           aFieldsAddedOnParseStart := aLst.Count;
+                                         end;
+
+    aALJsonDocument.onParseEndArray := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+                                       begin
+                                         // handle the case like {field1:[]}
+                                         if (aFieldsAddedOnParseStart = aLst.Count) and
+                                            (Path <> '') then aLst.Add(aPath + Path + aLst.NameValueSeparator + '[]');
+                                       end;
     aALJsonDocument.LoadFromJSON(AJsonStr, true{saxMode});
   finally
     aALJsonDocument.Free;

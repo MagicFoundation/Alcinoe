@@ -4388,39 +4388,45 @@ Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
 var aTmpPath: AnsiString;
     i: integer;
 begin
-  for I := 0 to aJsonNode.ChildNodes.Count - 1 do begin
+  if aJsonNode.ChildNodes.Count > 0 then begin
+    for I := 0 to aJsonNode.ChildNodes.Count - 1 do begin
 
-    if aJsonNode.NodeType = ntArray then aTmpPath := aPath + '[' + alinttostr(i) + ']'
-    else aTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[i].NodeName;
+      if aJsonNode.NodeType = ntArray then aTmpPath := aPath + '[' + alinttostr(i) + ']'
+      else aTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[i].NodeName;
 
-    case aJsonNode.ChildNodes[i].NodeType of
+      case aJsonNode.ChildNodes[i].NodeType of
 
-      ntObject: ALJSONToTStrings(aJsonNode.ChildNodes[i],
-                                 aTmpPath,
-                                 aLst,
-                                 aNullStr,
-                                 aTrueStr,
-                                 aFalseStr);
+        ntObject: ALJSONToTStrings(aJsonNode.ChildNodes[i],
+                                   aTmpPath,
+                                   aLst,
+                                   aNullStr,
+                                   aTrueStr,
+                                   aFalseStr);
 
-      ntArray: ALJSONToTStrings(aJsonNode.ChildNodes[i],
-                                aTmpPath,
-                                aLst,
-                                aNullStr,
-                                aTrueStr,
-                                aFalseStr);
+        ntArray: ALJSONToTStrings(aJsonNode.ChildNodes[i],
+                                  aTmpPath,
+                                  aLst,
+                                  aNullStr,
+                                  aTrueStr,
+                                  aFalseStr);
 
-      ntText: begin
-                if (aJsonNode.ChildNodes[i].NodeSubType = nstBoolean) then begin
-                  if aJsonNode.ChildNodes[i].Bool then                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aTrueStr)
-                  else                                                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aFalseStr);
-                end
-                else if (aJsonNode.ChildNodes[i].NodeSubType = nstnull) then aLst.Add(aTmpPath + aLst.NameValueSeparator + aNullStr)
-                else                                                         aLst.Add(aTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[i].Text);
-              end;
+        ntText: begin
+                  if (aJsonNode.ChildNodes[i].NodeSubType = nstBoolean) then begin
+                    if aJsonNode.ChildNodes[i].Bool then                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aTrueStr)
+                    else                                                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aFalseStr);
+                  end
+                  else if (aJsonNode.ChildNodes[i].NodeSubType = nstnull) then aLst.Add(aTmpPath + aLst.NameValueSeparator + aNullStr)
+                  else                                                         aLst.Add(aTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[i].Text);
+                end;
 
-      else raise Exception.Create('Unknown NodeType');
+        else raise Exception.Create('Unknown NodeType');
 
+      end;
     end;
+  end
+  else begin
+    if      aJsonNode.NodeType = ntArray  then aLst.Add(aPath + aLst.NameValueSeparator + '[]')
+    else if aJsonNode.NodeType = ntObject then aLst.Add(aPath + aLst.NameValueSeparator + '{}');
   end;
 end;
 

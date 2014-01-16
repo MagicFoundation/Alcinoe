@@ -563,7 +563,7 @@ type
     property onParseEndObject: TAlJSONParseObjectEvent read fonParseEndObject write fonParseEndObject;
     property onParseStartArray: TAlJSONParseArrayEvent read fonParseStartArray write fonParseStartArray;
     property onParseEndArray: TAlJSONParseArrayEvent read fonParseEndArray write fonParseEndArray;
-    property FormatSettings: TALFormatSettings read fFormatSettings write fFormatSettings;
+    property FormatSettings: TALFormatSettings read fFormatSettings write fFormatSettings; // this is use only on GetText/OnParseText to retrieve float and DateTime formatted according to FormatSettings
     property Tag: NativeInt read FTag write FTag;
   end;
 
@@ -573,12 +573,14 @@ Const CALDefaultNodeIndent  = '  '; { 2 spaces }
 {misc function}
 {$IF CompilerVersion >= 23} {Delphi XE2}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           const aFormatSettings: TALFormatSettings;
                            const aPath: AnsiString;
                            aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           const aFormatSettings: TALFormatSettings;
                            aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
@@ -2734,7 +2736,13 @@ end;
 {**************************************************************************************************************************************************}
 procedure TALJSONDocument.DoParseText(const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(fonParseText) then fonParseText(Self, Path, name, str, NodeSubType);
+  if Assigned(fonParseText) then begin
+    case NodeSubType of
+      nstFloat: fonParseText(Self, Path, name, ALFloatToStr(ALStrToFloat(str, ALDefaultFormatSettings),FormatSettings), NodeSubType);
+      nstDateTime: fonParseText(Self, Path, name, ALDateTimeToStr(ALStrToDateTime(Str, ALDefaultFormatSettings),FormatSettings), NodeSubType);
+      else fonParseText(Self, Path, name, str, NodeSubType);
+    end;
+  end;
 end;
 
 {*******************************************************************************************}
@@ -4287,6 +4295,7 @@ end;
 {**************************************}
 {$IF CompilerVersion >= 23} {Delphi XE2}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           const aFormatSettings: TALFormatSettings;
                            const aPath: AnsiString;
                            aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
@@ -4294,41 +4303,55 @@ Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
                            Const aFalseStr: AnsiString = 'false');
 
 var aALJsonDocument: TALJsonDocument;
-    aFieldsAddedOnParseStart: integer;
+    aContainChilds: boolean;
 begin
-  aALJsonDocument := TALJsonDocument.Create;
+  aALJsonDocument := TALJsonDocument.Create(aFormatSettings);
   try
+
     aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType)
                                    begin
-                                     if      (NodeSubType = nstBoolean) and (ALSameText(str, 'true'))  then aLst.Add(aPath + Path + aLst.NameValueSeparator + aTrueStr)
+                                     if (NodeSubType = nstBoolean) and (ALSameText(str, 'true')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aTrueStr)
                                      else if (NodeSubType = nstBoolean) and (ALSameText(str, 'false')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aFalseStr)
-                                     else if (NodeSubType = nstnull)    and (ALSameText(str, 'null'))  then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
-                                     else aLst.Add(aPath + Path + aLst.NameValueSeparator + str);
+                                     else if (NodeSubType = nstnull) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
+                                     else aLst.Add(aPath+ Path + aLst.NameValueSeparator + str);
+                                     aContainChilds := True;
                                    end;
+
+    aALJsonDocument.OnParseStartDocument := procedure (Sender: TObject)
+                                            begin
+                                              aContainChilds := False;
+                                            end;
+
+    aALJsonDocument.OnParseEndDocument := procedure (Sender: TObject)
+                                          begin
+                                            if aPath <> '' then begin
+                                              if not aContainChilds then aLst.Add(aPath + aLst.NameValueSeparator + '{}');
+                                              aContainChilds := true;
+                                            end;
+                                          end;
 
     aALJsonDocument.onParseStartObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                           begin
-                                            aFieldsAddedOnParseStart := aLst.Count;
+                                            aContainChilds := False;
                                           end;
 
-    aALJsonDocument.OnParseEndObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
+    aALJsonDocument.onParseEndObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                         begin
-                                          // handle the case like {field1:[{a:2},{}]}
-                                          if (aFieldsAddedOnParseStart = aLst.Count) and
-                                             (Path <> '') then aLst.Add(aPath + Path + aLst.NameValueSeparator + '{}');
+                                          if not aContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
+                                          aContainChilds := True;
                                         end;
 
     aALJsonDocument.onParseStartArray := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                          begin
-                                           aFieldsAddedOnParseStart := aLst.Count;
+                                           aContainChilds := False;
                                          end;
 
     aALJsonDocument.onParseEndArray := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                        begin
-                                         // handle the case like {field1:[]}
-                                         if (aFieldsAddedOnParseStart = aLst.Count) and
-                                            (Path <> '') then aLst.Add(aPath + Path + aLst.NameValueSeparator + '[]');
+                                        if not aContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
+                                         aContainChilds := True;
                                        end;
+
     aALJsonDocument.LoadFromJSON(AJsonStr, true{saxMode});
   finally
     aALJsonDocument.Free;
@@ -4339,12 +4362,14 @@ end;
 {**************************************}
 {$IF CompilerVersion >= 23} {Delphi XE2}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
+                           const aFormatSettings: TALFormatSettings;
                            aLst: TALStrings;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false');
 begin
  ALJSONToTStrings(AJsonStr,
+                  aFormatSettings,
                   '',
                   aLst,
                   aNullStr,

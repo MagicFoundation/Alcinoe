@@ -2226,8 +2226,8 @@ begin
           aRecAdded := aRecAdded + aNumberReturned;
 
           //loop still the cursorID > 0
-          while (Queries[aQueriesIndex].flags.TailMonitoring) and
-                (not fStopTailMonitoring) and
+          while ((not Queries[aQueriesIndex].flags.TailMonitoring) or
+                 (not fStopTailMonitoring)) and
                 (aContinue) and
                 (aCursorID <> 0) and
                 ((Queries[aQueriesIndex].First <= 0) or
@@ -3044,8 +3044,8 @@ begin
         //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
         //8-31	     Reserved	        Must be set to 0.
         aFlags := 0;
-        if Queries[aQueriesIndex].flags.TailMonitoring and assigned(OnNewRowFunct) then
-          raise EAlMongoDBClientException.Create('TailMonitoring work only with TAlMongoDBClient', 0 {aErrorCode}, false {aCloseConnection});
+        if Queries[aQueriesIndex].flags.TailMonitoring then
+          raise EAlMongoDBClientException.Create('Tail monitoring work only with TAlMongoDBClient', 0 {aErrorCode}, false {aCloseConnection});
         if Queries[aQueriesIndex].flags.SlaveOk then aFlags := aFlags or (1 shl 2);
         if Queries[aQueriesIndex].flags.NoCursorTimeout then aFlags := aFlags or (1 shl 4);
         if Queries[aQueriesIndex].flags.Partial then aFlags := aFlags or (1 shl 7);

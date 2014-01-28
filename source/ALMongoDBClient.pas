@@ -2178,7 +2178,8 @@ begin
       //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
       //8-31	     Reserved	        Must be set to 0.
       aFlags := 0;
-      if Queries[aQueriesIndex].flags.TailMonitoring and assigned(OnNewRowFunct) then begin
+      if Queries[aQueriesIndex].flags.TailMonitoring then begin
+        if not assigned(OnNewRowFunct) then raise Exception.Create('OnNewRowFunct is mandatory for tail monitoring');
         aFlags := aFlags or (1 shl 1); // TailableCursor
         aFlags := aFlags or (1 shl 5); // AwaitData
       end;
@@ -2225,9 +2226,8 @@ begin
           aRecAdded := aRecAdded + aNumberReturned;
 
           //loop still the cursorID > 0
-          while (((Queries[aQueriesIndex].flags.TailMonitoring) or
-                  (assigned(OnNewRowFunct))) and
-                 (not fStopTailMonitoring)) and
+          while (Queries[aQueriesIndex].flags.TailMonitoring) and
+                (not fStopTailMonitoring) and
                 (aContinue) and
                 (aCursorID <> 0) and
                 ((Queries[aQueriesIndex].First <= 0) or
@@ -2260,18 +2260,15 @@ begin
 
         end;
 
-      //sleep for TailMonitoring to not use 100% CPU
-      if ((Queries[aQueriesIndex].flags.TailMonitoring) or
-          (assigned(OnNewRowFunct))) and
-         (not fStopTailMonitoring) and
-         ((Queries[aQueriesIndex].First <= 0) or
-          (aRecAdded < Queries[aQueriesIndex].First)) then sleep(1);
+        //sleep for TailMonitoring to not use 100% CPU
+        if (Queries[aQueriesIndex].flags.TailMonitoring) and
+           (not fStopTailMonitoring) and
+           ((Queries[aQueriesIndex].First <= 0) or
+            (aRecAdded < Queries[aQueriesIndex].First)) then sleep(1);
 
       //loop for the TailMonitoring
-      until ((not Queries[aQueriesIndex].flags.TailMonitoring) and
-             (not assigned(OnNewRowFunct))) or
+      until (not Queries[aQueriesIndex].flags.TailMonitoring) or
             (fStopTailMonitoring) or
-            (aCursorID = 0) or
             ((Queries[aQueriesIndex].First > 0) and
              (aRecAdded >= Queries[aQueriesIndex].First));
 

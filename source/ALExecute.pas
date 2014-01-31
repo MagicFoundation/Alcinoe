@@ -48,6 +48,8 @@ History:      04/05/2007: overload the function ALWinExec32;
               26/06/2012: Add xe2 support
               01/09/2013: rename ALWinExec32 and ALWinExecAndWait32 to
                           ALWinExec and ALWinExecAndWait
+              31/01/2014: Add ALStartService, ALStopService and
+                          ALMakeServiceAutorestarting
 
 Link:
 
@@ -125,15 +127,23 @@ Procedure ALWinExec(const aUserName: ANSIString;
 function ALWinExecAndWait(aCommandLine:AnsiString; aVisibility : integer):DWORD;
 Function ALWinExecAndWaitV2(aCommandLine: AnsiString; aVisibility: integer): DWORD;
 function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
+function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+function ALMakeServiceAutorestarting(aServiceName: AnsiString;
+                                     aComputerName: AnsiString = '';
+                                     aTimeToRestartInSec: integer = 60 {one minute by default};
+                                     aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
 
 implementation
 
 uses {$IF CompilerVersion >= 23} {Delphi XE2}
      system.sysutils,
      winapi.messages,
+     winapi.winsvc,
      {$ELSE}
      sysutils,
      messages,
+     winsvc,
      {$IFEND}
      ALWindows,
      ALString;
@@ -503,6 +513,159 @@ begin
   if not Result then
     raise Exception.Create(SysErrorMessage(GetLastError));
 
+end;
+
+{***********************************************************}
+{Computer name could be a network name, for example \\SERVER.
+ If empty this will be applied to local machine.}
+function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+var aServiceStatus:     TServiceStatus;
+    aServiceManager:    SC_HANDLE;
+    aServiceInstance:   SC_HANDLE;
+    aCheckPoint:        DWORD;
+    aServiceArgVectors: PChar;
+    aServiceNameStr:    string;
+    aComputerNameStr:   string;
+begin
+  aServiceNameStr  := string(aServiceName);
+  aComputerNameStr := string(aComputerName);
+
+  aServiceStatus.dwCurrentState := 1;
+  aServiceManager := OpenSCManager(PChar(aComputerNameStr), nil, SC_MANAGER_CONNECT);
+  try
+
+    if aServiceManager > 0 then begin
+      aServiceInstance := OpenService(aServiceManager, PChar(aServiceNameStr), SERVICE_START or SERVICE_QUERY_STATUS);
+      try
+
+        if aServiceInstance > 0 then begin
+          aServiceArgVectors := nil;
+          if StartService(aServiceInstance, 0, aServiceArgVectors) then begin
+            if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
+
+              while aServiceStatus.dwCurrentState <> SERVICE_RUNNING do begin
+                aCheckPoint := aServiceStatus.dwCheckPoint;
+                Sleep(aServiceStatus.dwWaitHint);
+                if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
+                if (aServiceStatus.dwCheckPoint < aCheckPoint) then break;
+              end;
+
+            end else raise EALException.Create('Cannot query status of service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+          end else raise EALException.Create('Cannot start service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+        end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+      finally
+        CloseServiceHandle(aServiceInstance);
+      end;
+    end else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+  finally
+    CloseServiceHandle(aServiceManager);
+  end;
+  result := (aServiceStatus.dwCurrentState = SERVICE_RUNNING);
+end;
+
+{***********************************************************}
+{Computer name could be a network name, for example \\SERVER.
+ If empty this will be applied to local machine.}
+function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+var aServiceStatus:     TServiceStatus;
+    aServiceManager:    SC_HANDLE;
+    aServiceInstance:   SC_HANDLE;
+    aCheckPoint:        DWORD;
+    aServiceNameStr:    string;
+    aComputerNameStr:   string;
+begin
+  aServiceNameStr  := string(aServiceName);
+  aComputerNameStr := string(aComputerName);
+
+  aServiceManager := OpenSCManager(PChar(aComputerNameStr), nil, SC_MANAGER_CONNECT);
+  try
+
+    if aServiceManager > 0 then begin
+      aServiceInstance := OpenService(aServiceManager, PChar(aServiceNameStr), SERVICE_STOP or SERVICE_QUERY_STATUS);
+      try
+
+        if aServiceInstance > 0 then begin
+          if ControlService(aServiceInstance, SERVICE_CONTROL_STOP, aServiceStatus) then begin
+            if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
+
+              while aServiceStatus.dwCurrentState <> SERVICE_STOPPED do begin
+                aCheckPoint := aServiceStatus.dwCheckPoint;
+                Sleep(aServiceStatus.dwWaitHint);
+                if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
+                if (aServiceStatus.dwCheckPoint < aCheckPoint) then break;
+              end;
+
+            end else raise EALException.Create('Cannot query status of service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+          end else raise EALException.Create('Cannot stop service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+        end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+      finally
+        CloseServiceHandle(aServiceInstance);
+      end;
+    end else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+  finally
+    CloseServiceHandle(aServiceManager);
+  end;
+  result := (aServiceStatus.dwCurrentState = SERVICE_STOPPED);
+end;
+
+{************************************************************}
+{The Service Manager will try to restart the service waiting
+ between the attempting "aTimeToRestartInSec" seconds. In the
+ case of three consistent fails it will try to wait "aTimeToResetInSec"
+ seconds then counter of fails will be erased and it will try to
+ launch again.
+ Computer name could be a network name, for example \\SERVER.
+ If empty this will be applied to local machine.}
+function ALMakeServiceAutorestarting(aServiceName: AnsiString;
+                                     aComputerName: AnsiString = '';
+                                     aTimeToRestartInSec: integer = 60 {one minute by default};
+                                     aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
+var aServiceFailureActions: SERVICE_FAILURE_ACTIONS;
+    aFailActions:           array[1..1] of SC_ACTION;
+    aServiceManager:        SC_HANDLE;
+    aServiceInstance:       SC_HANDLE;
+    aServiceNameStr:        string;
+    aComputerNameStr:       string;
+begin
+  aServiceNameStr  := string(aServiceName);
+  aComputerNameStr := string(aComputerName);
+  result           := false;
+
+  aServiceManager := OpenSCManager(PChar(aComputerNameStr), nil, SC_MANAGER_CONNECT);
+  try
+
+    if aServiceManager > 0 then begin
+      aServiceInstance := OpenService(aServiceManager, PChar(aServiceNameStr), SERVICE_ALL_ACCESS);
+      try
+
+        if aServiceInstance > 0 then begin
+
+          aFailActions[1].&Type := SC_ACTION_RESTART;
+          aFailActions[1].Delay := aTimeToRestartInSec * 1000; // must be in milliseconds
+
+          aServiceFailureActions.dwResetPeriod := aTimeToResetInSec;
+          aServiceFailureActions.cActions      := 1;
+          aServiceFailureActions.lpRebootMsg   := nil;
+          aServiceFailureActions.lpCommand     := nil;
+          aServiceFailureActions.lpsaActions   := @aFailActions;
+
+          result := ChangeServiceConfig2(aServiceInstance, SERVICE_CONFIG_FAILURE_ACTIONS, @aServiceFailureActions);
+          if not result then raise EALException.Create('Cannot change service settings. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+        end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+      finally
+        CloseServiceHandle(aServiceInstance);
+      end;
+    end else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+  finally
+    CloseServiceHandle(aServiceManager);
+  end;
 end;
 
 end.

@@ -420,8 +420,8 @@ type
 procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
 function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
 function  ALNewGUIDByteString: Ansistring;
-function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false): Ansistring;
-Function  ALNewGUIDString(const WithoutBracket: boolean = false): AnsiString;
+function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): Ansistring;
+Function  ALNewGUIDString(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): AnsiString;
 function  ALMatchesMask(const Filename, Mask: AnsiString): Boolean;
 function  ALIfThen(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
 function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer): Integer; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
@@ -571,12 +571,12 @@ Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
 Function  ALUTF8ISO91995CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 Function  ALUTF8BGNPCGN1947CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
-function ALExtractExpression(const S: AnsiString;
-                             const OpenChar, CloseChar: AnsiChar; // ex: '(' and ')'
-                             Const QuoteChars: Array of ansiChar; // ex: ['''', '"']
-                             Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
-                             var StartPos: integer;
-                             var EndPos: integer): boolean;
+function  ALExtractExpression(const S: AnsiString;
+                              const OpenChar, CloseChar: AnsiChar; // ex: '(' and ')'
+                              Const QuoteChars: Array of ansiChar; // ex: ['''', '"']
+                              Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
+                              var StartPos: integer;
+                              var EndPos: integer): boolean;
 
 Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF16LittleEndianBom = ansiString(#$FF) + ansiString(#$FE);
@@ -801,29 +801,45 @@ begin
   result := ALGUIDToByteString(aGuid);
 end;
 
-{*********************************************************************************************}
-function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false): Ansistring;
+{***********************************************************************************************************************************}
+function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): Ansistring;
 begin
   if WithoutBracket then begin
-    SetLength(Result, 36);
-    {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
-      [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
-      Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    if WithoutHyphen then begin
+      SetLength(Result, 32);
+      {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end
+    else begin
+      SetLength(Result, 36);
+      {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end;
   end
   else begin
-    SetLength(Result, 38);
-    {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
-      [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
-      Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    if WithoutHyphen then begin
+      SetLength(Result, 34);
+      {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 34,'{%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end
+    else begin
+      SetLength(Result, 38);
+      {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end;
   end;
 end;
 
-{***************************************************************************}
-Function  ALNewGUIDString(const WithoutBracket: boolean = false): AnsiString;
+{*****************************************************************************************************************}
+Function  ALNewGUIDString(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): AnsiString;
 Var aGUID: TGUID;
 Begin
   if CreateGUID(aGUID) <> S_OK then RaiseLastOSError;
-  Result := ALGUIDToString(aGUID, WithoutBracket);
+  Result := ALGUIDToString(aGUID, WithoutBracket, WithoutHyphen);
 End;
 
 {***}

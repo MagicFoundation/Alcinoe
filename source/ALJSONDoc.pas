@@ -4317,19 +4317,6 @@ begin
                                      aContainChilds := True;
                                    end;
 
-    aALJsonDocument.OnParseStartDocument := procedure (Sender: TObject)
-                                            begin
-                                              aContainChilds := False;
-                                            end;
-
-    aALJsonDocument.OnParseEndDocument := procedure (Sender: TObject)
-                                          begin
-                                            if aPath <> '' then begin
-                                              if not aContainChilds then aLst.Add(aPath + aLst.NameValueSeparator + '{}');
-                                              aContainChilds := true;
-                                            end;
-                                          end;
-
     aALJsonDocument.onParseStartObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                           begin
                                             aContainChilds := False;
@@ -4337,7 +4324,7 @@ begin
 
     aALJsonDocument.onParseEndObject := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                         begin
-                                          if not aContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
+                                          if (not aContainChilds) and (aPath + Path <> ''{Path = '' mean it's the root object}) then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '{}');
                                           aContainChilds := True;
                                         end;
 
@@ -4348,7 +4335,7 @@ begin
 
     aALJsonDocument.onParseEndArray := procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString)
                                        begin
-                                        if not aContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
+                                         if not aContainChilds then aLst.Add(aPath+ Path + aLst.NameValueSeparator + '[]');
                                          aContainChilds := True;
                                        end;
 
@@ -4392,7 +4379,10 @@ begin
     for I := 0 to aJsonNode.ChildNodes.Count - 1 do begin
 
       if aJsonNode.NodeType = ntArray then aTmpPath := aPath + '[' + alinttostr(i) + ']'
-      else aTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[i].NodeName;
+      else begin
+        if aJsonNode.ChildNodes[i].NodeName = '' then raise Exception.Create('Nodename can not be empty');
+        aTmpPath := aPath + alIfThen(aPath <> '', '.', '') + aJsonNode.ChildNodes[i].NodeName;
+      end;
 
       case aJsonNode.ChildNodes[i].NodeType of
 
@@ -4424,7 +4414,7 @@ begin
       end;
     end;
   end
-  else begin
+  else if (aPath <> ''{aPath = '' mean it's the root object}) then begin
     if      aJsonNode.NodeType = ntArray  then aLst.Add(aPath + aLst.NameValueSeparator + '[]')
     else if aJsonNode.NodeType = ntObject then aLst.Add(aPath + aLst.NameValueSeparator + '{}');
   end;

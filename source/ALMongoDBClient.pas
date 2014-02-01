@@ -598,12 +598,14 @@ type
                            ReturnFieldsSelector: AnsiString;
                            Skip: integer;
                            First: Integer;
+                           NoCursorTimeout: Boolean;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       Procedure SelectData(FullCollectionName: AnsiString;
                            Query: AnsiString;
                            ReturnFieldsSelector: AnsiString;
+                           NoCursorTimeout: Boolean;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
@@ -1982,8 +1984,8 @@ begin
   CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
 end;
 
-{***********************************************************************************************************************}
-// // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
+{*******************************************************************************************************************}
+// http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlBaseMongoDBClient.DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean);
 var aIntBool: integer;
 begin
@@ -3165,6 +3167,7 @@ Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiStri
                                                     ReturnFieldsSelector: AnsiString;
                                                     Skip: integer;
                                                     First: Integer;
+                                                    NoCursorTimeout: Boolean;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
@@ -3176,6 +3179,7 @@ begin
   aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
   aQuery.Skip := Skip;
   aQuery.First := First;
+  aQuery.flags.NoCursorTimeout := NoCursorTimeout;
   SelectData(aQuery,
              OnNewRowFunct,
              ExtData,
@@ -3186,6 +3190,7 @@ end;
 Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiString;
                                                     Query: AnsiString;
                                                     ReturnFieldsSelector: AnsiString;
+                                                    NoCursorTimeout: Boolean;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
@@ -3195,6 +3200,7 @@ begin
              ReturnFieldsSelector,
              0, // skip
              0, // first
+             NoCursorTimeout,
              OnNewRowFunct,
              ExtData,
              ConnectionSocket);

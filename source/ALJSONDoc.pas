@@ -597,8 +597,10 @@ Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
                            Const aNullStr: AnsiString = 'null';
                            Const aTrueStr: AnsiString = 'true';
                            Const aFalseStr: AnsiString = 'false'); overload;
-procedure ALStringsToJson(const aLst: TALStrings;
-                          aJsonNode: TALJSONNode);
+procedure ALTStringsToJson(const aLst: TALStrings;
+                           aJsonNode: TALJSONNode;
+                           Const aPath: AnsiString;
+                           Const aNullStr: AnsiString = 'null');
 
 Procedure ALJSONToXML(aJSONNode: TALJsonNode;
                       aXMLNode: TALXmlNode;
@@ -4437,53 +4439,18 @@ begin
                    aFalseStr)
 end;
 
-{***********************************************}
-procedure ALStringsToJson(const aLst: TALStrings;
-                          aJsonNode: TALJSONNode);
+{************************************************}
+//TODO
+procedure ALTStringsToJson(const aLst: TALStrings;
+                           aJsonNode: TALJSONNode;
+                           Const aPath: AnsiString;
+                           Const aNullStr: AnsiString = 'null');
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _isValidNamePart(aNamePart: AnsiString): boolean;
-  begin
-    // check it's not empty
-    result := (aNamePart <> '');
+var i, j: integer;
+    aIndex: Integer;
+    aNames:  TALStringList;
+    aCurrJsonNode, aTmpJsonNode: TALJSONNode;
 
-    // check if it's correct index
-    if result and (ALPos('[', aNamePart) > 0) then begin
-      result := (Length(aNamePart) > 2) and
-                (aNamePart[1]               = '[') and
-                (aNamePart[Length(aNamePart)]  = ']') and
-                (ALPosEx('[', aNamePart, 2) = 0) and
-                (ALPosEx(']', aNamePart, 1) = Length(aNamePart));
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {Checks that next element in the list with
-   parts is looking like index. For example: [3]}
-  function _isArray(aNamePartsLst: TALStrings;
-                    aIndex: integer): boolean;
-  begin
-    result := (aNamePartsLst.Count > (aIndex + 1)) and
-              (_isValidNamePart(aNamePartsLst[aIndex + 1])) and
-              (ALPos('[', aNamePartsLst[aIndex + 1]) > 0);
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {Checks that it's text element, so no other parts
-   of the name is after.}
-  function _isTextElement(aNamePartsLst: TALStrings;
-                          aIndex: integer): boolean;
-  begin
-    result := (aNamePartsLst.Count = (aIndex + 1));
-  end;
-
-var i, j:           integer;
-    aName:          AnsiString;
-    aValue:         AnsiString;
-    aNamePart:      AnsiString;
-    aNamePartsLst:  TALStringList;
-    aJsonPath:      TALJSONNode;
-    aJsonPathCheck: TALJSONNode;
 begin
 
   // create list of the part of name,
@@ -4494,62 +4461,64 @@ begin
   //   [3]
   //   translations
   //   usa
-  aNamePartsLst := TALStringList.Create;
+  aNames := TALStringList.Create;
   try
-    // sort the list before to analyze
-    if not TALStringList(aLst).Sorted then TALStringList(aLst).Sorted := true;
 
-    // scroll the list
+    // scroll the aLst
     for i := 0 to aLst.Count - 1 do begin
-      aName              := aLst.Names[i];
-      aValue             := aLst.ValueFromIndex[i];
-      aNamePartsLst.Text := ALStringReplace(aName,              '[', #13#10'[', [rfReplaceAll]);
-      aNamePartsLst.Text := ALStringReplace(aNamePartsLst.Text, '.', #13#10,    [rfReplaceAll]);
 
-      aJsonPath := aJsonNode;
-      for j := 0 to aNamePartsLst.Count - 1 do begin
+      //if it's contain path
+      if (aPath = '') or
+         (alposExIgnoreCase(aPath + '.',aLst.Names[i]) = 1) then begin
 
-        // check if the part of name is valid
-        if not _isValidNamePart(aNamePartsLst[j]) then raise EALException.Create('Wrong name in the StringList: ' + aName);
+        //init aNames
+        aNames.Text := ALStringReplace(ALStringReplace(aLst.Names[i],
+                                                       '.',
+                                                       #13#10,
+                                                       [rfReplaceAll]),
+                                       '[',
+                                       #13#10'[',
+                                       [rfReplaceAll]);
 
-        // clean [], no need to check if it's well formed thanks to previous step
-        if ALPos('[', aNamePartsLst[j]) > 0 then aNamePart := ALCopyStr(aNamePartsLst[j], 2, Length(aNamePartsLst[j]) - 2)
-        else                                     aNamePart := aNamePartsLst[j];
+        //loop on all the name
+        aCurrJsonNode := aJsonNode;
+        for j := 0 to aNames.Count - 1 do begin
 
-        {$REGION 'Text element'}
-        if _isTextElement(aNamePartsLst, j) then begin
-          aJsonPathCheck := aJsonPath.ChildNodes.FindNode(aNamePart);
-          if aJsonPathCheck <> nil then begin
-            aJsonPath := aJsonPathCheck;
-            aJsonPath.Text := aValue;
+          //if we are in array
+          if aCurrJsonNode.NodeType = ntArray then begin
+            if (length(aNames[j]) <= 2) or
+               (aNames[j][1] <> '[') or
+               (aNames[j][length(aNames[j])] <> ']') or
+               (not ALTryStrToInt(ALCopyStr(aNames[j], 2, Length(aNames[j]) - 2), aIndex)) then raise EALException.Create('Wrong path: "'+aLst.Names[i]+'"');
+            while aIndex > aCurrJsonNode.ChildNodes.Count - 1 do
+              aCurrJsonNode.AddChild(ntText, aCurrJsonNode.ChildNodes.Count);
+            aCurrJsonNode := aCurrJsonNode.ChildNodes[aIndex];
           end
+
+          //if we are not in array
           else begin
-            with aJsonPath.AddChild(aNamePart, ntText) do Text := aValue;
+            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(aNames[j]);
+            if not assigned(aTmpJsonNode) then begin
+              if j = aNames.Count - 1 then aCurrJsonNode := aCurrJsonNode.AddChild(aNames[j], ntText)
+              else if (aNames[j+1] <> '') and (aNames[j+1][1] = '[') then aCurrJsonNode := aCurrJsonNode.AddChild(aNames[j], ntarray)
+              else aCurrJsonNode := aCurrJsonNode.AddChild(aNames[j], ntObject);
+            end
+            else aCurrJsonNode := aTmpJsonNode;
           end;
-        end
-        {$ENDREGION}
 
-        {$REGION 'Array'}
-        else if _isArray(aNamePartsLst, j) then begin
-          aJsonPathCheck := aJsonPath.ChildNodes.FindNode(aNamePart);
-          if aJsonPathCheck <> nil then aJsonPath := aJsonPathCheck
-          else                          aJsonPath := aJsonPath.AddChild(aNamePart, ntArray);
-        end
-        {$ENDREGION}
+          //set the value
+          if J = aNames.Count - 1 then begin
+            aCurrJsonNode.Text := aLst.ValueFromIndex[j];
+          end;
 
-        {$REGION 'Object'}
-        else begin
-          aJsonPathCheck := aJsonPath.ChildNodes.FindNode(aNamePart);
-          if aJsonPathCheck <> nil then aJsonPath := aJsonPathCheck
-          else                          aJsonPath := aJsonPath.AddChild(aNamePart, ntObject);
         end;
-        {$ENDREGION}
+
       end;
 
     end;
 
   finally
-    aNamePartsLst.Free;
+    aNames.Free;
   end;
 
 end;

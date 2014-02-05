@@ -545,7 +545,8 @@ begin
 
               while aServiceStatus.dwCurrentState <> SERVICE_RUNNING do begin
                 aCheckPoint := aServiceStatus.dwCheckPoint;
-                Sleep(aServiceStatus.dwWaitHint);
+                if aServiceStatus.dwWaitHint = 0 then break
+                else Sleep(aServiceStatus.dwWaitHint);
                 if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
                 if (aServiceStatus.dwCheckPoint < aCheckPoint) then break;
               end;
@@ -598,7 +599,10 @@ begin
               end;
 
             end else raise EALException.Create('Cannot query status of service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
-          end else raise EALException.Create('Cannot stop service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+          end else begin
+            // if the state of service is STOPPED it means it was already stopped (didn't started)
+            if aServiceStatus.dwCurrentState <> SERVICE_STOPPED then raise EALException.Create('Cannot stop service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+          end;
         end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
 
       finally

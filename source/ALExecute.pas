@@ -522,47 +522,46 @@ function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''
 var aServiceStatus:     TServiceStatus;
     aServiceManager:    SC_HANDLE;
     aServiceInstance:   SC_HANDLE;
-    aCheckPoint:        DWORD;
     aServiceArgVectors: PChar;
-    aServiceNameStr:    string;
-    aComputerNameStr:   string;
 begin
-  aServiceNameStr  := string(aServiceName);
-  aComputerNameStr := string(aComputerName);
-
+  Result := False;
   aServiceStatus.dwCurrentState := 1;
-  aServiceManager := OpenSCManager(PChar(aComputerNameStr), nil, SC_MANAGER_CONNECT);
+  aServiceManager := OpenSCManagerA(PansiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
     if aServiceManager > 0 then begin
-      aServiceInstance := OpenService(aServiceManager, PChar(aServiceNameStr), SERVICE_START or SERVICE_QUERY_STATUS);
+
+      aServiceInstance := OpenServiceA(aServiceManager, PansiChar(aServiceName), SERVICE_START or SERVICE_QUERY_STATUS);
       try
 
         if aServiceInstance > 0 then begin
+
           aServiceArgVectors := nil;
-          if StartService(aServiceInstance, 0, aServiceArgVectors) then begin
-            if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
+          if StartService(aServiceInstance, 0, aServiceArgVectors) and
+             QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
 
-              while aServiceStatus.dwCurrentState <> SERVICE_RUNNING do begin
-                aCheckPoint := aServiceStatus.dwCheckPoint;
-                if aServiceStatus.dwWaitHint = 0 then break
-                else Sleep(aServiceStatus.dwWaitHint);
-                if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
-                if (aServiceStatus.dwCheckPoint < aCheckPoint) then break;
-              end;
+            while aServiceStatus.dwCurrentState = SERVICE_START_PENDING do begin
+              Sleep(1000); // sleep one seconds
+              if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then EXIT;
+            end;
 
-            end else raise EALException.Create('Cannot query status of service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
-          end else raise EALException.Create('Cannot start service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
-        end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+          end
+          else exit;
+
+        end
+        else exit;
 
       finally
         CloseServiceHandle(aServiceInstance);
       end;
-    end else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+
+    end
+    else exit;
 
   finally
     CloseServiceHandle(aServiceManager);
   end;
+
   result := (aServiceStatus.dwCurrentState = SERVICE_RUNNING);
 end;
 
@@ -574,41 +573,38 @@ var aServiceStatus:     TServiceStatus;
     aServiceManager:    SC_HANDLE;
     aServiceInstance:   SC_HANDLE;
     aCheckPoint:        DWORD;
-    aServiceNameStr:    string;
-    aComputerNameStr:   string;
 begin
-  aServiceNameStr  := string(aServiceName);
-  aComputerNameStr := string(aComputerName);
-
-  aServiceManager := OpenSCManager(PChar(aComputerNameStr), nil, SC_MANAGER_CONNECT);
+  aServiceManager := OpenSCManagerA(PansiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
     if aServiceManager > 0 then begin
-      aServiceInstance := OpenService(aServiceManager, PChar(aServiceNameStr), SERVICE_STOP or SERVICE_QUERY_STATUS);
+      aServiceInstance := OpenServiceA(aServiceManager, PansiChar(aServiceName), SERVICE_STOP or SERVICE_QUERY_STATUS);
       try
 
         if aServiceInstance > 0 then begin
           if ControlService(aServiceInstance, SERVICE_CONTROL_STOP, aServiceStatus) then begin
             if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
 
-              while aServiceStatus.dwCurrentState <> SERVICE_STOPPED do begin
+              while aServiceStatus.dwCurrentState = SERVICE_STOP_PENDING do begin
                 aCheckPoint := aServiceStatus.dwCheckPoint;
-                Sleep(aServiceStatus.dwWaitHint);
+                Sleep(1000); // sleep 1 second
                 if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
                 if (aServiceStatus.dwCheckPoint < aCheckPoint) then break;
               end;
 
-            end else raise EALException.Create('Cannot query status of service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
-          end else begin
-            // if the state of service is STOPPED it means it was already stopped (didn't started)
-            if aServiceStatus.dwCurrentState <> SERVICE_STOPPED then raise EALException.Create('Cannot stop service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
-          end;
-        end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+            end
+            else raise EALException.Create('Cannot query status of service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+          end
+          else if aServiceStatus.dwCurrentState <> SERVICE_STOPPED then // if the state of service is STOPPED it means it was already stopped (didn't started)
+            raise EALException.Create('Cannot stop service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+        end
+        else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
 
       finally
         CloseServiceHandle(aServiceInstance);
       end;
-    end else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+    end
+    else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
 
   finally
     CloseServiceHandle(aServiceManager);
@@ -632,18 +628,14 @@ var aServiceFailureActions: SERVICE_FAILURE_ACTIONS;
     aFailActions:           array[1..1] of SC_ACTION;
     aServiceManager:        SC_HANDLE;
     aServiceInstance:       SC_HANDLE;
-    aServiceNameStr:        string;
-    aComputerNameStr:       string;
 begin
-  aServiceNameStr  := string(aServiceName);
-  aComputerNameStr := string(aComputerName);
   result           := false;
 
-  aServiceManager := OpenSCManager(PChar(aComputerNameStr), nil, SC_MANAGER_CONNECT);
+  aServiceManager := OpenSCManagerA(PansiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
     if aServiceManager > 0 then begin
-      aServiceInstance := OpenService(aServiceManager, PChar(aServiceNameStr), SERVICE_ALL_ACCESS);
+      aServiceInstance := OpenServiceA(aServiceManager, PansiChar(aServiceName), SERVICE_ALL_ACCESS);
       try
 
         if aServiceInstance > 0 then begin
@@ -660,12 +652,14 @@ begin
           result := ChangeServiceConfig2(aServiceInstance, SERVICE_CONFIG_FAILURE_ACTIONS, @aServiceFailureActions);
           if not result then raise EALException.Create('Cannot change service settings. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
 
-        end else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+        end
+        else raise EALException.Create('Cannot open service. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
 
       finally
         CloseServiceHandle(aServiceInstance);
       end;
-    end else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
+    end
+    else raise EALException.Create('Cannot open service manager. Service name: ' + aServiceName + '. Error code: ' + ALIntToStr(GetLastError));
 
   finally
     CloseServiceHandle(aServiceManager);

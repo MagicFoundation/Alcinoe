@@ -541,7 +541,7 @@ function  ALNEVExtractValue(const s: AnsiString): AnsiString;
 function  ALGetStringFromFile(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 function  ALGetStringFromFileWithoutUTF8BOM(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 procedure ALSaveStringtoFile(Str: AnsiString; filename: AnsiString);
-Function  ALWideNormalize(const S: Widestring): Widestring;
+Function  ALWideNormalize(const S: Widestring; const WordSeparator: WideChar = '-'): Widestring;
 Function  ALWideRemoveDiacritic(const S: Widestring): Widestring;
 Function  ALWideExpandLigatures(const S: Widestring): Widestring;
 Function  ALWideUpperCaseNoDiacritic(const S: Widestring): Widestring;
@@ -550,7 +550,7 @@ Function  ALUTF8RemoveDiacritic(const S: AnsiString): AnsiString;
 Function  ALUTF8ExpandLigatures(const S: AnsiString): AnsiString;
 Function  ALUTF8UpperCaseNoDiacritic(const S: AnsiString): AnsiString;
 Function  ALUTF8LowerCaseNoDiacritic(const S: AnsiString): AnsiString;
-Function  ALUTF8Normalize(const S: AnsiString): AnsiString;
+Function  ALUTF8Normalize(const S: AnsiString; const WordSeparator: ansiChar = '-'): AnsiString;
 function  ALUTF8UpperCase(const s: AnsiString): AnsiString;
 function  ALUTF8LowerCase(const s: AnsiString): AnsiString;
 function  AlUTF8Check(const S: AnsiString): Boolean;
@@ -8690,7 +8690,7 @@ end;
 {***********************}
 // Normalize a Widestring
 // ie: l''été sur l''europe => l-ete-sur-l-europe
-Function ALWideNormalize(const S: Widestring): Widestring;
+Function ALWideNormalize(const S: Widestring; const WordSeparator: WideChar = '-'): Widestring;
 
   {--------------------------------------------------------}
   {source: http://issues.apache.org/jira/browse/LUCENE-1343}
@@ -8846,13 +8846,13 @@ Begin
       result[j] := TmpWideStr[i];
     end
     else if ((j >= 1) and
-             (result[j] <> '-')) then begin
+             (result[j] <> WordSeparator)) then begin
       inc(j);
-      result[j] := '-';
+      result[j] := WordSeparator;
     end;
 
   end;
-  While (J > 0) and (result[j] = '-') do dec(j);
+  While (J > 0) and (result[j] = WordSeparator) do dec(j);
   setlength(result,j);
   InternalfoldNonDiacriticChar(result);
 end;
@@ -8977,12 +8977,12 @@ end;
 // The result of the function is the corresponding UTF-8 encoded string
 // "normalized":
 // ie: l''été sur l''europe => l-ete-sur-l-europe
-Function ALUTF8Normalize(const S: AnsiString): AnsiString;
+Function ALUTF8Normalize(const S: AnsiString; const WordSeparator: ansiChar = '-'): AnsiString;
 begin
   {$IFDEF UNICODE}
-  Result := utf8Encode(ALWideNormalize(UTF8ToWideString(S)));
+  Result := utf8Encode(ALWideNormalize(UTF8ToWideString(S), WideChar(WordSeparator)));
   {$ELSE}
-  Result := utf8Encode(ALWideNormalize(UTF8Decode(S)));
+  Result := utf8Encode(ALWideNormalize(UTF8Decode(S), WideChar(WordSeparator)));
   {$ENDIF}
 end;
 

@@ -3827,6 +3827,7 @@ begin
   aQuery.Query := fQuery;
   aQuery.ReturnFieldsSelector := fReturnFieldsSelector;
   aQuery.flags.TailMonitoring := True;
+  aQuery.flags.NoCursorTimeout := true; // because if the doEvent is too long then the cursor will timeout
 
   //loop still not terminated
   while not Terminated do begin

@@ -519,13 +519,12 @@ end;
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
 function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
-var aServiceStatus:     TServiceStatus;
-    aServiceManager:    SC_HANDLE;
-    aServiceInstance:   SC_HANDLE;
-    aServiceArgVectors: PChar;
+var aServiceStatus: TServiceStatus;
+    aServiceManager: SC_HANDLE;
+    aServiceInstance: SC_HANDLE;
+    aServiceArgVectors: PansiChar;
 begin
   result := False;
-  aServiceStatus.dwCurrentState := 1;
   aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
@@ -536,13 +535,11 @@ begin
 
         if aServiceInstance > 0 then begin
 
-          aServiceArgVectors := nil;
-
           // NOTICE: even if this function fails we need to do the QueryServiceStatus,
           // because it could fail if the service is already running, so we don't
           // check result of this function.
-          StartService(aServiceInstance, 0, aServiceArgVectors);
-
+          aServiceArgVectors := nil;
+          StartServiceA(aServiceInstance, 0, aServiceArgVectors);
           if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
 
             while aServiceStatus.dwCurrentState = SERVICE_START_PENDING do begin
@@ -551,18 +548,15 @@ begin
             end;
             result := (aServiceStatus.dwCurrentState = SERVICE_RUNNING);
 
-          end
-          else Exit;
+          end;
 
-        end
-        else Exit;
+        end;
 
       finally
         CloseServiceHandle(aServiceInstance);
       end;
 
-    end
-    else Exit;
+    end;
 
   finally
     CloseServiceHandle(aServiceManager);
@@ -573,9 +567,9 @@ end;
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
 function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
-var aServiceStatus:     TServiceStatus;
-    aServiceManager:    SC_HANDLE;
-    aServiceInstance:   SC_HANDLE;
+var aServiceStatus: TServiceStatus;
+    aServiceManager: SC_HANDLE;
+    aServiceInstance: SC_HANDLE;
 begin
   result := false;
   aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
@@ -592,7 +586,6 @@ begin
           // because it can fail if the service is already stopped, so we don't check
           // result of this function.
           ControlService(aServiceInstance, SERVICE_CONTROL_STOP, aServiceStatus);
-
           if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
 
             while aServiceStatus.dwCurrentState = SERVICE_STOP_PENDING do begin
@@ -601,18 +594,15 @@ begin
             end;
             result := (aServiceStatus.dwCurrentState = SERVICE_STOPPED);
 
-          end
-          else Exit;
+          end;
 
-        end
-        else Exit;
+        end;
 
       finally
         CloseServiceHandle(aServiceInstance);
       end;
 
-    end
-    else Exit;
+    end;
 
   finally
     CloseServiceHandle(aServiceManager);
@@ -632,12 +622,11 @@ function ALMakeServiceAutorestarting(aServiceName: AnsiString;
                                      aTimeToRestartInSec: integer = 60 {one minute by default};
                                      aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
 var aServiceFailureActions: SERVICE_FAILURE_ACTIONS;
-    aFailActions:           array[1..1] of SC_ACTION;
-    aServiceManager:        SC_HANDLE;
-    aServiceInstance:       SC_HANDLE;
+    aFailActions: array[1..1] of SC_ACTION;
+    aServiceManager: SC_HANDLE;
+    aServiceInstance: SC_HANDLE;
 begin
   result := false;
-
   aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
   try
 
@@ -659,15 +648,13 @@ begin
 
           result := ChangeServiceConfig2(aServiceInstance, SERVICE_CONFIG_FAILURE_ACTIONS, @aServiceFailureActions);
 
-        end
-        else Exit;
+        end;
 
       finally
         CloseServiceHandle(aServiceInstance);
       end;
 
-    end
-    else Exit;
+    end;
 
   finally
     CloseServiceHandle(aServiceManager);

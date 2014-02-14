@@ -8850,7 +8850,6 @@ Begin
       inc(j);
       result[j] := WordSeparator;
     end;
-
   end;
   While (J > 0) and (result[j] = WordSeparator) do dec(j);
   setlength(result,j);

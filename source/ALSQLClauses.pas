@@ -322,9 +322,9 @@ Begin
 
   //first + skip (if server type = ALSphinx)
   if (ServerType in [alSphinx, alMySql]) then begin
-    if (First >= 0) and
-       (skip >= 0) then Result := result + ' Limit ' + ALIntToStr(skip) + ', ' + ALIntToStr(First)
-    else if (First >= 0) then Result := result + ' Limit 0, ' + ALIntToStr(First)
+    if (First >= 0) and (skip >= 0) then Result := result + ' Limit ' + ALIntToStr(skip) + ', ' + ALIntToStr(First) // With two arguments, the first argument specifies the offset of the first row to return, and the second specifies the maximum number of rows to return
+    else if (skip >= 0) then             Result := result + ' Limit ' + ALIntToStr(skip) + ', ' + ALIntToStr(Maxint) // To retrieve all rows from a certain offset up to the end of the result set, you can use some large number for the second parameter.
+    else if (First >= 0) then            Result := result + ' Limit 0, '                        + ALIntToStr(First)
   end;
 
 End;

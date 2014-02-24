@@ -600,6 +600,7 @@ Procedure ALJSONToTStrings(const aJsonNode: TAlJsonNode;
 procedure ALTStringsToJson(const aLst: TALStrings;
                            aJsonNode: TALJSONNode;
                            Const aPath: AnsiString = '';
+                           Const aNameToLowerCase: boolean = false;
                            Const aNullStr: AnsiString = 'null');
 
 Procedure ALJSONToXML(aJSONNode: TALJsonNode;
@@ -4439,162 +4440,97 @@ begin
                    aFalseStr)
 end;
 
-{****************************************************}
-procedure ALTStringsToJson(const aLst:     TALStrings;
-                           aJsonNode:      TALJSONNode;
-                           const aPath:    AnsiString = '';
-                           const aNullStr: AnsiString = 'null');
+{************************************************}
+procedure ALTStringsToJson(const aLst: TALStrings;
+                           aJsonNode: TALJSONNode;
+                           Const aPath: AnsiString = '';
+                           Const aNameToLowerCase: boolean = false;
+                           Const aNullStr: AnsiString = 'null');
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  (*This procedure can handle the cases when text
-    element values are [...] or {...}, so it's JSON-
-    document that must be added to nodes.*)
-  procedure _processTextElement(aNode: TALJsonNode;
-                                aName: AnsiString;
-                                aValue: AnsiString);
-  var aTmpJsonNode: TAlJsonNode;
-  begin
-    aTmpJsonNode := aNode.ChildNodes.FindNode(aName);
+var aIndex: Integer;
+    aNames:  TALStringList;
+    aCurrJsonNode, aTmpJsonNode: TALJSONNode;
+    i, j: integer;
 
-    {$REGION 'If the node is NOT exists'}
-    if aTmpJsonNode = nil then begin
-      if (ALPos('{', aValue) = 1) or
-         (ALPos('[', aValue) = 1) then begin
-        aNode.LoadFromJSON('{"' + aName + '":' + aValue + '}', false{do not clear child nodes, just add one more});
-      end
-      else begin
-        with aNode.AddChild(aName, ntText) do Text := aValue;
-      end;
-    end
-    {$ENDREGION}
-
-    {$REGION 'If the node is exists'}
-    // NOTICE: normally here it must be not possible to have node type
-    // like an object or an array because these objects and arrays in
-    // the path must be handled when we search this particular node,
-    // so here it could be the only text value. For example, we had data
-    // like:
-    //     zip_codes[0][2]=2323
-    //     zip_codes[0][1]=12312
-    //     zip_codes[0][0]=avav
-    // When we reach zip_codes[0][0], we have zip_codes, it is an array,
-    // we found it and go ahead, then we have [0] it is an array, we found it
-    // and go ahead, then we have [0]. This [0] was already created like an
-    // text element when we were checking for the skipped indices. So it's
-    // ok, it is text element and we need add it.
-    // The same if we had something like:
-    //     labels[0][1].id=TTT
-    //     labels[0][0].id=GGG
-    // When we reach last [0] in labels[0][0].id we must already have it
-    // created like an ntObject, so we just go ahead, find "id" and add
-    // this node inside the object (this node is not exist yet, so it will
-    // be added on the block of the code above.
-    else begin
-
-      // TODO: need to think, if we have here some JSON {...} in the
-      // value then need we fire an exception or not? Normally, we need,
-      // because it means we had ugly data like:
-      //    some_data[1]=...
-      //    some_data[0]={"attr":"something"}
-      // And as soon as we create this way the node with type ntText,
-      // then we are not able to load JSON now, we need delete this current
-      // node and recreate it and then load it - this is too complicate and
-      // it's better to avoid this not using such kind of ugly data.
-
-      if aTmpJsonNode.NodeType = ntText then aTmpJsonNode.Text := aValue
-      else raise EALException.Create('Wrong detection! Attempting to process text element but object or array was found');
-    end;
-    {$ENDREGION}
-
-  end;
-
-var i, j:          integer;
-    aIndex:        integer;
-    aNamePart:     AnsiString;
-    aNames:        TALStringList;
-    aCurrJsonNode: TALJsonNode;
-    aTmpJsonNode:  TALJsonNode;
 begin
 
+  // create list of the part of name,
+  // from "aggregated_data.properties.types[3].translations.usa" =>
+  //   aggregated_data
+  //   properties
+  //   types
+  //   [3]
+  //   translations
+  //   usa
   aNames := TALStringList.Create;
   try
 
-    // scroll the list
+    //init aNames.linebreak
+    aNames.LineBreak := '.';
+
+    // scroll the aLst
     for i := 0 to aLst.Count - 1 do begin
 
-      // process if the path is empty or the name has the path
+      //if it's contain path
       if (aPath = '') or
-         (ALPosExIgnoreCase(aPath + '.', aLst.Names[i]) = 1) then begin
+         (alposExIgnoreCase(aPath + '.',aLst.Names[i]) = 1) then begin
 
-        // create list of the part of name,
-        // from "aggregated_data.properties.types[3].translations.usa" =>
+        // path.aggregated_data.properties.types[3].translations.usa =>
         //   aggregated_data
         //   properties
         //   types
         //   [3]
         //   translations
         //   usa
-        aNames.Text := ALStringReplace(ALStringReplace(aLst.Names[i],
-                                                       '[',
-                                                       #13#10'[',
-                                                       [rfReplaceAll]),
-                                       '.',
-                                       #13#10,
-                                       [rfReplaceAll]);
+        if (aPath <> '') then aNames.Text := ALStringReplace(ALStringReplace(aLst.Names[i],
+                                                                             aPath + '.',
+                                                                             '',
+                                                                             [rfIgnoreCase]),
+                                                             '[',
+                                                             '.[',
+                                                             [rfReplaceAll])
+        else aNames.Text := ALStringReplace(aLst.Names[i],
+                                            '[',
+                                            '.[',
+                                            [rfReplaceAll]);
 
+        //loop on all the name
         aCurrJsonNode := aJsonNode;
         for j := 0 to aNames.Count - 1 do begin
 
-          {$REGION 'Check special cases for arrays (unordered indices, spaces in indices)'}
-          // reset index
-          aIndex := -1;
-
-          // check if it's valid array index
-          if (ALPos('[', aNames[j]) > 0) and
-             (not ALTryStrToInt(ALCopyStr(aNames[j], 2, Length(aNames[j]) - 2), aIndex)) then raise EALException.Create('Wrong index in the name: "' + aLst.Names[i] + '"');
-
-          // create null nodes for the non-defined array items;
-          // it could be useful to handle the data like
-          //    array[0]=1
-          //    array[2]=3
-          if aIndex > -1 then begin
-            aNamePart := ALIntToStr(aIndex);
-            while aIndex > (aCurrJsonNode.ChildNodes.Count) do begin
-              if (aNames.Count = (j + 1))             then aCurrJsonNode.AddChild(ntText)
-              else if (aNames.Count > (j + 1)) and
-                      (ALPos('[', aNames[j + 1]) > 0) then aCurrJsonNode.AddChild(ntArray)
-              else                                         aCurrJsonNode.AddChild(ntObject);
+          //if we are in array
+          if aCurrJsonNode.NodeType = ntArray then begin
+            if (length(aNames[j]) <= 2) or
+               (aNames[j][1] <> '[') or
+               (aNames[j][length(aNames[j])] <> ']') or
+               (not ALTryStrToInt(ALCopyStr(aNames[j], 2, Length(aNames[j]) - 2), aIndex)) then raise EALException.Create('Wrong path: "'+aLst.Names[i]+'"');
+            while aIndex > aCurrJsonNode.ChildNodes.Count - 1 do begin
+              if j = aNames.Count - 1 then aCurrJsonNode.AddChild(ntText)
+              else if (aNames[j+1] <> '') and
+                      (aNames[j+1][1] = '[') then aCurrJsonNode := aCurrJsonNode.AddChild(ntarray)
+              else aCurrJsonNode := aCurrJsonNode.AddChild(ntObject);
             end;
+            aCurrJsonNode := aCurrJsonNode.ChildNodes[aIndex];
           end
-          else aNamePart := aNames[j];
-          {$ENDREGION}
 
-          {$REGION 'Text element'}
-          if (aNames.Count = (j + 1)) then _processTextElement(aCurrJsonNode, aNamePart, aLst.ValueFromIndex[i])
-          {$ENDREGION}
-
-          {$REGION 'Array'}
-          // "translations[123]" =>
-          //   translations
-          //   [123]
-          // If we are on "translations" we need to know
-          // if "translations" is an array node, this way
-          // we are checking NEXT node if it looks like index [number].
-          else if (aNames.Count > (j + 1)) and
-                  (ALPos('[', aNames[j + 1]) > 0) then begin
-            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(aNamePart);
-            if aTmpJsonNode <> nil then aCurrJsonNode := aTmpJsonNode
-            else                        aCurrJsonNode := aCurrJsonNode.AddChild(aNamePart, ntArray);
-          end
-          {$ENDREGION}
-
-          {$REGION 'Object'}
+          //if we are not in array
           else begin
-            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(aNamePart);
-            if aTmpJsonNode <> nil then aCurrJsonNode := aTmpJsonNode
-            else                        aCurrJsonNode := aCurrJsonNode.AddChild(aNamePart, ntObject);
+            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(aNames[j]);
+            if not assigned(aTmpJsonNode) then begin
+              if j = aNames.Count - 1 then aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntText)
+              else if (aNames[j+1] <> '') and
+                      (aNames[j+1][1] = '[') then aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntarray)
+              else aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntObject);
+            end
+            else aCurrJsonNode := aTmpJsonNode;
           end;
-          {$ENDREGION}
+
+          //set the value
+          if J = aNames.Count - 1 then begin
+            if aLst.ValueFromIndex[i] = aNullStr then aCurrJsonNode.Null := true
+            else aCurrJsonNode.Text := aLst.ValueFromIndex[i];
+          end;
+
         end;
 
       end;

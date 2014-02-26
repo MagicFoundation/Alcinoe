@@ -176,6 +176,7 @@ Type
   {------------------------------------------}
   TALIntegerList = class(TALBaseQuickSortList)
   private
+    FOwnsObject: Boolean;
     function  GetItem(Index: Integer): Integer;
     procedure SetItem(Index: Integer; const Item: Integer);
     function  GetObject(Index: Integer): TObject;
@@ -185,6 +186,8 @@ Type
     procedure InsertItem(Index: Integer; const item: integer; AObject: TObject);
     function  CompareItems(const Index1, Index2: Integer): Integer; override;
   public
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
     function  IndexOf(Item: Integer): Integer;
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: integer): Integer;
@@ -194,6 +197,7 @@ Type
     procedure InsertObject(Index: Integer; const item: integer; AObject: TObject);
     property  Items[Index: Integer]: Integer read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
   {-----------------------------------------}
@@ -206,6 +210,7 @@ Type
   {-------------------------------------------}
   TALCardinalList = class(TALBaseQuickSortList)
   private
+    FOwnsObject: Boolean;
     function  GetItem(Index: Integer): Cardinal;
     procedure SetItem(Index: Integer; const Item: Cardinal);
     function  GetObject(Index: Integer): TObject;
@@ -215,6 +220,8 @@ Type
     procedure InsertItem(Index: Integer; const item: Cardinal; AObject: TObject);
     function  CompareItems(const Index1, Index2: Integer): Integer; override;
   public
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
     function  IndexOf(Item: Cardinal): Integer;
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: Cardinal): Integer;
@@ -224,6 +231,7 @@ Type
     procedure InsertObject(Index: Integer; const item: Cardinal; AObject: TObject);
     property  Items[Index: Integer]: Cardinal read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
   {-----------------------------------}
@@ -236,6 +244,7 @@ Type
   {----------------------------------------}
   TALInt64List = class(TALBaseQuickSortList)
   private
+    FOwnsObject: Boolean;
     function  GetItem(Index: Integer): Int64;
     procedure SetItem(Index: Integer; const Item: Int64);
     function  GetObject(Index: Integer): TObject;
@@ -245,6 +254,8 @@ Type
     procedure InsertItem(Index: Integer; const item: Int64; AObject: TObject);
     function  CompareItems(const Index1, Index2: Integer): Integer; override;
   public
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
     function  IndexOf(Item: Int64): Integer;
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: Int64): Integer;
@@ -254,6 +265,7 @@ Type
     procedure InsertObject(Index: Integer; const item: Int64; AObject: TObject);
     property  Items[Index: Integer]: Int64 read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
   {-------------------------------------}
@@ -266,6 +278,7 @@ Type
   {------------------------------------------}
   TALDoubleList = class(TALBaseQuickSortList)
   private
+    FOwnsObject: Boolean;
     function  GetItem(Index: Integer): Double;
     procedure SetItem(Index: Integer; const Item: Double);
     function  GetObject(Index: Integer): TObject;
@@ -275,6 +288,8 @@ Type
     procedure InsertItem(Index: Integer; const item: Double; AObject: TObject);
     function  CompareItems(const Index1, Index2: Integer): Integer; override;
   public
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
     function  IndexOf(Item: Double): Integer;
     function  IndexOfObject(AObject: TObject): Integer;
     function  Add(const Item: Double): Integer;
@@ -284,6 +299,7 @@ Type
     procedure InsertObject(Index: Integer; const item: Double; AObject: TObject);
     property  Items[Index: Integer]: Double read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
   {-----------------------------}
@@ -302,7 +318,7 @@ Type
     procedure InsertItem(Index: Integer; Item: Pointer);
     property  List: TALQuickSortPointerList read FList;
   public
-    Constructor Create; virtual;
+    Constructor Create;
     destructor Destroy; override;
     procedure Clear; virtual;
     procedure Delete(Index: Integer);
@@ -314,8 +330,22 @@ Type
     property  Duplicates: TDuplicates read FDuplicates write FDuplicates;
   end;
 
+  {----------------------}
+  TALInt64AVLList = class;
+
+  {---------------------------------------------------------}
+  TALInt64AVLListBinaryTree = class(TALInt64KeyAVLBinaryTree)
+  Private
+    fOwner: TALInt64AVLList;
+  Protected
+    procedure FreeNodeObj(aNode: TALBaseAVLBinaryTreeNode); override;
+  Public
+    Constructor Create(aOwner: TALInt64AVLList); reintroduce;
+    property Owner: TALInt64AVLList read fOwner write fOwner;
+  end;
+
   {-----------------------------------------------------------------}
-  TALAVLInt64ListBinaryTreeNode = class(TALInt64KeyAVLBinaryTreeNode)
+  TALInt64AVLListBinaryTreeNode = class(TALInt64KeyAVLBinaryTreeNode)
   Private
   Protected
   Public
@@ -327,14 +357,16 @@ Type
   {-------------------------------------}
   TALInt64AVLList = class(TALBaseAVLList)
   private
-    FAVLBinTree: TALInt64KeyAVLBinaryTree;
+    FOwnsObject: Boolean;
+    FAVLBinTree: TALInt64AVLListBinaryTree;
     function  GetItem(Index: Integer): Int64;
     function  GetObject(Index: Integer): TObject;
     procedure PutObject(Index: Integer; AObject: TObject);
   protected
     procedure InsertItem(Index: Integer; const item: Int64; AObject: TObject);
   public
-    Constructor Create; override;
+    Constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
     destructor Destroy; override;
     procedure Clear; override;
     procedure Delete(Index: Integer);
@@ -345,6 +377,7 @@ Type
     function  Find(item: Int64; var Index: Integer): Boolean;
     property  Items[Index: Integer]: Int64 read GetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
 resourcestring
@@ -680,6 +713,20 @@ begin
   Result := PALIntegerListItem(Get(index))^.FInteger
 end;
 
+{********************************}
+constructor TALIntegerList.Create;
+begin
+  inherited Create;
+  FOwnsObject := false;
+end;
+
+{******************************************************}
+constructor TALIntegerList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FOwnsObject := OwnsObjects;
+end;
+
 {******************************************************}
 function TALIntegerList.IndexOf(Item: Integer): Integer;
 begin
@@ -715,7 +762,10 @@ end;
 {***********************************************************************}
 procedure TALIntegerList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
-  if Action = lnDeleted then dispose(ptr);
+  if Action = lnDeleted then begin
+    if OwnsObjects then PALIntegerListItem(Ptr).FObject.Free;
+    dispose(ptr);
+  end;
   inherited Notify(Ptr, Action);
 end;
 
@@ -838,6 +888,20 @@ begin
   Result := PALCardinalListItem(Get(index))^.FCardinal
 end;
 
+{*********************************}
+constructor TALCardinalList.Create;
+begin
+  inherited Create;
+  FOwnsObject := false;
+end;
+
+{*******************************************************}
+constructor TALCardinalList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FOwnsObject := OwnsObjects;
+end;
+
 {********************************************************}
 function TALCardinalList.IndexOf(Item: Cardinal): Integer;
 begin
@@ -873,7 +937,10 @@ end;
 {************************************************************************}
 procedure TALCardinalList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
-  if Action = lnDeleted then dispose(ptr);
+  if Action = lnDeleted then begin
+    if OwnsObjects then PALCardinalListItem(Ptr).FObject.Free;
+    dispose(ptr);
+  end;
   inherited Notify(Ptr, Action);
 end;
 
@@ -994,6 +1061,20 @@ begin
   Result := PALInt64ListItem(Get(index))^.FInt64
 end;
 
+{******************************}
+constructor TALInt64List.Create;
+begin
+  inherited Create;
+  FOwnsObject := false;
+end;
+
+{****************************************************}
+constructor TALInt64List.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FOwnsObject := OwnsObjects;
+end;
+
 {**************************************************}
 function TALInt64List.IndexOf(Item: Int64): Integer;
 begin
@@ -1029,7 +1110,10 @@ end;
 {*********************************************************************}
 procedure TALInt64List.Notify(Ptr: Pointer; Action: TListNotification);
 begin
-  if Action = lnDeleted then dispose(ptr);
+  if Action = lnDeleted then begin
+    if OwnsObjects then PALInt64ListItem(Ptr).FObject.Free;
+    dispose(ptr);
+  end;
   inherited Notify(Ptr, Action);
 end;
 
@@ -1150,6 +1234,20 @@ begin
   Result := PALDoubleListItem(Get(index))^.FDouble
 end;
 
+{*******************************}
+constructor TALDoubleList.Create;
+begin
+  inherited Create;
+  FOwnsObject := false;
+end;
+
+{*****************************************************}
+constructor TALDoubleList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FOwnsObject := OwnsObjects;
+end;
+
 {****************************************************}
 function TALDoubleList.IndexOf(Item: Double): Integer;
 begin
@@ -1185,7 +1283,10 @@ end;
 {**********************************************************************}
 procedure TALDoubleList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
-  if Action = lnDeleted then dispose(ptr);
+  if Action = lnDeleted then begin
+    if OwnsObjects then PALDoubleListItem(Ptr).FObject.Free;
+    dispose(ptr);
+  end;
   inherited Notify(Ptr, Action);
 end;
 
@@ -1364,8 +1465,22 @@ begin
   end;
 end;
 
+{********************************************************************}
+constructor TALInt64AVLListBinaryTree.Create(aOwner: TALInt64AVLList);
+begin
+  inherited create;
+  fOwner := aOwner;
+end;
+
+{*******************************************************************************}
+procedure TALInt64AVLListBinaryTree.FreeNodeObj(aNode: TALBaseAVLBinaryTreeNode);
+begin
+  if owner.OwnsObjects then TALInt64AVLListBinaryTreeNode(aNode).obj.Free;
+  inherited;
+end;
+
 {***********************************************}
-constructor TALAVLInt64ListBinaryTreeNode.Create;
+constructor TALInt64AVLListBinaryTreeNode.Create;
 begin
   inherited;
   Obj := nil;
@@ -1375,8 +1490,17 @@ end;
 {*********************************}
 constructor TALInt64AVLList.Create;
 begin
-  inherited;
-  FAVLBinTree:= TALInt64KeyAVLBinaryTree.Create;
+  inherited create;
+  FAVLBinTree:= TALInt64AVLListBinaryTree.Create(self);
+  FOwnsObject := False;
+end;
+
+{*******************************************************}
+constructor TALInt64AVLList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FAVLBinTree:= TALInt64AVLListBinaryTree.Create(self);
+  FOwnsObject := OwnsObjects;
 end;
 
 {*********************************}
@@ -1408,10 +1532,10 @@ end;
 
 {****************************************************************************************}
 procedure TALInt64AVLList.InsertItem(Index: Integer; const item: Int64; AObject: TObject);
-Var aNode: TALAVLInt64ListBinaryTreeNode;
+Var aNode: TALInt64AVLListBinaryTreeNode;
     i: integer;
 begin
-  aNode := TALAVLInt64ListBinaryTreeNode.Create;
+  aNode := TALInt64AVLListBinaryTreeNode.Create;
   aNode.ID  := item;
   aNode.Obj := AObject;
   aNode.Idx := Index;
@@ -1431,7 +1555,7 @@ begin
   end;
 
   for i := Index + 1 to Count - 1 do
-    inc(TALAVLInt64ListBinaryTreeNode(objects[i]).Idx);
+    inc(TALInt64AVLListBinaryTreeNode(objects[i]).Idx);
 end;
 
 {**********************************************************************}
@@ -1440,13 +1564,13 @@ var aNode: TALInt64KeyAVLBinaryTreeNode;
 begin
   aNode := FAVLBinTree.FindNode(item);
   result := assigned(aNode);
-  if result then Index := TALAVLInt64ListBinaryTreeNode(aNode).Idx;
+  if result then Index := TALInt64AVLListBinaryTreeNode(aNode).Idx;
 end;
 
 {******************************************************}
 function TALInt64AVLList.GetItem(Index: Integer): Int64;
 begin
-  Result := TALAVLInt64ListBinaryTreeNode(Get(index)).ID
+  Result := TALInt64AVLListBinaryTreeNode(Get(index)).ID
 end;
 
 {*****************************************************}
@@ -1462,7 +1586,7 @@ begin
   FAVLBinTree.DeleteNode(GetItem(Index));
 
   for i := Index + 1 to Count - 1 do
-    dec(TALAVLInt64ListBinaryTreeNode(Get(i)).Idx);
+    dec(TALInt64AVLListBinaryTreeNode(Get(i)).Idx);
 
   inherited Delete(Index);
 end;
@@ -1471,7 +1595,7 @@ end;
 function TALInt64AVLList.GetObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
-  Result :=  TALAVLInt64ListBinaryTreeNode(Get(index)).Obj;
+  Result :=  TALInt64AVLListBinaryTreeNode(Get(index)).Obj;
 end;
 
 {****************************************************************}
@@ -1486,7 +1610,7 @@ end;
 procedure TALInt64AVLList.PutObject(Index: Integer; AObject: TObject);
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
-  TALAVLInt64ListBinaryTreeNode(Get(index)).Obj := AObject;
+  TALInt64AVLListBinaryTreeNode(Get(index)).Obj := AObject;
 end;
 
 end.

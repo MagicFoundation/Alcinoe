@@ -67,6 +67,7 @@ interface
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
+function ALGMTNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
@@ -119,6 +120,14 @@ function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTim
 
 begin
   Result := aLocalDateTime + InternalCalcTimeZoneBias;
+end;
+
+{**************************}
+{The same like Now but used
+ GMT-time not local time.}
+function ALGMTNow: TDateTime;
+begin
+  result := AlLocalDateTimeToGMTDateTime(NOW);
 end;
 
 {******************************************************}

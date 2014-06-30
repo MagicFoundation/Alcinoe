@@ -4515,7 +4515,7 @@ begin
 
           //if we are not in array
           else begin
-            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(aNames[j]);
+            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(ALLowerCase(aNames[j]));
             if not assigned(aTmpJsonNode) then begin
               if j = aNames.Count - 1 then aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntText)
               else if (aNames[j+1] <> '') and

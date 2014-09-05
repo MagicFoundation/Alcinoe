@@ -97,6 +97,7 @@ function ALCreateProcessWithLogonW(lpUsername: LPCWSTR;  // LPCWSTR
                                    lpCurrentDirectory: LPCWSTR;  // LPCWSTR
                                    const lpStartupInfo: TStartupInfoW;  // LPSTARTUPINFOW
                                    var lpProcessInfo: TProcessInformation): BOOL; stdcall; // LPPROCESS_INFORMATION
+function AttachConsole(dwProcessId: DWORD): BOOL; stdcall;
 function ALUserExists(aUserName: AnsiString): boolean;
 
 
@@ -107,7 +108,7 @@ const INVALID_SET_FILE_POINTER = DWORD(-1);
       QUOTA_LIMITS_HARDWS_MAX_ENABLE  = $4;
       LOGON_WITH_PROFILE        = $1;
       LOGON_NETCREDENTIALS_ONLY = $2;
-
+      ATTACH_PARENT_PROCESS = DWORD(-1);
 
 implementation
 
@@ -123,6 +124,9 @@ function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
 
 {***********************************************************************************}
 function ALCreateProcessWithLogonW; external advapi32 name 'CreateProcessWithLogonW';
+
+{*************************************************************}
+function AttachConsole; external kernel32 name 'AttachConsole';
 
 {*********************************************************************************}
 function  ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;

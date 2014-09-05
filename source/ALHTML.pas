@@ -54,6 +54,7 @@ History :     19/10/2005: Make The code independant of the current local
               						add support for reference like &#x20AC; and &#39;
               26/06/2012: Add xe2 support
               28/01/2013: Add xe2 ALJavascriptEncode / ALUTF8JavascriptDecode
+              05/09/2014: Add ALRunJavascript function
 
 Link :
 
@@ -87,6 +88,7 @@ function  ALUTF8HTMLEncode(const Src: AnsiString;
 function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
 function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+function  ALRunJavascript(aCode: AnsiString): AnsiString;
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
@@ -98,10 +100,14 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      System.Math,
      System.Classes,
      System.sysutils,
+     System.Win.Comobj,
+     Winapi.Ole2,
      {$ELSE}
      Math,
      Classes,
      sysutils,
+     Comobj,
+     Ole2,
      {$IFEND}
      ALString,
      ALQuickSortList;
@@ -1083,6 +1089,23 @@ begin
 
   setLength(Result,CurrentResultPos-1);
 
+end;
+
+{This function evaluates the Javascript code given in the
+ parameter "aCode" and returns result. The function works
+ similar to browser's console, so you can send even the code
+ like this "2+2" => returns "4".}
+function ALRunJavascript(aCode: AnsiString): AnsiString;
+var aJavaScript: OleVariant;
+begin
+  CoInitialize(nil);
+  try
+    aJavaScript          := CreateOleObject('ScriptControl');
+    aJavaScript.Language := 'JavaScript';
+    result               := AnsiString(aJavaScript.Eval(String(aCode)));
+  finally
+    CoUninitialize;
+  end;
 end;
 
 {*******************************************************************************}

@@ -1966,7 +1966,7 @@ function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
   begin
     // space before to avoid something like "sin(...)"
     P1 := ALPosExIgnoreCase(ansiString(' in')+aOpeningBracketChar, result);  // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                                                 //                    ^P1
+                                                                             //                    ^P1
     while P1 > 0 do begin
 
       // init the aLvalue

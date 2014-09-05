@@ -508,7 +508,12 @@ function  ALIncludeTrailingPathDelimiter(const S: AnsiString): AnsiString;
 function  ALExcludeTrailingPathDelimiter(const S: AnsiString): AnsiString;
 procedure ALMove(const Source; var Dest; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
 procedure ALStrMove(const Source: PAnsiChar; var Dest: PAnsiChar; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
-function  ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString;
+function  ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString; overload;
+function  ALCopyStr(const aSourceString: AnsiString;
+                    const aStartStr: AnsiString;
+                    const aEndStr: AnsiString;
+                    const aOffset: integer = 1;
+                    const aRaiseExceptionIfNotFound: Boolean = True): AnsiString; overload;
 function  ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
 function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
                            ReplaceProc: TALHandleTagFunct;
@@ -8175,6 +8180,36 @@ begin
 
   SetLength(Result,aLength);
   ALMove(aSourceString[aStart], Result[1], aLength);
+end;
+
+{**************************************************}
+function  ALCopyStr(const aSourceString: AnsiString;
+                    const aStartStr: AnsiString;
+                    const aEndStr: AnsiString;
+                    const aOffset: integer = 1;
+                    const aRaiseExceptionIfNotFound: Boolean = True): AnsiString;
+var aLowSourceString: AnsiString;
+    P1, P2: integer;
+begin
+  aLowSourceString := ALLowerCase(aSourceString);
+  P1 := AlPosEx(ALLowerCase(aStartStr), aLowSourceString, aOffset);
+  if P1 <= 0 then begin
+    if aRaiseExceptionIfNotFound then Raise EALException.Create('Can not find' + ALIfThen(aOffset > 1, ' after offset ' + ALIntToStr(aOffset)) + ' the text ' + aStartStr + ' in ' + aSourceString)
+    else begin
+      result := '';
+      exit;
+    end;
+  end;
+  Inc(P1, Length(aStartStr));
+  P2 := AlPosEx(ALLowerCase(aEndStr), aLowSourceString, P1);
+  if P2 <= 0 then begin
+    if aRaiseExceptionIfNotFound then Raise EALException.Create('Can not find' + ALIfThen(aOffset > 1, ' after offset ' + ALIntToStr(aOffset)) + ' the text ' + aEndStr + ' in ' + aSourceString)
+    else begin
+      result := '';
+      exit;
+    end;
+  end;
+  result := ALCopyStr(aSourceString, P1, P2 - P1);
 end;
 
 {*******************************************************************************************}

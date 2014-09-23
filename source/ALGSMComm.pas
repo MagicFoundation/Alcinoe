@@ -594,12 +594,13 @@ function AlGSMComm_GSM7BitDefaultAlphabetToUnicode(aMessage: AnsiString;
 
 Var ResultCurrentIndex: integer;
     aMessageCurrentIndex: Integer;
+
 Begin
   SetLength(result,length(aMessage));
   ResultCurrentIndex := 1;
   aMessageCurrentIndex := 1;
 
-  While aMessageCurrentIndex < length(aMessage) do begin
+  While aMessageCurrentIndex <= length(aMessage) do begin
     If not InternalLookupChar(aMessage,
                               aMessageCurrentIndex,
                               Result,
@@ -730,27 +731,55 @@ end;
 {aMessage need to be in GSM 7 bit charset}
 Procedure AlGSMComm_DecodePDUMessage(aPDUMessage: AnsiString; Var aSMSCenter, aSMSAddress, AMessage: AnsiString);
 
-  {------------------------------------------------------}
-  function InternalPDUToString(v: AnsiString): AnsiString;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _7bitPDUToString(Pdu: AnsiString; UdhLen: integer): AnsiString;
   var I, InLen, OutLen, OutPos : Integer;
       TempByte, PrevByte : Byte;
+      PaddingBits: Byte;
+      PduIdx: Integer;
+      PduLen: Integer;
+      Octet: Byte;
+      ShiftedOctet: Byte;
+      NextOctet: Byte;
   begin
     { Check for empty input }
-    if v = '' then Exit;
+    if Pdu = '' then Exit;
+
+    // The following code removes padding at the end of the PDU by shifting it
+    // *right* by <PaddingBits>. It does this by taking the least significant
+    // <PaddingBits> from the following PDU byte and moving them to the most
+    // significant the current PDU byte.
+    if UdhLen > 0 then begin
+      PduLen := Length(Pdu);
+      PaddingBits := 7 - ((UdhLen * 8) mod 7);
+      for PduIdx := 1 to PduLen do
+      begin
+        Octet := Byte(Pdu[PduIdx]);
+        if (PduIdx = PduLen) then
+          ShiftedOctet := Byte(Octet shr PaddingBits)
+        else
+        begin
+          NextOctet := Byte(Pdu[PduIdx + 1]);
+          ShiftedOctet := Byte(Octet shr PaddingBits) or
+            Byte(NextOctet shl (8 - PaddingBits));
+        end;
+        Byte(Pdu[PduIdx]) := ShiftedOctet;
+      end;
+    end;
 
     { Init variables }
     PrevByte := 0;
     OutPos := 1;
 
     { Set length of output string }
-    InLen := Length(v);
+    InLen := Length(Pdu);
     Assert(InLen <= 140, 'Input string greater than 140 characters');
     OutLen := (InLen * 8) div 7;
     SetLength(Result, OutLen);
 
     { Encode output string }
     for I := 1 to InLen do begin
-      TempByte := Byte(v[I]);
+      TempByte := Byte(Pdu[I]);
       TempByte := TempByte and not ($FF shl (7-((I-1) mod 7)));
       TempByte := TempByte shl ((I-1) mod 7);
       TempByte := TempByte or PrevByte;
@@ -758,7 +787,7 @@ Procedure AlGSMComm_DecodePDUMessage(aPDUMessage: AnsiString; Var aSMSCenter, aS
       Inc(OutPos);
 
       { Set PrevByte for next round (or directly put it to Result) }
-      PrevByte := Byte(v[I]);
+      PrevByte := Byte(Pdu[I]);
       PrevByte := PrevByte shr (7-((I-1) mod 7));
       if (I mod 7) = 0 then begin
         Result[OutPos] := AnsiChar(PrevByte);
@@ -770,7 +799,10 @@ Procedure AlGSMComm_DecodePDUMessage(aPDUMessage: AnsiString; Var aSMSCenter, aS
   end;
 
 var aLength, I: Integer;
-    S: AnsiString;
+    aFirstOctet: ansiString;
+    aDSCOctet: ansiString;
+    aUdhLength: Integer;
+    
 begin
 
   {init}
@@ -780,7 +812,7 @@ begin
   I := 1; //07913386094000F0040B913386184131F900006040722172728007F43AA87D0AC301
 
   {Length of the SMSC information (in this case 7 octets)}
-  aLength := ALStrToInt(AlCopyStr(aPDUMessage, i, 2)); //07
+  aLength := ALStrToInt('$' + AlCopyStr(aPDUMessage, i, 2)); //07
   inc(I,2); //913386094000F0040B913386184131F900006040722172728007F43AA87D0AC301
   if aLength > 0 then begin
 
@@ -798,6 +830,9 @@ begin
   end;
 
   //First octet of this SMS-DELIVER message.
+  //Bit no	  7	       6	      5	       4	        3	       2	     1	    0
+  //Name	  TP-RP	  TP-UDHI  	TP-SRI	(unused)	(unused)	TP-MMS	TP-MTI	TP-MTI  
+  aFirstOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //0B913386184131F900006040722172728007F43AA87D0AC301
 
   //Address-Length. Length of the sender number (0B hex = 11 dec)
@@ -820,6 +855,7 @@ begin
   inc(I,2); //006040722172728007F43AA87D0AC301
 
   //TP-DCS Data coding scheme
+  aDSCOctet := ALIntToBit(ALStrToInt('$'+AlCopyStr(aPDUMessage,I,2)), 8);
   inc(I,2); //6040722172728007F43AA87D0AC301
 
   //TP-SCTS. Time stamp (semi-octets)
@@ -830,18 +866,44 @@ begin
   //indicate 8-bit data or Unicode, the length would be the number of octets (9).
   inc(I,2); //F43AA87D0AC301
 
+  //TP-UDHI
+  if aFirstOctet[2] = '1' then begin
+    aUdhLength := (ALStrToInt('$' + AlCopyStr(aPDUMessage,I,2))) + 1; //6
+    inc(i,aUdhLength * 2);   
+  end
+  else aUdhLength := 0;
+  
   // NumLength is the length of the message
   aLength := Length(aPDUMessage); // 14
 
-  // Set pointer to start of message
-  s := '';
-  while I <= aLength do begin
-    S := S + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
-    inc(I,2); //
+  // 7-bit alphabet
+  aMessage := '';
+  if (aDSCOctet[5] = '0') and (aDSCOctet[6] = '0') then begin
+    while I <= aLength - 1 do begin
+      aMessage := aMessage + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
+      inc(I,2); 
+    end;
+    aMessage := ansiString(AlGSMComm_GSM7BitDefaultAlphabetToUnicode(_7bitPDUToString(aMessage, aUdhLength)))
+  end
+  // 8-bit alphabet 
+  else if (aDSCOctet[5] = '0') and (aDSCOctet[6] = '1') then begin
+    while I <= aLength - 1 do begin
+      aMessage := aMessage + AnsiChar(ALStrToInt(ansiChar('$') + ansiChar(aPDUMessage[I]) + ansiChar(aPDUMessage[I+1])));
+      inc(I,2); 
+    end;
+  end  
+  // 16-bit alphabet 
+  else if (aDSCOctet[5] = '1') and (aDSCOctet[6] = '0') then begin
+    while I <= aLength - 3 do begin
+      aMessage := aMessage + ansiString( WideChar(ALStrToInt(ansiChar('$') + 
+                                                             ansiChar(aPDUMessage[I]) + 
+                                                             ansiChar(aPDUMessage[I+1]) + 
+                                                             ansiChar(aPDUMessage[I+2]) + 
+                                                             ansiChar(aPDUMessage[I+3]))));
+      inc(I,4);
+    end;                                                     
   end;
-
-  // Change message to string form
-  aMessage := InternalPDUToString(s);
+  
 end;
 
 {**********************************************}
@@ -1070,25 +1132,43 @@ procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: An
   Var P1, P2: Integer;
       aIndex: Integer;
       Str: AnsiString;
+      aStat: integer;
   Begin
-    {Receive Message}
-    SendCmd('AT+CMGL=4'+#13);
-    GetATCmdOkResponse(Str, 'AT+CMGL command error!');
 
-    {fullfill aLstMessage}
-    P1 := AlPos('+CMGL: ',str);
-    While P1 > 0 do begin
-      Inc(P1,7);
-      P2 := AlPosEx(',',Str,P1);
-      If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
-      aIndex := ALStrToInt(AlCopyStr(Str,P1,P2-P1));
-      P1 := ALPosEx(#13#10,Str,P2);
-      If P1 <= 0 then raise EALException.Create('AT+CMGL parse error!');
-      P1 := P1 + 2;
-      P2 := ALPosEx(#13#10,Str,P1);
-      If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
-      aLstMessage.Add(ALIntToStr(aIndex)+'='+ALTrim(AlCopyStr(Str,P1,P2-P1)));
-      P1 := AlPosEx('+CMGL: ',str,P2);
+    //AT+CMGL
+    //0 "REC UNREAD"   received unread message (i.e. new message)
+    //1 "REC READ"     received read message
+    //2 "STO UNSENT"   stored unsent message (only applicable to SMs)
+    //3 "STO SENT"     stored sent message (only applicable to SMs)
+    //4 "ALL"          all messages (only applicable to +CMGL command)
+    //
+    // normally i must say AT+CMGL=4 but i don't know why on some phone (B2100i for exemple)
+    // their is no AT+CMGL=4 (instead AT+CMGL=5)
+
+    aStat := 0;
+    while aStat <= 1 do begin
+
+      {Receive Message}
+      SendCmd('AT+CMGL='+alinttostr(aStat)+#13);
+      GetATCmdOkResponse(Str, 'AT+CMGL command error!');
+
+      {fullfill aLstMessage}
+      P1 := AlPos('+CMGL: ',str);
+      While P1 > 0 do begin
+        Inc(P1,7);
+        P2 := AlPosEx(',',Str,P1);
+        If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
+        aIndex := ALStrToInt(AlCopyStr(Str,P1,P2-P1));
+        P1 := ALPosEx(#13#10,Str,P2);
+        If P1 <= 0 then raise EALException.Create('AT+CMGL parse error!');
+        P1 := P1 + 2;
+        P2 := ALPosEx(#13#10,Str,P1);
+        If P2 <= 0 then raise EALException.Create('AT+CMGL parse error!');
+        if aLstMessage.IndexOfName(ALIntToStr(aIndex)) < 0 then aLstMessage.Add(ALIntToStr(aIndex)+aLstMessage.NameValueSeparator+ALTrim(AlCopyStr(Str,P1,P2-P1)));
+        P1 := AlPosEx('+CMGL: ',str,P2);
+      end;
+      inc(aStat);
+
     end;
   end;
 

@@ -464,6 +464,8 @@ function  ALIntToHex(Value: UInt64; Digits: Integer): AnsiString; overload;
 {$ENDIF}
 Function  ALBinToHex(const aBin: AnsiString): AnsiString;
 Function  ALHexToBin(const aHex: AnsiString): AnsiString;
+function  ALIntToBit(value: Integer; digits: integer): ansistring;
+function  AlBitToInt(Value: ansiString): Integer;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
@@ -6054,6 +6056,39 @@ begin
   end;
   setlength(result,length(aHex) div 2);
   if HexToBin(PansiChar(aHex),pansiChar(result),length(result)) <> length(result) then result := '';
+end;
+
+{***************************************************************}
+function ALIntToBit(value: integer; digits: integer): ansistring;
+begin
+  result := StringOfChar (ansiChar('0'), digits) ;
+  while value > 0 do begin
+    if (value and 1) = 1 then
+      result[digits] := '1';
+    dec(digits) ;
+    value := value shr 1;
+  end;
+end;
+
+{**********************************************}
+function ALBitToInt(Value: ansiString): integer;
+var i: Integer;
+begin
+
+  //init result
+  Result:=0;
+
+  //remove leading zeroes
+  i := 1;
+  while (i <= length(Value)) and (Value[i] = '0') do inc(i);
+  if i > length(Value) then exit;
+  Value := ALCopyStr(Value,I,Maxint);
+
+  //do the conversion
+  for i:=Length(Value) downto 1 do
+   if Value[i]='1' then
+    Result:=Result+(1 shl (Length(Value)-i));
+
 end;
 
 {*************************************************}

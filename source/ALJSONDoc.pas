@@ -4449,6 +4449,7 @@ procedure ALTStringsToJson(const aLst: TALStrings;
 
 var aIndex: Integer;
     aNames:  TALStringList;
+    aLowerName: AnsiString;
     aCurrJsonNode, aTmpJsonNode: TALJSONNode;
     i, j: integer;
 
@@ -4515,12 +4516,13 @@ begin
 
           //if we are not in array
           else begin
-            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]));
+            aLowerName := alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]);
+            aTmpJsonNode := aCurrJsonNode.ChildNodes.FindNode(aLowerName);
             if not assigned(aTmpJsonNode) then begin
-              if j = aNames.Count - 1 then aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntText)
+              if j = aNames.Count - 1 then aCurrJsonNode := aCurrJsonNode.AddChild(aLowerName, ntText)
               else if (aNames[j+1] <> '') and
-                      (aNames[j+1][1] = '[') then aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntarray)
-              else aCurrJsonNode := aCurrJsonNode.AddChild(alifThen(aNameToLowerCase, allowercase(aNames[j]), aNames[j]), ntObject);
+                      (aNames[j+1][1] = '[') then aCurrJsonNode := aCurrJsonNode.AddChild(aLowerName, ntarray)
+              else aCurrJsonNode := aCurrJsonNode.AddChild(aLowerName, ntObject);
             end
             else aCurrJsonNode := aTmpJsonNode;
           end;

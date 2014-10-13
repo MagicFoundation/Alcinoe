@@ -297,6 +297,34 @@ type
     end;
     TALMongoDBClientDeleteDataQUERIES = array of TALMongoDBClientDeleteDataQUERY;
 
+
+    {---------------------------------------------}
+    TALMongoDBClientFindAndModifyDataQUERY = record
+      FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                      // name with the collection name, using a . for the concatenation. For example, for the database
+                                      // foo and the collection bar, the full collection name is foo.bar
+      query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
+                        // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
+                        // one document to modify.
+      sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
+                        // documents. findAndModify modifies the first document in the sort order specified by this argument.
+      remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
+                       // Set this to true to remove the selected document . The default is false.
+      update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
+                          // The update field employs the same update operators or field: value specifications to modify the selected document.
+      new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
+                    // ignores the new option for remove operations. The default is false.
+      ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
+                                        // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
+      InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
+                                  // creates a new document if no document matches the query, or if documents match the query,
+                                  // findAndModify performs an update. The default is false.
+      RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+      ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+      class function Create: TALMongoDBClientFindAndModifyDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+    end;
+    TALMongoDBClientFindAndModifyDataQUERIES = array of TALMongoDBClientFindAndModifyDataQUERY;
+
     {---------------------------------------------}
     EAlMongoDBClientException = class(EALException)
     private
@@ -342,7 +370,7 @@ type
       Procedure CheckServerLastError(aSocketDescriptor: TSocket;
                                      var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
                                      var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                     var upserted: TALJSONObjectID); overload; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                     var upserted: ansiString); overload; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
       Procedure CheckServerLastError(aSocketDescriptor: TSocket); overload;
       Function BuildOPKILLCURSORSMessage(const requestID: integer;                       // identifier for this message
                                          const responseTo: integer;                      // requestID from the original request (used in reponses from db)
@@ -432,7 +460,7 @@ type
                           const update: ansiString;               // specification of the update to perform
                           var NumberOfDocumentsUpdated: integer;  // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
                           var updatedExisting: boolean;           // is true when an update affects at least one document and does not result in an upsert.
-                          var upserted: TALJSONObjectID);         // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                          var upserted: ansiString);              // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
       Procedure OP_DELETE(aSocketDescriptor: TSocket;
                           const flags: integer;                   // bit vector
                           const fullCollectionName: ansiString;   // "dbname.collectionname"
@@ -446,6 +474,8 @@ type
                                  TimeTaken: Integer); virtual;
       procedure OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
                                  TimeTaken: Integer); virtual;
+      procedure OnFindAndModifyDataDone(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                        TimeTaken: Integer); virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
@@ -516,7 +546,7 @@ type
       procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
                            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                           var ObjectID: TALJSONObjectID); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                           var ObjectID: ansiString); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
       procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY); overload; virtual;
       procedure UpdateData(FullCollectionName: AnsiString;
                            Selector: AnsiString;
@@ -525,7 +555,7 @@ type
                            MultiUpdate: Boolean;
                            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                           var ObjectID: TALJSONObjectID); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                           var ObjectID: ansiString); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
       procedure UpdateData(FullCollectionName: AnsiString;
                            Selector: AnsiString;
                            Update: AnsiString;
@@ -549,6 +579,35 @@ type
       procedure DeleteData(FullCollectionName: AnsiString;
                            Selector: AnsiString;
                            SingleRemove: Boolean); overload; virtual;
+
+      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                  JSONDATA: TALJSONNode;
+                                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                  var ObjectID: AnsiString); overload; virtual; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                  JSONDATA: TALJSONNode); overload; virtual;
+      Procedure FindAndModifyData(FullCollectionName: AnsiString;
+                                  query: AnsiString;
+                                  sort: AnsiString;
+                                  remove: boolean;
+                                  update: AnsiString;
+                                  new: boolean;
+                                  ReturnFieldsSelector: AnsiString;
+                                  InsertIfNotFound: boolean;
+                                  JSONDATA: TALJSONNode;
+                                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                  var ObjectID: AnsiString); overload; virtual; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+      Procedure FindAndModifyData(FullCollectionName: AnsiString;
+                                  query: AnsiString;
+                                  sort: AnsiString;
+                                  remove: boolean;
+                                  update: AnsiString;
+                                  new: boolean;
+                                  ReturnFieldsSelector: AnsiString;
+                                  InsertIfNotFound: boolean;
+                                  JSONDATA: TALJSONNode); overload; virtual;
 
       property Connected: Boolean read FConnected;
       property StopTailMonitoring: boolean read fStopTailMonitoring write fStopTailMonitoring;
@@ -640,7 +699,7 @@ type
       procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
                            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                           var ObjectID: TALJSONObjectID; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                           var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
@@ -651,7 +710,7 @@ type
                            MultiUpdate: Boolean;
                            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                           var ObjectID: TALJSONObjectID; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                           var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
       procedure UpdateData(FullCollectionName: AnsiString;
                            Selector: AnsiString;
@@ -685,6 +744,39 @@ type
                            Selector: AnsiString;
                            SingleRemove: Boolean;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+
+      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                  JSONDATA: TALJSONNode;
+                                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                  var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                  JSONDATA: TALJSONNode;
+                                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure FindAndModifyData(FullCollectionName: AnsiString;
+                                  query: AnsiString;
+                                  sort: AnsiString;
+                                  remove: boolean;
+                                  update: AnsiString;
+                                  new: boolean;
+                                  ReturnFieldsSelector: AnsiString;
+                                  InsertIfNotFound: boolean;
+                                  JSONDATA: TALJSONNode;
+                                  var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                  var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                  var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure FindAndModifyData(FullCollectionName: AnsiString;
+                                  query: AnsiString;
+                                  sort: AnsiString;
+                                  remove: boolean;
+                                  update: AnsiString;
+                                  new: boolean;
+                                  ReturnFieldsSelector: AnsiString;
+                                  InsertIfNotFound: boolean;
+                                  JSONDATA: TALJSONNode;
+                                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
       property Host: ansiString read fHost;
       property Port: integer read fPort;
@@ -821,6 +913,23 @@ begin
     FullCollectionName := '';
     selector := '';
     flags := TALMongoDBClientDeleteDataQUERYFlags.Create;
+  end;
+end;
+
+{***************************************************************************************************}
+class function TALMongoDBClientFindAndModifyDataQUERY.Create: TALMongoDBClientFindAndModifyDataQUERY;
+begin
+  with result do begin
+    FullCollectionName := '';
+    query := '';
+    sort := '';
+    remove := False;
+    update := '';
+    new := False;
+    ReturnFieldsSelector := '';
+    InsertIfNotFound := false;
+    RowTag := '';
+    ViewTag := '';
   end;
 end;
 
@@ -981,7 +1090,7 @@ end;
 Procedure TAlBaseMongoDBClient.CheckServerLastError(aSocketDescriptor: TSocket;
                                                     var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
                                                     var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                                    var upserted: TALJSONObjectID); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                                    var upserted: ansiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 
 Var aResponseFlags: integer;
     aCursorID: int64;
@@ -998,7 +1107,7 @@ begin
     //do the First query
     OP_QUERY(aSocketDescriptor,
              0, // flags
-             'db.$cmd',
+             'db.$cmd', // fullCollectionName
              0, // skip
              1, // First
              '{getLastError:1}', // query
@@ -1038,7 +1147,7 @@ begin
       else updatedExisting := False;
 
       aNode := aJSONDoc.Node.ChildNodes.FindNode('upserted');
-      if assigned(aNode) then upserted := aNode.ObjectID
+      if assigned(aNode) then upserted := aNode.text
       else fillchar(upserted[1],length(upserted),0);
 
     finally
@@ -1057,7 +1166,7 @@ end;
 Procedure TAlBaseMongoDBClient.CheckServerLastError(aSocketDescriptor: TSocket);
 var aNumberOfDocumentsUpdatedOrRemoved: integer;
     updatedExisting: boolean;
-    upserted: TALJSONObjectID;
+    upserted: ansiString;
 begin
   CheckServerLastError(aSocketDescriptor,
                        aNumberOfDocumentsUpdatedOrRemoved,
@@ -1892,7 +2001,7 @@ Procedure TAlBaseMongoDBClient.OP_UPDATE(aSocketDescriptor: TSocket;
                                          const update: ansiString;               // specification of the update to perform
                                          var NumberOfDocumentsUpdated: integer;  // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
                                          var updatedExisting: boolean;           // is true when an update affects at least one document and does not result in an upsert.
-                                         var upserted: TALJSONObjectID);         // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                         var upserted: ansiString);              // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 begin
   SendCmd(aSocketDescriptor,
           BuildOPUPDATEMessage(0, //const requestID: integer;
@@ -1915,7 +2024,7 @@ Procedure TAlBaseMongoDBClient.OP_DELETE(aSocketDescriptor: TSocket;
                                          const selector: ansiString;             // query object.
                                          var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
 var updatedExisting: boolean;
-    upserted: TALJSONObjectID;
+    upserted: ansiString;
 begin
   SendCmd(aSocketDescriptor,
           BuildOPDELETEMessage(0, //const requestID: integer;
@@ -1954,6 +2063,13 @@ end;
 {*************************************************************************************}
 procedure TAlBaseMongoDBClient.OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
                                                 TimeTaken: Integer);
+begin
+  // virtual
+end;
+
+{***************************************************************************************************}
+procedure TAlBaseMongoDBClient.OnFindAndModifyDataDone(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                                       TimeTaken: Integer);
 begin
   // virtual
 end;
@@ -2419,7 +2535,7 @@ Var aQueriesIndex: integer;
     aFlags: integer;
     aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
-    aObjectID: TALJSONObjectID;
+    aObjectID: ansiString;
     aStopWatch: TStopWatch;
 begin
 
@@ -2469,7 +2585,7 @@ end;
 procedure TAlMongoDBClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
                                       var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                       var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                      var ObjectID: TALJSONObjectID); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                      var ObjectID: ansiString); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 Var aFlags: integer;
     aStopWatch: TStopWatch;
 begin
@@ -2508,7 +2624,7 @@ end;
 Procedure TAlMongoDBClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY);
 var aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
-    aObjectID: TALJSONObjectID;
+    aObjectID: ansiString;
 begin
   UpdateData(Query,
              aNumberOfDocumentsUpdated,
@@ -2524,7 +2640,7 @@ procedure TAlMongoDBClient.UpdateData(FullCollectionName: AnsiString;
                                       MultiUpdate: Boolean;
                                       var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                       var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                      var ObjectID: TALJSONObjectID); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                      var ObjectID: ansiString); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
 var aQuery: TALMongoDBClientUpdateDataQUERY;
 begin
   aQuery := TALMongoDBClientUpdateDataQUERY.Create;
@@ -2547,7 +2663,7 @@ Procedure TAlMongoDBClient.UpdateData(FullCollectionName: AnsiString;
                                       MultiUpdate: Boolean);
 var aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
-    aObjectID: TALJSONObjectID;
+    aObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
              Selector,
@@ -2735,6 +2851,264 @@ begin
              Selector,
              SingleRemove,
              aNumberOfDocumentsRemoved);
+end;
+
+{*****************************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                             JSONDATA: TALJSONNode;
+                                             var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                             var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                             var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+Var aStopWatch: TStopWatch;
+    aDatabaseName: AnsiString;
+    aCollectionName: AnsiString;
+    aViewRec: TalJSONNode;
+    aResponseFlags: integer;
+    aTmpQuery: ansiString;
+    aCursorID: int64;
+    aStartingFrom: integer;
+    aNumberReturned: integer;
+    aContinue: boolean;
+    aTmpRowTag: ansiString;
+    aUpdateRowTagByFieldValue: Boolean;
+    aJSONDoc: TALJSONDocument;
+    aNode1: TALJSONNode;
+    aNode2: TALJSONNode;
+    alastErrorObjectNode: TALJSONNode;
+    P1: integer;
+begin
+
+  //Error if we are not connected
+  If not connected then raise Exception.Create('Not connected');
+
+  //init the TstopWatch
+  aStopWatch := TstopWatch.StartNew;
+
+  //create a temp JSONDoc
+  aJSONDoc := TALJSONDocument.Create;
+  try
+
+    //init aDatabaseName and aCollectionName
+    P1 := AlPos('.',Query.FullCollectionName);
+    if P1 <= 0 then raise Exception.Create('The full collection name must be the concatenation of the database name with the collection name');
+    aDatabaseName := ALCopyStr(Query.FullCollectionName, 1, P1-1);
+    aCollectionName := ALCopyStr(Query.FullCollectionName, P1+1, maxint);
+
+    //buid the query
+    aTmpQuery := '{"findAndModify":' + ALJsonEncodeWithNodeSubTypeHelperFunction(aCollectionName,nstText,ALdefaultformatsettings);
+    if Query.query <> '' then aTmpQuery := aTmpQuery + ',"query":'+Query.query;
+    if Query.sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+Query.sort;
+    aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.remove),nstBoolean,ALdefaultformatsettings);
+    if Query.update <> '' then aTmpQuery := aTmpQuery + ',"update":'+Query.update;
+    aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.new),nstBoolean,ALdefaultformatsettings);
+    if Query.ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+Query.ReturnFieldsSelector;
+    aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
+    aTmpQuery := aTmpQuery + '}';
+
+    //do the First query
+    OP_QUERY(fSocketDescriptor,
+             0, // flags
+             aDatabaseName  + '.$cmd', // fullCollectionName
+             0, // skip
+             1, // First
+             aTmpQuery, // query
+             '', // ReturnFieldsSelector,
+             aResponseFlags,
+             aCursorID,
+             aStartingFrom,
+             aNumberReturned,
+             aJSONDoc.Node,
+             nil,
+             nil,
+             '',
+             '',
+             aContinue);
+    try
+
+      // exemple of returned json result
+
+      //{
+      // "value":{"_id":2,"seq":3},
+      // "lastErrorObject":{
+      //   "updatedExisting":true,
+      //   "n":1
+      // },
+      // "ok":1
+      //}
+
+      //{
+      // "value":null,
+      // "lastErrorObject":{
+      //   "updatedExisting":false,
+      //   "n":1,
+      //   "upserted":2
+      // },
+      // "ok":1
+      //}
+
+      //{
+      // "ok":0,
+      // "errmsg":"remove and returnNew can\u0027t co-exist"
+      //}
+
+      //doNodeAutoCreate for the aJSONDoc
+      aJSONDoc.Options := [doNodeAutoCreate];
+
+      //init the aViewRec
+      if (Query.ViewTag <> '') then aViewRec := JSONdata.AddChild(Query.ViewTag, ntobject)
+      else aViewRec := JSONdata;
+
+      //check error
+      if aJSONDoc.Node.ChildNodes['ok'].Text <> '1' then begin
+        aNode1 := aJSONDoc.Node.ChildNodes.FindNode('errmsg');
+        if assigned(aNode1) and (not aNode1.Null) then raise EALException.Create(aNode1.Text)
+        else raise Exception.Create('Error calling FindAndModifyData')
+      end;
+
+      //get the value node
+      aNode1 := aJSONDoc.Node.ChildNodes.FindNode('value');
+      if assigned(aNode1) and (aNode1.NodeType = ntObject) then begin
+
+        //init aUpdateRowTagByFieldValue and aTmpRowTag
+        if AlPos('&>',Query.RowTag) = 1 then begin
+          aTmpRowTag := AlcopyStr(Query.RowTag, 3, maxint);
+          aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+        end
+        else begin
+          aTmpRowTag := Query.RowTag;
+          aUpdateRowTagByFieldValue := False;
+        end;
+
+        //add the row tag
+        if (aTmpRowTag <> '') or
+           (aViewRec.NodeType = ntarray) then aViewRec := aViewRec.AddChild(aTmpRowTag, ntobject);
+
+        //move the node
+        while aNode1.ChildNodes.Count > 0 do begin
+          aNode2 := aNode1.ChildNodes.Extract(0);
+          try
+            aViewRec.ChildNodes.Add(aNode2);
+          except
+            aNode2.Free;
+            raise;
+          end;
+        end;
+
+        // aUpdateRowTagByFieldValue
+        if aUpdateRowTagByFieldValue then begin
+          aNode1 := aViewRec.ChildNodes.FindNode(aTmpRowTag);
+          if assigned(aNode1) then aViewRec.NodeName := aNode1.Text;
+        end;
+
+      end;
+
+      //init alastErrorObjectNode;
+      alastErrorObjectNode := aJSONDoc.Node.ChildNodes['lastErrorObject'];
+
+      //NumberOfDocumentsUpdatedOrRemoved
+      aNode1 := alastErrorObjectNode.ChildNodes.FindNode('n');
+      if assigned(aNode1) then NumberOfDocumentsUpdatedOrRemoved := aNode1.int32
+      else NumberOfDocumentsUpdatedOrRemoved := 0;
+
+      //updatedExisting
+      aNode1 := alastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
+      if assigned(aNode1) then updatedExisting := aNode1.bool
+      else updatedExisting := False;
+
+      //ObjectID
+      aNode1 := alastErrorObjectNode.ChildNodes.FindNode('upserted');
+      if assigned(aNode1) then ObjectID := aNode1.text
+      else ObjectID := '';
+
+    finally
+
+      //close the curson
+      if aCursorId <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [aCursorID]);
+
+    end;
+
+  finally
+    aJSONDoc.free;
+  end;
+
+  //do the OnDeleteDataDone
+  aStopWatch.Stop;
+  OnFindAndModifyDataDone(Query,
+                          aStopWatch.ElapsedMilliseconds);
+
+end;
+
+{*****************************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                             JSONDATA: TALJSONNode);
+var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+begin
+  FindAndModifyData(Query,
+                    JSONDATA,
+                    aNumberOfDocumentsUpdatedOrRemoved,
+                    aupdatedExisting,
+                    aObjectID);
+end;
+
+{**************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(FullCollectionName: AnsiString;
+                                             query: AnsiString;
+                                             sort: AnsiString;
+                                             remove: boolean;
+                                             update: AnsiString;
+                                             new: boolean;
+                                             ReturnFieldsSelector: AnsiString;
+                                             InsertIfNotFound: boolean;
+                                             JSONDATA: TALJSONNode;
+                                             var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                             var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                             var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+var aQuery: TALMongoDBClientFindAndModifyDataQUERY;
+begin
+  aQuery := TALMongoDBClientFindAndModifyDataQUERY.Create;
+  aQuery.FullCollectionName := FullCollectionName;
+  aQuery.query := query;
+  aQuery.sort := sort;
+  aQuery.remove := remove;
+  aQuery.update := update;
+  aQuery.new := new;
+  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
+  aQuery.InsertIfNotFound := InsertIfNotFound;
+  FindAndModifyData(aQuery,
+                    JSONDATA,
+                    NumberOfDocumentsUpdatedOrRemoved,
+                    updatedExisting,
+                    ObjectID);
+end;
+
+{**************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(FullCollectionName: AnsiString;
+                                             query: AnsiString;
+                                             sort: AnsiString;
+                                             remove: boolean;
+                                             update: AnsiString;
+                                             new: boolean;
+                                             ReturnFieldsSelector: AnsiString;
+                                             InsertIfNotFound: boolean;
+                                             JSONDATA: TALJSONNode);
+var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+begin
+  FindAndModifyData(FullCollectionName,
+                    query,
+                    sort,
+                    remove,
+                    update,
+                    new,
+                    ReturnFieldsSelector,
+                    InsertIfNotFound,
+                    JSONDATA,
+                    aNumberOfDocumentsUpdatedOrRemoved,
+                    aupdatedExisting,
+                    aObjectID);
 end;
 
 {****************************************************************************}
@@ -3298,7 +3672,7 @@ Var aQueriesIndex: integer;
     aFlags: integer;
     aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
-    aObjectID: TALJSONObjectID;
+    aObjectID: ansiString;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
     aStopWatch: TStopWatch;
@@ -3371,7 +3745,7 @@ end;
 procedure TAlMongoDBConnectionPoolClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
                                                     var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                                     var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                                    var ObjectID: TALJSONObjectID; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                                    var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 Var aFlags: integer;
     aTMPConnectionSocket: TSocket;
@@ -3435,7 +3809,7 @@ Procedure TAlMongoDBConnectionPoolClient.UpdateData(Query: TALMongoDBClientUpdat
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
-    aObjectID: TALJSONObjectID;
+    aObjectID: ansiString;
 begin
   UpdateData(Query,
              aNumberOfDocumentsUpdated,
@@ -3452,7 +3826,7 @@ procedure TAlMongoDBConnectionPoolClient.UpdateData(FullCollectionName: AnsiStri
                                                     MultiUpdate: Boolean;
                                                     var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                                     var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                                    var ObjectID: TALJSONObjectID; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                                    var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aQuery: TALMongoDBClientUpdateDataQUERY;
 begin
@@ -3478,7 +3852,7 @@ Procedure TAlMongoDBConnectionPoolClient.UpdateData(FullCollectionName: AnsiStri
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
-    aObjectID: TALJSONObjectID;
+    aObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
              Selector,
@@ -3751,6 +4125,294 @@ begin
              SingleRemove,
              aNumberOfDocumentsRemoved,
              ConnectionSocket);
+end;
+
+{*******************************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                                           JSONDATA: TALJSONNode;
+                                                           var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                                           var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                                           var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                                           const ConnectionSocket: TSocket = INVALID_SOCKET);
+Var aTMPConnectionSocket: TSocket;
+    aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
+    aDatabaseName: AnsiString;
+    aCollectionName: AnsiString;
+    aViewRec: TalJSONNode;
+    aResponseFlags: integer;
+    aTmpQuery: ansiString;
+    aCursorID: int64;
+    aStartingFrom: integer;
+    aNumberReturned: integer;
+    aContinue: boolean;
+    aTmpRowTag: ansiString;
+    aUpdateRowTagByFieldValue: Boolean;
+    aJSONDoc: TALJSONDocument;
+    aNode1: TALJSONNode;
+    aNode2: TALJSONNode;
+    alastErrorObjectNode: TALJSONNode;
+    P1: integer;
+begin
+
+  //acquire a connection
+  if ConnectionSocket = INVALID_SOCKET then begin
+    aTMPConnectionSocket := AcquireConnection;
+    aOwnConnection := True;
+  end
+  else begin
+    aTMPConnectionSocket := ConnectionSocket;
+    aOwnConnection := False;
+  end;
+
+  try
+
+    //init the TstopWatch
+    aStopWatch := TstopWatch.StartNew;
+
+    //create a temp JSONDoc
+    aJSONDoc := TALJSONDocument.Create;
+    try
+
+      //init aDatabaseName and aCollectionName
+      P1 := AlPos('.',Query.FullCollectionName);
+      if P1 <= 0 then raise Exception.Create('The full collection name must be the concatenation of the database name with the collection name');
+      aDatabaseName := ALCopyStr(Query.FullCollectionName, 1, P1-1);
+      aCollectionName := ALCopyStr(Query.FullCollectionName, P1+1, maxint);
+
+      //buid the query
+      aTmpQuery := '{"findAndModify":' + ALJsonEncodeWithNodeSubTypeHelperFunction(aCollectionName,nstText,ALdefaultformatsettings);
+      if Query.query <> '' then aTmpQuery := aTmpQuery + ',"query":'+Query.query;
+      if Query.sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+Query.sort;
+      aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.remove),nstBoolean,ALdefaultformatsettings);
+      if Query.update <> '' then aTmpQuery := aTmpQuery + ',"update":'+Query.update;
+      aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.new),nstBoolean,ALdefaultformatsettings);
+      if Query.ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+Query.ReturnFieldsSelector;
+      aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
+      aTmpQuery := aTmpQuery + '}';
+
+      //do the First query
+      OP_QUERY(aTMPConnectionSocket,
+               0, // flags
+               aDatabaseName + '.$cmd', // fullCollectionName
+               0, // skip
+               1, // First
+               aTmpQuery, // query
+               '', // ReturnFieldsSelector,
+               aResponseFlags,
+               aCursorID,
+               aStartingFrom,
+               aNumberReturned,
+               aJSONDoc.Node,
+               nil,
+               nil,
+               '',
+               '',
+               aContinue);
+      try
+
+        // exemple of returned json result
+
+        //{
+        // "value":{"_id":2,"seq":3},
+        // "lastErrorObject":{
+        //   "updatedExisting":true,
+        //   "n":1
+        // },
+        // "ok":1
+        //}
+
+        //{
+        // "value":null,
+        // "lastErrorObject":{
+        //   "updatedExisting":false,
+        //   "n":1,
+        //   "upserted":2
+        // },
+        // "ok":1
+        //}
+
+        //{
+        // "ok":0,
+        // "errmsg":"remove and returnNew can\u0027t co-exist"
+        //}
+
+        //doNodeAutoCreate for the aJSONDoc
+        aJSONDoc.Options := [doNodeAutoCreate];
+
+        //init the aViewRec
+        if (Query.ViewTag <> '') then aViewRec := JSONdata.AddChild(Query.ViewTag, ntobject)
+        else aViewRec := JSONdata;
+
+        //check error
+        if aJSONDoc.Node.ChildNodes['ok'].Text <> '1' then begin
+          aNode1 := aJSONDoc.Node.ChildNodes.FindNode('errmsg');
+          if assigned(aNode1) and (not aNode1.Null) then raise EALException.Create(aNode1.Text)
+          else raise Exception.Create('Error calling FindAndModifyData')
+        end;
+
+        //get the value node
+        aNode1 := aJSONDoc.Node.ChildNodes.FindNode('value');
+        if assigned(aNode1) and (aNode1.NodeType = ntObject) then begin
+
+          //init aUpdateRowTagByFieldValue and aTmpRowTag
+          if AlPos('&>',Query.RowTag) = 1 then begin
+            aTmpRowTag := AlcopyStr(Query.RowTag, 3, maxint);
+            aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+          end
+          else begin
+            aTmpRowTag := Query.RowTag;
+            aUpdateRowTagByFieldValue := False;
+          end;
+
+          //add the row tag
+          if (aTmpRowTag <> '') or
+             (aViewRec.NodeType = ntarray) then aViewRec := aViewRec.AddChild(aTmpRowTag, ntobject);
+
+          //move the node
+          while aNode1.ChildNodes.Count > 0 do begin
+            aNode2 := aNode1.ChildNodes.Extract(0);
+            try
+              aViewRec.ChildNodes.Add(aNode2);
+            except
+              aNode2.Free;
+              raise;
+            end;
+          end;
+
+          // aUpdateRowTagByFieldValue
+          if aUpdateRowTagByFieldValue then begin
+            aNode1 := aViewRec.ChildNodes.FindNode(aTmpRowTag);
+            if assigned(aNode1) then aViewRec.NodeName := aNode1.Text;
+          end;
+
+        end;
+
+        //init alastErrorObjectNode;
+        alastErrorObjectNode := aJSONDoc.Node.ChildNodes['lastErrorObject'];
+
+        //NumberOfDocumentsUpdatedOrRemoved
+        aNode1 := alastErrorObjectNode.ChildNodes.FindNode('n');
+        if assigned(aNode1) then NumberOfDocumentsUpdatedOrRemoved := aNode1.int32
+        else NumberOfDocumentsUpdatedOrRemoved := 0;
+
+        //updatedExisting
+        aNode1 := alastErrorObjectNode.ChildNodes.FindNode('updatedExisting');
+        if assigned(aNode1) then updatedExisting := aNode1.bool
+        else updatedExisting := False;
+
+        //ObjectID
+        aNode1 := alastErrorObjectNode.ChildNodes.FindNode('upserted');
+        if assigned(aNode1) then ObjectID := aNode1.text
+        else ObjectID := '';
+
+      finally
+
+        //close the curson
+        if aCursorId <> 0 then OP_KILL_CURSORS(aTMPConnectionSocket, [aCursorID]);
+
+      end;
+
+    finally
+      aJSONDoc.free;
+    end;
+
+    //do the OnDeleteDataDone
+    aStopWatch.Stop;
+    OnFindAndModifyDataDone(Query,
+                            aStopWatch.ElapsedMilliseconds);
+
+    //Release the Connection
+    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+
+  except
+    On E: Exception do begin
+      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+                                               (not (E Is EAlMongoDBClientException)) or
+                                               (E as EAlMongoDBClientException).CloseConnection);
+      raise;
+    end;
+  end;
+
+end;
+
+{*******************************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+                                                           JSONDATA: TALJSONNode;
+                                                           const ConnectionSocket: TSocket = INVALID_SOCKET);
+var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+begin
+  FindAndModifyData(Query,
+                    JSONDATA,
+                    aNumberOfDocumentsUpdatedOrRemoved,
+                    aupdatedExisting,
+                    aObjectID,
+                    ConnectionSocket);
+end;
+
+{****************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(FullCollectionName: AnsiString;
+                                                           query: AnsiString;
+                                                           sort: AnsiString;
+                                                           remove: boolean;
+                                                           update: AnsiString;
+                                                           new: boolean;
+                                                           ReturnFieldsSelector: AnsiString;
+                                                           InsertIfNotFound: boolean;
+                                                           JSONDATA: TALJSONNode;
+                                                           var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+                                                           var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+                                                           var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+                                                           const ConnectionSocket: TSocket = INVALID_SOCKET);
+var aQuery: TALMongoDBClientFindAndModifyDataQUERY;
+begin
+  aQuery := TALMongoDBClientFindAndModifyDataQUERY.Create;
+  aQuery.FullCollectionName := FullCollectionName;
+  aQuery.query := query;
+  aQuery.sort := sort;
+  aQuery.remove := remove;
+  aQuery.update := update;
+  aQuery.new := new;
+  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
+  aQuery.InsertIfNotFound := InsertIfNotFound;
+  FindAndModifyData(aQuery,
+                    JSONDATA,
+                    NumberOfDocumentsUpdatedOrRemoved,
+                    updatedExisting,
+                    ObjectID,
+                    ConnectionSocket);
+end;
+
+{****************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(FullCollectionName: AnsiString;
+                                                           query: AnsiString;
+                                                           sort: AnsiString;
+                                                           remove: boolean;
+                                                           update: AnsiString;
+                                                           new: boolean;
+                                                           ReturnFieldsSelector: AnsiString;
+                                                           InsertIfNotFound: boolean;
+                                                           JSONDATA: TALJSONNode;
+                                                           const ConnectionSocket: TSocket = INVALID_SOCKET);
+var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
+    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
+    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+begin
+  FindAndModifyData(FullCollectionName,
+                    query,
+                    sort,
+                    remove,
+                    update,
+                    new,
+                    ReturnFieldsSelector,
+                    InsertIfNotFound,
+                    JSONDATA,
+                    aNumberOfDocumentsUpdatedOrRemoved,
+                    aupdatedExisting,
+                    aObjectID,
+                    ConnectionSocket);
 end;
 
 {************************************************************************}

@@ -78,9 +78,17 @@ type
 {$ifend}
 
 type
-
   // resampling support types
   TALResamplingFilter = (sfBox, sfTriangle, sfHermite, sfBell, sfSpline, sfLanczos3, sfMitchell);
+
+const
+  cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.
+                            //No bitmap can be that large (at present), and this effectively turns off
+                            //range checking on Scanline variables.
+
+type
+  pAlRGBTripleArray = ^TAlRGBTripleArray;
+  TAlRGBTripleArray = array[0..cAlPixelCountMax-1] OF TRGBTriple;
 
 // Resampling support routines
 procedure ALStretch(NewWidth, NewHeight: Cardinal; Filter: TALResamplingFilter; Radius: Single; Source, Target: TBitmap); overload;
@@ -107,6 +115,7 @@ procedure AlCropImage(aSrcBmp: TBitmap; aCropRect: Trect);
 procedure ALRotateBMP90(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
 procedure ALRotateBMP180(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
 procedure ALRotateBMP270(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
+procedure ALAntialiasingImage(aSrcBmp: TBitmap; aDestBmp: TBitmap; aPercentage: integer);
 
 implementation
 
@@ -120,14 +129,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      math;
      {$IFEND}
 
-Const
-  cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.
-                            //No bitmap can be that large (at present), and this effectively turns off
-                            //range checking on Scanline variables.
-
 type
-  pAlRGBTripleArray = ^TAlRGBTripleArray;
-  TAlRGBTripleArray = ARRAY[0..cAlPixelCountMax-1] OF TRGBTriple;
 
   // resampling support types
   TALRGBInt = record
@@ -1097,6 +1099,92 @@ begin
     for X := 0 to aSrcBmp.Width - 1 do begin
       aDestScanLines[(aSrcBmp.width - 1) - X][Y] := aSrcScanLine[X]
     end;
+  end;
+
+end;
+
+{**************************************************************************************}
+procedure ALAntialiasingImage(aSrcBmp: TBitmap; aDestBmp: TBitmap; aPercentage: integer);
+
+type
+  // Warning: it is not possible to use instead TALRGBA,
+  // as soon as we use this structure to calculate values
+  // that are exceeded Byte type.
+  TALColorShuffling = record
+    R: integer;
+    G: integer;
+    B: integer;
+    P: integer;
+  end;
+
+var aSrcScanLinePrevious: pAlRGBTripleArray;
+    aSrcScanLineCurrent: pAlRGBTripleArray;
+    aSrcScanLineNext: pAlRGBTripleArray;
+    aDestScanLine: pAlRGBTripleArray;
+    aColorShuffling: TALColorShuffling;
+    X, Y: integer;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _applyShuffling(DeltaR,
+                            DeltaG,
+                            DeltaB: Byte;
+                            Percentage: integer);
+  begin
+    with aColorShuffling do begin
+      R := R + DeltaR * Percentage;
+      G := G + DeltaG * Percentage;
+      B := B + DeltaB * Percentage;
+      P := P + Percentage;
+    end;
+  end;
+
+begin
+  // reset the scanlines that have a chance to be not initialized
+  aSrcScanLinePrevious := nil;
+  aSrcScanLineNext := nil;
+
+  // scroll all the lines of the image
+  for Y := 0 to aSrcBmp.Height - 1 do begin
+
+    // init all the required scanlines (current and also if possible previous and next)
+    if (Y > 0) then aSrcScanLinePrevious := aSrcBmp.ScanLine[Y - 1];
+    aSrcScanLineCurrent := aSrcBmp.ScanLine[Y];
+    if (Y < aSrcBmp.Height - 1) then aSrcScanLineNext := aSrcBmp.ScanLine[Y + 1];
+    aDestScanLine := aDestBmp.ScanLine[Y];
+
+    for X := 0 to aSrcBmp.Width - 1 do begin
+      // make basic initialization for color shuffling
+      aColorShuffling.R := aSrcScanLineCurrent[X].rgbtRed * 100;
+      aColorShuffling.G := aSrcScanLineCurrent[X].rgbtGreen * 100;
+      aColorShuffling.B := aSrcScanLineCurrent[X].rgbtBlue * 100;
+      aColorShuffling.P := 100; // initial percentage
+
+      // make smoothing using the previous and next colors if it's possible
+      if (X > 0) then _applyShuffling(aSrcScanLineCurrent[X - 1].rgbtRed,
+                                      aSrcScanLineCurrent[X - 1].rgbtGreen,
+                                      aSrcScanLineCurrent[X - 1].rgbtBlue,
+                                      aPercentage);
+      if (X < aSrcBmp.Width - 1) then _applyShuffling(aSrcScanLineCurrent[X + 1].rgbtRed,
+                                                      aSrcScanLineCurrent[X + 1].rgbtGreen,
+                                                      aSrcScanLineCurrent[X + 1].rgbtBlue,
+                                                      aPercentage);
+      if (Y > 0) then _applyShuffling(aSrcScanLinePrevious[X].rgbtRed,
+                                      aSrcScanLinePrevious[X].rgbtGreen,
+                                      aSrcScanLinePrevious[X].rgbtBlue,
+                                      aPercentage);
+      if (Y < aSrcBmp.Height - 1) then _applyShuffling(aSrcScanLineNext[X].rgbtRed,
+                                                       aSrcScanLineNext[X].rgbtGreen,
+                                                       aSrcScanLineNext[X].rgbtBlue,
+                                                       aPercentage);
+
+      // init the colors of destination picture
+      with aColorShuffling do begin
+        aDestScanLine[X].rgbtRed   := Round(R / P);
+        aDestScanLine[X].rgbtGreen := Round(G / P);
+        aDestScanLine[X].rgbtBlue  := Round(B / P);
+      end;
+    end;
+
   end;
 
 end;

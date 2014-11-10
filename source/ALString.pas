@@ -6039,10 +6039,7 @@ end;
 {*******************************************************}
 Function  ALBinToHex(const aBin: AnsiString): AnsiString;
 begin
-  if aBin = '' then begin
-    result := '';
-    exit;
-  end;
+  if aBin = '' then raise Exception.Create('Bad binary value');
   setlength(result,length(aBin) * 2);
   BintoHex(@aBin[1],pansiChar(result),length(aBin));
 end;
@@ -6050,12 +6047,9 @@ end;
 {*******************************************************}
 Function  ALHexToBin(const aHex: AnsiString): AnsiString;
 begin
-  if (aHex = '') or (length(aHex) mod 2 <> 0) then begin
-    result := '';
-    exit;
-  end;
+  if (aHex = '') or (length(aHex) mod 2 <> 0) then raise Exception.Create('Bad hex value');
   setlength(result,length(aHex) div 2);
-  if HexToBin(PansiChar(aHex),pansiChar(result),length(result)) <> length(result) then result := '';
+  if HexToBin(PansiChar(aHex),pansiChar(result),length(result)) <> length(result) then raise Exception.Create('Bad hex value');
 end;
 
 {***************************************************************}

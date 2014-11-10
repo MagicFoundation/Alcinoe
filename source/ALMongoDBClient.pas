@@ -359,7 +359,7 @@ type
                           const aSendTimeout: Integer;
                           const aReceiveTimeout: Integer;
                           const aKeepAlive: Boolean;
-                          const aTCPNoDelay: Boolean);
+                          const aTCPNoDelay: Boolean); virtual;
       Procedure DoDisconnect(var aSocketDescriptor: TSocket); virtual;
       Function SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
       Function SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer; Virtual;
@@ -1148,7 +1148,7 @@ begin
 
       aNode := aJSONDoc.Node.ChildNodes.FindNode('upserted');
       if assigned(aNode) then upserted := aNode.text
-      else fillchar(upserted[1],length(upserted),0);
+      else upserted := '';
 
     finally
 
@@ -1370,9 +1370,9 @@ begin
   //init aBsonselector
   if (length(Selector) > sizeof(aMessageLength)) then ALMove(Selector[1], aMessageLength, sizeof(aMessageLength))
   else aMessageLength := 0;
-    if (aMessageLength <> length(Selector)) or
-     ((length(Selector) > 0) and
-      (Selector[length(Selector)] <> #0)) then begin
+  if (aMessageLength <> length(Selector)) or
+   ((length(Selector) > 0) and
+    (Selector[length(Selector)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
       aJsonDocument.LoadFromJSON(Selector);

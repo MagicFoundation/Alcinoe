@@ -1,1 +1,0 @@
-ppcrossx64.exe C:\dev\Library\Alcinoe\udf\win64\aludf.pas -B -Mdelphi

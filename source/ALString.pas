@@ -466,6 +466,8 @@ Function  ALBinToHex(const aBin: AnsiString): AnsiString;
 Function  ALHexToBin(const aHex: AnsiString): AnsiString;
 function  ALIntToBit(value: Integer; digits: integer): ansistring;
 function  AlBitToInt(Value: ansiString): Integer;
+function  AlInt2BaseN(NumIn: UInt64; const charset: array of ansiChar): ansistring;
+function  AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
@@ -6082,6 +6084,75 @@ begin
   for i:=Length(Value) downto 1 do
    if Value[i]='1' then
     Result:=Result+(1 shl (Length(Value)-i));
+
+end;
+
+{********************************************************************************}
+function AlInt2BaseN(NumIn: UInt64; const charset: array of ansiChar): ansistring;
+var Remainder: UInt64;
+    BaseOut: integer;
+begin
+
+  //ex convert 1544745455 to base26
+  //                                               |
+  //1544745455 / 26 = 59413286, reste  19 -> T     |      26 / 26 = 1, reste 0 -> A
+  //59413286 / 26 = 2285126, reste 10 -> K         |      1 -> B
+  //2285126 / 26 = 87889, reste 12 -> M            |
+  //87889 / 26 = 3380, reste 9 -> J                |      26 = BA
+  //3380 / 26 = 130, reste 0 -> A                  |
+  //130 / 26 = 5, reste 0 -> A                     |
+  //5 -> G                                         |
+  //                                               |
+  //1544745455 = GAAJMKT
+
+  if length(charset) = 0 then raise Exception.Create('Charset must not be empty');
+
+  result := '';
+  BaseOut := length(charset);
+  while NumIn >= BaseOut do begin
+    DivMod(NumIn{Dividend}, BaseOut{Divisor}, NumIn{Result}, Remainder{Remainder});
+    Result := charset[Remainder] + Result;
+  end;
+  Result := charset[NumIn] + Result;
+
+end;
+
+{************************************************************************************}
+function AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
+var BaseIn: Byte;
+    Lst: TalStringList;
+    I,j: integer;
+    P: UInt64;
+begin
+
+  //
+  //ex convert ABCD to int
+  //
+  // ABCD = (26*26*26) * 0 + (26*26) * 1 + (26) * 2 + 3 = 731
+  //                     A             B          C   D
+
+  Lst := TalStringList.Create;
+  try
+
+    Lst.CaseSensitive := True;
+    Lst.Duplicates := DupError;
+    for I := Low(charset) to High(charset) do
+      Lst.addObject(charset[i],pointer(i));
+    Lst.Sorted := True;
+
+    result := 0;
+    P := 1;
+    BaseIn := length(charset);
+    for I := length(Str) downto 1 do begin
+      J := Lst.IndexOf(Str[I]);
+      if J < 0 then raise Exception.Create('Character ('+Str[I]+') not found in charset');
+      result := result + (int64(Lst.Objects[I]) * P);
+      P := P * BaseIn;
+    end;
+
+  finally
+    Lst.Free;
+  end;
 
 end;
 

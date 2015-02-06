@@ -6146,7 +6146,7 @@ begin
     for I := length(Str) downto 1 do begin
       J := Lst.IndexOf(Str[I]);
       if J < 0 then raise Exception.Create('Character ('+Str[I]+') not found in charset');
-      result := result + (int64(Lst.Objects[I]) * P);
+      result := result + (int64(Lst.Objects[J]) * P);
       P := P * BaseIn;
     end;
 

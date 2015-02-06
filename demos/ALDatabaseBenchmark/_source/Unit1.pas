@@ -3784,7 +3784,7 @@ Var aMongoDBClient: TAlMongoDBClient;
     Query: TALMongoDBClientUpdateDataQUERY;
     NumberOfDocumentsUpdatedOrRemoved: integer;
     updatedExisting: Boolean;
-    upserted: TALJsonObjectID;
+    upserted: ansiString;
 begin
 
   Screen.Cursor := CrHourGlass;

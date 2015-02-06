@@ -80,6 +80,9 @@ if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
   xcopy ..\BlowPipeEmail\BlowPipeEmail.exe demos\BlowPipeEmail /s
   IF ERRORLEVEL 1 goto ERROR
   
+  xcopy ..\BlowPipeEmail\sqlite3.dll demos\BlowPipeEmail /s
+  IF ERRORLEVEL 1 goto ERROR
+
   del ..\BlowPipeEmail\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
 
@@ -116,6 +119,9 @@ if exist ..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
   xcopy ..\BlowPipeSMS\BlowPipeSMS.exe demos\BlowPipeSMS /s
   IF ERRORLEVEL 1 goto ERROR
   
+  xcopy ..\BlowPipeSMS\sqlite3.dll demos\BlowPipeSMS /s
+  IF ERRORLEVEL 1 goto ERROR
+
   del ..\BlowPipeSMS\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
 

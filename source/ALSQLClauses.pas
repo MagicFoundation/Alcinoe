@@ -93,7 +93,7 @@ Type
     Having: TALStrings;
     Plan: ansiString; // dedicated to Firebird
     OrderBy: TALStrings;
-    Customs: TALStrings;
+    Custom: TALStrings;
     FBXClientSQLParams: TALFBXClientSQLParams; // dedicated to Firebird
     Constructor Create; Virtual;
     Destructor Destroy; override;
@@ -132,7 +132,7 @@ Type
     Table: ansiString;
     Value: TALStrings;
     Where: TALStrings;
-    Customs: TALStrings;
+    Custom: TALStrings;
     FBXClientSQLParams: TALFBXClientSQLParams; // dedicated to Firebird
     Constructor Create; Virtual;
     Destructor Destroy; override;
@@ -190,7 +190,7 @@ Begin
   Having:= TALStringList.create;
   Plan := '';
   OrderBy := TALStringList.create;
-  Customs := TALStringList.create;
+  Custom := TALStringList.create;
   setlength(FBXClientSQLParams, 0);
 end;
 
@@ -204,7 +204,7 @@ begin
   GroupBy.free;
   Having.free;
   OrderBy.free;
-  Customs.free;
+  Custom.free;
   inherited;
 end;
 
@@ -223,7 +223,7 @@ begin
   Having.Assign(source.Having);
   Plan := source.Plan;
   OrderBy.Assign(source.OrderBy);
-  Customs.Assign(source.Customs);
+  Custom.Assign(source.Custom);
   FBXClientSQLParams := Source.FBXClientSQLParams;
 end;
 
@@ -368,7 +368,7 @@ Begin
   Having.clear;
   Plan := '';
   OrderBy.clear;
-  Customs.clear;
+  Custom.clear;
   setlength(FBXClientSQLParams,0);
 End;
 
@@ -455,7 +455,7 @@ Begin
   table:= '';
   Value:= TALStringList.create;
   Where:= TALStringList.create;
-  Customs := TALStringList.create;
+  Custom := TALStringList.create;
   setlength(FBXClientSQLParams, 0);
 end;
 
@@ -464,7 +464,7 @@ destructor TALUpdateSQLClause.Destroy;
 begin
   Value.free;
   Where.free;
-  Customs.free;
+  Custom.free;
   inherited;
 end;
 
@@ -476,7 +476,7 @@ begin
   table:= source.Table;
   Value.Assign(source.Value);
   Where.Assign(source.Where);
-  Customs.Assign(source.Customs);
+  Custom.Assign(source.Custom);
   FBXClientSQLParams := Source.FBXClientSQLParams;
 end;
 
@@ -569,7 +569,7 @@ begin
   Table:= '';
   Value.clear;
   Where.clear;
-  Customs.clear;
+  Custom.clear;
   setlength(FBXClientSQLParams, 0);
 end;
 

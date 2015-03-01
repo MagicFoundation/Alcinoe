@@ -1231,33 +1231,56 @@ procedure ALExtractHeaderFields(Separators,
                                 StripQuotes: Boolean = False);
 
 var Head, Tail: PAnsiChar;
-    EOS, InQuote, LeadQuote: Boolean;
+    EOS, InQuote: Boolean;
     QuoteChar: AnsiChar;
     ExtractedField: AnsiString;
     SeparatorsWithQuotesAndNulChar: TSysCharSet;
     QuotesWithNulChar: TSysCharSet;
 
-  {------------------------------------------------------}
+  {-------------------------------------------------------}
+  //as i don't want to add the parameter namevalueseparator
+  //to the function, we will stripquote only if the string end
+  //with the quote or start with the quote
+  //ex: "name"="value"  =>  name=value
+  //ex: "name"=value    =>  name=value
+  //ex: name="value"    =>  name=value
   function DoStripQuotes(const S: AnsiString): AnsiString;
   var I: Integer;
-      InStripQuote: Boolean;
       StripQuoteChar: AnsiChar;
+      canStripQuotesOnLeftSide: boolean;
   begin
     Result := S;
-    InStripQuote := False;
-    StripQuoteChar := #0;
-    if StripQuotes then
-      for I := Length(Result) downto 1 do
-        if Result[I] in Quotes then
-          if InStripQuote and (StripQuoteChar = Result[I]) then begin
+    if StripQuotes then begin
+
+      canStripQuotesOnLeftSide := True;
+      if (length(result) > 0) and (result[length(result)] in quotes) then begin
+        StripQuoteChar := result[length(result)];
+        Delete(Result, length(result), 1);
+        i := Length(Result);
+        while i > 0 do begin
+          if (Result[I] = StripQuoteChar) then begin
             Delete(Result, I, 1);
-            InStripQuote := False;
-          end
-          else if not InStripQuote then begin
-            StripQuoteChar := Result[I];
-            InStripQuote := True;
+            canStripQuotesOnLeftSide := i > 1;
+            break;
+          end;
+          dec(i);
+        end;
+      end;
+
+      if (canStripQuotesOnLeftSide) and (length(result) > 0) and (result[1] in quotes) then begin
+        StripQuoteChar := result[1];
+        Delete(Result, 1, 1);
+        i := 1;
+        while i <= Length(Result) do begin
+          if (Result[I] = StripQuoteChar) then begin
             Delete(Result, I, 1);
-          end
+            break;
+          end;
+          inc(i);
+        end;
+      end;
+
+    end;
   end;
 
 Begin
@@ -1270,22 +1293,16 @@ Begin
     while Tail^ in WhiteSpace do Inc(Tail);
     Head := Tail;
     InQuote := False;
-    LeadQuote := False;
     while True do begin
       while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
       if Tail^ in Quotes then begin
         if (QuoteChar <> #0) and (QuoteChar = Tail^) then QuoteChar := #0
-        else If QuoteChar = #0 then begin
-          LeadQuote := Head = Tail;
-          QuoteChar := Tail^;
-          if LeadQuote then Inc(Head);
-        end;
+        else If QuoteChar = #0 then QuoteChar := Tail^;
         InQuote := QuoteChar <> #0;
-        if InQuote then Inc(Tail)
-        else Break;
-      end else Break;
+        Inc(Tail);
+      end
+      else Break;
     end;
-    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
     EOS := Tail^ = #0;
     if Head^ <> #0 then begin
       SetString(ExtractedField, Head, Tail-Head);
@@ -1307,38 +1324,59 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 StripQuotes: Boolean = False);
 
 var Head, Tail, NextTail: PAnsiChar;
-    EOS, InQuote, LeadQuote: Boolean;
+    EOS, InQuote: Boolean;
     QuoteChar: AnsiChar;
     ExtractedField: AnsiString;
     SeparatorsWithQuotesAndNulChar: TSysCharSet;
     QuotesWithNulChar: TSysCharSet;
 
-  {------------------------------------------------------}
+  {-------------------------------------------------------}
+  //as i don't want to add the parameter namevalueseparator
+  //to the function, we will stripquote only if the string end
+  //with the quote or start with the quote
+  //ex: "name"="value"  =>  name=value
+  //ex: "name"=value    =>  name=value
+  //ex: name="value"    =>  name=value
   function DoStripQuotes(const S: AnsiString): AnsiString;
   var I: Integer;
-      InStripQuote: Boolean;
       StripQuoteChar: AnsiChar;
+      canStripQuotesOnLeftSide: boolean;
   begin
     Result := S;
-    InStripQuote := False;
-    StripQuoteChar := #0;
     if StripQuotes then begin
-      i := Length(Result);
-      while i > 0 do begin
-        if Result[I] in Quotes then begin
-          if InStripQuote and (StripQuoteChar = Result[I]) then begin
+
+      canStripQuotesOnLeftSide := True;
+      if (length(result) > 0) and (result[length(result)] in quotes) then begin
+        StripQuoteChar := result[length(result)];
+        Delete(Result, length(result), 1);
+        i := Length(Result);
+        while i > 0 do begin
+          if (Result[I] = StripQuoteChar) then begin
             Delete(Result, I, 1);
             if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
-            else InStripQuote := False;
-          end
-          else if not InStripQuote then begin
-            StripQuoteChar := Result[I];
-            InStripQuote := True;
-            Delete(Result, I, 1);
-          end
+            else begin
+              canStripQuotesOnLeftSide := i > 1;
+              break;
+            end;
+          end;
+          dec(i);
         end;
-        dec(i);
       end;
+
+      if (canStripQuotesOnLeftSide) and (length(result) > 0) and (result[1] in quotes) then begin
+        StripQuoteChar := result[1];
+        Delete(Result, 1, 1);
+        i := 1;
+        while i <= Length(Result) do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            if (i < Length(Result)) and (Result[I+1] = StripQuoteChar) then inc(i)
+            else break;
+          end;
+          inc(i);
+        end;
+      end;
+
     end;
   end;
 
@@ -1352,7 +1390,6 @@ Begin
     while Tail^ in WhiteSpace do Inc(Tail);
     Head := Tail;
     InQuote := False;
-    LeadQuote := False;
     while True do begin
       while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
       if Tail^ in Quotes then begin
@@ -1361,17 +1398,12 @@ Begin
           if NextTail^ = Tail^ then inc(tail)
           else QuoteChar := #0;
         end
-        else If QuoteChar = #0 then begin
-          LeadQuote := Head = Tail;
-          QuoteChar := Tail^;
-          if LeadQuote then Inc(Head);
-        end;
+        else If QuoteChar = #0 then QuoteChar := Tail^;
         InQuote := QuoteChar <> #0;
-        if InQuote then Inc(Tail)
-        else Break;
-      end else Break;
+        Inc(Tail);
+      end
+      else Break;
     end;
-    if not LeadQuote and (Tail^ <> #0) and (Tail^ in Quotes) then Inc(Tail);
     EOS := Tail^ = #0;
     if Head^ <> #0 then begin
       SetString(ExtractedField, Head, Tail-Head);

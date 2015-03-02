@@ -120,15 +120,15 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
 
 const
+
   cAlPixelCountMax = 32768; //Using a large value for PixelCountMax serves two purposes.
                             //No bitmap can be that large (at present), and this effectively turns off
                             //range checking on Scanline variables.
 
 type
+
   pAlRGBTripleArray = ^TAlRGBTripleArray;
   TAlRGBTripleArray = array[0..cAlPixelCountMax-1] OF TRGBTriple;
-
-type
 
   // resampling support types
   TALRGBInt = record

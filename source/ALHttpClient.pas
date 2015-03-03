@@ -531,21 +531,23 @@ const
 
 function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
-Function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
 
-Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
-Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
-Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
+function ALTryIPV4StrToNumeric(aIPv4Str: AnsiString; var aIPv4Num: Cardinal): Boolean;
+function ALIPV4StrToNumeric(aIPv4: AnsiString): Cardinal;
+function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
+function ALIPv4EndOfRange(aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
 
 type
-  TALIPv6Binary = array[1..16] of ansiChar;
+  TALIPv6Binary = array[1..16] of AnsiChar;
 
-Function ALZeroIpV6: TALIPv6Binary;
-Function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
-Function ALIPV6StrTobinary(aIPv6: ansiString): TALIPv6Binary;
-Function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
-Function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
+function ALZeroIpV6: TALIPv6Binary;
+function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
+function ALIPV6StrTobinary(aIPv6: AnsiString): TALIPv6Binary;
+function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
+function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
+function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
 
 Const
   cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
@@ -559,11 +561,13 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Web.HttpApp,
      System.DateUtils,
      System.SysConst,
+     System.Math,
      {$ELSE}
      Windows,
      HttpApp,
      DateUtils,
      SysConst,
+     Math,
      {$IFEND}
      AlMisc,
      ALString;
@@ -2032,6 +2036,28 @@ Begin
 
 End;
 
+{********************************************************************************}
+{This function calculates ending IPv4-address for a given start of IPv4 range and
+ length of subnetwork mask.
+ Calculation is described in RFC: http://tools.ietf.org/html/rfc1878,
+ calculator to test its behaviour - https://www.ultratools.com/tools/netMask.
+ There are declared that length of subnetwork represents number of addresses
+ like 2^(32 - n) - 2 where "n" is a length of subnetwork mask.
+
+ This way for the address:
+  1.0.1.0/26
+
+ the length will be 2^(32-26) - 2 = 2^6 - 2 = 62 addresses + 1 reserved for
+ the services purposes, so the last possible address in that range will be:
+  1.0.1.63}
+function ALIPv4EndOfRange(aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
+begin
+  if (aMaskLength < 1) or
+     (aMaskLength > 32) then raise EALException.Create('Wrong value for mask length IPv4: ' + ALIntToStr(aMaskLength));
+
+  result := aStartIPv4 + Round(Power(2, (32 - aMaskLength)) - 1 {why not -2 it's that +1 address for service purposes})
+end;
+
 {*********************************}
 Function ALZeroIpV6: TALIPv6Binary;
 begin
@@ -2190,6 +2216,58 @@ Begin
   result[16] := aIPV6BinaryStr[16];
 
 End;
+
+{********************************************************************************
+{This function calculates ending IPv6-address for a given start of IPv6-range and
+ length of subnetwork mask.
+ RFC about IPv6 architecture is described here: https://tools.ietf.org/html/rfc4291.
+ Check out the also the good table representing the rules to calculate this ending address:
+  https://www.ripe.net/internet-coordination/press-centre/cidr_chart1.jpg
+ Calculator to test its behaviour: https://www.ultratools.com/tools/ipv6CIDRToRange
+
+ Assume that start IPv6: 2001:250:c20::/43,
+ /43 means that 128 - 43 = 85 bits starting from the lowest bit must be set to 1 and
+ we will get ending address.
+
+ So this address can be written like:
+  2001:250:c20:0:0:0:0:0
+
+ Setting 85 first bits of this address to 1 we will get
+  2001:250:c3f:ffff:ffff:ffff:ffff:ffff}
+function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _setBitTo1(const aValue: byte;
+                      const aBitNumber: byte): byte;
+  begin
+    if (aBitNumber > 8) or
+       (aBitNumber < 1) then raise EALException.Create('Bad bit number for IPv6');
+    result := aValue or (1 shl (aBitNumber - 1));
+  end;
+
+var aBitsCount: integer;
+    aByteNumber: integer;
+    aBitNumber: integer;
+    i: byte;
+begin
+  if (aMaskLength < 1) or
+     (aMaskLength > 128) then raise EALException.Create('Wrong value for mask length IPv4: ' + ALIntToStr(aMaskLength));
+
+  result := aStartIPv6;
+  aBitsCount := 128 - aMaskLength; // for example, 128 - 24 = 104
+
+  // scroll all the required bits and set them to 1;
+  // 1st bit to set actually represents 1st bit of the 16th byte,
+  // ...
+  // 10th bit represents 2nd bit of the 15th byte et cetera
+  for i := 1 to aBitsCount do begin
+    // NOTE: these variables are uneseccarily but the code becomes to be a little
+    //       more readable, we see immediately what each formula represents.
+    aByteNumber := 16 - (Ceil(i / 8)) + 1;
+    aBitNumber := 8 - ((Ceil(i / 8) * 8) - i);
+    result[aByteNumber] := AnsiChar(_setBitTo1(Ord(result[aByteNumber]), aBitNumber));
+  end;
+end;
 
 {***********************************************************************************}
 constructor EALHTTPClientException.Create(const Msg: AnsiString; SCode: Integer = 0);

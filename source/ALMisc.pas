@@ -72,6 +72,10 @@ function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
 
+const ALMAXUInt64: UInt64 = 18446744073709551615;
+      ALMAXInt64: Int64 = 9223372036854775807;
+      ALMAXINT: integer = 2147483647; // this is unecessarily because MAXINT system const exists but just for consistency
+
 implementation
 
 uses {$IF CompilerVersion >= 23} {Delphi XE2}

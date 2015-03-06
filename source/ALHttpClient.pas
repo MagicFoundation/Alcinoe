@@ -548,6 +548,8 @@ function ALIPV6StrTobinary(aIPv6: AnsiString): TALIPv6Binary;
 function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
 function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
 function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
+function ALIPv6HighestPartToInt64(aIPv6RawStringData: AnsiString): UInt64;
+function ALIPv6LowestPartToInt64(aIPv6RawStringData: AnsiString): UInt64;
 
 Const
   cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
@@ -2251,7 +2253,7 @@ var aBitsCount: integer;
     i: byte;
 begin
   if (aMaskLength < 1) or
-     (aMaskLength > 128) then raise EALException.Create('Wrong value for mask length IPv4: ' + ALIntToStr(aMaskLength));
+     (aMaskLength > 128) then raise EALException.Create('Wrong value for mask length IPv6: ' + ALIntToStr(aMaskLength));
 
   result := aStartIPv6;
   aBitsCount := 128 - aMaskLength; // for example, 128 - 24 = 104
@@ -2267,6 +2269,38 @@ begin
     aBitNumber := 8 - ((Ceil(i / 8) * 8) - i);
     result[aByteNumber] := AnsiChar(_setBitTo1(Ord(result[aByteNumber]), aBitNumber));
   end;
+end;
+
+{************************************************************************}
+function ALIPv6HighestPartToInt64(aIPv6RawStringData: AnsiString): UInt64;
+var aIntRec: Int64Rec;
+    i: integer;
+begin
+  if Length(aIPv6RawStringData) <> 16 then raise EALException.Create('Wrong length for IPv6 string data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6RawStringData)));
+
+  for i := 8 downto 1 do begin
+    aIntRec.Bytes[8 - i] := Ord(aIPv6RawStringData[i]);
+  end;
+
+  // it should be UInt64 of course, to handle the case when all the bytes are
+  // set to 255 (so all the 64 bits are set to 1)
+  result := UInt64(aIntRec);
+end;
+
+{***********************************************************************}
+function ALIPv6LowestPartToInt64(aIPv6RawStringData: AnsiString): UInt64;
+var aIntRec: Int64Rec;
+    i: integer;
+begin
+  if Length(aIPv6RawStringData) <> 16 then raise EALException.Create('Wrong length for IPv6 string data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6RawStringData)));
+
+  for i := 16 downto 9 do begin
+    aIntRec.Bytes[16 - i] := Ord(aIPv6RawStringData[i]);
+  end;
+
+  // it should be UInt64 of course, to handle the case when all the bytes are
+  // set to 255 (so all the 64 bits are set to 1)
+  result := UInt64(aIntRec);
 end;
 
 {***********************************************************************************}

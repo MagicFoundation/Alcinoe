@@ -2276,7 +2276,7 @@ function ALIPv6HighestPartToInt64(aIPv6: TALIPv6Binary): UInt64;
 var aIntRec: Int64Rec;
     i: integer;
 begin
-  if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 string data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
+  if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 binary data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
 
   for i := 8 downto 1 do begin
     aIntRec.Bytes[8 - i] := Ord(aIPv6[i]);
@@ -2292,7 +2292,7 @@ function ALIPv6LowestPartToInt64(aIPv6: TALIPv6Binary): UInt64;
 var aIntRec: Int64Rec;
     i: integer;
 begin
-  if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 string data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
+  if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 binary data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
 
   for i := 16 downto 9 do begin
     aIntRec.Bytes[16 - i] := Ord(aIPv6[i]);

@@ -1,0 +1,38 @@
+Determining if the include file tr1/unordered_map exists failed with the following output:
+Change Dir: C:/libpn/cpp/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"c:/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec1870092919.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft (R) Build Engine Version 4.0.30319.1
+[Microsoft .NET Framework, Version 4.0.30319.261]
+Copyright (C) Microsoft Corporation 2007. All rights reserved.
+
+Build started 5/14/2015 10:26:49 PM.
+Project "C:\libpn\cpp\build\CMakeFiles\CMakeTmp\cmTryCompileExec1870092919.vcxproj" on node 1 (default targets).
+PrepareForBuild:
+  Creating directory "cmTryCompileExec1870092919.dir\Debug\".
+  Creating directory "C:\libpn\cpp\build\CMakeFiles\CMakeTmp\Debug\".
+InitializeBuildStatus:
+  Creating "cmTryCompileExec1870092919.dir\Debug\cmTryCompileExec1870092919.unsuccessfulbuild" because "AlwaysCreate" was specified.
+ClCompile:
+  c:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"cmTryCompileExec1870092919.dir\Debug\\" /Fd"cmTryCompileExec1870092919.dir\Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:queue CheckIncludeFile.cxx
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.30319.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /GR /Fo"cmTryCompileExec1870092919.dir\Debug\\" /Fd"cmTryCompileExec1870092919.dir\Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:queue CheckIncludeFile.cxx
+  CheckIncludeFile.cxx
+  
+CheckIncludeFile.cxx(1): fatal error C1083: Cannot open include file: 'tr1/unordered_map': No such file or directory [C:\libpn\cpp\build\CMakeFiles\CMakeTmp\cmTryCompileExec1870092919.vcxproj]
+Done Building Project "C:\libpn\cpp\build\CMakeFiles\CMakeTmp\cmTryCompileExec1870092919.vcxproj" (default targets) -- FAILED.
+
+Build FAILED.
+
+"C:\libpn\cpp\build\CMakeFiles\CMakeTmp\cmTryCompileExec1870092919.vcxproj" (default target) (1) ->
+(ClCompile target) -> 
+  CheckIncludeFile.cxx(1): fatal error C1083: Cannot open include file: 'tr1/unordered_map': No such file or directory [C:\libpn\cpp\build\CMakeFiles\CMakeTmp\cmTryCompileExec1870092919.vcxproj]
+
+    0 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.48
+
+

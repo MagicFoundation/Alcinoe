@@ -3340,7 +3340,7 @@ var
   Overwrite: Boolean;
   FormatChar: AnsiChar;
   S: AnsiString;
-  StrBuf: array[0..64] of AnsiChar;
+  StrBuf: array[0..64] of AnsiChar; // if currencystring contain more than 64 chars then it's raise an error :(
   LeftJustification: Boolean;
   Width: Integer;
   Precision: Integer;
@@ -3756,7 +3756,7 @@ var
   ArgIndex, Width, Prec: Integer;
   BufferOrg, FormatOrg, FormatPtr: PAnsiChar;
   JustFlag: Byte;
-  StrBuf: array[0..64] of AnsiChar;
+  StrBuf: array[0..64] of AnsiChar; // if currencystring contain more than 64 chars then it's raise an error :(
   TempAnsiStr: AnsiString;
   SaveGOT: Integer;
 asm

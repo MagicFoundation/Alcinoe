@@ -4508,8 +4508,8 @@ begin
             while aIndex > aCurrJsonNode.ChildNodes.Count - 1 do begin
               if j = aNames.Count - 1 then aCurrJsonNode.AddChild(ntText)
               else if (aNames[j+1] <> '') and
-                      (aNames[j+1][1] = '[') then aCurrJsonNode := aCurrJsonNode.AddChild(ntarray)
-              else aCurrJsonNode := aCurrJsonNode.AddChild(ntObject);
+                      (aNames[j+1][1] = '[') then aCurrJsonNode.AddChild(ntarray)
+              else aCurrJsonNode.AddChild(ntObject);
             end;
             aCurrJsonNode := aCurrJsonNode.ChildNodes[aIndex];
           end

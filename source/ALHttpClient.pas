@@ -548,8 +548,9 @@ function ALIPV6StrTobinary(aIPv6: AnsiString): TALIPv6Binary;
 function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
 function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
 function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
-function ALIPv6HighestPartToInt64(aIPv6: TALIPv6Binary): UInt64;
-function ALIPv6LowestPartToInt64(aIPv6: TALIPv6Binary): UInt64;
+procedure ALIPv6SplitParts(aIPv6: TALIPv6Binary;
+                           var aHigestPart: UInt64;
+                           var aLowestPart: UInt64);
 
 Const
   cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
@@ -2271,36 +2272,30 @@ begin
   end;
 end;
 
-{**************************************************************}
-function ALIPv6HighestPartToInt64(aIPv6: TALIPv6Binary): UInt64;
+{**********************************************}
+procedure ALIPv6SplitParts(aIPv6: TALIPv6Binary;
+                           var aHigestPart: UInt64;
+                           var aLowestPart: UInt64);
 var aIntRec: Int64Rec;
     i: integer;
 begin
   if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 binary data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
 
+  // get the highest part
+  aIntRec.Lo := 0;
+  aIntRec.Hi := 0;
   for i := 8 downto 1 do begin
     aIntRec.Bytes[8 - i] := Ord(aIPv6[i]);
   end;
+  aHigestPart := UInt64(aIntRec);
 
-  // it should be UInt64 of course, to handle the case when all the bytes are
-  // set to 255 (so all the 64 bits are set to 1)
-  result := UInt64(aIntRec);
-end;
-
-{*************************************************************}
-function ALIPv6LowestPartToInt64(aIPv6: TALIPv6Binary): UInt64;
-var aIntRec: Int64Rec;
-    i: integer;
-begin
-  if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 binary data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
-
+  // get the lowest part
+  aIntRec.Lo := 0;
+  aIntRec.Hi := 0;
   for i := 16 downto 9 do begin
     aIntRec.Bytes[16 - i] := Ord(aIPv6[i]);
   end;
-
-  // it should be UInt64 of course, to handle the case when all the bytes are
-  // set to 255 (so all the 64 bits are set to 1)
-  result := UInt64(aIntRec);
+  aLowestPart := UInt64(aIntRec);
 end;
 
 {***********************************************************************************}

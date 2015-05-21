@@ -15,8 +15,6 @@
 // Author: Shaopeng Jia
 // Open-sourced by: Philippe Liard
 
-#define DllExport   extern "C" __declspec( dllexport )
-
 #include "phonenumbers/phonenumberutil.h"
 
 #include <string.h>
@@ -50,7 +48,6 @@
 #include "phonenumbers/stringutil.h"
 #include "phonenumbers/utf/unicodetext.h"
 #include "phonenumbers/utf/utf.h"
-
 
 namespace i18n {
 namespace phonenumbers {

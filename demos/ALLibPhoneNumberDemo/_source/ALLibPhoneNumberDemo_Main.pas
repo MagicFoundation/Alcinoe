@@ -40,30 +40,30 @@ implementation
 
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  Edit2.Text := string(ALIntToStr(ALStrPhoneNumberToInt64(Edit1.Text, Edit3.Text)));
+  Edit2.Text := string(ALIntToStr(ALStrPhoneNumberToInt64(ansiString(Edit1.Text), ansiString(Edit3.Text))));
   Edit4.Text := Edit2.Text;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  Edit2.Text := string(ALInt64PhoneNumberToStr(ALStrToInt64(Edit4.Text)));
+  Edit2.Text := string(ALInt64PhoneNumberToStr(ALStrToInt64(ansiString(Edit4.Text))));
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 begin
-  case ALGetPhoneNumberType(ALStrToInt64(Edit4.Text)) of
-    0: Edit2.Text := 'Landing line';
-    1: Edit2.Text := 'Mobile';
-    2: Edit2.Text := 'Mobile or Landing (mostly for US)';
-    3: Edit2.Text := 'TOLL-FREE';
-    4: Edit2.Text := 'Premium rate';
-    5: Edit2.Text := 'Shared cost';
-    6: Edit2.Text := 'Voice over IP';
-    7: Edit2.Text := 'Personal Number';
-    8: Edit2.Text := 'Pager';
-    9: Edit2.Text := 'UAN (Universal Access Numbers)';
-    10: Edit2.Text := 'Voice Mail';
-    11: Edit2.Text := 'Unknown';
+  case ALGetPhoneNumberType(ALStrToInt64(ansiString(Edit4.Text))) of
+    cALFixedLine: Edit2.Text := 'Landing line';
+    cALMobile: Edit2.Text := 'Mobile';
+    cALFixedLineOrMobil: Edit2.Text := 'Mobile or Landing (mostly for US)';
+    cALTollFree: Edit2.Text := 'TOLL-FREE';
+    cALPremiumRate: Edit2.Text := 'Premium rate';
+    cALSharedCost: Edit2.Text := 'Shared cost';
+    cALVoIP: Edit2.Text := 'Voice over IP';
+    cALPersonalNumber: Edit2.Text := 'Personal Number';
+    cALPager: Edit2.Text := 'Pager';
+    cALUAN: Edit2.Text := 'UAN (Universal Access Numbers)';
+    cALVoiceMail: Edit2.Text := 'Voice Mail';
+    cALUnknown: Edit2.Text := 'Unknown';
   end;
 end;
 

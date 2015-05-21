@@ -99,6 +99,8 @@ const cALFixedLine = 0;
 
 implementation
 
+uses alString;
+
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
 function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';
 function _GetPhoneNumberType(phoneNumber: Int64): integer; cdecl; external 'libphonenumber.dll';
@@ -106,7 +108,7 @@ function _GetPhoneNumberType(phoneNumber: Int64): integer; cdecl; external 'libp
 {**********************************************************************************}
 function ALStrPhoneNumberToInt64(const PhoneNumber, CountryCode: AnsiString): Int64;
 begin
-  result := _StrPhoneNumberToInt64(PAnsiChar(PhoneNumber), PAnsiChar(CountryCode));
+  result := _StrPhoneNumberToInt64(PAnsiChar(PhoneNumber), PAnsiChar(AlUppercase(CountryCode)));
 end;
 
 {***************************************************************}

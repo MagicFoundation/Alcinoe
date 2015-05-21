@@ -74,6 +74,7 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_ExeOutput>..\$(Platform)\</DCC_ExeOutput>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <DCC_CodePage>65001</DCC_CodePage>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

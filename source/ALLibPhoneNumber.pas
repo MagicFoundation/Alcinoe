@@ -80,45 +80,42 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      sysutils;
      {$IFEND}
 
-function ALStrPhoneNumberToInt64(PhoneNumber, CountryCode: AnsiString): Int64;
+function ALStrPhoneNumberToInt64(const PhoneNumber, CountryCode: AnsiString): Int64;
 function ALInt64PhoneNumberToStr(PhoneNumber: Int64): AnsiString;
 function ALGetPhoneNumberType(PhoneNumber: Int64): integer;
 
-const cALLibPhoneNumber_MaxPhoneLength = 255;
-
-      cALLibPhoneNumber_PhoneNumberType_FixedLine = 0;
-      cALLibPhoneNumber_PhoneNumberType_Mobile = 1;
-      cALLibPhoneNumber_PhoneNumberType_FixedLineOrMobil = 2; // in USA it is not possible to define
-      cALLibPhoneNumber_PhoneNumberType_TollFree = 3;
-      cALLibPhoneNumber_PhoneNumberType_PremiumRate = 4;
-      cALLibPhoneNumber_PhoneNumberType_SharedCost = 5; // see http://en.wikipedia.org/wiki/Shared_Cost_Service
-      cALLibPhoneNumber_PhoneNumberType_VoIP = 6;
-      cALLibPhoneNumber_PhoneNumberType_PersonalNumber = 7;
-      cALLibPhoneNumber_PhoneNumberType_Pager = 8;
-      cALLibPhoneNumber_PhoneNumberType_UAN = 9; // see "Universal Access Numbers"
-      cALLibPhoneNumber_PhoneNumberType_VoiceMail = 10;
-      cALLibPhoneNumber_PhoneNumberType_Unknown = 11;
+const cALFixedLine = 0;
+      cALMobile = 1;
+      cALFixedLineOrMobil = 2; // mostly for US
+      cALTollFree = 3;
+      cALPremiumRate = 4;
+      cALSharedCost = 5; // see http://en.wikipedia.org/wiki/Shared_Cost_Service
+      cALVoIP = 6;
+      cALPersonalNumber = 7;
+      cALPager = 8;
+      cALUAN = 9; // see "Universal Access Numbers"
+      cALVoiceMail = 10;
+      cALUnknown = 11;
 
 implementation
 
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
-procedure _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar); cdecl; external 'libphonenumber.dll';
+function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): integer; cdecl; external 'libphonenumber.dll';
 function _GetPhoneNumberType(phoneNumber: Int64): integer; cdecl; external 'libphonenumber.dll';
 
-{****************************************************************************}
-function ALStrPhoneNumberToInt64(PhoneNumber, CountryCode: AnsiString): Int64;
+{**********************************************************************************}
+function ALStrPhoneNumberToInt64(const PhoneNumber, CountryCode: AnsiString): Int64;
 begin
   result := _StrPhoneNumberToInt64(PAnsiChar(PhoneNumber), PAnsiChar(CountryCode));
 end;
 
 {***************************************************************}
 function ALInt64PhoneNumberToStr(PhoneNumber: Int64): AnsiString;
-var P1: PAnsiChar;
+var ln: integer;
 begin
-  GetMem(P1, cALLibPhoneNumber_MaxPhoneLength);
-  _Int64PhoneNumberToStr(PhoneNumber, P1);
-  result := AnsiString(P1);
-  FreeMem(P1, cALLibPhoneNumber_MaxPhoneLength);
+   SetLength(Result, 255);
+   ln := _Int64PhoneNumberToStr(PhoneNumber, @Result[1]);
+   SetLength(Result, ln);
 end;
 
 {*********************************************************}

@@ -549,8 +549,8 @@ function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
 function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
 function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
 procedure ALIPv6SplitParts(aIPv6: TALIPv6Binary;
-                           var aHigestPart: UInt64;
-                           var aLowestPart: UInt64);
+                           var aLowestPart: UInt64;
+                           var aHigestPart: UInt64);
 
 Const
   cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
@@ -2252,6 +2252,7 @@ var aBitsCount: integer;
     aByteNumber: integer;
     aBitNumber: integer;
     i: byte;
+
 begin
   if (aMaskLength < 1) or
      (aMaskLength > 128) then raise EALException.Create('Wrong value for mask length IPv6: ' + ALIntToStr(aMaskLength));
@@ -2274,28 +2275,26 @@ end;
 
 {**********************************************}
 procedure ALIPv6SplitParts(aIPv6: TALIPv6Binary;
-                           var aHigestPart: UInt64;
-                           var aLowestPart: UInt64);
+                           var aLowestPart: UInt64;
+                           var aHigestPart: UInt64);
 var aIntRec: Int64Rec;
     i: integer;
 begin
-  if Length(aIPv6) <> 16 then raise EALException.Create('Wrong length for IPv6 binary data, 16 is expected, length is: ' + ALIntToStr(Length(aIPv6)));
-
-  // get the highest part
+  // get the Lowest Part
   aIntRec.Lo := 0;
   aIntRec.Hi := 0;
   for i := 8 downto 1 do begin
     aIntRec.Bytes[8 - i] := Ord(aIPv6[i]);
   end;
-  aHigestPart := UInt64(aIntRec);
+  aLowestPart := UInt64(aIntRec);
 
-  // get the lowest part
+  // get the Higest Part
   aIntRec.Lo := 0;
   aIntRec.Hi := 0;
   for i := 16 downto 9 do begin
     aIntRec.Bytes[16 - i] := Ord(aIPv6[i]);
   end;
-  aLowestPart := UInt64(aIntRec);
+  aHigestPart := UInt64(aIntRec);
 end;
 
 {***********************************************************************************}

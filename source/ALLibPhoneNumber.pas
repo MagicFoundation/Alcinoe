@@ -100,7 +100,7 @@ const cALFixedLine = 0;
 implementation
 
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
-function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): integer; cdecl; external 'libphonenumber.dll';
+function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';
 function _GetPhoneNumberType(phoneNumber: Int64): integer; cdecl; external 'libphonenumber.dll';
 
 {**********************************************************************************}
@@ -111,11 +111,11 @@ end;
 
 {***************************************************************}
 function ALInt64PhoneNumberToStr(PhoneNumber: Int64): AnsiString;
-var ln: integer;
+var ln: Cardinal;
 begin
-   SetLength(Result, 255);
-   ln := _Int64PhoneNumberToStr(PhoneNumber, @Result[1]);
-   SetLength(Result, ln);
+  SetLength(Result, 255);
+  ln := _Int64PhoneNumberToStr(PhoneNumber, @Result[1]);
+  SetLength(Result, ln);
 end;
 
 {*********************************************************}

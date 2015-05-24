@@ -170,6 +170,11 @@ type
   TALFormatSettings = TFormatSettings;
   {$ENDIF}
 
+  function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
+  procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
+
+type
+
   EALException = class(Exception)
   public
     constructor Create(const Msg: AnsiString);
@@ -417,7 +422,6 @@ type
                                        Const SourceString: AnsiString;
                                        Var TagPosition, TagLength: integer): AnsiString;
 
-procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
 function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
 function  ALNewGUIDByteString: Ansistring;
 function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): Ansistring;
@@ -789,6 +793,40 @@ begin
   {$IFEND}
 end;
 {$ENDIF}
+
+{***********************************************************************************}
+function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
+var i: integer;
+begin
+  With aFormatSettings do begin
+    Result := CurrencyString + '#' +
+              ALIntToStr(CurrencyFormat) + '#' +
+              ALIntToStr(CurrencyDecimals) + '#' +
+              DateSeparator + '#' +
+              TimeSeparator + '#' +
+              ListSeparator + '#' +
+              ShortDateFormat + '#' +
+              LongDateFormat + '#' +
+              TimeAMString + '#' +
+              TimePMString + '#' +
+              ShortTimeFormat + '#' +
+              LongTimeFormat + '#';
+
+    for I := low(ShortMonthNames) to high(ShortMonthNames) do
+      result := result + ShortMonthNames[i] + '#';
+    for I := low(LongMonthNames) to high(LongMonthNames) do
+      result := result + LongMonthNames[i] + '#';
+    for I := low(ShortDayNames) to high(ShortDayNames) do
+      result := result + ShortDayNames[i] + '#';
+    for I := low(LongDayNames) to high(LongDayNames) do
+      result := result + LongDayNames[i] + '#';
+
+    Result := Result + ThousandSeparator + '#' +
+                       DecimalSeparator + '#' +
+                       ALIntToStr(TwoDigitYearCenturyWindow) + '#' +
+                       ALIntToStr(NegCurrFormat);
+  end;
+end;
 
 {****************************************************************************************}
 procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);

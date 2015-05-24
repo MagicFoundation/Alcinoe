@@ -180,6 +180,11 @@ Type
     function  GetConnectionID: Integer;
     function  GetTransactionID: Cardinal;
   Protected
+    function loadCachedData(const Key: AnsiString;
+                            var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(const Key: ansiString;
+                              const CacheThreshold: integer;
+                              const DataStr: ansiString); virtual;
     function GetFieldValue(aSQLDA: TALFBXSQLResult;
                            aDBHandle: IscDbHandle;
                            aTraHandle: IscTrHandle;
@@ -407,6 +412,11 @@ Type
     fDefaultReadTPB: AnsiString;
     fDefaultWriteTPB: AnsiString;
   Protected
+    function loadCachedData(const Key: AnsiString;
+                            var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(const Key: ansiString;
+                              const CacheThreshold: integer;
+                              const DataStr: ansiString); virtual;
     function GetCloseConnectionByErrCode(aGDSCode: Integer): Boolean; virtual;
     function GetDataBaseName: AnsiString; virtual;
     function GetFieldValue(aSQLDA: TALFBXSQLResult;
@@ -945,6 +955,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$ELSE}
      Diagnostics,
      {$IFEND}
+     ALCipher,
      ALWindows,
      alfbxError;
 
@@ -1192,6 +1203,21 @@ Begin
 
   End;
 
+end;
+
+{*********************************************************}
+function TALFBXClient.loadCachedData(const Key: AnsiString;
+                                     var DataStr: AnsiString): Boolean;
+begin
+  result := false; //virtual need to be overriden
+end;
+
+{***********************************************************}
+Procedure TALFBXClient.SaveDataToCache(const Key: ansiString;
+                                       const CacheThreshold: integer;
+                                       const DataStr: ansiString);
+begin
+  //virtual need to be overriden
 end;
 
 {*********************************************************}
@@ -1599,6 +1625,8 @@ Var aSqlpa: TALFBXSQLParams;
     aDropStmt: Boolean;
     aXmlDocument: TalXmlDocument;
     aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
 
     {------------------------------------}
     Procedure InternalSelectDataFetchRows;
@@ -1701,6 +1729,36 @@ begin
 
     //loop on all the SQL
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //Handle the CacheThreshold
+      aCacheKey := '';
+      If (Queries[aQueriesIndex].CacheThreshold > 0) and
+         (not assigned(aXmlDocument)) and
+         (((length(Queries) = 1) and
+           (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
+          (Queries[aQueriesIndex].ViewTag <> '')) then begin
+
+        //try to load from from cache
+        aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
+                                      alinttostr(Queries[aQueriesIndex].Skip) + '#' +
+                                      alinttostr(Queries[aQueriesIndex].First) + '#' +
+                                      ALGetFormatSettingsID(FormatSettings) + '#' +
+                                      Queries[aQueriesIndex].SQL);
+        if loadcachedData(aCacheKey, aCacheStr) then begin
+
+          //init the aViewRec
+          if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
+          else aViewRec := XMLdata;
+
+          //assign the tmp data to the XMLData
+          aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+
+          //go to the next loop
+          continue;
+
+        end;
+
+      end;
 
       //start the TstopWatch
       aStopWatch.Reset;
@@ -1820,6 +1878,17 @@ begin
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
                        aStopWatch.ElapsedMilliseconds);
+
+      //save to the cache
+      If aCacheKey <> '' then begin
+
+        //save the data
+        aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
+        SaveDataToCache(aCacheKey,
+                        Queries[aQueriesIndex].CacheThreshold,
+                        aCacheStr);
+
+      end;
 
     End;
 
@@ -3998,6 +4067,8 @@ procedure TALFBXConnectionPoolClient.SelectData(Queries: TALFBXClientSelectDataQ
       aTransactionWasAcquiredFromPool: Boolean;
       aStatementWasAcquiredFromPool: Boolean;
       aStopWatch: TStopWatch;
+      aCacheKey: ansiString;
+      aCacheStr: ansiString;
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
   {$IFDEF undef}{$REGION 'InternalSelectDataFetchRows'}{$ENDIF}
@@ -4138,6 +4209,37 @@ begin
 
       {$IFDEF undef}{$REGION 'loop on all the SQL'}{$ENDIF}
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        {$IFDEF undef}{$REGION 'Handle the CacheThreshold'}{$ENDIF}
+        aCacheKey := '';
+        If (Queries[aQueriesIndex].CacheThreshold > 0) and
+           (not assigned(aXmlDocument)) and
+           (((length(Queries) = 1) and
+             (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
+            (Queries[aQueriesIndex].ViewTag <> '')) then begin
+
+          //try to load from from cache
+          aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
+                                        alinttostr(Queries[aQueriesIndex].Skip) + '#' +
+                                        alinttostr(Queries[aQueriesIndex].First) + '#' +
+                                        ALGetFormatSettingsID(FormatSettings) + '#' +
+                                        Queries[aQueriesIndex].SQL);
+          if loadcachedData(aCacheKey, aCacheStr) then begin
+
+            //init the aViewRec
+            if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
+            else aViewRec := XMLdata;
+
+            //assign the tmp data to the XMLData
+            aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+
+            //go to the next loop
+            continue;
+
+          end;
+
+        end;
+        {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
         {$IFDEF undef}{$REGION 'Reset aStopWatch'}{$ENDIF}
         aStopWatch.Reset;
@@ -4449,6 +4551,18 @@ begin
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
                          aStopWatch.ElapsedMilliseconds);
+        {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+        {$IFDEF undef}{$REGION 'save to the cache'}{$ENDIF}
+        If aCacheKey <> '' then begin
+
+          //save the data
+          aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
+          SaveDataToCache(aCacheKey,
+                          Queries[aQueriesIndex].CacheThreshold,
+                          aCacheStr);
+
+        end;
         {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
       End;
@@ -5207,6 +5321,21 @@ begin
   finally
     FConnectionWithStmtPoolCS.Release;
   end;
+end;
+
+{***********************************************************************}
+function TALFBXConnectionPoolClient.loadCachedData(const Key: AnsiString;
+                                                   var DataStr: AnsiString): Boolean;
+begin
+  result := false; //virtual need to be overriden
+end;
+
+{*************************************************************************}
+Procedure TALFBXConnectionPoolClient.SaveDataToCache(const Key: ansiString;
+                                                     const CacheThreshold: integer;
+                                                     const DataStr: ansiString);
+begin
+  //virtual need to be overriden
 end;
 
 {******************************************************************************************}

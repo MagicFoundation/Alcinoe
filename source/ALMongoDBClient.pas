@@ -344,6 +344,11 @@ type
       fKeepAlive: Boolean;
       fTCPNoDelay: Boolean;
     protected
+      function loadCachedData(const Key: AnsiString;
+                              var DataStr: AnsiString): Boolean; virtual;
+      Procedure SaveDataToCache(const Key: ansiString;
+                                const CacheThreshold: integer;
+                                const DataStr: ansiString); virtual;
       procedure DoSetSendTimeout(aSocketDescriptor: TSocket; const Value: integer); virtual;
       procedure DoSetReceiveTimeout(aSocketDescriptor: TSocket; const Value: integer); virtual;
       procedure DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean); virtual;
@@ -830,6 +835,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Windows,
      Diagnostics,
      {$IFEND}
+     ALCipher,
      AlWinsock,
      ALWindows;
 
@@ -2088,6 +2094,21 @@ begin
   CheckError(Result = SOCKET_ERROR);
 end;
 
+{*****************************************************************}
+function TAlBaseMongoDBClient.loadCachedData(const Key: AnsiString;
+                                             var DataStr: AnsiString): Boolean;
+begin
+  result := false; //virtual need to be overriden
+end;
+
+{*******************************************************************}
+Procedure TAlBaseMongoDBClient.SaveDataToCache(const Key: ansiString;
+                                               const CacheThreshold: integer;
+                                               const DataStr: ansiString);
+begin
+  //virtual need to be overriden
+end;
+
 {************************************************************************************************}
 procedure TAlBaseMongoDBClient.DoSetSendTimeout(aSocketDescriptor: TSocket; const Value: integer);
 begin
@@ -2236,6 +2257,8 @@ Var aQueriesIndex: integer;
     aRecAdded: integer;
     aContinue: boolean;
     aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
 
 begin
 
@@ -2262,6 +2285,39 @@ begin
 
     //loop on all the Queries
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //Handle the CacheThreshold
+      aCacheKey := '';
+      If (Queries[aQueriesIndex].CacheThreshold > 0) and
+         (not assigned(aJSONDocument)) and
+         (not Queries[aQueriesIndex].flags.TailMonitoring) and
+         (((length(Queries) = 1) and
+           (JSONDATA.ChildNodes.Count = 0)) or  // else the save will not work
+          (Queries[aQueriesIndex].ViewTag <> '')) then begin
+
+        //try to load from from cache
+        aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
+                                      alinttostr(Queries[aQueriesIndex].Skip) + '#' +
+                                      alinttostr(Queries[aQueriesIndex].First) + '#' +
+                                      Queries[aQueriesIndex].FullCollectionName + '#' +
+                                      Queries[aQueriesIndex].ReturnFieldsSelector + '#' +
+                                      Queries[aQueriesIndex].Query);
+
+        if loadcachedData(aCacheKey, aCacheStr) then begin
+
+          //init the aViewRec
+          if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := JSONDATA.AddChild(Queries[aQueriesIndex].ViewTag, ntobject)
+          else aViewRec := JSONDATA;
+
+          //assign the tmp data to the XMLData
+          aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
+
+          //go to the next loop
+          continue;
+
+        end;
+
+      end;
 
       //start the TstopWatch
       aStopWatch.Reset;
@@ -2394,6 +2450,17 @@ begin
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
                        aStopWatch.ElapsedMilliseconds);
+
+      //save to the cache
+      If aCacheKey <> '' then begin
+
+        //save the data
+        aViewRec.SaveToJSON(aCacheStr);
+        SaveDataToCache(aCacheKey,
+                        Queries[aQueriesIndex].CacheThreshold,
+                        aCacheStr);
+
+      end;
 
     End;
 
@@ -3351,6 +3418,8 @@ Var aQueriesIndex: integer;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
     aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
 
 begin
 
@@ -3386,6 +3455,39 @@ begin
 
       //loop on all the Queries
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        //Handle the CacheThreshold
+        aCacheKey := '';
+        If (Queries[aQueriesIndex].CacheThreshold > 0) and
+           (not assigned(aJSONDocument)) and
+           (not Queries[aQueriesIndex].flags.TailMonitoring) and
+           (((length(Queries) = 1) and
+             (JSONDATA.ChildNodes.Count = 0)) or  // else the save will not work
+            (Queries[aQueriesIndex].ViewTag <> '')) then begin
+
+          //try to load from from cache
+          aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
+                                        alinttostr(Queries[aQueriesIndex].Skip) + '#' +
+                                        alinttostr(Queries[aQueriesIndex].First) + '#' +
+                                        Queries[aQueriesIndex].FullCollectionName + '#' +
+                                        Queries[aQueriesIndex].ReturnFieldsSelector + '#' +
+                                        Queries[aQueriesIndex].Query);
+
+          if loadcachedData(aCacheKey, aCacheStr) then begin
+
+            //init the aViewRec
+            if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := JSONDATA.AddChild(Queries[aQueriesIndex].ViewTag, ntobject)
+            else aViewRec := JSONDATA;
+
+            //assign the tmp data to the XMLData
+            aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
+
+            //go to the next loop
+            continue;
+
+          end;
+
+        end;
 
         //start the TstopWatch
         aStopWatch.Reset;
@@ -3498,6 +3600,17 @@ begin
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
                          aStopWatch.ElapsedMilliseconds);
+
+        //save to the cache
+        If aCacheKey <> '' then begin
+
+          //save the data
+          aViewRec.SaveToJSON(aCacheStr);
+          SaveDataToCache(aCacheKey,
+                          Queries[aQueriesIndex].CacheThreshold,
+                          aCacheStr);
+
+        end;
 
       End;
 

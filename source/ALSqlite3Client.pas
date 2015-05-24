@@ -137,6 +137,11 @@ Type
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
   Protected
+    function loadCachedData(const Key: AnsiString;
+                            var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(const Key: ansiString;
+                              const CacheThreshold: integer;
+                              const DataStr: ansiString); virtual;
     procedure CheckAPIError(Error: Boolean);
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
@@ -234,6 +239,11 @@ Type
     FOpenConnectionPragmaStatements: TALStrings;
     FNullString: AnsiString;
   Protected
+    function loadCachedData(const Key: AnsiString;
+                            var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(const Key: ansiString;
+                              const CacheThreshold: integer;
+                              const DataStr: ansiString); virtual;
     procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
     function  GetDataBaseName: AnsiString; virtual;
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
@@ -345,6 +355,7 @@ Uses {$IF CompilerVersion >= 23} {Delphi XE2}
      classes,
      Diagnostics,
      {$IFEND}
+     ALCipher,
      ALWindows;
 
 {*************************************************************************************}
@@ -681,6 +692,8 @@ Var astmt: PSQLite3Stmt;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
     aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
 
 begin
 
@@ -707,6 +720,36 @@ begin
 
     {loop on all the SQL}
     For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+      //Handle the CacheThreshold
+      aCacheKey := '';
+      If (Queries[aQueriesIndex].CacheThreshold > 0) and
+         (not assigned(aXmlDocument)) and
+         (((length(Queries) = 1) and
+           (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
+          (Queries[aQueriesIndex].ViewTag <> '')) then begin
+
+        //try to load from from cache
+        aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
+                                      alinttostr(Queries[aQueriesIndex].Skip) + '#' +
+                                      alinttostr(Queries[aQueriesIndex].First) + '#' +
+                                      ALGetFormatSettingsID(FormatSettings) + '#' +
+                                      Queries[aQueriesIndex].SQL);
+        if loadcachedData(aCacheKey, aCacheStr) then begin
+
+          //init the aViewRec
+          if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
+          else aViewRec := XMLdata;
+
+          //assign the tmp data to the XMLData
+          aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+
+          //go to the next loop
+          continue;
+
+        end;
+
+      end;
 
       //start the TstopWatch
       aStopWatch.Reset;
@@ -801,6 +844,17 @@ begin
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
                        aStopWatch.ElapsedMilliseconds);
+
+      //save to the cache
+      If aCacheKey <> '' then begin
+
+        //save the data
+        aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
+        SaveDataToCache(aCacheKey,
+                        Queries[aQueriesIndex].CacheThreshold,
+                        aCacheStr);
+
+      end;
 
     End;
 
@@ -1494,6 +1548,8 @@ Var astmt: PSQLite3Stmt;
     aXmlDocument: TalXmlDocument;
     aUpdateRowTagByFieldValue: Boolean;
     aStopWatch: TStopWatch;
+    aCacheKey: ansiString;
+    aCacheStr: ansiString;
 
 begin
 
@@ -1523,6 +1579,36 @@ begin
 
       {loop on all the SQL}
       For aQueriesIndex := 0 to length(Queries) - 1 do begin
+
+        //Handle the CacheThreshold
+        aCacheKey := '';
+        If (Queries[aQueriesIndex].CacheThreshold > 0) and
+           (not assigned(aXmlDocument)) and
+           (((length(Queries) = 1) and
+             (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
+            (Queries[aQueriesIndex].ViewTag <> '')) then begin
+
+          //try to load from from cache
+          aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
+                                        alinttostr(Queries[aQueriesIndex].Skip) + '#' +
+                                        alinttostr(Queries[aQueriesIndex].First) + '#' +
+                                        ALGetFormatSettingsID(FormatSettings) + '#' +
+                                        Queries[aQueriesIndex].SQL);
+          if loadcachedData(aCacheKey, aCacheStr) then begin
+
+            //init the aViewRec
+            if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
+            else aViewRec := XMLdata;
+
+            //assign the tmp data to the XMLData
+            aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+
+            //go to the next loop
+            continue;
+
+          end;
+
+        end;
 
         //start the TstopWatch
         aStopWatch.Reset;
@@ -1617,6 +1703,17 @@ begin
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
                          aStopWatch.ElapsedMilliseconds);
+
+        //save to the cache
+        If aCacheKey <> '' then begin
+
+          //save the data
+          aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
+          SaveDataToCache(aCacheKey,
+                          Queries[aQueriesIndex].CacheThreshold,
+                          aCacheStr);
+
+        end;
 
       end;
 

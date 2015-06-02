@@ -497,6 +497,8 @@ function  ALCompareStr(const S1, S2: AnsiString): Integer;
 function  ALSameStr(const S1, S2: AnsiString): Boolean;
 function  ALCompareText(const S1, S2: AnsiString): Integer;
 function  ALSameText(const S1, S2: AnsiString): Boolean;
+function  ALMatchText(const aText: AnsiString; const aValues: array of AnsiString): boolean;
+function  ALMatchStr(const aText: AnsiString; const aValues: array of AnsiString): boolean;
 function  ALTrim(const S: AnsiString): AnsiString;
 function  ALTrimLeft(const S: AnsiString): AnsiString;
 function  ALTrimRight(const S: AnsiString): AnsiString;
@@ -7941,6 +7943,26 @@ begin
   Result := System.AnsiStrings.SameText(S1, S2);
   {$ELSE}
   Result := SameText(S1, S2);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************}
+function ALMatchText(const aText: AnsiString; const aValues: array of AnsiString): boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := System.AnsiStrings.MatchText(aText, aValues);
+  {$ELSE}
+  Result := MatchText(aText, aValues);
+  {$ENDIF}
+end;
+
+{****************************************************************************************}
+function ALMatchStr(const aText: AnsiString; const aValues: array of AnsiString): boolean;
+begin
+  {$IFDEF UNICODE}
+  Result := System.AnsiStrings.MatchStr(aText, aValues);
+  {$ELSE}
+  Result := MatchStr(aText, aValues);
   {$ENDIF}
 end;
 

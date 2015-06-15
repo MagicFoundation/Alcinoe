@@ -128,7 +128,7 @@ Type
 
   {-------------------------------}
   TalSqlite3Client = Class(Tobject)
-  Private
+  private
     fLibrary: TALSqlite3Library;
     FownLibrary: Boolean;
     fSqlite3: PSQLite3;
@@ -136,12 +136,12 @@ Type
     finTransaction: Boolean;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
-  Protected
+  protected
     function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual;
+                            var DataStr: AnsiString): Boolean; virtual; abstract;
     Procedure SaveDataToCache(const Key: ansiString;
                               const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual;
+                              const DataStr: ansiString); virtual; abstract;
     procedure CheckAPIError(Error: Boolean);
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
@@ -151,7 +151,7 @@ Type
                                TimeTaken: Integer); virtual;
     procedure OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
                                TimeTaken: Integer); virtual;
-  Public
+  public
     Constructor Create(const lib: AnsiString = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
     Constructor Create(lib: TALSqlite3Library); overload; virtual;
     Destructor Destroy; Override;
@@ -240,10 +240,10 @@ Type
     FNullString: AnsiString;
   Protected
     function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual;
+                            var DataStr: AnsiString): Boolean; virtual; abstract;
     Procedure SaveDataToCache(const Key: ansiString;
                               const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual;
+                              const DataStr: ansiString); virtual; abstract;
     procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
     function  GetDataBaseName: AnsiString; virtual;
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;

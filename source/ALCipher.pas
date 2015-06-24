@@ -268,7 +268,7 @@ function  ALFileHashSHA1(const AFileName : AnsiString): AnsiString; overload;
 procedure ALStreamHashSHA1(var Digest : TAlCipherSHA1Digest; AStream : TStream); overload;
 function  ALStreamHashSHA1(AStream : TStream): AnsiString; overload;
 procedure ALStringHashSHA1(var Digest : TALCipherSHA1Digest; const Str : AnsiString); overload;
-function  ALStringHashSHA1(const Str : AnsiString): AnsiString; overload;
+function  ALStringHashSHA1(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
 
 { HMAC algorithms }
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
@@ -2667,12 +2667,21 @@ begin
   ALCipherHashSHA1(Digest, Str[1], Length(Str));
 end;
 
-{************************************************************}
-function ALStringHashSHA1(const Str : AnsiString): AnsiString;
+{*********************************************************************************************}
+function ALStringHashSHA1(const Str : AnsiString; const HexEncode: boolean = true): AnsiString;
 Var aSHA1Digest: TAlCipherSHA1Digest;
+    i: integer;
 Begin
   AlStringHashSHA1(aSHA1Digest, Str);
-  Result := AlCipherBufferToHex(ASHA1Digest, SizeOf(aSHA1Digest));
+  if HexEncode then result := AlCipherBufferToHex(ASHA1Digest, SizeOf(aSHA1Digest))
+  else begin
+    SetLength(result, Length(aSHA1Digest));
+             {0}                 {19}
+    for i := Low(aSHA1Digest) to High(aSHA1Digest) do begin
+            {(0 + 1) etc}
+      result[i + 1] := AnsiChar(aSHA1Digest[i]);
+    end;
+  end;
 end;
 
 {****************************************************************}

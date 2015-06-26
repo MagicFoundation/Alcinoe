@@ -127,8 +127,8 @@ Procedure ALWinExec(const aUserName: ANSIString;
 function ALWinExecAndWait(aCommandLine:AnsiString; aVisibility : integer):DWORD;
 Function ALWinExecAndWaitV2(aCommandLine: AnsiString; aVisibility: integer): DWORD;
 function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
-function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
-function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
+function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
 function ALMakeServiceAutorestarting(aServiceName: AnsiString;
                                      aComputerName: AnsiString = '';
                                      aTimeToRestartInSec: integer = 60 {one minute by default};
@@ -140,10 +140,12 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      system.sysutils,
      winapi.messages,
      winapi.winsvc,
+     System.Diagnostics,
      {$ELSE}
      sysutils,
      messages,
      winsvc,
+     Diagnostics,
      {$IFEND}
      ALWindows,
      ALString;
@@ -518,11 +520,12 @@ end;
 {***********************************************************}
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
-function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
 var aServiceStatus: TServiceStatus;
     aServiceManager: SC_HANDLE;
     aServiceInstance: SC_HANDLE;
     aServiceArgVectors: PansiChar;
+    aStopwatch: TStopwatch;
 begin
   result := False;
   aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
@@ -542,7 +545,9 @@ begin
           StartServiceA(aServiceInstance, 0, aServiceArgVectors);
           if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
 
+            aStopwatch := TStopwatch.StartNew;
             while aServiceStatus.dwCurrentState = SERVICE_START_PENDING do begin
+              if aStopwatch.ElapsedMilliseconds > aTimeOut * 1000 then exit;
               Sleep(1000); // sleep one seconds
               if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then Exit;
             end;
@@ -566,10 +571,11 @@ end;
 {***********************************************************}
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
-function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''): boolean;
+function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
 var aServiceStatus: TServiceStatus;
     aServiceManager: SC_HANDLE;
     aServiceInstance: SC_HANDLE;
+    aStopwatch: TStopwatch;
 begin
   result := false;
   aServiceManager := OpenSCManagerA(PAnsiChar(aComputerName), nil, SC_MANAGER_CONNECT);
@@ -588,7 +594,9 @@ begin
           ControlService(aServiceInstance, SERVICE_CONTROL_STOP, aServiceStatus);
           if QueryServiceStatus(aServiceInstance, aServiceStatus) then begin
 
+            aStopwatch := TStopwatch.StartNew;
             while aServiceStatus.dwCurrentState = SERVICE_STOP_PENDING do begin
+              if aStopwatch.ElapsedMilliseconds > aTimeOut * 1000 then exit;
               Sleep(1000); // sleep 1 second
               if (not QueryServiceStatus(aServiceInstance, aServiceStatus)) then break;
             end;

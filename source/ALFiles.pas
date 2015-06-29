@@ -121,15 +121,20 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
                            IgnoreFiles: Array of AnsiString;
-                           Const RemoveEmptySubDirectory: Boolean = True;
-                           Const FileNameMask: ansiString = '*';
-                           Const MinFileAge: TdateTime = 0): Boolean;
+                           const RemoveEmptySubDirectory: Boolean = True;
+                           const FileNameMask: ansiString = '*';
+                           const MinFileAge: TdateTime = 0): Boolean;
 var sr: TSearchRec;
     aIgnoreFilesLst: TalStringList;
     i: integer;
 begin
   {$WARN SYMBOL_DEPRECATED OFF}
   {$WARN SYMBOL_PLATFORM OFF}
+  Directory := ALTrim(Directory);
+  if (Directory = '') or
+     (Directory = '.') or
+     (Directory = '..') then raise EALException.Create('Wrong directory path to make empty directory: "' + Directory + '"');
+
   Result := True;
   Directory := ALIncludeTrailingPathDelimiter(Directory);
   aIgnoreFilesLst := TalStringList.Create;

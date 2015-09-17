@@ -77,6 +77,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Winapi.WinSock2,
      System.Contnrs,
      System.SyncObjs,
+     System.Diagnostics,
      {$ELSE}
      WinSock,
      Contnrs,
@@ -214,6 +215,8 @@ type
       Function DoVersion(aSocketDescriptor: TSocket): AnsiString; virtual;
       procedure DoVerbosity(aSocketDescriptor: TSocket;
                             level: integer); virtual;
+      procedure OnCmdDone(const aCmd: AnsiString;
+                          TimeTaken: Integer); virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
@@ -493,7 +496,11 @@ Function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
+    aStopWatch: TStopWatch;
 begin
+
+  aStopWatch := TstopWatch.StartNew;
+
   If (length(aCmd) <= 1) or
      (aCmd[length(aCmd)] <> #10) or
      (aCmd[length(aCmd) - 1] <> #13)
@@ -515,6 +522,10 @@ begin
     setlength(aGETStoredItems, 0);
     result := '';
   end;
+
+  aStopWatch.Stop;
+  OnCmdDone(aCmd, aStopWatch.ElapsedMilliseconds);
+
 end;
 
 {*****************************************************************}
@@ -1632,6 +1643,13 @@ Procedure TAlBaseMemCachedClient.DoVerbosity(aSocketDescriptor: TSocket;
                                              level: integer);
 begin
   SendCmd(aSocketDescriptor, 'verbosity ' + alinttostr(level), rpOK);
+end;
+
+{****************************************************************}
+procedure TAlBaseMemCachedClient.OnCmdDone(const aCmd: AnsiString;
+                                           TimeTaken: Integer);
+begin
+  // virtual
 end;
 
 {*****************************************************************************************************************************************************}

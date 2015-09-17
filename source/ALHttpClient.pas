@@ -500,11 +500,11 @@ Function  AlInternetCrackUrl(var Url: AnsiString; // if true return UrlPath
                              var Anchor: AnsiString;
                              Query: TALStrings): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: AnsiString; Var aAnchor: AnsiString): AnsiString; overload;
-Function  AlRemoveAnchorFromUrl(aUrl: AnsiString): AnsiString; overload;
-function  AlCombineUrl(RelativeUrl, BaseUrl: AnsiString): AnsiString; overload;
-Function  AlCombineUrl(RelativeUrl,
-                       BaseUrl,
-                       Anchor: AnsiString;
+Function  AlRemoveAnchorFromUrl(const aUrl: AnsiString): AnsiString; overload;
+function  AlCombineUrl(const RelativeUrl, BaseUrl: AnsiString): AnsiString; overload;
+Function  AlCombineUrl(const RelativeUrl,
+                             BaseUrl,
+                             Anchor: AnsiString;
                        Query: TALStrings): AnsiString; overload;
 
 const
@@ -1702,15 +1702,15 @@ begin
   Result := aUrl;
 end;
 
-{***********************************************************}
-Function AlRemoveAnchorFromUrl(aUrl: AnsiString): AnsiString;
+{*****************************************************************}
+Function AlRemoveAnchorFromUrl(const aUrl: AnsiString): AnsiString;
 var aAnchor: AnsiString;
 begin
   result := AlRemoveAnchorFromUrl(aUrl,aAnchor);
 end;
 
-{******************************************************************}
-function AlCombineUrl(RelativeUrl, BaseUrl: AnsiString): AnsiString;
+{************************************************************************}
+function AlCombineUrl(const RelativeUrl, BaseUrl: AnsiString): AnsiString;
 var Size: Dword;
     Buffer: AnsiString;
 begin
@@ -1732,10 +1732,10 @@ begin
   end;
 end;
 
-{*********************************}
-Function  AlCombineUrl(RelativeUrl,
-                       BaseUrl,
-                       Anchor: AnsiString;
+{***************************************}
+Function  AlCombineUrl(const RelativeUrl,
+                             BaseUrl,
+                             Anchor: AnsiString;
                        Query: TALStrings): AnsiString;
 Var S1 : AnsiString;
     {$IF CompilerVersion >= 18.5}

@@ -192,9 +192,9 @@ Type
                            aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
     procedure OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
     procedure OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
   Public
     Constructor Create(ApiVer: TALFBXVersion_API; const lib: AnsiString = GDS32DLL); overload; virtual;
     Constructor Create(lib: TALFBXLibrary); overload; virtual;
@@ -459,9 +459,9 @@ Type
                          const aNumbuffers: integer = -1;
                          const aOpenConnectionExtraParams: AnsiString = ''); virtual;
     procedure OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
     procedure OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
   Public
     Constructor Create(aDataBaseName,
                        aLogin,
@@ -1598,14 +1598,14 @@ end;
 
 {*************************************************************************}
 procedure TALFBXClient.OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
-                                        TimeTaken: Integer);
+                                        TimeTaken: double);
 begin
   // virtual
 end;
 
 {*************************************************************************}
 procedure TALFBXClient.OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
-                                        TimeTaken: Integer);
+                                        TimeTaken: double);
 begin
   // virtual
 end;
@@ -1877,7 +1877,7 @@ begin
       //do the OnSelectDataDone
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
       If aCacheKey <> '' then begin
@@ -2250,7 +2250,7 @@ begin
     //do the OnUpdateDataDone
     aStopWatch.Stop;
     OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -4025,14 +4025,14 @@ end;
 
 {***************************************************************************************}
 procedure TALFBXConnectionPoolClient.OnSelectDataDone(Query: TALFBXClientSelectDataQUERY;
-                                                      TimeTaken: Integer);
+                                                      TimeTaken: double);
 begin
   // virtual
 end;
 
 {***************************************************************************************}
 procedure TALFBXConnectionPoolClient.OnUpdateDataDone(Query: TALFBXClientUpdateDataQUERY;
-                                                      TimeTaken: Integer);
+                                                      TimeTaken: double);
 begin
   // virtual
 end;
@@ -4550,7 +4550,7 @@ begin
         {$IFDEF undef}{$REGION 'do the OnSelectDataDone'}{$ENDIF}
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.ElapsedMilliseconds);
+                         aStopWatch.Elapsed.TotalMilliseconds);
         {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
         {$IFDEF undef}{$REGION 'save to the cache'}{$ENDIF}
@@ -5140,7 +5140,7 @@ begin
       {$IFDEF undef}{$REGION 'do the OnUpdateDataDone'}{$ENDIF}
       aStopWatch.Stop;
       OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
       {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     end;

@@ -155,9 +155,9 @@ Type
                             aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
     procedure OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
     procedure OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
   Public
     Constructor Create(ApiVer: TALMySqlVersion_API;
                        const lib: AnsiString = 'libmysql.dll'); overload; virtual;
@@ -277,9 +277,9 @@ Type
                          Const aOpenConnectionClientFlag: Cardinal = 0;
                          Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
     procedure OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
     procedure OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: double); virtual;
   Public
     Constructor Create(aHost: AnsiString;
                        aPort: integer;
@@ -661,14 +661,14 @@ end;
 
 {*****************************************************************************}
 procedure TalMySqlClient.OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
-                                          TimeTaken: Integer);
+                                          TimeTaken: double);
 begin
   // virtual
 end;
 
 {*****************************************************************************}
 procedure TalMySqlClient.OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
-                                          TimeTaken: Integer);
+                                          TimeTaken: double);
 begin
   // virtual
 end;
@@ -865,7 +865,7 @@ begin
       //do the OnSelectDataDone
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
       If aCacheKey <> '' then begin
@@ -1054,7 +1054,7 @@ begin
     //do the OnUpdateDataDone
     aStopWatch.Stop;
     OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -1617,14 +1617,14 @@ end;
 
 {*******************************************************************************************}
 procedure TalMySqlConnectionPoolClient.OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
-                                                        TimeTaken: Integer);
+                                                        TimeTaken: double);
 begin
   // virtual
 end;
 
 {*******************************************************************************************}
 procedure TalMySqlConnectionPoolClient.OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
-                                                        TimeTaken: Integer);
+                                                        TimeTaken: double);
 begin
   // virtual
 end;
@@ -1828,7 +1828,7 @@ begin
         //do the OnSelectDataDone
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.ElapsedMilliseconds);
+                         aStopWatch.Elapsed.TotalMilliseconds);
 
         //save to the cache
         If aCacheKey <> '' then begin
@@ -2056,7 +2056,7 @@ begin
       //do the OnUpdateDataDone
       aStopWatch.Stop;
       OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
     end;
 

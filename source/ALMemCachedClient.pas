@@ -216,7 +216,7 @@ type
       procedure DoVerbosity(aSocketDescriptor: TSocket;
                             level: integer); virtual;
       procedure OnCmdDone(const aCmd: AnsiString;
-                          TimeTaken: Integer); virtual;
+                          TimeTaken: double); virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
@@ -524,7 +524,7 @@ begin
   end;
 
   aStopWatch.Stop;
-  OnCmdDone(aCmd, aStopWatch.ElapsedMilliseconds);
+  OnCmdDone(aCmd, aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -1647,7 +1647,7 @@ end;
 
 {****************************************************************}
 procedure TAlBaseMemCachedClient.OnCmdDone(const aCmd: AnsiString;
-                                           TimeTaken: Integer);
+                                           TimeTaken: double);
 begin
   // virtual
 end;

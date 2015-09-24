@@ -63,6 +63,8 @@ type
     cxWwwArkadiaComLabel: TcxLabel;
     cxLabel18: TcxLabel;
     cxLabel17: TcxLabel;
+    Button1: TButton;
+    Button2: TButton;
     procedure FormClick(Sender: TObject);
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton2Click(Sender: TObject);
@@ -112,6 +114,8 @@ type
     procedure ALButton47Click(Sender: TObject);
     procedure ALButton46Click(Sender: TObject);
     procedure cxWwwArkadiaComLabelClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
   public
   end;
@@ -970,6 +974,114 @@ begin
     AlUpperCase(AlRandomStr(10000));
   end;
   Showmessage('50,000 AlUpperCase in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+end;
+
+{*********************************************}
+procedure TForm1.Button1Click(Sender: TObject);
+Var S1: AnsiString;
+    i: integer;
+    StartDate: TdateTime;
+begin
+  StartDate := Now;
+  S1 := ALRandomStr(50) + '<#qlsdkjqklsjdq>' + ALRandomStr(50);
+  For i := 0 to 10 do begin
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(200) + '<#qlsdkjqklsjdq>' + ALRandomStr(200);
+  For i := 0 to 10 do begin
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(3000) + '<#qlsdkjqklsjdq>' + ALRandomStr(3000);
+  For i := 0 to 10 do begin
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(4000) + '<#qlsdkjqklsjdq>' + ALRandomStr(4000);
+  For i := 0 to 10 do begin
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(100000) + '<#qlsdkjqklsjdq>' + ALRandomStr(100000);
+  For i := 0 to 10 do begin
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := AlStringReplace(S1,'<#qlsdkjqklsjdq>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+  Showmessage('250 AlStringReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
+end;
+
+{*********************************************}
+procedure TForm1.Button2Click(Sender: TObject);
+Var S1: AnsiString;
+    i: integer;
+    StartDate: TdateTime;
+begin
+  StartDate := Now;
+  S1 := ALRandomStr(50) + '<#qlsdkjqklsjdq>' + ALRandomStr(50);
+  For i := 0 to 10 do begin
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(200) + '<#qlsdkjqklsjdq>' + ALRandomStr(200);
+  For i := 0 to 10 do begin
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(3000) + '<#qlsdkjqklsjdq>' + ALRandomStr(3000);
+  For i := 0 to 10 do begin
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(4000) + '<#qlsdkjqklsjdq>' + ALRandomStr(4000);
+  For i := 0 to 10 do begin
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+
+  S1 := ALRandomStr(100000) + '<#qlsdkjqklsjdq>' + ALRandomStr(100000);
+  For i := 0 to 10 do begin
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(8) + '<#qlsdkjqklsjdq>' + AlRandomStr(8),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(152) + '<#qlsdkjqklsjdq>' + AlRandomStr(152),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(1520) + '<#qlsdkjqklsjdq>' + AlRandomStr(1520),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(25055) + '<#qlsdkjqklsjdq>' + AlRandomStr(25055),[RfReplaceAll]);
+    S1 := ALFastTagReplace(S1,'<#', '>', AlRandomStr(56000) + '<#qlsdkjqklsjdq>' + AlRandomStr(56000),[RfReplaceAll]);
+  end;
+  Showmessage('250 ALFastTagReplace in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
 {**********************************************************}

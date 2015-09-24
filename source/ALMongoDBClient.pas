@@ -472,15 +472,15 @@ type
                           const selector: ansiString;             // query object.
                           var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
       procedure OnSelectDataDone(Query: TALMongoDBClientSelectDataQUERY;
-                                 TimeTaken: Integer); virtual;
+                                 TimeTaken: double); virtual;
       procedure OnUpdateDataDone(Query: TALMongoDBClientUpdateDataQUERY;
-                                 TimeTaken: Integer); virtual;
+                                 TimeTaken: double); virtual;
       procedure OnDeleteDataDone(Query: TALMongoDBClientDeleteDataQUERY;
-                                 TimeTaken: Integer); virtual;
+                                 TimeTaken: double); virtual;
       procedure OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
-                                 TimeTaken: Integer); virtual;
+                                 TimeTaken: double); virtual;
       procedure OnFindAndModifyDataDone(Query: TALMongoDBClientFindAndModifyDataQUERY;
-                                        TimeTaken: Integer); virtual;
+                                        TimeTaken: double); virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
@@ -2047,35 +2047,35 @@ end;
 
 {*************************************************************************************}
 procedure TAlBaseMongoDBClient.OnSelectDataDone(Query: TALMongoDBClientSelectDataQUERY;
-                                                TimeTaken: Integer);
+                                                TimeTaken: double);
 begin
   // virtual
 end;
 
 {*************************************************************************************}
 procedure TAlBaseMongoDBClient.OnUpdateDataDone(Query: TALMongoDBClientUpdateDataQUERY;
-                                                TimeTaken: Integer);
+                                                TimeTaken: double);
 begin
   // virtual
 end;
 
 {*************************************************************************************}
 procedure TAlBaseMongoDBClient.OnDeleteDataDone(Query: TALMongoDBClientDeleteDataQUERY;
-                                                TimeTaken: Integer);
+                                                TimeTaken: double);
 begin
   // virtual
 end;
 
 {*************************************************************************************}
 procedure TAlBaseMongoDBClient.OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
-                                                TimeTaken: Integer);
+                                                TimeTaken: double);
 begin
   // virtual
 end;
 
 {***************************************************************************************************}
 procedure TAlBaseMongoDBClient.OnFindAndModifyDataDone(Query: TALMongoDBClientFindAndModifyDataQUERY;
-                                                       TimeTaken: Integer);
+                                                       TimeTaken: double);
 begin
   // virtual
 end;
@@ -2449,7 +2449,7 @@ begin
       //do the OnSelectDataDone
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
       If aCacheKey <> '' then begin
@@ -2642,7 +2642,7 @@ begin
     //do the OnUpdateDataDone
     aStopWatch.Stop;
     OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -2683,7 +2683,7 @@ begin
   //do the OnUpdateDataDone
   aStopWatch.Stop;
   OnUpdateDataDone(Query,
-                   aStopWatch.ElapsedMilliseconds);
+                   aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -2782,7 +2782,7 @@ begin
     //do the OnInsertDataDone
     aStopWatch.Stop;
     OnInsertDataDone(Queries[aQueriesIndex],
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -2849,7 +2849,7 @@ begin
     //do the OnDeleteDataDone
     aStopWatch.Stop;
     OnDeleteDataDone(Queries[aQueriesIndex],
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -2883,7 +2883,7 @@ begin
   //do the OnDeleteDataDone
   aStopWatch.Stop;
   OnDeleteDataDone(Query,
-                   aStopWatch.ElapsedMilliseconds);
+                   aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -3101,7 +3101,7 @@ begin
   //do the OnDeleteDataDone
   aStopWatch.Stop;
   OnFindAndModifyDataDone(Query,
-                          aStopWatch.ElapsedMilliseconds);
+                          aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -3599,7 +3599,7 @@ begin
         //do the OnSelectDataDone
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.ElapsedMilliseconds);
+                         aStopWatch.Elapsed.TotalMilliseconds);
 
         //save to the cache
         If aCacheKey <> '' then begin
@@ -3836,7 +3836,7 @@ begin
       //do the OnUpdateDataDone
       aStopWatch.Stop;
       OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
     end;
 
@@ -3901,7 +3901,7 @@ begin
     //do the OnUpdateDataDone
     aStopWatch.Stop;
     OnUpdateDataDone(Query,
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
     if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
@@ -4030,7 +4030,7 @@ begin
       //do the OnInsertDataDone
       aStopWatch.Stop;
       OnInsertDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
     end;
 
@@ -4125,7 +4125,7 @@ begin
       //do the OnDeleteDataDone
       aStopWatch.Stop;
       OnDeleteDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
     end;
 
@@ -4183,7 +4183,7 @@ begin
     //do the OnDeleteDataDone
     aStopWatch.Stop;
     OnDeleteDataDone(Query,
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
     if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
@@ -4433,7 +4433,7 @@ begin
     //do the OnDeleteDataDone
     aStopWatch.Stop;
     OnFindAndModifyDataDone(Query,
-                            aStopWatch.ElapsedMilliseconds);
+                            aStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
     if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);

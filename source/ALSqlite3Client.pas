@@ -138,19 +138,19 @@ Type
     function  GetInTransaction: Boolean;
   protected
     function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual; abstract;
+                            var DataStr: AnsiString): Boolean; virtual;
     Procedure SaveDataToCache(const Key: ansiString;
                               const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual; abstract;
+                              const DataStr: ansiString); virtual;
     procedure CheckAPIError(Error: Boolean);
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
                             aIndex: Integer;
                             aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
     procedure OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: Double); virtual;
     procedure OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: Double); virtual;
   public
     Constructor Create(const lib: AnsiString = 'sqlite3.dll'; const initializeLib: Boolean = True); overload; virtual;
     Constructor Create(lib: TALSqlite3Library); overload; virtual;
@@ -256,9 +256,9 @@ Type
     Procedure ReleaseConnection(var ConnectionHandle: PSQLite3;
                                 const CloseConnection: Boolean = False); virtual;
     procedure OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: Double); virtual;
     procedure OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
-                               TimeTaken: Integer); virtual;
+                               TimeTaken: Double); virtual;
   Public
     Constructor Create(aDataBaseName: AnsiString;
                        const aOpenConnectionFlags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE;
@@ -396,6 +396,21 @@ end;
 function TalSqlite3Client.GetInTransaction: Boolean;
 begin
   result := finTransaction;
+end;
+
+{*************************************************************}
+function TalSqlite3Client.loadCachedData(const Key: AnsiString;
+                                         var DataStr: AnsiString): Boolean;
+begin
+  result := false; //virtual need to be overriden
+end;
+
+{***************************************************************}
+Procedure TalSqlite3Client.SaveDataToCache(const Key: ansiString;
+                                           const CacheThreshold: integer;
+                                           const DataStr: ansiString);
+begin
+  //virtual need to be overriden
 end;
 
 {*******************************************************}
@@ -659,14 +674,14 @@ end;
 
 {*********************************************************************************}
 procedure TalSqlite3Client.OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
-                                            TimeTaken: Integer);
+                                            TimeTaken: Double);
 begin
   // virtual
 end;
 
 {*********************************************************************************}
 procedure TalSqlite3Client.OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
-                                            TimeTaken: Integer);
+                                            TimeTaken: Double);
 begin
   // virtual
 end;
@@ -843,7 +858,7 @@ begin
       //do the OnSelectDataDone
       aStopWatch.Stop;
       OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
       If aCacheKey <> '' then begin
@@ -1041,7 +1056,7 @@ begin
     //do the OnUpdateDataDone
     aStopWatch.Stop;
     OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.ElapsedMilliseconds);
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -1511,14 +1526,14 @@ end;
 
 {***********************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.OnSelectDataDone(Query: TALSqlite3ClientSelectDataQUERY;
-                                                          TimeTaken: Integer);
+                                                          TimeTaken: Double);
 begin
   // virtual
 end;
 
 {***********************************************************************************************}
 procedure TalSqlite3ConnectionPoolClient.OnUpdateDataDone(Query: TALSqlite3ClientUpdateDataQUERY;
-                                                          TimeTaken: Integer);
+                                                          TimeTaken: Double);
 begin
   // virtual
 end;
@@ -1702,7 +1717,7 @@ begin
         //do the OnSelectDataDone
         aStopWatch.Stop;
         OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.ElapsedMilliseconds);
+                         aStopWatch.Elapsed.TotalMilliseconds);
 
         //save to the cache
         If aCacheKey <> '' then begin
@@ -1935,7 +1950,7 @@ begin
       //do the OnUpdateDataDone
       aStopWatch.Stop;
       OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.ElapsedMilliseconds);
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
     end;
 

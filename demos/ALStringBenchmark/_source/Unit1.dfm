@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 704
+  ClientHeight = 775
   ClientWidth = 763
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -142,7 +142,7 @@ object Form1: TForm1
   end
   object Panel2: TPanel
     Left = 16
-    Top = 537
+    Top = 569
     Width = 345
     Height = 153
     BevelOuter = bvNone
@@ -155,6 +155,7 @@ object Form1: TForm1
     object cxLabel1: TcxLabel
       Left = 12
       Top = 12
+      Hint = ''
       Caption = 'Please help us to keep the development of these components free'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -170,6 +171,7 @@ object Form1: TForm1
     object cxLabel2: TcxLabel
       Left = 12
       Top = 55
+      Hint = ''
       Caption = 'If you like these components please go to:'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -186,6 +188,7 @@ object Form1: TForm1
       Left = 12
       Top = 71
       Cursor = crHandPoint
+      Hint = ''
       Caption = 'http://www.arkadia.com'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -203,6 +206,7 @@ object Form1: TForm1
     object cxLabel18: TcxLabel
       Left = 12
       Top = 88
+      Hint = ''
       Caption = 'and click on the Facebook/Google+ like button'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -218,6 +222,7 @@ object Form1: TForm1
     object cxLabel17: TcxLabel
       Left = 12
       Top = 120
+      Hint = ''
       Caption = 'Thanks for your support !'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -527,5 +532,23 @@ object Form1: TForm1
     Caption = 'Benchmark Delphi StrToFloat (AnsiString)'
     TabOrder = 47
     OnClick = ALButton47Click
+  end
+  object Button1: TButton
+    Left = 16
+    Top = 527
+    Width = 230
+    Height = 25
+    Caption = 'Benchmark ALStringReplace'
+    TabOrder = 48
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 266
+    Top = 527
+    Width = 230
+    Height = 25
+    Caption = 'Benchmark ALFastTagReplace'
+    TabOrder = 49
+    OnClick = Button2Click
   end
 end

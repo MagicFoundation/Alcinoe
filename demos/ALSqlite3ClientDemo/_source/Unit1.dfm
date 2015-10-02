@@ -106,6 +106,7 @@ object Form1: TForm1
     object cxLabel1: TcxLabel
       Left = 12
       Top = 12
+      Hint = ''
       Caption = 'Please help us to keep the development of these components free'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -121,6 +122,7 @@ object Form1: TForm1
     object cxLabel2: TcxLabel
       Left = 12
       Top = 55
+      Hint = ''
       Caption = 'If you like these components please go to:'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -137,6 +139,7 @@ object Form1: TForm1
       Left = 12
       Top = 71
       Cursor = crHandPoint
+      Hint = ''
       Caption = 'http://www.arkadia.com'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -154,6 +157,7 @@ object Form1: TForm1
     object cxLabel18: TcxLabel
       Left = 12
       Top = 88
+      Hint = ''
       Caption = 'and click on the Facebook/Google+ like button'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -169,6 +173,7 @@ object Form1: TForm1
     object cxLabel17: TcxLabel
       Left = 12
       Top = 120
+      Hint = ''
       Caption = 'Thanks for your support !'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET

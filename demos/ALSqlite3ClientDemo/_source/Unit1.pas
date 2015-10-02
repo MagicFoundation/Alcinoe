@@ -66,13 +66,13 @@ uses AlSqlite3client,
 {*****************************************************************}
 procedure TForm1.ALEditSqlite3DatabaseButtonClick(Sender: TObject);
 begin
-  If OpenDialog1.Execute then (Sender as TEdit).Text := OpenDialog1.FileName;
+  If OpenDialog1.Execute then ALEditSqlite3Database.Text := OpenDialog1.FileName;
 end;
 
 {************************************************************}
 procedure TForm1.ALEditSqlite3LibButtonClick(Sender: TObject);
 begin
-  If OpenDialog2.Execute then (Sender as TEdit).Text := OpenDialog2.FileName;
+  If OpenDialog2.Execute then ALEditSqlite3Lib.Text := OpenDialog2.FileName;
 end;
 
 {**********************************************************}

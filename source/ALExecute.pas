@@ -124,15 +124,21 @@ Procedure ALWinExec(const aUserName: ANSIString;
                     const aCommandLine: ANSIString;
                     const aCurrentDirectory: AnsiString;
                     const aLogonFlags: dword = 0); overload;
-function ALWinExecAndWait(aCommandLine:AnsiString; aVisibility : integer):DWORD;
-Function ALWinExecAndWaitV2(aCommandLine: AnsiString; aVisibility: integer): DWORD;
-function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
-function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
-function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
-function ALMakeServiceAutorestarting(aServiceName: AnsiString;
-                                     aComputerName: AnsiString = '';
-                                     aTimeToRestartInSec: integer = 60 {one minute by default};
-                                     aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
+function ALWinExecAndWait(const aCommandLine:AnsiString;
+                          const aCurrentDirectory: AnsiString;
+                          const aEnvironment: AnsiString;
+                          const aVisibility : integer):DWORD; overload;
+function ALWinExecAndWait(const aCommandLine:AnsiString;
+                          const aVisibility : integer):DWORD; overload;
+Function ALWinExecAndWaitV2(const aCommandLine: AnsiString;
+                            const aVisibility: integer): DWORD;
+function ALNTSetPrivilege(const sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
+function ALStartService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
+function ALStopService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
+function ALMakeServiceAutorestarting(const aServiceName: AnsiString;
+                                     const aComputerName: AnsiString = '';
+                                     const aTimeToRestartInSec: integer = 60 {one minute by default};
+                                     const aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
 
 implementation
 
@@ -372,11 +378,22 @@ begin
 
 end;
 
-{******************************************************************************}
-function ALWinExecAndWait(aCommandLine:AnsiString; aVisibility : integer):DWORD;
+{******************************************************}
+function ALWinExecAndWait(const aCommandLine:AnsiString;
+                          const aCurrentDirectory: AnsiString;
+                          const aEnvironment: AnsiString;
+                          const aVisibility : integer):DWORD;
 var StartupInfo:TStartupInfoA;
     ProcessInfo:TProcessInformation;
+    PEnvironment: Pointer;
+    PCurrentDirectory: Pointer;
 begin
+
+  if aEnvironment <> '' then PEnvironment := PAnsiChar(aEnvironment)
+  else PEnvironment := nil;
+  if aCurrentDirectory <> '' then PCurrentDirectory := PAnsiChar(aCurrentDirectory)
+  else PCurrentDirectory := nil;
+
   FillChar(StartupInfo,Sizeof(StartupInfo),#0);
   StartupInfo.cb := Sizeof(StartupInfo);
   StartupInfo.dwFlags := STARTF_USESHOWWINDOW;
@@ -388,8 +405,8 @@ begin
                         false,                         { handle inheritance flag }
                         CREATE_NEW_CONSOLE or          { creation flags }
                         NORMAL_PRIORITY_CLASS,
-                        nil,                           { pointer to new environment block }
-                        nil,                           { pointer to current directory name }
+                        PEnvironment,                 { pointer to new environment block }
+                        PCurrentDirectory,            { pointer to current directory name }
                         StartupInfo,                   { pointer to STARTUPINFO }
                         ProcessInfo)                   { pointer to PROCESS_INF }
   then Result := DWORD(-1)
@@ -401,11 +418,22 @@ begin
   end;
 end;
 
-{************************************************************************}
-{*  ALWinExecAndWaitV2:                                                  }
-{*  The routine will process paint messages and messages                 }
-{*  send from other threads while it waits.                              }
-Function ALWinExecAndWaitV2(aCommandLine: AnsiString; aVisibility: integer): DWORD;
+{******************************************************}
+function ALWinExecAndWait(const aCommandLine:AnsiString;
+                          const aVisibility : integer):DWORD;
+begin
+  result := ALWinExecAndWait(aCommandLine,
+                             '', // aCurrentDirectory
+                             '', // aEnvironment
+                             aVisibility);
+end;
+
+{*********************************************************}
+{*  ALWinExecAndWaitV2:                                   }
+{*  The routine will process paint messages and messages  }
+{*  send from other threads while it waits.               }
+Function ALWinExecAndWaitV2(const aCommandLine: AnsiString;
+                            const aVisibility: integer): DWORD;
 
   {------------------------------------------}
   Procedure WaitFor( processHandle: THandle );
@@ -458,7 +486,7 @@ End;
 
 {*******************************************************************************************************************}
 // taken from http://www.delphi-zone.com/2010/02/how-to-use-the-adjusttokenprivileges-function-to-enable-a-privilege/
-function ALNTSetPrivilege(sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
+function ALNTSetPrivilege(const sPrivilege: AnsiString; bEnabled: Boolean): Boolean;
 var
   hToken: THandle;
   TokenPriv: TOKEN_PRIVILEGES;
@@ -520,7 +548,7 @@ end;
 {***********************************************************}
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
-function ALStartService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
+function ALStartService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
 var aServiceStatus: TServiceStatus;
     aServiceManager: SC_HANDLE;
     aServiceInstance: SC_HANDLE;
@@ -571,7 +599,7 @@ end;
 {***********************************************************}
 {Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
-function ALStopService(aServiceName: AnsiString; aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
+function ALStopService(const aServiceName: AnsiString; const aComputerName: AnsiString = ''; const aTimeOut: integer = 180): boolean;
 var aServiceStatus: TServiceStatus;
     aServiceManager: SC_HANDLE;
     aServiceInstance: SC_HANDLE;
@@ -625,10 +653,10 @@ end;
  launch again.
  Computer name could be a network name, for example \\SERVER.
  If empty this will be applied to local machine.}
-function ALMakeServiceAutorestarting(aServiceName: AnsiString;
-                                     aComputerName: AnsiString = '';
-                                     aTimeToRestartInSec: integer = 60 {one minute by default};
-                                     aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
+function ALMakeServiceAutorestarting(const aServiceName: AnsiString;
+                                     const aComputerName: AnsiString = '';
+                                     const aTimeToRestartInSec: integer = 60 {one minute by default};
+                                     const aTimeToResetInSec: integer = 180 {three minutes by default}): boolean;
 var aServiceFailureActions: SERVICE_FAILURE_ACTIONS;
     aFailActions: array[1..1] of SC_ACTION;
     aServiceManager: SC_HANDLE;

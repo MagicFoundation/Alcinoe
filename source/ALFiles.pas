@@ -133,7 +133,7 @@ begin
   Directory := ALTrim(Directory);
   if (Directory = '') or
      (Directory = '.') or
-     (Directory = '..') then raise EALException.Create('Wrong directory path to make empty directory: "' + Directory + '"');
+     (Directory = '..') then raise EALException.Create('Wrong directory ("' + Directory + '")');
 
   Result := True;
   Directory := ALIncludeTrailingPathDelimiter(Directory);

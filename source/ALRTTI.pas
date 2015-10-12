@@ -66,10 +66,38 @@ Type
 
   {********************************}
   TALRttiPropertyEx = class(TObject)
+  private
+    fRttiProperty: TRttiProperty;
+    fPropertyType: TRttiType;
+    fAttributes: TArray<TCustomAttribute>;
+    function GetName: string;
+    function GetPropertyType: TRttiType;
+    function GetIsReadable: Boolean;
+    function GetIsWritable: Boolean;
   public
-    Prop:       TRttiProperty;
-    RttiType:   TRttiType;
-    Attributes: TArray<TCustomAttribute>;
+    constructor Create(const aRttiProperty: TRttiProperty); Virtual;
+    property PropertyType: TRttiType read GetPropertyType;
+    function GetValue(Instance: Pointer): TValue;
+    procedure SetValue(Instance: Pointer; const AValue: TValue);
+    property IsReadable: Boolean read GetIsReadable;
+    property IsWritable: Boolean read GetIsWritable;
+    property Name: string read GetName;
+    function GetAttributes: TArray<TCustomAttribute>; virtual;
+  end;
+
+  {**************************************************}
+  TALRttiInstancePropertyEx = class(TALRttiPropertyEx)
+  private
+    function GetDefault: Integer; virtual;
+    function GetIndex: Integer; virtual;
+    function GetNameIndex: Smallint; virtual;
+    function GetPropInfo: PPropInfo; virtual;
+  public
+    function ToString: string; override;
+    property Index: Integer read GetIndex;
+    property Default: Integer read GetDefault;
+    property NameIndex: Smallint read GetNameIndex;
+    property PropInfo: PPropInfo read GetPropInfo;
   end;
 
   {********************************}
@@ -104,6 +132,7 @@ Type
     procedure AddAttribute(aAttribute: TCustomAttribute);
   public
     constructor Create; Virtual;
+    destructor Destroy; override;
     function GetMethods(const aVisibility: TMemberVisibility): TArray<TRttiMethod>; overload;
     function GetMethods(const AName: string; const aVisibility: TMemberVisibility): TArray<TRttiMethod>; overload;
     function GetFields(const aVisibility: TMemberVisibility): TArray<TRttiField>;
@@ -151,20 +180,89 @@ end;
 
 {****************************************}
 destructor TALRttiTypeExCacheNode.Destroy;
-var i: integer;
 begin
-  for i := Low(RttiTypeEX.fPrivateProperties) to High(RttiTypeEX.fPrivateProperties) do RttiTypeEX.fPrivateProperties[i].Free;
-  for i := Low(RttiTypeEX.fProtectedProperties) to High(RttiTypeEX.fProtectedProperties) do RttiTypeEX.fProtectedProperties[i].Free;
-  for i := Low(RttiTypeEX.fPublicProperties) to High(RttiTypeEX.fPublicProperties) do RttiTypeEX.fPublicProperties[i].Free;
-  for i := Low(RttiTypeEX.fPublishedProperties) to High(RttiTypeEX.fPublishedProperties) do RttiTypeEX.fPublishedProperties[i].Free;
-  
-  SetLength(RttiTypeEX.fPrivateProperties, 0);
-  SetLength(RttiTypeEX.fProtectedProperties, 0);
-  SetLength(RttiTypeEX.fPublicProperties, 0);
-  SetLength(RttiTypeEX.fPublishedProperties, 0);
-    
   RttiTypeEX.Free;
   inherited;
+end;
+
+{***********************************************************************}
+constructor TALRttiPropertyEx.Create(const aRttiProperty: TRttiProperty);
+begin
+  fRttiProperty := aRttiProperty;
+  fPropertyType := aRttiProperty.PropertyType;
+  fAttributes := aRttiProperty.GetAttributes;
+end;
+
+{*****************************************}
+function TALRttiPropertyEx.GetName: string;
+begin
+  result := fRttiProperty.Name;
+end;
+
+{****************************************************}
+function TALRttiPropertyEx.GetPropertyType: TRttiType;
+begin
+  result := fPropertyType;
+end;
+
+{************************************************}
+function TALRttiPropertyEx.GetIsReadable: Boolean;
+begin
+  result := fRttiProperty.IsReadable;
+end;
+
+{************************************************}
+function TALRttiPropertyEx.GetIsWritable: Boolean;
+begin
+  result := fRttiProperty.IsWritable;
+end;
+
+{*************************************************************}
+function TALRttiPropertyEx.GetValue(Instance: Pointer): TValue;
+begin
+  result := fRttiProperty.GetValue(Instance);
+end;
+
+{****************************************************************************}
+procedure TALRttiPropertyEx.SetValue(Instance: Pointer; const AValue: TValue);
+begin
+  fRttiProperty.SetValue(Instance, AValue);
+end;
+
+{*****************************************************************}
+function TALRttiPropertyEx.GetAttributes: TArray<TCustomAttribute>;
+begin
+  result := fAttributes;
+end;
+
+{*****************************************************}
+function TALRttiInstancePropertyEx.GetDefault: Integer;
+begin
+  Result := GetPropInfo^.Default;
+end;
+
+{***************************************************}
+function TALRttiInstancePropertyEx.GetIndex: Integer;
+begin
+  Result := GetPropInfo^.Index;
+end;
+
+{********************************************************}
+function TALRttiInstancePropertyEx.GetNameIndex: Smallint;
+begin
+  Result := GetPropInfo^.NameIndex;
+end;
+
+{********************************************************}
+function TALRttiInstancePropertyEx.GetPropInfo: PPropInfo;
+begin
+  result := TRttiInstanceProperty(fRttiProperty).PropInfo;
+end;
+
+{**************************************************}
+function TALRttiInstancePropertyEx.ToString: string;
+begin
+  Result := 'property ' + Name + ': ' + PropertyType.Name; // do not localize
 end;
 
 {*******************************}
@@ -191,6 +289,16 @@ begin
   setlength(fPublishedMethods, 0);
 
   setlength(fAttributes, 0);
+end;
+
+{*******************************}
+destructor TALRttiTypeEx.Destroy;
+var i: integer;
+begin
+  for i := Low(fPrivateProperties) to High(fPrivateProperties) do fPrivateProperties[i].Free;
+  for i := Low(fProtectedProperties) to High(fProtectedProperties) do fProtectedProperties[i].Free;
+  for i := Low(fPublicProperties) to High(fPublicProperties) do fPublicProperties[i].Free;
+  for i := Low(fPublishedProperties) to High(fPublishedProperties) do fPublishedProperties[i].Free;
 end;
 
 {*******************************************************}
@@ -321,71 +429,48 @@ end;
 
 {****************************************************************}
 procedure TALRttiTypeEx.AddProperty(aRttiProperty: TRttiProperty);
+
+  function _createRttiPropertyEx: TALRttiPropertyEx;
+  begin
+    if aRttiProperty is TRttiInstanceProperty then result := TALRttiInstancePropertyEx.Create(aRttiProperty)
+    else result := TALRttiPropertyEx.Create(aRttiProperty);
+  end;
+
 begin
   case aRttiProperty.Visibility of
     mvPrivate:begin
                 setlength(fPrivateProperties, length(fPrivateProperties)+1);
-                fPrivateProperties[high(fPrivateProperties)]            := TALRttiPropertyEx.Create;
-                fPrivateProperties[high(fPrivateProperties)].Prop       := aRttiProperty;
-                fPrivateProperties[high(fPrivateProperties)].RttiType   := aRttiProperty.PropertyType;
-                fPrivateProperties[high(fPrivateProperties)].Attributes := aRttiProperty.GetAttributes;
+                fPrivateProperties[high(fPrivateProperties)] := _createRttiPropertyEx;
               end;
     mvProtected:begin
                   setlength(fPrivateProperties, length(fPrivateProperties)+1);
-                  fPrivateProperties[high(fPrivateProperties)]            := TALRttiPropertyEx.Create;
-                  fPrivateProperties[high(fPrivateProperties)].Prop       := aRttiProperty;
-                  fPrivateProperties[high(fPrivateProperties)].RttiType   := aRttiProperty.PropertyType;
-                  fPrivateProperties[high(fPrivateProperties)].Attributes := aRttiProperty.GetAttributes;
+                  fPrivateProperties[high(fPrivateProperties)] := _createRttiPropertyEx;
 
                   setlength(fProtectedProperties, length(fProtectedProperties)+1);
-                  fProtectedProperties[high(fProtectedProperties)]            := TALRttiPropertyEx.Create;
-                  fProtectedProperties[high(fProtectedProperties)].Prop       := aRttiProperty;
-                  fProtectedProperties[high(fProtectedProperties)].RttiType   := aRttiProperty.PropertyType;
-                  fProtectedProperties[high(fProtectedProperties)].Attributes := aRttiProperty.GetAttributes;
+                  fProtectedProperties[high(fProtectedProperties)] := _createRttiPropertyEx;
                 end;
     mvPublic:begin
                setlength(fPrivateProperties, length(fPrivateProperties)+1);
-               fPrivateProperties[high(fPrivateProperties)]            := TALRttiPropertyEx.Create;
-               fPrivateProperties[high(fPrivateProperties)].Prop       := aRttiProperty;
-               fPrivateProperties[high(fPrivateProperties)].RttiType   := aRttiProperty.PropertyType;
-               fPrivateProperties[high(fPrivateProperties)].Attributes := aRttiProperty.GetAttributes;
+               fPrivateProperties[high(fPrivateProperties)] := _createRttiPropertyEx;
 
                setlength(fProtectedProperties, length(fProtectedProperties)+1);
-               fProtectedProperties[high(fProtectedProperties)]            := TALRttiPropertyEx.Create;
-               fProtectedProperties[high(fProtectedProperties)].Prop       := aRttiProperty;
-               fProtectedProperties[high(fProtectedProperties)].RttiType   := aRttiProperty.PropertyType;
-               fProtectedProperties[high(fProtectedProperties)].Attributes := aRttiProperty.GetAttributes;
+               fProtectedProperties[high(fProtectedProperties)] := _createRttiPropertyEx;
 
                setlength(fPublicProperties, length(fPublicProperties)+1);
-               fPublicProperties[high(fPublicProperties)]            := TALRttiPropertyEx.Create;
-               fPublicProperties[high(fPublicProperties)].Prop       := aRttiProperty;
-               fPublicProperties[high(fPublicProperties)].RttiType   := aRttiProperty.PropertyType;
-               fPublicProperties[high(fPublicProperties)].Attributes := aRttiProperty.GetAttributes;
+               fPublicProperties[high(fPublicProperties)] := _createRttiPropertyEx;
              end;
     mvPublished:begin
                   setlength(fPrivateProperties, length(fPrivateProperties)+1);
-                  fPrivateProperties[high(fPrivateProperties)]            := TALRttiPropertyEx.Create;
-                  fPrivateProperties[high(fPrivateProperties)].Prop       := aRttiProperty;
-                  fPrivateProperties[high(fPrivateProperties)].RttiType   := aRttiProperty.PropertyType;
-                  fPrivateProperties[high(fPrivateProperties)].Attributes := aRttiProperty.GetAttributes;
+                  fPrivateProperties[high(fPrivateProperties)] := _createRttiPropertyEx;
 
                   setlength(fProtectedProperties, length(fProtectedProperties)+1);
-                  fProtectedProperties[high(fProtectedProperties)]            := TALRttiPropertyEx.Create;
-                  fProtectedProperties[high(fProtectedProperties)].Prop       := aRttiProperty;
-                  fProtectedProperties[high(fProtectedProperties)].RttiType   := aRttiProperty.PropertyType;
-                  fProtectedProperties[high(fProtectedProperties)].Attributes := aRttiProperty.GetAttributes;
+                  fProtectedProperties[high(fProtectedProperties)] := _createRttiPropertyEx;
 
                   setlength(fPublicProperties, length(fPublicProperties)+1);
-                  fPublicProperties[high(fPublicProperties)]            := TALRttiPropertyEx.Create;
-                  fPublicProperties[high(fPublicProperties)].Prop       := aRttiProperty;
-                  fPublicProperties[high(fPublicProperties)].RttiType   := aRttiProperty.PropertyType;
-                  fPublicProperties[high(fPublicProperties)].Attributes := aRttiProperty.GetAttributes;
+                  fPublicProperties[high(fPublicProperties)] := _createRttiPropertyEx;
 
                   setlength(fPublishedProperties, length(fPublishedProperties)+1);
-                  fPublishedProperties[high(fPublishedProperties)]            := TALRttiPropertyEx.Create;
-                  fPublishedProperties[high(fPublishedProperties)].Prop       := aRttiProperty;
-                  fPublishedProperties[high(fPublishedProperties)].RttiType   := aRttiProperty.PropertyType;
-                  fPublishedProperties[high(fPublishedProperties)].Attributes := aRttiProperty.GetAttributes;
+                  fPublishedProperties[high(fPublishedProperties)] := _createRttiPropertyEx;
                 end;
     else raise Exception.Create('Unknown visibility');
   end;
@@ -402,10 +487,10 @@ end;
 function TALRttiTypeEx.GetFields(const aVisibility: TMemberVisibility): TArray<TRttiField>;
 begin
   case aVisibility of
-    mvPrivate:   result := fPrivateFields;
-    mvProtected: result := fProtectedFields;
-    mvPublic:    result := fPublicFields;
-    mvPublished: result := fPublishedFields;
+    mvPrivate:result := fPrivateFields;
+    mvProtected:result := fProtectedFields;
+    mvPublic:result := fPublicFields;
+    mvPublished:result := fPublishedFields;
     else raise Exception.Create('Unknown visibility');
   end;
 end;
@@ -423,10 +508,10 @@ end;
 function TALRttiTypeEx.GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TRttiIndexedProperty>;
 begin
   case aVisibility of
-    mvPrivate:   result := fPrivateIndexedProperties;
-    mvProtected: result := fProtectedIndexedProperties;
-    mvPublic:    result := fPublicIndexedProperties;
-    mvPublished: result := fPublishedIndexedProperties;
+    mvPrivate:result := fPrivateIndexedProperties;
+    mvProtected:result := fProtectedIndexedProperties;
+    mvPublic:result := fPublicIndexedProperties;
+    mvPublished:result := fPublishedIndexedProperties;
     else raise Exception.Create('Unknown visibility');
   end;
 end;
@@ -435,10 +520,10 @@ end;
 function TALRttiTypeEx.GetMethods(const aVisibility: TMemberVisibility): TArray<TRttiMethod>;
 begin
   case aVisibility of
-    mvPrivate:   result := fPrivateMethods;
-    mvProtected: result := fProtectedMethods;
-    mvPublic:    result := fPublicMethods;
-    mvPublished: result := fPublishedMethods;
+    mvPrivate:result := fPrivateMethods;
+    mvProtected:result := fProtectedMethods;
+    mvPublic:result := fPublicMethods;
+    mvPublished:result := fPublishedMethods;
     else raise Exception.Create('Unknown visibility');
   end;
 end;
@@ -470,10 +555,10 @@ end;
 function TALRttiTypeEx.GetProperties(const aVisibility: TMemberVisibility): TArray<TALRttiPropertyEx>;
 begin
   case aVisibility of
-    mvPrivate:   result := fPrivateProperties;
-    mvProtected: result := fProtectedProperties;
-    mvPublic:    result := fPublicProperties;
-    mvPublished: result := fPublishedProperties;
+    mvPrivate:result := fPrivateProperties;
+    mvProtected:result := fProtectedProperties;
+    mvPublic:result := fPublicProperties;
+    mvPublished:result := fPublishedProperties;
     else raise Exception.Create('Unknown visibility');
   end;
 end;
@@ -482,9 +567,9 @@ end;
 function TALRttiTypeEx.GetProperty(const AName: string; const aVisibility: TMemberVisibility): TALRttiPropertyEx;
 begin
   for Result in GetProperties(aVisibility) do
-    if SameText(Result.Prop.Name, AName) then
+    if SameText(Result.Name, AName) then
       Exit;
-  result := nil;
+  Result := nil;
 end;
 
 {*****************************************************************************************************************}

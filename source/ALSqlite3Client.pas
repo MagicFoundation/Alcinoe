@@ -159,7 +159,6 @@ Type
     procedure initialize; //can not be put in the create because config can/must be call prior initialize
     procedure shutdown;   //can not be put in the create because config can/must be call after shutdown
     procedure enable_shared_cache(enable: boolean);
-    function  soft_heap_limit64(n: int64): int64;
     Procedure Connect(const DatabaseName: AnsiString;
                       const flags: integer = SQLITE_OPEN_READWRITE or SQLITE_OPEN_CREATE);
     Procedure Disconnect;
@@ -274,7 +273,6 @@ Type
     procedure initialize; //can not be put in the create because config can/must be call prior initialize
     procedure shutdown;   //can not be put in the create because config can/must be call after shutdown
     procedure enable_shared_cache(enable: boolean);
-    function  soft_heap_limit64(n: int64): int64;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     Procedure TransactionStart(Var ConnectionHandle: PSQLite3; const ReadOnly: boolean = False); virtual;
     Procedure TransactionCommit(var ConnectionHandle: PSQLite3;
@@ -573,51 +571,6 @@ procedure TalSqlite3Client.enable_shared_cache(enable: boolean);
 begin
   if enable then CheckAPIError(FLibrary.sqlite3_enable_shared_cache(1) <> SQLITE_OK)
   else CheckAPIError(FLibrary.sqlite3_enable_shared_cache(0) <> SQLITE_OK);
-end;
-
-{*******************************************************************************
-The sqlite3_soft_heap_limit64() interface sets and/or queries the soft limit on
-the amount of heap memory that may be allocated by SQLite. SQLite strives to
-keep heap memory utilization below the soft heap limit by reducing the number of
-pages held in the page cache as heap memory usages approaches the limit. The
-soft heap limit is "soft" because even though SQLite strives to stay below the
-limit, it will exceed the limit rather than generate an SQLITE_NOMEM error. In
-other words, the soft heap limit is advisory only.
-
-The return value from sqlite3_soft_heap_limit64() is the size of the soft heap
-limit prior to the call, or negative in the case of an error. If the argument N
-is negative then no change is made to the soft heap limit. Hence, the current
-size of the soft heap limit can be determined by invoking
-sqlite3_soft_heap_limit64() with a negative argument.
-
-If the argument N is zero then the soft heap limit is disabled.
-
-The soft heap limit is not enforced in the current implementation if one or more
-of following conditions are true:
-
-  * The soft heap limit is set to zero.
-  * Memory accounting is disabled using a combination of the
-    sqlite3_config(SQLITE_CONFIG_MEMSTATUS,...) start-time option and the
-    SQLITE_DEFAULT_MEMSTATUS compile-time option.
-  * An alternative page cache implementation is specified using
-    sqlite3_config(SQLITE_CONFIG_PCACHE2,...).
-  * The page cache allocates from its own memory pool supplied by
-    sqlite3_config(SQLITE_CONFIG_PAGECACHE,...) rather than from the heap.
-
-Beginning with SQLite version 3.7.3, the soft heap limit is enforced regardless
-of whether or not the SQLITE_ENABLE_MEMORY_MANAGEMENT compile-time option is
-invoked. With SQLITE_ENABLE_MEMORY_MANAGEMENT, the soft heap limit is enforced
-on every memory allocation. Without SQLITE_ENABLE_MEMORY_MANAGEMENT, the soft
-heap limit is only enforced when memory is allocated by the page cache. Testing
-suggests that because the page cache is the predominate memory user in SQLite,
-most applications will achieve adequate soft heap limit enforcement without the
-use of SQLITE_ENABLE_MEMORY_MANAGEMENT.
-
-The circumstances under which SQLite will enforce the soft heap limit may
-changes in future releases of SQLite.}
-function TalSqlite3Client.soft_heap_limit64(n: int64): int64;
-begin
-  result := Flibrary.sqlite3_soft_heap_limit64(n);
 end;
 
 {**********************************************************
@@ -1309,12 +1262,6 @@ procedure TalSqlite3ConnectionPoolClient.enable_shared_cache(enable: boolean);
 begin
   if enable then CheckAPIError(nil, FLibrary.sqlite3_enable_shared_cache(1) <> SQLITE_OK)
   else CheckAPIError(nil, FLibrary.sqlite3_enable_shared_cache(0) <> SQLITE_OK);
-end;
-
-{*************************************************************************}
-function TalSqlite3ConnectionPoolClient.soft_heap_limit64(n: int64): int64;
-begin
-  result := Flibrary.sqlite3_soft_heap_limit64(n);
 end;
 
 {***************************************************************************************************}

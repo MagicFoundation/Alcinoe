@@ -8480,17 +8480,17 @@ Const ResultBuffSize: integer = 16384;
       Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
     end;
 
-    {----------------------------------------}
-    Procedure _MoveStr2Result(Src:AnsiString);
-    Var l: integer;
-    Begin
-      If Src <> '' then begin
+    {-----------------------------------------------}
+    procedure _MoveStr2Result(const Src: AnsiString);
+    var L: integer;
+    begin
+      if Src <> '' then begin
         L := Length(Src);
-        If L+ResultCurrentPos-1>ResultCurrentLength Then begin
+        If L + ResultCurrentPos - 1 > ResultCurrentLength then begin
           ResultCurrentLength := ResultCurrentLength + L + ResultBuffSize;
-          SetLength(Result,ResultCurrentLength);
+          SetLength(Result, ResultCurrentLength);
         end;
-        AlMove(Src[1],Result[ResultCurrentPos],L);
+        AlMove(Src[1], Result[ResultCurrentPos], L);
         ResultCurrentPos := ResultCurrentPos + L;
       end;
     end;

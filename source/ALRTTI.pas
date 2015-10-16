@@ -56,6 +56,10 @@ Link :
 **************************************************************}
 unit ALRtti;
 
+// TODO:
+//  1. make GetProperty, GetMethods and all the other search functions like this
+//     working using some sorted array
+
 interface
 
 uses System.Rtti,
@@ -107,6 +111,25 @@ Type
     //property Visibility: TMemberVisibility read GetVisibility;
   end;
 
+  {*********************************}
+  TALRttiField = class(TALRttiMember)
+  private
+    FRttiField: TRttiField;
+    FFieldType: TRttiType;
+    FOffset: integer;
+
+    function GetFieldType: TRttiType; virtual;
+    function GetOffset: Integer; virtual;
+  public
+    constructor Create(const aRttiField: TRttiField); virtual;
+    property FieldType: TRttiType read GetFieldType;
+    property Offset: Integer read GetOffset;
+
+    function GetValue(Instance: Pointer): TValue; virtual;
+    procedure SetValue(Instance: Pointer; const AValue: TValue); virtual;
+    //function ToString: string; override;
+  end;
+
   {************************************}
   TALRttiProperty = class(TALRttiMember)
   private
@@ -148,28 +171,114 @@ Type
     property PropInfo: PPropInfo read GetPropInfo;
   end;
 
+  {**********************************}
+  TALRttiMethod = class(TALRttiMember)
+  private
+    fRttiMethod: TRttiMethod;
+    fParameters: TArray<TRttiParameter>;
+
+    //FInvokeInfo: TMethodImplementation.TInvokeInfo;
+
+    //function GetIsConstructor: Boolean;
+    //function GetIsDestructor: Boolean;
+
+    //function GetMethodKind: TMethodKind; virtual; abstract;
+    //function GetCallingConvention: TCallConv; virtual; abstract;
+    //function GetReturnType: TRttiType; virtual; abstract;
+    //function GetDispatchKind: TDispatchKind; virtual;
+    //function GetHasExtendedInfo: Boolean; virtual;
+    //function GetVirtualIndex: Smallint; virtual;
+    //function GetCodeAddress: Pointer; virtual;
+    //function GetIsClassMethod: Boolean; virtual;
+    //function GetIsStatic: Boolean; virtual;
+    //function DispatchInvoke(Instance: TValue; const Args: array of TValue): TValue; virtual; abstract;
+    //function GetInvokeInfo: TMethodImplementation.TInvokeInfo;
+  public
+    constructor Create(const aRttiMethod: TRttiMethod); virtual;
+    //destructor Destroy; override;
+    function Invoke(Instance: TObject; const Args: array of TValue): TValue; overload;
+    function Invoke(Instance: TClass; const Args: array of TValue): TValue; overload;
+    function Invoke(Instance: TValue; const Args: array of TValue): TValue; overload;
+    // Create an implementation of a method with this signature, which delegates
+    // implementation to the passed-in callback.
+    //function CreateImplementation(AUserData: Pointer;
+    //  const ACallback: TMethodImplementationCallback): TMethodImplementation;
+    function GetParameters: TArray<TRttiParameter>; virtual;
+    //function ToString: string; override;
+    //property ReturnType: TRttiType read GetReturnType;
+    //property HasExtendedInfo: Boolean read GetHasExtendedInfo;
+    //property MethodKind: TMethodKind read GetMethodKind;
+    //property DispatchKind: TDispatchKind read GetDispatchKind;
+
+    //property IsConstructor: Boolean read GetIsConstructor;
+    //property IsDestructor: Boolean read GetIsDestructor;
+    //property IsClassMethod: Boolean read GetIsClassMethod;
+    // Static: No 'Self' parameter
+    //property IsStatic: Boolean read GetIsStatic;
+
+    // Vtable slot for virtual methods.
+    // Message index for message methods (non-negative).
+    // Dynamic index for dynamic methods (negative).
+    //property VirtualIndex: Smallint read GetVirtualIndex;
+    //property CallingConvention: TCallConv read GetCallingConvention;
+    //property CodeAddress: Pointer read GetCodeAddress;
+  end;
+
+  {*******************************************}
+  TALRttiIndexedProperty = class(TALRttiMember)
+  private
+    FRttiIndexedProperty: TRttiIndexedProperty;
+    FReadMethod: TRttiMethod;
+    FWriteMethod: TRttiMethod;
+    FPropertyType: TRttiType;
+
+    //procedure GetAccessors;
+    function GetPropertyType: TRttiType;
+    //function GetIsReadable: Boolean;
+    function GetIsWritable: Boolean;
+    function GetIsDefault: Boolean;
+    function GetReadMethod: TRttiMethod;
+    function GetWriteMethod: TRttiMethod;
+    //function GetHandle: PArrayPropInfo;
+    //function GetName: string; override;
+    //constructor Create(APackage: TRttiPackage; AParent: TRttiObject; var P: PByte); override;
+    //function GetVisibility: TMemberVisibility; override;
+  public
+    constructor Create(const aRttiIndexedProperty: TRttiIndexedProperty); virtual;
+    //property Handle: PArrayPropInfo read GetHandle;
+    property PropertyType: TRttiType read GetPropertyType;
+    property ReadMethod: TRttiMethod read GetReadMethod;
+    property WriteMethod: TRttiMethod read GetWriteMethod;
+    function GetValue(Instance: Pointer; const Args: array of TValue): TValue;
+    procedure SetValue(Instance: Pointer; const Args: array of TValue; const Value: TValue);
+    //property IsReadable: Boolean read GetIsReadable;
+    property IsWritable: Boolean read GetIsWritable;
+    property IsDefault: Boolean read GetIsDefault;
+    //function ToString: string; override;
+  end;
+
   {*************************************}
   TALRttiType = class(TALRttiNamedObject)
   private
-    fPrivateIndexedProperties: TArray<TRttiIndexedProperty>;
+    fPrivateIndexedProperties: TArray<TALRttiIndexedProperty>;
     fPrivateProperties: TArray<TALRttiProperty>;
-    fPrivateFields: TArray<TRttiField>;
-    fPrivateMethods: TArray<TRttiMethod>;
+    fPrivateFields: TArray<TALRttiField>;
+    fPrivateMethods: TArray<TALRttiMethod>;
 
-    fProtectedIndexedProperties: TArray<TRttiIndexedProperty>;
+    fProtectedIndexedProperties: TArray<TALRttiIndexedProperty>;
     fProtectedProperties: TArray<TALRttiProperty>;
-    fProtectedFields: TArray<TRttiField>;
-    fProtectedMethods: TArray<TRttiMethod>;
+    fProtectedFields: TArray<TALRttiField>;
+    fProtectedMethods: TArray<TALRttiMethod>;
 
-    fPublicIndexedProperties: TArray<TRttiIndexedProperty>;
+    fPublicIndexedProperties: TArray<TALRttiIndexedProperty>;
     fPublicProperties: TArray<TALRttiProperty>;
-    fPublicFields: TArray<TRttiField>;
-    fPublicMethods: TArray<TRttiMethod>;
+    fPublicFields: TArray<TALRttiField>;
+    fPublicMethods: TArray<TALRttiMethod>;
 
-    fPublishedIndexedProperties: TArray<TRttiIndexedProperty>;
+    fPublishedIndexedProperties: TArray<TALRttiIndexedProperty>;
     fPublishedProperties: TArray<TALRttiProperty>;
-    fPublishedFields: TArray<TRttiField>;
-    fPublishedMethods: TArray<TRttiMethod>;
+    fPublishedFields: TArray<TALRttiField>;
+    fPublishedMethods: TArray<TALRttiMethod>;
     //function GetName: string; override;
     //function GetTypeKind: TTypeKind;
     //function GetTypeData: PTypeData;
@@ -209,19 +318,19 @@ Type
     // into this type. These return elements flattened across the type hierarchy
     // in order from most derived to least derived.
     //function GetMethods: TArray<TRttiMethod>; overload; virtual;
-    function GetMethods(const aVisibility: TMemberVisibility): TArray<TRttiMethod>; overload;
+    function GetMethods(const aVisibility: TMemberVisibility): TArray<TALRttiMethod>; overload;
     //function GetFields: TArray<TRttiField>; virtual;
-    function GetFields(const aVisibility: TMemberVisibility): TArray<TRttiField>;
+    function GetFields(const aVisibility: TMemberVisibility): TArray<TALRttiField>;
     //function GetProperties: TArray<TRttiProperty>; virtual;
     function GetProperties(const aVisibility: TMemberVisibility): TArray<TALRttiProperty>;
     //function GetIndexedProperties: TArray<TRttiIndexedProperty>; virtual;
-    function GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TRttiIndexedProperty>;
+    function GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TALRttiIndexedProperty>;
 
     //function GetMethod(const AName: string): TRttiMethod; virtual;
     //function GetMethods(const AName: string): TArray<TRttiMethod>; overload; virtual;
-    function GetMethods(const AName: string; const aVisibility: TMemberVisibility): TArray<TRttiMethod>; overload;
+    function GetMethods(const AName: string; const aVisibility: TMemberVisibility): TArray<TALRttiMethod>; overload;
     //function GetField(const AName: string): TRttiField; virtual;
-    function GetField(const AName: string; const aVisibility: TMemberVisibility): TRttiField;
+    function GetField(const AName: string; const aVisibility: TMemberVisibility): TALRttiField;
     //function GetProperty(const AName: string): TRttiProperty; virtual;
     function GetProperty(const AName: string; const aVisibility: TMemberVisibility): TALRttiProperty; overload;
     function GetProperty(const AIndex: integer; const aVisibility: TMemberVisibility): TALRttiProperty; overload;
@@ -256,7 +365,7 @@ var vALRTTIContext: TRttiContext;
 
 implementation
 
-uses System.sysutils,
+uses System.SysUtils,
      AlString;
 
 {*************************************}
@@ -276,6 +385,50 @@ end;
 function TALRttiObject.GetAttributes: TArray<TCustomAttribute>;
 begin
   result := fAttributes;
+end;
+
+{************************************************************}
+constructor TALRttiField.Create(const aRttiField: TRttiField);
+begin
+  FName       := aRttiField.Name;
+  fAttributes := aRttiField.GetAttributes;
+  FRttiField  := aRttiField;
+  FFieldType  := aRttiField.FieldType;
+  FOffset     := aRttiField.Offset; // it seems it can vary on some childs of TRttiField, so it is safe to get it here
+end;
+
+{********************************************}
+function TALRttiField.GetFieldType: TRttiType;
+begin
+  result := FFieldType;
+end;
+
+{***************************************}
+function TALRttiField.GetOffset: Integer;
+begin
+  result := FOffset;
+end;
+
+{********************************************************}
+function TALRttiField.GetValue(Instance: Pointer): TValue;
+var
+  ft: TRttiType;
+begin
+  ft := FieldType;
+  if ft = nil then
+    raise ALInsufficientRtti;
+  TValue.Make(PByte(Instance) + Offset, ft.Handle, Result);
+end;
+
+{***********************************************************************}
+procedure TALRttiField.SetValue(Instance: Pointer; const AValue: TValue);
+var
+  ft: TRttiType;
+begin
+  ft := FieldType;
+  if ft = nil then
+    raise ALInsufficientRtti;
+  AValue.Cast(ft.Handle).ExtractRawData(PByte(Instance) + Offset);
 end;
 
 {***********************************************************}
@@ -436,132 +589,267 @@ begin
   Result := 'property ' + Name + ': ' + PropertyType.Name; // do not localize
 end;
 
+{***************************************************************}
+constructor TALRttiMethod.Create(const aRttiMethod: TRttiMethod);
+begin
+  fRttiMethod := aRttiMethod;
+  fName       := aRttiMethod.Name;
+  fAttributes := aRttiMethod.GetAttributes;
+  fParameters := aRttiMethod.GetParameters;
+end;
+
+{************************************************************************************}
+function TALRttiMethod.Invoke(Instance: TObject; const Args: array of TValue): TValue;
+begin
+  result := fRttiMethod.Invoke(Instance, Args);
+end;
+
+{***********************************************************************************}
+function TALRttiMethod.Invoke(Instance: TClass; const Args: array of TValue): TValue;
+begin
+  result := fRttiMethod.Invoke(Instance, Args);
+end;
+
+{***********************************************************************************}
+function TALRttiMethod.Invoke(Instance: TValue; const Args: array of TValue): TValue;
+begin
+  result := fRttiMethod.Invoke(Instance, Args);
+end;
+
+{***********************************************************}
+function TALRttiMethod.GetParameters: TArray<TRttiParameter>;
+begin
+  result := fParameters;
+end;
+
+
+{ TALRttiIndexedProperty }
+
+const ALRttiPafIsDefault = 1 shl 0;
+
+{******************************************************************************************}
+constructor TALRttiIndexedProperty.Create(const aRttiIndexedProperty: TRttiIndexedProperty);
+begin
+  FRttiIndexedProperty := aRttiIndexedProperty;
+  FReadMethod          := aRttiIndexedProperty.ReadMethod;
+  FWriteMethod         := aRttiIndexedProperty.WriteMethod;
+  FPropertyType        := aRttiIndexedProperty.PropertyType;
+  FName                := aRttiIndexedProperty.Name;
+  fAttributes          := aRttiIndexedProperty.GetAttributes;
+end;
+
+{*********************************************************}
+function TALRttiIndexedProperty.GetPropertyType: TRttiType;
+begin
+  result := FPropertyType;
+end;
+
+{*****************************************************}
+function TALRttiIndexedProperty.GetIsWritable: Boolean;
+begin
+  Result := FRttiIndexedProperty.Handle^.WriteIndex <> $FFFF;
+end;
+
+{****************************************************}
+function TALRttiIndexedProperty.GetIsDefault: Boolean;
+begin
+  Result := (FRttiIndexedProperty.Handle^.Flags and ALRttiPafIsDefault) <> 0;
+end;
+
+{*********************************************************}
+function TALRttiIndexedProperty.GetReadMethod: TRttiMethod;
+begin
+  result := FReadMethod;
+end;
+
+{**********************************************************}
+function TALRttiIndexedProperty.GetWriteMethod: TRttiMethod;
+begin
+  result := FWriteMethod;
+end;
+
+{***********************************************************************************************}
+function TALRttiIndexedProperty.GetValue(Instance: Pointer; const Args: array of TValue): TValue;
+var
+  getter: TRttiMethod;
+begin
+  getter := ReadMethod;
+  if getter = nil then
+    raise EPropWriteOnly.Create(Name);
+
+  if getter.IsStatic or getter.IsClassMethod then
+    Result := getter.Invoke(TClass(Instance), Args)
+  else
+    Result := getter.Invoke(TObject(Instance), Args);
+end;
+
+{*************************************************************************************************************}
+procedure TALRttiIndexedProperty.SetValue(Instance: Pointer; const Args: array of TValue; const Value: TValue);
+var
+  setter: TRttiMethod;
+  argsV: TArray<TValue>;
+  i: Integer;
+begin
+  setter := WriteMethod;
+  if setter = nil then
+    raise EPropReadOnly.Create(Name);
+  SetLength(argsV, Length(Args) + 1);
+  for i := 0 to High(Args) do
+    argsV[i] := Args[i];
+  argsV[Length(Args)] := Value;
+  if setter.IsStatic or setter.IsClassMethod then
+    setter.Invoke(TClass(Instance), argsV)
+  else
+    setter.Invoke(TObject(Instance), argsV);
+end;
+
 {*********************************************************}
 constructor TALRttiType.Create(const aRttiType: TRttiType);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AddField(const aRttiField: TRttiField);
+
+    {--------------------------------------}
+    function _createRttiField: TALRttiField;
+    begin
+      result := TALRttiField.Create(aRttiField);
+    end;
+
   begin
     case aRttiField.Visibility of
       mvPrivate:begin
                   setlength(fPrivateFields, length(fPrivateFields)+1);
-                  fPrivateFields[high(fPrivateFields)] := aRttiField;
+                  fPrivateFields[high(fPrivateFields)] := _createRttiField;
                 end;
       mvProtected:begin
                     setlength(fPrivateFields, length(fPrivateFields)+1);
-                    fPrivateFields[high(fPrivateFields)] := aRttiField;
+                    fPrivateFields[high(fPrivateFields)] := _createRttiField;
 
                     setlength(fProtectedFields, length(fProtectedFields)+1);
-                    fProtectedFields[high(fProtectedFields)] := aRttiField;
+                    fProtectedFields[high(fProtectedFields)] := _createRttiField;
                   end;
       mvPublic:begin
                  setlength(fPrivateFields, length(fPrivateFields)+1);
-                 fPrivateFields[high(fPrivateFields)] := aRttiField;
+                 fPrivateFields[high(fPrivateFields)] := _createRttiField;
 
                  setlength(fProtectedFields, length(fProtectedFields)+1);
-                 fProtectedFields[high(fProtectedFields)] := aRttiField;
+                 fProtectedFields[high(fProtectedFields)] := _createRttiField;
 
                  setlength(fPublicFields, length(fPublicFields)+1);
-                 fPublicFields[high(fPublicFields)] := aRttiField;
+                 fPublicFields[high(fPublicFields)] := _createRttiField;
                end;
       mvPublished:begin
                     setlength(fPrivateFields, length(fPrivateFields)+1);
-                    fPrivateFields[high(fPrivateFields)] := aRttiField;
+                    fPrivateFields[high(fPrivateFields)] := _createRttiField;
 
                     setlength(fProtectedFields, length(fProtectedFields)+1);
-                    fProtectedFields[high(fProtectedFields)] := aRttiField;
+                    fProtectedFields[high(fProtectedFields)] := _createRttiField;
 
                     setlength(fPublicFields, length(fPublicFields)+1);
-                    fPublicFields[high(fPublicFields)] := aRttiField;
+                    fPublicFields[high(fPublicFields)] := _createRttiField;
 
                     setlength(fPublishedFields, length(fPublishedFields)+1);
-                    fPublishedFields[high(fPublishedFields)] := aRttiField;
+                    fPublishedFields[high(fPublishedFields)] := _createRttiField;
                   end;
-      else raise Exception.Create('Unknown visibility');
+      else raise EALException.Create('Unknown visibility');
     end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AddIndexedProperty(const aRttiIndexedProperty: TRttiIndexedProperty);
+
+    {----------------------------------------------------------}
+    function _createRttiIndexedProperty: TALRttiIndexedProperty;
+    begin
+      result := TALRttiIndexedProperty.Create(aRttiIndexedProperty);
+    end;
+
   begin
     case aRttiIndexedProperty.Visibility of
       mvPrivate:begin
                   setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
-                  fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := aRttiIndexedProperty;
+                  fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := _createRttiIndexedProperty;
                 end;
       mvProtected:begin
                     setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
-                    fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := aRttiIndexedProperty;
+                    fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := _createRttiIndexedProperty;
 
                     setlength(fProtectedIndexedProperties, length(fProtectedIndexedProperties)+1);
-                    fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := aRttiIndexedProperty;
+                    fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := _createRttiIndexedProperty;
                   end;
       mvPublic:begin
                  setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
-                 fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := aRttiIndexedProperty;
+                 fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := _createRttiIndexedProperty;
 
                  setlength(fProtectedIndexedProperties, length(fProtectedIndexedProperties)+1);
-                 fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := aRttiIndexedProperty;
+                 fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := _createRttiIndexedProperty;
 
                  setlength(fPublicIndexedProperties, length(fPublicIndexedProperties)+1);
-                 fPublicIndexedProperties[high(fPublicIndexedProperties)] := aRttiIndexedProperty;
+                 fPublicIndexedProperties[high(fPublicIndexedProperties)] := _createRttiIndexedProperty;
                end;
       mvPublished:begin
                     setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
-                    fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := aRttiIndexedProperty;
+                    fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := _createRttiIndexedProperty;
 
                     setlength(fProtectedIndexedProperties, length(fProtectedIndexedProperties)+1);
-                    fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := aRttiIndexedProperty;
+                    fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := _createRttiIndexedProperty;
 
                     setlength(fPublicIndexedProperties, length(fPublicIndexedProperties)+1);
-                    fPublicIndexedProperties[high(fPublicIndexedProperties)] := aRttiIndexedProperty;
+                    fPublicIndexedProperties[high(fPublicIndexedProperties)] := _createRttiIndexedProperty;
 
                     setlength(fPublishedIndexedProperties, length(fPublishedIndexedProperties)+1);
-                    fPublishedIndexedProperties[high(fPublishedIndexedProperties)] := aRttiIndexedProperty;
+                    fPublishedIndexedProperties[high(fPublishedIndexedProperties)] := _createRttiIndexedProperty;
                   end;
       else raise Exception.Create('Unknown visibility');
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _AddMethod(const aRttiMethod: TRttiMethod);
+
+    {----------------------------------------}
+    function _createRttiMethod: TALRttiMethod;
+    begin
+      result := TALRttiMethod.Create(aRttiMethod);
+    end;
+
   begin
     case aRttiMethod.Visibility of
       mvPrivate:begin
                   setlength(fPrivateMethods, length(fPrivateMethods)+1);
-                  fPrivateMethods[high(fPrivateMethods)] := aRttiMethod;
+                  fPrivateMethods[high(fPrivateMethods)] := _createRttiMethod;
                 end;
       mvProtected:begin
                     setlength(fPrivateMethods, length(fPrivateMethods)+1);
-                    fPrivateMethods[high(fPrivateMethods)] := aRttiMethod;
+                    fPrivateMethods[high(fPrivateMethods)] := _createRttiMethod;
 
                     setlength(fProtectedMethods, length(fProtectedMethods)+1);
-                    fProtectedMethods[high(fProtectedMethods)] := aRttiMethod;
+                    fProtectedMethods[high(fProtectedMethods)] := _createRttiMethod;
                   end;
       mvPublic:begin
                  setlength(fPrivateMethods, length(fPrivateMethods)+1);
-                 fPrivateMethods[high(fPrivateMethods)] := aRttiMethod;
+                 fPrivateMethods[high(fPrivateMethods)] := _createRttiMethod;
 
                  setlength(fProtectedMethods, length(fProtectedMethods)+1);
-                 fProtectedMethods[high(fProtectedMethods)] := aRttiMethod;
+                 fProtectedMethods[high(fProtectedMethods)] := _createRttiMethod;
 
                  setlength(fPublicMethods, length(fPublicMethods)+1);
-                 fPublicMethods[high(fPublicMethods)] := aRttiMethod;
+                 fPublicMethods[high(fPublicMethods)] := _createRttiMethod;
                end;
       mvPublished:begin
                     setlength(fPrivateMethods, length(fPrivateMethods)+1);
-                    fPrivateMethods[high(fPrivateMethods)] := aRttiMethod;
+                    fPrivateMethods[high(fPrivateMethods)] := _createRttiMethod;
 
                     setlength(fProtectedMethods, length(fProtectedMethods)+1);
-                    fProtectedMethods[high(fProtectedMethods)] := aRttiMethod;
+                    fProtectedMethods[high(fProtectedMethods)] := _createRttiMethod;
 
                     setlength(fPublicMethods, length(fPublicMethods)+1);
-                    fPublicMethods[high(fPublicMethods)] := aRttiMethod;
+                    fPublicMethods[high(fPublicMethods)] := _createRttiMethod;
 
                     setlength(fPublishedMethods, length(fPublishedMethods)+1);
-                    fPublishedMethods[high(fPublishedMethods)] := aRttiMethod;
+                    fPublishedMethods[high(fPublishedMethods)] := _createRttiMethod;
                   end;
-      else raise Exception.Create('Unknown visibility');
+      else raise EALException.Create('Unknown visibility');
     end;
   end;
 
@@ -669,26 +957,47 @@ end;
 destructor TALRttiType.Destroy;
 var i: integer;
 begin
+
+  // clear the indexed properties
+  for i := Low(fPrivateIndexedProperties) to High(fPrivateIndexedProperties) do fPrivateIndexedProperties[i].Free;
+  for i := Low(fProtectedIndexedProperties) to High(fProtectedIndexedProperties) do fProtectedIndexedProperties[i].Free;
+  for i := Low(fPublicIndexedProperties) to High(fPublicIndexedProperties) do fPublicIndexedProperties[i].Free;
+  for i := Low(fPublishedIndexedProperties) to High(fPublishedIndexedProperties) do fPublishedIndexedProperties[i].Free;
+
+  // clear the properties
   for i := Low(fPrivateProperties) to High(fPrivateProperties) do fPrivateProperties[i].Free;
   for i := Low(fProtectedProperties) to High(fProtectedProperties) do fProtectedProperties[i].Free;
   for i := Low(fPublicProperties) to High(fPublicProperties) do fPublicProperties[i].Free;
   for i := Low(fPublishedProperties) to High(fPublishedProperties) do fPublishedProperties[i].Free;
+
+  // clear the fields
+  for i := Low(fPrivateFields) to High(fPrivateFields) do fPrivateFields[i].Free;
+  for i := Low(fProtectedFields) to High(fProtectedFields) do fProtectedFields[i].Free;
+  for i := Low(fPublicFields) to High(fPublicFields) do fPublicFields[i].Free;
+  for i := Low(fPublishedFields) to High(fPublishedFields) do fPublishedFields[i].Free;
+
+  // clear the methods
+  for i := Low(fPrivateMethods) to High(fPrivateMethods) do fPrivateMethods[i].Free;
+  for i := Low(fProtectedMethods) to High(fProtectedMethods) do fProtectedMethods[i].Free;
+  for i := Low(fPublicMethods) to High(fPublicMethods) do fPublicMethods[i].Free;
+  for i := Low(fPublishedMethods) to High(fPublishedMethods) do fPublishedMethods[i].Free;
+
 end;
 
-{***************************************************************************************}
-function TALRttiType.GetFields(const aVisibility: TMemberVisibility): TArray<TRttiField>;
+{*****************************************************************************************}
+function TALRttiType.GetFields(const aVisibility: TMemberVisibility): TArray<TALRttiField>;
 begin
   case aVisibility of
-    mvPrivate:result := fPrivateFields;
-    mvProtected:result := fProtectedFields;
-    mvPublic:result := fPublicFields;
-    mvPublished:result := fPublishedFields;
-    else raise Exception.Create('Unknown visibility');
+    mvPrivate:   result := fPrivateFields;
+    mvProtected: result := fProtectedFields;
+    mvPublic:    result := fPublicFields;
+    mvPublished: result := fPublishedFields;
+    else raise EALException.Create('Unknown visibility');
   end;
 end;
 
-{***************************************************************************************************}
-function TALRttiType.GetField(const AName: string; const aVisibility: TMemberVisibility): TRttiField;
+{*****************************************************************************************************}
+function TALRttiType.GetField(const AName: string; const aVisibility: TMemberVisibility): TALRttiField;
 begin
   for Result in GetFields(aVisibility) do
     if SameText(Result.Name, AName) then
@@ -696,34 +1005,34 @@ begin
   Result := nil;
 end;
 
-{************************************************************************************************************}
-function TALRttiType.GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TRttiIndexedProperty>;
-begin
-  case aVisibility of
-    mvPrivate:result := fPrivateIndexedProperties;
-    mvProtected:result := fProtectedIndexedProperties;
-    mvPublic:result := fPublicIndexedProperties;
-    mvPublished:result := fPublishedIndexedProperties;
-    else raise Exception.Create('Unknown visibility');
-  end;
-end;
-
-{*****************************************************************************************}
-function TALRttiType.GetMethods(const aVisibility: TMemberVisibility): TArray<TRttiMethod>;
-begin
-  case aVisibility of
-    mvPrivate:result := fPrivateMethods;
-    mvProtected:result := fProtectedMethods;
-    mvPublic:result := fPublicMethods;
-    mvPublished:result := fPublishedMethods;
-    else raise Exception.Create('Unknown visibility');
-  end;
-end;
-
 {**************************************************************************************************************}
-function TALRttiType.GetMethods(const AName: string; const aVisibility: TMemberVisibility): TArray<TRttiMethod>;
-var ms: TArray<TRttiMethod>;
-    m: TRttiMethod;
+function TALRttiType.GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TALRttiIndexedProperty>;
+begin
+  case aVisibility of
+    mvPrivate:   result := fPrivateIndexedProperties;
+    mvProtected: result := fProtectedIndexedProperties;
+    mvPublic:    result := fPublicIndexedProperties;
+    mvPublished: result := fPublishedIndexedProperties;
+    else raise EALException.Create('Unknown visibility');
+  end;
+end;
+
+{*******************************************************************************************}
+function TALRttiType.GetMethods(const aVisibility: TMemberVisibility): TArray<TALRttiMethod>;
+begin
+  case aVisibility of
+    mvPrivate:   result := fPrivateMethods;
+    mvProtected: result := fProtectedMethods;
+    mvPublic:    result := fPublicMethods;
+    mvPublished: result := fPublishedMethods;
+    else raise Exception.Create('Unknown visibility');
+  end;
+end;
+
+{****************************************************************************************************************}
+function TALRttiType.GetMethods(const AName: string; const aVisibility: TMemberVisibility): TArray<TALRttiMethod>;
+var ms: TArray<TALRttiMethod>;
+    m: TALRttiMethod;
     len: Integer;
 begin
   ms := GetMethods(aVisibility);
@@ -747,10 +1056,10 @@ end;
 function TALRttiType.GetProperties(const aVisibility: TMemberVisibility): TArray<TALRttiProperty>;
 begin
   case aVisibility of
-    mvPrivate:result := fPrivateProperties;
-    mvProtected:result := fProtectedProperties;
-    mvPublic:result := fPublicProperties;
-    mvPublished:result := fPublishedProperties;
+    mvPrivate:   result := fPrivateProperties;
+    mvProtected: result := fProtectedProperties;
+    mvPublic:    result := fPublicProperties;
+    mvPublished: result := fPublishedProperties;
     else raise Exception.Create('Unknown visibility');
   end;
 end;
@@ -801,7 +1110,7 @@ end;
 
 {****************************************************************}
 function ALGetRttiType(const aClassName: AnsiString): TALRttiType;
-var aRttiTypeCacheNode: Tobject;
+var aRttiTypeCacheNode: TObject;
 begin
   aRttiTypeCacheNode := vALRttiTypeCache.FindNode(aClassName);
   if not assigned(aRttiTypeCacheNode) then raise EALException.Create('Cannot obtain RTTI informations about the class ' + aClassName)

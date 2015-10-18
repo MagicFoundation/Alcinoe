@@ -423,11 +423,11 @@ constructor TALStrings.Create;
 begin
   inherited Create;
   FDefined := [];
-  FDelimiter := ',';          // doesn't matter what we set here because of fDefined
-  FLineBreak := sLineBreak;   // doesn't matter what we set here because of fDefined
-  FQuoteChar := '"';          // doesn't matter what we set here because of fDefined
-  FNameValueSeparator := '='; // doesn't matter what we set here because of fDefined
-  FStrictDelimiter:= False;   // doesn't matter what we set here because of fDefined
+  //FDelimiter := ',';          // doesn't matter what we set here because of fDefined
+  //FLineBreak := sLineBreak;   // doesn't matter what we set here because of fDefined
+  //FQuoteChar := '"';          // doesn't matter what we set here because of fDefined
+  //FNameValueSeparator := '='; // doesn't matter what we set here because of fDefined
+  //FStrictDelimiter:= False;   // doesn't matter what we set here because of fDefined
   FUpdateCount:= 0;
 end;
 

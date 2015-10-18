@@ -128,6 +128,7 @@ resourcestring
 type
 
   {$IFDEF UNICODE}
+  pALFormatSettings = ^TALFormatSettings;
   TALFormatSettings = record
   public
     // Important: Do not change the order of these declarations, they must
@@ -8447,7 +8448,7 @@ function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
 var ReplaceString: AnsiString;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
-    ParamList: TALStringList;
+    ParamList: TALAVLStringList;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
@@ -8543,8 +8544,9 @@ begin
     If assigned(ReplaceProc) or (assigned(ReplaceExtendedProc)) then begin
       TokenStr := _ExtractTokenStr;
       ParamStr := _ExtractParamsStr;
-      ParamList := TALStringList.Create;
+      ParamList := TALAVLStringList.Create;
       try
+        ParamList.Duplicates := dupIgnore;
         ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
                                               [' ', #9, #13, #10],
                                               ['"', ''''],

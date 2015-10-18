@@ -140,8 +140,8 @@ type
     Function    Head: TALBaseAVLBinaryTreeNode; virtual;
     Procedure   SaveToStream(Astream: Tstream); Virtual;
     Procedure   LoadFromStream(Astream: Tstream); Virtual;
-    Procedure   SaveToFile(AFilename: AnsiString); Virtual;
-    Procedure   LoadFromFile(AFilename: AnsiString); Virtual;
+    Procedure   SaveToFile(const AFilename: AnsiString); Virtual;
+    Procedure   LoadFromFile(const AFilename: AnsiString); Virtual;
     function    FindNode(idVal: pointer): TALBaseAVLBinaryTreeNode; virtual;
     function    First: TALBaseAVLBinaryTreeNode; virtual; {Return the smallest-value node in the tree}
     function    Last: TALBaseAVLBinaryTreeNode; virtual; {Return the largest-value node in the tree}
@@ -269,10 +269,10 @@ type
   public
     Constructor Create; override;
     function    AddNode(aNode: TALStringKeyAVLBinaryTreeNode): Boolean; reintroduce; virtual;
-    function    ExtractNode(IdVal: AnsiString): TALStringKeyAVLBinaryTreeNode; reintroduce; virtual;
-    function    DeleteNode(idVal: AnsiString): boolean; reintroduce; virtual;
+    function    ExtractNode(const IdVal: AnsiString): TALStringKeyAVLBinaryTreeNode; reintroduce; virtual;
+    function    DeleteNode(const idVal: AnsiString): boolean; reintroduce; virtual;
     Function    Head: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
-    function    FindNode(idVal: AnsiString): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
+    function    FindNode(const idVal: AnsiString): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual;
     function    First: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the smallest-value node in the tree}
     function    Last: TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the largest-value node in the tree}
     function    Next(aNode: TALStringKeyAVLBinaryTreeNode): TALStringKeyAVLBinaryTreeNode; Reintroduce; virtual; {Return the next node whose value is larger than aNode}
@@ -804,8 +804,8 @@ begin
   end;
 end;
 
-{*****************************************************************}
-procedure TALBaseAVLBinaryTree.LoadFromFile(AFilename: AnsiString);
+{***********************************************************************}
+procedure TALBaseAVLBinaryTree.LoadFromFile(const AFilename: AnsiString);
 var aStream: TStream;
 begin
   aStream := TFileStream.Create(String(aFileName), fmOpenRead or fmShareDenyWrite);
@@ -816,8 +816,8 @@ begin
   end;
 end;
 
-{***************************************************************}
-procedure TALBaseAVLBinaryTree.SaveToFile(AFilename: AnsiString);
+{*********************************************************************}
+procedure TALBaseAVLBinaryTree.SaveToFile(const AFilename: AnsiString);
 var aStream: TStream;
 begin
   aStream := TFileStream.Create(String(aFileName), fmCreate);
@@ -1367,20 +1367,20 @@ begin
   Result := FcompareKeyFunct(TALStringKeyAVLBinaryTreeNode(aNode1).ID,TALStringKeyAVLBinaryTreeNode(aNode2).ID);
 end;
 
-{***********************************************************************************************}
-function TALStringKeyAVLBinaryTree.ExtractNode(IdVal: AnsiString): TALStringKeyAVLBinaryTreeNode;
+{*****************************************************************************************************}
+function TALStringKeyAVLBinaryTree.ExtractNode(const IdVal: AnsiString): TALStringKeyAVLBinaryTreeNode;
 begin
   result := TALStringKeyAVLBinaryTreeNode(inherited ExtractNode(@idVal));
 end;
 
-{************************************************************************}
-function TALStringKeyAVLBinaryTree.DeleteNode(idVal: AnsiString): boolean;
+{******************************************************************************}
+function TALStringKeyAVLBinaryTree.DeleteNode(const idVal: AnsiString): boolean;
 begin
   result := inherited DeleteNode(@idVal);
 end;
 
-{********************************************************************************************}
-function TALStringKeyAVLBinaryTree.FindNode(idVal: AnsiString): TALStringKeyAVLBinaryTreeNode;
+{**************************************************************************************************}
+function TALStringKeyAVLBinaryTree.FindNode(const idVal: AnsiString): TALStringKeyAVLBinaryTreeNode;
 begin
   Result := TALStringKeyAVLBinaryTreeNode(inherited FindNode(@idVal));
 end;

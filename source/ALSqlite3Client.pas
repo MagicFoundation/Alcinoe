@@ -239,10 +239,10 @@ Type
     FNullString: AnsiString;
   Protected
     function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual; abstract;
+                            var DataStr: AnsiString): Boolean; virtual;
     Procedure SaveDataToCache(const Key: ansiString;
                               const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual; abstract;
+                              const DataStr: ansiString); virtual;
     procedure CheckAPIError(ConnectionHandle: PSQLite3; Error: Boolean);
     function  GetDataBaseName: AnsiString; virtual;
     Function  GetFieldValue(aSqlite3stmt: PSQLite3Stmt;
@@ -1237,6 +1237,21 @@ begin
   //inherite
   inherited;
 
+end;
+
+{***************************************************************************}
+function TalSqlite3ConnectionPoolClient.loadCachedData(const Key: AnsiString;
+                                                       var DataStr: AnsiString): Boolean;
+begin
+  result := false; //virtual need to be overriden
+end;
+
+{*****************************************************************************}
+Procedure TalSqlite3ConnectionPoolClient.SaveDataToCache(const Key: ansiString;
+                                                         const CacheThreshold: integer;
+                                                         const DataStr: ansiString);
+begin
+  //virtual need to be overriden
 end;
 
 {***************************************************************}

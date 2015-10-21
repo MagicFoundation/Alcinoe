@@ -60,8 +60,7 @@ interface
 
 uses System.Rtti,
      System.RTLConsts,
-     System.TypInfo,
-     AlAvlBinaryTree;
+     System.TypInfo;
 
 Type
 
@@ -377,23 +376,27 @@ Type
     // into this type. These return elements flattened across the type hierarchy
     // in order from most derived to least derived.
     //function GetMethods: TArray<TRttiMethod>; overload; virtual;
-    function GetMethods(const aVisibility: TMemberVisibility): TArray<TALRttiMethod>; overload;
     //function GetFields: TArray<TRttiField>; virtual;
-    function GetFields(const aVisibility: TMemberVisibility): TArray<TALRttiField>;
     //function GetProperties: TArray<TRttiProperty>; virtual;
-    function GetProperties(const aVisibility: TMemberVisibility): TArray<TALRttiProperty>;
     //function GetIndexedProperties: TArray<TRttiIndexedProperty>; virtual;
-    function GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TALRttiIndexedProperty>;
-
     //function GetMethod(const AName: string): TRttiMethod; virtual;
     //function GetMethods(const AName: string): TArray<TRttiMethod>; overload; virtual;
-    function GetMethods(const AName: ansistring; const aVisibility: TMemberVisibility): TArray<TALRttiMethod>; overload;
     //function GetField(const AName: string): TRttiField; virtual;
-    function GetField(const AName: ansistring; const aVisibility: TMemberVisibility): TALRttiField;
     //function GetProperty(const AName: string): TRttiProperty; virtual;
+    //function GetIndexedProperty(const AName: string): TRttiIndexedProperty; virtual;
+
+    function GetMethods(const aVisibility: TMemberVisibility): TArray<TALRttiMethod>; overload;
+    function GetMethods(const AName: ansistring; const aVisibility: TMemberVisibility): TArray<TALRttiMethod>; overload;
+
+    function GetFields(const aVisibility: TMemberVisibility): TArray<TALRttiField>;
+    function GetField(const AName: ansistring; const aVisibility: TMemberVisibility): TALRttiField;
+
+    function GetProperties(const aVisibility: TMemberVisibility): TArray<TALRttiProperty>;
     function GetProperty(const AName: ansistring; const aVisibility: TMemberVisibility): TALRttiProperty; overload;
     function GetProperty(const AIndex: integer; const aVisibility: TMemberVisibility): TALRttiProperty; overload;
-    //function GetIndexedProperty(const AName: string): TRttiIndexedProperty; virtual;
+
+    function GetIndexedProperties(const aVisibility: TMemberVisibility): TArray<TALRttiIndexedProperty>; overload;
+    function GetIndexedProperties(const AName: ansistring; const aVisibility: TMemberVisibility): TArray<TALRttiIndexedProperty>; overload;
 
     //function GetDeclaredMethods: TArray<TRttiMethod>; virtual;
     //function GetDeclaredProperties: TArray<TRttiProperty>; virtual;
@@ -444,7 +447,19 @@ Type
     property ElementType: TRttiType read fElementType;
   end;
 
-{**************************************************************************}
+{*******************************************************************************}
+function ALGetEnumName(TypeInfo: PTypeInfo; Value: Integer): ansistring; overload
+function ALGetEnumName(PropInfo: PPropInfo; Value: Integer): ansistring; overload
+function ALTryGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring; Var EnumValue: Integer): boolean; overload;
+function ALTryGetEnumValue(PropInfo: PPropInfo; const Name: ansistring; Var EnumValue: Integer): boolean; overload;
+function ALGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring): Integer; overload;
+function ALGetEnumValue(PropInfo: PPropInfo; const Name: ansistring): Integer; overload;
+function ALSetToString(TypeInfo: PTypeInfo; Value: Integer; const Brackets: Boolean = False): ansistring; overload;
+function ALSetToString(PropInfo: PPropInfo; Value: Integer; const Brackets: Boolean = False): ansistring; overload;
+function ALTryStringToSet(TypeInfo: PTypeInfo; const Value: ansistring; Var SetInt: Integer): Boolean; overload;
+function ALTryStringToSet(PropInfo: PPropInfo; const Value: ansistring; Var SetInt: Integer): Boolean; overload;
+function ALStringToSet(TypeInfo: PTypeInfo; const Value: ansistring): Integer; overload;
+function ALStringToSet(PropInfo: PPropInfo; const Value: ansistring): Integer; overload;
 function ALGetRttiType(const aClassName: AnsiString): TALRttiType; overload;
 function ALGetRttiType(const aTypeInfo: PTypeInfo): TALRttiType; overload;
 procedure ALRttiInitialization;
@@ -459,6 +474,308 @@ uses System.sysutils,
      System.Generics.Collections,
      System.Generics.Defaults,
      AlString;
+
+{****************************************}
+// P points a length field of ShortString.
+function _AfterString(const P: PByte): Pointer; inline;
+begin
+  Result := P + P^ + 1;
+end;
+
+{**********************************************************************}
+function ALGetEnumName(TypeInfo: PTypeInfo; Value: Integer): ansistring;
+
+const
+  _BooleanIdents: array [Boolean] of ansistring = ('False', 'True');
+
+var
+  P: Pointer;
+  T: PTypeData;
+  Len: Byte;
+
+begin
+  if TypeInfo^.Kind = tkInteger then
+  begin
+    Result := ALIntToStr(Value);
+    Exit;
+  end;
+  T := GetTypeData(GetTypeData(TypeInfo)^.BaseType^);
+  if (TypeInfo = System.TypeInfo(Boolean)) or (T^.MinValue < 0) then
+  begin
+    { LongBool/WordBool/ByteBool have MinValue < 0 and arbitrary
+      content in Value; Boolean has Value in [0, 1] }
+    Result := _BooleanIdents[Value <> 0];
+    if SameText(HexDisplayPrefix, '0x') then
+      Result := ALLowerCase(Result);
+  end
+  else
+  begin
+    P := @T^.NameList;
+    while Value <> 0 do
+    begin
+      P := _AfterString(P);
+      Dec(Value);
+    end;
+    //Result := _UTF8ToString(P);
+    Len := PByte(P)^; // length is store in First array
+    if Len <> 0 then
+    begin
+      P := PByte(P) + 1;
+      SetLength(Result, Len);
+      Move(PByte(P)^, Result[1], Len);
+    end
+    else result := '';
+
+  end;
+end;
+
+{**********************************************************************}
+function ALGetEnumName(PropInfo: PPropInfo; Value: Integer): ansistring;
+begin
+  result := ALGetEnumName(PropInfo^.PropType^, Value);
+end;
+
+{************************************************************************}
+function _UTF8SameText(const Str1: ShortString; Str2: PAnsiChar): Boolean;
+begin
+  Result := ALSametext(Str1, Str2);
+end;
+
+{*******************************************************************************}
+function _GetEnumNameValue(TypeInfo: PTypeInfo; const Name: AnsiString): Integer;
+asm //StackAligned
+        { ->    EAX Pointer to type info        }
+        {       EDX Pointer to string           }
+        { <-    EAX Value                       }
+
+        PUSH    EBX
+        PUSH    ESI
+        PUSH    EDI
+        PUSH    0
+
+        TEST    EDX,EDX
+        JE      @notFound
+
+        {       point ESI to first name of the base type }
+        XOR     ECX,ECX
+        MOV     CL,[EAX].TTypeInfo.Name.Byte[0]
+        MOV     EAX,[EAX].TTypeInfo.Name[ECX+1].TTypeData.BaseType
+        MOV     EAX,[EAX]
+        MOV     CL,[EAX].TTypeInfo.Name.Byte[0]
+        LEA     ESI,[EAX].TTypeInfo.Name[ECX+1].TTypeData.NameList
+
+        {       make EDI the high bound of the enum type }
+        MOV     EDI,[EAX].TTypeInfo.Name[ECX+1].TTypeData.MaxValue
+
+        {       EAX is our running index }
+        XOR     EAX,EAX
+
+        {       make ECX the length of the current string }
+
+@outerLoop:
+        MOVZX   ECX,[ESI].Byte[0]
+        CMP     ECX,[EDX-4]
+        JNE     @lengthMisMatch
+
+        {       we know for sure the names won't be zero length }
+@cmpLoop:
+        TEST    [ESP],1
+        JNZ     @utf8compare
+        MOV     BL,[EDX+ECX-1]
+        TEST    BL,$80
+        JNZ     @utf8compareParam
+        XOR     BL,[ESI+ECX]
+        TEST    BL,$80
+        JNZ     @utf8compare
+        TEST    BL,0DFH
+        JNE     @misMatch
+        DEC     ECX
+        JNE     @cmpLoop
+
+        {       as we didn't have a mismatch, we must have found the name }
+        JMP     @exit
+
+@utf8compareParam:
+        MOV     [ESP],1
+
+@utf8compare:
+        PUSH    EAX
+        PUSH    EDX
+        MOV     EAX,ESI
+{$IFDEF ALIGN_STACK}
+        SUB     ESP,4
+{$ENDIF ALIGN_STACK}
+        CALL    _UTF8SameText
+{$IFDEF ALIGN_STACK}
+        ADD     ESP,4
+{$ENDIF ALIGN_STACK}
+        TEST    AL,AL
+        POP     EDX
+        POP     EAX
+        JNZ     @exit
+
+@misMatch:
+        MOVZX   ECX,[ESI].Byte[0]
+@lengthMisMatch:
+        INC     EAX
+        LEA     ESI,[ESI+ECX+1]
+        CMP     EAX,EDI
+        JLE     @outerLoop
+
+        {       we haven't found the thing - return -1  }
+@notFound:
+        OR      EAX,-1
+
+@exit:
+
+        POP     EDI
+        POP     EDI
+        POP     ESI
+        POP     EBX
+end;
+
+{*******************************************************************************************************}
+function ALTryGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring; Var EnumValue: Integer): boolean;
+begin
+
+  //
+  // original code
+  //
+  //if TypeInfo^.Kind = tkInteger then
+  //  Result := ALStrToInt(Name)
+  //else
+  //begin
+  //  Assert(TypeInfo^.Kind = tkEnumeration);
+  //  if GetTypeData(TypeInfo)^.MinValue < 0 then  // Longbool/wordbool/bytebool
+  //  begin
+  //    if ALSameText(Name, 'False') then
+  //      Result := 0
+  //    else if ALSameText(Name, 'True') then
+  //      Result := -1
+  //    else
+  //      Result := ALStrToInt(Name);
+  //  end
+  //  else
+  //    Result := _GetEnumNameValue(TypeInfo, Name);
+  //end;
+
+  if TypeInfo^.Kind <> tkEnumeration then exit(false);
+  EnumValue := _GetEnumNameValue(TypeInfo, Name);
+  result := EnumValue > -1;
+
+end;
+
+{*******************************************************************************************************}
+function ALTryGetEnumValue(PropInfo: PPropInfo; const Name: ansistring; Var EnumValue: Integer): boolean;
+begin
+  result := ALTryGetEnumValue(PropInfo^.PropType^, Name, EnumValue);
+end;
+
+{****************************************************************************}
+function ALGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring): Integer;
+begin
+  if not ALTryGetEnumValue(TypeInfo, Name, result) then raise EALException.Create('Invalid enumeration name: '+Name+'');
+end;
+
+{****************************************************************************}
+function ALGetEnumValue(PropInfo: PPropInfo; const Name: ansistring): Integer;
+begin
+  result := ALGetEnumValue(PropInfo^.PropType^, Name);
+end;
+
+{*******************************************************************************************************}
+function ALSetToString(TypeInfo: PTypeInfo; Value: Integer; const Brackets: Boolean = False): ansistring;
+var
+  S: TIntegerSet;
+  I: Integer;
+begin
+  Result := '';
+  Integer(S) := Value;
+  TypeInfo := GetTypeData(TypeInfo)^.CompType^;
+  for I := 0 to SizeOf(Integer) * 8 - 1 do
+    if I in S then
+    begin
+      if Result <> '' then
+        Result := Result + ',';
+      Result := Result + ALGetEnumName(TypeInfo, I);
+    end;
+  if Brackets then
+    Result := '[' + Result + ']';
+end;
+
+{*******************************************************************************************************}
+function ALSetToString(PropInfo: PPropInfo; Value: Integer; const Brackets: Boolean = False): ansistring;
+begin
+  Result := ALSetToString(PropInfo^.PropType^, Value, Brackets);
+end;
+
+{****************************************************************************************************}
+function ALTryStringToSet(TypeInfo: PTypeInfo; const Value: ansistring; Var SetInt: Integer): Boolean;
+var
+  P: PansiChar;
+  EnumName: ansistring;
+  EnumValue: NativeInt;
+  EnumInfo: PTypeInfo;
+
+  // grab the next enum name
+  function NextWord(var P: PansiChar): ansistring;
+  var
+    i: Integer;
+  begin
+    i := 0;
+
+    // scan til whitespace
+    while not (P[i] in [',', ' ', #0,']']) do
+      Inc(i);
+
+    SetString(Result, P, i);
+
+    // skip whitespace
+    while (P[i] in [',', ' ',']']) do
+      Inc(i);
+
+    Inc(P, i);
+  end;
+
+begin
+  Result := True;
+  SetInt := 0;
+  if Value = '' then Exit;
+  P := PansiChar(Value);
+
+  // skip leading bracket and whitespace
+  while (P^ in ['[',' ']) do
+    Inc(P);
+
+  EnumInfo := GetTypeData(TypeInfo)^.CompType^;
+  EnumName := NextWord(P);
+  while EnumName <> '' do
+  begin
+    EnumValue := ALGetEnumValue(EnumInfo, EnumName);
+    if EnumValue < 0 then exit(False);
+
+    Include(TIntegerSet(SetInt), EnumValue);
+    EnumName := NextWord(P);
+  end;
+end;
+
+{****************************************************************************************************}
+function ALTryStringToSet(PropInfo: PPropInfo; const Value: ansistring; Var SetInt: Integer): Boolean;
+begin
+  result := ALTryStringToSet(PropInfo^.PropType^, Value, SetInt);
+end;
+
+{****************************************************************************}
+function ALStringToSet(TypeInfo: PTypeInfo; const Value: ansistring): Integer;
+begin
+  if not ALTryStringToSet(TypeInfo, Value, result) then raise EALException.Create('Invalid set string: '+Value+'');
+end;
+
+{****************************************************************************}
+function ALStringToSet(PropInfo: PPropInfo; const Value: ansistring): Integer;
+begin
+  Result := ALStringToSet(PropInfo^.PropType^, Value);
+end;
 
 {*************************************}
 function ALInsufficientRtti: Exception;
@@ -1002,6 +1319,48 @@ begin
   end;
 end;
 
+{***************************************************************************************************************************************}
+function TALRttiType.GetIndexedProperties(const AName: ansistring; const aVisibility: TMemberVisibility): TArray<TALRttiIndexedProperty>;
+var aRttiIndexedProperties: TArray<TALRttiIndexedProperty>;
+    aRttiIndexedProperty: TALRttiIndexedProperty;
+    I,J,K: integer;
+begin
+  if aName = '' then begin
+    aRttiIndexedProperties := GetIndexedProperties(aVisibility);
+    setlength(result, length(aRttiIndexedProperties));
+    i := 0;
+    for aRttiIndexedProperty in aRttiIndexedProperties do
+      if aRttiIndexedProperty.IsDefault then begin
+        result[i] := aRttiIndexedProperty;
+        inc(i);
+      end;
+    setlength(result,i);
+  end
+  else begin
+    aRttiIndexedProperties := GetIndexedProperties(aVisibility);
+    if Find(TArray<TALRttiNamedObject>(aRttiIndexedProperties), AName, I) then begin
+
+      J := I - 1;
+      while J >= 0 do begin
+        if ALSameText(aRttiIndexedProperties[j].Name, AName) then dec(J)
+        else break;
+      end;
+
+      K := I + 1;
+      while K <= length(aRttiIndexedProperties) - 1 do begin
+        if ALSameText(aRttiIndexedProperties[K].Name, AName) then inc(K)
+        else break;
+      end;
+
+      SetLength(Result, K-J-1);
+      for I := J+1 to K-1 do
+        Result[I-j-1] := aRttiIndexedProperties[I];
+
+    end
+    else Exit(nil);
+  end
+end;
+
 {*******************************************************************************************}
 function TALRttiType.GetMethods(const aVisibility: TMemberVisibility): TArray<TALRttiMethod>;
 begin
@@ -1073,39 +1432,13 @@ begin
   Result := nil;
 end;
 
-{********************************************}
-var _RttiTypeCache: TALStringKeyAVLBinaryTree;
-
-{**}
-type
-  _TALRttiTypeCacheNode = Class(TALStringKeyAVLBinaryTreeNode)
-  public
-    fRttiType: TALRttiType;
-    Constructor Create; override;
-    destructor Destroy; Override;
-  End;
-
-{***************************************}
-constructor _TALRttiTypeCacheNode.Create;
-begin
-  inherited create;
-  fRttiType := nil;
-end;
-
-{***************************************}
-destructor _TALRttiTypeCacheNode.Destroy;
-begin
-  if assigned(fRttiType) then fRttiType.Free;
-  inherited;
-end;
+{************************************************************}
+var _RttiTypeCache: TObjectDictionary<ansiString,TALRttiType>;
 
 {****************************************************************}
 function ALGetRttiType(const aClassName: AnsiString): TALRttiType;
-var aCacheNode: Tobject;
 begin
-  aCacheNode := _RttiTypeCache.FindNode(aClassName);
-  if not assigned(aCacheNode) then raise EALException.Create('Cannot obtain RTTI informations about the class ' + aClassName)
-  else result := _TALRttiTypeCacheNode(aCacheNode).fRttiType;
+  if not _RttiTypeCache.TryGetValue(aClassName, result) then raise EALException.Create('Cannot obtain RTTI informations about the class ' + aClassName);
 end;
 
 {**************************************************************}
@@ -1118,7 +1451,7 @@ end;
 procedure ALRttiInitialization;
 var aRttiTypes: TArray<TRttiType>;
     aRttiField: TRttiField;
-    aCacheNode: _TALRttiTypeCacheNode;
+    aRttiType: TALRttiType;
     i: integer;
 begin
 
@@ -1126,24 +1459,18 @@ begin
   vALRTTIContext := TRttiContext.Create;
 
   //create vALRttiTypeCache
-  _RttiTypeCache := TALStringKeyAVLBinaryTree.Create;
+  _RttiTypeCache := TObjectDictionary<ansiString,TALRttiType>.create([doOwnsValues]);
 
   //init aRTTITypes
   aRTTITypes := vALRTTIContext.GetTypes;
 
   //first loop to create all the node inside _RttiTypeCache
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    aCacheNode := _TALRttiTypeCacheNode.Create;
-    try
-      aCacheNode.ID := aRttiTypes[i].Handle.Name;
-      if aRttiTypes[i] is TRttiOrdinalType then aCacheNode.fRttiType := TALRttiOrdinalType.Create
-      else if aRttiTypes[i] is TRttiSetType then aCacheNode.fRttiType := TALRttiSetType.Create
-      else aCacheNode.fRttiType := TALRttiType.Create;
-      if not _RttiTypeCache.AddNode(aCacheNode) then
-        raise EALException.Create('Duplicate name ('+aCacheNode.ID+')');
-    except
-      aCacheNode.Free;
-      raise;
+    if not _RttiTypeCache.ContainsKey(aRttiTypes[i].Handle.Name) then begin
+      if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
+      else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
+      else aRttiType := TALRttiType.Create;
+      _RttiTypeCache.Add(aRttiTypes[i].Handle.Name, aRttiType);
     end;
   end;
 
@@ -1151,16 +1478,11 @@ begin
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
     for aRttiField in aRttiTypes[i].GetFields do begin
       if assigned(aRttiField.FieldType) then begin
-        aCacheNode := _TALRttiTypeCacheNode.Create;
-        try
-          aCacheNode.ID := aRttiField.FieldType.Handle.Name;
-          if aRttiTypes[i] is TRttiOrdinalType then aCacheNode.fRttiType := TALRttiOrdinalType.Create
-          else if aRttiTypes[i] is TRttiSetType then aCacheNode.fRttiType := TALRttiSetType.Create
-          else aCacheNode.fRttiType := TALRttiType.Create;
-          if not _RttiTypeCache.AddNode(aCacheNode) then aCacheNode.Free;
-        except
-          aCacheNode.Free;
-          raise;
+        if not _RttiTypeCache.ContainsKey(aRttiField.FieldType.Handle.Name) then begin
+          if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
+          else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
+          else aRttiType := TALRttiType.Create;
+          _RttiTypeCache.Add(aRttiField.FieldType.Handle.Name, aRttiType);
         end;
       end;
     end;
@@ -1168,8 +1490,8 @@ begin
 
   //3rd loop to init all the fRttiType inside each node of _RttiTypeCache
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    aCacheNode := _TALRttiTypeCacheNode(_RttiTypeCache.FindNode(aRttiTypes[i].Handle.Name));
-    if assigned(aCacheNode) then aCacheNode.fRttiType.init(aRttiTypes[i]);
+    if _RttiTypeCache.TryGetValue(aRttiTypes[i].Handle.Name, aRttiType)
+      then aRttiType.init(aRttiTypes[i]);
   end;
 
 end;

@@ -256,7 +256,7 @@ function  ALFileHashMD5(const AFileName : AnsiString): AnsiString; overload;
 procedure ALStreamHashMD5(var Digest : TAlCipherMD5Digest; AStream : TStream); overload;
 function  ALStreamHashMD5(AStream : TStream): AnsiString; overload;
 procedure ALStringHashMD5(var Digest : TALCipherMD5Digest; const Str : AnsiString); overload;
-function  ALStringHashMD5(const Str : AnsiString): AnsiString; overload;
+function  ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
 
 { SHA1 }
 procedure ALCipherInitSHA1(var Context: TALCipherSHA1Context);
@@ -2653,12 +2653,16 @@ begin
   ALCipherHashMD5(Digest, Str[1], Length(Str));
 end;
 
-{***********************************************************}
-function ALStringHashMD5(const Str : AnsiString): AnsiString;
+{********************************************************************************************}
+function ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString;
 Var aMD5Digest: TAlCipherMD5Digest;
 Begin
   AlStringHashMD5(aMD5Digest, Str);
-  Result := AlCipherBufferToHex(aMD5Digest, SizeOf(aMD5Digest));
+  if HexEncode then Result := AlCipherBufferToHex(aMD5Digest, SizeOf(aMD5Digest))
+  else begin
+    SetLength(result, Length(aMD5Digest));
+    ALmove(aMD5Digest, result[1], length(result));
+  end;
 end;
 
 {***********************************************************************************}
@@ -2670,17 +2674,12 @@ end;
 {*********************************************************************************************}
 function ALStringHashSHA1(const Str : AnsiString; const HexEncode: boolean = true): AnsiString;
 Var aSHA1Digest: TAlCipherSHA1Digest;
-    i: integer;
 Begin
   AlStringHashSHA1(aSHA1Digest, Str);
   if HexEncode then result := AlCipherBufferToHex(ASHA1Digest, SizeOf(aSHA1Digest))
   else begin
     SetLength(result, Length(aSHA1Digest));
-             {0}                 {19}
-    for i := Low(aSHA1Digest) to High(aSHA1Digest) do begin
-            {(0 + 1) etc}
-      result[i + 1] := AnsiChar(aSHA1Digest[i]);
-    end;
+    ALmove(aSHA1Digest, result[1], length(result));
   end;
 end;
 

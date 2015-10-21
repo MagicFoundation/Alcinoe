@@ -459,6 +459,9 @@ function  ALStrToInt64Def(const S: AnsiString; const Default: Int64): Int64;
 function  ALIntToStr(Value: Integer): AnsiString; overload;
 function  ALIntToStr(Value: Int64): AnsiString; overload;
 {$IFDEF UNICODE}
+function  ALStrToUInt64(const S: ansistring): UInt64; overload;
+function  ALStrToUInt64Def(const S: ansistring; const Default: UInt64): UInt64; overload;
+function  ALTryStrToUInt64(const S: ansistring; out Value: UInt64): Boolean; overload;
 function  ALUIntToStr(Value: Cardinal): AnsiString; overload;
 function  ALUIntToStr(Value: UInt64): AnsiString; overload;
 {$ENDIF}
@@ -5681,6 +5684,102 @@ begin
 end;
 {$ENDIF}
 
+{**************}
+{$IFDEF UNICODE}
+// the original implementation was with lot of "RANGE CHECK ERROR"
+// Exemple: while s[i] = AnsiChar(' ') do Inc(i);
+function _ALValUInt64(const s: ansistring; var code: Integer): UInt64;
+var
+  i: Integer;
+  len: Integer;
+  dig: Integer;
+  sign: Boolean;
+  empty: Boolean;
+begin
+  i := 1;
+  {$IFNDEF CPUX64} // avoid E1036: Variable 'dig' might not have been initialized
+  dig := 0;
+  {$ENDIF}
+  Result := 0;
+  if s = '' then
+  begin
+    code := 1;
+    exit;
+  end;
+  len := Length(S);
+  while (i <= Len) and (s[i] = ansiChar(' ')) do Inc(i);
+  if i > len then begin
+    code := i;
+    exit;
+  end;
+  sign := False;
+  if s[i] =  ansiChar('-') then
+  begin
+    sign := True;
+    Inc(i);
+    if i > len then begin
+      code := i;
+      exit;
+    end;
+  end
+  else if s[i] =  ansiChar('+') then begin
+    Inc(i);
+    if i > len then begin
+      code := i;
+      exit;
+    end;
+  end;
+  empty := True;
+  if (s[i] =  ansiChar('$')) or
+     (Upcase(s[i]) =  ansiChar('X')) or
+     ((s[i] =  ansiChar('0')) and
+      (I < Len) and
+      (Upcase(s[i+1]) = ansiChar('X'))) then
+  begin
+    if s[i] =  ansiChar('0') then
+      Inc(i);
+    Inc(i);
+    while (i <= Len) do
+    begin
+      case   ansiChar(s[i]) of
+       ansiChar('0').. ansiChar('9'): dig := Ord(s[i]) -  Ord('0');
+       ansiChar('A').. ansiChar('F'): dig := Ord(s[i]) - (Ord('A') - 10);
+       ansiChar('a').. ansiChar('f'): dig := Ord(s[i]) - (Ord('a') - 10);
+      else
+        break;
+      end;
+      if Result > (High(UInt64) shr 4) then
+        Break;
+      if sign and (dig <> 0) then
+        Break;
+      Result := Result shl 4 + dig;
+      Inc(i);
+      empty := False;
+    end;
+  end
+  else
+  begin
+    while (i <= Len) do
+    begin
+      case  ansiChar(s[i]) of
+        ansiChar('0').. ansiChar('9'): dig := Ord(s[i]) - Ord('0');
+      else
+        break;
+      end;
+      if Result > (High(UInt64) div 10) then
+        Break;
+      if sign and (dig <> 0) then
+        Break;
+      Result := Result*10 + dig;
+      Inc(i);
+      empty := False;
+    end;
+  end;
+  if (i <= len) or empty then code := i
+  else code := 0;
+end;
+{$ENDIF}
+
 {***********************************************************************}
 function ALTryStrToInt(const S: AnsiString; out Value: Integer): Boolean;
 {$IFDEF UNICODE}
@@ -5771,7 +5870,6 @@ begin
   result := StrToInt64Def(S, Default);
 end;
 {$ENDIF}
-
 
 {**************}
 {$IFDEF UNICODE}
@@ -5964,6 +6062,39 @@ end;
 {$ELSE}
 begin
   result := IntToStr(Value);
+end;
+{$ENDIF}
+
+{**************}
+{$IFDEF UNICODE}
+function ALStrToUInt64(const S: ansistring): UInt64;
+var
+  E: Integer;
+begin
+  Result := _ALValUInt64(S, E);
+  if E <> 0 then raise EConvertError.CreateResFmt(@{$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysConst.SInvalidInteger, [S]);
+end;
+{$ENDIF}
+
+{**************}
+{$IFDEF UNICODE}
+function ALStrToUInt64Def(const S: ansistring; const Default: UInt64): UInt64;
+var
+  E: Integer;
+begin
+  Result := _ALValUInt64(S, E);
+  if E <> 0 then Result := Default;
+end;
+{$ENDIF}
+
+{**************}
+{$IFDEF UNICODE}
+function ALTryStrToUInt64(const S: ansistring; out Value: UInt64): Boolean;
+var
+  E: Integer;
+begin
+  Value := _ALValUInt64(S, E);
+  Result := E = 0;
 end;
 {$ENDIF}
 

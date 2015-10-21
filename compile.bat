@@ -20,6 +20,9 @@ IF ERRORLEVEL 1 goto ERROR
 del demos\*.exe /s
 IF ERRORLEVEL 1 goto ERROR
 
+del demos\*.dll /s
+IF ERRORLEVEL 1 goto ERROR
+
 del demos\*.vlb /s
 IF ERRORLEVEL 1 goto ERROR
 

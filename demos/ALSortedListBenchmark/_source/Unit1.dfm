@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 331
+  ClientHeight = 591
   ClientWidth = 500
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -24,10 +24,11 @@ object Form1: TForm1
     OnClick = ALButton3Click
   end
   object Panel2: TPanel
-    Left = 80
-    Top = 160
-    Width = 344
+    Left = 0
+    Top = 438
+    Width = 500
     Height = 153
+    Align = alBottom
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Color = clSilver
@@ -38,6 +39,7 @@ object Form1: TForm1
     object cxLabel1: TcxLabel
       Left = 12
       Top = 12
+      Hint = ''
       Caption = 'Please help us to keep the development of these components free'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -53,6 +55,7 @@ object Form1: TForm1
     object cxLabel2: TcxLabel
       Left = 12
       Top = 55
+      Hint = ''
       Caption = 'If you like these components please go to:'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -69,6 +72,7 @@ object Form1: TForm1
       Left = 12
       Top = 71
       Cursor = crHandPoint
+      Hint = ''
       Caption = 'http://www.arkadia.com'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -86,6 +90,7 @@ object Form1: TForm1
     object cxLabel18: TcxLabel
       Left = 12
       Top = 88
+      Hint = ''
       Caption = 'and click on the Facebook/Google+ like button'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -101,6 +106,7 @@ object Form1: TForm1
     object cxLabel17: TcxLabel
       Left = 12
       Top = 120
+      Hint = ''
       Caption = 'Thanks for your support !'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -176,5 +182,22 @@ object Form1: TForm1
     Caption = 'Benchmark TStringList'
     TabOrder = 8
     OnClick = ALButton4Click
+  end
+  object Memo1: TMemo
+    Left = 0
+    Top = 175
+    Width = 500
+    Height = 263
+    Align = alBottom
+    TabOrder = 9
+  end
+  object Button1: TButton
+    Left = 258
+    Top = 142
+    Width = 220
+    Height = 25
+    Caption = 'Benchmark TDictionary'
+    TabOrder = 10
+    OnClick = Button1Click
   end
 end

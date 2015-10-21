@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, StrUtils, ExtCtrls, StdCtrls, cxGraphics,
   cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
-  cxLabel, Shellapi;
+  cxLabel, Shellapi, System.Generics.Collections, system.Diagnostics;
 
 type
   TForm1 = class(TForm)
@@ -24,6 +24,8 @@ type
     cxWwwArkadiaComLabel: TcxLabel;
     cxLabel18: TcxLabel;
     cxLabel17: TcxLabel;
+    Memo1: TMemo;
+    Button1: TButton;
     procedure FormClick(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -33,6 +35,7 @@ type
     procedure ALButton10Click(Sender: TObject);
     procedure ALButton33Click(Sender: TObject);
     procedure cxWwwArkadiaComLabelClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
   public
   end;
@@ -98,141 +101,200 @@ end;
 procedure TForm1.ALButton3Click(Sender: TObject);
 Var aStringKeyAVLBinaryTree: TALStringKeyAVLBinaryTree;
     aStringKeyAVLBinaryTreeNode: TALStringKeyAVLBinaryTreeNode;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TALStringKeyAVLBinaryTree');
+
   aStringKeyAVLBinaryTree := TALStringKeyAVLBinaryTree.create;
   try
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 1000000 do begin
       aStringKeyAVLBinaryTreeNode := TALStringKeyAVLBinaryTreeNode.Create;
       aStringKeyAVLBinaryTreeNode.ID := AlRandomStr(10);
       if not aStringKeyAVLBinaryTree.AddNode(aStringKeyAVLBinaryTreeNode) then aStringKeyAVLBinaryTreeNode.Free;
     end;
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 1,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    Showmessage('Add 1,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
-
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aStringKeyAVLBinaryTree.FindNode(AlRandomStr(10));
     end;
-
-    Showmessage('Search 100,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
   finally
     aStringKeyAVLBinaryTree.free;
   end;
+  Memo1.Lines.Add('Finished');
 end;
 
 {***********************************************}
 procedure TForm1.ALButton4Click(Sender: TObject);
 Var aLst: TStringList;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TStringList');
+
   aLst := TstringList.create;
   try
     aLst.Sorted := False;
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 1000000 do
       aLst.Add(AlRandomStrU(10));
-    Showmessage('Add 1,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 1,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOf(AlRandomStrU(10));
     end;
-    Showmessage('Search 10 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     aLst.Duplicates := DupIgnore;
     aLst.Sorted := True;
-    Showmessage('Sort 1,000,000 nodes nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Sort 1,000,000 nodes nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOf(AlRandomStrU(10));
     end;
-    Showmessage('Search 100,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
 
   finally
     aLst.free;
   end;
+  Memo1.Lines.Add('Finished');
 end;
 
 {***********************************************}
 procedure TForm1.ALButton5Click(Sender: TObject);
 Var aLst: TALInt64AVLList;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TALInt64AVLList');
+
   aLst := TALInt64AVLList.Create;
   try
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     aLst.Duplicates := DupIgnore;
     for I := 1 to 5000000 do
       aLst.Add(Random(MaxInt) * Random(MaxInt));
-    Showmessage('Add 5,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 5,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOf(Random(MaxInt) * Random(MaxInt));
     end;
-    Showmessage('Search 100,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
   finally
     aLst.Free;
   end;
-
+  Memo1.Lines.Add('Finished');
 end;
 
 {***********************************************}
 procedure TForm1.ALButton6Click(Sender: TObject);
 Var aLst: TALInt64List;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TALInt64List');
+
   aLst := TALInt64List.Create;
   try
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 5000000 do
       aLst.Add(Random(MaxInt) * Random(MaxInt));
-    Showmessage('Add 5,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 5,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOf(Random(MaxInt) * Random(MaxInt));
     end;
-    Showmessage('Search 10 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     aLst.sorted := True;
-    Showmessage('Sort 5,000,000 nodes nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Sort 5,000,000 nodes nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOf(Random(MaxInt) * Random(MaxInt));
     end;
-    Showmessage('Search 100,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
   finally
     aLst.Free;
   end;
-
+  Memo1.Lines.Add('Finished');
 end;
+
+{*********************************************}
+procedure TForm1.Button1Click(Sender: TObject);
+Var dict : TDictionary<ansiString, AnsiString>;
+    S1: ansiString;
+    aStopWatch: TstopWatch;
+    MemoryUsage: DWORD;
+    i: integer;
+begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TALStringList');
+
+  dict := TDictionary<ansiString, ansiString>.Create;
+  try
+
+    MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
+    aStopWatch := TstopWatch.startNew;
+    for I := 1 to 1000000 do
+      dict.Add(AlRandomStr(10), AlRandomStr(10));
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 1,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+
+    aStopWatch := TstopWatch.startNew;
+    for I := 1 to 100000 do begin
+      dict.TryGetValue(AlRandomStr(10),S1);
+    end;
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 (via TryGetValue) nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
+
+  finally
+    dict.free;
+  end;
+  Memo1.Lines.Add('Finished');
+end;
+
 
 {**********************************************************}
 procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
@@ -243,136 +305,163 @@ end;
 {************************************************}
 procedure TForm1.ALButton10Click(Sender: TObject);
 Var aLst: TALStringList;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TALStringList');
+
   aLst := TALStringList.create;
   try
     aLst.Sorted := False;
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 1000000 do
       aLst.Add(AlRandomStr(10) + '=' + AlRandomStr(10));
-    Showmessage('Add 1,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 1,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOf(AlRandomStr(10) + '=' + AlRandomStr(10));
     end;
-    Showmessage('Search 10 nodes (via IndexOf) in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes (via IndexOf) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOfName(AlRandomStr(10));
     end;
-    Showmessage('Search 10 nodes (via IndexOfName) in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes (via IndexOfName) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     aLst.Duplicates := DupIgnore;
     aLst.Sorted := True;
-    Showmessage('Sort 1,000,000 nodes nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Sort 1,000,000 nodes nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOf(AlRandomStr(10));
     end;
-    Showmessage('Search 100,000 (via IndexOf) nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 (via IndexOf) nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOfName(AlRandomStr(10));
     end;
-    Showmessage('Search 100,000 nodes (via IndexOfName) in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 nodes (via IndexOfName) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
   finally
     aLst.free;
   end;
+  Memo1.Lines.Add('Finished');
 end;
 
 {************************************************}
 procedure TForm1.ALButton11Click(Sender: TObject);
 Var aLst: TStringList;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TStringList');
+
   aLst := TstringList.create;
   try
     aLst.Sorted := False;
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 1000000 do
       aLst.Add(AlRandomStrU(10) + '=' + AlRandomStrU(10));
-    Showmessage('Add 1,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 1,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOf(AlRandomStrU(10) + '=' + AlRandomStrU(10));
     end;
-    Showmessage('Search 10 nodes (via IndexOf) in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes (via IndexOf) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOfName(AlRandomStrU(10));
     end;
-    Showmessage('Search 10 nodes (via IndexOfName) in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes (via IndexOfName) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     aLst.Duplicates := DupIgnore;
     aLst.Sorted := True;
-    Showmessage('Sort 1,000,000 nodes nodes in ' + inttostr(GetTickCount - StartDate) + ' ms');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Sort 1,000,000 nodes nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOf(AlRandomStrU(10));
     end;
-    Showmessage('Search 100,000 (via IndexOf) nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 (via IndexOf) nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 10 do begin
       aLst.IndexOfName(AlRandomStrU(10));
     end;
-    Showmessage('Search 10 nodes (via IndexOfName) in ' + inttostr(GetTickCount - StartDate) + ' ms (full scan search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 10 nodes (via IndexOfName) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (full scan search)');
 
   finally
     aLst.free;
   end;
+  Memo1.Lines.Add('Finished');
 end;
 
 {************************************************}
 procedure TForm1.ALButton33Click(Sender: TObject);
 Var aLst: TALAVLStringList;
-    StartDate: DWORD;
+    aStopWatch: TstopWatch;
     MemoryUsage: DWORD;
     i: integer;
 begin
+  IF Memo1.Lines.Count > 0 then Memo1.Lines.Add('');
+  Memo1.Lines.Add('Benchmark TALAVLStringList');
+
   aLst := TALAVLStringList.create;
   try
 
     MemoryUsage := ProcessMemoryUsage(GetCurrentProcessID);
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 1000000 do
       aLst.Add(AlRandomStr(10) + '=' + AlRandomStr(10));
-    Showmessage('Add 1,000,000 nodes in ' + inttostr(GetTickCount - StartDate) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Add 1,000,000 nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms - Memory used: ' + FormatFloat('0,',(ProcessMemoryUsage(GetCurrentProcessID) - MemoryUsage)) + ' bytes');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOf(AlRandomStr(10));
     end;
-    Showmessage('Search 100,000 (via IndexOf) nodes in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 (via IndexOf) nodes in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
-    StartDate := GetTickCount;
+    aStopWatch := TstopWatch.startNew;
     for I := 1 to 100000 do begin
       aLst.IndexOfName(AlRandomStr(10));
     end;
-    Showmessage('Search 100,000 nodes (via IndexOfName) in ' + inttostr(GetTickCount - StartDate) + ' ms (indexed search)');
+    aStopWatch.Stop;
+    Memo1.Lines.Add('Search 100,000 nodes (via IndexOfName) in ' + FormatFloat('0.00',aStopWatch.Elapsed.TotalMilliseconds) + ' ms (indexed search)');
 
   finally
     aLst.free;
   end;
+  Memo1.Lines.Add('Finished');
 end;
 
 {$IFDEF DEBUG}

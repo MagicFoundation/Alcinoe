@@ -252,8 +252,8 @@ type
     function Extract(const index: integer): TALXMLNode; overload; // [added from TXMLNodeList]
     function Extract(const Node: TALXMLNode): TALXMLNode; overload; // [added from TXMLNodeList]
     procedure Exchange(Index1, Index2: Integer); // [added from TXMLNodeList]
-    function FindNode(NodeName: AnsiString): TALXMLNode; overload;
-    function FindNode(NodeName: AnsiString; NodeAttributes: Array of ansiString): TALXMLNode; overload; // [added from TXMLNodeList]
+    function FindNode(const NodeName: AnsiString): TALXMLNode; overload;
+    function FindNode(const NodeName: AnsiString; NodeAttributes: Array of ansiString): TALXMLNode; overload; // [added from TXMLNodeList]
     function FindSibling(const Node: TALXMLNode; Delta: Integer): TALXMLNode;
     function First: TALXMLNode;
     function IndexOf(const Name: AnsiString): Integer; overload;
@@ -3366,7 +3366,7 @@ end;
  *NodeName is the node to access. It specifies the LocalName property of the desired node.
  FindNode returns the object of the node if it is in the list. If NodeName does not specify a node in the list,
  FindNode returns nil (Delphi) or NULL (C++).}
-function TALXMLNodeList.FindNode(NodeName: AnsiString): TALXMLNode;
+function TALXMLNodeList.FindNode(const NodeName: AnsiString): TALXMLNode;
 var Index: Integer;
 begin
   Index := IndexOf(NodeName);
@@ -3381,7 +3381,7 @@ end;
  *NodeAttributes is the attributes the node must have. ex: ['attribute1=value1', 'attribute2=value2']
  FindNode returns the object of the node if it is in the list. If NodeName and NodeAttributes  does not specify a node in the list,
  FindNode returns nil (Delphi) or NULL (C++).}
-function TALXMLNodeList.FindNode(NodeName: AnsiString; NodeAttributes: Array of ansiString): TALXMLNode; // [added from TXMLNodeList]
+function TALXMLNodeList.FindNode(const NodeName: AnsiString; NodeAttributes: Array of ansiString): TALXMLNode; // [added from TXMLNodeList]
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _AttributesMatches(const Node: TALXMlNode): boolean;

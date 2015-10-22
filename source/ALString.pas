@@ -8579,7 +8579,7 @@ function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
 var ReplaceString: AnsiString;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
     TokenStr, ParamStr: AnsiString;
-    ParamList: TALAVLStringList;
+    ParamList: TALStringList;
     TagStartLength: integer;
     TagEndLength: integer;
     SourceStringLength: Integer;
@@ -8675,7 +8675,7 @@ begin
     If assigned(ReplaceProc) or (assigned(ReplaceExtendedProc)) then begin
       TokenStr := _ExtractTokenStr;
       ParamStr := _ExtractParamsStr;
-      ParamList := TALAVLStringList.Create;
+      ParamList := TALStringList.Create;
       try
         ParamList.Duplicates := dupIgnore;
         ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],

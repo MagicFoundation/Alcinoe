@@ -62,6 +62,8 @@ uses System.Rtti,
      System.RTLConsts,
      System.TypInfo;
 
+{$R-}
+
 Type
 
   {******************}
@@ -107,12 +109,17 @@ Type
   TALRttiMember = class(TALRttiNamedObject)
   private
     fVisibility: TMemberVisibility;
+    fOrder: integer;
     //function GetParent: TRttiType;
     //function GetVisibility: TMemberVisibility; virtual;
   public
     constructor Create(Const aRttiMember: TRttiMember);
     //property Parent: TRttiType read GetParent;
     property Visibility: TMemberVisibility read fVisibility;
+    property Order: integer read fOrder write fOrder; // The list returned by GetMethods/getProperties/etc. are ordered by the class/interface hierarchy.
+                                                      // This means that the most recently included methods or properties are located at the top of the list.
+                                                      // the property Order is just a "hint" to know the hierarchy. more close to 0 it is, more higher it is
+                                                      // in the hierarchy
   end;
 
   {*********************************}
@@ -258,6 +265,7 @@ Type
     property VirtualIndex: Smallint read fVirtualIndex;
     property CallingConvention: TCallConv read fCallingConvention;
     property CodeAddress: Pointer read fCodeAddress;
+    function FinalCodeAddress(Cls: TClass): Pointer; // CodeAddress calculated => no virtuals etc.
   end;
 
   {*******************************************}
@@ -816,6 +824,7 @@ constructor TALRttiMember.Create(Const aRttiMember: TRttiMember);
 begin
   inherited create(aRttiMember);
   fVisibility := aRttiMember.Visibility;
+  fOrder := -1;
 end;
 
 {************************************************************}
@@ -882,6 +891,11 @@ begin
   else fParamType := nil;
 end;
 
+{**}
+type
+  PVtable = ^TVtable;
+  TVtable = array[0..MaxInt div SizeOf(Pointer) - 1] of Pointer;
+
 {***************************************************************}
 constructor TALRttiMethod.Create(const aRttiMethod: TRttiMethod);
 var aRttiParameters: TArray<TRttiParameter>;
@@ -913,6 +927,22 @@ var i: integer;
 begin
   for I := Low(fRttiParameters) to High(fRttiParameters) do fRttiParameters[i].free;
   inherited;
+end;
+
+{************************************************************}
+function TALRttiMethod.FinalCodeAddress(Cls: TClass): Pointer; // CodeAddress calculated => no virtuals etc.
+begin
+  if IsStatic then result := fCodeAddress // ex: TMarshal => class function OutString(const S: string): MarshaledString; overload; inline; static;
+  else begin
+    case DispatchKind of
+      dkVtable: result := PVtable(Cls)^[fVirtualIndex];
+      dkDynamic: result := GetDynaMethod(Cls, fVirtualIndex);
+      else result := fCodeAddress; //dkStatic => not virtual nor dynamic method
+                                             //dkMessage => never possible here
+                                             //dkInterface => never possible here
+
+    end;
+  end;
 end;
 
 {************************************************************************************}
@@ -1001,188 +1031,226 @@ end;
 {*****************************************************}
 procedure TALRttiType.init(const aRttiType: TRttiType);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _AddField(const aRttiField: TRttiField);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddField(const aRttiField: TRttiField; const aOrder: integer);
   begin
     case aRttiField.Visibility of
       mvPrivate:begin
                   setlength(fPrivateFields, length(fPrivateFields)+1);
                   fPrivateFields[high(fPrivateFields)] := TALRttiField.Create(aRttiField);
+                  fPrivateFields[high(fPrivateFields)].fOrder := aOrder;
                 end;
       mvProtected:begin
                     setlength(fPrivateFields, length(fPrivateFields)+1);
                     fPrivateFields[high(fPrivateFields)] := TALRttiField.Create(aRttiField);
+                    fPrivateFields[high(fPrivateFields)].fOrder := aOrder;
 
                     setlength(fProtectedFields, length(fProtectedFields)+1);
                     fProtectedFields[high(fProtectedFields)] := TALRttiField.Create(aRttiField);
+                    fProtectedFields[high(fProtectedFields)].fOrder := aOrder;
                   end;
       mvPublic:begin
                  setlength(fPrivateFields, length(fPrivateFields)+1);
                  fPrivateFields[high(fPrivateFields)] := TALRttiField.Create(aRttiField);
+                 fPrivateFields[high(fPrivateFields)].fOrder := aOrder;
 
                  setlength(fProtectedFields, length(fProtectedFields)+1);
                  fProtectedFields[high(fProtectedFields)] := TALRttiField.Create(aRttiField);
+                 fProtectedFields[high(fProtectedFields)].fOrder := aOrder;
 
                  setlength(fPublicFields, length(fPublicFields)+1);
                  fPublicFields[high(fPublicFields)] := TALRttiField.Create(aRttiField);
+                 fPublicFields[high(fPublicFields)].fOrder := aOrder;
                end;
       mvPublished:begin
                     setlength(fPrivateFields, length(fPrivateFields)+1);
                     fPrivateFields[high(fPrivateFields)] := TALRttiField.Create(aRttiField);
+                    fPrivateFields[high(fPrivateFields)].fOrder := aOrder;
 
                     setlength(fProtectedFields, length(fProtectedFields)+1);
                     fProtectedFields[high(fProtectedFields)] := TALRttiField.Create(aRttiField);
+                    fProtectedFields[high(fProtectedFields)].fOrder := aOrder;
 
                     setlength(fPublicFields, length(fPublicFields)+1);
                     fPublicFields[high(fPublicFields)] := TALRttiField.Create(aRttiField);
+                    fPublicFields[high(fPublicFields)].fOrder := aOrder;
 
                     setlength(fPublishedFields, length(fPublishedFields)+1);
                     fPublishedFields[high(fPublishedFields)] := TALRttiField.Create(aRttiField);
+                    fPublishedFields[high(fPublishedFields)].fOrder := aOrder;
                   end;
       else raise Exception.Create('Unknown visibility');
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _AddIndexedProperty(const aRttiIndexedProperty: TRttiIndexedProperty);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddIndexedProperty(const aRttiIndexedProperty: TRttiIndexedProperty; const aOrder: integer);
   begin
     case aRttiIndexedProperty.Visibility of
       mvPrivate:begin
                   setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
                   fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                  fPrivateIndexedProperties[high(fPrivateIndexedProperties)].fOrder := aOrder;
                 end;
       mvProtected:begin
                     setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
                     fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                    fPrivateIndexedProperties[high(fPrivateIndexedProperties)].fOrder := aOrder;
 
                     setlength(fProtectedIndexedProperties, length(fProtectedIndexedProperties)+1);
                     fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                    fProtectedIndexedProperties[high(fProtectedIndexedProperties)].fOrder := aOrder;
                   end;
       mvPublic:begin
                  setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
                  fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                 fPrivateIndexedProperties[high(fPrivateIndexedProperties)].fOrder := aOrder;
 
                  setlength(fProtectedIndexedProperties, length(fProtectedIndexedProperties)+1);
                  fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                 fProtectedIndexedProperties[high(fProtectedIndexedProperties)].fOrder := aOrder;
 
                  setlength(fPublicIndexedProperties, length(fPublicIndexedProperties)+1);
                  fPublicIndexedProperties[high(fPublicIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                 fPublicIndexedProperties[high(fPublicIndexedProperties)].fOrder := aOrder;
                end;
       mvPublished:begin
                     setlength(fPrivateIndexedProperties, length(fPrivateIndexedProperties)+1);
                     fPrivateIndexedProperties[high(fPrivateIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                    fPrivateIndexedProperties[high(fPrivateIndexedProperties)].fOrder := aOrder;
 
                     setlength(fProtectedIndexedProperties, length(fProtectedIndexedProperties)+1);
                     fProtectedIndexedProperties[high(fProtectedIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                    fProtectedIndexedProperties[high(fProtectedIndexedProperties)].fOrder := aOrder;
 
                     setlength(fPublicIndexedProperties, length(fPublicIndexedProperties)+1);
                     fPublicIndexedProperties[high(fPublicIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                    fPublicIndexedProperties[high(fPublicIndexedProperties)].fOrder := aOrder;
 
                     setlength(fPublishedIndexedProperties, length(fPublishedIndexedProperties)+1);
                     fPublishedIndexedProperties[high(fPublishedIndexedProperties)] := TALRttiIndexedProperty.create(aRttiIndexedProperty);
+                    fPublishedIndexedProperties[high(fPublishedIndexedProperties)].fOrder := aOrder;
                   end;
       else raise Exception.Create('Unknown visibility');
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _AddMethod(const aRttiMethod: TRttiMethod);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddMethod(const aRttiMethod: TRttiMethod; const aOrder: integer);
   begin
     case aRttiMethod.Visibility of
       mvPrivate:begin
                   setlength(fPrivateMethods, length(fPrivateMethods)+1);
                   fPrivateMethods[high(fPrivateMethods)] := TALRttiMethod.create(aRttiMethod);
+                  fPrivateMethods[high(fPrivateMethods)].fOrder := aOrder;
                 end;
       mvProtected:begin
                     setlength(fPrivateMethods, length(fPrivateMethods)+1);
                     fPrivateMethods[high(fPrivateMethods)] := TALRttiMethod.create(aRttiMethod);
+                    fPrivateMethods[high(fPrivateMethods)].fOrder := aOrder;
 
                     setlength(fProtectedMethods, length(fProtectedMethods)+1);
                     fProtectedMethods[high(fProtectedMethods)] := TALRttiMethod.create(aRttiMethod);
+                    fProtectedMethods[high(fProtectedMethods)].fOrder := aOrder;
                   end;
       mvPublic:begin
                  setlength(fPrivateMethods, length(fPrivateMethods)+1);
                  fPrivateMethods[high(fPrivateMethods)] := TALRttiMethod.create(aRttiMethod);
+                 fPrivateMethods[high(fPrivateMethods)].fOrder := aOrder;
 
                  setlength(fProtectedMethods, length(fProtectedMethods)+1);
                  fProtectedMethods[high(fProtectedMethods)] := TALRttiMethod.create(aRttiMethod);
+                 fProtectedMethods[high(fProtectedMethods)].fOrder := aOrder;
 
                  setlength(fPublicMethods, length(fPublicMethods)+1);
                  fPublicMethods[high(fPublicMethods)] := TALRttiMethod.create(aRttiMethod);
+                 fPublicMethods[high(fPublicMethods)].fOrder := aOrder;
                end;
       mvPublished:begin
                     setlength(fPrivateMethods, length(fPrivateMethods)+1);
                     fPrivateMethods[high(fPrivateMethods)] := TALRttiMethod.create(aRttiMethod);
+                    fPrivateMethods[high(fPrivateMethods)].fOrder := aOrder;
 
                     setlength(fProtectedMethods, length(fProtectedMethods)+1);
                     fProtectedMethods[high(fProtectedMethods)] := TALRttiMethod.create(aRttiMethod);
+                    fProtectedMethods[high(fProtectedMethods)].fOrder := aOrder;
 
                     setlength(fPublicMethods, length(fPublicMethods)+1);
                     fPublicMethods[high(fPublicMethods)] := TALRttiMethod.create(aRttiMethod);
+                    fPublicMethods[high(fPublicMethods)].fOrder := aOrder;
 
                     setlength(fPublishedMethods, length(fPublishedMethods)+1);
                     fPublishedMethods[high(fPublishedMethods)] := TALRttiMethod.create(aRttiMethod);
+                    fPublishedMethods[high(fPublishedMethods)].fOrder := aOrder;
                   end;
       else raise Exception.Create('Unknown visibility');
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _AddProperty(const aRttiProperty: TRttiProperty);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddProperty(const aRttiProperty: TRttiProperty; const aOrder: integer);
   begin
     case aRttiProperty.Visibility of
       mvPrivate:begin
                   setlength(fPrivateProperties, length(fPrivateProperties)+1);
                   fPrivateProperties[high(fPrivateProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                  fPrivateProperties[high(fPrivateProperties)].fOrder := aOrder;
                 end;
       mvProtected:begin
                     setlength(fPrivateProperties, length(fPrivateProperties)+1);
                     fPrivateProperties[high(fPrivateProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                    fPrivateProperties[high(fPrivateProperties)].fOrder := aOrder;
 
                     setlength(fProtectedProperties, length(fProtectedProperties)+1);
                     fProtectedProperties[high(fProtectedProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                    fProtectedProperties[high(fProtectedProperties)].fOrder := aOrder;
                   end;
       mvPublic:begin
                  setlength(fPrivateProperties, length(fPrivateProperties)+1);
                  fPrivateProperties[high(fPrivateProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                 fPrivateProperties[high(fPrivateProperties)].fOrder := aOrder;
 
                  setlength(fProtectedProperties, length(fProtectedProperties)+1);
                  fProtectedProperties[high(fProtectedProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                 fProtectedProperties[high(fProtectedProperties)].fOrder := aOrder;
 
                  setlength(fPublicProperties, length(fPublicProperties)+1);
                  fPublicProperties[high(fPublicProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                 fPublicProperties[high(fPublicProperties)].fOrder := aOrder;
                end;
       mvPublished:begin
                     setlength(fPrivateProperties, length(fPrivateProperties)+1);
                     fPrivateProperties[high(fPrivateProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                    fPrivateProperties[high(fPrivateProperties)].fOrder := aOrder;
 
                     setlength(fProtectedProperties, length(fProtectedProperties)+1);
                     fProtectedProperties[high(fProtectedProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                    fProtectedProperties[high(fProtectedProperties)].fOrder := aOrder;
 
                     setlength(fPublicProperties, length(fPublicProperties)+1);
                     fPublicProperties[high(fPublicProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                    fPublicProperties[high(fPublicProperties)].fOrder := aOrder;
 
                     setlength(fPublishedProperties, length(fPublishedProperties)+1);
                     fPublishedProperties[high(fPublishedProperties)] := TALRttiInstanceProperty.Create(TRttiInstanceProperty(aRttiProperty));
+                    fPublishedProperties[high(fPublishedProperties)].fOrder := aOrder;
                   end;
       else raise Exception.Create('Unknown visibility');
     end;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _sortArray(var aArray: TArray<TALRttiNamedObject>);
+  procedure _sortArray(var aArray: TArray<TALRttiMember>);
   begin
-    TArray.sort<TALRttiNamedObject>(aArray,
-                                    TDelegatedComparer<TALRttiNamedObject>.Construct(function(const Left, Right: TALRttiNamedObject): Integer
-                                    begin
-                                      Result := ALcompareText(Left.Name, Right.Name);
-                                    end));
+    TArray.sort<TALRttiMember>(aArray,
+                               TDelegatedComparer<TALRttiMember>.Construct(function(const Left, Right: TALRttiMember): Integer
+                               begin
+                                 Result := ALcompareText(Left.Name, Right.Name);
+                                 if result = 0 then result := Left.Order - Right.Order;
+                               end));
   end;
 
-var aRttiProperty: TRttiProperty;
-    aRttiIndexedProperty: TRttiIndexedProperty;
-    aRttiField: TRttiField;
-    aRttiMethod: TRttiMethod;
+var i: integer;
 
 begin
 
@@ -1222,30 +1290,30 @@ begin
   setlength(fPublishedFields, 0);
   setlength(fPublishedMethods, 0);
   //-----
-  for aRttiProperty in aRttiType.GetProperties do _AddProperty(aRttiProperty);
-  for aRttiIndexedProperty in aRttiType.GetIndexedProperties do _AddIndexedProperty(aRttiIndexedProperty);
-  for aRttiField in aRttiType.GetFields do _AddField(aRttiField);
-  for aRttiMethod in aRttiType.GetMethods do _AddMethod(aRttiMethod);
+  for i:=low(aRttiType.GetProperties) to high(aRttiType.GetProperties) do _AddProperty(aRttiType.GetProperties[i], i);
+  for i:=low(aRttiType.GetIndexedProperties) to high(aRttiType.GetIndexedProperties) do _AddIndexedProperty(aRttiType.GetIndexedProperties[i],i);
+  for i:=low(aRttiType.GetFields) to high(aRttiType.GetFields) do _AddField(aRttiType.GetFields[i],i);
+  for i:=low(aRttiType.GetMethods) to high(aRttiType.GetMethods) do _AddMethod(aRttiType.GetMethods[i],i);
   //-----
-  _sortArray(TArray<TALRttiNamedObject>(fPrivateIndexedProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fPrivateProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fPrivateFields));
-  _sortArray(TArray<TALRttiNamedObject>(fPrivateMethods));
+  _sortArray(TArray<TALRttiMember>(fPrivateIndexedProperties));
+  _sortArray(TArray<TALRttiMember>(fPrivateProperties));
+  _sortArray(TArray<TALRttiMember>(fPrivateFields));
+  _sortArray(TArray<TALRttiMember>(fPrivateMethods));
   //-----
-  _sortArray(TArray<TALRttiNamedObject>(fProtectedIndexedProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fProtectedProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fProtectedFields));
-  _sortArray(TArray<TALRttiNamedObject>(fProtectedMethods));
+  _sortArray(TArray<TALRttiMember>(fProtectedIndexedProperties));
+  _sortArray(TArray<TALRttiMember>(fProtectedProperties));
+  _sortArray(TArray<TALRttiMember>(fProtectedFields));
+  _sortArray(TArray<TALRttiMember>(fProtectedMethods));
   //-----
-  _sortArray(TArray<TALRttiNamedObject>(fPublicIndexedProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fPublicProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fPublicFields));
-  _sortArray(TArray<TALRttiNamedObject>(fPublicMethods));
+  _sortArray(TArray<TALRttiMember>(fPublicIndexedProperties));
+  _sortArray(TArray<TALRttiMember>(fPublicProperties));
+  _sortArray(TArray<TALRttiMember>(fPublicFields));
+  _sortArray(TArray<TALRttiMember>(fPublicMethods));
   //-----
-  _sortArray(TArray<TALRttiNamedObject>(fPublishedIndexedProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fPublishedProperties));
-  _sortArray(TArray<TALRttiNamedObject>(fPublishedFields));
-  _sortArray(TArray<TALRttiNamedObject>(fPublishedMethods));
+  _sortArray(TArray<TALRttiMember>(fPublishedIndexedProperties));
+  _sortArray(TArray<TALRttiMember>(fPublishedProperties));
+  _sortArray(TArray<TALRttiMember>(fPublishedFields));
+  _sortArray(TArray<TALRttiMember>(fPublishedMethods));
 
 end;
 

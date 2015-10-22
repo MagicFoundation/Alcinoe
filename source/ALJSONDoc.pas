@@ -329,7 +329,7 @@ type
     function Extract(const index: integer): TALJSONNode; overload;
     function Extract(const Node: TALJSONNode): TALJSONNode; overload;
     procedure Exchange(Index1, Index2: Integer);
-    function FindNode(NodeName: AnsiString): TALJSONNode; overload;
+    function FindNode(const NodeName: AnsiString): TALJSONNode; overload;
     function FindSibling(const Node: TALJSONNode; Delta: Integer): TALJSONNode;
     function First: TALJSONNode;
     function IndexOf(const Name: AnsiString): Integer; overload;
@@ -4006,7 +4006,7 @@ end;
  *NodeName is the node to access. It specifies the NodeName property of the desired node.
  FindNode returns the object of the node if it is in the list. If NodeName does not specify a node in the list,
  FindNode returns nil (Delphi) or NULL (C++).}
-function TALJSONNodeList.FindNode(NodeName: AnsiString): TALJSONNode;
+function TALJSONNodeList.FindNode(const NodeName: AnsiString): TALJSONNode;
 var Index: Integer;
 begin
   Index := IndexOf(NodeName);

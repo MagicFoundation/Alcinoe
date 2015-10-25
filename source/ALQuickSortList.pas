@@ -107,10 +107,11 @@ interface
 
 Uses {$IF CompilerVersion >= 23} {Delphi XE2}
      System.Classes,
+     System.Generics.Defaults,
+     System.Generics.Collections;
      {$ELSE}
-     Classes,
+     Classes;
      {$IFEND}
-     ALAVLBinaryTree;
 
 {$if CompilerVersion<=18.5}
 //http://stackoverflow.com/questions/7630781/delphi-2007-and-xe2-using-nativeint
@@ -275,7 +276,7 @@ Type
     FObject: TObject;
   end;
 
-  {------------------------------------------}
+  {-----------------------------------------}
   TALDoubleList = class(TALBaseQuickSortList)
   private
     FOwnsObject: Boolean;
@@ -302,83 +303,29 @@ Type
     property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
-  {-----------------------------}
-  TALBaseAVLList = class(TObject)
-  private
-    FList: TALQuickSortPointerList;
-    FCount: Integer;
-    FCapacity: Integer;
-    FDuplicates: TDuplicates;
-  protected
-    function  Get(Index: Integer): Pointer;
-    procedure Grow;
-    procedure Notify(Ptr: Pointer; Action: TListNotification); virtual;
-    procedure SetCapacity(NewCapacity: Integer);
-    procedure SetCount(NewCount: Integer);
-    procedure InsertItem(Index: Integer; Item: Pointer);
-    property  List: TALQuickSortPointerList read FList;
+  {--------------------------------------}
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALDictionary<TKey,TValue> = Class(TDictionary<TKey,TValue>)
   public
-    Constructor Create;
-    destructor Destroy; override;
-    procedure Clear; virtual;
-    procedure Delete(Index: Integer);
-    class procedure Error(const Msg: string; Data: NativeInt); overload; virtual;
-    class procedure Error(Msg: PResStringRec; Data: NativeInt); overload;
-    function  Expand: TALBaseAVLList;
-    property  Capacity: Integer read FCapacity write SetCapacity;
-    property  Count: Integer read FCount write SetCount;
-    property  Duplicates: TDuplicates read FDuplicates write FDuplicates;
-  end;
+    function TryAdd(const Key: TKey; const Value: TValue): boolean;
+  End;
+  {$IFEND}
 
-  {----------------------}
-  TALInt64AVLList = class;
-
-  {---------------------------------------------------------}
-  TALInt64AVLListBinaryTree = class(TALInt64KeyAVLBinaryTree)
-  Private
-    fOwner: TALInt64AVLList;
-  Protected
-    procedure FreeNodeObj(aNode: TALBaseAVLBinaryTreeNode); override;
-  Public
-    Constructor Create(aOwner: TALInt64AVLList); reintroduce;
-    property Owner: TALInt64AVLList read fOwner write fOwner;
-  end;
-
-  {-----------------------------------------------------------------}
-  TALInt64AVLListBinaryTreeNode = class(TALInt64KeyAVLBinaryTreeNode)
-  Private
-  Protected
-  Public
-    Obj: Tobject; // Object
-    Idx: integer; // Index in the NodeList
-    Constructor Create; Override;
-  end;
-
-  {-------------------------------------}
-  TALInt64AVLList = class(TALBaseAVLList)
+  {--------------------------------------}
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALObjectDictionary<TKey,TValue> = class(TALDictionary<TKey,TValue>)
   private
-    FOwnsObject: Boolean;
-    FAVLBinTree: TALInt64AVLListBinaryTree;
-    function  GetItem(Index: Integer): Int64;
-    function  GetObject(Index: Integer): TObject;
-    procedure PutObject(Index: Integer; AObject: TObject);
+    FOwnerships: TDictionaryOwnerships;
   protected
-    procedure InsertItem(Index: Integer; const item: Int64; AObject: TObject);
+    procedure KeyNotify(const Key: TKey; Action: TCollectionNotification); override;
+    procedure ValueNotify(const Value: TValue; Action: TCollectionNotification); override;
   public
-    Constructor Create; overload;
-    constructor Create(OwnsObjects: Boolean); overload;
-    destructor Destroy; override;
-    procedure Clear; override;
-    procedure Delete(Index: Integer);
-    function  IndexOf(Item: Int64): Integer;
-    function  IndexOfObject(AObject: TObject): Integer;
-    function  Add(const Item: Int64): Integer;
-    Function  AddObject(const Item: Int64; AObject: TObject): Integer;
-    function  Find(item: Int64; var Index: Integer): Boolean;
-    property  Items[Index: Integer]: Int64 read GetItem; default;
-    property  Objects[Index: Integer]: TObject read GetObject write PutObject;
-    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    constructor Create(Ownerships: TDictionaryOwnerships; ACapacity: Integer = 0); overload;
+    constructor Create(Ownerships: TDictionaryOwnerships; const AComparer: IEqualityComparer<TKey>); overload;
+    constructor Create(Ownerships: TDictionaryOwnerships; ACapacity: Integer; const AComparer: IEqualityComparer<TKey>); overload;
+    property Ownerships: TDictionaryOwnerships read fOwnerships write fOwnerships;
   end;
+  {$IFEND}
 
 resourcestring
   SALDuplicateItem = 'List does not allow duplicates';
@@ -389,7 +336,12 @@ resourcestring
 
 implementation
 
-uses ALString;
+uses {$IF CompilerVersion >= 23} {Delphi XE2}
+     System.SysUtils,
+     System.SysConst,
+     System.TypInfo,
+     {$IFEND}
+     ALString;
 
 {***********************************************************************************}
 function AlBaseQuickSortListCompare(List: TObject; Index1, Index2: Integer): Integer;
@@ -1327,290 +1279,74 @@ begin
   PALDoubleListItem(Get(index))^.FObject := AObject;
 end;
 
-{********************************}
-constructor TALBaseAVLList.Create;
-begin
-  Setlength(FList,0);
-  FCount:= 0;
-  FCapacity:= 0;
-  FDuplicates := dupIgnore;
-end;
-
-{********************************}
-destructor TALBaseAVLList.Destroy;
-begin
-  Clear;
-end;
-
-{*****************************}
-procedure TALBaseAVLList.Clear;
-begin
-  SetCount(0);
-  SetCapacity(0);
-end;
-
-{*****************************************************************}
-procedure TALBaseAVLList.InsertItem(Index: Integer; Item: Pointer);
-begin
-  if FCount = FCapacity then
-    Grow;
-  if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
-      (FCount - Index) * SizeOf(Pointer));
-  FList[Index] := Item;
-  Inc(FCount);
-  if (Item <> nil) then
-    Notify(Item, lnAdded);
-end;
-
-{**********************************************}
-procedure TALBaseAVLList.Delete(Index: Integer);
-var
-  Temp: Pointer;
-begin
-  if (Index < 0) or (Index >= FCount) then
-    Error(@SALListIndexError, Index);
-  Temp := FList[Index];
-  Dec(FCount);
-  if Index < FCount then
-    ALMove(FList[Index + 1], FList[Index],
-      (FCount - Index) * SizeOf(Pointer));
-  if (Temp <> nil) then
-    Notify(Temp, lnDeleted);
-end;
-
-{***********************************************************************}
-class procedure TALBaseAVLList.Error(const Msg: string; Data: NativeInt);
-begin
-  raise EListError.CreateFmt(Msg, [Data]);
-end;
-
-{************************************************************************}
-class procedure TALBaseAVLList.Error(Msg: PResStringRec; Data: NativeInt);
-begin
-  raise EListError.CreateFmt(LoadResString(Msg), [Data]);
-end;
-
-{***************************************************}
-function TALBaseAVLList.Get(Index: Integer): Pointer;
-begin
-  if Cardinal(Index) >= Cardinal(FCount) then
-    Error(@SALListIndexError, Index);
-  Result := FList[Index];
-end;
-
-{*********************************************}
-function TALBaseAVLList.Expand: TALBaseAVLList;
-begin
-  if FCount = FCapacity then
-    Grow;
-  Result := Self;
-end;
-
-{****************************}
-procedure TALBaseAVLList.Grow;
-var
-  Delta: Integer;
-begin
-  if FCapacity > 64 then
-    Delta := FCapacity div 4
-  else
-    if FCapacity > 8 then
-      Delta := 16
-    else
-      Delta := 4;
-  SetCapacity(FCapacity + Delta);
-end;
-
-{***********************************************************************}
-procedure TALBaseAVLList.Notify(Ptr: Pointer; Action: TListNotification);
-begin
-end;
-
-{*********************************************************}
-procedure TALBaseAVLList.SetCapacity(NewCapacity: Integer);
-begin
-  if NewCapacity < FCount then
-    Error(@SALListCapacityError, NewCapacity);
-  if NewCapacity <> FCapacity then
-  begin
-    SetLength(FList, NewCapacity);
-    FCapacity := NewCapacity;
-  end;
-end;
-
-{***************************************************}
-procedure TALBaseAVLList.SetCount(NewCount: Integer);
-var
-  I: Integer;
-  Temp: Pointer;
-begin
-  if NewCount < 0 then
-    Error(@SALListCountError, NewCount);
-  if NewCount <> FCount then
-  begin
-    if NewCount > FCapacity then
-      SetCapacity(NewCount);
-    if NewCount > FCount then
-      FillChar(FList[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
-    else
-    for I := FCount - 1 downto NewCount do
-    begin
-      Dec(FCount);
-      Temp := List[I];
-      if Temp <> nil then
-        Notify(Temp, lnDeleted);
-    end;
-    FCount := NewCount;
-  end;
-end;
-
-{********************************************************************}
-constructor TALInt64AVLListBinaryTree.Create(aOwner: TALInt64AVLList);
-begin
-  inherited create;
-  fOwner := aOwner;
-end;
-
-{*******************************************************************************}
-procedure TALInt64AVLListBinaryTree.FreeNodeObj(aNode: TALBaseAVLBinaryTreeNode);
-begin
-  if owner.OwnsObjects then TALInt64AVLListBinaryTreeNode(aNode).obj.Free;
-  inherited;
-end;
-
-{***********************************************}
-constructor TALInt64AVLListBinaryTreeNode.Create;
-begin
-  inherited;
-  Obj := nil;
-  idx := -1;
-end;
-
-{*********************************}
-constructor TALInt64AVLList.Create;
-begin
-  inherited create;
-  FAVLBinTree:= TALInt64AVLListBinaryTree.Create(self);
-  FOwnsObject := False;
-end;
-
-{*******************************************************}
-constructor TALInt64AVLList.Create(OwnsObjects: Boolean);
-begin
-  inherited Create;
-  FAVLBinTree:= TALInt64AVLListBinaryTree.Create(self);
-  FOwnsObject := OwnsObjects;
-end;
-
-{*********************************}
-destructor TALInt64AVLList.Destroy;
-begin
-  inherited;
-  FAVLBinTree.free;
-end;
-
-{******************************}
-procedure TALInt64AVLList.Clear;
-begin
-  FAVLBinTree.Clear;
-  inherited;
-end;
-
-{*******************************************************}
-function TALInt64AVLList.Add(const Item: Int64): Integer;
-begin
-  Result := AddObject(Item, nil);
-end;
-
-{*******************************************************************************}
-function TALInt64AVLList.AddObject(const Item: Int64; AObject: TObject): Integer;
-begin
-  Result := FCount;
-  InsertItem(Result, Item, AObject);
-end;
+{$IF CompilerVersion >= 23} {Delphi XE2}
 
 {****************************************************************************************}
-procedure TALInt64AVLList.InsertItem(Index: Integer; const item: Int64; AObject: TObject);
-Var aNode: TALInt64AVLListBinaryTreeNode;
-    i: integer;
+function TALDictionary<TKey,TValue>.TryAdd(const Key: TKey; const Value: TValue): boolean;
+var
+  index, hc: Integer;
 begin
-  aNode := TALInt64AVLListBinaryTreeNode.Create;
-  aNode.ID  := item;
-  aNode.Obj := AObject;
-  aNode.Idx := Index;
-  if not FAVLBinTree.AddNode(aNode) then begin
-    aNode.free;
-    case Duplicates of
-      dupIgnore: Exit;
-      else Error(@SALDuplicateItem, 0);
-    end;
+  if Count >= FGrowThreshold then
+    Grow;
+
+  hc := Hash(Key);
+  index := GetBucketIndex(Key, hc);
+  if index >= 0 then exit(False);
+
+  result := true;
+  DoAdd(hc, not index, Key, Value);
+end;
+
+{*****************************************************************************************************}
+procedure TALObjectDictionary<TKey,TValue>.KeyNotify(const Key: TKey; Action: TCollectionNotification);
+begin
+  inherited;
+  if (Action = cnRemoved) and (doOwnsKeys in FOwnerships) then
+    PObject(@Key)^.DisposeOf;
+end;
+
+{***********************************************************************************************************}
+procedure TALObjectDictionary<TKey,TValue>.ValueNotify(const Value: TValue; Action: TCollectionNotification);
+begin
+  inherited;
+  if (Action = cnRemoved) and (doOwnsValues in FOwnerships) then
+    PObject(@Value)^.DisposeOf;
+end;
+
+{************************************************************************************}
+constructor TALObjectDictionary<TKey,TValue>.Create(Ownerships: TDictionaryOwnerships;
+  ACapacity: Integer = 0);
+begin
+  Create(Ownerships, ACapacity, nil);
+end;
+
+{************************************************************************************}
+constructor TALObjectDictionary<TKey,TValue>.Create(Ownerships: TDictionaryOwnerships;
+  const AComparer: IEqualityComparer<TKey>);
+begin
+  Create(Ownerships, 0, AComparer);
+end;
+
+{************************************************************************************}
+constructor TALObjectDictionary<TKey,TValue>.Create(Ownerships: TDictionaryOwnerships;
+  ACapacity: Integer; const AComparer: IEqualityComparer<TKey>);
+begin
+  inherited Create(ACapacity, AComparer);
+  if doOwnsKeys in Ownerships then
+  begin
+    if (TypeInfo(TKey) = nil) or (PTypeInfo(TypeInfo(TKey))^.Kind <> tkClass) then
+      raise EInvalidCast.CreateRes(@SInvalidCast);
   end;
 
-  try
-    inherited InsertItem(index,aNode);
-  except
-    FAVLBinTree.DeleteNode(item);
-    raise;
+  if doOwnsValues in Ownerships then
+  begin
+    if (TypeInfo(TValue) = nil) or (PTypeInfo(TypeInfo(TValue))^.Kind <> tkClass) then
+      raise EInvalidCast.CreateRes(@SInvalidCast);
   end;
-
-  for i := Index + 1 to Count - 1 do
-    inc(TALInt64AVLListBinaryTreeNode(objects[i]).Idx);
+  FOwnerships := Ownerships;
 end;
 
-{**********************************************************************}
-function TALInt64AVLList.Find(item: Int64; var Index: Integer): Boolean;
-var aNode: TALInt64KeyAVLBinaryTreeNode;
-begin
-  aNode := FAVLBinTree.FindNode(item);
-  result := assigned(aNode);
-  if result then Index := TALInt64AVLListBinaryTreeNode(aNode).Idx;
-end;
+{$IFEND}
 
-{******************************************************}
-function TALInt64AVLList.GetItem(Index: Integer): Int64;
-begin
-  Result := TALInt64AVLListBinaryTreeNode(Get(index)).ID
-end;
-
-{*****************************************************}
-function TALInt64AVLList.IndexOf(Item: Int64): Integer;
-begin
-  if not Find(Item, Result) then Result := -1;
-end;
-
-{***********************************************}
-procedure TALInt64AVLList.Delete(Index: Integer);
-var i: integer;
-begin
-  FAVLBinTree.DeleteNode(GetItem(Index));
-
-  for i := Index + 1 to Count - 1 do
-    dec(TALInt64AVLListBinaryTreeNode(Get(i)).Idx);
-
-  inherited Delete(Index);
-end;
-
-{**********************************************************}
-function TALInt64AVLList.GetObject(Index: Integer): TObject;
-begin
-  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
-  Result :=  TALInt64AVLListBinaryTreeNode(Get(index)).Obj;
-end;
-
-{****************************************************************}
-function TALInt64AVLList.IndexOfObject(AObject: TObject): Integer;
-begin
-  for Result := 0 to Count - 1 do
-    if GetObject(Result) = AObject then Exit;
-  Result := -1;
-end;
-
-{********************************************************************}
-procedure TALInt64AVLList.PutObject(Index: Integer; AObject: TObject);
-begin
-  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
-  TALInt64AVLListBinaryTreeNode(Get(index)).Obj := AObject;
-end;
 
 end.

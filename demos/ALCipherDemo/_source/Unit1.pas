@@ -4,9 +4,9 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, cxGraphics,
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, cxGraphics, ALZlibExApi,
   cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
-  cxLabel, Shellapi;
+  cxLabel, Shellapi, System.Generics.Defaults;
 
 type
   TForm1 = class(TForm)
@@ -36,6 +36,9 @@ type
     cxLabel4: TcxLabel;
     cxLabel6: TcxLabel;
     cxWwwArkadiaComLabel: TcxLabel;
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -50,6 +53,9 @@ type
     procedure ALButton12Click(Sender: TObject);
     procedure ALButton13Click(Sender: TObject);
     procedure cxWwwArkadiaComLabelClick(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
   public
   end;
@@ -63,7 +69,8 @@ uses math,
      AlAVLBinaryTree,
      ALString,
      alMime,
-     alCipher;
+     alCipher,
+     alZlibEx;
 
 {$R *.dfm}
 
@@ -99,7 +106,7 @@ begin
   while True do begin
     ALStringHashMD5(Data);
     inc(counter);
-    if counter mod 1000 = 0 then begin
+    if counter mod 100000 = 0 then begin
       StatusBar1.Panels[0].Text := 'MD5';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
@@ -132,7 +139,7 @@ begin
   while True do begin
     ALStringHashSHA1(Data);
     inc(counter);
-    if counter mod 1000 = 0 then begin
+    if counter mod 100000 = 0 then begin
       StatusBar1.Panels[0].Text := 'SHA1';
       StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
       StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
@@ -306,6 +313,104 @@ Var outString: AnsiString;
 begin
   ALRDLEncryptStringCBC(ALMimeBase64DecodeString(ALTrim(ansiString(ALMemocryptedData.Lines.Text))), outString, ansiString(EditKey.Text), False);
   ALMemoDeCryptedData.Lines.Text := string(outString);
+end;
+
+{*********************************************}
+procedure TForm1.Button1Click(Sender: TObject);
+Var Data: AnsiString;
+    Counter: integer;
+    StartTime: DWORD;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench CRC32 (Zlib)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+  Counter := 0;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
+  Data := ALRandomStr(250);
+  while True do begin
+    ZCrc32(0, Data[1], length(Data));
+    inc(counter);
+    if counter mod 100000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'CRC32 (Zlib)';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
+      if (Sender as TButton).Tag = 0 then break;
+      application.ProcessMessages;
+    end;
+  end;
+end;
+
+{*********************************************}
+procedure TForm1.Button2Click(Sender: TObject);
+Var Data: AnsiString;
+    Counter: integer;
+    StartTime: DWORD;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench CRC32';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+  Counter := 0;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
+  Data := ALRandomStr(250);
+  while True do begin
+    ALStringHashCRC32(Data);
+    inc(counter);
+    if counter mod 100000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'CRC32';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
+      if (Sender as TButton).Tag = 0 then break;
+      application.ProcessMessages;
+    end;
+  end;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+Var Data: AnsiString;
+    Counter: integer;
+    StartTime: DWORD;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench BobJenkinsHash';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+  Counter := 0;
+  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StartTime := GetTickCount;
+  Data := ALRandomStr(250);
+  while True do begin
+    BobJenkinsHash(Data[1], Length(Data) * SizeOf(Data[1]), 0);
+    inc(counter);
+    if counter mod 100000 = 0 then begin
+      StatusBar1.Panels[0].Text := 'BobJenkinsHash';
+      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
+      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
+      if (Sender as TButton).Tag = 0 then break;
+      application.ProcessMessages;
+    end;
+  end;
 end;
 
 {**********************************************************}

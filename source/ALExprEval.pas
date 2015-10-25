@@ -1000,8 +1000,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Contnrs,
      {$IFEND}
      ALString,
-     ALZLibExAPI,
-     ALZLibEx;
+     ALCipher;
 
 {************************}
 {$IFDEF SUPPORTS_EXTENDED}
@@ -2027,7 +2026,7 @@ function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
   end;
 
 var aInSingleQuote, aInDoubleQuote: Boolean;
-    aCrc: LongInt;
+    aCrc: cardinal;
     P1, P2: integer;
     S1: ansiString;
 
@@ -2069,7 +2068,7 @@ begin
       S1 := AlCopyStr(result,P1, P2 - P1 + 1);
       S1 := ALDequotedStr(S1, S1[1]);
       if S1 = '' then aCrc := 0
-      else aCrc := ZCrc32(0, S1[1], length(S1));
+      else aCrc := ALStringHashCrc32(S1);
       Delete(result, P1, P2 - P1 + 1);
       Insert(ALIntToStr(aCrc), result, P1);
       P2 := P1 + length(ALIntToStr(aCrc));

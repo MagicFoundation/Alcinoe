@@ -119,8 +119,8 @@ object Form1: TForm1
     TabOrder = 6
   end
   object ALButton2: TButton
-    Left = 330
-    Top = 177
+    Left = 341
+    Top = 179
     Width = 97
     Height = 25
     Caption = 'Crypt (BF)'
@@ -128,8 +128,8 @@ object Form1: TForm1
     OnClick = ALButton2Click
   end
   object ALButton5: TButton
-    Left = 433
-    Top = 177
+    Left = 444
+    Top = 179
     Width = 115
     Height = 25
     Caption = 'DeCrypt (BF)'
@@ -137,8 +137,8 @@ object Form1: TForm1
     OnClick = ALButton5Click
   end
   object ALButton6: TButton
-    Left = 330
-    Top = 208
+    Left = 341
+    Top = 210
     Width = 97
     Height = 25
     Caption = 'Crypt (AES - EBC)'
@@ -146,8 +146,8 @@ object Form1: TForm1
     OnClick = ALButton6Click
   end
   object ALButton7: TButton
-    Left = 433
-    Top = 208
+    Left = 444
+    Top = 210
     Width = 115
     Height = 25
     Caption = 'DeCrypt (AES - EBC)'
@@ -155,26 +155,26 @@ object Form1: TForm1
     OnClick = ALButton7Click
   end
   object ALButton10: TButton
-    Left = 159
+    Left = 154
     Top = 8
-    Width = 124
+    Width = 136
     Height = 25
     Caption = 'Bench MD5'
     TabOrder = 11
     OnClick = ALButton10Click
   end
   object ALButton11: TButton
-    Left = 159
+    Left = 154
     Top = 39
-    Width = 124
+    Width = 136
     Height = 25
     Caption = 'Bench SHA1'
     TabOrder = 12
     OnClick = ALButton11Click
   end
   object ALButton8: TButton
-    Left = 330
-    Top = 239
+    Left = 341
+    Top = 241
     Width = 97
     Height = 25
     Caption = 'Crypt (AES - CBC)'
@@ -182,8 +182,8 @@ object Form1: TForm1
     OnClick = ALButton8Click
   end
   object ALButton9: TButton
-    Left = 433
-    Top = 239
+    Left = 444
+    Top = 241
     Width = 115
     Height = 25
     Caption = 'DeCrypt (AES - CBC)'
@@ -191,8 +191,8 @@ object Form1: TForm1
     OnClick = ALButton9Click
   end
   object ALButton12: TButton
-    Left = 330
-    Top = 270
+    Left = 341
+    Top = 272
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (SHA1)'
@@ -200,8 +200,8 @@ object Form1: TForm1
     OnClick = ALButton12Click
   end
   object ALButton13: TButton
-    Left = 330
-    Top = 301
+    Left = 341
+    Top = 303
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (MD5)'
@@ -209,7 +209,7 @@ object Form1: TForm1
     OnClick = ALButton13Click
   end
   object Panel7: TPanel
-    Left = 296
+    Left = 304
     Top = 8
     Width = 292
     Height = 153
@@ -223,6 +223,7 @@ object Form1: TForm1
     object cxLabel1: TcxLabel
       Left = 12
       Top = 12
+      Hint = ''
       Caption = 'Please help us to keep the development of these components free'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -238,6 +239,7 @@ object Form1: TForm1
     object Label15: TcxLabel
       Left = 12
       Top = 55
+      Hint = ''
       Caption = 'If you like these components please go to:'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -253,6 +255,7 @@ object Form1: TForm1
     object cxLabel4: TcxLabel
       Left = 12
       Top = 120
+      Hint = ''
       Caption = 'Thanks for your support !'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -268,6 +271,7 @@ object Form1: TForm1
     object cxLabel6: TcxLabel
       Left = 12
       Top = 88
+      Hint = ''
       Caption = 'and click on the Facebook/Google+ like button'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -284,6 +288,7 @@ object Form1: TForm1
       Left = 12
       Top = 71
       Cursor = crHandPoint
+      Hint = ''
       Caption = 'http://www.arkadia.com'
       ParentFont = False
       Style.Font.Charset = DEFAULT_CHARSET
@@ -298,5 +303,32 @@ object Form1: TForm1
       OnClick = cxWwwArkadiaComLabelClick
       Width = 160
     end
+  end
+  object Button1: TButton
+    Left = 154
+    Top = 70
+    Width = 136
+    Height = 25
+    Caption = 'Bench CRC32 (Zlib)'
+    TabOrder = 18
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Left = 154
+    Top = 101
+    Width = 136
+    Height = 25
+    Caption = 'Bench CRC32'
+    TabOrder = 19
+    OnClick = Button2Click
+  end
+  object Button3: TButton
+    Left = 152
+    Top = 132
+    Width = 138
+    Height = 25
+    Caption = 'Bench BobJenkinsHash'
+    TabOrder = 20
+    OnClick = Button3Click
   end
 end

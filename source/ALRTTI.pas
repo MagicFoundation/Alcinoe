@@ -1321,10 +1321,31 @@ end;
 destructor TALRttiType.Destroy;
 var i: integer;
 begin
+
+  // free properties
   for i := Low(fPrivateProperties) to High(fPrivateProperties) do fPrivateProperties[i].Free;
   for i := Low(fProtectedProperties) to High(fProtectedProperties) do fProtectedProperties[i].Free;
   for i := Low(fPublicProperties) to High(fPublicProperties) do fPublicProperties[i].Free;
   for i := Low(fPublishedProperties) to High(fPublishedProperties) do fPublishedProperties[i].Free;
+
+  // free indexed properties
+  for i := Low(fPrivateIndexedProperties) to High(fPrivateIndexedProperties) do fPrivateIndexedProperties[i].Free;
+  for i := Low(fProtectedIndexedProperties) to High(fProtectedIndexedProperties) do fProtectedIndexedProperties[i].Free;
+  for i := Low(fPublicIndexedProperties) to High(fPublicIndexedProperties) do fPublicIndexedProperties[i].Free;
+  for i := Low(fPublishedIndexedProperties) to High(fPublishedIndexedProperties) do fPublishedIndexedProperties[i].Free;
+
+  // free methods
+  for i := Low(fPrivateMethods) to High(fPrivateMethods) do fPrivateMethods[i].Free;
+  for i := Low(fProtectedMethods) to High(fProtectedMethods) do fProtectedMethods[i].Free;
+  for i := Low(fPublicMethods) to High(fPublicMethods) do fPublicMethods[i].Free;
+  for i := Low(fPublishedMethods) to High(fPublishedMethods) do fPublishedMethods[i].Free;
+
+  // free fields
+  for i := Low(fPrivateFields) to High(fPrivateFields) do fPrivateFields[i].Free;
+  for i := Low(fProtectedFields) to High(fProtectedFields) do fProtectedFields[i].Free;
+  for i := Low(fPublicFields) to High(fPublicFields) do fPublicFields[i].Free;
+  for i := Low(fPublishedFields) to High(fPublishedFields) do fPublishedFields[i].Free;
+
   inherited;
 end;
 

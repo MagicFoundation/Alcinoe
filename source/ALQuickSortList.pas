@@ -1302,7 +1302,11 @@ procedure TALObjectDictionary<TKey,TValue>.KeyNotify(const Key: TKey; Action: TC
 begin
   inherited;
   if (Action = cnRemoved) and (doOwnsKeys in FOwnerships) then
+    {$IF CompilerVersion >= 25} {Delphi XE4}
     PObject(@Key)^.DisposeOf;
+    {$else}
+    PObject(@Key)^.free;
+    {$ifend}
 end;
 
 {***********************************************************************************************************}
@@ -1310,7 +1314,11 @@ procedure TALObjectDictionary<TKey,TValue>.ValueNotify(const Value: TValue; Acti
 begin
   inherited;
   if (Action = cnRemoved) and (doOwnsValues in FOwnerships) then
+    {$IF CompilerVersion >= 25} {Delphi XE4}
     PObject(@Value)^.DisposeOf;
+    {$else}
+    PObject(@Value)^.free;
+    {$ifend}
 end;
 
 {************************************************************************************}

@@ -114,10 +114,12 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Winapi.Windows,
      System.SysUtils,
      System.Classes,
+     System.Contnrs,
      {$ELSE}
      Windows,
      SysUtils,
      Classes,
+     Contnrs,
      {$IFEND}
      ALStringList;
 
@@ -410,19 +412,6 @@ type
 
 {$ifend}
 
-type
-
-  TALHandleTagfunct = function(const TagString: AnsiString;
-                               TagParams: TALStrings;
-                               ExtData: pointer;
-                               Var Handled: Boolean): AnsiString;
-  TALHandleTagExtendedfunct = function(const TagString: AnsiString;
-                                       TagParams: TALStrings;
-                                       ExtData: pointer;
-                                       Var Handled: Boolean;
-                                       Const SourceString: AnsiString;
-                                       Var TagPosition, TagLength: integer): AnsiString;
-
 function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
 function  ALNewGUIDByteString: Ansistring;
 function  ALGUIDToString(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): Ansistring;
@@ -497,6 +486,8 @@ function  ALPosEx(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
 function  ALPosExIgnoreCase(const SubStr, S: Ansistring; Offset: Integer = 1): Integer;
 function  AlUpperCase(const S: AnsiString): AnsiString;
 function  AlLowerCase(const S: AnsiString): AnsiString;
+function  AlUpCase(const Ch: AnsiChar): AnsiChar;
+function  AlLoCase(const Ch: AnsiChar): AnsiChar;
 function  ALCompareStr(const S1, S2: AnsiString): Integer;
 function  ALSameStr(const S1, S2: AnsiString): Boolean;
 function  ALCompareText(const S1, S2: AnsiString): Integer;
@@ -531,6 +522,63 @@ function  ALCopyStr(const aSourceString: AnsiString;
                     const aOffset: integer = 1;
                     const aRaiseExceptionIfNotFound: Boolean = True): AnsiString; overload;
 function  ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
+
+type
+
+  TALTagParamsClass = class of TalStrings;
+
+  TALBasePrecompiledTag = Class(Tobject)
+  private
+    fTagString: ansiString;
+  protected
+    function GetTagParams: TALStrings; virtual; abstract;
+  public
+    property TagString: ansiString read fTagString write fTagString;
+    property TagParams: TALStrings read GetTagParams;
+  End;
+
+  TALPrecompiledTag = Class(TALBasePrecompiledTag)
+  private
+    fTagParams: TALStrings;
+  protected
+    function GetTagParams: TALStrings; override;
+  public
+    constructor Create;
+    destructor Destroy; override;
+  End;
+
+  TALHandleTagfunct = function(const TagString: AnsiString;
+                               TagParams: TALStrings;
+                               ExtData: pointer;
+                               Var Handled: Boolean): AnsiString;
+
+  TALHandleTagExtendedfunct = function(const TagString: AnsiString;
+                                       TagParams: TALStrings;
+                                       ExtData: pointer;
+                                       Var Handled: Boolean;
+                                       Const SourceString: AnsiString;
+                                       Var TagPosition, TagLength: integer): AnsiString;
+
+  TALHandleTagPrecompileFunct = function(const TagString: AnsiString;
+                                         TagParams: TALStrings;
+                                         ExtData: pointer;
+                                         Const SourceString: AnsiString;
+                                         Var TagPosition, TagLength: integer): TALBasePrecompiledTag;
+
+function ALFastTagReplacePrecompile(Const SourceString, TagStart, TagEnd: AnsiString;
+                                    PrecompileProc: TALHandleTagPrecompileFunct;
+                                    StripParamQuotes: Boolean;
+                                    ExtData: Pointer;
+                                    TagsContainer: TObjectList;
+                                    Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
+function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
+                          ReplaceProc: TALHandleTagFunct;
+                          ReplaceExtendedProc: TALHandleTagExtendedfunct;
+                          StripParamQuotes: Boolean;
+                          Flags: TReplaceFlags;
+                          ExtData: Pointer;
+                          TagParamsClass: TALTagParamsClass;
+                          const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 function  ALFastTagReplace(const SourceString, TagStart, TagEnd: AnsiString;
                            ReplaceProc: TALHandleTagFunct;
                            StripParamQuotes: Boolean;
@@ -553,6 +601,7 @@ function  ALExtractTagParams(Const SourceString, TagStart, TagEnd: AnsiString;
 Procedure ALSplitTextAndTag(Const SourceString, TagStart, TagEnd: AnsiString;
                             SplitTextAndTagLst: TALStrings;
                             IgnoreCase: Boolean);
+
 function  ALRandomStr(const aLength: Longint; const aCharset: Array of ansiChar): AnsiString; overload;
 function  ALRandomStr(const aLength: Longint): AnsiString; overload;
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
@@ -8036,6 +8085,22 @@ begin
   {$ENDIF}
 end;
 
+{***********************************************}
+function  AlUpCase(const Ch: AnsiChar): AnsiChar;
+begin
+  Result := Ch;
+  if Result in ['a'..'z'] then
+    Dec(Result, Ord('a')-Ord('A'));
+end;
+
+{***********************************************}
+function  AlLoCase(const Ch: AnsiChar): AnsiChar;
+begin
+  Result := Ch;
+  if Result in ['A'..'Z'] then
+    Inc(Result, Ord('a')-Ord('A'));
+end;
+
 {*******************************************************}
 function ALCompareStr(const S1, S2: AnsiString): Integer;
 begin
@@ -8566,15 +8631,34 @@ begin
   Result := AlCopyStr(s, Length(ALNEVExtractName(s)) + 2, MaxInt)
 end;
 
-{*************************************************************************}
-function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
-                          ReplaceProc: TALHandleTagFunct;
-                          ReplaceExtendedProc: TALHandleTagExtendedfunct;
-                          Const ReplaceWith: AnsiString;
-                          StripParamQuotes: Boolean;
-                          Flags: TReplaceFlags;
-                          ExtData: Pointer;
-                          const TagReplaceProcResult: Boolean = False): AnsiString; overload;
+{***********************************}
+constructor TALPrecompiledTag.Create;
+begin
+  fTagString := '';
+  fTagParams := TALStringList.Create;
+  TALStringList(fTagParams).Duplicates := dupIgnore;
+end;
+
+{***********************************}
+destructor TALPrecompiledTag.Destroy;
+begin
+  fTagParams.Free;
+  inherited;
+end;
+
+{**************************************************}
+function TALPrecompiledTag.GetTagParams: TALStrings;
+begin
+  result := fTagParams;
+end;
+
+{***********************************************************************************}
+function ALFastTagReplacePrecompile(Const SourceString, TagStart, TagEnd: AnsiString;
+                                    PrecompileProc: TALHandleTagPrecompileFunct;
+                                    StripParamQuotes: Boolean; // useless if PrecompileProc is provided
+                                    ExtData: Pointer;
+                                    TagsContainer: TObjectList; // just a container where all the PrecompiledTag will be store. must free all the PrecompiledTag at the end of the application
+                                    Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
 
 var ReplaceString: AnsiString;
     TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
@@ -8585,11 +8669,227 @@ var ReplaceString: AnsiString;
     SourceStringLength: Integer;
     InDoubleQuote: Boolean;
     InsingleQuote: Boolean;
+    SourceCurrentPos: integer;
+    ResultCurrentPos: integer;
+    ResultCurrentLength: integer;
+    PrecompiledTag: TALBasePrecompiledTag;
+    IgnoreCase: Boolean;
+    PosExFunct: Function(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
+    T1,T2: Integer;
+    i: integer;
+
+Const ResultBuffSize: integer = 16384;
+
+    {------------------------------------}
+    Function _ExtractTokenStr: AnsiString;
+    var x: Integer;
+    Begin
+      X := 1;
+      while (x <= length(ReplaceString)) and
+            (not (ReplaceString[x] in [' ', #9, #13, #10])) do inc(x);
+      if x > length(ReplaceString) then Result := ReplaceString
+      else Result := AlcopyStr(ReplaceString,1,x-1);
+    end;
+
+    {-----------------------------------------------------------------}
+    Function _ExtractParamsStr(const TokenStr: ansiString): AnsiString;
+    Begin
+      Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
+    end;
+
+    {-----------------------------------------------------------------------------------}
+    procedure _MoveStr2Result(const aSourceString: AnsiString; aStart, aLength: Integer);
+    var aSourceStringLength: Integer;
+    begin
+      aSourceStringLength := Length(aSourceString);
+      If (aStart < 1) then aStart := 1;
+
+      if (aSourceStringLength=0) or
+         (aLength < 1) or
+         (aStart > aSourceStringLength) then Exit;
+
+      if aLength > aSourceStringLength - (aStart - 1) then aLength := aSourceStringLength - (aStart-1);
+
+      If aLength + ResultCurrentPos - 1 > ResultCurrentLength then begin
+        ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
+        SetLength(Result, ResultCurrentLength);
+      end;
+      AlMove(aSourceString[aStart], Result[ResultCurrentPos], aLength);
+      ResultCurrentPos := ResultCurrentPos + aLength;
+    end;
+
+    {---------------------------------------------------------}
+    function  _ObjAddressToStr(Const Obj: Tobject): AnsiString;
+    begin
+      result := ALIntToHex(NativeInt(Obj), sizeof(pointer) * 2);
+    end;
+
+begin
+  if (SourceString = '') or (TagStart = '') or (TagEnd = '') then begin
+    Result := SourceString;
+    Exit;
+  end;
+
+  IgnoreCase := rfIgnoreCase in flags;
+  If IgnoreCase then PosExFunct := ALPosExIgnoreCase
+  Else PosExFunct := ALPosEx;
+
+  SourceCurrentPos := 1;
+  T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
+  if T1 <= 0 then begin
+    result := SourceString;
+    exit;
+  end;
+
+  SourceStringLength := length(SourceString);
+  ResultCurrentLength := SourceStringLength;
+  SetLength(Result,ResultCurrentLength);
+  ResultCurrentPos := 1;
+  TagStartLength := Length(TagStart);
+  TagEndLength := Length(TagEnd);
+  TagEndFirstChar := TagEnd[1];
+  TagEndFirstCharLower := ALLoCase(TagEnd[1]);
+  TagEndFirstCharUpper := ALUpCase(TagEnd[1]);
+
+  T2 := T1 + TagStartLength;
+  If (T1 > 0) and (T2 <= SourceStringLength) then begin
+    InDoubleQuote := False;
+    InsingleQuote := False;
+    While (T2 <= SourceStringLength) and
+          (InDoubleQuote or
+           InSingleQuote or
+           (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
+           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
+           ((TagEndLength > 1) and (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
+      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+      inc(T2);
+    end;
+    if (T2 > SourceStringLength) then T2 := 0;
+  end;
+
+
+  While (T1 > 0) and (T2 > T1) do begin
+    ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
+    T2 := T2 + TagEndLength;
+
+    If assigned(PrecompileProc) then begin
+      TokenStr := _ExtractTokenStr;
+      ParamStr := _ExtractParamsStr(TokenStr);
+      ParamList := TALStringList.Create;
+      try
+        ParamList.Duplicates := dupIgnore;
+        ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
+                                              [' ', #9, #13, #10],
+                                              ['"', ''''],
+                                              PAnsiChar(ParamStr),
+                                              ParamList,
+                                              False,
+                                              StripParamQuotes);
+
+        T2 := T2 - T1;
+        PrecompiledTag := PrecompileProc(TokenStr, ParamList, ExtData, SourceString, T1, T2);
+        T2 := T2 + T1;
+        if assigned(PrecompiledTag) then begin
+          TagsContainer.Add(PrecompiledTag);
+          ReplaceString := TagStart + #2{start of text} + _ObjAddressToStr(PrecompiledTag) + #3{end of text} + TagEnd;
+        end
+        else ReplaceString := '';
+      finally
+        ParamList.Free;
+      end;
+    end
+    else begin
+      PrecompiledTag := TALPrecompiledTag.Create;
+      try
+        PrecompiledTag.TagString := _ExtractTokenStr;
+        ParamStr := _ExtractParamsStr(PrecompiledTag.TagString);
+        ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
+                                              [' ', #9, #13, #10],
+                                              ['"', ''''],
+                                              PAnsiChar(ParamStr),
+                                              PrecompiledTag.TagParams,
+                                              False,
+                                              StripParamQuotes);
+        TagsContainer.Add(PrecompiledTag);
+        ReplaceString := TagStart + #2{start of text} + _ObjAddressToStr(PrecompiledTag) + #3{end of text} + TagEnd;
+      except
+        PrecompiledTag.Free;
+        raise;
+      end;
+      for I := 0 to PrecompiledTag.TagParams.Count - 1 do
+        PrecompiledTag.TagParams[i] := ALFastTagReplacePrecompile(PrecompiledTag.TagParams[i], //Const SourceString,
+                                                                  TagStart,
+                                                                  TagEnd,
+                                                                  PrecompileProc,
+                                                                  StripParamQuotes,
+                                                                  ExtData,
+                                                                  TagsContainer,
+                                                                  flags);
+      PrecompiledTag.TagString := ALFastTagReplacePrecompile(PrecompiledTag.TagString, //Const SourceString,
+                                                             TagStart,
+                                                             TagEnd,
+                                                             PrecompileProc,
+                                                             StripParamQuotes,
+                                                             ExtData,
+                                                             TagsContainer,
+                                                             flags);
+    end;
+
+    _MoveStr2Result(SourceString,SourceCurrentPos,T1 - SourceCurrentPos);
+    _MoveStr2Result(ReplaceString,1,length(ReplaceString));
+    SourceCurrentPos := T2;
+
+    T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
+    T2 := T1 + TagStartLength;
+    If (T1 > 0) and (T2 <= SourceStringLength) then begin
+      InDoubleQuote := False;
+      InsingleQuote := False;
+      While (T2 <= SourceStringLength) and
+            (InDoubleQuote or
+             InSingleQuote or
+             (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
+             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
+             ((TagEndLength > 1) and (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
+        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+        inc(T2);
+      end;
+      if (T2 > SourceStringLength) then T2 := 0;
+    end;
+  end;
+
+  _MoveStr2Result(SourceString,SourceCurrentPos,maxint);
+  SetLength(Result,ResultCurrentPos-1);
+end;
+
+{*************************************************************************}
+function ALFastTagReplace(Const SourceString, TagStart, TagEnd: AnsiString;
+                          ReplaceProc: TALHandleTagFunct;
+                          ReplaceExtendedProc: TALHandleTagExtendedfunct;
+                          StripParamQuotes: Boolean;
+                          Flags: TReplaceFlags;
+                          ExtData: Pointer;
+                          TagParamsClass: TALTagParamsClass;
+                          const TagReplaceProcResult: Boolean = False): AnsiString; overload;
+
+var ReplaceString: AnsiString;
+    TagEndFirstChar, TagEndFirstCharLower, TagEndFirstCharUpper: AnsiChar;
+    TokenStr, ParamStr: AnsiString;
+    ParamList: TAlStrings;
+    TagStartLength: integer;
+    TagEndLength: integer;
+    SourceStringLength: Integer;
+    InDoubleQuote: Boolean;
+    InsingleQuote: Boolean;
     TagHandled: Boolean;
     SourceCurrentPos: integer;
     ResultCurrentPos: integer;
     ResultCurrentLength: integer;
+    PrecompiledTag: TALBasePrecompiledTag;
+    InPrecompiledTag: Boolean;
     IgnoreCase: Boolean;
+    pSize: integer;
     PosExFunct: Function(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
     T1,T2: Integer;
 
@@ -8612,19 +8912,36 @@ Const ResultBuffSize: integer = 16384;
       Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
     end;
 
-    {-----------------------------------------------}
-    procedure _MoveStr2Result(const Src: AnsiString);
-    var L: integer;
+    {-----------------------------------------------------------------------------------}
+    procedure _MoveStr2Result(const aSourceString: AnsiString; aStart, aLength: Integer);
+    var aSourceStringLength: Integer;
     begin
-      if Src <> '' then begin
-        L := Length(Src);
-        If L + ResultCurrentPos - 1 > ResultCurrentLength then begin
-          ResultCurrentLength := ResultCurrentLength + L + ResultBuffSize;
-          SetLength(Result, ResultCurrentLength);
-        end;
-        AlMove(Src[1], Result[ResultCurrentPos], L);
-        ResultCurrentPos := ResultCurrentPos + L;
+      aSourceStringLength := Length(aSourceString);
+      If (aStart < 1) then aStart := 1;
+
+      if (aSourceStringLength=0) or
+         (aLength < 1) or
+         (aStart > aSourceStringLength) then Exit;
+
+      if aLength > aSourceStringLength - (aStart - 1) then aLength := aSourceStringLength - (aStart-1);
+
+      If aLength + ResultCurrentPos - 1 > ResultCurrentLength then begin
+        ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
+        SetLength(Result, ResultCurrentLength);
       end;
+      AlMove(aSourceString[aStart], Result[ResultCurrentPos], aLength);
+      ResultCurrentPos := ResultCurrentPos + aLength;
+    end;
+
+    {-----------------------------------------------------------------------------------}
+    function _HexToInt(const aSourceString: ansistring; Start, Length: Integer): integer;
+    begin
+      Result := 0;
+      for Start := start to start + length - 1 do
+        case aSourceString[Start] of
+          '0'..'9': Result := Result * 16 + Ord(aSourceString[Start]) - Ord('0');
+          'A'..'F': Result := Result * 16 + Ord(aSourceString[Start]) - Ord('A') + 10;
+        end;
     end;
 
 begin
@@ -8637,6 +8954,13 @@ begin
   If IgnoreCase then PosExFunct := ALPosExIgnoreCase
   Else PosExFunct := ALPosEx;
 
+  SourceCurrentPos := 1;
+  T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
+  if T1 <= 0 then begin
+    result := SourceString;
+    exit;
+  end;
+
   SourceStringLength := length(SourceString);
   ResultCurrentLength := SourceStringLength;
   SetLength(Result,ResultCurrentLength);
@@ -8644,40 +8968,69 @@ begin
   TagStartLength := Length(TagStart);
   TagEndLength := Length(TagEnd);
   TagEndFirstChar := TagEnd[1];
-  TagEndFirstCharLower := ALLowerCase(TagEnd[1])[1];
-  TagEndFirstCharUpper := ALUpperCase(TagEnd[1])[1];
-  SourceCurrentPos := 1;
+  TagEndFirstCharLower := ALLoCase(TagEnd[1]);
+  TagEndFirstCharUpper := ALUpCase(TagEnd[1]);
+  pSize := sizeOf(pointer) * 2;
+  InPrecompiledTag := False; // to remove warning
 
-  T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
   T2 := T1 + TagStartLength;
   If (T1 > 0) and (T2 <= SourceStringLength) then begin
-    InDoubleQuote := False;
-    InsingleQuote := False;
-    While (T2 <= SourceStringLength) and
-          (InDoubleQuote or
-           InSingleQuote or
-           (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-           ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-           (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
-      If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-      else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-      inc(T2);
+
+    //we are in precompiled tag
+    if (SourceString[T2] = #2) and
+       ((T2 + pSize + 1 + TagEndLength) <= SourceStringLength) and
+       (SourceString[T2 + pSize + 1] = #3) and
+       ((IgnoreCase and ((SourceString[T2 + pSize + 2] = TagEndFirstCharLower) or (SourceString[T2 + pSize + 2] = TagEndFirstCharUpper))) or
+        ((not IgnoreCase) and (SourceString[T2 + pSize + 2] = TagEndFirstChar))) and
+       ((TagEndLength <= 1) or (PosExFunct(TagEnd,AlCopyStr(SourceString,T2 + pSize + 2,TagEndLength),1) = 1)) then begin
+      InPrecompiledTag := True;
+      T2 := T2 + pSize + 1 + TagEndLength;
+    end
+
+    //else not precompiled tag
+    else begin
+      InDoubleQuote := False;
+      InsingleQuote := False;
+      While (T2 <= SourceStringLength) and
+            (InDoubleQuote or
+             InSingleQuote or
+             (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
+             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
+             ((TagEndLength > 1) and (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
+        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+        inc(T2);
+      end;
+      if (T2 > SourceStringLength) then T2 := 0;
     end;
-    if (T2 > SourceStringLength) then T2 := 0;
+
   end;
 
 
   While (T1 > 0) and (T2 > T1) do begin
-    ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
-    T2 := T2 + TagEndLength;
 
-    TagHandled := True;
-    If assigned(ReplaceProc) or (assigned(ReplaceExtendedProc)) then begin
+    //we are in precompiled tag
+    if InPrecompiledTag then begin
+      PrecompiledTag := Pointer(_HexToInt(SourceString, T1 + TagStartLength+1, pSize));
+      T2 := T2 + TagEndLength;
+      if assigned(ReplaceExtendedProc) then begin
+        T2 := T2 - T1;
+        ReplaceString := ReplaceExtendedProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, ExtData, TagHandled, SourceString, T1, T2);
+        T2 := T2 + T1;
+      end
+      else ReplaceString := ReplaceProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, ExtData, TagHandled);
+    end
+
+    //else not precompiled tag
+    else begin
+      ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
+      T2 := T2 + TagEndLength;
+
+      TagHandled := True;
       TokenStr := _ExtractTokenStr;
       ParamStr := _ExtractParamsStr;
-      ParamList := TALStringList.Create;
+      ParamList := TagParamsClass.Create;
       try
-        ParamList.Duplicates := dupIgnore;
         ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
                                               [' ', #9, #13, #10],
                                               ['"', ''''],
@@ -8691,50 +9044,70 @@ begin
           T2 := T2 + T1;
         end
         else ReplaceString := ReplaceProc(TokenStr, ParamList, ExtData, TagHandled);
-        if (TagHandled) and
-           (TagReplaceProcResult) and
-           (rfreplaceAll in flags) then ReplaceString := ALFastTagReplace(ReplaceString,
-                                                                          TagStart,
-                                                                          TagEnd,
-                                                                          ReplaceProc,
-                                                                          ReplaceExtendedProc,
-                                                                          ReplaceWith,
-                                                                          StripParamQuotes,
-                                                                          Flags,
-                                                                          ExtData,
-                                                                          TagReplaceProcResult);
       finally
         ParamList.Free;
       end;
-    end
-    else ReplaceString := ReplaceWith;
+    end;
 
-    If tagHandled then _MoveStr2Result(AlcopyStr(SourceString,SourceCurrentPos,T1 - SourceCurrentPos) + ReplaceString)
-    else _MoveStr2Result(AlcopyStr(SourceString,SourceCurrentPos,T2 - SourceCurrentPos));
+    if (TagHandled) and
+       (TagReplaceProcResult) and
+       (rfreplaceAll in flags) then ReplaceString := ALFastTagReplace(ReplaceString,
+                                                                      TagStart,
+                                                                      TagEnd,
+                                                                      ReplaceProc,
+                                                                      ReplaceExtendedProc,
+                                                                      StripParamQuotes,
+                                                                      Flags,
+                                                                      ExtData,
+                                                                      TagParamsClass,
+                                                                      TagReplaceProcResult);
+
+    If tagHandled then begin
+      _MoveStr2Result(SourceString,SourceCurrentPos,T1 - SourceCurrentPos);
+      _MoveStr2Result(ReplaceString,1,length(ReplaceString))
+    end
+    else _MoveStr2Result(SourceString,SourceCurrentPos,T2 - SourceCurrentPos);
     SourceCurrentPos := T2;
 
     If TagHandled and (not (rfreplaceAll in flags)) then Break;
 
+    InPrecompiledTag := False;
     T1 := PosExFunct(TagStart,SourceString,SourceCurrentPos);
     T2 := T1 + TagStartLength;
     If (T1 > 0) and (T2 <= SourceStringLength) then begin
-      InDoubleQuote := False;
-      InsingleQuote := False;
-      While (T2 <= SourceStringLength) and
-            (InDoubleQuote or
-             InSingleQuote or
-             (IgnoreCase and (not (SourceString[T2] in [TagEndFirstCharLower, TagEndFirstCharUpper]))) or
-             ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
-             (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1)) do begin
-        If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
-        else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
-        inc(T2);
+
+      //we are in precompiled tag
+      if (SourceString[T2] = #2) and
+         ((T2 + pSize + 1 + TagEndLength) <= SourceStringLength) and
+         (SourceString[T2 + pSize + 1] = #3) and
+         ((IgnoreCase and ((SourceString[T2 + pSize + 2] = TagEndFirstCharLower) or (SourceString[T2 + pSize + 2] = TagEndFirstCharUpper))) or
+          ((not IgnoreCase) and (SourceString[T2 + pSize + 2] = TagEndFirstChar))) and
+         ((TagEndLength <= 1) or (PosExFunct(TagEnd,AlCopyStr(SourceString,T2 + pSize + 2,TagEndLength),1) = 1)) then begin
+        InPrecompiledTag := True;
+        T2 := T2 + pSize + 1 + TagEndLength;
+      end
+
+      //else not precompiled tag
+      else begin
+        InDoubleQuote := False;
+        InsingleQuote := False;
+        While (T2 <= SourceStringLength) and
+              (InDoubleQuote or
+               InSingleQuote or
+               (IgnoreCase and (SourceString[T2] <> TagEndFirstCharLower) and (SourceString[T2] <> TagEndFirstCharUpper)) or
+               ((not IgnoreCase) and (SourceString[T2] <> TagEndFirstChar)) or
+               ((TagEndLength > 1) and (PosExFunct(TagEnd,AlCopyStr(SourceString,T2,TagEndLength),1) <> 1))) do begin
+          If SourceString[T2] = '"' then InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote)
+          else If SourceString[T2] = '''' then InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+          inc(T2);
+        end;
+        if (T2 > SourceStringLength) then T2 := 0;
       end;
-      if (T2 > SourceStringLength) then T2 := 0;
+
     end;
   end;
 
-  _MoveStr2Result(AlcopyStr(SourceString,SourceCurrentPos,maxint));
+  _MoveStr2Result(SourceString,SourceCurrentPos,maxint);
   SetLength(Result,ResultCurrentPos-1);
 end;
 
@@ -8751,10 +9124,10 @@ Begin
                              TagEnd,
                              ReplaceProc,
                              nil,
-                             '',
                              StripParamQuotes,
                              flags,
                              extdata,
+                             TALStringList,
                              TagReplaceProcResult);
 end;
 
@@ -8771,11 +9144,21 @@ Begin
                              TagEnd,
                              nil,
                              ReplaceExtendedProc,
-                             '',
                              StripParamQuotes,
                              flags,
                              extdata,
+                             TALStringList,
                              TagReplaceProcResult);
+end;
+
+{************************************************************}
+function ALFastTagReplaceWithFunc(const TagString: AnsiString;
+                                  TagParams: TALStrings;
+                                  ExtData: pointer;
+                                  Var Handled: Boolean): AnsiString;
+begin
+  Handled := true;
+  result := AnsiString(ExtData);
 end;
 
 {*************************************************************************}
@@ -8786,12 +9169,12 @@ Begin
   Result := ALFastTagReplace(SourceString,
                              TagStart,
                              TagEnd,
+                             ALFastTagReplaceWithFunc,
                              nil,
-                             nil,
-                             ReplaceWith,
                              True,
                              flags,
-                             nil,
+                             Addr(ReplaceWith[1]),
+                             TalStringList,
                              false);
 end;
 

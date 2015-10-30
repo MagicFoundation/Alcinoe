@@ -1508,6 +1508,7 @@ begin
     FDuplicates := TALStringList(Source).FDuplicates;
     FSorted := TALStringList(Source).FSorted;
   end
+  {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
   begin
     Clear;
@@ -1515,6 +1516,7 @@ begin
     FDuplicates := TALHashedStringList(Source).FDuplicates;
     FSorted := False;
   end
+  {$ifend}
   else if Source is TALAVLStringList then
   begin
     Clear;
@@ -2192,12 +2194,14 @@ begin
     CaseSensitive := TALStringList(Source).CaseSensitive;
     FDuplicates := TALStringList(Source).Duplicates;
   end
+  {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
   begin
     Clear;
     CaseSensitive := TALHashedStringList(Source).CaseSensitive;
     FDuplicates := TALHashedStringList(Source).FDuplicates;
   end
+  {$ifend}
   else if Source is TStringList then
   begin
     Clear;

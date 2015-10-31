@@ -758,13 +758,13 @@ begin
               if (aLst.Count <> 5) or
                  (not alTryStrToInt(aLst[2], aflags)) or
                  (not alTryStrToInt(aLst[3], aDataLength)) or
-                 (not alTryStrToInt64(aLst[4], aCasID)) then raise EALException.Create('Memcache Error: Response does not conform to protocol - ' + ALcopyStr(Result, 1, aResultPos));
+                 (not alTryStrToInt64(aLst[4], aCasID)) then raise EALException.CreateFmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
             end
             else begin
               aCasID := 0;
               if (aLst.Count <> 4) or
                  (not alTryStrToInt(aLst[2], aflags)) or
-                 (not alTryStrToInt(aLst[3], aDataLength)) then raise EALException.Create('Memcache Error: Response does not conform to protocol - ' + ALcopyStr(Result, 1, aResultPos));
+                 (not alTryStrToInt(aLst[3], aDataLength)) then raise EALException.CreateFmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
             end;
             aKey := aLst[1];
             aDataStartPos := aDataStartPos + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
@@ -800,13 +800,13 @@ begin
               if (aLst.Count <> 5) or
                  (not alTryStrToInt(aLst[2], aflags)) or
                  (not alTryStrToInt(aLst[3], aDataLength)) or
-                 (not alTryStrToInt64(aLst[4], aCasID)) then raise EALException.Create('Memcache Error: Response does not conform to protocol - ' + ALcopyStr(Result, 1, aResultPos));
+                 (not alTryStrToInt64(aLst[4], aCasID)) then raise EALException.Createfmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
             end
             else begin
               aCasID := 0;
               if (aLst.Count <> 4) or
                  (not alTryStrToInt(aLst[2], aflags)) or
-                 (not alTryStrToInt(aLst[3], aDataLength)) then raise EALException.Create('Memcache Error: Response does not conform to protocol - ' + ALcopyStr(Result, 1, aResultPos));
+                 (not alTryStrToInt(aLst[3], aDataLength)) then raise EALException.Createfmt('Memcache Error: Response does not conform to protocol - %s', [ALcopyStr(Result, 1, aResultPos)]);
             end;
             aKey := aLst[1];
             aDataStartPos := aDataStartPos + 2; // VALUE hihi 0 4 12\r\nAZER\r\nVALUE hoho 0 10 13\r\nAZDFUJNERT\r\nVALUE haha 0 5 14\r\nAZIUD\r\nEND\r\n
@@ -845,8 +845,8 @@ begin
 
       // ERROR Response
       else if (aResponseStatus = 'ERROR') and (aResponseStatusStartPos=1) then raise EALException.Create('Memcached Error - Nonexistent command')
-      else if (ALpos('SERVER_ERROR', aResponseStatus) = 1) and (aResponseStatusStartPos=1) then raise EALException.Create('Memcached Error - Server error - ' + aResponseStatus)
-      else if (ALpos('CLIENT_ERROR', aResponseStatus) = 1) and (aResponseStatusStartPos=1) then raise EAlMemCachedClientException.Create('Memcached Error - Client error in the input line - ' + aResponseStatus);
+      else if (ALpos('SERVER_ERROR', aResponseStatus) = 1) and (aResponseStatusStartPos=1) then raise EALException.Createfmt('Memcached Error - Server error - %s', [aResponseStatus])
+      else if (ALpos('CLIENT_ERROR', aResponseStatus) = 1) and (aResponseStatusStartPos=1) then raise EAlMemCachedClientException.Create(ALformat('Memcached Error - Client error in the input line - %s', [aResponseStatus]));
 
     end;
 

@@ -467,6 +467,7 @@ Type
     function GetTextStr: AnsiString; override;
     procedure Put(Index: Integer; const S: AnsiString); override;
     procedure PutObject(Index: Integer; AObject: TObject); override;
+    procedure SetCapacity(NewCapacity: Integer); override;
     procedure SetUpdateState(Updating: Boolean); override;
     procedure InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject); overload; virtual;
     procedure InsertItem(Index: Integer; const S: AnsiString; AObject: TObject); overload; virtual;
@@ -3266,6 +3267,13 @@ begin
   Changed;
 end;
 
+{**************************************************************}
+procedure TALHashedStringList.SetCapacity(NewCapacity: Integer);
+begin
+  FDictionary.SetCapacity(NewCapacity);
+  FNodeList.Capacity := NewCapacity;
+end;
+
 {***********************************************************************************************}
 procedure TALHashedStringList.QuickSort(L, R: Integer; SCompare: TALHashedStringListSortCompare);
 var
@@ -3345,6 +3353,7 @@ begin
   FDictionary := CreateDictionary(ACapacity, False);
   FCaseSensitive := False;
   FNodeList := TObjectList<TALHashedStringListDictionaryNode>.Create(False);
+  FNodeList.Capacity := ACapacity;
   FDuplicates := dupError;
   FOnChange := nil;
   FOnChanging := nil;

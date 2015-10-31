@@ -2022,7 +2022,7 @@ End;
 {*******************************************************}
 Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
 Begin
-  if not ALTryIPV4StrToNumeric(aIPv4, Result) then Raise EALException.Create('Bad IPv4 string: ' + aIPv4);
+  if not ALTryIPV4StrToNumeric(aIPv4, Result) then Raise EALException.CreateFmt('Bad IPv4 string: %s', [aIPv4]);
 End;
 
 {*******************************************************}
@@ -2056,7 +2056,7 @@ End;
 function ALIPv4EndOfRange(aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
 begin
   if (aMaskLength < 1) or
-     (aMaskLength > 32) then raise EALException.Create('Wrong value for mask length IPv4: ' + ALIntToStr(aMaskLength));
+     (aMaskLength > 32) then raise Exception.CreateFmt('Wrong value for mask length IPv4: %d', [aMaskLength]);
 
   result := aStartIPv4 + Round(Power(2, (32 - aMaskLength)) - 1 {why not -2 it's that +1 address for service purposes})
 end;
@@ -2178,7 +2178,7 @@ end;
 {***********************************************************}
 Function ALIPV6StrTobinary(aIPv6: ansiString): TALIPv6Binary;
 Begin
-  if not ALTryIPv6StrToBinary(aIPv6, Result) then Raise EALException.Create('Bad IPv6 string: ' + aIPv6);
+  if not ALTryIPv6StrToBinary(aIPv6, Result) then Raise EALException.CreateFmt('Bad IPv6 string: %s', [aIPv6]);
 End;
 
 {***********************************************************}
@@ -2255,7 +2255,7 @@ var aBitsCount: integer;
 
 begin
   if (aMaskLength < 1) or
-     (aMaskLength > 128) then raise EALException.Create('Wrong value for mask length IPv6: ' + ALIntToStr(aMaskLength));
+     (aMaskLength > 128) then raise Exception.CreateFmt('Wrong value for mask length IPv6: %d', [aMaskLength]);
 
   result := aStartIPv6;
   aBitsCount := 128 - aMaskLength; // for example, 128 - 24 = 104

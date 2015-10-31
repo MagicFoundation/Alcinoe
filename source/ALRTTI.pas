@@ -682,7 +682,7 @@ end;
 {****************************************************************************}
 function ALGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring): Integer;
 begin
-  if not ALTryGetEnumValue(TypeInfo, Name, result) then raise EALException.Create('Invalid enumeration name: '+Name+'');
+  if not ALTryGetEnumValue(TypeInfo, Name, result) then raise EALException.CreateFmt('Invalid enumeration name: %s', [Name]);
 end;
 
 {****************************************************************************}
@@ -776,7 +776,7 @@ end;
 {****************************************************************************}
 function ALStringToSet(TypeInfo: PTypeInfo; const Value: ansistring): Integer;
 begin
-  if not ALTryStringToSet(TypeInfo, Value, result) then raise EALException.Create('Invalid set string: '+Value+'');
+  if not ALTryStringToSet(TypeInfo, Value, result) then raise EALException.CreateFmt('Invalid set string: %s', [Value]);
 end;
 
 {****************************************************************************}
@@ -1527,7 +1527,7 @@ var _RttiTypeCache: TObjectDictionary<ansiString,TALRttiType>;
 {****************************************************************}
 function ALGetRttiType(const aClassName: AnsiString): TALRttiType;
 begin
-  if not _RttiTypeCache.TryGetValue(aClassName, result) then raise EALException.Create('Cannot obtain RTTI informations about the class ' + aClassName);
+  if not _RttiTypeCache.TryGetValue(aClassName, result) then raise EALException.CreateFmt('Cannot obtain RTTI informations about the class %s', [aClassName]);
 end;
 
 {**************************************************************}

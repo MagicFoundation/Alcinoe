@@ -181,6 +181,7 @@ type
   EALException = class(Exception)
   public
     constructor Create(const Msg: AnsiString);
+    constructor CreateFmt(const Msg: ansistring; const Args: array of const);
   end;
 
   TALStringStream = class(TStream)
@@ -692,6 +693,12 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
 constructor EALException.Create(const Msg: AnsiString);
 begin
   inherited create(String(Msg));
+end;
+
+{************************************************************************************}
+constructor EALException.CreateFmt(const Msg: ansistring; const Args: array of const);
+begin
+  inherited CreateFmt(String(Msg), Args);
 end;
 
 {************************************************************}
@@ -6368,7 +6375,7 @@ begin
     BaseIn := length(charset);
     for I := length(Str) downto 1 do begin
       J := Lst.IndexOf(Str[I]);
-      if J < 0 then raise Exception.Create('Character ('+Str[I]+') not found in charset');
+      if J < 0 then raise EALException.CreateFmt('Character (%s) not found in charset', [Str[I]]);
       result := result + (int64(Lst.Objects[J]) * P);
       P := P * BaseIn;
     end;
@@ -8567,7 +8574,7 @@ begin
   aLowSourceString := ALLowerCase(aSourceString);
   P1 := AlPosEx(ALLowerCase(aStartStr), aLowSourceString, aOffset);
   if P1 <= 0 then begin
-    if aRaiseExceptionIfNotFound then Raise EALException.Create('Can not find' + ALIfThen(aOffset > 1, ' after offset ' + ALIntToStr(aOffset)) + ' the text ' + aStartStr + ' in ' + aSourceString)
+    if aRaiseExceptionIfNotFound then Raise EALException.Createfmt('Can not find%s the text %s in %s', [ALIfThen(aOffset > 1, AlFormat(' after offset %d', [aOffset])), aStartStr, aSourceString])
     else begin
       result := '';
       exit;
@@ -8576,7 +8583,7 @@ begin
   Inc(P1, Length(aStartStr));
   P2 := AlPosEx(ALLowerCase(aEndStr), aLowSourceString, P1);
   if P2 <= 0 then begin
-    if aRaiseExceptionIfNotFound then Raise EALException.Create('Can not find' + ALIfThen(aOffset > 1, ' after offset ' + ALIntToStr(aOffset)) + ' the text ' + aEndStr + ' in ' + aSourceString)
+    if aRaiseExceptionIfNotFound then Raise EALException.Createfmt('Can not find%s the text %s in %s', [ALIfThen(aOffset > 1, AlFormat(' after offset %d', [aOffset])), aEndStr, aSourceString])
     else begin
       result := '';
       exit;

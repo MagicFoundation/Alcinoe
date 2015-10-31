@@ -4504,7 +4504,7 @@ begin
             if (length(aNames[j]) <= 2) or
                (aNames[j][1] <> '[') or
                (aNames[j][length(aNames[j])] <> ']') or
-               (not ALTryStrToInt(ALCopyStr(aNames[j], 2, Length(aNames[j]) - 2), aIndex)) then raise EALException.Create('Wrong path: "'+aLst.Names[i]+'"');
+               (not ALTryStrToInt(ALCopyStr(aNames[j], 2, Length(aNames[j]) - 2), aIndex)) then raise EALException.CreateFmt('Wrong path: "%s"', [aLst.Names[i]]);
             while aIndex > aCurrJsonNode.ChildNodes.Count - 1 do begin
               if j = aNames.Count - 1 then aCurrJsonNode.AddChild(ntText)
               else if (aNames[j+1] <> '') and

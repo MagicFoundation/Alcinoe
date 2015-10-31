@@ -107,6 +107,7 @@ interface
 
 Uses {$IF CompilerVersion >= 23} {Delphi XE2}
      System.Classes,
+     System.RTLConsts,
      System.Generics.Defaults,
      System.Generics.Collections;
      {$ELSE}
@@ -307,6 +308,7 @@ Type
   {$IF CompilerVersion >= 23} {Delphi XE2}
   TALDictionary<TKey,TValue> = Class(TDictionary<TKey,TValue>)
   public
+    procedure SetCapacity(ACapacity: Integer);
     function TryAdd(const Key: TKey; const Value: TValue): boolean;
   End;
   {$IFEND}
@@ -1280,6 +1282,26 @@ begin
 end;
 
 {$IF CompilerVersion >= 23} {Delphi XE2}
+
+{*******************************************************************}
+procedure TALDictionary<TKey,TValue>.SetCapacity(ACapacity: Integer);
+var
+  newCap: Integer;
+begin
+  if ACapacity < Count then
+    raise EArgumentOutOfRangeException.CreateRes(@SArgumentOutOfRange);
+
+  if ACapacity = 0 then
+    Rehash(0)
+  else
+  begin
+    newCap := 4;
+    while newCap < ACapacity do
+      newCap := newCap shl 1;
+    Rehash(newCap);
+  end
+end;
+
 
 {****************************************************************************************}
 function TALDictionary<TKey,TValue>.TryAdd(const Key: TKey; const Value: TValue): boolean;

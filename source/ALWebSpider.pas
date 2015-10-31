@@ -832,7 +832,7 @@ Var aExt: AnsiString;
   Function SplitPathMakeFilename: AnsiString;
   begin
     Result := fSaveDirectory + ALIntToStr((FCurrentLocalFileNameIndex div fSplitDirectoryAmount) * fSplitDirectoryAmount + fSplitDirectoryAmount) + '\';
-    If (not DirectoryExists(string(Result))) and (not createDir(string(Result))) then raise EALException.Create('cannot create dir: ' + Result);
+    If (not DirectoryExists(string(Result))) and (not createDir(string(Result))) then raise EALException.CreateFmt('cannot create dir: %s', [Result]);
     Result := Result + ALIntToStr(FCurrentLocalFileNameIndex) + aExt;
     inc(FCurrentLocalFileNameIndex);
   end;

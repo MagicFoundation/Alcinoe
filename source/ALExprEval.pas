@@ -1975,7 +1975,7 @@ function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
             (result[P2] in ['a'..'z', 'A'..'Z', '0'..'9', '_']) do Dec(P2); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
                                                                             //             ^^^^^^P2
       aLvalue := AlCopyStr(result, P2 + 1, P1 - P2 - 1); // MyVar
-      if aLValue = '' then raise EALException.Create('Wrong expression (cannot assign left value for operator IN): ' + AExpr);
+      if aLValue = '' then raise EALException.CreateFmt('Wrong expression (cannot assign left value for operator IN): %s', [AExpr]);
       P4 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
                     //              ^P4
 
@@ -2012,7 +2012,7 @@ function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
         end;
         Inc(P2);
       end;
-      if P2 > length(result) then raise EALException.Create('Wrong expression (missing closing bracket): ' + AExpr);
+      if P2 > length(result) then raise EALException.CreateFmt('Wrong expression (missing closing bracket): %s', [AExpr]);
       if aArguments <> '' then aArguments := aArguments + ' or ';
       aArguments := aArguments + '(' + aLValue + '=' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
 
@@ -2077,7 +2077,7 @@ begin
     else inc(P2);
 
   end;
-  if P1 > 0 then raise EALException.Create('Wrong expression (unterminated string): '+ AExpr);
+  if P1 > 0 then raise EALException.CreateFmt('Wrong expression (unterminated string): %s', [AExpr]);
 
   //Clear non-useful white spaces
   setlength(result, Length(Result));

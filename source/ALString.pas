@@ -176,6 +176,9 @@ type
   function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
   procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
 
+var
+  ALDefaultFormatSettings: TALformatSettings;
+
 type
 
   EALException = class(Exception)
@@ -662,9 +665,6 @@ Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF16bigEndianBom = ansiString(#$FE) + ansiString(#$FF);
       cAlUTF32LittleEndianBom = ansiString(#$FF) + ansiString(#$FE) + ansiString(#$00) + ansiString(#$00);
       cAlUTF32BigEndianBom = ansiString(#$00) + ansiString(#$00) + ansiString(#$FE) + ansiString(#$FF);
-
-var
-  ALDefaultFormatSettings: TALformatSettings;
 
 implementation
 

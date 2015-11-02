@@ -50,10 +50,10 @@ Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
 Know bug :
 
-History :     25/04/2013: add support to 's1' <> 's2'
-                          add support to z in (x, y, z)
-                          add support to max(x, y)
-                          add support to min(x,y)
+History :     25/04/2013: add possibility to compare string 's1' <> 's2'
+                          add IN support. ex: z IN (x, y, z)
+                          add MAX support. ex: max(x,y)
+                          add MIN support. ex: min(x,y)
 
 Link :
 
@@ -62,7 +62,7 @@ Note :        operator priority (as implemented in this unit)
               all unary operators are associated from right to left
 
              (highest) not bnot(bitwise) +(unary) -(unary)            (level 3)
-             * / div mod and band(bitwise) shl shr                    (level 2)
+             * / div mod and band(bitwise) shl shr in                 (level 2)
              +(binary) -(binary) or xor bor(bitwise) bxor(bitwise)    (level 1)
              (lowest)  < <= > >= cmp = <>                             (level 0)
 
@@ -99,13 +99,7 @@ type
 
 type
 
-  {$DEFINE SUPPORTS_EXTENDED}
-
-  {$IFDEF SUPPORTS_EXTENDED}
   ALFloat = Extended;
-  {$ELSE}
-  ALFloat = Double;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   PALFloat = ^ALFloat;
 
@@ -117,38 +111,28 @@ type
   TALFloat64 = Double;
   PALFloat64 = ^TALFloat64;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALFloat80 = Extended;
   PALFloat80 = ^TALFloat80;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALFloatFunc = function: TALFloat;
   TALFloat32Func = function: TALFloat32;
   TALFloat64Func = function: TALFloat64;
-  {$IFDEF SUPPORTS_EXTENDED}
   TALFloat80Func = function: TALFloat80;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALUnaryFunc = function(X: TALFloat): TALFloat;
   TALUnary32Func = function(X: TALFloat32): TALFloat32;
   TALUnary64Func = function(X: TALFloat64): TALFloat64;
-  {$IFDEF SUPPORTS_EXTENDED}
   TALUnary80Func = function(X: TALFloat80): TALFloat80;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALBinaryFunc = function(X, Y: TALFloat): TALFloat;
   TALBinary32Func = function(X, Y: TALFloat32): TALFloat32;
   TALBinary64Func = function(X, Y: TALFloat64): TALFloat64;
-  {$IFDEF SUPPORTS_EXTENDED}
   TALBinary80Func = function(X, Y: TALFloat80): TALFloat80;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALTernaryFunc = function(X, Y, Z: TALFloat): TALFloat;
   TALTernary32Func = function(X, Y, Z: TALFloat32): TALFloat32;
   TALTernary64Func = function(X, Y, Z: TALFloat64): TALFloat64;
-  {$IFDEF SUPPORTS_EXTENDED}
   TALTernary80Func = function(X, Y, Z: TALFloat80): TALFloat80;
-  {$ENDIF SUPPORTS_EXTENDED}
 
 type
   { Forward Declarations }
@@ -412,7 +396,7 @@ type
     FTokenAsString: AnsiString;
   public
     constructor Create;
-    procedure NextTok; virtual; abstract;
+    procedure NextTok(const EvalTok: Boolean = True); virtual; abstract;
     procedure Reset; virtual;
     property TokenAsString: AnsiString read FTokenAsString;
     property TokenAsNumber: TALFloat read FTokenAsNumber;
@@ -437,40 +421,28 @@ type
   public
     function LoadVar32(ALoc: PALFloat32): TALExprNode; virtual; abstract;
     function LoadVar64(ALoc: PALFloat64): TALExprNode; virtual; abstract;
-    {$IFDEF SUPPORTS_EXTENDED}
     function LoadVar80(ALoc: PALFloat80): TALExprNode; virtual; abstract;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     function LoadConst32(AValue: TALFloat32): TALExprNode; virtual; abstract;
     function LoadConst64(AValue: TALFloat64): TALExprNode; virtual; abstract;
-    {$IFDEF SUPPORTS_EXTENDED}
     function LoadConst80(AValue: TALFloat80): TALExprNode; virtual; abstract;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     function CallFloatFunc(AFunc: TALFloatFunc): TALExprNode; virtual; abstract;
     function CallFloat32Func(AFunc: TALFloat32Func): TALExprNode; virtual; abstract;
     function CallFloat64Func(AFunc: TALFloat64Func): TALExprNode; virtual; abstract;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallFloat80Func(AFunc: TALFloat80Func): TALExprNode; virtual; abstract;
-    {$ENDIF SUPPORTS_EXTENDED}
     function CallUnaryFunc(AFunc: TALUnaryFunc; X: TALExprNode): TALExprNode; virtual; abstract;
     function CallUnary32Func(AFunc: TALUnary32Func; X: TALExprNode): TALExprNode; virtual; abstract;
     function CallUnary64Func(AFunc: TALUnary64Func; X: TALExprNode): TALExprNode; virtual; abstract;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallUnary80Func(AFunc: TALUnary80Func; X: TALExprNode): TALExprNode; virtual; abstract;
-    {$ENDIF SUPPORTS_EXTENDED}
     function CallBinaryFunc(AFunc: TALBinaryFunc; X, Y: TALExprNode): TALExprNode; virtual; abstract;
     function CallBinary32Func(AFunc: TALBinary32Func; X, Y: TALExprNode): TALExprNode; virtual; abstract;
     function CallBinary64Func(AFunc: TALBinary64Func; X, Y: TALExprNode): TALExprNode; virtual; abstract;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallBinary80Func(AFunc: TALBinary80Func; X, Y: TALExprNode): TALExprNode; virtual; abstract;
-    {$ENDIF SUPPORTS_EXTENDED}
     function CallTernaryFunc(AFunc: TALTernaryFunc; X, Y, Z: TALExprNode): TALExprNode; virtual; abstract;
     function CallTernary32Func(AFunc: TALTernary32Func; X, Y, Z: TALExprNode): TALExprNode; virtual; abstract;
     function CallTernary64Func(AFunc: TALTernary64Func; X, Y, Z: TALExprNode): TALExprNode; virtual; abstract;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallTernary80Func(AFunc: TALTernary80Func; X, Y, Z: TALExprNode): TALExprNode; virtual; abstract;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     function Add(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
     function Subtract(ALeft, ARight: TALExprNode): TALExprNode; virtual; abstract;
@@ -501,14 +473,10 @@ type
 
     function LoadVar(ALoc: PALFloat32): TALExprNode; overload;
     function LoadVar(ALoc: PALFloat64): TALExprNode; overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     function LoadVar(ALoc: PALFloat80): TALExprNode; overload;
-    {$ENDIF SUPPORTS_EXTENDED}
     function LoadConst(AValue: TALFloat32): TALExprNode; overload;
     function LoadConst(AValue: TALFloat64): TALExprNode; overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     function LoadConst(AValue: TALFloat80): TALExprNode; overload;
-    {$ENDIF SUPPORTS_EXTENDED}
   end;
 
   TALExprCompileParser = class(TObject)
@@ -560,7 +528,7 @@ type
   public
     constructor Create(const ABuf: AnsiString);
 
-    procedure NextTok; override;
+    procedure NextTok(const EvalTok: Boolean = True); override;
     procedure Reset; override;
 
     property Buf: AnsiString read FBuf write SetBuf;
@@ -604,39 +572,27 @@ type
 
     function LoadVar32(ALoc: PALFloat32): TALExprNode; override;
     function LoadVar64(ALoc: PALFloat64): TALExprNode; override;
-    {$IFDEF SUPPORTS_EXTENDED}
     function LoadVar80(ALoc: PALFloat80): TALExprNode; override;
-    {$ENDIF SUPPORTS_EXTENDED}
     function LoadConst32(AValue: TALFloat32): TALExprNode; override;
     function LoadConst64(AValue: TALFloat64): TALExprNode; override;
-    {$IFDEF SUPPORTS_EXTENDED}
     function LoadConst80(AValue: TALFloat80): TALExprNode; override;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     function CallFloatFunc(AFunc: TALFloatFunc): TALExprNode; override;
     function CallFloat32Func(AFunc: TALFloat32Func): TALExprNode; override;
     function CallFloat64Func(AFunc: TALFloat64Func): TALExprNode; override;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallFloat80Func(AFunc: TALFloat80Func): TALExprNode; override;
-    {$ENDIF SUPPORTS_EXTENDED}
     function CallUnaryFunc(AFunc: TALUnaryFunc; X: TALExprNode): TALExprNode; override;
     function CallUnary32Func(AFunc: TALUnary32Func; X: TALExprNode): TALExprNode; override;
     function CallUnary64Func(AFunc: TALUnary64Func; X: TALExprNode): TALExprNode; override;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallUnary80Func(AFunc: TALUnary80Func; X: TALExprNode): TALExprNode; override;
-    {$ENDIF SUPPORTS_EXTENDED}
     function CallBinaryFunc(AFunc: TALBinaryFunc; X, Y: TALExprNode): TALExprNode; override;
     function CallBinary32Func(AFunc: TALBinary32Func; X, Y: TALExprNode): TALExprNode; override;
     function CallBinary64Func(AFunc: TALBinary64Func; X, Y: TALExprNode): TALExprNode; override;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallBinary80Func(AFunc: TALBinary80Func; X, Y: TALExprNode): TALExprNode; override;
-    {$ENDIF SUPPORTS_EXTENDED}
     function CallTernaryFunc(AFunc: TALTernaryFunc; X, Y, Z: TALExprNode): TALExprNode; override;
     function CallTernary32Func(AFunc: TALTernary32Func; X, Y, Z: TALExprNode): TALExprNode; override;
     function CallTernary64Func(AFunc: TALTernary64Func; X, Y, Z: TALExprNode): TALExprNode; override;
-    {$IFDEF SUPPORTS_EXTENDED}
     function CallTernary80Func(AFunc: TALTernary80Func; X, Y, Z: TALExprNode): TALExprNode; override;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     function Add(ALeft, ARight: TALExprNode): TALExprNode; override;
     function Subtract(ALeft, ARight: TALExprNode): TALExprNode; override;
@@ -695,7 +651,6 @@ type
     function Compile: TALExprNode; override;
   end;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALExprConst80Sym = class(TALExprSym)
   private
     FValue: TALFloat80;
@@ -704,7 +659,6 @@ type
     function Evaluate: TALFloat; override;
     function Compile: TALExprNode; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALExprVar32Sym = class(TALExprSym)
   private
@@ -726,7 +680,6 @@ type
     function Compile: TALExprNode; override;
   end;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALExprVar80Sym = class(TALExprSym)
   private
     FLoc: PALFloat80;
@@ -736,7 +689,6 @@ type
     function Evaluate: TALFloat; override;
     function Compile: TALExprNode; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALExprAbstractFuncSym = class(TALExprSym)
   protected
@@ -774,7 +726,6 @@ type
     function Compile: TALExprNode; override;
   end;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALExprFloat80FuncSym = class(TALExprAbstractFuncSym)
   private
     FFunc: TALFloat80Func;
@@ -783,7 +734,6 @@ type
     function Evaluate: TALFloat; override;
     function Compile: TALExprNode; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALExprUnaryFuncSym = class(TALExprAbstractFuncSym)
   private
@@ -812,7 +762,6 @@ type
     function Compile: TALExprNode; override;
   end;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALExprUnary80FuncSym = class(TALExprAbstractFuncSym)
   private
     FFunc: TALUnary80Func;
@@ -821,7 +770,6 @@ type
     function Evaluate: TALFloat; override;
     function Compile: TALExprNode; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALExprBinaryFuncSym = class(TALExprAbstractFuncSym)
   private
@@ -850,7 +798,6 @@ type
     function Compile: TALExprNode; override;
   end;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALExprBinary80FuncSym = class(TALExprAbstractFuncSym)
   private
     FFunc: TALBinary80Func;
@@ -859,7 +806,6 @@ type
     function Evaluate: TALFloat; override;
     function Compile: TALExprNode; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALExprTernaryFuncSym = class(TALExprAbstractFuncSym)
   private
@@ -888,7 +834,6 @@ type
     function Compile: TALExprNode; override;
   end;
 
-  {$IFDEF SUPPORTS_EXTENDED}
   TALExprTernary80FuncSym = class(TALExprAbstractFuncSym)
   private
     FFunc: TALTernary80Func;
@@ -897,7 +842,6 @@ type
     function Evaluate: TALFloat; override;
     function Compile: TALExprNode; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   TALEasyEvaluator = class(TObject)
   private
@@ -914,39 +858,27 @@ type
     //an expression, its current value will be inserted.
     procedure AddVar(const AName: AnsiString; var AVar: TALFloat32); overload;
     procedure AddVar(const AName: AnsiString; var AVar: TALFloat64); overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     procedure AddVar(const AName: AnsiString; var AVar: TALFloat80); overload;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     //Adds a constant to the internal context. Constants are different from variables
     //because sub-expressions made entirely from constants may be evaluated only once
     //(at compile time), and that value used for all subsequent evaluations.
     procedure AddConst(const AName: AnsiString; AConst: TALFloat32); overload;
     procedure AddConst(const AName: AnsiString; AConst: TALFloat64); overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     procedure AddConst(const AName: AnsiString; AConst: TALFloat80); overload;
-    {$ENDIF SUPPORTS_EXTENDED}
 
     procedure AddFunc(const AName: AnsiString; AFunc: TALFloat32Func); overload;
     procedure AddFunc(const AName: AnsiString; AFunc: TALFloat64Func); overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALFloat80Func); overload;
-    {$ENDIF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALUnary32Func); overload;
     procedure AddFunc(const AName: AnsiString; AFunc: TALUnary64Func); overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALUnary80Func); overload;
-    {$ENDIF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALBinary32Func); overload;
     procedure AddFunc(const AName: AnsiString; AFunc: TALBinary64Func); overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALBinary80Func); overload;
-    {$ENDIF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALTernary32Func); overload;
     procedure AddFunc(const AName: AnsiString; AFunc: TALTernary64Func); overload;
-    {$IFDEF SUPPORTS_EXTENDED}
     procedure AddFunc(const AName: AnsiString; AFunc: TALTernary80Func); overload;
-    {$ENDIF SUPPORTS_EXTENDED}
     procedure Remove(const AName: AnsiString);
 
     procedure Clear; virtual;
@@ -957,7 +889,6 @@ type
   private
     FLexer:     TALExprSimpleLexer;
     FParser:    TALExprEvalParser;
-    function    Prepare(const AExpr: AnsiString): AnsiString;
   public
     constructor Create;
     destructor  Destroy; override;
@@ -1002,22 +933,14 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      ALString,
      ALCipher;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*****************************************************}
 function ALEvaluator_Max(A, B: TALFloat80): TALFloat80;
-{$ELSE}
-function ALEvaluator_Max(X, Y: TALFloat64): TALFloat64;
-{$ENDIF}
 begin
   Result := Max(A, B);
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*****************************************************}
 function ALEvaluator_Min(A, B: TALFloat80): TALFloat80;
-{$ELSE}
-function ALEvaluator_Min(X, Y: TALFloat64): TALFloat64;
-{$ENDIF}
 begin
   Result := Min(A, B);
 end;
@@ -1534,6 +1457,9 @@ end;
 
 {******************************************************************}
 function TALExprEvalParser.EvalExprLevel2(ASkip: Boolean): TALFloat;
+var OpenTok: TALExprToken;
+    CloseTok: TALExprToken;
+    OpenTokCount: integer;
 begin
   Result := EvalExprLevel3(ASkip);
 
@@ -1543,7 +1469,58 @@ begin
         Result := Result * EvalExprLevel3(True);
       etForwardSlash:
         Result := Result / EvalExprLevel3(True);
-      etIdentifier: // div, mod, and, shl, shr, band
+      etIdentifier: // div, mod, and, shl, shr, band, in
+        if ALSameText(Lexer.TokenAsString, 'in') then
+        begin
+
+          Lexer.NextTok;
+
+          OpenTok := Lexer.CurrTok;
+          if OpenTok = etLParen then CloseTok := etRParen
+          else if OpenTok = etLBracket then CloseTok := etRBracket
+          else raise EALExprEvalError.CreateRes(@RsALExprEvalFirstArg);
+
+          while true do begin
+
+            if result = EvalExprLevel3(True) then begin
+
+              result := 1.0;
+
+              OpenTokCount := 1;
+              while True do begin
+
+                if Lexer.CurrTok = OpenTok then inc(OpenTokCount)
+                else if Lexer.CurrTok = CloseTok then begin
+                  dec(OpenTokCount);
+                  if OpenTokCount = 0 then begin
+                    Lexer.NextTok;
+                    break;
+                  end;
+                end 
+                else if Lexer.CurrTok = etEOF then
+                  raise EALExprEvalError.CreateRes(@RsALExprEvalEndArgs); 
+
+                Lexer.NextTok(false);
+                  
+              end;
+              
+              break;
+
+            end
+
+            else begin
+              if Lexer.CurrTok = CloseTok then begin
+                result := 0.0;
+                break;
+              end
+              else if Lexer.CurrTok <> etComma then
+                raise EALExprEvalError.CreateRes(@RsALExprEvalNextArg);                                                    
+            end;
+            
+          end;
+          
+        end
+        else
         if ALSameText(Lexer.TokenAsString, 'div') then
           Result := Round(Result) div Round(EvalExprLevel3(True))
         else
@@ -1664,8 +1641,8 @@ begin
   inherited Create;
 end;
 
-{***********************************}
-procedure TALExprSimpleLexer.NextTok;
+{******************************************************************}
+procedure TALExprSimpleLexer.NextTok(const EvalTok: Boolean = True);
 const
   CharToTokenMap: array [AnsiChar] of TALExprToken =
   (
@@ -1743,6 +1720,7 @@ var
   { register variable optimization }
   cp: PAnsiChar;
   start: PAnsiChar;
+  InSingleQuote, InDoubleQuote: Boolean;
 begin
   cp := FCurrPos;
 
@@ -1754,13 +1732,60 @@ begin
   case cp^ of
     #0:
       FCurrTok := etEof;
+    '"', '''':
+      begin
+
+        //Replace all the strings by their CRC - to compare them as numbers
+        //but replace empty string '' by 0 instead of the CRC of an empty string
+        start := cp;
+        InSingleQuote := cp^ = '''';
+        InDoubleQuote := cp^ = '"';
+        inc(cp);
+        While (InSingleQuote or InDoubleQuote) and (cp^ <> #0) do begin
+
+          if (cp^ = '"') then begin
+            InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote);
+            inc(cp);
+            if (cp^ = '"') then begin
+              inc(cp);
+              InDoubleQuote := (not InDoubleQuote) and (not InSingleQuote);
+            end;
+          end
+          else if (cp^ = '''') then begin
+            InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+            inc(cp);
+            if (cp^ = '''') then begin
+              inc(cp);
+              InSingleQuote := (not InSingleQuote) and (not InDoubleQuote);
+            end;
+          end
+          else inc(cp);
+
+        end;
+
+        if InSingleQuote or InDoubleQuote then FCurrTok := etInvalid
+        else begin
+
+          { evaluate number }
+          if EvalTok then begin
+            SetString(FTokenAsString, start, cp - start);
+            FTokenAsString := ALDequotedStr(FTokenAsString, FTokenAsString[1]);
+            if FTokenAsString = '' then FTokenAsNumber := 0
+            else FTokenAsNumber := ALStringHashCrc32(FTokenAsString);
+          end;
+          
+          FCurrTok := etNumber;
+
+        end;
+
+      end;
     'a'..'z', 'A'..'Z', '_':
       begin
         start := cp;
         Inc(cp);
         while ALCharIsValidIdentifierLetter(cp^) do
           Inc(cp);
-        SetString(FTokenAsString, start, cp - start);
+        if EvalTok then SetString(FTokenAsString, start, cp - start);
         FCurrTok := etIdentifier;
       end;
     '0'..'9':
@@ -1790,9 +1815,11 @@ begin
         end;
 
         { evaluate number }
-        SetString(FTokenAsString, start, cp - start);
-        FTokenAsNumber := ALStrToFloat(FTokenAsString, ALDefaultFormatSettings);
-
+        if EvalTok then begin
+          SetString(FTokenAsString, start, cp - start);
+          FTokenAsNumber := ALStrToFloat(FTokenAsString, ALDefaultFormatSettings);
+        end;
+        
         FCurrTok := etNumber;
       end;
     '<':
@@ -1826,7 +1853,10 @@ begin
       end;
   else
     { map character to token }
-    FCurrTok := CharToTokenMap[AnsiChar(cp^)];
+    if Word(cp^) < 256 then
+      FCurrTok := CharToTokenMap[AnsiChar(cp^)]
+    else
+      FCurrTok := etInvalid;
     Inc(cp);
   end;
 
@@ -1895,13 +1925,11 @@ begin
   Result := LoadVar64(ALoc);
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*****************************************************************}
 function TALExprNodeFactory.LoadVar(ALoc: PALFloat80): TALExprNode;
 begin
   Result := LoadVar80(ALoc);
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*********************************************************************}
 function TALExprNodeFactory.LoadConst(AValue: TALFloat32): TALExprNode;
@@ -1915,13 +1943,11 @@ begin
   Result := LoadConst64(AValue);
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*********************************************************************}
 function TALExprNodeFactory.LoadConst(AValue: TALFloat80): TALExprNode;
 begin
   Result := LoadConst80(AValue);
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {******************************}
 constructor TALEvaluator.Create;
@@ -1948,157 +1974,8 @@ end;
 {****************************************************************}
 function TALEvaluator.Evaluate(const AExpr: AnsiString): TALFloat;
 begin
-  FLexer.Buf := Prepare(AExpr);
+  FLexer.Buf := AExpr;
   Result := FParser.Evaluate;
-end;
-
-{*****************************************************************}
-function TALEvaluator.Prepare(const AExpr: AnsiString): AnsiString;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _handleIn(const aOpeningBracketChar, aClosingBracketChar: Ansichar);
-  var aLvalue: ansiString;
-      aSquareBracketCounter: integer;
-      aRoundBracketCounter: integer;
-      aArguments: ansiString;
-      P1, P2, P4, P3: integer;
-  begin
-    // space before to avoid something like "sin(...)"
-    P1 := ALPosExIgnoreCase(ansiString(' in')+aOpeningBracketChar, result);  // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                                                             //                    ^P1
-    while P1 > 0 do begin
-
-      // init the aLvalue
-      P2 := (P1 - 1); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                      //                  ^P2
-      while (P2 > 0) and
-            (result[P2] in ['a'..'z', 'A'..'Z', '0'..'9', '_']) do Dec(P2); // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                                                            //             ^^^^^^P2
-      aLvalue := AlCopyStr(result, P2 + 1, P1 - P2 - 1); // MyVar
-      if aLValue = '' then raise EALException.CreateFmt('Wrong expression (cannot assign left value for operator IN): %s', [AExpr]);
-      P4 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                    //              ^P4
-
-      // build aArguments
-      P1 := P1 + 4; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                    //                       ^P1
-      P2 := P1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                //                       ^P2
-      P3 := P1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                //                       ^P3
-      aRoundBracketCounter := 0;
-      aSquareBracketCounter := 0;
-      if aOpeningBracketChar = '(' then inc(aRoundBracketCounter)
-      else inc(aSquareBracketCounter);
-      aArguments := '';
-      while P2 <= length(result) do begin
-        if result[P2] = '(' then Inc(aRoundBracketCounter)
-        else if result[P2] = '[' then Inc(aSquareBracketCounter)
-        else if result[P2] = ')' then begin
-          Dec(aRoundBracketCounter);
-          if (aRoundBracketCounter + aSquareBracketCounter <= 0) then break;
-        end
-        else if result[P2] = ']' then begin
-          Dec(aSquareBracketCounter);
-          if (aRoundBracketCounter + aSquareBracketCounter <= 0) then break;
-        end
-        else if (result[P2] = ',') and
-                (aRoundBracketCounter + aSquareBracketCounter = 1) then begin // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                                                                              //                       ^^P2
-          if aArguments <> '' then aArguments := aArguments + ' or ';
-          aArguments := aArguments + '(' + aLValue + ' = ' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
-          P3 := P2 + 1; // (MyVar=0) or(MyVar in(1, 3, sqr(1,2), 4))
-                        //                         ^P3
-        end;
-        Inc(P2);
-      end;
-      if P2 > length(result) then raise EALException.CreateFmt('Wrong expression (missing closing bracket): %s', [AExpr]);
-      if aArguments <> '' then aArguments := aArguments + ' or ';
-      aArguments := aArguments + '(' + aLValue + '=' + ALTrim(ALCopyStr(result, P3, P2 - P3)) + ')';
-
-      Delete(result, P4, P2 - P4 + 1);
-      Insert('(' + aArguments + ')', result, P4);
-
-      //calculate again P1
-      P1 := ALPosExIgnoreCase(ansiString(' in')+aOpeningBracketChar, result, P4);
-
-    end;
-  end;
-
-var aInSingleQuote, aInDoubleQuote: Boolean;
-    aCrc: cardinal;
-    P1, P2: integer;
-    S1: ansiString;
-
-begin
-
-  //init result
-  result := AExpr;
-
-  //Replace all the strings by their CRC - to compare them as numbers
-  //but replace empty string '' by 0 instead of the CRC of an empty string
-  aInSingleQuote := False;
-  aInDoubleQuote := False;
-  P1 := 0;
-  P2 := 1;
-  While P2 <= length(Result) do begin
-
-    if (Result[P2] = '"') then begin
-      aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
-      if aInDoubleQuote then P1 := P2;
-      if (P2 < length(Result)) and
-         (Result[P2 + 1] = '"') then begin
-        inc(P2);
-        aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
-      end;
-    end
-    else if (Result[P2] = '''') then begin
-      aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote);
-      if aInSingleQuote then P1 := P2;
-      if (P2 < length(Result)) and
-         (Result[P2 + 1] = '''') then begin
-        inc(P2);
-        aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote);
-      end;
-    end;
-
-    if (not aInSingleQuote) and
-       (not aInDoubleQuote) and
-       (P1 > 0) then begin
-      S1 := AlCopyStr(result,P1, P2 - P1 + 1);
-      S1 := ALDequotedStr(S1, S1[1]);
-      if S1 = '' then aCrc := 0
-      else aCrc := ALStringHashCrc32(S1);
-      Delete(result, P1, P2 - P1 + 1);
-      Insert(ALIntToStr(aCrc), result, P1);
-      P2 := P1 + length(ALIntToStr(aCrc));
-      P1 := 0;
-    end
-    else inc(P2);
-
-  end;
-  if P1 > 0 then raise EALException.CreateFmt('Wrong expression (unterminated string): %s', [AExpr]);
-
-  //Clear non-useful white spaces
-  setlength(result, Length(Result));
-  P1 := 0;
-  for P2 := 1 to Length(Result) do begin
-    if not ((ALCharIsWhiteSpace(Result[P2])) and
-            (P2 < Length(Result)) and
-            ((ALCharIsWhiteSpace(Result[P2 + 1])) or
-             (Result[P2 + 1] in ['(','[']))) then begin
-      inc(P1);
-      if ALCharIsWhiteSpace(Result[P2]) then result[P1] := ' '
-      else result[P1] := Result[P2];
-    end;
-  end;
-  setlength(Result, P1);
-  result := ALTrim(result);
-
-  //handle the in (x, y, z)
-  _handleIn('(',')');
-  _handleIn('[',']');
-
 end;
 
 {************************************************}
@@ -2133,13 +2010,11 @@ type
     procedure Execute; override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {--------------------------------------}
   TALExprVar80VmOp = class(TALExprVarVmOp)
   public
     procedure Execute; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {------------------}
   { the const holder }
@@ -2355,8 +2230,7 @@ type
     procedure Execute; override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {-----------------------------------------------}
   TALExprCallFloat80VmOp = class(TALExprVirtMachOp)
   private
     FFunc: TALFloat80Func;
@@ -2364,7 +2238,6 @@ type
     constructor Create(AFunc: TALFloat80Func);
     procedure Execute; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {---------------------------------------------}
   TALExprCallUnaryVmOp = class(TALExprVirtMachOp)
@@ -2396,8 +2269,7 @@ type
     procedure Execute; override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {-----------------------------------------------}
   TALExprCallUnary80VmOp = class(TALExprVirtMachOp)
   private
     FFunc: TALUnary80Func;
@@ -2406,7 +2278,6 @@ type
     constructor Create(AFunc: TALUnary80Func; X: PALFloat);
     procedure Execute; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {----------------------------------------------}
   TALExprCallBinaryVmOp = class(TALExprVirtMachOp)
@@ -2438,8 +2309,7 @@ type
     procedure Execute; override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {------------------------------------------------}
   TALExprCallBinary80VmOp = class(TALExprVirtMachOp)
   private
     FFunc: TALBinary80Func;
@@ -2448,7 +2318,6 @@ type
     constructor Create(AFunc: TALBinary80Func; X, Y: PALFloat);
     procedure Execute; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {-----------------------------------------------}
   TALExprCallTernaryVmOp = class(TALExprVirtMachOp)
@@ -2480,8 +2349,7 @@ type
     procedure Execute; override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {-------------------------------------------------}
   TALExprCallTernary80VmOp = class(TALExprVirtMachOp)
   private
     FFunc: TALTernary80Func;
@@ -2490,7 +2358,6 @@ type
     constructor Create(AFunc: TALTernary80Func; X, Y, Z: PALFloat);
     procedure Execute; override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
 {*********************************}
 procedure TALExprVar32VmOp.Execute;
@@ -2504,13 +2371,11 @@ begin
   FOutput := PALFloat64(FVarLoc)^;
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*********************************}
 procedure TALExprVar80VmOp.Execute;
 begin
   FOutput := PALFloat80(FVarLoc)^;
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {****************************************************}
 constructor TALExprConstVmOp.Create(AValue: TALFloat);
@@ -2765,8 +2630,6 @@ begin
   FOutput := FFunc;
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {***************************************************************}
 constructor TALExprCallFloat80VmOp.Create(AFunc: TALFloat80Func);
 begin
@@ -2779,8 +2642,6 @@ procedure TALExprCallFloat80VmOp.Execute;
 begin
   FOutput := FFunc;
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {************************************************************************}
 constructor TALExprCallUnaryVmOp.Create(AFunc: TALUnaryFunc; X: PALFloat);
@@ -2824,8 +2685,6 @@ begin
   FOutput := FFunc(FX^);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {****************************************************************************}
 constructor TALExprCallUnary80VmOp.Create(AFunc: TALUnary80Func; X: PALFloat);
 begin
@@ -2839,8 +2698,6 @@ procedure TALExprCallUnary80VmOp.Execute;
 begin
   FOutput := FFunc(FX^);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*****************************************************************************}
 constructor TALExprCallBinaryVmOp.Create(AFunc: TALBinaryFunc; X, Y: PALFloat);
@@ -2887,8 +2744,6 @@ begin
   FOutput := FFunc(FX^, FY^);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {*********************************************************************************}
 constructor TALExprCallBinary80VmOp.Create(AFunc: TALBinary80Func; X, Y: PALFloat);
 begin
@@ -2903,8 +2758,6 @@ procedure TALExprCallBinary80VmOp.Execute;
 begin
   FOutput := FFunc(FX^, FY^);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {**********************************************************************************}
 constructor TALExprCallTernaryVmOp.Create(AFunc: TALTernaryFunc; X, Y, Z: PALFloat);
@@ -2954,8 +2807,6 @@ begin
   FOutput := FFunc(FX^, FY^, FZ^);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {**************************************************************************************}
 constructor TALExprCallTernary80VmOp.Create(AFunc: TALTernary80Func; X, Y, Z: PALFloat);
 begin
@@ -2971,8 +2822,6 @@ procedure TALExprCallTernary80VmOp.Execute;
 begin
   FOutput := FFunc(FX^, FY^, FZ^);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 { End of virtual machine operators }
 
@@ -3116,8 +2965,7 @@ type
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {---------------------------------------------}
   TALExprVar80VmNode = class(TALExprVirtMachNode)
   private
     FValue: PALFloat80;
@@ -3125,7 +2973,6 @@ type
     constructor Create(AValue: PALFloat80);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {-------------------------------------------------}
   TALExprCallFloatVmNode = class(TALExprVirtMachNode)
@@ -3154,8 +3001,7 @@ type
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {---------------------------------------------------}
   TALExprCallFloat80VmNode = class(TALExprVirtMachNode)
   private
     FFunc: TALFloat80Func;
@@ -3163,7 +3009,6 @@ type
     constructor Create(AFunc: TALFloat80Func);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {-------------------------------------------------}
   TALExprCallUnaryVmNode = class(TALExprVirtMachNode)
@@ -3192,8 +3037,7 @@ type
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {---------------------------------------------------}
   TALExprCallUnary80VmNode = class(TALExprVirtMachNode)
   private
     FFunc: TALUnary80Func;
@@ -3201,7 +3045,6 @@ type
     constructor Create(AFunc: TALUnary80Func; X: TALExprNode);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {--------------------------------------------------}
   TALExprCallBinaryVmNode = class(TALExprVirtMachNode)
@@ -3230,8 +3073,7 @@ type
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {----------------------------------------------------}
   TALExprCallBinary80VmNode = class(TALExprVirtMachNode)
   private
     FFunc: TALBinary80Func;
@@ -3239,7 +3081,6 @@ type
     constructor Create(AFunc: TALBinary80Func; X, Y: TALExprNode);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
   {---------------------------------------------------}
   TALExprCallTernaryVmNode = class(TALExprVirtMachNode)
@@ -3268,8 +3109,7 @@ type
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
-  {------------------------}
-  {$IFDEF SUPPORTS_EXTENDED}
+  {-----------------------------------------------------}
   TALExprCallTernary80VmNode = class(TALExprVirtMachNode)
   private
     FFunc: TALTernary80Func;
@@ -3277,7 +3117,6 @@ type
     constructor Create(AFunc: TALTernary80Func; X, Y, Z: TALExprNode);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
-  {$ENDIF SUPPORTS_EXTENDED}
 
 {***********************************************************************************************************}
 constructor TALExprUnaryVmNode.Create(AUnaryClass: TALExprUnaryVmOpClass; const ADeps: array of TALExprNode);
@@ -3353,8 +3192,6 @@ begin
   AVirtMach.Add(FExprVmCode);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {********************************************************}
 constructor TALExprVar80VmNode.Create(AValue: PALFloat80);
 begin
@@ -3368,8 +3205,6 @@ begin
   FExprVmCode := TALExprVar80VmOp.Create(FValue);
   AVirtMach.Add(FExprVmCode);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 { End of expression nodes for virtual machine }
 
@@ -3421,13 +3256,11 @@ begin
   Result := AddNode(TALExprVar64VmNode.Create(ALoc));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{***************************************************************************}
 function TALExprVirtMachNodeFactory.LoadVar80(ALoc: PALFloat80): TALExprNode;
 begin
   Result := AddNode(TALExprVar80VmNode.Create(ALoc));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*******************************************************************************}
 function TALExprVirtMachNodeFactory.LoadConst32(AValue: TALFloat32): TALExprNode;
@@ -3441,13 +3274,11 @@ begin
   Result := AddNode(TALExprConstVmNode.Create(AValue));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*******************************************************************************}
 function TALExprVirtMachNodeFactory.LoadConst80(AValue: TALFloat80): TALExprNode;
 begin
   Result := AddNode(TALExprConstVmNode.Create(AValue));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*******************************************************************************}
 function TALExprVirtMachNodeFactory.Add(ALeft, ARight: TALExprNode): TALExprNode;
@@ -3550,13 +3381,11 @@ begin
   Result := AddNode(TALExprCallFloat64VmNode.Create(AFunc));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{**************************************************************************************}
 function TALExprVirtMachNodeFactory.CallFloat80Func(AFunc: TALFloat80Func): TALExprNode;
 begin
   Result := AddNode(TALExprCallFloat80VmNode.Create(AFunc));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {**************************************************************************************************}
 function TALExprVirtMachNodeFactory.CallUnaryFunc(AFunc: TALUnaryFunc; X: TALExprNode): TALExprNode;
@@ -3576,13 +3405,11 @@ begin
   Result := AddNode(TALExprCallUnary64VmNode.Create(AFunc, X));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{******************************************************************************************************}
 function TALExprVirtMachNodeFactory.CallUnary80Func(AFunc: TALUnary80Func; X: TALExprNode): TALExprNode;
 begin
   Result := AddNode(TALExprCallUnary80VmNode.Create(AFunc, X));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*******************************************************************************************************}
 function TALExprVirtMachNodeFactory.CallBinaryFunc(AFunc: TALBinaryFunc; X, Y: TALExprNode): TALExprNode;
@@ -3602,13 +3429,11 @@ begin
   Result := AddNode(TALExprCallBinary64VmNode.Create(AFunc, X, Y));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{***********************************************************************************************************}
 function TALExprVirtMachNodeFactory.CallBinary80Func(AFunc: TALBinary80Func; X, Y: TALExprNode): TALExprNode;
 begin
   Result := AddNode(TALExprCallBinary80VmNode.Create(AFunc, X, Y));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {************************************************************************************************************}
 function TALExprVirtMachNodeFactory.CallTernaryFunc(AFunc: TALTernaryFunc; X, Y, Z: TALExprNode): TALExprNode;
@@ -3628,13 +3453,11 @@ begin
   Result := AddNode(TALExprCallTernary64VmNode.Create(AFunc, X, Y, Z));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{****************************************************************************************************************}
 function TALExprVirtMachNodeFactory.CallTernary80Func(AFunc: TALTernary80Func; X, Y, Z: TALExprNode): TALExprNode;
 begin
   Result := AddNode(TALExprCallTernary80VmNode.Create(AFunc, X, Y, Z));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {***********************************************************************************}
 function TALExprVirtMachNodeFactory.Compare(ALeft, ARight: TALExprNode): TALExprNode;
@@ -3827,8 +3650,6 @@ begin
   Result := FLoc^;
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {*****************************************************************************}
 constructor TALExprVar80Sym.Create(const AIdent: AnsiString; ALoc: PALFloat80);
 begin
@@ -3848,8 +3669,6 @@ function TALExprVar80Sym.Evaluate: TALFloat;
 begin
   Result := FLoc^;
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*************************************************************}
 constructor TALExprCallFloatVmNode.Create(AFunc: TALFloatFunc);
@@ -3893,8 +3712,6 @@ begin
   AVirtMach.Add(FExprVmCode);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {*****************************************************************}
 constructor TALExprCallFloat80VmNode.Create(AFunc: TALFloat80Func);
 begin
@@ -3908,8 +3725,6 @@ begin
   FExprVmCode := TALExprCallFloat80VmOp.Create(FFunc);
   AVirtMach.Add(FExprVmCode);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*****************************************************************************}
 constructor TALExprCallUnaryVmNode.Create(AFunc: TALUnaryFunc; X: TALExprNode);
@@ -3959,8 +3774,6 @@ begin
   AVirtMach.Add(FExprVmCode);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {*********************************************************************************}
 constructor TALExprCallUnary80VmNode.Create(AFunc: TALUnary80Func; X: TALExprNode);
 begin
@@ -3976,8 +3789,6 @@ begin
     VmDeps[0].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {**********************************************************************************}
 constructor TALExprCallBinaryVmNode.Create(AFunc: TALBinaryFunc; X, Y: TALExprNode);
@@ -4030,8 +3841,6 @@ begin
   AVirtMach.Add(FExprVmCode);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {**************************************************************************************}
 constructor TALExprCallBinary80VmNode.Create(AFunc: TALBinary80Func; X, Y: TALExprNode);
 begin
@@ -4048,8 +3857,6 @@ begin
     VmDeps[1].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {***************************************************************************************}
 constructor TALExprCallTernaryVmNode.Create(AFunc: TALTernaryFunc; X, Y, Z: TALExprNode);
@@ -4105,8 +3912,6 @@ begin
   AVirtMach.Add(FExprVmCode);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {*******************************************************************************************}
 constructor TALExprCallTernary80VmNode.Create(AFunc: TALTernary80Func; X, Y, Z: TALExprNode);
 begin
@@ -4124,8 +3929,6 @@ begin
     VmDeps[2].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {***********************************************************}
 function TALExprAbstractFuncSym.CompileFirstArg: TALExprNode;
@@ -4227,8 +4030,6 @@ begin
   Result := FFunc;
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {****************************************************************************************}
 constructor TALExprFloat80FuncSym.Create(const AIdent: AnsiString; AFunc: TALFloat80Func);
 begin
@@ -4248,8 +4049,6 @@ function TALExprFloat80FuncSym.Evaluate: TALFloat;
 begin
   Result := FFunc;
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {************************************************************************************}
 constructor TALExprUnaryFuncSym.Create(const AIdent: AnsiString; AFunc: TALUnaryFunc);
@@ -4335,8 +4134,6 @@ begin
   Result := FFunc(X);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {****************************************************************************************}
 constructor TALExprUnary80FuncSym.Create(const AIdent: AnsiString; AFunc: TALUnary80Func);
 begin
@@ -4364,8 +4161,6 @@ begin
   EndArgs;
   Result := FFunc(X);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {**************************************************************************************}
 constructor TALExprBinaryFuncSym.Create(const AIdent: AnsiString; AFunc: TALBinaryFunc);
@@ -4460,8 +4255,6 @@ begin
   Result := FFunc(X, Y);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {******************************************************************************************}
 constructor TALExprBinary80FuncSym.Create(const AIdent: AnsiString; AFunc: TALBinary80Func);
 begin
@@ -4491,8 +4284,6 @@ begin
   EndArgs;
   Result := FFunc(X, Y);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {****************************************************************************************}
 constructor TALExprTernaryFuncSym.Create(const AIdent: AnsiString; AFunc: TALTernaryFunc);
@@ -4590,8 +4381,6 @@ begin
   Result := FFunc(X, Y, Z);
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {********************************************************************************************}
 constructor TALExprTernary80FuncSym.Create(const AIdent: AnsiString; AFunc: TALTernary80Func);
 begin
@@ -4623,8 +4412,6 @@ begin
   EndArgs;
   Result := FFunc(X, Y, Z);
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*****************************************************************************}
 constructor TALExprConstSym.Create(const AIdent: AnsiString; AValue: TALFloat);
@@ -4683,8 +4470,6 @@ begin
   Result := FValue;
 end;
 
-{$IFDEF SUPPORTS_EXTENDED}
-
 {*********************************************************************************}
 constructor TALExprConst80Sym.Create(const AIdent: AnsiString; AValue: TALFloat80);
 begin
@@ -4703,8 +4488,6 @@ function TALExprConst80Sym.Evaluate: TALFloat;
 begin
   Result := FValue;
 end;
-
-{$ENDIF SUPPORTS_EXTENDED}
 
 {**********************************}
 constructor TALEasyEvaluator.Create;
@@ -4728,13 +4511,11 @@ begin
   inherited Destroy;
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*******************************************************************************}
 procedure TALEasyEvaluator.AddConst(const AName: AnsiString; AConst: TALFloat80);
 begin
   FOwnContext.Add(TALExprConst80Sym.Create(AName, AConst));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*******************************************************************************}
 procedure TALEasyEvaluator.AddConst(const AName: AnsiString; AConst: TALFloat64);
@@ -4760,13 +4541,11 @@ begin
   FOwnContext.Add(TALExprVar64Sym.Create(AName, @AVar));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*******************************************************************************}
 procedure TALEasyEvaluator.AddVar(const AName: AnsiString; var AVar: TALFloat80);
 begin
   FOwnContext.Add(TALExprVar80Sym.Create(AName, @AVar));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALFloat32Func);
@@ -4780,13 +4559,11 @@ begin
   FOwnContext.Add(TALExprFloat64FuncSym.Create(AName, AFunc));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALFloat80Func);
 begin
   FOwnContext.Add(TALExprFloat80FuncSym.Create(AName, AFunc));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALUnary32Func);
@@ -4800,13 +4577,11 @@ begin
   FOwnContext.Add(TALExprUnary64FuncSym.Create(AName, AFunc));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{*********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALUnary80Func);
 begin
   FOwnContext.Add(TALExprUnary80FuncSym.Create(AName, AFunc));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {**********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALBinary32Func);
@@ -4820,13 +4595,11 @@ begin
   FOwnContext.Add(TALExprBinary64FuncSym.Create(AName, AFunc));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{**********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALBinary80Func);
 begin
   FOwnContext.Add(TALExprBinary80FuncSym.Create(AName, AFunc));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {***********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALTernary32Func);
@@ -4840,13 +4613,11 @@ begin
   FOwnContext.Add(TALExprTernary64FuncSym.Create(AName, AFunc));
 end;
 
-{************************}
-{$IFDEF SUPPORTS_EXTENDED}
+{***********************************************************************************}
 procedure TALEasyEvaluator.AddFunc(const AName: AnsiString; AFunc: TALTernary80Func);
 begin
   FOwnContext.Add(TALExprTernary80FuncSym.Create(AName, AFunc));
 end;
-{$ENDIF SUPPORTS_EXTENDED}
 
 {*******************************}
 procedure TALEasyEvaluator.Clear;

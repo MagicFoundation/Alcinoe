@@ -186,7 +186,7 @@ Type
     //[deleted from Tstrings] property WriteBOM: Boolean read FWriteBOM write FWriteBOM;
     //[deleted from Tstrings] property StringsAdapter: IStringsAdapter read FAdapter write SetStringsAdapter;
     //[deleted from Tstrings] destructor Destroy; override;
-    constructor Create;
+    constructor Create; virtual;
     function Add(const S: AnsiString): Integer; virtual;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; virtual;
     function AddNameValue(const Name, Value: AnsiString): Integer; virtual; // [added from Tstrings]
@@ -294,8 +294,8 @@ Type
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
   public
-    constructor Create; overload;
-    constructor Create(OwnsObjects: Boolean); overload;
+    constructor Create; overload; override;
+    constructor Create(OwnsObjects: Boolean); reintroduce; overload;
     destructor Destroy; override;
     function Add(const S: AnsiString): Integer; override;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
@@ -381,8 +381,8 @@ Type
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
   public
-    constructor Create; overload;
-    constructor Create(OwnsObjects: Boolean); overload;
+    constructor Create; overload; override;
+    constructor Create(OwnsObjects: Boolean); reintroduce; overload;
     destructor Destroy; override;
     function Add(const S: AnsiString): Integer; override;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
@@ -474,10 +474,10 @@ Type
     procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
     procedure init(OwnsObjects: Boolean; ACapacity: Integer); virtual; //[added from TStringList]
   public
-    constructor Create; overload;
-    constructor Create(OwnsObjects: Boolean); overload;
-    constructor Create(ACapacity: Integer); overload; //[added from Tstrings]
-    constructor Create(OwnsObjects: Boolean; ACapacity: Integer); overload; //[added from Tstrings]
+    constructor Create; overload; override;
+    constructor Create(OwnsObjects: Boolean); reintroduce; overload;
+    constructor Create(ACapacity: Integer); reintroduce; overload; //[added from Tstrings]
+    constructor Create(OwnsObjects: Boolean; ACapacity: Integer); reintroduce; overload; //[added from Tstrings]
     destructor Destroy; override;
     function Add(const S: AnsiString): Integer; override;
     function AddObject(const S: AnsiString; AObject: TObject): Integer; override;

@@ -1511,6 +1511,7 @@ begin
             else begin
               if Lexer.CurrTok = CloseTok then begin
                 result := 0.0;
+                Lexer.NextTok;
                 break;
               end
               else if Lexer.CurrTok <> etComma then

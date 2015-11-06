@@ -143,7 +143,7 @@ const
 procedure ALFillMimeContentTypeByExtList(AMIMEList : TALStrings);
 procedure ALFillExtByMimeContentTypeList(AMIMEList : TALStrings);
 Function  ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
-Function  ALGetDefaultMIMEContentTypeFromExt(aExt: AnsiString): AnsiString;
+Function  ALGetDefaultMIMEContentTypeFromExt(const aExt: AnsiString): AnsiString;
 
 Var vAlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
     vAlExtbyMimeContentTypeList: TALStrings; {text/html=.htm}
@@ -1066,7 +1066,7 @@ begin
   end;
 end;
 
-{****************************************************************************}
+{************************************************************************************}
 Function ALGetDefaultFileExtFromMimeContentType(aContentType: AnsiString): AnsiString;
 Var P: integer;
     Index : Integer;
@@ -1082,8 +1082,8 @@ Begin
   if Index <> -1 then Result := vAlExtbyMimeContentTypeList.ValueFromIndex[Index];
 end;
 
-{****************************************************************}
-Function ALGetDefaultMIMEContentTypeFromExt(aExt: AnsiString): AnsiString;
+{******************************************************************************}
+Function ALGetDefaultMIMEContentTypeFromExt(const aExt: AnsiString): AnsiString;
 var Index : Integer;
     LExt: AnsiString;
 begin

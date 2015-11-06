@@ -81,12 +81,12 @@ Type
   {--------------------------------------}
   {$IF CompilerVersion >= 23} {Delphi XE2}
   TalMySqlClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
-                                                                 ViewTag: AnsiString;
+                                                                 const ViewTag: AnsiString;
                                                                  ExtData: Pointer;
                                                                  Var Continue: Boolean);
   {$ELSE}
   TalMySqlClientSelectDataOnNewRowFunct = Procedure(XMLRowData: TalXmlNode;
-                                                    ViewTag: AnsiString;
+                                                    const ViewTag: AnsiString;
                                                     ExtData: Pointer;
                                                     Var Continue: Boolean);
   {$IFEND}
@@ -97,32 +97,12 @@ Type
     FErrorCode: Integer;
     FSQLstate: AnsiString;
   public
-    constructor Create(aErrorMsg: AnsiString;
-                       aErrorCode: Integer;
-                       aSqlState: AnsiString); overload;
+    constructor Create(const aErrorMsg: AnsiString;
+                       const aErrorCode: Integer;
+                       const aSqlState: AnsiString); overload;
     property ErrorCode: Integer read FErrorCode;
     property SQLState: AnsiString read FSQLState;
   end;
-
-  {------------------------------------}
-  TalMySqlClientSelectDataQUERY = record
-    SQL: AnsiString;
-    RowTag: AnsiString;
-    ViewTag: AnsiString;
-    Skip: integer; // used only if value is > 0
-    First: Integer; // used only if value is > 0
-    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                             // cache or not. Values <= 0 deactivate the cache
-    class function Create: TalMySqlClientSelectDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-  end;
-  TalMySqlClientSelectDataQUERIES = array of TalMySqlClientSelectDataQUERY;
-
-  {------------------------------------}
-  TalMySqlClientUpdateDataQUERY = record
-    SQL: AnsiString;
-    class function Create: TalMySqlClientUpdateDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-  end;
-  TalMySqlClientUpdateDataQUERIES = array of TalMySqlClientUpdateDataQUERY;
 
   {---------------------}
   TALMySQLOption = record
@@ -139,7 +119,6 @@ Type
     fMySql: PMySql;
     fNullString: AnsiString;
     finTransaction: Boolean;
-    fMySQLFormatSettings: TALFormatSettings;
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
   Protected
@@ -152,91 +131,93 @@ Type
     Function  GetFieldValue(aFieldValue: PAnsiChar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
-                            aFormatSettings: TALFormatSettings): AnsiString;
+                            const aFormatSettings: TALFormatSettings): AnsiString;
     procedure initObject; virtual;
-    procedure OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+    procedure OnSelectDataDone(const SQL: AnsiString;
+                               const RowTag: AnsiString;
+                               const ViewTag: AnsiString;
+                               Skip: integer;
+                               First: Integer;
+                               CacheThreshold: Integer;
                                TimeTaken: double); virtual;
-    procedure OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+    procedure OnUpdateDataDone(const SQL: AnsiString;
                                TimeTaken: double); virtual;
   Public
     Constructor Create(ApiVer: TALMySqlVersion_API;
                        const lib: AnsiString = 'libmysql.dll'); overload; virtual;
     Constructor Create(lib: TALMySqlLibrary); overload; virtual;
     Destructor Destroy; Override;
-    Procedure Connect(Host: AnsiString;
+    Procedure Connect(const Host: AnsiString;
                       Port: integer;
-                      DataBaseName,
-                      Login,
-                      Password,
-                      CharSet: AnsiString;
+                      const DataBaseName,
+                            Login,
+                            Password,
+                            CharSet: AnsiString;
                       Const ClientFlag: Cardinal = 0;
                       Const Options: TALMySQLOptions = nil); virtual;
     Procedure Disconnect;
     Procedure TransactionStart;
     Procedure TransactionCommit;
     Procedure TransactionRollback;
-    Procedure SelectData(Queries: TalMySqlClientSelectDataQUERIES;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         const ViewTag: AnsiString;
+                         Skip: integer; // used only if value is > 0
+                         First: Integer; // used only if value is > 0
+                         CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                  // cache or not. Values <= 0 deactivate the cache
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(Query: TalMySqlClientSelectDataQUERY;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
+                         const FormatSettings: TALFormatSettings); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
+                         const FormatSettings: TALFormatSettings); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(Queries: TalMySqlClientSelectDataQUERIES;
-                         XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(Query: TalMySqlClientSelectDataQUERY;
-                         XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
-                         RowTag: AnsiString;
+                         const FormatSettings: TALFormatSettings); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
-                         RowTag: AnsiString;
+                         const FormatSettings: TALFormatSettings); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
+                         const FormatSettings: TALFormatSettings); overload; virtual;
+    Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings); overload; virtual;
-    procedure UpdateData(Queries: TalMySqlClientUpdateDataQUERIES); overload; virtual;
-    procedure UpdateData(Query: TalMySqlClientUpdateDataQUERY); overload; virtual;
+                         const FormatSettings: TALFormatSettings); overload; virtual;
     procedure UpdateData(SQLs: TALStrings); overload; virtual;
-    procedure UpdateData(SQL: AnsiString); overload; virtual;
-    procedure UpdateData(SQLs: array of AnsiString); overload; virtual;
-    function  insert_id(SQL: AnsiString): ULongLong;
+    procedure UpdateData(const SQL: AnsiString); overload; virtual;
+    procedure UpdateData(const SQLs: array of AnsiString); overload; virtual;
+    function  insert_id(const SQL: AnsiString): ULongLong;
     Property  Connected: Boolean Read GetConnected;
     Property  InTransaction: Boolean read GetInTransaction;
     Property  NullString: AnsiString Read fNullString Write fNullString;
     property  Lib: TALMySqlLibrary read FLibrary;
   end;
 
-  {----------------------------------------------}
-  TalMySqlConnectionPoolContainer = Class(TObject)
+  {--------------------------------------}
+  TalMySqlConnectionPoolContainer = record
     ConnectionHandle: PMySql;
     LastAccessDate: int64;
   End;
+  TalMySqlConnectionPool = array of TalMySqlConnectionPoolContainer;
 
   {-------------------------------------------}
   TalMySqlConnectionPoolClient = Class(Tobject)
   Private
     FLibrary: TALMySqlLibrary;
     FownLibrary: Boolean;
-    FConnectionPool: TObjectList;
+    FConnectionPool: TalMySqlConnectionPool;
+    FConnectionPoolCount: integer;
+    FConnectionPoolCapacity: integer;
     FConnectionPoolCS: TCriticalSection;
     FWorkingConnectionCount: Integer;
     FReleasingAllconnections: Boolean;
@@ -251,7 +232,6 @@ Type
     fOpenConnectionClientFlag: cardinal;
     FOpenConnectionOptions: TALMySQLOptions;
     FNullString: AnsiString;
-    fMySQLFormatSettings: TALFormatSettings;
   Protected
     function loadCachedData(const Key: AnsiString;
                             var DataStr: AnsiString): Boolean; virtual;
@@ -265,38 +245,43 @@ Type
     Function  GetFieldValue(aFieldValue: PAnsiChar;
                             aFieldType: TMysqlFieldTypes;
                             aFieldLength: integer;
-                            aFormatSettings: TALFormatSettings): AnsiString;
+                            const aFormatSettings: TALFormatSettings): AnsiString;
     Function  AcquireConnection: PMySql; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
-    procedure initObject(aHost: AnsiString;
+    procedure initObject(const aHost: AnsiString;
                          aPort: integer;
-                         aDataBaseName,
-                         aLogin,
-                         aPassword,
-                         aCharSet: AnsiString;
+                         const aDataBaseName,
+                               aLogin,
+                               aPassword,
+                               aCharSet: AnsiString;
                          Const aOpenConnectionClientFlag: Cardinal = 0;
                          Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
-    procedure OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+    procedure OnSelectDataDone(const SQL: AnsiString;
+                               const RowTag: AnsiString;
+                               const ViewTag: AnsiString;
+                               Skip: integer;
+                               First: Integer;
+                               CacheThreshold: Integer;
                                TimeTaken: double); virtual;
-    procedure OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+    procedure OnUpdateDataDone(const SQL: AnsiString;
                                TimeTaken: double); virtual;
   Public
-    Constructor Create(aHost: AnsiString;
+    Constructor Create(const aHost: AnsiString;
                        aPort: integer;
-                       aDataBaseName,
-                       aLogin,
-                       aPassword,
-                       aCharSet: AnsiString;
+                       const aDataBaseName,
+                             aLogin,
+                             aPassword,
+                             aCharSet: AnsiString;
                        aApiVer: TALMySqlVersion_API;
                        Const alib: AnsiString = 'libmysql.dll';
                        Const aOpenConnectionClientFlag: Cardinal = 0;
                        Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
-    Constructor Create(aHost: AnsiString;
+    Constructor Create(const aHost: AnsiString;
                        aPort: integer;
-                       aDataBaseName,
-                       aLogin,
-                       aPassword,
-                       aCharSet: AnsiString;
+                       const aDataBaseName,
+                             aLogin,
+                             aPassword,
+                             aCharSet: AnsiString;
                        alib: TALMySqlLibrary;
                        Const aOpenConnectionClientFlag: Cardinal = 0;
                        Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
@@ -305,59 +290,50 @@ Type
     Procedure TransactionStart(Var ConnectionHandle: PMySql); virtual;
     Procedure TransactionCommit(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
     Procedure TransactionRollback(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
-    Procedure SelectData(Queries: TalMySqlClientSelectDataQUERIES;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
+                         const ViewTag: AnsiString;
+                         Skip: integer; // used only if value is > 0
+                         First: Integer; // used only if value is > 0
+                         CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                  // cache or not. Values <= 0 deactivate the cache
                          XMLDATA: TalXMLNode;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(Query: TalMySqlClientSelectDataQUERY;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
+    Procedure SelectData(const SQL: AnsiString;
                          Skip: integer;
                          First: Integer;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
+    Procedure SelectData(const SQL: AnsiString;
                          OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                          ExtData: Pointer;
-                         FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(Queries: TalMySqlClientSelectDataQUERIES;
-                         XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(Query: TalMySqlClientSelectDataQUERY;
-                         XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
-                         RowTag: AnsiString;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
                          Skip: integer;
                          First: Integer;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
-                         RowTag: AnsiString;
+    Procedure SelectData(const SQL: AnsiString;
+                         const RowTag: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(SQL: AnsiString;
+    Procedure SelectData(const SQL: AnsiString;
                          XMLDATA: TalXMLNode;
-                         FormatSettings: TALFormatSettings;
+                         const FormatSettings: TALFormatSettings;
                          const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(Queries: TalMySqlClientUpdateDataQUERIES; const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(Query: TalMySqlClientUpdateDataQUERY; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQLs: TALStrings; const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQL: AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
-    procedure UpdateData(SQLs: array of AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
-    Function  insert_id(SQL: AnsiString; const ConnectionHandle: PMySql = nil): UlongLong; virtual;
+    procedure UpdateData(const SQL: AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
+    procedure UpdateData(const SQLs: array of AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
+    Function  insert_id(const SQL: AnsiString; const ConnectionHandle: PMySql = nil): UlongLong; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
     property  DataBaseName: AnsiString read GetDataBaseName;
@@ -369,6 +345,9 @@ Type
   end;
 
 Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
+
+var
+  ALMySqlFormatSettings: TALFormatSettings;
 
 implementation
 
@@ -384,27 +363,6 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      ALCipher,
      ALWindows;
 
-{*********************************************************************************}
-class function TalMySqlClientSelectDataQUERY.Create: TalMySqlClientSelectDataQUERY;
-begin
-  with result do begin
-    SQL := '';
-    RowTag := '';
-    ViewTag := '';
-    Skip := -1;
-    First := -1;
-    CacheThreshold := -1;
-  end;
-end;
-
-{*********************************************************************************}
-class function TalMySqlClientUpdateDataQUERY.Create: TalMySqlClientUpdateDataQUERY;
-begin
-  with result do begin
-    SQL := '';
-  end;
-end;
-
 {******************************************************************}
 Function AlMySqlClientSlashedStr(Const Str: AnsiString): AnsiString;
 var I: Integer;
@@ -415,10 +373,10 @@ begin
   Result := '''' + Result + '''';
 end;
 
-{*****************************************************}
-constructor EALMySqlError.Create(aErrorMsg: AnsiString;
-                                 aErrorCode: Integer;
-                                 aSqlState: AnsiString);
+{***********************************************************}
+constructor EALMySqlError.Create(const aErrorMsg: AnsiString;
+                                 const aErrorCode: Integer;
+                                 const aSqlState: AnsiString);
 begin
   fErrorCode := aErrorCode;
   FSQLstate := aSqlState;
@@ -469,7 +427,7 @@ end;
 function TalMySqlClient.GetFieldValue(aFieldValue: PAnsiChar;
                                       aFieldType: TMysqlFieldTypes;
                                       aFieldLength: integer;
-                                      aFormatSettings: TALFormatSettings): AnsiString;
+                                      const aFormatSettings: TALFormatSettings): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -481,12 +439,12 @@ begin
       FIELD_TYPE_DECIMAL,
       FIELD_TYPE_NEWDECIMAL,
       FIELD_TYPE_FLOAT,
-      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_DATE,
-      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_NULL: result := fNullString; // Example: SELECT NULL FROM DUAL
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
@@ -499,13 +457,6 @@ begin
   fMySql := nil;
   finTransaction := False;
   fNullString := '';
-  ALGetLocaleFormatSettings(1033, fMySQLFormatSettings);
-  fMySQLFormatSettings.DecimalSeparator := '.';
-  fMySQLFormatSettings.ThousandSeparator := ',';
-  fMySQLFormatSettings.DateSeparator := '-';
-  fMySQLFormatSettings.TimeSeparator := ':';
-  fMySQLFormatSettings.ShortDateFormat := 'yyyy/mm/dd';
-  fMySQLFormatSettings.ShortTimeFormat := 'hh:nn:ss';
 end;
 
 {************************************************************}
@@ -541,12 +492,12 @@ end;
 
 {*************************************************************
 http://dev.mysql.com/doc/refman/5.1/en/mysql-real-connect.html}
-procedure TalMySqlClient.connect(Host: AnsiString;
+procedure TalMySqlClient.connect(const Host: AnsiString;
                                  Port: integer;
-                                 DataBaseName,
-                                 Login,
-                                 Password,
-                                 CharSet: AnsiString;
+                                 const DataBaseName,
+                                       Login,
+                                       Password,
+                                       CharSet: AnsiString;
                                  Const ClientFlag: Cardinal = 0;
                                  const Options: TALMySQLOptions = nil);
 var i: integer;
@@ -659,26 +610,37 @@ begin
 
 end;
 
-{*****************************************************************************}
-procedure TalMySqlClient.OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+{**************************************************************}
+procedure TalMySqlClient.OnSelectDataDone(const SQL: AnsiString;
+                                          const RowTag: AnsiString;
+                                          const ViewTag: AnsiString;
+                                          Skip: integer;
+                                          First: Integer;
+                                          CacheThreshold: Integer;
+                                          TimeTaken: Double);
+begin
+  // virtual
+end;
+
+{**************************************************************}
+procedure TalMySqlClient.OnUpdateDataDone(const SQL: AnsiString;
                                           TimeTaken: double);
 begin
   // virtual
 end;
 
-{*****************************************************************************}
-procedure TalMySqlClient.OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
-                                          TimeTaken: double);
-begin
-  // virtual
-end;
-
-{***************************************************************************}
-procedure TalMySqlClient.SelectData(Queries: TalMySqlClientSelectDataQUERIES;
+{********************************************************}
+procedure TalMySqlClient.SelectData(const SQL: AnsiString;
+                                    const RowTag: AnsiString;
+                                    const ViewTag: AnsiString;
+                                    Skip: integer; // used only if value is > 0
+                                    First: Integer; // used only if value is > 0
+                                    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                             // cache or not. Values <= 0 deactivate the cache
                                     XMLDATA: TalXMLNode;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TALFormatSettings);
+                                    const FormatSettings: TALFormatSettings);
 Var aMySqlRes: PMYSQL_RES;
     aMySqlRow: PMYSQL_ROW;
     aMySqlFields: array of PMYSQL_FIELD;
@@ -688,7 +650,6 @@ Var aMySqlRes: PMYSQL_RES;
     aNewRec: TalXmlNode;
     aValueRec: TalXmlNode;
     aViewRec: TalXmlNode;
-    aQueriesIndex: integer;
     aRecIndex: integer;
     aRecAdded: integer;
     aContinue: Boolean;
@@ -697,11 +658,9 @@ Var aMySqlRes: PMYSQL_RES;
     aStopWatch: TStopWatch;
     aCacheKey: ansiString;
     aCacheStr: ansiString;
+    aTmpRowTag: ansiString;
 
 begin
-
-  //exit if no SQL
-  if length(Queries) = 0 then Exit;
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
@@ -721,164 +680,166 @@ begin
     //init the TstopWatch
     aStopWatch := TstopWatch.Create;
 
-    {loop on all the SQL}
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
+    //Handle the CacheThreshold
+    aCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(aXmlDocument)) and
+       ((XMLdata.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
 
-      //Handle the CacheThreshold
-      aCacheKey := '';
-      If (Queries[aQueriesIndex].CacheThreshold > 0) and
-         (not assigned(aXmlDocument)) and
-         (((length(Queries) = 1) and
-           (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
-          (Queries[aQueriesIndex].ViewTag <> '')) then begin
+      //try to load from from cache
+      aCacheKey := ALStringHashSHA1(RowTag + '#' +
+                                    alinttostr(Skip) + '#' +
+                                    alinttostr(First) + '#' +
+                                    ALGetFormatSettingsID(FormatSettings) + '#' +
+                                    SQL);
+      if loadcachedData(aCacheKey, aCacheStr) then begin
 
-        //try to load from from cache
-        aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
-                                      alinttostr(Queries[aQueriesIndex].Skip) + '#' +
-                                      alinttostr(Queries[aQueriesIndex].First) + '#' +
-                                      ALGetFormatSettingsID(FormatSettings) + '#' +
-                                      Queries[aQueriesIndex].SQL);
-        if loadcachedData(aCacheKey, aCacheStr) then begin
+        //init the aViewRec
+        if (ViewTag <> '') then aViewRec := XMLdata.AddChild(ViewTag)
+        else aViewRec := XMLdata;
 
-          //init the aViewRec
-          if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-          else aViewRec := XMLdata;
+        //assign the tmp data to the XMLData
+        aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
 
-          //assign the tmp data to the XMLData
-          aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
-
-          //go to the next loop
-          continue;
-
-        end;
+        //exit
+        exit;
 
       end;
 
-      //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+    end;
 
-      //prepare the query
-      CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
-      aMySqlRes := fLibrary.mysql_use_result(fMySQL);
-      CheckAPIError(aMySqlRes = nil);
-      Try
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
-        //Returns the number of columns in a result set.
-        aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
+    //prepare the query
+    CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(SQL), length(SQL)) <> 0);
+    aMySqlRes := fLibrary.mysql_use_result(fMySQL);
+    CheckAPIError(aMySqlRes = nil);
+    Try
 
-        //init the aMySqlFields array
-        //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
-        //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
-        setlength(aMySqlFields,aColumnCount);
-        for aColumnIndex := 0 to aColumnCount - 1 do
-          aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
+      //Returns the number of columns in a result set.
+      aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
 
-        //init the aViewRec
-        if (Queries[aQueriesIndex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-        else aViewRec := XMLdata;
+      //init the aMySqlFields array
+      //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
+      //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+      setlength(aMySqlFields,aColumnCount);
+      for aColumnIndex := 0 to aColumnCount - 1 do
+        aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
 
-        //init aUpdateRowTagByFieldValue
-        if AlPos('&>',Queries[aQueriesIndex].RowTag) = 1 then begin
-          delete(Queries[aQueriesIndex].RowTag, 1, 2);
-          aUpdateRowTagByFieldValue := Queries[aQueriesIndex].RowTag <> '';
+      //init the aViewRec
+      if (ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(ViewTag)
+      else aViewRec := XMLdata;
+
+      //init aUpdateRowTagByFieldValue
+      if AlPos('&>',RowTag) = 1 then begin
+        aTmpRowTag := ALcopyStr(RowTag,3,maxint);
+        aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+      end
+      else begin
+        aTmpRowTag := RowTag;
+        aUpdateRowTagByFieldValue := False;
+      end;
+
+      //loop throught all row
+      aRecIndex := 0;
+      aRecAdded := 0;
+      while True do begin
+
+        //retrieve the next row. return A MYSQL_ROW structure for the next row.
+        //NULL if there are no more rows to retrieve or if an error occurred.
+        aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+
+        //break if no more row
+        if aMySqlRow = nil then begin
+          CheckAPIerror(Flibrary.mysql_errno(fMySQL) <> 0);
+          break;
         end
-        else aUpdateRowTagByFieldValue := False;
 
-        //loop throught all row
-        aRecIndex := 0;
-        aRecAdded := 0;
-        while True do begin
+        //download the row
+        else begin
 
-          //retrieve the next row. return A MYSQL_ROW structure for the next row.
-          //NULL if there are no more rows to retrieve or if an error occurred.
-          aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+          //process if > Skip
+          inc(aRecIndex);
+          If aRecIndex > Skip then begin
 
-          //break if no more row
-          if aMySqlRow = nil then begin
-            CheckAPIerror(Flibrary.mysql_errno(fMySQL) <> 0);
-            break;
-          end
+            //init NewRec
+            if (aTmpRowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(aTmpRowTag)
+            Else aNewRec := aViewRec;
 
-          //download the row
-          else begin
+            //init aMySqlFieldLengths
+            aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
+            CheckAPIerror(aMySqlFieldLengths = nil);
 
-            //process if > Skip
-            inc(aRecIndex);
-            If aRecIndex > Queries[aQueriesIndex].Skip then begin
-
-              //init NewRec
-              if (Queries[aQueriesIndex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(Queries[aQueriesIndex].RowTag)
-              Else aNewRec := aViewRec;
-
-              //init aMySqlFieldLengths
-              aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
-              CheckAPIerror(aMySqlFieldLengths = nil);
-
-              //loop throught all column
-              For aColumnIndex := 0 to aColumnCount - 1 do begin
-                aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
-                if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
-                                                         FIELD_TYPE_MEDIUM_BLOB,
-                                                         FIELD_TYPE_LONG_BLOB,
-                                                         FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
-                                                                                                         avalueRec.OwnerDocument.CreateNode(
-                                                                                                                                            GetFieldValue(aMySqlRow[aColumnIndex],
-                                                                                                                                                          aMySqlFields[aColumnIndex]._type,
-                                                                                                                                                          aMySqlFieldLengths[aColumnIndex],
-                                                                                                                                                          FormatSettings),
-                                                                                                                                            ntCData
-                                                                                                                                           )
-                                                                                                         )
-                else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
-                                                     aMySqlFields[aColumnIndex]._type,
-                                                     aMySqlFieldLengths[aColumnIndex],
-                                                     FormatSettings);
-                if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
-              end;
-
-              //handle OnNewRowFunct
-              if assigned(OnNewRowFunct) then begin
-                aContinue := True;
-                OnNewRowFunct(aNewRec, Queries[aQueriesIndex].ViewTag, ExtData, aContinue);
-                if Not aContinue then Break;
-              end;
-
-              //free the node if aXmlDocument
-              if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
-
-              //handle the First
-              inc(aRecAdded);
-              If (Queries[aQueriesIndex].First > 0) and (aRecAdded >= Queries[aQueriesIndex].First) then Break;
-
+            //loop throught all column
+            For aColumnIndex := 0 to aColumnCount - 1 do begin
+              aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
+              if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
+                                                       FIELD_TYPE_MEDIUM_BLOB,
+                                                       FIELD_TYPE_LONG_BLOB,
+                                                       FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
+                                                                                                       avalueRec.OwnerDocument.CreateNode(
+                                                                                                                                          GetFieldValue(aMySqlRow[aColumnIndex],
+                                                                                                                                                        aMySqlFields[aColumnIndex]._type,
+                                                                                                                                                        aMySqlFieldLengths[aColumnIndex],
+                                                                                                                                                        FormatSettings),
+                                                                                                                                          ntCData
+                                                                                                                                         )
+                                                                                                       )
+              else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
+                                                   aMySqlFields[aColumnIndex]._type,
+                                                   aMySqlFieldLengths[aColumnIndex],
+                                                   FormatSettings);
+              if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
             end;
+
+            //handle OnNewRowFunct
+            if assigned(OnNewRowFunct) then begin
+              aContinue := True;
+              OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
+              if Not aContinue then Break;
+            end;
+
+            //free the node if aXmlDocument
+            if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+            //handle the First
+            inc(aRecAdded);
+            If (First > 0) and (aRecAdded >= First) then Break;
 
           end;
 
         end;
 
-      Finally
-        //Frees the memory allocated to aMySqlRes
-        fLibrary.mysql_free_result(aMySqlRes);
-      End;
-
-      //do the OnSelectDataDone
-      aStopWatch.Stop;
-      OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-
-      //save to the cache
-      If aCacheKey <> '' then begin
-
-        //save the data
-        aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
-        SaveDataToCache(aCacheKey,
-                        Queries[aQueriesIndex].CacheThreshold,
-                        aCacheStr);
-
       end;
 
+    Finally
+      //Frees the memory allocated to aMySqlRes
+      fLibrary.mysql_free_result(aMySqlRes);
     End;
+
+    //do the OnSelectDataDone
+    aStopWatch.Stop;
+    OnSelectDataDone(SQL,
+                     RowTag,
+                     ViewTag,
+                     Skip,
+                     First,
+                     CacheThreshold,
+                     aStopWatch.Elapsed.TotalMilliseconds);
+
+    //save to the cache
+    If aCacheKey <> '' then begin
+
+      //save the data
+      aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
+      SaveDataToCache(aCacheKey,
+                      CacheThreshold,
+                      aCacheStr);
+
+    end;
 
   Finally
     if assigned(aXmlDocument) then aXmlDocument.free;
@@ -886,154 +847,103 @@ begin
 
 end;
 
-{***********************************************************************}
-procedure TalMySqlClient.SelectData(Query: TalMySqlClientSelectDataQUERY;
-                                    OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                    ExtData: Pointer;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
-end;
-
-{**************************************************}
-procedure TalMySqlClient.SelectData(SQL: AnsiString;
+{********************************************************}
+procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     Skip: Integer;
                                     First: Integer;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
+                                    const FormatSettings: TALFormatSettings);
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
-             nil,
+  SelectData(SQL,
+             '', // RowTag,
+             '', //ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, // XMLDATA,
              OnNewRowFunct,
              ExtData,
              FormatSettings);
 end;
 
-{**************************************************}
-procedure TalMySqlClient.SelectData(SQL: AnsiString;
+{********************************************************}
+procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                     ExtData: Pointer;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
+                                    const FormatSettings: TALFormatSettings);
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
-             nil,
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // XMLDATA,
              OnNewRowFunct,
              ExtData,
              FormatSettings);
 end;
 
-{***************************************************************************}
-procedure TalMySqlClient.SelectData(Queries: TalMySqlClientSelectDataQUERIES;
-                                    XMLDATA: TalXMLNode;
-                                    FormatSettings: TALFormatSettings);
-begin
-
-  SelectData(Queries,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
-
-end;
-
-{***********************************************************************}
-procedure TalMySqlClient.SelectData(Query: TalMySqlClientSelectDataQUERY;
-                                    XMLDATA: TalXMLNode;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
-end;
-
-{**************************************************}
-procedure TalMySqlClient.SelectData(SQL: AnsiString;
-                                    RowTag: AnsiString;
+{********************************************************}
+procedure TalMySqlClient.SelectData(const SQL: AnsiString;
+                                    const RowTag: AnsiString;
                                     Skip: Integer;
                                     First: Integer;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
+                                    const FormatSettings: TALFormatSettings);
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
              XMLDATA,
-             nil,
-             nil,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
              FormatSettings);
 end;
 
-{**************************************************}
-procedure TalMySqlClient.SelectData(SQL: AnsiString;
-                                    RowTag: AnsiString;
+{********************************************************}
+procedure TalMySqlClient.SelectData(const SQL: AnsiString;
+                                    const RowTag: AnsiString;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
+                                    const FormatSettings: TALFormatSettings);
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(aSelectDataQUERIES,
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
              XMLDATA,
-             nil,
-             nil,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
              FormatSettings);
 end;
 
-{**************************************************}
-procedure TalMySqlClient.SelectData(SQL: AnsiString;
+{********************************************************}
+procedure TalMySqlClient.SelectData(const SQL: AnsiString;
                                     XMLDATA: TalXMLNode;
-                                    FormatSettings: TALFormatSettings);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
+                                    const FormatSettings: TALFormatSettings);
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
              XMLDATA,
-             nil,
-             nil,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
              FormatSettings);
 end;
 
-
-{****************************************************************************}
-procedure TalMySqlClient.UpdateData(Queries: TalMySqlClientUpdateDataQUERIES);
-Var aQueriesIndex: integer;
-    aStopWatch: TStopWatch;
+{*********************************************************}
+procedure TalMySqlClient.UpdateData(const SQL: AnsiString);
+Var aStopWatch: TStopWatch;
 begin
-
-  //exit if no SQL
-  if length(Queries) = 0 then Exit;
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
@@ -1041,72 +951,38 @@ begin
   //init the TstopWatch
   aStopWatch := TstopWatch.Create;
 
-  //loop on all the SQL
-  For aQueriesIndex := 0 to length(Queries) - 1 do begin
+  //start the TstopWatch
+  aStopWatch.Reset;
+  aStopWatch.Start;
 
-    //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+  //do the query
+  CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(SQL), length(SQL)) <> 0);
 
-    //do the query
-    CheckAPIError(fLibrary.mysql_real_query(fMySQL, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
-
-    //do the OnUpdateDataDone
-    aStopWatch.Stop;
-    OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.Elapsed.TotalMilliseconds);
-
-  end;
+  //do the OnUpdateDataDone
+  aStopWatch.Stop;
+  OnUpdateDataDone(SQL,
+                   aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
-{************************************************************************}
-procedure TalMySqlClient.UpdateData(Query: TalMySqlClientUpdateDataQUERY);
-Var aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
+{*******************************************************************}
+procedure TalMySqlClient.UpdateData(const SQLs: array of AnsiString);
+var i: integer;
 begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := Query;
-  UpdateData(aUpdateDataQUERIES);
+  for I := Low(SQLs) to High(SQLs) do
+    UpdateData(SQLs[i]);
 end;
 
 {****************************************************}
 procedure TalMySqlClient.UpdateData(SQLs: TALStrings);
-Var aSQLsIndex : integer;
-    aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
+var i: integer;
 begin
-  setlength(aUpdateDataQUERIES,SQLs.Count);
-  For aSQLsIndex := 0 to SQLs.Count - 1 do begin
-    aUpdateDataQUERIES[aSQLsIndex] := TalMySqlClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[aSQLsIndex].SQL := SQLs[aSQLsIndex];
-  end;
-  UpdateData(aUpdateDataQUERIES);
+  for I := 0 to sqls.Count - 1 do
+    UpdateData(SQLs[i]);
 end;
 
-{***************************************************}
-procedure TalMySqlClient.UpdateData(SQL: AnsiString);
-Var aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
-begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := TalMySqlClientUpdateDataQUERY.Create;
-  aUpdateDataQUERIES[0].SQL := SQL;
-  UpdateData(aUpdateDataQUERIES);
-end;
-
-{*************************************************************}
-procedure TalMySqlClient.UpdateData(SQLs: array of AnsiString);
-Var aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
-    i: integer;
-begin
-  setlength(aUpdateDataQUERIES,length(SQLs));
-  for I := 0 to length(SQLs) - 1 do begin
-    aUpdateDataQUERIES[i] := TalMySqlClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[i].SQL := SQLs[i];
-  end;
-  UpdateData(aUpdateDataQUERIES);
-end;
-
-{************************************************************}
-function TalMySqlClient.insert_id(SQL: AnsiString): ULongLong;
+{******************************************************************}
+function TalMySqlClient.insert_id(const SQL: AnsiString): ULongLong;
 begin
 
   //if the SQL is not empty
@@ -1125,10 +1001,6 @@ begin
   else result := 0;
 
 end;
-
-{*******}
-ThreadVar
-  vAlMySqlConnectionPoolClientThreadInitRefCount: Integer;
 
 {*************************************************************************}
 function TalMySqlConnectionPoolClient.loadCachedData(const Key: AnsiString;
@@ -1180,7 +1052,7 @@ end;
 function TalMySqlConnectionPoolClient.GetFieldValue(aFieldValue: PAnsiChar;
                                                     aFieldType: TMysqlFieldTypes;
                                                     aFieldLength: integer;
-                                                    aFormatSettings: TALFormatSettings): AnsiString;
+                                                    const aFormatSettings: TALFormatSettings): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -1192,25 +1064,25 @@ begin
       FIELD_TYPE_DECIMAL,
       FIELD_TYPE_NEWDECIMAL,
       FIELD_TYPE_FLOAT,
-      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DOUBLE: result := ALFloatToStr(ALStrToFloat(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_DATETIME: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_DATE,
-      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
-      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,fMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_NEWDATE: Result := ALDateToStr(ALStrToDate(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIME: Result := ALTimeToStr(ALStrToTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
+      FIELD_TYPE_TIMESTAMP: Result := ALDateTimeToStr(ALStrToDateTime(aFieldValue,ALMySqlFormatSettings),aformatSettings);
       FIELD_TYPE_NULL: result := fNullString; // Example: SELECT NULL FROM DUAL
       Else SetString(Result, aFieldValue, aFieldLength);
     end;
   end;
 end;
 
-{******************************************************************}
-procedure TalMySqlConnectionPoolClient.initObject(aHost: AnsiString;
+{************************************************************************}
+procedure TalMySqlConnectionPoolClient.initObject(const aHost: AnsiString;
                                                   aPort: integer;
-                                                  aDataBaseName,
-                                                  aLogin,
-                                                  aPassword,
-                                                  aCharSet: AnsiString;
+                                                  const aDataBaseName,
+                                                        aLogin,
+                                                        aPassword,
+                                                        aCharSet: AnsiString;
                                                   Const aOpenConnectionClientFlag: Cardinal = 0;
                                                   Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
@@ -1221,30 +1093,25 @@ begin
   fPassword := aPassword;
   fCharset := aCharset;
   fOpenConnectionClientFlag := aOpenConnectionClientFlag;
-  FOpenConnectionOptions := aOpenConnectionOptions;  
-  FConnectionPool:= TObjectList.Create(True);
+  FOpenConnectionOptions := aOpenConnectionOptions;
+  setlength(FConnectionPool,0);
+  FConnectionPoolCount := 0;
+  FConnectionPoolCapacity := 0;
   FConnectionPoolCS:= TCriticalSection.create;
   FWorkingConnectionCount:= 0;
   FReleasingAllconnections := False;
   FLastConnectionGarbage := ALGettickCount64;
   FConnectionMaxIdleTime := 1200000; // 1000 * 60 * 20 = 20 min
   FNullString := '';
-  ALGetLocaleFormatSettings(1033, fMySQLFormatSettings);
-  fMySQLFormatSettings.DecimalSeparator := '.';
-  fMySQLFormatSettings.ThousandSeparator := ',';
-  fMySQLFormatSettings.DateSeparator := '-';
-  fMySQLFormatSettings.TimeSeparator := ':';
-  fMySQLFormatSettings.ShortDateFormat := 'yyyy/mm/dd';
-  fMySQLFormatSettings.ShortTimeFormat := 'hh:nn:ss';
 end;
 
 {****************************************************************}
-constructor TalMySqlConnectionPoolClient.Create(aHost: AnsiString;
+constructor TalMySqlConnectionPoolClient.Create(const aHost: AnsiString;
                                                 aPort: integer;
-                                                aDataBaseName,
-                                                aLogin,
-                                                aPassword,
-                                                aCharSet: AnsiString;
+                                                const aDataBaseName,
+                                                      aLogin,
+                                                      aPassword,
+                                                      aCharSet: AnsiString;
                                                 aApiVer: TALMySqlVersion_API;
                                                 Const alib: AnsiString = 'libmysql.dll';
                                                 Const aOpenConnectionClientFlag: Cardinal = 0;
@@ -1263,18 +1130,18 @@ begin
                aOpenConnectionClientFlag,
                aOpenConnectionOptions);
   except
-    fLibrary.free;
+    FreeandNil(fLibrary);
     raise;
   End;
 end;
 
-{****************************************************************}
-constructor TalMySqlConnectionPoolClient.Create(aHost: AnsiString;
+{**********************************************************************}
+constructor TalMySqlConnectionPoolClient.Create(const aHost: AnsiString;
                                                 aPort: integer;
-                                                aDataBaseName,
-                                                aLogin,
-                                                aPassword,
-                                                aCharSet: AnsiString;
+                                                const aDataBaseName,
+                                                      aLogin,
+                                                      aPassword,
+                                                      aCharSet: AnsiString;
                                                 alib: TALMySqlLibrary;
                                                 Const aOpenConnectionClientFlag: Cardinal = 0;
                                                 Const aOpenConnectionOptions: TALMySQLOptions = nil);
@@ -1296,22 +1163,24 @@ destructor TalMySqlConnectionPoolClient.Destroy;
 begin
 
   //Release all connections
-  ReleaseAllConnections;
+  if assigned(fLibrary) then ReleaseAllConnections;
 
   //free object
-  FConnectionPool.free;
   FConnectionPoolCS.free;
-  if FownLibrary then fLibrary.Free;
+  if FownLibrary and assigned(fLibrary) then fLibrary.Free;
 
   //inherite
   inherited;
 
 end;
 
+{*******}
+ThreadVar
+  _ThreadInitRefCount: Integer;
+
 {**************************************************************}
 function TalMySqlConnectionPoolClient.AcquireConnection: PMySql;
-Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
-    aTickCount: int64;
+Var aTickCount: int64;
     i: integer;
 Begin
 
@@ -1322,6 +1191,16 @@ Begin
   FConnectionPoolCS.Acquire;
   Try
 
+    //MYSQL IT's A SHEET
+    //http://bugs.mysql.com/bug.php?id=66740
+    //https://bugzilla.redhat.com/show_bug.cgi?id=846602
+    //MySQL requires that each thread that uses the MySQL API first call
+    //mysql_thread_init() and at the end call mysql_thread_end(). If the thread
+    //fails to call mysql_thread_end(), then MySQL will block the main thread at
+    //program termination and wait for this threads to call mysql_thread_end().
+    //If that doesn't happen, then it prints an error message to STDERR.
+    //Not a very user-friendly behavior.
+    //
     // This function must be called early within each
     // created thread to initialize thread-specific variables
     // this look very important because if we comment this and
@@ -1329,7 +1208,7 @@ Begin
     // you can see this in the ALSQLBenchmark.exe project with the loop update button 
     // http://dev.mysql.com/doc/refman/5.6/en/threaded-clients.html
     CheckAPIError(Nil, FLibrary.mysql_thread_init <> 0);
-    inc(vAlMySqlConnectionPoolClientThreadInitRefCount);
+    inc(_ThreadInitRefCount);
     Try
 
       //raise an exception if currently realeasing all connection
@@ -1338,18 +1217,25 @@ Begin
       //delete the old unused connection
       aTickCount := ALGetTickCount64;
       if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
-        while FConnectionPool.Count > 0 do begin
-          aConnectionPoolContainer := TalMySqlConnectionPoolContainer(FConnectionPool[0]);
-          if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
+        while FConnectionPoolCount > 0 do begin
+          if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
+
             Try
-              FLibrary.MySql_close(aConnectionPoolContainer.ConnectionHandle);
+              FLibrary.MySql_close(FConnectionPool[0].ConnectionHandle);
             Except
               //Disconnect must be a "safe" procedure because it's mostly called in
               //finalization part of the code that it is not protected
               //that the bulsheet of MySql to answer SQLITE_BUSY instead of free
               //everything
             End;
-            FConnectionPool.Delete(0); // must be delete here because FConnectionPool free the object also
+
+            Dec(FConnectionPoolCount);
+            if  FConnectionPoolCount > 0 then
+            begin
+              System.Move(FConnectionPool[1], FConnectionPool[0],
+                (FConnectionPoolCount) * SizeOf(TalMySqlConnectionPoolContainer));
+            end;
+
           end
           else break;
         end;
@@ -1357,10 +1243,9 @@ Begin
       end;
 
       //acquire the new connection from the pool
-      If FConnectionPool.Count > 0 then begin
-        aConnectionPoolContainer := TalMySqlConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
-        Result := aConnectionPoolContainer.ConnectionHandle;
-        FConnectionPool.Delete(FConnectionPool.count - 1);
+      If FConnectionPoolCount > 0 then begin
+        Result := FConnectionPool[FConnectionPoolCount - 1].ConnectionHandle;
+        Dec(FConnectionPoolCount);
       end
 
       //create a new connection
@@ -1406,8 +1291,8 @@ Begin
     Except
 
       // free memory allocated by mysql_thread_init().
-      dec(vAlMySqlConnectionPoolClientThreadInitRefCount);
-      if vAlMySqlConnectionPoolClientThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
+      dec(_ThreadInitRefCount);
+      if _ThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
       Raise;
 
     End;
@@ -1427,7 +1312,6 @@ End;
  If MySql_close() is invoked while a transaction is open, the transaction is
  automatically rolled back.}
 procedure TalMySqlConnectionPoolClient.ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False);
-Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
 begin
 
   //security check
@@ -1439,10 +1323,15 @@ begin
 
     //add the connection to the pool
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
-      aConnectionPoolContainer := TalMySqlConnectionPoolContainer.Create;
-      aConnectionPoolContainer.ConnectionHandle := ConnectionHandle;
-      aConnectionPoolContainer.LastAccessDate := ALGetTickCount64;
-      FConnectionPool.add(aConnectionPoolContainer);
+      if FConnectionPoolCount = FConnectionPoolCapacity then begin
+        if FConnectionPoolCapacity > 64 then FConnectionPoolCapacity := FConnectionPoolCapacity + (FConnectionPoolCapacity div 4) else
+          if FConnectionPoolCapacity > 8 then FConnectionPoolCapacity := FConnectionPoolCapacity + 16 else
+            FConnectionPoolCapacity := FConnectionPoolCapacity + 4;
+        SetLength(FConnectionPool, FConnectionPoolCapacity);
+      end;
+      FConnectionPool[FConnectionPoolCount].ConnectionHandle := ConnectionHandle;
+      FConnectionPool[FConnectionPoolCount].LastAccessDate := ALGetTickCount64;
+      Inc(FConnectionPoolCount);
     end
 
     //close the connection
@@ -1463,11 +1352,9 @@ begin
 
     // free memory allocated by mysql_thread_init().
     // http://dev.mysql.com/doc/refman/5.6/en/threaded-clients.html
-    // but i see one drawback in this, if the thread is for exemple
-    // using 2 connections at the same time !
     Try
-      dec(vAlMySqlConnectionPoolClientThreadInitRefCount);
-      if vAlMySqlConnectionPoolClientThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
+      dec(_ThreadInitRefCount);
+      if _ThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
     Except
       //Disconnect must be a "safe" procedure because it's mostly called in
       //finalization part of the code that it is not protected
@@ -1481,7 +1368,6 @@ end;
 
 {*********************************************************************************************************}
 procedure TalMySqlConnectionPoolClient.ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True);
-Var aConnectionPoolContainer: TalMySqlConnectionPoolContainer;
 begin
 
   //i m still not sure if the FLibrary.MySql_close
@@ -1493,7 +1379,7 @@ begin
   //function we call mysql_thread_end
   try
     FLibrary.mysql_thread_init;
-    inc(vAlMySqlConnectionPoolClientThreadInitRefCount);
+    inc(_ThreadInitRefCount);
   except
     //must be safe
   end;
@@ -1519,15 +1405,14 @@ begin
       {free all database}
       FConnectionPoolCS.Acquire;
       Try
-        while FConnectionPool.Count > 0 do begin
-          aConnectionPoolContainer := TalMySqlConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
+        while FConnectionPoolCount > 0 do begin
           Try
-            FLibrary.MySql_close(aConnectionPoolContainer.ConnectionHandle);
+            FLibrary.MySql_close(FConnectionPool[FConnectionPoolcount - 1].ConnectionHandle);
           Except
             //Disconnect must be a "safe" procedure because it's mostly called in
             //finalization part of the code that it is not protected
           End;
-          FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
+          Dec(FConnectionPoolCount);
         end;
         FLastConnectionGarbage := ALGetTickCount64;
       finally
@@ -1541,8 +1426,8 @@ begin
 
   finally
     try
-      dec(vAlMySqlConnectionPoolClientThreadInitRefCount);
-      if vAlMySqlConnectionPoolClientThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
+      dec(_ThreadInitRefCount);
+      if _ThreadInitRefCount = 0 then FLibrary.mysql_thread_end;
     except
       //must be safe
     end;
@@ -1615,26 +1500,37 @@ begin
 
 end;
 
-{*******************************************************************************************}
-procedure TalMySqlConnectionPoolClient.OnSelectDataDone(Query: TALMySQLClientSelectDataQUERY;
+{****************************************************************************}
+procedure TalMySqlConnectionPoolClient.OnSelectDataDone(const SQL: AnsiString;
+                                                        const RowTag: AnsiString;
+                                                        const ViewTag: AnsiString;
+                                                        Skip: integer;
+                                                        First: Integer;
+                                                        CacheThreshold: Integer;
                                                         TimeTaken: double);
 begin
   // virtual
 end;
 
-{*******************************************************************************************}
-procedure TalMySqlConnectionPoolClient.OnUpdateDataDone(Query: TALMySQLClientUpdateDataQUERY;
+{****************************************************************************}
+procedure TalMySqlConnectionPoolClient.OnUpdateDataDone(const SQL: AnsiString;
                                                         TimeTaken: double);
 begin
   // virtual
 end;
 
-{*****************************************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(Queries: TalMySqlClientSelectDataQUERIES;
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                  const RowTag: AnsiString;
+                                                  const ViewTag: AnsiString;
+                                                  Skip: integer; // used only if value is > 0
+                                                  First: Integer; // used only if value is > 0
+                                                  CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                                           // cache or not. Values <= 0 deactivate the cache
                                                   XMLDATA: TalXMLNode;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
 
 Var aMySqlRes: PMYSQL_RES;
@@ -1646,7 +1542,6 @@ Var aMySqlRes: PMYSQL_RES;
     aNewRec: TalXmlNode;
     aValueRec: TalXmlNode;
     aViewRec: TalXmlNode;
-    aQueriesIndex: integer;
     aRecIndex: integer;
     aRecAdded: integer;
     aTmpConnectionHandle: PMySql;
@@ -1657,11 +1552,9 @@ Var aMySqlRes: PMYSQL_RES;
     aStopWatch: TStopWatch;
     aCacheKey: ansiString;
     aCacheStr: ansiString;
+    aTmpRowTag: ansiString;
 
 begin
-
-  //exit if no SQL
-  if length(Queries) = 0 then Exit;
 
   //only OnNewRowFunct / XMLDATA can be used
   if assigned(OnNewRowFunct) then XMLDATA := nil;
@@ -1684,164 +1577,166 @@ begin
       //init the TstopWatch
       aStopWatch := TstopWatch.Create;
 
-      //loop on all the SQL
-      For aQueriesIndex := 0 to length(Queries) - 1 do begin
+      //Handle the CacheThreshold
+      aCacheKey := '';
+      If (CacheThreshold > 0) and
+         (not assigned(aXmlDocument)) and
+         ((XMLdata.ChildNodes.Count = 0) or  // else the save will not work
+          (ViewTag <> '')) then begin
 
-        //Handle the CacheThreshold
-        aCacheKey := '';
-        If (Queries[aQueriesIndex].CacheThreshold > 0) and
-           (not assigned(aXmlDocument)) and
-           (((length(Queries) = 1) and
-             (XMLdata.ChildNodes.Count = 0)) or  // else the save will not work
-            (Queries[aQueriesIndex].ViewTag <> '')) then begin
+        //try to load from from cache
+        aCacheKey := ALStringHashSHA1(RowTag + '#' +
+                                      alinttostr(Skip) + '#' +
+                                      alinttostr(First) + '#' +
+                                      ALGetFormatSettingsID(FormatSettings) + '#' +
+                                      SQL);
+        if loadcachedData(aCacheKey, aCacheStr) then begin
 
-          //try to load from from cache
-          aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
-                                        alinttostr(Queries[aQueriesIndex].Skip) + '#' +
-                                        alinttostr(Queries[aQueriesIndex].First) + '#' +
-                                        ALGetFormatSettingsID(FormatSettings) + '#' +
-                                        Queries[aQueriesIndex].SQL);
-          if loadcachedData(aCacheKey, aCacheStr) then begin
+          //init the aViewRec
+          if (ViewTag <> '') then aViewRec := XMLdata.AddChild(ViewTag)
+          else aViewRec := XMLdata;
 
-            //init the aViewRec
-            if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-            else aViewRec := XMLdata;
+          //assign the tmp data to the XMLData
+          aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
 
-            //assign the tmp data to the XMLData
-            aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
-
-            //go to the next loop
-            continue;
-
-          end;
+          //exit
+          exit;
 
         end;
 
-        //start the TstopWatch
-        aStopWatch.Reset;
-        aStopWatch.Start;
+      end;
 
-        //prepare the query
-        CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
-        aMySqlRes := fLibrary.mysql_use_result(aTmpConnectionHandle);
-        CheckAPIError(aTmpConnectionHandle, aTmpConnectionHandle = nil);
-        Try
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
-          //Returns the number of columns in a result set.
-          aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
+      //prepare the query
+      CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(SQL), length(SQL)) <> 0);
+      aMySqlRes := fLibrary.mysql_use_result(aTmpConnectionHandle);
+      CheckAPIError(aTmpConnectionHandle, aTmpConnectionHandle = nil);
+      Try
 
-          //init the aMySqlFields array
-          //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
-          //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
-          setlength(aMySqlFields,aColumnCount);
-          for aColumnIndex := 0 to aColumnCount - 1 do
-            aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
+        //Returns the number of columns in a result set.
+        aColumnCount := fLibrary.mysql_num_fields(aMySqlRes);
 
-          //init the aViewRec
-          if (Queries[aQueriesIndex].ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(Queries[aQueriesIndex].ViewTag)
-          else aViewRec := XMLdata;
+        //init the aMySqlFields array
+        //this not work anymore in MYSQL5.5, i don't know why so i use mysql_fetch_field instead
+        //aMySqlFields := fLibrary.mysql_fetch_fields(aMySqlRes);
+        setlength(aMySqlFields,aColumnCount);
+        for aColumnIndex := 0 to aColumnCount - 1 do
+          aMySqlFields[aColumnIndex] := fLibrary.mysql_fetch_field(aMySqlRes);
 
-          //init aUpdateRowTagByFieldValue
-          if AlPos('&>',Queries[aQueriesIndex].RowTag) = 1 then begin
-            delete(Queries[aQueriesIndex].RowTag, 1, 2);
-            aUpdateRowTagByFieldValue := Queries[aQueriesIndex].RowTag <> '';
+        //init the aViewRec
+        if (ViewTag <> '') and (not assigned(aXmlDocument)) then aViewRec := XMLdata.AddChild(ViewTag)
+        else aViewRec := XMLdata;
+
+        //init aUpdateRowTagByFieldValue
+        if AlPos('&>',RowTag) = 1 then begin
+          aTmpRowTag := ALcopyStr(RowTag,3,maxint);
+          aUpdateRowTagByFieldValue := aTmpRowTag <> '';
+        end
+        else begin
+          aTmpRowTag := RowTag;
+          aUpdateRowTagByFieldValue := False;
+        end;
+
+        //loop throught all row
+        aRecIndex := 0;
+        aRecAdded := 0;
+        while True do begin
+
+          //retrieve the next row. return A MYSQL_ROW structure for the next row.
+          //NULL if there are no more rows to retrieve or if an error occurred.
+          aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+
+          //break if no more row
+          if aMySqlRow = nil then begin
+            CheckAPIerror(aTmpConnectionHandle, Flibrary.mysql_errno(aTmpConnectionHandle) <> 0);
+            break;
           end
-          else aUpdateRowTagByFieldValue := False;
 
-          //loop throught all row
-          aRecIndex := 0;
-          aRecAdded := 0;
-          while True do begin
+          //download the row
+          else begin
 
-            //retrieve the next row. return A MYSQL_ROW structure for the next row.
-            //NULL if there are no more rows to retrieve or if an error occurred.
-            aMySqlRow := fLibrary.mysql_fetch_row(aMySqlRes);
+            //process if > Skip
+            inc(aRecIndex);
+            If aRecIndex > Skip then begin
 
-            //break if no more row
-            if aMySqlRow = nil then begin
-              CheckAPIerror(aTmpConnectionHandle, Flibrary.mysql_errno(aTmpConnectionHandle) <> 0);
-              break;
-            end
+              //init NewRec
+              if (aTmpRowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(aTmpRowTag)
+              Else aNewRec := aViewRec;
 
-            //download the row
-            else begin
+              //init aMySqlFieldLengths
+              aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
+              CheckAPIerror(aTmpConnectionHandle, aMySqlFieldLengths = nil);
 
-              //process if > Skip
-              inc(aRecIndex);
-              If aRecIndex > Queries[aQueriesIndex].Skip then begin
-
-                //init NewRec
-                if (Queries[aQueriesIndex].RowTag <> '') and (not assigned(aXmlDocument)) then aNewRec := aViewRec.AddChild(Queries[aQueriesIndex].RowTag)
-                Else aNewRec := aViewRec;
-
-                //init aMySqlFieldLengths
-                aMySqlFieldLengths := fLibrary.mysql_fetch_lengths(aMySqlRes);
-                CheckAPIerror(aTmpConnectionHandle, aMySqlFieldLengths = nil);
-
-                //loop throught all column
-                For aColumnIndex := 0 to aColumnCount - 1 do begin
-                  aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
-                  if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
-                                                           FIELD_TYPE_MEDIUM_BLOB,
-                                                           FIELD_TYPE_LONG_BLOB,
-                                                           FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
-                                                                                                           avalueRec.OwnerDocument.CreateNode(
-                                                                                                                                              GetFieldValue(aMySqlRow[aColumnIndex],
-                                                                                                                                                            aMySqlFields[aColumnIndex]._type,
-                                                                                                                                                            aMySqlFieldLengths[aColumnIndex],
-                                                                                                                                                            FormatSettings),
-                                                                                                                                              ntCData
-                                                                                                                                             )
-                                                                                                           )
-                  else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
-                                                       aMySqlFields[aColumnIndex]._type,
-                                                       aMySqlFieldLengths[aColumnIndex],
-                                                       FormatSettings);
-                  if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
-                end;
-
-                //handle OnNewRowFunct
-                if assigned(OnNewRowFunct) then begin
-                  aContinue := True;
-                  OnNewRowFunct(aNewRec, Queries[aQueriesIndex].ViewTag, ExtData, aContinue);
-                  if Not aContinue then Break;
-                end;
-
-                //free the node if aXmlDocument
-                if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
-
-                //handle the First
-                inc(aRecAdded);
-                If (Queries[aQueriesIndex].First > 0) and (aRecAdded >= Queries[aQueriesIndex].First) then Break;
-
+              //loop throught all column
+              For aColumnIndex := 0 to aColumnCount - 1 do begin
+                aValueRec := aNewRec.AddChild(ALlowercase(aMySqlFields[aColumnIndex].name));
+                if (aMySqlFields[aColumnIndex]._type in [FIELD_TYPE_TINY_BLOB,
+                                                         FIELD_TYPE_MEDIUM_BLOB,
+                                                         FIELD_TYPE_LONG_BLOB,
+                                                         FIELD_TYPE_BLOB]) then avalueRec.ChildNodes.Add(
+                                                                                                         avalueRec.OwnerDocument.CreateNode(
+                                                                                                                                            GetFieldValue(aMySqlRow[aColumnIndex],
+                                                                                                                                                          aMySqlFields[aColumnIndex]._type,
+                                                                                                                                                          aMySqlFieldLengths[aColumnIndex],
+                                                                                                                                                          FormatSettings),
+                                                                                                                                            ntCData
+                                                                                                                                           )
+                                                                                                         )
+                else aValueRec.Text := GetFieldValue(aMySqlRow[aColumnIndex],
+                                                     aMySqlFields[aColumnIndex]._type,
+                                                     aMySqlFieldLengths[aColumnIndex],
+                                                     FormatSettings);
+                if aUpdateRowTagByFieldValue and (aValueRec.NodeName=aNewRec.NodeName) then aNewRec.NodeName := ALLowerCase(aValueRec.Text);
               end;
+
+              //handle OnNewRowFunct
+              if assigned(OnNewRowFunct) then begin
+                aContinue := True;
+                OnNewRowFunct(aNewRec, ViewTag, ExtData, aContinue);
+                if Not aContinue then Break;
+              end;
+
+              //free the node if aXmlDocument
+              if assigned(aXmlDocument) then aXmlDocument.DocumentElement.ChildNodes.Clear;
+
+              //handle the First
+              inc(aRecAdded);
+              If (First > 0) and (aRecAdded >= First) then Break;
 
             end;
 
           end;
 
-        Finally
-          //Frees the memory allocated to aMySqlRes
-          fLibrary.mysql_free_result(aMySqlRes);
-        End;
-
-        //do the OnSelectDataDone
-        aStopWatch.Stop;
-        OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.Elapsed.TotalMilliseconds);
-
-        //save to the cache
-        If aCacheKey <> '' then begin
-
-          //save the data
-          aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
-          SaveDataToCache(aCacheKey,
-                          Queries[aQueriesIndex].CacheThreshold,
-                          aCacheStr);
-
         end;
 
+      Finally
+        //Frees the memory allocated to aMySqlRes
+        fLibrary.mysql_free_result(aMySqlRes);
       End;
+
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(SQL,
+                       RowTag,
+                       ViewTag,
+                       Skip,
+                       First,
+                       CacheThreshold,
+                       aStopWatch.Elapsed.TotalMilliseconds);
+
+      //save to the cache
+      If aCacheKey <> '' then begin
+
+        //save the data
+        aViewRec.SaveToXML(aCacheStr, true{SaveOnlyChildNodes});
+        SaveDataToCache(aCacheKey,
+                        CacheThreshold,
+                        aCacheStr);
+
+      end;
 
       //commit the transaction and release the connection if owned
       if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
@@ -1868,171 +1763,115 @@ begin
 
 end;
 
-{*************************************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(Query: TalMySqlClientSelectDataQUERY;
-                                                  OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                                  ExtData: Pointer;
-                                                  FormatSettings: TALFormatSettings;
-                                                  const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings,
-             ConnectionHandle);
-end;
-
-{****************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   Skip: Integer;
                                                   First: Integer;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
-             nil,
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, // XMLDATA,
              OnNewRowFunct,
              ExtData,
              FormatSettings,
              ConnectionHandle);
 end;
 
-{****************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
                                                   ExtData: Pointer;
-                                                  FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
-             nil,
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // XMLDATA,
              OnNewRowFunct,
              ExtData,
              FormatSettings,
              ConnectionHandle);
 end;
 
-{*****************************************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(Queries: TalMySqlClientSelectDataQUERIES;
-                                                  XMLDATA: TalXMLNode;
-                                                  FormatSettings: TALFormatSettings;
-                                                  const ConnectionHandle: PMySql = nil);
-begin
-
-  SelectData(Queries,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             ConnectionHandle);
-
-end;
-
-{*************************************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(Query: TalMySqlClientSelectDataQUERY;
-                                                  XMLDATA: TalXMLNode;
-                                                  FormatSettings: TALFormatSettings;
-                                                  const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := Query;
-  SelectData(aSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             ConnectionHandle);
-end;
-
-{****************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
-                                                  RowTag: AnsiString;
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                  const RowTag: AnsiString;
                                                   Skip: Integer;
                                                   First: Integer;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  aSelectDataQUERIES[0].skip := Skip;
-  aSelectDataQUERIES[0].First := First;
-  SelectData(aSelectDataQUERIES,
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
              XMLDATA,
-             nil,
-             nil,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
              FormatSettings,
              ConnectionHandle);
 end;
 
-{****************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
-                                                  RowTag: AnsiString;
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
+                                                  const RowTag: AnsiString;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  aSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(aSelectDataQUERIES,
+  SelectData(SQL,
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
              XMLDATA,
-             nil,
-             nil,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
              FormatSettings,
              ConnectionHandle);
 end;
 
-{****************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(SQL: AnsiString;
+{**********************************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
                                                   XMLDATA: TalXMLNode;
-                                                  FormatSettings: TALFormatSettings;
+                                                  const FormatSettings: TALFormatSettings;
                                                   const ConnectionHandle: PMySql = nil);
-var aSelectDataQUERIES: TalMySqlClientSelectDataQUERIES;
 begin
-  setlength(aSelectDataQUERIES,1);
-  aSelectDataQUERIES[0] := TalMySqlClientSelectDataQUERY.Create;
-  aSelectDataQUERIES[0].Sql := Sql;
-  SelectData(aSelectDataQUERIES,
+  SelectData(SQL,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
              XMLDATA,
-             nil,
-             nil,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
              FormatSettings,
              ConnectionHandle);
 end;
 
-{********************************************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(Queries: TalMySqlClientUpdateDataQUERIES; const ConnectionHandle: PMySql = nil);
-Var aQueriesIndex: integer;
-    aTmpConnectionHandle: PMySql;
+{*************************************************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(const SQL: AnsiString; const ConnectionHandle: PMySql = nil);
+Var aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
     aStopWatch: TStopWatch;
 begin
-
-  //exit if no SQL
-  if length(Queries) = 0 then Exit;
 
   //acquire a connection and start the transaction if necessary
   aTmpConnectionHandle := ConnectionHandle;
@@ -2043,22 +1882,17 @@ begin
     //init the TstopWatch
     aStopWatch := TstopWatch.Create;
 
-    //loop on all the SQL
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
-      //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+    //do the query
+    CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(SQL), length(SQL)) <> 0);
 
-      //do the query
-      CheckAPIError(aTmpConnectionHandle, fLibrary.mysql_real_query(aTmpConnectionHandle, PAnsiChar(Queries[aQueriesIndex].SQL), length(Queries[aQueriesIndex].SQL)) <> 0);
-
-      //do the OnUpdateDataDone
-      aStopWatch.Stop;
-      OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-
-    end;
+    //do the OnUpdateDataDone
+    aStopWatch.Stop;
+    OnUpdateDataDone(SQL,
+                     aStopWatch.Elapsed.TotalMilliseconds);
 
     //commit the transaction and release the connection if owned
     if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
@@ -2081,53 +1915,88 @@ begin
 
 end;
 
-{****************************************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(Query: TalMySqlClientUpdateDataQUERY; const ConnectionHandle: PMySql = nil);
-Var aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
-begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := Query;
-  UpdateData(aUpdateDataQUERIES, ConnectionHandle);
-end;
-
-{********************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TALStrings; const ConnectionHandle: PMySql = nil);
-Var aSQLsIndex : integer;
-    aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
-begin
-  setlength(aUpdateDataQUERIES,SQLs.Count);
-  For aSQLsIndex := 0 to SQLs.Count - 1 do begin
-    aUpdateDataQUERIES[aSQLsIndex] := TalMySqlClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[aSQLsIndex].SQL := SQLs[aSQLsIndex];
-  end;
-  UpdateData(aUpdateDataQUERIES, ConnectionHandle);
-end;
-
-{*******************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQL: AnsiString; const ConnectionHandle: PMySql = nil);
-Var aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
-begin
-  setlength(aUpdateDataQUERIES,1);
-  aUpdateDataQUERIES[0] := TalMySqlClientUpdateDataQUERY.Create;
-  aUpdateDataQUERIES[0].SQL := SQL;
-  UpdateData(aUpdateDataQUERIES, ConnectionHandle);
-end;
-
-{*****************************************************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: array of AnsiString; const ConnectionHandle: PMySql = nil);
-Var aUpdateDataQUERIES: TalMySqlClientUpdateDataQUERIES;
+{********************************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(const SQLs: array of AnsiString;
+                                                  const ConnectionHandle: PMySql = nil);
+Var aTmpConnectionHandle: PMySql;
+    aOwnConnection: Boolean;
     i: integer;
 begin
-  setlength(aUpdateDataQUERIES,length(SQLs));
-  for I := 0 to length(SQLs) - 1 do begin
-    aUpdateDataQUERIES[i] := TalMySqlClientUpdateDataQUERY.Create;
-    aUpdateDataQUERIES[i].SQL := SQLs[i];
+
+  //acquire a connection and start the transaction if necessary
+  aTmpConnectionHandle := ConnectionHandle;
+  aOwnConnection := (not assigned(ConnectionHandle));
+  if aOwnConnection then TransactionStart(aTmpConnectionHandle);
+  Try
+
+    //update the data
+    for I := Low(SQLs) to High(SQLs) do
+      UpdateData(SQLs[i],
+                 aTmpConnectionHandle);
+
+    //commit the transaction and release the connection if owned
+    if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+
+  except
+    On E: Exception do begin
+
+      // rollback the transaction and release the connection if owned
+      // TODO
+      // instead of closing the connection, it's could be better to know
+      // if the error is related to the connection, or related to the
+      // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+      if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+
+      //raise the error
+      raise;
+
+    end;
   end;
-  UpdateData(aUpdateDataQUERIES, ConnectionHandle);
+
 end;
 
-{****************************************************************************************************************}
-function TalMySqlConnectionPoolClient.insert_id(SQL: AnsiString; const ConnectionHandle: PMySql = nil): ULongLong;
+{*****************************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TALStrings;
+                                                  const ConnectionHandle: PMySql = nil);
+Var aTmpConnectionHandle: PMySql;
+    aOwnConnection: Boolean;
+    i: integer;
+begin
+
+  //acquire a connection and start the transaction if necessary
+  aTmpConnectionHandle := ConnectionHandle;
+  aOwnConnection := (not assigned(ConnectionHandle));
+  if aOwnConnection then TransactionStart(aTmpConnectionHandle);
+  Try
+
+    //update the data
+    for I := 0 to SQLs.Count - 1 do
+      UpdateData(SQLs[i],
+                 aTmpConnectionHandle);
+
+    //commit the transaction and release the connection if owned
+    if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
+
+  except
+    On E: Exception do begin
+
+      // rollback the transaction and release the connection if owned
+      // TODO
+      // instead of closing the connection, it's could be better to know
+      // if the error is related to the connection, or related to the
+      // SQL (like we do in alFBXclient with GetCloseConnectionByErrCode
+      if aOwnConnection then TransactionRollback(aTmpConnectionHandle, true);
+
+      //raise the error
+      raise;
+
+    end;
+  end;
+
+end;
+
+{**********************************************************************************************************************}
+function TalMySqlConnectionPoolClient.insert_id(const SQL: AnsiString; const ConnectionHandle: PMySql = nil): ULongLong;
 Var aTmpConnectionHandle: PMySql;
     aOwnConnection: Boolean;
 begin
@@ -2179,7 +2048,7 @@ function TalMySqlConnectionPoolClient.ConnectionCount: Integer;
 begin
   FConnectionPoolCS.Acquire;
   Try
-    Result := FConnectionPool.Count + FWorkingConnectionCount;
+    Result := FConnectionPoolCount + FWorkingConnectionCount;
   finally
     FConnectionPoolCS.Release;
   end;
@@ -2195,5 +2064,14 @@ begin
     FConnectionPoolCS.Release;
   end;
 end;
+
+initialization
+  ALGetLocaleFormatSettings(1033, ALMySQLFormatSettings);
+  ALMySQLFormatSettings.DecimalSeparator := '.';
+  ALMySQLFormatSettings.ThousandSeparator := ',';
+  ALMySQLFormatSettings.DateSeparator := '-';
+  ALMySQLFormatSettings.TimeSeparator := ':';
+  ALMySQLFormatSettings.ShortDateFormat := 'yyyy/mm/dd';
+  ALMySQLFormatSettings.ShortTimeFormat := 'hh:nn:ss';
 
 end.

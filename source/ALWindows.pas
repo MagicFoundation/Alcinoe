@@ -98,7 +98,7 @@ function ALCreateProcessWithLogonW(lpUsername: LPCWSTR;  // LPCWSTR
                                    const lpStartupInfo: TStartupInfoW;  // LPSTARTUPINFOW
                                    var lpProcessInfo: TProcessInformation): BOOL; stdcall; // LPPROCESS_INFORMATION
 function AttachConsole(dwProcessId: DWORD): BOOL; stdcall;
-function ALUserExists(aUserName: AnsiString): boolean;
+function ALUserExists(const aUserName: AnsiString): boolean;
 
 
 const INVALID_SET_FILE_POINTER = DWORD(-1);
@@ -156,8 +156,8 @@ begin
   @ALSetProcessWorkingSetSizeEx := GetProcAddress(kernel32, 'SetProcessWorkingSetSizeEx');
 end;
 
-{****************************************************}
-function ALUserExists(aUserName: AnsiString): boolean;
+{**********************************************************}
+function ALUserExists(const aUserName: AnsiString): boolean;
 var SID: PSID;
     szDomain: PansiChar;
     cbDomain, cbSID: DWORD;

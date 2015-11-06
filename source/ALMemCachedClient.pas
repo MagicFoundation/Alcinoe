@@ -146,11 +146,11 @@ type
       Function SocketWrite(aSocketDescriptor: TSocket; {$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
       Function SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer; Virtual;
       Function SendCmd(aSocketDescriptor: TSocket;
-                       aCmd: AnsiString;
+                       const aCmd: AnsiString;
                        aResponseType: TAlMemCachedClient_responseType;
                        var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString; overload; virtual;
       Function SendCmd(aSocketDescriptor: TSocket;
-                       aCmd: AnsiString;
+                       const aCmd: AnsiString;
                        aResponseType: TAlMemCachedClient_responseType): AnsiString; overload; virtual;
       Function GetResponse(aSocketDescriptor: TSocket;
                            aResponseType: TAlMemCachedClient_responseType;
@@ -287,16 +287,19 @@ type
       property Connected: Boolean read FConnected;
     end;
 
-    {--------------------------------------------------}
-    TAlMemCachedConnectionPoolContainer = Class(TObject)
+    {------------------------------------------}
+    TAlMemCachedConnectionPoolContainer = record
       SocketDescriptor: TSocket;
       LastAccessDate: int64;
     End;
+    TAlMemCachedConnectionPool = array of TAlMemCachedConnectionPoolContainer;
 
     {--------------------------------------------------------------}
     TAlMemCachedConnectionPoolClient = class(TAlBaseMemCachedClient)
     private
-      FConnectionPool: TObjectList;
+      FConnectionPool: TAlMemCachedConnectionPool;
+      FConnectionPoolCount: integer;
+      FConnectionPoolCapacity: integer;
       FConnectionPoolCS: TCriticalSection;
       FWorkingConnectionCount: Integer;
       FReleasingAllconnections: Boolean;
@@ -490,7 +493,7 @@ end;
 
 {*****************************************************************}
 Function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
-                                        aCmd: AnsiString;
+                                        const aCmd: AnsiString;
                                         aResponseType: TAlMemCachedClient_responseType;
                                         var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
 Var P: PAnsiChar;
@@ -500,11 +503,6 @@ Var P: PAnsiChar;
 begin
 
   aStopWatch := TstopWatch.StartNew;
-
-  If (length(aCmd) <= 1) or
-     (aCmd[length(aCmd)] <> #10) or
-     (aCmd[length(aCmd) - 1] <> #13)
-  then aCmd := aCmd + #13#10;
 
   p:=@aCmd[1]; // pchar
   l:=length(aCmd);
@@ -530,7 +528,7 @@ end;
 
 {*****************************************************************}
 function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
-                                        aCmd: AnsiString;
+                                        const aCmd: AnsiString;
                                         aResponseType: TAlMemCachedClient_responseType): AnsiString;
 Var aGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
@@ -898,7 +896,7 @@ function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
 var aGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
-  SendCmd(aSocketDescriptor, 'get '+Key, rpRetrieval, aGETStoredItems);
+  SendCmd(aSocketDescriptor, 'get ' + Key + #13#10, rpRetrieval, aGETStoredItems);
   if length(aGETStoredItems) <> 1 then begin
     result := False;
     flags := 0;
@@ -917,7 +915,7 @@ function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
 var aGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
-  SendCmd(aSocketDescriptor, 'get '+Key, rpRetrieval, aGETStoredItems);
+  SendCmd(aSocketDescriptor, 'get ' + Key + #13#10, rpRetrieval, aGETStoredItems);
   if length(aGETStoredItems) <> 1 then raise EAlMemCachedClientException.Create('Not found');
   result := aGETStoredItems[0].data;
 end;
@@ -934,7 +932,7 @@ begin
     CheckKey(keys[i]);
     aStrKeys := aStrKeys + keys[i] + ' ';
   end;
-  SendCmd(aSocketDescriptor, 'get '+AlTrim(aStrKeys), rpRetrieval, result);
+  SendCmd(aSocketDescriptor, 'get ' + AlTrim(aStrKeys) + #13#10, rpRetrieval, result);
 end;
 
 {****************************************************************}
@@ -946,7 +944,7 @@ function TAlBaseMemCachedClient.DoGets(aSocketDescriptor: TSocket;
 var aGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
-  SendCmd(aSocketDescriptor, 'gets '+Key, rpRetrievals, aGETStoredItems);
+  SendCmd(aSocketDescriptor, 'gets ' + Key + #13#10, rpRetrievals, aGETStoredItems);
   if length(aGETStoredItems) <> 1 then begin
     result := False;
     flags := 0;
@@ -973,7 +971,7 @@ begin
     CheckKey(keys[i]);
     aStrKeys := aStrKeys + keys[i] + ' ';
   end;
-  SendCmd(aSocketDescriptor, 'gets '+AlTrim(aStrKeys), rpRetrievals, result);
+  SendCmd(aSocketDescriptor, 'gets ' + AlTrim(aStrKeys) + #13#10, rpRetrievals, result);
 end;
 
 {**************************************************************}
@@ -1189,7 +1187,7 @@ function TAlBaseMemCachedClient.DoDelete(aSocketDescriptor: TSocket;
 var aResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'delete '+Key, rpDelete);
+  aResultCode := SendCmd(aSocketDescriptor, 'delete ' + Key + #13#10, rpDelete);
   if aResultCode = 'NOT_FOUND' then result := False
   else if aResultCode = 'DELETED' then result := True
   else raise EAlMemCachedClientException.Create(aResultCode);
@@ -1243,7 +1241,7 @@ function TAlBaseMemCachedClient.DoIncr(aSocketDescriptor: TSocket;
 var aResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'incr '+Key + ' ' + aLintToStr(Value), rpINCRDECR);
+  aResultCode := SendCmd(aSocketDescriptor, 'incr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
   if not ALTryStrToInt64(aResultCode, Result) then raise EAlMemCachedClientException.Create(aResultCode);
 end;
 
@@ -1254,7 +1252,7 @@ function TAlBaseMemCachedClient.DoDecr(aSocketDescriptor: TSocket;
 var aResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor, 'decr '+Key + ' ' + aLintToStr(Value), rpINCRDECR);
+  aResultCode := SendCmd(aSocketDescriptor, 'decr ' + Key + ' ' + aLintToStr(Value) + #13#10, rpINCRDECR);
   if not ALTryStrToInt64(aResultCode, Result) then raise EAlMemCachedClientException.Create(aResultCode);
 end;
 
@@ -1287,9 +1285,7 @@ procedure TAlBaseMemCachedClient.DoTouch(aSocketDescriptor: TSocket;
 var aResultCode: AnsiString;
 begin
   CheckKey(key);
-  aResultCode := SendCmd(aSocketDescriptor,
-                         'touch '+Key+' '+ALInttostr(exptime),
-                         rpTOUCH);
+  aResultCode := SendCmd(aSocketDescriptor, 'touch ' + Key + ' ' + ALInttostr(exptime) + #13#10, rpTOUCH);
   if aResultCode <> 'TOUCHED' then raise EAlMemCachedClientException.Create(aResultCode);
 end;
 
@@ -1320,8 +1316,8 @@ end;
 procedure TAlBaseMemCachedClient.DoFlush_all(aSocketDescriptor: TSocket;
                                              delay: integer);
 begin
-  if delay > 0 then SendCmd(aSocketDescriptor, 'flush_all ' + ALinttostr(delay), rpOK)
-  else SendCmd(aSocketDescriptor, 'flush_all', rpOK);
+  if delay > 0 then SendCmd(aSocketDescriptor, 'flush_all ' + ALinttostr(delay) + #13#10, rpOK)
+  else SendCmd(aSocketDescriptor, 'flush_all' + #13#10, rpOK);
 end;
 
 {***********}
@@ -1617,8 +1613,8 @@ end;
 Function TAlBaseMemCachedClient.DoStats(aSocketDescriptor: TSocket;
                                         const args: AnsiString): AnsiString;
 begin
-  if args <> '' then result := SendCmd(aSocketDescriptor, 'stats ' + args, rpEND)
-  else result := SendCmd(aSocketDescriptor, 'stats', rpEND);
+  if args <> '' then result := SendCmd(aSocketDescriptor, 'stats ' + args + #13#10, rpEND)
+  else result := SendCmd(aSocketDescriptor, 'stats' + #13#10, rpEND);
 end;
 
 {******************************************}
@@ -1632,7 +1628,7 @@ end;
 // server.
 function TAlBaseMemCachedClient.DoVersion(aSocketDescriptor: TSocket): AnsiString;
 begin
-  Result := SendCmd(aSocketDescriptor, 'version', rpCRLF);
+  Result := SendCmd(aSocketDescriptor, 'version' + #13#10, rpCRLF);
 end;
 
 // "verbosity" is a command with a numeric argument. It always succeeds,
@@ -1642,7 +1638,7 @@ end;
 Procedure TAlBaseMemCachedClient.DoVerbosity(aSocketDescriptor: TSocket;
                                              level: integer);
 begin
-  SendCmd(aSocketDescriptor, 'verbosity ' + alinttostr(level), rpOK);
+  SendCmd(aSocketDescriptor, 'verbosity ' + alinttostr(level) + #13#10, rpOK);
 end;
 
 {****************************************************************}
@@ -1973,7 +1969,7 @@ end;
 // when it no longer needs it, without issuing this command.
 Procedure TAlMemCachedClient.Quit;
 begin
-  SendCmd(fSocketDescriptor, 'quit', rpNone);
+  SendCmd(fSocketDescriptor, 'quit' + #13#10, rpNone);
   Disconnect;
 end;
 
@@ -2027,8 +2023,7 @@ end;
 
 {*******************************************************************}
 function TAlMemCachedConnectionPoolClient.AcquireConnection: TSocket;
-Var aConnectionPoolContainer: TAlMemCachedConnectionPoolContainer;
-    aTickCount: int64;
+Var aTickCount: int64;
 Begin
 
   //synchronize the code
@@ -2041,16 +2036,23 @@ Begin
     //delete the old unused connection
     aTickCount := ALGetTickCount64;
     if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
-      while FConnectionPool.Count > 0 do begin
-        aConnectionPoolContainer := TAlMemCachedConnectionPoolContainer(FConnectionPool[0]);
-        if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
+      while FConnectionPoolCount > 0 do begin
+        if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
+
           Try
-            DoDisconnect(aConnectionPoolContainer.SocketDescriptor);
+            DoDisconnect(FConnectionPool[0].SocketDescriptor);
           Except
             //Disconnect must be a "safe" procedure because it's mostly called in
             //finalization part of the code that it is not protected
           End;
-          FConnectionPool.Delete(0); // must be delete here because FConnectionPool free the object also
+
+          Dec(FConnectionPoolCount);
+          if  FConnectionPoolCount > 0 then
+          begin
+            System.Move(FConnectionPool[1], FConnectionPool[0],
+              (FConnectionPoolCount) * SizeOf(TAlMemCachedConnectionPoolContainer));
+          end;
+
         end
         else break;
       end;
@@ -2058,21 +2060,14 @@ Begin
     end;
 
     //acquire the new connection from the pool
-    If FConnectionPool.Count > 0 then begin
-      aConnectionPoolContainer := TAlMemCachedConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
-      Result := aConnectionPoolContainer.SocketDescriptor;
-      FConnectionPool.Delete(FConnectionPool.count - 1);
+    If FConnectionPoolCount > 0 then begin
+      Result := FConnectionPool[FConnectionPoolCount - 1].SocketDescriptor;
+      Dec(FConnectionPoolCount);
     end
 
-    //create a new connection
+    //ask to create a new connection
     else begin
-      Doconnect(result,
-                fHost,//aHost,
-                fPort,//APort,
-                fSendTimeout,
-                fReceiveTimeout,
-                fKeepAlive,
-                fTCPNoDelay);
+      result := INVALID_SOCKET;
     end;
 
     //increase the connection count
@@ -2083,12 +2078,29 @@ Begin
     FConnectionPoolCS.Release;
   end;
 
+  //create a new connection if pool was empty
+  if result = INVALID_SOCKET then begin
+    try
+      Doconnect(result,
+                fHost,//aHost,
+                fPort,//APort,
+                fSendTimeout,
+                fReceiveTimeout,
+                fKeepAlive,
+                fTCPNoDelay);
+    except
+      FConnectionPoolCS.Acquire;
+      dec(FWorkingConnectionCount);
+      FConnectionPoolCS.Release;
+      raise;
+    end;
+  end;
+
 End;
 
 {*****************************************************************************************}
 procedure TAlMemCachedConnectionPoolClient.ReleaseConnection(var SocketDescriptor: TSocket;
                                                              const CloseConnection: Boolean = False);
-Var aConnectionPoolContainer: TAlMemCachedConnectionPoolContainer;
 begin
 
   //security check
@@ -2100,10 +2112,15 @@ begin
 
     //add the connection to the pool
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
-      aConnectionPoolContainer := TAlMemCachedConnectionPoolContainer.Create;
-      aConnectionPoolContainer.SocketDescriptor := SocketDescriptor;
-      aConnectionPoolContainer.LastAccessDate := ALGetTickCount64;
-      FConnectionPool.add(aConnectionPoolContainer);
+      if FConnectionPoolCount = FConnectionPoolCapacity then begin
+        if FConnectionPoolCapacity > 64 then FConnectionPoolCapacity := FConnectionPoolCapacity + (FConnectionPoolCapacity div 4) else
+          if FConnectionPoolCapacity > 8 then FConnectionPoolCapacity := FConnectionPoolCapacity + 16 else
+            FConnectionPoolCapacity := FConnectionPoolCapacity + 4;
+        SetLength(FConnectionPool, FConnectionPoolCapacity);
+      end;
+      FConnectionPool[FConnectionPoolCount].SocketDescriptor := SocketDescriptor;
+      FConnectionPool[FConnectionPoolCount].LastAccessDate := ALGetTickCount64;
+      Inc(FConnectionPoolCount);
     end
 
     //close the connection
@@ -2134,7 +2151,9 @@ begin
   inherited create;
   fHost:= aHost;
   fPort:= APort;
-  FConnectionPool:= TObjectList.Create(True);
+  setlength(FConnectionPool,0);
+  FConnectionPoolCount := 0;
+  FConnectionPoolCapacity := 0;
   FConnectionPoolCS:= TCriticalSection.create;
   FWorkingConnectionCount:= 0;
   FReleasingAllconnections := False;
@@ -2146,14 +2165,12 @@ end;
 destructor TAlMemCachedConnectionPoolClient.Destroy;
 begin
   ReleaseAllConnections;
-  FConnectionPool.free;
   FConnectionPoolCS.free;
   inherited;
 end;
 
 {*************************************************************************************************************}
 procedure TAlMemCachedConnectionPoolClient.ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True);
-Var aConnectionPoolContainer: TAlMemCachedConnectionPoolContainer;
 begin
 
   {we do this to forbid any new thread to create a new transaction}
@@ -2175,15 +2192,14 @@ begin
     {free all database}
     FConnectionPoolCS.Acquire;
     Try
-      while FConnectionPool.Count > 0 do begin
-        aConnectionPoolContainer := TAlMemCachedConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
+      while FConnectionPoolCount > 0 do begin
         Try
-          DoDisconnect(aConnectionPoolContainer.SocketDescriptor);
+          DoDisconnect(FConnectionPool[FConnectionPoolcount - 1].SocketDescriptor);
         Except
           //Disconnect must be a "safe" procedure because it's mostly called in
           //finalization part of the code that it is not protected
         End;
-        FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
+        Dec(FConnectionPoolCount);
       end;
       FLastConnectionGarbage := ALGetTickCount64;
     finally

@@ -53,12 +53,12 @@ type
     cxLabel17: TcxLabel;
     procedure ButtonStartClick(Sender: TObject);
     procedure BtnChooseSaveDirectoryClick(Sender: TObject);
-    procedure MainWebSpiderCrawlDownloadError(Sender: TObject; URL, ErrorMessage: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; Url, RedirectedTo: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
-    procedure MainWebSpiderCrawlFindLink(Sender: TObject; HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderCrawlDownloadError(Sender: TObject; const URL, ErrorMessage: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlDownloadRedirect(Sender: TObject; const Url, RedirectedTo: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlDownloadSuccess(Sender: TObject; const Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; HttpResponseContent: TStream; var StopCrawling: Boolean);
+    procedure MainWebSpiderCrawlFindLink(Sender: TObject; const HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; const URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure MainWebSpiderCrawlGetNextLink(Sender: TObject; var Url: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
-    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; var LocalPath: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
+    procedure MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject; const HtmlTagString: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HtmlTagParams: TALStrings; const URL: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; var LocalPath: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject; var FileName, BaseHref: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF});
     procedure ButtonStopClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -71,7 +71,7 @@ type
     FCurrentLocalFileNameIndex: integer;
     fMainWebSpider: TAlWebSpider;
     fMainHttpClient: TALWinHttpClient;
-    function GetNextLocalFileName(aContentType: AnsiString): AnsiString;
+    function GetNextLocalFileName(const aContentType: AnsiString): AnsiString;
   public
   end;
 
@@ -212,8 +212,8 @@ Begin
  if SelectDirectory(aDir, [sdAllowCreate, sdPerformCreate, sdPrompt],0) then  EditSaveDirectory.Text := IncludeTrailingPathDelimiter(aDir);
 end;
 
-{*************************************************************************}
-function TForm1.GetNextLocalFileName(aContentType: AnsiString): AnsiString;
+{*******************************************************************************}
+function TForm1.GetNextLocalFileName(const aContentType: AnsiString): AnsiString;
 Var aExt: AnsiString;
 
   {-----------------------------------------}
@@ -237,7 +237,7 @@ end;
 
 {***************************************************************}
 procedure TForm1.MainWebSpiderCrawlDownloadError(Sender: TObject;
-                                                 URL, ErrorMessage: AnsiString;
+                                                 const URL, ErrorMessage: AnsiString;
                                                  HTTPResponseHeader: TALHTTPResponseHeader;
                                                  var StopCrawling: Boolean);
 Var aNode: TPageDownloadedBinTreeNode;
@@ -261,10 +261,11 @@ end;
 
 {******************************************************************}
 procedure TForm1.MainWebSpiderCrawlDownloadRedirect(Sender: TObject;
-                                                    Url, RedirectedTo: AnsiString;
+                                                    const Url, RedirectedTo: AnsiString;
                                                     HTTPResponseHeader: TALHTTPResponseHeader;
                                                     var StopCrawling: Boolean);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
+    RedirectedToWithoutAnchor: ansiString;
 begin
   {add the url to downloaded list}
   aNode:= TPageDownloadedBinTreeNode.Create;
@@ -280,12 +281,12 @@ begin
      (ALlowercase(AlExtractHostNameFromUrl(ALTrim(AnsiString(editURL2Crawl.Text)))) = ALlowercase(AlExtractHostNameFromUrl(RedirectedTo))) then begin
 
     {remove the anchor}
-    RedirectedTo := AlRemoveAnchorFromUrl(RedirectedTo);
+    RedirectedToWithoutAnchor := AlRemoveAnchorFromUrl(RedirectedTo);
 
     {add the redirectTo url to the not yet downloaded list}
-    If FPageDownloadedBinTree.FindNode(RedirectedTo) = nil then begin
+    If FPageDownloadedBinTree.FindNode(RedirectedToWithoutAnchor) = nil then begin
       aNode:= TPageNotYetDownloadedBinTreeNode.Create;
-      aNode.ID := RedirectedTo;
+      aNode.ID := RedirectedToWithoutAnchor;
       TPageNotYetDownloadedBinTreeNode(aNode).DeepLevel := FCurrentDeepLevel;
       If not FPageNotYetDownloadedBinTree.AddNode(aNode) then aNode.Free;
     end;
@@ -301,7 +302,7 @@ end;
 
 {*****************************************************************}
 procedure TForm1.MainWebSpiderCrawlDownloadSuccess(Sender: TObject;
-                                                   Url: AnsiString;
+                                                   const Url: AnsiString;
                                                    HTTPResponseHeader: TALHTTPResponseHeader;
                                                    HttpResponseContent: TStream;
                                                    var StopCrawling: Boolean);
@@ -358,10 +359,11 @@ end;
 
 {**********************************************************}
 procedure TForm1.MainWebSpiderCrawlFindLink(Sender: TObject;
-                                            HtmlTagString: AnsiString;
+                                            const HtmlTagString: AnsiString;
                                             HtmlTagParams: TALStrings;
-                                            URL: AnsiString);
+                                            const URL: AnsiString);
 Var aNode: TPageNotYetDownloadedBinTreeNode;
+    aURLWithoutAnchor: AnsiString;
     Lst: TALStringList;
     I: integer;
     Flag1 : Boolean;
@@ -424,12 +426,12 @@ begin
   end;
 
   {remove the anchor}
-  URL := AlRemoveAnchorFromUrl(URL);
+  aURLWithoutAnchor := AlRemoveAnchorFromUrl(URL);
 
   {If the link not already downloaded then add it to the FPageNotYetDownloadedBinTree}
-  If FPageDownloadedBinTree.FindNode(url) = nil then begin
+  If FPageDownloadedBinTree.FindNode(aURLWithoutAnchor) = nil then begin
     aNode:= TPageNotYetDownloadedBinTreeNode.Create;
-    aNode.ID := Url;
+    aNode.ID := aURLWithoutAnchor;
     aNode.DeepLevel := FCurrentDeepLevel + 1;
     If not FPageNotYetDownloadedBinTree.AddNode(aNode) then aNode.Free
     else begin
@@ -507,25 +509,24 @@ end;
 
 {**************************************************************************}
 procedure TForm1.MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
-                                                            HtmlTagString: AnsiString;
+                                                            const HtmlTagString: AnsiString;
                                                             HtmlTagParams: TALStrings;
-                                                            URL: AnsiString;
+                                                            const URL: AnsiString;
                                                             var LocalPath: AnsiString);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
+    aTmpUrl: ansiString;
     aAnchorValue: AnsiString;
 begin
   LocalPath := '';
-
   If Url <> '' then begin
-
-    {Find the local Path}
+    aTmpUrl := Url;
     While True Do begin
-      Url := AlRemoveAnchorFromUrl(Url, aAnchorValue);
-      aNode := FPageDownloadedBinTree.FindNode(URL);
+      aTmpUrl := AlRemoveAnchorFromUrl(aTmpUrl, aAnchorValue);
+      aNode := FPageDownloadedBinTree.FindNode(aTmpUrl);
       If (aNode <> nil) then begin
         LocalPath := TPageDownloadedBinTreeNode(aNode).Data;
         If AlPos('=>',LocalPath) = 1 then Begin
-          Url := AlCopyStr(LocalPath,3,MaxInt);
+          aTmpUrl := AlCopyStr(LocalPath,3,MaxInt);
           LocalPath := '';
         end
         else Break;
@@ -550,7 +551,7 @@ end;
 procedure TForm1.MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject;
                                                                var FileName, BaseHref: AnsiString);
 
-  {-------------------------------------}
+  {-----------------------------------------}
   Function SplitPathMakeFilename: AnsiString;
   begin
     If FCurrentLocalFileNameIndex < 0 then result := ''

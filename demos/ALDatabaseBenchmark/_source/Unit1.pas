@@ -2165,9 +2165,11 @@ begin
           Exit;
         end;
       end;
-      Synchronize(UpdateGUI);
       If ((not fUpdateSQL) and (Tform1(fOwner).ALButtonSqlite3LoopSelect.tag = 2)) or
-         ((fUpdateSQL) and (Tform1(fOwner).ALButtonSqlite3LoopUpdate.tag = 2)) then Break;
+         ((fUpdateSQL) and (Tform1(fOwner).ALButtonSqlite3LoopUpdate.tag = 2)) then begin
+        Synchronize(UpdateGUI);
+        Break;
+      end;
     end;
 
   Finally
@@ -2523,9 +2525,11 @@ begin
           Exit;
         end;
       end;
-      Synchronize(UpdateGUI);
       If ((not fUpdateSQL) and (Tform1(fOwner).ALButtonFirebirdLoopSelect.tag = 2)) or
-         ((fUpdateSQL) and (Tform1(fOwner).ALButtonFirebirdLoopUpdate.tag = 2)) then Break;
+         ((fUpdateSQL) and (Tform1(fOwner).ALButtonFirebirdLoopUpdate.tag = 2)) then begin
+        Synchronize(UpdateGUI);
+        Break;
+      end;
     end;
 
   Finally
@@ -2694,9 +2698,11 @@ begin
           Exit;
         end;
       end;
-      Synchronize(UpdateGUI); // <= it's seam to be a source of bottleneck with mysql !! MYSQL IT'S A BULLSHEET !!
       If ((not fUpdateSQL) and ((Tform1(fOwner).ALButtonMySqlLoopSelect.tag = 2) or (Tform1(fOwner).ALButtonSphinxLoopSelect.tag = 2))) or
-         ((fUpdateSQL) and ((Tform1(fOwner).ALButtonMySqlLoopUpdate.tag = 2) or (Tform1(fOwner).ALButtonSphinxLoopUpdate.tag = 2))) then Break;
+         ((fUpdateSQL) and ((Tform1(fOwner).ALButtonMySqlLoopUpdate.tag = 2) or (Tform1(fOwner).ALButtonSphinxLoopUpdate.tag = 2))) then begin
+        Synchronize(UpdateGUI);
+        Break;
+      end;
     end;
 
   Finally
@@ -2856,11 +2862,13 @@ begin
         Exit;
       end;
     end;
-    if (FTotalLoop mod 100 = 0) or (FTotalLoop = fMaxLoop) then Synchronize(UpdateGUI);
     If (Tform1(fOwner).ALButtonMemcachedLoopGet.tag = 2) or
        (Tform1(fOwner).ALButtonMemcachedLoopSet.tag = 2) or
        (Tform1(fOwner).ALButtonMemcachedLoopIncr.tag = 2) or
-       (Tform1(fOwner).ALButtonMemcachedLoopDecr.tag = 2) then Break;
+       (Tform1(fOwner).ALButtonMemcachedLoopDecr.tag = 2) then begin
+      Synchronize(UpdateGUI);
+      Break;
+    end;
   end;
 
 end;
@@ -3042,11 +3050,13 @@ begin
           Exit;
         end;
       end;
-      Synchronize(UpdateGUI);
       If (Tform1(fOwner).ALButtonMongoDBLoopSELECT.tag = 2) or
          (Tform1(fOwner).ALButtonMongoDBLoopINSERT.tag = 2) or
          (Tform1(fOwner).ALButtonMongoDBLoopUPDATE.tag = 2) or
-         (Tform1(fOwner).ALButtonMongoDBLoopDELETE.tag = 2) then Break;
+         (Tform1(fOwner).ALButtonMongoDBLoopDELETE.tag = 2) then begin
+        Synchronize(UpdateGUI);
+        Break;
+      end;
     end;
 
   Finally

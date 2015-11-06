@@ -852,8 +852,8 @@ var StatusString: AnsiString;
     Headers: AnsiString;
     I: Integer;
 
-  {---------------------------------------------------------------------}
-  procedure AddHeaderItem(const Item: AnsiString; FormatStr: AnsiString);
+  {---------------------------------------------------------------------------}
+  procedure AddHeaderItem(const Item: AnsiString; const FormatStr: AnsiString);
   begin
     if Item <> '' then Headers := Headers + ALFormat(FormatStr, [Item]);
   end;

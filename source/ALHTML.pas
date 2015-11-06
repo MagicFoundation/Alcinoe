@@ -77,10 +77,10 @@ uses AlStringList;
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
                                 LstExtractedResourceText: TALStrings;
                                 Const DecodeHTMLText: Boolean = True); overload;
-function  ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
+function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
                                 Const DecodeHTMLText: Boolean = True): AnsiString; overload;
-function  ALXMLCDataElementEncode(Src: AnsiString): AnsiString;
-function  ALXMLTextElementEncode(Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+function  ALXMLCDataElementEncode(const Src: AnsiString): AnsiString;
+function  ALXMLTextElementEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
 function  ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
 function  ALUTF8HTMLEncode(const Src: AnsiString;
                            const EncodeASCIIHtmlEntities: Boolean = True;
@@ -88,7 +88,7 @@ function  ALUTF8HTMLEncode(const Src: AnsiString;
 function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
 function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
-function  ALRunJavascript(aCode: AnsiString): AnsiString;
+function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
@@ -374,8 +374,8 @@ Begin
 
 end;
 
-{*************************************************************}
-function  ALXMLCDataElementEncode(Src: AnsiString): AnsiString;
+{*******************************************************************}
+function  ALXMLCDataElementEncode(const Src: AnsiString): AnsiString;
 Begin
   //  The preferred approach to using CDATA sections for encoding text that contains the triad "]]>" is to use multiple CDATA sections by splitting each
   //  occurrence of the triad just before the ">". For example, to encode "]]>" one would write:
@@ -388,7 +388,7 @@ End;
 {*************************************************}
 {we use useNumericReference by default because it's
  compatible with XHTML, especially because of the &apos; entity}
-function ALXMLTextElementEncode(Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
+function ALXMLTextElementEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
 var i, l: integer;
     Buf, P: PAnsiChar;
     ch: Integer;
@@ -982,7 +982,7 @@ var CurrentSrcPos, CurrentResultPos : Integer;
     // convert number in octal format to decimat format.
     // It is not very difficult, because 217 in octal is
     // 2*8*8+1*8+7 in decimal format.
-    function _OctToDec(OctStr: ansistring): integer;
+    function _OctToDec(const OctStr: ansistring): integer;
     var i: Integer;
     begin
       Result:=0;
@@ -1095,7 +1095,7 @@ end;
  parameter "aCode" and returns result. The function works
  similar to browser's console, so you can send even the code
  like this "2+2" => returns "4".}
-function ALRunJavascript(aCode: AnsiString): AnsiString;
+function ALRunJavascript(const aCode: AnsiString): AnsiString;
 var aJavaScript: OleVariant;
 begin
   CoInitialize(nil);
@@ -1303,23 +1303,11 @@ procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
   Begin
     If DecodeHTMLText then Begin
       S := alUTF8HtmlDecode(ALTrim(S));
-      S := AlStringReplace(S,
-                           #13,
-                           ' ',
-                           [rfreplaceAll]);
-      S := AlStringReplace(S,
-                           #10,
-                           ' ',
-                           [rfreplaceAll]);
-      S := AlStringReplace(S,
-                           #9,
-                           ' ',
-                           [rfreplaceAll]);
+      S := AlStringReplace(S, #13, ' ', [rfreplaceAll]);
+      S := AlStringReplace(S, #10, ' ', [rfreplaceAll]);
+      S := AlStringReplace(S, #9,  ' ', [rfreplaceAll]);
       While AlPos('  ',S) > 0 Do
-        S := AlStringReplace(S,
-                             '  ',
-                             ' ',
-                             [rfreplaceAll]);
+        S := AlStringReplace(S, '  ', ' ', [rfreplaceAll]);
       S := ALTrim(S);
     end;
     If S <> '' then LstExtractedResourceText.add(S);
@@ -1352,8 +1340,8 @@ Begin
   end;
 end;
 
-{******************************************************}
-function  ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
+{************************************************************}
+function  ALUTF8ExtractHTMLText(const HtmlContent: AnsiString;
                                 Const DecodeHTMLText: Boolean = True): AnsiString;
 Var LstExtractedResourceText: TALStrings;
 Begin

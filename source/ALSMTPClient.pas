@@ -114,8 +114,8 @@ type
       procedure SetTCPNoDelay(const Value: boolean);
     protected
       procedure CheckError(Error: Boolean);
-      Function SendCmd(aCmd:AnsiString; OkResponses: array of Word): AnsiString; virtual;
-      Function GetResponse(OkResponses: array of Word): AnsiString;
+      Function SendCmd(aCmd:AnsiString; const OkResponses: array of Word): AnsiString; virtual;
+      Function GetResponse(const OkResponses: array of Word): AnsiString;
       Function SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
       Function SocketRead(var buf; len: Integer): Integer; Virtual;
     public
@@ -124,21 +124,21 @@ type
       Function Connect(const aHost: AnsiString; const APort: integer): AnsiString; virtual;
       Function Helo: AnsiString; virtual;
       Function Ehlo: AnsiString; virtual;
-      Function Auth(AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString; virtual;
-      Function Vrfy(aUserName: AnsiString): AnsiString; virtual;
+      Function Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString; virtual;
+      Function Vrfy(const aUserName: AnsiString): AnsiString; virtual;
       Function MailFrom(aSenderEmail: AnsiString): AnsiString; virtual;
       Function RcptTo(aRcptNameLst: TALStrings): AnsiString; virtual;
       Function Data(aMailData: AnsiString): AnsiString; overload; virtual;
-      Function Data(aHeader, aBody: AnsiString): AnsiString; overload; virtual;
-      Function Data(aHeader:TALEmailHeader; aBody: AnsiString): AnsiString; overload; virtual;
-      Function DataMultipartMixed(aHeader: TALEmailHeader; aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
+      Function Data(const aHeader, aBody: AnsiString): AnsiString; overload; virtual;
+      Function Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString; overload; virtual;
+      Function DataMultipartMixed(aHeader: TALEmailHeader; const aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
       Function Quit: AnsiString; virtual;
       Function Rset: AnsiString; virtual;
-      procedure SendMail(aHost: AnsiString; APort: integer; aSenderEmail: AnsiString; aRcptNameLst: TALStrings; AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; aMailData: AnsiString); overload; virtual;
-      procedure SendMail(aHost: AnsiString; APort: integer; aSenderEmail: AnsiString; aRcptNameLst: TALStrings; AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; aHeader, aBody: AnsiString); overload; virtual;
-      procedure SendMailMultipartMixed(aHost: AnsiString; APort: integer; aSenderEmail: AnsiString; aRcptNameLst: TALStrings; AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; aHeader: TALEmailHeader; aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents); virtual;
+      procedure SendMail(const aHost: AnsiString; APort: integer; const aSenderEmail: AnsiString; aRcptNameLst: TALStrings; const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; const aMailData: AnsiString); overload; virtual;
+      procedure SendMail(const aHost: AnsiString; APort: integer; const aSenderEmail: AnsiString; aRcptNameLst: TALStrings; const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; const aHeader, aBody: AnsiString); overload; virtual;
+      procedure SendMailMultipartMixed(const aHost: AnsiString; APort: integer; const aSenderEmail: AnsiString; aRcptNameLst: TALStrings; const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; aHeader: TALEmailHeader; const aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents); virtual;
       Procedure Disconnect; virtual;
-      Function GetAuthTypeFromEhloResponse(EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet; virtual;
+      Function GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet; virtual;
       property Connected: Boolean read FConnected;
       property SendTimeout: Integer read FSendTimeout write SetSendTimeout;
       property ReceiveTimeout: Integer read FReceiveTimeout write SetReceiveTimeout;
@@ -260,7 +260,7 @@ end;
  250-AUTH LOGIN CRAM-MD5
  250-8BITMIME
  250 SIZE 0}
-Function TAlSmtpClient.GetAuthTypeFromEhloResponse(EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet;
+Function TAlSmtpClient.GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet;
 var k, J: Integer;
     Str1, Str2: AnsiString;
     Lst: TALStringList;
@@ -340,8 +340,8 @@ begin
   Result := SendCmd('MAIL From:<'+aSenderEmail+'>',[250]);
 end;
 
-{**********************************************************************************************************}
-Function TAlSmtpClient.Auth(AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString;
+{****************************************************************************************************************}
+Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString;
 
   {---------------------------------------}
   Function InternalDoAuthPlain: AnsiString;
@@ -445,21 +445,21 @@ begin
   Result := SendCmd(aMailData + #13#10 + '.' + #13#10,[250]);
 end;
 
-{******************************************************************}
-Function TAlSmtpClient.Data(aHeader, aBody: AnsiString): AnsiString;
+{************************************************************************}
+Function TAlSmtpClient.Data(const aHeader, aBody: AnsiString): AnsiString;
 begin
   result := Data(ALTrim(aHeader) + #13#10#13#10 + aBody);
 end;
 
-{*********************************************************************************}
-Function TAlSmtpClient.Data(aHeader:TALEmailHeader; aBody: AnsiString): AnsiString;
+{***************************************************************************************}
+Function TAlSmtpClient.Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString;
 begin
   result := Data(aHeader.RawHeaderText, aBody);
 end;
 
 {****************************************************************}
 Function TAlSmtpClient.DataMultipartMixed(aHeader: TALEmailHeader;
-                                          aInlineText, aInlineTextContentType: AnsiString;
+                                          const aInlineText, aInlineTextContentType: AnsiString;
                                           aAttachments: TALMultiPartMixedContents): AnsiString;
 Var aMultipartMixedEncoder: TALMultipartMixedEncoder;
     Str: AnsiString;
@@ -504,7 +504,7 @@ end;
  If it is a user name, the full name of the user (if known) and the fully
  specified mailbox are returned. This command has no effect on any of the
  reverse-path buffer, the forward-path buffer, or the mail data buffer.}
-Function TAlSmtpClient.Vrfy(aUserName: AnsiString): AnsiString;
+Function TAlSmtpClient.Vrfy(const aUserName: AnsiString): AnsiString;
 begin
   Result := SendCmd('VRFY ' + aUserName,[250]);
 end;
@@ -520,13 +520,13 @@ begin
 end;
 
 {*************************************************}
-procedure TAlSmtpClient.SendMail(aHost: AnsiString;
+procedure TAlSmtpClient.SendMail(const aHost: AnsiString;
                                  APort: integer;
-                                 aSenderEmail: AnsiString;
+                                 const aSenderEmail: AnsiString;
                                  aRcptNameLst: TALStrings;
-                                 AUserName, APassword: AnsiString;
+                                 const AUserName, APassword: AnsiString;
                                  aAuthType: TalSmtpClientAuthType;
-                                 aMailData: AnsiString);
+                                 const aMailData: AnsiString);
 begin
   If Fconnected then Disconnect;
 
@@ -546,14 +546,14 @@ begin
   end;
 end;
 
-{*************************************************}
-procedure TAlSmtpClient.SendMail(aHost: AnsiString;
+{*******************************************************}
+procedure TAlSmtpClient.SendMail(const aHost: AnsiString;
                                  APort: integer;
-                                 aSenderEmail: AnsiString;
+                                 const aSenderEmail: AnsiString;
                                  aRcptNameLst: TALStrings;
-                                 AUserName, APassword: AnsiString;
+                                 const AUserName, APassword: AnsiString;
                                  aAuthType: TalSmtpClientAuthType;
-                                 aHeader, aBody: AnsiString);
+                                 const aHeader, aBody: AnsiString);
 begin
   If Fconnected then Disconnect;
 
@@ -573,15 +573,15 @@ begin
   end;
 end;
 
-{***************************************************************}
-procedure TAlSmtpClient.SendMailMultipartMixed(aHost: AnsiString;
+{*********************************************************************}
+procedure TAlSmtpClient.SendMailMultipartMixed(const aHost: AnsiString;
                                                APort: integer;
-                                               aSenderEmail: AnsiString;
+                                               const aSenderEmail: AnsiString;
                                                aRcptNameLst: TALStrings;
-                                               AUserName, APassword: AnsiString;
+                                               const AUserName, APassword: AnsiString;
                                                aAuthType: TalSmtpClientAuthType;
                                                aHeader: TALEmailHeader;
-                                               aInlineText, aInlineTextContentType: AnsiString;
+                                               const aInlineText, aInlineTextContentType: AnsiString;
                                                aAttachments: TALMultiPartMixedContents);
 begin
   If Fconnected then Disconnect;
@@ -635,7 +635,7 @@ end;
             NOOP <CRLF>
             QUIT <CRLF>
             TURN <CRLF>}
-function TAlSmtpClient.SendCmd(aCmd: AnsiString; OkResponses: array of Word): AnsiString;
+function TAlSmtpClient.SendCmd(aCmd: AnsiString; const OkResponses: array of Word): AnsiString;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
@@ -671,7 +671,7 @@ end;
  Only the EXPN and HELP commands are expected to result in multiline replies
  in normal circumstances, however multiline replies are allowed for any
  command.}
-function TAlSmtpClient.GetResponse(OkResponses: array of Word): AnsiString;
+function TAlSmtpClient.GetResponse(const OkResponses: array of Word): AnsiString;
 
   {------------------------------------------------------}
   function Internalstpblk(PValue : PAnsiChar) : PAnsiChar;

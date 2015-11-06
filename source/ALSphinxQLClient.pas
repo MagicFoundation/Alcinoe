@@ -69,7 +69,7 @@ Type
   {---------------------------------------}
   TalSphinxQlClient = Class(TalMySqlClient)
   Public
-    Procedure Connect(Host: AnsiString;
+    Procedure Connect(const Host: AnsiString;
                       Port: integer;
                       Const Options: TALMySQLOptions = nil); reintroduce;
   end;
@@ -78,12 +78,12 @@ Type
   TalSphinxQlConnectionPoolClient = Class(TalMySqlConnectionPoolClient)
   Private
   Public
-    Constructor Create(aHost: AnsiString;
+    Constructor Create(const aHost: AnsiString;
                        aPort: integer;
                        aApiVer: TALMySqlVersion_API;
                        const alib: AnsiString = 'libmysql.dll';
                        const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
-    Constructor Create(aHost: AnsiString;
+    Constructor Create(const aHost: AnsiString;
                        aPort: integer;
                        alib: TALMySqlLibrary;
                        const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
@@ -92,8 +92,8 @@ Type
 
 implementation
 
-{***************************************************}
-procedure TalSphinxQlClient.Connect(Host: AnsiString;
+{*********************************************************}
+procedure TalSphinxQlClient.Connect(const Host: AnsiString;
                                     Port: integer;
                                     Const Options: TALMySQLOptions = nil);
 begin
@@ -109,8 +109,8 @@ begin
 
 end;
 
-{*******************************************************************}
-constructor TalSphinxQlConnectionPoolClient.Create(aHost: AnsiString;
+{*************************************************************************}
+constructor TalSphinxQlConnectionPoolClient.Create(const aHost: AnsiString;
                                                    aPort: integer;
                                                    aApiVer: TALMySqlVersion_API;
                                                    const alib: AnsiString = 'libmysql.dll';
@@ -131,8 +131,8 @@ begin
 
 end;
 
-{*******************************************************************}
-constructor TalSphinxQlConnectionPoolClient.Create(aHost: AnsiString;
+{*************************************************************************}
+constructor TalSphinxQlConnectionPoolClient.Create(const aHost: AnsiString;
                                                    aPort: integer;
                                                    alib: TALMySqlLibrary;
                                                    const aOpenConnectionOptions: TALMySQLOptions = nil);

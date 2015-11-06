@@ -114,15 +114,15 @@ Type
   Public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure Connect(Serial: AnsiString); virtual;
+    procedure Connect(const Serial: AnsiString); virtual;
     Procedure Disconnect; virtual;
-    procedure SendCmd(aCmd: AnsiString); Virtual;
+    procedure SendCmd(const aCmd: AnsiString); Virtual;
     function GetResponse: AnsiString; virtual;
     Procedure GetATCmdOkResponse(Const ErrorMsg: AnsiString); overload;
     Procedure GetATCmdOkResponse(Var Response: AnsiString; Const ErrorMsg: AnsiString); overload;
     Procedure GetATCmdlinefeedResponse(Const ErrorMsg: AnsiString);
-    procedure SendSMSinPDUMode(aSMSCenter, aSMSAddress, aMessage: AnsiString; const EncodeMessageInPDU: Boolean=True);
-    procedure SendSMSinTextMode(aSMSCenter, aSMSAddress, aMessage, aCharset: AnsiString);
+    procedure SendSMSinPDUMode(const aSMSCenter, aSMSAddress: ansiString; aMessage: AnsiString; const EncodeMessageInPDU: Boolean=True);
+    procedure SendSMSinTextMode(const aSMSCenter, aSMSAddress, aMessage, aCharset: AnsiString);
     procedure ListAllSMSinPDUMode(aLstMessage: TALStrings; MemStorage: AnsiString);
     procedure DeleteSMS(aIndex: integer; MemStorage: AnsiString);
     property Connected: Boolean read FConnected;
@@ -130,11 +130,11 @@ Type
     Property Timeout: Cardinal read Ftimeout write Settimeout default 60000;
   end;
 
-{---------------------------------------------------------------------------------------------}
-function  AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress, aMessage: AnsiString): AnsiString;
-Procedure AlGSMComm_DecodePDUMessage(aPDUMessage: AnsiString; Var aSMSCenter, aSMSAddress, AMessage: AnsiString);
-function  AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(aMessage: WideString): AnsiString;
-function  AlGSMComm_GSM7BitDefaultAlphabetToUnicode(aMessage: AnsiString; Const UseGreekAlphabet: Boolean= False): Widestring;
+{---------------------------------------------------------------------------------------------------------------}
+function  AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress: ansiString; const aMessage: AnsiString): AnsiString;
+Procedure AlGSMComm_DecodePDUMessage(const aPDUMessage: AnsiString; Var aSMSCenter, aSMSAddress, AMessage: AnsiString);
+function  AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;
+function  AlGSMComm_GSM7BitDefaultAlphabetToUnicode(const aMessage: AnsiString; Const UseGreekAlphabet: Boolean= False): Widestring;
 
 implementation
 
@@ -145,8 +145,8 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
      ALString;
 
-{***********************************************************************************}
-function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(aMessage: WideString): AnsiString;
+{*****************************************************************************************}
+function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;
 
   {-------------------------------------------------}
   Function InternalLookupChar(aUnicodeChar: WideChar;
@@ -380,12 +380,12 @@ Begin
   SetLength(result,ResultCurrentIndex - 1);
 end;
 
-{**********************************************************************}
-function AlGSMComm_GSM7BitDefaultAlphabetToUnicode(aMessage: AnsiString;
+{****************************************************************************}
+function AlGSMComm_GSM7BitDefaultAlphabetToUnicode(const aMessage: AnsiString;
                                                    Const UseGreekAlphabet: Boolean= False): Widestring;
 
-  {-------------------------------------------------}
-  Function InternalLookupChar(aGSMString: AnsiString;
+  {-------------------------------------------------------}
+  Function InternalLookupChar(const aGSMString: AnsiString;
                               Var aGSMStringCurrentIndex: integer;
                               Var aUnicodeString: WideString;
                               Var aUnicodeStringCurrentIndex: integer): Boolean;
@@ -616,10 +616,10 @@ end;
 
 {****************************************}
 {aMessage need to be in GSM 7 bit charset}
-function AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress, aMessage: AnsiString): AnsiString;
+function AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress: ansiString; const aMessage: AnsiString): AnsiString;
 
-  {------------------------------------------------------}
-  function InternalStringToPDU(v: AnsiString): AnsiString;
+  {------------------------------------------------------------}
+  function InternalStringToPDU(const v: AnsiString): AnsiString;
   var I, InLen, OutLen, OutPos : Integer;
       RoundUp : Boolean;
       TempByte, NextByte : Byte;
@@ -729,7 +729,7 @@ end;
 
 {****************************************}
 {aMessage need to be in GSM 7 bit charset}
-Procedure AlGSMComm_DecodePDUMessage(aPDUMessage: AnsiString; Var aSMSCenter, aSMSAddress, AMessage: AnsiString);
+Procedure AlGSMComm_DecodePDUMessage(const aPDUMessage: AnsiString; Var aSMSCenter, aSMSAddress, AMessage: AnsiString);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _7bitPDUToString(Pdu: AnsiString; UdhLen: integer): AnsiString;
@@ -912,8 +912,8 @@ begin
   if Error then RaiseLastOSError;
 end;
 
-{***********************************************}
-procedure TAlGSMComm.Connect(Serial: AnsiString);
+{*****************************************************}
+procedure TAlGSMComm.Connect(const Serial: AnsiString);
 begin
   if FConnected then raise EALException.Create('Already connected');
 
@@ -1043,9 +1043,9 @@ begin
   end;
 end;
 
-{***********************************************}
-procedure TAlGSMComm.SendSMSinPDUMode(aSMSCenter,       //Service Center Address. leave empty to use the default configuration
-                                      aSMSAddress,      //phone number of the recipient
+{*****************************************************}
+procedure TAlGSMComm.SendSMSinPDUMode(const aSMSCenter, //Service Center Address. leave empty to use the default configuration
+                                            aSMSAddress: AnsiString; //phone number of the recipient
                                       aMessage: AnsiString; //The body of the message, can be in PDU (EncodeMessageInPDU need to be false) or in GSM 7 bit charset (EncodeMessageInPDU need to be true)
                                       const EncodeMessageInPDU: Boolean=True); //if we need to encode the aMessage in PDU
 Var aLength: Integer;
@@ -1085,11 +1085,11 @@ begin
   GetATCmdOkResponse('AT+CMGS command error!');
 end;
 
-{************************************************}
-procedure TAlGSMComm.SendSMSinTextMode(aSMSCenter,  //Service Center Address. leave empty to use the default configuration
-                                       aSMSAddress, //phone number of the recipient
-                                       aMessage,    //The body of the message
-                                       aCharset: AnsiString); //The Charset use in the message. leave empty to use the default charset
+{******************************************************}
+procedure TAlGSMComm.SendSMSinTextMode(const aSMSCenter,  //Service Center Address. leave empty to use the default configuration
+                                             aSMSAddress, //phone number of the recipient
+                                             aMessage,    //The body of the message
+                                             aCharset: AnsiString); //The Charset use in the message. leave empty to use the default charset
 begin
   If Not Fconnected then raise EALException.Create('Not Connected!');
 
@@ -1219,8 +1219,8 @@ begin
   GetATCmdOkResponse('AT+CMGD command error!');
 end;
 
-{*********************************************}
-Procedure TAlGSMComm.SendCmd(aCmd: AnsiString);
+{***************************************************}
+Procedure TAlGSMComm.SendCmd(const aCmd: AnsiString);
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;

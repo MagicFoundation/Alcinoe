@@ -81,7 +81,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
 
 function ALStrPhoneNumberToInt64(const PhoneNumber, CountryCode: AnsiString): Int64; overload;
-function ALStrPhoneNumberToInt64(aPhoneNumber: AnsiString): Int64; overload;
+function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64; overload;
 function ALInt64PhoneNumberToStr(PhoneNumber: Int64): AnsiString;
 function ALGetPhoneNumberType(PhoneNumber: Int64): integer;
 
@@ -116,32 +116,32 @@ end;
 {This function analyzes the phone number looking like
  [FR] 06.34.54.12.22, extract country code if it is possible and
  converts this number to an Int64 representation looking like 33634541222 }
-function ALStrPhoneNumberToInt64(aPhoneNumber: AnsiString): Int64;
+function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64;
 var aCountryCode: AnsiString;
     P1, P2: integer;
 begin
 
-  aPhoneNumber := ALTrim(aPhoneNumber);  //1rt trim the aPhoneNumber
-  if not altryStrToInt64(aPhoneNumber, result) then begin  //if the aPhoneNumber is already an integer then their is nothing to do
+  PhoneNumber := ALTrim(PhoneNumber);  //1rt trim the aPhoneNumber
+  if not altryStrToInt64(PhoneNumber, result) then begin  //if the aPhoneNumber is already an integer then their is nothing to do
 
     aCountryCode := '';
-    P1 := AlPos('[',aPhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
+    P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
     while P1 > 0 do begin
-      P2 := ALPosEx(']', aPhoneNumber, P1+1);
+      P2 := ALPosEx(']', PhoneNumber, P1+1);
       if P2 = P1 + 3 then begin
-        aCountryCode := ALUpperCase(ALCopyStr(aPhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
+        aCountryCode := ALUpperCase(ALCopyStr(PhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
         if (length(aCountryCode) = 2) and
            (aCountryCode[1] in ['A'..'Z']) and
            (aCountryCode[2] in ['A'..'Z']) then begin
-          delete(aPhoneNumber,P1,4); // "[FR] 06.34.54.12.22" => " 06.34.54.12.22"
-          aPhoneNumber := ALtrim(aPhoneNumber); // " 06.34.54.12.22" => "06.34.54.12.22"
+          delete(PhoneNumber,P1,4); // "[FR] 06.34.54.12.22" => " 06.34.54.12.22"
+          PhoneNumber := ALtrim(PhoneNumber); // " 06.34.54.12.22" => "06.34.54.12.22"
           break; // break the loop, we found the country code hint
         end
         else aCountryCode := '';
       end;
-      P1 := AlPosEx('[',aPhoneNumber, P1+1);
+      P1 := AlPosEx('[',PhoneNumber, P1+1);
     end;
-    result := ALStrPhoneNumberToInt64(aPhoneNumber, aCountryCode);
+    result := ALStrPhoneNumberToInt64(PhoneNumber, aCountryCode);
   end;
 
 end;

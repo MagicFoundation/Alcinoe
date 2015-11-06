@@ -276,10 +276,10 @@ type
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual; abstract;
     function  Execute(ServerVariables: TALStrings; RequestContentStream: Tstream): AnsiString; overload; virtual;
     procedure Execute(ServerVariables: TALStrings;
-                      RequestContentString: AnsiString;
+                      const RequestContentString: AnsiString;
                       ResponseContentStream: Tstream;
                       ResponseHeader: TALHTTPResponseHeader); overload; virtual;
-    function  Execute(ServerVariables: TALStrings; RequestContentString: AnsiString): AnsiString; overload; virtual;
+    function  Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString; overload; virtual;
     procedure ExecutePostUrlEncoded(ServerVariables: TALStrings;
                                     PostDataStrings: TALStrings;
                                     ResponseContentStream: Tstream;
@@ -297,7 +297,7 @@ type
     procedure CheckError(Error: Boolean); virtual; abstract;
     Function  IOWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; virtual; abstract;
     Function  IORead(var buf; len: Integer): Integer; virtual; abstract;
-    Procedure SendRequest(aRequest:AnsiString); virtual;
+    Procedure SendRequest(const aRequest:AnsiString); virtual;
     function  ReadResponse: AnsiString; virtual;
   public
     procedure Execute(ServerVariables: TALStrings;
@@ -356,9 +356,9 @@ type
     Property  RequestCount: Integer read FRequestCount;
   public
     constructor Create; overload; virtual;
-    constructor Create(aPhpInterpreterFilename: AnsiString); overload; virtual;
+    constructor Create(const aPhpInterpreterFilename: AnsiString); overload; virtual;
     destructor  Destroy; override;
-    Procedure Connect(aPhpInterpreterFilename: AnsiString); virtual;
+    Procedure Connect(const aPhpInterpreterFilename: AnsiString); virtual;
     Procedure Disconnect; virtual;
     procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
@@ -385,7 +385,7 @@ type
     Procedure ReleasePHPRunnerEngine(aPHPRunnerEngine: TALPhpNamedPipeFastCgiRunnerEngine);
   public
     constructor Create; overload; virtual;
-    constructor Create(aPhpInterpreter: AnsiString); overload; virtual;
+    constructor Create(const aPhpInterpreter: AnsiString); overload; virtual;
     destructor  Destroy; override;
     procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
@@ -404,7 +404,7 @@ type
   protected
   public
     constructor Create; overload; virtual;
-    constructor Create(aPhpInterpreter: AnsiString); overload; virtual;
+    constructor Create(const aPhpInterpreter: AnsiString); overload; virtual;
     procedure Execute(ServerVariables: TALStrings;
                       RequestContentStream: Tstream;
                       ResponseContentStream: Tstream;
@@ -455,8 +455,8 @@ begin
   end;
 end;
 
-{*************************************************************************************************************}
-function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; RequestContentString: AnsiString): AnsiString;
+{*******************************************************************************************************************}
+function TALPhpRunnerEngine.Execute(ServerVariables: TALStrings; const RequestContentString: AnsiString): AnsiString;
 var ResponseContentStream: TALStringStream;
     ResponseHeader: TALHTTPResponseHeader;
     RequestContentStream: TALStringStream;
@@ -479,7 +479,7 @@ end;
 
 {***************************************************************}
 procedure TALPhpRunnerEngine.Execute(ServerVariables: TALStrings;
-                                     RequestContentString: AnsiString;
+                                     const RequestContentString: AnsiString;
                                      ResponseContentStream: Tstream;
                                      ResponseHeader: TALHTTPResponseHeader);
 var RequestContentStream: TALStringStream;
@@ -535,8 +535,8 @@ begin
   end;
 end;
 
-{********************************************************************}
-procedure TALPhpFastCgiRunnerEngine.SendRequest(aRequest: AnsiString);
+{**************************************************************************}
+procedure TALPhpFastCgiRunnerEngine.SendRequest(const aRequest: AnsiString);
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
@@ -642,7 +642,7 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
   {i not understand why in FCGI_PARAMS we need to specify te contentlength
    to max 65535 and in name value pair we can specify a length up to 17 Mo!
    anyway a content length of 65535 for the server variable seam to be suffisant}
-  procedure InternalAddParam(var aStr : AnsiString; aName, aValue: AnsiString);
+  procedure InternalAddParam(var aStr : AnsiString; const aName, aValue: AnsiString);
   var I, J   : integer;
       Len    : array[0..1] of integer;
       Format : array[0..1] of integer;
@@ -905,8 +905,8 @@ begin
   CheckError(Result =  SOCKET_ERROR);
 end;
 
-{*****************************************************************************************}
-constructor TALPhpNamedPipeFastCgiRunnerEngine.Create(aPhpInterpreterFilename: AnsiString);
+{***********************************************************************************************}
+constructor TALPhpNamedPipeFastCgiRunnerEngine.Create(const aPhpInterpreterFilename: AnsiString);
 begin
   Create;
   Connect(aPhpInterpreterFilename);
@@ -936,8 +936,8 @@ begin
   inherited;
 end;
 
-{****************************************************************************************}
-procedure TALPhpNamedPipeFastCgiRunnerEngine.Connect(aPhpInterpreterFilename: AnsiString);
+{**********************************************************************************************}
+procedure TALPhpNamedPipeFastCgiRunnerEngine.Connect(const aPhpInterpreterFilename: AnsiString);
 Var aStartupInfo: TStartupInfoA;
     aEnvironment: AnsiString;
 begin
@@ -1138,8 +1138,8 @@ begin
   Ftimeout := 60000;
 end;
 
-{****************************************************************************}
-constructor TALPhpNamedPipeFastCgiManager.Create(aPhpInterpreter: AnsiString);
+{**********************************************************************************}
+constructor TALPhpNamedPipeFastCgiManager.Create(const aPhpInterpreter: AnsiString);
 begin
   create;
   fPhpInterpreterFilename := aPhpInterpreter;
@@ -1254,8 +1254,8 @@ begin
   end;
 end;
 
-{********************************************************************}
-constructor TALPhpCgiRunnerEngine.Create(aPhpInterpreter: AnsiString);
+{**************************************************************************}
+constructor TALPhpCgiRunnerEngine.Create(const aPhpInterpreter: AnsiString);
 begin
   fPhpInterpreterFilename := aPhpInterpreter;
 end;

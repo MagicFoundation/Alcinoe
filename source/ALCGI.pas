@@ -74,41 +74,41 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStrings); overload;
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                         ServerVariables: TALStrings;
-                                                        ScriptName,
-                                                        ScriptFileName: AnsiString;
-                                                        Url: AnsiString); overload;
+                                                        const ScriptName,
+                                                              ScriptFileName: AnsiString;
+                                                        const Url: AnsiString); overload;
 Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStrings); overload;
 Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
-                                          ScriptName,
-                                          ScriptFileName: AnsiString;
-                                          Url: AnsiString); overload;
+                                          const ScriptName,
+                                                ScriptFileName: AnsiString;
+                                          const Url: AnsiString); overload;
 Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                  ServerVariables: TALStrings;
-                                                 ScriptName,
-                                                 ScriptFileName: AnsiString;
-                                                 Url: AnsiString); overload;
-Procedure AlCGIExec(InterpreterFilename: AnsiString;
+                                                 const ScriptName,
+                                                       ScriptFileName: AnsiString;
+                                                 const Url: AnsiString); overload;
+Procedure AlCGIExec(const InterpreterFilename: AnsiString;
                     ServerVariables: TALStrings;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
                     ResponseHeader: TALHTTPResponseHeader); overload;
-Procedure AlCGIExec(ScriptName,
-                    ScriptFileName,
-                    Url,
-                    X_REWRITE_URL,
-                    InterpreterFilename: AnsiString;
+Procedure AlCGIExec(const ScriptName,
+                          ScriptFileName,
+                          Url,
+                          X_REWRITE_URL,
+                          InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
-                    overloadedCookies: AnsiString;
-                    overloadedQueryString: AnsiString;
-                    overloadedReferer: AnsiString;
+                    const overloadedCookies: AnsiString;
+                    const overloadedQueryString: AnsiString;
+                    const overloadedReferer: AnsiString;
                     overloadedRequestContentStream: Tstream;
                     Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader); overload;
-Procedure AlCGIExec(ScriptName,
-                    ScriptFileName,
-                    Url,
-                    X_REWRITE_URL,
-                    InterpreterFilename: AnsiString;
+Procedure AlCGIExec(const ScriptName,
+                          ScriptFileName,
+                          Url,
+                          X_REWRITE_URL,
+                          InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
                     Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader); overload;
@@ -141,9 +141,9 @@ end;
 {********************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                         ServerVariables: TALStrings;
-                                                        ScriptName,
-                                                        ScriptFileName: AnsiString;
-                                                        Url: AnsiString);
+                                                        const ScriptName,
+                                                              ScriptFileName: AnsiString;
+                                                        const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables);
   {----------}
@@ -178,9 +178,9 @@ end;
 
 {********************************************************************}
 Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStrings;
-                                          ScriptName,
-                                          ScriptFileName: AnsiString;
-                                          Url: AnsiString);
+                                          const ScriptName,
+                                                ScriptFileName: AnsiString;
+                                          const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariables(ServerVariables);
   {----------}
@@ -196,9 +196,9 @@ end;
 {*************************************************************************}
 Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                  ServerVariables: TALStrings;
-                                                 ScriptName,
-                                                 ScriptFileName: AnsiString;
-                                                 Url: AnsiString);
+                                                 const ScriptName,
+                                                       ScriptFileName: AnsiString;
+                                                 const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables, ScriptName, ScriptFileName, Url);
   {----------}
@@ -230,8 +230,8 @@ Begin
   //ServerVariables.Add('LOGON_USER='+            WebRequest.GetFieldByName('LOGON_USER'));             //LOGON_USER=
 end;
 
-{**************************************************}
-Procedure AlCGIExec(InterpreterFilename: AnsiString;
+{********************************************************}
+Procedure AlCGIExec(const InterpreterFilename: AnsiString;
                     ServerVariables: TALStrings;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
@@ -328,16 +328,16 @@ begin
   end;
 end;
 
-{*****************************}
-Procedure AlCGIExec(ScriptName,
-                    ScriptFileName,
-                    Url,
-                    X_REWRITE_URL,
-                    InterpreterFilename: AnsiString;
+{***********************************}
+Procedure AlCGIExec(const ScriptName,
+                          ScriptFileName,
+                          Url,
+                          X_REWRITE_URL,
+                          InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
-                    overloadedCookies: AnsiString;
-                    overloadedQueryString: AnsiString;
-                    overloadedReferer: AnsiString;
+                    const overloadedCookies: AnsiString;
+                    const overloadedQueryString: AnsiString;
+                    const overloadedReferer: AnsiString;
                     overloadedRequestContentStream: Tstream;
                     Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader);
@@ -374,12 +374,12 @@ begin
   end;
 end;
 
-{*****************************}
-Procedure AlCGIExec(ScriptName,
-                    ScriptFileName,
-                    Url,
-                    X_REWRITE_URL,
-                    InterpreterFilename: AnsiString;
+{***********************************}
+Procedure AlCGIExec(const ScriptName,
+                          ScriptFileName,
+                          Url,
+                          X_REWRITE_URL,
+                          InterpreterFilename: AnsiString;
                     WebRequest: TALIsapiRequest;
                     Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader);

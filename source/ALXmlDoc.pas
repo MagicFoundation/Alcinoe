@@ -2256,8 +2256,11 @@ function TALXMLNode.GetText: AnsiString;
 begin
   case NodeType of
     NtElement:         Begin
+                         // NodeList could be created on first access to ChildNodes like Node.ChildNodes.Count for example,
+                         // so we need to check also the situation when it's Assigned but empty (has 0 items)
                          CheckTextNode;
-                         If (InternalGetChildNodes <> nil) then result := ChildNodes[0].Text
+                         if (InternalGetChildNodes <> nil) and
+                            (ChildNodes.Count > 0) then result := ChildNodes[0].Text
                          else result := '';
                        end;
     NtAttribute:       Begin
@@ -2773,6 +2776,7 @@ begin
   Result := (NodeType=NtElement) and
             (
              (not assigned(aNodeList)) or
+             (aNodeList.Count = 0) or // because NodeList could be created on first access to ChildNodes like Node.ChildNodes.Count for example
              (
               (aNodeList.Count = 1) and
               (aNodeList[0].nodetype in [ntText, ntCData])

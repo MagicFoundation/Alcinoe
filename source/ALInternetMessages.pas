@@ -618,8 +618,8 @@ end;
 procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 Var aRawHeaderLst: TALStringList;
 
-  {---------------------------------------------}
-  Function AlG001(aName: AnsiString): AnsiString;
+  {---------------------------------------------------}
+  Function AlG001(const aName: AnsiString): AnsiString;
   Var i: Integer;
       Str: AnsiString;
   Begin
@@ -785,8 +785,8 @@ end;
 procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 Var aRawHeaderLst: TALStringList;
 
-  {---------------------------------------------}
-  Function AlG001(aName: AnsiString): AnsiString;
+  {---------------------------------------------------}
+  Function AlG001(const aName: AnsiString): AnsiString;
   Var i: Integer;
       Str: AnsiString;
   Begin

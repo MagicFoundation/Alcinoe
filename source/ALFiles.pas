@@ -68,11 +68,11 @@ interface
 
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
-                           IgnoreFiles: Array of AnsiString;
+                           const IgnoreFiles: Array of AnsiString;
                            Const RemoveEmptySubDirectory: Boolean = True;
                            Const FileNameMask: ansiString = '*';
                            Const MinFileAge: TdateTime = 0): Boolean; overload;
-Function  AlEmptyDirectory(Directory: ansiString;
+Function  AlEmptyDirectory(const Directory: ansiString;
                            SubDirectory: Boolean;
                            Const RemoveEmptySubDirectory: Boolean = True;
                            Const FileNameMask: ansiString = '*';
@@ -120,7 +120,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
 {***********************************************}
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
-                           IgnoreFiles: Array of AnsiString;
+                           const IgnoreFiles: Array of AnsiString;
                            const RemoveEmptySubDirectory: Boolean = True;
                            const FileNameMask: ansiString = '*';
                            const MinFileAge: TdateTime = 0): Boolean;
@@ -130,7 +130,6 @@ var sr: TSearchRec;
 begin
   {$WARN SYMBOL_DEPRECATED OFF}
   {$WARN SYMBOL_PLATFORM OFF}
-  Directory := ALTrim(Directory);
   if (Directory = '') or
      (Directory = '.') or
      (Directory = '..') then raise EALException.CreateFmt('Wrong directory ("%s")', [Directory]);
@@ -178,8 +177,8 @@ begin
   {$WARN SYMBOL_PLATFORM ON}
 end;
 
-{**********************************************}
-Function AlEmptyDirectory(Directory: ansiString;
+{****************************************************}
+Function AlEmptyDirectory(const Directory: ansiString;
                           SubDirectory: Boolean;
                           Const RemoveEmptySubDirectory: Boolean = True;
                           Const FileNameMask: ansiString = '*';

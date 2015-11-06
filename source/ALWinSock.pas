@@ -63,8 +63,8 @@ interface
 
 uses AlStringList;
 
-function  ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;
-function  ALIPAddrToName(IPAddr : AnsiString): AnsiString;
+function  ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;
+function  ALIPAddrToName(const IPAddr : AnsiString): AnsiString;
 function  ALgetLocalIPs: TALStrings;
 function  ALgetLocalHostName: AnsiString;
 
@@ -82,8 +82,8 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
      ALString;
 
-{*********************************************************************}
-function ALHostToIP(HostName: AnsiString; var Ip: AnsiString): Boolean;
+{***************************************************************************}
+function ALHostToIP(const HostName: AnsiString; var Ip: AnsiString): Boolean;
 var WSAData : TWSAData;
     hostEnt : PHostEnt;
     addr : PAnsiChar;
@@ -111,8 +111,8 @@ begin
   end
 end;
 
-{*******************************************************}
-function ALIPAddrToName(IPAddr : AnsiString): AnsiString;
+{*************************************************************}
+function ALIPAddrToName(const IPAddr : AnsiString): AnsiString;
 var SockAddrIn: TSockAddrIn;
     HostEnt: PHostEnt;
     WSAData: TWSAData;

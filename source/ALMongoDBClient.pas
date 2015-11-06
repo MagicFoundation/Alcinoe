@@ -171,12 +171,12 @@ type
     {--------------------------------------}
     {$IF CompilerVersion >= 23} {Delphi XE2}
     TALMongoDBClientSelectDataOnNewRowFunct = reference to Procedure(JSONRowData: TALJSONNode;
-                                                                     ViewTag: AnsiString;
+                                                                     const ViewTag: AnsiString;
                                                                      ExtData: Pointer;
                                                                      Var Continue: Boolean);
     {$ELSE}
     TALMongoDBClientSelectDataOnNewRowFunct = Procedure(JSONRowData: TALJSONNode;
-                                                        ViewTag: AnsiString;
+                                                        const ViewTag: AnsiString;
                                                         ExtData: Pointer;
                                                         Var Continue: Boolean);
     {$IFEND}
@@ -197,133 +197,32 @@ type
     //                            read all the data unless it closes the connection.
     // 7	      Partial	          Get partial results from a mongos if some shards are down (instead of throwing an error)
     // 8-31	                      Reserved	Must be set to 0.
-    TALMongoDBClientSelectDataQUERYFlags = record
-      TailMonitoring: boolean;  // it's TailableCursor + AwaitData option. If we are at the end of the data, wait for new data rather than returning no data
-                                // a good explanation can be found here: http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/
-                                //                                       http://shtylman.com/post/the-tail-of-mongodb/
-                                // use only with TALMongoDBClientSelectDataOnNewRowFunct
-      SlaveOk: boolean;         // Allow query of replica slave.
-                                // Note that you should use this flag even if you do not use the automatic routing to secondaries.
-                                // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
-                                // the database that you are aware that you might be getting older data and you're okay with that.
-                                // If you do not call this, you'll get "not master" errors when you try to query.
-      NoCursorTimeout: boolean; // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
-                                // Set this option to prevent that.
-      Partial: boolean;         // Get partial results from a mongos if some shards are down (instead of throwing an error)
-      class function Create: TALMongoDBClientSelectDataQUERYFlags; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
+    TALMongoDBClientSelectDataFlags = set of (sfTailMonitoring,  // it's TailableCursor + AwaitData option. If we are at the end of the data, wait for new data rather than returning no data
+                                                                 // a good explanation can be found here: http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/
+                                                                 //                                       http://shtylman.com/post/the-tail-of-mongodb/
+                                                                 // use only with TALMongoDBClientSelectDataOnNewRowFunct
+                                              sfSlaveOk,         // Allow query of replica slave.
+                                                                 // Note that you should use this flag even if you do not use the automatic routing to secondaries.
+                                                                 // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
+                                                                 // the database that you are aware that you might be getting older data and you're okay with that.
+                                                                 // If you do not call this, you'll get "not master" errors when you try to query.
+                                              sfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
+                                                                 // Set this option to prevent that.
+                                              sfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
 
-    {--------------------------------------}
-    TALMongoDBClientSelectDataQUERY = record
-      FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                      // name with the collection name, using a . for the concatenation. For example, for the database
-                                      // foo and the collection bar, the full collection name is foo.bar
-      Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
-                         // all of which must match for a document to be included in the result set. Possible elements
-                         // include $query, $orderby, $hint, $explain, and $snapshot.
-      ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
-                                        // The returnFieldsSelector contains one or more elements, each of which is the name
-                                        // of a field that should be returned, and and the integer value 1. In JSON notation,
-                                        // a returnFieldsSelector to limit to the fields a, b and c would be:
-                                        // { a : 1, b : 1, c : 1}
-      flags: TALMongoDBClientSelectDataQUERYFlags; // Options (see TALMongoDBClientSelectDataQUERYFlags)
-      RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-      ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-      Skip: integer; // Sets the number of documents to omit
-      First: Integer; // Limits the number of documents to retrieve
-      CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                               // cache or not. Values <= 0 deactivate the cache
-      class function Create: TALMongoDBClientSelectDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-    TALMongoDBClientSelectDataQUERIES = array of TALMongoDBClientSelectDataQUERY;
+    {-------------------------------------------------}
+    TALMongoDBClientUpdateDataFlags = set of (ufUpsert,       // If set, the database will insert the supplied object into the collection if no matching document is found.
+                                              ufMultiUpdate); // If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
 
-    {-------------------------------------------}
-    TALMongoDBClientUpdateDataQUERYFlags = record
-      Upsert: Boolean; // If set, the database will insert the supplied object into the collection if no matching document is found.
-      MultiUpdate: Boolean; // If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
-      class function Create: TALMongoDBClientUpdateDataQUERYFlags; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
+    {-----------------------------------------------------------}
+    TALMongoDBClientInsertDataFlags = set of (ifContinueOnError); // If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
+                                                                  // This makes bulk insert behave similarly to a series of single inserts, except lastError will be set
+                                                                  // if any insert fails, not just the last one. If multiple errors occur, only the most recent will be
+                                                                  // reported by getLastError. (new in 1.9.1)
 
-    {--------------------------------------}
-    TALMongoDBClientUpdateDataQUERY = record
-      FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                      // name with the collection name, using a . for the concatenation. For example, for the database
-                                      // foo and the collection bar, the full collection name is foo.bar
-      selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
-      update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
-                          // http://docs.mongodb.org/manual/tutorial/modify-documents/
-      flags: TALMongoDBClientUpdateDataQUERYFlags; // Options (see TALMongoDBClientUpdateDataQUERYFlags)
-      class function Create: TALMongoDBClientUpdateDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-    TALMongoDBClientUpdateDataQUERIES = array of TALMongoDBClientUpdateDataQUERY;
-
-    {-------------------------------------------}
-    TALMongoDBClientInsertDataQUERYFlags = record
-      ContinueOnError: Boolean; // If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-                                // This makes bulk insert behave similarly to a series of single inserts, except lastError will be set
-                                // if any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-                                // reported by getLastError. (new in 1.9.1)
-      class function Create: TALMongoDBClientInsertDataQUERYFlags; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-
-    {--------------------------------------}
-    TALMongoDBClientInsertDataQUERY = record
-      FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                      // name with the collection name, using a . for the concatenation. For example, for the database
-                                      // foo and the collection bar, the full collection name is foo.bar
-      documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
-      flags: TALMongoDBClientInsertDataQUERYFlags; // Options (see TALMongoDBClientInsertDataQUERYFlags)
-      class function Create: TALMongoDBClientInsertDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-    TALMongoDBClientInsertDataQUERIES = array of TALMongoDBClientInsertDataQUERY;
-
-    {-------------------------------------------}
-    TALMongoDBClientDeleteDataQUERYFlags = record
-      SingleRemove: Boolean; // If set, the database will remove only the first matching document in the
-                             // collection. Otherwise all matching documents will be removed.
-      class function Create: TALMongoDBClientDeleteDataQUERYFlags; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-
-    {--------------------------------------}
-    TALMongoDBClientDeleteDataQUERY = record
-      FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                      // name with the collection name, using a . for the concatenation. For example, for the database
-                                      // foo and the collection bar, the full collection name is foo.bar
-      selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
-                            // The selector will contain one or more elements, all of which must match for a document
-                            // to be removed from the collection
-      flags: TALMongoDBClientDeleteDataQUERYFlags; // Options (see TALMongoDBClientDeleteDataQUERYFlags)
-      class function Create: TALMongoDBClientDeleteDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-    TALMongoDBClientDeleteDataQUERIES = array of TALMongoDBClientDeleteDataQUERY;
-
-
-    {---------------------------------------------}
-    TALMongoDBClientFindAndModifyDataQUERY = record
-      FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
-                                      // name with the collection name, using a . for the concatenation. For example, for the database
-                                      // foo and the collection bar, the full collection name is foo.bar
-      query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
-                        // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
-                        // one document to modify.
-      sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
-                        // documents. findAndModify modifies the first document in the sort order specified by this argument.
-      remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
-                       // Set this to true to remove the selected document . The default is false.
-      update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
-                          // The update field employs the same update operators or field: value specifications to modify the selected document.
-      new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
-                    // ignores the new option for remove operations. The default is false.
-      ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
-                                        // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
-      InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
-                                  // creates a new document if no document matches the query, or if documents match the query,
-                                  // findAndModify performs an update. The default is false.
-      RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
-      ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
-      class function Create: TALMongoDBClientFindAndModifyDataQUERY; static; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
-    end;
-    TALMongoDBClientFindAndModifyDataQUERIES = array of TALMongoDBClientFindAndModifyDataQUERY;
+    {--------------------------------------------------------}
+    TALMongoDBClientDeleteDataFlags = set of (dfSingleRemove); // If set, the database will remove only the first matching document in the
+                                                               // collection. Otherwise all matching documents will be removed.
 
     {---------------------------------------------}
     EAlMongoDBClientException = class(EALException)
@@ -471,15 +370,39 @@ type
                           const fullCollectionName: ansiString;   // "dbname.collectionname"
                           const selector: ansiString;             // query object.
                           var NumberOfDocumentsRemoved: integer); // reports the number of documents updated or removed, if the preceding operation was an update or remove operation.
-      procedure OnSelectDataDone(Query: TALMongoDBClientSelectDataQUERY;
+      procedure OnSelectDataDone(const FullCollectionName: AnsiString;
+                                 const Query: AnsiString;
+                                 const ReturnFieldsSelector: AnsiString;
+                                 flags: TALMongoDBClientSelectDataFlags;
+                                 const RowTag: AnsiString;
+                                 const ViewTag: AnsiString;
+                                 Skip: integer;
+                                 First: Integer;
+                                 CacheThreshold: Integer;
                                  TimeTaken: double); virtual;
-      procedure OnUpdateDataDone(Query: TALMongoDBClientUpdateDataQUERY;
+      procedure OnUpdateDataDone(const FullCollectionName: AnsiString;
+                                 const selector: AnsiString;
+                                 const update: AnsiString;
+                                 flags: TALMongoDBClientUpdateDataFlags;
                                  TimeTaken: double); virtual;
-      procedure OnDeleteDataDone(Query: TALMongoDBClientDeleteDataQUERY;
+      procedure OnDeleteDataDone(const FullCollectionName: AnsiString;
+                                 const selector: AnsiString;
+                                 flags: TALMongoDBClientDeleteDataFlags;
                                  TimeTaken: double); virtual;
-      procedure OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
+      procedure OnInsertDataDone(const FullCollectionName: AnsiString;
+                                 const documents: AnsiString;
+                                 flags: TALMongoDBClientInsertDataFlags;
                                  TimeTaken: double); virtual;
-      procedure OnFindAndModifyDataDone(Query: TALMongoDBClientFindAndModifyDataQUERY;
+      procedure OnFindAndModifyDataDone(const FullCollectionName: AnsiString;
+                                        const query: AnsiString;
+                                        const sort: AnsiString;
+                                        remove: boolean;
+                                        const update: AnsiString;
+                                        new: boolean;
+                                        const ReturnFieldsSelector: AnsiString;
+                                        InsertIfNotFound: boolean;
+                                        RowTag: AnsiString;
+                                        ViewTag: AnsiString;
                                         TimeTaken: double); virtual;
     public
       constructor Create; virtual;
@@ -507,110 +430,138 @@ type
       Procedure Connect(const aHost: AnsiString; const APort: integer); virtual;
       Procedure Disconnect; virtual;
 
-      Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
+      Procedure SelectData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
+                                                    // all of which must match for a document to be included in the result set. Possible elements
+                                                    // include $query, $orderby, $hint, $explain, and $snapshot.
+                           const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
+                                                                   // The returnFieldsSelector contains one or more elements, each of which is the name
+                                                                   // of a field that should be returned, and and the integer value 1. In JSON notation,
+                                                                   // a returnFieldsSelector to limit to the fields a, b and c would be:
+                                                                   // { a : 1, b : 1, c : 1}
+                           flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
+                           const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                           const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                           Skip: integer; // Sets the number of documents to omit
+                           First: Integer; // Limits the number of documents to retrieve
+                           CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                    // cache or not. Values <= 0 deactivate the cache
                            JSONDATA: TALJSONNode;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer); overload; virtual;
-      Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                           OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                           ExtData: Pointer); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
                            Skip: integer;
                            First: Integer;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer); overload; virtual;
-      Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
-                           JSONDATA: TALJSONNode); overload; virtual;
-      Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                           JSONDATA: TALJSONNode); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
-                           RowTag: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
+                           const RowTag: AnsiString;
                            Skip: integer;
                            First: Integer;
                            JSONDATA: TALJSONNode); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
-                           RowTag: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
+                           const RowTag: AnsiString;
                            JSONDATA: TALJSONNode); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
                            JSONDATA: TALJSONNode); overload; virtual;
 
-      procedure UpdateData(Queries: TALMongoDBClientUpdateDataQUERIES); overload; virtual;
-      procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
+      procedure UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
+                           const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
+                                                     // http://docs.mongodb.org/manual/tutorial/modify-documents/
+                           flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
                            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                            var ObjectID: ansiString); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY); overload; virtual;
-      procedure UpdateData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           Update: AnsiString;
-                           InsertIfNotFound: Boolean;
-                           MultiUpdate: Boolean;
-                           var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-                           var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                           var ObjectID: ansiString); overload; virtual; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      procedure UpdateData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           Update: AnsiString;
-                           InsertIfNotFound: Boolean;
-                           MultiUpdate: Boolean); overload; virtual;
+      procedure UpdateData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
+                           const Update: AnsiString;
+                           flags: TALMongoDBClientUpdateDataFlags); overload; virtual;
 
-      procedure InsertData(Queries: TALMongoDBClientInsertDataQUERIES); overload; virtual;
-      procedure InsertData(Query: TALMongoDBClientInsertDataQUERY); overload; virtual;
-      procedure InsertData(FullCollectionName: AnsiString;
-                           Documents: AnsiString;
-                           ContinueOnError: Boolean); overload; virtual;
+      procedure InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
+                           flags: TALMongoDBClientInsertDataFlags); overload; virtual; // Options (see TALMongoDBClientInsertDataFlags)
 
-      procedure DeleteData(Queries: TALMongoDBClientDeleteDataQUERIES); overload; virtual;
-      procedure DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
+      procedure DeleteData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
+                                                       // The selector will contain one or more elements, all of which must match for a document
+                                                       // to be removed from the collection
+                           flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
                            var NumberOfDocumentsRemoved: integer); overload; virtual;
-      procedure DeleteData(Query: TALMongoDBClientDeleteDataQUERY); overload; virtual;
-      procedure DeleteData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           SingleRemove: Boolean;
-                           var NumberOfDocumentsRemoved: integer); overload; virtual;
-      procedure DeleteData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           SingleRemove: Boolean); overload; virtual;
+      procedure DeleteData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
+                           flags: TALMongoDBClientDeleteDataFlags); overload; virtual;
 
-      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+      Procedure FindAndModifyData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                        // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                        // foo and the collection bar, the full collection name is foo.bar
+                                  const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
+                                                           // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
+                                                           // one document to modify.
+                                  const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
+                                                          // documents. findAndModify modifies the first document in the sort order specified by this argument.
+                                  remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
+                                                   // Set this to true to remove the selected document . The default is false.
+                                  const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
+                                                            // The update field employs the same update operators or field: value specifications to modify the selected document.
+                                  new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
+                                                // ignores the new option for remove operations. The default is false.
+                                  const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
+                                                                          // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
+                                  InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
+                                                              // creates a new document if no document matches the query, or if documents match the query,
+                                                              // findAndModify performs an update. The default is false.
+                                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
                                   JSONDATA: TALJSONNode;
                                   var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                   var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                   var ObjectID: AnsiString); overload; virtual; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
-                                  JSONDATA: TALJSONNode); overload; virtual;
-      Procedure FindAndModifyData(FullCollectionName: AnsiString;
-                                  query: AnsiString;
-                                  sort: AnsiString;
+      Procedure FindAndModifyData(const FullCollectionName: AnsiString;
+                                  const query: AnsiString;
+                                  const sort: AnsiString;
                                   remove: boolean;
-                                  update: AnsiString;
+                                  const update: AnsiString;
                                   new: boolean;
-                                  ReturnFieldsSelector: AnsiString;
+                                  const ReturnFieldsSelector: AnsiString;
                                   InsertIfNotFound: boolean;
                                   JSONDATA: TALJSONNode;
                                   var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                   var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                   var ObjectID: AnsiString); overload; virtual; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-      Procedure FindAndModifyData(FullCollectionName: AnsiString;
-                                  query: AnsiString;
-                                  sort: AnsiString;
+      Procedure FindAndModifyData(const FullCollectionName: AnsiString;
+                                  const query: AnsiString;
+                                  const sort: AnsiString;
                                   remove: boolean;
-                                  update: AnsiString;
+                                  const update: AnsiString;
                                   new: boolean;
-                                  ReturnFieldsSelector: AnsiString;
+                                  const ReturnFieldsSelector: AnsiString;
                                   InsertIfNotFound: boolean;
                                   JSONDATA: TALJSONNode); overload; virtual;
 
@@ -618,16 +569,19 @@ type
       property StopTailMonitoring: boolean read fStopTailMonitoring write fStopTailMonitoring;
     end;
 
-    {------------------------------------------------}
-    TAlMongoDBConnectionPoolContainer = Class(TObject)
+    {----------------------------------------}
+    TAlMongoDBConnectionPoolContainer = record
       SocketDescriptor: TSocket;
       LastAccessDate: int64;
     End;
+    TAlMongoDBConnectionPool = array of TAlMongoDBConnectionPoolContainer;
 
     {----------------------------------------------------------}
     TAlMongoDBConnectionPoolClient = class(TAlBaseMongoDBClient)
     private
-      FConnectionPool: TObjectList;
+      FConnectionPool: TAlMongoDBConnectionPool;
+      FConnectionPoolCount: integer;
+      FConnectionPoolCapacity: integer;
       FConnectionPoolCS: TCriticalSection;
       FWorkingConnectionCount: Integer;
       FReleasingAllconnections: Boolean;
@@ -648,137 +602,151 @@ type
       destructor Destroy; override;
       Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
 
-      Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
+      Procedure SelectData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
+                                                    // all of which must match for a document to be included in the result set. Possible elements
+                                                    // include $query, $orderby, $hint, $explain, and $snapshot.
+                           const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
+                                                                   // The returnFieldsSelector contains one or more elements, each of which is the name
+                                                                   // of a field that should be returned, and and the integer value 1. In JSON notation,
+                                                                   // a returnFieldsSelector to limit to the fields a, b and c would be:
+                                                                   // { a : 1, b : 1, c : 1}
+                           flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
+                           const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                           const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                           Skip: integer; // Sets the number of documents to omit
+                           First: Integer; // Limits the number of documents to retrieve
+                           CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                    // cache or not. Values <= 0 deactivate the cache
                            JSONDATA: TALJSONNode;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                           OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                           ExtData: Pointer;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
                            Skip: integer;
                            First: Integer;
-                           NoCursorTimeout: Boolean;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
-                           NoCursorTimeout: Boolean;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
                            OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                            ExtData: Pointer;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
-                           JSONDATA: TALJSONNode;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                           JSONDATA: TALJSONNode;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
-                           RowTag: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
+                           const RowTag: AnsiString;
                            Skip: integer;
                            First: Integer;
                            JSONDATA: TALJSONNode;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
-                           RowTag: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
+                           const RowTag: AnsiString;
                            JSONDATA: TALJSONNode;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure SelectData(FullCollectionName: AnsiString;
-                           Query: AnsiString;
-                           ReturnFieldsSelector: AnsiString;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           flags: TALMongoDBClientSelectDataFlags;
                            JSONDATA: TALJSONNode;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
-      procedure UpdateData(Queries: TALMongoDBClientUpdateDataQUERIES;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
+      procedure UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
+                           const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
+                                                     // http://docs.mongodb.org/manual/tutorial/modify-documents/
+                           flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
                            var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                            var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure UpdateData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           Update: AnsiString;
-                           InsertIfNotFound: Boolean;
-                           MultiUpdate: Boolean;
-                           var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-                           var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                           var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure UpdateData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           Update: AnsiString;
-                           InsertIfNotFound: Boolean;
-                           MultiUpdate: Boolean;
+      procedure UpdateData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
+                           const Update: AnsiString;
+                           flags: TALMongoDBClientUpdateDataFlags;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
-      procedure InsertData(Queries: TALMongoDBClientInsertDataQUERIES;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure InsertData(Query: TALMongoDBClientInsertDataQUERY;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure InsertData(FullCollectionName: AnsiString;
-                           Documents: AnsiString;
-                           ContinueOnError: Boolean;
+      procedure InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
+                           flags: TALMongoDBClientInsertDataFlags;// Options (see TALMongoDBClientInsertDataFlags)
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
-      procedure DeleteData(Queries: TALMongoDBClientDeleteDataQUERIES;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
+      procedure DeleteData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
+                                                       // The selector will contain one or more elements, all of which must match for a document
+                                                       // to be removed from the collection
+                           flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
                            var NumberOfDocumentsRemoved: integer;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure DeleteData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           SingleRemove: Boolean;
-                           var NumberOfDocumentsRemoved: integer;
-                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      procedure DeleteData(FullCollectionName: AnsiString;
-                           Selector: AnsiString;
-                           SingleRemove: Boolean;
+      procedure DeleteData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
+                           flags: TALMongoDBClientDeleteDataFlags;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
-      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+      Procedure FindAndModifyData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                        // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                        // foo and the collection bar, the full collection name is foo.bar
+                                  const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
+                                                           // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
+                                                           // one document to modify.
+                                  const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
+                                                          // documents. findAndModify modifies the first document in the sort order specified by this argument.
+                                  remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
+                                                   // Set this to true to remove the selected document . The default is false.
+                                  const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
+                                                            // The update field employs the same update operators or field: value specifications to modify the selected document.
+                                  new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
+                                                // ignores the new option for remove operations. The default is false.
+                                  const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
+                                                                          // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
+                                  InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
+                                                              // creates a new document if no document matches the query, or if documents match the query,
+                                                              // findAndModify performs an update. The default is false.
+                                  const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                  const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
                                   JSONDATA: TALJSONNode;
                                   var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                   var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                   var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                   const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
-                                  JSONDATA: TALJSONNode;
-                                  const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure FindAndModifyData(FullCollectionName: AnsiString;
-                                  query: AnsiString;
-                                  sort: AnsiString;
+      Procedure FindAndModifyData(const FullCollectionName: AnsiString;
+                                  const query: AnsiString;
+                                  const sort: AnsiString;
                                   remove: boolean;
-                                  update: AnsiString;
+                                  const update: AnsiString;
                                   new: boolean;
-                                  ReturnFieldsSelector: AnsiString;
+                                  const ReturnFieldsSelector: AnsiString;
                                   InsertIfNotFound: boolean;
                                   JSONDATA: TALJSONNode;
                                   var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                   var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                   var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                   const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
-      Procedure FindAndModifyData(FullCollectionName: AnsiString;
-                                  query: AnsiString;
-                                  sort: AnsiString;
+      Procedure FindAndModifyData(const FullCollectionName: AnsiString;
+                                  const query: AnsiString;
+                                  const sort: AnsiString;
                                   remove: boolean;
-                                  update: AnsiString;
+                                  const update: AnsiString;
                                   new: boolean;
-                                  ReturnFieldsSelector: AnsiString;
+                                  const ReturnFieldsSelector: AnsiString;
                                   InsertIfNotFound: boolean;
                                   JSONDATA: TALJSONNode;
                                   const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
@@ -838,106 +806,6 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      ALCipher,
      AlWinsock,
      ALWindows;
-
-{***********************************************************************************************}
-class function TALMongoDBClientSelectDataQUERYFlags.Create: TALMongoDBClientSelectDataQUERYFlags;
-begin
-  with result do begin
-    TailMonitoring := False;
-    SlaveOk := False;
-    NoCursorTimeout := False;
-    Partial := False;
-  end;
-end;
-
-{*************************************************************************************}
-class function TALMongoDBClientSelectDataQUERY.Create: TALMongoDBClientSelectDataQUERY;
-begin
-  with result do begin
-    FullCollectionName := '';
-    Query := '';
-    ReturnFieldsSelector := '';
-    flags := TALMongoDBClientSelectDataQUERYFlags.Create;
-    RowTag := '';
-    ViewTag := '';
-    Skip := -1;
-    First := -1;
-    CacheThreshold := -1;
-  end;
-end;
-
-{***********************************************************************************************}
-class function TALMongoDBClientUpdateDataQUERYFlags.Create: TALMongoDBClientUpdateDataQUERYFlags;
-begin
-  with result do begin
-    Upsert := False;
-    MultiUpdate := False;
-  end;
-end;
-
-{*************************************************************************************}
-class function TALMongoDBClientUpdateDataQUERY.Create: TALMongoDBClientUpdateDataQUERY;
-begin
-  with result do begin
-    FullCollectionName := '';
-    selector := '';
-    update := '';
-    flags := TALMongoDBClientUpdateDataQUERYFlags.Create;
-  end;
-end;
-
-{***********************************************************************************************}
-class function TALMongoDBClientInsertDataQUERYFlags.Create: TALMongoDBClientInsertDataQUERYFlags;
-begin
-  with result do begin
-    ContinueOnError := False;
-  end;
-end;
-
-{*************************************************************************************}
-class function TALMongoDBClientInsertDataQUERY.Create: TALMongoDBClientInsertDataQUERY;
-begin
-  with result do begin
-    FullCollectionName := '';
-    documents := '';
-    flags := TALMongoDBClientInsertDataQUERYFlags.Create;
-  end;
-end;
-
-{***********************************************************************************************}
-class function TALMongoDBClientDeleteDataQUERYFlags.Create: TALMongoDBClientDeleteDataQUERYFlags;
-begin
-  with result do begin
-    SingleRemove := false;
-  end;
-end;
-
-{*************************************************************************************}
-class function TALMongoDBClientDeleteDataQUERY.Create: TALMongoDBClientDeleteDataQUERY;
-begin
-  with result do begin
-    FullCollectionName := '';
-    selector := '';
-    flags := TALMongoDBClientDeleteDataQUERYFlags.Create;
-  end;
-end;
-
-{***************************************************************************************************}
-class function TALMongoDBClientFindAndModifyDataQUERY.Create: TALMongoDBClientFindAndModifyDataQUERY;
-begin
-  with result do begin
-    FullCollectionName := '';
-    query := '';
-    sort := '';
-    remove := False;
-    update := '';
-    new := False;
-    ReturnFieldsSelector := '';
-    InsertIfNotFound := false;
-    RowTag := '';
-    ViewTag := '';
-  end;
-end;
 
 {***************************************************************************************************************************************}
 constructor EAlMongoDBClientException.Create(const aMsg: AnsiString; const aErrorCode: integer; const aCloseConnection: Boolean = False);
@@ -2045,36 +1913,60 @@ begin
                        upserted);
 end;
 
-{*************************************************************************************}
-procedure TAlBaseMongoDBClient.OnSelectDataDone(Query: TALMongoDBClientSelectDataQUERY;
+{***********************************************************************************}
+procedure TAlBaseMongoDBClient.OnSelectDataDone(const FullCollectionName: AnsiString;
+                                                const Query: AnsiString;
+                                                const ReturnFieldsSelector: AnsiString;
+                                                flags: TALMongoDBClientSelectDataFlags;
+                                                const RowTag: AnsiString;
+                                                const ViewTag: AnsiString;
+                                                Skip: integer;
+                                                First: Integer;
+                                                CacheThreshold: Integer;
                                                 TimeTaken: double);
 begin
   // virtual
 end;
 
-{*************************************************************************************}
-procedure TAlBaseMongoDBClient.OnUpdateDataDone(Query: TALMongoDBClientUpdateDataQUERY;
+{***********************************************************************************}
+procedure TAlBaseMongoDBClient.OnUpdateDataDone(const FullCollectionName: AnsiString;
+                                                const selector: AnsiString;
+                                                const update: AnsiString;
+                                                flags: TALMongoDBClientUpdateDataFlags;
                                                 TimeTaken: double);
 begin
   // virtual
 end;
 
-{*************************************************************************************}
-procedure TAlBaseMongoDBClient.OnDeleteDataDone(Query: TALMongoDBClientDeleteDataQUERY;
+{***********************************************************************************}
+procedure TAlBaseMongoDBClient.OnDeleteDataDone(const FullCollectionName: AnsiString;
+                                                const selector: AnsiString;
+                                                flags: TALMongoDBClientDeleteDataFlags;
                                                 TimeTaken: double);
 begin
   // virtual
 end;
 
-{*************************************************************************************}
-procedure TAlBaseMongoDBClient.OnInsertDataDone(Query: TALMongoDBClientInsertDataQUERY;
+{***********************************************************************************}
+procedure TAlBaseMongoDBClient.OnInsertDataDone(const FullCollectionName: AnsiString;
+                                                const documents: AnsiString;
+                                                flags: TALMongoDBClientInsertDataFlags;
                                                 TimeTaken: double);
 begin
   // virtual
 end;
 
-{***************************************************************************************************}
-procedure TAlBaseMongoDBClient.OnFindAndModifyDataDone(Query: TALMongoDBClientFindAndModifyDataQUERY;
+{******************************************************************************************}
+procedure TAlBaseMongoDBClient.OnFindAndModifyDataDone(const FullCollectionName: AnsiString;
+                                                       const query: AnsiString;
+                                                       const sort: AnsiString;
+                                                       remove: boolean;
+                                                       const update: AnsiString;
+                                                       new: boolean;
+                                                       const ReturnFieldsSelector: AnsiString;
+                                                       InsertIfNotFound: boolean;
+                                                       RowTag: AnsiString;
+                                                       ViewTag: AnsiString;
                                                        TimeTaken: double);
 begin
   // virtual
@@ -2240,14 +2132,30 @@ begin
   end;
 end;
 
-{*******************************************************************************}
-Procedure TAlMongoDBClient.SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                            // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                            // foo and the collection bar, the full collection name is foo.bar
+                                      const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
+                                                               // all of which must match for a document to be included in the result set. Possible elements
+                                                               // include $query, $orderby, $hint, $explain, and $snapshot.
+                                      const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
+                                                                              // The returnFieldsSelector contains one or more elements, each of which is the name
+                                                                              // of a field that should be returned, and and the integer value 1. In JSON notation,
+                                                                              // a returnFieldsSelector to limit to the fields a, b and c would be:
+                                                                              // { a : 1, b : 1, c : 1}
+                                      flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
+                                      const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                      const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                                      Skip: integer; // Sets the number of documents to omit
+                                      First: Integer; // Limits the number of documents to retrieve
+                                      CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                               // cache or not. Values <= 0 deactivate the cache
                                       JSONDATA: TALJSONNode;
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer);
 
-Var aQueriesIndex: integer;
-    aViewRec: TalJSONNode;
+Var aViewRec: TalJSONNode;
     aJSONDocument: TalJSONDocument;
     aResponseFlags: integer;
     aCursorID: int64;
@@ -2261,9 +2169,6 @@ Var aQueriesIndex: integer;
     aCacheStr: ansiString;
 
 begin
-
-  //exit if no query
-  if length(Queries) = 0 then Exit;
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
@@ -2283,186 +2188,188 @@ begin
     //init the TstopWatch
     aStopWatch := TstopWatch.Create;
 
-    //loop on all the Queries
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
+    //Handle the CacheThreshold
+    aCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(aJSONDocument)) and
+       (not (sfTailMonitoring in flags)) and
+       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
 
-      //Handle the CacheThreshold
-      aCacheKey := '';
-      If (Queries[aQueriesIndex].CacheThreshold > 0) and
-         (not assigned(aJSONDocument)) and
-         (not Queries[aQueriesIndex].flags.TailMonitoring) and
-         (((length(Queries) = 1) and
-           (JSONDATA.ChildNodes.Count = 0)) or  // else the save will not work
-          (Queries[aQueriesIndex].ViewTag <> '')) then begin
+      //try to load from from cache
+      aCacheKey := ALStringHashSHA1(RowTag + '#' +
+                                    alinttostr(Skip) + '#' +
+                                    alinttostr(First) + '#' +
+                                    FullCollectionName + '#' +
+                                    ReturnFieldsSelector + '#' +
+                                    Query);
 
-        //try to load from from cache
-        aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
-                                      alinttostr(Queries[aQueriesIndex].Skip) + '#' +
-                                      alinttostr(Queries[aQueriesIndex].First) + '#' +
-                                      Queries[aQueriesIndex].FullCollectionName + '#' +
-                                      Queries[aQueriesIndex].ReturnFieldsSelector + '#' +
-                                      Queries[aQueriesIndex].Query);
+      if loadcachedData(aCacheKey, aCacheStr) then begin
 
-        if loadcachedData(aCacheKey, aCacheStr) then begin
+        //init the aViewRec
+        if (ViewTag <> '') then aViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+        else aViewRec := JSONDATA;
 
-          //init the aViewRec
-          if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := JSONDATA.AddChild(Queries[aQueriesIndex].ViewTag, ntobject)
-          else aViewRec := JSONDATA;
+        //assign the tmp data to the XMLData
+        aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
 
-          //assign the tmp data to the XMLData
-          aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
-
-          //go to the next loop
-          continue;
-
-        end;
+        //exit
+        exit;
 
       end;
 
-      //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
+    end;
 
-      //build the flag integer
-      //bit num	   name	            description
-      //0	         Reserved	        Must be set to 0.
-      //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
-      //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
-      //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
-      //                            it references were deleted.
-      //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
-      //3	         OplogReplay	    Internal replication use only - driver should not set
-      //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
-      //                            option to prevent that.
-      //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
-      //                            timeout period, we do return as normal.
-      //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-      //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
-      //                            the data unless it closes the connection.
-      //                            Caveats:
-      //                            * Exhaust and limit are not compatible.
-      //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
-      //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
-      //                              without being completely iterated the underlying socket connection will be closed and discarded
-      //                              without being returned to the connection pool.
-      //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
-      //                              you must completely iterate the Cursor before executing any other operation.
-      //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
-      //                            Mostly because Exhaust is not compatible with mongos we will not use it
-      //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
-      //8-31	     Reserved	        Must be set to 0.
-      aFlags := 0;
-      if Queries[aQueriesIndex].flags.TailMonitoring then begin
-        if not assigned(OnNewRowFunct) then raise Exception.Create('OnNewRowFunct is mandatory for tail monitoring');
-        aFlags := aFlags or (1 shl 1); // TailableCursor
-        aFlags := aFlags or (1 shl 5); // AwaitData
-      end;
-      if Queries[aQueriesIndex].flags.SlaveOk then aFlags := aFlags or (1 shl 2);
-      if Queries[aQueriesIndex].flags.NoCursorTimeout then aFlags := aFlags or (1 shl 4);
-      if Queries[aQueriesIndex].flags.Partial then aFlags := aFlags or (1 shl 7);
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
 
-      //init the aViewRec
-      if (Queries[aQueriesIndex].ViewTag <> '') and (not assigned(aJSONDocument)) then aViewRec := JSONdata.AddChild(Queries[aQueriesIndex].ViewTag, ntobject)
-      else aViewRec := JSONdata;
+    //build the flag integer
+    //bit num	   name	            description
+    //0	         Reserved	        Must be set to 0.
+    //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
+    //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
+    //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
+    //                            it references were deleted.
+    //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
+    //3	         OplogReplay	    Internal replication use only - driver should not set
+    //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
+    //                            option to prevent that.
+    //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
+    //                            timeout period, we do return as normal.
+    //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
+    //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
+    //                            the data unless it closes the connection.
+    //                            Caveats:
+    //                            * Exhaust and limit are not compatible.
+    //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
+    //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
+    //                              without being completely iterated the underlying socket connection will be closed and discarded
+    //                              without being returned to the connection pool.
+    //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
+    //                              you must completely iterate the Cursor before executing any other operation.
+    //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
+    //                            Mostly because Exhaust is not compatible with mongos we will not use it
+    //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
+    //8-31	     Reserved	        Must be set to 0.
+    aFlags := 0;
+    if sfTailMonitoring in flags then begin
+      if not assigned(OnNewRowFunct) then raise Exception.Create('OnNewRowFunct is mandatory for tail monitoring');
+      aFlags := aFlags or (1 shl 1); // TailableCursor
+      aFlags := aFlags or (1 shl 5); // AwaitData
+    end;
+    if sfSlaveOk in flags then aFlags := aFlags or (1 shl 2);
+    if sfNoCursorTimeout in flags then aFlags := aFlags or (1 shl 4);
+    if sfPartial in flags then aFlags := aFlags or (1 shl 7);
 
-      //init aRecAdded
-      aRecAdded := 0;
+    //init the aViewRec
+    if (ViewTag <> '') and (not assigned(aJSONDocument)) then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
+    else aViewRec := JSONdata;
 
-      //for the TailMonitoring
-      repeat
+    //init aRecAdded
+    aRecAdded := 0;
 
-        //do the First query
-        aContinue := true;
-        OP_QUERY(fSocketDescriptor,
-                 aFlags,
-                 Queries[aQueriesIndex].fullCollectionName,
-                 ALIfThen(Queries[aQueriesIndex].Skip >= 0, Queries[aQueriesIndex].Skip, 0),
-                 ALIfThen(Queries[aQueriesIndex].First >= 0, Queries[aQueriesIndex].First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
-                                                                                               // the maximum BSON document size. For most queries, the first batch returns 101
-                                                                                               // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
-                                                                                               // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
-                 Queries[aQueriesIndex].query,
-                 Queries[aQueriesIndex].ReturnFieldsSelector,
-                 aResponseFlags,
-                 aCursorID,
-                 aStartingFrom, // where in the cursor this reply is starting
-                 aNumberReturned, // number of documents in the reply
-                 aViewRec,
-                 OnNewRowFunct,
-                 ExtData,
-                 Queries[aQueriesIndex].RowTag,
-                 Queries[aQueriesIndex].ViewTag,
-                 aContinue);
+    //for the TailMonitoring
+    repeat
 
-        try
+      //do the First query
+      aContinue := true;
+      OP_QUERY(fSocketDescriptor,
+               aFlags,
+               fullCollectionName,
+               ALIfThen(Skip >= 0, Skip, 0),
+               ALIfThen(First >= 0, First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
+                                               // the maximum BSON document size. For most queries, the first batch returns 101
+                                               // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
+                                               // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
+               query,
+               ReturnFieldsSelector,
+               aResponseFlags,
+               aCursorID,
+               aStartingFrom, // where in the cursor this reply is starting
+               aNumberReturned, // number of documents in the reply
+               aViewRec,
+               OnNewRowFunct,
+               ExtData,
+               RowTag,
+               ViewTag,
+               aContinue);
+
+      try
+
+        //init aRecAdded
+        aRecAdded := aRecAdded + aNumberReturned;
+
+        //loop still the cursorID > 0
+        while ((not (sfTailMonitoring in flags)) or
+               (not fStopTailMonitoring)) and
+              (aContinue) and
+              (aCursorID <> 0) and
+              ((First <= 0) or
+               (aRecAdded < First)) do begin
+
+          //Get more data
+          OP_GET_MORE(fSocketDescriptor,
+                      fullCollectionName,
+                      ALIfThen(First > 0, First - aRecAdded, 0),
+                      aCursorID,
+                      aResponseFlags,
+                      aStartingFrom,
+                      anumberReturned,
+                      aViewRec,
+                      OnNewRowFunct,
+                      ExtData,
+                      RowTag,
+                      ViewTag,
+                      aContinue);
 
           //init aRecAdded
           aRecAdded := aRecAdded + aNumberReturned;
 
-          //loop still the cursorID > 0
-          while ((not Queries[aQueriesIndex].flags.TailMonitoring) or
-                 (not fStopTailMonitoring)) and
-                (aContinue) and
-                (aCursorID <> 0) and
-                ((Queries[aQueriesIndex].First <= 0) or
-                 (aRecAdded < Queries[aQueriesIndex].First)) do begin
-
-            //Get more data
-            OP_GET_MORE(fSocketDescriptor,
-                        Queries[aQueriesIndex].fullCollectionName,
-                        ALIfThen(Queries[aQueriesIndex].First > 0, Queries[aQueriesIndex].First - aRecAdded, 0),
-                        aCursorID,
-                        aResponseFlags,
-                        aStartingFrom,
-                        anumberReturned,
-                        aViewRec,
-                        OnNewRowFunct,
-                        ExtData,
-                        Queries[aQueriesIndex].RowTag,
-                        Queries[aQueriesIndex].ViewTag,
-                        aContinue);
-
-            //init aRecAdded
-            aRecAdded := aRecAdded + aNumberReturned;
-
-          end;
-
-        finally
-
-          //close the curson
-          if aCursorId <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [aCursorID]);
-
         end;
 
-        //sleep for TailMonitoring to not use 100% CPU
-        if (Queries[aQueriesIndex].flags.TailMonitoring) and
-           (not fStopTailMonitoring) and
-           ((Queries[aQueriesIndex].First <= 0) or
-            (aRecAdded < Queries[aQueriesIndex].First)) then sleep(1);
+      finally
 
-      //loop for the TailMonitoring
-      until (not Queries[aQueriesIndex].flags.TailMonitoring) or
-            (fStopTailMonitoring) or
-            ((Queries[aQueriesIndex].First > 0) and
-             (aRecAdded >= Queries[aQueriesIndex].First));
-
-      //do the OnSelectDataDone
-      aStopWatch.Stop;
-      OnSelectDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-
-      //save to the cache
-      If aCacheKey <> '' then begin
-
-        //save the data
-        aViewRec.SaveToJSON(aCacheStr);
-        SaveDataToCache(aCacheKey,
-                        Queries[aQueriesIndex].CacheThreshold,
-                        aCacheStr);
+        //close the curson
+        if aCursorId <> 0 then OP_KILL_CURSORS(fSocketDescriptor, [aCursorID]);
 
       end;
 
-    End;
+      //sleep for TailMonitoring to not use 100% CPU
+      if (sfTailMonitoring in flags) and
+         (not fStopTailMonitoring) and
+         ((First <= 0) or
+          (aRecAdded < First)) then sleep(1);
+
+    //loop for the TailMonitoring
+    until (not (sfTailMonitoring in flags)) or
+          (fStopTailMonitoring) or
+          ((First > 0) and
+           (aRecAdded >= First));
+
+    //do the OnSelectDataDone
+    aStopWatch.Stop;
+    OnSelectDataDone(FullCollectionName,
+                     Query,
+                     ReturnFieldsSelector,
+                     flags,
+                     RowTag,
+                     ViewTag,
+                     Skip,
+                     First,
+                     CacheThreshold,
+                     aStopWatch.Elapsed.TotalMilliseconds);
+
+    //save to the cache
+    If aCacheKey <> '' then begin
+
+      //save the data
+      aViewRec.SaveToJSON(aCacheStr);
+      SaveDataToCache(aCacheKey,
+                      CacheThreshold,
+                      aCacheStr);
+
+    end;
 
   Finally
     if assigned(aJSONDocument) then aJSONDocument.free;
@@ -2470,186 +2377,127 @@ begin
 
 end;
 
-{***************************************************************************}
-Procedure TAlMongoDBClient.SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                                      OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                      ExtData: Pointer);
-var aSelectDataQueries: TALMongoDBClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQueries,1);
-  aSelectDataQueries[0] := Query;
-  SelectData(aSelectDataQueries,
-             nil, // JSONDATA
-             OnNewRowFunct,
-             ExtData);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
-                                      Query: AnsiString;
-                                      ReturnFieldsSelector: AnsiString;
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      flags: TALMongoDBClientSelectDataFlags;
                                       Skip: integer;
                                       First: Integer;
                                       OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                       ExtData: Pointer);
-var aQuery: TALMongoDBClientSelectDataQUERY;
-begin
-  aQuery := TALMongoDBClientSelectDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.Query := Query;
-  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
-  aQuery.Skip := Skip;
-  aQuery.First := First;
-  SelectData(aQuery,
-             OnNewRowFunct,
-             ExtData);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
-                                      Query: AnsiString;
-                                      ReturnFieldsSelector: AnsiString;
-                                      OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                      ExtData: Pointer);
 begin
   SelectData(FullCollectionName,
              Query,
              ReturnFieldsSelector,
-             0, // skip
-             0, // first
-             OnNewRowFunct,
-             ExtData);
-end;
-
-{*******************************************************************************}
-Procedure TAlMongoDBClient.SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
-                                      JSONDATA: TALJSONNode);
-begin
-  SelectData(Queries,
-             JSONDATA,
-             nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-             nil); // ExtData: Pointer
-end;
-
-{***************************************************************************}
-Procedure TAlMongoDBClient.SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                                      JSONDATA: TALJSONNode);
-var aSelectDataQueries: TALMongoDBClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQueries,1);
-  aSelectDataQueries[0] := Query;
-  SelectData(aSelectDataQueries,
-             JSONDATA,
-             nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-             nil); // ExtData: Pointer
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
-                                      Query: AnsiString;
-                                      ReturnFieldsSelector: AnsiString;
-                                      RowTag: AnsiString;
-                                      Skip: integer;
-                                      First: Integer;
-                                      JSONDATA: TALJSONNode);
-var aQuery: TALMongoDBClientSelectDataQUERY;
-begin
-  aQuery := TALMongoDBClientSelectDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.Query := Query;
-  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
-  aQuery.RowTag := RowTag;
-  aQuery.Skip := Skip;
-  aQuery.First := First;
-  SelectData(aQuery,
-             JSONDATA);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
-                                      Query: AnsiString;
-                                      ReturnFieldsSelector: AnsiString;
-                                      RowTag: AnsiString;
-                                      JSONDATA: TALJSONNode);
-begin
-  SelectData(FullCollectionName,
-             Query,
-             ReturnFieldsSelector,
-             RowTag,
-             0, // Skip
-             0, //First
-             JSONDATA);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.SelectData(FullCollectionName: AnsiString;
-                                      Query: AnsiString;
-                                      ReturnFieldsSelector: AnsiString;
-                                      JSONDATA: TALJSONNode);
-begin
-  SelectData(FullCollectionName,
-             Query,
-             ReturnFieldsSelector,
+             flags,
              '', // RowTag,
-             0, // Skip
-             0, //First
-             JSONDATA);
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, //JSONDATA,
+             OnNewRowFunct,
+             ExtData);
 end;
 
-{********************************************************************************}
-Procedure TAlMongoDBClient.UpdateData(Queries: TALMongoDBClientUpdateDataQUERIES);
-Var aQueriesIndex: integer;
-    aFlags: integer;
-    aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
-    aStopWatch: TStopWatch;
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      flags: TALMongoDBClientSelectDataFlags;
+                                      OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                                      ExtData: Pointer);
 begin
-
-  //exit if no query
-  if length(Queries) = 0 then Exit;
-
-  //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
-
-  //init the TstopWatch
-  aStopWatch := TstopWatch.Create;
-
-  //loop on all the Queries
-  For aQueriesIndex := 0 to length(Queries) - 1 do begin
-
-    //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
-
-    //bit num	  name	        description
-    //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
-    //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
-    //2-31    	Reserved	    Must be set to 0.
-    aFlags := 0;
-    if Queries[aQueriesIndex].flags.Upsert then aFlags := aFlags or (1 shl 0);
-    if Queries[aQueriesIndex].flags.MultiUpdate then aFlags := aFlags or (1 shl 1);
-
-    OP_UPDATE(fSocketDescriptor,
-              aflags,
-              Queries[aQueriesIndex].FullCollectionName,
-              Queries[aQueriesIndex].selector,
-              Queries[aQueriesIndex].Update,
-              aNumberOfDocumentsUpdated,
-              aupdatedExisting,
-              aObjectID);
-
-    //do the OnUpdateDataDone
-    aStopWatch.Stop;
-    OnUpdateDataDone(Queries[aQueriesIndex],
-                     aStopWatch.Elapsed.TotalMilliseconds);
-
-  end;
-
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewRowFunct,
+             ExtData);
 end;
 
-{***************************************************************************}
-procedure TAlMongoDBClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      flags: TALMongoDBClientSelectDataFlags;
+                                      const RowTag: AnsiString;
+                                      Skip: integer;
+                                      First: Integer;
+                                      JSONDATA: TALJSONNode);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      flags: TALMongoDBClientSelectDataFlags;
+                                      const RowTag: AnsiString;
+                                      JSONDATA: TALJSONNode);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      flags: TALMongoDBClientSelectDataFlags;
+                                      JSONDATA: TALJSONNode);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                            // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                            // foo and the collection bar, the full collection name is foo.bar
+                                      const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
+                                      const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
+                                                                // http://docs.mongodb.org/manual/tutorial/modify-documents/
+                                      flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
                                       var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                       var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                       var ObjectID: ansiString); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
@@ -2668,89 +2516,55 @@ begin
   //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
   //2-31    	Reserved	    Must be set to 0.
   aFlags := 0;
-  if Query.flags.Upsert then aFlags := aFlags or (1 shl 0);
-  if Query.flags.MultiUpdate then aFlags := aFlags or (1 shl 1);
+  if ufUpsert in flags then aFlags := aFlags or (1 shl 0);
+  if ufMultiUpdate in flags then aFlags := aFlags or (1 shl 1);
 
   OP_UPDATE(fSocketDescriptor,
             aflags,
-            Query.FullCollectionName,
-            Query.selector,
-            Query.Update,
+            FullCollectionName,
+            selector,
+            Update,
             NumberOfDocumentsUpdated,
             updatedExisting,
             ObjectID);
 
   //do the OnUpdateDataDone
   aStopWatch.Stop;
-  OnUpdateDataDone(Query,
+  OnUpdateDataDone(FullCollectionName,
+                   selector,
+                   update,
+                   flags,
                    aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
-{****************************************************************************}
-Procedure TAlMongoDBClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY);
-var aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
-begin
-  UpdateData(Query,
-             aNumberOfDocumentsUpdated,
-             aupdatedExisting,
-             aObjectID);
-end;
-
-{*******************************************************************}
-procedure TAlMongoDBClient.UpdateData(FullCollectionName: AnsiString;
-                                      Selector: AnsiString;
-                                      Update: AnsiString;
-                                      InsertIfNotFound: Boolean;
-                                      MultiUpdate: Boolean;
-                                      var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-                                      var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                      var ObjectID: ansiString); // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-var aQuery: TALMongoDBClientUpdateDataQUERY;
-begin
-  aQuery := TALMongoDBClientUpdateDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.selector := selector;
-  aQuery.update := update;
-  aQuery.flags.Upsert := InsertIfNotFound;
-  aQuery.flags.MultiUpdate := MultiUpdate;
-  UpdateData(aQuery,
-             NumberOfDocumentsUpdated,
-             updatedExisting,
-             ObjectID);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.UpdateData(FullCollectionName: AnsiString;
-                                      Selector: AnsiString;
-                                      Update: AnsiString;
-                                      InsertIfNotFound: Boolean;
-                                      MultiUpdate: Boolean);
+{*************************************************************************}
+Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString;
+                                      const Selector: AnsiString;
+                                      const Update: AnsiString;
+                                      flags: TALMongoDBClientUpdateDataFlags);
 var aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
     aObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
-             Selector,
-             Update,
-             InsertIfNotFound,
-             MultiUpdate,
+             selector,
+             update,
+             flags,
              aNumberOfDocumentsUpdated,
              aupdatedExisting,
              aObjectID);
 end;
 
-{********************************************************************************}
-Procedure TAlMongoDBClient.InsertData(Queries: TALMongoDBClientInsertDataQUERIES);
-Var aQueriesIndex: integer;
-    aFlags: integer;
+{*************************************************************************}
+Procedure TAlMongoDBClient.InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                            // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                            // foo and the collection bar, the full collection name is foo.bar
+                                      const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
+                                      flags: TALMongoDBClientInsertDataFlags); // Options (see TALMongoDBClientInsertDataFlags)
+Var aFlags: integer;
     aStopWatch: TStopWatch;
 begin
-
-  //exit if no Query
-  if length(Queries) = 0 then Exit;
 
   //Error if we are not connected
   If not connected then raise Exception.Create('Not connected');
@@ -2758,105 +2572,41 @@ begin
   //init the TstopWatch
   aStopWatch := TstopWatch.Create;
 
-  //loop on all the queries
-  For aQueriesIndex := 0 to length(Queries) - 1 do begin
+  //start the TstopWatch
+  aStopWatch.Reset;
+  aStopWatch.Start;
 
-    //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
+  //bit num	 name	            description
+  //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
+  //                          This makes bulk insert behave similarly to a series of single inserts, except lastError will be set if
+  //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
+  //                          reported by getLastError. (new in 1.9.1)
+  //1-31	   Reserved	        Must be set to 0.
+  aFlags := 0;
+  if ifContinueOnError in flags then aFlags := aFlags or (1 shl 0);
 
-    //bit num	 name	            description
-    //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-    //                          This makes bulk insert behave similarly to a series of single inserts, except lastError will be set if
-    //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-    //                          reported by getLastError. (new in 1.9.1)
-    //1-31	   Reserved	        Must be set to 0.
-    aFlags := 0;
-    if Queries[aQueriesIndex].flags.ContinueOnError then aFlags := aFlags or (1 shl 0);
+  OP_INSERT(fSocketDescriptor,
+            aflags,
+            FullCollectionName,
+            documents);
 
-    OP_INSERT(fSocketDescriptor,
-              aflags,
-              Queries[aQueriesIndex].FullCollectionName,
-              Queries[aQueriesIndex].documents);
-
-    //do the OnInsertDataDone
-    aStopWatch.Stop;
-    OnInsertDataDone(Queries[aQueriesIndex],
-                     aStopWatch.Elapsed.TotalMilliseconds);
-
-  end;
+  //do the OnInsertDataDone
+  aStopWatch.Stop;
+  OnInsertDataDone(FullCollectionName,
+                   documents,
+                   flags,
+                   aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
-{****************************************************************************}
-Procedure TAlMongoDBClient.InsertData(Query: TALMongoDBClientInsertDataQUERY);
-var aInsertDataQueries: TALMongoDBClientInsertDataQUERIES;
-begin
-  setlength(aInsertDataQueries,1);
-  aInsertDataQueries[0] := Query;
-  InsertData(aInsertDataQueries);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.InsertData(FullCollectionName: AnsiString;
-                                      Documents: AnsiString;
-                                      ContinueOnError: Boolean);
-var aQuery: TALMongoDBClientInsertDataQUERY;
-begin
-  aQuery := TALMongoDBClientInsertDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.documents := Documents;
-  aQuery.flags.ContinueOnError := ContinueOnError;
-  InsertData(aQuery);
-end;
-
-{********************************************************************************}
-Procedure TAlMongoDBClient.DeleteData(Queries: TALMongoDBClientDeleteDataQUERIES);
-Var aQueriesIndex: integer;
-    aFlags: integer;
-    aNumberOfDocumentsRemoved: integer;
-    aStopWatch: TStopWatch;
-begin
-
-  //exit if no query
-  if length(Queries) = 0 then Exit;
-
-  //Error if we are not connected
-  If not connected then raise Exception.Create('Not connected');
-
-  //init the TstopWatch
-  aStopWatch := TstopWatch.Create;
-
-  //loop on all the Queries
-  For aQueriesIndex := 0 to length(Queries) - 1 do begin
-
-    //start the TstopWatch
-    aStopWatch.Reset;
-    aStopWatch.Start;
-
-    //bit num	   name	          description
-    //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
-    //1-31	     Reserved	      Must be set to 0.
-    aFlags := 0;
-    if Queries[aQueriesIndex].flags.SingleRemove then aFlags := aFlags or (1 shl 0);
-
-    OP_DELETE(fSocketDescriptor,
-              aflags,
-              Queries[aQueriesIndex].FullCollectionName,
-              Queries[aQueriesIndex].selector,
-              aNumberOfDocumentsRemoved);
-
-    //do the OnDeleteDataDone
-    aStopWatch.Stop;
-    OnDeleteDataDone(Queries[aQueriesIndex],
-                     aStopWatch.Elapsed.TotalMilliseconds);
-
-  end;
-
-end;
-
-{***************************************************************************}
-Procedure TAlMongoDBClient.DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
+{*************************************************************************}
+Procedure TAlMongoDBClient.DeleteData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                            // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                            // foo and the collection bar, the full collection name is foo.bar
+                                      const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
+                                                                  // The selector will contain one or more elements, all of which must match for a document
+                                                                  // to be removed from the collection
+                                      flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
                                       var NumberOfDocumentsRemoved: integer);
 Var aFlags: integer;
     aStopWatch: TStopWatch;
@@ -2872,60 +2622,62 @@ begin
   //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
   //1-31	     Reserved	      Must be set to 0.
   aFlags := 0;
-  if Query.flags.SingleRemove then aFlags := aFlags or (1 shl 0);
+  if dfSingleRemove in flags then aFlags := aFlags or (1 shl 0);
 
   OP_DELETE(fSocketDescriptor,
             aflags,
-            Query.FullCollectionName,
-            Query.selector,
+            FullCollectionName,
+            selector,
             NumberOfDocumentsRemoved);
 
   //do the OnDeleteDataDone
   aStopWatch.Stop;
-  OnDeleteDataDone(Query,
+  OnDeleteDataDone(FullCollectionName,
+                   selector,
+                   flags,
                    aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
-{****************************************************************************}
-Procedure TAlMongoDBClient.DeleteData(Query: TALMongoDBClientDeleteDataQUERY);
-var aNumberOfDocumentsRemoved: integer;
-begin
-  DeleteData(Query, aNumberOfDocumentsRemoved);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.DeleteData(FullCollectionName: AnsiString;
-                                      Selector: AnsiString;
-                                      SingleRemove: Boolean;
-                                      var NumberOfDocumentsRemoved: integer);
-var aQuery: TALMongoDBClientDeleteDataQUERY;
-begin
-  aQuery := TALMongoDBClientDeleteDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.selector := Selector;
-  aQuery.flags.SingleRemove := SingleRemove;
-  DeleteData(aQuery, NumberOfDocumentsRemoved);
-end;
-
-{*******************************************************************}
-Procedure TAlMongoDBClient.DeleteData(FullCollectionName: AnsiString;
-                                      Selector: AnsiString;
-                                      SingleRemove: Boolean);
+{*************************************************************************}
+Procedure TAlMongoDBClient.DeleteData(const FullCollectionName: AnsiString;
+                                      const Selector: AnsiString;
+                                      flags: TALMongoDBClientDeleteDataFlags);
 var aNumberOfDocumentsRemoved: integer;
 begin
   DeleteData(FullCollectionName,
-             Selector,
-             SingleRemove,
+             selector,
+             flags,
              aNumberOfDocumentsRemoved);
 end;
 
-{*****************************************************************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+{********************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                                   // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                                   // foo and the collection bar, the full collection name is foo.bar
+                                             const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
+                                                                      // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
+                                                                      // one document to modify.
+                                             const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
+                                                                     // documents. findAndModify modifies the first document in the sort order specified by this argument.
+                                             remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
+                                                              // Set this to true to remove the selected document . The default is false.
+                                             const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
+                                                                       // The update field employs the same update operators or field: value specifications to modify the selected document.
+                                             new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
+                                                           // ignores the new option for remove operations. The default is false.
+                                             const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
+                                                                                     // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
+                                             InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
+                                                                         // creates a new document if no document matches the query, or if documents match the query,
+                                                                         // findAndModify performs an update. The default is false.
+                                             const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                             const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
                                              JSONDATA: TALJSONNode;
                                              var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                              var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                              var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
+
 Var aStopWatch: TStopWatch;
     aDatabaseName: AnsiString;
     aCollectionName: AnsiString;
@@ -2943,6 +2695,7 @@ Var aStopWatch: TStopWatch;
     aNode2: TALJSONNode;
     alastErrorObjectNode: TALJSONNode;
     P1: integer;
+
 begin
 
   //Error if we are not connected
@@ -2956,20 +2709,20 @@ begin
   try
 
     //init aDatabaseName and aCollectionName
-    P1 := AlPos('.',Query.FullCollectionName);
+    P1 := AlPos('.',FullCollectionName);
     if P1 <= 0 then raise Exception.Create('The full collection name must be the concatenation of the database name with the collection name');
-    aDatabaseName := ALCopyStr(Query.FullCollectionName, 1, P1-1);
-    aCollectionName := ALCopyStr(Query.FullCollectionName, P1+1, maxint);
+    aDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
+    aCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
 
     //buid the query
     aTmpQuery := '{"findAndModify":' + ALJsonEncodeWithNodeSubTypeHelperFunction(aCollectionName,nstText,ALdefaultformatsettings);
-    if Query.query <> '' then aTmpQuery := aTmpQuery + ',"query":'+Query.query;
-    if Query.sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+Query.sort;
-    aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.remove),nstBoolean,ALdefaultformatsettings);
-    if Query.update <> '' then aTmpQuery := aTmpQuery + ',"update":'+Query.update;
-    aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.new),nstBoolean,ALdefaultformatsettings);
-    if Query.ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+Query.ReturnFieldsSelector;
-    aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
+    if query <> '' then aTmpQuery := aTmpQuery + ',"query":'+query;
+    if sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+sort;
+    aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(remove),nstBoolean,ALdefaultformatsettings);
+    if update <> '' then aTmpQuery := aTmpQuery + ',"update":'+update;
+    aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(new),nstBoolean,ALdefaultformatsettings);
+    if ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+ReturnFieldsSelector;
+    aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
     aTmpQuery := aTmpQuery + '}';
 
     //do the First query
@@ -3022,7 +2775,7 @@ begin
       aJSONDoc.Options := [doNodeAutoCreate];
 
       //init the aViewRec
-      if (Query.ViewTag <> '') then aViewRec := JSONdata.AddChild(Query.ViewTag, ntobject)
+      if (ViewTag <> '') then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
       else aViewRec := JSONdata;
 
       //check error
@@ -3037,12 +2790,12 @@ begin
       if assigned(aNode1) and (aNode1.NodeType = ntObject) then begin
 
         //init aUpdateRowTagByFieldValue and aTmpRowTag
-        if AlPos('&>',Query.RowTag) = 1 then begin
-          aTmpRowTag := AlcopyStr(Query.RowTag, 3, maxint);
+        if AlPos('&>',RowTag) = 1 then begin
+          aTmpRowTag := AlcopyStr(RowTag, 3, maxint);
           aUpdateRowTagByFieldValue := aTmpRowTag <> '';
         end
         else begin
-          aTmpRowTag := Query.RowTag;
+          aTmpRowTag := RowTag;
           aUpdateRowTagByFieldValue := False;
         end;
 
@@ -3100,64 +2853,59 @@ begin
 
   //do the OnDeleteDataDone
   aStopWatch.Stop;
-  OnFindAndModifyDataDone(Query,
+  OnFindAndModifyDataDone(FullCollectionName,
+                          query,
+                          sort,
+                          remove,
+                          update,
+                          new,
+                          ReturnFieldsSelector,
+                          InsertIfNotFound,
+                          RowTag,
+                          ViewTag,
                           aStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
-{*****************************************************************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
-                                             JSONDATA: TALJSONNode);
-var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-begin
-  FindAndModifyData(Query,
-                    JSONDATA,
-                    aNumberOfDocumentsUpdatedOrRemoved,
-                    aupdatedExisting,
-                    aObjectID);
-end;
 
-{**************************************************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(FullCollectionName: AnsiString;
-                                             query: AnsiString;
-                                             sort: AnsiString;
+{********************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(const FullCollectionName: AnsiString;
+                                             const query: AnsiString;
+                                             const sort: AnsiString;
                                              remove: boolean;
-                                             update: AnsiString;
+                                             const update: AnsiString;
                                              new: boolean;
-                                             ReturnFieldsSelector: AnsiString;
+                                             const ReturnFieldsSelector: AnsiString;
                                              InsertIfNotFound: boolean;
                                              JSONDATA: TALJSONNode;
                                              var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                              var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                              var ObjectID: AnsiString); // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-var aQuery: TALMongoDBClientFindAndModifyDataQUERY;
 begin
-  aQuery := TALMongoDBClientFindAndModifyDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.query := query;
-  aQuery.sort := sort;
-  aQuery.remove := remove;
-  aQuery.update := update;
-  aQuery.new := new;
-  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
-  aQuery.InsertIfNotFound := InsertIfNotFound;
-  FindAndModifyData(aQuery,
+  FindAndModifyData(FullCollectionName,
+                    query,
+                    sort,
+                    remove,
+                    update,
+                    new,
+                    ReturnFieldsSelector,
+                    InsertIfNotFound,
+                    '', // RowTag,
+                    '', // ViewTag,
                     JSONDATA,
                     NumberOfDocumentsUpdatedOrRemoved,
                     updatedExisting,
                     ObjectID);
 end;
 
-{**************************************************************************}
-Procedure TAlMongoDBClient.FindAndModifyData(FullCollectionName: AnsiString;
-                                             query: AnsiString;
-                                             sort: AnsiString;
+{********************************************************************************}
+Procedure TAlMongoDBClient.FindAndModifyData(const FullCollectionName: AnsiString;
+                                             const query: AnsiString;
+                                             const sort: AnsiString;
                                              remove: boolean;
-                                             update: AnsiString;
+                                             const update: AnsiString;
                                              new: boolean;
-                                             ReturnFieldsSelector: AnsiString;
+                                             const ReturnFieldsSelector: AnsiString;
                                              InsertIfNotFound: boolean;
                                              JSONDATA: TALJSONNode);
 var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
@@ -3172,6 +2920,8 @@ begin
                     new,
                     ReturnFieldsSelector,
                     InsertIfNotFound,
+                    '', // RowTag,
+                    '', // ViewTag,
                     JSONDATA,
                     aNumberOfDocumentsUpdatedOrRemoved,
                     aupdatedExisting,
@@ -3228,8 +2978,7 @@ end;
 
 {*****************************************************************}
 function TAlMongoDBConnectionPoolClient.AcquireConnection: TSocket;
-Var aConnectionPoolContainer: TAlMongoDBConnectionPoolContainer;
-    aTickCount: int64;
+Var aTickCount: int64;
 Begin
 
   //synchronize the code
@@ -3242,16 +2991,23 @@ Begin
     //delete the old unused connection
     aTickCount := ALGetTickCount64;
     if aTickCount - fLastConnectionGarbage > (60000 {every minutes})  then begin
-      while FConnectionPool.Count > 0 do begin
-        aConnectionPoolContainer := TAlMongoDBConnectionPoolContainer(FConnectionPool[0]);
-        if aTickCount - aConnectionPoolContainer.Lastaccessdate > FConnectionMaxIdleTime then begin
+      while FConnectionPoolCount > 0 do begin
+        if aTickCount - FConnectionPool[0].Lastaccessdate > FConnectionMaxIdleTime then begin
+
           Try
-            DoDisconnect(aConnectionPoolContainer.SocketDescriptor);
+            DoDisconnect(FConnectionPool[0].SocketDescriptor);
           Except
             //Disconnect must be a "safe" procedure because it's mostly called in
             //finalization part of the code that it is not protected
           End;
-          FConnectionPool.Delete(0); // must be delete here because FConnectionPool free the object also
+
+          Dec(FConnectionPoolCount);
+          if  FConnectionPoolCount > 0 then
+          begin
+            System.Move(FConnectionPool[1], FConnectionPool[0],
+              (FConnectionPoolCount) * SizeOf(TAlMongoDBConnectionPoolContainer));
+          end;
+
         end
         else break;
       end;
@@ -3259,21 +3015,14 @@ Begin
     end;
 
     //acquire the new connection from the pool
-    If FConnectionPool.Count > 0 then begin
-      aConnectionPoolContainer := TAlMongoDBConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
-      Result := aConnectionPoolContainer.SocketDescriptor;
-      FConnectionPool.Delete(FConnectionPool.count - 1);
+    If FConnectionPoolCount > 0 then begin
+      Result := FConnectionPool[FConnectionPoolCount - 1].SocketDescriptor;
+      Dec(FConnectionPoolCount);
     end
 
-    //create a new connection
+    //ask to create a new connection
     else begin
-      Doconnect(result,
-                fHost,//aHost,
-                fPort,//APort,
-                fSendTimeout,
-                fReceiveTimeout,
-                fKeepAlive,
-                fTCPNoDelay);
+      result := INVALID_SOCKET;
     end;
 
     //increase the connection count
@@ -3284,12 +3033,29 @@ Begin
     FConnectionPoolCS.Release;
   end;
 
+  //create a new connection if pool was empty
+  if result = INVALID_SOCKET then begin
+    try
+      Doconnect(result,
+                fHost,//aHost,
+                fPort,//APort,
+                fSendTimeout,
+                fReceiveTimeout,
+                fKeepAlive,
+                fTCPNoDelay);
+    except
+      FConnectionPoolCS.Acquire;
+      dec(FWorkingConnectionCount);
+      FConnectionPoolCS.Release;
+      raise;
+    end;
+  end;
+
 End;
 
 {***************************************************************************************}
 procedure TAlMongoDBConnectionPoolClient.ReleaseConnection(var SocketDescriptor: TSocket;
                                                            const CloseConnection: Boolean = False);
-Var aConnectionPoolContainer: TAlMongoDBConnectionPoolContainer;
 begin
 
   //security check
@@ -3301,10 +3067,15 @@ begin
 
     //add the connection to the pool
     If (not CloseConnection) and (not FReleasingAllconnections) then begin
-      aConnectionPoolContainer := TAlMongoDBConnectionPoolContainer.Create;
-      aConnectionPoolContainer.SocketDescriptor := SocketDescriptor;
-      aConnectionPoolContainer.LastAccessDate := ALGetTickCount64;
-      FConnectionPool.add(aConnectionPoolContainer);
+      if FConnectionPoolCount = FConnectionPoolCapacity then begin
+        if FConnectionPoolCapacity > 64 then FConnectionPoolCapacity := FConnectionPoolCapacity + (FConnectionPoolCapacity div 4) else
+          if FConnectionPoolCapacity > 8 then FConnectionPoolCapacity := FConnectionPoolCapacity + 16 else
+            FConnectionPoolCapacity := FConnectionPoolCapacity + 4;
+        SetLength(FConnectionPool, FConnectionPoolCapacity);
+      end;
+      FConnectionPool[FConnectionPoolCount].SocketDescriptor := SocketDescriptor;
+      FConnectionPool[FConnectionPoolCount].LastAccessDate := ALGetTickCount64;
+      Inc(FConnectionPoolCount);
     end
 
     //close the connection
@@ -3335,7 +3106,9 @@ begin
   inherited create;
   fHost:= aHost;
   fPort:= APort;
-  FConnectionPool:= TObjectList.Create(True);
+  setlength(FConnectionPool,0);
+  FConnectionPoolCount := 0;
+  FConnectionPoolCapacity := 0;
   FConnectionPoolCS:= TCriticalSection.create;
   FWorkingConnectionCount:= 0;
   FReleasingAllconnections := False;
@@ -3347,14 +3120,12 @@ end;
 destructor TAlMongoDBConnectionPoolClient.Destroy;
 begin
   ReleaseAllConnections;
-  FConnectionPool.free;
   FConnectionPoolCS.free;
   inherited;
 end;
 
 {***********************************************************************************************************}
 procedure TAlMongoDBConnectionPoolClient.ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True);
-Var aConnectionPoolContainer: TAlMongoDBConnectionPoolContainer;
 begin
 
   {we do this to forbid any new thread to create a new transaction}
@@ -3376,15 +3147,14 @@ begin
     {free all database}
     FConnectionPoolCS.Acquire;
     Try
-      while FConnectionPool.Count > 0 do begin
-        aConnectionPoolContainer := TAlMongoDBConnectionPoolContainer(FConnectionPool[FConnectionPool.count - 1]);
+      while FConnectionPoolCount > 0 do begin
         Try
-          DoDisconnect(aConnectionPoolContainer.SocketDescriptor);
+          DoDisconnect(FConnectionPool[FConnectionPoolcount - 1].SocketDescriptor);
         Except
           //Disconnect must be a "safe" procedure because it's mostly called in
           //finalization part of the code that it is not protected
         End;
-        FConnectionPool.Delete(FConnectionPool.count - 1); // must be delete here because FConnectionPool free the object also
+        Dec(FConnectionPoolCount);
       end;
       FLastConnectionGarbage := ALGetTickCount64;
     finally
@@ -3398,15 +3168,31 @@ begin
 
 end;
 
-{*********************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                                          // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                                          // foo and the collection bar, the full collection name is foo.bar
+                                                    const Query: AnsiString; // BSON document that represents the query. The query will contain one or more elements,
+                                                                             // all of which must match for a document to be included in the result set. Possible elements
+                                                                             // include $query, $orderby, $hint, $explain, and $snapshot.
+                                                    const ReturnFieldsSelector: AnsiString; // Optional. BSON document that limits the fields in the returned documents.
+                                                                                            // The returnFieldsSelector contains one or more elements, each of which is the name
+                                                                                            // of a field that should be returned, and and the integer value 1. In JSON notation,
+                                                                                            // a returnFieldsSelector to limit to the fields a, b and c would be:
+                                                                                            // { a : 1, b : 1, c : 1}
+                                                    flags: TALMongoDBClientSelectDataFlags; // Options (see TALMongoDBClientSelectDataFlags)
+                                                    const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                                    const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
+                                                    Skip: integer; // Sets the number of documents to omit
+                                                    First: Integer; // Limits the number of documents to retrieve
+                                                    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                                                             // cache or not. Values <= 0 deactivate the cache
                                                     JSONDATA: TALJSONNode;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 
-Var aQueriesIndex: integer;
-    aViewRec: TalJSONNode;
+Var aViewRec: TalJSONNode;
     aJSONDocument: TalJSONDocument;
     aResponseFlags: integer;
     aCursorID: int64;
@@ -3422,9 +3208,6 @@ Var aQueriesIndex: integer;
     aCacheStr: ansiString;
 
 begin
-
-  //exit if no query
-  if length(Queries) = 0 then Exit;
 
   //acquire a connection
   if ConnectionSocket = INVALID_SOCKET then begin
@@ -3453,166 +3236,168 @@ begin
       //init the TstopWatch
       aStopWatch := TstopWatch.Create;
 
-      //loop on all the Queries
-      For aQueriesIndex := 0 to length(Queries) - 1 do begin
+      //Handle the CacheThreshold
+      aCacheKey := '';
+      If (CacheThreshold > 0) and
+         (not assigned(aJSONDocument)) and
+         (not (sfTailMonitoring in flags)) and
+         ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
+          (ViewTag <> '')) then begin
 
-        //Handle the CacheThreshold
-        aCacheKey := '';
-        If (Queries[aQueriesIndex].CacheThreshold > 0) and
-           (not assigned(aJSONDocument)) and
-           (not Queries[aQueriesIndex].flags.TailMonitoring) and
-           (((length(Queries) = 1) and
-             (JSONDATA.ChildNodes.Count = 0)) or  // else the save will not work
-            (Queries[aQueriesIndex].ViewTag <> '')) then begin
+        //try to load from from cache
+        aCacheKey := ALStringHashSHA1(RowTag + '#' +
+                                      alinttostr(Skip) + '#' +
+                                      alinttostr(First) + '#' +
+                                      FullCollectionName + '#' +
+                                      ReturnFieldsSelector + '#' +
+                                      Query);
 
-          //try to load from from cache
-          aCacheKey := ALStringHashSHA1(Queries[aQueriesIndex].RowTag + '#' +
-                                        alinttostr(Queries[aQueriesIndex].Skip) + '#' +
-                                        alinttostr(Queries[aQueriesIndex].First) + '#' +
-                                        Queries[aQueriesIndex].FullCollectionName + '#' +
-                                        Queries[aQueriesIndex].ReturnFieldsSelector + '#' +
-                                        Queries[aQueriesIndex].Query);
+        if loadcachedData(aCacheKey, aCacheStr) then begin
 
-          if loadcachedData(aCacheKey, aCacheStr) then begin
+          //init the aViewRec
+          if (ViewTag <> '') then aViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+          else aViewRec := JSONDATA;
 
-            //init the aViewRec
-            if (Queries[aQueriesIndex].ViewTag <> '') then aViewRec := JSONDATA.AddChild(Queries[aQueriesIndex].ViewTag, ntobject)
-            else aViewRec := JSONDATA;
+          //assign the tmp data to the XMLData
+          aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
 
-            //assign the tmp data to the XMLData
-            aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
-
-            //go to the next loop
-            continue;
-
-          end;
+          //exit
+          exit;
 
         end;
 
-        //start the TstopWatch
-        aStopWatch.Reset;
-        aStopWatch.Start;
+      end;
 
-        //build the flag integer
-        //bit num	   name	            description
-        //0	         Reserved	        Must be set to 0.
-        //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
-        //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
-        //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
-        //                            it references were deleted.
-        //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
-        //3	         OplogReplay	    Internal replication use only - driver should not set
-        //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
-        //                            option to prevent that.
-        //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
-        //                            timeout period, we do return as normal.
-        //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
-        //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
-        //                            the data unless it closes the connection.
-        //                            Caveats:
-        //                            * Exhaust and limit are not compatible.
-        //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
-        //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
-        //                              without being completely iterated the underlying socket connection will be closed and discarded
-        //                              without being returned to the connection pool.
-        //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
-        //                              you must completely iterate the Cursor before executing any other operation.
-        //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
-        //                            Mostly because Exhaust is not compatible with mongos we will not use it
-        //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
-        //8-31	     Reserved	        Must be set to 0.
-        aFlags := 0;
-        if Queries[aQueriesIndex].flags.TailMonitoring then
-          raise EAlMongoDBClientException.Create('Tail monitoring work only with TAlMongoDBClient', 0 {aErrorCode}, false {aCloseConnection});
-        if Queries[aQueriesIndex].flags.SlaveOk then aFlags := aFlags or (1 shl 2);
-        if Queries[aQueriesIndex].flags.NoCursorTimeout then aFlags := aFlags or (1 shl 4);
-        if Queries[aQueriesIndex].flags.Partial then aFlags := aFlags or (1 shl 7);
+      //start the TstopWatch
+      aStopWatch.Reset;
+      aStopWatch.Start;
 
-        //init the aViewRec
-        if (Queries[aQueriesIndex].ViewTag <> '') and (not assigned(aJSONDocument)) then aViewRec := JSONdata.AddChild(Queries[aQueriesIndex].ViewTag, ntobject)
-        else aViewRec := JSONdata;
+      //build the flag integer
+      //bit num	   name	            description
+      //0	         Reserved	        Must be set to 0.
+      //1	         TailableCursor	  Tailable means cursor is not closed when the last data is retrieved. Rather, the cursor marks the final object’s
+      //                            position. You can resume using the cursor later, from where it was located, if more data were received. Like any
+      //                            “latent cursor”, the cursor may become invalid at some point (CursorNotFound) – for example if the final object
+      //                            it references were deleted.
+      //2	         SlaveOk	        Allow query of replica slave. Normally these return an error except for namespace “local”.
+      //3	         OplogReplay	    Internal replication use only - driver should not set
+      //4	         NoCursorTimeout	The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use. Set this
+      //                            option to prevent that.
+      //5	         AwaitData	      Use with TailableCursor. If we are at the end of the data, block for a while rather than returning no data. After a
+      //                            timeout period, we do return as normal.
+      //6	         Exhaust	        Stream the data down full blast in multiple “more” packages, on the assumption that the client will fully read all data queried.
+      //                            Faster when you are pulling a lot of data and know you want to pull it all down. Note: the client is not allowed to not read all
+      //                            the data unless it closes the connection.
+      //                            Caveats:
+      //                            * Exhaust and limit are not compatible.
+      //                            * Exhaust cursors are not supported by mongos and can not be used with a sharded cluster.
+      //                            * Exhaust cursors require an exclusive socket connection to MongoDB. If the Cursor is discarded
+      //                              without being completely iterated the underlying socket connection will be closed and discarded
+      //                              without being returned to the connection pool.
+      //                            * If you create an exhaust cursor in a request (http://api.mongodb.org/python/current/examples/requests.html),
+      //                              you must completely iterate the Cursor before executing any other operation.
+      //                            * The per-query network_timeout option is ignored when using an exhaust cursor.
+      //                            Mostly because Exhaust is not compatible with mongos we will not use it
+      //7	         Partial	        Get partial results from a mongos if some shards are down (instead of throwing an error)
+      //8-31	     Reserved	        Must be set to 0.
+      aFlags := 0;
+      if sfTailMonitoring in flags then
+        raise EAlMongoDBClientException.Create('Tail monitoring work only with TAlMongoDBClient', 0 {aErrorCode}, false {aCloseConnection});
+      if sfSlaveOk in flags then aFlags := aFlags or (1 shl 2);
+      if sfNoCursorTimeout in flags then aFlags := aFlags or (1 shl 4);
+      if sfPartial in flags then aFlags := aFlags or (1 shl 7);
+
+      //init the aViewRec
+      if (ViewTag <> '') and (not assigned(aJSONDocument)) then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
+      else aViewRec := JSONdata;
+
+      //init aRecAdded
+      aRecAdded := 0;
+
+      //do the First query
+      aContinue := true;
+      OP_QUERY(aTMPConnectionSocket,
+               aFlags,
+               fullCollectionName,
+               ALIfThen(Skip >= 0, Skip, 0),
+               ALIfThen(First >= 0, First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
+                                               // the maximum BSON document size. For most queries, the first batch returns 101
+                                               // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
+                                               // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
+               query,
+               ReturnFieldsSelector,
+               aResponseFlags,
+               aCursorID,
+               aStartingFrom, // where in the cursor this reply is starting
+               aNumberReturned, // number of documents in the reply
+               aViewRec,
+               OnNewRowFunct,
+               ExtData,
+               RowTag,
+               ViewTag,
+               aContinue);
+
+      try
 
         //init aRecAdded
-        aRecAdded := 0;
+        aRecAdded := aRecAdded + aNumberReturned;
 
-        //do the First query
-        aContinue := true;
-        OP_QUERY(aTMPConnectionSocket,
-                 aFlags,
-                 Queries[aQueriesIndex].fullCollectionName,
-                 ALIfThen(Queries[aQueriesIndex].Skip >= 0, Queries[aQueriesIndex].Skip, 0),
-                 ALIfThen(Queries[aQueriesIndex].First >= 0, Queries[aQueriesIndex].First, 0), // The MongoDB server returns the query results in batches. Batch size will not exceed
-                                                                                         // the maximum BSON document size. For most queries, the first batch returns 101
-                                                                                         // documents or just enough documents to exceed 1 megabyte. Subsequent batch size is
-                                                                                         // 4 megabytes. To override the default size of the batch, see batchSize() and limit().
-                 Queries[aQueriesIndex].query,
-                 Queries[aQueriesIndex].ReturnFieldsSelector,
-                 aResponseFlags,
-                 aCursorID,
-                 aStartingFrom, // where in the cursor this reply is starting
-                 aNumberReturned, // number of documents in the reply
-                 aViewRec,
-                 OnNewRowFunct,
-                 ExtData,
-                 Queries[aQueriesIndex].RowTag,
-                 Queries[aQueriesIndex].ViewTag,
-                 aContinue);
+        //loop still the cursorID > 0
+        while (aContinue) and
+              (aCursorID <> 0) and
+              ((First <= 0) or
+               (aRecAdded < First)) do begin
 
-        try
+          //Get more data
+          OP_GET_MORE(aTMPConnectionSocket,
+                      fullCollectionName,
+                      ALIfThen(First > 0, First - aRecAdded, 0),
+                      aCursorID,
+                      aResponseFlags,
+                      aStartingFrom,
+                      anumberReturned,
+                      aViewRec,
+                      OnNewRowFunct,
+                      ExtData,
+                      RowTag,
+                      ViewTag,
+                      aContinue);
 
           //init aRecAdded
           aRecAdded := aRecAdded + aNumberReturned;
 
-          //loop still the cursorID > 0
-          while (aContinue) and
-                (aCursorID <> 0) and
-                ((Queries[aQueriesIndex].First <= 0) or
-                 (aRecAdded < Queries[aQueriesIndex].First)) do begin
-
-            //Get more data
-            OP_GET_MORE(aTMPConnectionSocket,
-                        Queries[aQueriesIndex].fullCollectionName,
-                        ALIfThen(Queries[aQueriesIndex].First > 0, Queries[aQueriesIndex].First - aRecAdded, 0),
-                        aCursorID,
-                        aResponseFlags,
-                        aStartingFrom,
-                        anumberReturned,
-                        aViewRec,
-                        OnNewRowFunct,
-                        ExtData,
-                        Queries[aQueriesIndex].RowTag,
-                        Queries[aQueriesIndex].ViewTag,
-                        aContinue);
-
-            //init aRecAdded
-            aRecAdded := aRecAdded + aNumberReturned;
-
-          end;
-
-        finally
-
-          //close the curson
-          if aCursorId <> 0 then OP_KILL_CURSORS(aTMPConnectionSocket, [aCursorID]);
-
         end;
 
-        //do the OnSelectDataDone
-        aStopWatch.Stop;
-        OnSelectDataDone(Queries[aQueriesIndex],
-                         aStopWatch.Elapsed.TotalMilliseconds);
+      finally
 
-        //save to the cache
-        If aCacheKey <> '' then begin
+        //close the curson
+        if aCursorId <> 0 then OP_KILL_CURSORS(aTMPConnectionSocket, [aCursorID]);
 
-          //save the data
-          aViewRec.SaveToJSON(aCacheStr);
-          SaveDataToCache(aCacheKey,
-                          Queries[aQueriesIndex].CacheThreshold,
-                          aCacheStr);
+      end;
 
-        end;
+      //do the OnSelectDataDone
+      aStopWatch.Stop;
+      OnSelectDataDone(FullCollectionName,
+                       Query,
+                       ReturnFieldsSelector,
+                       flags,
+                       RowTag,
+                       ViewTag,
+                       Skip,
+                       First,
+                       CacheThreshold,
+                       aStopWatch.Elapsed.TotalMilliseconds);
 
-      End;
+      //save to the cache
+      If aCacheKey <> '' then begin
+
+        //save the data
+        aViewRec.SaveToJSON(aCacheStr);
+        SaveDataToCache(aCacheKey,
+                        CacheThreshold,
+                        aCacheStr);
+
+      end;
 
     Finally
       if assigned(aJSONDocument) then aJSONDocument.free;
@@ -3632,52 +3417,13 @@ begin
 
 end;
 
-{*****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                                                    OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                                    ExtData: Pointer;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aSelectDataQueries: TALMongoDBClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQueries,1);
-  aSelectDataQueries[0] := Query;
-  SelectData(aSelectDataQueries,
-             nil, // JSONDATA
-             OnNewRowFunct,
-             ExtData,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiString;
-                                                    Query: AnsiString;
-                                                    ReturnFieldsSelector: AnsiString;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    flags: TALMongoDBClientSelectDataFlags;
                                                     Skip: integer;
                                                     First: Integer;
-                                                    NoCursorTimeout: Boolean;
-                                                    OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-                                                    ExtData: Pointer;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aQuery: TALMongoDBClientSelectDataQUERY;
-begin
-  aQuery := TALMongoDBClientSelectDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.Query := Query;
-  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
-  aQuery.Skip := Skip;
-  aQuery.First := First;
-  aQuery.flags.NoCursorTimeout := NoCursorTimeout;
-  SelectData(aQuery,
-             OnNewRowFunct,
-             ExtData,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiString;
-                                                    Query: AnsiString;
-                                                    ReturnFieldsSelector: AnsiString;
-                                                    NoCursorTimeout: Boolean;
                                                     OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
                                                     ExtData: Pointer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
@@ -3685,177 +3431,123 @@ begin
   SelectData(FullCollectionName,
              Query,
              ReturnFieldsSelector,
-             0, // skip
-             0, // first
-             NoCursorTimeout,
-             OnNewRowFunct,
-             ExtData,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(Queries: TALMongoDBClientSelectDataQUERIES;
-                                                    JSONDATA: TALJSONNode;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(Queries,
-             JSONDATA,
-             nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-             nil, // ExtData: Pointer
-             ConnectionSocket);
-end;
-
-{*****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(Query: TALMongoDBClientSelectDataQUERY;
-                                                    JSONDATA: TALJSONNode;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aSelectDataQueries: TALMongoDBClientSelectDataQUERIES;
-begin
-  setlength(aSelectDataQueries,1);
-  aSelectDataQueries[0] := Query;
-  SelectData(aSelectDataQueries,
-             JSONDATA,
-             nil, // OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
-             nil, // ExtData: Pointer
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiString;
-                                                    Query: AnsiString;
-                                                    ReturnFieldsSelector: AnsiString;
-                                                    RowTag: AnsiString;
-                                                    Skip: integer;
-                                                    First: Integer;
-                                                    JSONDATA: TALJSONNode;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aQuery: TALMongoDBClientSelectDataQUERY;
-begin
-  aQuery := TALMongoDBClientSelectDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.Query := Query;
-  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
-  aQuery.RowTag := RowTag;
-  aQuery.Skip := Skip;
-  aQuery.First := First;
-  SelectData(aQuery,
-             JSONDATA,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiString;
-                                                    Query: AnsiString;
-                                                    ReturnFieldsSelector: AnsiString;
-                                                    RowTag: AnsiString;
-                                                    JSONDATA: TALJSONNode;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(FullCollectionName,
-             Query,
-             ReturnFieldsSelector,
-             RowTag,
-             0, // Skip
-             0, //First
-             JSONDATA,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.SelectData(FullCollectionName: AnsiString;
-                                                    Query: AnsiString;
-                                                    ReturnFieldsSelector: AnsiString;
-                                                    JSONDATA: TALJSONNode;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-begin
-  SelectData(FullCollectionName,
-             Query,
-             ReturnFieldsSelector,
+             flags,
              '', // RowTag,
-             0, // Skip
-             0, //First
-             JSONDATA,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewRowFunct,
+             ExtData,
              ConnectionSocket);
 end;
 
-{*********************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.UpdateData(Queries: TALMongoDBClientUpdateDataQUERIES;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    flags: TALMongoDBClientSelectDataFlags;
+                                                    OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                                                    ExtData: Pointer;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-Var aQueriesIndex: integer;
-    aFlags: integer;
-    aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
 begin
-
-  //exit if no query
-  if length(Queries) = 0 then Exit;
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
-  end
-  else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
-
-    //loop on all the Queries
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
-
-      //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
-
-      //bit num	  name	        description
-      //0	        Upsert	      If set, the database will insert the supplied object into the collection if no matching document is found.
-      //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
-      //2-31    	Reserved	    Must be set to 0.
-      aFlags := 0;
-      if Queries[aQueriesIndex].flags.Upsert then aFlags := aFlags or (1 shl 0);
-      if Queries[aQueriesIndex].flags.MultiUpdate then aFlags := aFlags or (1 shl 1);
-
-      OP_UPDATE(aTMPConnectionSocket,
-                aflags,
-                Queries[aQueriesIndex].FullCollectionName,
-                Queries[aQueriesIndex].selector,
-                Queries[aQueriesIndex].Update,
-                aNumberOfDocumentsUpdated,
-                aupdatedExisting,
-                aObjectID);
-
-      //do the OnUpdateDataDone
-      aStopWatch.Stop;
-      OnUpdateDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-
-    end;
-
-    //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
-                                               (not (E Is EAlMongoDBClientException)) or
-                                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
-  end;
-
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewRowFunct,
+             ExtData,
+             ConnectionSocket);
 end;
 
-{*****************************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    flags: TALMongoDBClientSelectDataFlags;
+                                                    const RowTag: AnsiString;
+                                                    Skip: integer;
+                                                    First: Integer;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    flags: TALMongoDBClientSelectDataFlags;
+                                                    const RowTag: AnsiString;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    flags: TALMongoDBClientSelectDataFlags;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             flags,
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                                          // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                                          // foo and the collection bar, the full collection name is foo.bar
+                                                    const selector: AnsiString; // BSON document that specifies the query for selection of the document to update.
+                                                    const update: AnsiString; // BSON document that specifies the update to be performed. For information on specifying updates see
+                                                                              // http://docs.mongodb.org/manual/tutorial/modify-documents/
+                                                    flags: TALMongoDBClientUpdateDataFlags; // Options (see TALMongoDBClientUpdateDataFlags)
                                                     var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
                                                     var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                                     var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
@@ -3886,21 +3578,24 @@ begin
     //1	        MultiUpdate	  If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
     //2-31    	Reserved	    Must be set to 0.
     aFlags := 0;
-    if Query.flags.Upsert then aFlags := aFlags or (1 shl 0);
-    if Query.flags.MultiUpdate then aFlags := aFlags or (1 shl 1);
+    if ufUpsert in flags then aFlags := aFlags or (1 shl 0);
+    if ufMultiUpdate in flags then aFlags := aFlags or (1 shl 1);
 
     OP_UPDATE(aTMPConnectionSocket,
               aflags,
-              Query.FullCollectionName,
-              Query.selector,
-              Query.Update,
+              FullCollectionName,
+              selector,
+              Update,
               NumberOfDocumentsUpdated,
               updatedExisting,
               ObjectID);
 
     //do the OnUpdateDataDone
     aStopWatch.Stop;
-    OnUpdateDataDone(Query,
+    OnUpdateDataDone(FullCollectionName,
+                     selector,
+                     update,
+                     flags,
                      aStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
@@ -3917,240 +3612,111 @@ begin
 
 end;
 
-{*****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.UpdateData(Query: TALMongoDBClientUpdateDataQUERY;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsUpdated: integer;
-    aupdatedExisting: boolean;
-    aObjectID: ansiString;
-begin
-  UpdateData(Query,
-             aNumberOfDocumentsUpdated,
-             aupdatedExisting,
-             aObjectID,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-procedure TAlMongoDBConnectionPoolClient.UpdateData(FullCollectionName: AnsiString;
-                                                    Selector: AnsiString;
-                                                    Update: AnsiString;
-                                                    InsertIfNotFound: Boolean;
-                                                    MultiUpdate: Boolean;
-                                                    var NumberOfDocumentsUpdated: integer; // reports the number of documents updated
-                                                    var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-                                                    var ObjectID: ansiString; // an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aQuery: TALMongoDBClientUpdateDataQUERY;
-begin
-  aQuery := TALMongoDBClientUpdateDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.selector := selector;
-  aQuery.update := update;
-  aQuery.flags.Upsert := InsertIfNotFound;
-  aQuery.flags.MultiUpdate := MultiUpdate;
-  UpdateData(aQuery,
-             NumberOfDocumentsUpdated,
-             updatedExisting,
-             ObjectID,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.UpdateData(FullCollectionName: AnsiString;
-                                                    Selector: AnsiString;
-                                                    Update: AnsiString;
-                                                    InsertIfNotFound: Boolean;
-                                                    MultiUpdate: Boolean;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: AnsiString;
+                                                    const Selector: AnsiString;
+                                                    const Update: AnsiString;
+                                                    flags: TALMongoDBClientUpdateDataFlags;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aNumberOfDocumentsUpdated: integer;
     aupdatedExisting: boolean;
     aObjectID: ansiString;
 begin
   UpdateData(FullCollectionName,
-             Selector,
-             Update,
-             InsertIfNotFound,
-             MultiUpdate,
+             selector,
+             update,
+             flags,
              aNumberOfDocumentsUpdated,
              aupdatedExisting,
              aObjectID,
              ConnectionSocket);
 end;
 
-{*********************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.InsertData(Queries: TALMongoDBClientInsertDataQUERIES;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                                          // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                                          // foo and the collection bar, the full collection name is foo.bar
+                                                    const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
+                                                    flags: TALMongoDBClientInsertDataFlags;// Options (see TALMongoDBClientInsertDataFlags)
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
-Var aQueriesIndex: integer;
-    aFlags: integer;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
-begin
 
-  //exit if no Query
-  if length(Queries) = 0 then Exit;
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
-  end
-  else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
-
-    //loop on all the queries
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
-
-      //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
-
-      //bit num	 name	            description
-      //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-      //                          This makes bulk insert behave similarly to a series of single inserts, except lastError will be set if
-      //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-      //                          reported by getLastError. (new in 1.9.1)
-      //1-31	   Reserved	        Must be set to 0.
-      aFlags := 0;
-      if Queries[aQueriesIndex].flags.ContinueOnError then aFlags := aFlags or (1 shl 0);
-
-      OP_INSERT(aTMPConnectionSocket,
-                aflags,
-                Queries[aQueriesIndex].FullCollectionName,
-                Queries[aQueriesIndex].documents);
-
-      //do the OnInsertDataDone
-      aStopWatch.Stop;
-      OnInsertDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-
-    end;
-
-    //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
-                                               (not (E Is EAlMongoDBClientException)) or
-                                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
-  end;
-
-end;
-
-{*****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.InsertData(Query: TALMongoDBClientInsertDataQUERY;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aInsertDataQueries: TALMongoDBClientInsertDataQUERIES;
-begin
-  setlength(aInsertDataQueries,1);
-  aInsertDataQueries[0] := Query;
-  InsertData(aInsertDataQueries,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.InsertData(FullCollectionName: AnsiString;
-                                                    Documents: AnsiString;
-                                                    ContinueOnError: Boolean;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aQuery: TALMongoDBClientInsertDataQUERY;
-begin
-  aQuery := TALMongoDBClientInsertDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.documents := Documents;
-  aQuery.flags.ContinueOnError := ContinueOnError;
-  InsertData(aQuery,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(Queries: TALMongoDBClientDeleteDataQUERIES;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-Var aQueriesIndex: integer;
-    aFlags: integer;
-    aNumberOfDocumentsRemoved: integer;
-    aTMPConnectionSocket: TSocket;
-    aOwnConnection: Boolean;
-    aStopWatch: TStopWatch;
-begin
-
-  //exit if no query
-  if length(Queries) = 0 then Exit;
-
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
-  end
-  else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
-  end;
-
-  try
-
-    //init the TstopWatch
-    aStopWatch := TstopWatch.Create;
-
-    //loop on all the Queries
-    For aQueriesIndex := 0 to length(Queries) - 1 do begin
-
-      //start the TstopWatch
-      aStopWatch.Reset;
-      aStopWatch.Start;
-
-      //bit num	   name	          description
-      //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
-      //1-31	     Reserved	      Must be set to 0.
-      aFlags := 0;
-      if Queries[aQueriesIndex].flags.SingleRemove then aFlags := aFlags or (1 shl 0);
-
-      OP_DELETE(aTMPConnectionSocket,
-                aflags,
-                Queries[aQueriesIndex].FullCollectionName,
-                Queries[aQueriesIndex].selector,
-                aNumberOfDocumentsRemoved);
-
-      //do the OnDeleteDataDone
-      aStopWatch.Stop;
-      OnDeleteDataDone(Queries[aQueriesIndex],
-                       aStopWatch.Elapsed.TotalMilliseconds);
-
-    end;
-
-    //Release the Connection
-    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
-
-  except
-    On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
-                                               (not (E Is EAlMongoDBClientException)) or
-                                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
-    end;
-  end;
-
-end;
-
-{*****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
-                                                    var NumberOfDocumentsRemoved: integer;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
 Var aFlags: integer;
     aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
     aStopWatch: TStopWatch;
+
+begin
+
+  //acquire a connection
+  if ConnectionSocket = INVALID_SOCKET then begin
+    aTMPConnectionSocket := AcquireConnection;
+    aOwnConnection := True;
+  end
+  else begin
+    aTMPConnectionSocket := ConnectionSocket;
+    aOwnConnection := False;
+  end;
+
+  try
+
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
+    //start the TstopWatch
+    aStopWatch.Reset;
+    aStopWatch.Start;
+
+    //bit num	 name	            description
+    //0	       ContinueOnError	If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
+    //                          This makes bulk insert behave similarly to a series of single inserts, except lastError will be set if
+    //                          any insert fails, not just the last one. If multiple errors occur, only the most recent will be
+    //                          reported by getLastError. (new in 1.9.1)
+    //1-31	   Reserved	        Must be set to 0.
+    aFlags := 0;
+    if ifContinueOnError in flags then aFlags := aFlags or (1 shl 0);
+
+    OP_INSERT(aTMPConnectionSocket,
+              aflags,
+              FullCollectionName,
+              documents);
+
+    //do the OnInsertDataDone
+    aStopWatch.Stop;
+    OnInsertDataDone(FullCollectionName,
+                     documents,
+                     flags,
+                     aStopWatch.Elapsed.TotalMilliseconds);
+
+    //Release the Connection
+    if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
+
+  except
+    On E: Exception do begin
+      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+                                               (not (E Is EAlMongoDBClientException)) or
+                                               (E as EAlMongoDBClientException).CloseConnection);
+      raise;
+    end;
+  end;
+
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.DeleteData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                                          // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                                          // foo and the collection bar, the full collection name is foo.bar
+                                                    const selector: AnsiString; // BSON document that represent the query used to select the documents to be removed
+                                                                                // The selector will contain one or more elements, all of which must match for a document
+                                                                                // to be removed from the collection
+                                                    flags: TALMongoDBClientDeleteDataFlags; // Options (see TALMongoDBClientDeleteDataFlags)
+                                                    var NumberOfDocumentsRemoved: integer;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+
+Var aFlags: integer;
+    aTMPConnectionSocket: TSocket;
+    aOwnConnection: Boolean;
+    aStopWatch: TStopWatch;
+
 begin
 
   //acquire a connection
@@ -4172,17 +3738,19 @@ begin
     //0	         SingleRemove	  If set, the database will remove only the first matching document in the collection. Otherwise all matching documents will be removed.
     //1-31	     Reserved	      Must be set to 0.
     aFlags := 0;
-    if Query.flags.SingleRemove then aFlags := aFlags or (1 shl 0);
+    if dfSingleRemove in flags then aFlags := aFlags or (1 shl 0);
 
     OP_DELETE(aTMPConnectionSocket,
               aflags,
-              Query.FullCollectionName,
-              Query.selector,
+              FullCollectionName,
+              selector,
               NumberOfDocumentsRemoved);
 
     //do the OnDeleteDataDone
     aStopWatch.Stop;
-    OnDeleteDataDone(Query,
+    OnDeleteDataDone(FullCollectionName,
+                     selector,
+                     flags,
                      aStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
@@ -4199,54 +3767,48 @@ begin
 
 end;
 
-{*****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(Query: TALMongoDBClientDeleteDataQUERY;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsRemoved: integer;
-begin
-  DeleteData(Query,
-             aNumberOfDocumentsRemoved,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(FullCollectionName: AnsiString;
-                                                    Selector: AnsiString;
-                                                    SingleRemove: Boolean;
-                                                    var NumberOfDocumentsRemoved: integer;
-                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aQuery: TALMongoDBClientDeleteDataQUERY;
-begin
-  aQuery := TALMongoDBClientDeleteDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.selector := Selector;
-  aQuery.flags.SingleRemove := SingleRemove;
-  DeleteData(aQuery,
-             NumberOfDocumentsRemoved,
-             ConnectionSocket);
-end;
-
-{*********************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.DeleteData(FullCollectionName: AnsiString;
-                                                    Selector: AnsiString;
-                                                    SingleRemove: Boolean;
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.DeleteData(const FullCollectionName: AnsiString;
+                                                    const Selector: AnsiString;
+                                                    flags: TALMongoDBClientDeleteDataFlags;
                                                     const ConnectionSocket: TSocket = INVALID_SOCKET);
 var aNumberOfDocumentsRemoved: integer;
 begin
   DeleteData(FullCollectionName,
-             Selector,
-             SingleRemove,
+             selector,
+             flags,
              aNumberOfDocumentsRemoved,
              ConnectionSocket);
 end;
 
-{*******************************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
+{**********************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                                                 // foo and the collection bar, the full collection name is foo.bar
+                                                           const query: AnsiString; // Optional. The selection criteria for the modification. The query field employs the same query selectors as used in the
+                                                                                    // db.collection.find() method. Although the query may match multiple documents, findAndModify will select only
+                                                                                    // one document to modify.
+                                                           const sort: AnsiString; // Optional. Determines which document the operation modifies if the query selects multiple
+                                                                                   // documents. findAndModify modifies the first document in the sort order specified by this argument.
+                                                           remove: boolean; // Must specify either the remove or the update field. Removes the document specified in the query field.
+                                                                            // Set this to true to remove the selected document . The default is false.
+                                                           const update: AnsiString; // Must specify either the remove or the update field. Performs an update of the selected document.
+                                                                                     // The update field employs the same update operators or field: value specifications to modify the selected document.
+                                                           new: boolean; // Optional. When true, returns the modified document rather than the original. The findAndModify method
+                                                                         // ignores the new option for remove operations. The default is false.
+                                                           const ReturnFieldsSelector: AnsiString; // Optional. A subset of fields to return. The fields document specifies an inclusion of a
+                                                                                                   // field with 1, as in: fields: { <field1>: 1, <field2>: 1, ... }.
+                                                           InsertIfNotFound: boolean;  // Optional. Used in conjunction with the update field. When true, findAndModify
+                                                                                       // creates a new document if no document matches the query, or if documents match the query,
+                                                                                       // findAndModify performs an update. The default is false.
+                                                           const RowTag: AnsiString; // the node name under with all the fields of a single record will be stored in the JSON/XML result document.
+                                                           const ViewTag: AnsiString; // the node name under with all records will be stored in the JSON/XML result document.
                                                            JSONDATA: TALJSONNode;
                                                            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                                            var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                                            const ConnectionSocket: TSocket = INVALID_SOCKET);
+
 Var aTMPConnectionSocket: TSocket;
     aOwnConnection: Boolean;
     aStopWatch: TStopWatch;
@@ -4266,6 +3828,7 @@ Var aTMPConnectionSocket: TSocket;
     aNode2: TALJSONNode;
     alastErrorObjectNode: TALJSONNode;
     P1: integer;
+
 begin
 
   //acquire a connection
@@ -4288,20 +3851,20 @@ begin
     try
 
       //init aDatabaseName and aCollectionName
-      P1 := AlPos('.',Query.FullCollectionName);
+      P1 := AlPos('.',FullCollectionName);
       if P1 <= 0 then raise Exception.Create('The full collection name must be the concatenation of the database name with the collection name');
-      aDatabaseName := ALCopyStr(Query.FullCollectionName, 1, P1-1);
-      aCollectionName := ALCopyStr(Query.FullCollectionName, P1+1, maxint);
+      aDatabaseName := ALCopyStr(FullCollectionName, 1, P1-1);
+      aCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
 
       //buid the query
       aTmpQuery := '{"findAndModify":' + ALJsonEncodeWithNodeSubTypeHelperFunction(aCollectionName,nstText,ALdefaultformatsettings);
-      if Query.query <> '' then aTmpQuery := aTmpQuery + ',"query":'+Query.query;
-      if Query.sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+Query.sort;
-      aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.remove),nstBoolean,ALdefaultformatsettings);
-      if Query.update <> '' then aTmpQuery := aTmpQuery + ',"update":'+Query.update;
-      aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.new),nstBoolean,ALdefaultformatsettings);
-      if Query.ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+Query.ReturnFieldsSelector;
-      aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(Query.InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
+      if query <> '' then aTmpQuery := aTmpQuery + ',"query":'+query;
+      if sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+sort;
+      aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(remove),nstBoolean,ALdefaultformatsettings);
+      if update <> '' then aTmpQuery := aTmpQuery + ',"update":'+update;
+      aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(new),nstBoolean,ALdefaultformatsettings);
+      if ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+ReturnFieldsSelector;
+      aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
       aTmpQuery := aTmpQuery + '}';
 
       //do the First query
@@ -4354,7 +3917,7 @@ begin
         aJSONDoc.Options := [doNodeAutoCreate];
 
         //init the aViewRec
-        if (Query.ViewTag <> '') then aViewRec := JSONdata.AddChild(Query.ViewTag, ntobject)
+        if (ViewTag <> '') then aViewRec := JSONdata.AddChild(ViewTag, ntobject)
         else aViewRec := JSONdata;
 
         //check error
@@ -4369,12 +3932,12 @@ begin
         if assigned(aNode1) and (aNode1.NodeType = ntObject) then begin
 
           //init aUpdateRowTagByFieldValue and aTmpRowTag
-          if AlPos('&>',Query.RowTag) = 1 then begin
-            aTmpRowTag := AlcopyStr(Query.RowTag, 3, maxint);
+          if AlPos('&>',RowTag) = 1 then begin
+            aTmpRowTag := AlcopyStr(RowTag, 3, maxint);
             aUpdateRowTagByFieldValue := aTmpRowTag <> '';
           end
           else begin
-            aTmpRowTag := Query.RowTag;
+            aTmpRowTag := RowTag;
             aUpdateRowTagByFieldValue := False;
           end;
 
@@ -4432,7 +3995,16 @@ begin
 
     //do the OnDeleteDataDone
     aStopWatch.Stop;
-    OnFindAndModifyDataDone(Query,
+    OnFindAndModifyDataDone(FullCollectionName,
+                            query,
+                            sort,
+                            remove,
+                            update,
+                            new,
+                            ReturnFieldsSelector,
+                            InsertIfNotFound,
+                            RowTag,
+                            ViewTag,
                             aStopWatch.Elapsed.TotalMilliseconds);
 
     //Release the Connection
@@ -4449,48 +4021,31 @@ begin
 
 end;
 
-{*******************************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(Query: TALMongoDBClientFindAndModifyDataQUERY;
-                                                           JSONDATA: TALJSONNode;
-                                                           const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aNumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
-    aupdatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
-    aObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
-begin
-  FindAndModifyData(Query,
-                    JSONDATA,
-                    aNumberOfDocumentsUpdatedOrRemoved,
-                    aupdatedExisting,
-                    aObjectID,
-                    ConnectionSocket);
-end;
-
-{****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(FullCollectionName: AnsiString;
-                                                           query: AnsiString;
-                                                           sort: AnsiString;
+{**********************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(const FullCollectionName: AnsiString;
+                                                           const query: AnsiString;
+                                                           const sort: AnsiString;
                                                            remove: boolean;
-                                                           update: AnsiString;
+                                                           const update: AnsiString;
                                                            new: boolean;
-                                                           ReturnFieldsSelector: AnsiString;
+                                                           const ReturnFieldsSelector: AnsiString;
                                                            InsertIfNotFound: boolean;
                                                            JSONDATA: TALJSONNode;
                                                            var NumberOfDocumentsUpdatedOrRemoved: integer; // reports the number of documents updated or removed
                                                            var updatedExisting: boolean; // is true when an update affects at least one document and does not result in an upsert.
                                                            var ObjectID: AnsiString; // upserted is an ObjectId that corresponds to the upserted document if the update resulted in an insert.
                                                            const ConnectionSocket: TSocket = INVALID_SOCKET);
-var aQuery: TALMongoDBClientFindAndModifyDataQUERY;
 begin
-  aQuery := TALMongoDBClientFindAndModifyDataQUERY.Create;
-  aQuery.FullCollectionName := FullCollectionName;
-  aQuery.query := query;
-  aQuery.sort := sort;
-  aQuery.remove := remove;
-  aQuery.update := update;
-  aQuery.new := new;
-  aQuery.ReturnFieldsSelector := ReturnFieldsSelector;
-  aQuery.InsertIfNotFound := InsertIfNotFound;
-  FindAndModifyData(aQuery,
+  FindAndModifyData(FullCollectionName,
+                    query,
+                    sort,
+                    remove,
+                    update,
+                    new,
+                    ReturnFieldsSelector,
+                    InsertIfNotFound,
+                    '', // RowTag,
+                    '', // ViewTag,
                     JSONDATA,
                     NumberOfDocumentsUpdatedOrRemoved,
                     updatedExisting,
@@ -4498,14 +4053,14 @@ begin
                     ConnectionSocket);
 end;
 
-{****************************************************************************************}
-Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(FullCollectionName: AnsiString;
-                                                           query: AnsiString;
-                                                           sort: AnsiString;
+{**********************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.FindAndModifyData(const FullCollectionName: AnsiString;
+                                                           const query: AnsiString;
+                                                           const sort: AnsiString;
                                                            remove: boolean;
-                                                           update: AnsiString;
+                                                           const update: AnsiString;
                                                            new: boolean;
-                                                           ReturnFieldsSelector: AnsiString;
+                                                           const ReturnFieldsSelector: AnsiString;
                                                            InsertIfNotFound: boolean;
                                                            JSONDATA: TALJSONNode;
                                                            const ConnectionSocket: TSocket = INVALID_SOCKET);
@@ -4521,6 +4076,8 @@ begin
                     new,
                     ReturnFieldsSelector,
                     InsertIfNotFound,
+                    '', // RowTag,
+                    '', // ViewTag,
                     JSONDATA,
                     aNumberOfDocumentsUpdatedOrRemoved,
                     aupdatedExisting,
@@ -4591,18 +4148,9 @@ end;
 {***********************************************}
 procedure TAlMongoDBTailMonitoringThread.Execute;
 var aExtData: Pointer;
-    aQuery: TALMongoDBClientSelectDataQUERY;
 begin
   //to be sure that the thread was stated
   fStarted := True;
-
-  //init aQuery
-  aQuery := TALMongoDBClientSelectDataQUERY.Create;
-  aQuery.FullCollectionName := fFullCollectionName;
-  aQuery.Query := fQuery;
-  aQuery.ReturnFieldsSelector := fReturnFieldsSelector;
-  aQuery.flags.TailMonitoring := True;
-  aQuery.flags.NoCursorTimeout := true; // because if the doEvent is too long then the cursor will timeout
 
   //loop still not terminated
   while not Terminated do begin
@@ -4619,9 +4167,12 @@ begin
 
       //select the data
       aExtData := nil;
-      fMongoDBClient.SelectData(aQuery,
+      fMongoDBClient.SelectData(fFullCollectionName,
+                                fQuery,
+                                fReturnFieldsSelector,
+                                [sfTailMonitoring, sfNoCursorTimeout], // sfNoCursorTimeout because if the doEvent is too long then the cursor will timeout
                                 Procedure (JSONRowData: TALJSONNode;
-                                           ViewTag: AnsiString;
+                                           const ViewTag: AnsiString;
                                            ExtData: Pointer;
                                            Var Continue: Boolean)
                                 begin

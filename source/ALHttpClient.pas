@@ -474,11 +474,11 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 Strings: TALStrings;
                                                 Decode: Boolean;
                                                 StripQuotes: Boolean = False);
-Function  AlRemoveShemeFromUrl(aUrl: AnsiString): ansiString;
-Function  AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
-Function  AlExtractHostNameFromUrl(aUrl: AnsiString): AnsiString;
-Function  AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
-Function  AlExtractUrlPathFromUrl(aUrl: AnsiString): AnsiString;
+Function  AlRemoveShemeFromUrl(const aUrl: AnsiString): ansiString;
+Function  AlExtractShemeFromUrl(const aUrl: AnsiString): TInternetScheme;
+Function  AlExtractHostNameFromUrl(const aUrl: AnsiString): AnsiString;
+Function  AlExtractDomainNameFromUrl(const aUrl: AnsiString): AnsiString;
+Function  AlExtractUrlPathFromUrl(const aUrl: AnsiString): AnsiString;
 Function  AlInternetCrackUrl(aUrl: AnsiString;
                              Var SchemeName,
                                  HostName,
@@ -487,7 +487,7 @@ Function  AlInternetCrackUrl(aUrl: AnsiString;
                                  UrlPath,
                                  ExtraInfo: AnsiString;
                              var PortNumber: integer): Boolean; overload;
-Function  AlInternetCrackUrl(aUrl: AnsiString;
+Function  AlInternetCrackUrl(const aUrl: AnsiString;
                              Var SchemeName,
                                  HostName,
                                  UserName,
@@ -534,21 +534,21 @@ function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
 
-function ALTryIPV4StrToNumeric(aIPv4Str: AnsiString; var aIPv4Num: Cardinal): Boolean;
-function ALIPV4StrToNumeric(aIPv4: AnsiString): Cardinal;
-function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
-function ALIPv4EndOfRange(aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
+function ALTryIPV4StrToNumeric(const aIPv4Str: AnsiString; var aIPv4Num: Cardinal): Boolean;
+function ALIPV4StrToNumeric(const aIPv4: AnsiString): Cardinal;
+function ALNumericToIPv4Str(const aIPv4: Cardinal): ansiString;
+function ALIPv4EndOfRange(const aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
 
 type
   TALIPv6Binary = array[1..16] of AnsiChar;
 
 function ALZeroIpV6: TALIPv6Binary;
 function ALTryIPV6StrToBinary(aIPv6Str: ansiString; var aIPv6Bin: TALIPv6Binary): Boolean;
-function ALIPV6StrTobinary(aIPv6: AnsiString): TALIPv6Binary;
-function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
-function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
-function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
-procedure ALIPv6SplitParts(aIPv6: TALIPv6Binary;
+function ALIPV6StrTobinary(const aIPv6: AnsiString): TALIPv6Binary;
+function ALBinaryToIPv6Str(const aIPv6: TALIPv6Binary): ansiString;
+function ALBinaryStrToIPv6Binary(const aIPV6BinaryStr: ansiString): TALIPv6Binary;
+function ALIPv6EndOfRange(const aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
+procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aLowestPart: UInt64;
                            var aHigestPart: UInt64);
 
@@ -769,8 +769,8 @@ Var aRawHeaderLst: TALStringList;
     j: integer;
     AStatusLine: AnsiString;
 
-  {---------------------------------------------}
-  Function AlG001(aName: AnsiString): AnsiString;
+  {---------------------------------------------------}
+  Function AlG001(const aName: AnsiString): AnsiString;
   Var i: Integer;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
@@ -1042,8 +1042,8 @@ procedure TALHTTPRequestHeader.SetRawHeaderText(const aRawHeaderText: AnsiString
 Var aRawHeaderLst: TALStringList;
     j: integer;
 
-  {---------------------------------------------}
-  Function AlG001(aName: AnsiString): AnsiString;
+  {---------------------------------------------------}
+  Function AlG001(const aName: AnsiString): AnsiString;
   Var i: Integer;
   Begin
     I := aRawHeaderLst.IndexOfName(aName);
@@ -1421,8 +1421,8 @@ Begin
   until EOS;
 end;
 
-{***********************************************************}
-Function  AlRemoveShemeFromUrl(aUrl: AnsiString): ansiString;
+{*****************************************************************}
+Function  AlRemoveShemeFromUrl(const aUrl: AnsiString): ansiString;
 Var P: integer;
 begin
   P := AlPos('://', aUrl);
@@ -1430,8 +1430,8 @@ begin
   else result := aUrl;
 end;
 
-{****************************************************************}
-Function AlExtractShemeFromUrl(aUrl: AnsiString): TInternetScheme;
+{**********************************************************************}
+Function AlExtractShemeFromUrl(const aUrl: AnsiString): TInternetScheme;
 Var SchemeName,
     HostName,
     UserName,
@@ -1456,8 +1456,8 @@ begin
   else result := INTERNET_SCHEME_UNKNOWN;
 end;
 
-{**************************************************************}
-Function AlExtractHostNameFromUrl(aUrl: AnsiString): AnsiString;
+{********************************************************************}
+Function AlExtractHostNameFromUrl(const aUrl: AnsiString): AnsiString;
 Var SchemeName,
     HostName,
     UserName,
@@ -1477,8 +1477,8 @@ begin
   else result := '';
 end;
 
-{****************************************************************}
-Function AlExtractDomainNameFromUrl(aUrl: AnsiString): AnsiString;
+{**********************************************************************}
+Function AlExtractDomainNameFromUrl(const aUrl: AnsiString): AnsiString;
 var aIPv4Num: Cardinal;
 begin
   Result := AlExtractHostNameFromUrl(aUrl);
@@ -1490,8 +1490,8 @@ begin
   end;
 end;
 
-{**************************************************************}
-Function  AlExtractUrlPathFromUrl(aUrl: AnsiString): AnsiString;
+{********************************************************************}
+Function  AlExtractUrlPathFromUrl(const aUrl: AnsiString): AnsiString;
 Var SchemeName,
     HostName,
     UserName,
@@ -1592,8 +1592,8 @@ begin
 end;
 
 
-{*******************************************}
-Function AlInternetCrackUrl(aUrl: AnsiString;
+{*************************************************}
+Function AlInternetCrackUrl(const aUrl: AnsiString;
                             Var SchemeName,
                                 HostName,
                                 UserName,
@@ -1961,8 +1961,8 @@ Begin
     raise EConvertError.CreateResFmt(@SInvalidDateTime, [S]);
 end;
 
-{************************************************************************************}
-Function ALTryIPV4StrToNumeric(aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
+{******************************************************************************************}
+Function ALTryIPV4StrToNumeric(const aIPv4Str: ansiString; var aIPv4Num: Cardinal): Boolean;
 Var P1, P2: Integer;
     I1, I2, I3, I4: integer;
 Begin
@@ -2019,14 +2019,14 @@ Begin
 
 End;
 
-{*******************************************************}
-Function ALIPV4StrToNumeric(aIPv4: ansiString): Cardinal;
+{*************************************************************}
+Function ALIPV4StrToNumeric(const aIPv4: ansiString): Cardinal;
 Begin
   if not ALTryIPV4StrToNumeric(aIPv4, Result) then Raise EALException.CreateFmt('Bad IPv4 string: %s', [aIPv4]);
 End;
 
-{*******************************************************}
-Function ALNumericToIPv4Str(aIPv4: Cardinal): ansiString;
+{*************************************************************}
+Function ALNumericToIPv4Str(const aIPv4: Cardinal): ansiString;
 Var S1, S2, S3, S4: ansiString;
 Begin
 
@@ -2053,7 +2053,7 @@ End;
  the length will be 2^(32-26) - 2 = 2^6 - 2 = 62 addresses + 1 reserved for
  the services purposes, so the last possible address in that range will be:
   1.0.1.63}
-function ALIPv4EndOfRange(aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
+function ALIPv4EndOfRange(const aStartIPv4: Cardinal; aMaskLength: integer): Cardinal;
 begin
   if (aMaskLength < 1) or
      (aMaskLength > 32) then raise Exception.CreateFmt('Wrong value for mask length IPv4: %d', [aMaskLength]);
@@ -2175,14 +2175,14 @@ begin
 
 end;
 
-{***********************************************************}
-Function ALIPV6StrTobinary(aIPv6: ansiString): TALIPv6Binary;
+{*****************************************************************}
+Function ALIPV6StrTobinary(const aIPv6: ansiString): TALIPv6Binary;
 Begin
   if not ALTryIPv6StrToBinary(aIPv6, Result) then Raise EALException.CreateFmt('Bad IPv6 string: %s', [aIPv6]);
 End;
 
-{***********************************************************}
-Function ALBinaryToIPv6Str(aIPv6: TALIPv6Binary): ansiString;
+{*****************************************************************}
+Function ALBinaryToIPv6Str(const aIPv6: TALIPv6Binary): ansiString;
 Begin
 
   Result := ALIntToHex(ord(aIPv6[1]), 2)  + ALIntToHex(ord(aIPv6[2]), 2)   + ':' +
@@ -2196,8 +2196,8 @@ Begin
 
 End;
 
-{**************************************************************************}
-Function ALBinaryStrToIPv6Binary(aIPV6BinaryStr: ansiString): TALIPv6Binary;
+{********************************************************************************}
+Function ALBinaryStrToIPv6Binary(const aIPV6BinaryStr: ansiString): TALIPv6Binary;
 Begin
 
   if length(aIPV6BinaryStr) <> 16 then Raise EALException.Create('Bad IPv6 binary string');
@@ -2237,7 +2237,7 @@ End;
 
  Setting 85 first bits of this address to 1 we will get
   2001:250:c3f:ffff:ffff:ffff:ffff:ffff}
-function ALIPv6EndOfRange(aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
+function ALIPv6EndOfRange(const aStartIPv6: TALIPv6Binary; aMaskLength: integer): TALIPv6Binary;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _setBitTo1(const aValue: byte;
@@ -2273,8 +2273,8 @@ begin
   end;
 end;
 
-{**********************************************}
-procedure ALIPv6SplitParts(aIPv6: TALIPv6Binary;
+{****************************************************}
+procedure ALIPv6SplitParts(const aIPv6: TALIPv6Binary;
                            var aLowestPart: UInt64;
                            var aHigestPart: UInt64);
 var aIntRec: Int64Rec;

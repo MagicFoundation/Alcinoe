@@ -298,9 +298,9 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: AnsiString;
-    FTotalPrepareTimeTaken: int64;
-    FTotalExecuteTimeTaken: int64;
-    FTotalCommitTimeTaken: int64;
+    FTotalPrepareTimeTaken: extended;
+    FTotalExecuteTimeTaken: extended;
+    FTotalCommitTimeTaken: extended;
     FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
@@ -330,8 +330,8 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: AnsiString;
-    FTotalExecuteTimeTaken: int64;
-    FTotalCommitTimeTaken: int64;
+    FTotalExecuteTimeTaken: extended;
+    FTotalCommitTimeTaken: extended;
     FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
@@ -359,8 +359,8 @@ type
     fMaxLoop: integer;
     fNBLoopBeforeCommit: integer;
     FErrorMsg: AnsiString;
-    FTotalExecuteTimeTaken: int64;
-    FTotalCommitTimeTaken: int64;
+    FTotalExecuteTimeTaken: extended;
+    FTotalCommitTimeTaken: extended;
     FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
@@ -390,7 +390,7 @@ type
     fOn: Boolean;
     fMaxLoop: integer;
     FErrorMsg: AnsiString;
-    FTotalExecuteTimeTaken: int64;
+    FTotalExecuteTimeTaken: extended;
     FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
@@ -420,14 +420,13 @@ type
     fSelector: AnsiString;
     fSkip: ansiString;
     fFirst: ansiString;
-    fInsertIfNotFound: boolean;
-    fMultiUpdate: boolean;
-    fContinueOnError: boolean;
-    fSingleRemove: boolean;
+    fUpdateFlags: TALMongoDBClientUpdateDataFlags;
+    fInsertFlags: TALMongoDBClientInsertDataFlags;
+    fDeleteFlags: TALMongoDBClientDeleteDataFlags;
     fOn: Boolean;
     fMaxLoop: integer;
     FErrorMsg: AnsiString;
-    FTotalExecuteTimeTaken: int64;
+    FTotalExecuteTimeTaken: extended;
     FTotalLoop: integer;
     fOwner: TWinControl;
     fRank: integer;
@@ -653,7 +652,7 @@ begin
         end;
         aTKMain.Stop;
         ALMemoResult.Clear;
-        ALMemoResult.Lines.Add('Time Taken: ' + IntToStr(aTKMain.ElapsedMilliseconds) + ' ms');
+        ALMemoResult.Lines.Add('Time Taken: ' + string(ALFormatFloat('0.#####', aTKMain.Elapsed.TotalMilliseconds, ALDefaultFormatSettings)) + ' ms');
         aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
                                       -1,
                                       '',
@@ -687,8 +686,8 @@ begin
         TableViewThread.DataController.RecordCount := 1;
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
         TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
-        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,aTKPrepare.ElapsedMilliseconds);
-        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKSelect.ElapsedMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,aTKPrepare.Elapsed.TotalMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKSelect.Elapsed.TotalMilliseconds);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.ElapsedMilliseconds);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -828,7 +827,7 @@ begin
       end;
       aTKMain.Stop;
       ALMemoResult.Clear;
-      ALMemoResult.Lines.Add('Time Taken: ' + IntToStr(aTKMain.ElapsedMilliseconds) + ' ms');
+      ALMemoResult.Lines.Add('Time Taken: ' + string(ALFormatFloat('0.#####', aTKMain.Elapsed.TotalMilliseconds, ALDefaultFormatSettings)) + ' ms');
       aFBXClient.GetMonitoringInfos(aFBXClient.ConnectionID,
                                     -1,
                                     '',
@@ -858,9 +857,9 @@ begin
       TableViewThread.DataController.RecordCount := 1;
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,aTKPrepare.ElapsedMilliseconds);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKUpdate.ElapsedMilliseconds);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,aTKPrepare.Elapsed.TotalMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKUpdate.Elapsed.TotalMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       StatusBar1.Panels[2].Text := '';
@@ -1134,7 +1133,7 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
         TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
         TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -1211,8 +1210,8 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKExecute.ElapsedMilliseconds);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKExecute.Elapsed.TotalMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       StatusBar1.Panels[2].Text := '';
@@ -1446,7 +1445,7 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
         TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
         TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -1544,8 +1543,8 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKExecute.ElapsedMilliseconds);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKExecute.Elapsed.TotalMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       StatusBar1.Panels[2].Text := '';
@@ -1615,7 +1614,7 @@ begin
 
 
         ALMemoResult.Clear;
-        ALMemoResult.Lines.Add('Time Taken: ' + IntToStr(aStopWatch.ElapsedMilliseconds) + ' ms');
+        ALMemoResult.Lines.Add('Time Taken: ' + string(ALFormatFloat('0.#####', aStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettings)) + ' ms');
         aSphinxClient.SelectData('SHOW META',
                                  'rec',
                                  aXMLDATA2.DocumentElement,
@@ -1632,7 +1631,7 @@ begin
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
         TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
         TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -1704,8 +1703,8 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKExecute.ElapsedMilliseconds);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aTKExecute.Elapsed.TotalMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,aTKCommit.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
       StatusBar1.Panels[2].Text := '';
@@ -2101,13 +2100,9 @@ Var aconnectionHandle: PSQLite3;
     aStopWatch: TStopWatch;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
-    aLstSql: TALStrings;
-    aTmpLstSql: TALStrings;
     aXMLDATA: TalXmlDocument;
-    aSelectDataQueries: TalSqlite3ClientSelectDataQUERIES;
     aFormatSettings: TALFormatSettings;
     S1: AnsiString;
-    j: integer;
 begin
 
   //init the aFormatSettings
@@ -2117,7 +2112,6 @@ begin
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
 
   //create local object
-  aLstSql := TALStringList.create;
   aXMLDATA := TALXmlDocument.create('root');
   Try
 
@@ -2126,60 +2120,40 @@ begin
     while aLoopIndex <= fMaxLoop do begin
       try
 
-        //update the aLstSql
-        aLstSql.clear;
-        setlength(aSelectDataQueries,0);
-        for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          aTmpLstSql := TALStringList.Create;
-          Try
-            S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
-            aTmpLstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
-            for J := 0 to aTmpLstSql.Count - 1 do begin
-              S1 := aTmpLstSql[j];
-              S1 := ALFastTagReplace(S1,
-                                     '<#',
-                                     '>',
-                                     SQLFastTagReplaceFunct,
-                                     True,
-                                     nil);
-              aLstSql.Add(S1);
-              setlength(aSelectDataQueries,length(aSelectDataQueries)+1);
-              aSelectDataQueries[length(aSelectDataQueries)-1].Sql := S1;
-              aSelectDataQueries[length(aSelectDataQueries)-1].RowTag := '';
-              aSelectDataQueries[length(aSelectDataQueries)-1].viewTag := '';
-              aSelectDataQueries[length(aSelectDataQueries)-1].skip := 0;
-              aSelectDataQueries[length(aSelectDataQueries)-1].First := 0;
-            end;
-            inc(aLoopIndex);
-            inc(FTotalLoop);
-            if aLoopIndex > fMaxLoop then break;
-          Finally
-            aTmpLstSql.Free;
-          End;
-        end;
-
         //start the Transaction
         Tform1(fOwner).Sqlite3ConnectionPoolClient.TransactionStart(aconnectionHandle);
         try
 
-          //update the data
-          aStopWatch := TStopWatch.StartNew;
-          if fUpdateSQL then Tform1(fOwner).Sqlite3ConnectionPoolClient.UpdateData(aLstSql, aconnectionHandle)
-          else Tform1(fOwner).Sqlite3ConnectionPoolClient.SelectData(aSelectDataQueries,
-                                                                     aXMLDATA.documentElement,
-                                                                     aFormatSettings,
-                                                                     aconnectionHandle);
-          aStopWatch.Stop;
-          FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+          for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
 
-          //commit the data
+            s1 := ALFastTagReplace(fSQL,
+                                   '<#',
+                                   '>',
+                                   SQLFastTagReplaceFunct,
+                                   True,
+                                   nil);
+
+            aStopWatch := TStopWatch.StartNew;
+            if fUpdateSQL then Tform1(fOwner).Sqlite3ConnectionPoolClient.UpdateData(S1, aconnectionHandle)
+            else Tform1(fOwner).Sqlite3ConnectionPoolClient.SelectData(s1,
+                                                                       aXMLDATA.documentElement,
+                                                                       aFormatSettings,
+                                                                       aconnectionHandle);
+            aStopWatch.Stop;
+            FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
+
+            inc(aLoopIndex);
+            inc(FTotalLoop);
+            if aLoopIndex > fMaxLoop then break;
+
+          end;
+
           aStopWatch := TStopWatch.StartNew;
           Tform1(fOwner).Sqlite3ConnectionPoolClient.Transactioncommit(aconnectionHandle);
           aStopWatch.Stop;
-          FTotalCommitTimeTaken := FTotalCommitTimeTaken + aStopWatch.ElapsedMilliseconds;
+          FTotalCommitTimeTaken := FTotalCommitTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
 
         Except
-          //roolBack the data
           Tform1(fOwner).Sqlite3ConnectionPoolClient.TransactionRollBack(aconnectionHandle);
           raise;
         end;
@@ -2197,7 +2171,6 @@ begin
     end;
 
   Finally
-    aLstSql.free;
     aXMLDATA.free;
   End;
 end;
@@ -2222,8 +2195,8 @@ begin
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -2247,8 +2220,8 @@ begin
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -2424,7 +2397,7 @@ begin
                                                                   fTPB);
               aStopWatch.Stop;
               if FTotalPrepareTimeTaken = -1 then FTotalPrepareTimeTaken := 0;
-              FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aStopWatch.ElapsedMilliseconds;
+              FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
             end;
           end
           else begin
@@ -2438,7 +2411,7 @@ begin
                                                                   fTPB);
               aStopWatch.Stop;
               if FTotalPrepareTimeTaken = -1 then FTotalPrepareTimeTaken := 0;
-              FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aStopWatch.ElapsedMilliseconds;
+              FTotalPrepareTimeTaken := FTotalPrepareTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
             end;
           end;
           try
@@ -2490,7 +2463,7 @@ begin
                                                                                             aStatementPool,
                                                                                             fTPB);
                   aStopWatch.Stop;
-                  FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+                  FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
                 end
                 else begin
                   aStopWatch := TStopWatch.StartNew;
@@ -2502,7 +2475,7 @@ begin
                                                                          aStatementPool,
                                                                          fTPB);
                   aStopWatch.Stop;
-                  FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+                  FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
                 end;
               finally
                 if assigned(aStatementPool) then aStatementPool.Free;
@@ -2533,7 +2506,7 @@ begin
           aStopWatch := TStopWatch.StartNew;
           Tform1(fOwner).FirebirdConnectionPoolClient.Transactioncommit(aDbHandle,aTraHandle);
           aStopWatch.Stop;
-          FTotalCommitTimeTaken := FTotalCommitTimeTaken + aStopWatch.ElapsedMilliseconds;
+          FTotalCommitTimeTaken := FTotalCommitTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
 
         except
 
@@ -2579,10 +2552,10 @@ begin
         end;
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
-      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalLoop)
+      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) )
       else  TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -2605,10 +2578,10 @@ begin
         end;
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
-      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / FTotalLoop)
+      if FTotalPrepareTimeTaken >= 0 then TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,FTotalPrepareTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) )
       else  TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -2657,13 +2630,9 @@ Var aConnectionHandle: PMySql;
     aStopWatch: TStopWatch;
     aLoopIndex: integer;
     aCommitLoopIndex: integer;
-    aLstSql: TALStrings;
-    aTmpLstSql: TALStrings;
     aXMLDATA: TalXmlDocument;
-    aSelectDataQueries: TalMySqlClientSelectDataQUERIES;
     aFormatSettings: TALFormatSettings;
     S1: AnsiString;
-    j: integer;
 begin
 
   //init the aFormatSettings
@@ -2673,7 +2642,6 @@ begin
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
 
   //create local object
-  aLstSql := TALStringList.create;
   aXMLDATA := TALXmlDocument.create('root');
   Try
 
@@ -2682,60 +2650,39 @@ begin
     while aLoopIndex <= fMaxLoop do begin
       try
 
-        //update the aLstSql
-        aLstSql.clear;
-        setlength(aSelectDataQueries,0);
-        for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
-          aTmpLstSql := TALStringList.Create;
-          Try
-            S1 := AlStringReplace(fSQL,#13#10,' ',[RfReplaceALL]);
-            aTmpLstSql.Text := ALTrim(AlStringReplace(S1,';',#13#10,[RfReplaceALL]));
-            for J := 0 to aTmpLstSql.Count - 1 do begin
-              S1 := aTmpLstSql[j];
-              S1 := ALFastTagReplace(S1,
-                                     '<#',
-                                     '>',
-                                     SQLFastTagReplaceFunct,
-                                     True,
-                                     nil);
-              aLstSql.Add(S1);
-              setlength(aSelectDataQueries,length(aSelectDataQueries)+1);
-              aSelectDataQueries[length(aSelectDataQueries)-1].Sql := S1;
-              aSelectDataQueries[length(aSelectDataQueries)-1].RowTag := '';
-              aSelectDataQueries[length(aSelectDataQueries)-1].viewTag := '';
-              aSelectDataQueries[length(aSelectDataQueries)-1].skip := 0;
-              aSelectDataQueries[length(aSelectDataQueries)-1].First := 0;
-            end;
-            inc(aLoopIndex);
-            inc(FTotalLoop);
-            if aLoopIndex > fMaxLoop then break;
-          Finally
-            aTmpLstSql.Free;
-          End;
-        end;
-
         //start the Transaction
+        aConnectionHandle := nil;
         Tform1(fOwner).MySqlConnectionPoolClient.TransactionStart(aConnectionHandle);
         try
 
-          //update the data
-          aStopWatch := TStopWatch.StartNew;
-          if fUpdateSQL then Tform1(fOwner).MySqlConnectionPoolClient.UpdateData(aLstSql, aConnectionHandle)
-          else Tform1(fOwner).MySqlConnectionPoolClient.SelectData(aSelectDataQueries,
-                                                                   aXMLDATA.documentElement,
-                                                                   aFormatSettings,
-                                                                   aConnectionHandle);
-          aStopWatch.Stop;
-          FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+          for aCommitLoopIndex := 1 to fNBLoopBeforeCommit do begin
 
-          //commit the data
+            S1 := ALFastTagReplace(fSQL,
+                                   '<#',
+                                   '>',
+                                   SQLFastTagReplaceFunct,
+                                   True,
+                                   nil);
+
+            aStopWatch := TStopWatch.StartNew;
+            if fUpdateSQL then Tform1(fOwner).MySqlConnectionPoolClient.UpdateData(S1, aConnectionHandle)
+            else Tform1(fOwner).MySqlConnectionPoolClient.SelectData(S1,
+                                                                     aXMLDATA.documentElement,
+                                                                     aFormatSettings,
+                                                                     aConnectionHandle);
+            aStopWatch.Stop;
+            FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
+            inc(aLoopIndex);
+            inc(FTotalLoop);
+            if aLoopIndex > fMaxLoop then break;
+          end;
+
           aStopWatch := TStopWatch.StartNew;
           Tform1(fOwner).MySqlConnectionPoolClient.Transactioncommit(aConnectionHandle);
           aStopWatch.Stop;
-          FTotalCommitTimeTaken := FTotalCommitTimeTaken + aStopWatch.ElapsedMilliseconds;
+          FTotalCommitTimeTaken := FTotalCommitTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
 
         Except
-          //roolBack the data
           Tform1(fOwner).MySqlConnectionPoolClient.TransactionRollBack(aConnectionHandle);
           raise;
         end;
@@ -2753,7 +2700,6 @@ begin
     end;
 
   Finally
-    aLstSql.free;
     aXMLDATA.free;
   End;
 end;
@@ -2780,8 +2726,8 @@ begin
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -2807,8 +2753,8 @@ begin
       end;
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / FTotalLoop);
-      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / FTotalLoop);
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
+      TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,FTotalCommitTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) );
       TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
       TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
     finally
@@ -2898,7 +2844,7 @@ begin
       else if fCMD = 'INCR' then Tform1(fOwner).MemcachedConnectionPoolClient.Incr(aKey, 1)
       else if fCMD = 'DECR' then Tform1(fOwner).MemcachedConnectionPoolClient.Decr(aKey, 1);
       aStopWatch.Stop;
-      FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+      FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
 
       //update FTotalLoop
       inc(FTotalLoop);
@@ -2953,7 +2899,7 @@ begin
     end;
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,ALIfThen(FTotalLoop > 0, FTotalExecuteTimeTaken / FTotalLoop, 0));
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,ALIfThen(FTotalLoop > 0, FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) , 0));
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,0/0);
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
     TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
@@ -2994,10 +2940,13 @@ begin
   fOwner := AOwner;
   fRank := aRank;
   fCMD := aCMD;
-  fInsertIfNotFound := aInsertIfNotFound;
-  fMultiUpdate := aMultiUpdate;
-  fContinueOnError := aContinueOnError;
-  fSingleRemove := aSingleRemove;
+  fUpdateFlags := [];
+  fInsertFlags := [];
+  fDeleteFlags := [];
+  if aInsertIfNotFound then fUpdateFlags := fUpdateFlags + [ufUpsert];
+  if aMultiUpdate then fUpdateFlags := fUpdateFlags + [ufMultiUpdate];
+  if aContinueOnError then fInsertFlags := fInsertFlags + [ifContinueOnError];
+  if aSingleRemove then fdeleteFlags := fdeleteFlags + [dfSingleRemove];
 end;
 
 {*******************************************}
@@ -3028,11 +2977,11 @@ begin
 
         //update the params
         aFullCollectionName := ALFastTagReplace(fFullCollectionName,
-                                 '<#',
-                                 '>',
-                                 SQLFastTagReplaceFunct,
-                                 True,
-                                 nil);
+                                                '<#',
+                                                '>',
+                                                SQLFastTagReplaceFunct,
+                                                True,
+                                                nil);
         aQuery := ALFastTagReplace(fQuery,
                                    '<#',
                                    '>',
@@ -3065,6 +3014,7 @@ begin
         if fCMD = 'SELECT' then Tform1(fOwner).MongoDBConnectionPoolClient.SelectData(aFullCollectionName,
                                                                                       aQuery,
                                                                                       aSelector,
+                                                                                      [],
                                                                                       '', // rowtag
                                                                                       aSkip,
                                                                                       aFirst,
@@ -3072,16 +3022,15 @@ begin
         else if fCMD = 'UPDATE' then Tform1(fOwner).MongoDBConnectionPoolClient.UpdateData(aFullCollectionName,
                                                                                            aQuery,
                                                                                            aSelector,
-                                                                                           fInsertIfNotFound,
-                                                                                           fMultiUpdate)
+                                                                                           fUpdateFlags)
         else if fCMD = 'INSERT' then Tform1(fOwner).MongoDBConnectionPoolClient.InsertData(aFullCollectionName,
                                                                                            aQuery,
-                                                                                           fContinueOnError)
+                                                                                           fInsertFlags)
         else if fCMD = 'DELETE' then Tform1(fOwner).MongoDBConnectionPoolClient.DeleteData(aFullCollectionName,
                                                                                            aQuery,
-                                                                                           fSingleRemove);
+                                                                                           fdeleteFlags);
         aStopWatch.Stop;
-        FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.ElapsedMilliseconds;
+        FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
 
         //update FTotalLoop
         inc(FTotalLoop);
@@ -3140,7 +3089,7 @@ begin
     end;
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadCount.Index,FTotalLoop);
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,ALIfThen(FTotalLoop > 0, FTotalExecuteTimeTaken / FTotalLoop, 0));
+    TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageExecuteTimeTaken.Index,ALIfThen(FTotalLoop > 0, FTotalExecuteTimeTaken / alifThen(FTotalLoop <> 0, FTotalLoop, 1) , 0));
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadAverageCommitTimeTaken.Index,0/0);
     TForm1(fOwner).TableViewThread.DataController.SetValue(fRank-1,Tform1(fOwner).TableViewThreadErrorMsg.Index,FErrorMsg);
     TForm1(fOwner).StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb'
@@ -3406,7 +3355,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -3474,7 +3423,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -3516,7 +3465,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -3641,7 +3590,7 @@ procedure TForm1.ALButtonMongoDBSelectClick(Sender: TObject);
 Var aMongoDBClient: TAlMongoDBClient;
     aJSONDATA: TalJSONDocument;
     aStopWatch: TstopWatch;
-    Query: TALMongoDBClientSelectDataQUERY;
+    aFlags: TALMongoDBClientSelectDataFlags;
 begin
 
   Screen.Cursor := CrHourGlass;
@@ -3659,50 +3608,51 @@ begin
           ParseOptions := [];
         end;
 
-        Query := TALMongoDBClientSelectDataQUERY.Create;
-        Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
-                                                     '<#',
-                                                     '>',
-                                                     SQLFastTagReplaceFunct,
-                                                     True,
-                                                     nil);
-        Query.Query := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   nil);
-        Query.ReturnFieldsSelector := ALFastTagReplace(AnsiString(MemoMongoDBSelector.Lines.Text),
-                                                       '<#',
-                                                       '>',
-                                                       SQLFastTagReplaceFunct,
-                                                       True,
-                                                       nil);
-        Query.Skip := ALstrToInt(ALFastTagReplace(AnsiString(EditMongoDBSkip.Text),
-                                                  '<#',
-                                                  '>',
-                                                  SQLFastTagReplaceFunct,
-                                                  True,
-                                                  nil));
-        Query.First := ALstrToInt(ALFastTagReplace(AnsiString(EditMongoDBFirst.Text),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   nil));
-        Query.RowTag := 'rec';
-        Query.flags.SlaveOk := CheckGroupMongoDBSelectFlags.States[0] = cbsChecked;
-        Query.flags.Partial := CheckGroupMongoDBSelectFlags.States[1] = cbsChecked;
+        aflags := [];
+        if CheckGroupMongoDBSelectFlags.States[0] = cbsChecked then aflags := aflags + [sfSlaveOk];
+        if CheckGroupMongoDBSelectFlags.States[1] = cbsChecked then aflags := aflags + [sfPartial];
 
         aStopWatch:= TstopWatch.StartNew;
-        aMongoDBClient.SelectData(Query, aJSONDATA.Node);
+        aMongoDBClient.SelectData(ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil),
+                                  ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil),
+                                  ALFastTagReplace(AnsiString(MemoMongoDBSelector.Lines.Text),
+                                                   '<#',
+                                                   '>',
+                                                   SQLFastTagReplaceFunct,
+                                                   True,
+                                                   nil),
+                                  aflags,
+                                  'rec',
+                                  ALstrToInt(ALFastTagReplace(AnsiString(EditMongoDBSkip.Text),
+                                             '<#',
+                                             '>',
+                                             SQLFastTagReplaceFunct,
+                                             True,
+                                             nil)),
+                                  ALstrToInt(ALFastTagReplace(AnsiString(EditMongoDBFirst.Text),
+                                             '<#',
+                                             '>',
+                                             SQLFastTagReplaceFunct,
+                                             True,
+                                             nil)),
+                                  aJSONDATA.Node);
         aStopWatch.Stop;
 
         TableViewThread.DataController.RecordCount := 1;
         TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
         TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
         TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+        TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
         TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
         TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
         StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -3727,7 +3677,7 @@ end;
 procedure TForm1.ALButtonMongoDBINSERTClick(Sender: TObject);
 Var aMongoDBClient: TAlMongoDBClient;
     aStopWatch: TstopWatch;
-    Query: TALMongoDBClientINSERTDataQUERY;
+    aflags: TALMongoDBClientInsertDataFlags;
 begin
 
   Screen.Cursor := CrHourGlass;
@@ -3737,30 +3687,30 @@ begin
     Try
       aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
 
-      Query := TALMongoDBClientInsertDataQUERY.Create;
-      Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   nil);
-      Query.documents := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
-                                          '<#',
-                                          '>',
-                                          SQLFastTagReplaceFunct,
-                                          True,
-                                          nil);
-      Query.flags.ContinueOnError := CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked;
+      aflags := [];
+      if CheckGroupMongoDBINSERTFlags.States[0] = cbsChecked then aflags := aflags + [ifContinueOnError];
 
       aStopWatch:= TstopWatch.StartNew;
-      aMongoDBClient.InsertData(Query);
+      aMongoDBClient.InsertData(ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                aflags);
       aStopWatch.Stop;
 
       TableViewThread.DataController.RecordCount := 1;
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -3781,7 +3731,7 @@ end;
 procedure TForm1.ALButtonMongoDBUpdateClick(Sender: TObject);
 Var aMongoDBClient: TAlMongoDBClient;
     aStopWatch: TstopWatch;
-    Query: TALMongoDBClientUpdateDataQUERY;
+    aFlags: TALMongoDBClientUpdateDataFlags;
     NumberOfDocumentsUpdatedOrRemoved: integer;
     updatedExisting: Boolean;
     upserted: ansiString;
@@ -3794,32 +3744,31 @@ begin
     Try
       aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
 
-      Query := TALMongoDBClientUpdateDataQUERY.Create;
-      Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   nil);
-      Query.selector := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
-                                          '<#',
-                                          '>',
-                                          SQLFastTagReplaceFunct,
-                                          True,
-                                          nil);
-
-      Query.update := ALFastTagReplace(AnsiString(MemoMongoDBSelector.Lines.Text),
-                                          '<#',
-                                          '>',
-                                          SQLFastTagReplaceFunct,
-                                          True,
-                                          nil);
-      Query.flags.Upsert := CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked;
-      Query.flags.MultiUpdate := CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked;
+      aflags := [];
+      if CheckGroupMongoDBUpdateFlags.States[0] = cbsChecked then aflags := aflags + [ufUpsert];
+      if CheckGroupMongoDBUpdateFlags.States[1] = cbsChecked then aflags := aflags + [ufMultiUpdate];
 
 
       aStopWatch:= TstopWatch.StartNew;
-      aMongoDBClient.UpdateData(Query,
+      aMongoDBClient.UpdateData(ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                ALFastTagReplace(AnsiString(MemoMongoDBSelector.Lines.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                aFlags,
                                 NumberOfDocumentsUpdatedOrRemoved,
                                 updatedExisting,
                                 upserted);
@@ -3829,7 +3778,7 @@ begin
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';
@@ -3853,7 +3802,7 @@ end;
 procedure TForm1.ALButtonMongoDBDeleteClick(Sender: TObject);
 Var aMongoDBClient: TAlMongoDBClient;
     aStopWatch: TstopWatch;
-    Query: TALMongoDBClientDeleteDataQUERY;
+    aFlags: TALMongoDBClientDeleteDataFlags;
     NumberOfDocumentsUpdatedOrRemoved: integer;
 begin
 
@@ -3864,30 +3813,31 @@ begin
     Try
       aMongoDBClient.Connect(AnsiString(ALEditMongoDBHost.Text), StrToInt(ALEditMongoDBPort.Text));
 
-      Query := TALMongoDBClientDeleteDataQUERY.Create;
-      Query.FullCollectionName := ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
-                                                   '<#',
-                                                   '>',
-                                                   SQLFastTagReplaceFunct,
-                                                   True,
-                                                   nil);
-      Query.selector := ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
-                                         '<#',
-                                         '>',
-                                         SQLFastTagReplaceFunct,
-                                         True,
-                                         nil);
-      Query.flags.SingleRemove := CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked;
+      aflags := [];
+      if CheckGroupMongoDBDELETEFlags.States[0] = cbsChecked then aflags := aflags + [dfSingleRemove];
 
       aStopWatch:= TstopWatch.StartNew;
-      aMongoDBClient.DeleteData(Query, NumberOfDocumentsUpdatedOrRemoved);
+      aMongoDBClient.DeleteData(ALFastTagReplace(AnsiString(EditMongoDBFullCollectionName.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                ALFastTagReplace(AnsiString(MemoMongoDBQuery.Lines.Text),
+                                                 '<#',
+                                                 '>',
+                                                 SQLFastTagReplaceFunct,
+                                                 True,
+                                                 nil),
+                                aflags,
+                                NumberOfDocumentsUpdatedOrRemoved);
       aStopWatch.Stop;
 
       TableViewThread.DataController.RecordCount := 1;
       TableViewThread.DataController.SetValue(0,TableViewThreadNumber.Index, '1 (off)');
       TableViewThread.DataController.SetValue(0,TableViewThreadCount.Index,1);
       TableViewThread.DataController.SetValue(0,TableViewThreadAveragePrepareTimeTaken.Index,0/0);
-      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.ElapsedMilliseconds);
+      TableViewThread.DataController.SetValue(0,TableViewThreadAverageExecuteTimeTaken.Index,aStopWatch.Elapsed.TotalMilliseconds);
       TableViewThread.DataController.SetValue(0,TableViewThreadAverageCommitTimeTaken.Index,0/0);
       TableViewThread.DataController.SetValue(0,TableViewThreadErrorMsg.Index,'');
       StatusBar1.Panels[1].Text := 'Client Memory Usage: ' + IntToStr(round((ProcessMemoryUsage(GetCurrentProcessID) / 1024) / 1024)) + ' Mb';

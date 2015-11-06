@@ -96,8 +96,8 @@ type
       destructor Destroy; override;
       Function  Connect(const aHost: AnsiString; const APort: integer): AnsiString; virtual;
       Procedure Disconnect; virtual;
-      function  User(UserName: AnsiString): AnsiString; virtual;
-      function  Pass(Password: AnsiString): AnsiString; virtual;
+      function  User(const UserName: AnsiString): AnsiString; virtual;
+      function  Pass(const Password: AnsiString): AnsiString; virtual;
       Function  List: AnsiString; overload; virtual;
       procedure List(ALst: TALStrings); overload; virtual;
       Function  List(aMsgNumber: integer): AnsiString; overload; virtual;
@@ -162,7 +162,7 @@ end;
    follows the termination character, then the response from the POP
    server is ended and the line containing ".CRLF" is not considered
    part of the multi-line response.}
-Function ALPOP3ClientExtractTextFromMultilineResponse(aMultilineResponse: AnsiString): AnsiString;
+Function ALPOP3ClientExtractTextFromMultilineResponse(const aMultilineResponse: AnsiString): AnsiString;
 Var ln: Integer;
     P: Integer;
 begin
@@ -309,7 +309,7 @@ end;
         ...
      C: USER mrose
      S: +OK mrose is a real hoopy frood}
-function TAlPOP3Client.User(UserName: AnsiString): AnsiString;
+function TAlPOP3Client.User(const UserName: AnsiString): AnsiString;
 begin
   Result := SendCmd('USER ' + UserName, False);
 end;
@@ -349,7 +349,7 @@ end;
      S: +OK mrose is a real hoopy frood
      C: PASS secret
      S: +OK mrose's maildrop has 2 messages (320 octets)}
-function TAlPOP3Client.Pass(Password: AnsiString): AnsiString;
+function TAlPOP3Client.Pass(const Password: AnsiString): AnsiString;
 begin
   Result := SendCmd('PASS ' + Password, False);
 end;

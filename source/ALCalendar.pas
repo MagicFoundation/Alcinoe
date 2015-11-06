@@ -97,9 +97,9 @@ Type
 {-------------------------------------}
 Function ALDrawCalendar(Canvas:Tcanvas;
                         //----
-                        MonthHeaderStyle,
-                        DayHeaderStyle,
-                        DayDisabledStyle: TALDrawCalendarStyle;
+                        const MonthHeaderStyle,
+                              DayHeaderStyle,
+                              DayDisabledStyle: TALDrawCalendarStyle;
                         //----
                         BackGroundColor,
                         //----
@@ -109,7 +109,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         DaysHeaderBorderColorBottom: Tcolor;
                         //----
                         Year : Integer;
-                        FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
+                        const FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
                         //----
                         Var CalendarWidth : Integer;
                         Var CalendarHeight : Integer;
@@ -369,9 +369,9 @@ end;
 {*************************************}
 Function ALDrawCalendar(Canvas:Tcanvas;
                         //----
-                        MonthHeaderStyle,
-                        DayHeaderStyle,
-                        DayDisabledStyle: TALDrawCalendarStyle;
+                        const MonthHeaderStyle,
+                              DayHeaderStyle,
+                              DayDisabledStyle: TALDrawCalendarStyle;
                         //----
                         BackGroundColor,
                         //----
@@ -381,7 +381,7 @@ Function ALDrawCalendar(Canvas:Tcanvas;
                         DaysHeaderBorderColorBottom: Tcolor;
                         //----
                         Year : Integer;
-                        FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
+                        const FormatSettings: TALFormatSettings; // LongMonthNames and LongDayNames must be in UTF8
                         //----
                         Var CalendarWidth : Integer;
                         Var CalendarHeight : Integer;

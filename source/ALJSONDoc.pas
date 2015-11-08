@@ -536,6 +536,7 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
+    procedure Clear;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
     function IsEmptyDoc: Boolean;
@@ -1080,6 +1081,13 @@ begin
   if fFormatSettings <> @ALDefaultFormatSettings then dispose(fFormatSettings);
   ReleaseDoc;
   inherited;
+end;
+
+{******************************}
+procedure TALJSONDocument.Clear;
+begin
+  releaseDoc;
+  Active := true;
 end;
 
 {****************************************}

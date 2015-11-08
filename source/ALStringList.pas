@@ -321,6 +321,104 @@ Type
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
+  {----------------------}
+  TALNVStringList = class;
+
+  {---------------------------------}
+  PALNVStringItem = ^TALNVStringItem;
+  TALNVStringItem = record
+    FName: AnsiString;
+    FValue: AnsiString;
+    FNVS: Boolean;
+    FObject: TObject;
+  end;
+
+  {---------------------------------------------}
+  TALNVStringItemList = array of TALNVStringItem;
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  TALNVStringListSortCompare = reference to function(List: TALNVStringList; Index1, Index2: Integer): Integer;
+  {$ELSE}
+  TALNVStringListSortCompare = function(List: TALNVStringList; Index1, Index2: Integer): Integer;
+  {$IFEND}
+
+  {---------------------------------}
+  TALNVStringList = class(TALStrings)
+  private
+    FList: TALNVStringItemList;
+    FCount: Integer;
+    FCapacity: Integer;
+    FSorted: Boolean;
+    FDuplicates: TDuplicates;
+    FCaseSensitive: Boolean;
+    FOnChange: TNotifyEvent;
+    FOnChanging: TNotifyEvent;
+    FOwnsObject: Boolean;
+    procedure ExchangeItems(Index1, Index2: Integer);
+    procedure Grow;
+    procedure QuickSort(L, R: Integer; SCompare: TALNVStringListSortCompare);
+    procedure SetSorted(Value: Boolean);
+    procedure SetCaseSensitive(const Value: Boolean);
+    Function ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean; //[added from TStringList]
+  protected
+    function GetName(Index: Integer): AnsiString; override;
+    function GetStrictName(Index: Integer): AnsiString; override; // [added from Tstrings]
+    function GetValue(const Name: AnsiString): AnsiString; override;
+    procedure SetValue(const Name, Value: AnsiString); override;
+    function GetValueFromIndex(Index: Integer): AnsiString; override;
+    procedure SetValueFromIndex(Index: Integer; const Value: AnsiString); override;
+    procedure SetPersistentValue(const Name, Value: AnsiString); override; // [added from Tstrings]
+    procedure SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString); override; // [added from Tstrings]
+    procedure Changed; virtual;
+    procedure Changing; virtual;
+    function Get(Index: Integer): AnsiString; override;
+    function GetCapacity: Integer; override;
+    function GetCount: Integer; override;
+    function GetObject(Index: Integer): TObject; override;
+    function GetTextStr: AnsiString; override;
+    procedure Put(Index: Integer; const S: AnsiString); override;
+    procedure PutObject(Index: Integer; AObject: TObject); override;
+    procedure SetCapacity(NewCapacity: Integer); override;
+    procedure SetUpdateState(Updating: Boolean); override;
+    function CompareStrings(const S1, S2: AnsiString): Integer; override;
+    procedure InsertItem(Index: Integer; const S: AnsiString; AObject: TObject); overload; virtual;
+    procedure InsertItem(Index: Integer; const Name: AnsiString; WithNvS: boolean; AObject: TObject); overload; virtual; //[added from TStringList]
+    procedure InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject); overload; virtual; //[added from TStringList]
+    procedure AssignTo(Dest: TPersistent); override; //[added from Tstrings]
+    procedure init(OwnsObjects: Boolean); virtual; //[added from TStringList]
+  public
+    constructor Create; overload; override;
+    constructor Create(OwnsObjects: Boolean); reintroduce; overload;
+    destructor Destroy; override;
+    function Add(const S: AnsiString): Integer; override;
+    function AddObject(const S: AnsiString; AObject: TObject): Integer; override;
+    function AddNameValue(const Name, Value: AnsiString): Integer; override; // [added from Tstrings]
+    function AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer; override; // [added from Tstrings]
+    procedure Assign(Source: TPersistent); override;
+    procedure Clear; override;
+    procedure Delete(Index: Integer); override;
+    function  ExtractObject(Index: Integer): TObject; overload; virtual;
+    procedure Exchange(Index1, Index2: Integer); override;
+    function Find(const S: AnsiString; var Index: Integer): Boolean; virtual;
+    function FindName(const Name: AnsiString; var Index: Integer): Boolean; overload; // [added from TStringList]
+    function FindName(const Name: AnsiString; WithNvS: boolean; var Index: Integer): Boolean; overload; // [added from TStringList]
+    function FindNameValue(const Name, Value: AnsiString; var Index: Integer): Boolean;  // [added from TStringList]
+    function IndexOf(const S: AnsiString): Integer; override;
+    function IndexOfName(const Name: AnsiString): Integer; override; // [added from TStringList]
+    procedure Insert(Index: Integer; const S: AnsiString); override;
+    procedure InsertObject(Index: Integer; const S: AnsiString; AObject: TObject); override;
+    procedure InsertNameValue(Index: Integer; const Name, Value: AnsiString); override; // [added from Tstrings]
+    procedure InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject); override; // [added from Tstrings]
+    procedure Move(CurIndex, NewIndex: Integer); override;
+    procedure Sort; virtual;
+    procedure CustomSort(Compare: TALNVStringListSortCompare); virtual;
+    property Duplicates: TDuplicates read FDuplicates write FDuplicates;
+    property Sorted: Boolean read FSorted write SetSorted;
+    property CaseSensitive: Boolean read FCaseSensitive write SetCaseSensitive;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
+    property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+  end;
+
   {-----------------------}
   TALAVLStringList = class;
   TALAVLStringListSortCompare = function(List: TALAVLStringList; Index1, Index2: Integer): Integer;
@@ -1509,6 +1607,13 @@ begin
     FDuplicates := TALStringList(Source).FDuplicates;
     FSorted := TALStringList(Source).FSorted;
   end
+  else if Source is TALNVStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALNVStringList(Source).FCaseSensitive;
+    FDuplicates := TALNVStringList(Source).FDuplicates;
+    FSorted := TALNVStringList(Source).FSorted;
+  end
   {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
   begin
@@ -1699,7 +1804,28 @@ begin
       if C = 0 then
       begin
         Result := True;
-        if Duplicates <> dupAccept then L := I;
+        //if Duplicates <> dupAccept then L := I; //because we need the last value of name in any case
+                                                  //ex: a
+                                                  //    aaa
+                                                  //    aaa=
+                                                  //    bbb
+                                                  //then doing values['aaa'] := 'xxx' must result in
+                                                  //    a
+                                                  //    aaa
+                                                  //    aaa=xxx
+                                                  //    bbb
+                                                  //and not in
+                                                  //    a
+                                                  //    aaa=xxx
+                                                  //    aaa=
+                                                  //    bbb
+        L := I; // this mean L > H
+        I := I + 1;
+        while I <= FCount - 1 do begin
+          if CompareStrings(ExtractName(FList[I].FString), s) = 0 then L := I
+          else break;
+          I := I + 1;
+        end;
       end;
     end;
   end;
@@ -2127,6 +2253,1022 @@ begin
   end;
 end;
 
+{*********************************}
+destructor TALNVStringList.Destroy;
+var
+  I: Integer;
+  Temp: Array of TObject;
+begin
+  FOnChange := nil;
+  FOnChanging := nil;
+
+  // If the list owns the Objects gather them and free after the list is disposed
+  if OwnsObjects then
+  begin
+    SetLength(Temp, FCount);
+    for I := 0 to FCount - 1 do
+      Temp[I] := FList[I].FObject;
+  end;
+
+  inherited Destroy;
+  FCount := 0;
+  SetCapacity(0);
+
+  // Free the objects that were owned by the list
+  if Length(Temp) > 0 then
+    for I := 0 to Length(Temp) - 1 do
+      Temp[I].Free;
+end;
+
+{*********************************************************}
+function TALNVStringList.Add(const S: AnsiString): Integer;
+begin
+  Result := AddObject(S, nil);
+end;
+
+{*********************************************************************************}
+function TALNVStringList.AddObject(const S: AnsiString; AObject: TObject): Integer;
+Var aName, aValue: AnsiString;
+begin
+  if not Sorted then begin
+    Result := FCount;
+    InsertItem(Result, S, AObject);
+  end
+  else begin
+    if ExtractNameValue(S, aName, aValue) then begin
+      if FindNameValue(aName, aValue, Result) then
+        case Duplicates of
+          dupIgnore: Exit;
+          dupError: Error(@SDuplicateString, 0);
+        end;
+      InsertItem(Result, aName, aValue, AObject);
+    end
+    else begin
+      if FindName(s, false{WithNvS}, Result) then
+        case Duplicates of
+          dupIgnore: Exit;
+          dupError: Error(@SDuplicateString, 0);
+        end;
+      InsertItem(Result, s, False{WithNvS}, AObject);
+    end;
+  end;
+end;
+
+{****************************************************************************}
+function TALNVStringList.AddNameValue(const Name, Value: AnsiString): Integer;
+begin
+  Result := AddNameValueObject(Name, Value, nil);
+end;
+
+{****************************************************************************************************}
+function TALNVStringList.AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer;
+begin
+  if not Sorted then begin
+    Result := FCount;
+  end
+  else begin
+    if FindNameValue(Name, Value, Result) then
+      case Duplicates of
+        dupIgnore: Exit;
+        dupError: Error(@SDuplicateString, 0);
+      end;
+  end;
+  InsertItem(Result, Name, Value, AObject);
+end;
+
+{****************************************************}
+procedure TALNVStringList.Assign(Source: TPersistent);
+begin
+  if Source is TALNVStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALNVStringList(Source).FCaseSensitive;
+    FDuplicates := TALNVStringList(Source).FDuplicates;
+    FSorted := TALNVStringList(Source).FSorted;
+  end
+  else if Source is TALStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALStringList(Source).FCaseSensitive;
+    FDuplicates := TALStringList(Source).FDuplicates;
+    FSorted := TALStringList(Source).FSorted;
+  end
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  else if Source is TALHashedStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALHashedStringList(Source).CaseSensitive;
+    FDuplicates := TALHashedStringList(Source).FDuplicates;
+    FSorted := False;
+  end
+  {$ifend}
+  else if Source is TALAVLStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALAVLStringList(Source).CaseSensitive;
+    FDuplicates := TALAVLStringList(Source).FDuplicates;
+    FSorted := False;
+  end
+  else if Source is TStringList then
+  begin
+    Clear;
+    FCaseSensitive := TStringList(Source).CaseSensitive;
+    FDuplicates := TStringList(Source).Duplicates;
+    FSorted := TStringList(Source).Sorted;
+  end;
+  inherited Assign(Source);
+end;
+
+{****************************************************}
+procedure TALNVStringList.AssignTo(Dest: TPersistent);
+begin
+  if Dest is TStringList then
+  begin
+    TStringList(Dest).clear;
+    TStringList(Dest).CaseSensitive := fCaseSensitive;
+    TStringList(Dest).Duplicates := fDuplicates;
+    TStringList(Dest).Sorted := fSorted;
+  end;
+  inherited AssignTo(Dest);
+end;
+
+{********************************}
+procedure TALNVStringList.Changed;
+begin
+  if (FUpdateCount = 0) and Assigned(FOnChange) then
+    FOnChange(Self);
+end;
+
+{*********************************}
+procedure TALNVStringList.Changing;
+begin
+  if (FUpdateCount = 0) and Assigned(FOnChanging) then
+    FOnChanging(Self);
+end;
+
+{******************************}
+procedure TALNVStringList.Clear;
+var
+  I: Integer;
+  Temp: Array of TObject;
+begin
+  if FCount <> 0 then
+  begin
+    Changing;
+
+    // If the list owns the Objects gather them and free after the list is disposed
+    if OwnsObjects then
+    begin
+      SetLength(Temp, FCount);
+      for I := 0 to FCount - 1 do
+        Temp[I] := FList[I].FObject;
+    end;
+
+    FCount := 0;
+    SetCapacity(0);
+
+    // Free the objects that were owned by the list
+    if Length(Temp) > 0 then
+      for I := 0 to Length(Temp) - 1 do
+        Temp[I].Free;
+
+    Changed;
+  end;
+end;
+
+{***********************************************}
+procedure TALNVStringList.Delete(Index: Integer);
+var
+  Obj: TObject;
+begin
+  if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
+  Changing;
+  // If this list owns its objects then free the associated TObject with this index
+  if OwnsObjects then
+    Obj := FList[Index].FObject
+  else
+    Obj := nil;
+
+  // Direct memory writing to managed array follows
+  //  see http://dn.embarcadero.com/article/33423
+  // Explicitly finalize the element we about to stomp on with move
+  Finalize(FList[Index]);
+  Dec(FCount);
+  if Index < FCount then
+  begin
+    System.Move(FList[Index + 1], FList[Index],
+      (FCount - Index) * SizeOf(TALNVStringItem));
+    // Make sure there is no danglng pointer in the last (now unused) element
+    PPointer(@FList[FCount])^ := nil;
+  end;
+  if Obj <> nil then
+    Obj.Free;
+  Changed;
+end;
+
+{***************************************************************}
+function  TALNVStringList.ExtractObject(Index: Integer): TObject;
+begin
+  if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
+  result := FList[Index].FObject;
+  FList[Index].FObject := nil;
+end;
+
+{**********************************************************}
+procedure TALNVStringList.Exchange(Index1, Index2: Integer);
+begin
+  if (Index1 < 0) or (Index1 >= FCount) then Error(@SListIndexError, Index1);
+  if (Index2 < 0) or (Index2 >= FCount) then Error(@SListIndexError, Index2);
+  Changing;
+  ExchangeItems(Index1, Index2);
+  Changed;
+end;
+
+{***************************************************************}
+procedure TALNVStringList.ExchangeItems(Index1, Index2: Integer);
+var
+  Temp: Pointer;
+  Item1, Item2: PALNVStringItem;
+begin
+  Item1 := @FList[Index1];
+  Item2 := @FList[Index2];
+
+  Temp := Pointer(Item1^.FName);
+  Pointer(Item1^.FName) := Pointer(Item2^.FName);
+  Pointer(Item2^.FName) := Temp;
+
+  Temp := Pointer(Item1^.FValue);
+  Pointer(Item1^.FValue) := Pointer(Item2^.FValue);
+  Pointer(Item2^.FValue) := Temp;
+
+  Temp := Item1^.FObject;
+  Item1^.FObject := Item2^.FObject;
+  Item2^.FObject := Temp;
+end;
+
+{******************************************************************************}
+function TALNVStringList.Find(const S: AnsiString; var Index: Integer): Boolean;
+var Name, Value: ansiString;
+begin
+  if ExtractNameValue(S, Name, Value) then result := FindNameValue(Name, Value, Index)
+  else result := FindName(Name, False{WithNvS}, Index);
+end;
+
+{*************************************************************************************}
+function TALNVStringList.FindName(const Name: AnsiString; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareStrings(FList[I].FName, Name);     // The return value is less than 0 if FList[I].FName < Name, 0 if FList[I].FName = Name, or greater than 0 if FList[I].FName > Name.
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        //if Duplicates <> dupAccept then L := I; //because we need the last value of name in any case
+                                                  //ex: a
+                                                  //    aaa
+                                                  //    aaa=
+                                                  //    bbb
+                                                  //then doing values['aaa'] := 'xxx' must result in
+                                                  //    a
+                                                  //    aaa
+                                                  //    aaa=xxx
+                                                  //    bbb
+                                                  //and not in
+                                                  //    a
+                                                  //    aaa=xxx
+                                                  //    aaa=
+                                                  //    bbb
+        L := I; // this mean L > H
+        I := I + 1;
+        while I <= FCount - 1 do begin
+          if CompareStrings(FList[I].FName, Name) = 0 then L := I
+          else break;
+          I := I + 1;
+        end;
+      end;
+    end;
+  end;
+  Index := L;
+end;
+
+{*******************************************************************************************************}
+function TALNVStringList.FindName(const Name: AnsiString; WithNvS: boolean; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareStrings(FList[I].FName, Name);     // The return value is less than 0 if FList[I].FName < Name, 0 if FList[I].FName = Name, or greater than 0 if FList[I].FName > Name.
+    if (C = 0) then begin
+      if (not WithNvS) and FList[I].FNVS then c := 1   // Must be ordered in this order :
+                                                       // aa
+                                                       // aaa
+                                                       // aaa=
+                                                       // aaaa
+      else if (WithNvS) and (not FList[I].FNVS) then c := -1;  // Must be ordered in this order :
+                                                               // aa
+                                                               // aaa
+                                                               // aaa=
+                                                               // aaaa
+    end;
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        //if Duplicates <> dupAccept then L := I; //because we need the last value of name in any case
+                                                  //ex: a
+                                                  //    aaa
+                                                  //    aaa=
+                                                  //    bbb
+                                                  //then doing values['aaa'] := 'xxx' must result in
+                                                  //    a
+                                                  //    aaa
+                                                  //    aaa=xxx
+                                                  //    bbb
+                                                  //and not in
+                                                  //    a
+                                                  //    aaa=xxx
+                                                  //    aaa=
+                                                  //    bbb
+        L := I; // this mean L > H
+        I := I + 1;
+        while I <= FCount - 1 do begin
+          C := CompareStrings(FList[I].FName, Name);
+          if (C = 0) then begin
+            if (not WithNvS) and FList[I].FNVS then c := 1   // Must be ordered in this order :
+                                                             // aa
+                                                             // aaa
+                                                             // aaa=
+                                                             // aaaa
+            else if (WithNvS) and (not FList[I].FNVS) then c := -1;  // Must be ordered in this order :
+                                                                     // aa
+                                                                     // aaa
+                                                                     // aaa=
+                                                                     // aaaa
+          end;
+          if c = 0 then L := I
+          else break;
+          I := I + 1;
+        end;
+      end;
+    end;
+  end;
+  Index := L;
+end;
+
+{*************************************************************************************************}
+function TALNVStringList.FindNameValue(const Name, Value: AnsiString; var Index: Integer): Boolean;
+var
+  L, H, I, C: Integer;
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareStrings(FList[I].FName, Name);  // The return value is less than 0 if FList[I].FName < Name, 0 if FList[I].FName = Name, or greater than 0 if FList[I].FName > Name.
+    if (C = 0) then begin
+      if (not FList[I].FNVS) then c := -1 // Must be ordered in this order :
+                                          // aa
+                                          // aaa
+                                          // aaa=
+                                          // aaaa
+      else C := CompareStrings(FList[I].FValue, Value);  // The return value is less than 0 if FList[I].FValue < Value, 0 if FList[I].FValue = Value, or greater than 0 if FList[I].FValue > Value.
+    end;
+    if C < 0 then L := I + 1 else
+    begin
+      H := I - 1;
+      if C = 0 then
+      begin
+        Result := True;
+        if Duplicates <> dupAccept then L := I;
+      end;
+    end;
+  end;
+  Index := L;
+end;
+
+{*******************************************************}
+function TALNVStringList.Get(Index: Integer): AnsiString;
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SListIndexError, Index);
+  if FList[Index].fNvs then Result := FList[Index].FName + NameValueSeparator + FList[Index].fValue
+  else Result := FList[Index].fname;
+end;
+
+{********************************************}
+function TALNVStringList.GetCapacity: Integer;
+begin
+  Result := FCapacity;
+end;
+
+{*****************************************}
+function TALNVStringList.GetCount: Integer;
+begin
+  Result := FCount;
+end;
+
+{**********************************************************}
+function TALNVStringList.GetObject(Index: Integer): TObject;
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SListIndexError, Index);
+  Result := FList[Index].FObject;
+end;
+
+{*****************************}
+procedure TALNVStringList.Grow;
+var
+  Delta: Integer;
+begin
+  if FCapacity > 64 then Delta := FCapacity div 4 else
+    if FCapacity > 8 then Delta := 16 else
+      Delta := 4;
+  SetCapacity(FCapacity + Delta);
+end;
+
+{**********************************************}
+function TALNVStringList.GetTextStr: AnsiString;
+var
+  I, L, Size: Integer;
+  P: PAnsiChar;
+  S, LB: AnsiString;
+  NvS: AnsiChar;
+begin
+  Size := 0;
+  LB := LineBreak;
+  NvS := nameValueSeparator;
+  for I := 0 to FCount - 1 do begin
+    if FList[i].fNvs then Inc(Size, Length(FList[i].fName) + 1{length(NameValueSeparator)} +  Length(FList[i].fValue) + Length(LB))
+    else Inc(Size, Length(FList[i].fName) + Length(LB))
+  end;
+  SetString(Result, nil, Size);
+  P := Pointer(Result);
+  for I := 0 to FCount - 1 do
+  begin
+    S := FList[i].fName;
+    L := Length(S);
+    if L <> 0 then
+    begin
+      ALMove(Pointer(S)^, P^, L);
+      Inc(P, L);
+    end;
+    if FList[i].fNvs then begin
+      ALMove(NvS, P^, 1);
+      Inc(P, 1);
+      S := FList[i].fValue;
+      L := Length(S);
+      if L <> 0 then
+      begin
+        ALMove(Pointer(S)^, P^, L);
+        Inc(P, L);
+      end;
+    end;
+    L := Length(LB);
+    if L <> 0 then
+    begin
+      ALMove(Pointer(LB)^, P^, L);
+      Inc(P, L);
+    end;
+  end;
+end;
+
+{*************************************************************}
+function TALNVStringList.IndexOf(const S: AnsiString): Integer;
+Var aName, aValue: AnsiString;
+begin
+  if ExtractNameValue(S, aName, aValue) then begin
+    if not Sorted then begin
+      for Result := 0 to FCount - 1 do
+        if Flist[Result].FNVS and
+           (CompareStrings(Flist[Result].FName, aName) = 0) and
+           (CompareStrings(Flist[Result].FValue, aValue) = 0) then Exit;
+      Result := -1;
+    end
+    else begin
+      if not FindNameValue(aName, aValue, Result) then Result := -1;
+    end;
+  end
+  else begin
+    if not Sorted then begin
+      for Result := 0 to FCount - 1 do
+        if (not Flist[Result].FNVS) and
+           (CompareStrings(Flist[Result].FName, s) = 0) then Exit;
+      Result := -1;
+    end
+    else begin
+      if not FindName(s, false{WinthNvS}, Result) then Result := -1;
+    end;
+  end;
+end;
+
+{********************************************************************}
+function TALNVStringList.IndexOfName(const Name: ansistring): Integer;
+begin
+  if not Sorted then begin
+    for Result := 0 to FCount - 1 do
+      if CompareStrings(Flist[Result].FName, Name) = 0 then Exit;
+    Result := -1;
+  end
+  else begin
+    if not FindName(Name, Result) then Result := -1;
+  end;
+end;
+
+{********************************************************************}
+procedure TALNVStringList.Insert(Index: Integer; const S: AnsiString);
+begin
+  InsertObject(Index, S, nil);
+end;
+
+{********************************************************************************************}
+procedure TALNVStringList.InsertObject(Index: Integer; const S: AnsiString; AObject: TObject);
+begin
+  if Sorted then Error(@SSortedListError, 0);
+  if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
+  InsertItem(Index, S, AObject);
+end;
+
+{***************************************************************************************}
+procedure TALNVStringList.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
+begin
+  InsertNameValueObject(Index, Name, Value, nil);
+end;
+
+{***************************************************************************************************************}
+procedure TALNVStringList.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+begin
+  if Sorted then Error(@SSortedListError, 0);
+  if (Index < 0) or (Index > FCount) then Error(@SListIndexError, Index);
+  InsertItem(Index, Name, Value, AObject);
+end;
+
+{**********************************************************}
+procedure TALNVStringList.Move(CurIndex, NewIndex: Integer);
+var
+  TempObject: TObject;
+  TempName: AnsiString;
+  TempValue: AnsiString;
+  TempNvS: Boolean;
+begin
+  if CurIndex <> NewIndex then
+  begin
+    BeginUpdate;
+    try
+      TempName := Flist[curIndex].FName;
+      TempNvs := Flist[curIndex].FNvs;
+      if TempNvs then TempValue := Flist[curIndex].FValue;
+      TempObject := Flist[curIndex].FObject;
+      FList[CurIndex].FObject := nil;
+      Delete(CurIndex);
+      if TempNvs then InsertObject(NewIndex, TempName, TempObject)
+      else InsertNameValueObject(NewIndex, TempName, TempValue, TempObject)
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{******************************************************************************************}
+procedure TALNVStringList.InsertItem(Index: Integer; const S: AnsiString; AObject: TObject);
+var Name, Value: ansiString;
+begin
+  if ExtractNameValue(S, Name, Value) then InsertItem(Index, Name, Value, AObject)
+  else InsertItem(Index, s, False{WithNvS}, AObject);
+end;
+
+{****************************************************************************************************}
+procedure TALNVStringList.InsertItem(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
+begin
+  Changing;
+  if FCount = FCapacity then Grow;
+  if Index < FCount then
+    System.Move(FList[Index], FList[Index + 1],
+      (FCount - Index) * SizeOf(TALNVStringItem));
+  with FList[Index] do
+  begin
+    Pointer(FName) := nil;
+    Pointer(FValue) := nil;
+    FObject := AObject;
+    FName := Name;
+    fNvs := True;
+    FValue := Value;
+  end;
+  Inc(FCount);
+  Changed;
+end;
+
+{***************************************************************************************************************}
+procedure TALNVStringList.InsertItem(Index: Integer; const Name: AnsiString; WithNvS: boolean; AObject: TObject);
+begin
+  Changing;
+  if FCount = FCapacity then Grow;
+  if Index < FCount then
+    System.Move(FList[Index], FList[Index + 1],
+      (FCount - Index) * SizeOf(TALNVStringItem));
+  with FList[Index] do
+  begin
+    Pointer(FName) := nil;
+    Pointer(FValue) := nil;
+    FObject := AObject;
+    FName := Name;
+    fNvs := WithNvS;
+    FValue := '';
+  end;
+  Inc(FCount);
+  Changed;
+end;
+
+{*****************************************************************}
+procedure TALNVStringList.Put(Index: Integer; const S: AnsiString);
+var Name, Value: ansiString;
+begin
+  if not sorted then begin
+    if Cardinal(Index) >= Cardinal(FCount) then
+      Error(@SListIndexError, Index);
+    Changing;
+    if ExtractNameValue(S, Name, Value) then begin
+      FList[Index].FName := Name;
+      FList[Index].FNvS := True;
+      FList[Index].FValue := Value;
+    end
+    else begin
+      FList[Index].FName := S;
+      FList[Index].FNvS := False;
+      FList[Index].FValue := '';
+    end;
+    Changed;
+  end
+  else begin
+    delete(index);
+    add(s);
+  end;
+end;
+
+{********************************************************************}
+procedure TALNVStringList.PutObject(Index: Integer; AObject: TObject);
+var
+  Obj: TObject;
+begin
+  if Cardinal(Index) >= Cardinal(FCount) then
+    Error(@SListIndexError, Index);
+  Changing;
+
+  // Change from orignal TStringList
+  // If this list owns its objects then free the associated TObject with this index
+  if OwnsObjects then
+    Obj := FList[Index].FObject
+  else
+    Obj := nil;
+
+  FList[Index].FObject := AObject;
+
+  if Obj <> nil then
+    Obj.Free;
+
+  Changed;
+end;
+
+{***************************************************************************************}
+procedure TALNVStringList.QuickSort(L, R: Integer; SCompare: TALNVStringListSortCompare);
+var
+  I, J, P: Integer;
+begin
+  repeat
+    I := L;
+    J := R;
+    P := (L + R) shr 1;
+    repeat
+      while SCompare(Self, I, P) < 0 do Inc(I);
+      while SCompare(Self, J, P) > 0 do Dec(J);
+      if I <= J then
+      begin
+        if I <> J then
+          ExchangeItems(I, J);
+        if P = I then
+          P := J
+        else if P = J then
+          P := I;
+        Inc(I);
+        Dec(J);
+      end;
+    until I > J;
+    if L < J then QuickSort(L, J, SCompare);
+    L := I;
+  until I >= R;
+end;
+
+{**********************************************************}
+procedure TALNVStringList.SetCapacity(NewCapacity: Integer);
+begin
+  if NewCapacity < FCount then
+    Error(@SListCapacityError, NewCapacity);
+  if NewCapacity <> FCapacity then
+  begin
+    SetLength(FList, NewCapacity);
+    FCapacity := NewCapacity;
+  end;
+end;
+
+{**************************************************}
+procedure TALNVStringList.SetSorted(Value: Boolean);
+begin
+  if FSorted <> Value then
+  begin
+    if Value then Sort;
+    FSorted := Value;
+  end;
+end;
+
+{**********************************************************}
+procedure TALNVStringList.SetUpdateState(Updating: Boolean);
+begin
+  if Updating then Changing else Changed;
+end;
+
+{*********************************************************************************************}
+function ALNVStringListCompareStrings(List: TALNVStringList; Index1, Index2: Integer): Integer;
+begin
+  Result := List.CompareStrings(List.FList[Index1].FName,
+                                List.FList[Index2].FName);  // The return value is less than 0 if List.FList[Index1].FName < List.FList[Index2].FName, 0 if List.FList[Index1].FName = List.FList[Index2].FName, or greater than 0 if List.FList[Index1].FName > List.FList[Index2].FName.
+  if result = 0 then begin
+    if (not List.FList[Index1].fNvS) and List.FList[Index2].FNVS then result := -1  // Must be ordered in this order :
+                                                                                    // aa
+                                                                                    // aaa
+                                                                                    // aaa=
+                                                                                    // aaaa
+    else if (List.FList[Index1].fNvS) and (not List.FList[Index2].FNVS) then result := 1;  // Must be ordered in this order :
+                                                                                           // aa
+                                                                                           // aaa
+                                                                                           // aaa=
+                                                                                           // aaaa
+    if (result=0) then Result := List.CompareStrings(List.FList[Index1].FValue,
+                                                     List.FList[Index2].FValue);  // The return value is less than 0 if List.FList[Index1].FValue < List.FList[Index2].FValue, 0 if List.FList[Index1].FValue = List.FList[Index2].FValue, or greater than 0 if List.FList[Index1].FValue > List.FList[Index2].FValue.
+  end;
+end;
+
+{*****************************}
+procedure TALNVStringList.Sort;
+begin
+  CustomSort(ALNVStringListCompareStrings);
+end;
+
+{************************************************************************}
+procedure TALNVStringList.CustomSort(Compare: TALNVStringListSortCompare);
+begin
+  if not Sorted and (FCount > 1) then
+  begin
+    Changing;
+    QuickSort(0, FCount - 1, Compare);
+    Changed;
+  end;
+end;
+
+{*************************************************************************}
+function TALNVStringList.CompareStrings(const S1, S2: AnsiString): Integer;
+begin
+
+  // Orignial Delphi Code
+  // the difference between TALNVStringList and TStringList is that
+  // TstringList use ansiCompareStr or ansiCompareText that are
+  // dependant from the local. I don't like this behavior because
+  // as you can read
+  // http://msdn.microsoft.com/en-us/library/windows/desktop/dd317759(v=vs.85).aspx
+  // "Using CompareString incorrectly can compromise the security of your
+  // application. Strings that are not compared correctly can produce
+  // invalid input. For example, the function can raise security issues when
+  // used for a non-linguistic comparison, because two strings that are
+  // distinct in their binary representation can be linguistically equivalent"
+  // so i prefere to use instead CompareStr and CompareText but only
+  // a..z = A..Z will be handle when case insensitive is set.
+  // other behavior must be handle in descendant classe
+  //
+  // also not the ansiCompareStr and ansiCompareText
+  // are 10x more slower than CompareStr and CompareText
+  //
+  // if CaseSensitive then
+  //   Result := AnsiCompareStr(S1, S2)
+  // else
+  //   Result := AnsiCompareText(S1, S2);
+
+  // it's important that the order is not change because
+  // of the ord(NameValueSeparator) this is need because of
+  // function FindName
+  //
+  // EX the items
+  //
+  //   aaa0
+  //   aaa=123
+  //   aaaa
+  //
+  // must be ordered like
+  //
+  //   aaa=123   |     aaa
+  //   aaa0      |     aaa0
+  //   aaaa      |     aaaa
+  //                   => OK, ordered work with findname
+  //
+  // but with just Result := ALCompareText(S1, S2)
+  // it's will be ordered like
+  //
+  //   aaa0      |     aaa0
+  //   aaa=123   |     aaa
+  //   aaaa      |     aaaa
+  //                   => KO, NOT ordered, break the findname
+  //
+
+  if CaseSensitive then
+    Result := ALCompareStr(S1, S2)
+  else
+    Result := ALCompareText(S1, S2);
+
+end;
+
+{***************************************************}
+procedure TALNVStringList.init(OwnsObjects: Boolean);
+begin
+  setlength(FList, 0);
+  FCount := 0;
+  FCapacity := 0;
+  FSorted := False;
+  FDuplicates := dupIgnore;
+  FCaseSensitive := False;
+  FOnChange := nil;
+  FOnChanging := nil;
+  FOwnsObject := OwnsObjects;
+end;
+
+{*********************************}
+constructor TALNVStringList.Create;
+begin
+  inherited Create;
+  init(False);
+end;
+
+{*******************************************************}
+constructor TALNVStringList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  init(OwnsObjects);
+end;
+
+{***************************************************************}
+procedure TALNVStringList.SetCaseSensitive(const Value: Boolean);
+begin
+  if Value <> FCaseSensitive then
+  begin
+    FCaseSensitive := Value;
+    if Sorted then
+    begin
+      // Calling Sort won't sort the list because CustomSort will
+      // only sort the list if it's not already sorted
+      Sorted := False;
+      Sorted := True;
+    end;
+  end;
+end;
+
+{***************************************************************************************************}
+Function TALNVStringList.ExtractNameValue(const S: AnsiString; var Name, Value: AnsiString): Boolean;
+Var P1: Integer;
+begin
+  P1 := AlPos(NameValueSeparator,S);
+  if P1 > 0 then begin
+    result := True;
+    Name := AlCopyStr(S,1,P1-1);
+    Value := AlCopyStr(S,P1+1, maxint);
+  end
+  else begin
+    Result := False;
+    Name := S;
+    Value := '';
+  end;
+end;
+
+{***********************************************************}
+function TALNVStringList.GetName(Index: Integer): AnsiString;
+begin
+  if Cardinal(Index) >= Cardinal(Count) then
+    Error(@SListIndexError, Index);
+  Result := Flist[Index].fName;
+end;
+
+{*****************************************************************}
+function TALNVStringList.GetStrictName(Index: Integer): AnsiString;
+begin
+  if Cardinal(Index) >= Cardinal(Count) then
+    Error(@SListIndexError, Index);
+  if Flist[Index].fnvs then Result := Flist[Index].fName
+  else result := ''
+end;
+
+{********************************************************************}
+function TALNVStringList.GetValue(const Name: AnsiString): AnsiString;
+var
+  I: Integer;
+begin
+  I := IndexOfName(Name);
+  if I >= 0 then begin
+    if Flist[i].fnvs then Result := Flist[i].fValue
+    else Result := '';
+  end else
+    Result := '';
+end;
+
+{****************************************************************}
+procedure TALNVStringList.SetValue(const Name, Value: AnsiString);
+var
+  I: Integer;
+begin
+  I := IndexOfName(Name);
+  if Value <> '' then
+  begin
+    if I < 0 then AddNameValue(Name, Value)
+    else begin
+      Flist[i].fValue := Value;
+      Flist[i].fNVS := True;
+    end
+  end else
+  begin
+    if I >= 0 then Delete(I);
+  end;
+end;
+
+{*********************************************************************}
+function TALNVStringList.GetValueFromIndex(Index: Integer): AnsiString;
+begin
+  if Index >= 0 then
+  begin
+    if Cardinal(Index) >= Cardinal(Count) then
+      Error(@SListIndexError, Index);
+    if (Flist[index].fNvs) then
+      result := Flist[index].fValue
+    else
+      Result := '';
+  end
+  else
+    Result := '';
+end;
+
+{***********************************************************************************}
+procedure TALNVStringList.SetValueFromIndex(Index: Integer; const Value: AnsiString);
+begin
+  if Value <> '' then
+  begin
+    if Index < 0 then AddNameValue('', Value)
+    else begin
+      if Cardinal(Index) >= Cardinal(Count) then
+        Error(@SListIndexError, Index);
+      Flist[Index].fValue := Value;
+      Flist[Index].fNVS := True;
+    end;
+  end
+  else
+    if Index >= 0 then Delete(Index);
+end;
+
+{**************************************************************************}
+procedure TALNVStringList.SetPersistentValue(const Name, Value: AnsiString);
+var
+  I: Integer;
+begin
+  I := IndexOfName(Name);
+  if I < 0 then AddNameValue(Name, Value)
+  else begin
+    Flist[I].fValue := Value;
+    Flist[I].fNVS := True;
+  end
+end;
+
+{*********************************************************************************************}
+procedure TALNVStringList.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
+begin
+  if Index < 0 then AddNameValue('', Value)
+  else begin
+    if Cardinal(Index) >= Cardinal(Count) then
+      Error(@SListIndexError, Index);
+    Flist[Index].fValue := Value;
+    Flist[Index].fNVS := True;
+  end;
+end;
+
 {**********************************}
 destructor TALAVLStringList.Destroy;
 var
@@ -2194,6 +3336,12 @@ begin
     Clear;
     CaseSensitive := TALStringList(Source).CaseSensitive;
     FDuplicates := TALStringList(Source).Duplicates;
+  end
+  else if Source is TALNVStringList then
+  begin
+    Clear;
+    CaseSensitive := TALNVStringList(Source).FCaseSensitive;
+    FDuplicates := TALNVStringList(Source).FDuplicates;
   end
   {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
@@ -2349,7 +3497,7 @@ begin
   Result := TALAVLStringListBinaryTreeNode(FNodelist[Index]).Obj;
 end;
 
-{**************************************************}
+{***********************************************}
 function TALAVLStringList.GetTextStr: AnsiString;
 var
   I, L, Size, Count: Integer;
@@ -2442,13 +3590,13 @@ begin
   InsertItem(Index, S, AObject);
 end;
 
-{*******************************************************************************************}
+{****************************************************************************************}
 procedure TALAVLStringList.InsertNameValue(Index: Integer; const Name, Value: AnsiString);
 begin
   InsertNameValueObject(Index, Name, Value, nil);
 end;
 
-{*******************************************************************************************************************}
+{****************************************************************************************************************}
 procedure TALAVLStringList.InsertNameValueObject(Index: Integer; const Name, Value: AnsiString; AObject: TObject);
 begin
   if (Index < 0) or (Index > Count) then Error(@SListIndexError, Index);
@@ -2699,7 +3847,7 @@ begin
   end;
 end;
 
-{***************************************************************}
+{************************************************************}
 function TALAVLStringList.GetName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
@@ -2707,7 +3855,7 @@ begin
   Result := TALAVLStringListBinaryTreeNode(FNodelist[Index]).ID;
 end;
 
-{*********************************************************************}
+{******************************************************************}
 function TALAVLStringList.GetStrictName(Index: Integer): AnsiString;
 begin
   if Cardinal(Index) >= Cardinal(Count) then
@@ -2716,7 +3864,7 @@ begin
   else result := ''
 end;
 
-{************************************************************************}
+{*********************************************************************}
 function TALAVLStringList.GetValue(const Name: AnsiString): AnsiString;
 var
   I: Integer;
@@ -2729,7 +3877,7 @@ begin
     Result := '';
 end;
 
-{********************************************************************}
+{*****************************************************************}
 procedure TALAVLStringList.SetValue(const Name, Value: AnsiString);
 var
   I: Integer;
@@ -2748,7 +3896,7 @@ begin
   end;
 end;
 
-{*************************************************************************}
+{**********************************************************************}
 function TALAVLStringList.GetValueFromIndex(Index: Integer): AnsiString;
 begin
   if Index >= 0 then
@@ -2764,7 +3912,7 @@ begin
     Result := '';
 end;
 
-{***************************************************************************************}
+{************************************************************************************}
 procedure TALAVLStringList.SetValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Value <> '' then
@@ -2781,7 +3929,7 @@ begin
     if Index >= 0 then Delete(Index);
 end;
 
-{******************************************************************************}
+{***************************************************************************}
 procedure TALAVLStringList.SetPersistentValue(const Name, Value: AnsiString);
 var
   I: Integer;
@@ -2794,7 +3942,7 @@ begin
   end
 end;
 
-{*************************************************************************************************}
+{**********************************************************************************************}
 procedure TALAVLStringList.SetPersistentValueFromIndex(Index: Integer; const Value: AnsiString);
 begin
   if Index < 0 then AddNameValue('', Value)
@@ -2875,6 +4023,12 @@ begin
     Clear;
     CaseSensitive := TALStringList(Source).CaseSensitive;
     FDuplicates := TALStringList(Source).Duplicates;
+  end
+  else if Source is TALNVStringList then
+  begin
+    Clear;
+    FCaseSensitive := TALNVStringList(Source).FCaseSensitive;
+    FDuplicates := TALNVStringList(Source).FDuplicates;
   end
   else if Source is TALAvlStringList then
   begin

@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 442
   Top = 108
   Caption = 'Form1'
-  ClientHeight = 561
-  ClientWidth = 610
+  ClientHeight = 490
+  ClientWidth = 913
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,7 +15,7 @@ object Form1: TForm1
   TextHeight = 13
   object Label1: TLabel
     Left = 24
-    Top = 286
+    Top = 206
     Width = 22
     Height = 13
     Caption = 'Key'
@@ -28,7 +28,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 24
-    Top = 345
+    Top = 265
     Width = 104
     Height = 13
     Caption = 'Unencrypted Data'
@@ -40,8 +40,8 @@ object Form1: TForm1
     ParentFont = False
   end
   object Label3: TLabel
-    Left = 296
-    Top = 345
+    Left = 333
+    Top = 265
     Width = 187
     Height = 13
     Caption = 'Crypted Data (BASE64 Encoded)'
@@ -54,7 +54,7 @@ object Form1: TForm1
   end
   object ALButton1: TButton
     Left = 24
-    Top = 8
+    Top = 16
     Width = 124
     Height = 25
     Caption = 'Bench AES (EBC)'
@@ -63,23 +63,30 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 542
-    Width = 610
+    Top = 471
+    Width = 913
     Height = 19
     Panels = <
       item
-        Width = 140
+        Width = 200
       end
       item
         Width = 200
       end
       item
-        Width = 50
+        Width = 200
+      end
+      item
+        Width = 150
+      end
+      item
+        Width = 200
       end>
+    ExplicitWidth = 903
   end
   object ALButton3: TButton
     Left = 24
-    Top = 39
+    Top = 47
     Width = 124
     Height = 25
     Caption = 'Bench AES (CBC)'
@@ -88,7 +95,7 @@ object Form1: TForm1
   end
   object ALButton4: TButton
     Left = 24
-    Top = 70
+    Top = 78
     Width = 124
     Height = 25
     Caption = 'Bench Blowfish (EBC)'
@@ -97,30 +104,30 @@ object Form1: TForm1
   end
   object EditKey: TEdit
     Left = 24
-    Top = 305
+    Top = 225
     Width = 266
     Height = 21
     TabOrder = 4
   end
   object ALMemoDecryptedData: TMemo
     Left = 24
-    Top = 364
+    Top = 284
     Width = 266
     Height = 165
     ScrollBars = ssBoth
     TabOrder = 5
   end
   object ALMemoCryptedData: TMemo
-    Left = 296
-    Top = 364
+    Left = 333
+    Top = 284
     Width = 290
     Height = 165
     ScrollBars = ssBoth
     TabOrder = 6
   end
   object ALButton2: TButton
-    Left = 341
-    Top = 179
+    Left = 333
+    Top = 20
     Width = 97
     Height = 25
     Caption = 'Crypt (BF)'
@@ -128,8 +135,8 @@ object Form1: TForm1
     OnClick = ALButton2Click
   end
   object ALButton5: TButton
-    Left = 444
-    Top = 179
+    Left = 436
+    Top = 20
     Width = 115
     Height = 25
     Caption = 'DeCrypt (BF)'
@@ -137,8 +144,8 @@ object Form1: TForm1
     OnClick = ALButton5Click
   end
   object ALButton6: TButton
-    Left = 341
-    Top = 210
+    Left = 333
+    Top = 51
     Width = 97
     Height = 25
     Caption = 'Crypt (AES - EBC)'
@@ -146,8 +153,8 @@ object Form1: TForm1
     OnClick = ALButton6Click
   end
   object ALButton7: TButton
-    Left = 444
-    Top = 210
+    Left = 436
+    Top = 51
     Width = 115
     Height = 25
     Caption = 'DeCrypt (AES - EBC)'
@@ -156,7 +163,7 @@ object Form1: TForm1
   end
   object ALButton10: TButton
     Left = 154
-    Top = 8
+    Top = 16
     Width = 136
     Height = 25
     Caption = 'Bench MD5'
@@ -165,7 +172,7 @@ object Form1: TForm1
   end
   object ALButton11: TButton
     Left = 154
-    Top = 39
+    Top = 47
     Width = 136
     Height = 25
     Caption = 'Bench SHA1'
@@ -173,8 +180,8 @@ object Form1: TForm1
     OnClick = ALButton11Click
   end
   object ALButton8: TButton
-    Left = 341
-    Top = 241
+    Left = 333
+    Top = 82
     Width = 97
     Height = 25
     Caption = 'Crypt (AES - CBC)'
@@ -182,8 +189,8 @@ object Form1: TForm1
     OnClick = ALButton8Click
   end
   object ALButton9: TButton
-    Left = 444
-    Top = 241
+    Left = 436
+    Top = 82
     Width = 115
     Height = 25
     Caption = 'DeCrypt (AES - CBC)'
@@ -191,8 +198,8 @@ object Form1: TForm1
     OnClick = ALButton9Click
   end
   object ALButton12: TButton
-    Left = 341
-    Top = 272
+    Left = 333
+    Top = 113
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (SHA1)'
@@ -200,8 +207,8 @@ object Form1: TForm1
     OnClick = ALButton12Click
   end
   object ALButton13: TButton
-    Left = 341
-    Top = 303
+    Left = 333
+    Top = 144
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (MD5)'
@@ -209,8 +216,8 @@ object Form1: TForm1
     OnClick = ALButton13Click
   end
   object Panel7: TPanel
-    Left = 304
-    Top = 8
+    Left = 592
+    Top = 16
     Width = 292
     Height = 153
     BevelOuter = bvNone
@@ -306,7 +313,7 @@ object Form1: TForm1
   end
   object Button1: TButton
     Left = 154
-    Top = 70
+    Top = 78
     Width = 136
     Height = 25
     Caption = 'Bench CRC32 (Zlib)'
@@ -315,7 +322,7 @@ object Form1: TForm1
   end
   object Button2: TButton
     Left = 154
-    Top = 101
+    Top = 109
     Width = 136
     Height = 25
     Caption = 'Bench CRC32'
@@ -324,7 +331,7 @@ object Form1: TForm1
   end
   object Button3: TButton
     Left = 152
-    Top = 132
+    Top = 140
     Width = 138
     Height = 25
     Caption = 'Bench BobJenkinsHash'

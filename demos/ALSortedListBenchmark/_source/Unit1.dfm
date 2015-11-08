@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 738
-  ClientWidth = 711
+  ClientHeight = 710
+  ClientWidth = 989
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,15 +11,14 @@ object Form1: TForm1
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
-  OnClick = FormClick
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
-    Left = 239
-    Top = 76
-    Width = 215
+  object Label2: TLabel
+    Left = 223
+    Top = 57
+    Width = 148
     Height = 13
-    Caption = 'bench the operation aLst.Values[xxx];'
+    Caption = 'Number of items in the list'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -28,11 +27,10 @@ object Form1: TForm1
     ParentFont = False
   end
   object Panel2: TPanel
-    Left = 0
-    Top = 585
-    Width = 711
+    Left = 655
+    Top = 20
+    Width = 313
     Height = 153
-    Align = alBottom
     BevelOuter = bvNone
     BorderStyle = bsSingle
     Color = clSilver
@@ -40,7 +38,6 @@ object Form1: TForm1
     ParentBackground = False
     ParentCtl3D = False
     TabOrder = 0
-    ExplicitWidth = 702
     object cxLabel1: TcxLabel
       Left = 12
       Top = 12
@@ -125,49 +122,15 @@ object Form1: TForm1
       Width = 144
     end
   end
-  object ALButton10: TButton
-    Left = 234
-    Top = 8
-    Width = 220
-    Height = 25
-    Caption = 'Benchmark TALStringList (sorted)'
-    TabOrder = 1
-    OnClick = ALButton10Click
-  end
-  object ALButton11: TButton
-    Left = 234
-    Top = 39
-    Width = 220
-    Height = 25
-    Caption = 'Benchmark TStringList (sorted)'
-    TabOrder = 2
-    OnClick = ALButton11Click
-  end
-  object ALButton33: TButton
-    Left = 8
-    Top = 39
-    Width = 220
-    Height = 25
-    Caption = 'Benchmark TALAVLStringList'
-    TabOrder = 3
-    OnClick = ALButton33Click
-  end
-  object Button2: TButton
-    Left = 8
-    Top = 8
-    Width = 220
-    Height = 25
-    Caption = 'Benchmark TALHashedStringList'
-    TabOrder = 4
-    OnClick = Button2Click
-  end
   object Chart1: TChart
     Left = 0
-    Top = 104
-    Width = 711
-    Height = 481
-    Legend.Visible = False
-    BottomAxis.Title.Caption = 'NB items in the list'
+    Top = 208
+    Width = 989
+    Height = 502
+    Title.Text.Strings = (
+      'TChart')
+    Title.Visible = False
+    BottomAxis.LabelsBehind = True
     BottomAxis.Title.Font.Style = [fsBold]
     BottomAxis.TitleSize = 1
     LeftAxis.Title.Caption = 'time taken'
@@ -177,124 +140,180 @@ object Form1: TForm1
     View3DOptions.Orthogonal = False
     Align = alBottom
     Color = clWhite
-    TabOrder = 5
+    TabOrder = 1
     PrintMargins = (
       15
       24
       15
       24)
     ColorPaletteIndex = 7
-    object Series1: TLineSeries
+    object Series1: TBarSeries
+      LegendTitle = 'TALAVLStringList'
+      Marks.Angle = 90
       Marks.Arrow.Visible = True
       Marks.Callout.Brush.Color = clBlack
       Marks.Callout.Arrow.Visible = True
       Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
-      Brush.BackColor = clDefault
-      Pointer.Brush.Gradient.EndColor = 6724095
-      Pointer.Gradient.EndColor = 6724095
-      Pointer.InflateMargins = True
-      Pointer.Style = psRectangle
-      Pointer.Visible = False
+      Emboss.Color = 8618883
+      Shadow.Color = 8618883
       XValues.Name = 'X'
       XValues.Order = loAscending
-      YValues.Name = 'Y'
-      YValues.Order = loNone
-      Data = {0000000000}
-    end
-    object Series2: TLineSeries
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
-      Marks.Visible = False
-      Brush.BackColor = clDefault
-      Pointer.InflateMargins = True
-      Pointer.Style = psRectangle
-      Pointer.Visible = False
-      XValues.Name = 'X'
-      XValues.Order = loAscending
-      YValues.Name = 'Y'
-      YValues.Order = loNone
-      Data = {0000000000}
-    end
-    object Series3: TLineSeries
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
-      Marks.Visible = False
-      Brush.BackColor = clDefault
-      Pointer.InflateMargins = True
-      Pointer.Style = psRectangle
-      Pointer.Visible = False
-      XValues.Name = 'X'
-      XValues.Order = loAscending
-      YValues.Name = 'Y'
+      YValues.Name = 'Bar'
       YValues.Order = loNone
     end
-    object Series4: TLineSeries
+    object Series2: TBarSeries
+      LegendTitle = 'TALHashedStringList'
+      Marks.Angle = 90
       Marks.Arrow.Visible = True
       Marks.Callout.Brush.Color = clBlack
       Marks.Callout.Arrow.Visible = True
       Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
-      Brush.BackColor = clDefault
-      Pointer.InflateMargins = True
-      Pointer.Style = psRectangle
-      Pointer.Visible = False
+      Emboss.Color = 8684676
+      Shadow.Color = 8684676
       XValues.Name = 'X'
       XValues.Order = loAscending
-      YValues.Name = 'Y'
+      YValues.Name = 'Bar'
       YValues.Order = loNone
     end
-    object Series5: TLineSeries
+    object Series3: TBarSeries
+      LegendTitle = 'TALStringList'
+      Marks.Angle = 90
       Marks.Arrow.Visible = True
       Marks.Callout.Brush.Color = clBlack
       Marks.Callout.Arrow.Visible = True
       Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
-      Brush.BackColor = clDefault
-      Pointer.InflateMargins = True
-      Pointer.Style = psRectangle
-      Pointer.Visible = False
+      Emboss.Color = 8750469
+      Shadow.Color = 8750469
       XValues.Name = 'X'
       XValues.Order = loAscending
-      YValues.Name = 'Y'
+      YValues.Name = 'Bar'
       YValues.Order = loNone
     end
-    object Series6: TLineSeries
+    object Series4: TBarSeries
+      LegendTitle = 'TStringList'
+      Marks.Angle = 90
       Marks.Arrow.Visible = True
       Marks.Callout.Brush.Color = clBlack
       Marks.Callout.Arrow.Visible = True
       Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
-      Brush.BackColor = clDefault
-      Pointer.InflateMargins = True
-      Pointer.Style = psRectangle
-      Pointer.Visible = False
+      Emboss.Color = 8750469
+      Shadow.Color = 8750469
       XValues.Name = 'X'
       XValues.Order = loAscending
-      YValues.Name = 'Y'
+      YValues.Name = 'Bar'
+      YValues.Order = loNone
+    end
+    object Series5: TBarSeries
+      LegendTitle = 'TALIntegerList'
+      Marks.Angle = 65
+      Marks.Arrow.Visible = True
+      Marks.Callout.Brush.Color = clBlack
+      Marks.Callout.Arrow.Visible = True
+      Marks.ShapeStyle = fosRoundRectangle
+      Marks.Visible = False
+      Emboss.Color = 8684676
+      Shadow.Color = 8684676
+      XValues.Name = 'X'
+      XValues.Order = loAscending
+      YValues.Name = 'Bar'
+      YValues.Order = loNone
+    end
+    object Series6: TBarSeries
+      LegendTitle = 'TALNvStringList'
+      Marks.Arrow.Visible = True
+      Marks.Callout.Brush.Color = clBlack
+      Marks.Callout.Arrow.Visible = True
+      Marks.ShapeStyle = fosRoundRectangle
+      Marks.Visible = True
+      Emboss.Color = 8487297
+      Shadow.Color = 8487297
+      XValues.Name = 'X'
+      XValues.Order = loAscending
+      YValues.Name = 'Bar'
       YValues.Order = loNone
     end
   end
-  object Button1: TButton
-    Left = 460
-    Top = 8
+  object Button4: TButton
+    Left = 24
+    Top = 164
     Width = 220
     Height = 25
-    Caption = 'Benchmark TALStringList (fullscan)'
+    Caption = 'Run benchmark'
+    TabOrder = 2
+    OnClick = Button4Click
+  end
+  object SpinEditNbItems: TSpinEdit
+    Left = 223
+    Top = 76
+    Width = 121
+    Height = 22
+    MaxValue = 0
+    MinValue = 0
+    TabOrder = 3
+    Value = 1000
+  end
+  object CheckBoxALAVLStringList: TCheckBox
+    Left = 24
+    Top = 20
+    Width = 145
+    Height = 17
+    Caption = 'TALAVLStringList'
+    Checked = True
+    State = cbChecked
+    TabOrder = 4
+  end
+  object CheckBoxALHashedStringList: TCheckBox
+    Left = 24
+    Top = 43
+    Width = 137
+    Height = 17
+    Caption = 'TALHashedStringList'
+    Checked = True
+    State = cbChecked
+    TabOrder = 5
+  end
+  object CheckBoxALStringList: TCheckBox
+    Left = 24
+    Top = 66
+    Width = 97
+    Height = 17
+    Caption = 'TALStringList'
+    Checked = True
+    State = cbChecked
     TabOrder = 6
-    OnClick = Button1Click
   end
-  object Button3: TButton
-    Left = 460
-    Top = 39
-    Width = 220
-    Height = 25
-    Caption = 'Benchmark TStringList (fulscan)'
+  object CheckBoxStringList: TCheckBox
+    Left = 24
+    Top = 88
+    Width = 97
+    Height = 17
+    Caption = 'TStringList'
+    Checked = True
+    State = cbChecked
     TabOrder = 7
-    OnClick = Button3Click
+  end
+  object CheckBoxALIntegerList: TCheckBox
+    Left = 24
+    Top = 111
+    Width = 97
+    Height = 17
+    Caption = 'TALintegerList'
+    Checked = True
+    State = cbChecked
+    TabOrder = 8
+  end
+  object CheckBoxALNvStringList: TCheckBox
+    Left = 24
+    Top = 134
+    Width = 97
+    Height = 17
+    Caption = 'TALNVStringList'
+    Checked = True
+    State = cbChecked
+    TabOrder = 9
   end
 end

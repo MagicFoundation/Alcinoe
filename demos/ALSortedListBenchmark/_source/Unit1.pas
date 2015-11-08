@@ -8,38 +8,34 @@ uses
   cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
   cxLabel, Shellapi, System.Generics.Collections, system.Diagnostics,
   Vcl.ComCtrls, System.Generics.Defaults, VCLTee.TeEngine, VCLTee.Series,
-  VCLTee.TeeProcs, VCLTee.Chart;
+  VCLTee.TeeProcs, VCLTee.Chart, Vcl.Samples.Spin;
 
 type
   TForm1 = class(TForm)
     Panel2: TPanel;
-    ALButton10: TButton;
-    ALButton11: TButton;
-    ALButton33: TButton;
     cxLabel1: TcxLabel;
     cxLabel2: TcxLabel;
     cxWwwArkadiaComLabel: TcxLabel;
     cxLabel18: TcxLabel;
     cxLabel17: TcxLabel;
-    Button2: TButton;
     Chart1: TChart;
-    Series1: TLineSeries;
-    Series2: TLineSeries;
-    Button1: TButton;
-    Series3: TLineSeries;
-    Series4: TLineSeries;
-    Series5: TLineSeries;
-    Series6: TLineSeries;
-    Button3: TButton;
-    Label1: TLabel;
-    procedure FormClick(Sender: TObject);
-    procedure ALButton11Click(Sender: TObject);
-    procedure ALButton10Click(Sender: TObject);
-    procedure ALButton33Click(Sender: TObject);
+    Button4: TButton;
+    Series1: TBarSeries;
+    Series2: TBarSeries;
+    Series3: TBarSeries;
+    Series4: TBarSeries;
+    Series5: TBarSeries;
+    SpinEditNbItems: TSpinEdit;
+    Label2: TLabel;
+    CheckBoxALAVLStringList: TCheckBox;
+    CheckBoxALHashedStringList: TCheckBox;
+    CheckBoxALStringList: TCheckBox;
+    CheckBoxStringList: TCheckBox;
+    CheckBoxALIntegerList: TCheckBox;
+    CheckBoxALNvStringList: TCheckBox;
+    Series6: TBarSeries;
     procedure cxWwwArkadiaComLabelClick(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
   public
   end;
@@ -55,283 +51,454 @@ uses ALString,
 
 {$R *.dfm}
 
-type
-
-  {**************************************************}
-  PPROCESS_MEMORY_COUNTERS = ^PROCESS_MEMORY_COUNTERS;
-  PROCESS_MEMORY_COUNTERS = record
-    cb : DWORD;
-    PageFaultCount : DWORD;
-    PeakWorkingSetSize : DWORD;
-    WorkingSetSize : DWORD; //Task managers MemUsage number
-    QuotaPeakPagedPoolUsage : DWORD;
-    QuotaPagedPoolUsage : DWORD;
-    QuotaPeakNonPagedPoolUsage : DWORD;
-    QuotaNonPagedPoolUsage : DWORD;
-    PagefileUsage : DWORD; //TaskMan's VM Size number
-    PeakPagefileUsage : DWORD;
-  end;
-  TProcessMemoryCounters = PROCESS_MEMORY_COUNTERS;
-
-{**********************************************************************************************************************************************}
-function GetProcessMemoryInfo(Process : THandle; var MemoryCounters : TProcessMemoryCounters; cb : DWORD) : BOOL; stdcall; external 'psapi.dll';
-
-{****************************************************}
-function ProcessMemoryUsage(ProcessID : DWORD): DWORD;
-var ProcessHandle : THandle;
-    MemCounters   : TProcessMemoryCounters;
-begin
-  Result := 0;
-  ProcessHandle := OpenProcess(PROCESS_QUERY_INFORMATION or PROCESS_VM_READ,
-                               false,
-                               ProcessID);
-  try
-    if GetProcessMemoryInfo(ProcessHandle,
-                            MemCounters,
-                            sizeof(MemCounters))
-    then Result := MemCounters.WorkingSetSize;
-  finally
-    CloseHandle(ProcessHandle);
-  end;
-end;
-
-{******************************************}
-procedure TForm1.FormClick(Sender: TObject);
-begin
-  Windows.SetFocus(0);
-end;
-
-{*********************************************}
-procedure TForm1.Button1Click(Sender: TObject);
-
-    procedure _DoBench(Count: integer);
-    Var aLst: TALStringList;
-        aStopWatch: TstopWatch;
-        i,j: integer;
-    begin
-      aLst := TALStringList.create;
-      try
-        aLst.CaseSensitive := false;
-        aLst.duplicates := DupIgnore;
-        aStopWatch := TstopWatch.Create;
-        for I := 1 to 1000 do begin
-          aLst.Clear;
-          for j := 1 to Count do
-            aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-          aStopWatch.start;
-          aLst.Values[AlRandomStr(Random(30)+1)];
-          aStopWatch.Stop;
-        end;
-        chart1.Series[2].Addxy(Count, aStopWatch.Elapsed.TotalMilliseconds , '', clpurple);
-        application.ProcessMessages;
-      finally
-        aLst.Free;
-      end;
-    end;
-
-Var i: integer;
-
-begin
-
-chart1.Series[2].Clear;
-for I := 1 to 20 do
-  _DoBench(i);
-
-end;
-
-procedure TForm1.Button2Click(Sender: TObject);
-
-    procedure _DoBench(Count: integer);
-    Var aLst: TALHashedStringList;
-        aStopWatch: TstopWatch;
-        i,j: integer;
-    begin
-      aLst := TALHashedStringList.create;
-      try
-        aLst.CaseSensitive := false;
-        aLst.duplicates := DupIgnore;
-        aStopWatch := TstopWatch.Create;
-        for I := 1 to 1000 do begin
-          aLst.Clear;
-          for j := 1 to Count do
-            aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-          aStopWatch.start;
-          aLst.Values[AlRandomStr(Random(30)+1)];
-          aStopWatch.Stop;
-        end;
-        chart1.Series[0].Addxy(Count, aStopWatch.Elapsed.TotalMilliseconds , '', clred);
-        application.ProcessMessages;
-      finally
-        aLst.Free;
-      end;
-    end;
-
-Var i: integer;
-
-begin
-
-chart1.Series[0].Clear;
-for I := 1 to 50 do
-  _DoBench(i);
-end;
-
-
-procedure TForm1.Button3Click(Sender: TObject);
-
-    procedure _DoBench(Count: integer);
-    Var aLst: TStringList;
-        aStopWatch: TstopWatch;
-        i,j: integer;
-    begin
-      aLst := TStringList.create;
-      try
-        aLst.CaseSensitive := false;
-        aLst.duplicates := DupIgnore;
-        aStopWatch := TstopWatch.Create;
-        for I := 1 to 1000 do begin
-          aLst.Clear;
-          for j := 1 to Count do
-            aLst.Add(ALRandomStrU(Random(30)+1) + '=' + ALRandomStrU(50));
-          aStopWatch.start;
-          aLst.Values[ALRandomStrU(Random(30)+1)];
-          aStopWatch.Stop;
-        end;
-        chart1.Series[5].Addxy(Count, aStopWatch.Elapsed.TotalMilliseconds , '', clGray);
-        application.ProcessMessages;
-      finally
-        aLst.Free;
-      end;
-    end;
-
-Var i: integer;
-
-begin
-
-chart1.Series[5].Clear;
-for I := 1 to 20 do
-  _DoBench(i);
-
-end;
-
 {**********************************************************}
 procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
 begin
   ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
-{************************************************}
-procedure TForm1.ALButton10Click(Sender: TObject);
+{*********************************************}
+procedure TForm1.Button4Click(Sender: TObject);
 
-    procedure _DoBench(Count: integer);
-    Var aLst: TALStringList;
-        aStopWatch: TstopWatch;
-        i,j: integer;
-    begin
-      aLst := TALStringList.create;
-      try
-        aLst.CaseSensitive := false;
-        aLst.duplicates := DupIgnore;
-        aStopWatch := TstopWatch.Create;
-        for I := 1 to 1000 do begin
-          aLst.Clear;
-          for j := 1 to Count do
-            aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-          aLst.Sorted := True;
-          aStopWatch.start;
-          aLst.Values[AlRandomStr(Random(30)+1)];
-          aStopWatch.Stop;
-        end;
-        chart1.Series[1].Addxy(Count, aStopWatch.Elapsed.TotalMilliseconds , '', clgreen);
-        application.ProcessMessages;
-      finally
-        aLst.Free;
+  procedure _DoALAVLStringListBench(Count: integer);
+  Var aLst: TALAVLStringList;
+      aStopWatch: TstopWatch;
+      S1, S2: ansiString;
+      i,j: integer;
+  begin
+    aLst := TALAVLStringList.create;
+    try
+      aLst.CaseSensitive := false;
+      aLst.duplicates := DupIgnore;
+      aStopWatch := TstopWatch.Create;
+
+      //indexOF
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOf(S1);
+        aStopWatch.Stop;
       end;
-    end;
+      chart1.Series[0].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOf');
+      application.ProcessMessages;
 
-Var i: integer;
+      //indexOFName
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOfName(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[0].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOfName');
+      application.ProcessMessages;
+
+      //add
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.add(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[0].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Add');
+      application.ProcessMessages;
+
+      //Value['xxx'] := 'yyy';
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        S2 := AlRandomStr(50);
+        aStopWatch.start;
+        aLst.Values[S1] := S2;
+        aStopWatch.Stop;
+      end;
+      chart1.Series[0].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Value[xxx]:=yyy');
+      application.ProcessMessages;
+
+    finally
+      aLst.Free;
+    end;
+  end;
+
+  procedure _DoALHashedStringListBench(Count: integer);
+  Var aLst: TALHashedStringList;
+      aStopWatch: TstopWatch;
+      S1, S2: ansiString;
+      i,j: integer;
+  begin
+    aLst := TALHashedStringList.create;
+    try
+      aLst.CaseSensitive := false;
+      aLst.duplicates := DupIgnore;
+      aStopWatch := TstopWatch.Create;
+
+      //indexOF
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOf(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[1].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOf');
+      application.ProcessMessages;
+
+      //indexOFName
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOfName(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[1].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOfName');
+      application.ProcessMessages;
+
+      //add
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.add(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[1].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Add');
+      application.ProcessMessages;
+
+      //Value['xxx'] := 'yyy';
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        S2 := AlRandomStr(50);
+        aStopWatch.start;
+        aLst.Values[S1] := S2;
+        aStopWatch.Stop;
+      end;
+      chart1.Series[1].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Value[xxx]:=yyy');
+      application.ProcessMessages;
+
+    finally
+      aLst.Free;
+    end;
+  end;
+
+  procedure _DoALStringListBench(Count: integer);
+  Var aLst: TALStringList;
+      aStopWatch: TstopWatch;
+      S1, S2: ansiString;
+      i,j: integer;
+  begin
+    aLst := TALStringList.create;
+    try
+      aLst.CaseSensitive := false;
+      aLst.duplicates := DupIgnore;
+      aLst.sorted := true;
+      aStopWatch := TstopWatch.Create;
+
+      //indexOF
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOf(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[2].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOf');
+      application.ProcessMessages;
+
+      //indexOFName
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOfName(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[2].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOfName');
+      application.ProcessMessages;
+
+      //add
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.add(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[2].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Add');
+      application.ProcessMessages;
+
+      //Value['xxx'] := 'yyy';
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        S2 := AlRandomStr(50);
+        aStopWatch.start;
+        aLst.Values[S1] := S2;
+        aStopWatch.Stop;
+      end;
+      chart1.Series[2].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Value[xxx]:=yyy');
+      application.ProcessMessages;
+
+    finally
+      aLst.Free;
+    end;
+  end;
+
+  procedure _DoALNvStringListBench(Count: integer);
+  Var aLst: TALNvStringList;
+      aStopWatch: TstopWatch;
+      S1, S2: ansiString;
+      i,j: integer;
+  begin
+    aLst := TALNvStringList.create;
+    try
+      aLst.CaseSensitive := false;
+      aLst.duplicates := DupIgnore;
+      aLst.sorted := true;
+      aStopWatch := TstopWatch.Create;
+
+      //indexOF
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOf(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[5].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOf');
+      application.ProcessMessages;
+
+      //indexOFName
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOfName(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[5].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOfName');
+      application.ProcessMessages;
+
+      //add
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1));
+        S1 := AlRandomStr(Random(30)+1);
+        aStopWatch.start;
+        aLst.add(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[5].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Add');
+      application.ProcessMessages;
+
+      //Value['xxx'] := 'yyy';
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
+        S1 := AlRandomStr(Random(30)+1);
+        S2 := AlRandomStr(50);
+        aStopWatch.start;
+        aLst.Values[S1] := S2;
+        aStopWatch.Stop;
+      end;
+      chart1.Series[5].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Value[xxx]:=yyy');
+      application.ProcessMessages;
+
+    finally
+      aLst.Free;
+    end;
+  end;
+
+  procedure _DoStringListBench(Count: integer);
+  Var aLst: TStringList;
+      aStopWatch: TstopWatch;
+      S1, S2: String;
+      i,j: integer;
+  begin
+    aLst := TStringList.create;
+    try
+      aLst.CaseSensitive := false;
+      aLst.duplicates := DupIgnore;
+      aLst.sorted := true;
+      aStopWatch := TstopWatch.Create;
+
+      //indexOF
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStrU(Random(30)+1));
+        S1 := AlRandomStrU(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOf(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[3].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOf');
+      application.ProcessMessages;
+
+      //indexOFName
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStrU(Random(30)+1) + '=' + AlRandomStrU(50));
+        S1 := AlRandomStrU(Random(30)+1);
+        aStopWatch.start;
+        aLst.IndexOfName(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[3].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOfName');
+      application.ProcessMessages;
+
+      //add
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStrU(Random(30)+1));
+        S1 := AlRandomStrU(Random(30)+1);
+        aStopWatch.start;
+        aLst.add(S1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[3].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Add');
+      application.ProcessMessages;
+
+      //Value['xxx'] := 'yyy';
+      aLst.sorted := False;
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(AlRandomStrU(Random(30)+1) + '=' + AlRandomStrU(50));
+        S1 := AlRandomStrU(Random(30)+1);
+        S2 := AlRandomStrU(50);
+        aStopWatch.start;
+        aLst.Values[S1] := S2;
+        aStopWatch.Stop;
+      end;
+      chart1.Series[3].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Value[xxx]:=yyy');
+      application.ProcessMessages;
+
+    finally
+      aLst.Free;
+    end;
+  end;
+
+  procedure _DoALIntegerListBench(Count: integer);
+  Var aLst: TALIntegerList;
+      aStopWatch: TstopWatch;
+      I1: integer;
+      i,j: integer;
+  begin
+    aLst := TALIntegerList.create;
+    try
+      aLst.duplicates := DupIgnore;
+      aLst.sorted := true;
+      aStopWatch := TstopWatch.Create;
+
+      //indexOF
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(Random(maxint));
+        I1 := Random(maxint);
+        aStopWatch.start;
+        aLst.IndexOf(I1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[4].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'IndexOf');
+      application.ProcessMessages;
+
+      //indexOFName
+      chart1.Series[4].AddY(0, 'IndexOfName');
+
+      //add
+      aStopWatch.Reset;
+      for I := 1 to 1000 do begin
+        aLst.Clear;
+        for j := 1 to Count do
+          aLst.Add(Random(maxint));
+        I1 := Random(maxint);
+        aStopWatch.start;
+        aLst.add(I1);
+        aStopWatch.Stop;
+      end;
+      chart1.Series[4].AddY(aStopWatch.Elapsed.TotalMilliseconds, 'Add');
+      application.ProcessMessages;
+
+      //Value['xxx'] := 'yyy';
+      chart1.Series[4].AddY(0, 'Value[xxx]:=yyy');
+
+    finally
+      aLst.Free;
+    end;
+  end;
 
 begin
 
-chart1.Series[1].Clear;
-for I := 1 to 20 do
-  _DoBench(i);
-
-end;
-
-{************************************************}
-procedure TForm1.ALButton11Click(Sender: TObject);
-
-    procedure _DoBench(Count: integer);
-    Var aLst: TStringList;
-        aStopWatch: TstopWatch;
-        i,j: integer;
-    begin
-      aLst := TStringList.create;
-      try
-        aLst.CaseSensitive := false;
-        aLst.duplicates := DupIgnore;
-        aStopWatch := TstopWatch.Create;
-        for I := 1 to 1000 do begin
-          aLst.Clear;
-          for j := 1 to Count do
-            aLst.Add(string(AlRandomStr(Random(30)+1)) + '=' + string(AlRandomStr(50)));
-          aLst.Sorted := true;
-          aStopWatch.start;
-          aLst.Values[string(AlRandomStr(Random(30)+1))];
-          aStopWatch.Stop;
-        end;
-        chart1.Series[4].Addxy(Count, aStopWatch.Elapsed.TotalMilliseconds , '', clMaroon);
-        application.ProcessMessages;
-      finally
-        aLst.Free;
-      end;
-    end;
-
-Var i: integer;
-
-begin
-
-chart1.Series[4].Clear;
-for I := 1 to 20 do
-  _DoBench(i);
-
-end;
-
-{************************************************}
-procedure TForm1.ALButton33Click(Sender: TObject);
-
-    procedure _DoBench(Count: integer);
-    Var aLst: TALAVLStringList;
-        aStopWatch: TstopWatch;
-        i,j: integer;
-    begin
-      aLst := TALAVLStringList.create;
-      try
-        aLst.CaseSensitive := false;
-        aLst.duplicates := DupIgnore;
-        aStopWatch := TstopWatch.Create;
-        for I := 1 to 1000 do begin
-          aLst.Clear;
-          for j := 1 to Count do
-            aLst.Add(AlRandomStr(Random(30)+1) + '=' + AlRandomStr(50));
-          aStopWatch.start;
-          aLst.Values[AlRandomStr(Random(30)+1)];
-          aStopWatch.Stop;
-        end;
-        chart1.Series[3].Addxy(Count, aStopWatch.Elapsed.TotalMilliseconds , '', clBlack);
-        application.ProcessMessages;
-      finally
-        aLst.Free;
-      end;
-    end;
-
-Var i: integer;
-
-begin
-
-chart1.Series[3].Clear;
-for I := 1 to 50 do
-  _DoBench(i);
+  chart1.Series[0].Clear;
+  chart1.Series[1].Clear;
+  chart1.Series[2].Clear;
+  chart1.Series[3].Clear;
+  chart1.Series[4].Clear;
+  chart1.Series[5].Clear;
+  if CheckBoxALAVLStringList.Checked then _DoALAVLStringListBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxALHashedStringList.Checked then _DoALHashedStringListBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxALStringList.Checked then _DoALStringListBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxStringList.Checked then _DoStringListBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxALIntegerList.Checked then _DoALIntegerListBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxALNvStringList.Checked then _DoALNvStringListBench(StrToInt(SpinEditNbItems.Text));
 
 end;
 

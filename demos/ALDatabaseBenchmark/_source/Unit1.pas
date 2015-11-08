@@ -2133,6 +2133,7 @@ begin
                                    True,
                                    nil);
 
+            aXMLDATA.Clear('root');
             aStopWatch := TStopWatch.StartNew;
             if fUpdateSQL then Tform1(fOwner).Sqlite3ConnectionPoolClient.UpdateData(S1, aconnectionHandle)
             else Tform1(fOwner).Sqlite3ConnectionPoolClient.SelectData(s1,
@@ -2468,6 +2469,7 @@ begin
                   FTotalExecuteTimeTaken := FTotalExecuteTimeTaken + aStopWatch.Elapsed.TotalMilliseconds;
                 end
                 else begin
+                  aXMLDATA.Clear('root');
                   aStopWatch := TStopWatch.StartNew;
                   Tform1(fOwner).FirebirdConnectionPoolClient.SelectData(aTmpSelectDataQueries,
                                                                          aXMLDATA.documentElement,
@@ -2668,6 +2670,7 @@ begin
                                    True,
                                    nil);
 
+            aXMLDATA.Clear('root');
             aStopWatch := TStopWatch.StartNew;
             if fUpdateSQL then Tform1(fOwner).MySqlConnectionPoolClient.UpdateData(S1, aConnectionHandle)
             else Tform1(fOwner).MySqlConnectionPoolClient.SelectData(S1,
@@ -3018,6 +3021,7 @@ begin
                                                    nil));
 
         //update the data
+        aJSONDATA.Clear;
         aStopWatch := TStopWatch.StartNew;
         if fCMD = 'SELECT' then Tform1(fOwner).MongoDBConnectionPoolClient.SelectData(aFullCollectionName,
                                                                                       aQuery,

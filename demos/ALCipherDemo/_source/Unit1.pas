@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, ExtCtrls, StdCtrls, ComCtrls, cxGraphics, ALZlibExApi,
   cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
-  cxLabel, Shellapi, System.Generics.Defaults;
+  cxLabel, Shellapi, System.Generics.Defaults, diagnostics,
+  System.Generics.Collections, dateutils;
 
 type
   TForm1 = class(TForm)
@@ -85,9 +86,14 @@ end;
 
 {************************************************}
 procedure TForm1.ALButton10Click(Sender: TObject);
-Var Data: AnsiString;
-    Counter: integer;
-    StartTime: DWORD;
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: ansiString;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<ansiString,ansistring>;
+    aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
@@ -97,30 +103,51 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  Counter := 0;
-  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[0].Text := 'MD5';
   StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := '';
-  StartTime := GetTickCount;
-  Data := ALRandomStr(250);
-  while True do begin
-    ALStringHashMD5(Data);
-    inc(counter);
-    if counter mod 100000 = 0 then begin
-      StatusBar1.Panels[0].Text := 'MD5';
-      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
-      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TButton).Tag = 0 then break;
-      application.ProcessMessages;
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  aDictionary := TDictionary<ansiString,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25));
+      aStopWatch.Start;
+      aHash := ALStringHashMD5(aData, false);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then inc(aCollision);
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
     end;
+  finally
+    aDictionary.free;
   end;
 end;
 
 {***********************************************}
 procedure TForm1.ALButton11Click(Sender: TObject);
-Var Data: AnsiString;
-    Counter: integer;
-    StartTime: DWORD;
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: ansiString;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<ansiString,ansistring>;
+    aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
@@ -130,22 +157,38 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  Counter := 0;
-  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[0].Text := 'SHA1';
   StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := '';
-  StartTime := GetTickCount;
-  Data := ALRandomStr(250);
-  while True do begin
-    ALStringHashSHA1(Data);
-    inc(counter);
-    if counter mod 100000 = 0 then begin
-      StatusBar1.Panels[0].Text := 'SHA1';
-      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
-      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TButton).Tag = 0 then break;
-      application.ProcessMessages;
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  aDictionary := TDictionary<ansiString,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25));
+      aStopWatch.Start;
+      aHash := ALStringHashSHA1(aData, false);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then inc(aCollision);
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
     end;
+  finally
+    aDictionary.free;
   end;
 end;
 
@@ -317,9 +360,14 @@ end;
 
 {*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
-Var Data: AnsiString;
-    Counter: integer;
-    StartTime: DWORD;
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: integer;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<integer,ansistring>;
+    aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
@@ -329,30 +377,51 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  Counter := 0;
-  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[0].Text := 'CRC32 (Zlib)';
   StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := '';
-  StartTime := GetTickCount;
-  Data := ALRandomStr(250);
-  while True do begin
-    ZCrc32(0, Data[1], length(Data));
-    inc(counter);
-    if counter mod 100000 = 0 then begin
-      StatusBar1.Panels[0].Text := 'CRC32 (Zlib)';
-      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
-      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TButton).Tag = 0 then break;
-      application.ProcessMessages;
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  aDictionary := TDictionary<integer,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25));
+      aStopWatch.Start;
+      aHash := ZCrc32(0, aData[1], length(aData));
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then inc(aCollision);
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
     end;
+  finally
+    aDictionary.free;
   end;
 end;
 
 {*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
-Var Data: AnsiString;
-    Counter: integer;
-    StartTime: DWORD;
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: integer;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<integer,ansistring>;
+    aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
@@ -362,29 +431,51 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  Counter := 0;
-  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[0].Text := 'CRC32';
   StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := '';
-  StartTime := GetTickCount;
-  Data := ALRandomStr(250);
-  while True do begin
-    ALStringHashCRC32(Data);
-    inc(counter);
-    if counter mod 100000 = 0 then begin
-      StatusBar1.Panels[0].Text := 'CRC32';
-      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
-      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TButton).Tag = 0 then break;
-      application.ProcessMessages;
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  aDictionary := TDictionary<integer,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25));
+      aStopWatch.Start;
+      aHash := ALStringHashCRC32(aData);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then inc(aCollision);
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
     end;
+  finally
+    aDictionary.free;
   end;
 end;
 
+{*********************************************}
 procedure TForm1.Button3Click(Sender: TObject);
-Var Data: AnsiString;
-    Counter: integer;
-    StartTime: DWORD;
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: integer;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<integer,ansistring>;
+    aCollision: integer;
 begin
   if (Sender as TButton).Tag = 1 then begin
     (Sender as TButton).Tag := 0;
@@ -394,22 +485,38 @@ begin
   (Sender as TButton).Tag := 1;
   (Sender as TButton).Caption := 'Stop';
   randomize;
-  Counter := 0;
-  StatusBar1.Panels[0].Text := '';
+  StatusBar1.Panels[0].Text := 'BobJenkinsHash';
   StatusBar1.Panels[1].Text := '';
-  StatusBar1.Panels[2].Text := '';
-  StartTime := GetTickCount;
-  Data := ALRandomStr(250);
-  while True do begin
-    BobJenkinsHash(Data[1], Length(Data) * SizeOf(Data[1]), 0);
-    inc(counter);
-    if counter mod 100000 = 0 then begin
-      StatusBar1.Panels[0].Text := 'BobJenkinsHash';
-      StatusBar1.Panels[1].Text := IntToStr(round(counter / Max(1,((GetTickCount - StartTime) / 1000)))) + ' keys/s';
-      StatusBar1.Panels[2].Text := 'Input: '+inttostr(length(Data))+' bytes';
-      if (Sender as TButton).Tag = 0 then break;
-      application.ProcessMessages;
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  aDictionary := TDictionary<integer,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25));
+      aStopWatch.Start;
+      aHash := BobJenkinsHash(aData[1], Length(aData) * SizeOf(aData[1]), 0);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then inc(aCollision);
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
     end;
+  finally
+    aDictionary.free;
   end;
 end;
 

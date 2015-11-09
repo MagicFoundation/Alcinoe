@@ -9180,7 +9180,7 @@ Begin
                              nil,
                              True,
                              flags,
-                             Addr(ReplaceWith[1]),
+                             PAnsiChar(ReplaceWith),
                              TalStringList,
                              false);
 end;

@@ -228,7 +228,7 @@ object Form1: TForm1
       Marks.Callout.Brush.Color = clBlack
       Marks.Callout.Arrow.Visible = True
       Marks.ShapeStyle = fosRoundRectangle
-      Marks.Visible = True
+      Marks.Visible = False
       Emboss.Color = 8487297
       Shadow.Color = 8487297
       XValues.Name = 'X'

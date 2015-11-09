@@ -7,19 +7,34 @@ Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 product:      ALStringList
 Version:      4.01
 
-Description:  *TALStringList Work the same as Delphi TstringList except
-               that it's allow to search a name=value using a quicksort
-               algorithm when the list is sorted. Also TALStringList
-               use a locale independant algorithme (based on the 8-bit
-               ordinal value of each character) instead of the AnsiCompareText
-               and AnsiCompareStr used by the Delphi TstringList. at the
-               end the sort in TALStringList is up to 10x more faster
-               than in Delphi TstringList. Also TALStringList is not an
-               unicode TstringList but an 100% Ansi StringList
+Description:  TALStringList
+              TALStringList Work the same as Delphi TstringList except that it's
+              allow to search a name=value using a quicksort algorithm when the
+              list is sorted. Also TALStringList use a locale independant
+              algorithme (based on the 8-bit ordinal value of each character)
+              instead of the AnsiCompareText and AnsiCompareStr used by the
+              Delphi TstringList. at the end the sort in TALStringList is up to
+              10x more faster than in Delphi TstringList. Also TALStringList is
+              not an unicode TstringList but an 100% Ansi StringList
 
-              *TALAVLStringList it's also a like a TStringlist, but use
-               internaly an AVL binary Tree to speed up the
-               insert / delete / lookup.
+              TALNVStringList
+              TALNVStringList (NV for NameValue) is same as TALStringList (use
+              also a quicksort algorithme) except that here optimisation is
+              oriented for name/value list instead of string list.
+
+              TALAVLStringList
+              TALAVLStringList is same as TALStringList except that it's use
+              internally a self-balancing binary Tree instead of a quicksort
+              algorithm
+
+              TALHashedStringList
+              TALHashedStringList is same as TALStringList except that it's use
+              an internal hash table instead of a quicksort algorithm. By using
+              TALHashedStringList instead of TALStringList, you can improve
+              performance when the list contains a large number of strings
+              (else if you list don't contain a lot of strings the performance
+              is lower than TALStringList because of the cost to calculate the
+              hash)
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 

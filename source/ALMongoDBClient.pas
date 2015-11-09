@@ -484,6 +484,34 @@ type
                            const ReturnFieldsSelector: AnsiString;
                            flags: TALMongoDBClientSelectDataFlags;
                            JSONDATA: TALJSONNode); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           Skip: integer;
+                           First: Integer;
+                           OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                           ExtData: Pointer); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                           ExtData: Pointer); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           const RowTag: AnsiString;
+                           Skip: integer;
+                           First: Integer;
+                           JSONDATA: TALJSONNode); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           const RowTag: AnsiString;
+                           JSONDATA: TALJSONNode); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           JSONDATA: TALJSONNode); overload; virtual;
 
       procedure UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
@@ -499,12 +527,17 @@ type
                            const Selector: AnsiString;
                            const Update: AnsiString;
                            flags: TALMongoDBClientUpdateDataFlags); overload; virtual;
+      procedure UpdateData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
+                           const Update: AnsiString); overload; virtual;
 
       procedure InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
                                                                  // foo and the collection bar, the full collection name is foo.bar
                            const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
                            flags: TALMongoDBClientInsertDataFlags); overload; virtual; // Options (see TALMongoDBClientInsertDataFlags)
+      procedure InsertData(const FullCollectionName: AnsiString;
+                           const documents: AnsiString); overload; virtual;
 
       procedure DeleteData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
@@ -517,6 +550,8 @@ type
       procedure DeleteData(const FullCollectionName: AnsiString;
                            const Selector: AnsiString;
                            flags: TALMongoDBClientDeleteDataFlags); overload; virtual;
+      procedure DeleteData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString); overload; virtual;
 
       Procedure FindAndModifyData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                         // name with the collection name, using a . for the concatenation. For example, for the database
@@ -662,6 +697,39 @@ type
                            flags: TALMongoDBClientSelectDataFlags;
                            JSONDATA: TALJSONNode;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           Skip: integer;
+                           First: Integer;
+                           OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                           ExtData: Pointer;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                           ExtData: Pointer;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           const RowTag: AnsiString;
+                           Skip: integer;
+                           First: Integer;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           const RowTag: AnsiString;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      Procedure SelectData(const FullCollectionName: AnsiString;
+                           const Query: AnsiString;
+                           const ReturnFieldsSelector: AnsiString;
+                           JSONDATA: TALJSONNode;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
       procedure UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
@@ -679,6 +747,10 @@ type
                            const Update: AnsiString;
                            flags: TALMongoDBClientUpdateDataFlags;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      procedure UpdateData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
+                           const Update: AnsiString;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
       procedure InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
@@ -686,6 +758,12 @@ type
                            const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
                            flags: TALMongoDBClientInsertDataFlags;// Options (see TALMongoDBClientInsertDataFlags)
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      procedure InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
+                                                                 // name with the collection name, using a . for the concatenation. For example, for the database
+                                                                 // foo and the collection bar, the full collection name is foo.bar
+                           const documents: AnsiString; // One or more documents to insert into the collection. If there are more than one, they are written in sequence, one after another.
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+
 
       procedure DeleteData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                  // name with the collection name, using a . for the concatenation. For example, for the database
@@ -699,6 +777,9 @@ type
       procedure DeleteData(const FullCollectionName: AnsiString;
                            const Selector: AnsiString;
                            flags: TALMongoDBClientDeleteDataFlags;
+                           const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
+      procedure DeleteData(const FullCollectionName: AnsiString;
+                           const Selector: AnsiString;
                            const ConnectionSocket: TSocket = INVALID_SOCKET); overload; virtual;
 
       Procedure FindAndModifyData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
@@ -2491,6 +2572,114 @@ begin
 end;
 
 {*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      Skip: integer;
+                                      First: Integer;
+                                      OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                                      ExtData: Pointer);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, //JSONDATA,
+             OnNewRowFunct,
+             ExtData);
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                                      ExtData: Pointer);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewRowFunct,
+             ExtData);
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      const RowTag: AnsiString;
+                                      Skip: integer;
+                                      First: Integer;
+                                      JSONDATA: TALJSONNode);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      const RowTag: AnsiString;
+                                      JSONDATA: TALJSONNode);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.SelectData(const FullCollectionName: AnsiString;
+                                      const Query: AnsiString;
+                                      const ReturnFieldsSelector: AnsiString;
+                                      JSONDATA: TALJSONNode);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil); // ExtData
+end;
+
+{*************************************************************************}
 Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                             // name with the collection name, using a . for the concatenation. For example, for the database
                                                                             // foo and the collection bar, the full collection name is foo.bar
@@ -2557,6 +2746,23 @@ begin
 end;
 
 {*************************************************************************}
+Procedure TAlMongoDBClient.UpdateData(const FullCollectionName: AnsiString;
+                                      const Selector: AnsiString;
+                                      const Update: AnsiString);
+var aNumberOfDocumentsUpdated: integer;
+    aupdatedExisting: boolean;
+    aObjectID: ansiString;
+begin
+  UpdateData(FullCollectionName,
+             selector,
+             update,
+             [],
+             aNumberOfDocumentsUpdated,
+             aupdatedExisting,
+             aObjectID);
+end;
+
+{*************************************************************************}
 Procedure TAlMongoDBClient.InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                             // name with the collection name, using a . for the concatenation. For example, for the database
                                                                             // foo and the collection bar, the full collection name is foo.bar
@@ -2597,6 +2803,15 @@ begin
                    flags,
                    aStopWatch.Elapsed.TotalMilliseconds);
 
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.InsertData(const FullCollectionName: AnsiString;
+                                      const documents: AnsiString);
+begin
+  InsertData(FullCollectionName,
+             documents,
+             []);
 end;
 
 {*************************************************************************}
@@ -2648,6 +2863,17 @@ begin
   DeleteData(FullCollectionName,
              selector,
              flags,
+             aNumberOfDocumentsRemoved);
+end;
+
+{*************************************************************************}
+Procedure TAlMongoDBClient.DeleteData(const FullCollectionName: AnsiString;
+                                      const Selector: AnsiString);
+var aNumberOfDocumentsRemoved: integer;
+begin
+  DeleteData(FullCollectionName,
+             selector,
+             [],
              aNumberOfDocumentsRemoved);
 end;
 
@@ -3541,6 +3767,124 @@ begin
 end;
 
 {***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    Skip: integer;
+                                                    First: Integer;
+                                                    OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewRowFunct,
+             ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    OnNewRowFunct: TALMongoDBClientSelectDataOnNewRowFunct;
+                                                    ExtData: Pointer;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             nil, // JSONDATA,
+             OnNewRowFunct,
+             ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    const RowTag: AnsiString;
+                                                    Skip: integer;
+                                                    First: Integer;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             RowTag,
+             '', // ViewTag,
+             Skip,
+             First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    const RowTag: AnsiString;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.SelectData(const FullCollectionName: AnsiString;
+                                                    const Query: AnsiString;
+                                                    const ReturnFieldsSelector: AnsiString;
+                                                    JSONDATA: TALJSONNode;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  SelectData(FullCollectionName,
+             Query,
+             ReturnFieldsSelector,
+             [],
+             '', // RowTag,
+             '', // ViewTag,
+             -1, // Skip,
+             -1, // First,
+             -1, // CacheThreshold,
+             JSONDATA,
+             nil, // OnNewRowFunct,
+             nil, // ExtData,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
 Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                                           // name with the collection name, using a . for the concatenation. For example, for the database
                                                                                           // foo and the collection bar, the full collection name is foo.bar
@@ -3633,6 +3977,25 @@ begin
 end;
 
 {***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.UpdateData(const FullCollectionName: AnsiString;
+                                                    const Selector: AnsiString;
+                                                    const Update: AnsiString;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+var aNumberOfDocumentsUpdated: integer;
+    aupdatedExisting: boolean;
+    aObjectID: ansiString;
+begin
+  UpdateData(FullCollectionName,
+             selector,
+             update,
+             [],
+             aNumberOfDocumentsUpdated,
+             aupdatedExisting,
+             aObjectID,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
 Procedure TAlMongoDBConnectionPoolClient.InsertData(const FullCollectionName: AnsiString; // The full collection name. The full collection name is the concatenation of the database
                                                                                           // name with the collection name, using a . for the concatenation. For example, for the database
                                                                                           // foo and the collection bar, the full collection name is foo.bar
@@ -3699,6 +4062,17 @@ begin
     end;
   end;
 
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.InsertData(const FullCollectionName: AnsiString;
+                                                    const documents: AnsiString;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+begin
+  InsertData(FullCollectionName,
+             documents,
+             [],
+             ConnectionSocket);
 end;
 
 {***************************************************************************************}
@@ -3777,6 +4151,19 @@ begin
   DeleteData(FullCollectionName,
              selector,
              flags,
+             aNumberOfDocumentsRemoved,
+             ConnectionSocket);
+end;
+
+{***************************************************************************************}
+Procedure TAlMongoDBConnectionPoolClient.DeleteData(const FullCollectionName: AnsiString;
+                                                    const Selector: AnsiString;
+                                                    const ConnectionSocket: TSocket = INVALID_SOCKET);
+var aNumberOfDocumentsRemoved: integer;
+begin
+  DeleteData(FullCollectionName,
+             selector,
+             [],
              aNumberOfDocumentsRemoved,
              ConnectionSocket);
 end;

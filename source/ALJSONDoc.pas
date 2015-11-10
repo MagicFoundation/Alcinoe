@@ -2885,7 +2885,7 @@ begin
                    // Generally we have to use GetDateTime everytime because we must handle the case when
                    // value of the node like ISODate(...), so it comes from something like MongoDB
                    if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime, Fdocument.FormatSettings^)
-                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings);
+                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings); // TODO: i don't like it, need to think how to handle ISODate(...) by other way
                  end;
     nstNull: result := GetNodeValue;
     nstRegEx: result := GetNodeValue;

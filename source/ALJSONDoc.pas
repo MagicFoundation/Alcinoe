@@ -2870,7 +2870,10 @@ begin
 
   case NodeSubType of
     nstFloat: begin
-                if assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALFloatToStr(GetFloat,Fdocument.FormatSettings^)
+                // There are no known issues connected with some possible float values that requires for some special analysis
+                // like dates that can contain something like ISODate(...), so it's enough here just take NodeValue if it's
+                // default format settings
+                if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALFloatToStr(GetFloat, Fdocument.FormatSettings^)
                 else result := GetNodeValue;
               end;
     nstText: result := GetNodeValue;
@@ -2879,8 +2882,10 @@ begin
     nstObjectID: result := GetObjectID;
     nstBoolean: result := GetNodeValue;
     nstDateTime: begin
-                   if assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime,Fdocument.FormatSettings^)
-                   else result := GetNodeValue;
+                   // Generally we have to use GetDateTime everytime because we must handle the case when
+                   // value of the node like ISODate(...), so it comes from something like MongoDB
+                   if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime, Fdocument.FormatSettings^)
+                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings);
                  end;
     nstNull: result := GetNodeValue;
     nstRegEx: result := GetNodeValue;

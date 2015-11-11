@@ -6434,7 +6434,6 @@ begin
   result := ALTryStrToFloat(s,aDouble,AFormatSettings);
 end;
 
-
 {*******************************************************************************************}
 function ALFloatToStr(Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;
 {$IFDEF UNICODE}

@@ -1735,7 +1735,8 @@ begin
     System.Move(FList[Index + 1], FList[Index],
       (FCount - Index) * SizeOf(TALStringItem));
     // Make sure there is no danglng pointer in the last (now unused) element
-    PPointer(@FList[FCount])^ := nil;
+    PPointer(@FList[FCount].FString)^ := nil;
+    PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then
     Obj.Free;
@@ -2474,7 +2475,10 @@ begin
     System.Move(FList[Index + 1], FList[Index],
       (FCount - Index) * SizeOf(TALNVStringItem));
     // Make sure there is no danglng pointer in the last (now unused) element
-    PPointer(@FList[FCount])^ := nil;
+    PPointer(@FList[FCount].FName)^   := nil;
+    PPointer(@FList[FCount].FValue)^  := nil;
+    PPointer(@FList[FCount].FNVS)^    := nil;
+    PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then
     Obj.Free;

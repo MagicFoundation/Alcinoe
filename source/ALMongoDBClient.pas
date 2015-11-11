@@ -3435,64 +3435,64 @@ Var aViewRec: TalJSONNode;
 
 begin
 
-  //acquire a connection
-  if ConnectionSocket = INVALID_SOCKET then begin
-    aTMPConnectionSocket := AcquireConnection;
-    aOwnConnection := True;
-  end
+  //only OnNewRowFunct / JSONDATA can be used
+  if assigned(OnNewRowFunct) then JSONDATA := nil;
+
+  //clear the JSONDATA
+  if assigned(JSONDATA) then aJSONDocument := Nil
   else begin
-    aTMPConnectionSocket := ConnectionSocket;
-    aOwnConnection := False;
+    aJSONDocument := TALJSONDocument.create;
+    JSONDATA := aJSONDocument.Node;
   end;
 
   try
 
-    //only OnNewRowFunct / JSONDATA can be used
-    if assigned(OnNewRowFunct) then JSONDATA := nil;
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
 
-    //clear the JSONDATA
-    if assigned(JSONDATA) then aJSONDocument := Nil
-    else begin
-      aJSONDocument := TALJSONDocument.create;
-      JSONDATA := aJSONDocument.Node;
-    end;
+    //Handle the CacheThreshold
+    aCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(aJSONDocument)) and
+       (not (sfTailMonitoring in flags)) and
+       ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
 
-    Try
+      //try to load from from cache
+      aCacheKey := ALStringHashSHA1(RowTag + '#' +
+                                    alinttostr(Skip) + '#' +
+                                    alinttostr(First) + '#' +
+                                    FullCollectionName + '#' +
+                                    ReturnFieldsSelector + '#' +
+                                    Query);
 
-      //init the TstopWatch
-      aStopWatch := TstopWatch.Create;
+      if loadcachedData(aCacheKey, aCacheStr) then begin
 
-      //Handle the CacheThreshold
-      aCacheKey := '';
-      If (CacheThreshold > 0) and
-         (not assigned(aJSONDocument)) and
-         (not (sfTailMonitoring in flags)) and
-         ((JSONDATA.ChildNodes.Count = 0) or  // else the save will not work
-          (ViewTag <> '')) then begin
+        //init the aViewRec
+        if (ViewTag <> '') then aViewRec := JSONDATA.AddChild(ViewTag, ntobject)
+        else aViewRec := JSONDATA;
 
-        //try to load from from cache
-        aCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                      alinttostr(Skip) + '#' +
-                                      alinttostr(First) + '#' +
-                                      FullCollectionName + '#' +
-                                      ReturnFieldsSelector + '#' +
-                                      Query);
+        //assign the tmp data to the XMLData
+        aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
 
-        if loadcachedData(aCacheKey, aCacheStr) then begin
-
-          //init the aViewRec
-          if (ViewTag <> '') then aViewRec := JSONDATA.AddChild(ViewTag, ntobject)
-          else aViewRec := JSONDATA;
-
-          //assign the tmp data to the XMLData
-          aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
-
-          //exit
-          exit;
-
-        end;
+        //exit
+        exit;
 
       end;
+
+    end;
+
+    //acquire a connection
+    if ConnectionSocket = INVALID_SOCKET then begin
+      aTMPConnectionSocket := AcquireConnection;
+      aOwnConnection := True;
+    end
+    else begin
+      aTMPConnectionSocket := ConnectionSocket;
+      aOwnConnection := False;
+    end;
+
+    try
 
       //start the TstopWatch
       aStopWatch.Reset;
@@ -3625,20 +3625,20 @@ begin
 
       end;
 
-    Finally
-      if assigned(aJSONDocument) then aJSONDocument.free;
-    End;
-
     //Release the Connection
     if aOwnConnection then ReleaseConnection(aTMPConnectionSocket);
 
-  except
-    On E: Exception do begin
-      if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
-                                               (not (E Is EAlMongoDBClientException)) or
-                                               (E as EAlMongoDBClientException).CloseConnection);
-      raise;
+    except
+      On E: Exception do begin
+        if aOwnConnection then ReleaseConnection(aTMPConnectionSocket,
+                                                 (not (E Is EAlMongoDBClientException)) or
+                                                 (E as EAlMongoDBClientException).CloseConnection);
+        raise;
+      end;
     end;
+
+  finally
+    if assigned(aJSONDocument) then aJSONDocument.free;
   end;
 
 end;

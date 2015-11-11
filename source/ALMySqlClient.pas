@@ -1566,45 +1566,45 @@ begin
     XMLDATA := aXmlDocument.DocumentElement;
   end;
 
-  Try
+  try
+
+    //init the TstopWatch
+    aStopWatch := TstopWatch.Create;
+
+    //Handle the CacheThreshold
+    aCacheKey := '';
+    If (CacheThreshold > 0) and
+       (not assigned(aXmlDocument)) and
+       ((XMLdata.ChildNodes.Count = 0) or  // else the save will not work
+        (ViewTag <> '')) then begin
+
+      //try to load from from cache
+      aCacheKey := ALStringHashSHA1(RowTag + '#' +
+                                    alinttostr(Skip) + '#' +
+                                    alinttostr(First) + '#' +
+                                    ALGetFormatSettingsID(FormatSettings) + '#' +
+                                    SQL);
+      if loadcachedData(aCacheKey, aCacheStr) then begin
+
+        //init the aViewRec
+        if (ViewTag <> '') then aViewRec := XMLdata.AddChild(ViewTag)
+        else aViewRec := XMLdata;
+
+        //assign the tmp data to the XMLData
+        aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
+
+        //exit
+        exit;
+
+      end;
+
+    end;
 
     //acquire a connection and start the transaction if necessary
     aTmpConnectionHandle := ConnectionHandle;
     aOwnConnection := (not assigned(ConnectionHandle));
     if aOwnConnection then TransactionStart(aTmpConnectionHandle);
     Try
-
-      //init the TstopWatch
-      aStopWatch := TstopWatch.Create;
-
-      //Handle the CacheThreshold
-      aCacheKey := '';
-      If (CacheThreshold > 0) and
-         (not assigned(aXmlDocument)) and
-         ((XMLdata.ChildNodes.Count = 0) or  // else the save will not work
-          (ViewTag <> '')) then begin
-
-        //try to load from from cache
-        aCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                      alinttostr(Skip) + '#' +
-                                      alinttostr(First) + '#' +
-                                      ALGetFormatSettingsID(FormatSettings) + '#' +
-                                      SQL);
-        if loadcachedData(aCacheKey, aCacheStr) then begin
-
-          //init the aViewRec
-          if (ViewTag <> '') then aViewRec := XMLdata.AddChild(ViewTag)
-          else aViewRec := XMLdata;
-
-          //assign the tmp data to the XMLData
-          aViewRec.LoadFromXML(aCacheStr, true{XmlContainOnlyChildNodes}, false{ClearChildNodes});
-
-          //exit
-          exit;
-
-        end;
-
-      end;
 
       //start the TstopWatch
       aStopWatch.Reset;
@@ -1742,7 +1742,7 @@ begin
       if aOwnConnection then TransactionCommit(aTmpConnectionHandle);
 
     except
-      On E: Exception do begin
+      on E: Exception do begin
 
         // rollback the transaction and release the connection if owned
         // TODO
@@ -1757,9 +1757,9 @@ begin
       end;
     end;
 
-  Finally
+  finally
     if assigned(aXmlDocument) then aXmlDocument.free;
-  End;
+  end;
 
 end;
 

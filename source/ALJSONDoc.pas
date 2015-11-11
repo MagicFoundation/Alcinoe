@@ -617,6 +617,14 @@ function ALJsonEncodeWithNodeSubTypeHelperFunction(const aValue: AnsiString;
                                                    aNodeSubType: TALJSONNodeSubType;
                                                    const aFormatSettings: TALFormatSettings): AnsiString;
 
+function ALJSONDocTryStrToRegEx(const S: AnsiString; out Value: TALJSONRegEx): boolean;
+function ALJSONDocTryStrTobinary(const S: AnsiString; out Value: TALJSONBinary): boolean;
+function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+function ALJSONDocTryStrToObjectID(const S: AnsiString; out Value: TALJSONObjectID): Boolean;
+function ALJSONDocTryStrToTimestamp(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
+function ALJSONDocTryStrToInteger(const S: AnsiString; out Value: integer): Boolean;
+function ALJSONDocTryStrToInt64(const S: AnsiString; out Value: int64): Boolean;
+
 implementation
 
 uses {$IF CompilerVersion >= 23} {Delphi XE2}
@@ -2870,9 +2878,6 @@ begin
 
   case NodeSubType of
     nstFloat: begin
-                // There are no known issues connected with some possible float values that requires for some special analysis
-                // like dates that can contain something like ISODate(...), so it's enough here just take NodeValue if it's
-                // default format settings
                 if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALFloatToStr(GetFloat, Fdocument.FormatSettings^)
                 else result := GetNodeValue;
               end;
@@ -2885,7 +2890,7 @@ begin
                    // Generally we have to use GetDateTime everytime because we must handle the case when
                    // value of the node like ISODate(...), so it comes from something like MongoDB
                    if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime, Fdocument.FormatSettings^)
-                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings); // TODO: i don't like it, need to think how to handle ISODate(...) by other way
+                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings);
                  end;
     nstNull: result := GetNodeValue;
     nstRegEx: result := GetNodeValue;
@@ -2910,7 +2915,7 @@ end;
 function TALJSONNode.GetFloat: Double;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  If not ALTryStrToFloat(GetNodeValue, Result, ALDefaultFormatSettings) then ALJSONDocError(String(GetNodeValue) + ' is not a valid float');
+  If not ALTryStrToFloat(GetNodeValue, Result, ALDefaultFormatSettings) then ALJSONDocError('%s is not a valid float', [GetNodeValue]);
 end;
 
 {**************************************************}
@@ -2923,7 +2928,7 @@ end;
 function TALJSONNode.GetDateTime: TDateTime;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToDateTime(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid date and time');
+  if not ALJSONDocTryStrToDateTime(GetNodeValue, result) then ALJSONDocError('%s is not a valid date and time', [GetNodeValue]);
 end;
 
 {********************************************************}
@@ -2936,7 +2941,7 @@ end;
 function TALJSONNode.GetTimestamp: TALBSONTimestamp;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToTimestamp(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid BSON-Timestamp');
+  if not ALJSONDocTryStrToTimestamp(GetNodeValue, result) then ALJSONDocError('%s is not a valid BSON-Timestamp', [GetNodeValue]);
 end;
 
 {***************************************************************}
@@ -2949,7 +2954,7 @@ end;
 function TALJSONNode.GetObjectID: TALJSONObjectID;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToObjectID(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid ObjectID');
+  if not ALJSONDocTryStrToObjectID(GetNodeValue, result) then ALJSONDocError('%s is not a valid ObjectID', [GetNodeValue]);
 end;
 
 {*************************************************************}
@@ -2965,7 +2970,7 @@ end;
 function TALJSONNode.GetInt32: Integer;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToInteger(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid Int32');
+  if not ALJSONDocTryStrToInteger(GetNodeValue, result) then ALJSONDocError('%s is not a valid Int32', [GetNodeValue]);
 end;
 
 {***************************************************}
@@ -2978,7 +2983,7 @@ end;
 function TALJSONNode.GetInt64: Int64;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToInt64(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid Int64');
+  if not ALJSONDocTryStrToInt64(GetNodeValue, result) then ALJSONDocError('%s is not a valid Int64', [GetNodeValue]);
 end;
 
 {*************************************************}
@@ -2991,7 +2996,7 @@ end;
 function TALJSONNode.GetBool: Boolean;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  If not ALTryStrToBool(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid Boolean');
+  If not ALTryStrToBool(GetNodeValue, result) then ALJSONDocError('%s is not a valid Boolean', [GetNodeValue]);
 end;
 
 {**************************************************}
@@ -3032,7 +3037,7 @@ end;
 function TALJSONNode.GetRegEx: TALJSONRegEx;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToRegEx(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid regular expression');
+  if not ALJSONDocTryStrToRegEx(GetNodeValue, result) then ALJSONDocError('%s is not a valid regular expression', [GetNodeValue]);
 end;
 
 {********************************************************}
@@ -3045,7 +3050,7 @@ end;
 function TALJSONNode.GetBinary: TALJSONBinary;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToBinary(GetNodeValue, result) then ALJSONDocError(String(GetNodeValue) + ' is not a valid binary');
+  if not ALJSONDocTryStrToBinary(GetNodeValue, result) then ALJSONDocError('%s is not a valid binary', [GetNodeValue]);
 end;
 
 {**********************************************************}

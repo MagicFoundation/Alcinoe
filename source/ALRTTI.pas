@@ -60,7 +60,8 @@ interface
 
 uses System.Rtti,
      System.RTLConsts,
-     System.TypInfo;
+     System.TypInfo,
+     System.Generics.Collections;
 
 {$R-}
 
@@ -475,11 +476,11 @@ procedure ALRttiFinalization;
 
 {*******************************}
 var vALRTTIContext: TRttiContext;
+    vALRttiTypeCache: TObjectDictionary<ansiString,TALRttiType>;
 
 implementation
 
 uses System.sysutils,
-     System.Generics.Collections,
      System.Generics.Defaults,
      AlString;
 
@@ -1521,13 +1522,10 @@ begin
   Result := nil;
 end;
 
-{************************************************************}
-var _RttiTypeCache: TObjectDictionary<ansiString,TALRttiType>;
-
 {****************************************************************}
 function ALGetRttiType(const aClassName: AnsiString): TALRttiType;
 begin
-  if not _RttiTypeCache.TryGetValue(aClassName, result) then raise EALException.CreateFmt('Cannot obtain RTTI informations about the class %s', [aClassName]);
+  if not vALRttiTypeCache.TryGetValue(aClassName, result) then raise EALException.CreateFmt('Cannot obtain RTTI informations about the class %s', [aClassName]);
 end;
 
 {**************************************************************}
@@ -1548,18 +1546,18 @@ begin
   vALRTTIContext := TRttiContext.Create;
 
   //create vALRttiTypeCache
-  _RttiTypeCache := TObjectDictionary<ansiString,TALRttiType>.create([doOwnsValues]);
+  vALRttiTypeCache := TObjectDictionary<ansiString,TALRttiType>.create([doOwnsValues]);
 
   //init aRTTITypes
   aRTTITypes := vALRTTIContext.GetTypes;
 
   //first loop to create all the node inside _RttiTypeCache
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    if not _RttiTypeCache.ContainsKey(aRttiTypes[i].Handle.Name) then begin
+    if not vALRttiTypeCache.ContainsKey(aRttiTypes[i].Handle.Name) then begin
       if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
       else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
       else aRttiType := TALRttiType.Create;
-      _RttiTypeCache.Add(aRttiTypes[i].Handle.Name, aRttiType);
+      vALRttiTypeCache.Add(aRttiTypes[i].Handle.Name, aRttiType);
     end;
   end;
 
@@ -1567,11 +1565,11 @@ begin
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
     for aRttiField in aRttiTypes[i].GetFields do begin
       if assigned(aRttiField.FieldType) then begin
-        if not _RttiTypeCache.ContainsKey(aRttiField.FieldType.Handle.Name) then begin
+        if not vALRttiTypeCache.ContainsKey(aRttiField.FieldType.Handle.Name) then begin
           if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
           else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
           else aRttiType := TALRttiType.Create;
-          _RttiTypeCache.Add(aRttiField.FieldType.Handle.Name, aRttiType);
+          vALRttiTypeCache.Add(aRttiField.FieldType.Handle.Name, aRttiType);
         end;
       end;
     end;
@@ -1579,7 +1577,7 @@ begin
 
   //3rd loop to init all the fRttiType inside each node of _RttiTypeCache
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    if _RttiTypeCache.TryGetValue(aRttiTypes[i].Handle.Name, aRttiType)
+    if vALRttiTypeCache.TryGetValue(aRttiTypes[i].Handle.Name, aRttiType)
       then aRttiType.init(aRttiTypes[i]);
   end;
 
@@ -1589,7 +1587,7 @@ end;
 procedure ALRttiFinalization;
 Begin
   vALRTTIContext.Free;
-  _RttiTypeCache.Free;
+  vALRttiTypeCache.Free;
 End;
 
 end.

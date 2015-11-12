@@ -187,7 +187,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      AlStringList,
      ALXmlDoc;
 
-resourcestring
+const
   cALJSONNotActive              = 'No active document';
   cAlJSONNodeNotFound           = 'Node "%s" not found';
   cALJSONInvalidNodeType        = 'Invalid node type';
@@ -361,8 +361,6 @@ type
     function GetChildNodes: TALJSONNodeList; virtual;
     procedure SetChildNodes(const Value: TALJSONNodeList); virtual;
     function GetHasChildNodes: Boolean;
-    function GetNodeName: AnsiString;
-    procedure SetNodeName(const Value: AnsiString);
     function GetNodeType: TALJSONNodeType; virtual; abstract;
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     procedure SetNodeSubType(const Value: TALJSONNodeSubType); virtual; abstract;
@@ -393,6 +391,8 @@ type
     procedure SetRegEx(const Value: TALJSONRegEx);
     function GetBinary: TALJSONBinary;
     procedure SetBinary(const Value: TALJSONBinary);
+    function GetBinaryData: ansiString;
+    procedure SetBinaryData(const Value: ansiString);
     function GetOwnerDocument: TALJSONDocument;
     procedure SetOwnerDocument(const Value: TALJSONDocument);
     function GetParentNode: TALJSONNode;
@@ -418,7 +418,7 @@ type
     procedure LoadFromBSON(const BSON: AnsiString; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
     property HasChildNodes: Boolean read GetHasChildNodes;
-    property NodeName: AnsiString read GetNodeName write SetNodeName;
+    property NodeName: AnsiString read fNodeName write fNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: AnsiString read GetNodeValue; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType write SetNodeSubType;
@@ -436,6 +436,7 @@ type
     property Javascript: AnsiString read GetJavascript write SetJavascript;
     property RegEx: TALJSONRegEx read GetRegEx write SetRegEx;
     property Binary: TALJSONBinary read GetBinary write SetBinary;
+    property BinaryData: ansiString read GetBinaryData write SetBinaryData;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
   end;
@@ -485,6 +486,7 @@ type
     procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); override;
   public
     constructor Create(const NodeName: AnsiString = ''); override;
+    property NodeValue: AnsiString read fNodeValue; // it's just to have the property without any getter function to economize one string refcount
   end;
 
   {TALJSONDocument}
@@ -618,7 +620,7 @@ function ALJsonEncodeWithNodeSubTypeHelperFunction(const aValue: AnsiString;
                                                    const aFormatSettings: TALFormatSettings): AnsiString;
 
 function ALJSONDocTryStrToRegEx(const S: AnsiString; out Value: TALJSONRegEx): boolean;
-function ALJSONDocTryStrTobinary(const S: AnsiString; out Value: TALJSONBinary): boolean;
+function ALJSONDocTryStrTobinary(const S: AnsiString; out Subtype: byte; out Data: AnsiString): boolean;
 function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 function ALJSONDocTryStrToObjectID(const S: AnsiString; out Value: TALJSONObjectID): Boolean;
 function ALJSONDocTryStrToTimestamp(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
@@ -689,8 +691,8 @@ begin
 
 end;
 
-{***************************************************************************************}
-function ALJSONDocTryStrTobinary(const S: AnsiString; out Value: TALJSONBinary): boolean;
+{******************************************************************************************************}
+function ALJSONDocTryStrTobinary(const S: AnsiString; out Subtype: byte; out Data: AnsiString): boolean;
 var P1, P2: integer;
     aInt: integer;
 begin
@@ -724,7 +726,7 @@ begin
 
   // init Value.subtype
   if not ALTryStrToInt(ALTrim(ALCopyStr(s, P1, P2 - P1)), aInt) then Exit;
-  Value.subtype := aInt;
+  subtype := aInt;
 
   // init Value.Data
   p1 := P2 + 1; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
@@ -742,7 +744,7 @@ begin
   if (P2 <= p1) or (s[P2] <> s[P1]) then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
                                                //                                     ^P2
   inc(p1);
-  Value.Data := ALMimeBase64DecodeString(ALTrim(ALCopyStr(s, P1, P2-P1)));
+  Data := ALMimeBase64DecodeString(ALTrim(ALCopyStr(s, P1, P2-P1)));
 
   // set the result
   result := true;
@@ -1231,13 +1233,14 @@ Var RawJSONString: AnsiString;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function GetNodeSubTypeFromStrValue(const aStrValue: AnsiString; const AQuotedValue: Boolean): TALJSONNodeSubType;
-  var aDT:        TDateTime;
-      aObjectID:  TALJSONObjectID;
-      aTimestamp: TALBSONTimestamp;
-      aRegEx:     TALJSONRegEx;
-      aBinary:    TALJSONBinary;
-      aInt32:     integer;
-      aInt64:     int64;
+  var aDT:            TDateTime;
+      aObjectID:      TALJSONObjectID;
+      aTimestamp:     TALBSONTimestamp;
+      aRegEx:         TALJSONRegEx;
+      aBinarySubType: Byte;
+      aBinaryData:    ansiString;
+      aInt32:         integer;
+      aInt64:         int64;
   begin
     if AQuotedValue then result := NstText
     else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
@@ -1249,7 +1252,7 @@ Var RawJSONString: AnsiString;
     else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
     else if ALJSONDocTryStrToTimestamp(aStrValue, aTimestamp) then result := nstTimestamp
     else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
-    else if ALJSONDocTryStrToBinary(aStrValue, aBinary) then result := nstBinary
+    else if ALJSONDocTryStrToBinary(aStrValue, aBinarySubType, aBinaryData) then result := nstBinary
     else if ALJSONDocTryStrToRegEx(aStrValue, aRegEx) then result := nstRegEx
     else result := nstJavascript;
   end;
@@ -2832,18 +2835,6 @@ begin
   Result := assigned(aNodeList) and (aNodeList.Count > 0);
 end;
 
-{*******************************************}
-function TALJSONNode.GetNodeName: AnsiString;
-begin
-  result := FNodeName;
-end;
-
-{********************************************************}
-procedure TALJSONNode.SetNodeName(const Value: AnsiString);
-begin
-  fNodeName := Value;
-end;
-
 {**********************************************}
 function TALJSONNode.GetNodeTypeStr: AnsiString;
 begin
@@ -2861,8 +2852,8 @@ end;
 {********************************************}
 function TALJSONNode.GetNodeValue: ansiString;
 begin
+  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
   result := ''; // hide warning
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
 end;
 
 {*************************************************************************************************}
@@ -2884,17 +2875,15 @@ begin
     nstText: result := GetNodeValue;
     nstObject: result := GetNodeValue;
     nstArray: result := GetNodeValue;
-    nstObjectID: result := GetObjectID;
+    nstObjectID: result := GetObjectID; // value of the node like ObjectId ( "507f1f77bcf86cd799439011" ) so we must parse it via GetObjectID
     nstBoolean: result := GetNodeValue;
     nstDateTime: begin
-                   // Generally we have to use GetDateTime everytime because we must handle the case when
-                   // value of the node like ISODate(...), so it comes from something like MongoDB
                    if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime, Fdocument.FormatSettings^)
-                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings);
+                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings); // value of the node like ISODate('yyyy-mm-ddThh:nn:ss.zzzZ') so we must parse it via GetDateTime
                  end;
     nstNull: result := GetNodeValue;
     nstRegEx: result := GetNodeValue;
-    nstBinary: result := Getbinary.Data;
+    nstBinary: result := GetbinaryData;  // value of the node like BinData(0, "JliB6gIMRuSphAD2KmhzgQ==") so we must parse it via GetbinaryData
     nstJavascript: result := GetNodeValue;
     nstInt32: result := GetNodeValue;
     nstTimestamp: result := GetNodeValue;
@@ -3050,13 +3039,27 @@ end;
 function TALJSONNode.GetBinary: TALJSONBinary;
 begin
   if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToBinary(GetNodeValue, result) then ALJSONDocError('%s is not a valid binary', [GetNodeValue]);
+  if not ALJSONDocTryStrToBinary(GetNodeValue, result.Subtype, Result.Data) then ALJSONDocError('%s is not a valid binary', [GetNodeValue]);
 end;
 
 {**********************************************************}
 procedure TALJSONNode.SetBinary(const Value: TALJSONBinary);
 begin
   setNodeValue('BinData(' + ALInttostr(Value.Subtype) + ', "' + ALMimeBase64EncodeStringNoCRLF(Value.Data) + '")', nstBinary);
+end;
+
+{*********************************************}
+function TALJSONNode.GetBinaryData: ansiString;
+var aSubtype: byte;
+begin
+  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  if not ALJSONDocTryStrToBinary(GetNodeValue, aSubtype, Result) then ALJSONDocError('%s is not a valid binary', [GetNodeValue]);
+end;
+
+{***********************************************************}
+procedure TALJSONNode.SetBinaryData(const Value: ansiString);
+begin
+  setNodeValue('BinData(0, "' + ALMimeBase64EncodeStringNoCRLF(Value) + '")', nstBinary); // 0 = Default BSON type
 end;
 
 {*******************************************************}

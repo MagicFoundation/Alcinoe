@@ -288,6 +288,7 @@ Type
     FOnChange: TNotifyEvent;
     FOnChanging: TNotifyEvent;
     FOwnsObject: Boolean;
+    FNameValueOptimization: Boolean;
     procedure ExchangeItems(Index1, Index2: Integer);
     procedure Grow;
     procedure QuickSort(L, R: Integer; SCompare: TALStringListSortCompare);
@@ -334,6 +335,7 @@ Type
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChanging: TNotifyEvent read FOnChanging write FOnChanging;
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    property NameValueOptimization: Boolean read FNameValueOptimization write FNameValueOptimization;
   end;
 
   {----------------------}
@@ -1897,7 +1899,7 @@ end;
 {******************************************************************}
 function TALStringList.IndexOfName(const Name: ansistring): Integer;
 begin
-  if not Sorted then Result := inherited IndexOfName(Name)
+  if (not Sorted) or (not FNameValueOptimization) then Result := inherited IndexOfName(Name)
   else if not FindName(Name, Result) then Result := -1;
 end;
 
@@ -2218,11 +2220,18 @@ begin
   // IE 50% more slower with average 50 bytes for S1 and S2, it's even
   // more slower when the number of bytes in S1 and S2 increase
 
-  if CaseSensitive then
-    Result := InternalCompareStr(S1, S2)
-  else
-    Result := InternalCompareText(S1, S2);
-
+  if  fNameValueOptimization then begin
+    if CaseSensitive then
+      Result := InternalCompareStr(S1, S2)
+    else
+      Result := InternalCompareText(S1, S2);
+  end
+  else begin
+    if CaseSensitive then
+      Result := AlCompareStr(S1, S2)
+    else
+      Result := AlCompareText(S1, S2);
+  end;
 end;
 
 {*************************************************}
@@ -2237,6 +2246,7 @@ begin
   FOnChange := nil;
   FOnChanging := nil;
   FOwnsObject := OwnsObjects;
+  FNameValueOptimization := True;
 end;
 
 {*******************************}
@@ -2477,7 +2487,6 @@ begin
     // Make sure there is no danglng pointer in the last (now unused) element
     PPointer(@FList[FCount].FName)^   := nil;
     PPointer(@FList[FCount].FValue)^  := nil;
-    PPointer(@FList[FCount].FNVS)^    := nil;
     PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then

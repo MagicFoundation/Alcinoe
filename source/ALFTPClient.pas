@@ -189,7 +189,7 @@ type
 
 ResourceString
   CALFtpCLient_MsgNotConnected         = 'Not connected';
-  CALFtpCLient_MsgInvalidFtpRequest    = 'Invalid Ftp Request';  
+  CALFtpCLient_MsgInvalidFtpRequest    = 'Invalid Ftp Request';
 
 implementation
 

@@ -112,7 +112,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      {$IFEND}
      AlStringList;
 
-resourcestring
+const
   cALXmlNotActive            = 'No active document';
   cAlXmlNodeNotFound         = 'Node "%s" not found';
   cALXmlInvalidNodeType      = 'Invalid node type';

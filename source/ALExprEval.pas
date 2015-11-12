@@ -915,10 +915,6 @@ resourcestring
   RsALExprEvalNextArg  = 'Parse error: '','' and another parameter expected';
   RsALExprEvalEndArgs  = 'Parse error: '')'' to close function''s parameters expected';
 
-  RsALExprEvalExprNotFound          = 'Expression compiler error: Expression ''%s'' not found';
-  RsALExprEvalExprPtrNotFound       = 'Expression compiler error: Expression pointer not found';
-  RsALExprEvalExprRefCountAssertion = 'Expression compiler error: expression refcount < 0';
-
 implementation
 
 uses {$IF CompilerVersion >= 23} {Delphi XE2}

@@ -4625,7 +4625,10 @@ begin
                    end;
     nstBoolean:    if ALStrToBool(aValue) then result := 'true'
                    else result := 'false';
-    nstDateTime:   result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTime(aValue, aFormatSettings), ALDefaultFormatSettings);
+    nstDateTime:   begin
+                     if ALPos('ISODate', aValue) <= 0 then result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTime(aValue, aFormatSettings), ALDefaultFormatSettings)
+                     else result := aValue;
+                   end;
     nstJavascript: result := aValue;
     nstInt32:      result := 'NumberInt(' + ALIntToStr(ALstrToInt(aValue)) + ')';
     nstInt64:      result := 'NumberLong(' + ALIntToStr(ALstrToInt64(aValue)) + ')';

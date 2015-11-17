@@ -87,6 +87,7 @@ function  ALUTF8HTMLEncode(const Src: AnsiString;
                            const useNumericReference: boolean = True): AnsiString;
 function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
+procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
 function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
@@ -950,145 +951,228 @@ begin
   end;
 end;
 
-{******************************************************************}
-function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+{*****************************************************}
+procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
 
-var CurrentSrcPos, CurrentResultPos : Integer;
-    aTmpInteger: Integer;
-    SrcLength: integer;
+var CurrPos : Integer;
+    pResTail: PansiChar;
+    pResHead: pansiChar;
+    Ch1, Ch2, Ch3, Ch4, Ch5: ansiChar;
 
-    {---------------------------------------}
-    procedure _CopyCurrentSrcPosCharToResult;
-    Begin
-      result[CurrentResultPos] := src[CurrentSrcPos];
-      inc(CurrentResultPos);
-      inc(CurrentSrcPos);
+    {----------------------------------------------------}
+    function _OctToInt(I: integer; Ch: ansiChar): integer;
+    begin
+      Result := I * 8 + Ord(Ch) - Ord('0');
     end;
 
-    {----------------------------------------------------------------------------------}
-    procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
-    Var aUTF8String: AnsiString;
+    {----------------------------------------------------}
+    function _HexToInt(I: integer; Ch: ansiChar): integer;
+    begin
+      case Ch of
+        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+      end;
+    end;
+
+    {---------------------------------}
+    procedure _CopyCurrPosCharToResult;
+    Begin
+      pResTail^ := Str[CurrPos];
+      inc(pResTail);
+      inc(CurrPos);
+    end;
+
+    {-----------------------------------------------------------------------}
+    procedure _CopyAnsiCharToResult(aCharInt: Integer; aNewCurrPos: integer);
+    Begin
+      pResTail^ := ansiChar(aCharInt);
+      inc(pResTail);
+      CurrPos := aNewCurrPos;
+    end;
+
+    {--------------------------------------------------------------------------}
+    procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
+    Var {$IFDEF UNICODE}
+        aUTF8String: UTF8String;
+        {$ELSE}
+        aUTF8String: AnsiString;
+        {$ENDIF}
         K: integer;
     Begin
-      aUTF8String := UTF8Encode(WideChar(aUnicodeOrdEntity));
+      {$IFDEF UNICODE}
+      aUTF8String := Char(aCharInt);
+      {$ELSE}
+      aUTF8String := UTF8Encode(WideChar(aCharInt));
+      {$ENDIF}
       For k := 1 to length(aUTF8String) do begin
-        result[CurrentResultPos] := aUTF8String[k];
-        inc(CurrentResultPos);
+        pResTail^ := aUTF8String[k];
+        inc(pResTail);
       end;
-      CurrentSrcPos := aNewCurrentSrcPos;
+      CurrPos := aNewCurrPos;
     end;
 
-    {--------------------------------------------------}
-    // convert number in octal format to decimat format.
-    // It is not very difficult, because 217 in octal is
-    // 2*8*8+1*8+7 in decimal format.
-    function _OctToDec(const OctStr: ansistring): integer;
-    var i: Integer;
-    begin
-      Result:=0;
-      for i:=Length(OctStr) downto 1 do
-        Result:=Result+ALStrToInt(OctStr[i])*Trunc(Power(8, Length(OctStr)-i));
+    {---------------------------------}
+    procedure _CopyUnicodeCharToResult; overload;
+    var I: integer;
+    Begin
+      I := _HexToInt(0, ch2);
+      I := _HexToInt(I, ch3);
+      I := _HexToInt(I, ch4);
+      I := _HexToInt(I, ch5);
+      _CopyUnicodeCharToResult(I, CurrPos+6);
     end;
 
+    {---------------------------------------------------------------------------}
+    procedure _CopyIso88591CharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
+    {$IFDEF UNICODE}
+    type
+      Latin1String = type AnsiString(28591);
+    {$ENDIF}
+
+    Var {$IFDEF UNICODE}
+        aLatin1String: Latin1String;
+        aUTF8String: UTF8String;
+        {$ELSE}
+        aUTF8String: AnsiString;
+        {$ENDIF}
+        K: integer;
+
+    Begin
+      {$IFDEF UNICODE}
+      aLatin1String := ansiChar(aCharInt);
+      aUTF8String := aLatin1String;
+      {$ELSE}
+      aUTF8String := UTF8Encode(ALStringToWideString(ansichar(aCharInt), 28591{iso-8859-1})[1]);
+      {$ENDIF}
+      For k := 1 to length(aUTF8String) do begin
+        pResTail^ := aUTF8String[k];
+        inc(pResTail);
+      end;
+      CurrPos := aNewCurrPos;
+    end;
+
+    {-------------------------------------}
+    procedure _CopyHexIso88591CharToResult; overload;
+    var I: integer;
+    Begin
+      I := _HexToInt(0, ch2);
+      I := _HexToInt(I, ch3);
+      _CopyIso88591CharToResult(I, CurrPos+4);
+    end;
+
+    {-------------------------------------}
+    procedure _CopyOctIso88591CharToResult; overload;
+    var I: integer;
+    Begin
+      I := _OctToInt(0, ch1);
+      I := _OctToInt(I, ch2);
+      I := _OctToInt(I, ch3);
+      if I in [0..255] then _CopyIso88591CharToResult(I, CurrPos+4)
+      else inc(CurrPos); // delete the \
+    end;
+
+var Ln: integer;
 
 begin
 
   {init var}
-  CurrentSrcPos := 1;
-  CurrentResultPos := 1;
-  SrcLength := Length(src);
-  SetLength(Result,SrcLength);
+  CurrPos := 1;
+  Ln := Length(Str);
+  pResHead := PansiChar(Str);
+  pResTail := pResHead;
+
 
   {start loop}
-  while (CurrentSrcPos <= SrcLength) do begin
+  while (CurrPos <= Ln) do begin
 
     {escape char detected}
-    If src[CurrentSrcPos]='\' then begin
+    If Str[CurrPos]='\' then begin
+
+      if (CurrPos <= Ln - 5) then begin
+        Ch1 := Str[CurrPos + 1];
+        Ch2 := Str[CurrPos + 2];
+        Ch3 := Str[CurrPos + 3];
+        Ch4 := Str[CurrPos + 4];
+        Ch5 := Str[CurrPos + 5];
+      end
+      else if (CurrPos <= Ln - 3) then begin
+        Ch1 := Str[CurrPos + 1];
+        Ch2 := Str[CurrPos + 2];
+        Ch3 := Str[CurrPos + 3];
+        Ch4 := #0;
+        Ch5 := #0;
+      end
+      else begin
+        Ch1 := #0;
+        Ch2 := #0;
+        Ch3 := #0;
+        Ch4 := #0;
+        Ch5 := #0;
+      end;
 
       // Backspace
-      if (CurrentSrcPos <= SrcLength - 1) and
-         (src[CurrentSrcPos + 1] = 'b')  then _CopyCharToResult(8, CurrentSrcPos + 2)
+      if Ch1 = 'b' then _CopyAnsiCharToResult(8, CurrPos + 2)
 
       // Tab
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = 't')  then _CopyCharToResult(9, CurrentSrcPos + 2)
+      else if Ch1 = 't' then _CopyAnsiCharToResult(9, CurrPos + 2)
 
       // New line
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = 'n')  then _CopyCharToResult(10, CurrentSrcPos + 2)
+      else if Ch1 = 'n' then _CopyAnsiCharToResult(10, CurrPos + 2)
 
       // Vertical tab
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = 'v')  then _CopyCharToResult(11, CurrentSrcPos + 2)
+      else if Ch1 = 'v' then _CopyAnsiCharToResult(11, CurrPos + 2)
 
       // Form feed
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = 'f')  then _CopyCharToResult(12, CurrentSrcPos + 2)
+      else if Ch1 = 'f' then _CopyAnsiCharToResult(12, CurrPos + 2)
 
       // Carriage return
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = 'r')  then _CopyCharToResult(13, CurrentSrcPos + 2)
+      else if Ch1 = 'r' then _CopyAnsiCharToResult(13, CurrPos + 2)
 
       // Double quote
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = '"')  then _CopyCharToResult(34, CurrentSrcPos + 2)
+      else if Ch1 = '"' then _CopyAnsiCharToResult(34, CurrPos + 2)
 
       // Apostrophe or single quote
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = '''') then _CopyCharToResult(39, CurrentSrcPos + 2)
+      else if Ch1 = '''' then _CopyAnsiCharToResult(39, CurrPos + 2)
 
       // Backslash character (\).
-      else if (CurrentSrcPos <= SrcLength - 1) and
-              (src[CurrentSrcPos + 1] = '\')  then _CopyCharToResult(92, CurrentSrcPos + 2)
+      else if Ch1 = '\' then _CopyAnsiCharToResult(92, CurrPos + 2)
 
       // The character with the Latin-1 encoding specified by up to three octal digits XXX between 0 and 377
-      else if (CurrentSrcPos <= SrcLength - 3) and
-              (src[CurrentSrcPos+1] in ['0'..'7']) and
-              (src[CurrentSrcPos+2] in ['0'..'7']) and
-              (src[CurrentSrcPos+3] in ['0'..'7']) then begin
-
-        aTmpInteger := _OctToDec(ALCopyStr(Src, CurrentSrcPos+1, 3));
-        if aTmpInteger in [0..255] then _CopyCharToResult(Integer(ALStringToWideString(ansichar(aTmpInteger), 28591{iso-8859-1})[1]), CurrentSrcPos+4)
-        else inc(CurrentSrcPos); // delete the \
-
-      end
+      else if (Ch1 in ['0'..'7']) and
+              (Ch2 in ['0'..'7']) and
+              (Ch3 in ['0'..'7']) then _CopyOctIso88591CharToResult
 
       // The character with the Latin-1 encoding specified by the two hexadecimal digits XX between 00 and FF
-      else if (CurrentSrcPos <= SrcLength - 3) and
-              (src[CurrentSrcPos+1] = 'x') and
-              (src[CurrentSrcPos+2] in ['A'..'F', 'a'..'f', '0'..'9']) and
-              (src[CurrentSrcPos+3] in ['A'..'F', 'a'..'f', '0'..'9']) then begin
-
-        if ALTryStrToInt('$' + ALCopyStr(Src, CurrentSrcPos+2, 2), aTmpInteger)
-        then _CopyCharToResult(Integer(ALStringToWideString(ansichar(aTmpInteger), 28591{iso-8859-1})[1]), CurrentSrcPos+4)
-        else inc(CurrentSrcPos); // delete the \
-
-      end
+      else if (Ch1 = 'x') and
+              (Ch2 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (Ch3 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyHexIso88591CharToResult
 
       // The Unicode character specified by the four hexadecimal digits XXXX.
-      else if (CurrentSrcPos <= SrcLength - 3) and
-              (src[CurrentSrcPos+1] = 'u') and
-              (src[CurrentSrcPos+2] in ['A'..'F', 'a'..'f', '0'..'9']) and
-              (src[CurrentSrcPos+3] in ['A'..'F', 'a'..'f', '0'..'9']) and
-              (src[CurrentSrcPos+4] in ['A'..'F', 'a'..'f', '0'..'9']) and
-              (src[CurrentSrcPos+5] in ['A'..'F', 'a'..'f', '0'..'9']) then begin
-
-        if ALTryStrToInt('$' + ALCopyStr(Src, CurrentSrcPos+2, 4), aTmpInteger)
-        then _CopyCharToResult(aTmpInteger, CurrentSrcPos+6)
-        else inc(CurrentSrcPos); // delete the \
-
-      end
+      else if (Ch1 = 'u') and
+              (ch2 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (ch3 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (ch4 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (ch5 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyUnicodeCharToResult
 
       // delete the \
-      else inc(CurrentSrcPos);
+      else inc(CurrPos);
 
     end
-    else _CopyCurrentSrcPosCharToResult;
+    else _CopyCurrPosCharToResult;
 
   end;
 
-  setLength(Result,CurrentResultPos-1);
+  if pResTail-pResHead <> Ln then
+    setLength(Str,pResTail-pResHead);
 
+end;
+
+{******************************************************************}
+function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+begin
+  result := Src;
+  ALUTF8JavascriptDecodeV(result);
 end;
 
 {This function evaluates the Javascript code given in the

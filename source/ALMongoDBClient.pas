@@ -1235,7 +1235,7 @@ begin
       (documents[length(documents)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
+      aJsonDocument.LoadFromJSONString('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
                                                                      // [{ ... }, { ... }, { ... }]   => {"documents":[{ ... }, { ... }, { ... }] }
       aBsonDocuments := '';
       with aJsonDocument.Node.ChildNodes['documents'] do begin
@@ -1330,8 +1330,8 @@ begin
     (Selector[length(Selector)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON(Selector);
-      aJsonDocument.SaveToBSON(aBsonSelector);
+      aJsonDocument.LoadFromJSONString(Selector);
+      aJsonDocument.SaveToBSONString(aBsonSelector);
     finally
       aJsonDocument.Free;
     end;
@@ -1349,8 +1349,8 @@ begin
       (Update[length(Update)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON(Update);
-      aJsonDocument.SaveToBSON(aBsonUpdate);
+      aJsonDocument.LoadFromJSONString(Update);
+      aJsonDocument.SaveToBSONString(aBsonUpdate);
     finally
       aJsonDocument.Free;
     end;
@@ -1447,8 +1447,8 @@ begin
       (Selector[length(Selector)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON(Selector);
-      aJsonDocument.SaveToBSON(aBsonSelector);
+      aJsonDocument.LoadFromJSONString(Selector);
+      aJsonDocument.SaveToBSONString(aBsonSelector);
     finally
       aJsonDocument.Free;
     end;
@@ -1543,8 +1543,8 @@ begin
       (Query[length(Query)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON(Query);
-      aJsonDocument.SaveToBSON(aBsonQuery);
+      aJsonDocument.LoadFromJSONString(Query);
+      aJsonDocument.SaveToBSONString(aBsonQuery);
     finally
       aJsonDocument.Free;
     end;
@@ -1562,8 +1562,8 @@ begin
       (ReturnFieldsSelector[length(ReturnFieldsSelector)] <> #0)) then begin
     aJsonDocument := TALJsonDocument.Create;
     try
-      aJsonDocument.LoadFromJSON(ReturnFieldsSelector);
-      aJsonDocument.SaveToBSON(aBsonReturnFieldsSelector);
+      aJsonDocument.LoadFromJSONString(ReturnFieldsSelector);
+      aJsonDocument.SaveToBSONString(aBsonReturnFieldsSelector);
     finally
       aJsonDocument.Free;
     end;
@@ -1820,7 +1820,7 @@ begin
       if (aTmpRowTag <> '') or
          (documents.NodeType = ntarray) then aJsonNode1 := documents.AddChild(aTmpRowTag, ntobject)
       else aJsonNode1 := documents;
-      aJsonNode1.LoadFromBSON(adocumentStr, False{ClearChildNodes});
+      aJsonNode1.LoadFromBSONString(adocumentStr, False{ClearChildNodes});
       if aUpdateRowTagByFieldValue then begin
         aJsonNode2 := aJsonNode1.ChildNodes.FindNode(aTmpRowTag);
         if assigned(aJsonNode2) then aJsonNode1.NodeName := aJsonNode2.Text;
@@ -2292,7 +2292,7 @@ begin
         else aViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
+        aViewRec.LoadFromJsonString(aCacheStr, false{ClearChildNodes});
 
         //exit
         exit;
@@ -2445,7 +2445,7 @@ begin
     If aCacheKey <> '' then begin
 
       //save the data
-      aViewRec.SaveToJSON(aCacheStr);
+      aViewRec.SaveToJSONString(aCacheStr);
       SaveDataToCache(aCacheKey,
                       CacheThreshold,
                       aCacheStr);
@@ -3473,7 +3473,7 @@ begin
         else aViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        aViewRec.LoadFromJson(aCacheStr, false{ClearChildNodes});
+        aViewRec.LoadFromJsonString(aCacheStr, false{ClearChildNodes});
 
         //exit
         exit;
@@ -3618,7 +3618,7 @@ begin
       If aCacheKey <> '' then begin
 
         //save the data
-        aViewRec.SaveToJSON(aCacheStr);
+        aViewRec.SaveToJSONString(aCacheStr);
         SaveDataToCache(aCacheKey,
                         CacheThreshold,
                         aCacheStr);

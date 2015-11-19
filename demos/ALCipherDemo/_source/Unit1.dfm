@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 108
   Caption = 'Form1'
   ClientHeight = 490
-  ClientWidth = 913
+  ClientWidth = 647
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -64,14 +64,14 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Top = 471
-    Width = 913
+    Width = 647
     Height = 19
     Panels = <
       item
-        Width = 200
+        Width = 140
       end
       item
-        Width = 200
+        Width = 140
       end
       item
         Width = 200
@@ -82,7 +82,7 @@ object Form1: TForm1
       item
         Width = 200
       end>
-    ExplicitWidth = 903
+    ExplicitWidth = 913
   end
   object ALButton3: TButton
     Left = 24
@@ -126,8 +126,8 @@ object Form1: TForm1
     TabOrder = 6
   end
   object ALButton2: TButton
-    Left = 333
-    Top = 20
+    Left = 405
+    Top = 16
     Width = 97
     Height = 25
     Caption = 'Crypt (BF)'
@@ -135,8 +135,8 @@ object Form1: TForm1
     OnClick = ALButton2Click
   end
   object ALButton5: TButton
-    Left = 436
-    Top = 20
+    Left = 508
+    Top = 16
     Width = 115
     Height = 25
     Caption = 'DeCrypt (BF)'
@@ -144,8 +144,8 @@ object Form1: TForm1
     OnClick = ALButton5Click
   end
   object ALButton6: TButton
-    Left = 333
-    Top = 51
+    Left = 405
+    Top = 47
     Width = 97
     Height = 25
     Caption = 'Crypt (AES - EBC)'
@@ -153,8 +153,8 @@ object Form1: TForm1
     OnClick = ALButton6Click
   end
   object ALButton7: TButton
-    Left = 436
-    Top = 51
+    Left = 508
+    Top = 47
     Width = 115
     Height = 25
     Caption = 'DeCrypt (AES - EBC)'
@@ -180,8 +180,8 @@ object Form1: TForm1
     OnClick = ALButton11Click
   end
   object ALButton8: TButton
-    Left = 333
-    Top = 82
+    Left = 405
+    Top = 78
     Width = 97
     Height = 25
     Caption = 'Crypt (AES - CBC)'
@@ -189,8 +189,8 @@ object Form1: TForm1
     OnClick = ALButton8Click
   end
   object ALButton9: TButton
-    Left = 436
-    Top = 82
+    Left = 508
+    Top = 78
     Width = 115
     Height = 25
     Caption = 'DeCrypt (AES - CBC)'
@@ -198,8 +198,8 @@ object Form1: TForm1
     OnClick = ALButton9Click
   end
   object ALButton12: TButton
-    Left = 333
-    Top = 113
+    Left = 405
+    Top = 109
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (SHA1)'
@@ -207,109 +207,13 @@ object Form1: TForm1
     OnClick = ALButton12Click
   end
   object ALButton13: TButton
-    Left = 333
-    Top = 144
+    Left = 405
+    Top = 140
     Width = 218
     Height = 25
     Caption = 'Generate HMAC (MD5)'
     TabOrder = 16
     OnClick = ALButton13Click
-  end
-  object Panel7: TPanel
-    Left = 592
-    Top = 16
-    Width = 292
-    Height = 153
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Color = clSilver
-    Ctl3D = False
-    ParentBackground = False
-    ParentCtl3D = False
-    TabOrder = 17
-    object cxLabel1: TcxLabel
-      Left = 12
-      Top = 12
-      Hint = ''
-      Caption = 'Please help us to keep the development of these components free'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 242
-    end
-    object Label15: TcxLabel
-      Left = 12
-      Top = 55
-      Hint = ''
-      Caption = 'If you like these components please go to:'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 240
-    end
-    object cxLabel4: TcxLabel
-      Left = 12
-      Top = 120
-      Hint = ''
-      Caption = 'Thanks for your support !'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 144
-    end
-    object cxLabel6: TcxLabel
-      Left = 12
-      Top = 88
-      Hint = ''
-      Caption = 'and click on the Facebook/Google+ like button'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 261
-    end
-    object cxWwwArkadiaComLabel: TcxLabel
-      Left = 12
-      Top = 71
-      Cursor = crHandPoint
-      Hint = ''
-      Caption = 'http://www.arkadia.com'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clRed
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = [fsBold]
-      Style.TextColor = clMaroon
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      OnClick = cxWwwArkadiaComLabelClick
-      Width = 160
-    end
   end
   object Button1: TButton
     Left = 154
@@ -317,7 +221,7 @@ object Form1: TForm1
     Width = 136
     Height = 25
     Caption = 'Bench CRC32 (Zlib)'
-    TabOrder = 18
+    TabOrder = 17
     OnClick = Button1Click
   end
   object Button2: TButton
@@ -326,7 +230,7 @@ object Form1: TForm1
     Width = 136
     Height = 25
     Caption = 'Bench CRC32'
-    TabOrder = 19
+    TabOrder = 18
     OnClick = Button2Click
   end
   object Button3: TButton
@@ -335,7 +239,7 @@ object Form1: TForm1
     Width = 138
     Height = 25
     Caption = 'Bench BobJenkinsHash'
-    TabOrder = 20
+    TabOrder = 19
     OnClick = Button3Click
   end
 end

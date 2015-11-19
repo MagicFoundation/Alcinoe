@@ -45,12 +45,6 @@ type
     Label4: TLabel;
     EditExcludeLink: TEdit;
     Label6: TLabel;
-    Panel1: TPanel;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ButtonStartClick(Sender: TObject);
     procedure BtnChooseSaveDirectoryClick(Sender: TObject);
     procedure MainWebSpiderCrawlDownloadError(Sender: TObject; const URL, ErrorMessage: {$IFDEF UNICODE}AnsiString{$ELSE}String{$ENDIF}; HTTPResponseHeader: TALHTTPResponseHeader; var StopCrawling: Boolean);

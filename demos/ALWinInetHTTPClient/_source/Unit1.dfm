@@ -38,6 +38,7 @@ object Form1: TForm1
     Top = 0
     Width = 796
     Height = 589
+    Hint = ''
     Align = alClient
     TabOrder = 1
     Properties.ActivePage = TabSheet1
@@ -51,6 +52,7 @@ object Form1: TForm1
       object GroupBox9: TcxGroupBox
         Left = 0
         Top = 10
+        Hint = ''
         Align = alTop
         Caption = 'REQUEST'
         ParentFont = False
@@ -69,6 +71,7 @@ object Form1: TForm1
         object Label4: TcxLabel
           Left = 8
           Top = 62
+          Hint = ''
           Caption = 'Post Data Strings'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
@@ -82,6 +85,7 @@ object Form1: TForm1
         object Label6: TcxLabel
           Left = 8
           Top = 78
+          Hint = ''
           Caption = 'Format "name=value" if not URL Encode Post Data checked'
           ParentFont = False
           Transparent = True
@@ -89,6 +93,7 @@ object Form1: TForm1
         object Label7: TcxLabel
           Left = 392
           Top = 78
+          Hint = ''
           Caption = 'Format "Name=FileName"'
           ParentFont = False
           Transparent = True
@@ -96,6 +101,7 @@ object Form1: TForm1
         object Label5: TcxLabel
           Left = 392
           Top = 62
+          Hint = ''
           Caption = 'Post Data Files'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
@@ -109,6 +115,7 @@ object Form1: TForm1
         object Label1: TcxLabel
           Left = 8
           Top = 27
+          Hint = ''
           Caption = 'URL'
           ParentFont = False
           Transparent = True
@@ -116,6 +123,7 @@ object Form1: TForm1
         object editURL: TcxTextEdit
           Left = 40
           Top = 24
+          Hint = ''
           ParentFont = False
           TabOrder = 0
           Text = 'http://www.wikipedia.org'
@@ -124,6 +132,7 @@ object Form1: TForm1
         object MemoPostDataStrings: TcxMemo
           Left = 8
           Top = 94
+          Hint = ''
           ParentFont = False
           Properties.ScrollBars = ssVertical
           Properties.WordWrap = False
@@ -134,6 +143,7 @@ object Form1: TForm1
         object MemoPostDataFiles: TcxMemo
           Left = 392
           Top = 94
+          Hint = ''
           Anchors = [akLeft, akTop, akRight, akBottom]
           ParentFont = False
           Properties.ScrollBars = ssVertical
@@ -175,6 +185,7 @@ object Form1: TForm1
         object CheckBoxHttpEncodePostData: TcxCheckBox
           Left = 11
           Top = 171
+          Hint = ''
           Caption = 'HTTP Encode Post Data'
           ParentFont = False
           TabOrder = 5
@@ -199,6 +210,7 @@ object Form1: TForm1
         object CheckBoxUrlEncodePostData: TcxCheckBox
           Left = 169
           Top = 171
+          Hint = ''
           Caption = 'URL Encode Post Data'
           ParentFont = False
           TabOrder = 7
@@ -224,6 +236,7 @@ object Form1: TForm1
       object GroupBox10: TcxGroupBox
         Left = 0
         Top = 223
+        Hint = ''
         Align = alClient
         Caption = 'RESPONSE'
         ParentFont = False
@@ -250,6 +263,7 @@ object Form1: TForm1
           object Label2: TcxLabel
             Left = 5
             Top = 6
+            Hint = ''
             Caption = 'Header:'
             ParentFont = False
             Transparent = True
@@ -257,12 +271,13 @@ object Form1: TForm1
           object MemoResponseRawHeader: TcxMemo
             Left = 5
             Top = 24
+            Hint = ''
             Anchors = [akLeft, akTop, akRight, akBottom]
             ParentFont = False
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
             TabOrder = 1
-            Height = 186
+            Height = 281
             Width = 260
           end
         end
@@ -281,6 +296,7 @@ object Form1: TForm1
           object Label3: TcxLabel
             Left = 2
             Top = 6
+            Hint = ''
             Caption = 'Content:'
             ParentFont = False
             Transparent = True
@@ -288,13 +304,14 @@ object Form1: TForm1
           object MemoContentBody: TcxMemo
             Left = 2
             Top = 24
+            Hint = ''
             Anchors = [akLeft, akTop, akRight, akBottom]
             ParentFont = False
             Properties.ScrollBars = ssBoth
             Properties.WordWrap = False
             TabOrder = 1
-            Height = 186
-            Width = 488
+            Height = 281
+            Width = 486
           end
         end
         object cxSplitter1: TcxSplitter
@@ -302,6 +319,7 @@ object Form1: TForm1
           Top = 15
           Width = 7
           Height = 310
+          Hint = ''
           Control = Panel5
         end
       end
@@ -334,6 +352,7 @@ object Form1: TForm1
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
+        Hint = ''
         Caption = 'Authentication'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -348,6 +367,7 @@ object Form1: TForm1
         object Label18: TcxLabel
           Left = 16
           Top = 21
+          Hint = ''
           Caption = 'UserName'
           ParentFont = False
           Transparent = True
@@ -355,6 +375,7 @@ object Form1: TForm1
         object Label19: TcxLabel
           Left = 20
           Top = 46
+          Hint = ''
           Caption = 'Password'
           ParentFont = False
           Transparent = True
@@ -362,6 +383,7 @@ object Form1: TForm1
         object EditUserName: TcxTextEdit
           Left = 73
           Top = 18
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
@@ -371,6 +393,7 @@ object Form1: TForm1
         object EditPassword: TcxTextEdit
           Left = 73
           Top = 42
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 1
@@ -381,6 +404,7 @@ object Form1: TForm1
       object GroupBox4: TcxGroupBox
         Left = 7
         Top = 91
+        Hint = ''
         Caption = 'Timeout'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -395,6 +419,7 @@ object Form1: TForm1
         object Label14: TcxLabel
           Left = 41
           Top = 45
+          Hint = ''
           Caption = 'Send'
           ParentFont = False
           Transparent = True
@@ -402,6 +427,7 @@ object Form1: TForm1
         object Label17: TcxLabel
           Left = 26
           Top = 21
+          Hint = ''
           Caption = 'Connect'
           ParentFont = False
           Transparent = True
@@ -409,6 +435,7 @@ object Form1: TForm1
         object Label20: TcxLabel
           Left = 26
           Top = 69
+          Hint = ''
           Caption = 'Receive'
           ParentFont = False
           Transparent = True
@@ -416,6 +443,7 @@ object Form1: TForm1
         object EditSendTimeout: TcxTextEdit
           Left = 73
           Top = 42
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
@@ -426,6 +454,7 @@ object Form1: TForm1
         object EditReceiveTimeout: TcxTextEdit
           Left = 73
           Top = 66
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 1
@@ -436,6 +465,7 @@ object Form1: TForm1
         object EditConnectTimeout: TcxTextEdit
           Left = 73
           Top = 18
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 2
@@ -447,6 +477,7 @@ object Form1: TForm1
       object GroupBox6: TcxGroupBox
         Left = 7
         Top = 195
+        Hint = ''
         Caption = 'Protocole version'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -500,6 +531,7 @@ object Form1: TForm1
       object GroupBox7: TcxGroupBox
         Left = 304
         Top = 11
+        Hint = ''
         Caption = 'Internet options'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -514,6 +546,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_From_Cache: TcxCheckBox
           Left = 8
           Top = 24
+          Hint = ''
           Caption = 'From_Cache'
           ParentFont = False
           TabOrder = 0
@@ -526,6 +559,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Offline: TcxCheckBox
           Left = 8
           Top = 48
+          Hint = ''
           Caption = 'Offline'
           ParentFont = False
           TabOrder = 1
@@ -538,6 +572,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Keep_connection: TcxCheckBox
           Left = 8
           Top = 216
+          Hint = ''
           Caption = 'Keep_connection'
           ParentFont = False
           State = cbsChecked
@@ -551,6 +586,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_No_auto_redirect: TcxCheckBox
           Left = 8
           Top = 288
+          Hint = ''
           Caption = 'No_auto_redirect'
           ParentFont = False
           TabOrder = 3
@@ -563,6 +599,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Ignore_redirect_to_https: TcxCheckBox
           Left = 8
           Top = 192
+          Hint = ''
           Caption = 'Ignore_redirect_to_https'
           ParentFont = False
           TabOrder = 4
@@ -575,6 +612,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_No_auth: TcxCheckBox
           Left = 8
           Top = 264
+          Hint = ''
           Caption = 'No_auth'
           ParentFont = False
           TabOrder = 5
@@ -587,6 +625,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Ignore_cert_date_invalid: TcxCheckBox
           Left = 8
           Top = 144
+          Hint = ''
           Caption = 'Ignore_cert_date_invalid'
           ParentFont = False
           TabOrder = 6
@@ -599,6 +638,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Need_file: TcxCheckBox
           Left = 8
           Top = 240
+          Hint = ''
           Caption = 'Need_file'
           ParentFont = False
           TabOrder = 7
@@ -611,6 +651,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Ignore_redirect_to_http: TcxCheckBox
           Left = 8
           Top = 168
+          Hint = ''
           Caption = 'Ignore_redirect_to_http'
           ParentFont = False
           TabOrder = 8
@@ -623,6 +664,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Hyperlink: TcxCheckBox
           Left = 8
           Top = 96
+          Hint = ''
           Caption = 'Hyperlink'
           ParentFont = False
           TabOrder = 9
@@ -635,6 +677,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Ignore_cert_cn_invalid: TcxCheckBox
           Left = 8
           Top = 120
+          Hint = ''
           Caption = 'Ignore_cert_cn_invalid'
           ParentFont = False
           TabOrder = 10
@@ -647,6 +690,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Cache_if_net_fail: TcxCheckBox
           Left = 8
           Top = 72
+          Hint = ''
           Caption = 'Cache_if_net_fail'
           ParentFont = False
           TabOrder = 11
@@ -659,6 +703,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_No_cache_write: TcxCheckBox
           Left = 8
           Top = 312
+          Hint = ''
           Caption = 'No_cache_write'
           ParentFont = False
           TabOrder = 12
@@ -671,6 +716,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Resynchronize: TcxCheckBox
           Left = 8
           Top = 432
+          Hint = ''
           Caption = 'Resynchronize'
           ParentFont = False
           TabOrder = 13
@@ -683,6 +729,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_No_cookies: TcxCheckBox
           Left = 8
           Top = 336
+          Hint = ''
           Caption = 'No_cookies'
           ParentFont = False
           TabOrder = 14
@@ -695,6 +742,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Pragma_nocache: TcxCheckBox
           Left = 8
           Top = 384
+          Hint = ''
           Caption = 'Pragma_nocache'
           ParentFont = False
           TabOrder = 15
@@ -707,6 +755,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Reload: TcxCheckBox
           Left = 8
           Top = 408
+          Hint = ''
           Caption = 'Reload'
           ParentFont = False
           TabOrder = 16
@@ -719,6 +768,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_No_ui: TcxCheckBox
           Left = 8
           Top = 360
+          Hint = ''
           Caption = 'No_ui'
           ParentFont = False
           TabOrder = 17
@@ -731,6 +781,7 @@ object Form1: TForm1
         object CheckBoxInternetOption_Secure: TcxCheckBox
           Left = 8
           Top = 456
+          Hint = ''
           Caption = 'Secure'
           ParentFont = False
           TabOrder = 18
@@ -744,6 +795,7 @@ object Form1: TForm1
       object GroupBox2: TcxGroupBox
         Left = 8
         Top = 475
+        Hint = ''
         Caption = 'Access Type'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -833,6 +885,7 @@ object Form1: TForm1
       object GroupBox1: TcxGroupBox
         Left = 8
         Top = 323
+        Hint = ''
         Caption = 'Proxy'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -847,6 +900,7 @@ object Form1: TForm1
         object Label15: TcxLabel
           Left = 47
           Top = 45
+          Hint = ''
           Caption = 'Port'
           ParentFont = False
           Transparent = True
@@ -854,6 +908,7 @@ object Form1: TForm1
         object Label12: TcxLabel
           Left = 35
           Top = 21
+          Hint = ''
           Caption = 'Server'
           ParentFont = False
           Transparent = True
@@ -861,6 +916,7 @@ object Form1: TForm1
         object Label11: TcxLabel
           Left = 16
           Top = 69
+          Hint = ''
           Caption = 'UserName'
           ParentFont = False
           Transparent = True
@@ -868,6 +924,7 @@ object Form1: TForm1
         object Label16: TcxLabel
           Left = 20
           Top = 94
+          Hint = ''
           Caption = 'Password'
           ParentFont = False
           Transparent = True
@@ -875,6 +932,7 @@ object Form1: TForm1
         object Label13: TcxLabel
           Left = 32
           Top = 117
+          Hint = ''
           Caption = 'Bypass'
           ParentFont = False
           Transparent = True
@@ -882,6 +940,7 @@ object Form1: TForm1
         object EdProxyPort: TcxTextEdit
           Left = 73
           Top = 42
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
@@ -892,6 +951,7 @@ object Form1: TForm1
         object EdProxyUserName: TcxTextEdit
           Left = 73
           Top = 66
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 1
@@ -901,6 +961,7 @@ object Form1: TForm1
         object EdProxyServer: TcxTextEdit
           Left = 73
           Top = 18
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 2
@@ -910,6 +971,7 @@ object Form1: TForm1
         object EdProxyPassword: TcxTextEdit
           Left = 73
           Top = 90
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 3
@@ -919,6 +981,7 @@ object Form1: TForm1
         object EdProxyBypass: TcxTextEdit
           Left = 73
           Top = 114
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 4
@@ -930,6 +993,7 @@ object Form1: TForm1
       object GroupBox5: TcxGroupBox
         Left = 8
         Top = 259
+        Hint = ''
         Caption = 'Buffer Size'
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -944,6 +1008,7 @@ object Form1: TForm1
         object Label24: TcxLabel
           Left = 27
           Top = 21
+          Hint = ''
           Caption = 'Upload'
           ParentFont = False
           Transparent = True
@@ -951,6 +1016,7 @@ object Form1: TForm1
         object EditBufferUploadSize: TcxTextEdit
           Left = 73
           Top = 18
+          Hint = ''
           ParentFont = False
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
@@ -962,6 +1028,7 @@ object Form1: TForm1
       object GroupBox8: TcxGroupBox
         Left = 472
         Top = 11
+        Hint = ''
         Caption = 'Request Raw Header '
         ParentFont = False
         Style.Font.Charset = DEFAULT_CHARSET
@@ -971,11 +1038,12 @@ object Form1: TForm1
         Style.Font.Style = [fsBold]
         Style.IsFontAssigned = True
         TabOrder = 7
-        Height = 364
+        Height = 534
         Width = 313
         object Label8: TcxLabel
           Left = 9
           Top = 22
+          Hint = ''
           Caption = 'Format "Name: values" on each lines'
           ParentFont = False
           Transparent = True
@@ -983,104 +1051,14 @@ object Form1: TForm1
         object MemoRequestRawHeader: TcxMemo
           Left = 9
           Top = 38
+          Hint = ''
           ParentFont = False
           Properties.ScrollBars = ssVertical
           Properties.OnChange = OnCfgEditCHange
           TabOrder = 0
           OnClick = OnCfgEditCHange
-          Height = 312
+          Height = 487
           Width = 294
-        end
-      end
-      object Panel1: TPanel
-        Left = 481
-        Top = 381
-        Width = 294
-        Height = 161
-        BevelOuter = bvNone
-        BorderStyle = bsSingle
-        Color = clSilver
-        Ctl3D = False
-        ParentBackground = False
-        ParentCtl3D = False
-        TabOrder = 8
-        object cxLabel1: TcxLabel
-          Left = 14
-          Top = 15
-          Caption = 'Please help us to keep the development of these components free'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -12
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          Transparent = True
-          Width = 242
-        end
-        object cxLabel2: TcxLabel
-          Left = 14
-          Top = 58
-          Caption = 'If you like these components please go to:'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -12
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          Transparent = True
-          Width = 240
-        end
-        object cxWwwArkadiaComLabel: TcxLabel
-          Left = 14
-          Top = 74
-          Cursor = crHandPoint
-          Caption = 'http://www.arkadia.com'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clRed
-          Style.Font.Height = -12
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = [fsBold]
-          Style.TextColor = clMaroon
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          Transparent = True
-          OnClick = cxWwwArkadiaComLabelClick
-          Width = 160
-        end
-        object cxLabel18: TcxLabel
-          Left = 14
-          Top = 91
-          Caption = 'and click on the Facebook/Google+ like button'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -12
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          Transparent = True
-          Width = 261
-        end
-        object cxLabel17: TcxLabel
-          Left = 14
-          Top = 123
-          Caption = 'Thanks for your support !'
-          ParentFont = False
-          Style.Font.Charset = DEFAULT_CHARSET
-          Style.Font.Color = clWindowText
-          Style.Font.Height = -12
-          Style.Font.Name = 'Tahoma'
-          Style.Font.Style = []
-          Style.IsFontAssigned = True
-          Properties.WordWrap = True
-          Transparent = True
-          Width = 144
         end
       end
     end

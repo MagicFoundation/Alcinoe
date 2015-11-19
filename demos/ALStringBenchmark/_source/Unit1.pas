@@ -24,7 +24,6 @@ type
     ALButton12: TButton;
     ALButton13: TButton;
     ALButton14: TButton;
-    Panel2: TPanel;
     ALButton15: TButton;
     ALButton16: TButton;
     ALButton17: TButton;
@@ -58,11 +57,6 @@ type
     ALButton45: TButton;
     ALButton46: TButton;
     ALButton47: TButton;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     Button1: TButton;
     Button2: TButton;
     procedure FormClick(Sender: TObject);

@@ -156,97 +156,6 @@ object Form1: TForm1
     Font.Style = []
     ParentFont = False
   end
-  object Panel1: TPanel
-    Left = 379
-    Top = 24
-    Width = 292
-    Height = 153
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Color = clSilver
-    Ctl3D = False
-    ParentBackground = False
-    ParentCtl3D = False
-    TabOrder = 1
-    object cxLabel1: TcxLabel
-      Left = 12
-      Top = 12
-      Caption = 'Please help us to keep the development of these components free'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 242
-    end
-    object cxLabel2: TcxLabel
-      Left = 12
-      Top = 55
-      Caption = 'If you like these components please go to:'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 240
-    end
-    object cxWwwArkadiaComLabel: TcxLabel
-      Left = 12
-      Top = 71
-      Cursor = crHandPoint
-      Caption = 'http://www.arkadia.com'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clRed
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = [fsBold]
-      Style.TextColor = clMaroon
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      OnClick = cxWwwArkadiaComLabelClick
-      Width = 160
-    end
-    object cxLabel18: TcxLabel
-      Left = 12
-      Top = 88
-      Caption = 'and click on the Facebook/Google+ like button'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 261
-    end
-    object cxLabel17: TcxLabel
-      Left = 12
-      Top = 120
-      Caption = 'Thanks for your support !'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 144
-    end
-  end
   object ALButtonFirebirdStartTransaction: TButton
     Left = 379
     Top = 284
@@ -254,7 +163,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Start Transaction'
     Enabled = False
-    TabOrder = 2
+    TabOrder = 1
     OnClick = ALButtonFirebirdStartTransactionClick
   end
   object ALEditFirebirdLogin: TEdit
@@ -262,7 +171,7 @@ object Form1: TForm1
     Top = 100
     Width = 249
     Height = 21
-    TabOrder = 3
+    TabOrder = 2
     Text = 'SYSDBA'
   end
   object ALEditFirebirdPassword: TEdit
@@ -270,14 +179,14 @@ object Form1: TForm1
     Top = 129
     Width = 249
     Height = 21
-    TabOrder = 4
+    TabOrder = 3
   end
   object ALEditFirebirdCharset: TEdit
     Left = 106
     Top = 158
     Width = 72
     Height = 21
-    TabOrder = 5
+    TabOrder = 4
     Text = 'NONE'
   end
   object ALEditFirebirdLib: TEdit
@@ -285,7 +194,7 @@ object Form1: TForm1
     Top = 42
     Width = 224
     Height = 21
-    TabOrder = 6
+    TabOrder = 5
     Text = 'FBClient.dll'
   end
   object ALMemoFireBirdQuery: TMemo
@@ -294,7 +203,7 @@ object Form1: TForm1
     Width = 249
     Height = 95
     ScrollBars = ssBoth
-    TabOrder = 7
+    TabOrder = 6
     WordWrap = False
   end
   object ALEditFirebirdDatabase: TEdit
@@ -302,7 +211,7 @@ object Form1: TForm1
     Top = 71
     Width = 224
     Height = 21
-    TabOrder = 8
+    TabOrder = 7
   end
   object ALButtonFirebirdCommit: TButton
     Left = 379
@@ -311,7 +220,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Commit'
     Enabled = False
-    TabOrder = 9
+    TabOrder = 8
     OnClick = ALButtonFirebirdCommitClick
   end
   object ALButtonFirebirdSelect: TButton
@@ -321,7 +230,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Execute SELECT'
     Enabled = False
-    TabOrder = 10
+    TabOrder = 9
     OnClick = ALButtonFirebirdSelectClick
   end
   object ALButtonFirebirdRollBack: TButton
@@ -331,7 +240,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Rollback'
     Enabled = False
-    TabOrder = 11
+    TabOrder = 10
     OnClick = ALButtonFirebirdRollBackClick
   end
   object ALEditFireBirdNum_buffers: TEdit
@@ -339,7 +248,7 @@ object Form1: TForm1
     Top = 187
     Width = 46
     Height = 21
-    TabOrder = 12
+    TabOrder = 11
     Text = '0'
   end
   object ALButtonFirebirdCreateDatabase: TButton
@@ -348,7 +257,7 @@ object Form1: TForm1
     Width = 161
     Height = 25
     Caption = 'Create Database'
-    TabOrder = 13
+    TabOrder = 12
     OnClick = ALButtonFirebirdCreateDatabaseClick
   end
   object ALComboBoxFirebirdapiVer: TComboBox
@@ -379,7 +288,7 @@ object Form1: TForm1
       'isc_tpb_no_rec_version'
       'isc_tpb_nowait')
     ScrollBars = ssVertical
-    TabOrder = 14
+    TabOrder = 13
     WordWrap = False
   end
   object ALButtonFirebirdUpdate: TButton
@@ -389,7 +298,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Execute Update'
     Enabled = False
-    TabOrder = 15
+    TabOrder = 14
     OnClick = ALButtonFirebirdUpdateClick
   end
   object ALButtonFirebirdOpenConnection: TButton
@@ -398,7 +307,7 @@ object Form1: TForm1
     Width = 161
     Height = 25
     Caption = 'Open Connection'
-    TabOrder = 16
+    TabOrder = 15
     OnClick = ALButtonFirebirdOpenConnectionClick
   end
   object ALButtonCloseConnection: TButton
@@ -408,7 +317,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Close Connection'
     Enabled = False
-    TabOrder = 17
+    TabOrder = 16
     OnClick = ALButtonCloseConnectionClick
   end
   object ALButtonFirebirdPrepare: TButton
@@ -418,7 +327,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Prepare'
     Enabled = False
-    TabOrder = 18
+    TabOrder = 17
     OnClick = ALButtonFirebirdPrepareClick
   end
   object Panel3: TPanel
@@ -433,7 +342,7 @@ object Form1: TForm1
     Ctl3D = False
     ParentBackground = False
     ParentCtl3D = False
-    TabOrder = 19
+    TabOrder = 18
     object Splitter1: TSplitter
       Left = 414
       Top = 0
@@ -475,7 +384,7 @@ object Form1: TForm1
     Width = 249
     Height = 93
     ScrollBars = ssBoth
-    TabOrder = 20
+    TabOrder = 19
     WordWrap = False
   end
   object ALButtonFirebirdCommitRetaining: TButton
@@ -485,7 +394,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Commit Retaining'
     Enabled = False
-    TabOrder = 21
+    TabOrder = 20
     OnClick = ALButtonFirebirdCommitRetainingClick
   end
   object ALButtonFirebirdRollBackRetaining: TButton
@@ -495,7 +404,7 @@ object Form1: TForm1
     Height = 25
     Caption = 'Rollback Retaining'
     Enabled = False
-    TabOrder = 22
+    TabOrder = 21
     OnClick = ALButtonFirebirdRollBackRetainingClick
   end
   object Button1: TButton
@@ -504,7 +413,7 @@ object Form1: TForm1
     Width = 25
     Height = 21
     Caption = '...'
-    TabOrder = 23
+    TabOrder = 22
     OnClick = ALEditFirebirdLibButtonClick
   end
   object Button2: TButton
@@ -513,7 +422,7 @@ object Form1: TForm1
     Width = 25
     Height = 21
     Caption = '...'
-    TabOrder = 24
+    TabOrder = 23
     OnClick = ALEditFirebirdLibButtonClick
   end
   object OpenDialog1: TOpenDialog

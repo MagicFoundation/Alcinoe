@@ -63,12 +63,6 @@ type
     BccEdit: TEdit;
     AllInOneButton: TButton;
     ConfirmCheckBox: TCheckBox;
-    Panel2: TPanel;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure FormCreate(Sender: TObject);
     procedure ClearDisplayButtonClick(Sender: TObject);
     procedure ConnectButtonClick(Sender: TObject);

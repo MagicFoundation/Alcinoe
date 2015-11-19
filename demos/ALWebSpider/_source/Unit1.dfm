@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 288
   Caption = 'ALWebSpider'
   ClientHeight = 371
-  ClientWidth = 826
+  ClientWidth = 522
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -93,7 +93,7 @@ object Form1: TForm1
   object StatusBar1: TStatusBar
     Left = 0
     Top = 333
-    Width = 826
+    Width = 522
     Height = 19
     Panels = <
       item
@@ -102,6 +102,7 @@ object Form1: TForm1
       item
         Width = 100
       end>
+    ExplicitWidth = 826
   end
   object editURL2Crawl: TEdit
     Left = 136
@@ -210,12 +211,13 @@ object Form1: TForm1
   object StatusBar2: TStatusBar
     Left = 0
     Top = 352
-    Width = 826
+    Width = 522
     Height = 19
     Panels = <
       item
         Width = 50
       end>
+    ExplicitWidth = 826
   end
   object BtnChooseSaveDirectory: TButton
     Left = 481
@@ -229,7 +231,7 @@ object Form1: TForm1
   object MemoErrorMsg: TMemo
     Left = 0
     Top = 265
-    Width = 826
+    Width = 522
     Height = 68
     Align = alBottom
     Ctl3D = True
@@ -238,6 +240,7 @@ object Form1: TForm1
     ScrollBars = ssVertical
     TabOrder = 9
     WordWrap = False
+    ExplicitWidth = 826
   end
   object EditIncludeLink: TEdit
     Left = 136
@@ -268,101 +271,5 @@ object Form1: TForm1
     ParentCtl3D = False
     ParentFont = False
     TabOrder = 14
-  end
-  object Panel1: TPanel
-    Left = 520
-    Top = 16
-    Width = 292
-    Height = 153
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Color = clSilver
-    Ctl3D = False
-    ParentBackground = False
-    ParentCtl3D = False
-    TabOrder = 15
-    object cxLabel1: TcxLabel
-      Left = 12
-      Top = 12
-      Hint = ''
-      Caption = 'Please help us to keep the development of these components free'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 242
-    end
-    object cxLabel2: TcxLabel
-      Left = 12
-      Top = 55
-      Hint = ''
-      Caption = 'If you like these components please go to:'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 240
-    end
-    object cxWwwArkadiaComLabel: TcxLabel
-      Left = 12
-      Top = 71
-      Cursor = crHandPoint
-      Hint = ''
-      Caption = 'http://www.arkadia.com'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clRed
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = [fsBold]
-      Style.TextColor = clMaroon
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      OnClick = cxWwwArkadiaComLabelClick
-      Width = 160
-    end
-    object cxLabel18: TcxLabel
-      Left = 12
-      Top = 88
-      Hint = ''
-      Caption = 'and click on the Facebook/Google+ like button'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 261
-    end
-    object cxLabel17: TcxLabel
-      Left = 12
-      Top = 120
-      Hint = ''
-      Caption = 'Thanks for your support !'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 144
-    end
   end
 end

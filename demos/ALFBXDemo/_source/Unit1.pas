@@ -12,7 +12,6 @@ type
 
   TForm1 = class(TForm)
     OpenDialog1: TOpenDialog;
-    Panel1: TPanel;
     Label2: TLabel;
     Label4: TLabel;
     Label15: TLabel;
@@ -51,11 +50,6 @@ type
     ALButtonFirebirdRollBackRetaining: TButton;
     Button1: TButton;
     Button2: TButton;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ALButtonFirebirdUpdateClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure ALButtonFirebirdCreateDatabaseClick(Sender: TObject);

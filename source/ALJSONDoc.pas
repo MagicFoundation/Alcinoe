@@ -117,10 +117,23 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
               MyJsonDoc.onParseText := procedure (Sender: TObject;
                                                   const Path: AnsiString;
                                                   const name: AnsiString;
-                                                  const str: AnsiString;
-                                                  const NodeSubType: TALJSONNodeSubType)
+                                                  const Args: array of const;
+                                                  NodeSubType: TALJSONNodeSubType)
                                        begin
-                                         Writeln(Path + '=' + str);
+                                         case NodeSubType of
+                                           nstFloat: Writeln(Path + '=' + ALFloatToStr(Args[0].VExtended^, ALDefaultFormatSettings));
+                                           nstText: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
+                                           nstObjectID: Writeln(Path + '=' + 'ObjectId("'+ALBinToHex(ansiString(Args[0].VAnsiString))+'")');
+                                           nstBoolean: Writeln(Path + '=' + ALBoolToStr(Args[0].VBoolean,'true','false'));
+                                           nstDateTime: Writeln(Path + '=' + ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings));
+                                           nstNull: Writeln(Path + '=' + 'null');
+                                           nstRegEx: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
+                                           nstBinary: Writeln(Path + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+ansiString(ALMimeBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString)))+'")');
+                                           nstJavascript: Writeln(Path + '=' + ansiString(Args[0].VAnsiString));
+                                           nstInt32: Writeln(Path + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
+                                           nstTimestamp: Writeln(Path + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
+                                           nstInt64: Writeln(Path + '=' + 'NumberLong('+inttostr(Args[0].VInt64^)+')');
+                                         end;
                                        end;
               MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
 
@@ -236,37 +249,21 @@ type
                                        // \xFF | Min key
                                        // \x7F | Max key
 
-  TALJSONObjectID = Array[1..12] of AnsiChar; // ObjectId is a 12-byte BSON type, constructed using:
-                                              // a 4-byte value representing the seconds since the Unix epoch,
-                                              // a 3-byte machine identifier,
-                                              // a 2-byte process id, and
-                                              // a 3-byte counter, starting with a random value.
-
   TALBSONTimestamp = packed record      // Special internal type used by MongoDB replication and sharding.
-    case X: integer of                  // First 4 bytes are an increment, second 4 are a timestamp. Setting the
+    case integer of                     // First 4 bytes are an increment, second 4 are a timestamp. Setting the
       0: (I64: Int64);                  // timestamp to 0 has special semantics.
       1: (W1:  LongWord;
           W2:  LongWord);
   end;
 
-  TALJSONRegEx = record
-    Expression: AnsiString;
-    Options:    AnsiString;
-  end;
-
-  TALJSONBinary = record
-    Subtype: byte;
-    Data:    AnsiString;
-  end;
-
   {$IF CompilerVersion >= 23} {Delphi XE2}
   TAlJSONParseDocument = reference to procedure (Sender: TObject);
-  TAlJSONParseTextEvent = reference to procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Str: AnsiString; const NodeSubType: TALJSONNodeSubType);
+  TAlJSONParseTextEvent = reference to procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType);
   TAlJSONParseObjectEvent = reference to procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString);
   TAlJSONParseArrayEvent = reference to procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString);
   {$ELSE}
   TAlJSONParseDocument = procedure (Sender: TObject) of object;
-  TAlJSONParseTextEvent = procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Str: AnsiString; const NodeSubType: TALJSONNodeSubType) of object;
+  TAlJSONParseTextEvent = procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType) of object;
   TAlJSONParseObjectEvent = procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString) of object;
   TAlJSONParseArrayEvent = procedure (Sender: TObject; const Path: AnsiString; const Name: AnsiString) of object;
   {$IFEND}
@@ -281,12 +278,7 @@ type
                       doNodeAutoIndent); // affect only the SaveToStream
   TALJSONDocOptions = set of TALJSONDocOption;
 
-  TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
-                        poAddNodeSubTypeHelperFunct); // By default json (ie: javascript) treats all numbers as floating-point values.
-                                                      // To let other system (ie: mongoDB) understand the type of the number
-                                                      // we provide the helper functions NumberLong() to handle 64-bit integers
-                                                      // and NumberInt() to handle 64-bit integers. theses helper functions are
-                                                      // used when saving the json document.
+  TALJSONParseOption = (poIgnoreControlCharacters); // don't decode escaped characters (like \") and not encode them also (when save / load)
   TALJSONParseOptions = set of TALJSONParseOption;
 
   PALPointerJSONNodeList = ^TALPointerJSONNodeList;
@@ -363,20 +355,22 @@ type
     function GetHasChildNodes: Boolean;
     function GetNodeType: TALJSONNodeType; virtual; abstract;
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
-    procedure SetNodeSubType(const Value: TALJSONNodeSubType); virtual; abstract;
-    function GetNodeTypeStr: AnsiString;
-    function GetNodeValue: ansiString; virtual;
-    procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); virtual;
+    function GetNodeValueStr: ansiString; virtual;
+    function GetNodeValueInt64: int64; virtual;
+    procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); overload; virtual;
+    procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
+    procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     function GetText: AnsiString;
     procedure SetText(const Value: AnsiString);
+    function GetTextWithNodeSubTypeHelper: AnsiString;
     function GetFloat: Double;
     procedure SetFloat(const Value: Double);
     function GetDateTime: TDateTime;
     procedure SetDateTime(const Value: TDateTime);
     function GetTimestamp: TALBSONTimestamp;
     procedure SetTimestamp(const Value: TALBSONTimestamp);
-    function GetObjectID: TALJSONObjectID;
-    procedure SetObjectID(const Value: TALJSONObjectID);
+    function GetObjectID: AnsiString;
+    procedure SetObjectID(const Value: AnsiString);
     function GetInt32: Integer;
     procedure SetInt32(const Value: Integer);
     function GetInt64: Int64;
@@ -387,12 +381,16 @@ type
     procedure SetNull(const Value: Boolean);
     function GetJavascript: AnsiString;
     procedure SetJavascript(const Value: AnsiString);
-    function GetRegEx: TALJSONRegEx;
-    procedure SetRegEx(const Value: TALJSONRegEx);
-    function GetBinary: TALJSONBinary;
-    procedure SetBinary(const Value: TALJSONBinary);
-    function GetBinaryData: ansiString;
-    procedure SetBinaryData(const Value: ansiString);
+    function GetRegEx: ansiString;
+    procedure SetRegEx(const Pattern: ansiString); overload;
+    procedure SetRegEx(const Pattern: ansiString; const Options: TALPerlRegExOptions); overload;
+    function GetRegExOptions: TALPerlRegExOptions;
+    procedure SetRegExOptions(const Value: TALPerlRegExOptions);
+    function GetBinary: AnsiString;
+    procedure SetBinary(const Data: AnsiString); overload;
+    procedure SetBinary(const Data: AnsiString; const Subtype: byte); overload;
+    function GetBinarySubType: byte;
+    procedure SetBinarySubType(const Subtype: byte);
     function GetOwnerDocument: TALJSONDocument;
     procedure SetOwnerDocument(const Value: TALJSONDocument);
     function GetParentNode: TALJSONNode;
@@ -402,26 +400,34 @@ type
     function GetBSON: AnsiString;
     procedure SetBSON(const Value: AnsiString);
     function NestingLevel: Integer;
+    procedure SaveToBson(const Stream: TStream;
+                         Var buffer: ansiString);
+    procedure SaveToJson(const Stream: TStream;
+                         Var buffer: ansiString);
   public
     constructor Create(const NodeName: AnsiString); virtual;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode; overload;
     function NextSibling: TALJSONNode;
     function PreviousSibling: TALJSONNode;
-    procedure SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
-    procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
-    procedure SaveToJSON(var JSON: AnsiString);
-    procedure SaveToBSON(var BSON: AnsiString);
-    procedure LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False; Const ClearChildNodes: Boolean = True);
-    procedure LoadFromStream(const Stream: TStream; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
-    procedure LoadFromJSON(const JSON: AnsiString; Const ClearChildNodes: Boolean = True);
-    procedure LoadFromBSON(const BSON: AnsiString; Const ClearChildNodes: Boolean = True);
+    procedure SaveToJSONStream(const Stream: TStream);
+    procedure SaveToJSONFile(const FileName: AnsiString);
+    procedure SaveToJSONString(var Str: AnsiString);
+    procedure SaveToBSONStream(const Stream: TStream);
+    procedure SaveToBSONFile(const FileName: AnsiString);
+    procedure SaveToBSONString(var Str: AnsiString);
+    procedure LoadFromJSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromJSONStream(Stream: TStream; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromJSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSONStream(Stream: TStream; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read fNodeName write fNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
-    property NodeValue: AnsiString read GetNodeValue; // same as text property but without formating
-    property NodeSubType: TALJSONNodeSubType read GetNodeSubType write SetNodeSubType;
+    property NodeValue: AnsiString read GetNodeValueStr; // same as text property but without formating
+    property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
     property OwnerDocument: TALJSONDocument read GetOwnerDocument Write SetOwnerDocument;
     property ParentNode: TALJSONNode read GetParentNode;
     property Text: AnsiString read GetText write SetText;
@@ -430,13 +436,14 @@ type
     property Float: Double read GetFloat write SetFloat;
     property DateTime: TDateTime read GetDateTime write SetDateTime;
     property Timestamp: TALBSONTimestamp read GetTimestamp write SetTimestamp; // Use only by MongoDB, do not use it, use DateTime instead !
-    property ObjectID: TALJSONObjectID read GetObjectID write SetObjectID;
+    property ObjectID: AnsiString read GetObjectID write SetObjectID;
     property Bool: Boolean read GetBool write SetBool;
     property Null: Boolean read GetNull write SetNull;
     property Javascript: AnsiString read GetJavascript write SetJavascript;
-    property RegEx: TALJSONRegEx read GetRegEx write SetRegEx;
-    property Binary: TALJSONBinary read GetBinary write SetBinary;
-    property BinaryData: ansiString read GetBinaryData write SetBinaryData;
+    property RegEx: AnsiString read GetRegEx write SetRegEx;
+    property RegExOptions: TALPerlRegExOptions read GetRegExOptions write SetRegExOptions;
+    property Binary: ansiString read GetBinary write SetBinary;
+    property BinarySubType: Byte read GetBinarySubType write SetBinarySubType;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
   end;
@@ -448,7 +455,6 @@ type
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
-    procedure SetNodeSubType(const Value: TALJSONNodeSubType); override;
     function InternalGetChildNodes: TALJSONNodeList; override;
     function GetChildNodes: TALJSONNodeList; override;
     procedure SetChildNodes(const Value: TALJSONNodeList); override;
@@ -464,7 +470,6 @@ type
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
-    procedure SetNodeSubType(const Value: TALJSONNodeSubType); override;
     function InternalGetChildNodes: TALJSONNodeList; override;
     function GetChildNodes: TALJSONNodeList; override;
     procedure SetChildNodes(const Value: TALJSONNodeList); override;
@@ -473,20 +478,29 @@ type
     Destructor Destroy; override;
   end;
 
+  TALJSONTextNodeValueDefined = set of (nvStr, nvInt64);
+
   {Groups javascript, string, number, true, false, null}
   TALJSONTextNode = Class(TALJSONNode)
   private
     fNodeSubType: TALJSONNodeSubType;
-    fNodeValue: AnsiString;
+    fNodeValueStr: AnsiString; // contain the text representation of the node
+                               // WITHOUT any node subtype helper
+                               // for exemple for NumberLong(12391293) it's
+                               // store only 12391293
+    FnodeValueInt64: int64;    // contain the value Stored in an int64 (if the
+                               // value can be store in an int64)
+    fNodeValueDefined: TALJSONTextNodeValueDefined;
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
-    procedure SetNodeSubType(const Value: TALJSONNodeSubType); override;
-    function GetNodeValue: ansiString; override;
-    procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); override;
+    function GetNodeValueStr: ansiString; override;
+    function GetNodeValueInt64: int64; override;
+    procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); overload; override;
+    procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; override;
+    procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; override;
   public
     constructor Create(const NodeName: AnsiString = ''); override;
-    property NodeValue: AnsiString read fNodeValue; // it's just to have the property without any getter function to economize one string refcount
   end;
 
   {TALJSONDocument}
@@ -497,7 +511,7 @@ type
     FNodeIndentStr: AnsiString;
     FOptions: TALJSONDocOptions;
     FParseOptions: TALJSONParseOptions;
-    fPathSeparator: AnsiString;
+    fPathSeparator: AnsiChar;
     FOnParseStartDocument: TAlJSONParseDocument;
     FOnParseEndDocument: TAlJSONParseDocument;
     FonParseText: TAlJSONParseTextEvent;
@@ -510,13 +524,17 @@ type
     procedure CheckActive;
     procedure DoParseStartDocument;
     procedure DoParseEndDocument;
-    procedure DoParseText(const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType);
+    procedure DoParseText(const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType);
     procedure DoParseStartObject(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseEndObject(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseStartArray(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseEndArray(const Path: AnsiString; const Name: AnsiString);
-    Procedure ParseJSONStream(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
-    Procedure ParseBSONStream(Const RawBSONStream: TStream; Const ContainerNode: TALJSONNode);
+    Procedure ParseJSON(RawJSONStream: TStream;
+                        const RawJSONString: AnsiString;
+                        ContainerNode: TALJSONNode);
+    Procedure ParseBSON(RawBSONStream: TStream;
+                        const RawBSONString: AnsiString;
+                        ContainerNode: TALJSONNode);
     procedure ReleaseDoc;
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
@@ -525,8 +543,8 @@ type
     function GetNodeIndentStr: AnsiString;
     function GetOptions: TALJSONDocOptions;
     function GetParseOptions: TALJSONParseOptions;
-    function GetPathSeparator: AnsiString;
-    procedure SetPathSeparator(const Value: AnsiString);
+    function GetPathSeparator: ansiChar;
+    procedure SetPathSeparator(const Value: ansiChar);
     function  GetJSON: AnsiString;
     function  GetBSON: AnsiString;
     procedure SetOptions(const Value: TALJSONDocOptions);
@@ -538,25 +556,30 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual;
     constructor Create(const aFormatSettings: TALformatSettings; const aActive: Boolean = True); overload; virtual;
     destructor Destroy; override;
+    procedure MultiThreadPrepare;
     procedure Clear;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNode;
     function IsEmptyDoc: Boolean;
-    procedure LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False; Const ClearChildNodes: Boolean = True);
-    procedure LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
-    procedure LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
-    procedure LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
-    procedure SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
-    procedure SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
-    procedure SaveToJSON(var JSON: AnsiString);
-    procedure SaveToBSON(var BSON: AnsiString);
+    procedure LoadFromJSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromJSONStream(Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromJSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSONStream(Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure LoadFromBSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+    procedure SaveToJSONStream(const Stream: TStream);
+    procedure SaveToJSONFile(const FileName: AnsiString);
+    procedure SaveToJSONString(var Str: AnsiString);
+    procedure SaveToBSONStream(const Stream: TStream);
+    procedure SaveToBSONFile(const FileName: AnsiString);
+    procedure SaveToBSONString(var Str: AnsiString);
     property ChildNodes: TALJSONNodeList read GetChildNodes;
     property Node: TALJSONNode read GetDocumentNode;
     property Active: Boolean read GetActive write SetActive;
     property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALJSONDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALJSONParseOptions read GetParseOptions write SetParseOptions;
-    property PathSeparator: AnsiString read GetPathSeparator write SetPathSeparator;
+    property PathSeparator: ansiChar read GetPathSeparator write SetPathSeparator;
     property JSON: AnsiString read GetJSON write SetJSON;
     property BSON: AnsiString read GetBSON write SetBSON;
     property OnParseStartDocument: TAlJSONParseDocument read fOnParseStartDocument write fOnParseStartDocument;
@@ -571,7 +594,8 @@ type
   end;
 
 {misc constants}
-Const CALDefaultNodeIndent  = '  '; { 2 spaces }
+var
+  vALDefaultNodeIndent: ansiString;  // var instead of const to avoid new ansitring on assign
 
 {misc function}
 {$IF CompilerVersion >= 23} {Delphi XE2}
@@ -619,13 +643,13 @@ function ALJsonEncodeWithNodeSubTypeHelperFunction(const aValue: AnsiString;
                                                    aNodeSubType: TALJSONNodeSubType;
                                                    const aFormatSettings: TALFormatSettings): AnsiString;
 
-function ALJSONDocTryStrToRegEx(const S: AnsiString; out Value: TALJSONRegEx): boolean;
-function ALJSONDocTryStrTobinary(const S: AnsiString; out Subtype: byte; out Data: AnsiString): boolean;
-function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
-function ALJSONDocTryStrToObjectID(const S: AnsiString; out Value: TALJSONObjectID): Boolean;
-function ALJSONDocTryStrToTimestamp(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
-function ALJSONDocTryStrToInteger(const S: AnsiString; out Value: integer): Boolean;
-function ALJSONDocTryStrToInt64(const S: AnsiString; out Value: int64): Boolean;
+function ALJSONTryStrToRegEx(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): boolean;
+function ALJSONTryStrTobinary(const S: AnsiString; out Data: AnsiString; out Subtype: byte): boolean;
+function ALJSONTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+function ALJSONTryStrToObjectID(const S: AnsiString; out Value: ansiString): Boolean;
+function ALJSONTryStrToTimestamp(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
+function ALJSONTryStrToInt32(const S: AnsiString; out Value: integer): Boolean;
+function ALJSONTryStrToInt64(const S: AnsiString; out Value: int64): Boolean;
 
 implementation
 
@@ -638,16 +662,16 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      Contnrs,
      DateUtils,
      {$IFEND}
+     ALquickSortList,
      AlHTML,
      ALMime,
      ALMisc;
 
 var _cALJsonISODateFormatSettings: TALFormatSettings;
 
-{*************************************************************************************}
-function ALJSONDocTryStrToRegEx(const S: AnsiString; out Value: TALJSONRegEx): boolean;
-var aRegEx: TALPerlRegEx;
-    P1: integer;
+{***********************************************************************************************************************}
+function ALJSONTryStrToRegEx(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): boolean;
+var P1: integer;
     i: integer;
 begin
 
@@ -668,22 +692,33 @@ begin
     if P1 <> 1 then begin
 
       //init Value
-      Value.Options    := ALCopyStr(S, P1 + 1, maxint);
-      Value.Expression := ALCopyStr(S, 2, P1 - 2);
+      RegEx := ALCopyStr(S, 2, P1 - 2);
+      RegExOptions := [];
 
       // loop on all the options characters
       // to check if they are allowed.
-      for i := 1 to Length(Value.Options ) do
-        if not (Value.Options[i] in ['i','m','x','l','s','u']) then Exit;
+      for i := P1 + 1 to Length(S) do
+        case s[i] of
+          'i': RegExOptions := RegExOptions + [preCaseLess];
+          'm': RegExOptions := RegExOptions + [preMultiLine];
+          'x': RegExOptions := RegExOptions + [preExtended];
+          'l':;
+          's': RegExOptions := RegExOptions + [preSingleLine];
+          'u':;
+          else exit;
+        end;
+
+      //set the result to true
+      result := true;
 
       // check if it's compiling
-      aRegEx := TALPerlRegEx.Create;
-      try
-        aRegEx.RegEx := Value.Expression;
-        result := aRegEx.Compile(false{RaiseException});
-      finally
-        aRegEx.Free;
-      end;
+      //aRegEx := TALPerlRegEx.Create;
+      //try
+      //  aRegEx.RegEx := Value.Expression;
+      //  result := aRegEx.Compile(false{RaiseException});
+      //finally
+      //  aRegEx.Free;
+      //end;
 
     end;
 
@@ -691,71 +726,88 @@ begin
 
 end;
 
-{******************************************************************************************************}
-function ALJSONDocTryStrTobinary(const S: AnsiString; out Subtype: byte; out Data: AnsiString): boolean;
-var P1, P2: integer;
-    aInt: integer;
+{***************************************************************************************************}
+function ALJSONTryStrTobinary(const S: AnsiString; out Data: AnsiString; out Subtype: byte): boolean;
+var aInt: integer;
+    Ln: integer;
+    P1, P2: integer;
 begin
 
   // s must look like
   // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
   // BinData ( 0 , "JliB6gIMRuSphAD2KmhzgQ==" )
   result := false;
+  Ln := length(s);
   P1 := 1;
-  while (P1 <= length(s)) and (s[P1] in [#9, ' ']) do inc(P1);
-  if (P1 + 6 > length(s)) or
+
+  while (P1 <= ln) and (s[P1] in [#9, ' ']) do inc(P1);
+
+  if (P1 + 6 > ln) or
      (s[P1] <> 'B') or
      (s[P1+1] <> 'i') or
      (s[P1+2] <> 'n') or
      (s[P1+3] <> 'D') or
      (s[P1+4] <> 'a') or
      (s[P1+5] <> 't') or
-     (s[P1+6] <> 'a') then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+     (s[P1+6] <> 'a') then exit; // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
                                  // ^
-  P1 := p1 + 7{Length('BinData')}; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
-                                   //        ^
-  while (P1 <= length(s)) and (s[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(s)) or (s[P1] <> '(') then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
-                                                   //        ^P1
-  inc(P1); // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
-           //         ^P1
-  if (P1 > length(s)) then exit;
-  P2 := ALPosEx(',', s, P1);
-  if P2 <= P1 then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
-                         //          ^P2
 
-  // init Value.subtype
-  if not ALTryStrToInt(ALTrim(ALCopyStr(s, P1, P2 - P1)), aInt) then Exit;
+  P1 := p1 + 7{Length('BinData')}; // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+                                   //        ^
+  while (P1 <= ln) and (s[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (s[P1] <> '(') then exit; // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+                                            //        ^P1
+
+  inc(P1); // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+           //         ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1); // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+                                                        //          ^P1
+  if (P1 > ln) then exit;
+
+  P2 := P1;
+  while (P2 <= ln) and (S[P2] in ['0'..'9']) do inc(P2); // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+                                                         //           ^P2
+  if P2 > ln then exit;
+  if not ALTryStrToInt(ALcopyStr(S,P1,P2-P1), aInt) then Exit;
   subtype := aInt;
 
-  // init Value.Data
-  p1 := P2 + 1; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
-                //           ^P1
-  while (P1 <= length(s)) and (s[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(s)) or (not (s[P1] in ['"',''''])) then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
-                                                                //            ^P1
+  p1 := P2;
+  while (P1 <= ln) and (s[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (s[P1] <> ',') then exit; // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+                                            //            ^P2
+
+  inc(P1); // BinData( 0 , "JliB6gIMRuSphAD2KmhzgQ==")
+           //             ^P1
+  while (P1 <= ln) and (s[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (not (s[P1] in ['"',''''])) then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
+                                                         //            ^P1
+
   P2 := length(s);
   while (P2 > p1) and (s[P2] in [#9, ' ']) do dec(P2);
   if (P2 <= p1) or (s[P2] <> ')') then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
                                              //                                      ^P2
+
   dec(p2);
   if (P2 <= p1) then exit;
   while (P2 > p1) and (s[P2] in [#9, ' ']) do dec(P2);
   if (P2 <= p1) or (s[P2] <> s[P1]) then exit; // BinData(0, "JliB6gIMRuSphAD2KmhzgQ==")
                                                //                                     ^P2
+
   inc(p1);
-  Data := ALMimeBase64DecodeString(ALTrim(ALCopyStr(s, P1, P2-P1)));
+  Data := ALMimeBase64DecodeString(ALCopyStr(s, P1, P2-P1));
 
   // set the result
   result := true;
 
 end;
 
-{*************************************************************************************}
-function ALJSONDocTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
-var aDateStr: AnsiString;
-    aQuoteChar: ansiChar;
+{**********************************************************************************}
+function ALJSONTryStrToDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
+var aQuoteChar: ansiChar;
+    aTmpStr: AnsiString;
+    aTmpLn: integer;
     P1, P2: integer;
+    Ln: integer;
 begin
 
   // s must look like
@@ -764,130 +816,137 @@ begin
   // new ISODate('yyyy-mm-ddThh:nn:ss.zzzZ')
   // ISODate('yyyy-mm-ddThh:nn:ss.zzzZ')
   result := false;
-  aDateStr := ALTrim(S); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-  if alpos('new', aDateStr) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                                                                //    ^P1
+  Ln := length(s);
+  if alpos('new', s) = 1 then P1 := 4{length('new') + 1} // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                                         //    ^P1
   else P1 := 1;// Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
                // ^P1
-  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 <= length(aDateStr) - 3) and
-     (aDateStr[P1]   = 'D') and
-     (aDateStr[P1+1] = 'a') and
-     (aDateStr[P1+2] = 't') and
-     (aDateStr[P1+3] = 'e') then inc(p1, 4)  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                                             //          ^P1
-  else if (P1 <= length(aDateStr) - 6) and
-          (aDateStr[P1]   = 'I') and
-          (aDateStr[P1+1] = 'S') and
-          (aDateStr[P1+2] = 'O') and
-          (aDateStr[P1+3] = 'D') and
-          (aDateStr[P1+4] = 'a') and
-          (aDateStr[P1+5] = 't') and
-          (aDateStr[P1+6] = 'e') then inc(p1, 7)  // ISODate ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                                                  //        ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 <= ln - 3) and
+     (S[P1]   = 'D') and
+     (S[P1+1] = 'a') and
+     (S[P1+2] = 't') and
+     (S[P1+3] = 'e') then inc(p1, 4)  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                      //          ^P1
+  else if (P1 <= ln - 6) and
+          (S[P1]   = 'I') and
+          (S[P1+1] = 'S') and
+          (S[P1+2] = 'O') and
+          (S[P1+3] = 'D') and
+          (S[P1+4] = 'a') and
+          (S[P1+5] = 't') and
+          (S[P1+6] = 'e') then inc(p1, 7)  // ISODate ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                           //        ^P1
   else exit;
-  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aDateStr)) or (aDateStr[P1] <> '(') then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                                                                 //           ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (S[P1] <> '(') then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                            //           ^P1
   inc(P1); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
            //            ^P1
-  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aDateStr)) or (not (aDateStr[P1] in ['''','"'])) then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                                                                              //             ^P1
-  aQuoteChar := aDateStr[P1]; // "
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (not (S[P1] in ['''','"'])) then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                                                         //             ^P1
+  aQuoteChar := S[P1]; // "
   inc(p1); // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
            //              ^P1
   P2 := P1;
-  while (P1 <= length(aDateStr)) and (aDateStr[P1] <> aQuoteChar) do inc(P1);
-  if (P1 > length(aDateStr)) then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-                                        //                                      ^P1
-  result := ALTryStrToDateTime(alStringReplace(alStringReplace(AlcopyStr(aDateStr,P2,P1-P2),
-                                               'T',
-                                               ' ',
-                                               []),
-                               'Z',
-                               '',
-                               []),
-                               Value,
-                               _cALJsonISODateFormatSettings);
+  while (P1 <= ln) and (S[P1] <> aQuoteChar) do inc(P1);
+  if (P1 > ln) then exit; // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+                          //                                      ^P1
+  dec(P1);
+  if S[P1] <> 'Z' then exit;
+  aTmpStr := AlcopyStr(S,P2,P1-P2); // yyyy-mm-ddThh:nn:ss.zzz
+
+  P2 := 1;
+  aTmpLn := length(aTmpStr);
+  while (P2 <= aTmpLn) and (aTmpStr[P2] <> 'T') do inc(P2);
+  if P2 > aTmpLn then exit;
+  aTmpStr[P2] := ' '; // yyyy-mm-dd hh:nn:ss.zzz
+
+  result := ALTryStrToDateTime(aTmpStr, Value, _cALJsonISODateFormatSettings);
   if not result then exit;
 
-  inc(p1);  // // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
-            //                                          ^P1
-  while (P1 <= length(aDateStr)) and (aDateStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 <> length(aDateStr)) or (aDateStr[P1] <> ')') then begin
+  inc(p1,2);  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
+              //                                       ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 <> ln) or (S[P1] <> ')') then begin
     result := false;
     exit;
   end;
 
 end;
 
-{*******************************************************************************************}
-function ALJSONDocTryStrToObjectID(const S: AnsiString; out Value: TALJSONObjectID): Boolean;
-var aObjectIDStr: AnsiString;
-    aObjectIDhex: AnsiString;
+{****************************************************}
+// ObjectId is a 12-byte BSON type, constructed using:
+// a 4-byte value representing the seconds since the Unix epoch,
+// a 3-byte machine identifier,
+// a 2-byte process id, and
+// a 3-byte counter, starting with a random value.
+function ALJSONTryStrToObjectID(const S: AnsiString; out Value: AnsiString): Boolean;
+var aObjectIDhex: AnsiString;
     aQuoteChar: ansiChar;
     P1: integer;
+    Ln: integer;
 begin
 
   // s must look like
   // ObjectId ( "507f1f77bcf86cd799439011" )
   result := false;
-  aObjectIDStr := ALTrim(S); // ObjectId ( "507f1f77bcf86cd799439011" )
-  if alpos('ObjectId', aObjectIDStr) <> 1 then exit;
+  if alpos('ObjectId', S) <> 1 then exit;
+  Ln := length(s);
   P1 := 9{length('ObjectId') + 1}; // ObjectId ( "507f1f77bcf86cd799439011" )
                                    //         ^P1
-  while (P1 <= length(aObjectIDStr)) and (aObjectIDStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aObjectIDStr)) or (aObjectIDStr[P1] <> '(') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
-                                                                         //          ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (S[P1] <> '(') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                            //          ^P1
   inc(p1);  // ObjectId ( "507f1f77bcf86cd799439011" )
             //           ^P1
-  while (P1 <= length(aObjectIDStr)) and (aObjectIDStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aObjectIDStr)) or (not (aObjectIDStr[P1] in ['''','"'])) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
-                                                                                      //            ^P1
-  aQuoteChar := aObjectIDStr[P1]; // "
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (not (S[P1] in ['''','"'])) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                                         //            ^P1
+  aQuoteChar := S[P1]; // "
   inc(p1); // ObjectId ( "507f1f77bcf86cd799439011" )
            //             ^P1
-  if (P1 + 23{(length(aObjectIDhex)) - 1} > length(aObjectIDStr)) then exit;
-  setlength(aObjectIDhex,24);
-  aObjectIDhex := allowerCase(ALcopyStr(aObjectIDStr,P1,24{length(aObjectIDhex)})); // 507f1f77bcf86cd799439011
+  if (P1 + 23{(length(aObjectIDhex)) - 1} > ln) then exit;
+  aObjectIDhex := ALcopyStr(S,P1,24{length(aObjectIDhex)}); // 507f1f77bcf86cd799439011
   inc(P1, 24{length(aObjectIDhex)}); // ObjectId ( "507f1f77bcf86cd799439011" )
                                      //                                     ^P1
-  if (P1 > length(aObjectIDStr)) or (aObjectIDStr[P1] <> aQuoteChar) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
-                                                                                //                                     ^P1
+  if (P1 > ln) or (S[P1] <> aQuoteChar) then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                                   //                                     ^P1
   inc(p1);  // ObjectId ( "507f1f77bcf86cd799439011" )
             //                                      ^P1
-  while (P1 <= length(aObjectIDStr)) and (aObjectIDStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 <> length(aObjectIDStr)) or (aObjectIDStr[P1] <> ')') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
-                                                                          //                                       ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 <> ln) or (S[P1] <> ')') then exit; // ObjectId ( "507f1f77bcf86cd799439011" )
+                                             //                                       ^P1
   //convert 507f1f77bcf86cd799439011 to binary
+  Setlength(Value,12);
   result := HexToBin(PansiChar(aObjectIDhex),@Value[1],length(value)) = length(Value);
 
 end;
 
-{*********************************************************************************************}
-function ALJSONDocTryStrToTimestamp(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
-var aTimestampStr: AnsiString;
-    P1, P2:        integer;
+{******************************************************************************************}
+function ALJSONTryStrToTimestamp(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
+var P1, P2:        integer;
     aArgs:         AnsiString;
     aArg1:         integer;
     aArg2:         integer;
+    Ln: integer;
 begin
 
   // s must look like
   // Timestamp(0, 0)
   result        := false;
-  aTimestampStr := ALTrim(S);
-  if ALPos('Timestamp', aTimestampStr) <> 1 then Exit;
+  if ALPos('Timestamp', S) <> 1 then Exit;
+  Ln := length(s);
   P1 := 10{Length('Timestamp') + 1}; // Timestamp(0, 0)
                                      //          ^
-  while (P1 <= length(aTimestampStr)) and (aTimestampStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aTimestampStr)) or (aTimestampStr[P1] <> '(') then exit; // Timestamp(0, 0)
-                                                                           //          ^P1
-  P2 := ALPosEx(')', aTimestampStr, P1);
-  if P2 <> Length(aTimestampStr) then exit; // Timestamp(0, 0)
-                                            //               ^P2
-  aArgs := ALTrim(ALCopyStr(aTimestampStr, P1, P2 - P1)); // 0, 0
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (S[P1] <> '(') then exit; // Timestamp(0, 0)
+                                            //          ^P1
+  P2 := ALPosEx(')', S, P1);
+  if P2 <> ln then exit; // Timestamp(0, 0)
+                         //               ^P2
+  aArgs := ALCopyStr(S, P1+1, P2 - P1-1); // 0, 0
 
   // take arguments of function Timestamp
   P1 := ALPos(',', aArgs);
@@ -900,12 +959,12 @@ begin
   Value.W2 := aArg2; // lower  4 bytes - timestamp
 end;
 
-{**********************************************************************************}
-function ALJSONDocTryStrToInteger(const S: AnsiString; out Value: integer): Boolean;
-var aNumberStr: AnsiString;
-    aTmpStr: AnsiString;
+{*****************************************************************************}
+function ALJSONTryStrToInt32(const S: AnsiString; out Value: integer): Boolean;
+var aTmpStr: AnsiString;
     aQuoteChar: ansiChar;
     P1, P2: integer;
+    Ln: integer;
 begin
 
   // s must look like
@@ -914,45 +973,48 @@ begin
   // 12391293
   result := ALTryStrToInt(S, Value);
   if result then exit;
-  aNumberStr := ALTrim(S); // NumberInt ( "12391293" )
-  if alpos('NumberInt', aNumberStr) <> 1 then exit;
+  if alpos('NumberInt', S) <> 1 then exit;
+  Ln := length(s);
   P1 := 10{length('NumberInt') + 1}; // NumberInt ( "12391293" )
                                      //          ^P1
-  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aNumberStr)) or (aNumberStr[P1] <> '(') then exit; // NumberInt ( "12391293" )
-                                                                     //           ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (S[P1] <> '(') then exit; // NumberInt ( "12391293" )
+                                            //           ^P1
   inc(p1);  // NumberInt ( "12391293" )
             //            ^P1
-  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aNumberStr)) then exit
-  else if (not (aNumberStr[P1] in ['''','"'])) then begin // NumberInt ( 12391293 )
-                                                          //             ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) then exit
+  else if (not (S[P1] in ['''','"'])) then begin // NumberInt ( 12391293 )
+                                                 //             ^P1
     P2 := P1+1;
-    while (P2 <= length(aNumberStr)) and (aNumberStr[P2] in ['0'..'9']) do inc(P2); // NumberInt ( 12391293 )
-                                                                                    //                     ^P2
-    if P2 > length(aNumberStr) then exit;
-    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    while (P2 <= ln) and (S[P2] in ['0'..'9']) do inc(P2); // NumberInt ( 12391293 )
+                                                           //                     ^P2
+    if P2 > ln then exit;
+    aTmpStr := ALcopyStr(S,P1,P2-P1); // 12391293
     P1 := P2; // NumberInt ( 12391293 )
               //                     ^P2
 
-    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberInt ( "12391293" )
-                                                                        //                        ^P1
+    while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> ln) or (S[P1] <> ')') then exit; // NumberInt ( "12391293" )
+                                               //                        ^P1
   end
   else begin // NumberInt ( "12391293" )
              //             ^P1
 
-    aQuoteChar := aNumberStr[P1]; // "
+    aQuoteChar := S[P1]; // "
     inc(p1); // NumberInt ( "12391293" )
              //              ^P1
-    P2 := ALPosEx(aQuoteChar, aNumberStr, P1);
-    if P2 <= P1 then exit;
-    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    P2 := P1;
+    while P2 <= Ln do
+      if S[P2] = aQuoteChar then break
+      else inc(P2);
+    if P2 > ln then exit;
+    aTmpStr := ALcopyStr(S,P1,P2-P1); // 12391293
     P1 := P2 + 1; // NumberInt ( "12391293" )
                   //                       ^P1
-    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberInt ( "12391293" )
-                                                                        //                        ^P1
+    while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> ln) or (S[P1] <> ')') then exit; // NumberInt ( "12391293" )
+                                               //                        ^P1
   end;
 
   //convert 12391293 to integer
@@ -960,12 +1022,12 @@ begin
 
 end;
 
-{******************************************************************************}
-function ALJSONDocTryStrToInt64(const S: AnsiString; out Value: int64): Boolean;
-var aNumberStr: AnsiString;
-    aTmpStr: AnsiString;
+{***************************************************************************}
+function ALJSONTryStrToInt64(const S: AnsiString; out Value: int64): Boolean;
+var aTmpStr: AnsiString;
     aQuoteChar: ansiChar;
     P1, P2: integer;
+    Ln: integer;
 begin
 
   // s must look like
@@ -974,45 +1036,48 @@ begin
   // 12391293
   result := ALTryStrToInt64(S, Value);
   if result then exit;
-  aNumberStr := ALTrim(S); // NumberLong ( "12391293" )
-  if alpos('NumberLong', aNumberStr) <> 1 then exit;
+  if alpos('NumberLong', S) <> 1 then exit;
+  Ln := length(s);
   P1 := 11{length('NumberLong') + 1}; // NumberLong ( "12391293" )
                                       //           ^P1
-  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aNumberStr)) or (aNumberStr[P1] <> '(') then exit; // NumberLong ( "12391293" )
-                                                                     //            ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) or (S[P1] <> '(') then exit; // NumberLong ( "12391293" )
+                                            //            ^P1
   inc(p1);  // NumberLong ( "12391293" )
             //             ^P1
-  while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-  if (P1 > length(aNumberStr)) then exit
-  else if (not (aNumberStr[P1] in ['''','"'])) then begin // NumberLong ( 12391293 )
-                                                          //              ^P1
+  while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+  if (P1 > ln) then exit
+  else if (not (S[P1] in ['''','"'])) then begin // NumberLong ( 12391293 )
+                                                 //              ^P1
     P2 := P1+1;
-    while (P2 <= length(aNumberStr)) and (aNumberStr[P2] in ['0'..'9']) do inc(P2); // NumberLong ( 12391293 )
-                                                                                    //                      ^P2
-    if P2 > length(aNumberStr) then exit;
-    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    while (P2 <= ln) and (S[P2] in ['0'..'9']) do inc(P2); // NumberLong ( 12391293 )
+                                                           //                      ^P2
+    if P2 > ln then exit;
+    aTmpStr := ALcopyStr(S,P1,P2-P1); // 12391293
     P1 := P2; // NumberLong ( 12391293 )
               //                      ^P2
 
-    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberLong ( "12391293" )
-                                                                        //                         ^P1
+    while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> ln) or (S[P1] <> ')') then exit; // NumberLong ( "12391293" )
+                                               //                         ^P1
   end
   else begin // NumberLong ( "12391293" )
              //              ^P1
 
-    aQuoteChar := aNumberStr[P1]; // "
+    aQuoteChar := S[P1]; // "
     inc(p1); // NumberLong ( "12391293" )
              //               ^P1
-    P2 := ALPosEx(aQuoteChar, aNumberStr, P1);
-    if P2 <= P1 then exit;
-    aTmpStr := ALcopyStr(aNumberStr,P1,P2-P1); // 12391293
+    P2 := P1;
+    while P2 <= Ln do
+      if S[P2] = aQuoteChar then break
+      else inc(P2);
+    if P2 > ln then exit;
+    aTmpStr := ALcopyStr(S,P1,P2-P1); // 12391293
     P1 := P2 + 1; // NumberLong ( "12391293" )
                   //                        ^P1
-    while (P1 <= length(aNumberStr)) and (aNumberStr[P1] in [#9, ' ']) do inc(P1);
-    if (P1 <> length(aNumberStr)) or (aNumberStr[P1] <> ')') then exit; // NumberLong ( "12391293" )
-                                                                        //                         ^P1
+    while (P1 <= ln) and (S[P1] in [#9, ' ']) do inc(P1);
+    if (P1 <> ln) or (S[P1] <> ')') then exit; // NumberLong ( "12391293" )
+                                               //                         ^P1
   end;
 
   //convert 12391293 to integer
@@ -1030,6 +1095,17 @@ end;
 procedure ALJSONDocError(const Msg: String; const Args: array of const); overload;
 begin
   raise EALJSONDocError.CreateFmt(Msg, Args);
+end;
+
+{*************************************************************************************}
+procedure ALJSONDocError(const Msg: String; const NodeType: TalJsonNodeType); overload;
+begin
+  case NodeType of
+    ntObject: ALJSONDocError(Msg, ['ntObject']);
+    ntArray: ALJSONDocError(Msg, ['ntArray']);
+    ntText: ALJSONDocError(Msg, ['ntText']);
+    else AlJSONDocError(cAlJSONInvalidNodeType);
+  end;
 end;
 
 {***********************************************************************************}
@@ -1069,7 +1145,7 @@ begin
   FonParseStartArray := nil;
   FonParseEndArray := nil;
   FOptions := [];
-  NodeIndentStr := CALDefaultNodeIndent;
+  NodeIndentStr := vALDefaultNodeIndent;
   fFormatSettings := @ALDefaultFormatSettings;
   FTag := 0;
   SetActive(aActive);
@@ -1092,6 +1168,65 @@ begin
   ReleaseDoc;
   inherited;
 end;
+
+{*****************************************************************************}
+//will create all the nodevalue to be sure that multiple thread can safely read
+//at the same time the jsondocument
+procedure TALJSONDocument.MultiThreadPrepare;
+
+  procedure _doMultiThreadPrepare(aNode: TALJsonNode);
+  var i: integer;
+  begin
+
+    if aNode.NodeType = ntText then begin
+
+      case aNode.NodeSubType of
+        nstFloat,
+        nstBoolean,
+        nstDateTime,
+        nstNull,
+        nstInt32,
+        nstTimestamp,
+        nstInt64: aNode.GetNodeValueStr;
+        //nstText: can not be retrieve from int64
+        //nstObject: can not be retrieve from int64
+        //nstArray: can not be retrieve from int64
+        //nstBinary: only the binarysubtype is store in int64
+        //nstObjectID: can not be retrieve from int64
+        //nstRegEx: only the regex option is store in the int64
+        //nstJavascript: can not be retrieve from int64
+      end;
+
+      case aNode.NodeSubType of
+        nstFloat,
+        nstBoolean,
+        nstDateTime,
+        nstNull,
+        nstInt32,
+        nstTimestamp,
+        nstInt64: aNode.GetNodeValueInt64;
+        //nstText: can not be retrieve from int64
+        //nstObject: can not be retrieve from int64
+        //nstArray: can not be retrieve from int64
+        //nstBinary: only the binarysubtype is store in int64
+        //nstObjectID: can not be retrieve from int64
+        //nstRegEx: only the regex option is store in the int64
+        //nstJavascript: can not be retrieve from int64
+      end;
+
+    end
+
+    else begin
+      For i := 0 to aNode.ChildNodes.Count - 1 do
+        _doMultiThreadPrepare(aNode.ChildNodes[i]);
+    end;
+
+  end;
+
+begin
+  _doMultiThreadPrepare(node);
+end;
+
 
 {******************************}
 procedure TALJSONDocument.Clear;
@@ -1143,162 +1278,584 @@ end;
  *Each member of an object or each array value must be followed by a comma if it's not the last one
  *The common extension for json files is '.json'
  *The mime type for json files is 'application/json'}
-Procedure TALJSONDocument.ParseJSONStream(Const RawJSONStream: TStream; Const ContainerNode: TALJSONNode);
+Procedure TALJSONDocument.ParseJSON(RawJSONStream: TStream;
+                                    const RawJSONString: AnsiString;
+                                    ContainerNode: TALJSONNode);
 
 Const BufferSize: integer = 8192;
-Var RawJSONString: AnsiString;
-    RawJSONStringLength: Integer;
-    RawJSONStringPos: Integer;
+
+Var Buffer: AnsiString;
+    BufferLength: Integer;
+    BufferPos: Integer;
+    CurrName: AnsiString;
+    CurrIndex: integer;
+    CurrValue: ansiString;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNode;
-    DecodeJSONReferences: Boolean;
-    UseContainerNodeInsteadOfAddingChildNode: Boolean;
-    Paths: TALStringList;
-    ArrayIdx: integer;
+    NamePaths: TALNvStringList;
+    ObjectPaths: TALIntegerList;
+    DecodeJSONReferences: boolean;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function ExpandRawJSONString: boolean; overload;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ExpandBuffer: boolean; overload;
   Var ByteReaded, Byte2Read: Integer;
   Begin
-    If (RawJSONStringLength > 0) and (RawJSONStringPos > 1) then begin
-      if (RawJSONStringPos > RawJSONStringLength) then RawJSONStream.Position := RawJSONStream.Position - RawJSONStringLength + RawJSONStringPos - 1;
-      Byte2Read := min(RawJSONStringPos - 1, RawJSONStringLength);
-      if RawJSONStringPos <= length(RawJSONString) then ALMove(RawJSONString[RawJSONStringPos],
-                                                               RawJSONString[1],
-                                                               RawJSONStringLength-RawJSONStringPos+1);
-      RawJSONStringPos := 1;
+    if not assigned(RawJSONStream) then begin
+      result := false;
+      exit;
+    end;
+
+    If (BufferLength > 0) and (BufferPos > 1) then begin
+      if (BufferPos > BufferLength) then RawJSONStream.Position := RawJSONStream.Position - BufferLength + BufferPos - 1;
+      Byte2Read := min(BufferPos - 1, BufferLength);
+      if BufferPos <= length(Buffer) then ALMove(Pbyte(Buffer)[BufferPos - 1],
+                                                 pointer(Buffer)^,
+                                                 BufferLength-BufferPos+1);
+      BufferPos := 1;
     end
     else begin
       Byte2Read := BufferSize;
-      RawJSONStringLength := RawJSONStringLength + BufferSize;
-      SetLength(RawJSONString, RawJSONStringLength);
+      BufferLength := BufferLength + BufferSize;
+      SetLength(Buffer, BufferLength);
     end;
 
     //range check error is we not do so
-    if RawJSONStream.Position < RawJSONStream.Size then ByteReaded := RawJSONStream.Read(RawJSONString[RawJSONStringLength - Byte2Read + 1],Byte2Read)
+    if RawJSONStream.Position < RawJSONStream.Size then ByteReaded := RawJSONStream.Read(Pbyte(Buffer)[BufferLength - Byte2Read{+ 1 - 1}],Byte2Read)
     else ByteReaded := 0;
 
     If ByteReaded <> Byte2Read then begin
-      RawJSONStringLength := RawJSONStringLength - Byte2Read + ByteReaded;
-      SetLength(RawJSONString, RawJSONStringLength);
+      BufferLength := BufferLength - Byte2Read + ByteReaded;
+      SetLength(Buffer, BufferLength);
       Result := ByteReaded > 0;
     end
     else result := True;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function ExpandRawJSONString(var PosToKeepSync: Integer): boolean; overload;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ExpandBuffer(var PosToKeepSync: Integer): boolean; overload;
   var P1: integer;
   begin
-    P1 := RawJSONStringPos;
-    result := ExpandRawJSONString;
-    PosToKeepSync := PosToKeepSync - (P1 - RawJSONStringPos);
+    P1 := BufferPos;
+    result := ExpandBuffer;
+    PosToKeepSync := PosToKeepSync - (P1 - BufferPos);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetPathStr(Const ExtraItems: ansiString = ''): ansiString;
   var I, L, P, Size: Integer;
-      S, LB: AnsiString;
+      LB: ansiChar;
+      S: AnsiString;
   begin
     LB := PathSeparator;
     Size := length(ExtraItems);
-    if size <> 0 then Inc(Size, Length(LB));
-    for I := 1 to Paths.Count - 1 do Inc(Size, Length(Paths[I]) + Length(LB));
+    if size <> 0 then Inc(Size, sizeof(LB));
+    for I := 1 to NamePaths.Count - 1 do Inc(Size, Length(NamePaths.Names[I]) + sizeof(LB));
     SetLength(Result, Size);
     P := 1;
-    for I := 1 to Paths.Count - 1 do begin
-      S := Paths[I];
+    for I := 1 to NamePaths.Count - 1 do begin
+      S := NamePaths.Names[I];
       L := Length(S);
       if L <> 0 then begin
-        ALMove(S[1], Result[P], L);
+        ALMove(pointer(S)^, Pbyte(Result)[P-1], L);
         Inc(P, L);
       end;
-      L := Length(LB);
-      if (L <> 0) and
-         ((i <> Paths.Count - 1) or
+      L := sizeof(LB);
+      if ((i <> NamePaths.Count - 1) or
           (ExtraItems <> '')) and
-         (((NotSaxMode) and (TALJSONNode(Paths.Objects[I]).nodetype <> ntarray)) or
-          ((not NotSaxMode) and (integer(Paths.Objects[I]) <> 2{ntarray}))) then begin
-        ALMove(LB[1], result[P], L);
+         (((NotSaxMode) and (TALJSONNode(NamePaths.Objects[I]).nodetype <> ntarray)) or
+          ((not NotSaxMode) and (TALJSONNodeType(NamePaths.Objects[I]) <> ntarray))) then begin
+        ALMove(LB, Pbyte(Result)[P-1], L);
         Inc(P, L);
       end;
     end;
     if ExtraItems <> '' then begin
       L := length(ExtraItems);
-      ALMove(ExtraItems[1], result[P], L);
+      ALMove(pointer(ExtraItems)^, Pbyte(Result)[P-1], L);
       Inc(P, L);
     end;
     setlength(result,P-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Function GetNodeSubTypeFromStrValue(const aStrValue: AnsiString; const AQuotedValue: Boolean): TALJSONNodeSubType;
-  var aDT:            TDateTime;
-      aObjectID:      TALJSONObjectID;
-      aTimestamp:     TALBSONTimestamp;
-      aRegEx:         TALJSONRegEx;
-      aBinarySubType: Byte;
-      aBinaryData:    ansiString;
-      aInt32:         integer;
-      aInt64:         int64;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithIndex(const index: integer;
+                                  const Args: array of const;
+                                  const NodeSubType: TALJSONNodeSubType);
   begin
-    if AQuotedValue then result := NstText
-    else if ALIsFloat(aStrValue, ALDefaultFormatSettings) then result := nstFloat
-    else if ALJSONDocTryStrToInteger(aStrValue, aInt32) then result := NstInt32
-    else if ALJSONDocTryStrToInt64(aStrValue, aInt64) then result := NstInt64
-    else if alSameText(aStrValue, 'null') then result := nstNull
-    else if ALSametext(aStrValue,'true') or
-            ALSametext(aStrValue,'false') then result := nstBoolean
-    else if ALJSONDocTryStrToDateTime(aStrValue, aDT) then result := nstDateTime
-    else if ALJSONDocTryStrToTimestamp(aStrValue, aTimestamp) then result := nstTimestamp
-    else if ALJSONDocTryStrToObjectID(aStrValue, aObjectID) then result := nstObjectID
-    else if ALJSONDocTryStrToBinary(aStrValue, aBinarySubType, aBinaryData) then result := nstBinary
-    else if ALJSONDocTryStrToRegEx(aStrValue, aRegEx) then result := nstRegEx
-    else result := nstJavascript;
+    DoParseText(GetPathStr('[' + alinttostr(index) + ']'), '', Args, NodeSubType)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithName(const name: AnsiString;
+                                 const Args: array of const;
+                                 const NodeSubType: TALJSONNodeSubType);
+  begin
+    DoParseText(GetPathStr(Name), Name, Args, NodeSubType)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseText(const Index: integer;
+                         const Name: AnsiString;
+                         const Args: array of const;
+                         const NodeSubType: TALJSONNodeSubType);
+  begin
+    if Assigned(fonParseText) then begin
+      if notSaxMode then begin
+        if WorkingNode.nodetype=ntarray then _DoParseTextWithIndex(Index, Args, NodeSubType)
+        else _DoParseTextWithName(Name, Args, NodeSubType);
+      end
+      else begin
+        if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+        if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntArray then _DoParseTextWithIndex(Index, Args, NodeSubType)
+        else _DoParseTextWithName(Name, Args, NodeSubType);
+      end;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseStartObject(const Name: AnsiString);
+  begin
+    DoParseStartObject(GetPathStr, Name);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseEndObject;
+  begin
+    if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+    DoParseEndObject(GetPathStr, NamePaths.Names[NamePaths.Count - 1])
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseStartArray(const index: AnsiString);
+  begin
+    DoParseStartArray(GetPathStr, index)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseEndArray;
+  begin
+    if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+    DoParseEndArray(GetPathStr, NamePaths.Names[NamePaths.Count - 1]);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddIndexItemToNamePath(const index: integer; Obj: Pointer);
+  var S1: ansiString;
+  begin
+    setlength(S1,sizeOf(Integer));
+    ALmove(index, pointer(S1)^, sizeOf(Integer));
+    NamePaths.AddNameValueObject('[' + alinttostr(Index) + ']', S1, Obj)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddNameItemToNamePath(const name: AnsiString; Obj: Pointer);
+  begin
+    NamePaths.AddNameValueObject(Name, #$ff#$ff#$ff#$ff, Obj)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddItemToNamePath(index: integer; const name: AnsiString; Obj: Pointer);
+  begin
+    if notSaxMode then begin
+      if WorkingNode.nodetype=ntarray then _AddIndexItemToNamePath(Index, Obj)
+      else _AddNameItemToNamePath(name, Obj);
+    end
+    else begin
+      if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+      if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntarray then _AddIndexItemToNamePath(Index, Obj)
+      else _AddNameItemToNamePath(name, Obj);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createInt64Node(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aInt64: Int64;
+  begin
+    if ALJSONTryStrToInt64(value, aInt64) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.SetInt64(aInt64);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aint64], nstInt64)
+      end
+      else begin
+        _DoParseText(index, Name, [aint64], nstInt64)
+      end;
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createInt32Node(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aint32: Int32;
+  begin
+    if ALJSONTryStrToInt32(value, aInt32) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.Setint32(aInt32);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aint32], nstInt32)
+      end
+      else begin
+        _DoParseText(index, Name, [aint32], nstInt32)
+      end
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createTextNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+  begin
+    result := true;
+    if NotSaxMode then begin
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Settext(value);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(index, Name, [value], nstText)
+    end
+    else begin
+      _DoParseText(index, Name, [value], nstText)
+    end
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createFloatNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aDouble: Double;
+  begin
+    if ALTryStrToFloat(value, aDouble, ALDefaultFormatSettings) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.SetFloat(ADouble);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aDouble], nstFloat)
+      end
+      else begin
+        _DoParseText(index, Name, [aDouble], nstFloat)
+      end
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createBinaryNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aBinSubtype: byte;
+      aBinData: ansiString;
+  begin
+    if ALJSONTryStrToBinary(value, aBinData, aBinSubtype) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.setbinary(aBinData, aBinSubtype);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aBinData, aBinSubtype], nstBinary);
+      end
+      else begin
+        _DoParseText(index, Name, [aBinData, aBinSubtype], nstBinary);
+      end
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createObjectIDNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aObjectID: AnsiString;
+  begin
+    if ALJSONTryStrToObjectID(value, aObjectID) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.SetObjectID(aObjectID);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aObjectID], nstObjectID)
+      end
+      else begin
+        _DoParseText(index, Name, [aObjectID], nstObjectID)
+      end;
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createBooleanNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aBool: Boolean;
+  begin
+    if value = 'true' then aBool := true
+    else if value = 'false' then aBool := false
+    else begin
+      result := False;
+      exit;
+    end;
+    result := true;
+    if NotSaxMode then begin
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Setbool(aBool);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(index, Name, [aBool], nstBoolean);
+    end
+    else begin
+      _DoParseText(index, Name, [aBool], nstBoolean);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createDateTimeNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aDateTime: TdateTime;
+  begin
+    if ALJSONTryStrToDateTime(value, aDateTime) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.Setdatetime(aDateTime);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aDateTime], nstDateTime);
+      end
+      else begin
+        _DoParseText(index, Name, [aDateTime], nstDateTime);
+      end;
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createTimestampNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aTimestamp: TALBSONTimestamp;
+  begin
+    if ALJSONTryStrToTimestamp(value, aTimestamp) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.SetTimestamp(aTimestamp);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aTimestamp.W1, aTimestamp.W2], nstTimeStamp);
+      end
+      else begin
+        _DoParseText(index, Name, [aTimestamp.W1, aTimestamp.W2], nstTimeStamp);
+      end;
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createnullNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+  begin
+    if value = 'null' then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.Setnull(true);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, ['null'], nstNull);
+      end
+      else begin
+        _DoParseText(index, Name, ['null'], nstNull);
+      end;
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createRegExNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+      aRegEx: ansiString;
+      aRegExOptions: TALPerlRegExOptions;
+  begin
+    if ALJSONTryStrToRegEx(value, aRegEx, aRegExOptions) then begin
+      result := true;
+      if NotSaxMode then begin
+        if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+        else aNode := CreateNode(Name, nttext);
+        try
+          aNode.SetRegEx(aRegEx, aRegExOptions);
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
+        end;
+        _DoParseText(index, Name, [aRegEx, Byte(aRegExOptions)], nstRegEx)
+      end
+      else begin
+        _DoParseText(index, Name, [aRegEx, Byte(aRegExOptions)], nstRegEx)
+      end;
+    end
+    else result := False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _createJavascriptNode(index: integer; const name: AnsiString; const value: ansiString): boolean;
+  var aNode: TALJsonNode;
+  begin
+    result := true;
+    if NotSaxMode then begin
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetJavascript(value);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(index, Name, [value], nstJavascript);
+    end
+    else begin
+      _DoParseText(index, Name, [value], nstJavascript);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createNode(index: integer; const name: AnsiString; const value: ansiString; AQuotedValue: Boolean);
+  begin
+    if AQuotedValue then begin
+      _createTextNode(index, Name, Value);
+      exit;
+    end;
+    if _createFloatNode(index, Name, Value) then exit;
+    if _createBooleanNode(index, Name, Value) then exit;
+    if _createNullNode(index, Name, Value) then exit;
+    if _createInt32Node(index, Name, Value) then exit;
+    if _createInt64Node(index, Name, Value) then exit;
+    if _createDateTimeNode(index, Name, Value) then exit;
+    if _createBinaryNode(index, Name, Value) then exit;
+    if _createObjectIDNode(index, Name, Value) then exit;
+    if _createRegExNode(index, Name, Value) then exit;
+    if _createTimeStampNode(index, Name, Value) then exit;
+    _createJavascriptNode(index, Name, Value);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _extractLastIndexFromNamePath: integer;
+  begin
+    if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+    ALMove(pointer(namePaths.ValueFromIndex[namepaths.Count - 1])^,result,sizeOf(integer));
   end;
 
   {~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeNode;
-  Var aName, aValue: AnsiString;
-      aNode: TALJsonNode;
-      aQuoteChar: ansiChar;
+  Var aNode: TALJsonNode;
+      aNodeType: TALJSONNodeType;
+      aQuoteChar: AnsiChar;
       aNameValueSeparator: ansiChar;
-      aNodeTypeInt: integer;
-      aNodeSubType: TALJSONNodeSubType;
       aInSingleQuote: boolean;
       aInDoubleQuote: boolean;
       aInSquareBracket: integer;
       aInRoundBracket: integer;
       aInCurlyBracket: integer;
-      P1: Integer;
+      P1, P2: Integer;
+      c: ansiChar;
   Begin
+
+    {$IFDEF undef}{$REGION 'init current char (c)'}{$ENDIF}
+    c := Buffer[BufferPos];
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'end Object/Array'}{$ENDIF}
     // ... } ....
     // ... ] ....
-    if RawJsonString[RawJsonStringPos] in ['}',']'] then begin // ... } ...
-                                                               //     ^RawJsonStringPos
+    if c in ['}',']'] then begin // ... } ...
+                                 //     ^BufferPos
 
-      //Reset the ArrayIdx
-      ArrayIdx := -1;
+      //Reset the CurrIndex
+      CurrIndex := -1;
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
-      if (Paths.Count = 0) then ALJSONDocError(CALJSONParseError);
+      if assigned(ObjectPaths) then begin
+        if (ObjectPaths.Count = 0) then ALJSONDocError(cALBSONParseError);
+      end
+      else begin
+        if (NamePaths.Count = 0) then ALJSONDocError(cALBSONParseError);
+      end;
 
       //if we are not in sax mode
       if NotSaxMode then begin
 
         //init anode to one level up
-        aNode := TALJSONNode(Paths.Objects[paths.Count - 1]);
+        if assigned(ObjectPaths) then aNode := TALJSONNode(ObjectPaths.Objects[ObjectPaths.Count - 1])
+        else aNode := TALJSONNode(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
         if (aNode <> WorkingNode) then ALJSONDocError(CALJSONParseError);
 
+        //calculate anodeTypeInt
+        aNodeType := aNode.NodeType;
+        if not (aNodeType in [ntObject, ntarray]) then ALJSONDocError(cALBSONParseError);
+
         //check that the end object/array correspond to the aNodeType
-        if ((RawJsonString[RawJsonStringPos] = '}') and
-            (aNode.NodeType <> ntObject)) or
-           ((RawJsonString[RawJsonStringPos] = ']') and
-            (aNode.NodeType <> ntarray)) then ALJSONDocError(CALJSONParseError);
+        if ((c = '}') and
+            (aNodeType <> ntObject)) or
+           ((c = ']') and
+            (aNodeType <> ntarray)) then ALJSONDocError(CALJSONParseError);
 
         //if working node <> containernode then we can go to one level up
         If WorkingNode<>ContainerNode then begin
@@ -1306,8 +1863,13 @@ Var RawJSONString: AnsiString;
           //init WorkingNode to the parentNode
           WorkingNode := WorkingNode.ParentNode;
 
-          //update ArrayIdx if WorkingNode.NodeType = ntArray
-          if WorkingNode.NodeType = ntArray then ArrayIdx := ALStrToInt(AlCopyStr(Paths[paths.Count - 1], 2, length(Paths[paths.Count - 1]) - 2)) + 1;
+          //update CurrIndex if WorkingNode.NodeType = ntArray
+          if assigned(ObjectPaths) then begin
+            if WorkingNode.NodeType = ntArray then CurrIndex := ObjectPaths[Objectpaths.Count - 1] + 1;
+          end
+          else begin
+            if WorkingNode.NodeType = ntArray then CurrIndex := _extractLastIndexFromNamePath + 1;
+          end;
 
         end
 
@@ -1319,29 +1881,35 @@ Var RawJSONString: AnsiString;
       //if we are in sax mode
       else begin
 
-        //init aNodeTypeInt (we use this as flag in the Paths)
-        if RawJsonString[RawJsonStringPos] = '}' then aNodeTypeInt := 1
-        else aNodeTypeInt := 2;
+         //calculate anodeTypeInt
+        aNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
+        if not (anodeType in [ntObject,ntarray]) then ALJSONDocError(cALBSONParseError);
 
         //check that the end object/array correspond to the aNodeType
-        if integer(Paths.Objects[paths.Count - 1]) <> aNodeTypeInt then ALJSONDocError(CALJSONParseError);
+        if ((c = '}') and
+            (aNodeType <> ntObject)) or
+           ((c = ']') and
+            (aNodeType <> ntarray)) then ALJSONDocError(CALJSONParseError);
 
-        //update ArrayIdx if WorkingNode.NodeType = ntArray
-        if (paths.Count >= 2) and
-           (integer(Paths.Objects[paths.Count - 2]) = 2{ntarray}) then ArrayIdx := ALStrToInt(AlCopyStr(Paths[paths.Count - 1], 2, length(Paths[paths.Count - 1]) - 2)) + 1;
+        //update CurrIndex if WorkingNode.NodeType = ntArray
+        if (Namepaths.Count >= 2) and
+           (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 2]) = ntarray) then CurrIndex := _extractLastIndexFromNamePath + 1;
 
       end;
 
       //call the DoParseEndObject/array event
-      if RawJsonString[RawJsonStringPos] = '}' then DoParseEndObject(GetPathStr, Paths[paths.Count - 1])
-      else DoParseEndArray(GetPathStr, Paths[paths.Count - 1]);
+      if Assigned(fonParseEndObject) then begin
+        if anodeType = ntObject then _DoParseEndObject
+        else _DoParseEndArray;
+      end;
 
       //delete the last entry from the path
-      paths.Delete(paths.Count - 1);
+      if assigned(ObjectPaths) then ObjectPaths.Delete(ObjectPaths.Count - 1)
+      else NamePaths.Delete(NamePaths.Count - 1);
 
-      //update rawJSONStringPos
-      RawJSONStringPos := RawJsonStringPos + 1; // ... } ...
-                                                //      ^RawJsonStringPos
+      //update BufferPos
+      BufferPos := BufferPos + 1; // ... } ...
+                                  //      ^BufferPos
 
       //finallly exit from this procedure, everything was done
       exit;
@@ -1352,8 +1920,8 @@ Var RawJSONString: AnsiString;
     {$IFDEF undef}{$REGION 'Begin Object/Array Without NAME'}{$ENDIF}
     // ... { ....
     // ... [ ....
-    if RawJsonString[RawJsonStringPos] in ['{','['] then begin // ... { ...
-                                                               //     ^RawJsonStringPos
+    if c in ['{','['] then begin // ... { ...
+                                 //     ^BufferPos
 
       //if we are not in sax mode
       if NotSaxMode then begin
@@ -1361,97 +1929,62 @@ Var RawJSONString: AnsiString;
         //if workingnode = nil then it's mean we are outside the containerNode
         if not assigned(WorkingNode) then ALJSONDocError(CALJSONParseError);
 
-        //we are at the very beginning of the json document
-        If UseContainerNodeInsteadOfAddingChildNode then begin
+        //Node without name can be ONLY present inside an array node
+        if (CurrIndex < 0)  or
+           (WorkingNode.nodetype <> ntarray) then ALJSONDocError(CALJSONParseError);
 
-          //check that we are in object
-          if RawJsonString[RawJsonStringPos] <> '{' then ALJSONDocError(CALJSONParseError);
-
-          //inform to next loop that we will be not anymore at the very beginning of the json document
-          UseContainerNodeInsteadOfAddingChildNode := False;
-
-        end
-
-        //we are inside the json document
-        else begin
-
-          //Node without name can be ONLY present inside an array node
-          if (ArrayIdx < 0)  or
-             (WorkingNode.nodetype <> ntarray) then ALJSONDocError(CALJSONParseError);
-
-          //create the node according the the braket char and add it to the workingnode
-          if RawJsonString[RawJsonStringPos] = '{' then aNode := CreateNode('', ntObject)
-          else aNode := CreateNode('', ntarray);
-          try
-            WorkingNode.ChildNodes.Add(aNode);
-          except
-            aNode.Free;
-            raise;
-          end;
-
-          //set that the current working node will be now the new node newly created
-          WorkingNode := aNode;
-
+        //create the node according the the braket char and add it to the workingnode
+        if c = '{' then aNode := CreateNode('', ntObject)
+        else aNode := CreateNode('', ntarray);
+        try
+          WorkingNode.ChildNodes.Add(aNode);
+        except
+          aNode.Free;
+          raise;
         end;
 
+        //set that the current working node will be now the new node newly created
+        WorkingNode := aNode;
+
         //update the path
-        Paths.AddObject('[' + alinttostr(ArrayIdx) + ']', WorkingNode);
+        if assigned(ObjectPaths) then ObjectPaths.AddObject(CurrIndex, WorkingNode)
+        else _AddItemToNamePath(CurrIndex, '', WorkingNode);
 
       end
 
       //if we are in sax mode
       else begin
 
-        //we are at the very beginning of the json document
-        If UseContainerNodeInsteadOfAddingChildNode then begin
-
-          //check that we are in object
-          if RawJsonString[RawJsonStringPos] <> '{' then ALJSONDocError(CALJSONParseError);
-
-          //inform to next loop that we will be not anymore at the very beginning of the json document
-          UseContainerNodeInsteadOfAddingChildNode := False;
-
-        end
-
-        //we are inside the json document
-        else begin
-
           //Node without name can be ONLY present inside an array node
-          if (ArrayIdx < 0) or
-             ((Paths.Count = 0) or
-              (integer(Paths.Objects[paths.Count - 1]) <> 2{array})) then ALJSONDocError(CALJSONParseError);
-
-        end;
+          if (CurrIndex < 0) or
+             (NamePaths.Count = 0) or
+             (TALJsonNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then ALJSONDocError(CALJSONParseError);
 
         //update the path
-        if RawJsonString[RawJsonStringPos] = '{' then aNodeTypeInt := 1
-        else aNodeTypeInt := 2;
-        Paths.AddObject('[' + alinttostr(ArrayIdx) + ']', pointer(aNodeTypeInt));
+        if c = '{' then aNodeType := ntObject
+        else aNodeType := ntArray;
+        _AddItemToNamePath(CurrIndex, '', pointer(aNodeType));
 
       end;
 
       //call the DoParseStartObject/array event
-      if RawJsonString[RawJsonStringPos] = '{' then begin
-        DoParseStartObject(GetPathStr,'');
-        ArrayIdx := -1;
+      if c = '{' then begin
+        if Assigned(fonParseStartObject) then _DoParseStartObject('');
+        CurrIndex := -1;
       end
       else begin
-        DoParseStartArray(GetPathStr, '');
-        ArrayIdx := 0;
+        if Assigned(fonParseStartArray) then _DoParseStartArray('');
+        CurrIndex := 0;
       end;
 
-      //update rawJSONStringPos
-      RawJSONStringPos := RawJsonStringPos + 1; // ... { ...
-                                                //      ^RawJsonStringPos
+      //update BufferPos
+      BufferPos := BufferPos + 1; // ... { ...
+                                  //      ^BufferPos
 
       //finallly exit from this procedure, everything was done
       exit;
 
     end;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'error if UseContainerNodeInsteadOfAddingChildNode'}{$ENDIF}
-    If UseContainerNodeInsteadOfAddingChildNode then ALJSONDocError(CALJSONParseError);
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'extract the quoted name part'}{$ENDIF}
@@ -1470,32 +2003,34 @@ Var RawJSONString: AnsiString;
     // "value"
     // 'value'
     aQuoteChar := #0;
-    if RawJsonString[RawJsonStringPos] in ['"',''''] then begin  // ... " ...
-                                                                 //     ^RawJsonStringPos
-      aQuoteChar := RawJsonString[RawJsonStringPos]; // "
-      P1 := RawJsonStringPos + 1; // ... "...\"..."
-                                  //      ^P1
-      If P1 + 1 > RawJSONStringLength then ExpandRawJSONString(P1);
-      While P1 <= RawJSONStringLength do begin
+    if c in ['"',''''] then begin  // ... " ...
+                                   //     ^BufferPos
+      aQuoteChar := c; // "
+      P1 := BufferPos + 1; // ... "...\"..."
+                           //      ^P1
+      If P1 + 1 > BufferLength then ExpandBuffer(P1);
+      While P1 <= BufferLength do begin
 
-       If (P1 < RawJSONStringLength) and
-          (RawJSONString[P1] = '\') and
-          (RawJSONString[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
-                                                               //         ^^^P1
-       else if RawJSONString[P1] = aQuoteChar then begin
-         if DecodeJSONReferences then aName := ALUTF8JavascriptDecode(ALCopyStr(RawJsonString,RawJsonStringPos + 1,P1-RawJsonStringPos - 1)) // ..."...
-         else aName := ALCopyStr(RawJsonString,RawJsonStringPos + 1,P1-RawJsonStringPos - 1); // ...\"...
+       c := Buffer[P1];
+
+       If (c = '\') and
+          (P1 < BufferLength) and
+          (Buffer[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
+                                                        //         ^^^P1
+       else if c = aQuoteChar then begin
+         ALCopyStr(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
+         if DecodeJSONReferences then ALUTF8JavascriptDecodeV(CurrName); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
                      //      ^^^^^^^^^P1
 
-       if P1 + 1 > RawJSONStringLength then ExpandRawJSONString(P1);
+       if P1 + 1 > BufferLength then ExpandBuffer(P1);
 
       end;
-      if P1 > RawJSONStringLength then ALJSONDocError(CALJSONParseError);
-      RawJsonStringPos := P1 + 1; // ... "...\"..."
-                                  //      ^^^^^^^^^^RawJsonStringPos
+      if P1 > BufferLength then ALJSONDocError(CALJSONParseError);
+      BufferPos := P1 + 1; // ... "...\"..."
+                           //      ^^^^^^^^^^BufferPos
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -1525,109 +2060,94 @@ Var RawJSONString: AnsiString;
       aInRoundBracket := 0;
       aInCurlyBracket := 0;
 
-      P1 := RawJsonStringPos; // ... new Date('Dec 03, 1924'), ....
-                              //     ^P1
-      If P1 > RawJSONStringLength then ExpandRawJSONString(P1);
-      While P1 <= RawJSONStringLength do begin
+      While (BufferPos <= BufferLength) or ExpandBuffer do begin
+        If Buffer[BufferPos] <= ' ' then inc(bufferPos)
+        else break;
+      end;
+      if BufferPos > BufferLength then ALJSONDocError(CALJSONParseError);
+
+      P1 := BufferPos; // ... new Date('Dec 03, 1924'), ....
+                       //     ^P1
+      While (P1 <= BufferLength) or ExpandBuffer(P1) do begin
+
+        c := Buffer[P1];
 
         if (not aInSingleQuote) and
            (not aInDoubleQuote) and
            (aInSquareBracket = 0) and
            (aInRoundBracket = 0) and
            (aInCurlyBracket = 0) and
-           (RawJSONString[P1] in [',', '}', ']', ':']) then begin
-          aName := ALtrim(ALCopyStr(RawJsonString,RawJsonStringPos,P1-RawJsonStringPos)); // new Date('Dec 03, 1924')
+           (c in [',', '}', ']', ':']) then begin
+          P2 := P1-1;
+          While P2 >= BufferPos do begin
+            If Buffer[P2] <= ' ' then dec(P2)
+            else break;
+          end;
+          ALCopyStr(Buffer,CurrName,BufferPos,P2-BufferPos+1); // new Date('Dec 03, 1924')
           break;
         end
-        else if (RawJSONString[P1] = '"') then begin
+        else if (c = '"') then begin
           if (P1 <= 1) or
-             (RawJSONString[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
+             (Buffer[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
         end
-        else if (RawJSONString[P1] = '''') then begin
+        else if (c = '''') then begin
           if (P1 <= 1) or
-             (RawJSONString[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote)
+             (Buffer[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote)
         end
         else if (not aInSingleQuote) and
                 (not aInDoubleQuote) then begin
-          if (RawJSONString[P1] = '[') then inc(aInSquareBracket)
-          else if (RawJSONString[P1] = ']') then dec(aInSquareBracket)
-          else if (RawJSONString[P1] = '(') then inc(aInRoundBracket)
-          else if (RawJSONString[P1] = ')') then dec(aInRoundBracket)
-          else if (RawJSONString[P1] = '}') then inc(aInCurlyBracket)
-          else if (RawJSONString[P1] = '{') then dec(aInCurlyBracket);
+          if (c = '[') then inc(aInSquareBracket)
+          else if (c = ']') then dec(aInSquareBracket)
+          else if (c = '(') then inc(aInRoundBracket)
+          else if (c = ')') then dec(aInRoundBracket)
+          else if (c = '}') then inc(aInCurlyBracket)
+          else if (c = '{') then dec(aInCurlyBracket);
         end;
 
         inc(P1); // ... new Date('Dec 03, 1924'), ....
                  //     ^^^^^^^^^^^^^^^^^^^^^^^^^P1
 
-        if P1 > RawJSONStringLength then ExpandRawJSONString(P1);
-
       end;
-      if P1 > RawJSONStringLength then ALJSONDocError(CALJSONParseError);
-      RawJsonStringPos := P1; // ... new Date('Dec 03, 1924'), ....
-                              //                             ^RawJsonStringPos
+      if P1 > BufferLength then ALJSONDocError(CALJSONParseError);
+      BufferPos := P1; // ... new Date('Dec 03, 1924'), ....
+                       //                             ^BufferPos
 
     end;
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'extract the name value separator part'}{$ENDIF}
     aNameValueSeparator := #0;
-    if RawJSONStringPos > RawJSONStringLength then ExpandRawJSONString;
-    While RawJSONStringPos <= RawJSONStringLength do begin
-      If RawJSONString[RawJSONStringPos] in [' ', #13, #10, #9] then inc(RawJSONStringPos)
+    While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      If Buffer[BufferPos] <= ' ' then inc(BufferPos)
       else begin
-        aNameValueSeparator := RawJSONString[RawJSONStringPos];
+        aNameValueSeparator := Buffer[BufferPos];
         break;
       end;
-      if RawJSONStringPos > RawJSONStringLength then ExpandRawJSONString;
     end;
-    if RawJSONStringPos > RawJSONStringLength then ALJSONDocError(CALJSONParseError);  // .... : ....
-                                                                                       //      ^RawJSONStringPos
+    if BufferPos > BufferLength then ALJSONDocError(CALJSONParseError);  // .... : ....
+                                                                         //      ^BufferPos
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'if aNameValueSeparator is absent then it is just a value'}{$ENDIF}
     if aNameValueSeparator <> ':' then begin
 
-      //init aNodeSubType
-      aNodeSubType := GetNodeSubTypeFromStrValue(aName, aQuoteChar in ['"','''']);
-
-      //if we are not in sax mode
+      //Node without name can be ONLY present inside an array node
       if NotSaxMode then begin
-
-        //if workingnode = nil then it's mean we are outside the containerNode
         if not assigned(WorkingNode) then ALJSONDocError(CALJSONParseError);
-
-        //Node without name can be ONLY present inside an array node
-        if (ArrayIdx < 0)  or
+        if (CurrIndex < 0)  or
            (WorkingNode.nodetype <> ntarray) then ALJSONDocError(CALJSONParseError);
-
-        //create the node and add it to the workingnode
-        aNode := CreateNode('', nttext);
-        try
-          aNode.SetNodeValue(aName, aNodeSubType);
-          WorkingNode.ChildNodes.Add(aNode);
-        except
-          aNode.Free;
-          raise;
-        end;
-
       end
-
-      //we are inside the json document
       else begin
-
-          //Node without name can be ONLY present inside an array node
-          if (ArrayIdx < 0) or
-             ((Paths.Count = 0) or
-              (integer(Paths.Objects[paths.Count - 1]) <> 2{array})) then ALJSONDocError(CALJSONParseError);
-
+        if (CurrIndex < 0) or
+           (NamePaths.Count = 0) or
+           (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntarray) then ALJSONDocError(CALJSONParseError);
       end;
 
-      //call the DoParseText event
-      DoParseText(GetPathStr('['+alinttostr(ArrayIdx))+']', '', aName, aNodeSubType);
+      //create the node
+      _createNode(CurrIndex,'',CurrName,aQuoteChar in ['"','''']);
 
-      //increase the ArrayIdx
-      inc(ArrayIdx);
+      //increase the CurrIndex
+      inc(CurrIndex);
 
       //finallly exit from this procedure, everything was done
       exit;
@@ -1636,23 +2156,25 @@ Var RawJSONString: AnsiString;
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'remove the blank space between the name valueeparator and the value'}{$ENDIF}
-    inc(RawJSONStringPos); // ... : ....
-                           //      ^RawJSONStringPos
-    if RawJSONStringPos > RawJSONStringLength then ExpandRawJSONString;
-    While RawJSONStringPos <= RawJSONStringLength do begin
-      If RawJSONString[RawJSONStringPos] in [' ', #13, #10, #9] then inc(RawJSONStringPos)
+    inc(BufferPos); // ... : ....
+                    //      ^BufferPos
+    While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      If Buffer[BufferPos] <= ' ' then inc(BufferPos)
       else break;
-      if RawJSONStringPos > RawJSONStringLength then ExpandRawJSONString;
     end;
-    if RawJSONStringPos > RawJSONStringLength then ALJSONDocError(CALJSONParseError); // .... " ....
-                                                                                      //      ^RawJSONStringPos
+    if BufferPos > BufferLength then ALJSONDocError(CALJSONParseError); // .... " ....
+                                                                        //      ^BufferPos
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+
+    {$IFDEF undef}{$REGION 'init current char (c)'}{$ENDIF}
+    c := Buffer[BufferPos];
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'if the value is an object/array'}{$ENDIF}
     // name : { ... }
     // name : [ ... ]
-    if RawJsonString[RawJsonStringPos] in ['{','['] then begin // ... { ...
-                                                               //     ^RawJsonStringPos
+    if c in ['{','['] then begin // ... { ...
+                                 //     ^BufferPos
 
       //if we are not in sax mode
       if NotSaxMode then begin
@@ -1661,12 +2183,12 @@ Var RawJSONString: AnsiString;
         if not assigned(WorkingNode) then ALJSONDocError(CALJSONParseError);
 
         //Node withe name MUST be ONLY present inside an object node
-        if (ArrayIdx >= 0)  or
+        if (CurrIndex >= 0)  or
            (WorkingNode.nodetype <> ntObject) then ALJSONDocError(CALJSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
-        if RawJsonString[RawJsonStringPos] = '{' then aNode := CreateNode(aName, ntObject)
-        else aNode := CreateNode(aName, ntarray);
+        if c = '{' then aNode := CreateNode(CurrName, ntObject)
+        else aNode := CreateNode(CurrName, ntarray);
         try
           WorkingNode.ChildNodes.Add(aNode);
         except
@@ -1678,7 +2200,8 @@ Var RawJSONString: AnsiString;
         WorkingNode := aNode;
 
         //update the path
-        Paths.AddObject(aName, WorkingNode);
+        if assigned(ObjectPaths) then ObjectPaths.AddObject(-1, WorkingNode)
+        else _AddItemToNamePath(-1, CurrName, WorkingNode);
 
       end
 
@@ -1686,27 +2209,29 @@ Var RawJSONString: AnsiString;
       else begin
 
         //Node withe name MUST be ONLY present inside an object node
-        if (ArrayIdx >= 0) or
-           ((Paths.Count > 0) and
-            (integer(Paths.Objects[paths.Count - 1]) <> 1{object})) then ALJSONDocError(CALJSONParseError);
+        if (CurrIndex >= 0) or
+           (NamePaths.Count = 0) or
+           (TALJsonNodeType(NamePaths.Objects[NamePaths.Count - 1]) <> ntobject) then ALJSONDocError(CALJSONParseError);
 
         //update the path
-        if RawJsonString[RawJsonStringPos] = '{' then aNodeTypeInt := 1
-        else aNodeTypeInt := 2;
-        Paths.AddObject(aName, pointer(aNodeTypeInt));
+        if c = '{' then aNodeType := ntObject
+        else aNodeType := ntArray;
+        _AddItemToNamePath(-1, CurrName, pointer(aNodeType));
 
       end;
 
-      //call the DoParseStartObject/array event and update the ArrayIdx if it's an array
-      if RawJsonString[RawJsonStringPos] = '{' then DoParseStartObject(GetPathStr,aName)
+      //call the DoParseStartObject/array event and update the CurrIndex if it's an array
+      if c = '{' then begin
+        if Assigned(fonParseStartObject) then _DoParseStartObject(CurrName)
+      end
       else begin
-        DoParseStartArray(GetPathStr, aName);
-        ArrayIdx := 0;
+        if Assigned(fonParseStartArray) then _DoParseStartArray(CurrName);
+        CurrIndex := 0;
       end;
 
-      //update rawJSONStringPos
-      RawJSONStringPos := RawJsonStringPos + 1; // ... { ...
-                                                //      ^RawJsonStringPos
+      //update BufferPos
+      BufferPos := BufferPos + 1; // ... { ...
+                                  //      ^BufferPos
 
       //finallly exit from this procedure, everything was done
       exit;
@@ -1718,33 +2243,35 @@ Var RawJSONString: AnsiString;
     // name : "value"
     // name : 'value'
     aQuoteChar := #0;
-    if RawJsonString[RawJsonStringPos] in ['"',''''] then begin  // ... " ...
-                                                                 //     ^RawJsonStringPos
-      aQuoteChar := RawJsonString[RawJsonStringPos]; // "
-      P1 := RawJsonStringPos + 1; // ... "...\"..."
-                                  //      ^P1
-      If P1 + 1 > RawJSONStringLength then ExpandRawJSONString(P1);
-      While P1 <= RawJSONStringLength do begin
+    if c in ['"',''''] then begin  // ... " ...
+                                   //     ^BufferPos
 
-       If (P1 < RawJSONStringLength) and
-          (RawJSONString[P1] = '\') and
-          (RawJSONString[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
-                                                               //         ^^^P1
-       else if RawJSONString[P1] = aQuoteChar then begin
-         if DecodeJSONReferences then aValue := ALUTF8JavascriptDecode(ALCopyStr(RawJsonString,RawJsonStringPos + 1,P1-RawJsonStringPos - 1)) // ..."...
-         else aValue := ALCopyStr(RawJsonString,RawJsonStringPos + 1,P1-RawJsonStringPos - 1); // ...\"...
+      aQuoteChar := c; // "
+      P1 := BufferPos + 1; // ... "...\"..."
+                           //      ^P1
+      If P1 + 1 > BufferLength then ExpandBuffer(P1);
+      While P1 <= BufferLength do begin
+
+       c := Buffer[P1];
+
+       If (c = '\') and
+          (P1 < BufferLength) and
+          (Buffer[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
+                                                        //         ^^^P1
+       else if c = aQuoteChar then begin
+         ALCopyStr(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
+         if DecodeJSONReferences then ALUTF8JavascriptDecodeV(currValue); // ..."...
          break;
        end
        else inc(P1); // ... "...\"..."
                      //      ^^^^^^^^^P1
 
-       if P1 + 1 > RawJSONStringLength then ExpandRawJSONString(P1);
+       if P1 + 1 > BufferLength then ExpandBuffer(P1);
 
       end;
-      if P1 > RawJSONStringLength then ALJSONDocError(CALJSONParseError);
-      RawJsonStringPos := P1 + 1; // ... "...\"..."
-                                  //      ^^^^^^^^^^RawJsonStringPos
-
+      if P1 > BufferLength then ALJSONDocError(CALJSONParseError);
+      BufferPos := P1 + 1; // ... "...\"..."
+                           //      ^^^^^^^^^^BufferPos
 
     end
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
@@ -1765,47 +2292,57 @@ Var RawJSONString: AnsiString;
       aInRoundBracket := 0;
       aInCurlyBracket := 0;
 
-      P1 := RawJsonStringPos; // ... new Date('Dec 03, 1924'), ....
-                              //     ^P1
-      If P1 > RawJSONStringLength then ExpandRawJSONString(P1);
-      While P1 <= RawJSONStringLength do begin
+      While (BufferPos <= BufferLength) or ExpandBuffer do begin
+        If Buffer[BufferPos] <= ' ' then inc(bufferPos)
+        else break;
+      end;
+      if BufferPos > BufferLength then ALJSONDocError(CALJSONParseError);
+
+      P1 := BufferPos; // ... new Date('Dec 03, 1924'), ....
+                       //     ^P1
+      While (P1 <= BufferLength) or ExpandBuffer(P1) do begin
+
+        c := Buffer[P1];
 
         if (not aInSingleQuote) and
            (not aInDoubleQuote) and
            (aInSquareBracket = 0) and
            (aInRoundBracket = 0) and
            (aInCurlyBracket = 0) and
-           (RawJSONString[P1] in [',', '}', ']']) then begin
-          aValue := ALtrim(ALCopyStr(RawJsonString,RawJsonStringPos,P1-RawJsonStringPos)); // new Date('Dec 03, 1924')
+           (c in [',', '}', ']']) then begin
+          P2 := P1-1;
+          While P2 >= BufferPos do begin
+            If Buffer[P2] <= ' ' then dec(P2)
+            else break;
+          end;
+          ALCopyStr(Buffer,currValue,BufferPos,P2-BufferPos+1); // new Date('Dec 03, 1924')
           break;
         end
-        else if (RawJSONString[P1] = '"') then begin
+        else if (c = '"') then begin
           if (P1 <= 1) or
-             (RawJSONString[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
+             (Buffer[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
         end
-        else if (RawJSONString[P1] = '''') then begin
+        else if (c = '''') then begin
           if (P1 <= 1) or
-             (RawJSONString[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote)
+             (Buffer[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote)
         end
         else if (not aInSingleQuote) and
                 (not aInDoubleQuote) then begin
-          if (RawJSONString[P1] = '[') then inc(aInSquareBracket)
-          else if (RawJSONString[P1] = ']') then dec(aInSquareBracket)
-          else if (RawJSONString[P1] = '(') then inc(aInRoundBracket)
-          else if (RawJSONString[P1] = ')') then dec(aInRoundBracket)
-          else if (RawJSONString[P1] = '}') then inc(aInCurlyBracket)
-          else if (RawJSONString[P1] = '{') then dec(aInCurlyBracket);
+          if (c = '[') then inc(aInSquareBracket)
+          else if (c = ']') then dec(aInSquareBracket)
+          else if (c = '(') then inc(aInRoundBracket)
+          else if (c = ')') then dec(aInRoundBracket)
+          else if (c = '}') then inc(aInCurlyBracket)
+          else if (c = '{') then dec(aInCurlyBracket);
         end;
 
         inc(P1); // ... new Date('Dec 03, 1924'), ....
                  //     ^^^^^^^^^^^^^^^^^^^^^^^^^P1
 
-        if P1 > RawJSONStringLength then ExpandRawJSONString(P1);
-
       end;
-      if P1 > RawJSONStringLength then ALJSONDocError(CALJSONParseError);
-      RawJsonStringPos := P1; // ... new Date('Dec 03, 1924'), ....
-                              //                             ^RawJsonStringPos
+      if P1 > BufferLength then ALJSONDocError(CALJSONParseError);
+      BufferPos := P1; // ... new Date('Dec 03, 1924'), ....
+                       //                             ^BufferPos
 
 
     end;
@@ -1813,46 +2350,26 @@ Var RawJSONString: AnsiString;
 
     {$IFDEF undef}{$REGION 'create the named text node'}{$ENDIF}
 
-    //init aNodeSubType
-    aNodeSubType := GetNodeSubTypeFromStrValue(aValue, aQuoteChar in ['"','''']);
-
-    //if we are not in sax mode
+    //Node withe name MUST be ONLY present inside an object node
     if NotSaxMode then begin
-
-      //if workingnode = nil then it's mean we are outside the containerNode
       if not assigned(WorkingNode) then ALJSONDocError(CALJSONParseError);
-
-      //Node withe name MUST be ONLY present inside an object node
-      if (ArrayIdx >= 0)  or
+      if (CurrIndex >= 0)  or
          (WorkingNode.nodetype <> ntObject) then ALJSONDocError(CALJSONParseError);
-
-      //create the node and add it to the workingnode
-      aNode := CreateNode(aName, nttext);
-      try
-        aNode.SetNodeValue(aValue, aNodeSubType);
-        WorkingNode.ChildNodes.Add(aNode);
-      except
-        aNode.Free;
-        raise;
-      end;
-
     end
-
-    //if we are in sax mode
     else begin
-
-      //Node with name MUST be ONLY present inside an object node
-      if (ArrayIdx >= 0) or
-         ((Paths.Count > 0) and
-          (integer(Paths.Objects[paths.Count - 1]) <> 1{object})) then ALJSONDocError(CALJSONParseError);
-
+      if (CurrIndex >= 0) or
+         (NamePaths.Count = 0) or
+         (TALJSONNodeType(NamePaths.Objects[Namepaths.Count - 1]) <> ntObject) then ALJSONDocError(CALJSONParseError);
     end;
 
-    //call the DoParseStartObject/array event
-    DoParseText(GetPathStr(aName), aName, aValue, aNodeSubType);
+    //create the node
+    _createNode(currIndex,CurrName,CurrValue,aQuoteChar in ['"','''']);
+
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
   end;
+
+var c: ansiChar;
 
 Begin
 
@@ -1865,175 +2382,751 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  Paths := TALStringList.Create;
+  //event fonParseStartDocument
+  DoParseStartDocument;
+
+  //init WorkingNode and NotSaxMode, CurrIndex and DecodeJSONReferences
+  WorkingNode := ContainerNode;
+  NotSaxMode := assigned(ContainerNode);
+  DecodeJSONReferences := not (poIgnoreControlCharacters in ParseOptions);
+  CurrIndex := -1;
+
+  //init ObjectPaths or NamePaths
+  if (NotSaxMode) and
+     (not assigned(fonParseText)) and
+     (not assigned(FonParseStartObject)) and
+     (not assigned(FonParseEndObject)) and
+     (not assigned(FonParseStartArray)) and
+     (not assigned(FonParseEndArray)) then begin
+    ObjectPaths := TALIntegerList.Create(false{OwnsObjects});
+    NamePaths := nil;
+  end
+  else begin
+    ObjectPaths := nil;
+    NamePaths := TALNvStringList.Create;
+  end;
   Try
 
-    DoParseStartDocument;
+    //init Buffer
+    if assigned(RawJSONStream) then begin
+      Buffer := '';
+      BufferLength := 0;
+      BufferPos := 1;
+      ExpandBuffer;
+    end
+    else begin
+      Buffer := RawJSONString;
+      BufferLength := length(RawJSONString);
+      BufferPos := 1;
+    end;
 
-    ArrayIdx := -1;
-    WorkingNode := ContainerNode;
-    NotSaxMode := assigned(ContainerNode);
-    UseContainerNodeInsteadOfAddingChildNode := True;
-    DecodeJSONReferences := not (poIgnoreControlCharacters in ParseOptions);
-    RawJSONString := '';
-    RawJSONStringLength := 0;
-    RawJSONStringPos := 1;
-    ExpandRawJSONString;
-    if AlUTF8DetectBOM(PansiChar(RawJSONString),length(RawJSONString)) then RawJSONStringPos := 4;
+    //skip utf8 bom
+    //ExpandBuffer;
+    //if AlUTF8DetectBOM(PansiChar(Buffer),length(Buffer)) then BufferPos := 4;
+    //useless now
 
-    While RawJSONStringPos <= RawJSONStringLength do begin
+    //add first node in ObjectPaths/NamePaths
+    if assigned(ObjectPaths) then ObjectPaths.AddObject(-1, WorkingNode)
+    else begin
+      if NotSaxMode then _AddNameItemToNamePath('', WorkingNode)
+      else _AddNameItemToNamePath('', pointer(ntObject));
+    end;
 
-      If RawJSONString[RawJSONStringPos] in [' ', ',', #13, #10, #9] then inc(RawJSONStringPos)
+    //skip the first {
+    While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      c := Buffer[BufferPos];
+      If c <= ' ' then inc(bufferPos)
+      else begin
+        if c <> '{' then ALJSONDocError(cALJSONParseError);
+        inc(bufferPos);
+        break;
+      end;
+    end;
+
+    //analyze all the nodes
+    While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      c := Buffer[BufferPos];
+      If (c <= ' ') or (c = ',') then inc(bufferPos)
       else AnalyzeNode;
-
-      if RawJSONStringPos > RawJSONStringLength then ExpandRawJSONString;
-
     end;
 
     //some tags are not closed
-    if Paths.Count > 0 then ALJSONDocError(CALJSONParseError);
+    if assigned(ObjectPaths) then begin
+      if ObjectPaths.Count > 0 then ALJSONDocError(cALJSONParseError);
+    end
+    else begin
+      if NamePaths.Count > 0 then ALJSONDocError(cALJSONParseError);
+    end;
 
-    //mean the node was not update (empty stream?)
-    if UseContainerNodeInsteadOfAddingChildNode then ALJSONDocError(CALJSONParseError);
+    //mean the node was not update (empty stream?) or not weel closed
+    if WorkingNode <> nil then ALJSONDocError(cALJSONParseError);
 
+    //event fonParseEndDocument
     DoParseEndDocument;
 
   finally
-    Paths.Free;
+
+    //free ObjectPaths/NamePaths
+    if assigned(ObjectPaths) then ObjectPaths.Free
+    else NamePaths.Free;
+
   end;
 
 end;
 
+
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
-procedure TALJSONDocument.ParseBSONStream(const RawBSONStream: TStream; const ContainerNode: TALJSONNode);
+procedure TALJSONDocument.ParseBSON(RawBSONStream: TStream;
+                                    const RawBSONString: AnsiString;
+                                    ContainerNode: TALJSONNode);
 
 Const BufferSize: integer = 8192;
-Var RawBSONString: AnsiString;
-    RawBSONStringLength: Integer;
-    RawBSONStringPos: Integer;
+
+Var Buffer: AnsiString;
+    BufferLength: Integer;
+    BufferPos: Integer;
+    CurrName: AnsiString;
     NotSaxMode: Boolean;
     WorkingNode: TALJSONNode;
-    Paths: TALStringList;
+    NamePaths: TALStringList;
+    ObjectPaths: TObjectList;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function ExpandRawBSONString: boolean; overload;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ExpandBuffer: boolean; overload;
   Var ByteReaded, Byte2Read: Integer;
   Begin
-    If (RawBSONStringLength > 0) and (RawBSONStringPos > 1) then begin
-      if (RawBSONStringPos > RawBSONStringLength) then RawBSONStream.Position := RawBSONStream.Position - RawBSONStringLength + RawBSONStringPos - 1;
-      Byte2Read := min(RawBSONStringPos - 1, RawBSONStringLength);
-      if RawBSONStringPos <= length(RawBSONString) then ALMove(RawBSONString[RawBSONStringPos],
-                                                               RawBSONString[1],
-                                                               RawBSONStringLength-RawBSONStringPos+1);
-      RawBSONStringPos := 1;
+    if not assigned(RawBSONStream) then begin
+      result := false;
+      exit;
+    end;
+
+    If (BufferLength > 0) and (BufferPos > 1) then begin
+      if (BufferPos > BufferLength) then RawBSONStream.Position := RawBSONStream.Position - BufferLength + BufferPos - 1;
+      Byte2Read := min(BufferPos - 1, BufferLength);
+      if BufferPos <= length(Buffer) then ALMove(Pbyte(Buffer)[BufferPos - 1],
+                                                 pointer(Buffer)^,
+                                                 BufferLength-BufferPos+1);
+      BufferPos := 1;
     end
     else begin
       Byte2Read := BufferSize;
-      RawBSONStringLength := RawBSONStringLength + BufferSize;
-      SetLength(RawBSONString, RawBSONStringLength);
+      BufferLength := BufferLength + BufferSize;
+      SetLength(Buffer, BufferLength);
     end;
 
     //range check error is we not do so
-    if RawBSONStream.Position < RawBSONStream.Size then ByteReaded := RawBSONStream.Read(RawBSONString[RawBSONStringLength - Byte2Read + 1],Byte2Read)
+    if RawBSONStream.Position < RawBSONStream.Size then ByteReaded := RawBSONStream.Read(Pbyte(Buffer)[BufferLength - Byte2Read{+ 1 - 1}],Byte2Read)
     else ByteReaded := 0;
 
     If ByteReaded <> Byte2Read then begin
-      RawBSONStringLength := RawBSONStringLength - Byte2Read + ByteReaded;
-      SetLength(RawBSONString, RawBSONStringLength);
+      BufferLength := BufferLength - Byte2Read + ByteReaded;
+      SetLength(Buffer, BufferLength);
       Result := ByteReaded > 0;
     end
     else result := True;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function ExpandRawBSONString(var PosToKeepSync: Integer): boolean; overload;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function ExpandBuffer(var PosToKeepSync: Integer): boolean; overload;
   var P1: integer;
   begin
-    P1 := RawBSONStringPos;
-    result := ExpandRawBSONString;
-    PosToKeepSync := PosToKeepSync - (P1 - RawBSONStringPos);
+    P1 := BufferPos;
+    result := ExpandBuffer;
+    PosToKeepSync := PosToKeepSync - (P1 - BufferPos);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetPathStr(Const ExtraItems: ansiString = ''): ansiString;
   var I, L, P, Size: Integer;
-      S, LB: AnsiString;
+      LB: ansiChar;
+      S: AnsiString;
   begin
     LB := PathSeparator;
     Size := length(ExtraItems);
-    if size <> 0 then Inc(Size, Length(LB));
-    for I := 1 to Paths.Count - 1 do Inc(Size, Length(Paths[I]) + Length(LB));
+    if size <> 0 then Inc(Size, sizeof(LB));
+    for I := 1 to NamePaths.Count - 1 do Inc(Size, Length(NamePaths[I]) + sizeof(LB));
     SetLength(Result, Size);
     P := 1;
-    for I := 1 to Paths.Count - 1 do begin
-      S := Paths[I];
+    for I := 1 to NamePaths.Count - 1 do begin
+      S := NamePaths[I];
       L := Length(S);
       if L <> 0 then begin
-        ALMove(S[1], Result[P], L);
+        ALMove(pointer(S)^, Pbyte(Result)[P-1], L);
         Inc(P, L);
       end;
-      L := Length(LB);
-      if (L <> 0) and
-         ((i <> Paths.Count - 1) or
+      L := sizeof(LB);
+      if ((i <> NamePaths.Count - 1) or
           (ExtraItems <> '')) and
-         (((NotSaxMode) and (TALJSONNode(Paths.Objects[I]).nodetype <> ntarray)) or
-          ((not NotSaxMode) and (integer(Paths.Objects[I]) <> 2{ntarray}))) then begin
-        ALMove(LB[1], result[P], L);
+         (((NotSaxMode) and (TALJSONNode(NamePaths.Objects[I]).nodetype <> ntarray)) or
+          ((not NotSaxMode) and (TALJSONNodeType(NamePaths.Objects[I]) <> ntarray))) then begin
+        ALMove(LB, Pbyte(Result)[P-1], L);
         Inc(P, L);
       end;
     end;
     if ExtraItems <> '' then begin
       L := length(ExtraItems);
-      ALMove(ExtraItems[1], result[P], L);
+      ALMove(pointer(ExtraItems)^, Pbyte(Result)[P-1], L);
       Inc(P, L);
     end;
     setlength(result,P-1);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithIndex(const index: AnsiString;
+                                  const Args: array of const;
+                                  const NodeSubType: TALJSONNodeSubType);
+  begin
+    DoParseText(GetPathStr('[' + index + ']'), '', Args, NodeSubType)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithName(const name: AnsiString;
+                                 const Args: array of const;
+                                 const NodeSubType: TALJSONNodeSubType);
+  begin
+    DoParseText(GetPathStr(Name), Name, Args, NodeSubType)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseText(const NameOrIndex: AnsiString;
+                         const Args: array of const;
+                         const NodeSubType: TALJSONNodeSubType);
+  begin
+    if Assigned(fonParseText) then begin
+      if notSaxMode then begin
+        if WorkingNode.nodetype=ntarray then _DoParseTextWithIndex(NameOrIndex, Args, NodeSubType)
+        else _DoParseTextWithName(NameOrIndex, Args, NodeSubType);
+      end
+      else begin
+        if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+        if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntArray then _DoParseTextWithIndex(NameOrIndex, Args, NodeSubType)
+        else _DoParseTextWithName(NameOrIndex, Args, NodeSubType);
+      end;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseStartObject(const Name: AnsiString);
+  begin
+    DoParseStartObject(GetPathStr, Name);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseEndObject;
+  begin
+    if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+    DoParseEndObject(GetPathStr, NamePaths[NamePaths.Count - 1])
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseStartArray(const index: AnsiString);
+  begin
+    DoParseStartArray(GetPathStr, index)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseEndArray;
+  begin
+    if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+    DoParseEndArray(GetPathStr, NamePaths[NamePaths.Count - 1]);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddIndexItemToNamePath(const index: AnsiString; Obj: Pointer);
+  begin
+    NamePaths.AddObject('[' + Index + ']', Obj)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddNameItemToNamePath(const name: AnsiString; Obj: Pointer);
+  begin
+    NamePaths.AddObject(Name, Obj)
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _AddItemToNamePath(const nameOrIndex: AnsiString; Obj: Pointer);
+  begin
+    if notSaxMode then begin
+      if WorkingNode.nodetype=ntarray then _AddIndexItemToNamePath(nameOrIndex, Obj)
+      else _AddNameItemToNamePath(nameOrIndex, Obj);
+    end
+    else begin
+      if NamePaths.Count = 0 then ALJSONDocError(CALJSONParseError);
+      if TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]) = ntarray then _AddIndexItemToNamePath(nameOrIndex, Obj)
+      else _AddNameItemToNamePath(nameOrIndex, Obj);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createInt64Node(const name: AnsiString;
+                             const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aInt64: Int64;
+  begin
+    if BufferPos > BufferLength - sizeof(aInt64) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aInt64, sizeof(aInt64));
+    BufferPos := BufferPos + sizeof(aInt64);
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetInt64(aInt64);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aint64], NodeSubType)
+    end
+    else begin
+      _DoParseText(Name, [aint64], NodeSubType)
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createInt32Node(const name: AnsiString;
+                             const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aint32: Int32;
+  begin
+    if BufferPos > BufferLength - sizeof(aint32) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aint32) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aint32, sizeof(aint32));
+    BufferPos := BufferPos + sizeof(aint32);
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Setint32(aInt32);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aint32], NodeSubType)
+    end
+    else begin
+      _DoParseText(Name, [aint32], NodeSubType)
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createTextNode(const name: AnsiString;
+                            const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aInt32: Int32;
+      aText: ansiString;
+  begin
+    if BufferPos > BufferLength - sizeof(aInt32) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aInt32, sizeof(aInt32));
+    BufferPos := BufferPos + sizeof(aInt32);
+    while (BufferPos + aInt32 - 1 > BufferLength) do
+      if not ExpandBuffer then ALJSONDocError(cALBSONParseError);
+    ALCopyStr(Buffer,aText,BufferPos,aInt32 - 1{for the trailing #0});
+    BufferPos := BufferPos + aInt32;
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Settext(aText);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aText], NodeSubType)
+    end
+    else begin
+      _DoParseText(Name, [aText], NodeSubType)
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createFloatNode(const name: AnsiString;
+                             const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aDouble: Double;
+  begin
+    if BufferPos > BufferLength - sizeof(Double) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(Double) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(pbyte(Buffer)[BufferPos-1], aDouble, sizeof(Double));
+    BufferPos := BufferPos + sizeof(Double);
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetFloat(ADouble);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aDouble], NodeSubType)
+    end
+    else begin
+      _DoParseText(Name, [aDouble], NodeSubType)
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createBinaryNode(const name: AnsiString;
+                              const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aInt32: Int32;
+      aBinSubtype: byte;
+      aBinData: ansiString;
+  begin
+    //Get size
+    if BufferPos > BufferLength - sizeof(aInt32) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aInt32, sizeof(aInt32));
+    BufferPos := BufferPos + sizeof(aInt32);
+
+    //Get the subtype
+    if BufferPos > BufferLength then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength then ALJSONDocError(cALBSONParseError);
+    end;
+    aBinSubtype := Byte(Buffer[BufferPos]);
+    BufferPos := BufferPos + 1;
+
+    //Get the data
+    while (BufferPos + aInt32 - 1 > BufferLength) do
+      if not ExpandBuffer then ALJSONDocError(cALBSONParseError);
+    ALCopyStr(Buffer,aBinData,BufferPos,aInt32);
+    BufferPos := BufferPos + aInt32;
+
+    //create the node
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.setbinary(aBinData, aBinSubtype);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aBinData, aBinSubtype], NodeSubType);
+    end
+    else begin
+      _DoParseText(Name, [aBinData, aBinSubtype], NodeSubType);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createObjectIDNode(const name: AnsiString;
+                                const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aObjectID: AnsiString;
+  begin
+    if BufferPos > BufferLength - length(aObjectID) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - length(aObjectID) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    Setlength(aObjectID, 12); // ObjectId is a 12-byte BSON type
+    ALMove(Pbyte(Buffer)[BufferPos-1], pbyte(aObjectID)[0], length(aObjectID)); // pbyte(aObjectID)[0] to not have a jump in uniqueString (aObjectID is already unique thanks to Setlength)
+    BufferPos := BufferPos + length(aObjectID);
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetObjectID(aObjectID);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aObjectID], NodeSubType)
+    end
+    else begin
+      _DoParseText(Name, [aObjectID], NodeSubType)
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createBooleanNode(const name: AnsiString;
+                               const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aBool: Boolean;
+  begin
+    if BufferPos > BufferLength then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength then ALJSONDocError(cALBSONParseError);
+    end;
+    if Buffer[BufferPos] = #$00 then aBool := False
+    else if Buffer[BufferPos] = #$01 then aBool := true
+    else begin
+      ALJSONDocError(cALBSONParseError);
+      aBool := False; // to hide a warning;
+    end;
+    BufferPos := BufferPos + 1;
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Setbool(aBool);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aBool], NodeSubType);
+    end
+    else begin
+      _DoParseText(Name, [aBool], NodeSubType);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createDateTimeNode(const name: AnsiString;
+                                const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aDateTime: TdateTime;
+      aInt64: Int64;
+  begin
+    if BufferPos > BufferLength - sizeof(aInt64) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aInt64, sizeof(aInt64));
+    aDateTime := ALUnixMsToDateTime(aInt64);
+    BufferPos := BufferPos + sizeof(aInt64);
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Setdatetime(aDateTime);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aDateTime], NodeSubType);
+    end
+    else begin
+      _DoParseText(Name, [aDateTime], NodeSubType);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createTimestampNode(const name: AnsiString;
+                                 const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aTimestamp: TALBSONTimestamp;
+      aInt64: Int64;
+  begin
+    if BufferPos > BufferLength - sizeof(aInt64) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aInt64, sizeof(aInt64));
+    aTimestamp.I64 := aInt64;
+    BufferPos := BufferPos + sizeof(aInt64);
+
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetTimestamp(aTimestamp);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aTimestamp.W1, aTimestamp.W2], NodeSubType);
+    end
+    else begin
+      _DoParseText(Name, [aTimestamp.W1, aTimestamp.W2], NodeSubType);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createnullNode(const name: AnsiString;
+                            const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+  begin
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.Setnull(true);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, ['null'], NodeSubType);
+    end
+    else begin
+      _DoParseText(Name, ['null'], NodeSubType);
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createRegExNode(const name: AnsiString;
+                             const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aRegEx: ansiString;
+      aRegExOptions: TALPerlRegExOptions;
+      P1: integer;
+  begin
+    //Get pattern
+    P1 := BufferPos;
+    While (P1 <= BufferLength) or ExpandBuffer(P1) do begin
+      If Buffer[P1] <> #$00 then inc(P1)
+      else begin
+        aRegEx := AlCopyStr(Buffer, BufferPos, P1 - BufferPos);
+        break;
+      end;
+    end;
+    if P1 > BufferLength then ALJSONDocError(cALBSONParseError);
+    BufferPos := P1 + 1;
+    if BufferPos > BufferLength then ExpandBuffer;
+
+    //Get options
+    aRegExOptions := [];
+    While (BufferPos <= BufferLength) or ExpandBuffer do begin
+      case Buffer[BufferPos] of
+        'i': aRegExOptions := aRegExOptions + [preCaseLess];
+        'm': aRegExOptions := aRegExOptions + [preMultiLine];
+        'x': aRegExOptions := aRegExOptions + [preExtended];
+        'l':;
+        's': aRegExOptions := aRegExOptions + [preSingleLine];
+        'u':;
+        #$00: break;
+      end;
+      inc(BufferPos);
+    end;
+    if BufferPos > BufferLength then ALJSONDocError(cALBSONParseError);
+    inc(BufferPos);
+    if BufferPos > BufferLength then ExpandBuffer;
+
+    //create the node
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetRegEx(aRegEx, aRegExOptions);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aRegEx, Byte(aRegExOptions)], NodeSubType)
+    end
+    else begin
+      _DoParseText(Name, [aRegEx, Byte(aRegExOptions)], NodeSubType)
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createJavascriptNode(const name: AnsiString;
+                                  const NodeSubType: TALJSONNodeSubType);
+  var aNode: TALJsonNode;
+      aJavascript: ansiString;
+      aInt32: Int32;
+  begin
+    if BufferPos > BufferLength - sizeof(aInt32) + 1 then begin
+      ExpandBuffer;
+      if BufferPos > BufferLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
+    end;
+    ALMove(Pbyte(Buffer)[BufferPos-1], aInt32, sizeof(aInt32));
+    BufferPos := BufferPos + sizeof(aInt32);
+    while (BufferPos + aInt32 - 1 > BufferLength) do
+      if not ExpandBuffer then ALJSONDocError(cALBSONParseError);
+    ALCopyStr(Buffer,aJavascript,BufferPos,aInt32 - 1{for the trailing #0});
+    BufferPos := BufferPos + aInt32;
+
+    //create the node
+    if NotSaxMode then begin
+      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
+      if WorkingNode.nodetype=ntarray then aNode := CreateNode('', nttext)
+      else aNode := CreateNode(Name, nttext);
+      try
+        aNode.SetJavascript(aJavascript);
+        WorkingNode.ChildNodes.Add(aNode);
+      except
+        aNode.Free;
+        raise;
+      end;
+      _DoParseText(Name, [aJavascript], NodeSubType);
+    end
+    else begin
+      _DoParseText(Name, [aJavascript], NodeSubType);
+    end;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~}
   procedure AnalyzeNode;
   Var aNode: TALJsonNode;
-      aNodeTypeInt: integer;
+      aNodeType: TALJSONNodeType;
       aNodeSubType: TALJSONNodeSubType;
-      aName: AnsiString;
-      aDouble: Double;
-      aInt32: Integer;
-      aInt64: Int64;
-      aDateTime: TdateTime;
-      aObjectID: TALJSONObjectID;
-      aTimestamp: TALBSONTimestamp;
-      aBool: Boolean;
-      aTextValue: AnsiString;
-      aRegEx: TALJSONRegEx;
-      aBinary: TALJSONBinary;
       P1: Integer;
+      c: ansiChar;
   Begin
+
+    {$IFDEF undef}{$REGION 'init current char (c)'}{$ENDIF}
+    c := Buffer[BufferPos];
+    {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'End Object/Array'}{$ENDIF}
     // ... } ....
     // ... ] ....
-    if RawBSONString[RawBSONStringPos] = #$00 then begin
+    if c = #$00 then begin
 
       //error if Paths.Count = 0 (mean one end object/array without any starting)
-      if (Paths.Count = 0) then ALJSONDocError(cALBSONParseError);
-
-      //fucking warning
-      anodeTypeInt := 0;
+      if assigned(ObjectPaths) then begin
+        if (ObjectPaths.Count = 0) then ALJSONDocError(cALBSONParseError);
+      end
+      else begin
+        if (NamePaths.Count = 0) then ALJSONDocError(cALBSONParseError);
+      end;
 
       //if we are not in sax mode
       if NotSaxMode then begin
 
         //init anode to one level up
-        aNode := TALJSONNode(Paths.Objects[paths.Count - 1]);
+        if assigned(ObjectPaths) then aNode := TALJSONNode(ObjectPaths[ObjectPaths.Count - 1])
+        else aNode := TALJSONNode(NamePaths.Objects[NamePaths.Count - 1]);
 
         //if anode <> workingNode aie aie aie
         if (aNode <> WorkingNode) then ALJSONDocError(cALBSONParseError);
 
         //calculate anodeTypeInt
-        if aNode.NodeType = ntObject then aNodeTypeInt := 1
-        else if aNode.NodeType = ntarray then aNodeTypeInt := 2
-        else ALJSONDocError(cALBSONParseError);
+        aNodeType := aNode.NodeType;
+        if not (aNodeType in [ntObject, ntarray]) then ALJSONDocError(cALBSONParseError);
 
         //if working node <> containernode then we can go to one level up
         If WorkingNode<>ContainerNode then begin
@@ -2052,20 +3145,23 @@ Var RawBSONString: AnsiString;
       else begin
 
         //calculate anodeTypeInt
-        anodeTypeInt := integer(Paths.Objects[paths.Count - 1]);
-        if not (anodeTypeInt in [1,2]) then ALJSONDocError(cALBSONParseError);
+        aNodeType := TALJSONNodeType(NamePaths.Objects[NamePaths.Count - 1]);
+        if not (anodeType in [ntObject,ntarray]) then ALJSONDocError(cALBSONParseError);
 
       end;
 
       //call the DoParseEndObject/array event
-      if anodeTypeInt = 1 then DoParseEndObject(GetPathStr, Paths[paths.Count - 1])
-      else DoParseEndArray(GetPathStr, Paths[paths.Count - 1]);
+      if Assigned(fonParseEndObject) then begin
+        if anodeType = ntObject then _DoParseEndObject
+        else _DoParseEndArray;
+      end;
 
       //delete the last entry from the path
-      paths.Delete(paths.Count - 1);
+      if assigned(ObjectPaths) then ObjectPaths.Delete(ObjectPaths.Count - 1)
+      else NamePaths.Delete(NamePaths.Count - 1);
 
-      //update RawBSONStringPos
-      RawBSONStringPos := RawBSONStringPos + 1;
+      //update BufferPos
+      BufferPos := BufferPos + 1;
 
       //finallly exit from this procedure, everything was done
       exit;
@@ -2075,7 +3171,7 @@ Var RawBSONString: AnsiString;
 
     {$IFDEF undef}{$REGION 'Get the node sub type'}{$ENDIF}
     aNodeSubType := nstText; // to hide fucking warning
-    case RawBSONString[RawBSONStringPos] of
+    case c of
       #$01: aNodeSubType := nstFloat;
       #$02: aNodeSubType := nstText;
       #$03: aNodeSubType := nstObject;
@@ -2092,23 +3188,22 @@ Var RawBSONString: AnsiString;
       #$12: aNodeSubType := nstint64;
       else ALJSONDocError(cALBSONParseError);
     end;
-    RawBSONStringPos := RawBSONStringPos + 1;
-    If RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    BufferPos := BufferPos + 1;
+    If BufferPos > BufferLength then ExpandBuffer;
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'Get the node name'}{$ENDIF}
-    P1 := RawBSONStringPos;
-    While P1 <= RawBSONStringLength do begin
-      If RawBSONString[P1] <> #$00 then inc(P1)
+    P1 := BufferPos;
+    While (P1 <= BufferLength) or ExpandBuffer(P1) do begin
+      If Buffer[P1] <> #$00 then inc(P1)
       else begin
-        aName := AlCopyStr(RawBSONString, RawBSONStringPos, P1-RawBSONStringPos);
+        AlCopyStr(Buffer, CurrName, BufferPos, P1-BufferPos);
         break;
       end;
-      if P1 > RawBSONStringLength then ExpandRawBSONString(P1);
     end;
-    if P1 > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
-    RawBSONStringPos := P1 + 1;
-    if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    if P1 > BufferLength then ALJSONDocError(cALBSONParseError);
+    BufferPos := P1 + 1;
+    if BufferPos > BufferLength then ExpandBuffer;
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
     {$IFDEF undef}{$REGION 'Begin Object/Array'}{$ENDIF}
@@ -2123,8 +3218,14 @@ Var RawBSONString: AnsiString;
         if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
 
         //create the node according the the braket char and add it to the workingnode
-        if aNodeSubType = nstObject then aNode := CreateNode(ALIfThen(WorkingNode.nodetype=ntarray, '', aName), ntObject)
-        else aNode := CreateNode(ALIfThen(WorkingNode.nodetype=ntarray, '', aName), ntarray);
+        if aNodeSubType = nstObject then begin
+          if WorkingNode.nodetype=ntarray then aNode := CreateNode('', ntObject)
+          else aNode := CreateNode(CurrName, ntObject);
+        end
+        else begin
+          if WorkingNode.nodetype=ntarray then aNode := CreateNode('', ntarray)
+          else aNode := CreateNode(CurrName, ntarray);
+        end;
         try
           WorkingNode.ChildNodes.Add(aNode);
         except
@@ -2136,7 +3237,8 @@ Var RawBSONString: AnsiString;
         WorkingNode := aNode;
 
         //update the path
-        Paths.AddObject(ALIfThen(WorkingNode.nodetype=ntarray, '[' + aName + ']', aName), WorkingNode);
+        if assigned(ObjectPaths) then ObjectPaths.Add(WorkingNode)
+        else _AddItemToNamePath(CurrName, WorkingNode);
 
       end
 
@@ -2144,18 +3246,22 @@ Var RawBSONString: AnsiString;
       else begin
 
         //update the path
-        if aNodeSubType = nstObject then aNodeTypeInt := 1
-        else aNodeTypeInt := 2;
-        Paths.AddObject(ALIfThen((Paths.Count > 0) and (integer(Paths.Objects[paths.Count - 1]) = 2{array}), '[' + aName + ']', aName), pointer(aNodeTypeInt));
+        if aNodeSubType = nstObject then aNodeType := ntObject
+        else aNodeType := ntArray;
+        _AddItemToNamePath(CurrName, pointer(aNodeType));
 
       end;
 
       //call the DoParseStartObject/array event
-      if aNodeSubType = nstObject then DoParseStartObject(GetPathStr,'')
-      else DoParseStartArray(GetPathStr, '');
+      if aNodeSubType = nstObject then begin
+        if Assigned(fonParseStartObject) then _DoParseStartObject(CurrName)
+      end
+      else begin
+         if Assigned(fonParseStartArray) then _DoParseStartArray(CurrName);
+      end;
 
-      //update RawBSONStringPos
-      RawBSONStringPos := RawBSONStringPos + 4; // we don't need the size of the object/array (4 bytes)
+      //update BufferPos
+      BufferPos := BufferPos + 4; // we don't need the size of the object/array (4 bytes)
 
       //finallly exit from this procedure, everything was done
       exit;
@@ -2163,269 +3269,46 @@ Var RawBSONString: AnsiString;
     end;
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
-    {$IFDEF undef}{$REGION 'Remove Delphi warning'}{$ENDIF}
-    aBool := False;
-    aDateTime := 0;
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+    {$IFDEF undef}{$REGION 'create the node'}{$ENDIF}
+    case aNodeSubType of
+      // \x01 + name + \x00 + double
+      nstFloat: _createFloatNode(CurrName, aNodeSubType);
 
-    {$IFDEF undef}{$REGION 'Extract value: Floating point'}{$ENDIF}
-    // \x01 + name + \x00 + double
-    if aNodeSubType = nstFloat then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(Double) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(Double) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aDouble, sizeof(Double));
-      aTextValue := ALFloatToStr(aDouble, ALDefaultFormatSettings);
-      RawBSONStringPos := RawBSONStringPos + sizeof(Double);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      // \x02 + name + \x00 + length (int32) + string + \x00
+      nstText: _createTextNode(CurrName, aNodeSubType);
 
-    {$IFDEF undef}{$REGION 'Extract value: UTF-8 string'}{$ENDIF}
-    // \x02 + name + \x00 + length (int32) + string + \x00
-    else if aNodeSubType = nstText then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt32, sizeof(aInt32));
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt32);
-      while (RawBSONStringPos + aInt32 - 1 > RawBSONStringLength) do
-        if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
-      aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
-      RawBSONStringPos := RawBSONStringPos + aInt32;
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      // \x05 + name + \x00 + int32 + subtype + (byte*)
+      nstbinary: _createBinaryNode(CurrName, aNodeSubType);
 
-    {$IFDEF undef}{$REGION 'Extract value: Binary data'}{$ENDIF}
-    // \x05 + name + \x00 + int32 + subtype + (byte*)
-    else if aNodeSubType = nstbinary then begin
+      // \x07 + name + \x00 + (byte*12)
+      nstObjectID: _createObjectIDNode(CurrName, aNodeSubType);
 
-      {$REGION 'Get size'}
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt32, sizeof(aInt32));
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt32);
-      {$ENDREGION}
+      // \x08 + name + \x00 + \x00 => Boolean "false"
+      // \x08 + name + \x00 + \x01	=> Boolean "true"
+      nstBoolean: _createBooleanNode(CurrName, aNodeSubType);
 
-      {$REGION 'Get the subtype'}
-      if RawBSONStringPos > RawBSONStringLength then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
-      end;
-      aBinary.Subtype := Byte(RawBSONString[RawBSONStringPos]);
-      RawBSONStringPos := RawBSONStringPos + 1;
-      {$ENDREGION}
+      // \x09 + name + \x00 + int64
+      nstDateTime: _createDateTimeNode(CurrName, aNodeSubType);
 
-      {$REGION 'Get the data'}
-      while (RawBSONStringPos + aInt32 - 1 > RawBSONStringLength) do
-        if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
-      aBinary.Data := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32);
-      RawBSONStringPos := RawBSONStringPos + aInt32;
-      {$ENDREGION}
+      // \x11 + name + \x00 + int64
+      nstTimestamp: _createTimestampNode(CurrName, aNodeSubType);
 
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      // \x0A + name + \x00
+      nstnull: _createNullNode(CurrName, aNodeSubType);
 
-    {$IFDEF undef}{$REGION 'Extract value: ObjectId'}{$ENDIF}
-    // \x07 + name + \x00 + (byte*12)
-    else if aNodeSubType = nstObjectID then begin
-      if RawBSONStringPos > RawBSONStringLength - length(aObjectID) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - length(aObjectID) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aObjectID[1], length(aObjectID));
-      setlength(aTextValue, length(aObjectID) * 2);
-      BintoHex(@aObjectID[1],pansichar(aTextValue),length(aObjectID));
-      aTextValue := 'ObjectId("'+ AllowerCase(aTextValue) + '")';
-      RawBSONStringPos := RawBSONStringPos + length(aObjectID);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
+      // \x0B + name + \x00 + (byte*) + \x00 + (byte*) + \x00
+      nstRegEx: _createRegExNode(CurrName, aNodeSubType);
 
-    {$IFDEF undef}{$REGION 'Extract value: Boolean'}{$ENDIF}
-    // \x08 + name + \x00 + \x00 => Boolean "false"
-    // \x08 + name + \x00 + \x01	=> Boolean "true"
-    else if aNodeSubType = nstBoolean then begin
-      if RawBSONStringPos > RawBSONStringLength then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
-      end;
-      if RawBSONString[RawBSONStringPos] = #$00 then begin
-        aBool := False;
-        aTextValue := 'false';
-      end
-      else if RawBSONString[RawBSONStringPos] = #$01 then begin
-        aBool := true;
-        aTextValue := 'true';
-      end
+      // \x0D + name + \x00 + length (int32) + string + \x00
+      nstJavascript: _createJavascriptNode(CurrName, aNodeSubType);
+
+      // \x10 + name + \x00 + int32
+      nstint32: _createInt32Node(CurrName, aNodeSubType);
+
+      // \x12 + name + \x00 + int64
+      nstint64: _createInt64Node(CurrName, aNodeSubType);
+
       else ALJSONDocError(cALBSONParseError);
-      RawBSONStringPos := RawBSONStringPos + 1;
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: UTC datetime'}{$ENDIF}
-    // \x09 + name + \x00 + int64
-    else if aNodeSubType = nstDateTime then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aDateTime := ALUnixMsToDateTime(aInt64);
-      aTextValue := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aDateTime, ALDefaultFormatSettings);
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: Timestamp'}{$ENDIF}
-    // \x11 + name + \x00 + int64
-    else if aNodeSubType = nstTimestamp then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aTimestamp.I64 := aInt64;
-      aTextValue := 'Timestamp(' + ALUIntToStr(aTimestamp.W1) + ', ' + ALUIntToStr(aTimestamp.W2) + ')';
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: Null value'}{$ENDIF}
-    // \x0A + name + \x00
-    else if aNodeSubType = nstnull then begin
-      aTextValue := 'null';
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: Regular expression'}{$ENDIF}
-    // \x0B + name + \x00 + (byte*) + \x00 + (byte*) + \x00
-    else if aNodeSubType = nstRegEx then begin
-
-      {$REGION 'Get pattern'}
-      P1 := RawBSONStringPos;
-      While P1 <= RawBSONStringLength do begin
-        If RawBSONString[P1] <> #$00 then inc(P1)
-        else begin
-          aRegEx.Expression := AlCopyStr(RawBSONString, RawBSONStringPos, P1 - RawBSONStringPos);
-          break;
-        end;
-        if P1 > RawBSONStringLength then ExpandRawBSONString(P1);
-      end;
-      if P1 > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
-      RawBSONStringPos := P1 + 1;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
-      {$ENDREGION}
-
-      {$REGION 'Get options'}
-      P1 := RawBSONStringPos;
-      While P1 <= RawBSONStringLength do begin
-        If RawBSONString[P1] <> #$00 then inc(P1)
-        else begin
-          aRegEx.Options := AlCopyStr(RawBSONString, RawBSONStringPos, P1 - RawBSONStringPos);
-          break;
-        end;
-        if P1 > RawBSONStringLength then ExpandRawBSONString(P1);
-      end;
-      if P1 > RawBSONStringLength then ALJSONDocError(cALBSONParseError);
-      RawBSONStringPos := P1 + 1;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
-      {$ENDREGION}
-
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: JavaScript code'}{$ENDIF}
-    // \x0D + name + \x00 + length (int32) + string + \x00
-    else if aNodeSubType = nstJavascript then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt32) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt32, sizeof(aInt32));
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt32);
-      while (RawBSONStringPos + aInt32 - 1 > RawBSONStringLength) do
-        if not ExpandRawBSONString then ALJSONDocError(cALBSONParseError);
-      aTextValue := ALCopyStr(RawBSONString,RawBSONStringPos,aInt32 - 1{for the trailing #0});
-      RawBSONStringPos := RawBSONStringPos + aInt32;
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: 32-bit Integer'}{$ENDIF}
-    // \x10 + name + \x00 + int32
-    else if aNodeSubType = nstint32 then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aint32) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aint32) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aint32, sizeof(aint32));
-      aTextValue := 'NumberInt(' + ALIntToStr(aint32) + ')';
-      RawBSONStringPos := RawBSONStringPos + sizeof(aint32);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: 64-bit integer'}{$ENDIF}
-    // \x12 + name + \x00 + int64
-    else if aNodeSubType = nstint64 then begin
-      if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then begin
-        ExpandRawBSONString;
-        if RawBSONStringPos > RawBSONStringLength - sizeof(aInt64) + 1 then ALJSONDocError(cALBSONParseError);
-      end;
-      ALMove(RawBSONString[RawBSONStringPos], aInt64, sizeof(aInt64));
-      aTextValue := 'NumberLong(' + ALIntToStr(aint64) + ')';
-      RawBSONStringPos := RawBSONStringPos + sizeof(aInt64);
-    end
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'Extract value: Undefined'}{$ENDIF}
-    else ALJSONDocError(cALBSONParseError);
-    {$IFDEF undef}{$ENDREGION}{$ENDIF}
-
-    {$IFDEF undef}{$REGION 'create the named text node'}{$ENDIF}
-    if NotSaxMode then begin
-
-      //if workingnode = nil then it's mean we are outside the containerNode
-      if not assigned(WorkingNode) then ALJSONDocError(cALBSONParseError);
-
-      //create the node and add it to the workingnode
-      aNode := CreateNode(ALIfThen(WorkingNode.nodetype=ntarray, '', aName), nttext);
-      try
-        case aNodeSubType of
-          nstFloat: aNode.Float := ADouble;
-          nstText: aNode.text := aTextValue;
-          nstObjectID: aNode.ObjectID := aObjectID;
-          nstBoolean: aNode.Bool := aBool;
-          nstDateTime: aNode.DateTime := aDateTime;
-          nstTimestamp: aNode.Timestamp := aTimestamp;
-          nstNull: aNode.null := true;
-          nstRegEx: aNode.RegEx := aRegEx;
-          nstBinary: aNode.binary := aBinary;
-          nstJavascript: aNode.Javascript := aTextValue;
-          nstInt32: aNode.int32 := aInt32;
-          nstInt64: aNode.int64 := aInt64;
-          else ALJSONDocError(cALBSONParseError);
-        end;
-        WorkingNode.ChildNodes.Add(aNode);
-      except
-        aNode.Free;
-        raise;
-      end;
-
-      //call the DoParseStartObject/array event
-      if WorkingNode.nodetype=ntarray then DoParseText(GetPathStr('[' + aName + ']'), '', aTextValue, aNodeSubType)
-      else DoParseText(GetPathStr(aName), aName, aTextValue, aNodeSubType);
-
-    end
-
-    //if we are in sax mode
-    else begin
-
-      //call the DoParseStartObject/array event
-      if (Paths.Count > 0) and (integer(Paths.Objects[paths.Count - 1]) = 2{array}) then DoParseText(GetPathStr('[' + aName + ']'), '', aTextValue, aNodeSubType)
-      else DoParseText(GetPathStr(aName), aName, aTextValue, aNodeSubType);
-
     end;
     {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -2442,35 +3325,73 @@ Begin
   // NOTE: ContainerNode must be ntobject or nil (sax mode)
   //
 
-  Paths := TALStringList.Create;
+  //event fonParseStartDocument
+  DoParseStartDocument;
+
+  //init WorkingNode and NotSaxMode
+  WorkingNode := ContainerNode;
+  NotSaxMode := assigned(ContainerNode);
+
+  //init ObjectPaths or NamePaths
+  if (NotSaxMode) and
+     (not assigned(fonParseText)) and
+     (not assigned(FonParseStartObject)) and
+     (not assigned(FonParseEndObject)) and
+     (not assigned(FonParseStartArray)) and
+     (not assigned(FonParseEndArray)) then begin
+    ObjectPaths := TObjectList.Create(false{OwnsObjects});
+    NamePaths := nil;
+  end
+  else begin
+    ObjectPaths := nil;
+    NamePaths := TALStringList.Create;
+  end;
   Try
 
-    DoParseStartDocument;
-
-    WorkingNode := ContainerNode;
-    NotSaxMode := assigned(ContainerNode);
-    RawBSONString := '';
-    RawBSONStringLength := 0;
-    RawBSONStringPos := 5; // the first 4 bytes are the length of the document and we don't need it
-    ExpandRawBSONString;
-    if NotSaxMode then Paths.AddObject('[-1]', WorkingNode)
-    else Paths.AddObject('[-1]', pointer(1));
-
-    While RawBSONStringPos <= RawBSONStringLength do begin
-      AnalyzeNode;
-      if RawBSONStringPos > RawBSONStringLength then ExpandRawBSONString;
+    //init Buffer
+    if assigned(RawBSONStream) then begin
+      Buffer := '';
+      BufferLength := 0;
+      BufferPos := 5; // the first 4 bytes are the length of the document and we don't need it
+      ExpandBuffer;
+    end
+    else begin
+      Buffer := RawBSONString;
+      BufferLength := length(RawBSONString);
+      BufferPos := 5; // the first 4 bytes are the length of the document and we don't need it
     end;
 
+    //add first node in ObjectPaths/NamePaths
+    if assigned(ObjectPaths) then ObjectPaths.Add(WorkingNode)
+    else begin
+      if NotSaxMode then NamePaths.AddObject('[-1]', WorkingNode)
+      else NamePaths.AddObject('[-1]', pointer(ntObject));
+    end;
+
+    //analyze all the nodes
+    While (BufferPos <= BufferLength) or ExpandBuffer do
+      AnalyzeNode;
+
     //some tags are not closed
-    if Paths.Count > 0 then ALJSONDocError(cALBSONParseError);
+    if assigned(ObjectPaths) then begin
+      if ObjectPaths.Count > 0 then ALJSONDocError(cALBSONParseError);
+    end
+    else begin
+      if NamePaths.Count > 0 then ALJSONDocError(cALBSONParseError);
+    end;
 
     //mean the node was not update (empty stream?) or not weel closed
     if WorkingNode <> nil then ALJSONDocError(cALBSONParseError);
 
+    //event fonParseEndDocument
     DoParseEndDocument;
 
   finally
-    Paths.Free;
+
+    //free ObjectPaths/NamePaths
+    if assigned(ObjectPaths) then ObjectPaths.Free
+    else NamePaths.Free;
+
   end;
 
 end;
@@ -2481,82 +3402,106 @@ begin
   if assigned(FDocumentNode) then FreeAndNil(FDocumentNode);
 end;
 
-{**************************************}
-{Loads an JSON document and activates it.
- Call LoadFromFile to load the JSON document specified by AFileName and set the Active property to true so
- that you can examine or modify the document.
- *AFileName is the name of the JSON document to load from disk. If AFileName is an empty string, TALJSONDocument uses the value of the
-  FileName property. If AFileName is not an empty string, TALJSONDocument changes the FileName property to AFileName.
- Once you have loaded an JSON document, any changes you make to the document are not saved back to disk until you call the SaveToFile method.}
-procedure TALJSONDocument.LoadFromFile(const AFileName: AnsiString; const saxMode: Boolean = False; const BSONFile: Boolean = False; Const ClearChildNodes: Boolean = True);
-var FileStream: TFileStream;
-begin
-  FileStream := TFileStream.Create(string(aFileName), fmOpenRead or fmShareDenyWrite);
-  try
-    LoadFromStream(FileStream, saxMode, BSONFile, ClearChildNodes);
-  finally
-    FileStream.Free;
-  end;
-end;
-
-{****************************************************}
-{Loads an JSON document from a stream and activates it.
- Call LoadFromStream to load the JSON document from a stream.
- *Stream is a stream object that can be used to read the string of JSON that makes up the document.
- After loading the document from Stream, LoadFromStream sets the Active property to true.}
-procedure TALJSONDocument.LoadFromStream(const Stream: TStream; const saxMode: Boolean = False; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
+{*****************************************************************}
+{Loads a string representation of an JSON document and activates it.
+ Call LoadFromJSONString to assign a string as the value of the JSON document. Unlike the JSON property, which lets you assign JSON on a line-by-line
+ basis, LoadFromJSONString treats the text of the JSON document as a whole.
+ The str parameter is a string containing the text of an JSON document. It should represent the JSON text encoded using 8 bits char (utf-8, iso-8859-1, etc)
+ After assigning the JSON property as the contents of the document, LoadFromJSONString sets the Active property to true.}
+procedure TALJSONDocument.LoadFromJSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   if saxMode then SetActive(False)
   else begin
     if ClearChildNodes then releaseDoc;
     SetActive(True);
   end;
-  if BSONStream then ParseBSONStream(Stream, FDocumentNode)
-  else ParseJSONStream(Stream, FDocumentNode);
+  ParseJSON(nil, Str, FDocumentNode)
 end;
 
-{*****************************************************************}
-{Loads a string representation of an JSON document and activates it.
- Call LoadFromJSON to assign a string as the value of the JSON document. Unlike the JSON property, which lets you assign JSON on a line-by-line
- basis, LoadFromJSON treats the text of the JSON document as a whole.
- The JSON parameter is a string containing the text of an JSON document. It should represent the JSON text encoded using 8 bits char (utf-8, iso-8859-1, etc)
- After assigning the JSON property as the contents of the document, LoadFromJSON sets the Active property to true.}
-procedure TALJSONDocument.LoadFromJSON(const JSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
-var StringStream: TALStringStream;
+{****************************************************}
+{Loads an JSON document from a stream and activates it.
+ Call LoadFromJSONStream to load the JSON document from a stream.
+ *Stream is a stream object that can be used to read the string of JSON that makes up the document.
+ After loading the document from Stream, LoadFromJSONStream sets the Active property to true.}
+procedure TALJSONDocument.LoadFromJSONStream(Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
-  StringStream := TALStringStream.Create(JSON);
+  if saxMode then SetActive(False)
+  else begin
+    if ClearChildNodes then releaseDoc;
+    SetActive(True);
+  end;
+  ParseJSON(Stream, '', FDocumentNode)
+end;
+
+{**************************************}
+{Loads an JSON document and activates it.
+ Call LoadFromJSONFile to load the JSON document specified by AFileName and set the Active property to true so
+ that you can examine or modify the document.
+ *AFileName is the name of the JSON document to load from disk. If AFileName is an empty string, TALJSONDocument uses the value of the
+  FileName property. If AFileName is not an empty string, TALJSONDocument changes the FileName property to AFileName.
+ Once you have loaded an JSON document, any changes you make to the document are not saved back to disk until you call the SaveToFile method.}
+procedure TALJSONDocument.LoadFromJSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+var FileStream: TFileStream;
+begin
+  FileStream := TFileStream.Create(string(FileName), fmOpenRead or fmShareDenyWrite);
   try
-    LoadFromStream(StringStream, saxMode, False {BSONStream}, ClearChildNodes);
+    LoadFromJSONStream(FileStream, saxMode, ClearChildNodes);
   finally
-    StringStream.Free;
+    FileStream.Free;
   end;
 end;
 
-{************************************************************************************************************************************}
-procedure TALJSONDocument.LoadFromBSON(const BSON: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
-var StringStream: TALStringStream;
+{*****************************************************************************************************************************************}
+procedure TALJSONDocument.LoadFromBSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
-  StringStream := TALStringStream.Create(BSON);
-  try
-    LoadFromStream(StringStream, saxMode, True {BSONStream}, ClearChildNodes);
-  finally
-    StringStream.Free;
+  if saxMode then SetActive(False)
+  else begin
+    if ClearChildNodes then releaseDoc;
+    SetActive(True);
   end;
+  ParseBSON(nil, Str, FDocumentNode)
+end;
+
+{***********************************************************************************************************************************}
+procedure TALJSONDocument.LoadFromBSONStream(Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+begin
+  if saxMode then SetActive(False)
+  else begin
+    if ClearChildNodes then releaseDoc;
+    SetActive(True);
+  end;
+  ParseBSON(Stream, '', FDocumentNode)
+end;
+
+{********************************************************************************************************************************************}
+procedure TALJSONDocument.LoadFromBSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
+var FileStream: TFileStream;
+begin
+  FileStream := TFileStream.Create(string(FileName), fmOpenRead or fmShareDenyWrite);
+  try
+    LoadFromBSONStream(FileStream, saxMode, ClearChildNodes);
+  finally
+    FileStream.Free;
+  end;
+end;
+
+{***********************************}
+{Saves the JSON document to a stream.
+ Call SaveToStream to save the contents of the JSON document to the stream specified by Stream.}
+procedure TALJSONDocument.SaveToJSONStream(const Stream: TStream);
+begin
+  CheckActive;
+  node.SaveToJSONStream(Stream);
 end;
 
 {******************************}
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
  AFileName is the name of the file to save.}
-procedure TALJSONDocument.SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
-Var afileStream: TfileStream;
+procedure TALJSONDocument.SaveToJSONFile(const FileName: AnsiString);
 begin
-  aFileStream := TfileStream.Create(String(AFileName),fmCreate);
-  Try
-    SaveToStream(aFileStream, BSONFile);
-  finally
-    aFileStream.Free;
-  end;
+  CheckActive;
+  node.SaveToJSONFile(FileName);
 end;
 
 {************************************************}
@@ -2564,43 +3509,31 @@ end;
  Call SaveToJSON to save the contents of the JSON document to the string-type variable specified by JSON. SaveToJSON writes the contents of JSON document
  using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the JSON parameter.
  Unlike the JSON property, which lets you write individual lines from the JSON document, SaveToJSON writes the entire text of the JSON document.}
-procedure TALJSONDocument.SaveToJSON(var JSON: AnsiString);
-Var StringStream: TALStringStream;
-begin
-  StringStream := TALstringStream.Create('');
-  Try
-    SaveToStream(StringStream, False {BSONStream});
-    JSON := StringStream.DataString;
-  finally
-    StringStream.Free;
-  end;
-end;
-
-{**********************************************************}
-{Saves the JSON document to binary representation of JSON -
- BSON. Specification of this format can be found here:
- http://bsonspec.org/#/specification.
- Format BSON is mostly using for the purposes of
- MongoDB interconnection.}
-procedure TALJSONDocument.SaveToBSON(var BSON: AnsiString);
-Var StringStream: TALStringStream;
-begin
-  StringStream := TALstringStream.Create('');
-  Try
-    SaveToStream(StringStream, True {BSONStream});
-    BSON := StringStream.DataString;
-  finally
-    StringStream.Free;
-  end;
-end;
-
-{**********************************}
-{Saves the JSON document to a stream.
- Call SaveToStream to save the contents of the JSON document to the stream specified by Stream.}
-procedure TALJSONDocument.SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
+procedure TALJSONDocument.SaveToJSONString(var str: AnsiString);
 begin
   CheckActive;
-  node.SaveToStream(Stream, BSONStream);
+  node.SaveToJSONString(Str);
+end;
+
+{****************************************************************}
+procedure TALJSONDocument.SaveToBsonStream(const Stream: TStream);
+begin
+  CheckActive;
+  node.SaveToBsonStream(Stream);
+end;
+
+{*******************************************************************}
+procedure TALJSONDocument.SaveToBsonFile(const FileName: AnsiString);
+begin
+  CheckActive;
+  node.SaveToBsonFile(FileName);
+end;
+
+{**************************************************************}
+procedure TALJSONDocument.SaveToBsonString(var str: AnsiString);
+begin
+  CheckActive;
+  node.SaveToBsonString(Str);
 end;
 
 {*************************************}
@@ -2608,7 +3541,7 @@ end;
  GetJSON is the read implementation of the JSON property.}
 function TALJSONDocument.GetJSON: AnsiString;
 begin
-  SaveToJSON(Result);
+  SaveToJSONString(Result);
 end;
 
 {*************************************}
@@ -2616,7 +3549,7 @@ end;
  GetBSON is the read implementation of the BSON property.}
 function TALJSONDocument.GetBSON: AnsiString;
 begin
-  SaveToBSON(Result);
+  SaveToBSONString(Result);
 end;
 
 {**********************************}
@@ -2625,7 +3558,7 @@ end;
  *Value contains the raw (unparsed) JSON to assign.}
 procedure TALJSONDocument.SetJSON(const Value: AnsiString);
 begin
-  LoadFromJSON(Value, False{saxMode}, true{ClearChildNodes});
+  LoadFromJSONString(Value, False{saxMode}, true{ClearChildNodes});
 end;
 
 {**********************************}
@@ -2634,7 +3567,7 @@ end;
  *Value contains the raw (unparsed) BSON to assign.}
 procedure TALJSONDocument.SetBSON(const Value: AnsiString);
 begin
-  LoadFromBSON(Value, False{saxMode}, true{ClearChildNodes});
+  LoadFromBSONString(Value, False{saxMode}, true{ClearChildNodes});
 end;
 
 {***********************************}
@@ -2733,14 +3666,14 @@ begin
   FParseOptions := Value;
 end;
 
-{******************************************************************}
-procedure TALJSONDocument.SetPathSeparator(const Value: AnsiString);
+{****************************************************************}
+procedure TALJSONDocument.SetPathSeparator(const Value: ansiChar);
 begin
   FPathSeparator := Value;
 end;
 
-{****************************************************}
-function TALJSONDocument.GetPathSeparator: AnsiString;
+{**************************************************}
+function TALJSONDocument.GetPathSeparator: ansiChar;
 begin
   result := fPathSeparator;
 end;
@@ -2757,22 +3690,10 @@ begin
   if Assigned(fonParseEndDocument) then fonParseEndDocument(Self);
 end;
 
-{**************************************************************************************************************************************************}
-procedure TALJSONDocument.DoParseText(const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType);
+{*************************************************************************************************************************************************}
+procedure TALJSONDocument.DoParseText(const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType);
 begin
-  if Assigned(fonParseText) then begin
-    case NodeSubType of
-      nstFloat: begin
-                  if fFormatSettings <> @ALDefaultFormatSettings then fonParseText(Self, Path, name, ALFloatToStr(ALStrToFloat(str, ALDefaultFormatSettings),FormatSettings^), NodeSubType)
-                  else fonParseText(Self, Path, name, str, NodeSubType);
-                end;
-      nstDateTime: begin
-                     if fFormatSettings <> @ALDefaultFormatSettings then fonParseText(Self, Path, name, ALDateTimeToStr(ALStrToDateTime(Str, ALDefaultFormatSettings),FormatSettings^), NodeSubType)
-                     else fonParseText(Self, Path, name, Str, NodeSubType)
-                   end
-      else fonParseText(Self, Path, name, str, NodeSubType);
-    end;
-  end;
+  if Assigned(fonParseText) then fonParseText(Self, Path, name, Args, NodeSubType);
 end;
 
 {*******************************************************************************************}
@@ -2817,13 +3738,13 @@ end;
 function TALJSONNode.GetChildNodes: TALJSONNodeList;
 begin
   Result := nil; // hide warning
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
+  ALJsonDocError(CALJsonOperationError,GetNodeType)
 end;
 
 {****************************************************************}
 procedure TALJSONNode.SetChildNodes(const Value: TALJSONNodeList);
 begin
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
+  ALJsonDocError(CALJsonOperationError,GetNodeType)
 end;
 
 {***********************************************}
@@ -2835,31 +3756,36 @@ begin
   Result := assigned(aNodeList) and (aNodeList.Count > 0);
 end;
 
-{**********************************************}
-function TALJSONNode.GetNodeTypeStr: AnsiString;
+{***********************************************}
+function TALJSONNode.GetNodeValueStr: ansiString;
 begin
-  case NodeType of
-    ntObject: result := 'ntObject';
-    ntArray: result := 'ntArray';
-    ntText: result := 'ntText';
-    else begin
-      Result := ''; //for hide warning
-      AlJSONDocError(cAlJSONInvalidNodeType);
-    end;
-  end;
+  ALJsonDocError(CALJsonOperationError,GetNodeType);
+  result := ''; // hide warning
 end;
 
 {********************************************}
-function TALJSONNode.GetNodeValue: ansiString;
+function TALJSONNode.GetNodeValueInt64: int64;
 begin
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  result := ''; // hide warning
+  ALJsonDocError(CALJsonOperationError,GetNodeType);
+  result := 0; // hide warning
 end;
 
 {*************************************************************************************************}
 procedure TALJSONNode.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
+  ALJsonDocError(CALJsonOperationError,GetNodeType);
+end;
+
+{********************************************************************************************}
+procedure TALJSONNode.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
+begin
+  ALJsonDocError(CALJsonOperationError,GetNodeType);
+end;
+
+{*****************************************************************************************************************************}
+procedure TALJSONNode.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
+begin
+  ALJsonDocError(CALJsonOperationError,GetNodeType);
 end;
 
 {***********************************}
@@ -2868,26 +3794,26 @@ function TALJSONNode.GetText: AnsiString;
 begin
 
   case NodeSubType of
-    nstFloat: begin
+    nstFloat: begin // return the formated float
                 if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALFloatToStr(GetFloat, Fdocument.FormatSettings^)
-                else result := GetNodeValue;
+                else result := GetNodeValueStr;
               end;
-    nstText: result := GetNodeValue;
-    nstObject: result := GetNodeValue;
-    nstArray: result := GetNodeValue;
-    nstObjectID: result := GetObjectID; // value of the node like ObjectId ( "507f1f77bcf86cd799439011" ) so we must parse it via GetObjectID
-    nstBoolean: result := GetNodeValue;
-    nstDateTime: begin
+    nstText: result := GetNodeValueStr;  // return the raw text
+    nstObject: result := GetNodeValueStr;  // return the raw objectID
+    nstArray: result := GetNodeValueStr;  // error
+    nstObjectID: result := GetNodeValueStr; // error
+    nstBoolean: result := GetNodeValueStr;  // return true or false
+    nstDateTime: begin // return the formated datetime
                    if Assigned(FDocument) and (Fdocument.FormatSettings <> @ALDefaultFormatSettings) then result := ALDateTimeToStr(GetDateTime, Fdocument.FormatSettings^)
-                   else result := ALDateTimeToStr(GetDateTime, ALDefaultFormatSettings); // value of the node like ISODate('yyyy-mm-ddThh:nn:ss.zzzZ') so we must parse it via GetDateTime
+                   else result := GetNodeValueStr;
                  end;
-    nstNull: result := GetNodeValue;
-    nstRegEx: result := GetNodeValue;
-    nstBinary: result := GetbinaryData;  // value of the node like BinData(0, "JliB6gIMRuSphAD2KmhzgQ==") so we must parse it via GetbinaryData
-    nstJavascript: result := GetNodeValue;
-    nstInt32: result := GetNodeValue;
-    nstTimestamp: result := GetNodeValue;
-    nstInt64: result := GetNodeValue;
+    nstNull: result := GetNodeValueStr; // return null
+    nstRegEx: result := GetNodeValueStr; // return the raw regex (without the options)
+    nstBinary: result := GetNodeValueStr; // return the raw binary (without the binary subtype)
+    nstJavascript: result := GetNodeValueStr; // return the raw javascript
+    nstInt32: result := GetNodeValueStr;  // return the number
+    nstTimestamp: result := GetNodeValueStr;  // return the number (as int64)
+    nstInt64: result := GetNodeValueStr;  // return the number
     else AlJSONDocError(cALJSONInvalidBSONNodeSubType);
   end;
 
@@ -2900,120 +3826,250 @@ begin
   setNodeValue(Value, nstText);
 end;
 
+{***********************************}
+// By default json (ie: javascript) treats all numbers as floating-point values.
+// To let other system (ie: mongoDB) understand the type of the number
+// we provide the helper functions NumberLong() to handle 64-bit integers
+// and NumberInt() to handle 64-bit integers (and some others). theses helper functions are
+// used when saving the json document.
+function TALJSONNode.GetTextWithNodeSubTypeHelper: AnsiString;
+
+  procedure _GetObjectID;
+  begin
+    result := 'ObjectId("'+ALBinToHex(ObjectID)+'")';
+  end;
+
+  procedure _GetBinary;
+  begin
+    result := 'BinData('+alinttostr(BinarySubType)+', "'+ALMimeBase64EncodeStringNoCRLF(Binary)+'")';
+  end;
+
+  procedure _GetDateTime;
+  begin
+    result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettings)
+  end;
+
+  procedure _Getint32;
+  begin
+    result := 'NumberInt(' + text + ')'
+  end;
+
+  procedure _Getint64;
+  begin
+    result := 'NumberLong(' + text + ')';
+  end;
+
+  procedure _GetRegEx;
+  var aRegExOptions: TALPerlRegExOptions;
+      aRegExOptionsStr: ansiString;
+  begin
+    aRegExOptionsStr := '';
+    aRegExOptions := RegExOptions;
+    if preCaseLess in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr + 'i';
+    if preMultiLine in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr +'m';
+    if preExtended in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr +'x';
+    //'l':;
+    if preSingleLine in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr + 's';
+    //'u':;
+    result := '/'+regex+'/' + aRegExOptionsStr;
+  end;
+
+  procedure _GetTimestamp;
+  begin
+    result := 'Timestamp('+alinttostr(GetTimeStamp.W1)+', '+alinttostr(GetTimeStamp.W2)+')';
+  end;
+
+begin
+
+  case NodeSubType of
+    nstFloat:      result := GetNodeValueStr;
+    nstText:       result := GetNodeValueStr;
+    nstBinary:     _GetBinary;
+    nstObjectID:   _GetObjectID;
+    nstBoolean:    result := GetNodeValueStr;
+    nstDateTime:   _GetDateTime;
+    nstJavascript: result := GetNodeValueStr;
+    nstInt32:      _Getint32;
+    nstInt64:      _Getint64;
+    nstNull:       result := GetNodeValueStr;
+    nstObject:     result := GetNodeValueStr;
+    nstArray:      result := GetNodeValueStr;
+    nstRegEx:      _GetRegEx;
+    nstTimestamp:  _GetTimestamp;
+    else raise Exception.Create('Unknown Node SubType');
+  end;
+
+end;
+
 {************************************}
 function TALJSONNode.GetFloat: Double;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  If not ALTryStrToFloat(GetNodeValue, Result, ALDefaultFormatSettings) then ALJSONDocError('%s is not a valid float', [GetNodeValue]);
+  case NodeSubType of
+    nstFloat: PInt64(@result)^ := GetNodeValueInt64;
+    nstInt32,
+    nstInt64: Result := GetNodeValueInt64;
+    else begin
+      AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+      result := 0; // to hide a warning;
+    end;
+  end;
 end;
 
 {**************************************************}
 procedure TALJSONNode.SetFloat(const Value: Double);
 begin
-  setNodeValue(ALFloatToStr(Value, ALDefaultFormatSettings), nstFloat);
+  setNodeValue(PInt64(@Value)^, nstFloat);
 end;
 
 {******************************************}
 function TALJSONNode.GetDateTime: TDateTime;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToDateTime(GetNodeValue, result) then ALJSONDocError('%s is not a valid date and time', [GetNodeValue]);
+  if NodeSubType = nstDateTime then PInt64(@result)^ := GetNodeValueInt64
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := 0; // to hide a warning;
+  end;
 end;
 
 {********************************************************}
 procedure TALJSONNode.SetDateTime(const Value: TDateTime);
 begin
-  setNodeValue(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Value, ALDefaultFormatSettings), nstDateTime);
+  setNodeValue(PInt64(@Value)^, nstDateTime);
 end;
 
 {**************************************************}
 function TALJSONNode.GetTimestamp: TALBSONTimestamp;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToTimestamp(GetNodeValue, result) then ALJSONDocError('%s is not a valid BSON-Timestamp', [GetNodeValue]);
+  if NodeSubType = nstTimestamp then result.I64 := GetNodeValueInt64
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result.I64 := 0; // to hide a warning;
+  end;
 end;
 
 {***************************************************************}
 procedure TALJSONNode.SetTimestamp(const Value: TALBSONTimestamp);
 begin
-  setNodeValue('Timestamp(' + ALUIntToStr(Value.W1) + ', ' + ALUIntToStr(Value.W2) + ')', nstTimestamp);
+  setNodeValue(Value.I64, nstTimestamp);
 end;
 
-{************************************************}
-function TALJSONNode.GetObjectID: TALJSONObjectID;
+{*******************************************}
+function TALJSONNode.GetObjectID: ansiString;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToObjectID(GetNodeValue, result) then ALJSONDocError('%s is not a valid ObjectID', [GetNodeValue]);
+  if NodeSubType = nstObjectID then result := GetNodeValueStr
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := ''; // to hide a warning;
+  end;
 end;
 
-{*************************************************************}
-procedure TALJSONNode.SetObjectID(const Value: TALJSONObjectID);
-var aStr: AnsiString;
+{*********************************************************}
+procedure TALJSONNode.SetObjectID(const Value: AnsiString);
 begin
-  setlength(aStr, length(Value) * 2);
-  BintoHex(@Value[1],pansiChar(aStr),length(Value));
-  setNodeValue('ObjectId("'+ALLowerCase(aStr)+'")', nstObjectID);
+  if length(Value) <> 12 then AlJSONDocError('ObjectID must have 12 bytes');
+  setNodeValue(Value, nstObjectID);
 end;
 
 {*************************************}
 function TALJSONNode.GetInt32: Integer;
+var aDouble: Double;
+    aint64: system.int64;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToInteger(GetNodeValue, result) then ALJSONDocError('%s is not a valid Int32', [GetNodeValue]);
+  case NodeSubType of
+    nstFloat: begin
+                PInt64(@aDouble)^ := GetNodeValueInt64;
+                aInt64 := trunc(aDouble);
+                if (aInt64 <> aDouble) or
+                   (aInt64 > system.int32.MaxValue) or
+                   (aInt64 < system.int32.MinValue) then AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+                result := aint64;
+              end;
+    nstInt32: begin
+                aInt64 := GetNodeValueInt64;
+                if (aInt64 > system.int32.MaxValue) or
+                   (aInt64 < system.int32.MinValue) then AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+                result := aInt64;
+              end;
+    nstInt64: Result := GetNodeValueInt64;
+    else begin
+      AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+      result := 0; // to hide a warning;
+    end;
+  end;
 end;
 
 {***************************************************}
 procedure TALJSONNode.SetInt32(const Value: Integer);
 begin
-  setNodeValue(ALIntToStr(Value), nstInt32);
+  setNodeValue(Value, nstInt32);
 end;
 
 {***********************************}
 function TALJSONNode.GetInt64: Int64;
+var aDouble: Double;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToInt64(GetNodeValue, result) then ALJSONDocError('%s is not a valid Int64', [GetNodeValue]);
+  case NodeSubType of
+    nstFloat: begin
+                PInt64(@aDouble)^ := GetNodeValueInt64;
+                result := trunc(aDouble);
+                if result <> aDouble then AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+              end;
+    nstInt32,
+    nstInt64: Result := GetNodeValueInt64;
+    else begin
+      AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+      result := 0; // to hide a warning;
+    end;
+  end;
 end;
 
 {*************************************************}
 procedure TALJSONNode.SetInt64(const Value: Int64);
 begin
-  setNodeValue(ALIntToStr(Value), nstInt64);
+  setNodeValue(Value, nstInt64);
 end;
 
 {************************************}
 function TALJSONNode.GetBool: Boolean;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  If not ALTryStrToBool(GetNodeValue, result) then ALJSONDocError('%s is not a valid Boolean', [GetNodeValue]);
+  if NodeSubType = nstBoolean then begin
+    if GetNodeValueInt64 = 0 then result := False
+    else result := true;
+  end
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := False; // to hide a warning;
+  end;
 end;
 
 {**************************************************}
 procedure TALJSONNode.SetBool(const Value: Boolean);
 begin
-  if Value then setNodeValue('true', nstBoolean)
-  else setNodeValue('false', nstBoolean);
+  if Value then setNodeValue(1, nstBoolean)
+  else setNodeValue(0, nstBoolean);
 end;
 
 {************************************}
 function TALJSONNode.GetNull: Boolean;
 begin
-  Result := (NodeSubType <> nstText) and
-            (AlSameText(GetNodeValue, 'null'));
+  result := NodeSubType = nstNull;
 end;
 
 {**************************************************}
 procedure TALJSONNode.SetNull(const Value: Boolean);
 begin
-  if Value then setNodeValue('null', nstNull)
+  if Value then setNodeValue(0, nstNull)
   else ALJSONDocError('Only "true" is allowed for setNull property');
 end;
 
 {*********************************************}
 function TALJSONNode.GetJavascript: AnsiString;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  Result := GetNodeValue;
+  if NodeSubType = nstJavascript then result := GetNodeValueStr
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := ''; // to hide a warning;
+  end;
 end;
 
 {***********************************************************}
@@ -3022,44 +4078,82 @@ begin
   setNodeValue(Value, nstJavascript);
 end;
 
-{******************************************}
-function TALJSONNode.GetRegEx: TALJSONRegEx;
+{****************************************}
+function TALJSONNode.GetRegEx: ansiString;
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToRegEx(GetNodeValue, result) then ALJSONDocError('%s is not a valid regular expression', [GetNodeValue]);
+  if NodeSubType = nstRegEx then result := GetNodeValueStr
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := ''; // to hide a warning;
+  end;
 end;
 
 {********************************************************}
-procedure TALJSONNode.SetRegEx(const Value: TALJSONRegEx);
+procedure TALJSONNode.SetRegEx(const Pattern: ansiString);
 begin
-  setNodeValue('/' + Value.Expression + '/' + Value.Options, nstRegEx);
+  setNodeValue(Pattern, 0, nstRegEx);
 end;
 
-{********************************************}
-function TALJSONNode.GetBinary: TALJSONBinary;
+{********************************************************************************************}
+procedure TALJSONNode.SetRegEx(const Pattern: ansiString; const Options: TALPerlRegExOptions);
 begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToBinary(GetNodeValue, result.Subtype, Result.Data) then ALJSONDocError('%s is not a valid binary', [GetNodeValue]);
+  setNodeValue(Pattern, byte(Options), nstRegEx);
+end;
+
+{********************************************************}
+function TALJSONNode.GetRegExOptions: TALPerlRegExOptions;
+begin
+  if NodeSubType = nstRegEx then result := TALPerlRegExOptions(byte(GetNodeValueInt64))
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := []; // to hide a warning;
+  end;
+end;
+
+{**********************************************************************}
+procedure TALJSONNode.SetRegExOptions(const Value: TALPerlRegExOptions);
+begin
+  if NodeSubType <> nstRegEx then ALJSONDocError('You can set regex options only to a regex node');
+  setNodeValue(byte(Value), nstRegEx);
+end;
+
+{*****************************************}
+function TALJSONNode.GetBinary: AnsiString;
+begin
+  if NodeSubType = nstBinary then result := GetNodeValueStr
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := ''; // to hide a warning;
+  end;
+end;
+
+{******************************************************}
+procedure TALJSONNode.SetBinary(const Data: AnsiString);
+begin
+  setNodeValue(Data, 0, nstBinary); // 0 = Default BSON type
+end;
+
+{***************************************************************************}
+procedure TALJSONNode.SetBinary(const Data: AnsiString; const Subtype: byte);
+begin
+  setNodeValue(Data, Subtype, nstBinary);
+end;
+
+{******************************************}
+function TALJSONNode.GetBinarySubType: byte;
+begin
+  if NodeSubType = nstBinary then result := byte(GetNodeValueInt64)
+  else begin
+    AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+    result := 0; // to hide a warning;
+  end;
 end;
 
 {**********************************************************}
-procedure TALJSONNode.SetBinary(const Value: TALJSONBinary);
+procedure TALJSONNode.SetBinarySubType(const Subtype: byte);
 begin
-  setNodeValue('BinData(' + ALInttostr(Value.Subtype) + ', "' + ALMimeBase64EncodeStringNoCRLF(Value.Data) + '")', nstBinary);
-end;
-
-{*********************************************}
-function TALJSONNode.GetBinaryData: ansiString;
-var aSubtype: byte;
-begin
-  if NodeSubType = nstText then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  if not ALJSONDocTryStrToBinary(GetNodeValue, aSubtype, Result) then ALJSONDocError('%s is not a valid binary', [GetNodeValue]);
-end;
-
-{***********************************************************}
-procedure TALJSONNode.SetBinaryData(const Value: ansiString);
-begin
-  setNodeValue('BinData(0, "' + ALMimeBase64EncodeStringNoCRLF(Value) + '")', nstBinary); // 0 = Default BSON type
+  if NodeSubType <> nstBinary then ALJSONDocError('You can set binary subtype only to a binary node');
+  setNodeValue(Subtype, nstBinary);
 end;
 
 {*******************************************************}
@@ -3102,14 +4196,14 @@ end;
  GetJSON returns the JSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNode.GetJSON: AnsiString;
 begin
-  SaveToJSON(result);
+  SaveToJSONString(result);
 end;
 
 {************************************************}
 {SetJSON reload the node with the new given value }
 procedure TALJSONNode.SetJSON(const Value: AnsiString);
 Begin
-  LoadFromJSON(Value, true{ClearChildNodes});
+  LoadFromJSONString(Value, true{ClearChildNodes});
 end;
 
 {*******************************************************************}
@@ -3117,14 +4211,14 @@ end;
  GetBSON returns the BSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNode.GetBSON: AnsiString;
 begin
-  SaveToBSON(result);
+  SaveToBSONString(result);
 end;
 
 {************************************************}
 {SetBSON reload the node with the new given value }
 procedure TALJSONNode.SetBSON(const Value: AnsiString);
 Begin
-  LoadFromBSON(Value, true{ClearChildNodes});
+  LoadFromBSONString(Value, true{ClearChildNodes});
 end;
 
 {*****************************************************************}
@@ -3187,646 +4281,804 @@ begin
   else Result := nil;
 end;
 
-{******************************************************************************}
-{Returns the JSON that corresponds to this node and any child nodes it contains.}
-procedure TALJSONNode.SaveToStream(const Stream: TStream; const BSONStream: boolean = False);
+{*****************************************************}
+procedure TALJSONNode.SaveToJson(const Stream: TStream;
+                                 Var buffer: ansiString);
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _SaveToJSONStream;
+Const BufferSize: integer = 8192;
 
-  Const BufferSize: integer = 32768;
-  Var NodeStack: Tstack;
-      CurrentNode: TalJSONNode;
-      CurrentParentNode: TalJSONNode;
-      CurrentIndentStr: AnsiString;
-      IndentStr: AnsiString;
-      EncodeControlCharacters: Boolean;
-      AddNodeSubTypeHelperFunct: Boolean;
-      AutoIndentNode: Boolean;
-      BufferString: AnsiString;
-      BufferStringPos: Integer;
-      LastWrittenChar: AnsiChar;
+Var NodeStack: Tstack;
+    CurrentNode: TalJSONNode;
+    CurrentParentNode: TalJSONNode;
+    CurrentIndentStr: AnsiString;
+    IndentStr: AnsiString;
+    EncodeControlCharacters: Boolean;
+    AutoIndentNode: Boolean;
+    BufferPos: Integer;
+    LastWrittenChar: AnsiChar;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
-    Begin
-      If BufferLength > 0 then stream.Write(buffer[1],BufferLength);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteStr2Buffer(const str:AnsiString);
-    var l: integer;
-    Begin
-      L := Length(Str);
-      if l = 0 then exit;
-      LastWrittenChar := Str[L];
-      if L >= BufferSize then begin
-        WriteBuffer2Stream(BufferString,BufferStringPos);
-        BufferStringPos := 0;
-        WriteBuffer2Stream(str, l)
-      end
-      else begin
-        if L + BufferStringPos > length(BufferString) then setlength(BufferString, L + BufferStringPos);
-        ALMove(str[1], BufferString[BufferStringPos + 1], L);
-        BufferStringPos := BufferStringPos + L;
-        if BufferStringPos >= BufferSize then begin
-          WriteBuffer2Stream(BufferString,BufferStringPos);
-          BufferStringPos := 0;
-        end;
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteTextNode2Stream(aTextNode:TALJSONNode);
-    var aInt32: integer;
-        aInt64: system.int64;
-    Begin
-      with aTextNode do begin
-
-        if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
-
-        if AutoIndentNode then WriteStr2Buffer(#13#10 + CurrentIndentStr);
-
-        if (assigned(ParentNode)) and
-           (ParentNode.NodeType <> ntArray) then begin
-          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":')
-          else WriteStr2Buffer('"'+NodeName+'":');
-        end;
-
-        if NodeSubType = NstText then begin
-          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(Text)+'"')
-          else WriteStr2Buffer('"'+Text+'"');
-        end
-        else if (NodeSubType = NstInt32) and
-                (AddNodeSubTypeHelperFunct) and
-                (ALTryStrToInt(NodeValue, aInt32)) then WriteStr2Buffer('NumberInt('+ALInttostr(aInt32)+')')
-        else if (NodeSubType = NstInt64) and
-                (AddNodeSubTypeHelperFunct) and
-                (ALTryStrToInt64(NodeValue, aInt64)) then WriteStr2Buffer('NumberLong('+ALInttostr(aInt64)+')')
-        else WriteStr2Buffer(NodeValue);
-
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteStartObjectNode2Stream(aObjectNode:TALJSONNode);
-    var ANodeList: TALJSONNodeList;
-        aEmptyNode: Boolean;
-        i: integer;
-    Begin
-      with aObjectNode do begin
-
-        if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
-
-        if AutoIndentNode and (CurrentIndentStr <> '') then WriteStr2Buffer(#13#10 + CurrentIndentStr);
-
-        if aObjectNode = self then WriteStr2Buffer('{')
-        else if (assigned(ParentNode)) and
-                (ParentNode.NodeType <> ntArray) then begin
-          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":{')
-          else WriteStr2Buffer('"'+NodeName+'":{');
-        end
-        else WriteStr2Buffer('{');
-
-        aEmptyNode := True;
-        aNodeList := InternalGetChildNodes;
-        If assigned(aNodeList) then begin
-          with aNodeList do
-            If count > 0 then begin
-              aEmptyNode := False;
-              NodeStack.Push(aObjectNode);
-              For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
-            end
-        end;
-
-        If aEmptyNode then WriteStr2Buffer('}')
-        else CurrentIndentStr := CurrentIndentStr + IndentStr;
-
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteEndObjectNode2Stream(aObjectNode:TALJSONNode);
-    Begin
-      if AutoIndentNode then begin
-        delete(CurrentIndentStr,length(CurrentIndentStr) - length(IndentStr)+1, maxint);
-        WriteStr2Buffer(#13#10 + CurrentIndentStr);
-      end;
-      WriteStr2Buffer('}');
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteStartArrayNode2Stream(aArrayNode:TALJSONNode);
-    var ANodeList: TALJSONNodeList;
-        aEmptyNode: Boolean;
-        i: integer;
-    Begin
-      with aArrayNode do begin
-
-        if not (LastWrittenChar in ['{','[']) then WriteStr2Buffer(',');
-
-        if AutoIndentNode and (CurrentIndentStr <> '') then WriteStr2Buffer(#13#10 + CurrentIndentStr);
-
-        if aArrayNode = self then WriteStr2Buffer('[')
-        else if (assigned(ParentNode)) and
-                (ParentNode.NodeType <> ntArray) then begin
-          if EncodeControlCharacters then WriteStr2Buffer('"'+ALJavascriptEncode(NodeName)+'":[')
-          else WriteStr2Buffer('"'+NodeName+'":[');
-        end
-        else WriteStr2Buffer('[');
-
-        aEmptyNode := True;
-        aNodeList := InternalGetChildNodes;
-        If assigned(aNodeList) then begin
-          with aNodeList do
-            If count > 0 then begin
-              aEmptyNode := False;
-              NodeStack.Push(aArrayNode);
-              For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
-            end
-        end;
-
-        If aEmptyNode then WriteStr2Buffer(']')
-        else CurrentIndentStr := CurrentIndentStr + IndentStr;
-
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteEndArrayNode2Stream(aArrayNode:TALJSONNode);
-    Begin
-      if AutoIndentNode then begin
-        delete(CurrentIndentStr,length(CurrentIndentStr) - length(IndentStr) + 1, maxint);
-        WriteStr2Buffer(#13#10 + CurrentIndentStr);
-      end;
-      WriteStr2Buffer(']');
-    end;
-
-  begin
-    If not (NodeType in [ntObject, ntArray]) then exit;  // normally only Object node can gave a valid json stream
-                                                         // but their is some situation where the array (containing json node)
-                                                         // is also usefull
-    CurrentParentNode := nil;
-    NodeStack := Tstack.Create;
-    Try
-
-      {init buffer string}
-      Setlength(BufferString, BufferSize * 2);
-      BufferStringPos := 0;
-      LastWrittenChar := '{';
-      EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
-      AddNodeSubTypeHelperFunct := (poAddNodeSubTypeHelperFunct in FDocument.ParseOptions);
-      AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
-      IndentStr := FDocument.NodeIndentStr;
-      CurrentIndentStr := '';
-
-      {SaveOnlyChildNode}
-      NodeStack.Push(self);
-
-      {loop on all nodes}
-      While NodeStack.Count > 0 Do begin
-        CurrentNode := TAlJSONNode(NodeStack.Pop);
-
-        with CurrentNode do
-          case NodeType of
-            ntObject: begin
-                        if currentNode = CurrentParentNode then WriteEndObjectNode2Stream(CurrentNode)
-                        else WriteStartObjectNode2Stream(CurrentNode);
-                      end;
-            ntArray: begin
-                        if currentNode = CurrentParentNode then WriteEndArrayNode2Stream(CurrentNode)
-                        else WriteStartArrayNode2Stream(CurrentNode);
-                     end;
-            ntText: WriteTextNode2Stream(CurrentNode);
-            else AlJSONDocError(cAlJSONInvalidNodeType);
-          end;
-
-        CurrentParentNode := CurrentNode.ParentNode;
-      end;
-
-      {Write the buffer}
-      WriteBuffer2Stream(BufferString, BufferStringPos);
-
-    finally
-      NodeStack.Free;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
+  Begin
+    if assigned(Stream) then begin
+      If BufferLength > 0 then stream.Write(pointer(buffer)^,BufferLength);
+      BufferPos := 0;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _SaveToBSONStream;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _Write2Buffer(const Source; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
+  Begin
+    if Count = 0 then exit;
+    if Count + BufferPos > length(Buffer) then setlength(Buffer, Count + BufferPos + BufferSize);
+    ALMove(Source, pbyte(Buffer)[BufferPos], Count);
+    BufferPos := BufferPos + Count;
+    if BufferPos >= 32768 then _WriteBuffer2Stream(Buffer,BufferPos);
+  end;
 
-  Const BufferSize: integer = 32768;
-  Var NodeStack: Tstack;
-      NodeIndexStack: Tstack;
-      NodeStartPosStack: Tstack;
-      CurrentNode: TalJSONNode;
-      CurrentParentNode: TalJSONNode;
-      CurrentNodeIndex: integer;
-      CurrentNodeStartPos: System.int64;
-      BufferString: AnsiString;
-      BufferStringPos: Integer;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStr2Buffer(const str:AnsiString);
+  var l: integer;
+  Begin
+    L := Length(Str);
+    if l = 0 then exit;
+    LastWrittenChar := Str[L];
+    _Write2Buffer(pointer(str)^,l);
+  end;
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
-    Begin
-      If BufferLength > 0 then stream.Write(buffer[1],BufferLength);
-    end;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteTextNode2Buffer(aTextNode:TALJSONNode);
+  Begin
+    with aTextNode do begin
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteStr2Buffer(const str:AnsiString);
-    var l: integer;
-    Begin
-      L := Length(Str);
-      if l = 0 then exit;
-      if L >= BufferSize then begin
-        WriteBuffer2Stream(BufferString,BufferStringPos);
-        BufferStringPos := 0;
-        WriteBuffer2Stream(str, l);
+      if not (LastWrittenChar in ['{','[']) then _WriteStr2Buffer(',');
+
+      if AutoIndentNode then begin
+        _WriteStr2Buffer(#13#10);
+        _WriteStr2Buffer(CurrentIndentStr);
+      end;
+
+      if (assigned(ParentNode)) and
+         (ParentNode.NodeType <> ntArray) then begin
+        if EncodeControlCharacters then begin
+           _WriteStr2Buffer('"');
+           _WriteStr2Buffer(ALJavascriptEncode(NodeName));
+           _WriteStr2Buffer('":');
+        end
+        else begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(NodeName);
+          _WriteStr2Buffer('":');
+        end;
+      end;
+
+      if NodeSubType = NstText then begin
+        if EncodeControlCharacters then begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(ALJavascriptEncode(GetText));
+          _WriteStr2Buffer('"');
+        end
+        else begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(Text);
+          _WriteStr2Buffer('"');
+        end;
       end
-      else begin
-        if L + BufferStringPos > length(BufferString) then setlength(BufferString, L + BufferStringPos);
-        ALMove(str[1], BufferString[BufferStringPos + 1], L);
-        BufferStringPos := BufferStringPos + L;
-        if BufferStringPos >= BufferSize then begin
-          WriteBuffer2Stream(BufferString,BufferStringPos);
-          BufferStringPos := 0;
-        end;
-      end;
-    end;
+      else _WriteStr2Buffer(GetTextWithNodeSubTypeHelper);
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    //take care because fucking TStringStream (for exemple) do not permit
-    //to write previous to the current position (it's set the size of the
-    //new stream to the current position ... unbelievable!)
-    Procedure WriteInt2Pos(const aInt:integer; const aPos: system.Int64);
-    var aTmpPos: System.int64;
-    Begin
-      if aPos < Stream.position then begin
-        aTmpPos := Stream.position;
-        Stream.position := aPos;
-        stream.Write(aInt,sizeof(aInt));
-        Stream.position := aTmpPos;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStartObjectNode2Buffer(aObjectNode:TALJSONNode);
+  var ANodeList: TALJSONNodeList;
+      aEmptyNode: Boolean;
+      i: integer;
+  Begin
+    with aObjectNode do begin
+
+      if not (LastWrittenChar in ['{','[']) then _WriteStr2Buffer(',');
+
+      if AutoIndentNode and (CurrentIndentStr <> '') then begin
+         _WriteStr2Buffer(#13#10);
+         _WriteStr2Buffer(CurrentIndentStr);
+      end;
+
+      if aObjectNode = self then _WriteStr2Buffer('{')
+      else if (assigned(ParentNode)) and
+              (ParentNode.NodeType <> ntArray) then begin
+        if EncodeControlCharacters then begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(ALJavascriptEncode(NodeName));
+          _WriteStr2Buffer('":{')
+        end
+        else begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(NodeName);
+          _WriteStr2Buffer('":{');
+        end;
       end
-      else ALMove(aInt, BufferString[aPos - Stream.position + 1], sizeOf(aInt));
-    end;
+      else _WriteStr2Buffer('{');
 
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteTextNode2Stream(aTextNode:TALJSONNode; aNodeIndex: integer);
-    var aBinStr: AnsiString;
-        aNodeName: AnsiString;
-        aDouble: Double;
-        aInt32: Integer;
-        aInt64: system.Int64;
-        aObjectID: TALJSONObjectID;
-        aTimestamp: TALBSONTimestamp;
-        aRegEx: TALJSONRegEx;
-        aBinary: TALJSONBinary;
-    Begin
-      with aTextNode do begin
-
-        // calculate the aNodeName
-        if (assigned(ParentNode)) and
-           (ParentNode.NodeType = ntArray) then aNodeName := ALInttostr(aNodeIndex)
-        else aNodeName := NodeName;
-
-        // add the nodevalue to the buffer
-        case NodeSubType of
-
-          // \x01 + name + \x00 + double
-          nstFloat: begin
-                      aDouble := Float;
-                      setlength(aBinStr,sizeOf(aDouble));
-                      ALMove(aDouble, aBinStr[1], sizeOf(aDouble));
-                      WriteStr2Buffer(#$01 + aNodeName + #$00 + aBinStr);
-                    end;
-
-          // \x02 + name + \x00 + length (int32) + string + \x00
-          nstText: begin
-                      aInt32 := length(text) + 1 {for the trailing #0};
-                      setlength(aBinStr,sizeOf(aInt32));
-                      ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
-                      WriteStr2Buffer(#$02 + aNodeName + #$00 + aBinStr + text + #$00);
-                   end;
-
-          // \x05 + name + \x00 + int32 + subtype + (byte*)
-          nstbinary: begin
-                       aBinary := Binary;
-                       aInt32 := length(aBinary.Data);
-                       setlength(aBinStr,sizeOf(aInt32));
-                       ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
-                       WriteStr2Buffer(#$05 + aNodeName + #$00 + aBinStr + ansiChar(aBinary.Subtype) + aBinary.Data);
-                     end;
-
-          // \x07 + name + \x00 + (byte*12)
-          nstObjectID: begin
-                         aObjectID := ObjectID;
-                         setlength(aBinStr,sizeOf(aObjectID));
-                         ALMove(aObjectID[1], aBinStr[1], sizeOf(aObjectID));
-                         WriteStr2Buffer(#$07 + aNodeName + #$00 + aBinStr);
-                       end;
-
-          // \x08 + name + \x00 + \x00 => Boolean "false"
-          // \x08 + name + \x00 + \x01	=> Boolean "true"
-          nstBoolean: begin
-                        if not bool then WriteStr2Buffer(#$08 + aNodeName + #$00 + #$00)
-                        else WriteStr2Buffer(#$08 + aNodeName + #$00 + #$01);
-                      end;
-
-          // \x09 + name + \x00 + int64
-          nstDateTime: begin
-                         aInt64 := ALDateTimeToUnixMs(DateTime);
-                         setlength(aBinStr,sizeOf(aInt64));
-                         ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
-                         WriteStr2Buffer(#$09 + aNodeName + #$00 + aBinStr);
-                       end;
-
-          // \x11 + name + \x00 + int64
-          nstTimestamp: begin
-                          aTimestamp := Timestamp;
-                          setlength(aBinStr,sizeOf(aInt64));
-                          ALMove(aTimestamp.I64, aBinStr[1], sizeOf(aInt64));
-                          WriteStr2Buffer(#$11 + aNodeName + #$00 + aBinStr);
-                        end;
-
-          // \x0A + name + \x00
-          nstNull: begin
-                     WriteStr2Buffer(#$0A + aNodeName + #$00);
-                   end;
-
-          // \xOB + name + \x00 + (byte*) + \x00 + (byte*) + \x00
-          nstRegEx: begin
-                      aRegEx := RegEx;
-                      WriteStr2Buffer(#$0B + aNodeName + #$00 + aRegEx.Expression + #$00 + aRegEx.Options + #$00);
-                    end;
-
-          // \x0D + name + \x00 + length (int32) + string + \x00
-          nstJavascript: begin
-                           aInt32 := length(text) + 1 {for the trailing #0};
-                           setlength(aBinStr,sizeOf(aInt32));
-                           ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
-                           WriteStr2Buffer(#$0D + aNodeName + #$00 + aBinStr + text + #$00);
-                         end;
-
-          // \x10 + name + \x00 + int32
-          nstInt32: begin
-                      aInt32 := int32;
-                      setlength(aBinStr,sizeOf(aInt32));
-                      ALMove(aInt32, aBinStr[1], sizeOf(aInt32));
-                      WriteStr2Buffer(#$10 + aNodeName + #$00 + aBinStr);
-                    end;
-
-          // \x12 + name + \x00 + int64
-          nstInt64: begin
-                      aInt64 := int64;
-                      setlength(aBinStr,sizeOf(aInt64));
-                      ALMove(aInt64, aBinStr[1], sizeOf(aInt64));
-                      WriteStr2Buffer(#$12 + aNodeName + #$00 + aBinStr);
-                    end
-
-          else AlJSONDocError(cALJSONInvalidBSONNodeSubType);
-
-        end;
-
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteStartObjectNode2Stream(aObjectNode:TALJSONNode; aNodeIndex: integer);
-    var ANodeList: TALJSONNodeList;
-        aEmptyNode: Boolean;
-        aPos: system.int64;
-        i: integer;
-    Begin
-      with aObjectNode do begin
-
-        if aObjectNode = self then WriteStr2Buffer(#$00+#$00+#$00+#$00)
-        else if (assigned(ParentNode)) and
-                (ParentNode.NodeType = ntArray) then WriteStr2Buffer(#$03 + ALInttostr(aNodeIndex) + #$00 + #$00+#$00+#$00+#$00)
-        else WriteStr2Buffer(#$03 + NodeName + #$00 + #$00+#$00+#$00+#$00);
-
-        aPos := Stream.Position + BufferStringPos - 4{length of the #$00+#$00+#$00+#$00};
-
-        aEmptyNode := True;
-        aNodeList := InternalGetChildNodes;
-        If assigned(aNodeList) then begin
-          with aNodeList do
-            If count > 0 then begin
-              aEmptyNode := False;
-              NodeStack.Push(aObjectNode);
-              NodeIndexStack.Push(pointer(aNodeIndex));
-              NodeStartPosStack.Push(pointer(aPos));
-              For i := Count - 1 downto 0 do begin
-                NodeStack.Push(Nodes[i]);
-                NodeIndexStack.Push(pointer(i));
-                NodeStartPosStack.Push(pointer(-1));
-              end;
-            end
-        end;
-
-        If aEmptyNode then begin
-          WriteStr2Buffer(#$00);
-          WriteInt2Pos(5{length of the object},aPos);
-        end;
-
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteEndObjectNode2Stream(aObjectNode:TALJSONNode; aNodeStartPos: system.Int64);
-    Begin
-      WriteStr2Buffer(#$00);
-      WriteInt2Pos(Stream.Position + BufferStringPos - aNodeStartPos, aNodeStartPos);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteStartArrayNode2Stream(aArrayNode:TALJSONNode; aNodeIndex: integer);
-    var ANodeList: TALJSONNodeList;
-        aEmptyNode: Boolean;
-        aPos: system.int64;
-        i: integer;
-    Begin
-      with aArrayNode do begin
-
-        if (assigned(ParentNode)) and
-           (ParentNode.NodeType = ntArray) then WriteStr2Buffer(#$04 + ALInttostr(aNodeIndex) + #$00 + #$00+#$00+#$00+#$00)
-        else WriteStr2Buffer(#$04 + NodeName + #$00 + #$00+#$00+#$00+#$00);
-
-        aPos := Stream.Position + BufferStringPos - 4{length of the #$00+#$00+#$00+#$00};
-
-        aEmptyNode := True;
-        aNodeList := InternalGetChildNodes;
-        If assigned(aNodeList) then begin
-          with aNodeList do
-            If count > 0 then begin
-              aEmptyNode := False;
-              NodeStack.Push(aArrayNode);
-              NodeIndexStack.Push(pointer(aNodeIndex));
-              NodeStartPosStack.Push(pointer(aPos));
-              For i := Count - 1 downto 0 do begin
-                NodeStack.Push(Nodes[i]);
-                NodeIndexStack.Push(pointer(i));
-                NodeStartPosStack.Push(pointer(-1));
-              end;
-            end
-        end;
-
-        If aEmptyNode then begin
-          WriteStr2Buffer(#$00);
-          WriteInt2Pos(5{length of the object},aPos);
-        end;
-
-      end;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    Procedure WriteEndArrayNode2Stream(aArrayNode:TALJSONNode; aNodeStartPos: system.Int64);
-    Begin
-      WriteStr2Buffer(#$00);
-      WriteInt2Pos(Stream.Position + BufferStringPos - aNodeStartPos, aNodeStartPos);
-    end;
-
-  begin
-    If NodeType <> ntobject then exit;
-
-    CurrentParentNode := nil;
-    NodeStack := Tstack.Create;
-    NodeIndexStack := Tstack.Create;
-    NodeStartPosStack := Tstack.Create;
-    Try
-
-      {init buffer string}
-      Setlength(BufferString, BufferSize * 2);
-      BufferStringPos := 0;
-
-      {SaveOnlyChildNode}
-      NodeStack.Push(self);
-      NodeIndexStack.Push(pointer(0));
-      NodeStartPosStack.Push(pointer(Stream.Position));
-
-
-      {loop on all nodes}
-      While NodeStack.Count > 0 Do begin
-        CurrentNode := TAlJSONNode(NodeStack.Pop);
-        CurrentNodeIndex := integer(NodeIndexStack.Pop);
-        CurrentNodeStartPos := system.int64(NodeStartPosStack.Pop);
-
-        with CurrentNode do
-          case NodeType of
-            ntObject: begin
-                        if currentNode = CurrentParentNode then WriteEndObjectNode2Stream(CurrentNode, CurrentNodeStartPos)
-                        else WriteStartObjectNode2Stream(CurrentNode, CurrentNodeIndex);
-                      end;
-            ntArray: begin
-                        if currentNode = CurrentParentNode then WriteEndArrayNode2Stream(CurrentNode, CurrentNodeStartPos)
-                        else WriteStartArrayNode2Stream(CurrentNode, CurrentNodeIndex);
-                     end;
-            ntText: WriteTextNode2Stream(CurrentNode, CurrentNodeIndex);
-            else AlJSONDocError(cAlJSONInvalidNodeType);
-          end;
-
-        CurrentParentNode := CurrentNode.ParentNode;
+      aEmptyNode := True;
+      aNodeList := InternalGetChildNodes;
+      If assigned(aNodeList) then begin
+        with aNodeList do
+          If count > 0 then begin
+            aEmptyNode := False;
+            NodeStack.Push(aObjectNode);
+            For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
+          end
       end;
 
-      {Write the buffer}
-      WriteBuffer2Stream(BufferString, BufferStringPos);
+      If aEmptyNode then _WriteStr2Buffer('}')
+      else CurrentIndentStr := CurrentIndentStr + IndentStr;
 
-    finally
-      NodeStack.Free;
-      NodeIndexStack.Free;
-      NodeStartPosStack.Free;
     end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteEndObjectNode2Buffer(aObjectNode:TALJSONNode);
+  Begin
+    if AutoIndentNode then begin
+      delete(CurrentIndentStr, length(CurrentIndentStr) - length(IndentStr)+1, maxint);
+      _WriteStr2Buffer(#13#10);
+      _WriteStr2Buffer(CurrentIndentStr);
+    end;
+    _WriteStr2Buffer('}');
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStartArrayNode2Buffer(aArrayNode:TALJSONNode);
+  var ANodeList: TALJSONNodeList;
+      aEmptyNode: Boolean;
+      i: integer;
+  Begin
+    with aArrayNode do begin
+
+      if not (LastWrittenChar in ['{','[']) then _WriteStr2Buffer(',');
+
+      if AutoIndentNode and (CurrentIndentStr <> '') then begin
+        _WriteStr2Buffer(#13#10);
+        _WriteStr2Buffer(CurrentIndentStr);
+      end;
+
+      if aArrayNode = self then _WriteStr2Buffer('[')
+      else if (assigned(ParentNode)) and
+              (ParentNode.NodeType <> ntArray) then begin
+        if EncodeControlCharacters then begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(ALJavascriptEncode(NodeName));
+          _WriteStr2Buffer('":[');
+        end
+        else begin
+          _WriteStr2Buffer('"');
+          _WriteStr2Buffer(NodeName);
+          _WriteStr2Buffer('":[');
+        end;
+      end
+      else _WriteStr2Buffer('[');
+
+      aEmptyNode := True;
+      aNodeList := InternalGetChildNodes;
+      If assigned(aNodeList) then begin
+        with aNodeList do
+          If count > 0 then begin
+            aEmptyNode := False;
+            NodeStack.Push(aArrayNode);
+            For i := Count - 1 downto 0 do NodeStack.Push(Nodes[i]);
+          end
+      end;
+
+      If aEmptyNode then _WriteStr2Buffer(']')
+      else CurrentIndentStr := CurrentIndentStr + IndentStr;
+
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteEndArrayNode2Buffer(aArrayNode:TALJSONNode);
+  Begin
+    if AutoIndentNode then begin
+      delete(CurrentIndentStr, length(CurrentIndentStr) - length(IndentStr) + 1, maxint);
+      _WriteStr2Buffer(#13#10);
+      _WriteStr2Buffer(CurrentIndentStr);
+    end;
+    _WriteStr2Buffer(']');
   end;
 
 begin
-  if BSONStream then _SaveToBSONStream
-  else _SaveToJSONStream;
+  If not (NodeType in [ntObject, ntArray]) then exit;  // normally only Object node can gave a valid json stream
+                                                       // but their is some situation where the array (containing json node)
+                                                       // is also usefull
+  CurrentParentNode := nil;
+  NodeStack := Tstack.Create;
+  Try
+
+    {init buffer string}
+    Setlength(Buffer, BufferSize); // will make buffer uniquestring
+    BufferPos := 0;
+    LastWrittenChar := '{';
+    EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
+    AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
+    IndentStr := FDocument.NodeIndentStr;
+    CurrentIndentStr := '';
+
+    {SaveOnlyChildNode}
+    NodeStack.Push(self);
+
+    {loop on all nodes}
+    While NodeStack.Count > 0 Do begin
+      CurrentNode := TAlJSONNode(NodeStack.Pop);
+
+      with CurrentNode do
+        case NodeType of
+          ntObject: begin
+                      if currentNode = CurrentParentNode then _WriteEndObjectNode2Buffer(CurrentNode)
+                      else _WriteStartObjectNode2Buffer(CurrentNode);
+                    end;
+          ntArray: begin
+                      if currentNode = CurrentParentNode then _WriteEndArrayNode2Buffer(CurrentNode)
+                      else _WriteStartArrayNode2Buffer(CurrentNode);
+                   end;
+          ntText: _WriteTextNode2Buffer(CurrentNode);
+          else AlJSONDocError(cAlJSONInvalidNodeType);
+        end;
+
+      CurrentParentNode := CurrentNode.ParentNode;
+    end;
+
+    {Write the buffer}
+    if assigned(Stream) then _WriteBuffer2Stream(Buffer, BufferPos)
+    else setlength(Buffer,BufferPos);
+
+  finally
+    NodeStack.Free;
+  end;
 end;
 
-{************************************************************************************************************************************}
-procedure TALJSONNode.LoadFromStream(const Stream: TStream; const BSONStream: boolean = False; Const ClearChildNodes: Boolean = True);
+{***********************************}
+{Saves the JSON document to a stream.
+ Call SaveToStream to save the contents of the JSON document to the stream specified by Stream.}
+procedure TALJSONNode.SaveToJSONStream(const Stream: TStream);
+var buffer: ansiString;
+begin
+  SaveToJson(Stream, buffer);
+end;
+
+{******************************}
+{Saves the JSON document to disk.
+ Call SaveToFile to save any modifications you have made to the parsed JSON document.
+ AFileName is the name of the file to save.}
+procedure TALJSONNode.SaveToJSONFile(const FileName: AnsiString);
+Var afileStream: TfileStream;
+begin
+  aFileStream := TfileStream.Create(String(FileName),fmCreate);
+  Try
+    SaveToJSONStream(aFileStream);
+  finally
+    aFileStream.Free;
+  end;
+end;
+
+{************************************************}
+{Saves the JSON document to a string-type variable.
+ Call SaveToJSON to save the contents of the JSON document to the string-type variable specified by JSON. SaveToJSON writes the contents of JSON document
+ using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the JSON parameter.
+ Unlike the JSON property, which lets you write individual lines from the JSON document, SaveToJSON writes the entire text of the JSON document.}
+procedure TALJSONNode.SaveToJSONString(var str: AnsiString);
+begin
+  SaveToJson(nil, Str);
+end;
+
+{*****************************************************}
+procedure TALJSONNode.SaveToBson(const Stream: TStream;
+                                 Var buffer: ansiString);
+
+Const BufferSize: integer = 8192;
+
+Var NodeStack: Tstack;
+    NodeIndexStack: TALintegerList;
+    NodeStartPosStack: TALInt64List;
+    CurrentNode: TalJSONNode;
+    CurrentParentNode: TalJSONNode;
+    CurrentNodeIndex: integer;
+    CurrentNodeStartPos: System.int64;
+    BufferPos: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND};
+    StreamPos: system.int64;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
+  Begin
+    if assigned(Stream) then begin
+      If BufferLength > 0 then stream.Write(pointer(buffer)^,BufferLength);
+      BufferPos := 0;
+      StreamPos := stream.Position;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _Write2Buffer(const Source; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
+  Begin
+    if Count = 0 then exit;
+    if Count + BufferPos > length(Buffer) then setlength(Buffer, Count + BufferPos + BufferSize);
+    ALMove(Source, pbyte(Buffer)[BufferPos], Count);
+    BufferPos := BufferPos + Count;
+    if BufferPos >= 32768 then _WriteBuffer2Stream(Buffer,BufferPos);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStr2Buffer(const str:AnsiString); overload;
+  Begin
+    _Write2Buffer(pointer(str)^,length(Str));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStr2Buffer(const index:integer); overload;
+  Begin
+    _WriteStr2Buffer(alinttostr(index));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  //take care because fucking TStringStream (for exemple) do not permit
+  //to write previous to the current position (it's set the size of the
+  //new stream to the current position ... unbelievable!)
+  Procedure _WriteInt2Pos(const aInt:integer; const aPos: system.Int64);
+  Begin
+    if aPos < StreamPos then begin
+      Stream.position := aPos;
+      stream.Write(aInt,sizeof(aInt));
+      Stream.position := StreamPos;
+    end
+    else ALMove(aInt, Buffer[aPos - StreamPos + 1], sizeOf(aInt));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x01 + name + \x00 + double
+  Procedure _WriteFloatValue2Buffer(aTextNode:TALJSONNode);
+  var aDouble: Double;
+  begin
+    aDouble := aTextNode.Float;
+    _Write2Buffer(aDouble, sizeOf(aDouble));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x02 + name + \x00 + length (int32) + string + \x00
+  Procedure _WriteTextValue2Buffer(aTextNode:TALJSONNode);
+  var aInt32: system.int32;
+      aText: ansiString;
+  begin
+    aText := aTextNode.Text;
+    aInt32 := length(aText) + 1 {for the trailing #0};
+    _Write2Buffer(aInt32, sizeOf(aInt32));
+    _WriteStr2Buffer(aText);
+    _WriteStr2Buffer(#$00);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x05 + name + \x00 + int32 + subtype + (byte*)
+  Procedure _WriteBinaryValue2Buffer(aTextNode:TALJSONNode);
+  var aInt32: system.int32;
+      aBinary: ansiString;
+      aBinarySubType: Byte;
+  begin
+    aBinary := aTextNode.binary;
+    aBinarySubType := aTextNode.BinarySubType;
+    aInt32 := length(aBinary);
+    _Write2Buffer(aInt32, sizeOf(aInt32));
+    _Write2Buffer(aBinarySubType, sizeOF(aBinarySubType));
+    _WriteStr2Buffer(aBinary);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x07 + name + \x00 + (byte*12)
+  Procedure _WriteObjectIDValue2Buffer(aTextNode:TALJSONNode);
+  begin
+    _WriteStr2Buffer(aTextNode.ObjectID);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x08 + name + \x00 + \x00 => Boolean "false"
+  // \x08 + name + \x00 + \x01	=> Boolean "true"
+  Procedure _WriteBooleanValue2Buffer(aTextNode:TALJSONNode);
+  begin
+    if not aTextNode.bool then _WriteStr2Buffer(#$00)
+    else _WriteStr2Buffer(#$01);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x09 + name + \x00 + int64
+  Procedure _WriteDateTimeValue2Buffer(aTextNode:TALJSONNode);
+  var aInt64: system.Int64;
+  begin
+    aInt64 := ALDateTimeToUnixMs(aTextNode.DateTime);
+    _Write2Buffer(aInt64, sizeOf(aInt64));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x11 + name + \x00 + int64
+  Procedure _WriteTimestampValue2Buffer(aTextNode:TALJSONNode);
+  var aInt64: system.Int64;
+  begin
+    aInt64 := aTextNode.Timestamp.I64;
+    _Write2Buffer(aInt64, sizeOf(aInt64));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \xOB + name + \x00 + (byte*) + \x00 + (byte*) + \x00
+  Procedure _WriteRegExValue2Buffer(aTextNode:TALJSONNode);
+  var aRegExOptions: TALPerlRegExOptions;
+      aRegExOptionsStr: ansiString;
+  begin
+    aRegExOptionsStr := '';
+    aRegExOptions := aTextNode.RegExOptions;
+    if preCaseLess in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr + 'i';
+    if preMultiLine in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr +'m';
+    if preExtended in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr +'x';
+    //'l':;
+    if preSingleLine in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr + 's';
+    //'u':;
+    _WriteStr2Buffer(aTextNode.RegEx);
+    _WriteStr2Buffer(#$00);
+    _WriteStr2Buffer(aRegExOptionsStr);
+    _WriteStr2Buffer(#$00);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x0D + name + \x00 + length (int32) + string + \x00
+  Procedure _WriteJavascriptValue2Buffer(aTextNode:TALJSONNode);
+  var aInt32: system.int32;
+      aJavascript: ansiString;
+  begin
+    aJavascript := aTextNode.Javascript;
+    aInt32 := length(aJavascript) + 1 {for the trailing #0};
+    _Write2Buffer(aInt32, sizeOf(aInt32));
+    _WriteStr2Buffer(aJavascript);
+    _WriteStr2Buffer(#$00);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x10 + name + \x00 + int32
+  Procedure _WriteInt32Value2Buffer(aTextNode:TALJSONNode);
+  var aInt32: system.Int32;
+  begin
+    aInt32 := aTextNode.int32;
+    _Write2Buffer(aInt32, sizeOf(aInt32));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // \x12 + name + \x00 + int64
+  Procedure _WriteInt64Value2Buffer(aTextNode:TALJSONNode);
+  var aInt64: system.Int64;
+  begin
+    aInt64 := aTextNode.int64;
+    _Write2Buffer(aInt64, sizeOf(aInt64));
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteTextNode2Buffer(aTextNode:TALJSONNode; aNodeIndex: integer);
+  Begin
+    with aTextNode do begin
+
+      // write the node subtype
+      case NodeSubType of
+        // \x01 + name + \x00 + double
+        nstFloat: _WriteStr2Buffer(#$01);
+        // \x02 + name + \x00 + length (int32) + string + \x00
+        nstText: _WriteStr2Buffer(#$02);
+        // \x05 + name + \x00 + int32 + subtype + (byte*)
+        nstbinary: _WriteStr2Buffer(#$05);
+        // \x07 + name + \x00 + (byte*12)
+        nstObjectID: _WriteStr2Buffer(#$07);
+        // \x08 + name + \x00 + \x00 => Boolean "false"
+        // \x08 + name + \x00 + \x01	=> Boolean "true"
+        nstBoolean: _WriteStr2Buffer(#$08);
+        // \x09 + name + \x00 + int64
+        nstDateTime: _WriteStr2Buffer(#$09);
+        // \x11 + name + \x00 + int64
+        nstTimestamp: _WriteStr2Buffer(#$11);
+        // \x0A + name + \x00
+        nstNull: _WriteStr2Buffer(#$0A);
+        // \xOB + name + \x00 + (byte*) + \x00 + (byte*) + \x00
+        nstRegEx: _WriteStr2Buffer(#$0B);
+        // \x0D + name + \x00 + length (int32) + string + \x00
+        nstJavascript: _WriteStr2Buffer(#$0D);
+        // \x10 + name + \x00 + int32
+        nstInt32: _WriteStr2Buffer(#$10);
+        // \x12 + name + \x00 + int64
+        nstInt64: _WriteStr2Buffer(#$12);
+        else AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+      end;
+
+      // write the nodename
+      if (assigned(ParentNode)) and
+         (ParentNode.NodeType = ntArray) then _WriteStr2Buffer(aNodeIndex)
+      else _WriteStr2Buffer(NodeName);
+      _WriteStr2Buffer(#$00);
+
+      // add the nodevalue to the buffer
+      case NodeSubType of
+        nstFloat: _WriteFloatValue2Buffer(aTextNode);
+        nstText: _WriteTextValue2Buffer(aTextNode);
+        nstbinary: _WritebinaryValue2Buffer(aTextNode);
+        nstObjectID: _WriteObjectIDValue2Buffer(aTextNode);
+        nstBoolean: _WriteBooleanValue2Buffer(aTextNode);
+        nstDateTime: _WriteDateTimeValue2Buffer(aTextNode);
+        nstTimestamp: _WriteTimestampValue2Buffer(aTextNode);
+        nstNull:;
+        nstRegEx: _WriteRegExValue2Buffer(aTextNode);
+        nstJavascript: _WriteJavascriptValue2Buffer(aTextNode);
+        nstInt32: _WriteInt32Value2Buffer(aTextNode);
+        nstInt64: _WriteInt64Value2Buffer(aTextNode);
+        else AlJSONDocError(cALJSONInvalidBSONNodeSubType);
+      end;
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStartObjectNode2Buffer(aObjectNode:TALJSONNode; aNodeIndex: integer);
+  var ANodeList: TALJSONNodeList;
+      aEmptyNode: Boolean;
+      aPos: system.int64;
+      i: integer;
+  Begin
+    with aObjectNode do begin
+
+      if aObjectNode = self then _WriteStr2Buffer(#$00#$00#$00#$00)
+      else if (assigned(ParentNode)) and
+              (ParentNode.NodeType = ntArray) then begin
+        _WriteStr2Buffer(#$03);
+        _WriteStr2Buffer(aNodeIndex);
+        _WriteStr2Buffer(#$00#$00#$00#$00#$00);
+      end
+      else begin
+        _WriteStr2Buffer(#$03);
+        _WriteStr2Buffer(NodeName);
+        _WriteStr2Buffer(#$00#$00#$00#$00#$00);
+      end;
+
+      aPos := StreamPos + BufferPos - 4{length of the #$00#$00#$00#$00};
+
+      aEmptyNode := True;
+      aNodeList := InternalGetChildNodes;
+      If assigned(aNodeList) then begin
+        with aNodeList do
+          If count > 0 then begin
+            aEmptyNode := False;
+            NodeStack.Push(aObjectNode);
+            NodeIndexStack.Push(aNodeIndex);
+            NodeStartPosStack.Push(aPos);
+            For i := Count - 1 downto 0 do begin
+              NodeStack.Push(Nodes[i]);
+              NodeIndexStack.Push(i);
+              NodeStartPosStack.Push(-1);
+            end;
+          end
+      end;
+
+      If aEmptyNode then begin
+        _WriteStr2Buffer(#$00);
+        _WriteInt2Pos(5{length of the object},aPos);
+      end;
+
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteEndObjectNode2Buffer(aObjectNode:TALJSONNode; aNodeStartPos: system.Int64);
+  Begin
+    _WriteStr2Buffer(#$00);
+    _WriteInt2Pos(StreamPos + BufferPos - aNodeStartPos, aNodeStartPos);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteStartArrayNode2Buffer(aArrayNode:TALJSONNode; aNodeIndex: integer);
+  var ANodeList: TALJSONNodeList;
+      aEmptyNode: Boolean;
+      aPos: system.int64;
+      i: integer;
+  Begin
+    with aArrayNode do begin
+
+      if (assigned(ParentNode)) and
+         (ParentNode.NodeType = ntArray) then begin
+        _WriteStr2Buffer(#$04);
+        _WriteStr2Buffer(aNodeIndex);
+        _WriteStr2Buffer(#$00#$00#$00#$00#$00);
+      end
+      else begin
+        _WriteStr2Buffer(#$04);
+        _WriteStr2Buffer(NodeName);
+        _WriteStr2Buffer(#$00#$00#$00#$00#$00);
+      end;
+
+      aPos := StreamPos + BufferPos - 4{length of the #$00+#$00+#$00+#$00};
+
+      aEmptyNode := True;
+      aNodeList := InternalGetChildNodes;
+      If assigned(aNodeList) then begin
+        with aNodeList do
+          If count > 0 then begin
+            aEmptyNode := False;
+            NodeStack.Push(aArrayNode);
+            NodeIndexStack.Push(aNodeIndex);
+            NodeStartPosStack.Push(aPos);
+            For i := Count - 1 downto 0 do begin
+              NodeStack.Push(Nodes[i]);
+              NodeIndexStack.Push(i);
+              NodeStartPosStack.Push(-1);
+            end;
+          end
+      end;
+
+      If aEmptyNode then begin
+        _WriteStr2Buffer(#$00);
+        _WriteInt2Pos(5{length of the object},aPos);
+      end;
+
+    end;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Procedure _WriteEndArrayNode2Buffer(aArrayNode:TALJSONNode; aNodeStartPos: system.Int64);
+  Begin
+    _WriteStr2Buffer(#$00);
+    _WriteInt2Pos(StreamPos + BufferPos - aNodeStartPos, aNodeStartPos);
+  end;
+
+begin
+  If NodeType <> ntobject then exit;
+
+  CurrentParentNode := nil;
+  NodeStack := Tstack.Create;
+  NodeIndexStack := TALintegerList.Create;
+  NodeStartPosStack := TALInt64List.Create;
+  Try
+
+    {init buffer string}
+    Setlength(Buffer, BufferSize); // will make buffer uniquestring
+    BufferPos := 0;
+    if assigned(Stream) then StreamPos := Stream.Position
+    else StreamPos := 0;
+
+    {SaveOnlyChildNode}
+    NodeStack.Push(self);
+    NodeIndexStack.Push(0);
+    NodeStartPosStack.Push(StreamPos);
+
+
+    {loop on all nodes}
+    While NodeStack.Count > 0 Do begin
+      CurrentNode := TAlJSONNode(NodeStack.Pop);
+      CurrentNodeIndex := integer(NodeIndexStack.Pop);
+      CurrentNodeStartPos := integer(NodeStartPosStack.Pop);
+
+      with CurrentNode do
+        case NodeType of
+          ntObject: begin
+                      if currentNode = CurrentParentNode then _WriteEndObjectNode2Buffer(CurrentNode, CurrentNodeStartPos)
+                      else _WriteStartObjectNode2Buffer(CurrentNode, CurrentNodeIndex);
+                    end;
+          ntArray: begin
+                      if currentNode = CurrentParentNode then _WriteEndArrayNode2Buffer(CurrentNode, CurrentNodeStartPos)
+                      else _WriteStartArrayNode2Buffer(CurrentNode, CurrentNodeIndex);
+                   end;
+          ntText: _WriteTextNode2Buffer(CurrentNode, CurrentNodeIndex);
+          else AlJSONDocError(cAlJSONInvalidNodeType);
+        end;
+
+      CurrentParentNode := CurrentNode.ParentNode;
+    end;
+
+    {Write the buffer}
+    if assigned(Stream) then _WriteBuffer2Stream(Buffer, BufferPos)
+    else setlength(Buffer,BufferPos);
+
+  finally
+    NodeStack.Free;
+    NodeIndexStack.Free;
+    NodeStartPosStack.Free;
+  end;
+end;
+
+{************************************************************}
+procedure TALJSONNode.SaveToBsonStream(const Stream: TStream);
+var buffer: ansiString;
+begin
+  SaveToBson(Stream, buffer);
+end;
+
+{***************************************************************}
+procedure TALJSONNode.SaveToBsonFile(const FileName: AnsiString);
+Var afileStream: TfileStream;
+begin
+  aFileStream := TfileStream.Create(String(FileName),fmCreate);
+  Try
+    SaveToBsonStream(aFileStream);
+  finally
+    aFileStream.Free;
+  end;
+end;
+
+{**********************************************************}
+procedure TALJSONNode.SaveToBsonString(var str: AnsiString);
+begin
+  SaveToBson(nil, Str);
+end;
+
+{*****************************************************************************************************}
+procedure TALJSONNode.LoadFromJSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
 Begin
-  If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
+  If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,GetNodeType);
   if ClearChildNodes then ChildNodes.Clear;
   Try
-    if BSONStream then FDocument.ParseBSONStream(Stream, self)
-    else FDocument.ParseJSONStream(Stream, self);
+    FDocument.ParseJson(nil, Str, self)
   except
     ChildNodes.Clear;
     raise;
   end;
 end;
 
-{*********************************************************************************************}
-procedure TALJSONNode.SaveToFile(const AFileName: AnsiString; const BSONFile: boolean = False);
-Var afileStream: TfileStream;
-begin
-  aFileStream := TfileStream.Create(String(AFileName),fmCreate);
+{***********************************************************************************************}
+procedure TALJSONNode.LoadFromJSONStream(Stream: TStream; Const ClearChildNodes: Boolean = True);
+Begin
+  If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,GetNodeType);
+  if ClearChildNodes then ChildNodes.Clear;
   Try
-    SaveToStream(aFileStream, BSONFile);
+    FDocument.ParseJSON(Stream, '', self)
+  except
+    ChildNodes.Clear;
+    raise;
+  end;
+end;
+
+{********************************************************************************************************}
+procedure TALJSONNode.LoadFromJSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
+Var afileStream: TfileStream;
+Begin
+  aFileStream := TfileStream.Create(string(FileName), fmOpenRead or fmShareDenyWrite);
+  Try
+    LoadFromJSONStream(aFileStream, ClearChildNodes);
   finally
     aFileStream.Free;
   end;
 end;
 
-{**************************************************************************************************************************************}
-procedure TALJSONNode.LoadFromFile(const AFileName: AnsiString; const BSONFile: boolean = False; Const ClearChildNodes: Boolean = True);
+{*****************************************************************************************************}
+procedure TALJSONNode.LoadFromBSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
+Begin
+  If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,GetNodeType);
+  if ClearChildNodes then ChildNodes.Clear;
+  Try
+    FDocument.ParseBSON(nil, Str, self)
+  except
+    ChildNodes.Clear;
+    raise;
+  end;
+end;
+
+{***********************************************************************************************}
+procedure TALJSONNode.LoadFromBSONStream(Stream: TStream; Const ClearChildNodes: Boolean = True);
+Begin
+  If NodeType <> ntObject then ALJsonDocError(CALJsonOperationError,GetNodeType);
+  if ClearChildNodes then ChildNodes.Clear;
+  Try
+    FDocument.ParseBSON(Stream, '', self)
+  except
+    ChildNodes.Clear;
+    raise;
+  end;
+end;
+
+{********************************************************************************************************}
+procedure TALJSONNode.LoadFromBSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
 Var afileStream: TfileStream;
 Begin
-  aFileStream := TfileStream.Create(string(AFileName), fmOpenRead or fmShareDenyWrite);
+  aFileStream := TfileStream.Create(string(FileName), fmOpenRead or fmShareDenyWrite);
   Try
-    LoadFromStream(aFileStream, BSONFile, ClearChildNodes);
+    LoadFromBSONStream(aFileStream, ClearChildNodes);
   finally
     aFileStream.Free;
-  end;
-end;
-
-{*****************************************************}
-procedure TALJSONNode.SaveToJSON(var JSON: AnsiString);
-Var aStringStream: TALStringStream;
-begin
-  aStringStream := TALStringStream.Create('');
-  Try
-    SaveToStream(aStringStream, false {BSONStream});
-    JSON := aStringStream.DataString;
-  finally
-    aStringStream.Free;
-  end;
-end;
-
-{*****************************************************}
-procedure TALJSONNode.SaveToBSON(var BSON: AnsiString);
-Var aStringStream: TALStringStream;
-begin
-  aStringStream := TALStringStream.Create('');
-  Try
-    SaveToStream(aStringStream, True {BSONStream});
-    BSON := aStringStream.DataString;
-  finally
-    aStringStream.Free;
-  end;
-end;
-
-{************************************************************************************************}
-procedure TALJSONNode.LoadFromJSON(const JSON: AnsiString; Const ClearChildNodes: Boolean = True);
-Var aStringStream: TALStringStream;
-Begin
-  aStringStream := TALStringStream.Create(JSON);
-  Try
-    LoadFromStream(aStringStream, False {BSONStream}, ClearChildNodes);
-  finally
-    aStringStream.Free;
-  end;
-end;
-
-{************************************************************************************************}
-procedure TALJSONNode.LoadFromBSON(const BSON: AnsiString; Const ClearChildNodes: Boolean = True);
-Var aStringStream: TALStringStream;
-Begin
-  aStringStream := TALStringStream.Create(BSON);
-  Try
-    LoadFromStream(aStringStream, True {BSONStream}, ClearChildNodes);
-  finally
-    aStringStream.Free;
   end;
 end;
 
@@ -3868,12 +5120,6 @@ end;
 function TALJSONObjectNode.GetNodeSubType: TALJSONNodeSubType;
 begin
   Result := NstObject;
-end;
-
-{**************************************************************************}
-procedure TALJSONObjectNode.SetNodeSubType(const Value: TALJSONNodeSubType);
-begin
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
 end;
 
 {********************************************}
@@ -3923,12 +5169,6 @@ begin
   Result := NstArray;
 end;
 
-{*************************************************************************}
-procedure TALJSONArrayNode.SetNodeSubType(const Value: TALJSONNodeSubType);
-begin
-  ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr])
-end;
-
 {********************************************}
 {Get Childnode without create it if not exist}
 function TALJSONArrayNode.InternalGetChildNodes: TALJSONNodeList;
@@ -3941,10 +5181,12 @@ constructor TALJSONTextNode.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
   fNodeSubType := nstText;
-  fNodeValue := '';
+  fNodeValueStr := '';
+  FnodeValueInt64 := 0;
+  fNodeValueDefined := [nvStr];
 end;
 
-{**************************************************}
+{****************************************************}
 function TALJSONTextNode.GetNodeType: TALJSONNodeType;
 begin
   Result := NtText;
@@ -3956,24 +5198,118 @@ begin
   Result := fNodeSubType;
 end;
 
-{************************************************************************}
-procedure TALJSONTextNode.SetNodeSubType(const Value: TALJSONNodeSubType);
+{***************************************************}
+function TALJSONTextNode.GetNodeValueStr: ansiString;
 begin
-  if Value in [nstObject, nstArray] then ALJsonDocError(CALJsonOperationError,[GetNodeTypeStr]);
-  fNodeSubType := Value;
+  if nvStr in fNodeValueDefined then result := fNodeValueStr
+  else begin
+
+    if not (nvInt64 in fNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
+
+    case fNodeSubType of
+      nstFloat: ALFloatToStr(GetFloat, fNodeValueStr, ALDefaultFormatSettings);
+      //nstText: can not be retrieve from int64
+      //nstObject: can not be retrieve from int64
+      //nstArray: can not be retrieve from int64
+      //nstBinary: only the binarysubtype is store in int64
+      //nstObjectID: can not be retrieve from int64
+      nstBoolean: ALBoolToStr(fNodeValueStr, getBool, 'true', 'false');
+      nstDateTime: ALDateTimeToStr(GetDateTime, fNodeValueStr, ALDefaultFormatSettings);
+      nstNull: fNodeValueStr := 'null';
+      //nstRegEx: only the regex option is store in the int64
+      //nstJavascript: can not be retrieve from int64
+      nstInt32: ALintToStr(GetInt32, fNodeValueStr);
+      nstTimestamp: ALformat('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fNodeValueStr);
+      nstInt64: ALintToStr(GetInt64, fNodeValueStr);
+      else ALJsonDocError(CALJsonOperationError,GetNodeType);
+    end;
+
+    fNodeValueDefined := fNodeValueDefined + [nvStr];
+    result := fNodeValueStr;
+
+  end;
 end;
 
 {************************************************}
-function TALJSONTextNode.GetNodeValue: ansiString;
+function TALJSONTextNode.GetNodeValueInt64: int64;
+var aDouble: Double;
+    aBool: boolean;
+    aDateTime: TdateTime;
+    aInt32: system.int32;
+    aTimestamp: TALBSONTimestamp;
 begin
-  result := fNodeValue;
+  if nvInt64 in fNodeValueDefined then result := fNodeValueInt64
+  else begin
+
+    if not (nvStr in fNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
+
+    case fNodeSubType of
+      nstFloat: begin
+                  IF not ALTryStrToFloat(fNodeValueStr, aDouble, ALDefaultFormatSettings) then ALJSONDocError('%s is not a valid Float', [fNodeValueStr]);
+                  fNodeValueInt64 := Pint64(@aDouble)^;
+                end;
+      //nstText: can not be retrieve from int64
+      //nstObject: can not be retrieve from int64
+      //nstArray: can not be retrieve from int64
+      //nstBinary: only the binarysubtype is store in int64
+      //nstObjectID: can not be retrieve from int64
+      nstBoolean: begin
+                    IF not ALTryStrToBool(fNodeValueStr, aBool) then ALJSONDocError('%s is not a valid Boolean', [fNodeValueStr]);
+                    fNodeValueInt64 := ALBoolToInt(aBool);
+                  end;
+      nstDateTime: begin
+                     IF not ALTryStrToDateTime(fNodeValueStr, aDateTime, ALdefaultFormatSettings) then ALJSONDocError('%s is not a valid Datetime', [fNodeValueStr]);
+                     fNodeValueInt64 := Pint64(@aDateTime)^;
+                   end;
+      nstNull:  begin
+                  fNodeValueInt64 := 0;
+                end;
+      //nstRegEx: only the regex option is store in the int64
+      //nstJavascript: can not be retrieve from int64
+      nstInt32: begin
+                  IF not ALTryStrToInt(fNodeValueStr, aInt32) then ALJSONDocError('%s is not a valid Int32', [fNodeValueStr]);
+                  fNodeValueInt64 := aInt32;
+                end;
+      nstTimestamp: begin
+                      IF not ALJSONTryStrToTimestamp(fNodeValueStr, aTimestamp) then ALJSONDocError('%s is not a valid Timestamp', [fNodeValueStr]);
+                      fNodeValueInt64 := aTimestamp.I64;
+                    end;
+      nstInt64: begin
+                  IF not ALTryStrToInt64(fNodeValueStr, fNodeValueInt64) then ALJSONDocError('%s is not a valid Int64', [fNodeValueStr]);
+                end;
+      else ALJsonDocError(CALJsonOperationError,GetNodeType);
+    end;
+
+    fNodeValueDefined := fNodeValueDefined + [nvInt64];
+    result := fNodeValueInt64;
+
+  end;
 end;
 
 {*****************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
-  fNodeValue := Value;
+  fNodeValueStr := Value;
+  fNodeValueDefined := [nvStr];
+end;
+
+{************************************************************************************************}
+procedure TALJSONTextNode.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
+begin
+  fNodeSubType := NodeSubType;
+  fNodeValueInt64 := Value;
+  if (NodeSubType in [nstBinary, nstRegEx]) then fNodeValueDefined := fNodeValueDefined + [nvInt64] // keep the fNodeValueStr
+  else fNodeValueDefined := [nvInt64];
+end;
+
+{*********************************************************************************************************************************}
+procedure TALJSONTextNode.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
+begin
+  fNodeSubType := NodeSubType;
+  fNodeValueStr := StrValue;
+  fNodeValueInt64 := Int64Value;
+  fNodeValueDefined := [nvStr, nvInt64];
 end;
 
 {*****************************************************}
@@ -4338,12 +5674,11 @@ begin
   aALJsonDocument := TALJsonDocument.Create(aFormatSettings);
   try
 
-    aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const str: AnsiString; const NodeSubType: TALJSONNodeSubType)
+    aALJsonDocument.onParseText := procedure (Sender: TObject; const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType)
                                    begin
-                                     if (NodeSubType = nstBoolean) and (ALSameText(str, 'true')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aTrueStr)
-                                     else if (NodeSubType = nstBoolean) and (ALSameText(str, 'false')) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aFalseStr)
+                                     if (NodeSubType = nstBoolean)   then aLst.Add(aPath + Path + aLst.NameValueSeparator + ALBoolToStr(Args[0].VBoolean,aTrueStr,aFalseStr))
                                      else if (NodeSubType = nstnull) then aLst.Add(aPath + Path + aLst.NameValueSeparator + aNullStr)
-                                     else aLst.Add(aPath+ Path + aLst.NameValueSeparator + str);
+                                     else                                 aLst.Add(aPath + Path + aLst.NameValueSeparator + ansiString(Args[0].VAnsiString));
                                      aContainChilds := True;
                                    end;
 
@@ -4369,7 +5704,7 @@ begin
                                          aContainChilds := True;
                                        end;
 
-    aALJsonDocument.LoadFromJSON(AJsonStr, true{saxMode});
+    aALJsonDocument.LoadFromJSONString(AJsonStr, true{saxMode});
   finally
     aALJsonDocument.Free;
   end;
@@ -4431,10 +5766,7 @@ begin
                                   aFalseStr);
 
         ntText: begin
-                  if (aJsonNode.ChildNodes[i].NodeSubType = nstBoolean) then begin
-                    if aJsonNode.ChildNodes[i].Bool then                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aTrueStr)
-                    else                                                       aLst.Add(aTmpPath + aLst.NameValueSeparator + aFalseStr);
-                  end
+                  if (aJsonNode.ChildNodes[i].NodeSubType = nstBoolean) then   aLst.Add(aTmpPath + aLst.NameValueSeparator + ALBoolToStr(aJsonNode.ChildNodes[i].Bool,aTrueStr,aFalseStr))
                   else if (aJsonNode.ChildNodes[i].NodeSubType = nstnull) then aLst.Add(aTmpPath + aLst.NameValueSeparator + aNullStr)
                   else                                                         aLst.Add(aTmpPath + aLst.NameValueSeparator + aJsonNode.ChildNodes[i].Text);
                 end;
@@ -4625,10 +5957,7 @@ begin
                    end;
     nstBoolean:    if ALStrToBool(aValue) then result := 'true'
                    else result := 'false';
-    nstDateTime:   begin
-                     if ALPos('ISODate', aValue) <= 0 then result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTime(aValue, aFormatSettings), ALDefaultFormatSettings)
-                     else result := aValue;
-                   end;
+    nstDateTime:   result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTime(aValue, aFormatSettings), ALDefaultFormatSettings);
     nstJavascript: result := aValue;
     nstInt32:      result := 'NumberInt(' + ALIntToStr(ALstrToInt(aValue)) + ')';
     nstInt64:      result := 'NumberLong(' + ALIntToStr(ALstrToInt64(aValue)) + ')';
@@ -4647,6 +5976,7 @@ initialization
   _cALJsonISODateFormatSettings.TimeSeparator := ':';
   _cALJsonISODateFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
   _cALJsonISODateFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
+  vALDefaultNodeIndent := '  '; { 2 spaces }
 
 
 end.

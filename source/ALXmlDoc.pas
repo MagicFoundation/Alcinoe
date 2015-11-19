@@ -135,8 +135,10 @@ const
   CALVersion            = 'version';
   CALEncoding           = 'encoding';
   CALStandalone         = 'standalone';
-  CALDefaultNodeIndent  = '  '; { 2 spaces }
   CALXmlDocument        = 'DOCUMENT';
+
+var
+  vALDefaultNodeIndent: ansiString; // var instead of const to avoid new ansitring on assign
 
 type
 
@@ -149,13 +151,13 @@ type
   TAlXMLParseDocument = reference to procedure (Sender: TObject);
   TAlXMLParseProcessingInstructionEvent = reference to procedure (Sender: TObject; const Path, Target, Data: AnsiString);
   TAlXMLParseTextEvent = reference to procedure (Sender: TObject; const Path, Str: AnsiString);
-  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings);
+  TAlXMLParseStartElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
   TAlXMLParseEndElementEvent = reference to procedure (Sender: TObject; const Path, Name: AnsiString);
   {$ELSE}
   TAlXMLParseDocument = procedure (Sender: TObject) of object;
   TAlXMLParseProcessingInstructionEvent = procedure (Sender: TObject; const Path, Target, Data: AnsiString) of object;
   TAlXMLParseTextEvent = procedure (Sender: TObject; const Path, Str: AnsiString) of object;
-  TAlXMLParseStartElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings) of object;
+  TAlXMLParseStartElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings) of object;
   TAlXMLParseEndElementEvent = procedure (Sender: TObject; const Path, Name: AnsiString) of object;
   {$IFEND}
 
@@ -655,7 +657,7 @@ type
     FNodeIndentStr: AnsiString;
     FOptions: TALXMLDocOptions;
     FParseOptions: TALXMLParseOptions;
-    fPathSeparator: AnsiString;
+    fPathSeparator: ansiChar;
     FOnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent; // [added from TXMLDocument]
     FOnParseStartDocument: TAlXMLParseDocument; // [added from TXMLDocument]
     FOnParseEndDocument: TAlXMLParseDocument; // [added from TXMLDocument]
@@ -707,7 +709,7 @@ type
     procedure DoParseProcessingInstruction(const Path, Target, Data: AnsiString); // [added from TXMLDocument]
     procedure DoParseStartDocument; // [added from TXMLDocument]
     procedure DoParseEndDocument; // [added from TXMLDocument]
-    procedure DoParseStartElement(const Path, Name: AnsiString; const Attributes: TALStrings); // [added from TXMLDocument]
+    procedure DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStrings); // [added from TXMLDocument]
     procedure DoParseEndElement(const Path, Name: AnsiString); // [added from TXMLDocument]
     procedure DoParseText(const Path, Str: AnsiString); // [added from TXMLDocument]
     procedure DoParseComment(const Path, Str: AnsiString); // [added from TXMLDocument]
@@ -724,8 +726,8 @@ type
     function GetNodeIndentStr: AnsiString;
     function GetOptions: TALXMLDocOptions;
     function GetParseOptions: TALXMLParseOptions;
-    function GetPathSeparator: AnsiString;
-    procedure SetPathSeparator(const Value: AnsiString);
+    function GetPathSeparator: AnsiChar;
+    procedure SetPathSeparator(const Value: ansiChar);
     function GetStandAlone: AnsiString;
     function GetVersion: AnsiString;
     function GetXML: AnsiString; //[Replace from TXMLDocument] function GetXML: TALStrings;
@@ -767,6 +769,7 @@ type
     constructor Create(const aActive: Boolean = True); overload; virtual; //[Replace from TXMLDocument]  constructor Create
     constructor Create(const Rootname:AnsiString; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr); overload; virtual; // [added from TXMLDocument]
     destructor Destroy; override;
+    procedure MultiThreadPrepare; // [added from TXMLDocument]
     procedure Clear(const Rootname:AnsiString; const EncodingStr: AnsiString = cAlXMLUTF8EncodingStr); // [added from TXMLDocument]
     function AddChild(const TagName: AnsiString): TALXMLNode;
     function CreateElement(const TagOrData: AnsiString): TALXMLNode;  //[Replace from TXMLDocument] function CreateElement(const TagOrData, NamespaceURI: AnsiString): TALXMLNode;
@@ -788,7 +791,7 @@ type
     property NodeIndentStr: AnsiString read GetNodeIndentStr write SetNodeIndentStr;
     property Options: TALXMLDocOptions read GetOptions write SetOptions;
     property ParseOptions: TALXMLParseOptions read GetParseOptions write SetParseOptions;
-    property PathSeparator: AnsiString read GetPathSeparator write SetPathSeparator;
+    property PathSeparator: ansiChar read GetPathSeparator write SetPathSeparator;
     property XML: AnsiString read GetXML write SetXML;
     property OnParseProcessingInstruction: TAlXMLParseProcessingInstructionEvent read FOnParseProcessingInstruction write FOnParseProcessingInstruction; // [added from TXMLDocument]
     property OnParseStartDocument: TAlXMLParseDocument read FOnParseStartDocument write FOnParseStartDocument; // [added from TXMLDocument]
@@ -877,7 +880,7 @@ begin
   SepPos := ALPos(CALNSDelim,Aname);
   if SepPos > 0 then begin
     setlength(Result,SepPos - 1);
-    ALMove(aName[1], Result[1], SepPos - 1);
+    ALMove(pointer(aName)^, pointer(Result)^, SepPos - 1);
   end
   else result := '';
 end;
@@ -895,12 +898,12 @@ begin
   if SepPos > 0 then begin
     aLength := Length(Aname) - seppos;
     setlength(Result,aLength);
-    ALMove(aName[SepPos + 1], Result[1], aLength); // faster than system.move
+    ALMove(pbyte(aName)[SepPos], pointer(Result)^, aLength);
   end
   else begin
     aLength := Length(Aname);
     setlength(Result,aLength);
-    ALMove(aName[1], Result[1], aLength); // faster than system.move
+    ALMove(pointer(aName)^, pointer(Result)^, aLength);
   end;
 end;
 
@@ -993,7 +996,7 @@ begin
   FonParseComment:= nil;
   FonParseCData:= nil;
   FOptions := [];
-  NodeIndentStr := CALDefaultNodeIndent;
+  NodeIndentStr := vALDefaultNodeIndent;
   FTag := 0;
   SetActive(aActive);
 end;
@@ -1014,6 +1017,26 @@ destructor TALXMLDocument.Destroy;
 begin
   ReleaseDoc;
   inherited;
+end;
+
+{****************************************************************************}
+//will create all the nodelist to be sure that multiple thread can safely read
+//at the same time the Xmldocument
+procedure TALXMLDocument.MultiThreadPrepare;
+
+  procedure _doMultiThreadPrepare(aNode: TalXmlNode);
+  var i: integer;
+  begin
+    If assigned(ANode.ChildNodes) then  // aNode.ChildNodes will create the nodelist
+      For i := 0 to aNode.ChildNodes.Count - 1 do
+        _doMultiThreadPrepare(aNode.ChildNodes[i]);
+    If assigned(ANode.attributeNodes) then  // aNode.attributeNodes will create the nodelist
+      For i := 0 to aNode.attributeNodes.Count - 1 do
+        _doMultiThreadPrepare(aNode.attributeNodes[i]);
+  end;
+
+begin
+  _doMultiThreadPrepare(DocumentElement);
 end;
 
 {***************************************************************************************************************}
@@ -1055,9 +1078,10 @@ Procedure TALXMLDocument.ParseXmlStream(RawXmlStream: TStream;
                                         StreamContainOnlyChildNodes: Boolean=False);
 
 Const BufferSize: integer = 8192;
-Var RawXmlString: AnsiString;
-    RawXmlStringLength: Integer;
-    RawXmlStringPos: Integer;
+
+Var buffer: AnsiString;
+    bufferLength: Integer;
+    bufferPos: Integer;
     PreserveWhiteSpace: Boolean;
     LstParams: TALStringList;
     NotSaxMode: Boolean;
@@ -1068,30 +1092,30 @@ Var RawXmlString: AnsiString;
     CodePage: Word;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function ExpandRawXmlString: boolean;
+  function Expandbuffer: boolean;
   Var ByteReaded, Byte2Read: Integer;
   Begin
-    If (RawXmlStringLength > 0) and (RawXmlStringPos > 1) then begin
-      if (RawXmlStringPos > RawXmlStringLength) then RawXmlStream.Position := RawXmlStream.Position - RawXmlStringLength + RawXmlStringPos - 1;
-      Byte2Read := min(RawXmlStringPos - 1, RawXmlStringLength);
-      if RawXmlStringPos <= length(RawXmlString) then ALMove(RawXmlString[RawXmlStringPos],
-                                                             RawXmlString[1],
-                                                             RawXmlStringLength-RawXmlStringPos+1);
-      RawXmlStringPos := 1;
+    If (bufferLength > 0) and (bufferPos > 1) then begin
+      if (bufferPos > bufferLength) then RawXmlStream.Position := RawXmlStream.Position - bufferLength + bufferPos - 1;
+      Byte2Read := min(bufferPos - 1, bufferLength);
+      if bufferPos <= length(buffer) then ALMove(Pbyte(Buffer)[BufferPos - 1],
+                                                 pointer(Buffer)^,
+                                                 bufferLength-bufferPos+1); // no uniqueString will be call in this variant
+      bufferPos := 1;
     end
     else begin
       Byte2Read := BufferSize;
-      RawXmlStringLength := RawXmlStringLength + BufferSize;
-      SetLength(RawXmlString, RawXmlStringLength);
+      bufferLength := bufferLength + BufferSize;
+      SetLength(buffer, bufferLength);
     end;
 
     //range check error is we not do so
-    if RawXmlStream.Position < RawXmlStream.Size then ByteReaded := RawXmlStream.Read(RawXmlString[RawXmlStringLength - Byte2Read + 1],Byte2Read)
+    if RawXmlStream.Position < RawXmlStream.Size then ByteReaded := RawXmlStream.Read(Pbyte(Buffer)[BufferLength - Byte2Read{+ 1 - 1}],Byte2Read)
     else ByteReaded := 0;
 
     If ByteReaded <> Byte2Read then begin
-      RawXmlStringLength := RawXmlStringLength - Byte2Read + ByteReaded;
-      SetLength(RawXmlString, RawXmlStringLength);
+      bufferLength := bufferLength - Byte2Read + ByteReaded;
+      SetLength(buffer, bufferLength);
       Result := ByteReaded > 0;
     end
     else result := True;
@@ -1100,11 +1124,11 @@ Var RawXmlString: AnsiString;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function PosInXmlString(const Substr: AnsiString; Offset: integer = 1): integer;
   Begin
-    Result := ALPosEx(Substr,RawXmlString,OffSet);
+    Result := ALPosEx(Substr,buffer,OffSet);
     While (Result <= 0) do begin
-      Offset := RawXmlStringlength - RawXmlStringPos + 3 - length(Substr);
-      If not ExpandRawXmlString then break;
-      Result := ALPosEx(Substr,RawXmlString,offset);
+      Offset := bufferlength - bufferPos + 3 - length(Substr);
+      If not Expandbuffer then break;
+      Result := ALPosEx(Substr,buffer,offset);
     end;
   end;
 
@@ -1169,14 +1193,15 @@ Var RawXmlString: AnsiString;
   function GetPathStr(Const ExtraItems: ansiString = ''): ansiString;
   var I, L, Size, Count: Integer;
       P: PAnsiChar;
-      S, LB: AnsiString;
+      LB: AnsiChar;
+      S: AnsiString;
   begin
     Count := Paths.Count;
     LB := PathSeparator;
     Size := length(ExtraItems);
-    if size <> 0 then Inc(Size, Length(LB));
-    for I := 0 to Count - 1 do Inc(Size, Length(Paths[I]) + Length(LB));
-    if size <> 0 then dec(Size, Length(LB));
+    if size <> 0 then Inc(Size, sizeOF(LB));
+    for I := 0 to Count - 1 do Inc(Size, Length(Paths[I]) + sizeOF(LB));
+    if size <> 0 then dec(Size, sizeOF(LB));
     SetLength(Result, Size);
     P := Pointer(Result);
     for I := 0 to Count - 1 do begin
@@ -1186,9 +1211,9 @@ Var RawXmlString: AnsiString;
         ALMove(Pointer(S)^, P^, L);
         Inc(P, L);
       end;
-      L := Length(LB);
+      L := sizeOF(LB);
       if (L <> 0) and ((i <> Count - 1) or (ExtraItems <> '')) then begin
-        ALMove(Pointer(LB)^, P^, L);
+        ALMove(LB, P^, L);
         Inc(P, L);
       end;
     end;
@@ -1205,13 +1230,13 @@ Var RawXmlString: AnsiString;
   Begin
     { <?name?>...
       <?name content?>... }
-    P2 := PosInXmlString('?>', RawXmlStringPos + 2);
+    P2 := PosInXmlString('?>', bufferPos + 2);
     If P2 > 0 then begin
 
-      P1 := CharPosInString([' ',#9,#13,#10],RawXmlString, RawXmlStringPos+2);
+      P1 := CharPosInString([' ',#9,#13,#10],buffer, bufferPos+2);
       If (P1 <= 0) or (P1 > P2) then P1 := P2;
-      aName := ALCopyStr(RawXmlString,RawXmlStringPos + 2,P1-RawXmlStringPos - 2);
-      aContent := ALCopyStr(RawXmlString,P1+1,P2-P1-1);
+      aName := ALCopyStr(buffer,bufferPos + 2,P1-bufferPos - 2);
+      aContent := ALCopyStr(buffer,P1+1,P2-P1-1);
       If NotSaxMode then begin
         if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
         If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
@@ -1223,11 +1248,11 @@ Var RawXmlString: AnsiString;
       //      syntax has often resulted in it being referred to as a processing instruction
       if ((not notSaxMode) or
           (ContainerNode.NodeType=ntDocument)) and
-         (RawXmlStringPos in [1,4{UTF8 BOOM}]) then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, aContent, ''));
+         (bufferPos in [1,4{UTF8 BOOM}]) then CodePage := ALGetCodePageFromCharSetName(ALExtractAttrValue(CALEncoding, aContent, ''));
 
       DoParseProcessingInstruction(GetPathStr(aName), aName, aContent);
 
-      RawXmlStringPos := P2 + 2;
+      bufferPos := P2 + 2;
 
     end
     else ALXmlDocError(CALXmlParseError);
@@ -1238,10 +1263,10 @@ Var RawXmlString: AnsiString;
   Var P1: Integer;
   Begin
     { <!DOCTYPE ....> }
-    P1 := PosInXmlString('>', RawXmlStringPos + 9);
+    P1 := PosInXmlString('>', bufferPos + 9);
     If P1 > 0 then begin
       //not yet implemented - simply skip the tag
-      RawXmlStringPos := P1 + 1;
+      bufferPos := P1 + 1;
     end
     else ALXmlDocError(CALXmlParseError);
   end;
@@ -1252,16 +1277,16 @@ Var RawXmlString: AnsiString;
       aContent: AnsiString;
   Begin
     { <!-- name -->... }
-    P1 := PosInXmlString('-->',RawXmlStringPos + 4);
+    P1 := PosInXmlString('-->',bufferPos + 4);
     If P1 > 0 then begin
-      aContent := ALCopyStr(RawXmlString,RawXmlStringPos + 4,P1-RawXmlStringPos - 4);
+      aContent := ALCopyStr(buffer,bufferPos + 4,P1-bufferPos - 4);
       if NotSaxMode then begin
         if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
         If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
         WorkingNode.ChildNodes.Add(CreateNode(acontent, ntcomment, ''));
       end;
       DoParseComment(GetPathStr, aContent);
-      RawXmlStringPos := P1 + 3;
+      bufferPos := P1 + 3;
     end
     else ALXmlDocError(CALXmlParseError);
   end;
@@ -1272,16 +1297,16 @@ Var RawXmlString: AnsiString;
       aContent: AnsiString;
   Begin
     { <![CDATA[...]]> }
-    P1 := PosInXmlString(']]>',RawXmlStringPos + 9);
+    P1 := PosInXmlString(']]>',bufferPos + 9);
     If P1 > 0 then begin
-      aContent := ALCopyStr(RawXmlString,RawXmlStringPos + 9,P1-RawXmlStringPos - 9);
+      aContent := ALCopyStr(buffer,bufferPos + 9,P1-bufferPos - 9);
       if NotSaxMode then begin
         if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
         If UseContainerNodeInsteadOfAddingChildNode then ALXmlDocError(CALXmlParseError); // because if not we need to delete and recreate the container node and this can cause trouble in the calling function
         WorkingNode.ChildNodes.Add(CreateNode(acontent, ntcdata, ''));
       end;
       DoParseCdata(GetPathStr, aContent);
-      RawXmlStringPos := P1 + 3;
+      bufferPos := P1 + 3;
     end
     else ALXmlDocError(CALXmlParseError);
   end;
@@ -1300,12 +1325,12 @@ Var RawXmlString: AnsiString;
     //<name/>...
     //<name attrname="attrvalue"/>...
     //</name>...
-    P1 := PosInXmlString('>',RawXmlStringPos + 1);
+    P1 := PosInXmlString('>',bufferPos + 1);
     If P1 > 0 then begin
 
       //end tag
-      If RawXmlString[RawXmlStringPos + 1] = '/' then begin
-        aName := ALtrimRight(ALCopyStr(RawXmlString,RawXmlStringPos + 2,P1-RawXmlStringPos - 2));
+      If buffer[bufferPos + 1] = '/' then begin
+        aName := ALtrimRight(ALCopyStr(buffer,bufferPos + 2,P1-bufferPos - 2));
         if (Paths.Count = 0) or
            (Paths[paths.Count - 1] <> aName) then ALXmlDocError(CALXmlParseError);
         if NotSaxMode then begin
@@ -1316,23 +1341,23 @@ Var RawXmlString: AnsiString;
         end;
         DoParseEndElement(GetPathStr, aName);
         paths.Delete(paths.Count - 1);
-        RawXmlStringPos := P1 + 1;
+        bufferPos := P1 + 1;
         exit;
       end;
 
       //tag is enclosed?
-      If (RawXmlString[P1-1] = '/') then Begin
+      If (buffer[P1-1] = '/') then Begin
         TagEnclosed := True;
         dec(P1);
       end
       else TagEnclosed := False;
 
-      P2 := CharPosInString([' ',#9,#13,#10],RawXmlString,RawXmlStringPos + 1);
+      P2 := CharPosInString([' ',#9,#13,#10],buffer,bufferPos + 1);
       If (P2 <= 0) or (P2 > P1) then P2 := P1;
 
-      aName := ALCopyStr(RawXmlString,RawXmlStringPos + 1,P2-RawXmlStringPos - 1);
+      aName := ALCopyStr(buffer,bufferPos + 1,P2-bufferPos - 1);
       if (aName = '') or (aName[1] = #0) then ALXmlDocError(CALXmlParseError); // mean it's an UTF-16 encoding not yet supported
-      aContent := ALCopyStr(RawXmlString,P2+1,P1-P2-1);
+      aContent := ALCopyStr(buffer,P2+1,P1-P2-1);
 
       if NotSaxMode then begin
         if not assigned(WorkingNode) then ALXmlDocError(CALXmlParseError);
@@ -1392,11 +1417,11 @@ Var RawXmlString: AnsiString;
           Paths.AddObject(aName, WorkingNode);
         end
         else Paths.Add(aName);
-        RawXmlStringPos := P1+1;
+        bufferPos := P1+1;
       end
       else begin
         DoParseEndElement(GetPathStr(aName), aName);
-        RawXmlStringPos := P1+2;
+        bufferPos := P1+2;
       end;
 
     end
@@ -1408,10 +1433,10 @@ Var RawXmlString: AnsiString;
   Var P1: Integer;
       Str1: AnsiString;
   Begin
-    P1 := PosInXmlString('<',RawXmlStringPos);
-    If (P1<=0) then P1 := RawXmlStringLength + 1;
+    P1 := PosInXmlString('<',bufferPos);
+    If (P1<=0) then P1 := bufferLength + 1;
 
-    Str1 := ALCopyStr(RawXmlString,RawXmlStringPos,P1-RawXmlStringPos);
+    Str1 := ALCopyStr(buffer,bufferPos,P1-bufferPos);
     If (PreserveWhiteSpace) or (ALTrim(Str1) <> '') then Begin
 
       if DecodeXmlReferences then begin
@@ -1432,7 +1457,7 @@ Var RawXmlString: AnsiString;
 
     end;
 
-    RawXmlStringPos := P1;
+    bufferPos := P1;
   end;
 
 Begin
@@ -1459,44 +1484,44 @@ Begin
     DecodeXmlReferences := not (poIgnoreXmlReferences in ParseOptions);
     if NotSaxMode then CodePage := ALGetCodePageFromCharSetName(Encoding)
     else CodePage := 0;
-    RawXmlString := '';
-    RawXmlStringLength := 0;
-    RawXmlStringPos := 1;
-    ExpandRawXmlString;
-    if AlUTF8DetectBOM(PansiChar(RawXmlString),length(RawXmlString)) then RawXmlStringPos := 4;
+    buffer := '';
+    bufferLength := 0;
+    bufferPos := 1;
+    Expandbuffer;
+    if AlUTF8DetectBOM(PansiChar(buffer),length(buffer)) then bufferPos := 4;
 
-    While RawXmlStringPos <= RawXmlStringLength do begin
+    While bufferPos <= bufferLength do begin
 
-      If RawXmlString[RawXmlStringPos] = '<' then begin
-             If (RawXmlStringPos < RawXmlStringLength) and
-                (RawXmlString[RawXmlStringPos + 1] = '?') then AnalyzePI
-        else if (RawXmlStringPos + 2 < RawXmlStringLength) and
-                (RawXmlString[RawXmlStringPos + 1] = '!') and
-                (RawXmlString[RawXmlStringPos + 2] = '-') and
-                (RawXmlString[RawXmlStringPos + 3] = '-') then AnalyzeComment
-        else if (RawXmlStringPos + 7 < RawXmlStringLength) and
-                (RawXmlString[RawXmlStringPos + 1] = '!') and
-                (RawXmlString[RawXmlStringPos + 2] = '[') and
-                (RawXmlString[RawXmlStringPos + 3] = 'C') and
-                (RawXmlString[RawXmlStringPos + 4] = 'D') and
-                (RawXmlString[RawXmlStringPos + 5] = 'A') and
-                (RawXmlString[RawXmlStringPos + 6] = 'T') and
-                (RawXmlString[RawXmlStringPos + 7] = 'A') and
-                (RawXmlString[RawXmlStringPos + 8] = '[') then AnalyzeCData
-        else if (RawXmlStringPos + 7 < RawXmlStringLength) and
-                (RawXmlString[RawXmlStringPos + 1] = '!') and
-                (RawXmlString[RawXmlStringPos + 2] = 'D') and
-                (RawXmlString[RawXmlStringPos + 3] = 'O') and
-                (RawXmlString[RawXmlStringPos + 4] = 'C') and
-                (RawXmlString[RawXmlStringPos + 5] = 'T') and
-                (RawXmlString[RawXmlStringPos + 6] = 'Y') and
-                (RawXmlString[RawXmlStringPos + 7] = 'P') and
-                (RawXmlString[RawXmlStringPos + 8] = 'E') then AnalyzeDOCTYPE
+      If buffer[bufferPos] = '<' then begin
+             If (bufferPos < bufferLength) and
+                (buffer[bufferPos + 1] = '?') then AnalyzePI
+        else if (bufferPos + 2 < bufferLength) and
+                (buffer[bufferPos + 1] = '!') and
+                (buffer[bufferPos + 2] = '-') and
+                (buffer[bufferPos + 3] = '-') then AnalyzeComment
+        else if (bufferPos + 7 < bufferLength) and
+                (buffer[bufferPos + 1] = '!') and
+                (buffer[bufferPos + 2] = '[') and
+                (buffer[bufferPos + 3] = 'C') and
+                (buffer[bufferPos + 4] = 'D') and
+                (buffer[bufferPos + 5] = 'A') and
+                (buffer[bufferPos + 6] = 'T') and
+                (buffer[bufferPos + 7] = 'A') and
+                (buffer[bufferPos + 8] = '[') then AnalyzeCData
+        else if (bufferPos + 7 < bufferLength) and
+                (buffer[bufferPos + 1] = '!') and
+                (buffer[bufferPos + 2] = 'D') and
+                (buffer[bufferPos + 3] = 'O') and
+                (buffer[bufferPos + 4] = 'C') and
+                (buffer[bufferPos + 5] = 'T') and
+                (buffer[bufferPos + 6] = 'Y') and
+                (buffer[bufferPos + 7] = 'P') and
+                (buffer[bufferPos + 8] = 'E') then AnalyzeDOCTYPE
         else AnalyzeTag
       end
       else AnalyzeText;
 
-      if RawXmlStringPos + 7 >= RawXmlStringLength then ExpandRawXmlString;
+      if bufferPos + 7 >= bufferLength then Expandbuffer;
 
     end;
 
@@ -1796,14 +1821,14 @@ begin
   FParseOptions := Value;
 end;
 
-{*****************************************************************}
-procedure TALXMLDocument.SetPathSeparator(const Value: AnsiString);
+{***************************************************************}
+procedure TALXMLDocument.SetPathSeparator(const Value: AnsiChar);
 begin
   FPathSeparator := Value;
 end;
 
-{***************************************************}
-function TALXMLDocument.GetPathSeparator: AnsiString;
+{*************************************************}
+function TALXMLDocument.GetPathSeparator: ansiChar;
 begin
   result := fPathSeparator;
 end;
@@ -1961,8 +1986,8 @@ begin
   if Assigned(FOnParseStartDocument) then FOnParseStartDocument(Self);
 end;
 
-{*******************************************************************************************************}
-procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; const Attributes: TALStrings);
+{*************************************************************************************************}
+procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStrings);
 begin
   if Assigned(FOnParseStartElement) then FOnParseStartElement(Self, Path, Name, Attributes);
 end;
@@ -2774,14 +2799,10 @@ Var aNodeList: TALXMLNodeList;
 begin
   aNodeList := InternalGetChildNodes;
   Result := (NodeType=NtElement) and
-            (
-             (not assigned(aNodeList)) or
+            ((not assigned(aNodeList)) or
              (aNodeList.Count = 0) or // because NodeList could be created on first access to ChildNodes like Node.ChildNodes.Count for example
-             (
-              (aNodeList.Count = 1) and
-              (aNodeList[0].nodetype in [ntText, ntCData])
-             )
-            );
+             ((aNodeList.Count = 1) and
+              (aNodeList[0].nodetype in [ntText, ntCData])));
 end;
 
 {*******************************************************}
@@ -3589,9 +3610,7 @@ procedure TALXMLNodeList.Insert(Index: Integer; const Node: TALXMLNode);
     for I := 1 to Len do IndentStr := IndentStr + Owner.OwnerDocument.NodeIndentStr;
     if Break then IndentStr := SLineBreak + IndentStr;
     with Owner do
-      IndentNode := ALCreateXmlNode(IndentStr,
-                                    ntText,
-                                    '');
+      IndentNode := ALCreateXmlNode(IndentStr, ntText, '');
     InternalInsert(Index, IndentNode);
   end;
 
@@ -3627,9 +3646,7 @@ var Node: TALXMLNode;
 begin
   Node := Get(Index);
   Dec(FCount);
-  if Index < FCount then ALMove(FList^[Index + 1],
-                                FList^[Index],
-                                (FCount - Index) * SizeOf(Pointer));
+  if Index < FCount then ALMove(FList^[Index + 1], FList^[Index], (FCount - Index) * SizeOf(Pointer));
   if assigned(Node) then FreeAndNil(Node);
   result := Index;
 end;
@@ -3852,5 +3869,8 @@ Begin
     end;
   end;
 end;
+
+initialization
+  vALDefaultNodeIndent := '  '; { 2 spaces }
 
 end.

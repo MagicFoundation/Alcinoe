@@ -59,12 +59,6 @@ type
     ArticleIDEdit: TEdit;
     ButtonLast: TButton;
     ButtonPost: TButton;
-    Panel1: TPanel;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure FormCreate(Sender: TObject);
     procedure NextButtonClick(Sender: TObject);
     procedure ConnectButtonClick(Sender: TObject);

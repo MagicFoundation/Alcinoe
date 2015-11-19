@@ -10,7 +10,6 @@ uses
 
 type
   TForm1 = class(TForm)
-    Panel1: TPanel;
     ALMemoResult: TMemo;
     Label6: TLabel;
     Label24: TLabel;
@@ -35,11 +34,6 @@ type
     OpenDialog2: TOpenDialog;
     Button1: TButton;
     Button2: TButton;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ALButtonSqlLite3SelectClick(Sender: TObject);
     procedure ALButtonSqlite3UpdateClick(Sender: TObject);
     procedure ALButtonSqlLite3VacuumClick(Sender: TObject);

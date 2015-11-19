@@ -89,7 +89,6 @@ type
     Label3: TcxLabel;
     EditSendDelayBetweenEachSend: tcxtextedit;
     Label5: TcxLabel;
-    Panel2: TPanel;
     TableViewThreadDNS: TcxGridColumn;
     TableViewThreadConnect: TcxGridColumn;
     TableViewThreadReceive: TcxGridColumn;
@@ -99,11 +98,6 @@ type
     dxSkinController1: TdxSkinController;
     cxStyleRepository1: TcxStyleRepository;
     cxStyle1: TcxStyle;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ButtonStartClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TableViewThreadDownloadSpeedGetDisplayText(Sender: TcxCustomGridTableItem; ARecord: TcxCustomGridRecord; var AText: String);

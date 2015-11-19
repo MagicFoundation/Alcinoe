@@ -429,13 +429,17 @@ function  ALIfThen(AValue: Boolean; const ATrue: Single; const AFalse: Single): 
 function  ALIfThen(AValue: Boolean; const ATrue: Double; const AFalse: Double): Double; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
 function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extended): Extended; overload; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
 function  ALFormat(const Format: AnsiString; const Args: array of const): AnsiString; overload;
+procedure ALFormat(const Format: AnsiString; const Args: array of const; var Result: ansiString); overload;
 function  ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString; overload;
+procedure ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings; var Result: ansiString); overload;
 function  ALTryStrToBool(const S: Ansistring; out Value: Boolean): Boolean;
 Function  AlStrToBool(Value:AnsiString):Boolean;
-function  ALBoolToStr(B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'): Ansistring;
+function  ALBoolToStr(B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'): Ansistring; overload;
+procedure ALBoolToStr(var s: ansiString; B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0'); overload;
 function  ALDateToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
-function  ALDateTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
+function  ALDateTimeToStr(const DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString; overload;
+procedure ALDateTimeToStr(const DateTime: TDateTime; var s: ansiString; const AFormatSettings: TALFormatSettings); overload;
 function  ALFormatDateTime(const Format: AnsiString; DateTime: TDateTime; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALTryStrToDate(const S: AnsiString; out Value: TDateTime; const AFormatSettings: TALFormatSettings): Boolean;
 function  ALStrToDate(const S: AnsiString; const AFormatSettings: TALFormatSettings): TDateTime;
@@ -450,7 +454,10 @@ function  ALTryStrToInt64(const S: AnsiString; out Value: Int64): Boolean;
 function  ALStrToInt64(const S: AnsiString): Int64;
 function  ALStrToInt64Def(const S: AnsiString; const Default: Int64): Int64;
 function  ALIntToStr(Value: Integer): AnsiString; overload;
+procedure ALIntToStr(Value: Integer; var s: ansiString); overload;
 function  ALIntToStr(Value: Int64): AnsiString; overload;
+procedure ALIntToStr(Value: Int64; var s: ansiString); overload;
+
 {$IFDEF UNICODE}
 function  ALStrToUInt64(const S: ansistring): UInt64; overload;
 function  ALStrToUInt64Def(const S: ansistring; const Default: UInt64): UInt64; overload;
@@ -473,7 +480,8 @@ Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
 Function  ALIsFloat (const S: AnsiString; const AFormatSettings: TALFormatSettings): Boolean;
-function  ALFloatToStr(Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;
+function  ALFloatToStr(Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString; overload;
+procedure ALFloatToStr(Value: Extended; var S: ansiString; const AFormatSettings: TALFormatSettings); overload;
 function  ALCurrToStr(Value: Currency; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALFormatFloat(const Format: AnsiString; Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALFormatCurr(const Format: AnsiString; Value: Currency; const AFormatSettings: TALFormatSettings): AnsiString;
@@ -517,9 +525,10 @@ function  ALIncludeTrailingPathDelimiter(const S: AnsiString; const PathDelimite
 function  ALExcludeTrailingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 function  ALIncludeLeadingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
 function  ALExcludeLeadingPathDelimiter(const S: AnsiString; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): AnsiString;
-procedure ALMove(const Source; var Dest; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
+var ALMove: procedure (const Source; var Dest; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
 procedure ALStrMove(const Source: PAnsiChar; var Dest: PAnsiChar; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
 function  ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString; overload;
+procedure ALCopyStr(const aSourceString: AnsiString; var aDestString: ansiString; aStart, aLength: Integer); overload;
 function  ALCopyStr(const aSourceString: AnsiString;
                     const aStartStr: AnsiString;
                     const aEndStr: AnsiString;
@@ -659,6 +668,21 @@ function  ALExtractExpression(const S: AnsiString;
                               Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
                               var StartPos: integer;
                               var EndPos: integer): boolean;
+function  ALHTTPDecode(const AStr: AnsiString): AnsiString;
+procedure ALExtractHeaderFields(Separators,
+                                WhiteSpace,
+                                Quotes: TSysCharSet;
+                                Content: PAnsiChar;
+                                Strings: TALStrings;
+                                HttpDecode: Boolean;
+                                StripQuotes: Boolean = False);
+procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
+                                                WhiteSpace,
+                                                Quotes: TSysCharSet;
+                                                Content: PAnsiChar;
+                                                Strings: TALStrings;
+                                                HttpDecode: Boolean;
+                                                StripQuotes: Boolean = False);
 
 Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF16LittleEndianBom = ansiString(#$FF) + ansiString(#$FE);
@@ -675,7 +699,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
        System.RegularExpressionsConsts,
        System.Ansistrings,
        System.Character,
-       System.Math,
+       System.Math;
      {$ELSE}
        SysConst,
        RTLConsts,
@@ -685,9 +709,8 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
        {$ELSE}
          Strutils,
        {$ENDIF}
-       Math,
+       Math;
      {$IFEND}
-     AlHTTPClient;
 
 {*****************************************************}
 constructor EALException.Create(const Msg: AnsiString);
@@ -713,7 +736,13 @@ function TALStringStream.Read(var Buffer; Count: Longint): Longint;
 begin
   Result := Length(FDataString) - FPosition;
   if Result > Count then Result := Count;
-  ALMove(PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Buffer, Result * SizeOf(AnsiChar));
+
+  // a little modification from the original TStringStream
+  // because in original we will have a call to uniqueString on FDataString :(
+  // https://forums.embarcadero.com/thread.jspa?threadID=119103
+  // ALMove(PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Buffer, Result * SizeOf(AnsiChar));
+  ALMove(Pbyte(FDataString)[FPosition + SizeOf(AnsiChar) - 1], Buffer, Result * SizeOf(AnsiChar));
+
   Inc(FPosition, Result);
 end;
 
@@ -723,7 +752,8 @@ begin
   Result := Count;
 
   // a little modification from the original TStringStream
-  // because in original it's crazy we can not update the datastring !!
+  // because in original it's crazy we can not update part inside the datastring !!
+  // SetLength(FDataString, (FPosition + Result));
   if FPosition + Result > length(FDataString) then SetLength(FDataString, (FPosition + Result));
 
   ALMove(Buffer, PAnsiChar(@FDataString[FPosition + SizeOf(AnsiChar)])^, Result * SizeOf(AnsiChar));
@@ -4407,8 +4437,24 @@ begin
   Result := ALFormat(Format, Args, ALDefaultFormatSettings);
 end;
 
+{***********************************************************************************************}
+procedure ALFormat(const Format: AnsiString; const Args: array of const; var Result: ansiString);
+begin
+  Result := ALFormat(Format, Args, ALDefaultFormatSettings);
+end;
+
 {****************************************************************************************************************************}
 function ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings): AnsiString;
+begin
+  {$IFDEF UNICODE}
+  ALFmtStr(Result, Format, Args, AFormatSettings);
+  {$ELSE}
+  Result := sysutils.Format(Format, Args, AFormatSettings);
+  {$ENDIF}
+end;
+
+{*****************************************************************************************************************************************}
+procedure ALFormat(const Format: AnsiString; const Args: array of const; const AFormatSettings: TALFormatSettings; var Result: ansiString);
 begin
   {$IFDEF UNICODE}
   ALFmtStr(Result, Format, Args, AFormatSettings);
@@ -4451,6 +4497,13 @@ function  ALBoolToStr(B: Boolean; const trueStr: ansistring='1'; const falseStr:
 begin
   if B then result := trueStr
   else result := falseStr;
+end;
+
+{******************************************************************************************************************}
+procedure ALBoolToStr(var s: ansiString; B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0');
+begin
+  if B then s := trueStr
+  else s := falseStr;
 end;
 
 {**************}
@@ -4924,6 +4977,16 @@ begin
   ALDateTimeToString(Result, '', DateTime, AFormatSettings);
   {$ELSE}
   Result := DateTimeToStr(DateTime, AFormatSettings);
+  {$ENDIF}
+end;
+
+{****************************************************************************************************************}
+procedure ALDateTimeToStr(const DateTime: TDateTime; var s: ansiString; const AFormatSettings: TALFormatSettings);
+begin
+  {$IFDEF UNICODE}
+  ALDateTimeToString(s, '', DateTime, AFormatSettings);
+  {$ELSE}
+  s := DateTimeToStr(DateTime, AFormatSettings);
   {$ENDIF}
 end;
 
@@ -6106,6 +6169,21 @@ begin
 end;
 {$ENDIF}
 
+{******************************************************}
+procedure ALIntToStr(Value: Integer; var s: ansiString);
+{$IFDEF UNICODE}
+begin
+  if Value < 0 then
+    s := _ALIntToStr32(-Value, True)
+  else
+    s := _ALIntToStr32(Value, False);
+end;
+{$ELSE}
+begin
+  s := IntToStr(Value);
+end;
+{$ENDIF}
+
 {********************************************}
 function ALIntToStr(Value: Int64): AnsiString;
 {$IFDEF UNICODE}
@@ -6120,6 +6198,22 @@ begin
   result := IntToStr(Value);
 end;
 {$ENDIF}
+
+{****************************************************}
+procedure ALIntToStr(Value: Int64; var s: ansiString);
+{$IFDEF UNICODE}
+begin
+  if Value < 0 then
+    s := _ALIntToStr64(-Value, True)
+  else
+    s := _ALIntToStr64(Value, False);
+end;
+{$ELSE}
+begin
+  s := IntToStr(Value);
+end;
+{$ENDIF}
+
 
 {**************}
 {$IFDEF UNICODE}
@@ -6446,6 +6540,21 @@ end;
 {$ELSE}
 begin
   result := FloatToStr(Value, AFormatSettings);
+end;
+{$ENDIF}
+
+{***************************************************************************************************}
+procedure ALFloatToStr(Value: Extended; var S: ansiString; const AFormatSettings: TALFormatSettings);
+{$IFDEF UNICODE}
+var
+  Buffer: array[0..63] of AnsiChar;
+begin
+  SetString(S, Buffer, ALFloatToText(Buffer, Value, fvExtended,
+    ffGeneral, 15, 0, AFormatSettings));
+end;
+{$ELSE}
+begin
+  S := FloatToStr(Value, AFormatSettings);
 end;
 {$ENDIF}
 
@@ -8173,32 +8282,71 @@ end;
 
 {************************************************}
 function  ALTrim(const S: AnsiString): AnsiString;
+var
+  I, L: Integer;
 begin
-  {$IFDEF UNICODE}
-  Result := System.AnsiStrings.Trim(S);
-  {$ELSE}
-  Result := Trim(S);
-  {$ENDIF}
+  L := Length(S);
+  I := 1;
+  if (L > 0) and (S[I] > ' ') and (S[L] > ' ') then
+    {$if CompilerVersion >= 24}{Delphi XE3}
+    Exit(S);
+    {$ELSE}
+    begin
+      result := S;
+      exit;
+    end;
+    {$IFEND}
+  while (I <= L) and (S[I] <= ' ') do Inc(I);
+  if I > L then
+    {$if CompilerVersion >= 24}{Delphi XE3}
+    Exit('');
+    {$ELSE}
+    begin
+      result := '';
+      exit;
+    end;
+    {$IFEND}
+  while S[L] <= ' ' do Dec(L);
+  Result := ALCopyStr(S, I, L - I + 1);
 end;
 
 {****************************************************}
 function  ALTrimLeft(const S: AnsiString): AnsiString;
+var
+  I, L: Integer;
 begin
-  {$IFDEF UNICODE}
-  Result := System.AnsiStrings.TrimLeft(S);
-  {$ELSE}
-  Result := TrimLeft(S);
-  {$ENDIF}
+  L := Length(S);
+  I := 1;
+  while (I <= L) and (S[I] <= ' ') do Inc(I);
+  if I = 1 then
+    {$if CompilerVersion >= 24}{Delphi XE3}
+    Exit(S);
+    {$ELSE}
+    begin
+      result := S;
+      exit;
+    end;
+    {$IFEND}
+  Result := ALCopyStr(S, I, Maxint);
 end;
 
 {*****************************************************}
 function  ALTrimRight(const S: AnsiString): AnsiString;
+var
+  I: Integer;
 begin
-  {$IFDEF UNICODE}
-  Result := System.AnsiStrings.TrimRight(S);
-  {$ELSE}
-  Result := TrimRight(S);
-  {$ENDIF}
+  I := Length(S);
+  if (I > 0) and (S[I] > ' ') then
+    {$if CompilerVersion >= 24}{Delphi XE3}
+    Exit(S);
+    {$ELSE}
+    begin
+      result := S;
+      exit;
+    end;
+    {$IFEND}
+  while (I > 0) and (S[I] <= ' ') do Dec(I);
+  Result := ALCopyStr(S, 1, I);
 end;
 
 {*************************************************************************}
@@ -8383,12 +8531,6 @@ begin
   else result := S;
 end;
 
-{**********************************************************************************************************************}
-procedure ALMove(const Source; var Dest; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
-begin
-  System.Move(Source, Dest, Count);
-end;
-
 {***********************************************************************************************}
 // warning ALStrMove inverse the order of the original StrMove (to keep the same order as ALMove)
 procedure ALStrMove(const Source: PAnsiChar; var Dest: PAnsiChar; Count: {$if CompilerVersion >= 23}{Delphi XE2}NativeInt{$ELSE}Integer{$IFEND});
@@ -8557,8 +8699,28 @@ begin
 
   if aLength > aSourceStringLength - (aStart - 1) then aLength := aSourceStringLength - (aStart-1);
 
-  SetLength(Result,aLength);
-  ALMove(aSourceString[aStart], Result[1], aLength);
+  SetLength(Result,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
+  ALMove(Pbyte(aSourceString)[aStart-1], Pbyte(Result)[0], aLength); // Pbyte(aDestString)[0] to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
+end;
+
+{**********************************************************************************************************}
+procedure ALCopyStr(const aSourceString: AnsiString; var aDestString: ansiString; aStart, aLength: Integer);
+var aSourceStringLength: Integer;
+begin
+  aSourceStringLength := Length(aSourceString);
+  If (aStart < 1) then aStart := 1;
+
+  if (aSourceStringLength=0) or
+     (aLength < 1) or
+     (aStart > aSourceStringLength) then Begin
+    aDestString := '';
+    Exit;
+  end;
+
+  if aLength > aSourceStringLength - (aStart - 1) then aLength := aSourceStringLength - (aStart-1);
+
+  SetLength(aDestString,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
+  ALMove(Pbyte(aSourceString)[aStart-1], Pbyte(aDestString)[0], aLength);  // Pbyte(aDestString)[0] to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
 end;
 
 {**************************************************}
@@ -8720,7 +8882,7 @@ Const ResultBuffSize: integer = 16384;
         ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
         SetLength(Result, ResultCurrentLength);
       end;
-      AlMove(aSourceString[aStart], Result[ResultCurrentPos], aLength);
+      AlMove(pbyte(aSourceString)[aStart-1], pbyte(Result)[ResultCurrentPos-1], aLength);
       ResultCurrentPos := ResultCurrentPos + aLength;
     end;
 
@@ -8935,7 +9097,7 @@ Const ResultBuffSize: integer = 16384;
         ResultCurrentLength := ResultCurrentLength + aLength + ResultBuffSize;
         SetLength(Result, ResultCurrentLength);
       end;
-      AlMove(aSourceString[aStart], Result[ResultCurrentPos], aLength);
+      AlMove(pbyte(aSourceString)[aStart-1], pbyte(Result)[ResultCurrentPos-1], aLength);
       ResultCurrentPos := ResultCurrentPos + aLength;
     end;
 
@@ -10702,9 +10864,265 @@ begin
   result := EndPos <= length(S);
 end;
 
+{************************************************************}
+//the difference between this function and the delphi function
+//HttpApp.HttpDecode is that this function will not raise any
+//error (EConvertError) when the url will contain % that
+//are not encoded
+function ALHTTPDecode(const AStr: AnsiString): AnsiString;
+var Sp, Rp, Cp, Tp: PAnsiChar;
+    int: integer;
+    S: AnsiString;
+begin
+  SetLength(Result, Length(AStr));
+  Sp := PAnsiChar(AStr);
+  Rp := PAnsiChar(Result);
+  while Sp^ <> #0 do begin
+    case Sp^ of
+      '+': Rp^ := ' ';
+      '%': begin
+             Tp := Sp;
+             Inc(Sp);
+
+             //escaped % (%%)
+             if Sp^ = '%' then Rp^ := '%'
+
+             // %<hex> encoded character
+             else begin
+               Cp := Sp;
+               Inc(Sp);
+               if (Cp^ <> #0) and (Sp^ <> #0) then begin
+                 S := AnsiChar('$') + AnsiChar(Cp^) + AnsiChar(Sp^);
+                 if ALTryStrToInt(s,int) then Rp^ := ansiChar(int)
+                 else begin
+                   Rp^ := '%';
+                   Sp := Tp;
+                 end;
+               end
+               else begin
+                 Rp^ := '%';
+                 Sp := Tp;
+               end;
+             end;
+           end;
+      else Rp^ := Sp^;
+    end;
+    Inc(Rp);
+    Inc(Sp);
+  end;
+  SetLength(Result, Rp - PAnsiChar(Result));
+end;
+
+{********************************************************}
+{Parses a multi-valued string into its constituent fields.
+ ExtractHeaderFields is a general utility to parse multi-valued HTTP header strings into separate substrings.
+ * Separators is a set of characters that are used to separate individual values within the multi-valued string.
+ * WhiteSpace is a set of characters that are to be ignored when parsing the string.
+ * Content is the multi-valued string to be parsed.
+ * Strings is the TStrings object that receives the individual values that are parsed from Content.
+ * StripQuotes determines whether the surrounding quotes are removed from the resulting items. When StripQuotes is true, surrounding quotes are removed
+   before substrings are added to Strings.
+ Note:	Characters contained in Separators or WhiteSpace are treated as part of a value substring if the substring is surrounded by single or double quote
+ marks. HTTP escape characters are converted using the ALHTTPDecode function.}
+procedure ALExtractHeaderFields(Separators,
+                                WhiteSpace,
+                                Quotes: TSysCharSet;
+                                Content: PAnsiChar;
+                                Strings: TALStrings;
+                                HttpDecode: Boolean;
+                                StripQuotes: Boolean = False);
+
+var Head, Tail: PAnsiChar;
+    EOS, InQuote: Boolean;
+    QuoteChar: AnsiChar;
+    ExtractedField: AnsiString;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
+
+  {-------------------------------------------------------}
+  //as i don't want to add the parameter namevalueseparator
+  //to the function, we will stripquote only if the string end
+  //with the quote or start with the quote
+  //ex: "name"="value"  =>  name=value
+  //ex: "name"=value    =>  name=value
+  //ex: name="value"    =>  name=value
+  function DoStripQuotes(const S: AnsiString): AnsiString;
+  var I: Integer;
+      StripQuoteChar: AnsiChar;
+      canStripQuotesOnLeftSide: boolean;
+  begin
+    Result := S;
+    if StripQuotes then begin
+
+      canStripQuotesOnLeftSide := True;
+      if (length(result) > 0) and (result[length(result)] in quotes) then begin
+        StripQuoteChar := result[length(result)];
+        Delete(Result, length(result), 1);
+        i := Length(Result);
+        while i > 0 do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            canStripQuotesOnLeftSide := i > 1;
+            break;
+          end;
+          dec(i);
+        end;
+      end;
+
+      if (canStripQuotesOnLeftSide) and (length(result) > 0) and (result[1] in quotes) then begin
+        StripQuoteChar := result[1];
+        Delete(Result, 1, 1);
+        i := 1;
+        while i <= Length(Result) do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            break;
+          end;
+          inc(i);
+        end;
+      end;
+
+    end;
+  end;
+
+Begin
+  if (Content = nil) or (Content^ = #0) then Exit;
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
+  Tail := Content;
+  QuoteChar := #0;
+  repeat
+    while Tail^ in WhiteSpace do Inc(Tail);
+    Head := Tail;
+    InQuote := False;
+    while True do begin
+      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if Tail^ in Quotes then begin
+        if (QuoteChar <> #0) and (QuoteChar = Tail^) then QuoteChar := #0
+        else If QuoteChar = #0 then QuoteChar := Tail^;
+        InQuote := QuoteChar <> #0;
+        Inc(Tail);
+      end
+      else Break;
+    end;
+    EOS := Tail^ = #0;
+    if Head^ <> #0 then begin
+      SetString(ExtractedField, Head, Tail-Head);
+      if HttpDecode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
+      else Strings.Add(DoStripQuotes(ExtractedField));
+    end;
+    Inc(Tail);
+  until EOS;
+end;
+
+{**************************************************************************************}
+{same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
+procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
+                                                WhiteSpace,
+                                                Quotes: TSysCharSet;
+                                                Content: PAnsiChar;
+                                                Strings: TALStrings;
+                                                HttpDecode: Boolean;
+                                                StripQuotes: Boolean = False);
+
+var Head, Tail, NextTail: PAnsiChar;
+    EOS, InQuote: Boolean;
+    QuoteChar: AnsiChar;
+    ExtractedField: AnsiString;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
+
+  {-------------------------------------------------------}
+  //as i don't want to add the parameter namevalueseparator
+  //to the function, we will stripquote only if the string end
+  //with the quote or start with the quote
+  //ex: "name"="value"  =>  name=value
+  //ex: "name"=value    =>  name=value
+  //ex: name="value"    =>  name=value
+  function DoStripQuotes(const S: AnsiString): AnsiString;
+  var I: Integer;
+      StripQuoteChar: AnsiChar;
+      canStripQuotesOnLeftSide: boolean;
+  begin
+    Result := S;
+    if StripQuotes then begin
+
+      canStripQuotesOnLeftSide := True;
+      if (length(result) > 0) and (result[length(result)] in quotes) then begin
+        StripQuoteChar := result[length(result)];
+        Delete(Result, length(result), 1);
+        i := Length(Result);
+        while i > 0 do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
+            else begin
+              canStripQuotesOnLeftSide := i > 1;
+              break;
+            end;
+          end;
+          dec(i);
+        end;
+      end;
+
+      if (canStripQuotesOnLeftSide) and (length(result) > 0) and (result[1] in quotes) then begin
+        StripQuoteChar := result[1];
+        Delete(Result, 1, 1);
+        i := 1;
+        while i <= Length(Result) do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            if (i < Length(Result)) and (Result[I+1] = StripQuoteChar) then inc(i)
+            else break;
+          end;
+          inc(i);
+        end;
+      end;
+
+    end;
+  end;
+
+Begin
+  if (Content = nil) or (Content^ = #0) then Exit;
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
+  Tail := Content;
+  QuoteChar := #0;
+  repeat
+    while Tail^ in WhiteSpace do Inc(Tail);
+    Head := Tail;
+    InQuote := False;
+    while True do begin
+      while (InQuote and not (Tail^ in QuotesWithNulChar)) or not (Tail^ in SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if Tail^ in Quotes then begin
+        if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
+          NextTail := Tail + 1;
+          if NextTail^ = Tail^ then inc(tail)
+          else QuoteChar := #0;
+        end
+        else If QuoteChar = #0 then QuoteChar := Tail^;
+        InQuote := QuoteChar <> #0;
+        Inc(Tail);
+      end
+      else Break;
+    end;
+    EOS := Tail^ = #0;
+    if Head^ <> #0 then begin
+      SetString(ExtractedField, Head, Tail-Head);
+      if HttpDecode then Strings.Add(ALHTTPDecode(DoStripQuotes(ExtractedField)))
+      else Strings.Add(DoStripQuotes(ExtractedField));
+    end;
+    Inc(Tail);
+  until EOS;
+end;
+
 
 initialization
   ALPosExIgnoreCaseInitialiseLookupTable;
   ALGetLocaleFormatSettings(1033{en-US}, ALDefaultFormatSettings);
-
+  {$IF CompilerVersion >= 23} {Delphi XE2}
+  ALMove := @System.Move;
+  {$else}
+  ALMove := @Move;
+  {$ifend}
 end.

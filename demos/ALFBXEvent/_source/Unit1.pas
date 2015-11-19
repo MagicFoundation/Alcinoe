@@ -42,14 +42,8 @@ type
     ALMemoFireBirdEventName: TMemo;
     Label1: TLabel;
     OpenDialog2: TOpenDialog;
-    Panel2: TPanel;
     Button2: TButton;
     Button1: TButton;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton2Click(Sender: TObject);
     procedure ALEditFirebirdLibButtonClick(Sender: TObject);

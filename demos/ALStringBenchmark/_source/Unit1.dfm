@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 445
   Top = 202
   Caption = 'Form1'
-  ClientHeight = 775
+  ClientHeight = 569
   ClientWidth = 763
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -140,109 +140,13 @@ object Form1: TForm1
     TabOrder = 13
     OnClick = ALButton14Click
   end
-  object Panel2: TPanel
-    Left = 16
-    Top = 569
-    Width = 345
-    Height = 153
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Color = clSilver
-    Ctl3D = False
-    ParentBackground = False
-    ParentCtl3D = False
-    TabOrder = 14
-    object cxLabel1: TcxLabel
-      Left = 12
-      Top = 12
-      Hint = ''
-      Caption = 'Please help us to keep the development of these components free'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 242
-    end
-    object cxLabel2: TcxLabel
-      Left = 12
-      Top = 55
-      Hint = ''
-      Caption = 'If you like these components please go to:'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 240
-    end
-    object cxWwwArkadiaComLabel: TcxLabel
-      Left = 12
-      Top = 71
-      Cursor = crHandPoint
-      Hint = ''
-      Caption = 'http://www.arkadia.com'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clRed
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = [fsBold]
-      Style.TextColor = clMaroon
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      OnClick = cxWwwArkadiaComLabelClick
-      Width = 160
-    end
-    object cxLabel18: TcxLabel
-      Left = 12
-      Top = 88
-      Hint = ''
-      Caption = 'and click on the Facebook/Google+ like button'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 261
-    end
-    object cxLabel17: TcxLabel
-      Left = 12
-      Top = 120
-      Hint = ''
-      Caption = 'Thanks for your support !'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 144
-    end
-  end
   object ALButton15: TButton
     Left = 16
     Top = 240
     Width = 230
     Height = 25
     Caption = 'Benchmark ALIntToStr (AnsiString)'
-    TabOrder = 15
+    TabOrder = 14
     OnClick = ALButton15Click
   end
   object ALButton16: TButton
@@ -251,7 +155,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi IntToStr (Unicode)'
-    TabOrder = 16
+    TabOrder = 15
     OnClick = ALButton16Click
   end
   object ALButton17: TButton
@@ -260,7 +164,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALStrToInt (AnsiString)'
-    TabOrder = 17
+    TabOrder = 16
     OnClick = ALButton17Click
   end
   object ALButton18: TButton
@@ -269,7 +173,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToInt (Unicode)'
-    TabOrder = 18
+    TabOrder = 17
     OnClick = ALButton18Click
   end
   object ALButton19: TButton
@@ -278,7 +182,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALStrToInt64 (AnsiString)'
-    TabOrder = 19
+    TabOrder = 18
     OnClick = ALButton19Click
   end
   object ALButton20: TButton
@@ -287,7 +191,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToInt64 (Unicode)'
-    TabOrder = 20
+    TabOrder = 19
     OnClick = ALButton20Click
   end
   object ALButton21: TButton
@@ -296,7 +200,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALDateToStr (AnsiString)'
-    TabOrder = 21
+    TabOrder = 20
     OnClick = ALButton21Click
   end
   object ALButton22: TButton
@@ -305,7 +209,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi DateToStr (Unicode)'
-    TabOrder = 22
+    TabOrder = 21
     OnClick = ALButton22Click
   end
   object ALButton23: TButton
@@ -314,7 +218,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark AnsiString Memory Usage'
-    TabOrder = 23
+    TabOrder = 22
     OnClick = ALButton23Click
   end
   object ALButton24: TButton
@@ -323,7 +227,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark UnicodeString Memory Usage'
-    TabOrder = 24
+    TabOrder = 23
     OnClick = ALButton24Click
   end
   object ALButton25: TButton
@@ -332,7 +236,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALFloatToStr (AnsiString)'
-    TabOrder = 25
+    TabOrder = 24
     OnClick = ALButton25Click
   end
   object ALButton26: TButton
@@ -341,7 +245,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi FloatToStr (Unicode)'
-    TabOrder = 26
+    TabOrder = 25
     OnClick = ALButton26Click
   end
   object ALButton27: TButton
@@ -350,7 +254,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALStrToDateTime (AnsiString)'
-    TabOrder = 27
+    TabOrder = 26
     OnClick = ALButton27Click
   end
   object ALButton28: TButton
@@ -359,7 +263,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToDateTime (Unicode)'
-    TabOrder = 28
+    TabOrder = 27
     OnClick = ALButton28Click
   end
   object ALButton29: TButton
@@ -368,7 +272,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StringReplace (AnsiString)'
-    TabOrder = 29
+    TabOrder = 28
     OnClick = ALButton29Click
   end
   object ALButton30: TButton
@@ -377,7 +281,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi PosEx (AnsiString)'
-    TabOrder = 30
+    TabOrder = 29
     OnClick = ALButton30Click
   end
   object ALButton31: TButton
@@ -386,7 +290,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi Pos (AnsiString)'
-    TabOrder = 31
+    TabOrder = 30
     OnClick = ALButton31Click
   end
   object ALButton32: TButton
@@ -395,7 +299,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi CompareText (AnsiString)'
-    TabOrder = 32
+    TabOrder = 31
     OnClick = ALButton32Click
   end
   object ALButton33: TButton
@@ -404,7 +308,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi UpperCase (AnsiString)'
-    TabOrder = 33
+    TabOrder = 32
     OnClick = ALButton33Click
   end
   object ALButton34: TButton
@@ -413,7 +317,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi LowerCase (AnsiString)'
-    TabOrder = 34
+    TabOrder = 33
     OnClick = ALButton34Click
   end
   object ALButton35: TButton
@@ -422,7 +326,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi Copy (AnsiString)'
-    TabOrder = 35
+    TabOrder = 34
     OnClick = ALButton35Click
   end
   object ALButton36: TButton
@@ -431,7 +335,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi IntToStr (AnsiString)'
-    TabOrder = 36
+    TabOrder = 35
     OnClick = ALButton36Click
   end
   object ALButton37: TButton
@@ -440,7 +344,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToInt (AnsiString)'
-    TabOrder = 37
+    TabOrder = 36
     OnClick = ALButton37Click
   end
   object ALButton38: TButton
@@ -449,7 +353,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToInt64 (AnsiString)'
-    TabOrder = 38
+    TabOrder = 37
     OnClick = ALButton38Click
   end
   object ALButton39: TButton
@@ -458,7 +362,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi DateToStr (AnsiString)'
-    TabOrder = 39
+    TabOrder = 38
     OnClick = ALButton39Click
   end
   object ALButton41: TButton
@@ -467,7 +371,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi FloatToStr (AnsiString)'
-    TabOrder = 40
+    TabOrder = 39
     OnClick = ALButton41Click
   end
   object ALButton42: TButton
@@ -476,7 +380,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToDateTime (AnsiString)'
-    TabOrder = 41
+    TabOrder = 40
     OnClick = ALButton42Click
   end
   object ALButton40: TButton
@@ -485,7 +389,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALFormat (AnsiString)'
-    TabOrder = 42
+    TabOrder = 41
     OnClick = ALButton40Click
   end
   object ALButton43: TButton
@@ -494,7 +398,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi Format (Unicode)'
-    TabOrder = 43
+    TabOrder = 42
     OnClick = ALButton43Click
   end
   object ALButton44: TButton
@@ -503,7 +407,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi Format (AnsiString)'
-    TabOrder = 44
+    TabOrder = 43
     OnClick = ALButton44Click
   end
   object ALButton45: TButton
@@ -512,7 +416,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALStrToFloat (AnsiString)'
-    TabOrder = 45
+    TabOrder = 44
     OnClick = ALButton45Click
   end
   object ALButton46: TButton
@@ -521,7 +425,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToFloat (Unicode)'
-    TabOrder = 46
+    TabOrder = 45
     OnClick = ALButton46Click
   end
   object ALButton47: TButton
@@ -530,7 +434,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark Delphi StrToFloat (AnsiString)'
-    TabOrder = 47
+    TabOrder = 46
     OnClick = ALButton47Click
   end
   object Button1: TButton
@@ -539,7 +443,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALStringReplace'
-    TabOrder = 48
+    TabOrder = 47
     OnClick = Button1Click
   end
   object Button2: TButton
@@ -548,7 +452,7 @@ object Form1: TForm1
     Width = 230
     Height = 25
     Caption = 'Benchmark ALFastTagReplace'
-    TabOrder = 49
+    TabOrder = 48
     OnClick = Button2Click
   end
 end

@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 214
   Caption = 'SMTP Test'
   ClientHeight = 564
-  ClientWidth = 881
+  ClientWidth = 593
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object Form1: TForm1
   object MsgMemo: TMemo
     Left = 0
     Top = 191
-    Width = 881
+    Width = 593
     Height = 120
     Hint = 'Enter the message text in this memo'
     Align = alTop
@@ -34,11 +34,12 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 0
+    ExplicitWidth = 881
   end
   object DisplayMemo: TMemo
     Left = 0
     Top = 394
-    Width = 881
+    Width = 593
     Height = 170
     Hint = 'This memo shows info messages'
     Align = alClient
@@ -53,14 +54,16 @@ object Form1: TForm1
     ScrollBars = ssBoth
     ShowHint = True
     TabOrder = 2
+    ExplicitWidth = 881
   end
   object ToolsPanel: TPanel
     Left = 0
     Top = 0
-    Width = 881
+    Width = 593
     Height = 191
     Align = alTop
     TabOrder = 3
+    ExplicitWidth = 881
     object Label1: TLabel
       Left = 22
       Top = 11
@@ -386,105 +389,15 @@ object Form1: TForm1
       Caption = 'Confirm'
       TabOrder = 11
     end
-    object Panel2: TPanel
-      Left = 577
-      Top = 8
-      Width = 292
-      Height = 153
-      BevelOuter = bvNone
-      BorderStyle = bsSingle
-      Color = clSilver
-      Ctl3D = False
-      ParentBackground = False
-      ParentCtl3D = False
-      TabOrder = 22
-      object cxLabel1: TcxLabel
-        Left = 12
-        Top = 12
-        Caption = 'Please help us to keep the development of these components free'
-        ParentFont = False
-        Style.Font.Charset = DEFAULT_CHARSET
-        Style.Font.Color = clWindowText
-        Style.Font.Height = -12
-        Style.Font.Name = 'Tahoma'
-        Style.Font.Style = []
-        Style.IsFontAssigned = True
-        Properties.WordWrap = True
-        Transparent = True
-        Width = 242
-      end
-      object cxLabel2: TcxLabel
-        Left = 12
-        Top = 55
-        Caption = 'If you like these components please go to:'
-        ParentFont = False
-        Style.Font.Charset = DEFAULT_CHARSET
-        Style.Font.Color = clWindowText
-        Style.Font.Height = -12
-        Style.Font.Name = 'Tahoma'
-        Style.Font.Style = []
-        Style.IsFontAssigned = True
-        Properties.WordWrap = True
-        Transparent = True
-        Width = 240
-      end
-      object cxWwwArkadiaComLabel: TcxLabel
-        Left = 12
-        Top = 71
-        Cursor = crHandPoint
-        Caption = 'http://www.arkadia.com'
-        ParentFont = False
-        Style.Font.Charset = DEFAULT_CHARSET
-        Style.Font.Color = clRed
-        Style.Font.Height = -12
-        Style.Font.Name = 'Tahoma'
-        Style.Font.Style = [fsBold]
-        Style.TextColor = clMaroon
-        Style.IsFontAssigned = True
-        Properties.WordWrap = True
-        Transparent = True
-        OnClick = cxWwwArkadiaComLabelClick
-        Width = 160
-      end
-      object cxLabel18: TcxLabel
-        Left = 12
-        Top = 88
-        Caption = 'and click on the Facebook/Google+ like button'
-        ParentFont = False
-        Style.Font.Charset = DEFAULT_CHARSET
-        Style.Font.Color = clWindowText
-        Style.Font.Height = -12
-        Style.Font.Name = 'Tahoma'
-        Style.Font.Style = []
-        Style.IsFontAssigned = True
-        Properties.WordWrap = True
-        Transparent = True
-        Width = 261
-      end
-      object cxLabel17: TcxLabel
-        Left = 12
-        Top = 120
-        Caption = 'Thanks for your support !'
-        ParentFont = False
-        Style.Font.Charset = DEFAULT_CHARSET
-        Style.Font.Color = clWindowText
-        Style.Font.Height = -12
-        Style.Font.Name = 'Tahoma'
-        Style.Font.Style = []
-        Style.IsFontAssigned = True
-        Properties.WordWrap = True
-        Transparent = True
-        Width = 144
-      end
-    end
   end
   object AttachPanel: TPanel
     Left = 0
     Top = 311
-    Width = 881
+    Width = 593
     Height = 17
     Align = alTop
     TabOrder = 4
+    ExplicitWidth = 881
     object Label6: TLabel
       Left = 16
       Top = 2
@@ -496,7 +409,7 @@ object Form1: TForm1
   object FileAttachMemo: TMemo
     Left = 0
     Top = 328
-    Width = 881
+    Width = 593
     Height = 49
     Hint = 'Enter the attached file path, one per line'
     Align = alTop
@@ -510,14 +423,16 @@ object Form1: TForm1
     ScrollBars = ssVertical
     ShowHint = True
     TabOrder = 1
+    ExplicitWidth = 881
   end
   object InfoPanel: TPanel
     Left = 0
     Top = 377
-    Width = 881
+    Width = 593
     Height = 17
     Align = alTop
     TabOrder = 5
+    ExplicitWidth = 881
     object Label7: TLabel
       Left = 16
       Top = 2

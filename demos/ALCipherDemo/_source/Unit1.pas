@@ -31,12 +31,6 @@ type
     ALButton9: TButton;
     ALButton12: TButton;
     ALButton13: TButton;
-    Panel7: TPanel;
-    cxLabel1: TcxLabel;
-    Label15: TcxLabel;
-    cxLabel4: TcxLabel;
-    cxLabel6: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;

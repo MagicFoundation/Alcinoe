@@ -90,7 +90,6 @@ type
     CheckBoxHttpEncodePostData: TcxCheckBox;
     ButtonHead: TcxButton;
     CheckBoxUrlEncodePostData: TcxCheckBox;
-    Panel1: TPanel;
     ButtonTrace: TcxButton;
     dxSkinController1: TdxSkinController;
     Panel3: TPanel;
@@ -103,11 +102,6 @@ type
     Label3: TcxLabel;
     MemoContentBody: TcxMemo;
     cxSplitter1: TcxSplitter;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ButtonGetClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);

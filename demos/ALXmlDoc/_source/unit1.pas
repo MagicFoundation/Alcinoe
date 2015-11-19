@@ -8,9 +8,6 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
      ALStringList, cxGraphics, cxControls, cxLookAndFeels,
      cxLookAndFeelPainters, cxContainer, cxEdit, cxLabel, Shellapi;
 
-{------------------------------------}
-Const WM_XmlFullyLoaded = WM_user + 1;
-
 type
 
   PPROCESS_MEMORY_COUNTERS = ^PROCESS_MEMORY_COUNTERS;
@@ -40,19 +37,13 @@ type
     ButtonGenerate100000NodeWithXmlDocument: TButton;
     ButtonParseXMLWithALXmlDocumentInSaxMode: TButton;
     MemoParseXmlWithALXmlDocumentInSaxMode: TMemo;
-    Panel1: TPanel;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ButtonLoadXmlWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonLoadXmlWithXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonGenerate100000NodeWithXmlDocumentClick(Sender: TObject);
     procedure ALXMLDocumentSaxModeParseComment(Sender: TObject; const Path, Str: AnsiString);
     procedure ALXMLDocumentSaxModeParseProcessingInstruction(Sender: TObject; const Path, Target, Data: AnsiString);
-    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings);
+    procedure ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
     procedure ALXMLDocumentSaxModeParseText(Sender: TObject; const Path, Str: AnsiString);
     procedure ButtonParseXMLWithALXmlDocumentInSaxModeClick(Sender: TObject);
     procedure cxWwwArkadiaComLabelClick(Sender: TObject);
@@ -342,8 +333,8 @@ begin
   inc(FNodeCount);
 end;
 
-{**********************************************************************************************************************************}
-procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; const Attributes: TALStrings);
+{****************************************************************************************************************************}
+procedure TForm1.ALXMLDocumentSaxModeParseStartElement(Sender: TObject; const Path, Name: AnsiString; Attributes: TALStrings);
 begin
   FNodeCount := FNodeCount + 2 * (Attributes.Count) + 1;
 end;

@@ -12,12 +12,6 @@ uses
 
 type
   TForm1 = class(TForm)
-    Panel2: TPanel;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     Chart1: TChart;
     Button4: TButton;
     Series1: TBarSeries;

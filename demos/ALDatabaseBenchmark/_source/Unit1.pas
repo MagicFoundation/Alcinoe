@@ -120,7 +120,6 @@ type
     ALEditSqlite3NBThread: TcxTextEdit;
     ALCheckBoxSqlite3SharedCache: TcxCheckBox;
     ALCheckBoxSqlite3ReadUncommited: TcxCheckBox;
-    Panel2: TPanel;
     ALMemoFireBirdParams: TcxMemo;
     Label1: TcxLabel;
     Label14: TcxLabel;
@@ -229,11 +228,6 @@ type
     CheckGroupMongoDBUpdateFlags: TcxCheckGroup;
     CheckGroupMongoDBDeleteFlags: TcxCheckGroup;
     ALButtonMongoDBLOOPDELETE: TcxButton;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure FormClick(Sender: TObject);
     procedure ALButtonMySqlSelectClick(Sender: TObject);
     procedure ALButtonFirebirdSelectClick(Sender: TObject);

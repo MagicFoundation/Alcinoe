@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   Caption = 'Form1'
   ClientHeight = 567
-  ClientWidth = 698
+  ClientWidth = 393
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -226,104 +226,13 @@ object Form1: TForm1
     Height = 79
     TabOrder = 7
   end
-  object Panel2: TPanel
-    Left = 389
-    Top = 8
-    Width = 292
-    Height = 153
-    BevelOuter = bvNone
-    BorderStyle = bsSingle
-    Color = clSilver
-    Ctl3D = False
-    ParentBackground = False
-    ParentCtl3D = False
-    TabOrder = 11
-    object cxLabel1: TcxLabel
-      Left = 12
-      Top = 12
-      Caption = 'Please help us to keep the development of these components free'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 242
-    end
-    object cxLabel2: TcxLabel
-      Left = 12
-      Top = 55
-      Caption = 'If you like these components please go to:'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 240
-    end
-    object cxWwwArkadiaComLabel: TcxLabel
-      Left = 12
-      Top = 71
-      Cursor = crHandPoint
-      Caption = 'http://www.arkadia.com'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clRed
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = [fsBold]
-      Style.TextColor = clMaroon
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      OnClick = cxWwwArkadiaComLabelClick
-      Width = 160
-    end
-    object cxLabel18: TcxLabel
-      Left = 12
-      Top = 88
-      Caption = 'and click on the Facebook/Google+ like button'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 261
-    end
-    object cxLabel17: TcxLabel
-      Left = 12
-      Top = 120
-      Caption = 'Thanks for your support !'
-      ParentFont = False
-      Style.Font.Charset = DEFAULT_CHARSET
-      Style.Font.Color = clWindowText
-      Style.Font.Height = -12
-      Style.Font.Name = 'Tahoma'
-      Style.Font.Style = []
-      Style.IsFontAssigned = True
-      Properties.WordWrap = True
-      Transparent = True
-      Width = 144
-    end
-  end
   object Button2: TButton
     Left = 335
     Top = 71
     Width = 27
     Height = 21
     Caption = '...'
-    TabOrder = 12
+    TabOrder = 11
     OnClick = ALEditFirebirdDatabaseButtonClick
   end
   object Button1: TButton
@@ -332,15 +241,15 @@ object Form1: TForm1
     Width = 27
     Height = 21
     Caption = '...'
-    TabOrder = 13
+    TabOrder = 12
     OnClick = ALEditFirebirdLibButtonClick
   end
   object OpenDialog1: TOpenDialog
-    Left = 570
-    Top = 304
+    Left = 250
+    Top = 208
   end
   object OpenDialog2: TOpenDialog
-    Left = 570
-    Top = 248
+    Left = 250
+    Top = 152
   end
 end

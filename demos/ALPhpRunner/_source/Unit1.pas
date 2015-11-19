@@ -66,12 +66,6 @@ type
     Panel3: TPanel;
     Panel4: TPanel;
     Panel5: TPanel;
-    Panel2: TPanel;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    cxWwwArkadiaComLabel: TcxLabel;
-    cxLabel18: TcxLabel;
-    cxLabel17: TcxLabel;
     procedure ButtonInitAndGetClick(Sender: TObject);
     procedure ButtonOpenInExplorerClick(Sender: TObject);
     procedure ButtonInitAndPostClick(Sender: TObject);

@@ -200,6 +200,9 @@ Type
     property  Items[Index: Integer]: Integer read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
     property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    function  Push(Item: Integer): Integer;
+    function  Pop: Integer; inline;
+    function  Peek: Integer; inline;
   end;
 
   {-----------------------------------------}
@@ -234,6 +237,9 @@ Type
     property  Items[Index: Integer]: Cardinal read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
     property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    function  Push(Item: Cardinal): Cardinal;
+    function  Pop: Cardinal; inline;
+    function  Peek: Cardinal; inline;
   end;
 
   {-----------------------------------}
@@ -268,6 +274,9 @@ Type
     property  Items[Index: Integer]: Int64 read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
     property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    function  Push(Item: Int64): Int64;
+    function  Pop: Int64; inline;
+    function  Peek: Int64; inline;
   end;
 
   {-------------------------------------}
@@ -302,6 +311,9 @@ Type
     property  Items[Index: Integer]: Double read GetItem write SetItem; default;
     property  Objects[Index: Integer]: TObject read GetObject write PutObject;
     property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    function  Push(Item: Double): Double;
+    function  Pop: Double; inline;
+    function  Peek: Double; inline;
   end;
 
   {--------------------------------------}
@@ -760,6 +772,26 @@ begin
   PALIntegerListItem(Get(index))^.FObject := AObject;
 end;
 
+{***************************************************}
+function TALIntegerList.Push(Item: integer): integer;
+begin
+  Add(Item);
+  result := Item;
+end;
+
+{***********************************}
+function TALIntegerList.Pop: integer;
+begin
+  Result := Peek;
+  Delete(Count-1);
+end;
+
+{************************************}
+function TALIntegerList.Peek: integer;
+begin
+  Result := GetItem(Count-1);
+end;
+
 {**********************************************************}
 function TALCardinalList.Add(const Item: Cardinal): Integer;
 begin
@@ -935,6 +967,26 @@ begin
   PALCardinalListItem(Get(index))^.FObject := AObject;
 end;
 
+{******************************************************}
+function TALCardinalList.Push(Item: cardinal): cardinal;
+begin
+  Add(Item);
+  result := Item;
+end;
+
+{*************************************}
+function TALCardinalList.Pop: cardinal;
+begin
+  Result := Peek;
+  Delete(Count-1);
+end;
+
+{**************************************}
+function TALCardinalList.Peek: cardinal;
+begin
+  Result := GetItem(Count-1);
+end;
+
 {****************************************************}
 function TALInt64List.Add(const Item: Int64): Integer;
 begin
@@ -1108,6 +1160,26 @@ begin
   PALInt64ListItem(Get(index))^.FObject := AObject;
 end;
 
+{**********************************************}
+function TALInt64List.Push(Item: int64): int64;
+begin
+  Add(Item);
+  result := Item;
+end;
+
+{*******************************}
+function TALInt64List.Pop: int64;
+begin
+  Result := Peek;
+  Delete(Count-1);
+end;
+
+{********************************}
+function TALInt64List.Peek: int64;
+begin
+  Result := GetItem(Count-1);
+end;
+
 {******************************************************}
 function TALDoubleList.Add(const Item: Double): Integer;
 begin
@@ -1279,6 +1351,26 @@ procedure TALDoubleList.PutObject(Index: Integer; AObject: TObject);
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
   PALDoubleListItem(Get(index))^.FObject := AObject;
+end;
+
+{************************************************}
+function TALDoubleList.Push(Item: Double): Double;
+begin
+  Add(Item);
+  result := Item;
+end;
+
+{*********************************}
+function TALDoubleList.Pop: Double;
+begin
+  Result := Peek;
+  Delete(Count-1);
+end;
+
+{**********************************}
+function TALDoubleList.Peek: Double;
+begin
+  Result := GetItem(Count-1);
 end;
 
 {$IF CompilerVersion >= 23} {Delphi XE2}

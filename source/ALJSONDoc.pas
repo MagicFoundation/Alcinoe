@@ -357,12 +357,12 @@ type
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     function GetNodeValueStr: ansiString; virtual;
     function GetNodeValueInt64: int64; virtual;
+    function GetNodeValueWithNodeSubTypeHelper: AnsiString;
     procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     function GetText: AnsiString;
     procedure SetText(const Value: AnsiString);
-    function GetTextWithNodeSubTypeHelper: AnsiString;
     function GetFloat: Double;
     procedure SetFloat(const Value: Double);
     function GetDateTime: TDateTime;
@@ -484,13 +484,13 @@ type
   TALJSONTextNode = Class(TALJSONNode)
   private
     fNodeSubType: TALJSONNodeSubType;
-    fNodeValueStr: AnsiString; // contain the text representation of the node
-                               // WITHOUT any node subtype helper
-                               // for exemple for NumberLong(12391293) it's
-                               // store only 12391293
-    FnodeValueInt64: int64;    // contain the value Stored in an int64 (if the
+    fRawNodeValueStr: AnsiString; // contain the text representation of the node
+                                  // WITHOUT any node subtype helper
+                                  // for exemple for NumberLong(12391293) it's
+                                  // store only 12391293
+    FRawNodeValueInt64: int64;    // contain the value Stored in an int64 (if the
                                // value can be store in an int64)
-    fNodeValueDefined: TALJSONTextNodeValueDefined;
+    fRawNodeValueDefined: TALJSONTextNodeValueDefined;
   protected
     function GetNodeType: TALJSONNodeType; override;
     function GetNodeSubType: TALJSONNodeSubType; override;
@@ -501,6 +501,9 @@ type
     procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; override;
   public
     constructor Create(const NodeName: AnsiString = ''); override;
+    property RawNodeValueDefined: TALJSONTextNodeValueDefined read fRawNodeValueDefined;
+    property RawNodeValueStr: AnsiString read fRawNodeValueStr;
+    property RawNodeValueint64: int64 read fRawNodeValueint64;
   end;
 
   {TALJSONDocument}
@@ -3832,7 +3835,7 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit integers
 // and NumberInt() to handle 64-bit integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONNode.GetTextWithNodeSubTypeHelper: AnsiString;
+function TALJSONNode.GetNodeValueWithNodeSubTypeHelper: AnsiString;
 
   procedure _GetObjectID;
   begin
@@ -4364,7 +4367,7 @@ Var NodeStack: Tstack;
           _WriteStr2Buffer('"');
         end;
       end
-      else _WriteStr2Buffer(GetTextWithNodeSubTypeHelper);
+      else _WriteStr2Buffer(GetNodeValueWithNodeSubTypeHelper);
 
     end;
   end;
@@ -5181,9 +5184,9 @@ constructor TALJSONTextNode.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
   fNodeSubType := nstText;
-  fNodeValueStr := '';
-  FnodeValueInt64 := 0;
-  fNodeValueDefined := [nvStr];
+  fRawNodeValueStr := '';
+  FRawNodeValueInt64 := 0;
+  fRawNodeValueDefined := [nvStr];
 end;
 
 {****************************************************}
@@ -5201,31 +5204,31 @@ end;
 {***************************************************}
 function TALJSONTextNode.GetNodeValueStr: ansiString;
 begin
-  if nvStr in fNodeValueDefined then result := fNodeValueStr
+  if nvStr in fRawNodeValueDefined then result := fRawNodeValueStr
   else begin
 
-    if not (nvInt64 in fNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
+    if not (nvInt64 in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
-      nstFloat: ALFloatToStr(GetFloat, fNodeValueStr, ALDefaultFormatSettings);
+      nstFloat: ALFloatToStr(GetFloat, fRawNodeValueStr, ALDefaultFormatSettings);
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
       //nstArray: can not be retrieve from int64
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
-      nstBoolean: ALBoolToStr(fNodeValueStr, getBool, 'true', 'false');
-      nstDateTime: ALDateTimeToStr(GetDateTime, fNodeValueStr, ALDefaultFormatSettings);
-      nstNull: fNodeValueStr := 'null';
+      nstBoolean: ALBoolToStr(fRawNodeValueStr, getBool, 'true', 'false');
+      nstDateTime: ALDateTimeToStr(GetDateTime, fRawNodeValueStr, ALDefaultFormatSettings);
+      nstNull: fRawNodeValueStr := 'null';
       //nstRegEx: only the regex option is store in the int64
       //nstJavascript: can not be retrieve from int64
-      nstInt32: ALintToStr(GetInt32, fNodeValueStr);
-      nstTimestamp: ALformat('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fNodeValueStr);
-      nstInt64: ALintToStr(GetInt64, fNodeValueStr);
+      nstInt32: ALintToStr(GetInt32, fRawNodeValueStr);
+      nstTimestamp: ALformat('Timestamp(%u, %u)', [GetTimestamp.W1,GetTimestamp.W2], fRawNodeValueStr);
+      nstInt64: ALintToStr(GetInt64, fRawNodeValueStr);
       else ALJsonDocError(CALJsonOperationError,GetNodeType);
     end;
 
-    fNodeValueDefined := fNodeValueDefined + [nvStr];
-    result := fNodeValueStr;
+    fRawNodeValueDefined := fRawNodeValueDefined + [nvStr];
+    result := fRawNodeValueStr;
 
   end;
 end;
@@ -5238,15 +5241,15 @@ var aDouble: Double;
     aInt32: system.int32;
     aTimestamp: TALBSONTimestamp;
 begin
-  if nvInt64 in fNodeValueDefined then result := fNodeValueInt64
+  if nvInt64 in fRawNodeValueDefined then result := fRawNodeValueInt64
   else begin
 
-    if not (nvStr in fNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
+    if not (nvStr in fRawNodeValueDefined) then ALJsonDocError(CALJsonOperationError,GetNodeType);
 
     case fNodeSubType of
       nstFloat: begin
-                  IF not ALTryStrToFloat(fNodeValueStr, aDouble, ALDefaultFormatSettings) then ALJSONDocError('%s is not a valid Float', [fNodeValueStr]);
-                  fNodeValueInt64 := Pint64(@aDouble)^;
+                  IF not ALTryStrToFloat(fRawNodeValueStr, aDouble, ALDefaultFormatSettings) then ALJSONDocError('%s is not a valid Float', [fRawNodeValueStr]);
+                  fRawNodeValueInt64 := Pint64(@aDouble)^;
                 end;
       //nstText: can not be retrieve from int64
       //nstObject: can not be retrieve from int64
@@ -5254,34 +5257,34 @@ begin
       //nstBinary: only the binarysubtype is store in int64
       //nstObjectID: can not be retrieve from int64
       nstBoolean: begin
-                    IF not ALTryStrToBool(fNodeValueStr, aBool) then ALJSONDocError('%s is not a valid Boolean', [fNodeValueStr]);
-                    fNodeValueInt64 := ALBoolToInt(aBool);
+                    IF not ALTryStrToBool(fRawNodeValueStr, aBool) then ALJSONDocError('%s is not a valid Boolean', [fRawNodeValueStr]);
+                    fRawNodeValueInt64 := ALBoolToInt(aBool);
                   end;
       nstDateTime: begin
-                     IF not ALTryStrToDateTime(fNodeValueStr, aDateTime, ALdefaultFormatSettings) then ALJSONDocError('%s is not a valid Datetime', [fNodeValueStr]);
-                     fNodeValueInt64 := Pint64(@aDateTime)^;
+                     IF not ALTryStrToDateTime(fRawNodeValueStr, aDateTime, ALdefaultFormatSettings) then ALJSONDocError('%s is not a valid Datetime', [fRawNodeValueStr]);
+                     fRawNodeValueInt64 := Pint64(@aDateTime)^;
                    end;
       nstNull:  begin
-                  fNodeValueInt64 := 0;
+                  fRawNodeValueInt64 := 0;
                 end;
       //nstRegEx: only the regex option is store in the int64
       //nstJavascript: can not be retrieve from int64
       nstInt32: begin
-                  IF not ALTryStrToInt(fNodeValueStr, aInt32) then ALJSONDocError('%s is not a valid Int32', [fNodeValueStr]);
-                  fNodeValueInt64 := aInt32;
+                  IF not ALTryStrToInt(fRawNodeValueStr, aInt32) then ALJSONDocError('%s is not a valid Int32', [fRawNodeValueStr]);
+                  fRawNodeValueInt64 := aInt32;
                 end;
       nstTimestamp: begin
-                      IF not ALJSONTryStrToTimestamp(fNodeValueStr, aTimestamp) then ALJSONDocError('%s is not a valid Timestamp', [fNodeValueStr]);
-                      fNodeValueInt64 := aTimestamp.I64;
+                      IF not ALJSONTryStrToTimestamp(fRawNodeValueStr, aTimestamp) then ALJSONDocError('%s is not a valid Timestamp', [fRawNodeValueStr]);
+                      fRawNodeValueInt64 := aTimestamp.I64;
                     end;
       nstInt64: begin
-                  IF not ALTryStrToInt64(fNodeValueStr, fNodeValueInt64) then ALJSONDocError('%s is not a valid Int64', [fNodeValueStr]);
+                  IF not ALTryStrToInt64(fRawNodeValueStr, fRawNodeValueInt64) then ALJSONDocError('%s is not a valid Int64', [fRawNodeValueStr]);
                 end;
       else ALJsonDocError(CALJsonOperationError,GetNodeType);
     end;
 
-    fNodeValueDefined := fNodeValueDefined + [nvInt64];
-    result := fNodeValueInt64;
+    fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64];
+    result := fRawNodeValueInt64;
 
   end;
 end;
@@ -5290,26 +5293,26 @@ end;
 procedure TALJSONTextNode.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
-  fNodeValueStr := Value;
-  fNodeValueDefined := [nvStr];
+  fRawNodeValueStr := Value;
+  fRawNodeValueDefined := [nvStr];
 end;
 
 {************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
-  fNodeValueInt64 := Value;
-  if (NodeSubType in [nstBinary, nstRegEx]) then fNodeValueDefined := fNodeValueDefined + [nvInt64] // keep the fNodeValueStr
-  else fNodeValueDefined := [nvInt64];
+  fRawNodeValueInt64 := Value;
+  if (NodeSubType in [nstBinary, nstRegEx]) then fRawNodeValueDefined := fRawNodeValueDefined + [nvInt64] // keep the fNodeValueStr
+  else fRawNodeValueDefined := [nvInt64];
 end;
 
 {*********************************************************************************************************************************}
 procedure TALJSONTextNode.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
-  fNodeValueStr := StrValue;
-  fNodeValueInt64 := Int64Value;
-  fNodeValueDefined := [nvStr, nvInt64];
+  fRawNodeValueStr := StrValue;
+  fRawNodeValueInt64 := Int64Value;
+  fRawNodeValueDefined := [nvStr, nvInt64];
 end;
 
 {*****************************************************}

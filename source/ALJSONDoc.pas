@@ -278,7 +278,9 @@ type
                       doNodeAutoIndent); // affect only the SaveToStream
   TALJSONDocOptions = set of TALJSONDocOption;
 
-  TALJSONParseOption = (poIgnoreControlCharacters); // don't decode escaped characters (like \") and not encode them also (when save / load)
+  TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
+                        poSkipNodeSubTypeHelper4Int);  // don't use helper functions NumberLong() to handle 64-bit integers and NumberInt()
+                                                       // to handle 32-bit integers
   TALJSONParseOptions = set of TALJSONParseOption;
 
   PALPointerJSONNodeList = ^TALPointerJSONNodeList;
@@ -357,7 +359,7 @@ type
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     function GetNodeValueStr: ansiString; virtual;
     function GetNodeValueInt64: int64; virtual;
-    function GetNodeValueWithNodeSubTypeHelper: AnsiString;
+    function GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelper4Int: boolean = False): AnsiString;
     procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
@@ -3833,9 +3835,9 @@ end;
 // By default json (ie: javascript) treats all numbers as floating-point values.
 // To let other system (ie: mongoDB) understand the type of the number
 // we provide the helper functions NumberLong() to handle 64-bit integers
-// and NumberInt() to handle 64-bit integers (and some others). theses helper functions are
+// and NumberInt() to handle 32-bit integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONNode.GetNodeValueWithNodeSubTypeHelper: AnsiString;
+function TALJSONNode.GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelper4Int: boolean = False): AnsiString;
 
   procedure _GetObjectID;
   begin
@@ -3892,8 +3894,10 @@ begin
     nstBoolean:    result := GetNodeValueStr;
     nstDateTime:   _GetDateTime;
     nstJavascript: result := GetNodeValueStr;
-    nstInt32:      _Getint32;
-    nstInt64:      _Getint64;
+    nstInt32:      if SkipNodeSubTypeHelper4Int then result := GetNodeValueStr
+                   else _Getint32;
+    nstInt64:      if SkipNodeSubTypeHelper4Int then result := GetNodeValueStr
+                   else _Getint64;
     nstNull:       result := GetNodeValueStr;
     nstObject:     result := GetNodeValueStr;
     nstArray:      result := GetNodeValueStr;
@@ -4296,6 +4300,7 @@ Var NodeStack: Tstack;
     CurrentIndentStr: AnsiString;
     IndentStr: AnsiString;
     EncodeControlCharacters: Boolean;
+    SkipNodeSubTypeHelper4Int: boolean;
     AutoIndentNode: Boolean;
     BufferPos: Integer;
     LastWrittenChar: AnsiChar;
@@ -4367,7 +4372,7 @@ Var NodeStack: Tstack;
           _WriteStr2Buffer('"');
         end;
       end
-      else _WriteStr2Buffer(GetNodeValueWithNodeSubTypeHelper);
+      else _WriteStr2Buffer(GetNodeValueWithNodeSubTypeHelper(SkipNodeSubTypeHelper4Int));
 
     end;
   end;
@@ -4503,6 +4508,7 @@ begin
     BufferPos := 0;
     LastWrittenChar := '{';
     EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
+    SkipNodeSubTypeHelper4Int := poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions;
     AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
     IndentStr := FDocument.NodeIndentStr;
     CurrentIndentStr := '';

@@ -279,6 +279,43 @@ Type
     function  Peek: Int64; inline;
   end;
 
+  {-------------------------------------------}
+  PALNativeIntListItem = ^TALNativeIntListItem;
+  TALNativeIntListItem = record
+    FNativeInt: NativeInt;
+    FObject: TObject;
+  end;
+
+  {--------------------------------------------}
+  TALNativeIntList = class(TALBaseQuickSortList)
+  private
+    FOwnsObject: Boolean;
+    function  GetItem(Index: Integer): NativeInt;
+    procedure SetItem(Index: Integer; const Item: NativeInt);
+    function  GetObject(Index: Integer): TObject;
+    procedure PutObject(Index: Integer; AObject: TObject);
+  protected
+    procedure Notify(Ptr: Pointer; Action: TListNotification); override;
+    procedure InsertItem(Index: Integer; const item: NativeInt; AObject: TObject);
+    function  CompareItems(const Index1, Index2: Integer): Integer; override;
+  public
+    constructor Create; overload;
+    constructor Create(OwnsObjects: Boolean); overload;
+    function  IndexOf(Item: NativeInt): Integer;
+    function  IndexOfObject(AObject: TObject): Integer;
+    function  Add(const Item: NativeInt): Integer;
+    Function  AddObject(const Item: NativeInt; AObject: TObject): Integer;
+    function  Find(item: NativeInt; var Index: Integer): Boolean;
+    procedure Insert(Index: Integer; const item: NativeInt);
+    procedure InsertObject(Index: Integer; const item: NativeInt; AObject: TObject);
+    property  Items[Index: Integer]: NativeInt read GetItem write SetItem; default;
+    property  Objects[Index: Integer]: TObject read GetObject write PutObject;
+    property  OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
+    function  Push(Item: NativeInt): NativeInt;
+    function  Pop: NativeInt; inline;
+    function  Peek: NativeInt; inline;
+  end;
+
   {-------------------------------------}
   PALDoubleListItem = ^TALDoubleListItem;
   TALDoubleListItem = record
@@ -1176,6 +1213,199 @@ end;
 
 {********************************}
 function TALInt64List.Peek: int64;
+begin
+  Result := GetItem(Count-1);
+end;
+
+{************************************************************}
+function TALNativeIntList.Add(const Item: NativeInt): Integer;
+begin
+  Result := AddObject(Item, nil);
+end;
+
+{************************************************************************************}
+function TALNativeIntList.AddObject(const Item: NativeInt; AObject: TObject): Integer;
+begin
+  if not Sorted then Result := FCount
+  else if Find(Item, Result) then
+    case Duplicates of
+      dupIgnore: Exit;
+      dupError: Error(@SALDuplicateItem, 0);
+    end;
+  InsertItem(Result, Item, AObject);
+end;
+
+{*********************************************************************************************}
+procedure TALNativeIntList.InsertItem(Index: Integer; const item: NativeInt; AObject: TObject);
+Var aPALNativeIntListItem: PALNativeIntListItem;
+begin
+  New(aPALNativeIntListItem);
+  aPALNativeIntListItem^.FNativeInt := item;
+  aPALNativeIntListItem^.FObject := AObject;
+  try
+    inherited InsertItem(index,aPALNativeIntListItem);
+  except
+    Dispose(aPALNativeIntListItem);
+    raise;
+  end;
+end;
+
+{*****************************************************************************}
+function TALNativeIntList.CompareItems(const Index1, Index2: integer): Integer;
+var aNativeInt: NativeInt;
+begin
+  aNativeInt := PALNativeIntListItem(Get(Index1))^.FNativeInt - PALNativeIntListItem(Get(Index2))^.FNativeInt;
+  if aNativeInt < 0 then result := -1
+  else if aNativeInt > 0 then result := 1
+  else result := 0;
+end;
+
+{***************************************************************************}
+function TALNativeIntList.Find(item: NativeInt; var Index: Integer): Boolean;
+var L, H, I, C: Integer;
+
+  {----------------------------------------------------}
+  Function _CompareNativeInt(D1,D2: NativeInt): Integer;
+  Begin
+    if D1 < D2 then result := -1
+    else if D1 > D2 then result := 1
+    else result := 0;
+  end;
+
+begin
+  Result := False;
+  L := 0;
+  H := FCount - 1;
+  while L <= H do begin
+    I := (L + H) shr 1;
+    C := _CompareNativeInt(GetItem(I),item);
+    if C < 0 then L := I + 1
+    else begin
+      H := I - 1;
+      if C = 0 then begin
+        Result := True;
+        if Duplicates <> dupAccept then L := I;
+      end;
+    end;
+  end;
+  Index := L;
+end;
+
+{***********************************************************}
+function TALNativeIntList.GetItem(Index: Integer): NativeInt;
+begin
+  Result := PALNativeIntListItem(Get(index))^.FNativeInt
+end;
+
+{**********************************}
+constructor TALNativeIntList.Create;
+begin
+  inherited Create;
+  FOwnsObject := false;
+end;
+
+{********************************************************}
+constructor TALNativeIntList.Create(OwnsObjects: Boolean);
+begin
+  inherited Create;
+  FOwnsObject := OwnsObjects;
+end;
+
+{**********************************************************}
+function TALNativeIntList.IndexOf(Item: NativeInt): Integer;
+begin
+  if not Sorted then Begin
+    Result := 0;
+    while (Result < FCount) and (GetItem(result) <> Item) do Inc(Result);
+    if Result = FCount then Result := -1;
+  end
+  else if not Find(Item, Result) then Result := -1;
+end;
+
+{***********************************************************************}
+procedure TALNativeIntList.Insert(Index: Integer; const Item: NativeInt);
+begin
+  InsertObject(Index, index, nil);
+end;
+
+{***********************************************************************************************}
+procedure TALNativeIntList.InsertObject(Index: Integer; const item: NativeInt; AObject: TObject);
+Var aPALNativeIntListItem: PALNativeIntListItem;
+begin
+  New(aPALNativeIntListItem);
+  aPALNativeIntListItem^.FNativeInt := item;
+  aPALNativeIntListItem^.FObject := AObject;
+  try
+    inherited insert(index,aPALNativeIntListItem);
+  except
+    Dispose(aPALNativeIntListItem);
+    raise;
+  end;
+end;
+
+{*************************************************************************}
+procedure TALNativeIntList.Notify(Ptr: Pointer; Action: TListNotification);
+begin
+  if Action = lnDeleted then begin
+    if OwnsObjects then PALNativeIntListItem(Ptr).FObject.Free;
+    dispose(ptr);
+  end;
+  inherited Notify(Ptr, Action);
+end;
+
+{************************************************************************}
+procedure TALNativeIntList.SetItem(Index: Integer; const Item: NativeInt);
+Var aPALNativeIntListItem: PALNativeIntListItem;
+begin
+  New(aPALNativeIntListItem);
+  aPALNativeIntListItem^.FNativeInt := item;
+  aPALNativeIntListItem^.FObject := nil;
+  Try
+    Put(Index, aPALNativeIntListItem);
+  except
+    Dispose(aPALNativeIntListItem);
+    raise;
+  end;
+end;
+
+{***********************************************************}
+function TALNativeIntList.GetObject(Index: Integer): TObject;
+begin
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
+  Result :=  PALNativeIntListItem(Get(index))^.FObject;
+end;
+
+{*****************************************************************}
+function TALNativeIntList.IndexOfObject(AObject: TObject): Integer;
+begin
+  for Result := 0 to Count - 1 do
+    if GetObject(Result) = AObject then Exit;
+  Result := -1;
+end;
+
+{*********************************************************************}
+procedure TALNativeIntList.PutObject(Index: Integer; AObject: TObject);
+begin
+  if (Index < 0) or (Index >= FCount) then Error(@SALListIndexError, Index);
+  PALNativeIntListItem(Get(index))^.FObject := AObject;
+end;
+
+{*********************************************************}
+function TALNativeIntList.Push(Item: NativeInt): NativeInt;
+begin
+  Add(Item);
+  result := Item;
+end;
+
+{***************************************}
+function TALNativeIntList.Pop: NativeInt;
+begin
+  Result := Peek;
+  Delete(Count-1);
+end;
+
+{****************************************}
+function TALNativeIntList.Peek: NativeInt;
 begin
   Result := GetItem(Count-1);
 end;

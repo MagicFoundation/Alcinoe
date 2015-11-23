@@ -133,6 +133,14 @@ type
   pALFormatSettings = ^TALFormatSettings;
   TALFormatSettings = record
   public
+    type
+      TEraInfo = record
+        EraName: ansiString;
+        EraOffset: Integer;
+        EraStart: TDate;
+        EraEnd: TDate;
+      end;
+  public
     // Important: Do not change the order of these declarations, they must
     // match the declaration order of the corresponding globals variables exactly!
     CurrencyString: AnsiString;
@@ -151,6 +159,7 @@ type
     LongMonthNames: array[1..12] of AnsiString;
     ShortDayNames: array[1..7] of AnsiString;
     LongDayNames: array[1..7] of AnsiString;
+    EraInfo: array of TEraInfo;
     ThousandSeparator: AnsiChar;
     DecimalSeparator: AnsiChar;
     TwoDigitYearCenturyWindow: Word;
@@ -168,6 +177,7 @@ type
     {$IF CompilerVersion >= 22} {Delphi XE}
     class function Create(const LocaleName: AnsiString): TALFormatSettings; overload; static;
     {$IFEND}
+    function GetEraYearOffset(const Name: ansistring): Integer;
   end;
   {$ELSE}
   TALFormatSettings = TFormatSettings;
@@ -832,6 +842,24 @@ begin
       ShortDayNames[i] := AnsiString(aFormatSettings.ShortDayNames[i]);
     for I := Low(LongDayNames) to High(LongDayNames) do
       LongDayNames[i] := AnsiString(aFormatSettings.LongDayNames[i]);
+    {$IF CompilerVersion >= 28} {Delphi XE7}
+    setlength(EraInfo, length(aFormatSettings.EraInfo));
+    for I := Low(aFormatSettings.EraInfo) to High(aFormatSettings.EraInfo) do
+      EraInfo[i].EraName := ansiString(aFormatSettings.EraInfo[i].EraName);
+      EraInfo[i].EraOffset := aFormatSettings.EraInfo[i].EraOffset;
+      EraInfo[i].EraStart := aFormatSettings.EraInfo[i].EraStart;
+      EraInfo[i].EraEnd := aFormatSettings.EraInfo[i].EraEnd;
+    {$else}
+    setlength(EraInfo, MaxEraCount);
+    for I := 1 to MaxEraCount do begin
+      EraInfo[i-1].EraName := ansiString(EraNames[i]);
+      EraInfo[i-1].EraOffset := EraYearOffsets[i];
+      {$IFDEF POSIX}
+      EraInfo[i-1].EraStart := EraRanges[i].StartDate;
+      EraInfo[i-1].EraEnd := EraRanges[i].EndDate;
+      {$ENDIF POSIX}
+    end;
+    {$ifend}
     ThousandSeparator := AnsiChar(aFormatSettings.ThousandSeparator);
     DecimalSeparator := AnsiChar(aFormatSettings.DecimalSeparator);
     TwoDigitYearCenturyWindow := aFormatSettings.TwoDigitYearCenturyWindow;
@@ -868,6 +896,24 @@ begin
       ShortDayNames[i] := AnsiString(aFormatSettings.ShortDayNames[i]);
     for I := Low(LongDayNames) to High(LongDayNames) do
       LongDayNames[i] := AnsiString(aFormatSettings.LongDayNames[i]);
+    {$IF CompilerVersion >= 28} {Delphi XE7}
+    setlength(EraInfo, length(aFormatSettings.EraInfo));
+    for I := Low(aFormatSettings.EraInfo) to High(aFormatSettings.EraInfo) do
+      EraInfo[i].EraName := ansiString(aFormatSettings.EraInfo[i].EraName);
+      EraInfo[i].EraOffset := aFormatSettings.EraInfo[i].EraOffset;
+      EraInfo[i].EraStart := aFormatSettings.EraInfo[i].EraStart;
+      EraInfo[i].EraEnd := aFormatSettings.EraInfo[i].EraEnd;
+    {$else}
+    setlength(EraInfo, MaxEraCount);
+    for I := 1 to MaxEraCount do begin
+      EraInfo[i-1].EraName := ansiString(EraNames[i]);
+      EraInfo[i-1].EraOffset := EraYearOffsets[i];
+      {$IFDEF POSIX}
+      EraInfo[i-1].EraStart := EraRanges[i].StartDate;
+      EraInfo[i-1].EraEnd := EraRanges[i].EndDate;
+      {$ENDIF POSIX}
+    end;
+    {$ifend}
     ThousandSeparator := AnsiChar(aFormatSettings.ThousandSeparator);
     DecimalSeparator := AnsiChar(aFormatSettings.DecimalSeparator);
     TwoDigitYearCenturyWindow := aFormatSettings.TwoDigitYearCenturyWindow;
@@ -875,6 +921,23 @@ begin
   end;
 end;
 {$IFEND}
+
+{***************************************************************************}
+function TALFormatSettings.GetEraYearOffset(const Name: ansistring): Integer;
+var
+  I: Integer;
+begin
+  Result := 0;
+  for I := Low(EraInfo) to High(EraInfo) do
+  begin
+    if EraInfo[I].EraName = '' then Break;
+    if ALPos(EraInfo[I].EraName, Name) > 0 then
+    begin
+      Result := EraInfo[I].EraOffset;
+      Exit;
+    end;
+  end;
+end;
 
 {**************}
 {$IFDEF UNICODE}
@@ -4674,14 +4737,10 @@ var
       I : Byte;
     begin
       Result := 0;
-      for I := 1 to EraCount do
+      for I := High(AFormatSettings.EraInfo) downto Low(AFormatSettings.EraInfo) do
       begin
-        if (EraRanges[I].StartDate <= Date) and
-          (EraRanges[I].EndDate >= Date) then
-        begin
-          Result := I;
-          Exit;
-        end;
+        if (AFormatSettings.EraInfo[I].EraStart <= Date) then
+          Exit(I);
       end;
     end;
 
@@ -4692,23 +4751,24 @@ var
       Result := '';
       I := FindEra(Trunc(DateTime));
       if I > 0 then
-        Result := EraNames[I];
+        Result := AFormatSettings.EraInfo[I].EraName;
     end;
 
-    function ConvertYearString(const Count: Integer) : AnsiString;
+    function ConvertYearString(const Count: Integer) : ansiString;
     var
-      I : Byte;
-      S : AnsiString;
+      S : ansiString;
+      function GetEraOffset: integer;
+      begin
+        Result := FindEra(Trunc(DateTime));
+        if Result > 0 then
+          Result := AFormatSettings.EraInfo[Result].EraOffset;
+      end;
     begin
-      I := FindEra(Trunc(DateTime));
-      if I > 0 then
-        S := ALIntToStr(Year - EraYearOffsets[I])
-      else
-        S := ALIntToStr(Year);
-      while Length(S) < Count do
+      S := ALIntToStr(Year - GetEraOffset);
+      while S.Length < Count do
         S := '0' + S;
-      if Length(S) > Count then
-        S := ALCopyStr(S, Length(S) - (Count - 1), Count);
+      if S.Length > Count then
+        S := alCopyStr(S, Length(S) - (Count - 1), Count);
       Result := S;
     end;
 {$ENDIF POSIX}
@@ -5119,25 +5179,6 @@ end;
 
 {**************}
 {$IFDEF UNICODE}
-function ALGetEraYearOffset(const Name: AnsiString): Integer;
-var
-  I: Integer;
-begin
-  Result := 0;
-  for I := Low(EraNames) to High(EraNames) do
-  begin
-    if EraNames[I] = '' then Break;
-    if ALPos(AnsiString(EraNames[I]), Name) > 0 then
-    begin
-      Result := EraYearOffsets[I];
-      Exit;
-    end;
-  end;
-end;
-{$ENDIF}
-
-{**************}
-{$IFDEF UNICODE}
 function ALScanDate(const S: AnsiString; var Pos: Integer; var Date: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean; overload;
 var
@@ -5176,11 +5217,12 @@ begin
   begin
     ALScanToNumber(S, Pos);
     EraName := ALTrim(ALCopyStr(S, 1, Pos-1));
-    EraYearOffset := ALGetEraYearOffset(EraName);
+    EraYearOffset := AFormatSettings.GetEraYearOffset(EraName);
   end
   else
-    if ALPos('e', AFormatSettings.ShortDateFormat) > 0 then
-      EraYearOffset := EraYearOffsets[1];
+    if (ALPos('e', AFormatSettings.ShortDateFormat) > 0) and
+       (High(AFormatSettings.EraInfo)>=0) then
+      EraYearOffset := AFormatSettings.EraInfo[High(AFormatSettings.EraInfo)].EraOffset;
   if not (ALScanNumber(S, Pos, N1, L1) and ALScanChar(S, Pos, AFormatSettings.DateSeparator) and
     ALScanNumber(S, Pos, N2, L2)) then Exit;
   if ALScanChar(S, Pos, AFormatSettings.DateSeparator) then

@@ -7,7 +7,7 @@ uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
      ALStringList, Shellapi, cxGraphics, cxControls, cxLookAndFeels,
      cxLookAndFeelPainters, cxContainer, cxEdit, cxLabel, ALMime, Vcl.Dialogs,
      Contnrs, alFiles, diagnostics, superobject, DBXJSON, DBXplatform, IOUtils,
-     dwsJSON;
+     dwsJSON, Execute.JSON;
 
 type
 
@@ -42,6 +42,7 @@ type
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
+    Button7: TButton;
     procedure ButtonLoadXmlWithALXmlDocumentClick(Sender: TObject);
     procedure ButtonCreateDynamicallyJsonDocumentClick(Sender: TObject);
     procedure ButtonSaveToBsonClick(Sender: TObject);
@@ -52,6 +53,7 @@ type
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
   private
   public
   end;
@@ -446,6 +448,74 @@ begin
     end;
 
   end;
+end;
+
+type
+  TMyObject = class
+    Name: string;
+    Date: TDateTime;
+    Nums: array of Integer;
+    Plus: string;
+  end;
+
+procedure TForm1.Button7Click(Sender: TObject);
+  var
+    t: TMyObject;
+    s: string;
+    i: integer;
+    aStopWatch: TstopWatch;
+    aALJsonDocument: TALJsonDocument;
+    S2: ansiString;
+
+begin
+
+    MemoCreateDynamicallyJsonDocument.Lines.Clear;
+    Try
+
+      aStopWatch := TstopWatch.StartNew;
+      for I := 0 to 100000 do begin
+        t := TMyObject.Create;
+        t.Name := 'Paul';
+        t.Date := Now();
+        setlength(t.Nums, 3);
+        t.Nums[0] := 1;
+        t.Nums[2] := 2;
+        t.Nums[3] := 3;
+        t.Plus := 'plus';
+        s := t.toJSON(); // {"Name":"Paul","Date":"2015-11-23T19:33:25","Nums":[1,0,2],"Plus":"plus"}
+        t.Free;
+        t := TMyObject.Create;
+        t.FromJSON(s);
+        t.Free;
+      end;
+      aStopWatch.Stop;
+      MemoCreateDynamicallyJsonDocument.Lines.Add('Time to save/load 100000 objects with EXECUTE.json: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
+
+        aStopWatch := TstopWatch.StartNew;
+        for I := 0 to 100000 do begin
+          aALJsonDocument:= TALJsonDocument.Create;
+          aALJsonDocument.addchild('Name').Text := 'Stephane';
+          aALJsonDocument.addchild('Date').DateTime := Now;
+          with aALJsonDocument.addchild('Nums', ntArray) do begin
+            addchild.Float := 1;
+            addchild.Float := 2;
+            addchild.Float := 3;
+          end;
+          aALJsonDocument.addchild('Plus').Text := 'plus';
+          aALJsonDocument.SaveToBSONString(S2); // {"Name":"Stephane","Date":ISODate("2015-11-23T19:44:53.057Z"),"Nums":[1,2,3],"Plus":"plus"}
+          aALJsonDocument.Free;
+          aALJsonDocument:= TALJsonDocument.Create;
+          aALJsonDocument.LoadFromBSONString(S2);
+          aALJsonDocument.Free;
+        end;
+        aStopWatch.Stop;
+        MemoCreateDynamicallyJsonDocument.Lines.Add('Time to save/load 100000 objects with TalJsonDoc: ' + FormatFloat('0,',aStopWatch.Elapsed.TotalMilliseconds) + ' ms');
+
+    except
+      on E: Exception do
+        MemoCreateDynamicallyJsonDocument.Lines.Add('Error: ' + E.Message);
+    end;
+
 end;
 
 {*************************************************************************}

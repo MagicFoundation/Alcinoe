@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 438
   Top = 209
   Caption = 'Form1'
-  ClientHeight = 674
+  ClientHeight = 701
   ClientWidth = 816
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -67,13 +67,13 @@ object Form1: TForm1
     Left = 414
     Top = 47
     Width = 378
-    Height = 370
+    Height = 412
     ScrollBars = ssBoth
     TabOrder = 4
   end
   object MemoCreateDynamicallyJsonDocument: TMemo
     Left = 16
-    Top = 473
+    Top = 505
     Width = 377
     Height = 183
     ScrollBars = ssBoth
@@ -81,7 +81,7 @@ object Form1: TForm1
   end
   object MemoBSON: TMemo
     Left = 414
-    Top = 473
+    Top = 505
     Width = 378
     Height = 183
     ScrollBars = ssBoth
@@ -89,7 +89,7 @@ object Form1: TForm1
   end
   object Button1: TButton
     Left = 414
-    Top = 434
+    Top = 465
     Width = 378
     Height = 25
     Caption = 'Load JSON Document from BSON Content Below'
@@ -140,6 +140,15 @@ object Form1: TForm1
     Caption = 'Load Bson Document from file using TALJsonDoc'
     TabOrder = 12
     OnClick = Button6Click
+  end
+  object Button7: TButton
+    Left = 16
+    Top = 465
+    Width = 377
+    Height = 25
+    Caption = 'TALJsonDoc vs Execute.JSON'
+    TabOrder = 13
+    OnClick = Button7Click
   end
   object MainOpenDialog: TOpenDialog
     Left = 552

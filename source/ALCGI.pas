@@ -87,30 +87,11 @@ Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
                                                  const ScriptName,
                                                        ScriptFileName: AnsiString;
                                                  const Url: AnsiString); overload;
+
 Procedure AlCGIExec(const InterpreterFilename: AnsiString;
                     ServerVariables: TALStrings;
                     RequestContentStream: Tstream;
                     ResponseContentStream: Tstream;
-                    ResponseHeader: TALHTTPResponseHeader); overload;
-Procedure AlCGIExec(const ScriptName,
-                          ScriptFileName,
-                          Url,
-                          X_REWRITE_URL,
-                          InterpreterFilename: AnsiString;
-                    WebRequest: TALIsapiRequest;
-                    const overloadedCookies: AnsiString;
-                    const overloadedQueryString: AnsiString;
-                    const overloadedReferer: AnsiString;
-                    overloadedRequestContentStream: Tstream;
-                    Var ResponseContentString: AnsiString;
-                    ResponseHeader: TALHTTPResponseHeader); overload;
-Procedure AlCGIExec(const ScriptName,
-                          ScriptFileName,
-                          Url,
-                          X_REWRITE_URL,
-                          InterpreterFilename: AnsiString;
-                    WebRequest: TALIsapiRequest;
-                    Var ResponseContentString: AnsiString;
                     ResponseHeader: TALHTTPResponseHeader); overload;
 
 implementation
@@ -327,76 +308,5 @@ begin
     If FreeRequestContentStream then RequestContentStream.Free;
   end;
 end;
-
-{***********************************}
-Procedure AlCGIExec(const ScriptName,
-                          ScriptFileName,
-                          Url,
-                          X_REWRITE_URL,
-                          InterpreterFilename: AnsiString;
-                    WebRequest: TALIsapiRequest;
-                    const overloadedCookies: AnsiString;
-                    const overloadedQueryString: AnsiString;
-                    const overloadedReferer: AnsiString;
-                    overloadedRequestContentStream: Tstream;
-                    Var ResponseContentString: AnsiString;
-                    ResponseHeader: TALHTTPResponseHeader);
-
-Var ServerVariables: TALStrings;
-    RequestContentStream: Tstream;
-    ResponsecontentStream: TALStringStream;
-
-begin
-  ServerVariables := TALStringList.Create;
-  ResponsecontentStream := TALStringStream.Create('');
-  Try
-
-    If overloadedRequestContentStream <> nil then RequestContentStream := overloadedRequestContentStream
-    else RequestContentStream := WebRequest.ContentStream;
-
-    alCGIInitServerVariablesFromWebRequest(WebRequest, ServerVariables, ScriptName, ScriptFileName, Url);
-    ServerVariables.Values['HTTP_X_REWRITE_URL'] := X_REWRITE_URL;                                         //HTTP_X_REWRITE_URL=/forum4/discussion98851/showthread.php?bleubleu=24
-    If OverloadedCookies <> #0 then ServerVariables.Values['HTTP_COOKIE'] := OverloadedCookies;            //HTTP_COOKIE=bblastvisit=1155301716; bblastactivity=0; bbthreadedmode=linear; sessionid=2025726278; __utmc=96992031; CurrencyCode=EUR; MeasurementSystem=2; language=USA; Source=127.0.0.1; __utma=96992031.751139461.1154095149.1155298085.1155307847.37; __utmz=96992031.1154095149.1.1.utmccn=(direct)|utmcsr=(direct)|utmcmd=(none); vbulletin_collapse=; __utmb=96992031
-    If overloadedQueryString <> #0 then ServerVariables.Values['QUERY_STRING'] := overloadedQueryString;   //QUERY_STRING=goto=newpost&t=1
-    If overloadedReferer <> #0 then ServerVariables.Values['HTTP_REFERER'] := overloadedReferer;           //HTTP_REFERER=http://www.yahoo.fr
-
-    AlCGIExec(InterpreterFilename,
-              ServerVariables,
-              RequestContentStream,
-              ResponsecontentStream,
-              ResponseHeader);
-
-    ResponsecontentString := ResponsecontentStream.DataString;
-
-  finally
-    ServerVariables.free;
-    ResponsecontentStream.Free;
-  end;
-end;
-
-{***********************************}
-Procedure AlCGIExec(const ScriptName,
-                          ScriptFileName,
-                          Url,
-                          X_REWRITE_URL,
-                          InterpreterFilename: AnsiString;
-                    WebRequest: TALIsapiRequest;
-                    Var ResponseContentString: AnsiString;
-                    ResponseHeader: TALHTTPResponseHeader);
-begin
-  AlCGIExec(ScriptName,
-            ScriptFileName,
-            Url,
-            X_REWRITE_URL,
-            InterpreterFilename,
-            WebRequest,
-            #0,
-            #0,
-            #0,
-            nil,
-            ResponseContentString,
-            ResponseHeader);
-end;
-
 
 end.

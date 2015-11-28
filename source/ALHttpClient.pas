@@ -584,7 +584,7 @@ begin
   FValue := '';
   FPath := '';
   FDomain := '';
-  FExpires := -1;
+  FExpires := ALNullDate;
   FSecure := False;
 end;
 
@@ -609,7 +609,7 @@ begin
   Result := ALFormat('%s=%s; ', [HTTPEncode(FName), HTTPEncode(FValue)]);
   if Domain <> '' then Result := Result + ALFormat('domain=%s; ', [Domain]);
   if Path <> '' then Result := Result + ALFormat('path=%s; ', [Path]);
-  if Expires > -1 then begin
+  if Expires <> ALNullDate then begin
     Result := Result + ALFormat(ALFormatDateTime('"expires=%s, "dd"-%s-"yyyy" "hh":"nn":"ss" GMT; "',
                                                  Expires,
                                                  ALDefaultFormatSettings),
@@ -634,7 +634,7 @@ begin
   FValue:= '';
   FPath:= '';
   FDomain:= '';
-  FExpires:= -1;
+  FExpires:= ALNullDate;
   FSecure:= False;
 
   aCookieProp := TALStringList.Create;
@@ -657,7 +657,7 @@ begin
     FValue := aCookieProp.ValueFromIndex[0];
     FPath := aCookieProp.values['PATH'];
     if FPath = '' then FPath := '/';
-    if not ALTryRfc822StrToGmtDateTime(aCookieProp.values['EXPIRES'], FExpires) then FExpires := -1;
+    if not ALTryRfc822StrToGmtDateTime(aCookieProp.values['EXPIRES'], FExpires) then FExpires := ALNullDate;
     FDomain := aCookieProp.values['DOMAIN'];
     FSecure := aCookieProp.IndexOf('SECURE') <> -1;
 

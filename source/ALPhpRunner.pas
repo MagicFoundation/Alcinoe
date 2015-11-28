@@ -565,7 +565,7 @@ function TALPhpFastCgiRunnerEngine.ReadResponse: AnsiString;
                               // data pending in the network's input buffer that can be read from socket
 
     while aCount > 0 do begin
-      aBuffStrLength := IORead(aBuffStr[1], length(aBuffStr));
+      aBuffStrLength := IORead(pointer(aBuffStr)^, length(aBuffStr));
       If aBuffStrLength <= 0 then raise Exception.Create('Connection close gracefully!');
       aStr := aStr + AlCopyStr(aBuffStr,1,aBuffStrLength);
       dec(aCount,aBuffStrLength);
@@ -576,6 +576,7 @@ Var ErrMsg: AnsiString;
     CurrMsgStr: AnsiString;
     CurrMsgContentlength: integer;
     CurrMsgPaddingLength: integer;
+
 begin
   {init the result and local var}
   Result := '';
@@ -665,17 +666,17 @@ procedure TALPhpFastCgiRunnerEngine.Execute(ServerVariables: TALStrings;
     SetLength(aStr, J + Tam);
     inc(J);
     for I := 0 to 1 do begin
-      if Format[I] = 1 then aStr[J] := AnsiChar(Len[I])
+      if Format[I] = 1 then Pbyte(aStr)[J-1] := Len[I]
       else begin
-        aStr[J]   := AnsiChar(((Len[I] shr  24) and $FF) + $80);
-        aStr[J+1] := AnsiChar( (Len[I] shr  16) and $FF);
-        aStr[J+2] := AnsiChar( (Len[I] shr   8) and $FF);
-        aStr[J+3] := AnsiChar(  Len[I] and $FF);
+        Pbyte(aStr)[J-1] := ((Len[I] shr  24) and $FF) + $80;
+        Pbyte(aStr)[J]   :=  (Len[I] shr  16) and $FF;
+        Pbyte(aStr)[J+1] :=  (Len[I] shr   8) and $FF;
+        Pbyte(aStr)[J+2] :=   Len[I] and $FF;
       end;
       inc(J, Format[I]);
     end;
-    ALMove(aName[1], aStr[J], Len[0]);
-    ALMove(aValue[1], aStr[J + Len[0]], Len[1]);
+    ALMove(pointer(aName)^, pbyte(aStr)[J-1], Len[0]);
+    ALMove(pointer(aValue)^, pbyte(aStr)[J + Len[0] - 1], Len[1]);
 
     //the content data of the name value pair look like :
     //nameLengthB0#valueLengthB0#nameData[nameLength]#valueData[valueLength]
@@ -709,6 +710,7 @@ var aResponseStr: AnsiString;
     Tam : word;
     P1: integer;
     S1 : AnsiString;
+
 begin
 
   {init aFormatedRequestStr from aRequestStr}
@@ -718,7 +720,7 @@ begin
     setlength(S1, 8184);
     RequestContentStream.Position := 0;
     while P1 <= RequestContentStream.Size do begin
-      Tam := RequestContentStream.Read(S1[1], 8184); // ok i decide to plit the message in 8ko, because php send me in FCGI_STDOUT message split in 8ko (including 8 bytes of header)
+      Tam := RequestContentStream.Read(pointer(S1)^, 8184); // ok i decide to plit the message in 8ko, because php send me in FCGI_STDOUT message split in 8ko (including 8 bytes of header)
       inc(P1, Tam);
       aFormatedRequestStr := aFormatedRequestStr + #1             +#5         +#0          +#1          +AnsiChar(hi(Tam)) +AnsiChar(lo(Tam)) +#0            +#0       +AlCopyStr(S1,1,Tam);
                                                  //FCGI_VERSION_1 +FCGI_STDIN +requestIdB1 +requestIdB0 +contentLengthB1   +contentLengthB0   +paddingLength +reserved +contentData[contentLength]

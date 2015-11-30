@@ -1749,8 +1749,10 @@ end;
 function  TALStringList.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
+  Changing;
   result := FList[Index].FObject;
   FList[Index].FObject := nil;
+  Changed;
 end;
 
 {********************************************************}
@@ -2498,8 +2500,10 @@ end;
 function  TALNVStringList.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= FCount) then Error(@SListIndexError, Index);
+  Changing;
   result := FList[Index].FObject;
   FList[Index].FObject := nil;
+  Changed;
 end;
 
 {**********************************************************}
@@ -3230,8 +3234,10 @@ begin
   begin
     if I < 0 then AddNameValue(Name, Value)
     else begin
+      Changing;
       Flist[i].fValue := Value;
       Flist[i].fNVS := True;
+      Changed;
     end
   end else
   begin
@@ -3264,8 +3270,10 @@ begin
     else begin
       if Cardinal(Index) >= Cardinal(Count) then
         Error(@SListIndexError, Index);
+      Changing;
       Flist[Index].fValue := Value;
       Flist[Index].fNVS := True;
+      Changed;
     end;
   end
   else
@@ -3280,8 +3288,10 @@ begin
   I := IndexOfName(Name);
   if I < 0 then AddNameValue(Name, Value)
   else begin
+    Changing;
     Flist[I].fValue := Value;
     Flist[I].fNVS := True;
+    Changed;
   end
 end;
 
@@ -3292,8 +3302,10 @@ begin
   else begin
     if Cardinal(Index) >= Cardinal(Count) then
       Error(@SListIndexError, Index);
+    Changing;
     Flist[Index].fValue := Value;
     Flist[Index].fNVS := True;
+    Changed;
   end;
 end;
 
@@ -3473,10 +3485,12 @@ end;
 function  TALAVLStringList.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  Changing;
   with TALAVLStringListBinaryTreeNode(FNodeList[Index]) do begin
     result := Obj;
     Obj := nil;
   end;
+  Changed;
 end;
 
 {***********************************************************}
@@ -3915,8 +3929,10 @@ begin
   begin
     if I < 0 then AddNameValue(Name, Value)
     else begin
+      Changing;
       TALAVLStringListBinaryTreeNode(FNodeList[i]).Val := Value;
       TALAVLStringListBinaryTreeNode(FNodeList[i]).NVS := True;
+      Changed;
     end
   end else
   begin
@@ -3949,8 +3965,10 @@ begin
     else begin
       if Cardinal(Index) >= Cardinal(Count) then
         Error(@SListIndexError, Index);
+      Changing;
       TALAVLStringListBinaryTreeNode(FNodeList[Index]).Val := Value;
       TALAVLStringListBinaryTreeNode(FNodeList[Index]).NVS := True;
+      Changed;
     end;
   end
   else
@@ -3965,8 +3983,10 @@ begin
   I := IndexOfName(Name);
   if I < 0 then AddNameValue(Name, Value)
   else begin
+    Changing;
     TALAVLStringListBinaryTreeNode(FNodeList[I]).Val := Value;
     TALAVLStringListBinaryTreeNode(FNodeList[I]).NVS := True;
+    Changed;
   end
 end;
 
@@ -3977,8 +3997,10 @@ begin
   else begin
     if Cardinal(Index) >= Cardinal(Count) then
       Error(@SListIndexError, Index);
+    Changing;
     TALAVLStringListBinaryTreeNode(FNodeList[Index]).Val := Value;
     TALAVLStringListBinaryTreeNode(FNodeList[Index]).NVS := True;
+    Changed;
   end;
 end;
 
@@ -4158,10 +4180,12 @@ end;
 function  TALHashedStringList.ExtractObject(Index: Integer): TObject;
 begin
   if (Index < 0) or (Index >= Count) then Error(@SListIndexError, Index);
+  Changing;
   with FNodeList[Index] do begin
     result := Obj;
     Obj := nil;
   end;
+  Changed;
 end;
 
 {**************************************************************}
@@ -4655,8 +4679,10 @@ begin
   begin
     if I < 0 then AddNameValue(Name, Value)
     else begin
+      Changing;
       FNodeList[i].Val := Value;
       FNodeList[i].NVS := True;
+      Changed;
     end
   end else
   begin
@@ -4689,8 +4715,10 @@ begin
     else begin
       if Cardinal(Index) >= Cardinal(Count) then
         Error(@SListIndexError, Index);
+      Changing;
       FNodeList[Index].Val := Value;
       FNodeList[Index].NVS := True;
+      Changed;
     end;
   end
   else
@@ -4705,8 +4733,10 @@ begin
   I := IndexOfName(Name);
   if I < 0 then AddNameValue(Name, Value)
   else begin
+    Changing;
     FNodeList[I].Val := Value;
     FNodeList[I].NVS := True;
+    Changed;
   end
 end;
 
@@ -4717,8 +4747,10 @@ begin
   else begin
     if Cardinal(Index) >= Cardinal(Count) then
       Error(@SListIndexError, Index);
+    Changing;
     FNodeList[Index].Val := Value;
     FNodeList[Index].NVS := True;
+    Changed;
   end;
 end;
 

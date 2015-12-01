@@ -670,7 +670,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      ALquickSortList,
      AlHTML,
      ALMime,
-     ALMisc;
+     ALCommon;
 
 var _cALJsonISODateFormatSettings: TALFormatSettings;
 

@@ -557,7 +557,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      SysConst,
      Math,
      {$IFEND}
-     AlMisc,
+     AlCommon,
      ALString;
 
 {***********************************************************************************}

@@ -4,10 +4,10 @@ svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
 Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 							
-product:      Alcinoe Misc functions
+product:      Alcinoe Common functions
 Version:      4.00
 
-Description:  Alcinoe Misc Functions
+Description:  Alcinoe Common Functions
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 
@@ -56,7 +56,7 @@ Link :
 * Please, help us to keep the development of these components free by 
   promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
-unit ALMisc;
+unit ALCommon;
 
 interface
 

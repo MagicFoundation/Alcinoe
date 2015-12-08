@@ -96,26 +96,15 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Classes,
+Uses System.Classes,
      System.Contnrs,
      System.Generics.Defaults,
      System.Generics.Collections,
      System.Math,
-     {$ELSE}
-     Classes,
-     Contnrs,
-     Math,
-     {$IFEND}
      ALQuickSortList,
      AlAvlBinaryTRee;
 
 Type
-
-  {$IF CompilerVersion < 18.5} {Delphi 2007}
-  TStringsDefined = set of (sdDelimiter, sdQuoteChar, sdNameValueSeparator,
-    sdLineBreak, sdStrictDelimiter);
-  {$IFEND}
 
   {-----------------}
   TALStrings = class;
@@ -127,7 +116,7 @@ Type
     FStrings: TALStrings;
   public
     constructor Create(AStrings: TALStrings);
-    function GetCurrent: AnsiString; {$IF CompilerVersion >= 17.0}inline;{$IFEND}
+    function GetCurrent: AnsiString; inline;
     function MoveNext: Boolean;
     property Current: AnsiString read GetCurrent;
   end;
@@ -208,10 +197,8 @@ Type
     function AddNameValueObject(const Name, Value: AnsiString; AObject: TObject): Integer; virtual; // [added from Tstrings]
     procedure Append(const S: AnsiString);
     procedure AddStrings(Strings: TALStrings); overload; virtual;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     procedure AddStrings(const Strings: TArray<AnsiString>); overload;
     procedure AddStrings(const Strings: TArray<AnsiString>; const Objects: TArray<TObject>); overload;
-    {$IFEND}
     procedure Assign(Source: TPersistent); override;
     procedure BeginUpdate;
     procedure Clear; virtual; abstract;
@@ -234,10 +221,8 @@ Type
     procedure SaveToFile(const FileName: AnsiString); virtual;
     procedure SaveToStream(Stream: TStream); virtual;
     procedure SetText(Text: PAnsiChar); virtual;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     function ToStringArray: TArray<AnsiString>;
     function ToObjectArray: TArray<TObject>;
-    {$IFEND}
     property Capacity: Integer read GetCapacity write SetCapacity;
     property CommaText: AnsiString read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
@@ -270,11 +255,7 @@ Type
 
   {-----------------------------------------}
   TALStringItemList = array of TALStringItem;
-  {$IF CompilerVersion >= 23} {Delphi XE2}
   TALStringListSortCompare = reference to function(List: TALStringList; Index1, Index2: Integer): Integer;
-  {$ELSE}
-  TALStringListSortCompare = function(List: TALStringList; Index1, Index2: Integer): Integer;
-  {$IFEND}
 
   {-------------------------------}
   TALStringList = class(TALStrings)
@@ -352,11 +333,7 @@ Type
 
   {---------------------------------------------}
   TALNVStringItemList = array of TALNVStringItem;
-  {$IF CompilerVersion >= 23} {Delphi XE2}
   TALNVStringListSortCompare = reference to function(List: TALNVStringList; Index1, Index2: Integer): Integer;
-  {$ELSE}
-  TALNVStringListSortCompare = function(List: TALNVStringList; Index1, Index2: Integer): Integer;
-  {$IFEND}
 
   {---------------------------------}
   TALNVStringList = class(TALStrings)
@@ -523,8 +500,6 @@ Type
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
-{$IF CompilerVersion >= 23} {Delphi XE2 - because we use TDictionary but i think TDictionary was 1rt introduced in D2009}
-
   {--------------------------}
   TALHashedStringList = class;
   TALHashedStringListSortCompare = function(List: TALHashedStringList; Index1, Index2: Integer): Integer;
@@ -618,20 +593,11 @@ Type
     property OwnsObjects: Boolean read FOwnsObject write FOwnsObject;
   end;
 
-{$IFEND}
-
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Sysutils,
+Uses System.Sysutils,
      System.RTLConsts,
-     {$IF CompilerVersion >= 24}{Delphi XE3}
      System.Ansistrings,
-     {$IFEND}
-     {$ELSE}
-     sysutils,
-     RTLConsts,
-     {$IFEND}
      ALCipher,
      ALString;
 
@@ -716,8 +682,7 @@ begin
   end;
 end;
 
-{**************************************}
-{$IF CompilerVersion >= 23} {Delphi XE2}
+{*****************************************************************}
 procedure TALStrings.AddStrings(const Strings: TArray<AnsiString>);
 var
   I: Integer;
@@ -730,10 +695,8 @@ begin
     EndUpdate;
   end;
 end;
-{$IFEND}
 
-{**************************************}
-{$IF CompilerVersion >= 23} {Delphi XE2}
+{*************************************************************************************************}
 procedure TALStrings.AddStrings(const Strings: TArray<AnsiString>; const Objects: TArray<TObject>);
 var
   I: Integer;
@@ -748,7 +711,6 @@ begin
     EndUpdate;
   end;
 end;
-{$IFEND}
 
 {***********************************************}
 procedure TALStrings.Assign(Source: TPersistent);
@@ -779,10 +741,8 @@ begin
       NameValueSeparator := AnsiChar(TStrings(Source).NameValueSeparator);
       QuoteChar := AnsiChar(TStrings(Source).QuoteChar);
       Delimiter := AnsiChar(TStrings(Source).Delimiter);
-      {$IF CompilerVersion >= 18.5} {Delphi D2007}
       LineBreak := AnsiString(TStrings(Source).LineBreak);
       StrictDelimiter := TStrings(Source).StrictDelimiter;
-      {$IFEND}
       for I := 0 to Tstrings(Source).Count - 1 do
         AddObject(Ansistring(Tstrings(Source)[I]), Tstrings(Source).Objects[I]);
     finally
@@ -805,10 +765,8 @@ begin
       Tstrings(Dest).NameValueSeparator := char(FNameValueSeparator);
       Tstrings(Dest).QuoteChar := char(FQuoteChar);
       Tstrings(Dest).Delimiter := char(FDelimiter);
-      {$IF CompilerVersion >= 18.5} {Delphi D2007}
       Tstrings(Dest).LineBreak := String(FLineBreak);
       Tstrings(Dest).StrictDelimiter := FStrictDelimiter;
-      {$IFEND}
       for I := 0 to Count - 1 do
         Tstrings(Dest).AddObject(string(get(I)), Objects[I]);
     finally
@@ -1023,7 +981,7 @@ end;
 {*************************************}
 function TALStrings.GetText: PAnsiChar;
 begin
-  Result := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrNew(PAnsiChar(GetTextStr));
+  Result := System.Ansistrings.StrNew(PAnsiChar(GetTextStr));
 end;
 
 {*****************************************}
@@ -1320,7 +1278,7 @@ begin
         while P^ <> #0 do
         begin
           Start := P;
-          LB := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrPos(P, PAnsiChar(LineBreak));
+          LB := System.Ansistrings.StrPos(P, PAnsiChar(LineBreak));
           while (P^ <> #0) and (P <> LB) do Inc(P);
           SetString(S, Start, P - Start);
           Add(S);
@@ -1543,8 +1501,7 @@ begin
   else Put(Index, Names[Index] + NameValueSeparator + Value);
 end;
 
-{**************************************}
-{$IF CompilerVersion >= 23} {Delphi XE2}
+{****************************************************}
 function TALStrings.ToStringArray: TArray<AnsiString>;
 var
   I: Integer;
@@ -1553,10 +1510,8 @@ begin
   for I := 0 to Count - 1 do
     Result[I] := Strings[I];
 end;
-{$IFEND}
 
-{**************************************}
-{$IF CompilerVersion >= 23} {Delphi XE2}
+{*************************************************}
 function TALStrings.ToObjectArray: TArray<TObject>;
 var
   I: Integer;
@@ -1565,7 +1520,6 @@ begin
   for I := 0 to Count - 1 do
     Result[I] := Objects[I];
 end;
-{$IFEND}
 
 {*******************************}
 destructor TALStringList.Destroy;
@@ -1631,7 +1585,6 @@ begin
     FDuplicates := TALNVStringList(Source).FDuplicates;
     FSorted := TALNVStringList(Source).FSorted;
   end
-  {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
   begin
     Clear;
@@ -1639,7 +1592,6 @@ begin
     FDuplicates := TALHashedStringList(Source).FDuplicates;
     FSorted := False;
   end
-  {$ifend}
   else if Source is TALAVLStringList then
   begin
     Clear;
@@ -2381,7 +2333,6 @@ begin
     FDuplicates := TALStringList(Source).FDuplicates;
     FSorted := TALStringList(Source).FSorted;
   end
-  {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
   begin
     Clear;
@@ -2389,7 +2340,6 @@ begin
     FDuplicates := TALHashedStringList(Source).FDuplicates;
     FSorted := False;
   end
-  {$ifend}
   else if Source is TALAVLStringList then
   begin
     Clear;
@@ -3383,14 +3333,12 @@ begin
     CaseSensitive := TALNVStringList(Source).FCaseSensitive;
     FDuplicates := TALNVStringList(Source).FDuplicates;
   end
-  {$IF CompilerVersion >= 23} {Delphi XE2}
   else if Source is TALHashedStringList then
   begin
     Clear;
     CaseSensitive := TALHashedStringList(Source).CaseSensitive;
     FDuplicates := TALHashedStringList(Source).FDuplicates;
   end
-  {$ifend}
   else if Source is TStringList then
   begin
     Clear;
@@ -4003,8 +3951,6 @@ begin
     Changed;
   end;
 end;
-
-{$IF CompilerVersion >= 23} {Delphi XE2 - because we use TDictionary but i think TDictionary was 1rt introduced in D2009}
 
 {*************************************}
 destructor TALHashedStringList.Destroy;
@@ -4753,8 +4699,6 @@ begin
     Changed;
   end;
 end;
-
-{$IFEND}
 
 end.
 

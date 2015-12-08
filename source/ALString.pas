@@ -91,13 +91,24 @@ unit ALString;
 
 interface
 
+{$H+,B-,R-}
+
 // http://docwiki.embarcadero.com/RADStudio/en/Conditional_compilation_(Delphi)
 // http://docwiki.embarcadero.com/RADStudio/en/Compiler_Versions
 {$IFDEF CPUX86}
   {$DEFINE X86ASM}
 {$ELSE !CPUX86}
   {$DEFINE PUREPASCAL}
+  {$DEFINE PUREPASCAL_X64ONLY}
 {$ENDIF !CPUX86}
+
+{$IF SizeOf(Extended) = 10}
+  {$DEFINE EXTENDEDIS10BYTES}
+{$ENDIF}
+
+{$IFDEF ANDROID}
+  {$DEFINE USE_LIBICU}
+{$ENDIF}
 
 {$DEFINE LEGACY_FORMAT} // Define this to enable the old ASM code for Win32.
 
@@ -176,7 +187,7 @@ type
 
   {$IFNDEF NEXTGEN}
   function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
-  procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
+  procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings); platform;
   {$ENDIF}
 
 var
@@ -215,6 +226,11 @@ type
   {$ENDIF}
 
   {$IFNDEF NEXTGEN}
+
+  //
+  //TALMask is taken from delphi seattle upd1
+  //
+
   EALMaskException = class(Exception);
 
   TALMask = class
@@ -249,6 +265,7 @@ type
   end;
 
   function  ALMatchesMask(const Filename, Mask: AnsiString): Boolean;
+
   {$ENDIF}
 
 type
@@ -1038,44 +1055,28 @@ end;
 
 {***********************************************************************************}
 function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
-var i: integer;
 begin
   With aFormatSettings do begin
-    Result := CurrencyString + '#' +
-              ALIntToStr(CurrencyFormat) + '#' +
+    Result := ALIntToStr(CurrencyFormat) + '#' +
               ALIntToStr(CurrencyDecimals) + '#' +
               DateSeparator + '#' +
               TimeSeparator + '#' +
               ListSeparator + '#' +
               ShortDateFormat + '#' +
               LongDateFormat + '#' +
-              TimeAMString + '#' +
-              TimePMString + '#' +
               ShortTimeFormat + '#' +
-              LongTimeFormat + '#';
-
-    for I := low(ShortMonthNames) to high(ShortMonthNames) do
-      result := result + ShortMonthNames[i] + '#';
-    for I := low(LongMonthNames) to high(LongMonthNames) do
-      result := result + LongMonthNames[i] + '#';
-    for I := low(ShortDayNames) to high(ShortDayNames) do
-      result := result + ShortDayNames[i] + '#';
-    for I := low(LongDayNames) to high(LongDayNames) do
-      result := result + LongDayNames[i] + '#';
-
-    Result := Result + ThousandSeparator + '#' +
-                       DecimalSeparator + '#' +
-                       ALIntToStr(TwoDigitYearCenturyWindow) + '#' +
-                       ALIntToStr(NegCurrFormat);
+              LongTimeFormat + '#' +
+              ThousandSeparator + '#' +
+              DecimalSeparator + '#' +
+              ALIntToStr(TwoDigitYearCenturyWindow) + '#' +
+              ALIntToStr(NegCurrFormat);
   end;
 end;
 
 {****************************************************************************************}
 procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
 begin
-  {$WARN SYMBOL_PLATFORM OFF}
-    AFormatSettings := TALFormatSettings.Create(Locale);
-  {$WARN SYMBOL_DEPRECATED ON}
+  AFormatSettings := TALFormatSettings.Create(Locale);
 end;
 
 {**********************************************************}
@@ -1135,6 +1136,11 @@ Begin
   Result := ALGUIDToString(aGUID, WithoutBracket, WithoutHyphen);
 End;
 
+//
+//TALMask is taken from delphi seattle upd1
+//
+
+{***}
 const
   MaxCards = 30;
 
@@ -1208,9 +1214,9 @@ var
     while not (P^ in [#0, ']']) do
     begin
       // MBCS characters not supported in msSet!
-      if IsLeadChar(P^) then
-         Inc(P)
-      else
+      //if IsLeadChar(P^) then
+      //   Inc(P)
+      //else
       case P^ of
         '-':
           if LastChar = #0 then InvalidMask
@@ -1242,14 +1248,14 @@ begin
       '?': if not SkipTo then WriteScan(msAny);
       '[':  ScanSet;
     else
-      if IsLeadChar(P^) then
-      begin
-        LeadByte := P^;
-        Inc(P);
-        TrailByte := P^;
-        WriteScan(msMBCSLiteral);
-      end
-      else
+      //if IsLeadChar(P^) then
+      //begin
+      //  LeadByte := P^;
+      //  Inc(P);
+      //  TrailByte := P^;
+      //  WriteScan(msMBCSLiteral);
+      //end
+      //else
       begin
         Literal := P^;
         WriteScan(msLiteral);
@@ -1487,13 +1493,13 @@ end;
 Assume there are 13 backreferences:
 
 Text        TALPerlRegEx    .NET      Java       ECMAScript
-$17         $1 + "7"      "$17"     $1 + "7"   $1 + "7"
-$017        $1 + "7"      "$017"    $1 + "7"   $1 + "7"
-$12         $12           $12       $12        $12
-$012        $1 + "2"      $12       $12        $1 + "2"
-${1}2       $1 + "2"      $1 + "2"  error      "${1}2"
-$$          "$"           "$"       error      "$"
-\$          "$"           "\$"      "$"        "\$"
+$17         $1 + "7"        "$17"     $1 + "7"   $1 + "7"
+$017        $1 + "7"        "$017"    $1 + "7"   $1 + "7"
+$12         $12             $12       $12        $12
+$012        $1 + "2"        $12       $12        $1 + "2"
+${1}2       $1 + "2"        $1 + "2"  error      "${1}2"
+$$          "$"             "$"       error      "$"
+\$          "$"             "\$"      "$"        "\$"
 *)
 
 {***************************************************}
@@ -2378,7 +2384,8 @@ begin
   raise EConvertError.CreateRes(ResString);
 end;
 
-{***************************************************************************}
+{********************}
+//delphi seattle upd 1
 procedure ALFormatError(ErrorCode: Integer; Format: PChar; FmtLen: Cardinal);
 const
   FormatErrorStrs: array[0..1] of PResStringRec = (
@@ -2394,9 +2401,9 @@ begin
   ALConvertErrorFmt(FormatErrorStrs[ErrorCode], [PChar(@Buffer)]);
 end;
 
-{****************************************************************}
-procedure ALAnsiFormatError(ErrorCode: Integer; Format: PAnsiChar;
-  FmtLen: Cardinal);
+{********************}
+//delphi seattle upd 1
+procedure ALAnsiFormatError(ErrorCode: Integer; Format: PAnsiChar; FmtLen: Cardinal);
 var
   FormatText: string;
 begin
@@ -2404,13 +2411,8 @@ begin
   ALFormatError(ErrorCode, PChar(FormatText), FmtLen);
 end;
 
-{********************************************}
-procedure ALFormatClearStr(var S: AnsiString);
-begin
-  S := '';
-end;
-
-{***************************************************************}
+{********************}
+//delphi seattle upd 1
 procedure ALFormatVarToStr(var S: AnsiString; const V: TVarData);
 begin
   if Assigned(System.VarToLStrProc) then
@@ -2419,11 +2421,19 @@ begin
     System.Error(reVarInvalidOp);
 end;
 
+{********************}
+//delphi seattle upd 1
+procedure ALFormatClearStr(var S: AnsiString);
+begin
+  S := '';
+end;
+
 {***}
 const
   cALDCon10: Integer = 10;
 
-{*************}
+{********************}
+//delphi seattle upd 1
 {$IFDEF X86ASM}
 procedure ALPutExponent;
 // Store exponent
@@ -2500,7 +2510,8 @@ asm //StackAlignSafe - internal method can be called unaligned
 end;
 {$ENDIF X86ASM}
 
-{*****************}
+{********************}
+//delphi seattle upd 1
 {$IFDEF PUREPASCAL}
 function ALInternalFloatToText(
   ABuffer: PByte;
@@ -2512,11 +2523,11 @@ function ALInternalFloatToText(
   const AFormatSettings: TALFormatSettings): Integer;
 const
   CMinExtPrecision = 2;
-{$IFDEF CPUX86}
+{$IFDEF EXTENDEDIS10BYTES}
   CMaxExtPrecision = 18;
-{$ELSE !CPUX86}
-  CMaxExtPrecision = 16;
-{$ENDIF !CPUX86}
+{$ELSE !EXTENDEDIS10BYTES}
+  CMaxExtPrecision = 17;
+{$ENDIF EXTENDEDIS10BYTES}
 
   CCurrPrecision = 19;
   CGenExpDigits = 9999;
@@ -2525,9 +2536,9 @@ const
   CMinusSign: AnsiChar = '-';  // DO NOT LOCALIZE
   CPlusSign: AnsiChar = '+';   // DO NOT LOCALIZE
   CZero: AnsiChar = '0';       // DO NOT LOCALIZE
-  CSpecial: array[0 .. 1] of string[3] = ('INF', 'NAN'); // DO NOT LOCALIZE
-  CCurrencyFormats: array[0 .. 3] of string[5] = ('$*@@@', '*$@@@', '$ *@@', '* $@@'); // DO NOT LOCALIZE
-  CNegCurrencyFormats: array[0 .. 15] of string[5] =
+  CSpecial: array[0 .. 1] of ansistring = ('INF', 'NAN'); // DO NOT LOCALIZE
+  CCurrencyFormats: array[0 .. 3] of ansistring = ('$*@@@', '*$@@@', '$ *@@', '* $@@'); // DO NOT LOCALIZE
+  CNegCurrencyFormats: array[0 .. 15] of ansistring =
   (
     '($*)@', '-$*@@', '$-*@@', '$*-@@', '(*$)@', '-*$@@', // DO NOT LOCALIZE
     '*-$@@', '*$-@@', '-* $@', '-$ *@', '* $-@', // DO NOT LOCALIZE
@@ -2541,101 +2552,60 @@ var
   LExponent: Cardinal;
   LUseENotation: Boolean;
 
-  LCurrentFormat: string[5];
-  LCurrChar: AnsiChar;
+  LCurrentFormat: ansistring;
+  //LCurrChar: Char;
+  ICurrChar: integer;
   LFloatRecDigit: Integer;
   LNextThousand: Integer;
 
-  //procedure AppendChar(const AChar: Char);
-  //begin
-  //  if ABufferIsUnicode then
-  //  begin
-  //    PWideChar(ABuffer)^ := AChar;
-  //    Inc(ABuffer, SizeOf(Char));
-  //  end else
-  //  begin
-  //    PAnsiChar(ABuffer)^ := AnsiChar(AChar);
-  //    Inc(ABuffer, SizeOf(AnsiChar));
-  //  end;
-  //
-  //  Inc(Result);
-  //end;
-
-  procedure AppendAnsiChar(const AChar: AnsiChar);
+  procedure AppendChar(const AChar: AnsiChar);
   begin
-    if ABufferIsUnicode then
-    begin
-      PWideChar(ABuffer)^ := Char(AChar);
-      Inc(ABuffer, SizeOf(Char));
-    end else
-    begin
+    //if ABufferIsUnicode then
+    //begin
+    //  PChar(ABuffer)^ := Char(AChar);
+    //  Inc(ABuffer, SizeOf(Char));
+    //end else
+    //begin
       PAnsiChar(ABuffer)^ := AChar;
       Inc(ABuffer, SizeOf(AnsiChar));
-    end;
+    //end;
 
     Inc(Result);
   end;
 
-  procedure AppendAnsiString(const AStr: AnsiString);
+  procedure AppendString(const AStr: AnsiString);
   var
-    I, L: Integer;
+    {I,} L: Integer;
   begin
     L := Length(AStr);
 
     if L > 0 then
     begin
-      if ABufferIsUnicode then
-      begin
-        { Unicode -- loop }
-        for I := 1 to L do
-        begin
-          PWideChar(ABuffer)^ := Char(AStr[I]);
-          Inc(ABuffer, SizeOf(Char));
-        end;
-      end else
-      begin
+      //if ABufferIsUnicode then
+      //begin
+      //  { Unicode -- loop }
+      //  for I := Low(AStr) to High(AStr) do
+      //  begin
+      //    PChar(ABuffer)^ := Char(AStr[I]);
+      //    Inc(ABuffer, SizeOf(Char));
+      //  end;
+      //end else
+      //begin
         { ANSI -- move directly }
-        ALMove(AStr[1], ABuffer^, L);
+        ALMove(pointer(AStr)^, ABuffer^, L);
         Inc(ABuffer, L * SizeOf(AnsiChar));
-      end;
+      //end;
 
       Inc(Result, L);
     end;
   end;
 
-  //procedure AppendString(const AStr: String);
-  //var
-  //  I, L: Integer;
-  //begin
-  //  L := Length(AStr);
-  //
-  //  if L > 0 then
-  //  begin
-  //    if ABufferIsUnicode then
-  //    begin
-  //      { Unicode -- move directly }
-  //      MoveChars(AStr[1], ABuffer^, L);
-  //      Inc(ABuffer, L * SizeOf(Char));
-  //    end else
-  //    begin
-  //      { ANSI -- loop }
-  //      for I := 1 to L do
-  //      begin
-  //        PAnsiChar(ABuffer)^ := AnsiChar(AStr[I]);
-  //        Inc(ABuffer, SizeOf(AnsiChar));
-  //      end;
-  //    end;
-  //
-  //    Inc(Result, L);
-  //  end;
-  //end;
-
-  function GetDigit: AnsiChar;
+  function GetDigit: Byte;
   begin
-    Result := AnsiChar(FloatRec.Digits[LFloatRecDigit]);
+    Result := FloatRec.Digits[LFloatRecDigit];
 
-    if Result = #0 then
-      Result := '0'
+    if Result = Ord(#0) then
+      Result := Ord('0')
     else
       Inc(LFloatRecDigit);
   end;
@@ -2659,7 +2629,7 @@ var
 
       repeat
         { Append the next digit }
-        AppendAnsiChar(GetDigit);
+        AppendChar(ansiChar(GetDigit));
 
         { Update loop counters }
         Dec(K);
@@ -2671,26 +2641,26 @@ var
           LNextThousand := 3;
 
           if AFormatSettings.ThousandSeparator <> #0 then
-            AppendAnsiChar(AFormatSettings.ThousandSeparator);
+            AppendChar(AFormatSettings.ThousandSeparator);
         end;
       until (K = 0);
 
     end else
-      AppendAnsiChar(CZero);
+      AppendChar(CZero);
 
     { If there are ADigits left to fill }
     if LDigits <> 0 then
     begin
       { Put in the decimal separator if it was specified }
       if AFormatSettings.DecimalSeparator <> #0 then
-        AppendAnsiChar(AFormatSettings.DecimalSeparator);
+        AppendChar(AFormatSettings.DecimalSeparator);
 
       { If there is  negative exponent }
       if K < 0 then
       begin
         { Fill with zeroes until the exponent or ADigits are exhausted}
         repeat
-          AppendAnsiChar(CZero);
+          AppendChar(CZero);
 
           Inc(K);
           Dec(LDigits);
@@ -2701,7 +2671,7 @@ var
       begin
         { Exponent was filled, there are still ADigits left to fill }
         repeat
-          AppendAnsiChar(GetDigit);
+          AppendChar(ansiChar(GetDigit));
           Dec(LDigits);
         until (LDigits <= 0);
       end;
@@ -2711,7 +2681,7 @@ var
   procedure FormatExponent;
   var
     LMinCnt, LExponent: Integer;
-    LExpString: string[8];
+    LExpString: ansistring;
     LDigitCnt: Integer;
   begin
     { Adjust digit count }
@@ -2724,52 +2694,37 @@ var
     LExponent := FloatRec.Exponent - 1;
 
     { Place the E character into position }
-    AppendAnsiChar(CExpChar);
+    AppendChar(CExpChar);
 
-{    if FloatRec.Digits[0] <> #0 then
+    if Byte(FloatRec.Digits[0]) <> Ord(#0) then
     begin
       if LExponent < 0 then
       begin
         LExponent := -LExponent;
         AppendChar(CMinusSign);
-      end;
-    end else
-    begin
-      LExponent := 0;
-
-      if AFormat <> ffGeneral then
-        AppendChar(CPlusSign);
-    end;
- }
-    if FloatRec.Digits[0] <> ord(#0) then
-    begin
-      if LExponent < 0 then
-      begin
-        LExponent := -LExponent;
-        AppendAnsiChar(CMinusSign);
       end
       else
       begin
         if AFormat <> ffGeneral then
-          AppendAnsiChar(CPlusSign);
+          AppendChar(CPlusSign);
       end;
     end else
     begin
       if AFormat <> ffGeneral then
-        AppendAnsiChar(CPlusSign);
+        AppendChar(CPlusSign);
       LExponent := 0;
     end;
 
-    Str(LExponent, LExpString);
+    LExpString := ALIntToStr(LExponent);
     LDigitCnt := Length(LExpString);
 
     while LDigitCnt < LMinCnt do
     begin
-      AppendAnsiChar(CZero);
+      AppendChar(CZero);
       Inc(LDigitCnt);
     end;
 
-    AppendAnsiString(LExpString);
+    AppendString(LExpString);
   end;
 
 begin
@@ -2794,21 +2749,20 @@ begin
 
   { Decode the float }
   FloatToDecimal(FloatRec, AValue, AValueType, APrecision, LDigits);
-{$IFDEF CPUX86}
-  LExponent := FloatRec.Exponent - $7FFF;
-{$ENDIF CPUX86}
-{$IFDEF CPUX64}
-  LExponent := FloatRec.Exponent - $7FF;
-{$ENDIF CPUX64}
+{$IFDEF EXTENDEDIS10BYTES}
+  LExponent := UInt16(FloatRec.Exponent) - $7FFF;
+{$ELSE !EXTENDEDIS10BYTES}
+  LExponent := UInt16(Int16(FloatRec.Exponent) - $7FF);
+{$ENDIF EXTENDEDIS10BYTES}
 
   { Check for INF or NAN}
   if LExponent < 2 then
   begin
     { Append the sign to output buffer }
     if FloatRec.Negative then
-      AppendAnsiChar(CMinusSign);
+      AppendChar(CMinusSign);
 
-    AppendAnsiString(CSpecial[LExponent]);
+    AppendString(CSpecial[LExponent]);
     Exit;
   end;
 
@@ -2821,7 +2775,7 @@ begin
     begin
       { Append the sign to output buffer }
       if FloatRec.Negative then
-        AppendAnsiChar(CMinusSign);
+        AppendChar(CMinusSign);
 
       LUseENotation := False;
 
@@ -2838,41 +2792,41 @@ begin
         { Append the ADigits that precede decimal separator }
         while LDigits > 0 do
         begin
-          AppendAnsiChar(GetDigit);
+          AppendChar(ansiChar(GetDigit));
           Dec(LDigits);
         end;
 
         { Append the decimal separator and the following digit }
         if FloatRec.Digits[LFloatRecDigit] <> ord(#0) then
         begin
-          AppendAnsiChar(AFormatSettings.DecimalSeparator);
+          AppendChar(AFormatSettings.DecimalSeparator);
 
           { Append the ADigits that come after the decimal separator }
           while FloatRec.Digits[LFloatRecDigit] <> ord(#0) do
-            AppendAnsiChar(GetDigit);
+            AppendChar(ansiChar(GetDigit));
         end;
 
         if LUseENotation then
           FormatExponent();
       end else
       begin
-        AppendAnsiChar(CZero);
+        AppendChar(CZero);
 
         if FloatRec.Digits[0] <> ord(#0) then
         begin
-          AppendAnsiChar(AFormatSettings.DecimalSeparator);
+          AppendChar(AFormatSettings.DecimalSeparator);
           LDigits := -LDigits;
 
           { Append zeroes to fulfill the exponent }
           while LDigits > 0 do
           begin
-            AppendAnsiChar(CZero);
+            AppendChar(CZero);
             Dec(LDigits);
           end;
 
           { Attach all the other ADigits now }
           while FloatRec.Digits[LFloatRecDigit] <> ord(#0) do
-            AppendAnsiChar(GetDigit);
+            AppendChar(ansiChar(GetDigit));
         end;
       end;
     end;
@@ -2881,16 +2835,16 @@ begin
     begin
       { Append the sign to output buffer }
       if FloatRec.Negative then
-        AppendAnsiChar(CMinusSign);
+        AppendChar(CMinusSign);
 
       { Append the first digit and the decimal separator }
-      AppendAnsiChar(GetDigit);
-      AppendAnsiChar(AFormatSettings.DecimalSeparator);
+      AppendChar(ansiChar(GetDigit));
+      AppendChar(AFormatSettings.DecimalSeparator);
 
       { Append ADigits based on the APrecision requirements }
       Dec(APrecision);
       repeat
-        AppendAnsiChar(GetDigit);
+        AppendChar(ansiChar(GetDigit));
         Dec(APrecision);
       until (APrecision = 0);
 
@@ -2901,7 +2855,7 @@ begin
     begin
       { Append the sign to output buffer }
       if FloatRec.Negative then
-        AppendAnsiChar(CMinusSign);
+        AppendChar(CMinusSign);
 
       FormatNumber();
     end;
@@ -2926,22 +2880,26 @@ begin
       end;
 
       { Iterate over each charater in the AFormat string }
-      for LCurrChar in LCurrentFormat do
-        case LCurrChar of
+//      for LCurrChar in LCurrentFormat do
+//        case LCurrChar of
+      for ICurrChar := Low(LCurrentFormat) to High(LCurrentFormat) do
+        case LCurrentFormat[ICurrChar] of
           '@': break;
           '$':
             if AFormatSettings.CurrencyString <> '' {EmptyStr} then
-              AppendAnsiString(AFormatSettings.CurrencyString);
+              AppendString(AFormatSettings.CurrencyString);
           '*': FormatNumber();
           else
-             AppendAnsiChar(LCurrChar);
+             //AppendChar(LCurrChar);
+             AppendChar(LCurrentFormat[ICurrChar]);
         end;
     end;
   end;
 end;
 {$ENDIF PUREPASCAL}
 
-{*******************************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALFloatToText(BufferArg: PAnsiChar; const Value; ValueType: TFloatValue;
   Format: TFloatFormat; Precision, Digits: Integer;
   const AFormatSettings: TALFormatSettings): Integer;
@@ -3337,7 +3295,8 @@ end;
 {$ENDIF X86ASM}
 {$ENDIF !PUREPASCAL}
 
-{*************}
+{********************}
+//delphi seattle upd 1
 {$IFDEF X86ASM}
 procedure ALCvtInt;
 { IN:
@@ -3393,7 +3352,8 @@ asm // StackAlignSafe
 end;
 {$ENDIF X86ASM}
 
-{*************}
+{********************}
+//delphi seattle upd 1
 {$IFDEF X86ASM}
 procedure ALCvtInt64;
 { IN:
@@ -3494,7 +3454,8 @@ asm //StackAlignSafe
 end;
 {$ENDIF X86ASM}
 
-{**************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALFormatBuf(var Buffer; BufLen: Cardinal; const Format;
   FmtLen: Cardinal; const Args: array of const;
   const AFormatSettings: TALFormatSettings): Cardinal; overload;
@@ -3545,7 +3506,7 @@ var
     end;
   end;
 
-  function AddBuf(const AItem: PAnsiChar; ItemLen: Integer = -1): Boolean;
+  function AddBuf(const AItem: PAnsiChar; ItemLen: Integer = -1; StringLen: Integer = -1): Boolean;
   var
     NumChar: Integer;
     Len: Integer;
@@ -3556,7 +3517,10 @@ var
   begin
     Item := AItem;
     if Assigned(AItem) then
-      NumChar := System.Ansistrings.StrLen(Item)
+      if StringLen = -1 then
+        NumChar := System.AnsiStrings.StrLen(Item)
+      else
+        NumChar := StringLen
     else
       NumChar := 0;
     if (ItemLen > -1) and (NumChar > ItemLen) then
@@ -3875,7 +3839,7 @@ begin
             ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
         vtAnsiString:
           if FormatChar = 'S' then
-            Overwrite := AddBuf(CurrentArg.VAnsiString, Precision)
+            Overwrite := AddBuf(CurrentArg.VAnsiString, Precision, Length(AnsiString(CurrentArg.VAnsiString)))
           else
             ALAnsiFormatError(0, PAnsiChar(@Format), FmtLen);
         vtInt64:
@@ -4286,7 +4250,7 @@ asm
         MOV    ECX, [EBX].DefaultSystemCodePage
         MOV    ECX, [ECX]
 {$ELSE !PIC}
-        MOV    ECX, 0  // 0 instead of DefaultSystemCodePage because if not we receive the error Need imported data reference ($G) to access DefaultSystemCodePage when we compile the dpk
+        MOV    ECX, DefaultSystemCodePage  // maybe we must use 0 instead of DefaultSystemCodePage because if not we receive the error Need imported data reference ($G) to access DefaultSystemCodePage when we compile the dpk
 {$ENDIF}
         CALL   ESI
         POP    ECX
@@ -4614,46 +4578,38 @@ end;
 
 {$IFNDEF NEXTGEN}
 
-{******************************************************************************}
-procedure ALDateTimeToString(var Result: AnsiString; const ALFormat: AnsiString;
+{********************}
+//delphi seattle upd 1
+procedure ALDateTimeToString(var Result: AnsiString; const Format: AnsiString;
   DateTime: TDateTime; const AFormatSettings: TALFormatSettings);
-const
-  BufSize = 256;
 var
-  BufPosStatic, BufPosDynamic, AppendLevel: Integer;
-  BufferStatic: array[0..BufSize-1] of AnsiChar;
-  BufferDynamic: array of AnsiChar;
-  UseStatic: Boolean;
-  I: Integer;
+  BufPos, AppendLevel: Integer;
+  Buffer: array[0..255] of AnsiChar;
+  DynBuffer: array of AnsiChar;
+  Sb: TArray<ansiChar>;
 
   procedure AppendChars(P: PAnsiChar; Count: Integer);
   var
-    NumChars: Integer;
-  begin
-    if Count > 0 then
+    N, I: Integer;
     begin
-      if UseStatic then
+    N := SizeOf(Buffer) div SizeOf(AnsiChar);
+    N := N - BufPos;
+    if Count > N then
       begin
-        NumChars := SizeOf(BufferStatic) div SizeOf(AnsiChar);
-        if BufPosStatic + Count > NumChars then
-          UseStatic := false
-        else
-        begin
-          ALMove(P[0], BufferStatic[BufPosStatic], Count * SizeOf(AnsiChar));
-          Inc(BufPosStatic, Count);
-        end
+      I := Length(DynBuffer);
+      SetLength(DynBuffer, I + BufPos + Count);
+      if BufPos > 0 then
+      begin
+        ALMove(Buffer[0], DynBuffer[I], BufPos * SizeOf(AnsiChar));
+        Inc(I, BufPos);
       end;
-      if not UseStatic then
-      begin
-        NumChars := Length(BufferDynamic);
-        while BufPosDynamic + Count > NumChars do
+      ALMove(P[0], DynBuffer[I], Count * SizeOf(AnsiChar));
+      BufPos := 0;
+    end
+    else if Count > 0 then
     begin
-          NumChars := NumChars + BufSize;
-          SetLength(BufferDynamic, NumChars);
-        end;
-        ALMove(P[0], BufferDynamic[BufPosDynamic], Count * SizeOf(AnsiChar));
-        Inc(BufPosDynamic, Count);
-      end;
+      ALMove(P[0], Buffer[BufPos], Count * SizeOf(AnsiChar));
+      Inc(BufPos, Count);
     end;
   end;
 
@@ -4664,15 +4620,15 @@ var
 
   procedure AppendNumber(Number, Digits: Integer);
   const
-    ALFormat: array[0..3] of AnsiChar = '%.*d';
+    Format: array[0..3] of AnsiChar = '%.*d';
   var
     NumBuf: array[0..15] of AnsiChar;
   begin
-    AppendChars(NumBuf, ALFormatBuf(NumBuf, Length(NumBuf), ALFormat,
-      Length(ALFormat), [Digits, Number]));
+    AppendChars(NumBuf, ALFormatBuf(NumBuf, Length(NumBuf), Format,
+      Length(Format), [Digits, Number]));
   end;
 
-  procedure AppendFormat(ALFormat: PAnsiChar);
+  procedure AppendFormat(Format: PAnsiChar);
   var
     Starter, Token, LastToken: AnsiChar;
     DateDecoded, TimeDecoded, Use12HourClock,
@@ -4685,9 +4641,9 @@ var
     var
       P: PAnsiChar;
     begin
-      P := ALFormat;
-      while ALFormat^ = Starter do Inc(ALFormat);
-      Count := ALFormat - P + 1;
+      P := Format;
+      while Format^ = Starter do Inc(Format);
+      Count := Format - P + 1;
     end;
 
     procedure GetDate;
@@ -4717,12 +4673,9 @@ var
       P: PAnsiChar;
     begin
       Result := '';
-      with SystemTime do
-      begin
-        wYear  := Year;
-        wMonth := Month;
-        wDay   := Day;
-      end;
+      SystemTime.wYear  := Year;
+      SystemTime.wMonth := Month;
+      SystemTime.wDay   := Day;
 
       FormatStr := 'gg';
       if GetDateFormatA(GetThreadLocale, DATE_USE_ALT_CALENDAR, @SystemTime,
@@ -4753,12 +4706,9 @@ var
       Buffer: array[Byte] of AnsiChar;
     begin
       Result := '';
-      with SystemTime do
-      begin
-        wYear  := Year;
-        wMonth := Month;
-        wDay   := Day;
-      end;
+      SystemTime.wYear  := Year;
+      SystemTime.wMonth := Month;
+      SystemTime.wDay   := Day;
 
       if Count <= 2 then
         FormatStr := 'yy' // avoid Win95 bug.
@@ -4769,13 +4719,16 @@ var
         PAnsiChar(FormatStr), Buffer, SizeOf(Buffer)) <> 0 then
       begin
         Result := Buffer;
-        if (Count = 1) and (Result[1] = '0') then
+        if (Count = 1) and (Result[Low(AnsiString)] = '0') then
           Result := ALCopyStr(Result, 2, Length(Result)-1);
       end;
     end;
 {$ENDIF MSWINDOWS}
 
 {$IFDEF POSIX}
+//NextGen not support ansiString
+(*
+    {$IFNDEF MACOS}
     function FindEra(Date: Integer): Byte;
     var
       I : Byte;
@@ -4787,55 +4740,136 @@ var
           Exit(I);
       end;
     end;
+    {$ENDIF !MACOS}
 
     function ConvertEraString(const Count: Integer) : AnsiString;
     var
+      {$IFDEF MACOS}
+      Formatter: CFDateFormatterRef;
+      LDate: CFGregorianDate;
+      LYear, LMonth, LDay: Word;
+      FormatString: TCFString;
+      DefaultTZ: CFTimeZoneRef;
+      Locale: CFLocaleRef;
+      {$ELSE !MACOS}
       I : Byte;
+      {$ENDIF MACOS}
     begin
       Result := '';
+      {$IFDEF MACOS}
+      Locale := nil;
+      DefaultTZ := nil;
+      Formatter := nil;
+      FormatString.Value := nil;
+
+      try
+        Locale := CFLocaleCopyCurrent;
+        DefaultTZ := CFTimeZoneCopyDefault;
+        Formatter := CFDateFormatterCreate(kCFAllocatorDefault, Locale,
+                        kCFDateFormatterFullStyle, kCFDateFormatterNoStyle);
+        FormatString := TCFString.Create('GG');
+        CFDateFormatterSetFormat(Formatter, FormatString.Value);
+        DecodeDate(DateTime, LYear, LMonth, LDay);
+        LDate.year := LYear; LDate.month := ShortInt(LMonth); LDate.day := ShortInt(LDay);
+        LDate.hour := 0; LDate.minute := 0; LDate.second := 0;
+        Result := TCFString(CFDateFormatterCreateStringWithAbsoluteTime(
+                              kCFAllocatorDefault, Formatter,
+                              CFGregorianDateGetAbsoluteTime(LDate, DefaultTZ))
+                           ).AsString(true);
+      finally
+        if FormatString.Value <> nil then
+          CFRelease(FormatString.Value);
+        if Formatter <> nil then
+          CFRelease(Formatter);
+        if DefaultTZ <> nil then
+          CFRelease(DefaultTZ);
+        if Locale <> nil then
+          CFRelease(Locale);
+      end;
+      {$ELSE !MACOS}
       I := FindEra(Trunc(DateTime));
       if I > 0 then
         Result := AFormatSettings.EraInfo[I].EraName;
+      {$ENDIF MACOS}
     end;
 
-    function ConvertYearString(const Count: Integer) : ansiString;
+    function ConvertYearString(const Count: Integer) : AnsiString;
     var
-      S : ansiString;
+      S : AnsiString;
       function GetEraOffset: integer;
+      {$IFDEF MACOS}
+      var
+        StartEra, TargetDate, LengthEra: CFAbsoluteTime;
+        LDate: CFGregorianDate;
+        LYear, LMonth, LDay: Word;
+        Calendar, CurrentCalendar: CFCalendarRef;
+        TimeZone: CFTimeZoneRef;
+      {$ENDIF MACOS}
       begin
+        {$IFDEF MACOS}
+        Result := 0;
+        TimeZone := nil;
+        CurrentCalendar := nil;
+        Calendar := nil;
+        try
+          DecodeDate(DateTime, LYear, LMonth, LDay);
+          LDate.year := LYear; LDate.month := ShortInt(LMonth); LDate.day := ShortInt(LDay);
+          LDate.hour := 0; LDate.minute := 0; LDate.second := 0;
+          TimeZone := CFTimeZoneCopyDefault;
+          TargetDate := CFGregorianDateGetAbsoluteTime(LDate, TimeZone);
+          CurrentCalendar := CFCalendarCopyCurrent;
+          Calendar := CFCalendarCreateWithIdentifier(kCFAllocatorDefault,
+                                  CFCalendarGetIdentifier(CurrentCalendar));
+          if CFCalendarGetTimeRangeOfUnit(Calendar, kCFCalendarUnitEra,
+                                          TargetDate, @StartEra, @LengthEra) then
+          begin
+            LDate := CFAbsoluteTimeGetGregorianDate(StartEra, TimeZone);
+            Result := LDate.Year - 1;
+          end;
+        finally
+          if CurrentCalendar <> nil then
+            CFRelease(CurrentCalendar);
+          if Calendar <> nil then
+            CFRelease(Calendar);
+          if TimeZone <> nil then
+            CFRelease(TimeZone);
+        end;
+        {$ELSE !MACOS}
         Result := FindEra(Trunc(DateTime));
         if Result > 0 then
           Result := AFormatSettings.EraInfo[Result].EraOffset;
+        {$ENDIF MACOS}
       end;
     begin
       S := ALIntToStr(Year - GetEraOffset);
       while S.Length < Count do
         S := '0' + S;
       if S.Length > Count then
-        S := alCopyStr(S, Length(S) - (Count - 1), Count);
+        S := ALCopyStr(S, Length(S) - (Count - 1), Count);
       Result := S;
     end;
+*)
 {$ENDIF POSIX}
 
   begin
-    if (ALFormat <> nil) and (AppendLevel < 2) then
+    if (Format <> nil) and (AppendLevel < 2) then
     begin
       Inc(AppendLevel);
       LastToken := ' ';
       DateDecoded := False;
       TimeDecoded := False;
       Use12HourClock := False;
-      while ALFormat^ <> #0 do
+      while Format^ <> #0 do
       begin
-        Starter := ALFormat^;
+        Starter := Format^;
         //if IsLeadChar(Starter) then
         //begin
-        //  AppendChars(ALFormat, StrCharLength(ALFormat) div SizeOf(AnsiChar));
-        //  ALFormat := StrNextChar(ALFormat);
+        //  AppendChars(Format, System.Ansistrings.StrCharLength(Format) div SizeOf(AnsiChar));
+        //  Format := System.Ansistrings.StrNextChar(Format);
         //  LastToken := ' ';
         //  Continue;
         //end;
-        ALFormat := System.Ansistrings.StrNextChar(ALFormat);
+        Format := System.Ansistrings.StrNextChar(Format);
         Token := Starter;
         if Token in ['a'..'z'] then Dec(Token, 32);
         if Token in ['A'..'Z'] then
@@ -4896,12 +4930,12 @@ var
               GetCount;
               GetTime;
               BetweenQuotes := False;
-              P := ALFormat;
+              P := Format;
               while P^ <> #0 do
               begin
                 //if IsLeadChar(P^) then
                 //begin
-                //  P := StrNextChar(P);
+                //  P := System.Ansistrings.StrNextChar(P);
                 //  Continue;
                 //end;
                 case P^ of
@@ -4957,19 +4991,19 @@ var
           'A':
             begin
               GetTime;
-              P := ALFormat - 1;
+              P := Format - 1;
               if System.Ansistrings.StrLIComp(P, 'AM/PM', 5) = 0 then
               begin
                 if Hour >= 12 then Inc(P, 3);
                 AppendChars(P, 2);
-                Inc(ALFormat, 4);
+                Inc(Format, 4);
                 Use12HourClock := TRUE;
               end else
               if System.Ansistrings.StrLIComp(P, 'A/P', 3) = 0 then
               begin
                 if Hour >= 12 then Inc(P, 2);
                 AppendChars(P, 1);
-                Inc(ALFormat, 2);
+                Inc(Format, 2);
                 Use12HourClock := TRUE;
               end else
               if System.Ansistrings.StrLIComp(P, 'AMPM', 4) = 0 then
@@ -4977,20 +5011,20 @@ var
                 if Hour < 12 then
                   AppendString(AFormatSettings.TimeAMString) else
                   AppendString(AFormatSettings.TimePMString);
-                Inc(ALFormat, 3);
+                Inc(Format, 3);
                 Use12HourClock := TRUE;
               end else
               if System.Ansistrings.StrLIComp(P, 'AAAA', 4) = 0 then
               begin
                 GetDate;
                 AppendString(AFormatSettings.LongDayNames[DayOfWeek(DateTime)]);
-                Inc(ALFormat, 3);
+                Inc(Format, 3);
               end else
               if System.Ansistrings.StrLIComp(P, 'AAA', 3) = 0 then
               begin
                 GetDate;
                 AppendString(AFormatSettings.ShortDayNames[DayOfWeek(DateTime)]);
-                Inc(ALFormat, 2);
+                Inc(Format, 2);
               end else
               AppendChars(@Starter, 1);
             end;
@@ -4999,7 +5033,7 @@ var
               GetCount;
               AppendFormat(Pointer(AFormatSettings.ShortDateFormat));
               GetTime;
-              if (Hour <> 0) or (Min <> 0) or (Sec <> 0) then
+              if (Hour <> 0) or (Min <> 0) or (Sec <> 0) or (MSec <> 0) then
               begin
                 AppendChars(' ', 1);
                 AppendFormat(Pointer(AFormatSettings.LongTimeFormat));
@@ -5013,16 +5047,16 @@ var
               AppendChars(@AFormatSettings.TimeSeparator, 1);
           '''', '"':
             begin
-              P := ALFormat;
-              while (ALFormat^ <> #0) and (ALFormat^ <> Starter) do
+              P := Format;
+              while (Format^ <> #0) and (Format^ <> Starter) do
               begin
-                //if IsLeadChar(ALFormat^) then
-                //  ALFormat := StrNextChar(ALFormat)
+                //if IsLeadChar(Format^) then
+                //  Format := System.Ansistrings.StrNextChar(Format)
                 //else
-                  Inc(ALFormat);
+                  Inc(Format);
               end;
-              AppendChars(P, ALFormat - P);
-              if ALFormat^ <> #0 then Inc(ALFormat);
+              AppendChars(P, Format - P);
+              if Format^ <> #0 then Inc(Format);
             end;
         else
           AppendChars(@Starter, 1);
@@ -5033,18 +5067,23 @@ var
   end;
 
 begin
-  BufPosStatic := 0;
-  BufPosDynamic := 0;
-  UseStatic := True;
-  SetLength(BufferDynamic, 0);
+  BufPos := 0;
   AppendLevel := 0;
-  if ALFormat <> '' then AppendFormat(Pointer(ALFormat)) else AppendFormat('C');
-  SetString(Result, BufferStatic, BufPosStatic);
-  if BufPosDynamic > 0 then
+  if Format <> '' then AppendFormat(Pointer(Format)) else AppendFormat('C');
+  if Length(DynBuffer) > 0 then
   begin
-    for I := 0 to BufPosDynamic - 1 do
-      Result := Result + BufferDynamic[i];
-    SetLength(BufferDynamic, 0);
+    SetLength(Sb, Length(DynBuffer) + BufPos);
+    ALMove(DynBuffer[0], Sb[0], Length(DynBuffer) * SizeOf(AnsiChar));
+    if BufPos > 0 then
+      ALMove(Buffer[0], Sb[Length(DynBuffer)], BufPos * SizeOf(AnsiChar));
+    //Result := String.Create(Sb);
+    SetLength(Result, Length(Sb));
+    alMove(Sb[0], PansiChar(Result)^, Length(Sb));
+  end
+  else begin
+    //Result := AnsiString.Create(Buffer, 0, BufPos);
+    SetLength(Result, BufPos);
+    alMove(Buffer[0], PansiChar(Result)^, BufPos);
   end;
 end;
 
@@ -5105,17 +5144,19 @@ end;
 type
   TALDateOrder = (doMDY, doDMY, doYMD);
 
-{************************************************************}
+{********************}
+//delphi seattle upd 1
 procedure ALScanBlanks(const S: AnsiString; var Pos: Integer);
 var
   I: Integer;
 begin
   I := Pos;
-  while (I <= Length(S)) and (S[I] = ' ') do Inc(I);
+  while (I <= High(S)) and (S[I] = ' ') do Inc(I);
   Pos := I;
 end;
 
-{**********************************************************}
+{********************}
+//delphi seattle upd 1
 function ALScanNumber(const S: AnsiString; var Pos: Integer;
   var Number: Word; var CharCount: Byte): Boolean;
 var
@@ -5127,7 +5168,7 @@ begin
   ALScanBlanks(S, Pos);
   I := Pos;
   N := 0;
-  while (I <= Length(S)) and (S[I] in ['0'..'9']) and (N < 1000) do
+  while (I <= High(S)) and (S[I] in ['0'..'9']) and (N < 1000) do
   begin
     N := N * 10 + (Ord(S[I]) - Ord('0'));
     Inc(I);
@@ -5141,7 +5182,8 @@ begin
   end;
 end;
 
-{**********************************************************}
+{********************}
+//delphi seattle upd 1
 function ALScanString(const S: AnsiString; var Pos: Integer;
   const Symbol: AnsiString): Boolean;
 begin
@@ -5149,7 +5191,8 @@ begin
   if Symbol <> '' then
   begin
     ALScanBlanks(S, Pos);
-    if ALCompareText(Symbol, ALCopyStr(S, Pos, Length(Symbol))) = 0 then
+    //if AnsiCompareText(Symbol, S.SubString(Pos - Low(string), Symbol.Length)) = 0 then
+    if ALCompareText(Symbol, ALCopyStr(S, Pos + alifThen(Low(ansiString)=0,1,0), Length(Symbol))) = 0 then
     begin
       Inc(Pos, Length(Symbol));
       Result := True;
@@ -5157,26 +5200,28 @@ begin
   end;
 end;
 
-{********************************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALScanChar(const S: AnsiString; var Pos: Integer; Ch: AnsiChar): Boolean;
 begin
   Result := False;
   ALScanBlanks(S, Pos);
-  if (Pos <= Length(S)) and (S[Pos] = Ch) then
+  if (Pos <= High(S)) and (S[Pos] = Ch) then
   begin
     Inc(Pos);
     Result := True;
   end;
 end;
 
-{******************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALGetDateOrder(const DateFormat: AnsiString): TALDateOrder;
 var
   I: Integer;
 begin
   Result := doMDY;
-  I := 1;
-  while I <= Length(DateFormat) do
+  I := low(ansiString);
+  while I <= High(DateFormat) do
   begin
     case AnsiChar(Ord(DateFormat[I]) and $DF) of
       'E': Result := doYMD;
@@ -5191,10 +5236,11 @@ begin
   end;
 end;
 
-{**************************************************************}
+{********************}
+//delphi seattle upd 1
 procedure ALScanToNumber(const S: AnsiString; var Pos: Integer);
 begin
-  while (Pos <= Length(S)) and not (S[Pos] in ['0'..'9']) do
+  while (Pos <= High(S)) and not (S[Pos] in ['0'..'9']) do
   begin
     //if IsLeadChar(S[Pos]) then
     //  Pos := NextCharIndex(S, Pos)
@@ -5203,7 +5249,8 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALScanDate(const S: AnsiString; var Pos: Integer; var Date: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean; overload;
 var
@@ -5238,13 +5285,14 @@ begin
   Result := False;
   DateOrder := ALGetDateOrder(AFormatSettings.ShortDateFormat);
   EraYearOffset := 0;
-  if AFormatSettings.ShortDateFormat[1] = 'g' then  // skip over prefix text
+  if AFormatSettings.ShortDateFormat[Low(ansistring)] = 'g' then  // skip over prefix text
   begin
     ALScanToNumber(S, Pos);
-    EraName := ALTrim(ALCopyStr(S, 1, Pos-1));
+    EraName := ALTrim(ALCopyStr(S, 1, Pos-low(ansiString)));
     EraYearOffset := AFormatSettings.GetEraYearOffset(EraName);
   end
   else
+    // If we are with only two digits for year, we suppose we are in the last era.
     if (ALPos('e', AFormatSettings.ShortDateFormat) > 0) and
        (High(AFormatSettings.EraInfo)>=0) then
       EraYearOffset := AFormatSettings.EraInfo[High(AFormatSettings.EraInfo)].EraOffset;
@@ -5281,24 +5329,25 @@ begin
   end;
   ALScanChar(S, Pos, AFormatSettings.DateSeparator);
   ALScanBlanks(S, Pos);
-  if SysLocale.FarEast and (ALPos('ddd', AFormatSettings.ShortDateFormat) <> 0) then
+  if SysLocale.FarEast and (ALPos('dddd', AFormatSettings.ShortDateFormat) <> 0) then
   begin     // ignore trailing text
-    if AFormatSettings.ShortTimeFormat[1] in ['0'..'9'] then  // stop at time digit
+    if AFormatSettings.ShortTimeFormat[Low(ansistring)] in ['0'..'9'] then  // stop at time digit
       ALScanToNumber(S, Pos)
     else  // stop at time prefix
       repeat
-        while (Pos <= Length(S)) and (S[Pos] <> ' ') do Inc(Pos);
+        while (Pos <= High(S)) and (S[Pos] <> ' ') do Inc(Pos);
         ALScanBlanks(S, Pos);
-      until (Pos > Length(S)) or
-        (ALCompareText(AFormatSettings.TimeAMString,
-         ALCopyStr(S, Pos, Length(AFormatSettings.TimeAMString))) = 0) or
-        (ALCompareText(AFormatSettings.TimePMString,
-         ALCopyStr(S, Pos, Length(AFormatSettings.TimePMString))) = 0);
+      until (Pos > high(S)) or
+        //(AnsiCompareText(AFormatSettings.TimeAMString, S.SubString(Pos - Low(string), AFormatSettings.TimeAMString.Length)) = 0) or
+        //(AnsiCompareText(AFormatSettings.TimePMString, S.SubString(Pos - Low(string), AFormatSettings.TimePMString.Length)) = 0);
+        (ALCompareText(AFormatSettings.TimeAMString, ALCopyStr(S, Pos + alifThen(Low(ansiString)=0,1,0), Length(AFormatSettings.TimeAMString))) = 0) or
+        (ALCompareText(AFormatSettings.TimePMString, ALCopyStr(S, Pos + alifThen(Low(ansiString)=0,1,0), Length(AFormatSettings.TimePMString))) = 0);
   end;
   Result := TryEncodeDate(Y, M, D, Date);
 end;
 
-{*****************************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALScanTime(const S: AnsiString; var Pos: Integer; var Time: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean; overload;
 var
@@ -5349,8 +5398,8 @@ function ALTryStrToDate(const S: AnsiString; out Value: TDateTime;
 var
   Pos: Integer;
 begin
-  Pos := 1;
-  Result := ALScanDate(S, Pos, Value, AFormatSettings) and (Pos > Length(S));
+  Pos := low(ansiString);
+  Result := ALScanDate(S, Pos, Value, AFormatSettings) and (Pos > High(S));
 end;
 
 {***************************************}
@@ -5367,8 +5416,8 @@ function ALTryStrToTime(const S: AnsiString; out Value: TDateTime;
 var
   Pos: Integer;
 begin
-  Pos := 1;
-  Result := ALScanTime(S, Pos, Value, AFormatSettings) and (Pos > Length(S));
+  Pos := low(ansiString);
+  Result := ALScanTime(S, Pos, Value, AFormatSettings) and (Pos > High(S));
 end;
 
 {***************************************}
@@ -5379,16 +5428,10 @@ begin
     ALConvertErrorFmt(@System.SysConst.SInvalidTime, [S]);
 end;
 
-{********************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean;
-// correct a not rang check error
-// replace
-// while (S[BlankPos] <> ' ') and (BlankPos <= Length(S)) do
-//            Inc(BlankPos);
-// by
-// while (BlankPos <= Length(S)) and (S[BlankPos] <> ' ') do
-//            Inc(BlankPos);
 var
   Pos: Integer;
   NumberPos: Integer;
@@ -5397,11 +5440,13 @@ var
   Stop: Boolean;
 begin
   Result := True;
-  Pos := 1;
+  Pos := Low(ansistring);
   LTime := 0;
 
   // jump over all the non-numeric characters before the date data
-  ALScanToNumber(S, Pos);
+  // if the format starts with era name, do not skip any character.
+  if AFormatSettings.ShortDateFormat[Low(ansistring)] <> 'g' then
+    ALScanToNumber(S, Pos);
 
   // date data scanned; searched for the time data
   if ALScanDate(S, Pos, LDate, AFormatSettings) then
@@ -5411,7 +5456,7 @@ begin
     ALScanToNumber(S, NumberPos);
 
     // the first number of the time data was found
-    if NumberPos < Length(S) then
+    if NumberPos < High(S) then
     begin
       // search between the end of date and the start of time for AM and PM
       // strings; if found, then ScanTime from this position where it is found
@@ -5440,9 +5485,9 @@ begin
         // search of the next blank if no AM/PM string has been found
         if not Stop then
         begin
-          while (BlankPos <= Length(S)) and (S[BlankPos] <> ' ') do
+          while (S[BlankPos] <> ' ') and (BlankPos <= High(S)) do
             Inc(BlankPos);
-          if BlankPos > Length(S) then
+          if BlankPos > High(S) then
             BlankPos := 0;
         end;
       end;
@@ -5488,116 +5533,98 @@ begin
     ALConvertErrorFmt(@System.SysConst.SInvalidDateTime, [S]);
 end;
 
-{*****************************************************}
+{********************}
+//delphi seattle upd 1
 // Hex : ( '$' | 'X' | 'x' | '0X' | '0x' ) [0-9A-Fa-f]*
 // Dec : ( '+' | '-' )? [0-9]*
-function _ALValLong(const s: AnsiString; var code: Integer): Longint;
+function _ALValLong(const S: ansiString; var Code: Integer): Integer;
 {$IFDEF PUREPASCAL}
-// TODO
-// this implementation is buggy
-// showmessage(inttostr(strtoint('2147483649'))); => NO ERROR and result is -2147483647
-// this because of
-//
-//   if Result > (High(Result) div 10) then ...
-//
-// of course 214748364 IS NOT > High(longint) so no stop here
-// and in few lines after
-//
-// Result := Result * 10 + Ord(s[I]) - Ord('0');
-// Result := 214748364 * 10 + 9; => overflow off course
+const
+  FirstIndex = Low(ansistring);
 var
-  I, Len, Digit: Integer;
-  Negative, Hex: Boolean;
+  I: Integer;
+  Dig: Integer;
+  Sign: Boolean;
+  Empty: Boolean;
 begin
-  // U-OK
-  I := 1;
-  code := -1;
+  I := FirstIndex;
+  Sign := False;
   Result := 0;
-  Negative := False;
-  Hex := False;
-  Len := Length(s);
-  while (I <= Len) and (s[I] = ' ') do
-    Inc(I);
-  if I > Len then
+  {$IF not (defined(CPUX64) and not defined(EXTERNALLINKER))}
+  Dig := 0;
+  {$IFEND}
+  Empty := True;
+
+  if S = '' then
+  begin
+    Code := 1;
     Exit;
-  case s[I] of
-    '$',
-    'x',
-    'X':
-      begin
-        if I = Len then
-        begin
-          Code := I + 2; // Emulate Win32 _ValLong behaviour
-          Exit;
-        end;
-        Hex := True;
-        Inc(I);
-      end;
-    '0':
-      begin
-        Hex := (Len > I) and ((s[I+1] = 'X') or (s[I+1] = 'x'));
-        if Hex then
-          Inc(I, 2);
-      end;
-    '-':
-      begin
-        if I = Len then
-        begin
-          Code := I + 1; // Emulate Win32 _ValLong behaviour
-          Exit;
-        end;
-        Negative := True;
-        Inc(I);
-      end;
-    '+':
-      begin
-        if I = Len then
-        begin
-          Code := I + 1; // Emulate Win32 _ValLong behaviour
-          Exit;
-        end;
-        Inc(I);
-      end;
   end;
-  if Hex then
-    while I <= Len do
+  while S[I] = ' ' do
+    Inc(I);
+
+  if S[I] = '-' then
+  begin
+    Sign := True;
+    Inc(I);
+  end
+  else if S[I] = '+' then
+    Inc(I);
+  // Hex
+  if ((S[I] = '0') and (I < High(S)) and ((S[I+1] = 'X') or (S[I+1] = 'x'))) or
+      (S[I] = '$') or
+      (S[I] = 'X') or
+      (S[I] = 'x') then
+  begin
+    if S[I] = '0' then
+      Inc(I);
+    Inc(I);
+    while True do
     begin
-      // check for overflow
-      if Result > (High(Result) shr 3) then
-      begin
-        code := I;
-        Exit;
-      end;
-      case s[I] of
-        '0'..'9': Result := Result * 16 + Ord(s[I]) - Ord('0');
-        'a'..'f': Result := Result * 16 + Ord(s[I]) - Ord('a') + 10;
-        'A'..'F': Result := Result * 16 + Ord(s[I]) - Ord('A') + 10;
+      case S[I] of
+       '0'..'9': Dig := Ord(S[I]) - Ord('0');
+       'A'..'F': Dig := Ord(S[I]) - Ord('A') + 10;
+       'a'..'f': Dig := Ord(S[I]) - Ord('a') + 10;
       else
-        code := I;
-        Exit;
+        Break;
       end;
+      if (Result < 0) or (Result > (High(Integer) shr 3)) then
+        Break;
+      Result := Result shl 4 + Dig;
       Inc(I);
-    end
-  else
-    while I <= Len do
-    begin
-      // check for overflow
-      if Result > (High(Result) div 10) then
-      begin
-        code := I;
-        Exit;
-      end;
-      Digit := Ord(s[I]) - Ord('0');
-      if (Digit < 0) or (Digit > 9) then begin
-         Code := I;
-         Exit;
-      end;
-      Result := Result * 10 + Ord(s[I]) - Ord('0');
-      Inc(I);
+      Empty := False;
     end;
-  if Negative then
-    Result := -Result;
-  code := 0;
+
+    if Sign then
+      Result := - Result;
+  end
+  // Decimal
+  else
+  begin
+    while True do
+    begin
+      case S[I] of
+        '0'..'9': Dig := Ord(S[I]) - Ord('0');
+      else
+        Break;
+      end;
+      if (Result < 0) or (Result > (High(Integer) div 10)) then
+        Break;
+      Result := Result*10 + Dig;
+      Inc(I);
+      Empty := False;
+    end;
+
+    if Sign then
+      Result := - Result;
+    if (Result <> 0) and (Sign <> (Result < 0)) then
+      Dec(I);
+  end;
+
+  if ((S[I] <> ansiChar(#0)) or Empty) then
+    Code := I + 1 - FirstIndex
+  else
+    Code := 0;
 end;
 {$ELSE !PUREPASCAL}
 asm
@@ -5750,144 +5777,137 @@ asm
 end;
 {$ENDIF}
 
-{******************************************************************}
+{********************}
+//delphi seattle upd 1
 function _ALValInt64(const s: AnsiString; var code: Integer): Int64;
-// the original implementation was with lot of "RANGE CHECK ERROR"
-// Exemple: while s[i] = AnsiChar(' ') do Inc(i);
+const
+  FirstIndex = Low(ansistring);
 var
-  i: Integer;
-  len: Integer;
-  dig: Integer;
-  sign: Boolean;
-  empty: Boolean;
+  I: Integer;
+  Dig: Integer;
+  Sign: Boolean;
+  Empty: Boolean;
 begin
-  i := 1;
-  {$IFNDEF CPUX64} // avoid E1036: Variable 'dig' might not have been initialized
-  dig := 0;
-  {$ENDIF}
+  I := FirstIndex;
+  Sign := False;
   Result := 0;
-  if s = '' then begin
-    code := i;
-    exit;
-  end;
-  len := Length(S);
-  while (i <= Len) and (s[i] = ' ') do Inc(i);
-  if i > len then begin
-    code := i;
-    exit;
-  end;
-  sign := False;
-  if s[i] = '-' then begin
-    sign := True;
-    Inc(i);
-    if i > len then begin
-      code := i;
-      exit;
-    end;
-  end
-  else if s[i] = '+' then begin
-    Inc(i);
-    if i > len then begin
-      code := i;
-      exit;
-    end;
-  end;
-  empty := True;
-  if (s[i] = '$') or
-     (Upcase(s[i]) = 'X') or
-     ((s[i] = '0') and
-      (I < Len) and
-      (Upcase(s[i+1]) = 'X')) then
+  {$IF not (defined(CPUX64) and not defined(EXTERNALLINKER))}
+  Dig := 0;
+  {$IFEND}
+  Empty := True;
+
+  if S = '' then
   begin
-    if s[i] = '0' then Inc(i);
-    Inc(i);
-    while (i <= Len) do begin
-      case s[i] of
-        '0'..'9': dig := Ord(s[i]) - (Ord('0'));
-        'A'..'F': dig := Ord(s[i]) - (Ord('A') - 10);
-        'a'..'f': dig := Ord(s[i]) - (Ord('a') - 10);
-        else break;
-      end;
-      if (Result < 0) or (Result > (High(Int64) shr 3)) then Break;
-      Result := Result shl 4 + dig;
-      Inc(i);
-      empty := False;
-    end;
-    if sign then Result := - Result;
-  end
-  else begin
-    while (i <= Len) do begin
-      case s[i] of
-        '0'..'9': dig := Ord(s[i]) - Ord('0');
-        else break;
-      end;
-      if (Result < 0) or (Result > (High(Int64) div 10)) then break;
-      Result := Result*10 + dig;
-      Inc(i);
-      empty := False;
-    end;
-    if sign then Result := - Result;
-    if (Result <> 0) and (sign <> (Result < 0)) then Dec(i);
+    Code := 1;
+    Exit;
   end;
-  if (i <= len) or empty then code := i
-  else code := 0;
+  while S[I] = ' ' do
+    Inc(I);
+
+  if S[I] = '-' then
+  begin
+    Sign := True;
+    Inc(I);
+  end
+  else if S[I] = '+' then
+    Inc(I);
+  // Hex
+  if ((S[I] = '0') and (I < High(S)) and ((S[I+1] = 'X') or (S[I+1] = 'x'))) or
+      (S[I] = '$') or
+      (S[I] = 'X') or
+      (S[I] = 'x') then
+  begin
+    if S[I] = '0' then
+      Inc(I);
+    Inc(I);
+    while True do
+    begin
+      case S[I] of
+       '0'..'9': Dig := Ord(S[I]) - Ord('0');
+       'A'..'F': Dig := Ord(S[I]) - Ord('A') + 10;
+       'a'..'f': Dig := Ord(S[I]) - Ord('a') + 10;
+      else
+        Break;
+      end;
+      if (Result < 0) or (Result > (High(Int64) shr 3)) then
+        Break;
+      Result := Result shl 4 + Dig;
+      Inc(I);
+      Empty := False;
+    end;
+
+    if Sign then
+      Result := - Result;
+  end
+  // Decimal
+  else
+  begin
+    while True do
+    begin
+      case S[I] of
+        '0'..'9': Dig := Ord(S[I]) - Ord('0');
+      else
+        Break;
+      end;
+      if (Result < 0) or (Result > (High(Int64) div 10)) then
+        Break;
+      Result := Result*10 + Dig;
+      Inc(I);
+      Empty := False;
+    end;
+
+    if Sign then
+      Result := - Result;
+    if (Result <> 0) and (Sign <> (Result < 0)) then
+      Dec(I);
+  end;
+
+  if ((S[I] <> ansiChar(#0)) or Empty) then
+    Code := I + 1 - FirstIndex
+  else
+    Code := 0;
 end;
 
-{****************************************************************}
-// the original implementation was with lot of "RANGE CHECK ERROR"
-// Exemple: while s[i] = AnsiChar(' ') do Inc(i);
+{********************}
+//delphi seattle upd 1
 function _ALValUInt64(const s: ansistring; var code: Integer): UInt64;
+const
+  FirstIndex = Low(ansistring);
 var
   i: Integer;
-  len: Integer;
   dig: Integer;
   sign: Boolean;
   empty: Boolean;
 begin
-  i := 1;
-  {$IFNDEF CPUX64} // avoid E1036: Variable 'dig' might not have been initialized
+  i := FirstIndex;
+  // avoid E1036: Variable 'dig' might not have been initialized
+  {$IF not (defined(CPUX64) and not defined(EXTERNALLINKER))}
   dig := 0;
-  {$ENDIF}
+  {$IFEND}
   Result := 0;
   if s = '' then
   begin
     code := 1;
     exit;
   end;
-  len := Length(S);
-  while (i <= Len) and (s[i] = ansiChar(' ')) do Inc(i);
-  if i > len then begin
-    code := i;
-    exit;
-  end;
+  while s[i] = ansiChar(' ') do
+    Inc(i);
   sign := False;
   if s[i] =  ansiChar('-') then
   begin
     sign := True;
     Inc(i);
-    if i > len then begin
-      code := i;
-      exit;
-    end;
   end
-  else if s[i] =  ansiChar('+') then begin
+  else if s[i] =  ansiChar('+') then
     Inc(i);
-    if i > len then begin
-      code := i;
-      exit;
-    end;
-  end;
   empty := True;
-  if (s[i] =  ansiChar('$')) or
-     (Upcase(s[i]) =  ansiChar('X')) or
-     ((s[i] =  ansiChar('0')) and
-      (I < Len) and
-      (Upcase(s[i+1]) = ansiChar('X'))) then
+  if (s[i] =  ansiChar('$')) or (Upcase(s[i]) =  ansiChar('X'))
+    or ((s[i] =  ansiChar('0')) and (I < High(S)) and (Upcase(s[i+1]) =  ansiChar('X'))) then
   begin
     if s[i] =  ansiChar('0') then
       Inc(i);
     Inc(i);
-    while (i <= Len) do
+    while True do
     begin
       case   ansiChar(s[i]) of
        ansiChar('0').. ansiChar('9'): dig := Ord(s[i]) -  Ord('0');
@@ -5907,7 +5927,7 @@ begin
   end
   else
   begin
-    while (i <= Len) do
+    while True do
     begin
       case  ansiChar(s[i]) of
         ansiChar('0').. ansiChar('9'): dig := Ord(s[i]) - Ord('0');
@@ -5923,8 +5943,10 @@ begin
       empty := False;
     end;
   end;
-  if (i <= len) or empty then code := i
-  else code := 0;
+  if (s[i] <> ansiChar(#0)) or empty then
+    code := i + 1 - FirstIndex
+  else
+    code := 0;
 end;
 
 {***********************************************************************}
@@ -5995,7 +6017,8 @@ const
      '80','81','82','83','84','85','86','87','88','89',
      '90','91','92','93','94','95','96','97','98','99');
 
-{*********************************************************************}
+{********************}
+//delphi seattle upd 1
 function _ALIntToStr32(Value: Cardinal; Negative: Boolean): AnsiString;
 var
   I, J, K : Cardinal;
@@ -6037,7 +6060,8 @@ begin
     PAnsiChar(P)^ := AnsiChar(I or ord(AnsiChar('0')));
 end;
 
-{*******************************************************************}
+{********************}
+//delphi seattle upd 1
 function _ALIntToStr64(Value: UInt64; Negative: Boolean): AnsiString;
 var
   I64, J64, K64      : UInt64;
@@ -6048,10 +6072,8 @@ var
 begin
   {Within Integer Range - Use Faster Integer Version}
   if (Negative and (Value <= High(Integer))) or
-     (not Negative and (Value <= High(Cardinal))) then begin
-    result := _ALIntToStr32(Value, Negative);
-    Exit;
-  end;
+     (not Negative and (Value <= High(Cardinal))) then
+    exit(_ALIntToStr32(Value, Negative));
 
   I64 := Value;
   if I64 >= 100000000000000 then
@@ -6283,8 +6305,9 @@ function _ALIntToHex(Value: UInt64; Digits: Integer): AnsiString;
 var
   I32    : Integer;
   I, J   : UInt64;
-  P      : PAnsiChar;
+  P      : Integer;
   NewLen : Integer;
+  Sb     : TArray<ansiChar>;
 begin
   NewLen := 1;
   I := Value shr 4;
@@ -6295,15 +6318,15 @@ begin
   end;
   if Digits > NewLen then
   begin
-    SetLength(Result, Digits);
-    for I32 := 1 to Digits - NewLen do
-      Result[I32] := AnsiChar('0');
-    P := @Result[Digits - NewLen+1];
+    SetLength(Sb, Digits);
+    for I32 := 0 to (Digits - NewLen) - 1 do
+      Sb[I32] := '0';
+    P := Digits - NewLen;
   end
   else
   begin
-    SetLength(Result, NewLen);
-    P := PAnsiChar(Result);
+    SetLength(Sb, NewLen);
+    P := 0;
   end;
   I := Value;
   while NewLen > 2 do
@@ -6311,12 +6334,21 @@ begin
     J := I and $FF;
     I := I shr 8;
     Dec(NewLen, 2);
-    PWord(P + NewLen)^ := Word(ALTwoHexLookup[J]);
+    Sb[P + NewLen] := AlTwoHexLookup[J][1];
+    Sb[P + NewLen + 1] := AlTwoHexLookup[J][2];
+
   end;
   if NewLen = 2 then
-    PWord(P)^ := Word(ALTwoHexLookup[I])
+  begin
+    Sb[P] := AlTwoHexLookup[I][1];
+    Sb[P+1] := AlTwoHexLookup[I][2];
+  end
   else
-    PAnsiChar(P)^ := (PAnsiChar(@ALTwoHexLookup[I])+1)^;
+    Sb[P] := AlTwoHexLookup[I][2];
+
+  //Result := String.Create(Sb);
+  SetLength(Result, Length(Sb));
+  alMove(Sb[0], PansiChar(Result)^, Length(Sb));
 end;
 
 {***************************************************************}
@@ -6546,19 +6578,44 @@ begin
     ffGeneral, 0, 0, AFormatSettings));
 end;
 
-{***}
+{********************}
+//delphi seattle upd 1
 const
-  cALWNear: Word = $133F;
-  cALmIE = $0001;
-  cALmOE = $0008;
+// 8087/SSE status word masks
+  mIE = $0001;
+  mDE = $0002;
+  mZE = $0004;
+  mOE = $0008;
+  mUE = $0010;
+  mPE = $0020;
+{$IFDEF CPUX86}
+  mC0 = $0100;
+  mC1 = $0200;
+  mC2 = $0400;
+  mC3 = $4000;
+{$ENDIF CPUX86}
+
+{$IFDEF CPUX86}
+const
+// 8087 control word
+// Infinity control  = 1 Affine
+// Rounding Control  = 0 Round to nearest or even
+// Precision Control = 3 64 bits
+// All interrupts masked
+  CWNear: Word = $133F;
+{$ENDIF CPUX86}
 {$IFDEF CPUX64}
 const
+//  MXCSR control word
+// Rounding Control  = 0 Round to nearest or even
+// All interrupts masked
   MXCSRNear: UInt32 = $1F80;
 {$ENDIF CPUX64}
 
-{*************}
+{********************}
+//delphi seattle upd 1
 {$IFDEF CPUX86}
-function TestAndClearFPUExceptions(AExceptionMask: Word): Boolean;
+function ALTestAndClearFPUExceptions(AExceptionMask: Word): Boolean;
 asm
       PUSH    ECX
       MOV     CX, AX
@@ -6576,8 +6633,12 @@ asm
       RET
 end;
 {$ENDIF CPUX86}
+
+{********************}
+//delphi seattle upd 1
+{$WARN SYMBOL_PLATFORM OFF}
 {$IFDEF CPUX64}
-function TestAndClearSSEExceptions(AExceptionMask: UInt32): Boolean;
+function ALTestAndClearSSEExceptions(AExceptionMask: UInt32): Boolean;
 var
   MXCSR: UInt32;
 begin
@@ -6586,51 +6647,246 @@ begin
   ResetMXCSR;
 end;
 {$ENDIF CPUX64}
+{$WARN SYMBOL_PLATFORM ON}
 
-{*****************}
-{$IFDEF PUREPASCAL}
+{********************}
+//delphi seattle upd 1
 //this function is not threadsafe because of Set8087CW
 //!! this is amazing !!
-function ALInternalTextToFloat(
-  ABuffer: PByte;
-  const AIsUnicodeBuffer: Boolean;
-  var AValue;
-  const AValueType: TFloatValue;
+{$WARN SYMBOL_PLATFORM OFF}
+function ALInternalTextToExtended(
+  ABuffer: PansiChar;
+  var AValue: Extended;
   const AFormatSettings: TALFormatSettings): Boolean;
 const
-{$IFDEF CPUX64}
-  CMaxExponent = 1024;
-{$ELSE !CPUX64}
+{$IFDEF EXTENDEDIS10BYTES}
   CMaxExponent = 4999;
-{$ENDIF !CPUX64}
+{$ELSE !EXTENDEDIS10BYTES}
+  CMaxExponent = 1024;
+{$ENDIF EXTENDEDIS10BYTES}
 
   CExponent = 'E'; // DO NOT LOCALIZE;
   CPlus = '+';     // DO NOT LOCALIZE;
   CMinus = '-';    // DO NOT LOCALIZE;
 
 var
+{$IFDEF NEXTGEN}
+//  SavedRoundMode: Int32;
+//  LSavedFlags: Word;
+//  LDummyFlags: Word;
+{$ELSE !NEXTGEN}
 {$IFDEF CPUX86}
   LSavedCtrlWord: Word;
 {$ENDIF CPUX86}
 {$IFDEF CPUX64}
   LSavedMXCSR: UInt32;
 {$ENDIF CPUX64}
+{$ENDIF}
   LPower: Integer;
   LSign: SmallInt;
   LResult: Extended;
-  LCurrChar: AnsiChar;
+  LCurrChar: ansiChar;
 
   procedure NextChar;
   begin
-    if AIsUnicodeBuffer then
+    LCurrChar := PansiChar(ABuffer)^;
+    Inc(PansiChar(ABuffer));
+  end;
+
+  procedure SkipWhitespace();
+  begin
+    { Skip white spaces }
+    while LCurrChar = ' ' do
+      NextChar;
+  end;
+
+  function ReadSign(): SmallInt;
+  begin
+    Result := 1;
+    if LCurrChar = CPlus then
+      NextChar()
+    else if LCurrChar = CMinus then
     begin
-      LCurrChar := AnsiChar(PWideChar(ABuffer)^);
-      Inc(PWideChar(ABuffer));
-    end else
-    begin
-      LCurrChar := AnsiChar(PAnsiChar(ABuffer)^);
-      Inc(PAnsiChar(ABuffer));
+      NextChar();
+      Result := -1;
     end;
+  end;
+
+  function ReadNumber(var AOut: Extended): Integer;
+  begin
+    Result := 0;
+    //while LCurrChar.IsDigit do
+    while CharInSet(LCurrChar, ['0'..'9']) do
+    begin
+      AOut := AOut * 10;
+      AOut := AOut + Ord(LCurrChar) - Ord('0');
+
+      NextChar();
+      Inc(Result);
+    end;
+  end;
+
+  function ReadExponent: SmallInt;
+  var
+    LSign: SmallInt;
+  begin
+    LSign := ReadSign();
+    Result := 0;
+    //while LCurrChar.IsDigit do
+    while CharInSet(LCurrChar, ['0'..'9']) do
+    begin
+      Result := Result * 10;
+      Result := Result + Ord(LCurrChar) - Ord('0');
+      NextChar();
+    end;
+
+    if Result > CMaxExponent then
+      Result := CMaxExponent;
+
+    Result := Result * LSign;
+  end;
+
+begin
+  { Prepare }
+  Result := False;
+  NextChar();
+
+{$IFDEF NEXTGEN}
+
+//  FEnvGetExceptFlag(LSavedFlags, fe_ALL_EXCEPT);
+//  FEnvSetExceptFlag(LSavedFlags, fe_ALL_EXCEPT);
+//  SavedRoundMode := FEnvGetRound;
+//  FEnvSetRound(fe_TONEAREST);
+{$ELSE  NEXTGEN}
+{$IFDEF CPUX86}
+  { Prepare the FPU }
+  LSavedCtrlWord := Get8087CW();
+  ALTestAndClearFPUExceptions(0);
+  Set8087CW(CWNear);
+{$ENDIF CPUX86}
+{$IFDEF CPUX64}
+  { Prepare the FPU }
+  LSavedMXCSR := GetMXCSR;
+  ALTestAndClearSSEExceptions(0);
+  SetMXCSR(MXCSRNear);
+{$ENDIF CPUX64}
+{$ENDIF NEXTGEN}
+
+  { Skip white spaces }
+  SkipWhitespace();
+
+  { Exit if nothing to do }
+  if LCurrChar <> #0 then
+  begin
+    { Detect the sign of the number }
+    LSign := ReadSign();
+    if LCurrChar <> #0 then
+    begin
+      { De result }
+      LResult := 0;
+
+      { Read the integer and fractionary parts }
+      ReadNumber(LResult);
+      if LCurrChar = AFormatSettings.DecimalSeparator then
+      begin
+        NextChar();
+        LPower := -ReadNumber(LResult);
+      end else
+        LPower := 0;
+
+      { Read the exponent and adjust the power }
+      if Char(Word(LCurrChar) and $FFDF) = CExponent then
+      begin
+        NextChar();
+        Inc(LPower, ReadExponent());
+      end;
+
+      { Skip white spaces }
+      SkipWhitespace();
+
+      { Continue only if the buffer is depleted }
+      if LCurrChar = #0 then
+      begin
+        { Calculate the final number }
+      {$IFDEF NEXTGEN}
+        try
+          LResult := Power10(LResult, LPower) * LSign;
+          AValue := LResult;
+          Result := True;
+        except
+          Result := False;
+        end;
+      {$ELSE  NEXTGEN}
+        LResult := Power10(LResult, LPower) * LSign;
+        AValue := LResult;
+      {$ENDIF NEXTGEN}
+
+
+{$IFDEF NEXTGEN}
+
+
+//        Result := True;
+{$ELSE  NEXTGEN}
+{$IFDEF CPUX86}
+        { Final check that everything went OK }
+        Result := ALTestAndClearFPUExceptions(mIE + mOE);
+{$ENDIF CPUX86}
+{$IFDEF CPUX64}
+        { Final check that everything went OK }
+        Result := ALTestAndClearSSEExceptions(mIE + mOE);
+{$ENDIF CPUX64}
+{$ENDIF NEXTGEN}
+      end;
+    end;
+  end;
+
+  { Clear Math Exceptions }
+{$IFDEF NEXTGEN}
+
+//  FEnvSetRound(SavedRoundMode);
+//  FEnvSetExceptFlag(LDummyFlags, LSavedFlags);
+{$ELSE  NEXTGEN}
+{$IFDEF CPUX86}
+  Set8087CW(LSavedCtrlWord);
+{$ENDIF CPUX86}
+{$IFDEF CPUX64}
+  SetMXCSR(LSavedMXCSR);
+{$ENDIF CPUX64}
+{$ENDIF NEXTGEN}
+end;
+{$WARN SYMBOL_PLATFORM ON}
+
+{********************}
+//delphi seattle upd 1
+//this function is not threadsafe because of Set8087CW
+//!! this is amazing !!
+function ALInternalTextToCurrency(
+  ABuffer: PansiChar;
+  var AValue: Currency;
+  const AFormatSettings: TALFormatSettings): Boolean;
+{$IFDEF EXTENDEDIS10BYTES}
+const
+  CMaxExponent = 4999;
+  CExponent = 'E'; // DO NOT LOCALIZE;
+  CPlus = '+';     // DO NOT LOCALIZE;
+  CMinus = '-';    // DO NOT LOCALIZE;
+var
+{$IFDEF NEXTGEN}
+
+{$ELSE !NEXTGEN}
+{$IFDEF CPUX86}
+  LSavedCtrlWord: Word;
+{$ENDIF CPUX86}
+{$ENDIF NEXTGEN}
+  LPower: Integer;
+  LSign: SmallInt;
+  LResult: Extended;
+  LCurrChar: ansiChar;
+
+  procedure NextChar;
+  begin
+    LCurrChar := ABuffer^;
+    Inc(ABuffer);
   end;
 
   procedure SkipWhitespace();
@@ -6689,18 +6945,16 @@ begin
   Result := False;
   NextChar();
 
+{$IFDEF NEXTGEN}
+
+{$ELSE  NEXTGEN}
 {$IFDEF CPUX86}
   { Prepare the FPU }
   LSavedCtrlWord := Get8087CW();
-  TestAndClearFPUExceptions(0);
-  Set8087CW(cALWNear);
+  ALTestAndClearFPUExceptions(0);
+  Set8087CW(CWNear);
 {$ENDIF CPUX86}
-{$IFDEF CPUX64}
-  { Prepare the FPU }
-  LSavedMXCSR := GetMXCSR;
-  TestAndClearSSEExceptions(0);
-  SetMXCSR(MXCSRNear);
-{$ENDIF CPUX64}
+{$ENDIF NEXTGEN}
 
   { Skip white spaces }
   SkipWhitespace();
@@ -6740,41 +6994,179 @@ begin
         { Calculate the final number }
         LResult := Power10(LResult, LPower) * LSign;
 
-        if AValueType = fvCurrency then
-          Currency(AValue) := LResult
-        else
-          Extended(AValue) := LResult;
+        Currency(AValue) := LResult;
 
+{$IFDEF NEXTGEN}
+
+
+        Result := true;
+{$ELSE  NEXTGEN}
 {$IFDEF CPUX86}
         { Final check that everything went OK }
-        Result := TestAndClearFPUExceptions(cALmIE + cALmOE);
+        Result := ALTestAndClearFPUExceptions(mIE + mOE);
 {$ENDIF CPUX86}
-{$IFDEF CPUX64}
-        { Final check that everything went OK }
-        Result := TestAndClearSSEExceptions(cALmIE + cALmOE);
-{$ENDIF CPUX64}
+{$ENDIF NEXTGEN}
       end;
     end;
   end;
 
   { Clear Math Exceptions }
+{$IFDEF NEXTGEN}
+
+{$ELSE  NEXTGEN}
 {$IFDEF CPUX86}
   Set8087CW(LSavedCtrlWord);
 {$ENDIF CPUX86}
-{$IFDEF CPUX64}
-  SetMXCSR(LSavedMXCSR);
-{$ENDIF CPUX64}
+{$ENDIF NEXTGEN}
 end;
-{$ENDIF}
+{$ELSE !EXTENDEDIS10BYTES}
+const
+  CExponent = 'E'; // DO NOT LOCALIZE;
+  CPlus = '+';     // DO NOT LOCALIZE;
+  CMinus = '-';    // DO NOT LOCALIZE;
+  Int64MaxDiv10 = $CCCCCCCCCCCCCCC;
+var
+  LPower: Integer;
+  LSign: SmallInt;
+  LValue: UInt64;
+  BufIndex: Integer;
 
-{***************************}
+  procedure SkipWhitespace;
+  begin
+    { Skip white spaces }
+    while ABuffer[BufIndex] = ' ' do
+      Inc(BufIndex);
+  end;
+
+  function ReadSign: SmallInt;
+  begin
+    Result := 1;
+    if ABuffer[BufIndex] = CPlus then
+      Inc(BufIndex)
+    else if ABuffer[BufIndex] = CMinus then
+    begin
+      Inc(BufIndex);
+      Result := -1;
+    end;
+  end;
+
+  function ReadNumber(var aValue: UInt64): Integer;
+  begin
+    Result := 0;
+    while ABuffer[BufIndex] in ['0'..'9'] do
+    begin
+      if aValue >= Int64MaxDiv10 then
+      begin
+        if aValue > Int64MaxDiv10 then break
+        else if ABuffer[BufIndex] > '7' then break
+      end;
+      aValue := aValue * 10;
+      aValue := aValue + Ord(ABuffer[BufIndex]) - Ord('0');
+      Inc(Result);
+      Inc(BufIndex);
+    end;
+    // Skip remaining numbers.
+    while ABuffer[BufIndex] in ['0'..'9'] do
+      Inc(BufIndex);
+  end;
+
+  function ReadExponent: Integer;
+  var
+    LSign: Integer;
+  begin
+    LSign := ReadSign;
+    Result := 0;
+    while ABuffer[BufIndex] in ['0'..'9'] do
+    begin
+      Result := Result * 10;
+      Result := Result + Ord(ABuffer[BufIndex]) - Ord('0');
+      Inc(BufIndex);
+    end;
+    Result := Result * LSign;
+  end;
+
+begin
+  { Prepare }
+  BufIndex := 0;
+  Result := False;
+  { Skip white spaces }
+  SkipWhitespace;
+
+  { Exit if nothing to do }
+  if ABuffer[BufIndex] <> #0 then
+  begin
+    { Detect the sign of the number }
+    LSign := ReadSign;
+    if ABuffer[BufIndex] <> #0 then
+    begin
+      { De result }
+      LValue := 0;
+
+      { Read the integer and fractionary parts }
+      ReadNumber(LValue);
+      if ABuffer[BufIndex] = AFormatSettings.DecimalSeparator then
+      begin
+        Inc(BufIndex);
+        LPower := -ReadNumber(LValue);
+      end else
+        LPower := 0;
+
+      { Read the exponent and adjust the power }
+      if Char(Word(ABuffer[BufIndex]) and $FFDF) = CExponent then
+      begin
+        Inc(BufIndex);
+        Inc(LPower, ReadExponent);
+      end;
+
+      { Skip white spaces }
+      SkipWhitespace();
+
+      { Continue only if the buffer is depleted }
+      if ABuffer[BufIndex] = #0 then
+      begin
+        { Calculate the final number }
+        LPower := LPower + 4; // Add Currency's offset digit
+
+        while LPower > 0 do
+        begin
+          if LValue > Int64MaxDiv10 then
+            Exit(False); // overflow.
+          LValue := LValue * 10;
+          Dec(LPower);
+        end;
+        while LPower < 0 do
+        begin
+          LValue := LValue div 10;
+          Inc(LPower);
+        end;
+
+        PUInt64(@AValue)^ := LValue;
+
+        if LSign < 0 then
+          AValue := -AValue;
+
+        Result := True;
+      end;
+    end;
+  end;
+end;
+{$ENDIF EXTENDEDIS10BYTES}
+
+{********************}
+//delphi seattle upd 1
 {$WARN SYMBOL_DEPRECATED OFF}
 function ALTextToFloat(Buffer: PAnsiChar; var Value;
   ValueType: TFloatValue; const AFormatSettings: TALFormatSettings): Boolean;
 {$IFDEF PUREPASCAL}
+//var
+//  S: string;
 begin
-  { Call internal helper. Assuming the buffer is ANSI. }
-  Result := ALInternalTextToFloat(PByte(Buffer), False, Value, ValueType, AFormatSettings);
+//  S := string(AnsiString(Buffer));
+//  Result := TextToFloat( PChar(s), Value, ValueType, AFormatSettings);
+  if ValueType = fvExtended then
+    Result := ALInternalTextToExtended(Buffer, Extended(Value), AFormatSettings)
+  else
+    Result := ALInternalTextToCurrency(Buffer, Currency(Value), AFormatSettings);
 end;
 {$ELSE !PUREPASCAL}
 {$IFDEF X86ASM}
@@ -6807,7 +7199,7 @@ asm //StackAligned
         MOV     EAX, SaveGOT
         FLDCW   [EAX].CWNear
 {$ELSE !PIC}
-        FLDCW   cALWNear
+        FLDCW   CWNear
 {$ENDIF !PIC}
         FLDZ
         CALL    @@SkipBlanks
@@ -6864,7 +7256,7 @@ asm //StackAligned
         JMP     @@8
 @@7:    FSTP    TBYTE PTR [EDI]
 @@8:    FSTSW   AX
-        TEST    AX,cALmIE+cALmOE
+        TEST    AX,mIE+mOE
         JNE     @@10
         MOV     AL,1
         JMP     @@11
@@ -6901,7 +7293,7 @@ asm //StackAligned
         FIMUL   [EBX].DCon10
         XCHG    SaveGOT,EBX
 {$ELSE !PIC}
-        FIMUL   cALDCon10
+        FIMUL   calDCon10
 {$ENDIF !PIC}
         MOV     Temp,EAX
         FIADD   Temp
@@ -6946,17 +7338,18 @@ end;
 {$ENDIF !PUREPASCAL}
 {$WARN SYMBOL_DEPRECATED ON}
 
-{*****************}
+{********************}
+//delphi seattle upd 1
 {$IFDEF PUREPASCAL}
-function ALInternalFloatToTextFmt(Buf: PByte; const Value; ValueType: TFloatValue; Format: PByte;
+function InternalFloatToTextFmt(Buf: PByte; const Value; ValueType: TFloatValue; Format: PByte;
   const AFormatSettings: TALFormatSettings; const Unicode: Boolean): Integer;
 const
   CMinExtPrecision = 2;
-{$IFDEF CPUX64}
+{$IFDEF EXTENDEDIS10BYTES}
   CMaxExtPrecision = 18;
-{$ELSE !CPUX64}
-  CMaxExtPrecision = 16;
-{$ENDIF !CPUX64}
+{$ELSE !EXTENDEDIS10BYTES}
+  CMaxExtPrecision = 17;
+{$ENDIF EXTENDEDIS10BYTES}
 
 var
   AIndex: Integer;
@@ -6971,96 +7364,80 @@ var
   Scientific: Boolean;
   Precision: Integer;
   Digits: Integer;
-  DecimalSep: AnsiChar;
-  ThousandsSep: AnsiChar;
+  DecimalSep: ansiChar;
+  ThousandsSep: ansiChar;
   FormatLength: Integer;
 
-  //procedure AppendChar(const AChar: Char);
-  //begin
-  //  if Unicode then
-  //  begin
-  //    PWideChar(Buf)^ := AChar;
-  //    Inc(Buf, SizeOf(Char));
-  //  end else
-  //  begin
-  //    PAnsiChar(Buf)^ := AnsiChar(AChar);
-  //    Inc(Buf, SizeOf(AnsiChar));
-  //  end;
-  //
-  //  Inc(Result);
-  //end;
-
-  function GetLength(const ABuf: PByte): Integer;
-  var
-    AWide: PWideChar;
-    AAnsi: PAnsiChar;
+  procedure AppendChar(const AChar: ansiChar);
   begin
-    Result := 0;
-    if Unicode then
-    begin
-      AWide := PWideChar(ABuf);
-      while AWide^ <> #0 do
-      begin
-        Inc(AWide);
-        Inc(Result);
-      end;
-    end else
-    begin
-      AAnsi := PAnsiChar(ABuf);
-      while AAnsi^ <> #0 do
-      begin
-        Inc(AAnsi);
-        Inc(Result);
-      end;
-    end;
-  end;
-
-  function GetCharIndex(const ABuf: PByte; const Index: Integer): AnsiChar;
-  begin
-    if Unicode then
-      Result := AnsiChar(PWideChar(ABuf)[Index])
-    else
-      Result := AnsiChar(PAnsiChar(ABuf)[Index]);
-  end;
-
-  procedure AppendAnsiChar(const AChar: AnsiChar);
-  begin
-    if Unicode then
-    begin
-      PWideChar(Buf)^ := Char(AChar);
-      Inc(Buf, SizeOf(Char));
-    end else
-    begin
-      PAnsiChar(Buf)^ := AChar;
-      Inc(Buf, SizeOf(AnsiChar));
-    end;
+    //if Unicode then
+    //begin
+    //  PWideChar(Buf)^ := char(AChar);
+    //  Inc(Buf, SizeOf(Char));
+    //end else
+    //begin
+      PByte(Buf)^ := Byte(AChar);
+      Inc(Buf, SizeOf(Byte));
+    //end;
 
     Inc(Result);
   end;
 
-  procedure AppendString(const AStr: AnsiString);
+  function GetLength(const ABuf: PByte): Integer;
   var
-    I, L: Integer;
+    //AWide: PChar;
+    AAnsi: PByte;
   begin
-    L := Length(AStr);
+    Result := 0;
+    //if Unicode then
+    //begin
+    //  AWide := PChar(ABuf);
+    //  while AWide^ <> #0 do
+    //  begin
+    //    Inc(AWide);
+    //    Inc(Result);
+    //  end;
+    //end else
+    //begin
+      AAnsi := PByte(ABuf);
+      while AAnsi^ <> Ord(#0) do
+      begin
+        Inc(AAnsi);
+        Inc(Result);
+      end;
+    //end;
+  end;
+
+  function GetCharIndex(const ABuf: PByte; const Index: Integer): ansiChar;
+  begin
+    //if Unicode then
+    //  Result := PWideChar(ABuf)[Index]
+    //else
+      Result := ansiChar(PByte(ABuf)[Index]);
+  end;
+
+  procedure AppendString(const AStr: ansiString);
+  var
+    {I,} L: Integer;
+  begin
+    L := length(AStr);
 
     if L > 0 then
     begin
-      if Unicode then
-      begin
-        { Unicode -- loop }
-        for I := 1 to L do
-        begin
-          PWideChar(Buf)^ := Char(AStr[I]);
-          Inc(Buf, SizeOf(Char));
-        end;
-      end else
-      begin
+      //if Unicode then
+      //begin
+      //  { Unicode -- loop }
+      //  for I := Low(AStr) to High(AStr) do
+      //  begin
+      //    PChar(Buf)^ := Char(AStr[I]);
+      //    Inc(Buf, SizeOf(Char));
+      //  end;
+      //end else
+      //begin
         { ANSI -- move directly }
-        ALMove(AStr[1], Buf^, L);
+        ALMove(pointer(AStr)^, Buf^, L);
         Inc(Buf, L * SizeOf(AnsiChar));
-      end;
-
+      //end;
       Inc(Result, L);
     end;
   end;
@@ -7107,10 +7484,10 @@ var
       Result := C;
   end;
 
-  function ScanSection(APos: Integer): AnsiString;
+  function ScanSection(APos: Integer): ansiString;
   var
     C: Integer;
-    AChar: AnsiChar;
+    AChar: ansiChar;
     I: Integer;
   begin
     DecimalIndex := -1;
@@ -7155,7 +7532,8 @@ var
           if C < FormatLength then
           begin
             AChar := GetCharIndex(Format, C);
-            if (AChar = '-') or (AChar = '+') then begin
+            if (AChar = '-') or (AChar = '+') then
+            begin
               Scientific := true;
               Inc(C);
               while (C < FormatLength) and (GetCharIndex(Format, C) = '0') do
@@ -7203,7 +7581,7 @@ var
   begin
     Result := 0;
     C := Low(FloatValue.Digits);
-    while (C <= High(FloatValue.Digits)) and (FloatValue.Digits[C] <> ord(#0)) do
+    while (C <= High(FloatValue.Digits)) and (FloatValue.Digits[C] <> Ord(#0)) do
     begin
       Inc(C);
       Inc(Result);
@@ -7217,34 +7595,34 @@ var
     DigitPlace: Integer;
     DigitsC: Integer;
     DigitsLimit: Integer;
-    OldC: AnsiChar;
+    OldC: ansiChar;
     Sign: ansiChar;
     Zeros: Integer;
 
-    procedure WriteDigit(ADigit: AnsiChar);
+    procedure WriteDigit(ADigit: ansiChar);
     begin
       if DigitPlace = 0 then
       begin
-        AppendAnsiChar(DecimalSep);
-        AppendAnsiChar(ADigit);
+        AppendChar(DecimalSep);
+        AppendChar(ADigit);
         Dec(DigitPlace);
       end
       else
       begin
-        AppendAnsiChar(ADigit);
+        AppendChar(ADigit);
         Dec(DigitPlace);
         if ThousandSep and (DigitPlace > 1) and ((DigitPlace mod 3) = 0) then
-          AppendAnsiChar(ThousandsSep);
+          AppendChar(ThousandsSep);
       end;
     end;
 
     procedure AddDigit;
     var
-      AChar: AnsiChar;
+      AChar: ansiChar;
     begin
       if DigitsC <= DigitsLimit then
       begin
-        AChar := AnsiChar(FloatValue.Digits[DigitsC]);
+        AChar := ansiChar(FloatValue.Digits[DigitsC]);
         Inc(DigitsC);
         WriteDigit(AChar);
       end
@@ -7283,12 +7661,12 @@ var
       end;
     end;
 
-    procedure PutExponent(EChar: AnsiChar; Sign: AnsiChar; Zeros: Integer; Exponent: Integer);
+    procedure PutExponent(EChar: ansiChar; Sign: ansiChar; Zeros: Integer; Exponent: Integer);
     var
-      Exp: AnsiString;
-      WriteSign: AnsiString;
+      Exp: ansiString;
+      WriteSign: ansiString;
     begin
-      AppendAnsiChar(EChar);
+      AppendChar(EChar);
       if (Sign = '+') and (Exponent >=0) then
         WriteSign := '+'
       else
@@ -7297,13 +7675,13 @@ var
         else
           WriteSign := '';
 
-      Exp := AlIntToStr(Abs(Exponent));
-      AppendString(WriteSign + StringOfChar(AnsiChar('0'), Zeros - Length(Exp)) + Exp);
+      Exp := alIntToStr(Abs(Exponent));
+      AppendString(WriteSign + StringOfChar(ansiChar('0'), Zeros - length(Exp)) + Exp);
     end;
 
   begin
     if (FloatValue.Negative) and (SectionIndex = 0) then
-      AppendAnsiChar('-');
+      AppendChar('-');
 
     if Scientific then
     begin
@@ -7320,9 +7698,10 @@ var
     end;
 
     DigitsLimit := DigitsLength - 1;
-    C := 1;
+    C := low(ansiString);
     DigitsC := 0;
-    while C <= Length(Section) do
+    //while C < length(Section) do
+    while C <= High(Section) do
     begin
       case Section[C] of
         '0', '#': begin
@@ -7335,9 +7714,9 @@ var
         '"', '''': begin
           OldC := Section[C];
           Inc(C);
-          while (C < Length(Section)) and (Section[C] <> OldC) do
+          while (C < High(Section)) and (Section[C] <> OldC) do
           begin
-            AppendAnsiChar(Section[C]);
+            AppendChar(Section[C]);
             Inc(C);
           end;
           Inc(C);
@@ -7346,16 +7725,18 @@ var
         'e', 'E': begin
           OldC := Section[C];
           Inc(C);
-          if C <= Length(Section) then
+          //if C < length(Section) then
+          if C <= High(Section) then
           begin
             Sign := Section[C];
             if (Sign <> '+') and (Sign <> '-') then
-              AppendAnsiChar(OldC)
+              AppendChar(OldC)
             else
             begin
               Zeros := 0;
               Inc(C);
-              while (C <= Length(Section)) and (Section[C] = '0') do
+              //while (C < length(Section)) and (Section[C] = '0') do
+              while (C <= High(Section)) and (Section[C] = '0') do
               begin
                 Inc(C);
                 if Zeros < 4 then Inc(Zeros);
@@ -7367,13 +7748,14 @@ var
 
         else
         begin
-          AppendAnsiChar(Section[C]);
+          AppendChar(Section[C]);
           Inc(C);
         end;
       end;
     end;
-    if Result > 0 then begin
-      AppendAnsiChar(#0);
+    if Result > 0 then
+    begin
+      AppendChar(#0);
       Dec(Result);
     end;
   end;
@@ -7401,6 +7783,11 @@ begin
 
   SectionIndex := FindSection(AIndex);
   Section := ScanSection(SectionIndex);
+  if Section = '' then
+  begin
+    SectionIndex := FindSection(0);
+    Section := ScanSection(SectionIndex);
+  end;
 
   if Scientific then
   begin
@@ -7416,10 +7803,14 @@ begin
   if (FormatLength = 0) or (GetCharIndex(Format, 0) = ';') or
     ((FloatValue.Exponent >= 18) and (not Scientific)) or
     (FloatValue.Exponent = $7FF) or (FloatValue.Exponent = $800) then
-    if Unicode then
-      Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0)
-    else
+{$IFNDEF NEXTGEN}
+    //if Unicode then
+    //  Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+    //else
       Result := System.Ansistrings.FloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+{$ELSE NEXTGEN}
+    Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+{$ENDIF !NEXTGEN}
   else
     ApplyFormat;
 end;
@@ -7434,12 +7825,13 @@ begin
     AFormatSettings);
 end;
 
-{****************************************************************************}
+{********************}
+//delphi seattle upd 1
 function ALFloatToTextFmt(Buf: PAnsiChar; const Value; ValueType: TFloatValue;
   Format: PAnsiChar; const AFormatSettings: TALFormatSettings): Integer;
 {$IFDEF PUREPASCAL}
 begin
-  Result := ALInternalFloatToTextFmt(PByte(Buf), Value, ValueType, PByte(Format), AFormatSettings, False);
+  Result := InternalFloatToTextFmt(PByte(Buf), Value, ValueType, PByte(Format), AFormatSettings, False);
 end;
 {$ELSE !PUREPASCAL}
 {$IFDEF X86ASM}
@@ -8174,11 +8566,9 @@ var
 begin
   L := Length(S);
   I := 1;
-  if (L > 0) and (S[I] > ' ') and (S[L] > ' ') then
-    Exit(S);
+  if (L > 0) and (S[I] > ' ') and (S[L] > ' ') then Exit(S);
   while (I <= L) and (S[I] <= ' ') do Inc(I);
-  if I > L then
-    Exit('');
+  if I > L then Exit('');
   while S[L] <= ' ' do Dec(L);
   Result := ALCopyStr(S, I, L - I + 1);
 end;
@@ -8191,8 +8581,7 @@ begin
   L := Length(S);
   I := 1;
   while (I <= L) and (S[I] <= ' ') do Inc(I);
-  if I = 1 then
-    Exit(S);
+  if I = 1 then Exit(S);
   Result := ALCopyStr(S, I, Maxint);
 end;
 
@@ -8202,8 +8591,7 @@ var
   I: Integer;
 begin
   I := Length(S);
-  if (I > 0) and (S[I] > ' ') then
-    Exit(S);
+  if (I > 0) and (S[I] > ' ') then Exit(S);
   while (I > 0) and (S[I] <= ' ') do Dec(I);
   Result := ALCopyStr(S, 1, I);
 end;
@@ -11001,10 +11389,9 @@ end;
 initialization
 
   {$IFNDEF NEXTGEN}
-    ALPosExIgnoreCaseInitialiseLookupTable;
-    ALGetLocaleFormatSettings(1033{en-US}, ALDefaultFormatSettings);
+  ALPosExIgnoreCaseInitialiseLookupTable;
+  ALDefaultFormatSettings := TALFormatSettings.Create('en-US'); // 1033 {en-US}
   {$ENDIF}
-
   ALDefaultFormatSettingsU := TALFormatSettingsU.Create('en-US');
 
   ALMove := system.Move;

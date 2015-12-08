@@ -776,12 +776,12 @@ begin
     BeginUpdate;
     try
       Clear;
-      FNameValueSeparator := AnsiChar(TStrings(Source).NameValueSeparator);
-      FQuoteChar := AnsiChar(TStrings(Source).QuoteChar);
-      FDelimiter := AnsiChar(TStrings(Source).Delimiter);
+      NameValueSeparator := AnsiChar(TStrings(Source).NameValueSeparator);
+      QuoteChar := AnsiChar(TStrings(Source).QuoteChar);
+      Delimiter := AnsiChar(TStrings(Source).Delimiter);
       {$IF CompilerVersion >= 18.5} {Delphi D2007}
-      FLineBreak := AnsiString(TStrings(Source).LineBreak);
-      FStrictDelimiter := TStrings(Source).StrictDelimiter;
+      LineBreak := AnsiString(TStrings(Source).LineBreak);
+      StrictDelimiter := TStrings(Source).StrictDelimiter;
       {$IFEND}
       for I := 0 to Tstrings(Source).Count - 1 do
         AddObject(Ansistring(Tstrings(Source)[I]), Tstrings(Source).Objects[I]);
@@ -1650,9 +1650,9 @@ begin
   else if Source is TStringList then
   begin
     Clear;
-    FCaseSensitive := TStringList(Source).CaseSensitive;
-    FDuplicates := TStringList(Source).Duplicates;
-    FSorted := TStringList(Source).Sorted;
+    CaseSensitive := TStringList(Source).CaseSensitive;
+    Duplicates := TStringList(Source).Duplicates;
+    Sorted := TStringList(Source).Sorted;
   end;
   inherited Assign(Source);
 end;
@@ -2400,9 +2400,9 @@ begin
   else if Source is TStringList then
   begin
     Clear;
-    FCaseSensitive := TStringList(Source).CaseSensitive;
-    FDuplicates := TStringList(Source).Duplicates;
-    FSorted := TStringList(Source).Sorted;
+    CaseSensitive := TStringList(Source).CaseSensitive;
+    Duplicates := TStringList(Source).Duplicates;
+    Sorted := TStringList(Source).Sorted;
   end;
   inherited Assign(Source);
 end;
@@ -4757,6 +4757,7 @@ end;
 {$IFEND}
 
 end.
+
 
 
 

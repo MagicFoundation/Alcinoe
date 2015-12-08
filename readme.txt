@@ -6,6 +6,17 @@ svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 or with a web browser at:
 http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
 
+About support of delphi version
+
+Actually the source is maintained on last version of 
+Delphi (XE4 - seattle). The modifications to make it 
+working on lower version of Delphi are little and can 
+be easily handled via define condition. But I have no 
+time and no older delphi compiler to test it. Anyone 
+who want to work on it is welcome, and I will gave 
+him a write access to the svn.
+
+
 About Win64
 
 Unfortunatly, in win64 we lost all the FastCode heritage. 

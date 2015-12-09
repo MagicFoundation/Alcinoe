@@ -955,11 +955,12 @@ begin
       LongDayNames[i] := AnsiString(aFormatSettings.LongDayNames[i]);
     {$IF CompilerVersion >= 28} {Delphi XE7}
     setlength(EraInfo, length(aFormatSettings.EraInfo));
-    for I := Low(aFormatSettings.EraInfo) to High(aFormatSettings.EraInfo) do
+    for I := Low(aFormatSettings.EraInfo) to High(aFormatSettings.EraInfo) do begin
       EraInfo[i].EraName := ansiString(aFormatSettings.EraInfo[i].EraName);
       EraInfo[i].EraOffset := aFormatSettings.EraInfo[i].EraOffset;
       EraInfo[i].EraStart := aFormatSettings.EraInfo[i].EraStart;
       EraInfo[i].EraEnd := aFormatSettings.EraInfo[i].EraEnd;
+    end;
     {$else}
     setlength(EraInfo, MaxEraCount);
     for I := 1 to MaxEraCount do begin
@@ -1007,11 +1008,12 @@ begin
       LongDayNames[i] := AnsiString(aFormatSettings.LongDayNames[i]);
     {$IF CompilerVersion >= 28} {Delphi XE7}
     setlength(EraInfo, length(aFormatSettings.EraInfo));
-    for I := Low(aFormatSettings.EraInfo) to High(aFormatSettings.EraInfo) do
+    for I := Low(aFormatSettings.EraInfo) to High(aFormatSettings.EraInfo) do begin
       EraInfo[i].EraName := ansiString(aFormatSettings.EraInfo[i].EraName);
       EraInfo[i].EraOffset := aFormatSettings.EraInfo[i].EraOffset;
       EraInfo[i].EraStart := aFormatSettings.EraInfo[i].EraStart;
       EraInfo[i].EraEnd := aFormatSettings.EraInfo[i].EraEnd;
+    end;
     {$else}
     setlength(EraInfo, MaxEraCount);
     for I := 1 to MaxEraCount do begin
@@ -8510,9 +8512,9 @@ begin
         C1 := (PS + I + J)^;
         C2 := (PSubStr + J)^;
         if (C1 = C2) or
-           ((charinSet(C1, ['a' .. 'z'])) and
+           (((C1 >= char('a')) and (C1 <= char('z'))) and
             (C1 = Char(word(C2) + $20))) or
-           ((charinSet(C1, ['A' .. 'Z'])) and
+           (((C1 >= char('A')) and (C1 <= char('Z'))) and
             (C1 = Char(word(C2) - $20))) then
           Inc(J)
         else
@@ -8692,11 +8694,15 @@ begin
     Result := S;
 end;
 
+{$ENDIF !NEXTGEN}
+
 {****************************************************************}
 function ALExtractQuotedStrU(var Src: PChar; Quote: Char): String;
 begin
   result := AnsiExtractQuotedStr(PWideChar(Src), Quote);
 end;
+
+{$IFNDEF NEXTGEN}
 
 {******************************************************************}
 function  ALExtractFilePath(const FileName: AnsiString): AnsiString;
@@ -9074,10 +9080,15 @@ end;
 {*******************************************************************************************}
 function  ALRandomStr(const aLength: Longint; const aCharset: Array of ansiChar): AnsiString;
 var X: Longint;
+    P: Pansichar;
 begin
-  if aLength <= 0 then exit;
+  if aLength <= 0 then exit('');
   SetLength(Result, aLength);
-  for X:=1 to aLength do Result[X] := aCharset[Random(length(aCharset))];
+  P := pansiChar(Result);
+  for X:=1 to aLength do begin
+    P^ := aCharset[Random(length(aCharset))];
+    inc(P);
+  end;
 end;
 
 {*******************************************************}
@@ -9091,10 +9102,15 @@ end;
 {************************************************************************************}
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String;
 var X: Longint;
+    P: Pchar;
 begin
-  if aLength <= 0 then exit;
+  if aLength <= 0 then exit('');
   SetLength(Result, aLength);
-  for X:=1 to aLength do Result[X] := aCharset[Random(length(aCharset))];
+  P := pchar(Result);
+  for X:=1 to aLength do begin
+    P^ := aCharset[Random(length(aCharset))];
+    inc(P);
+  end;
 end;
 
 {****************************************************}

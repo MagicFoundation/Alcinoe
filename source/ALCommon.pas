@@ -66,8 +66,10 @@ interface
 
 Function AlBoolToInt(Value:Boolean):Integer;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
+{$IFDEF MSWINDOWS}
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
 function ALGMTNow: TDateTime;
+{$ENDIF}
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
@@ -86,16 +88,11 @@ const ALMAXUInt64: UInt64 = 18446744073709551615;
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
+uses {$IFDEF MSWINDOWS}
      Winapi.Windows,
+     {$ENDIF}
      system.sysutils,
-     system.DateUtils,
-     {$ELSE}
-     Windows,
-     sysutils,
-     DateUtils,
-     {$IFEND}
-     ALString;
+     system.DateUtils;
 
 {******************************************}
 Function AlBoolToInt(Value:Boolean):Integer;
@@ -110,7 +107,8 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
-{********************************************************************************}
+{****************}
+{$IFDEF MSWINDOWS}
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
 
   {--------------------------------------------}
@@ -133,14 +131,17 @@ function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTim
 begin
   Result := aLocalDateTime + InternalCalcTimeZoneBias;
 end;
+{$ENDIF}
 
-{**************************}
+{****************}
+{$IFDEF MSWINDOWS}
 {The same like Now but used
  GMT-time not local time.}
 function ALGMTNow: TDateTime;
 begin
   result := AlLocalDateTimeToGMTDateTime(NOW);
 end;
+{$ENDIF}
 
 {******************************************************}
 Function ALInc(var x: integer; Count: integer): Integer;

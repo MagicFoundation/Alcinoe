@@ -116,7 +116,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IFDEF MSWINDOWS}
+uses ALInit,
+     {$IFDEF MSWINDOWS}
        Winapi.Windows,
      {$ENDIF}
      System.SysUtils,
@@ -524,6 +525,8 @@ function  ALIntToBit(value: Integer; digits: integer): ansistring;
 function  AlBitToInt(Value: ansiString): Integer;
 function  AlInt2BaseN(NumIn: UInt64; const charset: array of ansiChar): ansistring;
 function  AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
+var       ALBase64EncodeString: function(const S: AnsiString): AnsiString;
+var       ALBase64DecodeString: function(const S: AnsiString): AnsiString;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
@@ -621,6 +624,8 @@ var       ALTryStrToUInt64U: function(const S: String; out Value: UInt64): Boole
 {$ifend}
 function  ALUIntToStrU(Value: Cardinal): String; overload; inline;
 function  ALUIntToStrU(Value: UInt64): String; overload; inline;
+var       ALBase64EncodeStringU: function(const S: String): String;
+var       ALBase64DecodeStringU: function(const S: String): String;
 function  ALFloatToStrU(Value: Extended; const AFormatSettings: TALFormatSettingsU): String; overload; inline;
 procedure ALFloatToStrU(Value: Extended; var S: String; const AFormatSettings: TALFormatSettingsU); overload; inline;
 var       ALCurrToStrU: function(Value: Currency; const AFormatSettings: TALFormatSettingsU): string;
@@ -652,6 +657,7 @@ function  ALQuotedStrU(const S: String; const Quote: Char = ''''): String;
 var       ALDequotedStrU: function(const S: string; AQuote: Char): string;
 function  ALExtractQuotedStrU(var Src: PChar; Quote: Char): String;
 var       ALLastDelimiterU: function(const Delimiters, S: string): Integer;
+procedure ALStrMoveU(const Source: PChar; var Dest: PChar; Count: NativeInt); inline;
 function  ALCopyStrU(const aSourceString: String; aStart, aLength: Integer): String; overload;
 procedure ALCopyStrU(const aSourceString: String; var aDestString: String; aStart, aLength: Integer); overload;
 function  ALCopyStrU(const aSourceString: String;
@@ -823,6 +829,8 @@ Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
       cAlUTF32BigEndianBom = ansiString(#$00) + ansiString(#$00) + ansiString(#$FE) + ansiString(#$FF);
 {$ENDIF}
 
+Procedure ALStringInitialization;
+
 implementation
 
 uses System.SysConst,
@@ -834,7 +842,8 @@ uses System.SysConst,
      System.Ansistrings,
      {$ENDIF}
      System.Character,
-     System.Math;
+     System.Math,
+     ALMime;
 
 {$IFNDEF NEXTGEN}
 
@@ -8937,6 +8946,17 @@ begin
   ALMove(Source^, Dest^, Count);
 end;
 
+{$ENDIF !NEXTGEN}
+
+{***********************************************************************************************}
+// warning ALStrMove inverse the order of the original StrMove (to keep the same order as ALMove)
+procedure ALStrMoveU(const Source: PChar; var Dest: PChar; Count: NativeInt);
+begin
+  ALMove(Source^, Dest^, Count * sizeOf(Char));
+end;
+
+{$IFNDEF NEXTGEN}
+
 {****************************************************************************************}
 function ALCopyStr(const aSourceString: AnsiString; aStart, aLength: Integer): AnsiString;
 var aSourceStringLength: Integer;
@@ -11402,7 +11422,9 @@ end;
 
 {$ENDIF}
 
-initialization
+{*******************************}
+Procedure ALStringInitialization;
+begin
 
   {$IFNDEF NEXTGEN}
   ALPosExIgnoreCaseInitialiseLookupTable;
@@ -11422,6 +11444,8 @@ initialization
   ALSameText := system.AnsiStrings.SameText;
   ALMatchText := System.AnsiStrings.MatchText;
   ALMatchStr := System.AnsiStrings.MatchStr;
+  ALBase64EncodeString := ALMimeEncodeStringNoCRLF;
+  ALBase64DecodeString := ALMimeDecodeString;
   {$ENDIF}
 
   ALDateToStrU := system.sysutils.DateToStr;
@@ -11447,6 +11471,8 @@ initialization
   ALCurrToStrU := system.sysutils.CurrToStr;
   ALFormatFloatU := system.sysutils.FormatFloat;
   ALFormatCurrU := system.sysutils.FormatCurr;
+  ALBase64EncodeStringU := ALMimeEncodeStringNoCRLFU;
+  ALBase64DecodeStringU := ALMimeDecodeStringU;
   ALStrToFloatU := system.sysutils.StrToFloat;
   ALStrToFloatDefU := system.sysutils.StrToFloatDef;
   ALStrToCurrU := system.sysutils.StrToCurr;
@@ -11467,5 +11493,7 @@ initialization
   ALDequotedStrU := system.sysutils.AnsiDequotedStr;
   ALLastDelimiterU := system.sysutils.LastDelimiter;
   ALStringReplaceU := system.sysutils.StringReplace;
+
+end;
 
 end.

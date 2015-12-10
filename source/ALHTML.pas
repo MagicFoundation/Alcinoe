@@ -74,6 +74,8 @@ interface
 
 uses AlStringList;
 
+{$IFNDEF NEXTGEN}
+
 procedure ALUTF8ExtractHTMLText(HtmlContent: AnsiString;
                                 LstExtractedResourceText: TALStrings;
                                 Const DecodeHTMLText: Boolean = True); overload;
@@ -96,23 +98,25 @@ procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
 procedure ALCompactHtmlTagParams(TagParams: TALStrings);
 
+{$ENDIF}
+
+function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
+procedure ALJavascriptDecodeVU(Var Str: String);
+function  ALJavascriptDecodeU(const Src: String): String;
+
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Math,
+uses System.Math,
      System.Classes,
      System.sysutils,
+     {$IFNDEF NEXTGEN}
      System.Win.Comobj,
      Winapi.Ole2,
-     {$ELSE}
-     Math,
-     Classes,
-     sysutils,
-     Comobj,
-     Ole2,
-     {$IFEND}
+     {$ENDIF}
      ALString,
      ALQuickSortList;
+
+{$IFNDEF NEXTGEN}
 
 Var vALhtml_LstEntities: TALStrings;
 
@@ -401,7 +405,7 @@ begin
   GetMem(Buf, L * 6); // to be on the *very* safe side
   try
     P := Buf;
-    for i := 1 to L do begin
+    for i := low(Src) to High(Src) do begin
       ch := Ord(src[i]);
       case ch of
         34: begin // quot "
@@ -466,20 +470,14 @@ begin
   end;
 end;
 
-{*********************************************************************}
-function ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
-begin
-  result := Src;
-  ALUTF8XMLTextElementDecodeV(result);
-end;
-
 {*********************************************************}
 procedure ALUTF8XMLTextElementDecodeV(var Str: AnsiString);
+
 var CurrPos: integer;
     Ln: integer;
     PResHead: PAnsiChar;
     PResTail: PAnsiChar;
-    Chars: array[1..11] of AnsiChar;
+    Chars: array[1..10] of AnsiChar;
     IsUniqueString: boolean;
 
     {------------------------------}
@@ -510,63 +508,12 @@ var CurrPos: integer;
       end;
     end;
 
-    {--------------------------------------------------------------------------}
-    procedure _CopyUnicodeCharToResult(aCharInt: integer; aNewCurrPos: integer);
-    var {$IFDEF UNICODE}
-        aUTF8String: UTF8String;
-        {$ELSE}
-        aUTF8String: AnsiString;
-        {$ENDIF}
-        k: integer;
+    {---------------------------------}
+    procedure _CopyCurrPosCharToResult;
     begin
-      if not IsUniqueString then _GenerateUniqueString;
-
-      {$IFDEF UNICODE}
-      aUTF8String := UTF8String(Char(aCharInt));
-      {$ELSE}
-      aUTF8String := UTF8Encode(WideChar(aCharInt));
-      {$ENDIF}
-      for k := 1 to Length(aUTF8String) do begin
-        PResTail^ := aUTF8String[k];
-        Inc(PResTail);
-      end;
-      CurrPos := aNewCurrPos;
-    end;
-
-    {---------------------------------------------------------------}
-    procedure _CopyHexadecimalEntityToResult(aEntityLength: integer);
-    var i: integer;
-        Res: integer;
-    begin
-      Res := 0;
-
-      // 3 because Chars[1] = # and Chars[2] = x
-      for i := 3 to aEntityLength - 1 do begin
-        if i = 3 then Res := _HexToInt(0,   Chars[i])
-        else          Res := _HexToInt(Res, Chars[i]);
-      end;
-      _CopyUnicodeCharToResult(Res, CurrPos + aEntityLength + 2); // &#x0af8;
-                                                                  //    CurrPos pointed to &,
-                                                                  //    aEntityLength is a length of "0af8" = 4
-                                                                  //    2 is a length of #x in the beginning
-    end;
-
-    {-----------------------------------------------------------}
-    procedure _CopyDecimalEntityToResult(aEntityLength: integer);
-    var i: integer;
-        Res: integer;
-    begin
-      Res := 0;
-
-      // 2 because Chars[1] = #
-      for i := 2 to aEntityLength - 1 do begin
-        if i = 2 then Res := _DecimalToInt(0,   Chars[i])
-        else          Res := _DecimalToInt(Res, Chars[i]);
-      end;
-      _CopyUnicodeCharToResult(Res, CurrPos + aEntityLength + 1); // &#2345;
-                                                                  //    CurrPos pointed to &,
-                                                                  //    aEntityLength is a length of "2345" = 4
-                                                                  //    1 is a length of # in the beginning and
+      if IsUniqueString then PResTail^ := Str[CurrPos];
+      Inc(PResTail);
+      Inc(CurrPos);
     end;
 
     {-----------------------------------------------------------------------}
@@ -578,20 +525,57 @@ var CurrPos: integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {---------------------------------}
-    procedure _CopyCurrPosCharToResult;
+    {--------------------------------------------------------------------------}
+    procedure _CopyUnicodeCharToResult(aCharInt: integer; aNewCurrPos: integer);
+    var aUTF8String: UTF8String;
+        k: integer;
     begin
-      if IsUniqueString then PResTail^ := Str[CurrPos];
-      Inc(PResTail);
-      Inc(CurrPos);
+      if not IsUniqueString then _GenerateUniqueString;
+      aUTF8String := UTF8String(Char(aCharInt));
+      for k := low(aUTF8String) to high(aUTF8String) do begin
+        PResTail^ := aUTF8String[k];
+        Inc(PResTail);
+      end;
+      CurrPos := aNewCurrPos;
     end;
 
-var i, j: integer;
+    {---------------------------------------------------------------}
+    procedure _CopyHexadecimalEntityToResult(aEntityLength: integer); // aEntityLength include the last ; but not the first &
+    var i: integer;
+        Res: integer;
+    begin
+      Res := 0;
+      for i := 3 to aEntityLength - 1 do  // 3 because Chars[1] = # and Chars[2] = x
+        Res := _HexToInt(Res, Chars[i]);
+      _CopyUnicodeCharToResult(Res, CurrPos + aEntityLength + 1); // ...&#x0af8;...
+                                                                  //    ^CurrPos and aEntityLength=7
+                                                                  // =>
+                                                                  // ...&#x0af8;...
+                                                                  //            ^CurrPos
+    end;
+
+    {-----------------------------------------------------------}
+    procedure _CopyDecimalEntityToResult(aEntityLength: integer); // aEntityLength include the last ; but not the first &
+    var i: integer;
+        Res: integer;
+    begin
+      Res := 0;
+      for i := 2 to aEntityLength - 1 do // 2 because Chars[1] = #
+        Res := _DecimalToInt(Res, Chars[i]);
+      _CopyUnicodeCharToResult(Res, CurrPos + aEntityLength + 1); // ...&#2345;...
+                                                                  //    ^CurrPos and aEntityLength=6
+                                                                  // =>
+                                                                  // ...&#2345;...
+                                                                  //           ^CurrPos
+    end;
+
+var i, j, l: integer;
+
 begin
 
   {Init var}
-  CurrPos := 1;
-  Ln := Length(Str);
+  CurrPos := low(Str);
+  Ln := High(Str);
   IsUniqueString := false;
   PResHead := PAnsiChar(Str);
   PResTail := PResHead;
@@ -605,20 +589,20 @@ begin
       {Construct chars array of the XML-entity}
       j := CurrPos + 1;
       i := 1;
-      while (j <= Ln) and (Str[j] <> ';') and (j - CurrPos <= 11) do begin
+      while (j <= Ln) and (Str[j] <> ';') and (i <= 10) do begin
         Chars[i] := Str[j];
         Inc(i);
         Inc(j);
       end;
 
-      {Fill the remaining part of array by #0}
-      while i <= 11 do begin
-        Chars[i] := #0;
-        Inc(i);
-      end;
-
       {If XML-entity is valid}
-      if (j <= Ln) and (j - CurrPos <= 11) then begin
+      if (j <= Ln) and (i <= 10) then begin
+
+        {Fill the remaining part of array by #0}
+        while i <= 10 do begin
+          Chars[i] := #0;
+          Inc(i);
+        end;
 
         {Numeric XML-entity}
         // see: https://en.wikipedia.org/wiki/List_of_XML_and_HTML_character_entity_references
@@ -629,17 +613,18 @@ begin
           {Numeric hexadecimal XML-entity}
           if Chars[2] = 'x' then begin
 
+            l := j - CurrPos; {Length of entity}
+
             // Chars[3] of entity should be in this case in 0..9,a..f,A..F and
             // all the others must be 0..9,a..f,A..F or #0
-            if (Chars[3]  in ['0'..'9']) and
-               (Chars[4]  in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[5]  in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[6]  in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[7]  in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[8]  in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[9]  in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[10] in [#0, 'A'..'F', 'a'..'f', '0'..'9']) and
-               (Chars[11] in [#0, 'A'..'F', 'a'..'f', '0'..'9']) then _CopyHexadecimalEntityToResult(j - CurrPos{Length of entity})
+            if (Chars[3]  in ['A'..'F', 'a'..'f', '0'..'9']) and
+               ((L <= 4) or (Chars[4]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 5) or (Chars[5]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 6) or (Chars[6]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 7) or (Chars[7]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 8) or (Chars[8]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 9) or (Chars[9]  in ['A'..'F', 'a'..'f', '0'..'9'])) and
+               ((L <= 10) or (Chars[10] in ['A'..'F', 'a'..'f', '0'..'9'])) then _CopyHexadecimalEntityToResult(l{Length of entity})
             else _CopyCurrPosCharToResult;
 
           end
@@ -647,22 +632,22 @@ begin
           {Plain numeric decimal XML-entity}
           else begin
 
+            l := j - CurrPos; {Length of entity}
+
             // Chars[2] of entity should be in this case in 0..9 and
             // all the others must be 0..9 or #0
             if (Chars[2]  in ['0'..'9']) and
-               (Chars[3]  in [#0, '0'..'9']) and
-               (Chars[4]  in [#0, '0'..'9']) and
-               (Chars[5]  in [#0, '0'..'9']) and
-               (Chars[6]  in [#0, '0'..'9']) and
-               (Chars[7]  in [#0, '0'..'9']) and
-               (Chars[8]  in [#0, '0'..'9']) and
-               (Chars[9]  in [#0, '0'..'9']) and
-               (Chars[10] in [#0, '0'..'9']) and
-               (Chars[11] in [#0, '0'..'9']) then _CopyDecimalEntityToResult(j - CurrPos{Length of entity})
+               ((L <= 3) or (Chars[3]  in ['0'..'9'])) and
+               ((L <= 4) or (Chars[4]  in ['0'..'9'])) and
+               ((L <= 5) or (Chars[5]  in ['0'..'9'])) and
+               ((L <= 6) or (Chars[6]  in ['0'..'9'])) and
+               ((L <= 7) or (Chars[7]  in ['0'..'9'])) and
+               ((L <= 8) or (Chars[8]  in ['0'..'9'])) and
+               ((L <= 9) or (Chars[9]  in ['0'..'9'])) and
+               ((L <= 10) or (Chars[10] in ['0'..'9'])) then _CopyDecimalEntityToResult(l{Length of entity})
             else _CopyCurrPosCharToResult;
 
           end;
-
 
         end
 
@@ -693,7 +678,6 @@ begin
 
         end;
 
-
       end
       else _CopyCurrPosCharToResult;
 
@@ -704,9 +688,16 @@ begin
 
   {Change the length the string only if some modifications was done.
    Else we don't need to do anything.}
-  if PResTail - PResHead <> Ln then
+  if PResTail - PResHead <> length(Str) then
     SetLength(Str, PResTail - PResHead);
 
+end;
+
+{*********************************************************************}
+function ALUTF8XMLTextElementDecode(const Src: AnsiString): AnsiString;
+begin
+  result := Src;
+  ALUTF8XMLTextElementDecodeV(result);
 end;
 
 {**********************************************}
@@ -719,7 +710,7 @@ var i, k, l: integer;
     aEntityStr: AnsiString;
     aEntityInt: Integer;
     aIndex: integer;
-    aTmpWideString: WideString;
+    aTmpString: String;
     LstUnicodeEntitiesNumber: TALIntegerList;
 
 begin
@@ -735,19 +726,15 @@ begin
         LstUnicodeEntitiesNumber.AddObject(integer(vALhtml_LstEntities.Objects[i]),pointer(i));
     end;
 
-    {$IFDEF UNICODE}
-    aTmpWideString := UTF8ToWideString(Src);
-    {$ELSE}
-    aTmpWideString := UTF8Decode(Src);
-    {$ENDIF}
-    L := length(aTmpWideString);
+    aTmpString := UTF8ToString(Src);
+    L := length(aTmpString);
     If L=0 then Exit;
 
     GetMem(Buf, length(Src) * 12); // to be on the *very* safe side
     try
       P := Buf;
       For i := 1 to L do begin
-        aEntityInt := Integer(aTmpWideString[i]);
+        aEntityInt := Integer(aTmpString[i]);
         Case aEntityInt of
           34: begin // quot "
                 If EncodeASCIIHtmlEntities then begin
@@ -836,7 +823,7 @@ begin
                 else aEntityStr := '&#'+ALIntToStr(aEntityInt)+';'
               end;
             end
-            else aEntityStr := ansistring(aTmpWideString[i]);
+            else aEntityStr := ansistring(aTmpString[i]);
 
             for k := 1 to Length(aEntityStr) do begin
               P^ := aEntityStr[k];
@@ -873,11 +860,11 @@ var CurrentSrcPos, CurrentResultPos : Integer;
 
   {----------------------------------------------------------------------------------}
   procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
-  Var aUTF8String: AnsiString;
+  Var aUTF8String: Utf8String;
       K: integer;
   Begin
-    aUTF8String := UTF8Encode(WideChar(aUnicodeOrdEntity));
-    For k := 1 to length(aUTF8String) do begin
+    aUTF8String := UTF8String(Char(aUnicodeOrdEntity));
+    For k := low(aUTF8String) to high(aUTF8String) do begin
       result[CurrentResultPos] := aUTF8String[k];
       inc(CurrentResultPos);
     end;
@@ -972,7 +959,7 @@ begin
   else GetMem(Buf, L * 2); // to be on the *very* safe side
   try
     P := Buf;
-    for i := 1 to L do begin
+    for i := low(Src) to high(Src) do begin
       ch := Ord(src[i]);
       case ch of
         8: begin // Backspace
@@ -1146,21 +1133,12 @@ var CurrPos : Integer;
 
     {--------------------------------------------------------------------------}
     procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
-    var {$IFDEF UNICODE}
-        aUTF8String: UTF8String;
-        {$ELSE}
-        aUTF8String: AnsiString;
-        {$ENDIF}
+    var aUTF8String: UTF8String;
         K: integer;
     begin
       if not IsUniqueString then _GenerateUniqueString;
-
-      {$IFDEF UNICODE}
       aUTF8String := UTF8String(Char(aCharInt));
-      {$ELSE}
-      aUTF8String := UTF8Encode(WideChar(aCharInt));
-      {$ENDIF}
-      For k := 1 to length(aUTF8String) do begin
+      For k := low(aUTF8String) to high(aUTF8String) do begin
         pResTail^ := aUTF8String[k];
         inc(pResTail);
       end;
@@ -1178,31 +1156,21 @@ var CurrPos : Integer;
       _CopyUnicodeCharToResult(I, CurrPos+6);
     end;
 
-    {---------------------------------------------------------------------------}
-    procedure _CopyIso88591CharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
-    {$IFDEF UNICODE}
-    type
-      Latin1String = type AnsiString(28591);
-    {$ENDIF}
-
-    var {$IFDEF UNICODE}
-        aLatin1String: Latin1String;
+    {------------------------------------------------------------------------}
+    procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
+    var aChar: WideChar;
         aUTF8String: UTF8String;
-        {$ELSE}
-        aUTF8String: AnsiString;
-        {$ENDIF}
         K: integer;
-
     begin
       if not IsUniqueString then _GenerateUniqueString;
-
-      {$IFDEF UNICODE}
-      aLatin1String := ansiChar(aCharInt);
-      aUTF8String := UTF8String(aLatin1String);
-      {$ELSE}
-      aUTF8String := UTF8Encode(ALStringToWideString(ansichar(aCharInt), 28591{iso-8859-1})[1]);
-      {$ENDIF}
-      for k := 1 to length(aUTF8String) do begin
+      if UnicodeFromLocaleChars(28591, //CodePage,
+                                0, // Flags
+                                @aCharInt,// LocaleStr
+                                1, // LocaleStrLen
+                                @aChar, // UnicodeStr
+                                1)<> 1 then RaiseLastOSError; // UnicodeStrLen
+      aUTF8String := UTF8String(aChar);
+      for k := low(aUTF8String) to high(aUTF8String) do begin
         pResTail^ := aUTF8String[k];
         inc(pResTail);
       end;
@@ -1210,7 +1178,7 @@ var CurrPos : Integer;
     end;
 
     {-------------------------------------}
-    procedure _CopyHexIso88591CharToResult; overload;
+    procedure _CopyHexIso88591CharToResult;
     var I: integer;
     Begin
       I := _HexToInt(0, ch2);
@@ -1219,7 +1187,7 @@ var CurrPos : Integer;
     end;
 
     {-------------------------------------}
-    procedure _CopyOctIso88591CharToResult; overload;
+    procedure _CopyOctIso88591CharToResult;
     var I: integer;
     Begin
       I := _OctToInt(0, ch1);
@@ -1234,12 +1202,11 @@ var Ln: integer;
 begin
 
   {init var}
-  CurrPos := 1;
-  Ln := Length(Str);
+  CurrPos := low(Str);
+  Ln := high(Str);
   IsUniqueString := false;
   pResHead := PansiChar(Str);
   pResTail := pResHead;
-
 
   {start loop}
   while (CurrPos <= Ln) do begin
@@ -1321,7 +1288,7 @@ begin
 
   end;
 
-  if pResTail-pResHead <> Ln then
+  if pResTail-pResHead <> length(Str) then
     setLength(Str,pResTail-pResHead);
 
 end;
@@ -1332,6 +1299,357 @@ begin
   result := Src;
   ALUTF8JavascriptDecodeV(result);
 end;
+
+{$ENDIF !NEXTGEN}
+
+{******************************************************************************************}
+// https://developer.mozilla.org/en-US/docs/JavaScript/Guide/Values,_variables,_and_literals
+function  ALJavascriptEncodeU(const Src: String; const useNumericReference: boolean = true): String;
+var i, l: integer;
+    Buf, P: PChar;
+    ch: Integer;
+begin
+  Result := '';
+  L := Length(src);
+  if L = 0 then exit;
+  if useNumericReference then GetMem(Buf, L * 6) // to be on the *very* safe side
+  else GetMem(Buf, L * 2); // to be on the *very* safe side
+  try
+    P := Buf;
+    for i := low(src) to high(src) do begin
+      ch := Ord(src[i]);
+      case ch of
+        8: begin // Backspace
+             if useNumericReference then begin
+               ALStrMoveU('\u0008', P, 6);
+               Inc(P, 6);
+             end
+             else begin
+               ALStrMoveU('\b', P, 2);
+               Inc(P, 2);
+             end;
+           end;
+        9: begin // Tab
+             if useNumericReference then begin
+               ALStrMoveU('\u0009', P, 6);
+               Inc(P, 6);
+             end
+             else begin
+               ALStrMoveU('\t', P, 2);
+               Inc(P, 2);
+             end;
+           end;
+        10: begin // New line
+              if useNumericReference then begin
+                ALStrMoveU('\u000A', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\n', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        11: begin // Vertical tab
+              if useNumericReference then begin
+                ALStrMoveU('\u000B', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\v', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        12: begin // Form feed
+              if useNumericReference then begin
+                ALStrMoveU('\u000C', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\f', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        13: begin // Carriage return
+              if useNumericReference then begin
+                ALStrMoveU('\u000D', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\r', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        34: begin // Double quote
+              if useNumericReference then begin
+                ALStrMoveU('\u0022', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\"', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        38: begin // & ... we need to encode it because in javascript &#39; or &amp; will be converted to ' and error unterminated string
+              ALStrMoveU('\u0026', P, 6);
+              Inc(P, 6);
+            end;
+        39: begin // Apostrophe or single quote
+              if useNumericReference then begin
+                ALStrMoveU('\u0027', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\''', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        60: begin // < ... mostly to hide all </script> tag inside javascript.
+                  // http://www.wwco.com/~wls/blog/2007/04/25/using-script-in-a-javascript-literal/
+              ALStrMoveU('\u003C', P, 6);
+              Inc(P, 6);
+            end;
+        62: begin // > ... mostly to hide all HTML tag inside javascript.
+              ALStrMoveU('\u003E', P, 6);
+              Inc(P, 6);
+            end;
+        92: begin // Backslash character (\).
+              if useNumericReference then begin
+                ALStrMoveU('\u005C', P, 6);
+                Inc(P, 6);
+              end
+              else begin
+                ALStrMoveU('\\', P, 2);
+                Inc(P, 2);
+              end;
+            end;
+        else Begin
+          P^:= Char(ch);
+          Inc(P);
+        end;
+      end;
+    end;
+    SetString(Result, Buf, P - Buf);
+  finally
+    FreeMem(Buf);
+  end;
+end;
+
+{**************************}
+{$WARN WIDECHAR_REDUCED OFF}
+procedure ALJavascriptDecodeVU(Var Str: String);
+
+var CurrPos : Integer;
+    pResTail: PChar;
+    pResHead: pChar;
+    Ch1, Ch2, Ch3, Ch4, Ch5: Char;
+    IsUniqueString: boolean;
+
+    {------------------------------}
+    procedure _GenerateUniqueString;
+    var Padding: integer;
+    begin
+      Padding := PResTail - PResHead;
+      UniqueString(Str);
+      PResHead := PChar(Str);
+      PResTail := PResHead + Padding;
+      IsUniqueString := true;
+    end;
+
+    {------------------------------------------------}
+    function _OctToInt(I: integer; Ch: Char): integer;
+    begin
+      Result := I * 8 + Ord(Ch) - Ord('0');
+    end;
+
+    {------------------------------------------------}
+    function _HexToInt(I: integer; Ch: Char): integer;
+    begin
+      case Ch of
+        '0'..'9': Result := I * 16 + Ord(Ch) - Ord('0');
+        'a'..'f': Result := I * 16 + Ord(Ch) - Ord('a') + 10;
+        'A'..'F': Result := I * 16 + Ord(Ch) - Ord('A') + 10;
+        else raise EALExceptionU.Create('Wrong HEX-character found');
+      end;
+    end;
+
+    {---------------------------------}
+    procedure _CopyCurrPosCharToResult;
+    Begin
+      if IsUniqueString then pResTail^ := Str[CurrPos];
+      inc(pResTail);
+      inc(CurrPos);
+    end;
+
+    {-------------------------------------------------------------------}
+    procedure _CopyCharToResult(aCharInt: Integer; aNewCurrPos: integer);
+    begin
+      if not IsUniqueString then _GenerateUniqueString;
+      pResTail^ := Char(aCharInt);
+      inc(pResTail);
+      CurrPos := aNewCurrPos;
+    end;
+
+    {--------------------------------------------------------------------------}
+    procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
+    begin
+      if not IsUniqueString then _GenerateUniqueString;
+      pResTail^ := Char(aCharInt);
+      inc(pResTail);
+      CurrPos := aNewCurrPos;
+    end;
+
+    {---------------------------------}
+    procedure _CopyUnicodeCharToResult; overload;
+    var I: integer;
+    Begin
+      I := _HexToInt(0, ch2);
+      I := _HexToInt(I, ch3);
+      I := _HexToInt(I, ch4);
+      I := _HexToInt(I, ch5);
+      _CopyUnicodeCharToResult(I, CurrPos+6);
+    end;
+
+    {------------------------------------------------------------------------}
+    procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
+    var aChar: WideChar;
+    begin
+      if not IsUniqueString then _GenerateUniqueString;
+      if UnicodeFromLocaleChars(28591, //CodePage,
+                                0, // Flags
+                                @aCharInt,// LocaleStr
+                                1, // LocaleStrLen
+                                @aChar, // UnicodeStr
+                                1) <> 1 then RaiseLastOSError; // UnicodeStrLen
+      pResTail^ := aChar;
+      inc(pResTail);
+      CurrPos := aNewCurrPos;
+    end;
+
+    {-------------------------------------}
+    procedure _CopyHexIso88591CharToResult;
+    var I: integer;
+    Begin
+      I := _HexToInt(0, ch2);
+      I := _HexToInt(I, ch3);
+      _CopyIso88591CharToResult(I, CurrPos+4);
+    end;
+
+    {-------------------------------------}
+    procedure _CopyOctIso88591CharToResult;
+    var I: integer;
+    Begin
+      I := _OctToInt(0, ch1);
+      I := _OctToInt(I, ch2);
+      I := _OctToInt(I, ch3);
+      if I in [0..255] then _CopyIso88591CharToResult(I, CurrPos+4)
+      else inc(CurrPos); // delete the \
+    end;
+
+var Ln: integer;
+
+begin
+
+  {init var}
+  CurrPos := low(Str);
+  Ln := high(Str);
+  IsUniqueString := false;
+  pResHead := PChar(Str);
+  pResTail := pResHead;
+
+  {start loop}
+  while (CurrPos <= Ln) do begin
+
+    {escape char detected}
+    If Str[CurrPos]='\' then begin
+
+      if (CurrPos <= Ln - 5) then begin
+        Ch1 := Str[CurrPos + 1];
+        Ch2 := Str[CurrPos + 2];
+        Ch3 := Str[CurrPos + 3];
+        Ch4 := Str[CurrPos + 4];
+        Ch5 := Str[CurrPos + 5];
+      end
+      else if (CurrPos <= Ln - 3) then begin
+        Ch1 := Str[CurrPos + 1];
+        Ch2 := Str[CurrPos + 2];
+        Ch3 := Str[CurrPos + 3];
+        Ch4 := #0;
+        Ch5 := #0;
+      end
+      else begin
+        Ch1 := #0;
+        Ch2 := #0;
+        Ch3 := #0;
+        Ch4 := #0;
+        Ch5 := #0;
+      end;
+
+      // Backspace
+      if Ch1 = 'b' then _CopyCharToResult(8, CurrPos + 2)
+
+      // Tab
+      else if Ch1 = 't' then _CopyCharToResult(9, CurrPos + 2)
+
+      // New line
+      else if Ch1 = 'n' then _CopyCharToResult(10, CurrPos + 2)
+
+      // Vertical tab
+      else if Ch1 = 'v' then _CopyCharToResult(11, CurrPos + 2)
+
+      // Form feed
+      else if Ch1 = 'f' then _CopyCharToResult(12, CurrPos + 2)
+
+      // Carriage return
+      else if Ch1 = 'r' then _CopyCharToResult(13, CurrPos + 2)
+
+      // Double quote
+      else if Ch1 = '"' then _CopyCharToResult(34, CurrPos + 2)
+
+      // Apostrophe or single quote
+      else if Ch1 = '''' then _CopyCharToResult(39, CurrPos + 2)
+
+      // Backslash character (\).
+      else if Ch1 = '\' then _CopyCharToResult(92, CurrPos + 2)
+
+      // The character with the Latin-1 encoding specified by up to three octal digits XXX between 0 and 377
+      else if (Ch1 in ['0'..'7']) and
+              (Ch2 in ['0'..'7']) and
+              (Ch3 in ['0'..'7']) then _CopyOctIso88591CharToResult
+
+      // The character with the Latin-1 encoding specified by the two hexadecimal digits XX between 00 and FF
+      else if (Ch1 = 'x') and
+              (Ch2 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (Ch3 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyHexIso88591CharToResult
+
+      // The Unicode character specified by the four hexadecimal digits XXXX.
+      else if (Ch1 = 'u') and
+              (ch2 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (ch3 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (ch4 in ['A'..'F', 'a'..'f', '0'..'9']) and
+              (ch5 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyUnicodeCharToResult
+
+      // delete the \
+      else inc(CurrPos);
+
+    end
+    else _CopyCurrPosCharToResult;
+
+  end;
+
+  if pResTail-pResHead <> length(Str) then
+    setLength(Str,pResTail-pResHead);
+
+end;
+{$WARN WIDECHAR_REDUCED ON}
+
+{*******************************************************}
+function  ALJavascriptDecodeU(const Src: String): String;
+begin
+  result := Src;
+  ALJavascriptDecodeVU(result);
+end;
+
+{$IFNDEF NEXTGEN}
 
 {This function evaluates the Javascript code given in the
  parameter "aCode" and returns result. The function works
@@ -1601,16 +1919,24 @@ Begin
   end;
 end;
 
+{$ENDIF}
+
 Initialization
+
+{$IFNDEF NEXTGEN}
   vALhtml_LstEntities := TALStringList.create;
+  TALStringList(vALhtml_LstEntities).NameValueOptimization := False;
   ALInitHtmlEntitiesLst(vALhtml_LstEntities);
   With (vALhtml_LstEntities as TALStringList) do begin
     CaseSensitive := True;
     Duplicates := DupAccept;
     Sorted := True;
   end;
+{$ENDIF}
 
 Finalization
+{$IFNDEF NEXTGEN}
   vALhtml_LstEntities.Free;
+{$ENDIF}
 
 end.

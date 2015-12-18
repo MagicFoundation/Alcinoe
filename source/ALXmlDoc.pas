@@ -127,7 +127,6 @@ const
   CALXMLParameterIsIncorrect = 'The parameter is incorrect';
 
 const
-  cALXMLNodeMaxListSize = Maxint div 16;
   cAlXMLUTF8EncodingStr = 'UTF-8';
   cALXmlUTF8HeaderStr   = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'#13#10;
   CALNSDelim            = ':';
@@ -197,8 +196,7 @@ type
                       xpEncoding,
                       xpStandalone);
 
-  PALPointerXMLNodeList = ^TALPointerXMLNodeList;
-  TALPointerXMLNodeList = array[0..cALXMLNodeMaxListSize - 1] of TALXMLNode;
+  TALXMLPointerList = array of TALXMLNode;
 
   {Exception}
   EALXMLDocError = class(Exception)
@@ -215,7 +213,7 @@ type
     //[Deleted from TXMLNodeList] FUpdateCount: Integer;
     FCapacity: Integer; // [added from TXMLNodeList]
     FCount: integer; // [added from TXMLNodeList]
-    FList: PALPointerXMLNodeList; //[Replace from TXMLNodeList] FList: IInterfaceList;
+    FList: TALXMLPointerList; //[Replace from TXMLNodeList] FList: IInterfaceList;
     FOwner: TALXMLNode;
     procedure QuickSort(L, R: Integer; XCompare: TALXMLNodeListSortCompare); // [added from TXMLNodeList]
   protected
@@ -228,7 +226,6 @@ type
     procedure SetCapacity(NewCapacity: Integer); // [added from TXMLNodeList]
     procedure SetCount(NewCount: Integer); // [added from TXMLNodeList]
     property Owner: TALXMLNode read FOwner;
-    function GetCount: Integer;
     function Get(Index: Integer): TALXMLNode;
     {$IF CompilerVersion < 18.5}
     function GetNode(const IndexOrName: OleVariant): TALXMLNode;
@@ -265,7 +262,7 @@ type
     function ReplaceNode(const OldNode, NewNode: TALXMLNode): TALXMLNode;
     procedure Clear;
     procedure Insert(Index: Integer; const Node: TALXMLNode);
-    property Count: Integer read GetCount;
+    property Count: Integer read fCount;
     {$IF CompilerVersion < 18.5}
     property Nodes[const IndexOrName: OleVariant]: TALXMLNode read GetNode; default;
     {$ELSE}
@@ -3351,14 +3348,6 @@ begin
   Clear;
 end;
 
-{***************************************}
-{Returns the number of nodes in the list.
- GetCount is the read implementation of the Count property.}
-function TALXMLNodeList.GetCount: Integer;
-begin
-  Result := FCount;
-end;
-
 {*************************************}
 {Returns the index of a specified node.
  Call IndexOf to locate a node in the list.
@@ -3368,7 +3357,7 @@ end;
 function TALXMLNodeList.IndexOf(const Node: TALXMLNode): Integer;
 begin
   Result := 0;
-  while (Result < FCount) and (FList^[Result] <> Node) do Inc(Result);
+  while (Result < FCount) and (FList[Result] <> Node) do Inc(Result);
   if Result = FCount then Result := -1;
 end;
 
@@ -3475,7 +3464,7 @@ end;
 function TALXMLNodeList.Get(Index: Integer): TALXMLNode;
 begin
   if (Index < 0) or (Index >= FCount) then ALXMLDocError(CALXmlListIndexError, [Index]);
-  Result := FList^[Index];
+  Result := FList[Index];
 end;
 
 {**************************}
@@ -3583,11 +3572,11 @@ begin
   else begin
     if (Index < 0) or (Index > FCount) then ALXMLDocError(CALXmlListIndexError, [Index]);
     if FCount = FCapacity then Grow;
-    if Index < FCount then ALMove(FList^[Index],
-                                  FList^[Index + 1],
+    if Index < FCount then ALMove(FList[Index],
+                                  FList[Index + 1],
                                   (FCount - Index) * SizeOf(Pointer));
   end;
-  FList^[index] := Node;
+  FList[index] := Node;
   Inc(FCount);
   Node.SetParentNode(Fowner);
   result := index;
@@ -3646,7 +3635,7 @@ var Node: TALXMLNode;
 begin
   Node := Get(Index);
   Dec(FCount);
-  if Index < FCount then ALMove(FList^[Index + 1], FList^[Index], (FCount - Index) * SizeOf(Pointer));
+  if Index < FCount then ALMove(FList[Index + 1], FList[Index], (FCount - Index) * SizeOf(Pointer));
   if assigned(Node) then FreeAndNil(Node);
   result := Index;
 end;
@@ -3691,9 +3680,9 @@ var Item: Pointer;
 begin
   if (Index1 < 0) or (Index1 >= FCount) then ALXMLDocError(cALXmlListIndexError, [Index1]);
   if (Index2 < 0) or (Index2 >= FCount) then ALXMLDocError(cALXmlListIndexError, [Index2]);
-  Item := FList^[Index1];
-  FList^[Index1] := FList^[Index2];
-  FList^[Index2] := Item;
+  Item := FList[Index1];
+  FList[Index1] := FList[Index2];
+  FList[Index2] := Item;
 end;
 
 {***********************************************************}
@@ -3704,7 +3693,7 @@ function TALXMLNodeList.Extract(const index: integer): TALXMLNode;
 begin
   Result := Get(index);
   Result.SetParentNode(nil);
-  FList^[index] := nil;
+  FList[index] := nil;
   Delete(index);
 end;
 
@@ -3746,9 +3735,9 @@ end;
 {*********************************************************}
 procedure TALXMLNodeList.SetCapacity(NewCapacity: Integer);
 begin
-  if (NewCapacity < FCount) or (NewCapacity > cALXMLNodeMaxListSize) then ALXMLDocError(CALXmlListCapacityError, [NewCapacity]);
+  if (NewCapacity < FCount) then ALXMLDocError(CALXmlListCapacityError, [NewCapacity]);
   if NewCapacity <> FCapacity then begin
-    ReallocMem(FList, NewCapacity * SizeOf(Pointer));
+    SetLength(FList, NewCapacity);
     FCapacity := NewCapacity;
   end;
 end;
@@ -3757,9 +3746,9 @@ end;
 procedure TALXMLNodeList.SetCount(NewCount: Integer);
 var I: Integer;
 begin
-  if (NewCount < 0) or (NewCount > cALXMLNodeMaxListSize) then ALXMLDocError(CALXmlListCountError, [NewCount]);
+  if (NewCount < 0) then ALXMLDocError(CALXmlListCountError, [NewCount]);
   if NewCount > FCapacity then SetCapacity(NewCount);
-  if NewCount > FCount then FillChar(FList^[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
+  if NewCount > FCount then FillChar(FList[FCount], (NewCount - FCount) * SizeOf(Pointer), 0)
   else for I := FCount - 1 downto NewCount do Delete(I);
   FCount := NewCount;
 end;

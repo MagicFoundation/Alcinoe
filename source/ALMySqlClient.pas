@@ -2066,7 +2066,7 @@ begin
 end;
 
 initialization
-  ALGetLocaleFormatSettings(1033, ALMySQLFormatSettings);
+  ALMySQLFormatSettings := TALFormatSettings.Create('en-US'); // 1033 {en-US}
   ALMySQLFormatSettings.DecimalSeparator := '.';
   ALMySQLFormatSettings.ThousandSeparator := ',';
   ALMySQLFormatSettings.DateSeparator := '-';

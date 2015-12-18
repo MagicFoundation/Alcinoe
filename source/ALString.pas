@@ -544,7 +544,7 @@ function  ALTryStrToFloat(const S: AnsiString; out Value: Single; const AFormatS
 function  ALStrToCurr(const S: AnsiString; const AFormatSettings: TALFormatSettings): Currency;
 function  ALStrToCurrDef(const S: AnsiString; const Default: Currency; const AFormatSettings: TALFormatSettings): Currency;
 function  ALTryStrToCurr(const S: AnsiString; out Value: Currency; const AFormatSettings: TALFormatSettings): Boolean;
-var       ALPos: function(const SubStr, Str: RawByteString; Offset: Integer = 1): Integer;
+function  ALPos(const SubStr, Str: AnsiString; Offset: Integer = 1): Integer; inline;
 var       ALPosEx: function(const SubStr, S: AnsiString; Offset: Integer = 1): Integer;
 function  ALPosExIgnoreCase(const SubStr, S: Ansistring; Offset: Integer = 1): Integer;
 var       AlUpperCase: function(const S: AnsiString): AnsiString;
@@ -8310,6 +8310,12 @@ begin
   Result := ALTextToFloat(PAnsiChar(S), Value, fvCurrency, AFormatSettings);
 end;
 
+{***************************************************************************}
+function  ALPos(const SubStr, Str: AnsiString; Offset: Integer = 1): Integer;
+begin
+  Result := System.Pos(SubStr, Str, Offset);
+end;
+
 var
   vALPosExIgnoreCaseLookupTable: packed array[AnsiChar] of AnsiChar; {Upcase Lookup Table}
 
@@ -9044,7 +9050,7 @@ begin
   if aLength > aSourceStringLength - (aStart - 1) then aLength := aSourceStringLength - (aStart-1);
 
   SetLength(Result,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
-  ALMove(Pbyte(aSourceString)[aStart-1], pointer(Result)^, aLength*SizeOf(Char)); // pointer(Result)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
+  ALMove(PChar(aSourceString)[aStart-1], pointer(Result)^, aLength*SizeOf(Char)); // pointer(Result)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
 end;
 
 {***************************************************************************************************}
@@ -9064,7 +9070,7 @@ begin
   if aLength > aSourceStringLength - (aStart - 1) then aLength := aSourceStringLength - (aStart-1);
 
   SetLength(aDestString,aLength); //  To guarantee that the string is unique, call the SetLength, SetString, or UniqueString procedures
-  ALMove(Pbyte(aSourceString)[aStart-1], pointer(aDestString)^, aLength*SizeOf(Char));  // pointer(aDestString)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
+  ALMove(PChar(aSourceString)[aStart-1], pointer(aDestString)^, aLength*SizeOf(Char));  // pointer(aDestString)^ to not jump inside uniqueString (aDestString is already unique thanks to previous SetLength))
 end;
 
 {***********************************************}
@@ -11434,7 +11440,6 @@ begin
 
   ALMove := system.Move;
   {$IFNDEF NEXTGEN}
-  ALPos := System.Pos;
   ALPosEx := System.AnsiStrings.PosEx;
   AlUpperCase := system.AnsiStrings.UpperCase;
   AlLowerCase := system.AnsiStrings.LowerCase;

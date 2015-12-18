@@ -514,7 +514,7 @@ Begin
                   aCharSet := AlcopyStr(aEncodedText,P1+2,P2-P1-2); //iso-8859-1
                   aCodePage := ALGetCodePageFromCharSetName(Acharset); //28591
                   aencodedText := AlcopyStr(aEncodedText,P3+1,P4-P3-1); //this=20is=20some=20text
-                  If (aEncoding='b') then aencodedText := ALMimeBase64DecodeString(aencodedText)
+                  If (aEncoding='b') then aencodedText := ALMimeDecodeString(aencodedText)
                   else aencodedText := ALDecodeQuotedPrintableString(aencodedText);
                   LstEncodedWord.Objects[i] := Pointer(1);
                 end;

@@ -349,7 +349,7 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
   begin
     If aUserName='' then raise EALException.Create('UserName is empty');
     If aPassword='' then raise EALException.Create('Password is empty');
-    aAuthPlain := ALMimeBase64EncodeStringNoCRLF(aUserName + #0 + aUserName + #0 + aPassword);
+    aAuthPlain := ALMimeEncodeStringNoCRLF(aUserName + #0 + aUserName + #0 + aPassword);
     Result := SendCmd('AUTH PLAIN ' + aAuthPlain,[235]);
   end;
 
@@ -359,8 +359,8 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
     If aUserName='' then raise EALException.Create('UserName is empty');
     If aPassword='' then raise EALException.Create('Password is empty');
     SendCmd('AUTH LOGIN',[334]);
-    SendCmd(ALMimeBase64EncodeStringNoCRLF(aUsername),[334]);
-    Result := SendCmd(ALMimeBase64EncodeStringNoCRLF(aPassword),[235]);
+    SendCmd(ALMimeEncodeStringNoCRLF(aUsername),[334]);
+    Result := SendCmd(ALMimeEncodeStringNoCRLF(aPassword),[235]);
   end;
 
 var tmpAuthType: TAlSmtpClientAuthType;

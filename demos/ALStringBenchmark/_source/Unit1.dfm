@@ -442,7 +442,7 @@ object Form1: TForm1
     Top = 527
     Width = 230
     Height = 25
-    Caption = 'Benchmark ALStringReplace'
+    Caption = 'Benchmark ALBase64Encode (AnsiString)'
     TabOrder = 47
     OnClick = Button1Click
   end
@@ -451,7 +451,7 @@ object Form1: TForm1
     Top = 527
     Width = 230
     Height = 25
-    Caption = 'Benchmark ALFastTagReplace'
+    Caption = 'Benchmark Delphi Base64Encode (Unicode)'
     TabOrder = 48
     OnClick = Button2Click
   end

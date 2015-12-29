@@ -550,6 +550,7 @@ uses {$IF CompilerVersion >= 23} {Delphi XE2}
      System.DateUtils,
      System.SysConst,
      System.Math,
+     system.AnsiStrings,
      {$ELSE}
      Windows,
      HttpApp,
@@ -606,7 +607,7 @@ end;
 {************************************************}
 function TALHTTPCookie.GetHeaderValue: AnsiString;
 begin
-  Result := ALFormat('%s=%s; ', [HTTPEncode(FName), HTTPEncode(FValue)]);
+  Result := ALFormat('%s=%s; ', [ALHTTPEncode(FName), ALHTTPEncode(FValue)]);
   if Domain <> '' then Result := Result + ALFormat('domain=%s; ', [Domain]);
   if Path <> '' then Result := Result + ALFormat('path=%s; ', [Path]);
   if Expires <> ALNullDate then begin
@@ -1123,7 +1124,7 @@ begin
   for i := 0 to ParamValues.Count - 1 do begin
     LStr := ParamValues[i];
     LPos := AlPos(ParamValues.NameValueSeparator, LStr);
-    if LPos > 0 then ParamValues[i] := HTTPEncode(AlCopyStr(LStr, 1, LPos-1)) + '=' + HTTPEncode(AlCopyStr(LStr, LPos+1, MAXINT));
+    if LPos > 0 then ParamValues[i] := ALHTTPEncode(AlCopyStr(LStr, 1, LPos-1)) + '=' + ALHTTPEncode(AlCopyStr(LStr, LPos+1, MAXINT));
   end;
 end;
 
@@ -2194,8 +2195,8 @@ begin
       for i := 0 to aPostDataStrings.Count - 1 do begin
         Str := aPostDataStrings[i];
         P := AlPos(aPostDataStrings.NameValueSeparator, Str);
-        if P > 0 then Str := HTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + HTTPEncode(AlCopyStr(Str, P+1, MAXINT))
-        else Str := HTTPEncode(Str);
+        if P > 0 then Str := ALHTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + ALHTTPEncode(AlCopyStr(Str, P+1, MAXINT))
+        else Str := ALHTTPEncode(Str);
         If i < aPostDataStrings.Count - 1 then aURLEncodedContentStream.WriteString(Str + '&')
         else aURLEncodedContentStream.WriteString(Str);
       end;
@@ -2306,8 +2307,8 @@ begin
     Str := aParams[i];
     P := AlPos(aParams.NameValueSeparator, Str);
     if EncodeParams then begin
-      if P > 0 then Query := Query + HTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + HTTPEncode(AlCopyStr(Str, P+1, MAXINT)) + ALIfThen(i < aParams.Count - 1, '&')
-      else Query := Query + HTTPEncode(Str) + ALIfThen(i < aParams.Count - 1, '&')
+      if P > 0 then Query := Query + ALHTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + ALHTTPEncode(AlCopyStr(Str, P+1, MAXINT)) + ALIfThen(i < aParams.Count - 1, '&')
+      else Query := Query + ALHTTPEncode(Str) + ALIfThen(i < aParams.Count - 1, '&')
     end
     else begin
       if P > 0 then Query := Query + AlCopyStr(Str, 1, P-1) + '=' + AlCopyStr(Str, P+1, MAXINT) + ALIfThen(i < aParams.Count - 1, '&')
@@ -2403,8 +2404,8 @@ begin
       for i := 0 to aPostDataStrings.Count - 1 do begin
         Str := aPostDataStrings[i];
         P := AlPos(aPostDataStrings.NameValueSeparator, Str);
-        if P > 0 then Str := HTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + HTTPEncode(AlCopyStr(Str, P+1, MAXINT))
-        else Str := HTTPEncode(Str);
+        if P > 0 then Str := ALHTTPEncode(AlCopyStr(Str, 1, P-1)) + '=' + ALHTTPEncode(AlCopyStr(Str, P+1, MAXINT))
+        else Str := ALHTTPEncode(Str);
         If i < aPostDataStrings.Count - 1 then aURLEncodedContentStream.WriteString(Str + '&')
         else aURLEncodedContentStream.WriteString(Str);
       end;

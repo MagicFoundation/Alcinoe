@@ -801,6 +801,7 @@ function  ALExtractExpression(const S: AnsiString;
                               Const EscapeQuoteChar: ansiChar; // ex: '\' or #0 to ignore
                               var StartPos: integer;
                               var EndPos: integer): boolean;
+function  ALHTTPEncode(const AStr: AnsiString): AnsiString; inline;
 function  ALHTTPDecode(const AStr: AnsiString): AnsiString;
 procedure ALExtractHeaderFields(Separators,
                                 WhiteSpace,
@@ -11172,6 +11173,37 @@ begin
     if aOpenCount <> 0 then inc(EndPos);
   end;
   result := EndPos <= length(S);
+end;
+
+{*********************************************************}
+function  ALHTTPEncode(const AStr: AnsiString): AnsiString;
+// The NoConversion set contains characters as specificed in RFC 1738 and
+// should not be modified unless the standard changes.
+const
+  NoConversion = ['A'..'Z','a'..'z','*','@','.','_','-',
+                  '0'..'9','$','!','''','(',')'];
+var
+  Sp, Rp: PAnsiChar;
+begin
+  SetLength(Result, Length(AStr) * 3);
+  Sp := PAnsiChar(AStr);
+  Rp := PAnsiChar(Result);
+  while Sp^ <> #0 do
+  begin
+    if Sp^ in NoConversion then
+      Rp^ := Sp^
+    else
+      if Sp^ = ' ' then
+        Rp^ := '+'
+      else
+      begin
+        System.AnsiStrings.FormatBuf(Rp^, 3, AnsiString('%%%.2x'), 6, [Ord(Sp^)]);
+        Inc(Rp,2);
+      end;
+    Inc(Rp);
+    Inc(Sp);
+  end;
+  SetLength(Result, Rp - PAnsiChar(Result));
 end;
 
 {************************************************************}

@@ -1,7 +1,7 @@
 program ALDatabaseBenchmark;
 
 uses
-  scalemm2,
+  ALTBBMM,
   Forms,
   Unit1 in 'Unit1.pas' {Form1};
 

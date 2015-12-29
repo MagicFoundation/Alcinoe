@@ -18,6 +18,8 @@ unit dwsUtils;
 
 {$I dws.inc}
 
+{$WARN DUPLICATE_CTOR_DTOR OFF}
+
 interface
 
 uses
@@ -5323,4 +5325,5 @@ finalization
    TObject(vWOBSPool).Free;
 
 end.
+
 

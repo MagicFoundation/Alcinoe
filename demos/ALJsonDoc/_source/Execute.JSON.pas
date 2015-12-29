@@ -1577,5 +1577,9 @@ begin
 end;
 
 initialization
+{$WARN SYMBOL_DEPRECATED OFF}
+{$WARN SYMBOL_PLATFORM OFF}
   GetLocaleFormatSettings(1033{en-US}, JSONFormat);
+{$WARN SYMBOL_PLATFORM ON}
+{$WARN SYMBOL_DEPRECATED ON}
 end.

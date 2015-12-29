@@ -21,7 +21,7 @@ uses Windows,
   cxLookAndFeelPainters, cxContainer, cxEdit, Menus, cxRadioGroup,
   cxCheckBox, cxButtons, cxMemo, cxTextEdit, cxLabel, cxGroupBox, cxPC,
   dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, dxSkinsForm, cxSplitter,
-  cxClasses;
+  cxClasses, dxBarBuiltInMenu, system.AnsiStrings;
 
 type
   TForm1 = class(TForm)
@@ -143,7 +143,7 @@ implementation
 Uses DateUtils,
      HttpApp,
      ALMultiPartParser,
-     AlMisc,
+     AlCommon,
      AlFiles,
      AlMime,
      ALString,
@@ -441,7 +441,7 @@ begin
                                                                                         CheckBoxHTTPEncodePostData.Checked)
         else begin
 
-          if CheckBoxHTTPEncodePostData.Checked then ARawPostDatastream := TALStringStream.create(HTTPEncode(aTmpPostDataString.text))
+          if CheckBoxHTTPEncodePostData.Checked then ARawPostDatastream := TALStringStream.create(ALHTTPEncode(aTmpPostDataString.text))
           else ARawPostDatastream := TALStringStream.create(aTmpPostDataString.text);
           try
 

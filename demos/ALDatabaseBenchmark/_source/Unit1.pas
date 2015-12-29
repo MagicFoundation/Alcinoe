@@ -13,7 +13,8 @@ uses
   dxSkinFoggy, dxSkinscxPCPainter, dxSkinsForm, Vcl.Menus, cxButtons,
   cxPCdxBarPopupMenu, cxPC, cxContainer, cxLabel, cxTextEdit, cxMaskEdit,
   cxButtonEdit, cxCheckBox, cxGroupBox, cxRadioGroup, AlMemCachedClient,
-  ALMongoDBClient, ALJsonDoc, cxCheckGroup, cxNavigator, Shellapi;
+  ALMongoDBClient, ALJsonDoc, cxCheckGroup, cxNavigator, Shellapi,
+  dxBarBuiltInMenu;
 
 type
 
@@ -568,7 +569,7 @@ begin
   aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
   aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -745,7 +746,7 @@ begin
   aTPB := AlStringReplace(aTPB, #13#10, '', [rfReplaceALL]);
   aTPB := AlStringReplace(aTPB, ' ', '', [rfReplaceALL]);
 
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -1085,7 +1086,7 @@ begin
     else aMySQLAPiVersion := MYSQL50;
   end;
 
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -1370,7 +1371,7 @@ Var aSqlite3Client: TalSqlite3Client;
     aFormatSettings: TALFormatSettings;
     S1: AnsiString;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -1572,7 +1573,7 @@ begin
     else aMySQLAPiVersion := MYSQL50;
   end;
 
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
   Screen.Cursor := CrHourGlass;
   try
 
@@ -2100,7 +2101,7 @@ Var aconnectionHandle: PSQLite3;
 begin
 
   //init the aFormatSettings
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
@@ -2303,7 +2304,7 @@ Var aDBHandle: IscDbHandle;
 begin
 
   //init the aFormatSettings
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;
@@ -2636,7 +2637,7 @@ Var aConnectionHandle: PMySql;
 begin
 
   //init the aFormatSettings
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := AlDefaultFormatSettings;
 
   //init the fNBLoopBeforeCommit
   if fNBLoopBeforeCommit <= 0 then fNBLoopBeforeCommit := 1;

@@ -408,7 +408,7 @@ var aXMLDATA: TalXmlDocument;
     i: integer;
 begin
 
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := ALDefaultFormatSettings;
   aXMLDATA := TALXmlDocument.create('root');
   Try
 

@@ -7,7 +7,7 @@ uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
      ALStringList, Shellapi, cxGraphics, cxControls, cxLookAndFeels,
      cxLookAndFeelPainters, cxContainer, cxEdit, cxLabel, ALMime, Vcl.Dialogs,
      Contnrs, alFiles, diagnostics, superobject, DBXJSON, DBXplatform, IOUtils,
-     dwsJSON, Execute.JSON;
+     dwsJSON, Execute.JSON, system.JSON, system.Generics.collections;
 
 type
 
@@ -242,7 +242,7 @@ begin
                                        nstDateTime: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings)));
                                        nstNull: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'null');
                                        nstRegEx: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + '/' + string(ansiString(Args[0].VAnsiString)));
-                                       nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALMimeBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString))))+'")');
+                                       nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
                                        nstJavascript: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
                                        nstInt32: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
                                        nstTimestamp: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');
@@ -660,7 +660,7 @@ begin
                                        nstDateTime: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', Args[0].VExtended^, ALDefaultFormatSettings)));
                                        nstNull: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'null');
                                        nstRegEx: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + '/' + string(ansiString(Args[0].VAnsiString)));
-                                       nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALMimeBase64EncodeStringNoCRLF(ansiString(Args[0].VAnsiString))))+'")');
+                                       nstBinary: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'BinData('+inttostr(Args[1].VInteger)+', "'+string(ansiString(ALBase64EncodeString(ansiString(Args[0].VAnsiString))))+'")');
                                        nstJavascript: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + string(ansiString(Args[0].VAnsiString)));
                                        nstInt32: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'NumberInt('+inttostr(Args[0].VInteger)+')');
                                        nstTimestamp: MemoLoadJsonDocumentSAXMODEResult.Lines.Add(String(Path) + '=' + 'Timestamp('+inttostr(int64(cardinal(Args[0].VInteger)))+', '+inttostr(int64(cardinal(Args[1].VInteger)))+')');

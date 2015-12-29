@@ -10,7 +10,7 @@ uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
      cxGridCustomView, cxGrid, Spin, dxSkinsCore, dxSkinFoggy, dxSkinscxPCPainter, cxPCdxBarPopupMenu,
      cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
      cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
-     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator;
+     cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu;
 
 Const
   WM_UpdateGUI = WM_User + 1;
@@ -199,7 +199,7 @@ Uses Math,
      DateUtils,
      ALMultiPartParser,
      AlFiles,
-     AlMisc,
+     AlCommon,
      ALWindows,
      AlHtml,
      AlMime,

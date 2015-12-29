@@ -176,7 +176,7 @@ Var aSqlite3Client: TalSqlite3Client;
     S1: AnsiString;
     i: integer;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := ALDefaultFormatSettings;
   Screen.Cursor := CrHourGlass;
   try
 

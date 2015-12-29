@@ -92,7 +92,7 @@ var aFbxClient: TalFbxClient;
     S1: AnsiString;
 Begin
 
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  aFormatSettings := ALDefaultFormatSettings;
 
   if (InternalExtractParamFileName('-database') = '') or
      (InternalExtractParamFileName('-user') = '') or

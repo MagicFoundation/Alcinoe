@@ -1,4 +1,4 @@
-@SET BDS=C:\Program Files (x86)\Embarcadero\RAD Studio\11.0
+@SET BDS=C:\Program Files (x86)\Embarcadero\Studio\17.0
 @SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v3.5
 @SET FrameworkVersion=v3.5
 @SET PATH=%FrameworkDir%;%PATH%
@@ -6,6 +6,9 @@
 @echo off
 
 del *.rsm /s
+IF ERRORLEVEL 1 goto ERROR
+
+del *.stat /s
 IF ERRORLEVEL 1 goto ERROR
 
 del *.identcache /s
@@ -57,6 +60,9 @@ if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
   del ..\BlowPipeEmail\*.rsm /s
   IF ERRORLEVEL 1 goto ERROR
   
+  del ..\BlowPipeEmail\*.stat /s
+  IF ERRORLEVEL 1 goto ERROR
+  
   del ..\BlowPipeEmail\*.dcu /s
   IF ERRORLEVEL 1 goto ERROR
   
@@ -94,6 +100,9 @@ if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
 if exist ..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
 
   del ..\BlowPipeSMS\*.rsm /s
+  IF ERRORLEVEL 1 goto ERROR
+  
+  del ..\BlowPipeSMS\*.stat /s
   IF ERRORLEVEL 1 goto ERROR
   
   del ..\BlowPipeSMS\*.dcu /s

@@ -44,6 +44,21 @@ IF ERRORLEVEL 1 goto ERROR
 del demos\ALCheckSource\*.res /s
 IF ERRORLEVEL 1 goto ERROR
 
+rmdir /s /q dcu
+IF ERRORLEVEL 1 goto ERROR
+
+mkdir dcu
+IF ERRORLEVEL 1 goto ERROR
+
+rmdir /s /q lib\alcinoe
+IF ERRORLEVEL 1 goto ERROR
+
+mkdir lib\alcinoe
+IF ERRORLEVEL 1 goto ERROR
+
+MSBuild source\Alcinoe.dproj /t:build /p:Config=Release /p:Platform=Win32
+IF ERRORLEVEL 1 goto ERROR
+
 CHDIR demos\
 FOR /R %%J IN (*.dproj) DO (	
   echo %%J			

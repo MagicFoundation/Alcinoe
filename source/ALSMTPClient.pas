@@ -127,12 +127,34 @@ type
       Function Data(const aMailData: AnsiString): AnsiString; overload; virtual;
       Function Data(const aHeader, aBody: AnsiString): AnsiString; overload; virtual;
       Function Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString; overload; virtual;
-      Function DataMultipartMixed(aHeader: TALEmailHeader; const aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
+      Function DataMultipartMixed(aHeader: TALEmailHeader;
+                                  const aInlineText, aInlineTextContentType: AnsiString;
+                                  aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
       Function Quit: AnsiString; virtual;
       Function Rset: AnsiString; virtual;
-      procedure SendMail(const aHost: AnsiString; APort: integer; const aSenderEmail: AnsiString; aRcptNameLst: TALStrings; const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; const aMailData: AnsiString); overload; virtual;
-      procedure SendMail(const aHost: AnsiString; APort: integer; const aSenderEmail: AnsiString; aRcptNameLst: TALStrings; const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; const aHeader, aBody: AnsiString); overload; virtual;
-      procedure SendMailMultipartMixed(const aHost: AnsiString; APort: integer; const aSenderEmail: AnsiString; aRcptNameLst: TALStrings; const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType; aHeader: TALEmailHeader; const aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents); virtual;
+      procedure SendMail(const aHost: AnsiString;
+                         APort: integer;
+                         const aSenderEmail: AnsiString;
+                         aRcptNameLst: TALStrings;
+                         const AUserName, APassword: AnsiString;
+                         aAuthType: TalSmtpClientAuthType;
+                         const aMailData: AnsiString); overload; virtual;
+      procedure SendMail(const aHost: AnsiString;
+                         APort: integer;
+                         const aSenderEmail: AnsiString;
+                         aRcptNameLst: TALStrings;
+                         const AUserName, APassword: AnsiString;
+                         aAuthType: TalSmtpClientAuthType;
+                         const aHeader, aBody: AnsiString); overload; virtual;
+      procedure SendMailMultipartMixed(const aHost: AnsiString;
+                                       APort: integer;
+                                       const aSenderEmail: AnsiString;
+                                       aRcptNameLst: TALStrings;
+                                       const AUserName, APassword: AnsiString;
+                                       aAuthType: TalSmtpClientAuthType;
+                                       aHeader: TALEmailHeader;
+                                       const aInlineText, aInlineTextContentType: AnsiString;
+                                       aAttachments: TALMultiPartMixedContents); virtual;
       Procedure Disconnect; virtual;
       Function GetAuthTypeFromEhloResponse(const EhloResponse: AnsiString): TAlSmtpClientAuthTypeSet; virtual;
       property Connected: Boolean read FConnected;
@@ -458,7 +480,7 @@ begin
       aHeader.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
       DataStream.Position := 0;
-      DataStream.Read(str[1],DataStream.Size);
+      DataStream.Read(pointer(str)^,DataStream.Size);
     end;
     Result := Data(aHeader.RawHeaderText, Str);
   finally
@@ -705,7 +727,7 @@ begin
     {Read the response from the socket - end of the response is show by <CRLF>}
     aResponse := '';
     While True do begin
-      aBuffStrLength := SocketRead(aBuffStr[1], length(aBuffStr));
+      aBuffStrLength := SocketRead(pointer(aBuffStr)^, length(aBuffStr));
       If aBuffStrLength <= 0 then raise EALException.Create('Connection close gracefully!');
       aResponse := AResponse + AlCopyStr(aBuffStr,1,aBuffStrLength);
       aResponseLength := length(aResponse);

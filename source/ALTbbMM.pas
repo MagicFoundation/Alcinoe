@@ -40,9 +40,9 @@ Usage:        Put this unit to the very first place on your program in section "
               of the dynamical library. Inside you will discover many subfolders named as "vc10",
               "vc11" etc. They are aligned for the corresponding version of MSVC-compiler bundled
               with their corresponding version of Visual Studio. There are identical libraries
-              but built with different versions of compiler. You can safely use the very first
-              (in December 2015 in was "vc10") because there is no difference which of them we will
-              use in Delphi.
+              but built with different versions of compiler. it's seam that dll compiled with the last
+              version of visual studio are a little more faster than dll compiled with the first
+              version but you will need to run adequate vcredist
 
 Legal issues: Copyright (C) 1999-2013 by Arkadia Software Engineering
 

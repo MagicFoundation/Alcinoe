@@ -76,11 +76,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.WinSock2,
-     {$ELSE}
-     WinSock,
-     {$IFEND}
+Uses Winapi.WinSock2,
      ALStringList,
      ALInternetMessages,
      ALMultiPartParser;
@@ -114,9 +110,9 @@ type
       procedure SetTCPNoDelay(const Value: boolean);
     protected
       procedure CheckError(Error: Boolean);
-      Function SendCmd(aCmd:AnsiString; const OkResponses: array of Word): AnsiString; virtual;
+      Function SendCmd(const aCmd:AnsiString; const OkResponses: array of Word): AnsiString; virtual;
       Function GetResponse(const OkResponses: array of Word): AnsiString;
-      Function SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer; Virtual;
+      Function SocketWrite(const Buf; len: Integer): Integer; Virtual;
       Function SocketRead(var buf; len: Integer): Integer; Virtual;
     public
       constructor Create; virtual;
@@ -126,9 +122,9 @@ type
       Function Ehlo: AnsiString; virtual;
       Function Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString; virtual;
       Function Vrfy(const aUserName: AnsiString): AnsiString; virtual;
-      Function MailFrom(aSenderEmail: AnsiString): AnsiString; virtual;
+      Function MailFrom(const aSenderEmail: AnsiString): AnsiString; virtual;
       Function RcptTo(aRcptNameLst: TALStrings): AnsiString; virtual;
-      Function Data(aMailData: AnsiString): AnsiString; overload; virtual;
+      Function Data(const aMailData: AnsiString): AnsiString; overload; virtual;
       Function Data(const aHeader, aBody: AnsiString): AnsiString; overload; virtual;
       Function Data(aHeader:TALEmailHeader; const aBody: AnsiString): AnsiString; overload; virtual;
       Function DataMultipartMixed(aHeader: TALEmailHeader; const aInlineText, aInlineTextContentType: AnsiString; aAttachments: TALMultiPartMixedContents): AnsiString; virtual;
@@ -148,15 +144,9 @@ type
 
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+Uses Winapi.Windows,
      System.Classes,
      System.SysUtils,
-     {$ELSE}
-     Windows,
-     Classes,
-     SysUtils,
-     {$IFEND}
      ALMime,
      ALWinsock,
      ALString;
@@ -203,19 +193,11 @@ Function TAlSmtpClient.Connect(const aHost: AnsiString; const APort: integer): A
     SockAddr.sin_family:=AF_INET;
     SockAddr.sin_port:=swap(Port);
     SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(Server));
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     If SockAddr.sin_addr.S_addr = INADDR_NONE then begin
-    {$ELSE}
-    If SockAddr.sin_addr.S_addr = integer(INADDR_NONE) then begin
-    {$IFEND}
       checkError(not ALHostToIP(Server, IP));
       SockAddr.sin_addr.S_addr:=inet_addr(PAnsiChar(IP));
     end;
-    {$IF CompilerVersion >= 23} {Delphi XE2}
     CheckError(Winapi.WinSock2.Connect(FSocketDescriptor,TSockAddr(SockAddr),SizeOf(SockAddr))=SOCKET_ERROR);
-    {$ELSE}
-    CheckError(WinSock.Connect(FSocketDescriptor,SockAddr,SizeOf(SockAddr))=SOCKET_ERROR);
-    {$IFEND}
   end;
 
 begin
@@ -277,6 +259,7 @@ begin
         Str1 := AlCopyStr(Str1, 6, maxint); //LOGIN
         Str1 := AlStringReplace(Str1, '=', ' ', [rfReplaceAll]); //LOGIN
         while (str1 <> '') do begin
+
           K := AlPos(' ', Str1);
           if K <= 0 then begin
             Str2 := ALTrim(Str1);
@@ -332,9 +315,8 @@ end;
  messages (for example, undeliverable mail notifications) the reverse-path may be null.
  This command clears the reverse-path buffer, the forward-path buffer, and the mail data
  buffer; and inserts the reverse-path information from this command into the reverse-path buffer.}
-Function TAlSmtpClient.MailFrom(aSenderEmail: AnsiString): AnsiString;
+Function TAlSmtpClient.MailFrom(const aSenderEmail: AnsiString): AnsiString;
 begin
-  aSenderEmail := ALTrim(aSenderEmail);
   If aSenderEmail = '' then raise EALException.Create('Sender email is empty');
   If AlPos(#13#10,aSenderEmail) > 0 then raise EALException.Create('Sender email is invalid');
   Result := SendCmd('MAIL From:<'+aSenderEmail+'>',[250]);
@@ -343,8 +325,8 @@ end;
 {****************************************************************************************************************}
 Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: TalSmtpClientAuthType): AnsiString;
 
-  {---------------------------------------}
-  Function InternalDoAuthPlain: AnsiString;
+  {--------------------------------}
+  Function _DoAuthPlain: AnsiString;
   var aAuthPlain : AnsiString;
   begin
     If aUserName='' then raise EALException.Create('UserName is empty');
@@ -353,8 +335,8 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
     Result := SendCmd('AUTH PLAIN ' + aAuthPlain,[235]);
   end;
 
-  {---------------------------------------}
-  Function InternalDoAuthLogin: AnsiString;
+  {--------------------------------}
+  Function _DoAuthLogin: AnsiString;
   begin
     If aUserName='' then raise EALException.Create('UserName is empty');
     If aPassword='' then raise EALException.Create('Password is empty');
@@ -364,6 +346,7 @@ Function TAlSmtpClient.Auth(const AUserName, APassword: AnsiString; aAuthType: T
   end;
 
 var tmpAuthType: TAlSmtpClientAuthType;
+
 begin
 
   if aAuthType = AlsmtpClientAuthAutoSelect then begin
@@ -376,8 +359,8 @@ begin
   else tmpAuthType := aAuthType;
 
   case tmpAuthType of
-    alsmtpClientAuthPlain : Result := InternalDoAuthPlain;
-    alsmtpClientAuthLogin : result := InternalDoAuthLogin;
+    alsmtpClientAuthPlain : Result := _DoAuthPlain;
+    alsmtpClientAuthLogin : result := _DoAuthLogin;
     alsmtpClientAuthCramMD5 : raise EALException.Create('CRAM-MD5 Authentication is not supported yet!');
     alsmtpClientAuthCramSHA1: raise EALException.Create('CRAM-SHA1 Authentication is not supported yet!');
     else raise EALException.Create('No Authentication scheme found');
@@ -431,18 +414,20 @@ end;
  message to the originator of the message. Either a single notification which lists all of the recipients that failed
  to get the message, or separate notification messages must be sent for each failed recipient. All undeliverable mail
  notification messages are sent using the MAIL command (even if they result from processing a SEND, SOML, or SAML command).}
-Function TAlSmtpClient.Data(aMailData: AnsiString): AnsiString;
-Var I : Integer;
+Function TAlSmtpClient.Data(const aMailData: AnsiString): AnsiString;
+Var aTmpMailData: AnsiString;
+    I : Integer;
 begin
   SendCmd('DATA',[354]);
 
   i := 2;
-  while i <= Length(aMailData) Do begin
-    If (aMailData[i] = '.') and (aMailData[i-1] = #10) and (aMailData[i-2] = #13) then Insert('.',aMailData,i);
+  aTmpMailData := aMailData;
+  while i <= Length(aTmpMailData) Do begin
+    If (aTmpMailData[i] = '.') and (aTmpMailData[i-1] = #10) and (aTmpMailData[i-2] = #13) then Insert('.',aTmpMailData,i);
     inc(i);
   end;
 
-  Result := SendCmd(aMailData + #13#10 + '.' + #13#10,[250]);
+  Result := SendCmd(aTmpMailData + #13#10'.'#13#10,[250]);
 end;
 
 {************************************************************************}
@@ -519,7 +504,7 @@ begin
   Result := SendCmd('RSET',[250]);
 end;
 
-{*************************************************}
+{*******************************************************}
 procedure TAlSmtpClient.SendMail(const aHost: AnsiString;
                                  APort: integer;
                                  const aSenderEmail: AnsiString;
@@ -585,7 +570,6 @@ procedure TAlSmtpClient.SendMailMultipartMixed(const aHost: AnsiString;
                                                aAttachments: TALMultiPartMixedContents);
 begin
   If Fconnected then Disconnect;
-
   connect(aHost,APort);
   Try
 
@@ -594,12 +578,10 @@ begin
     If aAuthType <> AlsmtpClientAuthNone then Auth(AUserName, APassword, aAuthType);
     mailFrom(aSenderEmail);
     RcptTo(aRcptNameLst);
-    DataMultipartMixed(
-                       aHeader,
+    DataMultipartMixed(aHeader,
                        aInlineText,
                        aInlineTextContentType,
-                       aAttachments
-                      );
+                       aAttachments);
     Quit;
 
   Finally
@@ -635,18 +617,21 @@ end;
             NOOP <CRLF>
             QUIT <CRLF>
             TURN <CRLF>}
-function TAlSmtpClient.SendCmd(aCmd: AnsiString; const OkResponses: array of Word): AnsiString;
+function TAlSmtpClient.SendCmd(const aCmd: AnsiString; const OkResponses: array of Word): AnsiString;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
+    TmpCmd: AnsiString;
 begin
+
   If (length(aCmd) <= 1) or
      (aCmd[length(aCmd)] <> #10) or
      (aCmd[length(aCmd) - 1] <> #13)
-  then aCmd := aCmd + #13#10;
+  then TmpCmd := aCmd + #13#10
+  else TmpCmd := aCmd;
 
-  p:=@aCmd[1]; // pchar
-  l:=length(aCmd);
+  p:=@TmpCmd[1]; // pchar
+  l:=length(TmpCmd);
   while l>0 do begin
     ByteSent:=SocketWrite(p^,l);
     if ByteSent<=0 then raise EALException.Create('Connection close gracefully!');
@@ -673,19 +658,19 @@ end;
  command.}
 function TAlSmtpClient.GetResponse(const OkResponses: array of Word): AnsiString;
 
-  {------------------------------------------------------}
-  function Internalstpblk(PValue : PAnsiChar) : PAnsiChar;
+  {-----------------------------------------------}
+  function _stpblk(PValue : PAnsiChar) : PAnsiChar;
   begin
     Result := PValue;
     while Result^ in [' ', #9, #10, #13] do Inc(Result);
   end;
 
-  {-----------------------------------------------------------------------------}
-  function InternalGetInteger(Data: PAnsiChar; var Number : Integer) : PAnsiChar;
+  {----------------------------------------------------------------------}
+  function _GetInteger(Data: PAnsiChar; var Number : Integer) : PAnsiChar;
   var bSign : Boolean;
   begin
     Number := 0;
-    Result := InternalStpBlk(Data);
+    Result := _StpBlk(Data);
     if (Result = nil) then Exit;
     { Remember the sign }
     if Result^ in ['-', '+'] then begin
@@ -711,6 +696,7 @@ Var aBuffStr: AnsiString;
     ALst : TALStringList;
     P: PAnsiChar;
     i, j: integer;
+
 begin
   Result := '';
   Setlength(aBuffStr,512); //The maximum total length of a reply line including the reply code and the <CRLF> is 512 characters. (http://www.freesoft.org/CIE/RFC/821/24.htm)
@@ -738,8 +724,9 @@ begin
       Alst.Text := aResponse;
       If Alst.count = 0 then raise EALException.Create('Emtpy response');
       For j := 0 to Alst.count - 1 do begin
+
         aResponse := Alst[j];
-        p := InternalGetInteger(@aResponse[1], aStatusCode);
+        p := _GetInteger(@aResponse[1], aStatusCode);
         aGoodResponse := False;
         for I := 0 to High(OkResponses) do
           if OkResponses[I] = aStatusCode then begin
@@ -752,6 +739,7 @@ begin
           If J <> Alst.count - 1 then Raise EALException.Create(aResponse);
           Exit;
         end;
+
       end;
     Finally
       ALst.Free;
@@ -760,8 +748,8 @@ begin
   end;
 end;
 
-{******************************************************************************************************************}
-Function TAlSmtpClient.SocketWrite({$IF CompilerVersion >= 23}const{$ELSE}var{$IFEND} Buf; len: Integer): Integer;
+{*******************************************************************}
+Function TAlSmtpClient.SocketWrite(const Buf; len: Integer): Integer;
 begin
   Result := Send(FSocketDescriptor,Buf,len,0);
   CheckError(Result =  SOCKET_ERROR);

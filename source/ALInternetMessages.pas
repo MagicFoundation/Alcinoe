@@ -62,11 +62,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     system.Classes,
-     {$ELSE}
-     Classes,
-     {$IFEND}
+uses system.Classes,
      AlStringList;
 
 Type
@@ -182,18 +178,12 @@ function AlExtractEmailAddress(const FriendlyEmail: AnsiString): AnsiString;
 Function ALMakeFriendlyEmailAddress(const aRealName, aEmail: AnsiString): AnsiString;
 Function ALEncodeRealName4FriendlyEmailAddress(const aRealName: AnsiString): AnsiString;
 Function AlGenerateInternetMessageID: AnsiString; overload;
-Function AlGenerateInternetMessageID(ahostname: AnsiString): AnsiString; overload;
-Function ALDecodeQuotedPrintableString(src: AnsiString): AnsiString;
-Function AlDecodeInternetMessageHeaderInUTF8(const aHeaderStr: AnsiString; aDefaultCodePage: Integer): AnsiString;
+Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString; overload;
 function AlIsValidEmail(const Value: AnsiString): boolean;
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     system.Sysutils,
-     {$ELSE}
-     Sysutils,
-     {$IFEND}
+uses system.Sysutils,
      ALHttpClient,
      ALMime,
      ALWinsock,
@@ -218,17 +208,17 @@ var P1, P2, P3, P4, P5: integer;
 
 begin
 
-  {----------}
+  //----------
   FriendlyEmail := ALTrim(FriendlyEmail);
 
-  {----------}
+  //----------
   Result := '';
   RealName := '';
 
-  {----------}
+  //----------
   ln := Length(FriendlyEmail);
 
-  {----------}
+  //----------
   if ALMatchesMask(FriendlyEmail, '* <*>') then P1 := Ln-1  // toto <toto@toto.com> | "toto" <toto@toto.com> | (toto) <toto@toto.com>
   else if ALMatchesMask(FriendlyEmail, '<*> *') then P1 := 2 // <toto@toto.com> toto.com | <toto@toto.com> "toto" | <toto@toto.com> (toto)
   else if ALMatchesMask(FriendlyEmail, '<*>') then P1 := 2 // <toto@toto.com>
@@ -239,10 +229,10 @@ begin
     Exit;
   end;
 
-  {----------}
+  //----------
   Result := FriendlyEmail[P1];
 
-  {----------}
+  //----------
   P2 := P1-1;
   While (P2 > 0) and (FriendlyEmail[P2] in ['a'..'z','A'..'Z','0'..'9','_','-','.','@']) do begin
     Result := FriendlyEmail[P2] + Result;
@@ -257,12 +247,12 @@ begin
   end;
   While (P3 <= Ln) and (FriendlyEmail[P3] in [' ',#9]) do inc(P3);
 
-  {----------}
+  //----------
   If (P2 > 0) and
      (P3 <= Ln) then begin
     If (((FriendlyEmail[P2] = '<') and (FriendlyEmail[P3] = '>'))) then begin
       Dec(P2);
-      Inc(P3);        
+      Inc(P3);
     end
     else begin
       S1 := Result;
@@ -298,16 +288,16 @@ begin
     end;
   end;
 
-  {----------}
+  //----------
   RealName := ALTrim(AlCopyStr(FriendlyEmail,1,P2) + AlCopyStr(FriendlyEmail,P3,Maxint));
 
-  {----------}
+  //----------
   If (RealName = '') then begin
     If (result <> '') then exit;
     RealName := ALTrim(FriendlyEmail);
   end;
 
-  {----------}
+  //----------
   ln := Length(RealName);
   if (decodeRealName) and
      (ln >= 2) and
@@ -389,152 +379,13 @@ Begin
   Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + ALTrim(AlGetLocalHostName);
 end;
 
-{**********************************************************************}
-Function AlGenerateInternetMessageID(ahostname: AnsiString): AnsiString;
+{****************************************************************************}
+Function AlGenerateInternetMessageID(const ahostname: AnsiString): AnsiString;
+var aTmpHostName: ansiString;
 Begin
-  ahostname := ALTrim(ahostname);
-  If ahostname <> '' then Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + ahostname
+  aTmpHostName := ALTrim(ahostname);
+  If aTmpHostName <> '' then Result := AlStringReplace(ALNewGUIDString(true{WithoutBracket}),'-','',[rfReplaceAll]) + '@' + aTmpHostName
   else Result := AlGenerateInternetMessageID;
-end;
-
-{******************************************************************}
-Function ALDecodeQuotedPrintableString(src: AnsiString): AnsiString;
-var CurrentSrcPos, CurrentResultPos : Integer;
-    Entity : AnsiString;
-    SrcLength: integer;
-    in1: integer;
-
-    {--------------------------------------}
-    procedure CopyCurrentSrcPosCharToResult;
-    Begin
-      result[CurrentResultPos] := src[CurrentSrcPos];
-      inc(CurrentResultPos);
-      inc(CurrentSrcPos);
-    end;
-
-    {---------------------------------------------------------------------}
-    procedure CopyCharToResult(aChar: AnsiChar; NewCurrentSrcPos: integer);
-    Begin
-      result[CurrentResultPos] := aChar;
-      inc(CurrentResultPos);
-      CurrentSrcPos := NewCurrentSrcPos;
-    end;
-
-begin
-  {remove soft line break}
-  Src := AlStringReplace(Src,'='#13#10,'',[rfReplaceAll]);
-
-  {init var}
-  CurrentSrcPos := 1;
-  CurrentResultPos := 1;
-  SrcLength := Length(src);
-  Entity := '';
-  SetLength(Result,SrcLength);
-
-  {start loop}
-  while (CurrentSrcPos <= SrcLength) do begin
-
-    {Encoded entity detected}
-    If src[CurrentSrcPos]= '=' then begin
-
-      {Encoded entity is valid in length}
-      If (CurrentSrcPos+2<=SrcLength) then Begin
-
-        Entity := ALCopyStr(Src,
-                            CurrentSrcPos+1,
-                            2);
-
-        If ALTryStrToInt(alUpperCase('$'+Entity),in1) and (in1 <= 255) and (in1 >= 0) then CopyCharToResult(AnsiChar(in1), CurrentSrcPos+3)
-        else CopyCurrentSrcPosCharToResult;
-
-      end
-      else CopyCurrentSrcPosCharToResult;
-
-    end
-    else If src[CurrentSrcPos]= '_' then CopyCharToResult(' ', CurrentSrcPos+1)
-    else CopyCurrentSrcPosCharToResult;
-
-  end;
-
-  setLength(Result,CurrentResultPos-1);
-end;
-
-{****************************************************************************************************************}
-Function AlDecodeInternetMessageHeaderInUTF8(const aHeaderStr: AnsiString; aDefaultCodePage: Integer): AnsiString;
-
-Var P1, P2, P3, P4: integer;
-    I: integer;
-    aCharSet: AnsiString;
-    aEncoding: AnsiString;
-    aencodedText: AnsiString;
-    aCodePage: integer;
-    LstEncodedWord: TALStringList;
-
-Begin
-  // encoded-word = "=?" charset "?" encoding "?" encoded-text "?="
-  // =?iso-8859-1?q?=20this=20is=20some=20text?=
-  Result := '';
-  LstEncodedWord := TALStringList.Create;
-  Try
-
-    P1 := 1;
-    While True do begin
-      P2 := AlPosEx('=?',aHeaderStr,P1);
-      If P2 <= 0 then Break;
-      P3 := ALPosEX('?', aHeaderStr, P2+2);
-      if P3 > 0 then P3 := ALPosEX('?', aHeaderStr, P3+1);
-      if P3 > 0 then P3 := ALPosEX('?', aHeaderStr, P3+1);
-      If (P3 <= 0) or (P3=Length(aHeaderStr)) or (aHeaderStr[P3+1] <> '=') then begin
-        LstEncodedWord.Add(AlCopyStr(aHeaderStr,P1,P2+2-P1));
-        P1 := P1 + 2;
-      end
-      else begin
-        LstEncodedWord.Add(AlCopyStr(aHeaderStr,P1,P2-P1));
-        LstEncodedWord.Add(AlCopyStr(aHeaderStr,P2,P3+2-P2));
-        P1 := P3+2;
-      end;
-    end;
-    LstEncodedWord.Add(AlCopyStr(aHeaderStr,P1,MaxInt));
-
-    For i := 0 to LstEncodedWord.Count - 1 do begin
-      aencodedText := LstEncodedWord[i];
-      aCodePage := aDefaultCodePage;
-      LstEncodedWord.Objects[i] := Pointer(0);
-      If aEncodedText <> '' then begin
-        P1 := AlPos('=?', aEncodedText);
-        If P1 = 1 then begin
-          P2 := AlPosEx('?',aEncodedText,P1+2);
-          If (P2 > 0) then Begin
-            P3 := AlPosEx('?',aEncodedText,P2+1);
-            If P3 > 0 then begin
-              P4 := AlPosEx('?=',aEncodedText,P3+1);
-              If P4 > 0 then Begin
-                aEncoding := alLowerCase(AlcopyStr(aEncodedText,P2+1,P3-P2-1)); //q
-                If (aEncoding='q') or (aEncoding='b') then begin
-                  aCharSet := AlcopyStr(aEncodedText,P1+2,P2-P1-2); //iso-8859-1
-                  aCodePage := ALGetCodePageFromCharSetName(Acharset); //28591
-                  aencodedText := AlcopyStr(aEncodedText,P3+1,P4-P3-1); //this=20is=20some=20text
-                  If (aEncoding='b') then aencodedText := ALMimeDecodeString(aencodedText)
-                  else aencodedText := ALDecodeQuotedPrintableString(aencodedText);
-                  LstEncodedWord.Objects[i] := Pointer(1);
-                end;
-              end;
-            end;
-          end;
-        end;
-        If aCodePage <> 65001 then aencodedText := ALUTF8Encode(aEncodedText, aCodePage);
-        LstEncodedWord[i] := aencodedText;
-        If (I >= 2) and
-           (LstEncodedWord.Objects[i] = Pointer(1)) and
-           (LstEncodedWord.Objects[i-2] = Pointer(1)) and
-           (ALTrim(LstEncodedWord[i-1]) = '') then LstEncodedWord[i-1] := '';
-      end;
-    end;
-    For i := 0 to LstEncodedWord.Count - 1 do Result := Result + LstEncodedWord[i];
-
-  finally
-    LstEncodedWord.Free;
-  end;
 end;
 
 {*****************************}
@@ -616,10 +467,11 @@ end;
 
 {**************************************************************************}
 procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
+
 Var aRawHeaderLst: TALStringList;
 
-  {---------------------------------------------------}
-  Function AlG001(const aName: AnsiString): AnsiString;
+  {-----------------------------------------------------------}
+  Function _extractHeader(const aName: AnsiString): AnsiString;
   Var i: Integer;
       Str: AnsiString;
   Begin
@@ -641,6 +493,7 @@ Var aRawHeaderLst: TALStringList;
 
 Var Str1, Str2: AnsiString;
     j: integer;
+
 begin
   Clear;
   aRawHeaderLst := TALStringList.create;
@@ -648,22 +501,22 @@ begin
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
 
-    fFrom:= Alg001('From');
-    fSender:= Alg001('Sender');
-    fSendTo:= Alg001('To');
-    fcc:= Alg001('cc');
-    fbcc:= Alg001('bcc');
-    fReplyTo:= Alg001('Reply-To');
-    fSubject:= Alg001('Subject');
-    fMessageID:= Alg001('Message-ID');
-    fReferences:= Alg001('References');
-    fComments:= Alg001('Comments');
-    fDate:= Alg001('Date');
-    fContentType:= Alg001('Content-Type');
-    fContentTransferEncoding:= Alg001('Content-Transfer-Encoding');
-    fMIMEVersion:= Alg001('MIME-Version');
-    fPriority:= Alg001('Priority');
-    fDispositionNotificationTo:= Alg001('Disposition-Notification-To');
+    fFrom:= _extractHeader('From');
+    fSender:= _extractHeader('Sender');
+    fSendTo:= _extractHeader('To');
+    fcc:= _extractHeader('cc');
+    fbcc:= _extractHeader('bcc');
+    fReplyTo:= _extractHeader('Reply-To');
+    fSubject:= _extractHeader('Subject');
+    fMessageID:= _extractHeader('Message-ID');
+    fReferences:= _extractHeader('References');
+    fComments:= _extractHeader('Comments');
+    fDate:= _extractHeader('Date');
+    fContentType:= _extractHeader('Content-Type');
+    fContentTransferEncoding:= _extractHeader('Content-Transfer-Encoding');
+    fMIMEVersion:= _extractHeader('MIME-Version');
+    fPriority:= _extractHeader('Priority');
+    fDispositionNotificationTo:= _extractHeader('Disposition-Notification-To');
 
     FCustomHeaders.clear;
     J := 0;
@@ -783,10 +636,11 @@ end;
 
 {********************************************************************************}
 procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
+
 Var aRawHeaderLst: TALStringList;
 
-  {---------------------------------------------------}
-  Function AlG001(const aName: AnsiString): AnsiString;
+  {-----------------------------------------------------------}
+  Function _extractHeader(const aName: AnsiString): AnsiString;
   Var i: Integer;
       Str: AnsiString;
   Begin
@@ -808,6 +662,7 @@ Var aRawHeaderLst: TALStringList;
 
 Var Str1, Str2: AnsiString;
     j: integer;
+
 begin
   Clear;
   aRawHeaderLst := TALStringList.create;
@@ -815,29 +670,29 @@ begin
     aRawHeaderLst.NameValueSeparator := ':';
     aRawHeaderLst.Text := aRawHeaderText;
 
-    fRelayVersion:= Alg001('Relay-Version');
-    fPostingVersion:= Alg001('Posting-Version');
-    fFrom:= Alg001('From');
-    fDate:= Alg001('Date');
-    fNewsgroups:= Alg001('Newsgroups');
-    fSubject:= Alg001('Subject');
-    fMessageID:= Alg001('Message-ID');
-    fPath:= Alg001('Path');
-    fReplyTo:= Alg001('Reply-To');
-    fSender:= Alg001('Sender');
-    fFollowupTo:= Alg001('Followup-To');
-    fDateReceived:= Alg001('Date-Received');
-    fExpires:= Alg001('Expires');
-    fReferences:= Alg001('References');
-    fControl:= Alg001('Control');
-    fDistribution:= Alg001('Distribution');
-    fOrganization:= Alg001('Organization');
-    fComments:= Alg001('Comments');
-    fContentType:= Alg001('Content-Type');
-    fContentTransferEncoding:= Alg001('Content-Transfer-Encoding');
-    fMIMEVersion:= Alg001('MIME-Version');
-    fNNTPPostingHost:= Alg001('NNTP-Posting-Host');
-    fNNTPPostingDate:= Alg001('NNTP-Posting-Date');
+    fRelayVersion:= _extractHeader('Relay-Version');
+    fPostingVersion:= _extractHeader('Posting-Version');
+    fFrom:= _extractHeader('From');
+    fDate:= _extractHeader('Date');
+    fNewsgroups:= _extractHeader('Newsgroups');
+    fSubject:= _extractHeader('Subject');
+    fMessageID:= _extractHeader('Message-ID');
+    fPath:= _extractHeader('Path');
+    fReplyTo:= _extractHeader('Reply-To');
+    fSender:= _extractHeader('Sender');
+    fFollowupTo:= _extractHeader('Followup-To');
+    fDateReceived:= _extractHeader('Date-Received');
+    fExpires:= _extractHeader('Expires');
+    fReferences:= _extractHeader('References');
+    fControl:= _extractHeader('Control');
+    fDistribution:= _extractHeader('Distribution');
+    fOrganization:= _extractHeader('Organization');
+    fComments:= _extractHeader('Comments');
+    fContentType:= _extractHeader('Content-Type');
+    fContentTransferEncoding:= _extractHeader('Content-Transfer-Encoding');
+    fMIMEVersion:= _extractHeader('MIME-Version');
+    fNNTPPostingHost:= _extractHeader('NNTP-Posting-Host');
+    fNNTPPostingDate:= _extractHeader('NNTP-Posting-Date');
 
     FCustomHeaders.clear;
     J := 0;
@@ -905,6 +760,7 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
 
 var i, j: integer;
     namePart, serverPart, extPart: AnsiString;
+
 begin
   Result := false;
 

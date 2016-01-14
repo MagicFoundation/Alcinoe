@@ -265,6 +265,8 @@ begin
     Thumb.OnMouseEnter := OnThumbMouseEnter;
     thumb.Parent := Self.Parent;
   end;
+  TALRangeTrackBar(Parent).MinClipWidth := MinClipWidth;
+  TALRangeTrackBar(Parent).MinClipHeight := MinClipHeight;
   UpdateHighlight;
 end;
 

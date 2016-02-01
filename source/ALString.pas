@@ -6456,7 +6456,11 @@ end;
 {***********************************************************************}
 Function  ALTryHexToBinU(const aHex: String; out Value: TBytes): boolean;
 var l: integer;
+    {$IF CompilerVersion < 30}{Delphi seattle}
+    aByteHex: Tbytes;
+    {$IFEND}
 begin
+  {$IF CompilerVersion >= 30}{Delphi seattle}
   l := length(aHex);
   if (l = 0) or (l mod 2 <> 0) then exit(False);
   setlength(Value,l div 2);
@@ -6465,6 +6469,17 @@ begin
                      Value, //Buffer
                      0, // BufOffset
                      length(Value)) = l div 2;
+  {$ELSE}
+  aByteHex := Tencoding.UTF8.GetBytes(aHex);
+  l := length(aByteHex);
+  if (l = 0) or (l mod 2 <> 0) then exit(False);
+  setlength(Value,l div 2);
+  result := HexToBin(aByteHex, // Text
+                     0, // TextOffset
+                     Value, //Buffer
+                     0, // BufOffset
+                     length(Value)) = l div 2;
+  {$IFEND}
 end;
 
 {************************************************}

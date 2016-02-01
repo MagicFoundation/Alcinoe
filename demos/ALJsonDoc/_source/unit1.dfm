@@ -35,13 +35,20 @@ object Form1: TForm1
     Width = 377
     Height = 186
     Lines.Strings = (
+      '{_id : 1.32,'
+      '"name": {"first": "John","last": "Backus"},'
+      '"birth": new Date('#39'2013-09-10T17:20:25.178Z'#39'), '
+      '"contribs":["Fortran","ALGOL","Backus-Naur Form","FP"],'
       
-        '{_id : 1.32,"name": {"first": "John","last": "Backus"},"birth": ' +
-        'new Date('#39'2013-09-10T17:20:25.178Z'#39'), "contribs":["Fortran","ALG' +
-        'OL","Backus-Naur Form","FP"],"awards":[{"award":"National Medal ' +
-        'of Science","year":1975,"by":"National Science Foundation"},{"aw' +
-        'ard":"Turing Award","year":1977,"by":"ACM"}],"spouse":"","addres' +
-        's":{},"phones":[]}')
+        '"awards":[{"award":"National Medal of Science","year":1975,"by":' +
+        '"National Science Foundation"},{"award":"Turing Award","year":19' +
+        '77,"by":"ACM"}],'
+      '"spouse":"",'
+      '"address":{},'
+      '"phones":[],'
+      '"regex": /<TAG\b[^>]*>(.*?)</TAG>/im,'
+      '"binary": BinData(0, "JliB6gIMRuSphAD2KmhzgQ=="),'
+      '"ObjectId": ObjectId ( "507f1f77bcf86cd799439011" )}')
     ScrollBars = ssBoth
     TabOrder = 1
   end
@@ -101,7 +108,7 @@ object Form1: TForm1
     Top = 307
     Width = 377
     Height = 25
-    Caption = 'Load Json Document from file using TALJsonDoc'
+    Caption = 'Load Json Document from file using TALJsonDoc / TALJsonDocU'
     TabOrder = 8
     OnClick = Button3Click
   end
@@ -137,7 +144,7 @@ object Form1: TForm1
     Top = 339
     Width = 377
     Height = 25
-    Caption = 'Load Bson Document from file using TALJsonDoc'
+    Caption = 'Load Bson Document from file using TALJsonDoc / TALJsonDocU'
     TabOrder = 12
     OnClick = Button6Click
   end

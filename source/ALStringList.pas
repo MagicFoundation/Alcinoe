@@ -1474,7 +1474,7 @@ begin
   try
     Size := Stream.Size - Stream.Position;
     SetString(S, nil, Size);
-    Stream.Read(Pointer(S)^, Size);
+    Stream.ReadBuffer(Pointer(S)^, Size);
     SetTextStr(S);
   finally
     EndUpdate;
@@ -5619,7 +5619,7 @@ begin
   try
     Size := Stream.Size - Stream.Position;
     SetLength(Buffer, Size);
-    Stream.Read(Buffer, 0, Size);
+    Stream.ReadBuffer(Buffer, 0, Size);
     Size := TEncoding.GetBufferEncoding(Buffer, Encoding, FDefaultEncoding);
     SetEncoding(Encoding); // Keep Encoding in case the stream is saved
     SetTextStr(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));

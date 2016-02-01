@@ -201,7 +201,7 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
   begin
     If aInputStream.size > 0 then begin
       SetLength(aStrBuffer,aInputStream.size);
-      aInputStream.read(aStrBuffer[1],aInputStream.size);
+      aInputStream.readBuffer(pointer(aStrBuffer)^,aInputStream.size);
       While true do begin
         if not WriteFile(aInputWritePipe,            // handle to file to write to
                          aStrBuffer[1],              // pointer to data to write to file
@@ -236,7 +236,7 @@ var aOutputReadPipe,aOutputWritePipe: THANDLE;
                         AstrBufferSize,              // number of bytes to read
                         aBytesRead,                  // address of number of bytes read
                         nil) then RaiseLastOSError;  // address of structure for data
-        If aBytesRead > 0 then aOutputStream.Write(aStrBuffer[1], aBytesRead);
+        If aBytesRead > 0 then aOutputStream.WriteBuffer(pointer(aStrBuffer)^, aBytesRead);
       end
       else break;
     end;

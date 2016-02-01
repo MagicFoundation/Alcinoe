@@ -616,7 +616,7 @@ begin
                                         @S[1],
                                         Size,
                                         Downloaded));
-        DataStream.Write(S[1], Size);
+        DataStream.WriteBuffer(pointer(S)^, Size);
 
         { Receiving Data event }
         inc(ContentlengthDownloaded, Downloaded);

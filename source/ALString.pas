@@ -519,7 +519,9 @@ function  ALUIntToStr(Value: UInt64): AnsiString; overload;
 function  ALIntToHex(Value: Integer; Digits: Integer): AnsiString; overload;
 function  ALIntToHex(Value: Int64; Digits: Integer): AnsiString; overload;
 function  ALIntToHex(Value: UInt64; Digits: Integer): AnsiString; overload;
+Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
 Function  ALBinToHex(const aBin: AnsiString): AnsiString;
+Function  ALTryHexToBin(const aHex: AnsiString; out Value: AnsiString): boolean;
 Function  ALHexToBin(const aHex: AnsiString): AnsiString;
 function  ALIntToBit(value: Integer; digits: integer): ansistring;
 function  AlBitToInt(Value: ansiString): Integer;
@@ -624,8 +626,14 @@ var       ALTryStrToUInt64U: function(const S: String; out Value: UInt64): Boole
 {$ifend}
 function  ALUIntToStrU(Value: Cardinal): String; overload; inline;
 function  ALUIntToStrU(Value: UInt64): String; overload; inline;
-var       ALBase64EncodeStringU: function(const S: String): String;
-var       ALBase64DecodeStringU: function(const S: String): String;
+function  ALTryBinToHexU(const aBin: Tbytes; out Value: String): boolean;
+Function  ALBinToHexU(const aBin: Tbytes): String;
+Function  ALTryHexToBinU(const aHex: String; out Value: Tbytes): boolean;
+Function  ALHexToBinU(const aHex: String): Tbytes;
+var       ALBase64EncodeStringU: function(const S: String; const AEncoding: TEncoding = nil): String;
+var       ALBase64DecodeStringU: function(const S: String; const AEncoding: TEncoding = nil): String;
+var       ALBase64EncodeBytesU: function(const Bytes: Tbytes): String;
+var       ALBase64DecodeBytesU: function(const S: String): Tbytes;
 function  ALFloatToStrU(Value: Extended; const AFormatSettings: TALFormatSettingsU): String; overload; inline;
 procedure ALFloatToStrU(Value: Extended; var S: String; const AFormatSettings: TALFormatSettingsU); overload; inline;
 var       ALCurrToStrU: function(Value: Currency; const AFormatSettings: TALFormatSettingsU): string;
@@ -754,9 +762,9 @@ function  ALRandomStr(const aLength: Longint; const aCharset: Array of ansiChar)
 function  ALRandomStr(const aLength: Longint): AnsiString; overload;
 function  ALNEVExtractName(const S: AnsiString): AnsiString;
 function  ALNEVExtractValue(const s: AnsiString): AnsiString;
-function  ALGetStringFromFile(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
-function  ALGetStringFromFileWithoutUTF8BOM(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
-procedure ALSaveStringtoFile(Str: AnsiString; filename: AnsiString);
+function  ALGetStringFromFile(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
+function  ALGetStringFromFileWithoutUTF8BOM(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
+procedure ALSaveStringtoFile(const Str: AnsiString; const filename: AnsiString);
 Function  ALWideNormalize(const S: Widestring;
                           const WordSeparator: WideChar;
                           const SymbolsToIgnore: array of WideChar): Widestring; overload;
@@ -819,6 +827,11 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
                                                 StripQuotes: Boolean = False);
 {$ENDIF}
 
+function  ALGetBytesFromStream(const aStream : TStream): Tbytes;
+function  ALGetBytesFromFileU(const filename: String; const ShareMode: Word = fmShareDenyWrite): Tbytes;
+function  ALGetStringFromBufferU(const buf : TBytes; ADefaultEncoding: TEncoding): String;
+function  ALGetStringFromStreamU(const aStream : TStream; ADefaultEncoding: TEncoding) : String;
+function  ALGetStringFromFileU(const filename: String; ADefaultEncoding: TEncoding; const ShareMode: Word = fmShareDenyWrite): String;
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
 function  ALRandomStrU(const aLength: Longint): String; overload;
 
@@ -6381,21 +6394,87 @@ begin
   Result := _ALIntToHex(Value, digits);
 end;
 
+{******************************************************************************}
+Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
+begin
+  if aBin = '' then exit(false);
+  setlength(Value,length(aBin) * 2);
+  BintoHex(PansiChar(aBin),pansiChar(Value),length(aBin));
+  Value := ALlowerCase(Value);
+  result := true;
+end;
+
 {*******************************************************}
 Function  ALBinToHex(const aBin: AnsiString): AnsiString;
 begin
-  if aBin = '' then raise Exception.Create('Bad binary value');
-  setlength(result,length(aBin) * 2);
-  BintoHex(@aBin[1],pansiChar(result),length(aBin));
+  if not ALTryBinToHex(aBin, Result) then
+    raise Exception.Create('Bad binary value');
+end;
+
+{******************************************************************************}
+Function  ALTryHexToBin(const aHex: AnsiString; out Value: AnsiString): boolean;
+var l: integer;
+begin
+  l := length(aHex);
+  if (l = 0) or (l mod 2 <> 0) then exit(False);
+  setlength(Value,l div 2);
+  result := HexToBin(PansiChar(aHex),pansiChar(Value),length(Value)) = l div 2;
 end;
 
 {*******************************************************}
 Function  ALHexToBin(const aHex: AnsiString): AnsiString;
 begin
-  if (aHex = '') or (length(aHex) mod 2 <> 0) then raise Exception.Create('Bad hex value');
-  setlength(result,length(aHex) div 2);
-  if HexToBin(PansiChar(aHex),pansiChar(result),length(result)) <> length(result) then raise Exception.Create('Bad hex value');
+  if not ALTryHexToBin(aHex, Result) then
+    raise Exception.Create('Bad hex value');
 end;
+
+{$ENDIF !NEXTGEN}
+
+{***********************************************************************}
+Function  ALTryBinToHexU(const aBin: TBytes; out Value: String): boolean;
+var bufOut: TBytes;
+begin
+  if length(aBin) = 0 then exit(false);
+  setlength(bufOut,length(aBin) * 2);
+  BintoHex(aBin, // Buffer: TBytes
+           0, // BufOffset: Integer;
+           bufOut, // Text: TBytes;
+           0, // TextOffset: Integer;
+           length(aBin)); // Count: Integer
+  Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
+  Value := AlLowerCaseU(Value);
+  result := true;
+end;
+
+{************************************************}
+Function  ALBinToHexU(const aBin: TBytes): String;
+begin
+  if not ALTryBinToHexU(aBin, Result) then
+    raise Exception.Create('Bad binary value');
+end;
+
+{***********************************************************************}
+Function  ALTryHexToBinU(const aHex: String; out Value: TBytes): boolean;
+var l: integer;
+begin
+  l := length(aHex);
+  if (l = 0) or (l mod 2 <> 0) then exit(False);
+  setlength(Value,l div 2);
+  result := HexToBin(PChar(aHex), // Text
+                     0, // TextOffset
+                     Value, //Buffer
+                     0, // BufOffset
+                     length(Value)) = l div 2;
+end;
+
+{************************************************}
+Function  ALHexToBinU(const aHex: String): TBytes;
+begin
+  if not ALTryHexToBinU(aHex, Result) then
+    raise Exception.Create('Bad hex value');
+end;
+
+{$IFNDEF NEXTGEN}
 
 {***************************************************************}
 function ALIntToBit(value: integer; digits: integer): ansistring;
@@ -9883,8 +9962,8 @@ begin
 
 end;
 
-{*******************************************************************************************************}
-function ALGetStringFromFile(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
+{*************************************************************************************************************}
+function ALGetStringFromFile(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 Var AFileStream: TfileStream;
 begin
   AFileStream := TFileStream.Create(String(filename),fmOpenRead or ShareMode);
@@ -9892,7 +9971,7 @@ begin
 
     If AFileStream.size > 0 then begin
       SetLength(Result, AFileStream.size);
-      AfileStream.Read(Result[1],AfileStream.Size)
+      AfileStream.ReadBuffer(pointer(Result)^,AfileStream.Size)
     end
     else Result := '';
 
@@ -9901,8 +9980,8 @@ begin
   end;
 end;
 
-{*********************************************************************************************************************}
-function ALGetStringFromFileWithoutUTF8BOM(filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
+{***************************************************************************************************************************}
+function ALGetStringFromFileWithoutUTF8BOM(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 Var AFileStream: TfileStream;
     aBOMStr: AnsiString;
     aSize: Integer;
@@ -9915,14 +9994,14 @@ begin
 
       If Asize >= 3 then begin
         SetLength(aBOMStr,3);
-        AfileStream.Read(aBOMStr[1],3);
+        AfileStream.ReadBuffer(pointer(aBOMStr)^,3);
         If AlUTF8DetectBOM(PAnsiChar(aBOMStr), 3) then aSize := aSize - 3
         else AfileStream.Position := 0;
       end;
 
       If aSize > 0 then begin
         SetLength(Result, aSize);
-        AfileStream.Read(Result[1],ASize)
+        AfileStream.ReadBuffer(pointer(Result)^,ASize)
       end
       else Result := '';
 
@@ -9934,26 +10013,95 @@ begin
   end;
 end;
 
-{******************************************************************}
-procedure ALSaveStringtoFile(Str: AnsiString; filename: AnsiString);
-Var AStringStream: TStringStream;
-    AMemoryStream: TMemoryStream;
+{******************************************************************************}
+procedure ALSaveStringtoFile(const Str: AnsiString; const filename: AnsiString);
+Var AFileStream: TFileStream;
 begin
-  AMemoryStream := TMemoryStream.Create;
+  AFileStream := TFileStream.Create(String(filename),fmCreate);
   try
-
-    AStringStream := TStringStream.Create(str);
-    try
-      AmemoryStream.LoadFromStream(AstringStream);
-      AmemoryStream.SaveToFile(String(filename));
-    finally
-      AStringStream.Free;
-    end;
-
+    AFileStream.WriteBuffer(Pointer(Str)^, Length(Str));
   finally
-    AMemoryStream.Free;
+    AFileStream.Free;
   end;
 end;
+
+{$ENDIF}
+
+{**************************************************************}
+function  ALGetBytesFromStream(const aStream : TStream): Tbytes;
+var l: Integer;
+begin
+   l:=aStream.Size-aStream.Position;
+   SetLength(result, l);
+   aStream.ReadBuffer(result[0], l);
+end;
+
+{******************************************************************************************************}
+function  ALGetBytesFromFileU(const filename: String; const ShareMode: Word = fmShareDenyWrite): Tbytes;
+Var AFileStream: TfileStream;
+begin
+  AFileStream := TFileStream.Create(filename,fmOpenRead or ShareMode);
+  try
+    Result := ALGetBytesFromStream(AFileStream);
+  finally
+    AfileStream.Free;
+  end;
+end;
+
+{****************************************************************************************}
+function  ALGetStringFromBufferU(const buf : TBytes; ADefaultEncoding: TEncoding): String;
+var encoding : TEncoding;
+    n : Integer;
+begin
+  encoding:=nil;
+  n:=TEncoding.GetBufferEncoding(buf, encoding, ADefaultEncoding);
+
+  //
+  // i thing it's better to raise an error to warn the user that the buf is badly encoded
+  // so i disconnect the code below
+  //
+  // handle UTF-8 directly, encoding.GetString returns an SNoMappingForUnicodeCharacter error
+  // whenever a non-utf-8 character is detected, the implementation below
+  // will return a '?' for non-utf8 characters instead
+  //
+  // var sourceLen, len: integer;
+  //
+  // if encoding=TEncoding.UTF8 then begin
+  //   sourceLen := Length(buf)-n;
+  //   SetLength(Result, sourceLen);
+  //   len := Utf8ToUnicode(Pointer(Result), sourceLen+1, PAnsiChar(buf)+n, sourceLen)-1;
+  //   if len>0 then begin
+  //     if len<>sourceLen then SetLength(Result, len);
+  //   end
+  //   else Result:=''
+  // end
+  // else Result:=encoding.GetString(buf, n, Length(buf)-n);
+  //
+
+  Result:=encoding.GetString(buf, n, Length(buf)-n);
+end;
+
+{*********************************************************************************************}
+function  ALGetStringFromStreamU(const aStream : TStream; ADefaultEncoding: TEncoding): String;
+var buf: Tbytes;
+begin
+   Buf := ALGetBytesFromStream(aStream);
+   Result:=ALGetStringFromBufferU(buf, ADefaultEncoding);
+end;
+
+{************************************************************************************************************************************}
+function  ALGetStringFromFileU(const filename: String; ADefaultEncoding: TEncoding; const ShareMode: Word = fmShareDenyWrite): String;
+Var AFileStream: TfileStream;
+begin
+  AFileStream := TFileStream.Create(filename,fmOpenRead or ShareMode);
+  try
+    Result := ALGetStringFromStreamU(AFileStream, ADefaultEncoding);
+  finally
+    AfileStream.Free;
+  end;
+end;
+
+{$IFNDEF NEXTGEN}
 
 {***********************}
 // Normalize a Widestring
@@ -11510,6 +11658,8 @@ begin
   ALFormatCurrU := system.sysutils.FormatCurr;
   ALBase64EncodeStringU := ALMimeEncodeStringNoCRLFU;
   ALBase64DecodeStringU := ALMimeDecodeStringU;
+  ALBase64EncodeBytesU := ALMimeEncodeBytesNoCRLFU;
+  ALBase64DecodeBytesU := ALMimeDecodeBytesU;
   ALStrToFloatU := system.sysutils.StrToFloat;
   ALStrToFloatDefU := system.sysutils.StrToFloatDef;
   ALStrToCurrU := system.sysutils.StrToCurr;

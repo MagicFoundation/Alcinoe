@@ -44,10 +44,10 @@ IF ERRORLEVEL 1 goto ERROR
 del demos\ALCheckSource\*.res /s
 IF ERRORLEVEL 1 goto ERROR
 
-rmdir /s /q dcu
+rmdir /s /q source\dcu
 IF ERRORLEVEL 1 goto ERROR
 
-mkdir dcu
+mkdir source\dcu
 IF ERRORLEVEL 1 goto ERROR
 
 rmdir /s /q lib\alcinoe

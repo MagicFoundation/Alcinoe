@@ -1196,9 +1196,9 @@ Var buffer: AnsiString;
     Count := Paths.Count;
     LB := PathSeparator;
     Size := length(ExtraItems);
-    if size <> 0 then Inc(Size, sizeOF(LB));
-    for I := 0 to Count - 1 do Inc(Size, Length(Paths[I]) + sizeOF(LB));
-    if size <> 0 then dec(Size, sizeOF(LB));
+    if size <> 0 then Inc(Size, 1{length(LB)});
+    for I := 0 to Count - 1 do Inc(Size, Length(Paths[I]) + 1{length(LB)});
+    if size <> 0 then dec(Size, 1{length(LB)});
     SetLength(Result, Size);
     P := Pointer(Result);
     for I := 0 to Count - 1 do begin
@@ -1208,7 +1208,7 @@ Var buffer: AnsiString;
         ALMove(Pointer(S)^, P^, L);
         Inc(P, L);
       end;
-      L := sizeOF(LB);
+      L := 1{length(LB)};
       if (L <> 0) and ((i <> Count - 1) or (ExtraItems <> '')) then begin
         ALMove(LB, P^, L);
         Inc(P, L);

@@ -35,7 +35,8 @@ object Form1: TForm1
     Width = 377
     Height = 186
     Lines.Strings = (
-      '{_id : 1.32,'
+      '{'
+      '_id : 1.32,'
       '"name": {"first": "John","last": "Backus"},'
       '"birth": new Date('#39'2013-09-10T17:20:25.178Z'#39'), '
       '"contribs":["Fortran","ALGOL","Backus-Naur Form","FP"],'
@@ -48,7 +49,11 @@ object Form1: TForm1
       '"phones":[],'
       '"regex": /<TAG\b[^>]*>(.*?)</TAG>/im,'
       '"binary": BinData(0, "JliB6gIMRuSphAD2KmhzgQ=="),'
-      '"ObjectId": ObjectId ( "507f1f77bcf86cd799439011" )}')
+      '"ObjectId": ObjectId ( "507f1f77bcf86cd799439011" ),'
+      
+        '"Javascript":function showMilitaryTime() {if (document.theForm.s' +
+        'howMilitary[0].checked) {return true;}return false;}'
+      '}')
     ScrollBars = ssBoth
     TabOrder = 1
   end

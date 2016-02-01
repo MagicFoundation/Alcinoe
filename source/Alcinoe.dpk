@@ -34,7 +34,8 @@ requires
   fmx;
 
 contains
-  ALFmxRangeTrackBar in 'ALFmxRangeTrackBar.pas';
+  ALFmxRangeTrackBar in 'ALFmxRangeTrackBar.pas',
+  ALFmxScrollBox in 'ALFmxScrollBox.pas';
 
 end.
 

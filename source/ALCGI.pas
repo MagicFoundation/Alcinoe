@@ -301,7 +301,7 @@ begin
     P1 := AlPos(#13#10#13#10,S1);
     ResponseHeader.RawHeaderText := AlCopyStr(S1,1,P1-1);
     S1 := AlCopyStr(S1,P1+4,MaxInt);
-    ResponseContentStream.Write(S1[1], length(S1));
+    ResponseContentStream.WriteBuffer(pointer(S1)^, length(S1));
 
   finally
     aStream.Free;

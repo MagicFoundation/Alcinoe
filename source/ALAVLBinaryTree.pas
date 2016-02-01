@@ -709,10 +709,10 @@ begin
   Try
 
     {load the Head}
-    AStream.Read(k, SizeOf(k));
+    AStream.Readbuffer(k, SizeOf(k));
     if k then begin
       FHead := CreateNode;
-      AStream.Read(FHead.Bal, SizeOf(FHead.Bal));
+      AStream.ReadBuffer(FHead.Bal, SizeOf(FHead.Bal));
       FHead.LoadFromStream(aStream);
       inc(FnodeCount);
       FHead.childNodes[cALAVLBinaryTree_RightChild] := FHead; //a flag
@@ -729,7 +729,7 @@ begin
       aParentNode := TALBaseAVLBinaryTreeNode(LstNode.Pop);
 
       {load the data}
-      AStream.Read(k, SizeOf(k));
+      AStream.ReadBuffer(k, SizeOf(k));
       if k then begin
 
         {find the good child node where we will work on}
@@ -742,7 +742,7 @@ begin
           aNode := aParentNode.childNodes[cALAVLBinaryTree_RightChild];
         end;
 
-        AStream.Read(ANode.Bal, SizeOf(ANode.Bal));
+        AStream.ReadBuffer(ANode.Bal, SizeOf(ANode.Bal));
         ANode.LoadFromStream(aStream);
         inc(FnodeCount);
         aNode.childNodes[cALAVLBinaryTree_RightChild] := aNode; //a flag
@@ -783,9 +783,9 @@ begin
       If assigned(aNode) then begin
         {write that the node exist}
         K := True;
-        AStream.Write(k, SizeOf(k));
+        AStream.WriteBuffer(k, SizeOf(k));
         {write the balance}
-        AStream.Write(aNode.bal, SizeOf(aNode.bal));
+        AStream.WriteBuffer(aNode.bal, SizeOf(aNode.bal));
         {write the data}
         Anode.SaveToStream(astream);
         {continue the loop with the leftchild and rightChild}
@@ -795,7 +795,7 @@ begin
       else begin
         {write that the node doesn't exist}
         K := False;
-        AStream.Write(k, SizeOf(k));
+        AStream.WriteBuffer(k, SizeOf(k));
       end;
     end;
 
@@ -1029,13 +1029,13 @@ end;
 {************************************************************************}
 procedure TALIntegerKeyAVLBinaryTreeNode.LoadFromStream(Astream: Tstream);
 begin
-  AStream.Read(ID, SizeOf(ID));
+  AStream.ReadBuffer(ID, SizeOf(ID));
 end;
 
 {**********************************************************************}
 procedure TALIntegerKeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
-  AStream.write(ID, SizeOf(ID));
+  AStream.writeBuffer(ID, SizeOf(ID));
 end;
 
 {******************************************************************************************}
@@ -1126,13 +1126,13 @@ end;
 {*************************************************************************}
 procedure TALCardinalKeyAVLBinaryTreeNode.LoadFromStream(Astream: Tstream);
 begin
-  AStream.Read(ID, SizeOf(ID));
+  AStream.ReadBuffer(ID, SizeOf(ID));
 end;
 
 {***********************************************************************}
 procedure TALCardinalKeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
-  AStream.write(ID, SizeOf(ID));
+  AStream.writeBuffer(ID, SizeOf(ID));
 end;
 
 {********************************************************************************************}
@@ -1223,13 +1223,13 @@ end;
 {**********************************************************************}
 procedure TALInt64KeyAVLBinaryTreeNode.LoadFromStream(Astream: Tstream);
 begin
-  AStream.Read(ID, SizeOf(ID));
+  AStream.ReadBuffer(ID, SizeOf(ID));
 end;
 
 {********************************************************************}
 procedure TALInt64KeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 begin
-  AStream.write(ID, SizeOf(ID));
+  AStream.writeBuffer(ID, SizeOf(ID));
 end;
 
 {**************************************************************************************}
@@ -1321,9 +1321,9 @@ end;
 procedure TALStringKeyAVLBinaryTreeNode.LoadFromStream(Astream: Tstream);
 Var K:integer;
 begin
-  AStream.Read(k, SizeOf(k));
+  AStream.ReadBuffer(k, SizeOf(k));
   SetLength(ID, k);
-  if k > 0 then AStream.Read(ID[1], k);
+  if k > 0 then AStream.ReadBuffer(pointer(ID)^, k);
 end;
 
 {*********************************************************************}
@@ -1331,8 +1331,8 @@ procedure TALStringKeyAVLBinaryTreeNode.SaveToStream(Astream: Tstream);
 Var K:integer;
 begin
   K := length(ID);
-  AStream.write(k, SizeOf(k));
-  if k > 0 then AStream.write(ID[1], k);
+  AStream.writeBuffer(k, SizeOf(k));
+  if k > 0 then AStream.writeBuffer(pointer(ID)^, k);
 end;
 
 {*******************************************}

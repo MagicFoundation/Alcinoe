@@ -10,18 +10,43 @@ uses System.Classes,
 
 type
 
+  //TTrackBar
+  //  TLayout
+  //    TStyleObject (ftrack - horizontal)
+  //      TStyleObject (fTrackHighlight)
+  //        TRectangle
+  //    TStyleObject (ftrack - vertical)
+  //      TStyleObject (fTrackHighlight)
+  //        TRectangle
+  //    TThumb
+  //      TbuttonStyleObject
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMaxRangeTrackBar = class;
+  TALMinThumbTrackBar = class;
+  TALMaxThumbTrackBar = class;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBGTrackBar = Class(TTrackBar)
+  private
+    [weak] fMinThumbTrackBar: TALMinThumbTrackBar;
+    [weak] fMaxThumbTrackBar: TALMaxThumbTrackBar;
+  protected
+    procedure ApplyStyle; override;
+    procedure DoRealign; override;
+    procedure UpdateHighlight;
+  end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMinRangeTrackBar = Class(TTrackBar)
+  TALMinThumbTrackBar = Class(TTrackBar)
   private
-    [weak] fMaxTrackBar: TALMaxRangeTrackBar;
+    [weak] fBGTrackBar: TALBGTrackBar;
+    [weak] fMaxThumbTrackBar: TALMaxThumbTrackBar;
     procedure OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure OnThumbMouseLeave(Sender: TObject);
     procedure OnThumbMouseEnter(Sender: TObject);
+    procedure onThumbApplyStyleLookup(Sender: TObject);
   protected
     procedure Resize; override;
     procedure ApplyStyle; override;
@@ -30,27 +55,29 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMaxRangeTrackBar = Class(TTrackBar)
+  TALMaxThumbTrackBar = Class(TTrackBar)
   private
-    [weak] fMinTrackBar: TALMinRangeTrackBar;
+    [weak] fBGTrackBar: TALBGTrackBar;
+    [weak] fMinThumbTrackBar: TALMinThumbTrackBar;
     procedure OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure OnThumbMouseLeave(Sender: TObject);
     procedure OnThumbMouseEnter(Sender: TObject);
+    procedure onThumbApplyStyleLookup(Sender: TObject);
   protected
     procedure Resize; override;
     procedure ApplyStyle; override;
     procedure DoChanged; override;
     procedure DoTracking; override;
-    procedure UpdateHighlight;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRangeTrackBar = class(TControl)
   private
-    fMinTrackBar: TALMinRangeTrackBar;
-    fMaxTrackBar: TALMaxRangeTrackBar;
+    fBGTrackBar: TALBGTrackBar;
+    fMinThumbTrackBar: TALMinThumbTrackBar;
+    fMaxThumbTrackBar: TALMaxThumbTrackBar;
     procedure SetMax(const Value: Single);
     procedure SetMin(const Value: Single);
     function GetMax: Single;
@@ -65,8 +92,10 @@ type
     procedure SetMinValue(const Value: Single);
     procedure SetOrientation(const Value: TOrientation);
     procedure SetSmallChange(const Value: Single);
+    procedure SetonApplyStyleLookup(const Value: TNotifyEvent);
+    function GetOnApplyStyleLookup: TNotifyEvent;
   protected
-    FOnChange, FOnTracking: TNotifyEvent;
+    FOnChange, FOnTracking, fonThumbApplyStyleLookup: TNotifyEvent;
     procedure Paint; override;
     procedure Resize; override;
   public
@@ -82,6 +111,8 @@ type
     property Orientation: TOrientation read GetOrientation write SetOrientation;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnTracking: TNotifyEvent read FOnTracking write FOnTracking;
+    property onThumbApplyStyleLookup: TNotifyEvent read fonThumbApplyStyleLookup write fonThumbApplyStyleLookup;
+    property onApplyStyleLookup: TNotifyEvent read GetOnApplyStyleLookup write SetonApplyStyleLookup;
     property Align;
     property Anchors;
     property ClipChildren;
@@ -133,187 +164,239 @@ procedure Register;
 implementation
 
 uses System.SysUtils,
+     FMX.styles.objects,
      FMX.Types;
 
-{**********************************************************************************************************************}
-procedure TALMinRangeTrackBar.OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  tcontrol(Sender).BringToFront;
-  if assigned(TALRangeTrackBar(Parent).OnMouseDown) then
-    TALRangeTrackBar(Parent).OnMouseDown(Parent, Button, Shift, X, Y);
-end;
-
-{********************************************************************************************************************}
-procedure TALMinRangeTrackBar.OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseUp) then
-    TALRangeTrackBar(Parent).OnMouseUp(Parent, Button, Shift, X, Y);
-end;
-
-{************************************************************************************************}
-procedure TALMinRangeTrackBar.OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseMove) then
-    TALRangeTrackBar(Parent).OnMouseMove(Parent, Shift, X, Y);
-end;
-
-{***************************************************************}
-procedure TALMinRangeTrackBar.OnThumbMouseLeave(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseLeave) then
-    TALRangeTrackBar(Parent).OnMouseLeave(Parent);
-end;
-
-{***************************************************************}
-procedure TALMinRangeTrackBar.OnThumbMouseEnter(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseEnter) then
-    TALRangeTrackBar(Parent).OnMouseEnter(Parent);
-end;
-
-{***************************************}
-procedure TALMinRangeTrackBar.ApplyStyle;
-begin
-  inherited;
-  if assigned(FTrack) then FTrack.visible := False;
-  if assigned(FTrackHighlight) then FTrackHighlight.visible := False;
-  if assigned(Thumb) then begin
-    Thumb.Parent := self.Parent;
-    Thumb.OnMouseDown := OnThumbMouseDown;
-    Thumb.OnMouseUp := OnThumbMouseUp;
-    Thumb.OnMouseMove := OnThumbMouseMove;
-    Thumb.OnMouseLeave := OnThumbMouseLeave;
-    Thumb.OnMouseEnter := OnThumbMouseEnter;
-  end;
-  fMaxTrackBar.UpdateHighlight;
-end;
-
-{***********************************}
-procedure TALMinRangeTrackBar.Resize;
-begin
-  inherited;
-  fMaxTrackBar.UpdateHighlight;
-end;
-
-{***************************************}
-procedure TALMinRangeTrackBar.DoTracking;
-begin
-  if Value > fMaxTrackBar.value then Value := fMaxTrackBar.value
-  else begin
-    inherited;
-    if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnTracking) then
-      TALRangeTrackBar(parent).FOnTracking(parent);
-    fMaxTrackBar.UpdateHighlight;
-  end;
-end;
-
-{**************************************}
-procedure TALMinRangeTrackBar.DoChanged;
-begin
-  inherited;
-  if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnChange) then
-    TALRangeTrackBar(parent).FOnChange(parent);
-  fMaxTrackBar.UpdateHighlight;
-end;
-
-{**********************************************************************************************************************}
-procedure TALMaxRangeTrackBar.OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  tcontrol(Sender).BringToFront;
-  if assigned(TALRangeTrackBar(Parent).OnMouseDown) then
-    TALRangeTrackBar(Parent).OnMouseDown(Parent, Button, Shift, X, Y);
-end;
-
-{********************************************************************************************************************}
-procedure TALMaxRangeTrackBar.OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseUp) then
-    TALRangeTrackBar(Parent).OnMouseUp(Parent, Button, Shift, X, Y);
-end;
-
-{************************************************************************************************}
-procedure TALMaxRangeTrackBar.OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseMove) then
-    TALRangeTrackBar(Parent).OnMouseMove(Parent, Shift, X, Y);
-end;
-
-{***************************************************************}
-procedure TALMaxRangeTrackBar.OnThumbMouseLeave(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseLeave) then
-    TALRangeTrackBar(Parent).OnMouseLeave(Parent);
-end;
-
-{***************************************************************}
-procedure TALMaxRangeTrackBar.OnThumbMouseEnter(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseEnter) then
-    TALRangeTrackBar(Parent).OnMouseEnter(Parent);
-end;
-
-{***************************************}
-procedure TALMaxRangeTrackBar.ApplyStyle;
+{*********************************}
+procedure TALBGTrackBar.ApplyStyle;
 begin
   inherited;
   if assigned(FTrackHighlight) then FTrackHighlight.Align := TALignLayout.None;
-  if assigned(Thumb) then begin
-    Thumb.OnMouseDown := OnThumbMouseDown;
-    Thumb.OnMouseUp := OnThumbMouseUp;
-    Thumb.OnMouseMove := OnThumbMouseMove;
-    Thumb.OnMouseLeave := OnThumbMouseLeave;
-    Thumb.OnMouseEnter := OnThumbMouseEnter;
-    thumb.Parent := Self.Parent;
-  end;
+  if assigned(Thumb) then Thumb.Visible := False;
   TALRangeTrackBar(Parent).MinClipWidth := MinClipWidth;
   TALRangeTrackBar(Parent).MinClipHeight := MinClipHeight;
   UpdateHighlight;
 end;
 
-{***********************************}
-procedure TALMaxRangeTrackBar.Resize;
+{********************************}
+procedure TALBGTrackBar.DoRealign;
 begin
   inherited;
-  UpdateHighlight;
-end;
-
-{***************************************}
-procedure TALMaxRangeTrackBar.DoTracking;
-begin
-  if Value < fMinTrackBar.value then value := fMinTrackBar.value
-  else begin
-    inherited;
-    if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnTracking) then
-      TALRangeTrackBar(parent).FOnTracking(parent);
-    UpdateHighlight;
-  end;
+  if assigned(Thumb) then Thumb.Visible := False;
 end;
 
 {**************************************}
-procedure TALMaxRangeTrackBar.DoChanged;
-begin
-  inherited;
-  if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnChange) then
-    TALRangeTrackBar(parent).FOnChange(parent);
-  UpdateHighlight;
-end;
-
-{********************************************}
-procedure TALMaxRangeTrackBar.UpdateHighlight;
+procedure TALBGTrackBar.UpdateHighlight;
 begin
   if FTrackHighlight <> nil then
   begin
     case Orientation of
       TOrientation.Horizontal: begin
-        FTrackHighlight.position.X := Round((fMinTrackBar.GetThumbRect.Left + fMinTrackBar.GetThumbRect.Right) / 2);
-        FTrackHighlight.Width := Round((GetThumbRect.Left + GetThumbRect.Right) / 2) - FTrackHighlight.position.X;
+        if (fMinThumbTrackBar.Thumb <> nil) and (fMaxThumbTrackBar.Thumb <> nil) then begin
+          FTrackHighlight.position.X := fMinThumbTrackBar.GetThumbRect.Left - fMinThumbTrackBar.Thumb.Margins.Left;
+          FTrackHighlight.Width := Round((fMaxThumbTrackBar.GetThumbRect.Left + fMaxThumbTrackBar.GetThumbRect.Right) / 2) - FTrackHighlight.position.X;
+        end
+        else begin
+          FTrackHighlight.position.X := 0;
+          FTrackHighlight.Width := 0;
+        end;
       end;
       TOrientation.Vertical: begin
-        FTrackHighlight.position.Y := Round((fMinTrackBar.GetThumbRect.Top + fMinTrackBar.GetThumbRect.Bottom) / 2);
-        FTrackHighlight.Height := Round((GetThumbRect.Top + GetThumbRect.Bottom) / 2) - FTrackHighlight.position.Y;
+        if (fMinThumbTrackBar.Thumb <> nil) and (fMaxThumbTrackBar.Thumb <> nil) then begin
+          FTrackHighlight.position.y := fMinThumbTrackBar.GetThumbRect.Top - fMinThumbTrackBar.Thumb.Margins.Top;
+          FTrackHighlight.Height := Round((fMaxThumbTrackBar.GetThumbRect.Top + fMaxThumbTrackBar.GetThumbRect.Bottom) / 2) - FTrackHighlight.position.y;
+        end
+        else begin
+          FTrackHighlight.position.y := 0;
+          FTrackHighlight.Height := 0;
+        end;
       end;
     end;
   end;
+end;
+
+{**********************************************************************************************************************}
+procedure TALMinThumbTrackBar.OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  BringToFront;
+  if assigned(TALRangeTrackBar(Parent).OnMouseDown) then
+    TALRangeTrackBar(Parent).OnMouseDown(Parent, Button, Shift, X, Y);
+end;
+
+{********************************************************************************************************************}
+procedure TALMinThumbTrackBar.OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseUp) then
+    TALRangeTrackBar(Parent).OnMouseUp(Parent, Button, Shift, X, Y);
+end;
+
+{************************************************************************************************}
+procedure TALMinThumbTrackBar.OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseMove) then
+    TALRangeTrackBar(Parent).OnMouseMove(Parent, Shift, X, Y);
+end;
+
+{***************************************************************}
+procedure TALMinThumbTrackBar.OnThumbMouseLeave(Sender: TObject);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseLeave) then
+    TALRangeTrackBar(Parent).OnMouseLeave(Parent);
+end;
+
+{***************************************************************}
+procedure TALMinThumbTrackBar.OnThumbMouseEnter(Sender: TObject);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseEnter) then
+    TALRangeTrackBar(Parent).OnMouseEnter(Parent);
+end;
+
+{*********************************************************************}
+procedure TALMinThumbTrackBar.onThumbApplyStyleLookup(Sender: TObject);
+begin
+
+  // TThumb
+  //   TbuttonStyleObject
+
+  if assigned(TALRangeTrackBar(Parent).onThumbApplyStyleLookup) then
+    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender)
+
+end;
+
+{***************************************}
+procedure TALMinThumbTrackBar.ApplyStyle;
+begin
+  inherited;
+  if assigned(FTrack) then FTrack.visible := False;
+  if assigned(Thumb) then begin
+    Thumb.OnMouseDown := OnThumbMouseDown;
+    Thumb.OnMouseUp := OnThumbMouseUp;
+    Thumb.OnMouseMove := OnThumbMouseMove;
+    Thumb.OnMouseLeave := OnThumbMouseLeave;
+    Thumb.OnMouseEnter := OnThumbMouseEnter;
+    Thumb.OnApplyStyleLookup := onThumbApplyStyleLookup;
+  end;
+  fBGTrackBar.UpdateHighlight;
+end;
+
+{***********************************}
+procedure TALMinThumbTrackBar.Resize;
+begin
+  inherited;
+  fBGTrackBar.UpdateHighlight;
+end;
+
+{***************************************}
+procedure TALMinThumbTrackBar.DoTracking;
+begin
+  if Value > fMaxThumbTrackBar.value then Value := fMaxThumbTrackBar.value
+  else begin
+    inherited;
+    if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnTracking) then
+      TALRangeTrackBar(parent).FOnTracking(parent);
+    fBGTrackBar.UpdateHighlight;
+  end;
+end;
+
+{**************************************}
+procedure TALMinThumbTrackBar.DoChanged;
+begin
+  inherited;
+  if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnChange) then
+    TALRangeTrackBar(parent).FOnChange(parent);
+  fBGTrackBar.UpdateHighlight;
+end;
+
+{**********************************************************************************************************************}
+procedure TALMaxThumbTrackBar.OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  BringToFront;
+  if assigned(TALRangeTrackBar(Parent).OnMouseDown) then
+    TALRangeTrackBar(Parent).OnMouseDown(Parent, Button, Shift, X, Y);
+end;
+
+{********************************************************************************************************************}
+procedure TALMaxThumbTrackBar.OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseUp) then
+    TALRangeTrackBar(Parent).OnMouseUp(Parent, Button, Shift, X, Y);
+end;
+
+{************************************************************************************************}
+procedure TALMaxThumbTrackBar.OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseMove) then
+    TALRangeTrackBar(Parent).OnMouseMove(Parent, Shift, X, Y);
+end;
+
+{***************************************************************}
+procedure TALMaxThumbTrackBar.OnThumbMouseLeave(Sender: TObject);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseLeave) then
+    TALRangeTrackBar(Parent).OnMouseLeave(Parent);
+end;
+
+{***************************************************************}
+procedure TALMaxThumbTrackBar.OnThumbMouseEnter(Sender: TObject);
+begin
+  if assigned(TALRangeTrackBar(Parent).OnMouseEnter) then
+    TALRangeTrackBar(Parent).OnMouseEnter(Parent);
+end;
+
+{*********************************************************************}
+procedure TALMaxThumbTrackBar.onThumbApplyStyleLookup(Sender: TObject);
+begin
+
+  // TThumb
+  //   TbuttonStyleObject
+
+  if assigned(TALRangeTrackBar(Parent).onThumbApplyStyleLookup) then
+    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender)
+
+end;
+
+{***************************************}
+procedure TALMaxThumbTrackBar.ApplyStyle;
+begin
+  inherited;
+  if assigned(FTrack) then FTrack.visible := False;
+  if assigned(Thumb) then begin
+    Thumb.OnMouseDown := OnThumbMouseDown;
+    Thumb.OnMouseUp := OnThumbMouseUp;
+    Thumb.OnMouseMove := OnThumbMouseMove;
+    Thumb.OnMouseLeave := OnThumbMouseLeave;
+    Thumb.OnMouseEnter := OnThumbMouseEnter;
+    Thumb.OnApplyStyleLookup := onThumbApplyStyleLookup;
+  end;
+  fBGTrackBar.UpdateHighlight;
+end;
+
+{***********************************}
+procedure TALMaxThumbTrackBar.Resize;
+begin
+  inherited;
+  fBGTrackBar.UpdateHighlight;
+end;
+
+{***************************************}
+procedure TALMaxThumbTrackBar.DoTracking;
+begin
+  if Value < fMinThumbTrackBar.value then value := fMinThumbTrackBar.value
+  else begin
+    inherited;
+    if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnTracking) then
+      TALRangeTrackBar(parent).FOnTracking(parent);
+    fBGTrackBar.UpdateHighlight;
+  end;
+end;
+
+{**************************************}
+procedure TALMaxThumbTrackBar.DoChanged;
+begin
+  inherited;
+  if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnChange) then
+    TALRangeTrackBar(parent).FOnChange(parent);
+  fBGTrackBar.UpdateHighlight;
 end;
 
 {******************************************************}
@@ -326,25 +409,41 @@ begin
   //-----
   FOnChange := nil;
   FOnTracking := nil;
+  fonThumbApplyStyleLookup := nil;
   //-----
-  fMaxTrackBar := TALMaxRangeTrackBar.Create(self);
-  fMaxTrackBar.Stored := False;
-  fMaxTrackBar.Parent := Self;
-  fMaxTrackBar.Align := TalignLayout.Client;
-  fMaxTrackBar.HitTest := False;
+  fBGTrackBar := TALBGTrackBar.Create(self);
   //-----
-  fMinTrackBar := TALMinRangeTrackBar.Create(self);
-  fMinTrackBar.Stored := False;
-  fMinTrackBar.fMaxTrackBar := fMaxTrackBar;
-  fMaxTrackBar.fMinTrackBar := fMinTrackBar;
-  Width := fMinTrackBar.Width;
-  height := fMinTrackBar.Height;
-  fMinTrackBar.Parent := Self;
-  fMinTrackBar.Align := TalignLayout.Client;
-  fMinTrackBar.HitTest := False;
+  Width := fBGTrackBar.Width;
+  height := fBGTrackBar.Height;
   //-----
-  SetMin(fMinTrackBar.Min);
-  SetMax(fMaxTrackBar.Max);
+  fBGTrackBar.Stored := False;
+  fBGTrackBar.Parent := Self;
+  fBGTrackBar.Align := TalignLayout.Client;
+  fBGTrackBar.HitTest := False;
+  //-----
+  fMaxThumbTrackBar := TALMaxThumbTrackBar.Create(self);
+  fMaxThumbTrackBar.Stored := False;
+  fMaxThumbTrackBar.Parent := Self;
+  fMaxThumbTrackBar.Align := TalignLayout.Client;
+  fMaxThumbTrackBar.HitTest := False;
+  //-----
+  fMinThumbTrackBar := TALMinThumbTrackBar.Create(self);
+  fMinThumbTrackBar.Stored := False;
+  fMinThumbTrackBar.Parent := Self;
+  fMinThumbTrackBar.Align := TalignLayout.Client;
+  fMinThumbTrackBar.HitTest := False;
+  //-----
+  fBGTrackBar.fMinThumbTrackBar := fMinThumbTrackBar;
+  fBGTrackBar.fMaxThumbTrackBar := fMaxThumbTrackBar;
+  //-----
+  fMinThumbTrackBar.fBGTrackBar := fBGTrackBar;
+  fMinThumbTrackBar.fMaxThumbTrackBar := fMaxThumbTrackBar;
+  //-----
+  fMaxThumbTrackBar.fBGTrackBar := fBGTrackBar;
+  fMaxThumbTrackBar.fMinThumbTrackBar := fMinThumbTrackBar;
+  //-----
+  SetMin(fMinThumbTrackBar.Min);
+  SetMax(fMaxThumbTrackBar.Max);
 end;
 
 {*******************************}
@@ -358,8 +457,9 @@ end;
 {**********************************}
 destructor TALRangeTrackBar.Destroy;
 begin
-  freeandnil(fMaxTrackBar);
-  freeandnil(fMinTrackBar);
+  freeandnil(fMaxThumbTrackBar);
+  freeandnil(fMinThumbTrackBar);
+  freeandnil(fBGTrackBar);
   inherited;
 end;
 
@@ -368,104 +468,121 @@ procedure TALRangeTrackBar.Resize;
 begin
   inherited;
   case Orientation of
-    TOrientation.Horizontal: height := fMinTrackBar.Height;
-    TOrientation.Vertical: Width := fMinTrackBar.Width;
+    TOrientation.Horizontal: height := fbgTrackBar.Height;
+    TOrientation.Vertical: Width := fbgTrackBar.Width;
   end;
 end;
 
 {***************************************}
 function TALRangeTrackBar.GetMax: Single;
 begin
-  result := fMaxTrackBar.Max;
-end;
-
-{***************************************}
-function TALRangeTrackBar.GetMin: Single;
-begin
-  result := fMinTrackBar.Min;
+  result := fMaxThumbTrackBar.Max;
 end;
 
 {*****************************************************}
 procedure TALRangeTrackBar.SetMax(const Value: Single);
 begin
-  fMinTrackBar.Max := Value;
-  fMaxTrackBar.Max := Value;
+  fBGTrackBar.Max := Value;
+  fMinThumbTrackBar.Max := Value;
+  fMaxThumbTrackBar.Max := Value;
   //-----
-  fMinTrackBar.Value := Min;
-  fMaxTrackBar.Value := max;
+  fMinThumbTrackBar.Value := Min;
+  fMaxThumbTrackBar.Value := max;
+end;
+
+{***************************************}
+function TALRangeTrackBar.GetMin: Single;
+begin
+  result := fMinThumbTrackBar.Min;
 end;
 
 {*****************************************************}
 procedure TALRangeTrackBar.SetMin(const Value: Single);
 begin
-  fMinTrackBar.Min := Value;
-  fMaxTrackBar.Min := Value;
+  fBGTrackBar.Min := Value;
+  fMinThumbTrackBar.Min := Value;
+  fMaxThumbTrackBar.Min := Value;
   //-----
-  fMinTrackBar.Value := Min;
-  fMaxTrackBar.Value := max;
+  fMinThumbTrackBar.Value := Min;
+  fMaxThumbTrackBar.Value := max;
 end;
 
 {*********************************************}
 function TALRangeTrackBar.GetFrequency: Single;
 begin
-  result := fMaxTrackBar.Frequency;
-end;
-
-{********************************************}
-function TALRangeTrackBar.GetMaxValue: Single;
-begin
-  result := fMaxTrackBar.Value;
-end;
-
-{********************************************}
-function TALRangeTrackBar.GetMinValue: Single;
-begin
-  result := fMinTrackBar.Value;
-end;
-
-{*****************************************************}
-function TALRangeTrackBar.GetOrientation: TOrientation;
-begin
-  result := fMaxTrackBar.Orientation;
-end;
-
-{***********************************************}
-function TALRangeTrackBar.GetSmallChange: Single;
-begin
-  result := fMaxTrackBar.SmallChange;
+  result := fBGTrackBar.Frequency;
 end;
 
 {***********************************************************}
 procedure TALRangeTrackBar.SetFrequency(const Value: Single);
 begin
-  fMaxTrackBar.Frequency := Value;
-  fMinTrackBar.Frequency := Value;
+  fBGTrackBar.Frequency := Value;
+  fMaxThumbTrackBar.Frequency := Value;
+  fMinThumbTrackBar.Frequency := Value;
+end;
+
+{********************************************}
+function TALRangeTrackBar.GetMaxValue: Single;
+begin
+  result := fMaxThumbTrackBar.Value;
 end;
 
 {**********************************************************}
 procedure TALRangeTrackBar.SetMaxValue(const Value: Single);
 begin
-  fMaxTrackBar.value := Value;
+  fMaxThumbTrackBar.value := Value;
+end;
+
+{********************************************}
+function TALRangeTrackBar.GetMinValue: Single;
+begin
+  result := fMinThumbTrackBar.Value;
 end;
 
 {**********************************************************}
 procedure TALRangeTrackBar.SetMinValue(const Value: Single);
 begin
-  fMinTrackBar.value := Value;
+  fMinThumbTrackBar.value := Value;
+end;
+
+{************************************************************}
+function TALRangeTrackBar.GetOnApplyStyleLookup: TNotifyEvent;
+begin
+  result := fbgTrackBar.OnApplyStyleLookup;
+end;
+
+{**************************************************************************}
+procedure TALRangeTrackBar.SetonApplyStyleLookup(const Value: TNotifyEvent);
+begin
+  fbgTrackBar.OnApplyStyleLookup := Value;
+end;
+
+{*****************************************************}
+function TALRangeTrackBar.GetOrientation: TOrientation;
+begin
+  result := fBGTrackBar.Orientation;
 end;
 
 {*******************************************************************}
 procedure TALRangeTrackBar.SetOrientation(const Value: TOrientation);
 begin
-  fMaxTrackBar.Orientation := Value;
-  fMinTrackBar.Orientation := Value;
+  fBGTrackBar.Orientation := Value;
+  fMaxThumbTrackBar.Orientation := Value;
+  fMinThumbTrackBar.Orientation := Value;
+end;
+
+{***********************************************}
+function TALRangeTrackBar.GetSmallChange: Single;
+begin
+  result := fBGTrackBar.SmallChange;
 end;
 
 {*************************************************************}
 procedure TALRangeTrackBar.SetSmallChange(const Value: Single);
 begin
-  fMaxTrackBar.SmallChange := Value;
-  fMinTrackBar.SmallChange := Value;
+  fBGTrackBar.SmallChange := Value;
+  fMaxThumbTrackBar.SmallChange := Value;
+  fMinThumbTrackBar.SmallChange := Value;
 end;
 
 procedure Register;

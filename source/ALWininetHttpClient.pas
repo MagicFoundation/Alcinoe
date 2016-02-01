@@ -832,7 +832,7 @@ begin
                                       @S[1],
                                       Size,
                                       Downloaded));
-      aResponseContentStream.Write(S[1], Size);
+      aResponseContentStream.Writebuffer(pointer(S)^, Size);
 
       { Receiving Data event }
       inc(ContentlengthDownloaded, Downloaded);

@@ -749,7 +749,7 @@ begin
   P1 := AlPos(#13#10#13#10,aResponseStr);
   if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');
   ResponseHeader.RawHeaderText := AlCopyStr(aResponseStr,1,P1-1);
-  if P1 + 4 <= length(aResponseStr) then ResponseContentStream.Write(aResponseStr[P1 + 4], length(aResponseStr) - P1 - 3);
+  if P1 + 4 <= length(aResponseStr) then ResponseContentStream.WriteBuffer(aResponseStr[P1 + 4], length(aResponseStr) - P1 - 3);
 
 end;
 

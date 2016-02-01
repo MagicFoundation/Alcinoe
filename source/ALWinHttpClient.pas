@@ -742,7 +742,7 @@ begin
                                      @aStr[1],
                                      Size,
                                      Downloaded));
-      aResponseContentStream.Write(aStr[1], Size);
+      aResponseContentStream.WriteBuffer(pointer(aStr)^, Size);
 
       { Receiving Data event }
       inc(ContentlengthDownloaded, Downloaded);

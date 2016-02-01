@@ -867,7 +867,7 @@ var sBuffer: AnsiString;
 begin
   aDataStream.Position := 0;
   SetLength(sBuffer, aDataStream.Size);
-  aDataStream.Read(Pointer(sBuffer)^, aDataStream.Size);
+  aDataStream.ReadBuffer(Pointer(sBuffer)^, aDataStream.Size);
   Decode(sBuffer, aboundary);
 end;
 
@@ -916,7 +916,7 @@ begin
 
       {write the body to the content}
       P2 := P2 + 4;
-      DataStream.Write(aDataStr[P2], P3-P2);
+      DataStream.WriteBuffer(aDataStr[P2], P3-P2);
       DataStream.Position := 0;
 
       {move P1 to the newt boundary}

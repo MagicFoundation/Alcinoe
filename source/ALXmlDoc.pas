@@ -2391,7 +2391,7 @@ Var NodeStack: Tstack;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure WriteBuffer2Stream(const buffer: ansiString; BufferLength: Integer);
   Begin
-    If BufferLength > 0 then stream.Write(buffer[1],BufferLength);
+    If BufferLength > 0 then stream.WriteBuffer(pointer(buffer)^,BufferLength);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}

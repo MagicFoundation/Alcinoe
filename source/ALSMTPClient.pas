@@ -480,7 +480,7 @@ begin
       aHeader.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
       DataStream.Position := 0;
-      DataStream.Read(pointer(str)^,DataStream.Size);
+      DataStream.ReadBuffer(pointer(str)^,DataStream.Size);
     end;
     Result := Data(aHeader.RawHeaderText, Str);
   finally

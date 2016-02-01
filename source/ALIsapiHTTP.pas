@@ -497,11 +497,11 @@ begin
     FcontentStream := TmemoryStream.Create;
     FcontentStream.Size := ECB.cbTotalBytes; // cbTotalBytes The total number of bytes to be received from the client.
                                              // This is equivalent to the CGI variable CONTENT_LENGTH
-    if ECB.cbAvailable > 0 then FcontentStream.Write(ECB.lpbData^, ECB.cbAvailable); // The available number of bytes (out of a total of cbTotalBytes) in the buffer pointed to by lpbData.
-                                                                                     // If cbTotalBytes is the same as cbAvailable, the lpbData variable will point to a buffer that contains
-                                                                                     // all the data as sent by the client. Otherwise, cbTotalBytes will contain the total number of bytes
-                                                                                     // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
-                                                                                     // the rest of the data (beginning from an offset of cbAvailable).
+    if ECB.cbAvailable > 0 then FcontentStream.WriteBuffer(ECB.lpbData^, ECB.cbAvailable); // The available number of bytes (out of a total of cbTotalBytes) in the buffer pointed to by lpbData.
+                                                                                           // If cbTotalBytes is the same as cbAvailable, the lpbData variable will point to a buffer that contains
+                                                                                           // all the data as sent by the client. Otherwise, cbTotalBytes will contain the total number of bytes
+                                                                                           // of data received. The ISAPI extensions will then need to use the callback function ReadClient to read
+                                                                                           // the rest of the data (beginning from an offset of cbAvailable).
     while FcontentStream.Position < FcontentStream.Size do begin
       aByteRead := ReadClient(Pointer(Longint(TMemoryStream(FcontentStream).Memory) + FcontentStream.Position)^, FcontentStream.Size - FcontentStream.Position);
       if aByteRead <= 0 then break;  // The doc of Delphi say "If no more content is available, ReadClient returns -1."

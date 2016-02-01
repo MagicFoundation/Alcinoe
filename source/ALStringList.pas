@@ -5619,7 +5619,11 @@ begin
   try
     Size := Stream.Size - Stream.Position;
     SetLength(Buffer, Size);
+    {$IF CompilerVersion >= 30}{Delphi seattle}
     Stream.ReadBuffer(Buffer, 0, Size);
+    {$else}
+    Stream.Read(Buffer, 0, Size);
+    {$ifend}
     Size := TEncoding.GetBufferEncoding(Buffer, Encoding, FDefaultEncoding);
     SetEncoding(Encoding); // Keep Encoding in case the stream is saved
     SetTextStr(Encoding.GetString(Buffer, Size, Length(Buffer) - Size));

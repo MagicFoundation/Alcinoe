@@ -614,7 +614,7 @@ Begin
             {read the content in Str}
             CurrentHTTPResponseContent.Position := 0;
             SetLength(Str, CurrentHTTPResponseContent.size);
-            CurrentHTTPResponseContent.ReadBuffer(Str[1],CurrentHTTPResponseContent.Size);
+            CurrentHTTPResponseContent.ReadBuffer(pointer(Str)^,CurrentHTTPResponseContent.Size);
 
             {check the mime content type because some server send wrong mime content type}
             IF (FindMimeFromData(
@@ -925,7 +925,7 @@ begin
   {put the content in str}
   HttpResponseContent.Position := 0;
   SetLength(Str, HttpResponseContent.size);
-  HttpResponseContent.ReadBuffer(Str[1],HttpResponseContent.Size);
+  HttpResponseContent.ReadBuffer(pointer(Str)^,HttpResponseContent.Size);
 
   {we add a check here to be sure that the file is an http file (text file}
   {Some server send image with text/htm content type}

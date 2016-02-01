@@ -1460,7 +1460,7 @@ begin
       HeaderContent.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
       DataStream.Position := 0;
-      DataStream.Read(str[1],DataStream.Size);
+      DataStream.ReadBuffer(pointer(str)^,DataStream.Size);
     end;
     Post(Headercontent.RawHeaderText, Str);
   finally

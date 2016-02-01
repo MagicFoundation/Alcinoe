@@ -1974,14 +1974,14 @@ begin
   InStream := TMemoryStream.Create;
   OutStream := TMemoryStream.Create;
   try
-    InStream.Write(InString[1], Length(InString));
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
     InStream.Position := 0;
 
     if Encrypt then ALBFEncryptStream(InStream, OutStream, Key, True)
     else ALBFEncryptStream(InStream, OutStream, Key, False);
     OutStream.Position := 0;
     SetLength(Result, OutStream.Size);
-    OutStream.Read(Result[1], OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
   finally
     InStream.Free;
     OutStream.Free;
@@ -1999,14 +1999,14 @@ begin
   InStream := TMemoryStream.Create;
   OutStream := TMemoryStream.Create;
   Try
-    InStream.Write(InString[1], Length(InString));
+    InStream.WriteBuffer(Pointer(InString)^, Length(InString));
     InStream.Position := 0;
 
     if Encrypt then ALBFEncryptStreamCBC(InStream, OutStream, Key, True)
     else ALBFEncryptStreamCBC(InStream, OutStream, Key, False);
     OutStream.Position := 0;
     SetLength(Result, OutStream.Size);
-    OutStream.Read(Result[1], OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
   finally
     InStream.Free;
     OutStream.Free;
@@ -2072,7 +2072,7 @@ begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
       raise EALCipherException.Create(cAlCryptInvalidFileFormat);
     ALCipherEncryptBF(Context, Block, Encrypt);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
 
   if Encrypt then begin
@@ -2088,7 +2088,7 @@ begin
 
     {encrypt and save full block}
     ALCipherEncryptBF(Context, Block, Encrypt);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
@@ -2099,7 +2099,7 @@ begin
     I := PByteArray(@Block)^[SizeOf(Block)-1];
 
     {save valid portion of block}
-    OutStream.Write(Block, I);
+    OutStream.WriteBuffer(Block, I);
   end;
 end;
 
@@ -2123,11 +2123,11 @@ begin
     Block[0] := timeGetTime;
     Block[1] := timeGetTime;
     ALCipherEncryptBF(Context, Block, Encrypt);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
     IV := Block;
   end else begin
     {read the frist block to prime the IV}
-    InStream.Read(Block, SizeOf(Block));
+    InStream.ReadBuffer(Block, SizeOf(Block));
     Dec(BlockCount);
     IV := Block;
   end;
@@ -2151,7 +2151,7 @@ begin
       IV := Work;
     end;
 
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
 
   if Encrypt then begin
@@ -2167,7 +2167,7 @@ begin
 
     {encrypt and save full block}
     ALCipherEncryptBFCBC(Context, IV, Block, Encrypt);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
@@ -2178,7 +2178,7 @@ begin
     I := PByteArray(@Block)^[SizeOf(Block)-1];
 
     {save valid portion of block}
-    OutStream.Write(Block, I);
+    OutStream.WriteBuffer(Block, I);
   end;
 end;
 
@@ -2296,14 +2296,14 @@ begin
   InStream := TMemoryStream.Create;
   OutStream := TMemoryStream.Create;
   try
-    InStream.Write(InString[1], Length(InString));
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
     InStream.Position := 0;
 
     if Encrypt then AlRDLEncryptStream(InStream, OutStream, Key, KeySize, True)
     else AlRDLEncryptStream(InStream, OutStream, Key, KeySize, False);
     OutStream.Position := 0;
     SetLength(Result, OutStream.Size);
-    OutStream.Read(Result[1], OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
   finally
     InStream.Free;
     OutStream.Free;
@@ -2322,14 +2322,14 @@ begin
   InStream := TMemoryStream.Create;
   OutStream := TMemoryStream.Create;
   Try
-    InStream.Write(InString[1], Length(InString));
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
     InStream.Position := 0;
 
     if Encrypt then AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, True)
     else AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, False);
     OutStream.Position := 0;
     SetLength(Result, OutStream.Size);
-    OutStream.Read(Result[1], OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
   finally
     InStream.Free;
     OutStream.Free;
@@ -2395,7 +2395,7 @@ begin
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
       raise EALCipherException.Create(cALCryptInvalidFileFormat);
     ALCipherEncryptRDL(Context, Block);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
 
   if Encrypt then begin
@@ -2411,7 +2411,7 @@ begin
 
     {encrypt and save full block}
     ALCipherEncryptRDL(Context, Block);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
@@ -2422,7 +2422,7 @@ begin
     I := PByteArray(@Block)^[SizeOf(Block)-1];
 
     {save valid portion of block}
-    OutStream.Write(Block, I);
+    OutStream.WriteBuffer(Block, I);
   end;
 end;
 
@@ -2446,11 +2446,11 @@ begin
     Block[0] := timeGetTime;
     Block[1] := timeGetTime;
     ALCipherEncryptRDL(Context, Block);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
     IV := Block;
   end else begin
     {read the frist block to prime the IV}
-    InStream.Read(Block, SizeOf(Block));
+    InStream.ReadBuffer(Block, SizeOf(Block));
     Dec(BlockCount);
     IV := Block;
   end;
@@ -2474,7 +2474,7 @@ begin
       IV := Work;
     end;
 
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end;
 
   if Encrypt then begin
@@ -2490,7 +2490,7 @@ begin
 
     {encrypt and save full block}
     ALCipherEncryptRDLCBC(Context, IV, Block);
-    OutStream.Write(Block, SizeOf(Block));
+    OutStream.WriteBuffer(Block, SizeOf(Block));
   end else begin
     {encrypted file is always a multiple of the block size}
     if InStream.Read(Block, SizeOf(Block)) <> SizeOf(Block) then
@@ -2501,7 +2501,7 @@ begin
     I := PByteArray(@Block)^[SizeOf(Block)-1];
 
     {save valid portion of block}
-    OutStream.Write(Block, I);
+    OutStream.WriteBuffer(Block, I);
   end;
 end;
 

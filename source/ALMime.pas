@@ -93,9 +93,14 @@ function ALMimeEncodeString(const S: AnsiString): AnsiString;
 function ALMimeEncodeStringNoCRLF(const S: AnsiString): AnsiString;
 function ALMimeDecodeString(const S: AnsiString): AnsiString;
 {$ENDIF}
-function ALMimeEncodeStringU(const S: String): String;
-function ALMimeEncodeStringNoCRLFU(const S: String): String;
-function ALMimeDecodeStringU(const S: String): String;
+function ALMimeEncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;  // AEncoding = how the 16 bits string will be encoded in 8 bits string to be later encoded via base64 (who only support 8 bits string)
+function ALMimeEncodeStringNoCRLFU(const S: String; const AEncoding: TEncoding = nil): String;  // AEncoding = how the 16 bits string will be encoded in 8 bits string to be later encoded via base64 (who only support 8 bits string)
+function ALMimeDecodeStringU(const S: String; const AEncoding: TEncoding = nil): String; // AEncoding = how the 8 bits string returned by the output of the base64 will be encoded in 16 bits string.
+//------
+function ALMimeEncodeBytesU(const Bytes: Tbytes): String;
+function ALMimeEncodeBytesNoCRLFU(const Bytes: Tbytes): String;
+function ALMimeDecodeBytesU(const S: String): Tbytes;
+
 
 function ALMimeEncodedSize(const InputSize: ALSizeInt): ALSizeInt;
 function ALMimeEncodedSizeNoCRLF(const InputSize: ALSizeInt): ALSizeInt;
@@ -339,8 +344,8 @@ begin
 end;
 {$ENDIF}
 
-{****************************************************}
-function ALMimeEncodeStringU(const S: String): String;
+{**************************************************************************************}
+function ALMimeEncodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
 var
   L: ALSizeInt;
   BufIn: TBytes;
@@ -348,18 +353,19 @@ var
 begin
   if S <> '' then
   begin
-    BufIn := TEncoding.UTF8.GetBytes(S);
+    if assigned(AEncoding) then BufIn := AEncoding.GetBytes(S)
+    else BufIn := TEncoding.unicode.GetBytes(S);
     L := Length(BufIn);
     SetLength(BufOut, ALMimeEncodedSize(L));
     ALMimeEncode(BufIn[0], L, BufOut[0]);
-    result := TEncoding.UTF8.GetString(BufOut);
+    result := TEncoding.UTF8.GetString(BufOut); // BufOut must contain only low ascii chars with are compatible with UTF8 (i could also take ASCII)
   end
   else
     Result := '';
 end;
 
-{**********************************************************}
-function ALMimeEncodeStringNoCRLFU(const S: String): String;
+{********************************************************************************************}
+function ALMimeEncodeStringNoCRLFU(const S: String; const AEncoding: TEncoding = nil): String;
 var
   L: ALSizeInt;
   BufIn: TBytes;
@@ -367,18 +373,19 @@ var
 begin
   if S <> '' then
   begin
-    BufIn := TEncoding.UTF8.GetBytes(S);
+    if assigned(AEncoding) then BufIn := AEncoding.GetBytes(S)
+    else BufIn := TEncoding.unicode.GetBytes(S);
     L := Length(BufIn);
     SetLength(BufOut, ALMimeEncodedSizeNoCRLF(L));
     ALMimeEncodeNoCRLF(BufIn[0], L, BufOut[0]);
-    result := TEncoding.UTF8.GetString(BufOut);
+    result := TEncoding.UTF8.GetString(BufOut);  // BufOut must contain only low ascii chars with are compatible with UTF8 (i could also take ASCII)
   end
   else
     Result := '';
 end;
 
-{****************************************************}
-function ALMimeDecodeStringU(const S: String): String;
+{**************************************************************************************}
+function ALMimeDecodeStringU(const S: String; const AEncoding: TEncoding = nil): String;
 var
   ByteBuffer, ByteBufferSpace: Cardinal;
   L: ALSizeInt;
@@ -387,7 +394,7 @@ var
 begin
   if S <> '' then
   begin
-    BufIn := TEncoding.UTF8.GetBytes(S);
+    BufIn := TEncoding.utf8.GetBytes(S); // BufIn must contain only low ascii chars with are compatible with UTF8 (i could also take ASCII)
     L := Length(BufIn);
     SetLength(BufOut, ALMimeDecodedSize(L));
     ByteBuffer := 0;
@@ -395,10 +402,67 @@ begin
     L := ALMimeDecodePartial(BufIn[0], L, BufOut[0], ByteBuffer, ByteBufferSpace);
     Inc(L, ALMimeDecodePartialEnd(BufOut[L], ByteBuffer, ByteBufferSpace));
     SetLength(BufOut, L);
-    result := TEncoding.UTF8.GetString(BufOut);
+    if assigned(AEncoding) then result := AEncoding.GetString(BufOut)
+    else result := TEncoding.unicode.GetString(BufOut);
   end
   else
     Result := '';
+end;
+
+{*******************************************************}
+function ALMimeEncodeBytesU(const Bytes: Tbytes): String;
+var
+  L: ALSizeInt;
+  BufOut: TBytes;
+begin
+  L := Length(Bytes);
+  if L > 0 then
+  begin
+    SetLength(BufOut, ALMimeEncodedSize(L));
+    ALMimeEncode(Bytes[0], L, BufOut[0]);
+    result := TEncoding.UTF8.GetString(BufOut); // BufOut must contain only low ascii chars with are compatible with UTF8 (i could also take ASCII)
+  end
+  else
+    Result := '';
+end;
+
+{*************************************************************}
+function ALMimeEncodeBytesNoCRLFU(const Bytes: Tbytes): String;
+var
+  L: ALSizeInt;
+  BufOut: TBytes;
+begin
+  L := Length(Bytes);
+  if L > 0 then
+  begin
+    SetLength(BufOut, ALMimeEncodedSizeNoCRLF(L));
+    ALMimeEncodeNoCRLF(Bytes[0], L, BufOut[0]);
+    result := TEncoding.UTF8.GetString(BufOut);  // BufOut must contain only low ascii chars with are compatible with UTF8 (i could also take ASCII)
+  end
+  else
+    Result := '';
+end;
+
+{***************************************************}
+function ALMimeDecodeBytesU(const S: String): Tbytes;
+var
+  ByteBuffer, ByteBufferSpace: Cardinal;
+  L: ALSizeInt;
+  BufIn: TBytes;
+begin
+  if S <> '' then
+  begin
+    BufIn := TEncoding.utf8.GetBytes(S); // BufIn must contain only low ascii chars with are compatible with UTF8 (i could also take ASCII)
+    L := Length(BufIn);
+    SetLength(result, ALMimeDecodedSize(L));
+    ByteBuffer := 0;
+    ByteBufferSpace := 4;
+    L := ALMimeDecodePartial(BufIn[0], L, result[0], ByteBuffer, ByteBufferSpace);
+    Inc(L, ALMimeDecodePartialEnd(result[L], ByteBuffer, ByteBufferSpace));
+    SetLength(result, L);
+  end
+  else
+    setlength(result, 0);
 end;
 
 {*****************}
@@ -942,7 +1006,7 @@ begin
   while BytesRead = Length(InputBuffer) do
   begin
     ALMimeEncodeFullLines(InputBuffer, Length(InputBuffer), OutputBuffer);
-    OutputStream.Write(OutputBuffer, Length(OutputBuffer));
+    OutputStream.WriteBuffer(OutputBuffer, Length(OutputBuffer));
     BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
   end;
 
@@ -959,7 +1023,7 @@ begin
 
   ALMimeEncodeNoCRLF(I^, BytesRead - IDelta, O^);
 
-  OutputStream.Write(OutputBuffer, ALMimeEncodedSize(BytesRead));
+  OutputStream.WriteBuffer(OutputBuffer, ALMimeEncodedSize(BytesRead));
 end;
 
 {******************************************************************************************}
@@ -975,12 +1039,12 @@ begin
   while BytesRead = Length(InputBuffer) do
   begin
     ALMimeEncodeNoCRLF(InputBuffer, Length(InputBuffer), OutputBuffer);
-    OutputStream.Write(OutputBuffer, Length(OutputBuffer));
+    OutputStream.WriteBuffer(OutputBuffer, Length(OutputBuffer));
     BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
   end;
 
   ALMimeEncodeNoCRLF(InputBuffer, BytesRead, OutputBuffer);
-  OutputStream.Write(OutputBuffer, ALMimeEncodedSizeNoCRLF(BytesRead));
+  OutputStream.WriteBuffer(OutputBuffer, ALMimeEncodedSizeNoCRLF(BytesRead));
 end;
 
 {************************************************************************************}
@@ -998,10 +1062,10 @@ begin
 
   while BytesRead > 0 do
   begin
-    OutputStream.Write(OutputBuffer, ALMimeDecodePartial(InputBuffer, BytesRead, OutputBuffer, ByteBuffer, ByteBufferSpace));
+    OutputStream.WriteBuffer(OutputBuffer, ALMimeDecodePartial(InputBuffer, BytesRead, OutputBuffer, ByteBuffer, ByteBufferSpace));
     BytesRead := InputStream.Read(InputBuffer, Length(InputBuffer));
   end;
-  OutputStream.Write(OutputBuffer, ALMimeDecodePartialEnd(OutputBuffer, ByteBuffer, ByteBufferSpace));
+  OutputStream.WriteBuffer(OutputBuffer, ALMimeDecodePartialEnd(OutputBuffer, ByteBuffer, ByteBufferSpace));
 end;
 
 {$IFNDEF NEXTGEN}

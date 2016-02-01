@@ -469,9 +469,9 @@ function ALTryStringToSet(TypeInfo: PTypeInfo; const Value: ansistring; Var SetI
 function ALTryStringToSet(PropInfo: PPropInfo; const Value: ansistring; Var SetInt: Integer): Boolean; overload;
 function ALStringToSet(TypeInfo: PTypeInfo; const Value: ansistring): Integer; overload;
 function ALStringToSet(PropInfo: PPropInfo; const Value: ansistring): Integer; overload;
-function ALGetRttiType(const aClassName: AnsiString): TALRttiType; overload;
-function ALGetRttiType(const aTypeInfo: PTypeInfo): TALRttiType; overload;
-procedure ALRttiInitialization;
+function ALGetRttiType(const aQualifiedName: AnsiString): TALRttiType;
+procedure ALRttiInitialization(const aQualifiedNameToSkip: array of AnsiString); overload;
+procedure ALRttiInitialization; overload;
 procedure ALRttiFinalization;
 
 {*******************************}
@@ -833,7 +833,16 @@ constructor TALRttiField.Create(const aRttiField: TRttiField);
 begin
   inherited create(aRttiField);
   fRttiField := aRttiField;
-  if assigned(aRttiField.FieldType) then fFieldType := ALGetRttiType(aRttiField.FieldType.Handle)
+  //ENonPublicType look like :TALFormatSettings.:1
+  //This will raise an exception in QualifiedName
+  //function TRttiType.GetQualifiedName: string;
+  //begin
+  //  Result := Package.GetNameFromType(Self);
+  //  if Result = '' then
+  //    raise ENonPublicType.CreateResFmt(@SNonPublicType, [Name]);
+  //end;
+  if assigned(aRttiField.FieldType) and
+     (alpos(':',aRttiField.FieldType.Handle.Name) <> 1) then fFieldType := ALGetRttiType(ansiString(aRttiField.FieldType.QualifiedName))
   else fFieldType := nil;
   fOffset := aRttiField.Offset;
 end;
@@ -855,7 +864,7 @@ constructor TALRttiProperty.Create(const aRttiProperty: TRttiProperty);
 begin
   inherited create(aRttiProperty);
   fRttiProperty := aRttiProperty;
-  if assigned(aRttiProperty.PropertyType) then fPropertyType := ALGetRttiType(aRttiProperty.PropertyType.Handle)
+  if assigned(aRttiProperty.PropertyType) then fPropertyType := ALGetRttiType(ansiString(aRttiProperty.PropertyType.QualifiedName))
   else fPropertyType := nil;
   fIsReadable := aRttiProperty.IsReadable;
   fIsWritable := aRttiProperty.IsWritable;
@@ -888,7 +897,7 @@ constructor TALRttiParameter.Create(const aRttiParameter: TRttiParameter);
 begin
   inherited create(aRttiParameter);
   FFlags := aRttiParameter.Flags;
-  if assigned(aRttiParameter.ParamType) then fParamType := ALGetRttiType(aRttiParameter.ParamType.Handle)
+  if assigned(aRttiParameter.ParamType) then fParamType := ALGetRttiType(ansiString(aRttiParameter.ParamType.QualifiedName))
   else fParamType := nil;
 end;
 
@@ -908,18 +917,21 @@ begin
   setlength(fRttiParameters, length(aRttiParameters));
   for I := Low(aRttiParameters) to High(aRttiParameters) do
     fRttiParameters[i] := TALRttiParameter.Create(aRttiParameters[i]);
-  if assigned(aRttiMethod.ReturnType) then fReturnType := ALGetRttiType(aRttiMethod.ReturnType.Handle)
+  if aRttiMethod.HasExtendedInfo and
+     assigned(aRttiMethod.ReturnType) then fReturnType := ALGetRttiType(ansiString(aRttiMethod.ReturnType.QualifiedName))
   else fReturnType := nil;
   fCodeAddress := aRttiMethod.CodeAddress;
   fIsConstructor := aRttiMethod.IsConstructor;
   fIsDestructor := aRttiMethod.IsDestructor;
   fHasExtendedInfo := aRttiMethod.HasExtendedInfo;
-  fMethodKind := aRttiMethod.MethodKind;
+  if aRttiMethod.HasExtendedInfo then
+    fMethodKind := aRttiMethod.MethodKind;
   fDispatchKind := aRttiMethod.DispatchKind;
   fIsClassMethod := aRttiMethod.IsClassMethod;
   fIsStatic := aRttiMethod.IsStatic;
   fVirtualIndex := aRttiMethod.VirtualIndex;
-  fCallingConvention := aRttiMethod.CallingConvention;
+  if aRttiMethod.HasExtendedInfo then
+    fCallingConvention := aRttiMethod.CallingConvention;
 end;
 
 {*******************************}
@@ -975,7 +987,7 @@ constructor TALRttiIndexedProperty.Create(const aRTTIIndexedProperty: TRttiIndex
 begin
   inherited create(aRTTIIndexedProperty);
   fRTTIIndexedProperty := aRTTIIndexedProperty;
-  if assigned(aRTTIIndexedProperty.PropertyType) then fPropertyType := ALGetRttiType(aRTTIIndexedProperty.PropertyType.Handle)
+  if assigned(aRTTIIndexedProperty.PropertyType) then fPropertyType := ALGetRttiType(ansiString(aRTTIIndexedProperty.PropertyType.QualifiedName))
   else fPropertyType := nil;
   if assigned(aRTTIIndexedProperty.ReadMethod) then fReadMethod := TALRttiMethod.Create(aRTTIIndexedProperty.ReadMethod)
   else fReadMethod := nil;
@@ -1266,9 +1278,9 @@ begin
   fIsRecord := aRttiType.IsRecord;
   fIsSet := aRttiType.IsSet;
   fIsInstance := aRttiType.IsInstance;
-  if IsOrdinal and assigned(aRttiType.AsOrdinal) then fAsOrdinal := TALRttiOrdinalType(ALGetRttiType(aRttiType.AsOrdinal.Handle))
+  if IsOrdinal and assigned(aRttiType.AsOrdinal) then fAsOrdinal := TALRttiOrdinalType(ALGetRttiType(ansiString(aRttiType.AsOrdinal.QualifiedName)))
   else fAsOrdinal := nil;
-  if isSet and assigned(aRttiType.AsSet) then fAsSet := TALRttiSetType(ALGetRttiType(aRttiType.AsSet.Handle))
+  if isSet and assigned(aRttiType.AsSet) then fAsSet := TALRttiSetType(ALGetRttiType(ansiString(aRttiType.AsSet.QualifiedName)))
   else fAsSet := nil;
   //-----
   setlength(fPrivateIndexedProperties, 0);
@@ -1522,24 +1534,20 @@ begin
   Result := nil;
 end;
 
-{****************************************************************}
-function ALGetRttiType(const aClassName: AnsiString): TALRttiType;
+{********************************************************************}
+function ALGetRttiType(const aQualifiedName: AnsiString): TALRttiType;
 begin
-  if not vALRttiTypeCache.TryGetValue(aClassName, result) then raise EALException.CreateFmt('Cannot obtain RTTI informations about the class %s', [aClassName]);
+  if not vALRttiTypeCache.TryGetValue(aQualifiedName, result) then
+    raise EALException.CreateFmt('Cannot obtain RTTI informations about the class %s', [aQualifiedName]);
 end;
 
-{**************************************************************}
-function ALGetRttiType(const aTypeInfo: PTypeInfo): TALRttiType;
-begin
-  result := ALGetRttiType(aTypeInfo.Name);
-end;
-
-{*****************************}
-procedure ALRttiInitialization;
+{******************************************************************************}
+procedure ALRttiInitialization(const aQualifiedNameToSkip: array of AnsiString);
 var aRttiTypes: TArray<TRttiType>;
-    aRttiField: TRttiField;
     aRttiType: TALRttiType;
-    i: integer;
+    aQualifiedName: AnsiString;
+    aContinue: Boolean;
+    i, j: integer;
 begin
 
   //create vALRTTIContext
@@ -1553,34 +1561,37 @@ begin
 
   //first loop to create all the node inside _RttiTypeCache
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    if not vALRttiTypeCache.ContainsKey(aRttiTypes[i].Handle.Name) then begin
-      if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
-      else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
-      else aRttiType := TALRttiType.Create;
-      vALRttiTypeCache.Add(aRttiTypes[i].Handle.Name, aRttiType);
-    end;
-  end;
-
-  //second loop to handle strange name present in field like :TALFormatSettings.:1
-  for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    for aRttiField in aRttiTypes[i].GetFields do begin
-      if assigned(aRttiField.FieldType) then begin
-        if not vALRttiTypeCache.ContainsKey(aRttiField.FieldType.Handle.Name) then begin
-          if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
-          else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
-          else aRttiType := TALRttiType.Create;
-          vALRttiTypeCache.Add(aRttiField.FieldType.Handle.Name, aRttiType);
-        end;
+    aContinue := True;
+    aQualifiedName := ansiString(aRttiTypes[i].QualifiedName);
+    for j := Low(aQualifiedNameToSkip) to High(aQualifiedNameToSkip) do begin
+      if ALMatchesMask(aQualifiedName, aQualifiedNameToSkip[j]) then begin
+        aContinue := False;
+        break;
       end;
+    end;
+    if aContinue then begin
+      if not vALRttiTypeCache.ContainsKey(aQualifiedName) then begin
+        if aRttiTypes[i] is TRttiOrdinalType then aRttiType := TALRttiOrdinalType.Create
+        else if aRttiTypes[i] is TRttiSetType then aRttiType := TALRttiSetType.Create
+        else aRttiType := TALRttiType.Create;
+        vALRttiTypeCache.Add(aQualifiedName, aRttiType);
+      end
+      else raise Exception.Create('Error 3A680CE4-FB3F-4C9C-8717-EA5FFB0BBFF6'); // not possible error
     end;
   end;
 
   //3rd loop to init all the fRttiType inside each node of _RttiTypeCache
   for I := Low(aRttiTypes) to High(aRttiTypes) do begin
-    if vALRttiTypeCache.TryGetValue(aRttiTypes[i].Handle.Name, aRttiType)
-      then aRttiType.init(aRttiTypes[i]);
+    if vALRttiTypeCache.TryGetValue(ansiString(aRttiTypes[i].QualifiedName), aRttiType) then
+      aRttiType.init(aRttiTypes[i]);
   end;
 
+end;
+
+{*****************************}
+procedure ALRttiInitialization;
+begin
+  ALRttiInitialization([]);
 end;
 
 {***************************}

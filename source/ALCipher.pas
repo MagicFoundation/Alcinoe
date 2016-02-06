@@ -75,14 +75,17 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
+
+uses {$IFNDEF NEXTGEN}
+     system.sysutils,
      Winapi.Windows,
      System.Classes,
-     {$ELSE}
-     Windows,
-     Classes,
-     {$IFEND}
      ALString;
+     {$ELSE}
+     system.sysutils;
+     {$ENDIF}
+
+{$IFNDEF NEXTGEN}
 
 const
 
@@ -283,6 +286,7 @@ function  ALStringHashELF(const Str : AnsiString): LongInt; overload;
 procedure ALStringHashMix128(var Digest : LongInt; const Str : AnsiString); overload;
 function  ALStringHashMix128(const Str : AnsiString): LongInt; overload;
 
+{$ENDIF}
 
  //http://blog.synopse.info/post/2014/05/25/New-crc32c%28%29-function-using-optimized-asm-and-SSE-4.2-instruction
  //In fact, most popular file formats and protocols (Ethernet, MPEG-2, ZIP, RAR,
@@ -298,12 +302,21 @@ var
   // - tables content is created from code in initialization section below
   ALCrc32ctab: array[0..{$ifdef WIN64}3{$else}7{$endif},byte] of cardinal;
 
+{$IFNDEF NEXTGEN}
+
 /// compute CRC32C checksum on the supplied buffer using x86/x64 code
 // - result is compatible with SSE 4.2 based hardware accelerated instruction
 // - result is not compatible with zlib's crc32() - not the same polynom
 // - ALCrc32cfast() is 1.7 GB/s, ALCrc32csse42() is 3.7 GB/s
 function ALCrc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
 function ALCrc32cfast_2(Const str: AnsiString): cardinal;
+
+{$ENDIF}
+
+function ALCrc32cfastBytes(crc: cardinal; buf: Pbyte; len: cardinal): cardinal; overload;
+function ALStringHashCrc32U(Const str: string; Const encoding: Tencoding): cardinal; overload;
+
+{$IFNDEF NEXTGEN}
 
 var
   /// the available CPU features, as recognized at program startup
@@ -336,17 +349,16 @@ var
   // - you should use this function instead of ALCrc32cfast() nor ALCrc32csse42()
   ALStringHashCrc32: TALStringHashCrc32;
 
+{$ENDIF}
+
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     system.sysutils,
-     winapi.MMSystem,
+{$IFNDEF NEXTGEN}
+uses winapi.MMSystem,
      system.Math;
-     {$ELSE}
-     sysutils,
-     MMSystem,
-     Math;
-     {$IFEND}
+{$ENDIF}
+
+{$IFNDEF NEXTGEN}
 
 type
   pALCipherMD5ContextEx = ^TALCipherMD5ContextEx;
@@ -3119,12 +3131,57 @@ begin
   PIntegerArray(@ALCpuFeatures)^[1] := regs.ecx;
 end;
 
+{$ENDIF}
+
+{*****************************************************************************}
+function ALCrc32cfastBytes(crc: cardinal; buf: Pbyte; len: cardinal): cardinal;
+type
+  _PtrUInt = {$ifdef UNICODE}NativeUInt{$else}cardinal{$endif};
+begin
+  result := not crc;
+  if (buf<>nil) and (len>0) then begin
+    repeat
+      if _PtrUInt(buf) and 3=0 then // align to 4 bytes boundary
+        break;
+      result := ALCrc32ctab[0,Byte(result xor buf^)] xor (result shr 8);
+      dec(len);
+      inc(buf);
+    until len=0;
+    while len>=4 do begin
+      result := result xor PCardinal(buf)^;
+      inc(buf,4);
+      result := ALCrc32ctab[3,Byte(result)] xor
+                ALCrc32ctab[2,Byte(result shr 8)] xor
+                ALCrc32ctab[1,Byte(result shr 16)] xor
+                ALCrc32ctab[0,result shr 24];
+      dec(len,4);
+    end;
+    while len>0 do begin
+      result := ALCrc32ctab[0,Byte(result xor buf^)] xor (result shr 8);
+      dec(len);
+      inc(buf);
+    end;
+  end;
+  result := not result;
+end;
+
+
+{**********************************************************************************}
+function ALStringHashCrc32U(Const str: String; Const encoding: Tencoding): cardinal;
+var abytes: Tbytes;
+begin
+ aBytes := encoding.GetBytes(str);
+ Result:=ALCrc32cfastBytes(0, pbyte(@aBytes[0]), Length(aBytes));
+end;
+
 {********************}
 procedure _InitCipher;
 var i,n: integer;
     crc: cardinal;
 begin
+  {$IFNDEF NEXTGEN}
   _TestIntelCpuFeatures;
+  {$ENDIF}
   // initialize tables for crc32cfast()
   for i := 0 to 255 do begin
     crc := i;
@@ -3141,10 +3198,12 @@ begin
       ALCrc32ctab[n,i] := crc;
     end;
   end;
+  {$IFNDEF NEXTGEN}
   if cfSSE42 in ALCpuFeatures then begin
     ALStringHashCrc32 := @ALCrc32csse42_2;
   end else
     ALStringHashCrc32 := @ALCrc32cfast_2;
+  {$ENDIF}
 end;
 
 initialization

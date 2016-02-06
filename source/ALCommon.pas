@@ -65,6 +65,7 @@ interface
 {$IFEND}
 
 Function AlBoolToInt(Value:Boolean):Integer;
+Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 {$IFDEF MSWINDOWS}
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
@@ -99,6 +100,12 @@ Function AlBoolToInt(Value:Boolean):Integer;
 Begin
   If Value then result := 1
   else result := 0;
+end;
+
+{******************************************}
+Function AlIntToBool(Value:integer):boolean;
+begin
+  result := Value <> 0;
 end;
 
 {***************************************************************}

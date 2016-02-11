@@ -259,7 +259,13 @@ begin
   //   TbuttonStyleObject
 
   if assigned(TALRangeTrackBar(Parent).onThumbApplyStyleLookup) then
-    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender)
+    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender);
+
+  if (value >= fMaxThumbTrackBar.Max) and
+     (assigned(Thumb)) then BringToFront
+  else if (value <= Min) and
+          (assigned(fMaxThumbTrackBar.Thumb)) then fMaxThumbTrackBar.BringToFront;
+
 
 end;
 
@@ -351,7 +357,12 @@ begin
   //   TbuttonStyleObject
 
   if assigned(TALRangeTrackBar(Parent).onThumbApplyStyleLookup) then
-    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender)
+    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender);
+
+  if (value <= fMinThumbTrackBar.min) and
+     (assigned(Thumb)) then BringToFront
+  else if (value >= max) and
+          (assigned(fMinThumbTrackBar.Thumb)) then fMinThumbTrackBar.BringToFront;
 
 end;
 

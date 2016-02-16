@@ -70,6 +70,9 @@ interface
 {.$V-} {Var-String Checking}
 {.$B-} {Complete Boolean Evaluation}
 {.$I+} {Input/Output-Checking}
+{$IFNDEF CPUX86}
+  {$O-} {Optimisation} // With Optimisation the result of ALRDLEncryptStringCBC is wrong under WIN64 :(
+{$ENDIF}
 
 {$IF CompilerVersion >= 25} {Delphi XE4}
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)

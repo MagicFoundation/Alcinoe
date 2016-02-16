@@ -65,6 +65,15 @@ uses System.Rtti,
 
 {$R-}
 
+// http://docwiki.embarcadero.com/RADStudio/en/Conditional_compilation_(Delphi)
+// http://docwiki.embarcadero.com/RADStudio/en/Compiler_Versions
+{$IFDEF CPUX86}
+  {$DEFINE X86ASM}
+{$ELSE !CPUX86}
+  {$DEFINE PUREPASCAL}
+  {$DEFINE PUREPASCAL_X64ONLY}
+{$ENDIF !CPUX86}
+
 Type
 
   {******************}
@@ -531,7 +540,7 @@ begin
     begin
       P := PByte(P) + 1;
       SetLength(Result, Len);
-      Move(PByte(P)^, Result[1], Len);
+      Move(PByte(P)^, pointer(Result)^, Len);
     end
     else result := '';
 
@@ -552,6 +561,24 @@ end;
 
 {*******************************************************************************}
 function _GetEnumNameValue(TypeInfo: PTypeInfo; const Name: AnsiString): Integer;
+{$IFDEF PUREPASCAL}
+var
+  TypeData: PTypeData;
+  LName: PByte;
+  LStr: ansiString;
+  I: Integer;
+begin
+  TypeData := GetTypeData(GetTypeData(TypeInfo)^.BaseType^);
+  LName := PByte(@TypeData.NameList);
+  for i := 0 to TypeData.MaxValue do begin
+    setlength(LStr, LName^);
+    ALMove(pointer(LName+1)^, pointer(LStr)^, LName^);
+    if ALSameText(LStr, Name) then Exit(I);
+    inc(LName, LName^ + 1);
+  end;
+  Result := -1;
+end;
+{$ELSE  PUREPASCAL}
 asm //StackAligned
         { ->    EAX Pointer to type info        }
         {       EDX Pointer to string           }
@@ -642,6 +669,7 @@ asm //StackAligned
         POP     ESI
         POP     EBX
 end;
+{$ENDIF}
 
 {*******************************************************************************************************}
 function ALTryGetEnumValue(TypeInfo: PTypeInfo; const Name: ansistring; Var EnumValue: Integer): boolean;

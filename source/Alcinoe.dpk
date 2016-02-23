@@ -35,7 +35,9 @@ requires
 
 contains
   ALFmxRangeTrackBar in 'ALFmxRangeTrackBar.pas',
-  ALFmxScrollBox in 'ALFmxScrollBox.pas';
+  ALFmxScrollBox in 'ALFmxScrollBox.pas',
+  ALFmxRectangle in 'ALFmxRectangle.pas',
+  ALFmxText in 'ALFmxText.pas';
 
 end.
 

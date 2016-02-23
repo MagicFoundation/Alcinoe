@@ -1,0 +1,196 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  ClientHeight = 801
+  ClientWidth = 320
+  Quality = HighQuality
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object ALVertScrollBox1: TALVertScrollBox
+    Align = Client
+    Size.Width = 320.000000000000000000
+    Size.Height = 801.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Viewport.Width = 320.000000000000000000
+    Viewport.Height = 801.000000000000000000
+    object Button1: TButton
+      Align = Top
+      CanFocus = False
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 57.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Demo with Delphi Firemonkey Controls'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button1Click
+    end
+    object Button2: TButton
+      Align = Top
+      CanFocus = False
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Demo with Alcinoe Firemonkey Controls'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button2Click
+    end
+    object Button15: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 520.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 9
+      Text = 'Bench TALText Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button15Click
+    end
+    object Button4: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 155.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 4
+      Text = 'Bench TRectangle (stroke + corners) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button4Click
+    end
+    object Text1: TText
+      Align = Top
+      Position.Y = 196.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button5: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 106.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 7
+      Text = 'Bench TALRectangle (stroke + corners) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button255Click
+    end
+    object Text3: TText
+      Align = Top
+      Position.Y = 561.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button3: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 609.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 8
+      Text = 'Bench TText Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button3Click
+    end
+    object Text4: TText
+      Align = Top
+      Position.Y = 650.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button6: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 244.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 6
+      Text = 'Bench TALRectangle (stroke) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button6Click
+    end
+    object Button7: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 293.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'Bench TRectangle (stroke) Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button7Click
+    end
+    object Text2: TText
+      Align = Top
+      Position.Y = 334.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+    object Button8: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 382.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Text = 'Bench TALRectangle Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button8Click
+    end
+    object Button9: TButton
+      Align = Top
+      ClipParent = True
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 431.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      Text = 'Bench TRectangle Paint'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button9Click
+    end
+    object Text5: TText
+      Align = Top
+      Position.Y = 472.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
+    end
+  end
+end

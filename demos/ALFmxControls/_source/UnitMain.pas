@@ -51,7 +51,7 @@ type
     Button1: TButton;
     Button2: TButton;
     Button15: TButton;
-    ALVertScrollBox1: TALVertScrollBox;
+    ALVertScrollBox1: TVertScrollBox;
     Button4: TButton;
     Text1: TText;
     Button5: TButton;

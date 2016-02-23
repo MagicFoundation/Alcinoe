@@ -31,6 +31,7 @@ type
     [weak] fMinThumbTrackBar: TALMinThumbTrackBar;
     [weak] fMaxThumbTrackBar: TALMaxThumbTrackBar;
   protected
+    procedure Resize; override;
     procedure ApplyStyle; override;
     procedure DoRealign; override;
     procedure UpdateHighlight;
@@ -94,6 +95,8 @@ type
     procedure SetSmallChange(const Value: Single);
     procedure SetonApplyStyleLookup(const Value: TNotifyEvent);
     function GetOnApplyStyleLookup: TNotifyEvent;
+    function GetStyleLookup: string;
+    procedure SetStyleLookup(const Value: string);
   protected
     FOnChange, FOnTracking, fonThumbApplyStyleLookup: TNotifyEvent;
     procedure Paint; override;
@@ -113,6 +116,7 @@ type
     property OnTracking: TNotifyEvent read FOnTracking write FOnTracking;
     property onThumbApplyStyleLookup: TNotifyEvent read fonThumbApplyStyleLookup write fonThumbApplyStyleLookup;
     property onApplyStyleLookup: TNotifyEvent read GetOnApplyStyleLookup write SetonApplyStyleLookup;
+    property StyleLookup: string read GetStyleLookup write SetStyleLookup;
     property Align;
     property Anchors;
     property ClipChildren;
@@ -183,6 +187,16 @@ procedure TALBGTrackBar.DoRealign;
 begin
   inherited;
   if assigned(Thumb) then Thumb.Visible := False;
+end;
+
+{*****************************}
+procedure TALBGTrackBar.Resize;
+begin
+  inherited;
+  case Orientation of
+    TOrientation.Horizontal: if height <> TALRangeTrackBar(Parent).width then TALRangeTrackBar(Parent).Height := height;
+    TOrientation.Vertical: if width <> TALRangeTrackBar(Parent).width then TALRangeTrackBar(Parent).width := width;
+  end;
 end;
 
 {**************************************}
@@ -479,8 +493,8 @@ procedure TALRangeTrackBar.Resize;
 begin
   inherited;
   case Orientation of
-    TOrientation.Horizontal: height := fbgTrackBar.Height;
-    TOrientation.Vertical: Width := fbgTrackBar.Width;
+    TOrientation.Horizontal: if height <> fbgTrackBar.Height then height := fbgTrackBar.Height;
+    TOrientation.Vertical: if Width <> fbgTrackBar.Width then Width := fbgTrackBar.Width;
   end;
 end;
 
@@ -594,6 +608,20 @@ begin
   fBGTrackBar.SmallChange := Value;
   fMaxThumbTrackBar.SmallChange := Value;
   fMinThumbTrackBar.SmallChange := Value;
+end;
+
+{***********************************************}
+function TALRangeTrackBar.GetStyleLookup: string;
+begin
+  result := fBGTrackBar.StyleLookup;
+end;
+
+{*************************************************************}
+procedure TALRangeTrackBar.SetStyleLookup(const Value: string);
+begin
+  fBGTrackBar.StyleLookup := Value;
+  fBGTrackBar.StyleLookup := Value;
+  fBGTrackBar.StyleLookup := Value;
 end;
 
 procedure Register;

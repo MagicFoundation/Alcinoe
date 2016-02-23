@@ -9,7 +9,7 @@ object Form1: TForm1
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMasterStyle = 0
-  object ALVertScrollBox1: TALVertScrollBox
+  object ALVertScrollBox1: TVertScrollBox
     Align = Client
     Size.Width = 320.000000000000000000
     Size.Height = 801.000000000000000000

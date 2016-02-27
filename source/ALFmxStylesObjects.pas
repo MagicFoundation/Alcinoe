@@ -189,6 +189,7 @@ begin
 
   if (csDesigning in ComponentState) or
      (not fdoubleBuffered) or
+     (Scene = nil) or
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) then begin
     if fBufBitmap <> nil then begin
@@ -350,6 +351,7 @@ begin
 
   if (csDesigning in ComponentState) or
      (not fdoubleBuffered) or
+     (Scene = nil) or
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) then begin
     if fBufBitmap <> nil then begin
@@ -513,6 +515,7 @@ begin
 
   if (csDesigning in ComponentState) or
      (not fdoubleBuffered) or
+     (Scene = nil) or
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) then begin
     if fBufBitmap <> nil then begin
@@ -662,6 +665,7 @@ begin
 
     if (csDesigning in ComponentState) or
      (not fdoubleBuffered) or
+     (Scene = nil) or
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
      (Text.IsEmpty) then begin

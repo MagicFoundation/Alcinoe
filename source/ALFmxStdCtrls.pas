@@ -1,10 +1,9 @@
-unit ALFmxRangeTrackBar;
+unit ALFmxStdCtrls;
 
 interface
 
 uses System.Classes,
      System.UITypes,
-     FMX.layouts,
      FMX.Controls,
      FMX.StdCtrls;
 
@@ -168,7 +167,6 @@ procedure Register;
 implementation
 
 uses System.SysUtils,
-     FMX.styles.objects,
      FMX.Types;
 
 {*********************************}
@@ -580,6 +578,8 @@ end;
 procedure TALRangeTrackBar.SetonApplyStyleLookup(const Value: TNotifyEvent);
 begin
   fbgTrackBar.OnApplyStyleLookup := Value;
+  fMaxThumbTrackBar.OnApplyStyleLookup := Value;
+  fMinThumbTrackBar.OnApplyStyleLookup := Value;
 end;
 
 {*****************************************************}
@@ -620,8 +620,8 @@ end;
 procedure TALRangeTrackBar.SetStyleLookup(const Value: string);
 begin
   fBGTrackBar.StyleLookup := Value;
-  fBGTrackBar.StyleLookup := Value;
-  fBGTrackBar.StyleLookup := Value;
+  fMaxThumbTrackBar.StyleLookup := Value;
+  fMinThumbTrackBar.StyleLookup := Value;
 end;
 
 procedure Register;

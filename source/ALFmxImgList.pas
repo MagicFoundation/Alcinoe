@@ -1,22 +1,27 @@
-unit ALFmxRectangle;
+unit ALFmxImgList;
 
 interface
 
 uses System.Classes,
+     System.UITypes,
      System.Types,
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.types3D,
      {$ENDIF}
      FMX.graphics,
+     FMX.imgList,
      FMX.objects;
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALRectangle = class(TRectangle)
+  {~~~~~~~~~~~~~~~~~~~~~~}
+  TALGlyph = class(TGlyph)
   private
     fdoubleBuffered: boolean;
     fBufSize: TsizeF;
+    fBufImages: TCustomImageList;
+    FbufImageIndex: TImageIndex;
+    fBufStretch: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
     {$ELSE}
@@ -48,30 +53,31 @@ implementation
 
 uses system.Math,
      system.Math.Vectors,
+     fmx.types,
      fmx.consts,
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
      {$ENDIF}
-     fmx.controls;
+     fmx.controls,
+     alFmxCommon;
 
-{**************************************************}
-constructor TALRectangle.Create(AOwner: TComponent);
+{**********************************************}
+constructor TALGlyph.Create(AOwner: TComponent);
 begin
   fdoubleBuffered := false;
   fBufBitmap := nil;
-  fBufSize := TsizeF.Create(0,0);
   inherited;
 end;
 
-{******************************}
-destructor TALRectangle.Destroy;
+{**************************}
+destructor TALGlyph.Destroy;
 begin
   clearBufBitmap;
   inherited;
 end;
 
-{************************************}
-procedure TALRectangle.clearBufBitmap;
+{********************************}
+procedure TALGlyph.clearBufBitmap;
 begin
   if fBufBitmap <> nil then begin
     fBufBitmap.Free;
@@ -81,9 +87,9 @@ end;
 
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-function TALRectangle.MakeBufBitmap: TTexture;
+function TALGlyph.MakeBufBitmap: TTexture;
 {$ELSE}
-function TALRectangle.MakeBufBitmap: Tbitmap;
+function TALGlyph.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 var {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     TmpBitmap: Tbitmap;
@@ -93,7 +99,10 @@ var {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     SceneScale: Single;
 begin
 
-  if (csDesigning in ComponentState) or (not fdoubleBuffered) then begin
+  if (csDesigning in ComponentState) or
+     (not fdoubleBuffered) or
+     (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
+     (SameValue(Size.Size.cy, 0, TEpsilon.position)) then begin
     if fBufBitmap <> nil then begin
       fBufBitmap.Free;
       fBufBitmap := nil;
@@ -103,10 +112,16 @@ begin
 
   if (fBufBitmap <> nil) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
-     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
+     (fBufImages = Images) and
+     (FbufImageIndex = ImageIndex) and
+     (fBufStretch = stretch) then exit(fBufBitmap);
 
   clearBufBitmap;
   fBufSize := Size.Size;
+  fBufImages := Images;
+  FbufImageIndex := ImageIndex;
+  fBufStretch := stretch;
 
   if Scene <> nil then SceneScale := Scene.GetSceneScale
   else SceneScale := 1;
@@ -169,8 +184,8 @@ begin
 
 end;
 
-{***************************}
-procedure TALRectangle.Paint;
+{***********************}
+procedure TALGlyph.Paint;
 begin
 
   MakeBufBitmap;
@@ -201,7 +216,10 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALRectangle]);
+  RegisterComponents('Alcinoe', [TALGlyph]);
 end;
+
+initialization
+  RegisterFmxClasses([TALGlyph]);
 
 end.

@@ -4,25 +4,14 @@ interface
 
 uses FMX.controls;
 
-function ALFmxGetScreenScale: Single;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 
 implementation
 
 uses fmx.controls.presentation,
-     fmx.platform,
      ALFmxObjects,
      ALFmxImgList,
      ALFmxStylesObjects;
-
-{***********************************}
-function ALFmxGetScreenScale: Single;
-var ScreenService: IFMXScreenService;
-begin
- Result := 1;
- if TPlatformServices.Current.SupportsPlatformService (IFMXScreenService, IInterface(ScreenService)) then
-   Result := ScreenService.GetScreenScale;
-end;
 
 {******************************************************}
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);

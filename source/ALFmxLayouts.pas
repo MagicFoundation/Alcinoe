@@ -1,4 +1,4 @@
-unit ALFmxScrollBox;
+unit ALFmxLayouts;
 
 interface
 

@@ -31,13 +31,16 @@ package Alcinoe;
 
 requires
   rtl,
-  fmx;
+  fmx,
+  DesignIDE;
 
 contains
-  ALFmxRangeTrackBar in 'ALFmxRangeTrackBar.pas',
-  ALFmxScrollBox in 'ALFmxScrollBox.pas',
-  ALFmxRectangle in 'ALFmxRectangle.pas',
-  ALFmxText in 'ALFmxText.pas';
+  ALFmxLayouts in 'ALFmxLayouts.pas',
+  ALFmxObjects in 'ALFmxObjects.pas',
+  ALFmxImgList in 'ALFmxImgList.pas',
+  ALReg in 'ALReg.pas',
+  ALFmxStdCtrls in 'ALFmxStdCtrls.pas',
+  ALFmxStylesObjects in 'ALFmxStylesObjects.pas';
 
 end.
 

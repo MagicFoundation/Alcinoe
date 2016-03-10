@@ -4,7 +4,7 @@ interface
 
 uses FMX.controls;
 
-Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
+Procedure ALFmxMakeBufBitmaps(const aControl: TControl; const NoBufBitmaps4MSWindows: boolean = True);
 
 implementation
 
@@ -13,10 +13,15 @@ uses fmx.controls.presentation,
      ALFmxImgList,
      ALFmxStylesObjects;
 
-{******************************************************}
-Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
+{****************************************************************************************************}
+Procedure ALFmxMakeBufBitmaps(const aControl: TControl; const NoBufBitmaps4MSWindows: boolean = True);
 var aChild: TControl;
 begin
+
+  {$IF Defined(MSWINDOWS)}
+  if NoBufBitmaps4MSWindows then exit;
+  {$ENDIF}
+
   if aControl is TPresentedControl then TPresentedControl(aControl).ApplyStyleLookup; // this to generate child controls
                                                                                       // that can be TALText for exemple
                                                                                       // (for the Tlabel)
@@ -56,6 +61,7 @@ begin
   end;
   for aChild in aControl.Controls do
     ALFmxMakeBufBitmaps(aChild);
+
 end;
 
 end.

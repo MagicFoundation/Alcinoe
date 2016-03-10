@@ -179,6 +179,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_40x40.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls.app\</RemoteDir>
+            <RemoteName>FM_SpotlightSearchIcon_40x40.png</RemoteName>
+            <DeployClass>iPad_SpotLight40</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="..\iOSDevice32\Debug\ALFmxControls.entitlements" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\../\</RemoteDir>
             <RemoteName>ALFmxControls.entitlements</RemoteName>
@@ -201,15 +210,6 @@
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Default-667h@2x.png</RemoteName>
             <DeployClass>iPhone_Launch750</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_40x40.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_SpotlightSearchIcon_40x40.png</RemoteName>
-            <DeployClass>iPad_SpotLight40</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>

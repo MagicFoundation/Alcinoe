@@ -70,6 +70,12 @@ CHDIR ..
 
 pause
 
+xcopy dll\tbbmalloc\win32\tbbmalloc.dll demos\ALDatabaseBenchmark\win32 /s
+IF ERRORLEVEL 1 goto ERROR
+
+xcopy dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
+IF ERRORLEVEL 1 goto ERROR
+
 if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
 
   del ..\BlowPipeEmail\*.rsm /s

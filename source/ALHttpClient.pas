@@ -69,15 +69,11 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
+uses System.SysUtils,
      System.Classes,
+     {$IFDEF MSWINDOWS}
      Winapi.Wininet,
-     {$ELSE}
-     SysUtils,
-     Classes,
-     Wininet,
-     {$IFEND}
+     {$ENDIF}
      ALStringList,
      ALMultiPartParser;
 
@@ -460,7 +456,9 @@ procedure ALExtractHTTPFields(Separators,
                               Strings: TALStrings;
                               StripQuotes: Boolean = False);
 Function  AlRemoveShemeFromUrl(const aUrl: AnsiString): ansiString;
+{$IFDEF MSWINDOWS}
 Function  AlExtractShemeFromUrl(const aUrl: AnsiString): TInternetScheme;
+{$ENDIF}
 Function  AlExtractHostNameFromUrl(const aUrl: AnsiString): AnsiString;
 Function  AlExtractDomainNameFromUrl(const aUrl: AnsiString): AnsiString;
 Function  AlExtractUrlPathFromUrl(const aUrl: AnsiString): AnsiString;
@@ -486,11 +484,13 @@ Function  AlInternetCrackUrl(var Url: AnsiString; // if true return UrlPath
                              Query: TALStrings): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: AnsiString; Var aAnchor: AnsiString): AnsiString; overload;
 Function  AlRemoveAnchorFromUrl(const aUrl: AnsiString): AnsiString; overload;
+{$IFDEF MSWINDOWS}
 function  AlCombineUrl(const RelativeUrl, BaseUrl: AnsiString): AnsiString; overload;
 Function  AlCombineUrl(const RelativeUrl,
                              BaseUrl,
                              Anchor: AnsiString;
                        Query: TALStrings): AnsiString; overload;
+{$ENDIF}
 
 const
   CAlRfc822DayOfWeekNames: array[1..7] of AnsiString = ('Sun',
@@ -515,7 +515,9 @@ const
                                                               'Dec');
 
 function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+{$IFDEF MSWINDOWS}
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
+{$ENDIF}
 function ALTryRfc822StrToGMTDateTime(const S: AnsiString; out Value: TDateTime): Boolean;
 function ALRfc822StrToGMTDateTime(const s: AnsiString): TDateTime;
 
@@ -544,20 +546,14 @@ Const
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
+uses {$IFDEF MSWINDOWS}
      Winapi.Windows,
+     {$ENDIF}
      Web.HttpApp,
      System.DateUtils,
      System.SysConst,
      System.Math,
      system.AnsiStrings,
-     {$ELSE}
-     Windows,
-     HttpApp,
-     DateUtils,
-     SysConst,
-     Math,
-     {$IFEND}
      AlCommon,
      ALString;
 
@@ -1164,7 +1160,8 @@ begin
   else result := aUrl;
 end;
 
-{**********************************************************************}
+{****************}
+{$IFDEF MSWINDOWS}
 Function AlExtractShemeFromUrl(const aUrl: AnsiString): TInternetScheme;
 Var SchemeName,
     HostName,
@@ -1189,6 +1186,7 @@ begin
   end
   else result := INTERNET_SCHEME_UNKNOWN;
 end;
+{$ENDIF}
 
 {********************************************************************}
 Function AlExtractHostNameFromUrl(const aUrl: AnsiString): AnsiString;
@@ -1355,14 +1353,9 @@ begin
     end
     else Anchor := '';
     if (aExtraInfo <> '') and (aExtraInfo[1] = '?') then begin
-      {$IF CompilerVersion >= 18.5}
-        if AlPos('&amp;', aExtraInfo) > 0 then Query.LineBreak := '&amp;'
-        else Query.LineBreak := '&';
-        Query.text := AlCopyStr(aExtraInfo,2,Maxint);
-      {$ELSE}
-        if AlPos('&amp;', aExtraInfo) > 0 then Query.text := AlStringReplace(AlCopyStr(aExtraInfo,2,Maxint), '&amp;', #13#10, [rfReplaceAll])
-        else                                   Query.text := AlStringReplace(AlCopyStr(aExtraInfo,2,Maxint), '&',     #13#10, [rfReplaceAll]);
-      {$IFEND}
+      if AlPos('&amp;', aExtraInfo) > 0 then Query.LineBreak := '&amp;'
+      else Query.LineBreak := '&';
+      Query.text := AlCopyStr(aExtraInfo,2,Maxint);
     end
     else Query.clear;
   end
@@ -1443,7 +1436,8 @@ begin
   result := AlRemoveAnchorFromUrl(aUrl,aAnchor);
 end;
 
-{************************************************************************}
+{****************}
+{$IFDEF MSWINDOWS}
 function AlCombineUrl(const RelativeUrl, BaseUrl: AnsiString): AnsiString;
 var Size: Dword;
     Buffer: AnsiString;
@@ -1465,50 +1459,39 @@ begin
 
   end;
 end;
+{$ENDIF}
 
-{***************************************}
+{****************}
+{$IFDEF MSWINDOWS}
 Function  AlCombineUrl(const RelativeUrl,
                              BaseUrl,
                              Anchor: AnsiString;
                        Query: TALStrings): AnsiString;
 Var S1 : AnsiString;
-    {$IF CompilerVersion >= 18.5}
     aBool: Boolean;
-    {$IFEND}
 begin
   if Query.Count > 0 then begin
 
-    {$IF CompilerVersion >= 18.5}
-      if Query.LineBreak = #13#10 then begin
-        aBool := True;
-        Query.LineBreak := '&';
-      end
-      else aBool := False;
+    if Query.LineBreak = #13#10 then begin
+      aBool := True;
+      Query.LineBreak := '&';
+    end
+    else aBool := False;
 
-      try
+    try
 
-        S1 := ALTrim(Query.Text);
-        while alpos(Query.LineBreak, S1) = 1 do delete(S1,1,length(Query.LineBreak));
-        while alposEx(Query.LineBreak,
-                      S1,
-                      length(S1) - length(Query.LineBreak) + 1) > 0 do delete(S1,
-                                                                              length(S1) - length(Query.LineBreak) + 1,
-                                                                              MaxInt);
-        if S1 <> '' then S1 := '?' + S1;
-
-      finally
-        if aBool then Query.LineBreak := #13#10;
-      end;
-    {$ELSE}
-      S1 := AlStringReplace(ALTrim(Query.Text),#13#10,'&',[rfReplaceAll]);
-      while alpos('&', S1) = 1 do delete(S1,1,1);
-      while alposEx('&',
+      S1 := ALTrim(Query.Text);
+      while alpos(Query.LineBreak, S1) = 1 do delete(S1,1,length(Query.LineBreak));
+      while alposEx(Query.LineBreak,
                     S1,
-                    length(S1)) > 0 do delete(S1,
-                                              length(S1),
-                                              MaxInt);
+                    length(S1) - length(Query.LineBreak) + 1) > 0 do delete(S1,
+                                                                            length(S1) - length(Query.LineBreak) + 1,
+                                                                            MaxInt);
       if S1 <> '' then S1 := '?' + S1;
-    {$IFEND}
+
+    finally
+      if aBool then Query.LineBreak := #13#10;
+    end;
 
   end
   else S1 := '';
@@ -1517,6 +1500,7 @@ begin
 
   Result := AlCombineUrl(RelativeUrl + S1, BaseUrl);
 end;
+{$ENDIF}
 
 {*********************************************************************}
 {aValue is a GMT TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
@@ -1537,12 +1521,14 @@ begin
                       'GMT']);
 end;
 
-{***********************************************************************}
+{****************}
+{$IFDEF MSWINDOWS}
 {aValue is a Local TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 begin
   Result := ALGMTDateTimeToRfc822Str(AlLocalDateTimeToGMTDateTime(aValue));
 end;
+{$ENDIF}
 
 {************************************************************}
 {Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123

@@ -61,6 +61,15 @@ unit ALMime;
 
 interface
 
+{$IF CompilerVersion < 29} {Delphi XE8}
+  {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+    {$DEFINE CPU64BITS} // The CPU is in a 64-bit environment, such as DCC64.EXE. *New* in XE8
+  {$ENDIF}
+  {$IF defined(CPUX86)} // 	The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+    {$DEFINE CPU32BITS} // The CPU is in a 32-bit environment, such as DCC32.EXE. *New* in XE8
+  {$ENDIF}
+{$ENDIF}
+
 {$IF CompilerVersion >= 25} {Delphi XE4}
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
@@ -72,20 +81,20 @@ uses System.Classes,
 
 type
   TALDynByteArray = array of Byte;
-  {$IFDEF CPUX64}
+  {$IF defined(CPU64BITS)}
   ALSizeInt = NativeInt;
   {$ELSE}
   ALSizeInt = Integer;
-  {$ENDIF !CPUX64}
+  {$IFEND}
 
 type
   TALAddr32 = Cardinal;
   TALAddr64 = Int64;
-  {$IFDEF CPUX64}
+  {$IF defined(CPU64BITS)}
   TALAddr = TALAddr64;
   {$ELSE}
   TALAddr = TALAddr32;
-  {$ENDIF !CPUX64}
+  {$IFEND}
 
 //From jcl
 {$IFNDEF NEXTGEN}

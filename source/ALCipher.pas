@@ -64,13 +64,22 @@ unit ALCipher;
 
 interface
 
+{$IF CompilerVersion < 29} {Delphi XE8}
+  {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+    {$DEFINE CPU64BITS} // The CPU is in a 64-bit environment, such as DCC64.EXE. *New* in XE8
+  {$ENDIF}
+  {$IF defined(CPUX86)} // 	The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+    {$DEFINE CPU32BITS} // The CPU is in a 32-bit environment, such as DCC32.EXE. *New* in XE8
+  {$ENDIF}
+{$ENDIF}
+
 {$A+} {Word Align Data}
 {$Q-} {Overflow Checking}
 {$R-} {Range-Checking}
 {.$V-} {Var-String Checking}
 {.$B-} {Complete Boolean Evaluation}
 {.$I+} {Input/Output-Checking}
-{$IFNDEF CPUX86}
+{$IF defined(CPU64BITS)}
   {$O-} {Optimisation} // With Optimisation the result of ALRDLEncryptStringCBC is wrong under WIN64 :(
 {$ENDIF}
 
@@ -80,12 +89,16 @@ interface
 
 
 uses {$IFNDEF NEXTGEN}
-     system.sysutils,
-     Winapi.Windows,
-     System.Classes,
-     ALString;
-     {$ELSE}
-     system.sysutils;
+       system.sysutils,
+       {$IF defined(MSWINDOWS)}
+       winapi.windows,
+       {$ELSE}
+       system.types,
+       {$IFEND}
+       System.Classes,
+       ALString;
+       {$ELSE}
+       system.sysutils;
      {$ENDIF}
 
 {$IFNDEF NEXTGEN}
@@ -303,7 +316,7 @@ var
   // - created with a polynom diverse from zlib's crc32() algorithm, but
   // compatible with SSE 4.2 crc32 instruction
   // - tables content is created from code in initialization section below
-  ALCrc32ctab: array[0..{$ifdef WIN64}3{$else}7{$endif},byte] of cardinal;
+  ALCrc32ctab: array[0..{$IF defined(CPU64BITS)}3{$else}7{$ifend},byte] of cardinal;
 
 {$IFNDEF NEXTGEN}
 
@@ -357,7 +370,9 @@ var
 implementation
 
 {$IFNDEF NEXTGEN}
-uses winapi.MMSystem,
+uses {$IF defined(MSWINDOWS)}
+     winapi.MMSystem,
+     {$IFEND}
      system.Math;
 {$ENDIF}
 
@@ -1546,7 +1561,7 @@ end;
 
 {*******************************************************************************}
 procedure ALCipherXorMemPrim(var Mem1;  const Mem2;  Count : Cardinal); register;
-{$IFDEF WIN64}
+{$IF defined(CPU64BITS)}
 var
   PMem1, PMem2: PLongword;
   Rest: Integer;
@@ -1612,7 +1627,7 @@ asm
   pop  edi
   pop  esi
 end;
-{$ENDIF}
+{$ifend}
 
 {*****************************************************************}
 procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
@@ -2135,8 +2150,13 @@ begin
 
   if Encrypt then begin
     {set up an initialization vector (IV)}
+    {$IF defined(MSWINDOWS)}
     Block[0] := timeGetTime;
     Block[1] := timeGetTime;
+    {$ELSE}
+    Block[0] := TThread.GetTickCount;
+    Block[1] := TThread.GetTickCount;
+    {$IFEND}
     ALCipherEncryptBF(Context, Block, Encrypt);
     OutStream.WriteBuffer(Block, SizeOf(Block));
     IV := Block;
@@ -2458,8 +2478,13 @@ begin
 
   if Encrypt then begin
     {set up an initialization vector (IV)}
+    {$IF defined(MSWINDOWS)}
     Block[0] := timeGetTime;
     Block[1] := timeGetTime;
+    {$ELSE}
+    Block[0] := TThread.GetTickCount;
+    Block[1] := TThread.GetTickCount;
+    {$IFEND}
     ALCipherEncryptRDL(Context, Block);
     OutStream.WriteBuffer(Block, SizeOf(Block));
     IV := Block;
@@ -2842,7 +2867,7 @@ type
 
 {***************************************************************}
 procedure _GetCPUID(Param: Cardinal; var Registers: _TRegisters);
-{$ifdef win64}
+{$IF defined(CPU64BITS)}
 asm // ecx=param, rdx=Registers (Linux: edi,rsi)
   .NOFRAME
   mov eax,ecx
@@ -2886,11 +2911,11 @@ asm
   pop edi
   pop esi
 end;
-{$endif win64}
+{$ifend}
 
 {*****************************************************************************}
 function ALCrc32csse42(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
-{$ifdef win64}
+{$IF defined(CPU64BITS)}
 asm // ecx=crc, rdx=buf, r8=len (Linux: edi,rsi,rdx)
   .NOFRAME
     mov eax,ecx
@@ -2978,7 +3003,7 @@ asm // eax=crc, edx=buf, ecx=len
     {$ifend}
 @0: not eax
 end;
-{$endif win64}
+{$ifend}
 
 {********************************************************}
 function ALCrc32csse42_2(Const str: AnsiString): cardinal;
@@ -2988,7 +3013,7 @@ end;
 
 {****************************************************************************}
 function ALCrc32cfast(crc: cardinal; buf: PAnsiChar; len: cardinal): cardinal;
-{$ifdef WIN64}
+{$IF defined(CPU64BITS)}
 type
   _PtrUInt = {$ifdef UNICODE}NativeUInt{$else}cardinal{$endif};
 begin
@@ -3115,7 +3140,7 @@ asm
   pop ebx
   not eax
 end;
-{$ENDIF WIN64}
+{$ifend}
 
 {*******************************************************}
 function ALCrc32cfast_2(Const str: AnsiString): cardinal;

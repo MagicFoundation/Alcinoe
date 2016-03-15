@@ -103,13 +103,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Classes,
+uses System.Classes,
      System.sysutils,
-     {$ELSE}
-     Classes,
-     sysutils,
-     {$IFEND}
      AlStringList;
 
 const
@@ -227,9 +222,6 @@ type
     procedure SetCount(NewCount: Integer); // [added from TXMLNodeList]
     property Owner: TALXMLNode read FOwner;
     function Get(Index: Integer): TALXMLNode;
-    {$IF CompilerVersion < 18.5}
-    function GetNode(const IndexOrName: OleVariant): TALXMLNode;
-    {$IFEND}
     function GetNodeByIndex(Const Index: Integer): TALXMLNode; // [added from TXMLNodeList]
     function GetNodeByName(Const Name: AnsiString): TALXMLNode; // [added from TXMLNodeList]
     Function InternalInsert(Index: Integer; const Node: TALXMLNode): integer;
@@ -263,12 +255,8 @@ type
     procedure Clear;
     procedure Insert(Index: Integer; const Node: TALXMLNode);
     property Count: Integer read fCount;
-    {$IF CompilerVersion < 18.5}
-    property Nodes[const IndexOrName: OleVariant]: TALXMLNode read GetNode; default;
-    {$ELSE}
     property Nodes[const Name: AnsiString]: TALXMLNode read GetNodeByName; default;
     property Nodes[const Index: integer]: TALXMLNode read GetNodeByIndex; default;
-    {$IFEND}
   end;
 
   {TALXMLNode}
@@ -820,16 +808,11 @@ function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Math,
-     Winapi.Windows,
+uses System.Math,
      System.Contnrs,
-     {$ELSE}
-     Math,
-     Windows,
-     Contnrs,
-     {$IF CompilerVersion < 18.5}Variants,{$IFEND}
-     {$IFEND}
+     {$IFDEF MSWINDOWS}
+     Winapi.Windows,
+     {$ENDIF}
      AlHTML,
      ALHttpClient,
      ALString;
@@ -3466,21 +3449,6 @@ begin
   if (Index < 0) or (Index >= FCount) then ALXMLDocError(CALXmlListIndexError, [Index]);
   Result := FList[Index];
 end;
-
-{**************************}
-{$IF CompilerVersion < 18.5}
-{Returns a specified node from the list.
- GetNode is the read implementation of the Nodes property.
- *IndexOrName identifies the desired node. It can be The index of the node, where 0 is the index of the first node,
-  1 is the index of the second node, and so on. The LocalName property of a node in the list.
- If IndexOrName does not identify a node in the list, GetNode tries to create a new node with the name specified by
- IndexOrName. If it can’t create the new node, GetNode raises an exception.}
-function TALXMLNodeList.GetNode(const IndexOrName: OleVariant): TALXMLNode;
-begin
-  if VarIsOrdinal(IndexOrName) then Result := GetNodeByIndex(IndexOrName)
-  else Result := GetNodeByName(AnsiString(IndexOrName));
-end;
-{$IFEND}
 
 {**************************************}
 {Returns a specified node from the list.

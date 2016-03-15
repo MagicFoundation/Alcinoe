@@ -213,8 +213,8 @@ object Form1: TForm1
     OnClick = ALButton22Click
   end
   object ALButton23: TButton
-    Left = 16
-    Top = 496
+    Left = 516
+    Top = 495
     Width = 230
     Height = 25
     Caption = 'Benchmark AnsiString Memory Usage'

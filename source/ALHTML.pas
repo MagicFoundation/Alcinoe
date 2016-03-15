@@ -92,7 +92,9 @@ function  ALUTF8HTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString;
 procedure ALUTF8JavascriptDecodeV(Var Str: AnsiString);
 function  ALUTF8JavascriptDecode(const Src: AnsiString): AnsiString;
+{$IFDEF MSWINDOWS}
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
+{$ENDIF}
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
                                                      Const DeleteBodyOfUnwantedTag: Boolean = False;
                                                      const ReplaceUnwantedTagCharBy: AnsiChar = #1);
@@ -109,7 +111,7 @@ implementation
 uses System.Math,
      System.Classes,
      System.sysutils,
-     {$IFNDEF NEXTGEN}
+     {$IFDEF MSWINDOWS}
      System.Win.Comobj,
      Winapi.Ole2,
      {$ENDIF}
@@ -1651,6 +1653,8 @@ end;
 
 {$IFNDEF NEXTGEN}
 
+{****************}
+{$IFDEF MSWINDOWS}
 {This function evaluates the Javascript code given in the
  parameter "aCode" and returns result. The function works
  similar to browser's console, so you can send even the code
@@ -1667,6 +1671,7 @@ begin
     CoUninitialize;
   end;
 end;
+{$ENDIF}
 
 {*******************************************************************************}
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;

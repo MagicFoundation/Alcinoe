@@ -93,6 +93,15 @@ interface
 
 {$H+,B-,R-}
 
+{$IF CompilerVersion < 29} {Delphi XE8}
+  {$IF defined(CPUX64)} // The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+    {$DEFINE CPU64BITS} // The CPU is in a 64-bit environment, such as DCC64.EXE. *New* in XE8
+  {$ENDIF}
+  {$IF defined(CPUX86)} // 	The CPU supports the x86-64 instruction set, and is in a 64-bit environment. *New* in XE2/x64
+    {$DEFINE CPU32BITS} // The CPU is in a 32-bit environment, such as DCC32.EXE. *New* in XE8
+  {$ENDIF}
+{$ENDIF}
+
 // http://docwiki.embarcadero.com/RADStudio/en/Conditional_compilation_(Delphi)
 // http://docwiki.embarcadero.com/RADStudio/en/Compiler_Versions
 {$IFDEF CPUX86}
@@ -125,6 +134,9 @@ uses ALInit,
      {$IFNDEF NEXTGEN}
        System.Contnrs,
      {$ENDIF}
+     {$IFDEF MACOS}
+       Macapi.CoreFoundation,
+     {$ENDIF MACOS}
      ALStringList;
 
 resourcestring
@@ -174,7 +186,9 @@ type
     // Creates a TALFormatSettings record with values provided by the operating
     // system for the specified locale. The locale is an LCID on Windows
     // platforms, or a locale_t on Posix platforms.
+    {$IF defined(MSWINDOWS)}
     class function Create(Locale: LCID): TALFormatSettings; overload; platform; static;
+    {$IFEND}
     // Creates a TALFormatSettings record with values provided by the operating
     // system for the specified locale name in the "Language-Country" format.
     // Example: 'en-US' for U.S. English settings or 'en-UK' for UK English settings.
@@ -188,7 +202,9 @@ type
 
   {$IFNDEF NEXTGEN}
   function ALGetFormatSettingsID(const aFormatSettings: TALFormatSettings): AnsiString;
+  {$IF defined(MSWINDOWS)}
   procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings); platform;
+  {$IFEND}
   {$ENDIF}
 
 var
@@ -765,6 +781,7 @@ function  ALNEVExtractValue(const s: AnsiString): AnsiString;
 function  ALGetStringFromFile(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 function  ALGetStringFromFileWithoutUTF8BOM(const filename: AnsiString; const ShareMode: Word = fmShareDenyWrite): AnsiString;
 procedure ALSaveStringtoFile(const Str: AnsiString; const filename: AnsiString);
+{$IF defined(MSWINDOWS)}
 Function  ALWideNormalize(const S: Widestring;
                           const WordSeparator: WideChar;
                           const SymbolsToIgnore: array of WideChar): Widestring; overload;
@@ -783,9 +800,10 @@ Function  ALUTF8Normalize(const S: AnsiString;
                           const SymbolsToIgnore: array of AnsiChar): AnsiString; overload;
 Function  ALUTF8Normalize(const S: AnsiString;
                           const WordSeparator: ansiChar = '-'): AnsiString; overload;
+function  AlUTF8Check(const S: AnsiString): Boolean;
+{$IFEND}
 function  ALUTF8UpperCase(const s: AnsiString): AnsiString;
 function  ALUTF8LowerCase(const s: AnsiString): AnsiString;
-function  AlUTF8Check(const S: AnsiString): Boolean;
 function  AlUTF8removeBOM(const S: AnsiString): AnsiString;
 function  AlUTF8DetectBOM(const P: PAnsiChar; const Size: Integer): Boolean;
 function  ALUTF8CharSize(Lead: AnsiChar): Integer;
@@ -795,12 +813,14 @@ Function  ALUTF8CharTrunc(const s:AnsiString; const Count: Integer): AnsiString;
 Function  ALUTF8UpperFirstChar(const s:AnsiString): AnsiString;
 Function  ALUTF8TitleCase(const s:AnsiString): AnsiString;
 Function  ALUTF8SentenceCase(const s:AnsiString): AnsiString;
-Function  ALStringToWideString(const S: AnsiString; const aCodePage: Word): WideString;
+{$IF defined(MSWINDOWS)}
+Function  ALStringToWideString(const S: RawByteString; const aCodePage: Word): WideString;
 function  AlWideStringToString(const WS: WideString; const aCodePage: Word): AnsiString;
-Function  ALUTF8Encode(const S: AnsiString; const aCodePage: Word): AnsiString;
-Function  ALUTF8decode(const S: AnsiString; const aCodePage: Word): AnsiString;
-Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 Function  ALGetCodePageFromLCID(const aLCID:Integer): Word;
+{$IFEND}
+Function  ALUTF8Encode(const S: RawByteString; const aCodePage: Word): AnsiString;
+Function  ALUTF8decode(const S: UTF8String; const aCodePage: Word): AnsiString;
+Function  ALGetCodePageFromCharSetName(Acharset:AnsiString): Word;
 Function  ALUTF8ISO91995CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 Function  ALUTF8BGNPCGN1947CyrillicToLatin(const aCyrillicText: AnsiString): AnsiString;
 function  ALExtractExpression(const S: AnsiString;
@@ -947,7 +967,8 @@ begin
   if FPosition > NewSize then FPosition := NewSize;
 end;
 
-{***********************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 class function TALFormatSettings.Create(Locale: LCID): TALFormatSettings;
 var aFormatSettings: TformatSettings;
     i: integer;
@@ -1001,6 +1022,7 @@ begin
     NegCurrFormat := aFormatSettings.NegCurrFormat;
   end;
 end;
+{$IFEND}
 
 {***************************************************************************************}
 class function TALFormatSettings.Create(const LocaleName: AnsiString): TALFormatSettings;
@@ -1098,11 +1120,13 @@ begin
   end;
 end;
 
-{****************************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 procedure ALGetLocaleFormatSettings(Locale: LCID; var AFormatSettings: TALFormatSettings);
 begin
   AFormatSettings := TALFormatSettings.Create(Locale);
 end;
+{$IFEND}
 
 {**********************************************************}
 function  ALGUIDToByteString(const Guid: TGUID): Ansistring;
@@ -2453,6 +2477,17 @@ begin
   S := '';
 end;
 
+{$IFDEF PIC}
+{******************************************}
+{ Do not remove export or the begin block. }
+function ALGetGOT: Pointer; export;
+begin
+  asm
+        MOV     Result,EBX
+  end;
+end;
+{$ENDIF}
+
 {***}
 const
   cALDCon10: Integer = 10;
@@ -2474,7 +2509,7 @@ asm //StackAlignSafe - internal method can be called unaligned
 {$IFDEF PIC}
         PUSH    EAX
         PUSH    ECX
-        CALL    GetGOT
+        CALL    ALGetGOT
         MOV     ESI,EAX
         POP     ECX
         POP     EAX
@@ -2952,7 +2987,7 @@ asm //StackAligned
         MOV     Buffer,EAX
 {$IFDEF PIC}
         PUSH    ECX
-        CALL    GetGOT
+        CALL    ALGetGOT
         MOV     SaveGOT,EAX
         POP     ECX
 {$ELSE !PIC}
@@ -3930,7 +3965,7 @@ asm
         MOV     ESI, ECX
 {$IFDEF PIC}
         PUSH    ECX
-        CALL    GetGOT
+        CALL    ALGetGOT
         POP     ECX
 {$ELSE !PIC}
         XOR     EAX, EAX
@@ -4603,6 +4638,84 @@ end;
 
 {$IFNDEF NEXTGEN}
 
+{$IFDEF MACOS}
+{**}
+type
+  TCFString = record
+    Value: CFStringRef;
+
+    constructor Create(const Val: string);
+    function AsString(Release: Boolean = False): string;
+    function AsAnsiString(Release: Boolean = False): ansistring;
+    function AsChar(Release: Boolean = False): Char;
+    class operator Implicit(const Ref: CFStringRef): TCFString;
+    class operator Implicit(const Ref: CFMutableStringRef): TCFString;
+  end;
+
+{**********************************************}
+constructor TCFString.Create(const Val: string);
+begin
+  Value := CFStringCreateWithCharacters(kCFAllocatorDefault,
+    PChar(Val), Length(Val));
+end;
+
+{************************************************************}
+function TCFString.AsString(Release: Boolean = False): string;
+var
+  Range: CFRange;
+  Tmp: TCharArray;
+begin
+  if Value = nil then Exit('');
+  try
+    Range := CFRangeMake(0, CFStringGetLength(Value));
+    if Range.Length > 0 then
+    begin
+      SetLength(Tmp, Range.Length);
+      CFStringGetCharacters(Value, Range, MarshaledString(Tmp));
+      Result := string.Create(Tmp);
+    end
+    else
+      Result := EmptyStr;
+  finally
+    if Release then
+      CFRelease(Value);
+  end;
+end;
+
+{********************************************************************}
+function TCFString.AsAnsiString(Release: Boolean = False): ansistring;
+begin
+  result := AnsiString(AsString(Release));
+end;
+
+{********************************************************}
+function TCFString.AsChar(Release: Boolean = False): Char;
+begin
+  if Value = nil then Exit(#0);
+  try
+    if CFStringGetLength(Value) > 0 then
+      Result := CFStringGetCharacterAtIndex(Value, 0)
+  else
+      Result := #0;
+  finally
+    if Release then
+      CFRelease(Value);
+  end;
+end;
+
+{*******************************************************************}
+class operator TCFString.Implicit(const Ref: CFStringRef): TCFString;
+begin
+  Result.Value := Ref;
+end;
+
+{**************************************************************************}
+class operator TCFString.Implicit(const Ref: CFMutableStringRef): TCFString;
+begin
+  Result.Value := CFStringRef(Ref);
+end;
+{$ENDIF MACOS}
+
 {********************}
 //delphi seattle upd 1
 procedure ALDateTimeToString(var Result: AnsiString; const Format: AnsiString;
@@ -4751,8 +4864,6 @@ var
 {$ENDIF MSWINDOWS}
 
 {$IFDEF POSIX}
-//NextGen not support ansiString
-(*
     {$IFNDEF MACOS}
     function FindEra(Date: Integer): Byte;
     var
@@ -4800,7 +4911,7 @@ var
         Result := TCFString(CFDateFormatterCreateStringWithAbsoluteTime(
                               kCFAllocatorDefault, Formatter,
                               CFGregorianDateGetAbsoluteTime(LDate, DefaultTZ))
-                           ).AsString(true);
+                           ).AsAnsiString(true);
       finally
         if FormatString.Value <> nil then
           CFRelease(FormatString.Value);
@@ -4867,13 +4978,12 @@ var
       end;
     begin
       S := ALIntToStr(Year - GetEraOffset);
-      while S.Length < Count do
+      while Length(S) < Count do
         S := '0' + S;
-      if S.Length > Count then
+      if Length(S) > Count then
         S := ALCopyStr(S, Length(S) - (Count - 1), Count);
       Result := S;
     end;
-*)
 {$ENDIF POSIX}
 
   begin
@@ -7289,7 +7399,7 @@ asm //StackAligned
         MOV     EDI,EDX
 {$IFDEF PIC}
         PUSH    ECX
-        CALL    GetGOT
+        CALL    ALGetGOT
         POP     EBX
         MOV     SaveGOT,EAX
 {$ELSE !PIC}
@@ -7396,7 +7506,7 @@ asm //StackAligned
         JNC     @@32
 {$IFDEF PIC}
         XCHG    SaveGOT,EBX
-        FIMUL   [EBX].DCon10
+        FIMUL   [EBX].calDCon10
         XCHG    SaveGOT,EBX
 {$ELSE !PIC}
         FIMUL   calDCon10
@@ -10118,7 +10228,8 @@ end;
 
 {$IFNDEF NEXTGEN}
 
-{***********************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // Normalize a Widestring
 // ie: l''été sur l''europe => l-ete-sur-l-europe
 Function  ALWideNormalize(const S: Widestring;
@@ -10301,16 +10412,20 @@ Begin
   setlength(result,j);
   _foldNonDiacriticChar(result);
 end;
+{$IFEND}
 
-{***********************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // Normalize a Widestring
 // ie: l''été sur l''europe => l-ete-sur-l-europe
 Function ALWideNormalize(const S: Widestring; const WordSeparator: WideChar = '-'): Widestring;
 Begin
   result := ALWideNormalize(S, WordSeparator, []);
 end;
+{$IFEND}
 
-{*************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 {remove accented character}
 Function ALWideRemoveDiacritic(const S: Widestring): Widestring;
 
@@ -10344,8 +10459,10 @@ begin
     inc(j);
   end;
 end;
+{$IFEND}
 
-{***************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // Expand all ligature characters so that they are represented by
 // their two-character equivalent. For example, the ligature 'æ' expands to
 // the two characters 'a' and 'e'.}
@@ -10360,20 +10477,26 @@ begin
   setlength(Result,LenResult);
   FoldStringW(aMAP_EXPAND_LIGATURES, PwideChar(S), LenS, PwideChar(Result), LenResult);
 end;
+{$IFEND}
 
-{*******************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Function ALWideUpperCaseNoDiacritic(const S: Widestring): Widestring;
 begin
   Result := ALWideRemoveDiacritic(WideUppercase(s));
 end;
+{$IFEND}
 
-{*******************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Function ALWideLowerCaseNoDiacritic(const S: Widestring): Widestring;
 begin
   Result := ALWideRemoveDiacritic(Widelowercase(s));
 end;
+{$IFEND}
 
-{*********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // S is a AnsiString that contains UTF-8 encoded characters
 // The result of the function is the corresponding UTF-8 encoded string
 // without any Diacritic.
@@ -10381,8 +10504,10 @@ Function ALUTF8RemoveDiacritic(const S: AnsiString): AnsiString;
 begin
   Result := utf8Encode(ALWideRemoveDiacritic(UTF8ToWideString(S)));
 end;
+{$IFEND}
 
-{********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // S is a AnsiString that contains UTF-8 encoded characters
 // The result of the function is the corresponding UTF-8 encoded string
 // without any Ligatures.
@@ -10390,8 +10515,10 @@ Function ALUTF8ExpandLigatures(const S: AnsiString): AnsiString;
 begin
   Result := utf8Encode(ALWideExpandLigatures(UTF8ToWideString(S)));
 end;
+{$IFEND}
 
-{*********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // S is a AnsiString that contains UTF-8 encoded characters
 // The result of the function is the corresponding UTF-8 encoded string
 // in UpperCase without any Diacritic.
@@ -10399,8 +10526,10 @@ Function ALUTF8UpperCaseNoDiacritic(const S: AnsiString): AnsiString;
 begin
   Result := utf8Encode(ALWideUpperCaseNoDiacritic(UTF8ToWideString(S)));
 end;
+{$IFEND}
 
-{*********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // S is a AnsiString that contains UTF-8 encoded characters
 // The result of the function is the corresponding UTF-8 encoded string
 // in LowerCase without any Diacritic.
@@ -10408,8 +10537,10 @@ Function ALUTF8LowerCaseNoDiacritic(const S: AnsiString): AnsiString;
 begin
   Result := utf8Encode(ALWideLowerCaseNoDiacritic(UTF8ToWideString(S)));
 end;
+{$IFEND}
 
-{**************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // S is a AnsiString that contains UTF-8 encoded characters
 // The result of the function is the corresponding UTF-8 encoded string
 // "normalized":
@@ -10425,8 +10556,10 @@ begin
     aWideSymbolsToIgnore[i] := WideChar(SymbolsToIgnore[i]);
   Result := utf8Encode(ALWideNormalize(UTF8ToWideString(S), WideChar(WordSeparator)));
 end;
+{$IFEND}
 
-{**************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 // S is a AnsiString that contains UTF-8 encoded characters
 // The result of the function is the corresponding UTF-8 encoded string
 // "normalized":
@@ -10436,6 +10569,7 @@ Function ALUTF8Normalize(const S: AnsiString;
 begin
   Result := utf8Encode(ALWideNormalize(UTF8ToWideString(S), WideChar(WordSeparator), []));
 end;
+{$IFEND}
 
 {*********************************************************}
 // S is a AnsiString that contains UTF-8 encoded characters
@@ -10467,7 +10601,8 @@ begin
   result := utf8encode(WideLowerCase(UTF8ToWideString(s)));
 end;
 
-{*************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function AlUTF8Check(const S: AnsiString): Boolean;
 begin
   if S = '' then exit(true);
@@ -10478,6 +10613,7 @@ begin
                                 nil, // LPWSTR lpWideCharStr
                                 0) > 0; // int cchWideChar
 end;
+{$IFEND}
 
 {*************************************************************************}
 function AlUTF8DetectBOM(const P: PansiChar; const Size: Integer): Boolean;
@@ -10794,7 +10930,8 @@ begin
 end;
 {$IFEND}
 
-{********************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 Function ALGetCodePageFromLCID(const aLCID:Integer): Word;
 var
   Buffer: array [0..6] of AnsiChar;
@@ -10802,9 +10939,11 @@ begin
   GetLocaleInfoA(ALcid, LOCALE_IDEFAULTANSICODEPAGE, Buffer, Length(Buffer));
   Result:= ALStrToIntDef(Buffer, 0);
 end;
+{$IFEND}
 
-{************************************************************************************}
-Function ALStringToWideString(const S: AnsiString; const aCodePage: Word): WideString;
+{**********************}
+{$IF defined(MSWINDOWS)}
+Function ALStringToWideString(const S: RawByteString; const aCodePage: Word): WideString;
 var InputLength,
     OutputLength: Integer;
 begin
@@ -10828,8 +10967,10 @@ begin
                          PWideChar(Result),
                          OutputLength) = 0 then raiseLastOsError;
 end;
+{$IFEND}
 
-{*************************************************************************************}
+{**********************}
+{$IF defined(MSWINDOWS)}
 function AlWideStringToString(const WS: WideString; const aCodePage: Word): AnsiString;
 var InputLength,
     OutputLength: Integer;
@@ -10858,17 +10999,28 @@ begin
                          nil,
                          nil) = 0 then raiseLastOsError;
 end;
+{$IFEND}
 
-{****************************************************************************}
-Function ALUTF8Encode(const S: AnsiString; const aCodePage: Word): AnsiString;
+{*******************************************************************************}
+Function ALUTF8Encode(const S: RawByteString; const aCodePage: Word): AnsiString;
+var TmpS: RawByteString;
 begin
-  Result := UTF8Encode(ALStringToWideString(S, aCodePage));
+  //Result := UTF8Encode(ALStringToWideString(S, aCodePage));
+  //it's look like the code below is a little (15%) more faster then
+  //the previous implementation, and it's compatible with OSX
+  TmpS := S;
+  SetCodePage(TmpS, aCodePage, False);
+  result := UTF8Encode(String(TmpS));
 end;
 
 {****************************************************************************}
-Function ALUTF8decode(const S: AnsiString; const aCodePage: Word): AnsiString;
+Function ALUTF8decode(const S: UTF8String; const aCodePage: Word): AnsiString;
 begin
-  Result := ALWideStringToString(UTF8ToWideString(S), aCodePage);
+  //Result := ALWideStringToString(UTF8ToWideString(S), aCodePage);
+  //it's look like the code below is a little (15%) more faster then
+  //the previous implementation, and it's compatible with OSX
+  result := S;
+  SetCodePage(RawByteString(Result), aCodePage, true);
 end;
 
 {*******************************************************************************************

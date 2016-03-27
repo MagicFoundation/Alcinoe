@@ -10242,12 +10242,12 @@ Var NodeStack: Tstack<TalJSONNodeU>;
   // \x02 + name + \x00 + length (int32) + string + \x00
   Procedure _WriteTextValue2Buffer(aTextNode:TalJSONNodeU);
   var aInt32: system.int32;
-      aText: String;
+      aText: Tbytes;
   begin
-    aText := aTextNode.Text;
+    aText := Tencoding.UTF8.GetBytes(aTextNode.Text);
     aInt32 := length(aText) + 1 {for the trailing #0};
     _Write2Buffer(aInt32, sizeOf(aInt32));
-    _WriteUTF8Str2Buffer(aText);
+    _WriteBytes2Buffer(aText);
     _WriteByte2Buffer($00);
   end;
 
@@ -10324,12 +10324,12 @@ Var NodeStack: Tstack<TalJSONNodeU>;
   // \x0D + name + \x00 + length (int32) + string + \x00
   Procedure _WriteJavascriptValue2Buffer(aTextNode:TalJSONNodeU);
   var aInt32: system.int32;
-      aJavascript: String;
+      aJavascript: Tbytes;
   begin
-    aJavascript := aTextNode.Javascript;
+    aJavascript := Tencoding.UTF8.GetBytes(aTextNode.Javascript);
     aInt32 := length(aJavascript) + 1 {for the trailing #0};
     _Write2Buffer(aInt32, sizeOf(aInt32));
-    _WriteUTF8Str2Buffer(aJavascript);
+    _WriteBytes2Buffer(aJavascript);
     _WriteByte2Buffer($00);
   end;
 

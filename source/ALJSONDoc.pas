@@ -189,6 +189,10 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
+{$IF Low(string) = 0}
+  {$DEFINE _ZEROBASEDSTRINGS_ON}
+{$IFEND}
+
 uses system.Classes,
      system.sysutils,
      {$IFNDEF NEXTGEN}
@@ -6394,7 +6398,9 @@ begin
   end;
 
 end;
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -6476,7 +6482,9 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -6555,7 +6563,9 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -6607,7 +6617,9 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -6647,7 +6659,9 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -6714,7 +6728,9 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
@@ -6781,7 +6797,9 @@ begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*******************************************}
 procedure ALJSONDocErrorU(const Msg: String); overload;
@@ -8110,7 +8128,9 @@ Begin
 
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
@@ -10105,7 +10125,9 @@ begin
   end;
 end;
 {$WARN WIDECHAR_REDUCED ON}
-{$ZEROBASEDSTRINGS ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {***********************************}
 {Saves the JSON document to a stream.

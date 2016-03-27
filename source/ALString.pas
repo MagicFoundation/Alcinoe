@@ -681,6 +681,11 @@ function  ALQuotedStrU(const S: String; const Quote: Char = ''''): String;
 var       ALDequotedStrU: function(const S: string; AQuote: Char): string;
 function  ALExtractQuotedStrU(var Src: PChar; Quote: Char): String;
 var       ALLastDelimiterU: function(const Delimiters, S: string): Integer;
+function  ALIsPathDelimiterU(const S: String; Index: Integer; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean;
+function  ALIncludeTrailingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+function  ALExcludeTrailingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+function  ALIncludeLeadingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+function  ALExcludeLeadingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
 procedure ALStrMoveU(const Source: PChar; var Dest: PChar; Count: NativeInt); inline;
 function  ALCopyStrU(const aSourceString: String; aStart, aLength: Integer): String; overload;
 procedure ALCopyStrU(const aSourceString: String; var aDestString: String; aStart, aLength: Integer); overload;
@@ -8972,7 +8977,7 @@ end;
 {******************************************************************************************************************************************************}
 function ALIsPathDelimiter(const S: AnsiString; Index: Integer; const PathDelimiter: ansiString = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean;
 begin
-  Result := (Index > 0) and (Index <= Length(S)) and (S[Index] = PathDelimiter);
+  Result := (Index >= low(s)) and (Index <= high(S)) and (S[Index] = PathDelimiter);
 end;
 
 {******************************************************************************************************************************************************}
@@ -9004,6 +9009,46 @@ begin
   if ALIsPathDelimiter(S, 1, PathDelimiter) then Result := ALcopyStr(S,2,maxint)
   else result := S;
 end;
+
+{$ENDIF !NEXTGEN}
+
+{***********************************************************************************************************************************************}
+function ALIsPathDelimiterU(const S: String; Index: Integer; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): Boolean;
+begin
+  Result := (Index >= low(s)) and (Index <= high(S)) and (S[low(s) + Index - 1] = PathDelimiter);
+end;
+
+{*******************************************************************************************************************************************}
+function ALIncludeTrailingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+begin
+  Result := S;
+  if not ALIsPathDelimiterU(Result, Length(Result), PathDelimiter) then
+    Result := Result + PathDelimiter;
+end;
+
+{*******************************************************************************************************************************************}
+function ALExcludeTrailingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+begin
+  Result := S;
+  if ALIsPathDelimiterU(Result, Length(Result), PathDelimiter) then
+    SetLength(Result, Length(Result)-1);
+end;
+
+{******************************************************************************************************************************************}
+function ALIncludeLeadingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+begin
+  if not ALIsPathDelimiterU(s, 1, PathDelimiter) then Result := PathDelimiter + s
+  else Result := S;
+end;
+
+{******************************************************************************************************************************************}
+function ALExcludeLeadingPathDelimiterU(const S: String; const PathDelimiter: String = {$IFDEF MSWINDOWS} '\' {$ELSE} '/' {$ENDIF}): String;
+begin
+  if ALIsPathDelimiterU(S, 1, PathDelimiter) then Result := ALcopyStrU(S,2,maxint)
+  else result := S;
+end;
+
+{$IFNDEF NEXTGEN}
 
 {*****************************************************************************************}
 {from John O'Harrow (john@elmcrest.demon.co.uk) - original name: StringReplace_JOH_IA32_12}

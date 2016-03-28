@@ -290,7 +290,7 @@ type
     FCapacity: Integer;
     FCount: integer;
     FList: TALJSONPointerList;
-    FOwner: TALJSONNode;
+    [weak] FOwner: TALJSONNode;
     procedure QuickSort(L, R: Integer; XCompare: TALJSONNodeListSortCompare);
   protected
     procedure Grow;
@@ -334,8 +334,8 @@ type
   {TALJSONNode represents a node in an JSON document.}
   TALJSONNode = class(TObject)
   private
-    FDocument: TALJSONDocument;
-    FParentNode: TALJSONNode;
+    [weak] FDocument: TALJSONDocument;
+    [weak] FParentNode: TALJSONNode;
     fNodeName: AnsiString;
   protected
     function CreateChildList: TALJSONNodeList;
@@ -667,7 +667,7 @@ type
     FCapacity: Integer;
     FCount: integer;
     FList: TALJSONPointerListU;
-    FOwner: TALJSONNodeU;
+    [weak] FOwner: TALJSONNodeU;
     procedure QuickSort(L, R: Integer; XCompare: TALJSONNodeListSortCompareU);
   protected
     procedure Grow;
@@ -711,8 +711,8 @@ type
   {TALJSONNodeU represents a node in an JSON document.}
   TALJSONNodeU = class(TObject)
   private
-    FDocument: TALJSONDocumentU;
-    FParentNode: TALJSONNodeU;
+    [weak] FDocument: TALJSONDocumentU;
+    [weak] FParentNode: TALJSONNodeU;
     fNodeName: String;
   protected
     function CreateChildList: TALJSONNodeListU;
@@ -4857,10 +4857,11 @@ begin
     Setlength(Buffer, BufferSize); // will make buffer uniquestring
     BufferPos := 0;
     LastWrittenChar := '{';
-    EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
-    SkipNodeSubTypeHelper4Int := poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions;
-    AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
-    IndentStr := FDocument.NodeIndentStr;
+    EncodeControlCharacters := (FDocument = nil) or (not (poIgnoreControlCharacters in FDocument.ParseOptions));
+    SkipNodeSubTypeHelper4Int := (FDocument <> nil) and (poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions);
+    AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
+    if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
+    else IndentStr := vALDefaultNodeIndent;
     CurrentIndentStr := '';
 
     {SaveOnlyChildNode}
@@ -5684,6 +5685,7 @@ end;
 destructor TALJSONNodeList.Destroy;
 begin
   Clear;
+  inherited;
 end;
 
 {*************************************}
@@ -5899,6 +5901,7 @@ begin
                                   FList[Index + 1],
                                   (FCount - Index) * SizeOf(Pointer));
   end;
+  Pointer(FList[index]) := nil;
   FList[index] := Node;
   Inc(FCount);
   Node.SetParentNode(Fowner);
@@ -5914,9 +5917,13 @@ var Node: TALJSONNode;
 begin
   Node := Get(Index);
   Dec(FCount);
-  if Index < FCount then ALMove(FList[Index + 1],
-                                FList[Index],
-                                (FCount - Index) * SizeOf(Pointer));
+  if Index < FCount then begin
+    FList[Index] := nil;
+    ALMove(FList[Index + 1],
+           FList[Index],
+           (FCount - Index) * SizeOf(Pointer));
+    Pointer(FList[FCount]) := nil;
+  end;
   if assigned(Node) then FreeAndNil(Node);
   result := Index;
 end;
@@ -10086,10 +10093,11 @@ begin
     Setlength(Buffer, BufferSize); // will make buffer uniquestring
     BufferPos := 0;
     LastWrittenChar := '{';
-    EncodeControlCharacters := not (poIgnoreControlCharacters in FDocument.ParseOptions);
-    SkipNodeSubTypeHelper4Int := poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions;
-    AutoIndentNode := (doNodeAutoIndent in FDocument.Options);
-    IndentStr := FDocument.NodeIndentStr;
+    EncodeControlCharacters := (FDocument = nil) or (not (poIgnoreControlCharacters in FDocument.ParseOptions));
+    SkipNodeSubTypeHelper4Int := (FDocument <> nil) and (poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions);
+    AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
+    if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
+    else IndentStr := vALDefaultNodeIndentU;
     CurrentIndentStr := '';
 
     {SaveOnlyChildNode}
@@ -10943,6 +10951,7 @@ end;
 destructor TALJSONNodeListU.Destroy;
 begin
   Clear;
+  inherited;
 end;
 
 {*************************************}
@@ -11158,6 +11167,7 @@ begin
                                   FList[Index + 1],
                                   (FCount - Index) * SizeOf(Pointer));
   end;
+  Pointer(FList[index]) := nil;
   FList[index] := Node;
   Inc(FCount);
   Node.SetParentNode(Fowner);
@@ -11173,9 +11183,13 @@ var Node: TALJSONNodeU;
 begin
   Node := Get(Index);
   Dec(FCount);
-  if Index < FCount then ALMove(FList[Index + 1],
-                                FList[Index],
-                                (FCount - Index) * SizeOf(Pointer));
+  if Index < FCount then begin
+    FList[Index] := nil;
+    ALMove(FList[Index + 1],
+           FList[Index],
+           (FCount - Index) * SizeOf(Pointer));
+    Pointer(FList[FCount]) := nil;
+  end;
   if assigned(Node) then FreeAndNil(Node);
   result := Index;
 end;

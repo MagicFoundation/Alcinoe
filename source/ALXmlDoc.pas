@@ -209,7 +209,7 @@ type
     FCapacity: Integer; // [added from TXMLNodeList]
     FCount: integer; // [added from TXMLNodeList]
     FList: TALXMLPointerList; //[Replace from TXMLNodeList] FList: IInterfaceList;
-    FOwner: TALXMLNode;
+    [weak] FOwner: TALXMLNode;
     procedure QuickSort(L, R: Integer; XCompare: TALXMLNodeListSortCompare); // [added from TXMLNodeList]
   protected
     //[Deleted from TXMLNodeList] function DoNotify(Operation: TNodeListOperation; const Node: IXMLNode; const IndexOrName: OleVariant; BeforeOperation: Boolean): IXMLNode;
@@ -288,7 +288,7 @@ type
     //[Deleted from TXMLNode] FReadOnly: Boolean;
     //[Deleted from TXMLNode] FOnHostChildNotify: TNodeListNotification;
     //[Deleted from TXMLNode] FOnHostAttrNotify: TNodeListNotification;
-    FDocument: TALXMLDocument;
+    [weak] FDocument: TALXMLDocument;
   protected
     //[Deleted from TXMLNode] function _AddRef: Integer; stdcall;
     //[Deleted from TXMLNode] function _Release: Integer; stdcall;
@@ -421,7 +421,7 @@ type
   private
     FAttributeNodes: TALXMLNodeList;
     FChildNodes: TALXMLNodeList;
-    FParentNode: TALXMLNode;
+    [weak] FParentNode: TALXMLNode;
     FInternalValue: AnsiString;
   protected
     procedure DoBeforeChildNodesInsert(Index: Integer; const Node: TALXMLNode); override; // [added from TXMLNode]
@@ -466,7 +466,7 @@ type
    or ntEntityRef.}
   TALXmlTextNode = Class(TALXMLNode)
   private
-    FParentNode: TALXMLNode;
+    [weak] FParentNode: TALXMLNode;
     FInternalValue: AnsiString;
   protected
     function GetNodeType: TALXMLNodeType; override;
@@ -501,7 +501,7 @@ type
    They appear as the child of an ntDocument, ntDocFragment, ntElement, or ntEntityRef node.}
   TALXmlCommentNode = Class(TALXMLNode)
   private
-    FParentNode: TALXMLNode;
+    [weak] FParentNode: TALXMLNode;
     FInternalValue: AnsiString;
   protected
     function GetNodeType: TALXMLNodeType; override;
@@ -519,7 +519,7 @@ type
    ntDocFragment, ntElement, or ntEntityRef.}
   TALXmlProcessingInstrNode = Class(TALXMLNode)
   private
-    FParentNode: TALXMLNode;
+    [weak] FParentNode: TALXMLNode;
     FInternalValue: AnsiString;
     FInternalChildValue: AnsiString;
   protected
@@ -540,7 +540,7 @@ type
    nodes. They can appear as the child of an ntDocFragment, ntEntityRef, or ntElement node.}
   TALXmlCDataNode = Class(TALXMLNode)
   private
-    FParentNode: TALXMLNode;
+    [weak] FParentNode: TALXMLNode;
     FInternalValue: AnsiString;
   protected
     function GetNodeType: TALXMLNodeType; override;
@@ -1071,7 +1071,7 @@ Var buffer: AnsiString;
     Paths: TALStringList;
     CodePage: Word;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function Expandbuffer: boolean;
   Var ByteReaded, Byte2Read: Integer;
   Begin
@@ -3329,6 +3329,7 @@ end;
 destructor TALXMLNodeList.Destroy;
 begin
   Clear;
+  inherited;
 end;
 
 {*************************************}
@@ -3544,6 +3545,7 @@ begin
                                   FList[Index + 1],
                                   (FCount - Index) * SizeOf(Pointer));
   end;
+  Pointer(FList[index]) := nil;
   FList[index] := Node;
   Inc(FCount);
   Node.SetParentNode(Fowner);
@@ -3603,7 +3605,13 @@ var Node: TALXMLNode;
 begin
   Node := Get(Index);
   Dec(FCount);
-  if Index < FCount then ALMove(FList[Index + 1], FList[Index], (FCount - Index) * SizeOf(Pointer));
+  if Index < FCount then begin
+    FList[Index] := nil;
+    ALMove(FList[Index + 1],
+           FList[Index],
+           (FCount - Index) * SizeOf(Pointer));
+    Pointer(FList[FCount]) := nil;
+  end;
   if assigned(Node) then FreeAndNil(Node);
   result := Index;
 end;

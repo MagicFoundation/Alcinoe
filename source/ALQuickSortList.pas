@@ -537,6 +537,7 @@ end;
 destructor TALBaseQuickSortList.Destroy;
 begin
   Clear;
+  inherited;
 end;
 
 {***********************************}
@@ -549,11 +550,11 @@ end;
 {***********************************************************************}
 procedure TALBaseQuickSortList.InsertItem(Index: Integer; Item: Pointer);
 begin
-  if FCount = FCapacity then
-    Grow;
+  if FCount = FCapacity then Grow;
   if Index < FCount then
     ALMove(FList[Index], FList[Index + 1],
       (FCount - Index) * SizeOf(Pointer));
+  Pointer(FList[Index]) := nil;
   FList[Index] := Item;
   Inc(FCount);
   if (Item <> nil) then
@@ -579,9 +580,13 @@ begin
     Error(@SALListIndexError, Index);
   Temp := FList[Index];
   Dec(FCount);
-  if Index < FCount then
-    ALMove(FList[Index + 1], FList[Index],
-      (FCount - Index) * SizeOf(Pointer));
+  if Index < FCount then begin
+    FList[Index] := nil;
+    ALMove(FList[Index + 1],
+           FList[Index],
+          (FCount - Index) * SizeOf(Pointer));
+    Pointer(FList[FCount]) := nil;
+  end;
   if (Temp <> nil) then
     Notify(Temp, lnDeleted);
 end;
@@ -889,7 +894,7 @@ end;
 procedure TALIntegerList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then PALIntegerListItem(Ptr).FObject.Free;
+    if OwnsObjects then freeandnil(PALIntegerListItem(Ptr).FObject);
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1084,7 +1089,7 @@ end;
 procedure TALCardinalList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then PALCardinalListItem(Ptr).FObject.Free;
+    if OwnsObjects then freeandnil(PALCardinalListItem(Ptr).FObject);
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1277,7 +1282,7 @@ end;
 procedure TALInt64List.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then PALInt64ListItem(Ptr).FObject.Free;
+    if OwnsObjects then freeandnil(PALInt64ListItem(Ptr).FObject);
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1470,7 +1475,7 @@ end;
 procedure TALNativeIntList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then PALNativeIntListItem(Ptr).FObject.Free;
+    if OwnsObjects then freeandnil(PALNativeIntListItem(Ptr).FObject);
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1663,7 +1668,7 @@ end;
 procedure TALDoubleList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then PALDoubleListItem(Ptr).FObject.Free;
+    if OwnsObjects then freeandnil(PALDoubleListItem(Ptr).FObject);
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);

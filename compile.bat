@@ -17,6 +17,9 @@ IF ERRORLEVEL 1 goto ERROR
 del *.dproj.local /s
 IF ERRORLEVEL 1 goto ERROR
 
+del *.deployproj.local /s
+IF ERRORLEVEL 1 goto ERROR
+
 del *.dcu /s
 IF ERRORLEVEL 1 goto ERROR
 

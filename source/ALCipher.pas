@@ -88,46 +88,27 @@ interface
 {$IFEND}
 
 
-uses {$IFNDEF NEXTGEN}
-       system.sysutils,
-       {$IF defined(MSWINDOWS)}
-       winapi.windows,
-       {$ELSE}
-       system.types,
-       {$IFEND}
-       System.Classes,
-       ALString;
+uses system.sysutils,
+     {$IF defined(MSWINDOWS)}
+     winapi.windows,
      {$ELSE}
-       system.sysutils,
-       System.Classes,
-       system.types;
-     {$ENDIF}
-
-{$IFNDEF NEXTGEN}
-
-const
-
-  { largest structure that can be created }
-  cALCipherMaxStructSize = 1024 * 2000000; {2G}
-
+     system.types,
+     {$IFEND}
+     System.Classes,
+     ALString;
 
 { Cipher exception }
 type
+  {$IFNDEF NEXTGEN}
   EALCipherException = class(EALException);
+  {$ELSE}
+  EALCipherException = class(EALExceptionU);
+  {$ENDIF}
 
 { encryption key types }
 type
-  PALCipherKey64  = ^TALCipherKey64;                                                 {!!.03}
-  TALCipherKey64  = array [0..7] of Byte;
-
   PALCipherKey128 = ^TALCipherKey128;                                                {!!.03}
   TALCipherKey128 = array [0..15] of Byte;
-
-  PALCipherKey192 = ^TALCipherKey192;                                                {!!.03}
-  TALCipherKey192 = array [0..23] of Byte;
-
-  PALCipherKey256 = ^TALCipherKey256;                                                {!!.03}
-  TALCipherKey256 = array [0..31] of Byte;
 
 { message digest blocks }
 type
@@ -146,9 +127,14 @@ type
     sdBuf   : array [0..63] of Byte;
   end;
 
+{$IFNDEF NEXTGEN}
 { Key generation }
 procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : AnsiString);
 procedure ALCipherGenerateRandomKey(var Key; KeySize : Integer);
+{$ENDIF}
+procedure ALCipherGenerateMD5KeyU(var Key : TALCipherKey128; const Str : String; Const encoding: Tencoding);
+
+{$IFNDEF NEXTGEN}
 
 { Misc public utilities }
 function  AlCipherBufferToHex(const Buf; BufSize : Cardinal) : AnsiString;
@@ -243,20 +229,36 @@ procedure ALRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key: Ans
 procedure ALRDLEncryptStream(InStream, OutStream : TStream; const Key: AnsiString; Encrypt : Boolean); overload;
 procedure ALRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key: AnsiString; Encrypt : Boolean); overload;
 {$ENDIF}
-
-{$IFNDEF NEXTGEN}
+procedure ALRDLEncryptStringU(const InString: String; var OutString : String; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStringCBCU(const InString: String; var OutString : String; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+function  ALRDLEncryptStringU(const InString: String; const Key; KeySize : Longint; Encrypt : Boolean) : String; overload;
+function  ALRDLEncryptStringCBCU(const InString: String; const Key; KeySize : Longint; Encrypt : Boolean) : String; overload;
+procedure ALRDLEncryptFileU(const InFile, OutFile : String; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptFileCBCU(const InFile, OutFile : String; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStringU(const InString: String; var OutString : String; const Key: String; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStringCBCU(const InString: String; var OutString : String; const Key: String; Encrypt : Boolean); overload;
+function  ALRDLEncryptStringU(const InString: String; const Key: String; Encrypt : Boolean) : String; overload;
+function  ALRDLEncryptStringCBCU(const InString: String; const Key: String; Encrypt : Boolean) : String; overload;
+procedure ALRDLEncryptFileU(const InFile, OutFile : String; const Key: String; Encrypt : Boolean); overload;
+procedure ALRDLEncryptFileCBCU(const InFile, OutFile : String; const Key: String; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStreamU(InStream, OutStream : TStream; const Key: String; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStreamCBCU(InStream, OutStream : TStream; const Key: String; Encrypt : Boolean); overload;
 
 { MD5 }
 procedure ALCipherInitMD5(var Context : TALCipherMD5Context);
 procedure ALCipherHashMD5(var Digest : TALCipherMD5Digest; const Buf; BufSize : LongInt);
 procedure ALCipherFinalizeMD5(var Context : TALCipherMD5Context; var Digest : TALCipherMD5Digest);
 procedure ALCipherUpdateMD5(var Context : TALCipherMD5Context; const Buf;  BufSize : LongInt);
+{$IFNDEF NEXTGEN}
 procedure ALFileHashMD5(var Digest : TAlCipherMD5Digest; const AFileName : AnsiString); overload;
 function  ALFileHashMD5(const AFileName : AnsiString): AnsiString; overload;
 procedure ALStreamHashMD5(var Digest : TAlCipherMD5Digest; AStream : TStream); overload;
 function  ALStreamHashMD5(AStream : TStream): AnsiString; overload;
 procedure ALStringHashMD5(var Digest : TALCipherMD5Digest; const Str : AnsiString); overload;
 function  ALStringHashMD5(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
+{$ENDIF}
+
+{$IFNDEF NEXTGEN}
 
 { SHA1 }
 procedure ALCipherInitSHA1(var Context: TALCipherSHA1Context);
@@ -349,12 +351,11 @@ var
 
 implementation
 
-{$IFNDEF NEXTGEN}
+
 uses {$IF defined(MSWINDOWS)}
      winapi.MMSystem,
      {$IFEND}
      system.Math;
-{$ENDIF}
 
 {$IFNDEF NEXTGEN}
 
@@ -728,6 +729,7 @@ const
   cALCipherLBMASK_HI = DWORD( $FF0000 );
   cALCipherLBMASK_LO = DWORD( $FF00 );
 
+{$ENDIF}
 
 { Rijndael constants }
 const
@@ -742,7 +744,6 @@ const
 { Rijndael structures }
 type
   TALCipherRDLVectors = array[0..(cALCipherRDLNb128 - 1)] of TALCipherRDLVector;
-  TALCipherRDLMixColMatrix = array[0..3, 0..3] of Byte;
 
 {-Rijndael lookup tables}
 
@@ -1069,6 +1070,8 @@ const
      $D7CADC31, $D9C1D138, $CBDCC623, $C5D7CB2A, $EFE6E815, $E1EDE51C, $F3F0F207, $FDFBFF0E,
      $A792B479, $A999B970, $BB84AE6B, $B58FA362, $9FBE805D, $91B58D54, $83A89A4F, $8DA39746);
 
+{$IFNDEF NEXTGEN}
+
 {***************************************************************************************}
 procedure ALCipherInitEncryptBF(Key : TALCipherKey128; var Context : TALCipherBFContext);
 var
@@ -1197,9 +1200,24 @@ procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : AnsiStri
 var
   D : TALCipherMD5Digest;
 begin
-  ALCipherHashMD5(D, Str[1], Length(Str));
+  ALCipherHashMD5(D, Str[low(ansiString)], Length(Str));
   Key := TALCipherKey128(D);
 end;
+
+{$ENDIF}
+
+{**********************************************************************************************************}
+procedure ALCipherGenerateMD5KeyU(var Key : TALCipherKey128; const Str : String; Const encoding: Tencoding);
+var
+  abytes: Tbytes;
+  D : TALCipherMD5Digest;
+begin
+  aBytes := encoding.GetBytes(str);
+  ALCipherHashMD5(D, aBytes[0], Length(aBytes));
+  Key := TALCipherKey128(D);
+end;
+
+{$IFNDEF NEXTGEN}
 
 {************************************************}
 procedure ALCipherMix128(var X : TALCipher128Bit);
@@ -1541,9 +1559,9 @@ end;
 
 {$ENDIF}
 
-{*******************************************************************************}
-procedure ALCipherXorMemPrim(var Mem1;  const Mem2;  Count : Cardinal); register;
-{$IF defined(CPU64BITS)}
+{*********************************************************************}
+procedure ALCipherXorMemPrim(var Mem1;  const Mem2;  Count : Cardinal);
+{$IF defined(NEXTGEN) or defined(CPU64BITS)}
 var
   PMem1, PMem2: PLongword;
   Rest: Integer;
@@ -1572,6 +1590,7 @@ begin
   end;
 end;
 {$ELSE}
+register;
 asm
   push esi
   push edi
@@ -1803,6 +1822,8 @@ begin
   end;
 end;
 
+{$ENDIF}
+
 {*****Rijndael************************************************************}
 function ALCipherRdlSubVector(v : TALCipherRDLVector) : TALCipherRDLVector;
   { S-Box substitution }
@@ -1882,8 +1903,6 @@ begin
   State := TALCipherRDLBlock(r);
 end;
 
-{$ENDIF}
-
 {***********************************************************************************************}
 procedure ALCipherEncryptRDL(const Context : TALCipherRDLContext; var Block : TALCipherRDLBlock);
   { encrypt/decrypt block ECB mode }
@@ -1957,11 +1976,11 @@ begin
   end;
 end;
 
-{$IFNDEF NEXTGEN}
-
 {***}
 const
   cAlCryptInvalidFileFormat = 'Invalid file format';
+
+{$IFNDEF NEXTGEN}
 
 {*****Blowfish****************************************}
 procedure ALBFEncryptString(const InString: AnsiString;
@@ -2287,113 +2306,7 @@ begin
   ALBFEncryptFileCBC(InFile, OutFile, aCipherKey128, Encrypt);
 end;
 
-{*****Rijndael*****************************************}
-procedure AlRDLEncryptString(const InString: AnsiString;
-                             var OutString: AnsiString;
-                             const Key;
-                             KeySize : Longint;
-                             Encrypt : Boolean);
-begin
-  OutString := AlRDLEncryptString(InString, Key, KeySize, Encrypt);
-end;
-
-{*********************************************************}
-procedure AlRDLEncryptStringCBC(const InString: AnsiString;
-                                var OutString: AnsiString;
-                                const Key;
-                                KeySize : Longint;
-                                Encrypt : Boolean);
-begin
-  OutString := AlRDLEncryptStringCBC(InString, Key, KeySize, Encrypt);
-end;
-
-{*****************************************************}
-function AlRDLEncryptString(const InString: AnsiString;
-                            const Key;
-                            KeySize : Longint;
-                            Encrypt : Boolean): AnsiString;
-var
-  InStream  : TMemoryStream;
-  OutStream : TMemoryStream;
-begin
-  InStream := TMemoryStream.Create;
-  OutStream := TMemoryStream.Create;
-  try
-    InStream.WriteBuffer(pointer(InString)^, Length(InString));
-    InStream.Position := 0;
-
-    if Encrypt then AlRDLEncryptStream(InStream, OutStream, Key, KeySize, True)
-    else AlRDLEncryptStream(InStream, OutStream, Key, KeySize, False);
-    OutStream.Position := 0;
-    SetLength(Result, OutStream.Size);
-    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
-  finally
-    InStream.Free;
-    OutStream.Free;
-  end;
-end;
-
-{********************************************************}
-function AlRDLEncryptStringCBC(const InString: AnsiString;
-                               const Key;
-                               KeySize : Longint;
-                               Encrypt : Boolean) : AnsiString;
-var
-  InStream  : TMemoryStream;
-  OutStream : TMemoryStream;
-begin
-  InStream := TMemoryStream.Create;
-  OutStream := TMemoryStream.Create;
-  Try
-    InStream.WriteBuffer(pointer(InString)^, Length(InString));
-    InStream.Position := 0;
-
-    if Encrypt then AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, True)
-    else AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, False);
-    OutStream.Position := 0;
-    SetLength(Result, OutStream.Size);
-    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
-  finally
-    InStream.Free;
-    OutStream.Free;
-  end;
-end;
-
-{**************************************************************************************************************}
-procedure AlRDLEncryptFile(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean);
-var
-  InStream, OutStream : TStream;
-begin
-  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
-  try
-    OutStream := TFileStream.Create(String(OutFile), fmCreate);
-    try
-      ALRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
-    finally
-      OutStream.Free;
-    end;
-  finally
-    InStream.Free;
-  end;
-end;
-
-{*****************************************************************************************************************}
-procedure AlRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean);
-var
-  InStream, OutStream : TStream;
-begin
-  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
-  try
-    OutStream := TFileStream.Create(String(OutFile), fmCreate);
-    try
-      ALRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, Encrypt);
-    finally
-      OutStream.Free;
-    end;
-  finally
-    InStream.Free;
-  end;
-end;
+{$ENDIF}
 
 {***********************************************************************************************************}
 procedure AlRDLEncryptStream(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean);
@@ -2533,6 +2446,116 @@ begin
   end;
 end;
 
+{$IFNDEF NEXTGEN}
+
+{******************************************************}
+procedure AlRDLEncryptString(const InString: AnsiString;
+                             var OutString: AnsiString;
+                             const Key;
+                             KeySize : Longint;
+                             Encrypt : Boolean);
+begin
+  OutString := AlRDLEncryptString(InString, Key, KeySize, Encrypt);
+end;
+
+{*********************************************************}
+procedure AlRDLEncryptStringCBC(const InString: AnsiString;
+                                var OutString: AnsiString;
+                                const Key;
+                                KeySize : Longint;
+                                Encrypt : Boolean);
+begin
+  OutString := AlRDLEncryptStringCBC(InString, Key, KeySize, Encrypt);
+end;
+
+{*****************************************************}
+function AlRDLEncryptString(const InString: AnsiString;
+                            const Key;
+                            KeySize : Longint;
+                            Encrypt : Boolean): AnsiString;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  try
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then AlRDLEncryptStream(InStream, OutStream, Key, KeySize, True)
+    else AlRDLEncryptStream(InStream, OutStream, Key, KeySize, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{********************************************************}
+function AlRDLEncryptStringCBC(const InString: AnsiString;
+                               const Key;
+                               KeySize : Longint;
+                               Encrypt : Boolean) : AnsiString;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  Try
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, True)
+    else AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{**************************************************************************************************************}
+procedure AlRDLEncryptFile(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(String(OutFile), fmCreate);
+    try
+      ALRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{*****************************************************************************************************************}
+procedure AlRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(String(InFile), fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(String(OutFile), fmCreate);
+    try
+      ALRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
 {******************************************************}
 procedure AlRDLEncryptString(const InString: AnsiString;
                              var OutString : AnsiString;
@@ -2614,6 +2637,200 @@ begin
   ALCipherGenerateMD5Key(aCipherKey128, Key);
   AlRDLEncryptFileCBC(InFile, OutFile, aCipherKey128, 16, Encrypt);
 end;
+
+{$ENDIF}
+
+{***************************************************}
+procedure AlRDLEncryptStringU(const InString: String;
+                              var OutString: String;
+                              const Key;
+                              KeySize : Longint;
+                              Encrypt : Boolean);
+begin
+  OutString := AlRDLEncryptStringU(InString, Key, KeySize, Encrypt);
+end;
+
+{******************************************************}
+procedure AlRDLEncryptStringCBCU(const InString: String;
+                                 var OutString: String;
+                                 const Key;
+                                 KeySize : Longint;
+                                 Encrypt : Boolean);
+begin
+  OutString := AlRDLEncryptStringCBCU(InString, Key, KeySize, Encrypt);
+end;
+
+{**************************************************}
+function AlRDLEncryptStringU(const InString: String;
+                             const Key;
+                             KeySize : Longint;
+                             Encrypt : Boolean): String;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  try
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then AlRDLEncryptStream(InStream, OutStream, Key, KeySize, True)
+    else AlRDLEncryptStream(InStream, OutStream, Key, KeySize, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{*****************************************************}
+function AlRDLEncryptStringCBCU(const InString: String;
+                                const Key;
+                                KeySize : Longint;
+                                Encrypt : Boolean) : String;
+var
+  InStream  : TMemoryStream;
+  OutStream : TMemoryStream;
+begin
+  InStream := TMemoryStream.Create;
+  OutStream := TMemoryStream.Create;
+  Try
+    InStream.WriteBuffer(pointer(InString)^, Length(InString));
+    InStream.Position := 0;
+
+    if Encrypt then AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, True)
+    else AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, False);
+    OutStream.Position := 0;
+    SetLength(Result, OutStream.Size);
+    OutStream.ReadBuffer(pointer(Result)^, OutStream.Size);
+  finally
+    InStream.Free;
+    OutStream.Free;
+  end;
+end;
+
+{***********************************************************************************************************}
+procedure AlRDLEncryptFileU(const InFile, OutFile : String; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(InFile, fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(OutFile, fmCreate);
+    try
+      AlRDLEncryptStream(InStream, OutStream, Key, KeySize, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{**************************************************************************************************************}
+procedure AlRDLEncryptFileCBCU(const InFile, OutFile : String; const Key; KeySize : Longint; Encrypt : Boolean);
+var
+  InStream, OutStream : TStream;
+begin
+  InStream := TFileStream.Create(InFile, fmOpenRead or fmShareDenyWrite);
+  try
+    OutStream := TFileStream.Create(OutFile, fmCreate);
+    try
+      AlRDLEncryptStreamCBC(InStream, OutStream, Key, KeySize, Encrypt);
+    finally
+      OutStream.Free;
+    end;
+  finally
+    InStream.Free;
+  end;
+end;
+
+{***************************************************}
+procedure AlRDLEncryptStringU(const InString: String;
+                              var OutString : String;
+                              const Key: String;
+                              Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  AlRDLEncryptStringU(InString,OutString, aCipherKey128, 16, Encrypt);
+end;
+
+{******************************************************}
+procedure AlRDLEncryptStringCBCU(const InString: String;
+                                 var OutString : String;
+                                 const Key: String;
+                                 Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  AlRDLEncryptStringCBCU(InString, OutString, aCipherKey128, 16, Encrypt);
+end;
+
+{***************************************************}
+function  AlRDLEncryptStringU(const InString: String;
+                              const Key: String;
+                              Encrypt : Boolean) : String;
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  Result := AlRDLEncryptStringU(InString, aCipherKey128, 16, Encrypt);
+end;
+
+{******************************************************}
+function  AlRDLEncryptStringCBCU(const InString: String;
+                                 const Key: String;
+                                 Encrypt : Boolean) : String;
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  result := AlRDLEncryptStringCBCU(InString, aCipherKey128, 16, Encrypt);
+end;
+
+{*********************************************************}
+procedure AlRDLEncryptStreamU(InStream, OutStream: TStream;
+                              const Key: String;
+                              Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  AlRDLEncryptStream(InStream, OutStream, aCipherKey128, 16, Encrypt);
+end;
+
+{************************************************************}
+procedure AlRDLEncryptStreamCBCU(InStream, OutStream: TStream;
+                                 const Key: String;
+                                 Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  AlRDLEncryptStreamCBC(InStream, OutStream, aCipherKey128, 16, Encrypt);
+end;
+
+{********************************************************}
+procedure AlRDLEncryptFileU(const InFile, OutFile: String;
+                            const Key: String;
+                            Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  AlRDLEncryptFileU(InFile, OutFile, aCipherKey128, 16, Encrypt);
+end;
+
+{***********************************************************}
+procedure AlRDLEncryptFileCBCU(const InFile, OutFile: String;
+                               const Key: String;
+                               Encrypt : Boolean);
+var aCipherKey128: TALCipherKey128;
+begin
+  ALCipherGenerateMD5KeyU(aCipherKey128, Key, Tencoding.UTF8); // utf8 to stay compatible with the ansi version (who normally use UTF8 ansi String)
+  AlRDLEncryptFileCBCU(InFile, OutFile, aCipherKey128, 16, Encrypt);
+end;
+
+{$IFNDEF NEXTGEN}
 
 {****MD5******************************************************************************}
 procedure AlFileHashMD5(var Digest : TALCipherMD5Digest; const AFileName : AnsiString);

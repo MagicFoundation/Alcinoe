@@ -97,8 +97,10 @@ uses {$IFNDEF NEXTGEN}
        {$IFEND}
        System.Classes,
        ALString;
-       {$ELSE}
-       system.sysutils;
+     {$ELSE}
+       system.sysutils,
+       System.Classes,
+       system.types;
      {$ENDIF}
 
 {$IFNDEF NEXTGEN}
@@ -109,49 +111,9 @@ const
   cALCipherMaxStructSize = 1024 * 2000000; {2G}
 
 
+{ Cipher exception }
 type
-
-  { Cipher exception }
   EALCipherException = class(EALException);
-
-  { general structures }
-  pALCipherLongIntArray = ^TALCipherLongIntArray;
-  TALCipherLongIntArray = array [0..cALCipherMaxStructSize div SizeOf(LongInt) - 1] of LongInt;
-
-  TALCipherLongIntRec = packed record
-    case Byte of
-      1: (Lo: Word;
-          Hi: Word);
-      2: (LoLo: Byte;
-          LoHi: Byte;
-          HiLo: Byte;
-          HiHi: Byte);
-  end;
-
-  TALCipherInt64 = packed record
-    case Byte of
-      0: (Lo: LongInt;
-          Hi: LongInt);
-      1: (LoLo: Word;
-          LoHi: Word;
-          HiLo: Word;
-          HiHi: Word);
-      2: (LoLoLo: Byte;
-          LoLoHi: Byte;
-          LoHiLo: Byte;
-          LoHiHi: Byte;
-          HiLoLo: Byte;
-          HiLoHi: Byte;
-          HiHiLo: Byte;
-          HiHiHi: Byte);
-  end;
-
-  TALCipherRDLVector = record
-    case Byte of
-      0 : (dw : DWord);
-      1 : (bt : array[0..3] of Byte);
-    end;
-
 
 { encryption key types }
 type
@@ -166,37 +128,6 @@ type
 
   PALCipherKey256 = ^TALCipherKey256;                                                {!!.03}
   TALCipherKey256 = array [0..31] of Byte;
-
-
-{ encryption block types }
-type
-  TALCipherBFBlock   = array[0..1] of LongInt;     { BlowFish }
-  TALCipherRDLBlock  = array[0..15] of Byte;       { Rijndael }
-
-
-{ context type constants }
-const
-  cALCipherBFRounds = 16;      { 16 blowfish rounds }
-  cALCipherMaxRDLRounds = 14;  { 14 Rijndael rounds }
-
-
-{ block cipher context types }
-type
-  { Blowfish }
-  TALCipherBFContext = packed record
-    PBox    : array[0..(cALCipherBFRounds+1)] of LongInt;
-    SBox    : array[0..3, 0..255] of LongInt;
-  end;
-
-  { Rijndael }
-  TALCipherRDLContext = packed record
-    Encrypt : Boolean;
-    Dummy   : array[0..2] of Byte; {filler}
-    Rounds  : DWord;
-    case Byte of
-      0 : (W  : array[0..(cALCipherMaxRDLRounds * 4)] of TALCipherRDLVector);
-      1 : (Rk : array[0..cALCipherMaxRDLRounds] of TALCipherRDLBlock);
-    end;
 
 { message digest blocks }
 type
@@ -225,6 +156,22 @@ procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
 function  ALCipherRolX(I, C : DWord) : DWord; register;
 
 { Blowfish }
+
+{ encryption block types }
+type
+  TALCipherBFBlock   = array[0..1] of LongInt;     { BlowFish }
+
+{ context type constants }
+const
+  cALCipherBFRounds = 16;      { 16 blowfish rounds }
+
+{ block cipher context types }
+type
+  TALCipherBFContext = packed record
+    PBox    : array[0..(cALCipherBFRounds+1)] of LongInt;
+    SBox    : array[0..3, 0..255] of LongInt;
+  end;
+
 procedure ALCipherInitEncryptBF(Key : TALCipherKey128; var Context : TALCipherBFContext);
 procedure ALCipherEncryptBF(const Context : TALCipherBFContext; var Block : TALCipherBFBlock; Encrypt : Boolean);
 procedure ALCipherEncryptBFCBC(const Context : TALCipherBFContext; const Prev : TALCipherBFBlock; var Block : TALCipherBFBlock; Encrypt : Boolean);
@@ -245,18 +192,48 @@ procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiStri
 procedure ALBFEncryptFile(const InFile, OutFile: AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
 procedure ALBFEncryptFileCBC(const InFile, OutFile: AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
 
+{$ENDIF}
+
 { Rijndael (AES) }
+
+type
+  TALCipherRDLVector = record
+    case Byte of
+      0 : (dw : DWord);
+      1 : (bt : array[0..3] of Byte);
+    end;
+
+{ encryption block types }
+type
+  TALCipherRDLBlock  = array[0..15] of Byte;       { Rijndael }
+
+{ context type constants }
+const
+  cALCipherMaxRDLRounds = 14;  { 14 Rijndael rounds }
+
+{ block cipher context types }
+type
+  TALCipherRDLContext = packed record
+    Encrypt : Boolean;
+    Dummy   : array[0..2] of Byte; {filler}
+    Rounds  : DWord;
+    case Byte of
+      0 : (W  : array[0..(cALCipherMaxRDLRounds * 4)] of TALCipherRDLVector);
+      1 : (Rk : array[0..cALCipherMaxRDLRounds] of TALCipherRDLBlock);
+    end;
+
 procedure ALCipherInitEncryptRDL(const Key; KeySize : Longint; var Context : TALCipherRDLContext; Encrypt : Boolean);
 procedure ALCipherEncryptRDL(const Context : TALCipherRDLContext; var Block : TALCipherRDLBlock);
 procedure ALCipherEncryptRDLCBC(const Context : TALCipherRDLContext; const Prev : TALCipherRDLBlock; var Block : TALCipherRDLBlock);
+procedure ALRDLEncryptStream(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+procedure ALRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean); overload;
+{$IFNDEF NEXTGEN}
 procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
 procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
 function  ALRDLEncryptString(const InString: AnsiString; const Key; KeySize : Longint; Encrypt : Boolean) : AnsiString; overload;
 function  ALRDLEncryptStringCBC(const InString: AnsiString; const Key; KeySize : Longint; Encrypt : Boolean) : AnsiString; overload;
 procedure ALRDLEncryptFile(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
 procedure ALRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key; KeySize : Longint; Encrypt : Boolean); overload;
-procedure ALRDLEncryptStream(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean); overload;
-procedure ALRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key; KeySize : Longint; Encrypt : Boolean); overload;
 procedure ALRDLEncryptString(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
 procedure ALRDLEncryptStringCBC(const InString: AnsiString; var OutString : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
 function  ALRDLEncryptString(const InString: AnsiString; const Key: AnsiString; Encrypt : Boolean) : AnsiString; overload;
@@ -265,6 +242,9 @@ procedure ALRDLEncryptFile(const InFile, OutFile : AnsiString; const Key: AnsiSt
 procedure ALRDLEncryptFileCBC(const InFile, OutFile : AnsiString; const Key: AnsiString; Encrypt : Boolean); overload;
 procedure ALRDLEncryptStream(InStream, OutStream : TStream; const Key: AnsiString; Encrypt : Boolean); overload;
 procedure ALRDLEncryptStreamCBC(InStream, OutStream : TStream; const Key: AnsiString; Encrypt : Boolean); overload;
+{$ENDIF}
+
+{$IFNDEF NEXTGEN}
 
 { MD5 }
 procedure ALCipherInitMD5(var Context : TALCipherMD5Context);
@@ -1559,6 +1539,8 @@ begin
   Digest := Temp[3];
 end;
 
+{$ENDIF}
+
 {*******************************************************************************}
 procedure ALCipherXorMemPrim(var Mem1;  const Mem2;  Count : Cardinal); register;
 {$IF defined(CPU64BITS)}
@@ -1628,6 +1610,8 @@ asm
   pop  esi
 end;
 {$ifend}
+
+{$IFNDEF NEXTGEN}
 
 {*****************************************************************}
 procedure ALCipherXorMem(var Mem1;  const Mem2;  Count : Cardinal);
@@ -1898,6 +1882,8 @@ begin
   State := TALCipherRDLBlock(r);
 end;
 
+{$ENDIF}
+
 {***********************************************************************************************}
 procedure ALCipherEncryptRDL(const Context : TALCipherRDLContext; var Block : TALCipherRDLBlock);
   { encrypt/decrypt block ECB mode }
@@ -1970,6 +1956,8 @@ begin
       end;
   end;
 end;
+
+{$IFNDEF NEXTGEN}
 
 {***}
 const

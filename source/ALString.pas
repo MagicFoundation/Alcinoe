@@ -535,8 +535,10 @@ function  ALUIntToStr(Value: UInt64): AnsiString; overload;
 function  ALIntToHex(Value: Integer; Digits: Integer): AnsiString; overload;
 function  ALIntToHex(Value: Int64; Digits: Integer): AnsiString; overload;
 function  ALIntToHex(Value: UInt64; Digits: Integer): AnsiString; overload;
-Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
-Function  ALBinToHex(const aBin: AnsiString): AnsiString;
+Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean; overload;
+Function  ALBinToHex(const aBin: AnsiString): AnsiString; overload;
+Function  ALTryBinToHex(const aBin; aBinSize : Cardinal; out Value: AnsiString): boolean; overload;
+Function  ALBinToHex(const aBin; aBinSize : Cardinal): AnsiString; overload;
 Function  ALTryHexToBin(const aHex: AnsiString; out Value: AnsiString): boolean;
 Function  ALHexToBin(const aHex: AnsiString): AnsiString;
 function  ALIntToBit(value: Integer; digits: integer): ansistring;
@@ -642,8 +644,10 @@ var       ALTryStrToUInt64U: function(const S: String; out Value: UInt64): Boole
 {$ifend}
 function  ALUIntToStrU(Value: Cardinal): String; overload; inline;
 function  ALUIntToStrU(Value: UInt64): String; overload; inline;
-function  ALTryBinToHexU(const aBin: Tbytes; out Value: String): boolean;
-Function  ALBinToHexU(const aBin: Tbytes): String;
+function  ALTryBinToHexU(const aBin: Tbytes; out Value: String): boolean; overload;
+Function  ALBinToHexU(const aBin: Tbytes): String; overload;
+Function  ALTryBinToHexU(const aBin; aBinSize : Cardinal; out Value: String): boolean; overload;
+Function  ALBinToHexU(const aBin; aBinSize : Cardinal): String; overload;
 Function  ALTryHexToBinU(const aHex: String; out Value: Tbytes): boolean;
 Function  ALHexToBinU(const aHex: String): Tbytes;
 var       ALBase64EncodeStringU: function(const S: String; const AEncoding: TEncoding = nil): String;
@@ -6526,6 +6530,23 @@ begin
     raise Exception.Create('Bad binary value');
 end;
 
+{***************************************************************************************}
+Function  ALTryBinToHex(const aBin; aBinSize : Cardinal; out Value: AnsiString): boolean;
+begin
+  if aBinSize = 0 then exit(false);
+  setlength(Value, aBinSize * 2);
+  BintoHex(@aBin,pansiChar(Value),aBinSize);
+  Value := ALlowerCase(Value);
+  result := true;
+end;
+
+{****************************************************************}
+Function  ALBinToHex(const aBin; aBinSize : Cardinal): AnsiString;
+begin
+  if not ALTryBinToHex(aBin, aBinSize, Result) then
+    raise Exception.Create('Bad binary value');
+end;
+
 {******************************************************************************}
 Function  ALTryHexToBin(const aHex: AnsiString; out Value: AnsiString): boolean;
 var l: integer;
@@ -6565,6 +6586,29 @@ end;
 Function  ALBinToHexU(const aBin: TBytes): String;
 begin
   if not ALTryBinToHexU(aBin, Result) then
+    raise Exception.Create('Bad binary value');
+end;
+
+{************************************************************************************}
+Function  ALTryBinToHexU(const aBin; aBinSize : Cardinal; out Value: String): boolean;
+var bufOut: TBytes;
+begin
+  if aBinSize = 0 then exit(false);
+  setlength(bufOut,aBinSize * 2);
+  BintoHex(Tbytes(@aBin), // Buffer: TBytes
+           0, // BufOffset: Integer;
+           bufOut, // Text: TBytes;
+           0, // TextOffset: Integer;
+           aBinSize); // Count: Integer
+  Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
+  Value := AlLowerCaseU(Value);
+  result := true;
+end;
+
+{*************************************************************}
+Function  ALBinToHexU(const aBin; aBinSize : Cardinal): String;
+begin
+  if not ALTryBinToHexU(aBin, aBinSize, Result) then
     raise Exception.Create('Bad binary value');
 end;
 
@@ -11064,7 +11108,7 @@ begin
   //Result := ALWideStringToString(UTF8ToWideString(S), aCodePage);
   //it's look like the code below is a little (15%) more faster then
   //the previous implementation, and it's compatible with OSX
-  result := S;
+  result := ansiString(S);
   SetCodePage(RawByteString(Result), aCodePage, true);
 end;
 

@@ -254,8 +254,8 @@ type
   TALJSONDocOptions = set of TALJSONDocOption;
 
   TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
-                        poSkipNodeSubTypeHelper4Int);  // don't use helper functions NumberLong() to handle 64-bit integers and NumberInt()
-                                                       // to handle 32-bit integers
+                        poSkipNodeSubTypeHelper);  // don't use helper functions like NumberLong() to handle 64-bit integers or NumberInt()
+                                                   // to handle 32-bit integers
   TALJSONParseOptions = set of TALJSONParseOption;
 
   {Exception}
@@ -347,7 +347,7 @@ type
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     function GetNodeValueStr: ansiString; virtual;
     function GetNodeValueInt64: int64; virtual;
-    function GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelper4Int: boolean = False): AnsiString;
+    function GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolean = False): AnsiString;
     procedure SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
@@ -724,7 +724,7 @@ type
     function GetNodeSubType: TALJSONNodeSubType; virtual; abstract;
     function GetNodeValueStr: String; virtual;
     function GetNodeValueInt64: int64; virtual;
-    function GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelper4Int: boolean = False): String;
+    function GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolean = False): String;
     procedure SetNodeValue(const Value: String; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
     procedure SetNodeValue(const StrValue: String; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType); overload; virtual;
@@ -4187,31 +4187,36 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit integers
 // and NumberInt() to handle 32-bit integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONNode.GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelper4Int: boolean = False): AnsiString;
+function TALJSONNode.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolean = False): AnsiString;
 
   procedure _GetObjectID;
   begin
-    result := 'ObjectId("'+ALBinToHex(ObjectID)+'")';
+    if SkipNodeSubTypeHelper then result := '"'+ALBinToHex(ObjectID)+'"'
+    else result := 'ObjectId("'+ALBinToHex(ObjectID)+'")';
   end;
 
   procedure _GetBinary;
   begin
-    result := 'BinData('+alinttostr(BinarySubType)+', "'+ALBase64EncodeString(Binary)+'")';
+    if SkipNodeSubTypeHelper then result := '"'+ALBase64EncodeString(Binary)+'"'
+    else result := 'BinData('+alinttostr(BinarySubType)+', "'+ALBase64EncodeString(Binary)+'")';
   end;
 
   procedure _GetDateTime;
   begin
-    result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettings)
+    if SkipNodeSubTypeHelper then result := ALFormatDateTime('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettings)
+    else result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettings)
   end;
 
   procedure _Getint32;
   begin
-    result := 'NumberInt(' + text + ')'
+    if SkipNodeSubTypeHelper then result := text
+    else result := 'NumberInt(' + text + ')'
   end;
 
   procedure _Getint64;
   begin
-    result := 'NumberLong(' + text + ')';
+    if SkipNodeSubTypeHelper then result := text
+    else result := 'NumberLong(' + text + ')';
   end;
 
   procedure _GetRegEx;
@@ -4227,11 +4232,13 @@ function TALJSONNode.GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelp
     if preSingleLine in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr + 's';
     //'u':;
     result := '/'+regex+'/' + aRegExOptionsStr;
+    if not SkipNodeSubTypeHelper then result := '"' + ALJavascriptEncode(result) + '"';
   end;
 
   procedure _GetTimestamp;
   begin
-    result := 'Timestamp('+alinttostr(GetTimeStamp.W1)+', '+alinttostr(GetTimeStamp.W2)+')';
+    if SkipNodeSubTypeHelper then result := '"Timestamp('+alinttostr(GetTimeStamp.W1)+', '+alinttostr(GetTimeStamp.W2)+')"'
+    else result := 'Timestamp('+alinttostr(GetTimeStamp.W1)+', '+alinttostr(GetTimeStamp.W2)+')';
   end;
 
 begin
@@ -4244,10 +4251,8 @@ begin
     nstBoolean:    result := GetNodeValueStr;
     nstDateTime:   _GetDateTime;
     nstJavascript: result := GetNodeValueStr;
-    nstInt32:      if SkipNodeSubTypeHelper4Int then result := GetNodeValueStr
-                   else _Getint32;
-    nstInt64:      if SkipNodeSubTypeHelper4Int then result := GetNodeValueStr
-                   else _Getint64;
+    nstInt32:      _Getint32;
+    nstInt64:      _Getint64;
     nstNull:       result := GetNodeValueStr;
     nstObject:     result := GetNodeValueStr;
     nstArray:      result := GetNodeValueStr;
@@ -4650,7 +4655,7 @@ Var NodeStack: Tstack<TALJSONNode>;
     CurrentIndentStr: AnsiString;
     IndentStr: AnsiString;
     EncodeControlCharacters: Boolean;
-    SkipNodeSubTypeHelper4Int: boolean;
+    SkipNodeSubTypeHelper: boolean;
     AutoIndentNode: Boolean;
     BufferPos: Integer;
     LastWrittenChar: AnsiChar;
@@ -4722,7 +4727,7 @@ Var NodeStack: Tstack<TALJSONNode>;
           _WriteStr2Buffer('"');
         end;
       end
-      else _WriteStr2Buffer(GetNodeValueWithNodeSubTypeHelper(SkipNodeSubTypeHelper4Int));
+      else _WriteStr2Buffer(GetNodeValueInterchange(SkipNodeSubTypeHelper));
 
     end;
   end;
@@ -4858,7 +4863,7 @@ begin
     BufferPos := 0;
     LastWrittenChar := '{';
     EncodeControlCharacters := (FDocument = nil) or (not (poIgnoreControlCharacters in FDocument.ParseOptions));
-    SkipNodeSubTypeHelper4Int := (FDocument <> nil) and (poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions);
+    SkipNodeSubTypeHelper := (FDocument <> nil) and (poSkipNodeSubTypeHelper in FDocument.ParseOptions);
     AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
     if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
     else IndentStr := vALDefaultNodeIndent;
@@ -9416,31 +9421,36 @@ end;
 // we provide the helper functions NumberLong() to handle 64-bit integers
 // and NumberInt() to handle 32-bit integers (and some others). theses helper functions are
 // used when saving the json document.
-function TALJSONNodeU.GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHelper4Int: boolean = False): String;
+function TALJSONNodeU.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolean = False): String;
 
   procedure _GetObjectID;
   begin
-    result := 'ObjectId("'+ObjectID+'")';
+    if SkipNodeSubTypeHelper then result := '"'+ObjectID+'"'
+    else result := 'ObjectId("'+ObjectID+'")';
   end;
 
   procedure _GetBinary;
   begin
-    result := 'BinData('+alinttostrU(BinarySubType)+', "'+Binary+'")';
+    if SkipNodeSubTypeHelper then result := '"'+Binary+'"'
+    else result := 'BinData('+alinttostrU(BinarySubType)+', "'+Binary+'")';
   end;
 
   procedure _GetDateTime;
   begin
-    result := ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsU)
+    if SkipNodeSubTypeHelper then result := ALFormatDateTimeU('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsU)
+    else result := ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsU)
   end;
 
   procedure _Getint32;
   begin
-    result := 'NumberInt(' + text + ')'
+    if SkipNodeSubTypeHelper then result := text
+    else result := 'NumberInt(' + text + ')'
   end;
 
   procedure _Getint64;
   begin
-    result := 'NumberLong(' + text + ')';
+    if SkipNodeSubTypeHelper then result := text
+    else result := 'NumberLong(' + text + ')';
   end;
 
   procedure _GetRegEx;
@@ -9456,11 +9466,13 @@ function TALJSONNodeU.GetNodeValueWithNodeSubTypeHelper(const SkipNodeSubTypeHel
     if preSingleLine in aRegExOptions then aRegExOptionsStr := aRegExOptionsStr + 's';
     //'u':;
     result := '/'+regex+'/' + aRegExOptionsStr;
+    if not SkipNodeSubTypeHelper then result := '"' + ALJavascriptEncodeU(result) + '"'
   end;
 
   procedure _GetTimestamp;
   begin
-    result := 'Timestamp('+alinttostrU(GetTimeStamp.W1)+', '+alinttostrU(GetTimeStamp.W2)+')';
+    if SkipNodeSubTypeHelper then result := '"Timestamp('+alinttostrU(GetTimeStamp.W1)+', '+alinttostrU(GetTimeStamp.W2)+')"'
+    else result := 'Timestamp('+alinttostrU(GetTimeStamp.W1)+', '+alinttostrU(GetTimeStamp.W2)+')';
   end;
 
 begin
@@ -9473,10 +9485,8 @@ begin
     nstBoolean:    result := GetNodeValueStr;
     nstDateTime:   _GetDateTime;
     nstJavascript: result := GetNodeValueStr;
-    nstInt32:      if SkipNodeSubTypeHelper4Int then result := GetNodeValueStr
-                   else _Getint32;
-    nstInt64:      if SkipNodeSubTypeHelper4Int then result := GetNodeValueStr
-                   else _Getint64;
+    nstInt32:      _Getint32;
+    nstInt64:      _Getint64;
     nstNull:       result := GetNodeValueStr;
     nstObject:     result := GetNodeValueStr;
     nstArray:      result := GetNodeValueStr;
@@ -9882,7 +9892,7 @@ Var NodeStack: Tstack<TALJSONNodeU>;
     CurrentIndentStr: String;
     IndentStr: String;
     EncodeControlCharacters: Boolean;
-    SkipNodeSubTypeHelper4Int: boolean;
+    SkipNodeSubTypeHelper: boolean;
     AutoIndentNode: Boolean;
     BufferPos: Integer;
     LastWrittenChar: Char;
@@ -9958,7 +9968,7 @@ Var NodeStack: Tstack<TALJSONNodeU>;
           _WriteStr2Buffer('"');
         end;
       end
-      else _WriteStr2Buffer(GetNodeValueWithNodeSubTypeHelper(SkipNodeSubTypeHelper4Int));
+      else _WriteStr2Buffer(GetNodeValueInterchange(SkipNodeSubTypeHelper));
 
     end;
   end;
@@ -10094,7 +10104,7 @@ begin
     BufferPos := 0;
     LastWrittenChar := '{';
     EncodeControlCharacters := (FDocument = nil) or (not (poIgnoreControlCharacters in FDocument.ParseOptions));
-    SkipNodeSubTypeHelper4Int := (FDocument <> nil) and (poSkipNodeSubTypeHelper4Int in FDocument.ParseOptions);
+    SkipNodeSubTypeHelper := (FDocument <> nil) and (poSkipNodeSubTypeHelper in FDocument.ParseOptions);
     AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
     if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
     else IndentStr := vALDefaultNodeIndentU;

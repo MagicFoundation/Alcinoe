@@ -250,7 +250,8 @@ type
   end;
 
   TALJSONDocOption = (doNodeAutoCreate, // create only ntText Node !
-                      doNodeAutoIndent); // affect only the SaveToStream
+                      doNodeAutoIndent, // affect only the SaveToStream
+                      doProtectedSave);     // save first to a tmp file and then later rename the tmp file to the desired filename
   TALJSONDocOptions = set of TALJSONDocOption;
 
   TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
@@ -1015,6 +1016,7 @@ implementation
 
 uses System.Math,
      System.Generics.Collections,
+     system.IOUtils,
      System.DateUtils,
      ALquickSortList,
      AlHTML,
@@ -4917,12 +4919,29 @@ end;
  AFileName is the name of the file to save.}
 procedure TALJSONNode.SaveToJSONFile(const FileName: AnsiString);
 Var afileStream: TfileStream;
+    aTmpFilename: AnsiString;
 begin
-  aFileStream := TfileStream.Create(String(FileName),fmCreate);
-  Try
-    SaveToJSONStream(aFileStream);
-  finally
-    aFileStream.Free;
+  if (assigned(FDocument)) and
+     (doProtectedSave in fDocument.Options) then aTmpFilename := FileName + '.~tmp'
+  else aTmpFilename := FileName;
+  try
+
+    aFileStream := TfileStream.Create(String(aTmpFilename),fmCreate);
+    Try
+      SaveToJSONStream(aFileStream);
+    finally
+      aFileStream.Free;
+    end;
+
+    if aTmpFilename <> FileName then begin
+      if TFile.Exists(string(FileName)) then TFile.Delete(string(FileName));
+      TFile.Move(string(aTmpFilename), string(FileName));
+    end;
+
+  except
+    if (aTmpFilename <> FileName) and
+       (TFile.Exists(string(aTmpFilename))) then TFile.Delete(string(aTmpFilename));
+    raise;
   end;
 end;
 
@@ -5356,12 +5375,29 @@ end;
 {***************************************************************}
 procedure TALJSONNode.SaveToBsonFile(const FileName: AnsiString);
 Var afileStream: TfileStream;
+    aTmpFilename: AnsiString;
 begin
-  aFileStream := TfileStream.Create(String(FileName),fmCreate);
-  Try
-    SaveToBsonStream(aFileStream);
-  finally
-    aFileStream.Free;
+  if (assigned(FDocument)) and
+     (doProtectedSave in fDocument.Options) then aTmpFilename := FileName + '.~tmp'
+  else aTmpFilename := FileName;
+  try
+
+    aFileStream := TfileStream.Create(String(aTmpFilename),fmCreate);
+    Try
+      SaveToBsonStream(aFileStream);
+    finally
+      aFileStream.Free;
+    end;
+
+    if aTmpFilename <> FileName then begin
+      if TFile.Exists(string(FileName)) then TFile.Delete(string(FileName));
+      TFile.Move(string(aTmpFilename), string(FileName));
+    end;
+
+  except
+    if (aTmpFilename <> FileName) and
+       (TFile.Exists(string(aTmpFilename))) then TFile.Delete(string(aTmpFilename));
+    raise;
   end;
 end;
 
@@ -10168,12 +10204,29 @@ end;
  AFileName is the name of the file to save.}
 procedure TALJSONNodeU.SaveToJSONFile(const FileName: String; const Encoding: TEncoding);
 Var afileStream: TfileStream;
+    aTmpFilename: String;
 begin
-  aFileStream := TfileStream.Create(String(FileName),fmCreate);
-  Try
-    SaveToJSONStream(aFileStream, Encoding);
-  finally
-    aFileStream.Free;
+  if (assigned(FDocument)) and
+     (doProtectedSave in fDocument.Options) then aTmpFilename := FileName + '.~tmp'
+  else aTmpFilename := FileName;
+  try
+
+    aFileStream := TfileStream.Create(aTmpFilename,fmCreate);
+    Try
+      SaveToJSONStream(aFileStream, Encoding);
+    finally
+      aFileStream.Free;
+    end;
+
+    if aTmpFilename <> FileName then begin
+      if TFile.Exists(FileName) then TFile.Delete(FileName);
+      TFile.Move(aTmpFilename, FileName);
+    end;
+
+  except
+    if (aTmpFilename <> FileName) and
+       (TFile.Exists(aTmpFilename)) then TFile.Delete(aTmpFilename);
+    raise;
   end;
 end;
 
@@ -10627,12 +10680,29 @@ end;
 {************************************************************}
 procedure TALJSONNodeU.SaveToBsonFile(const FileName: String);
 Var afileStream: TfileStream;
+    aTmpFilename: String;
 begin
-  aFileStream := TfileStream.Create(String(FileName),fmCreate);
-  Try
-    SaveToBsonStream(aFileStream);
-  finally
-    aFileStream.Free;
+  if (assigned(FDocument)) and
+     (doProtectedSave in fDocument.Options) then aTmpFilename := FileName + '.~tmp'
+  else aTmpFilename := FileName;
+  try
+
+    aFileStream := TfileStream.Create(aTmpFilename,fmCreate);
+    Try
+      SaveToBsonStream(aFileStream);
+    finally
+      aFileStream.Free;
+    end;
+
+    if aTmpFilename <> FileName then begin
+      if TFile.Exists(FileName) then TFile.Delete(FileName);
+      TFile.Move(aTmpFilename, FileName);
+    end;
+
+  except
+    if (aTmpFilename <> FileName) and
+       (TFile.Exists(aTmpFilename)) then TFile.Delete(aTmpFilename);
+    raise;
   end;
 end;
 

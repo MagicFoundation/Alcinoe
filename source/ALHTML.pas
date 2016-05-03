@@ -1283,7 +1283,7 @@ begin
               (ch5 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyUnicodeCharToResult
 
       // delete the \
-      else inc(CurrPos);
+      else _CopyAnsiCharToResult(ord(ch1), CurrPos + 2)
 
     end
     else _CopyCurrPosCharToResult;
@@ -1631,7 +1631,7 @@ begin
               (ch5 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyUnicodeCharToResult
 
       // delete the \
-      else inc(CurrPos);
+      else _CopyCharToResult(ord(Ch1), CurrPos + 2)
 
     end
     else _CopyCurrPosCharToResult;

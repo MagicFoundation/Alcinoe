@@ -255,8 +255,10 @@ type
   TALJSONDocOptions = set of TALJSONDocOption;
 
   TALJSONParseOption = (poIgnoreControlCharacters, // don't decode escaped characters (like \") and not encode them also (when save / load)
-                        poSkipNodeSubTypeHelper);  // don't use helper functions like NumberLong() to handle 64-bit integers or NumberInt()
+                        poSkipNodeSubTypeHelper,   // don't use helper functions like NumberLong() to handle 64-bit integers or NumberInt()
                                                    // to handle 32-bit integers
+                        poSaveInt64AsText);        // JS represents all numbers as double, and with growing integers you loose precision at some point
+                                                   // use this option to return Int64 as string
   TALJSONParseOptions = set of TALJSONParseOption;
 
   {Exception}
@@ -4814,6 +4816,7 @@ Var NodeStack: Tstack<TALJSONNode>;
     IndentStr: AnsiString;
     EncodeControlCharacters: Boolean;
     SkipNodeSubTypeHelper: boolean;
+    SaveInt64AsText: Boolean;
     AutoIndentNode: Boolean;
     BufferPos: Integer;
     LastWrittenChar: AnsiChar;
@@ -4873,8 +4876,9 @@ Var NodeStack: Tstack<TALJSONNode>;
         end;
       end;
 
-      if NodeSubType = NstText then begin
-        if EncodeControlCharacters then begin
+      if (NodeSubType = NstText) or
+         ((NodeSubType = nstInt64) and SaveInt64AsText) then begin
+        if (NodeSubType = NstText) and EncodeControlCharacters then begin
           _WriteStr2Buffer('"');
           _WriteStr2Buffer(ALJavascriptEncode(GetText));
           _WriteStr2Buffer('"');
@@ -5022,6 +5026,7 @@ begin
     LastWrittenChar := '{';
     EncodeControlCharacters := (FDocument = nil) or (not (poIgnoreControlCharacters in FDocument.ParseOptions));
     SkipNodeSubTypeHelper := (FDocument <> nil) and (poSkipNodeSubTypeHelper in FDocument.ParseOptions);
+    SaveInt64AsText := SkipNodeSubTypeHelper and (FDocument <> nil) and (poSaveInt64AsText in FDocument.ParseOptions);
     AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
     if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
     else IndentStr := vALDefaultNodeIndent;
@@ -10205,6 +10210,7 @@ Var NodeStack: Tstack<TALJSONNodeU>;
     IndentStr: String;
     EncodeControlCharacters: Boolean;
     SkipNodeSubTypeHelper: boolean;
+    SaveInt64AsText: Boolean;
     AutoIndentNode: Boolean;
     BufferPos: Integer;
     LastWrittenChar: Char;
@@ -10268,8 +10274,9 @@ Var NodeStack: Tstack<TALJSONNodeU>;
         end;
       end;
 
-      if NodeSubType = NstText then begin
-        if EncodeControlCharacters then begin
+      if (NodeSubType = NstText) or
+         ((NodeSubType = nstInt64) and SaveInt64AsText) then begin
+        if (NodeSubType = NstText) and EncodeControlCharacters then begin
           _WriteStr2Buffer('"');
           _WriteStr2Buffer(ALJavascriptEncodeU(GetText));
           _WriteStr2Buffer('"');
@@ -10417,6 +10424,7 @@ begin
     LastWrittenChar := '{';
     EncodeControlCharacters := (FDocument = nil) or (not (poIgnoreControlCharacters in FDocument.ParseOptions));
     SkipNodeSubTypeHelper := (FDocument <> nil) and (poSkipNodeSubTypeHelper in FDocument.ParseOptions);
+    SaveInt64AsText := SkipNodeSubTypeHelper and (FDocument <> nil) and (poSaveInt64AsText in FDocument.ParseOptions);
     AutoIndentNode := (FDocument <> nil) and (doNodeAutoIndent in FDocument.Options);
     if FDocument <> nil then IndentStr := FDocument.NodeIndentStr
     else IndentStr := vALDefaultNodeIndentU;

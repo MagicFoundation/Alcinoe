@@ -49,7 +49,7 @@ type
   private
     fdoubleBuffered: boolean;
     fBufSize: TsizeF;
-    FBufState: set of TALCheckStyleObject.TState;
+    [weak] fBufCurrentLink: TBitmapLinks;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
     {$ELSE}
@@ -80,7 +80,7 @@ type
   private
     fdoubleBuffered: boolean;
     fBufSize: TsizeF;
-    FBuffCurrent: TButtonAnimation;
+    [weak] FBuffCurrentLink: TBitmapLinks;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
     {$ELSE}
@@ -297,24 +297,11 @@ begin
 
 end;
 
-Type
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckStyleObjectState = set of TALCheckStyleObject.TState;
-  TALTabStyleObjectHelper = class helper for TTabStyleObject
-   function _fstate: TALCheckStyleObjectState;
-  end;
-
-{*****************************************************************}
-function TALTabStyleObjectHelper._fstate: TALCheckStyleObjectState;
-begin
-  result := TTabStyleObject(self).fstate;
-end;
-
 {*********************************************************}
 constructor TALCheckStyleObject.Create(AOwner: TComponent);
 begin
   fdoubleBuffered := false;
+  FBufCurrentLink := nil;
   fBufBitmap := nil;
   inherited;
 end;
@@ -364,11 +351,11 @@ begin
   if (fBufBitmap <> nil) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
-     (FBufState = _fstate) then exit(fBufBitmap);
+     (FBufCurrentLink = GetCurrentLink) then exit(fBufBitmap);
 
   clearBufBitmap;
   fBufSize := Size.Size;
-  FBufState := _fstate;
+  FBufCurrentLink := GetCurrentLink;
 
   if Scene <> nil then SceneScale := Scene.GetSceneScale
   else SceneScale := 1;
@@ -461,24 +448,11 @@ begin
 
 end;
 
-Type
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALButtonStyleObjectHelper = class helper for TButtonStyleObject
-   function _FCurrent: TButtonAnimation;
-  end;
-
-
-{**************************************************************}
-function TALButtonStyleObjectHelper._FCurrent: TButtonAnimation;
-begin
-  result := TButtonStyleObject(self).FCurrent;
-end;
-
 {**********************************************************}
 constructor TALButtonStyleObject.Create(AOwner: TComponent);
 begin
   fdoubleBuffered := false;
+  FBuffCurrentLink := nil;
   fBufBitmap := nil;
   inherited;
 end;
@@ -528,11 +502,11 @@ begin
   if (fBufBitmap <> nil) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
-     (FBuffCurrent = _fCurrent) then exit(fBufBitmap);
+     (FBuffCurrentLink = GetCurrentLink) then exit(fBufBitmap);
 
   clearBufBitmap;
   fBufSize := Size.Size;
-  FBuffCurrent := _fCurrent;
+  FBuffCurrentLink := GetCurrentLink;
 
   if Scene <> nil then SceneScale := Scene.GetSceneScale
   else SceneScale := 1;

@@ -2233,6 +2233,7 @@ Var Buffer: AnsiString;
       aNameValueSeparator: ansiChar;
       aInSingleQuote: boolean;
       aInDoubleQuote: boolean;
+      aInSlashQuote: boolean;
       aInSquareBracket: integer;
       aInRoundBracket: integer;
       aInCurlyBracket: integer;
@@ -2708,10 +2709,12 @@ Var Buffer: AnsiString;
     // name : ISODATE('1/1/2001')
     // name : function(){return(new Date).getTime()}, ...}
     // name : new Date(''Dec 03, 1924'')
+    // name : /test/i
     else begin
 
       aInSingleQuote := False;
       aInDoubleQuote := False;
+      aInSlashQuote := False;
       aInSquareBracket := 0;
       aInRoundBracket := 0;
       aInCurlyBracket := 0;
@@ -2730,6 +2733,7 @@ Var Buffer: AnsiString;
 
         if (not aInSingleQuote) and
            (not aInDoubleQuote) and
+           (not aInSlashQuote) and
            (aInSquareBracket = 0) and
            (aInRoundBracket = 0) and
            (aInCurlyBracket = 0) and
@@ -2744,14 +2748,19 @@ Var Buffer: AnsiString;
         end
         else if (c = '"') then begin
           if (P1 <= 1) or
-             (Buffer[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
+             (Buffer[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote) and (not aInSlashQuote);
         end
         else if (c = '''') then begin
           if (P1 <= 1) or
-             (Buffer[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote)
+             (Buffer[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote) and (not aInSlashQuote)
+        end
+        else if (c = '/') then begin
+          if (P1 <= 1) or
+             (Buffer[P1 - 1] <> '\') then aInSlashQuote := (not aInSingleQuote) and (not aInDoubleQuote) and (not aInSlashQuote);
         end
         else if (not aInSingleQuote) and
-                (not aInDoubleQuote) then begin
+                (not aInDoubleQuote) and
+                (not aInSlashQuote) then begin
           if (c = '[') then inc(aInSquareBracket)
           else if (c = ']') then dec(aInSquareBracket)
           else if (c = '(') then inc(aInRoundBracket)
@@ -7716,6 +7725,7 @@ Var BufferLength: Integer;
       aNameValueSeparator: Char;
       aInSingleQuote: boolean;
       aInDoubleQuote: boolean;
+      aInSlashQuote: boolean;
       aInSquareBracket: integer;
       aInRoundBracket: integer;
       aInCurlyBracket: integer;
@@ -8185,10 +8195,12 @@ Var BufferLength: Integer;
     // name : ISODATE('1/1/2001')
     // name : function(){return(new Date).getTime()}, ...}
     // name : new Date(''Dec 03, 1924'')
+    // name : /test/i
     else begin
 
       aInSingleQuote := False;
       aInDoubleQuote := False;
+      aInSlashQuote := False;
       aInSquareBracket := 0;
       aInRoundBracket := 0;
       aInCurlyBracket := 0;
@@ -8207,6 +8219,7 @@ Var BufferLength: Integer;
 
         if (not aInSingleQuote) and
            (not aInDoubleQuote) and
+           (not aInSlashQuote) and
            (aInSquareBracket = 0) and
            (aInRoundBracket = 0) and
            (aInCurlyBracket = 0) and
@@ -8221,14 +8234,19 @@ Var BufferLength: Integer;
         end
         else if (c = '"') then begin
           if (P1 <= 1) or
-             (Buffer[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote);
+             (Buffer[P1 - 1] <> '\') then aInDoubleQuote := (not aInDoubleQuote) and (not aInSingleQuote) and (not aInSlashQuote);
         end
         else if (c = '''') then begin
           if (P1 <= 1) or
-             (Buffer[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote)
+             (Buffer[P1 - 1] <> '\') then aInSingleQuote := (not aInSingleQuote) and (not aInDoubleQuote) and (not aInSlashQuote);
+        end
+        else if (c = '/') then begin
+          if (P1 <= 1) or
+             (Buffer[P1 - 1] <> '\') then aInSlashQuote := (not aInSingleQuote) and (not aInDoubleQuote) and (not aInSlashQuote);
         end
         else if (not aInSingleQuote) and
-                (not aInDoubleQuote) then begin
+                (not aInDoubleQuote) and
+                (not aInSlashQuote) then begin
           if (c = '[') then inc(aInSquareBracket)
           else if (c = ']') then dec(aInSquareBracket)
           else if (c = '(') then inc(aInRoundBracket)

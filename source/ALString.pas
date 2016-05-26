@@ -303,11 +303,6 @@ type
     preNotEmpty        // Empty matches not allowed
   );
 
-type
-  TALPerlRegExEscapeOptions = set of (
-    preEscapeJavascript // Escapes also the character / that serves as ranges of RegEx in Javascript
-  );
-
 const
   // Maximum number of subexpressions (backreferences)
   // Subexpressions are created by placing round brackets in the regex, and are referenced by \1, \2, ...
@@ -368,7 +363,7 @@ type
         // Come to life
     destructor Destroy; override;
         // Clean up after ourselves
-    class function EscapeRegExChars(const S: AnsiString; aEscapeOptions: TALPerlRegExEscapeOptions = []): AnsiString;
+    class function EscapeRegExChars(const S: AnsiString): AnsiString;
         // Escapes regex characters in S so that the regex engine can be used to match S as plain text
     function Compile(const RaiseException: boolean = True): boolean;
         // Compile the regex. Called automatically by Match
@@ -1800,9 +1795,8 @@ begin
   inherited Destroy;
 end;
 
-{***************************************************************}
-class function TALPerlRegEx.EscapeRegExChars(const S: AnsiString;
-                                             aEscapeOptions: TALPerlRegExEscapeOptions = []): AnsiString;
+{****************************************************************************}
+class function TALPerlRegEx.EscapeRegExChars(const S: AnsiString): AnsiString;
 var
   I: Integer;
 begin
@@ -1811,16 +1805,8 @@ begin
   while I > 0 do
   begin
     case Result[I] of
-      '.', '[', ']', '(', ')', '?', '*', '+', '{', '}', '^', '$', '|', '\':
+      '.', '[', ']', '(', ')', '?', '*', '+', '{', '}', '^', '$', '|', '\', '/':
         Insert('\', Result, I);
-      // Normally character / is allowed in Perl RegEx but in Javascript it used to be
-      // a range of regular expression so if we set an option to escape for Javascript
-      // then we will escape this character too.
-      '/':
-        begin
-          if preEscapeJavascript in aEscapeOptions then
-            Insert('\', Result, I);
-        end;
       #0:
         begin
           Result[I] := '0';

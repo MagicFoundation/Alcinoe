@@ -603,6 +603,7 @@ type
 {misc constants}
 var
   vALDefaultNodeIndent: ansiString;  // var instead of const to avoid new ansitring on assign
+  vALJsonISODateFormatSettings: TALFormatSettings;
 
 {misc function}
 Procedure ALJSONToTStrings(const AJsonStr: AnsiString;
@@ -1001,6 +1002,7 @@ type
 {misc constants}
 var
   vALDefaultNodeIndentU: String;  // var instead of const to avoid new ansitring on assign
+  vALJsonISODateFormatSettingsU: TALFormatSettingsU;
 
 {misc function}
 Procedure ALJSONToTStringsU(const AJsonStr: String;
@@ -1062,8 +1064,6 @@ uses System.Math,
      ALCommon;
 
 {$IFNDEF NEXTGEN}
-
-var _cALJsonISODateFormatSettings: TALFormatSettings;
 
 {*********************************************************************}
 Function ALFindJsonNodeByInt32ChildNodeValue(const JsonNode:TalJsonNode;
@@ -1288,7 +1288,7 @@ begin
   if P2 > aTmpLn then exit;
   aTmpStr[P2] := ' '; // yyyy-mm-dd hh:nn:ss.zzz
 
-  result := ALTryStrToDateTime(aTmpStr, Value, _cALJsonISODateFormatSettings);
+  result := ALTryStrToDateTime(aTmpStr, Value, vALJsonISODateFormatSettings);
   if not result then exit;
 
   inc(p1,2);  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
@@ -6557,8 +6557,6 @@ end;
 
 {$ENDIF}
 
-var _cALJsonISODateFormatSettingsU: TALformatSettingsU;
-
 {************************************************************************}
 Function ALFindJsonNodeByInt32ChildNodeValueU(const JsonNode:TalJsonNodeU;
                                               Const ChildNodeName: String;
@@ -6797,7 +6795,7 @@ begin
   if P2 > aTmpLn then exit;
   aTmpStr[P2] := ' '; // yyyy-mm-dd hh:nn:ss.zzz
 
-  result := ALTryStrToDateTimeU(aTmpStr, Value, _cALJsonISODateFormatSettingsU);
+  result := ALTryStrToDateTimeU(aTmpStr, Value, vALJsonISODateFormatSettingsU);
   if not result then exit;
 
   inc(p1,2);  // new  Date ( 'yyyy-mm-ddThh:nn:ss.zzzZ' )
@@ -11960,19 +11958,19 @@ end;
 initialization
 
 {$IFNDEF NEXTGEN}
-  _cALJsonISODateFormatSettings := TalFormatSettings.Create('en-US');
-  _cALJsonISODateFormatSettings.DateSeparator := '-';
-  _cALJsonISODateFormatSettings.TimeSeparator := ':';
-  _cALJsonISODateFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
-  _cALJsonISODateFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
+  vALJsonISODateFormatSettings := TalFormatSettings.Create('en-US');
+  vALJsonISODateFormatSettings.DateSeparator := '-';
+  vALJsonISODateFormatSettings.TimeSeparator := ':';
+  vALJsonISODateFormatSettings.ShortDateFormat := 'yyyy-mm-dd';
+  vALJsonISODateFormatSettings.ShortTimeFormat := 'hh:nn:ss.zzz';
   vALDefaultNodeIndent := '  '; { 2 spaces }
 {$ENDIF}
 
-  _cALJsonISODateFormatSettingsU := TalFormatSettingsU.Create('en-US');
-  _cALJsonISODateFormatSettingsU.DateSeparator := '-';
-  _cALJsonISODateFormatSettingsU.TimeSeparator := ':';
-  _cALJsonISODateFormatSettingsU.ShortDateFormat := 'yyyy-mm-dd';
-  _cALJsonISODateFormatSettingsU.ShortTimeFormat := 'hh:nn:ss.zzz';
+  vALJsonISODateFormatSettingsU := TalFormatSettingsU.Create('en-US');
+  vALJsonISODateFormatSettingsU.DateSeparator := '-';
+  vALJsonISODateFormatSettingsU.TimeSeparator := ':';
+  vALJsonISODateFormatSettingsU.ShortDateFormat := 'yyyy-mm-dd';
+  vALJsonISODateFormatSettingsU.ShortTimeFormat := 'hh:nn:ss.zzz';
   vALDefaultNodeIndentU := '  '; { 2 spaces }
 
 end.

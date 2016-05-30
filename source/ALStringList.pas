@@ -139,7 +139,6 @@ Type
     //[deleted from Tstrings] FAdapter: IStringsAdapter;
     //[deleted from Tstrings] procedure ReadData(Reader: TReader);
     //[deleted from Tstrings] procedure WriteData(Writer: TWriter);
-    FDefined: TStringsDefined;
     FDelimiter: AnsiChar;
     FLineBreak: AnsiString;
     FQuoteChar: AnsiChar;
@@ -150,16 +149,6 @@ Type
     function GetDelimitedText: AnsiString;
     procedure SetCommaText(const Value: AnsiString);
     procedure SetDelimitedText(const Value: AnsiString);
-    function GetDelimiter: AnsiChar;
-    procedure SetDelimiter(const Value: AnsiChar);
-    function GetLineBreak: AnsiString;
-    procedure SetLineBreak(const Value: AnsiString);
-    function GetQuoteChar: AnsiChar;
-    procedure SetQuoteChar(const Value: AnsiChar);
-    function GetNameValueSeparator: AnsiChar;
-    procedure SetNameValueSeparator(const Value: AnsiChar);
-    function GetStrictDelimiter: Boolean;
-    procedure SetStrictDelimiter(const Value: Boolean);
   protected
     //[deleted from Tstrings] procedure SetEncoding(const Value: TEncoding);
     //[deleted from Tstrings] procedure DefineProperties(Filer: TFiler); override;
@@ -233,19 +222,19 @@ Type
     property Capacity: Integer read GetCapacity write SetCapacity;
     property CommaText: AnsiString read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
-    property Delimiter: AnsiChar read GetDelimiter write SetDelimiter;
+    property Delimiter: AnsiChar read fDelimiter write fDelimiter;
     property DelimitedText: AnsiString read GetDelimitedText write SetDelimitedText;
-    property LineBreak: AnsiString read GetLineBreak write SetLineBreak;
+    property LineBreak: AnsiString read fLineBreak write fLineBreak;
     property Names[Index: Integer]: AnsiString read GetName;
     property StrictNames[Index: Integer]: AnsiString read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
-    property QuoteChar: AnsiChar read GetQuoteChar write SetQuoteChar;
+    property QuoteChar: AnsiChar read fQuoteChar write fQuoteChar;
     property Values[const Name: AnsiString]: AnsiString read GetValue write SetValue;
     property ValueFromIndex[Index: Integer]: AnsiString read GetValueFromIndex write SetValueFromIndex;
     property PersistentValues[const Name: AnsiString]: AnsiString read GetValue write SetPersistentValue; // [added from Tstrings]
     property PersistentValueFromIndex[Index: Integer]: AnsiString read GetValueFromIndex write SetPersistentValueFromIndex; // [added from Tstrings]
-    property NameValueSeparator: AnsiChar read GetNameValueSeparator write SetNameValueSeparator;
-    property StrictDelimiter: Boolean read GetStrictDelimiter write SetStrictDelimiter;
+    property NameValueSeparator: AnsiChar read fNameValueSeparator write fNameValueSeparator;
+    property StrictDelimiter: Boolean read fStrictDelimiter write fStrictDelimiter;
     property Strings[Index: Integer]: AnsiString read Get write Put; default;
     property Text: AnsiString read GetTextStr write SetTextStr;
   end;
@@ -627,7 +616,6 @@ type
     //[deleted from Tstrings] procedure ReadData(Reader: TReader);
     //[deleted from Tstrings] procedure WriteData(Writer: TWriter);
     FEncoding: TEncoding;
-    FDefined: TStringsDefined;
     FDefaultEncoding: TEncoding;
     FDelimiter: Char;
     FLineBreak: String;
@@ -640,16 +628,6 @@ type
     function GetDelimitedText: String;
     procedure SetCommaText(const Value: String);
     procedure SetDelimitedText(const Value: String);
-    function GetDelimiter: Char;
-    procedure SetDelimiter(const Value: Char);
-    function GetLineBreak: String;
-    procedure SetLineBreak(const Value: String);
-    function GetQuoteChar: Char;
-    procedure SetQuoteChar(const Value: Char);
-    function GetNameValueSeparator: Char;
-    procedure SetNameValueSeparator(const Value: Char);
-    function GetStrictDelimiter: Boolean;
-    procedure SetStrictDelimiter(const Value: Boolean);
     procedure SetDefaultEncoding(const Value: TEncoding);
   protected
     //[deleted from Tstrings] procedure DefineProperties(Filer: TFiler); override;
@@ -722,20 +700,20 @@ type
     property CommaText: String read GetCommaText write SetCommaText;
     property Count: Integer read GetCount;
     property DefaultEncoding: TEncoding read FDefaultEncoding write SetDefaultEncoding;
-    property Delimiter: Char read GetDelimiter write SetDelimiter;
+    property Delimiter: Char read fDelimiter write fDelimiter;
     property DelimitedText: String read GetDelimitedText write SetDelimitedText;
     property Encoding: TEncoding read FEncoding;
-    property LineBreak: String read GetLineBreak write SetLineBreak;
+    property LineBreak: String read fLineBreak write fLineBreak;
     property Names[Index: Integer]: String read GetName;
     property StrictNames[Index: Integer]: String read GetStrictName; // [added from Tstrings]
     property Objects[Index: Integer]: TObject read GetObject write PutObject;
-    property QuoteChar: Char read GetQuoteChar write SetQuoteChar;
+    property QuoteChar: Char read fQuoteChar write fQuoteChar;
     property Values[const Name: String]: String read GetValue write SetValue;
     property ValueFromIndex[Index: Integer]: String read GetValueFromIndex write SetValueFromIndex;
     property PersistentValues[const Name: String]: String read GetValue write SetPersistentValue; // [added from Tstrings]
     property PersistentValueFromIndex[Index: Integer]: String read GetValueFromIndex write SetPersistentValueFromIndex; // [added from Tstrings]
-    property NameValueSeparator: Char read GetNameValueSeparator write SetNameValueSeparator;
-    property StrictDelimiter: Boolean read GetStrictDelimiter write SetStrictDelimiter;
+    property NameValueSeparator: Char read fNameValueSeparator write fNameValueSeparator;
+    property StrictDelimiter: Boolean read fStrictDelimiter write fStrictDelimiter;
     property Strings[Index: Integer]: String read Get write Put; default;
     property Text: String read GetTextStr write SetTextStr;
     property WriteBOM: Boolean read FWriteBOM write FWriteBOM;
@@ -948,12 +926,11 @@ end;
 constructor TALStrings.Create;
 begin
   inherited Create;
-  FDefined := [];
-  //FDelimiter := ',';          // doesn't matter what we set here because of fDefined
-  //FLineBreak := sLineBreak;   // doesn't matter what we set here because of fDefined
-  //FQuoteChar := '"';          // doesn't matter what we set here because of fDefined
-  //FNameValueSeparator := '='; // doesn't matter what we set here because of fDefined
-  //FStrictDelimiter:= False;   // doesn't matter what we set here because of fDefined
+  FDelimiter := ',';
+  FLineBreak := sLineBreak;
+  FQuoteChar := '"';
+  FNameValueSeparator := '=';
+  FStrictDelimiter:= False;
   FUpdateCount:= 0;
 end;
 
@@ -1042,12 +1019,11 @@ begin
     BeginUpdate;
     try
       Clear;
-      FDefined := TALStrings(Source).FDefined;
-      FNameValueSeparator := TALStrings(Source).FNameValueSeparator;
-      FQuoteChar := TALStrings(Source).FQuoteChar;
-      FDelimiter := TALStrings(Source).FDelimiter;
-      FLineBreak := TALStrings(Source).FLineBreak;
-      FStrictDelimiter := TALStrings(Source).FStrictDelimiter;
+      NameValueSeparator := TALStrings(Source).NameValueSeparator;
+      QuoteChar := TALStrings(Source).QuoteChar;
+      Delimiter := TALStrings(Source).Delimiter;
+      LineBreak := TALStrings(Source).LineBreak;
+      StrictDelimiter := TALStrings(Source).StrictDelimiter;
       AddStrings(TALStrings(Source));
     finally
       EndUpdate;
@@ -1083,11 +1059,11 @@ begin
     Tstrings(Dest).BeginUpdate;
     try
       Tstrings(Dest).Clear;
-      Tstrings(Dest).NameValueSeparator := char(FNameValueSeparator);
-      Tstrings(Dest).QuoteChar := char(FQuoteChar);
-      Tstrings(Dest).Delimiter := char(FDelimiter);
-      Tstrings(Dest).LineBreak := String(FLineBreak);
-      Tstrings(Dest).StrictDelimiter := FStrictDelimiter;
+      Tstrings(Dest).NameValueSeparator := char(NameValueSeparator);
+      Tstrings(Dest).QuoteChar := char(QuoteChar);
+      Tstrings(Dest).Delimiter := char(Delimiter);
+      Tstrings(Dest).LineBreak := String(LineBreak);
+      Tstrings(Dest).StrictDelimiter := StrictDelimiter;
       for I := 0 to Count - 1 do
         Tstrings(Dest).AddObject(string(get(I)), Objects[I]);
     finally
@@ -1223,21 +1199,18 @@ end;
 {*******************************************}
 function TALStrings.GetCommaText: AnsiString;
 var
-  LOldDefined: TStringsDefined;
   LOldDelimiter: AnsiChar;
   LOldQuoteChar: AnsiChar;
 begin
-  LOldDefined := FDefined;
-  LOldDelimiter := FDelimiter;
-  LOldQuoteChar := FQuoteChar;
+  LOldDelimiter := Delimiter;
+  LOldQuoteChar := QuoteChar;
   Delimiter := ',';
   QuoteChar := '"';
   try
     Result := GetDelimitedText;
   finally
-    FDelimiter := LOldDelimiter;
-    FQuoteChar := LOldQuoteChar;
-    FDefined := LOldDefined;
+    Delimiter := LOldDelimiter;
+    QuoteChar := LOldQuoteChar;
   end;
 end;
 
@@ -1543,21 +1516,18 @@ end;
 {*********************************************************}
 procedure TALStrings.SetCommaText(const Value: AnsiString);
 var
-  LOldDefined: TStringsDefined;
   LOldDelimiter: AnsiChar;
   LOldQuoteChar: AnsiChar;
 begin
-  LOldDefined := FDefined;
-  LOldDelimiter := FDelimiter;
-  LOldQuoteChar := FQuoteChar;
+  LOldDelimiter := Delimiter;
+  LOldQuoteChar := QuoteChar;
   Delimiter := ',';
   QuoteChar := '"';
   try
     SetDelimitedText(Value);
   finally
-    FDelimiter := LOldDelimiter;
-    FQuoteChar := LOldQuoteChar;
-    FDefined := LOldDefined;
+    Delimiter := LOldDelimiter;
+    QuoteChar := LOldQuoteChar;
   end;
 end;
 
@@ -1663,13 +1633,13 @@ begin
       else
       begin
         P1 := P;
-        while ((not FStrictDelimiter and (P^ > ' ')) or
-              (FStrictDelimiter and (P^ <> #0))) and (P^ <> Delimiter) do
+        while ((not StrictDelimiter and (P^ > ' ')) or
+              (StrictDelimiter and (P^ <> #0))) and (P^ <> Delimiter) do
           Inc(P);
         SetString(S, P1, P - P1);
       end;
       Add(S);
-      if not FStrictDelimiter then
+      if not StrictDelimiter then
         while P^ in [#1..' '] do
           Inc(P);
 
@@ -1681,7 +1651,7 @@ begin
           Add('');
         repeat
           Inc(P);
-        until not (not FStrictDelimiter and (P^ in [#1..' ']));
+        until not (not StrictDelimiter and (P^ in [#1..' ']));
       end;
     end;
   finally
@@ -1689,100 +1659,10 @@ begin
   end;
 end;
 
-{*****************************************}
-function TALStrings.GetDelimiter: AnsiChar;
-begin
-  if not (sdDelimiter in FDefined) then
-    Delimiter := ',';
-  Result := FDelimiter;
-end;
-
-{*******************************************}
-function TALStrings.GetLineBreak: AnsiString;
-begin
-  if not (sdLineBreak in FDefined) then
-    LineBreak := sLineBreak;
-  Result := FLineBreak;
-end;
-
-{*****************************************}
-function TALStrings.GetQuoteChar: AnsiChar;
-begin
-  if not (sdQuoteChar in FDefined) then
-    QuoteChar := '"';
-  Result := FQuoteChar;
-end;
-
-{**********************************************}
-function TALStrings.GetStrictDelimiter: Boolean;
-begin
-  if not (sdStrictDelimiter in FDefined) then
-    StrictDelimiter := False;
-  Result := FStrictDelimiter;
-end;
-
-{*******************************************************}
-procedure TALStrings.SetDelimiter(const Value: AnsiChar);
-begin
-  if (FDelimiter <> Value) or not (sdDelimiter in FDefined) then
-  begin
-    Include(FDefined, sdDelimiter);
-    FDelimiter := Value;
-  end
-end;
-
-{*********************************************************}
-procedure TALStrings.SetLineBreak(const Value: AnsiString);
-begin
-  if (FLineBreak <> Value) or not (sdLineBreak in FDefined) then
-  begin
-    Include(FDefined, sdLineBreak);
-    FLineBreak := Value;
-  end
-end;
-
-{*******************************************************}
-procedure TALStrings.SetQuoteChar(const Value: AnsiChar);
-begin
-  if (FQuoteChar <> Value) or not (sdQuoteChar in FDefined) then
-  begin
-    Include(FDefined, sdQuoteChar);
-    FQuoteChar := Value;
-  end
-end;
-
-{************************************************************}
-procedure TALStrings.SetStrictDelimiter(const Value: Boolean);
-begin
-  if (FStrictDelimiter <> Value) or not (sdStrictDelimiter in FDefined) then
-  begin
-    Include(FDefined, sdStrictDelimiter);
-    FStrictDelimiter := Value;
-  end
-end;
-
 {********************************************************************}
 function TALStrings.CompareStrings(const S1, S2: AnsiString): Integer;
 begin
   Result := ALCompareText(S1, S2);
-end;
-
-{**************************************************}
-function TALStrings.GetNameValueSeparator: AnsiChar;
-begin
-  if not (sdNameValueSeparator in FDefined) then
-    NameValueSeparator := '=';
-  Result := FNameValueSeparator;
-end;
-
-{****************************************************************}
-procedure TALStrings.SetNameValueSeparator(const Value: AnsiChar);
-begin
-  if (FNameValueSeparator <> Value) or not (sdNameValueSeparator in FDefined) then
-  begin
-    Include(FDefined, sdNameValueSeparator);
-    FNameValueSeparator := Value;
-  end
 end;
 
 {****************************************************************}
@@ -2049,9 +1929,9 @@ begin
   Temp := Pointer(Item1^.FString);
   Pointer(Item1^.FString) := Pointer(Item2^.FString);
   Pointer(Item2^.FString) := Temp;
-  Temp := Item1^.FObject;
-  Item1^.FObject := Item2^.FObject;
-  Item2^.FObject := Temp;
+  Temp := Pointer(Item1^.FObject);
+  Pointer(Item1^.FObject) := Pointer(Item2^.FObject);
+  Pointer(Item2^.FObject) := Temp;
 end;
 
 {****************************************************************************}
@@ -2802,9 +2682,9 @@ begin
   Pointer(Item1^.FValue) := Pointer(Item2^.FValue);
   Pointer(Item2^.FValue) := Temp;
 
-  Temp := Item1^.FObject;
-  Item1^.FObject := Item2^.FObject;
-  Item2^.FObject := Temp;
+  Temp := pointer(Item1^.FObject);
+  pointer(Item1^.FObject) := pointer(Item2^.FObject);
+  pointer(Item2^.FObject) := Temp;
 end;
 
 {******************************************************************************}
@@ -5043,24 +4923,23 @@ end;
 constructor TALStringsU.Create;
 begin
   inherited Create;
-  FDefaultEncoding := TEncoding.Default;
+  FDefaultEncoding := TEncoding.UTF8;
   FEncoding := nil;
   FWriteBOM := True;
-  FDefined := [];
-  //FDelimiter := ',';          // doesn't matter what we set here because of fDefined
-  //FLineBreak := sLineBreak;   // doesn't matter what we set here because of fDefined
-  //FQuoteChar := '"';          // doesn't matter what we set here because of fDefined
-  //FNameValueSeparator := '='; // doesn't matter what we set here because of fDefined
-  //FStrictDelimiter:= False;   // doesn't matter what we set here because of fDefined
+  FDelimiter := ',';
+  FLineBreak := sLineBreak;
+  FQuoteChar := '"';
+  FNameValueSeparator := '=';
+  FStrictDelimiter:= False;
   FUpdateCount:= 0;
 end;
 
 {*****************************}
 destructor TALStringsU.Destroy;
 begin
-  if (FEncoding <> nil) and not TEncoding.IsStandardEncoding(FEncoding) then
+  if (FEncoding <> nil) and (not TEncoding.IsStandardEncoding(FEncoding)) then
     FreeAndNil(FEncoding);
-  if not TEncoding.IsStandardEncoding(FDefaultEncoding) then
+  if (FDefaultEncoding <> nil) and (not TEncoding.IsStandardEncoding(FDefaultEncoding)) then
     FreeAndNil(FDefaultEncoding);
   inherited Destroy;
 end;
@@ -5151,16 +5030,15 @@ begin
     try
       Clear;
       // Must use property setter for DefaultEncoding
-      DefaultEncoding := TALStringsU(Source).FDefaultEncoding;
+      DefaultEncoding := TALStringsU(Source).DefaultEncoding;
       // Must use internal property setter for Encoding
-      SetEncoding(TALStringsU(Source).FEncoding);
-      FDefined := TALStringsU(Source).FDefined;
-      FNameValueSeparator := TALStringsU(Source).FNameValueSeparator;
-      FQuoteChar := TALStringsU(Source).FQuoteChar;
-      FDelimiter := TALStringsU(Source).FDelimiter;
-      FLineBreak := TALStringsU(Source).FLineBreak;
-      FStrictDelimiter := TALStringsU(Source).FStrictDelimiter;
-      FWriteBOM := TALStringsU(Source).FWriteBOM;
+      SetEncoding(TALStringsU(Source).Encoding);
+      NameValueSeparator := TALStringsU(Source).NameValueSeparator;
+      QuoteChar := TALStringsU(Source).QuoteChar;
+      Delimiter := TALStringsU(Source).Delimiter;
+      LineBreak := TALStringsU(Source).LineBreak;
+      StrictDelimiter := TALStringsU(Source).StrictDelimiter;
+      WriteBOM := TALStringsU(Source).WriteBOM;
       AddStrings(TALStringsU(Source));
     finally
       EndUpdate;
@@ -5201,11 +5079,11 @@ begin
     Tstrings(Dest).BeginUpdate;
     try
       Tstrings(Dest).Clear;
-      Tstrings(Dest).NameValueSeparator := FNameValueSeparator;
-      Tstrings(Dest).QuoteChar := FQuoteChar;
-      Tstrings(Dest).Delimiter := FDelimiter;
-      Tstrings(Dest).LineBreak := FLineBreak;
-      Tstrings(Dest).StrictDelimiter := FStrictDelimiter;
+      Tstrings(Dest).NameValueSeparator := NameValueSeparator;
+      Tstrings(Dest).QuoteChar := QuoteChar;
+      Tstrings(Dest).Delimiter := Delimiter;
+      Tstrings(Dest).LineBreak := LineBreak;
+      Tstrings(Dest).StrictDelimiter := StrictDelimiter;
       for I := 0 to Count - 1 do
         Tstrings(Dest).AddObject(get(I), Objects[I]);
     finally
@@ -5341,21 +5219,18 @@ end;
 {****************************************}
 function TALStringsU.GetCommaText: String;
 var
-  LOldDefined: TStringsDefined;
   LOldDelimiter: Char;
   LOldQuoteChar: Char;
 begin
-  LOldDefined := FDefined;
-  LOldDelimiter := FDelimiter;
-  LOldQuoteChar := FQuoteChar;
+  LOldDelimiter := Delimiter;
+  LOldQuoteChar := QuoteChar;
   Delimiter := ',';
   QuoteChar := '"';
   try
     Result := GetDelimitedText;
   finally
-    FDelimiter := LOldDelimiter;
-    FQuoteChar := LOldQuoteChar;
-    FDefined := LOldDefined;
+    Delimiter := LOldDelimiter;
+    QuoteChar := LOldQuoteChar;
   end;
 end;
 
@@ -5690,7 +5565,7 @@ begin
   if Encoding = nil then
     Encoding := FDefaultEncoding;
   Buffer := Encoding.GetBytes(GetTextStr);
-  if FWriteBOM then
+  if WriteBOM then
   begin
     Preamble := Encoding.GetPreamble;
     if Length(Preamble) > 0 then
@@ -5708,21 +5583,18 @@ end;
 {******************************************************}
 procedure TALStringsU.SetCommaText(const Value: String);
 var
-  LOldDefined: TStringsDefined;
   LOldDelimiter: Char;
   LOldQuoteChar: Char;
 begin
-  LOldDefined := FDefined;
-  LOldDelimiter := FDelimiter;
-  LOldQuoteChar := FQuoteChar;
+  LOldDelimiter := Delimiter;
+  LOldQuoteChar := QuoteChar;
   Delimiter := ',';
   QuoteChar := '"';
   try
     SetDelimitedText(Value);
   finally
-    FDelimiter := LOldDelimiter;
-    FQuoteChar := LOldQuoteChar;
-    FDefined := LOldDefined;
+    Delimiter := LOldDelimiter;
+    QuoteChar := LOldQuoteChar;
   end;
 end;
 
@@ -5813,14 +5685,14 @@ end;
 {***************************************************************}
 procedure TALStringsU.SetDefaultEncoding(const Value: TEncoding);
 begin
-  if not TEncoding.IsStandardEncoding(FDefaultEncoding) then
+  if (FDefaultEncoding <> nil) and (not TEncoding.IsStandardEncoding(FDefaultEncoding)) then
     FDefaultEncoding.Free;
   if TEncoding.IsStandardEncoding(Value) then
     FDefaultEncoding := Value
   else if Value <> nil then
     FDefaultEncoding := Value.Clone
   else
-    FDefaultEncoding := TEncoding.Default;
+    FDefaultEncoding := TEncoding.UTF8;
 end;
 
 {**********************************************************}
@@ -5843,13 +5715,13 @@ begin
       else
       begin
         P1 := P;
-        while ((not FStrictDelimiter and (P^ > ' ')) or
-              (FStrictDelimiter and (P^ <> #0))) and (P^ <> Delimiter) do
+        while ((not StrictDelimiter and (P^ > ' ')) or
+              (StrictDelimiter and (P^ <> #0))) and (P^ <> Delimiter) do
           Inc(P);
         SetString(S, P1, P - P1);
       end;
       Add(S);
-      if not FStrictDelimiter then
+      if not StrictDelimiter then
         while ((P^ >= char(#1)) and (P^ <= char(' '))) do
           Inc(P);
 
@@ -5861,7 +5733,7 @@ begin
           Add('');
         repeat
           Inc(P);
-        until not (not FStrictDelimiter and ((P^ >= char(#1)) and (P^ <= char(' '))));
+        until not (not StrictDelimiter and ((P^ >= char(#1)) and (P^ <= char(' '))));
       end;
     end;
   finally
@@ -5872,110 +5744,20 @@ end;
 {********************************************************}
 procedure TALStringsU.SetEncoding(const Value: TEncoding);
 begin
-  if not TEncoding.IsStandardEncoding(FEncoding) then
+  if (FEncoding <> nil) and (not TEncoding.IsStandardEncoding(FEncoding)) then
     FEncoding.Free;
   if TEncoding.IsStandardEncoding(Value) then
     FEncoding := Value
   else if Value <> nil then
     FEncoding := Value.Clone
   else
-    FEncoding := TEncoding.Default;
-end;
-
-{**************************************}
-function TALStringsU.GetDelimiter: Char;
-begin
-  if not (sdDelimiter in FDefined) then
-    Delimiter := ',';
-  Result := FDelimiter;
-end;
-
-{****************************************}
-function TALStringsU.GetLineBreak: String;
-begin
-  if not (sdLineBreak in FDefined) then
-    LineBreak := sLineBreak;
-  Result := FLineBreak;
-end;
-
-{**************************************}
-function TALStringsU.GetQuoteChar: Char;
-begin
-  if not (sdQuoteChar in FDefined) then
-    QuoteChar := '"';
-  Result := FQuoteChar;
-end;
-
-{***********************************************}
-function TALStringsU.GetStrictDelimiter: Boolean;
-begin
-  if not (sdStrictDelimiter in FDefined) then
-    StrictDelimiter := False;
-  Result := FStrictDelimiter;
-end;
-
-{****************************************************}
-procedure TALStringsU.SetDelimiter(const Value: Char);
-begin
-  if (FDelimiter <> Value) or not (sdDelimiter in FDefined) then
-  begin
-    Include(FDefined, sdDelimiter);
-    FDelimiter := Value;
-  end
-end;
-
-{******************************************************}
-procedure TALStringsU.SetLineBreak(const Value: String);
-begin
-  if (FLineBreak <> Value) or not (sdLineBreak in FDefined) then
-  begin
-    Include(FDefined, sdLineBreak);
-    FLineBreak := Value;
-  end
-end;
-
-{****************************************************}
-procedure TALStringsU.SetQuoteChar(const Value: Char);
-begin
-  if (FQuoteChar <> Value) or not (sdQuoteChar in FDefined) then
-  begin
-    Include(FDefined, sdQuoteChar);
-    FQuoteChar := Value;
-  end
-end;
-
-{*************************************************************}
-procedure TALStringsU.SetStrictDelimiter(const Value: Boolean);
-begin
-  if (FStrictDelimiter <> Value) or not (sdStrictDelimiter in FDefined) then
-  begin
-    Include(FDefined, sdStrictDelimiter);
-    FStrictDelimiter := Value;
-  end
+    FEncoding := TEncoding.UTF8;
 end;
 
 {*****************************************************************}
 function TALStringsU.CompareStrings(const S1, S2: String): Integer;
 begin
   Result := ALCompareTextU(S1, S2);
-end;
-
-{***********************************************}
-function TALStringsU.GetNameValueSeparator: Char;
-begin
-  if not (sdNameValueSeparator in FDefined) then
-    NameValueSeparator := '=';
-  Result := FNameValueSeparator;
-end;
-
-{*************************************************************}
-procedure TALStringsU.SetNameValueSeparator(const Value: Char);
-begin
-  if (FNameValueSeparator <> Value) or not (sdNameValueSeparator in FDefined) then
-  begin
-    Include(FDefined, sdNameValueSeparator);
-    FNameValueSeparator := Value;
-  end
 end;
 
 {*************************************************************}
@@ -6228,9 +6010,9 @@ begin
   Temp := Pointer(Item1^.FString);
   Pointer(Item1^.FString) := Pointer(Item2^.FString);
   Pointer(Item2^.FString) := Temp;
-  Temp := Item1^.FObject;
-  Item1^.FObject := Item2^.FObject;
-  Item2^.FObject := Temp;
+  Temp := pointer(Item1^.FObject);
+  pointer(Item1^.FObject) := pointer(Item2^.FObject);
+  pointer(Item2^.FObject) := Temp;
 end;
 
 {*************************************************************************}
@@ -6967,9 +6749,9 @@ begin
   Pointer(Item1^.FValue) := Pointer(Item2^.FValue);
   Pointer(Item2^.FValue) := Temp;
 
-  Temp := Item1^.FObject;
-  Item1^.FObject := Item2^.FObject;
-  Item2^.FObject := Temp;
+  Temp := pointer(Item1^.FObject);
+  pointer(Item1^.FObject) := pointer(Item2^.FObject);
+  pointer(Item2^.FObject) := Temp;
 end;
 
 {***************************************************************************}

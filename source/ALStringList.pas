@@ -145,6 +145,7 @@ Type
     FNameValueSeparator: AnsiChar;
     FStrictDelimiter: Boolean;
     FUpdateCount: Integer;
+    FProtectedSave: Boolean;
     function GetCommaText: AnsiString;
     function GetDelimitedText: AnsiString;
     procedure SetCommaText(const Value: AnsiString);
@@ -237,6 +238,7 @@ Type
     property StrictDelimiter: Boolean read fStrictDelimiter write fStrictDelimiter;
     property Strings[Index: Integer]: AnsiString read Get write Put; default;
     property Text: AnsiString read GetTextStr write SetTextStr;
+    property ProtectedSave: Boolean read fProtectedSave write fProtectedSave;
   end;
 
   {--------------------}
@@ -624,6 +626,7 @@ type
     FStrictDelimiter: Boolean;
     FUpdateCount: Integer;
     FWriteBOM: Boolean;
+    FProtectedSave: Boolean;
     function GetCommaText: String;
     function GetDelimitedText: String;
     procedure SetCommaText(const Value: String);
@@ -717,6 +720,7 @@ type
     property Strings[Index: Integer]: String read Get write Put; default;
     property Text: String read GetTextStr write SetTextStr;
     property WriteBOM: Boolean read FWriteBOM write FWriteBOM;
+    property ProtectedSave: Boolean read fProtectedSave write fProtectedSave;
   end;
 
   {---------------------}
@@ -892,6 +896,7 @@ type
 implementation
 
 Uses System.RTLConsts,
+     system.IOUtils,
      {$IFNDEF NEXTGEN}
      System.Ansistrings,
      ALCipher,
@@ -932,6 +937,7 @@ begin
   FNameValueSeparator := '=';
   FStrictDelimiter:= False;
   FUpdateCount:= 0;
+  fProtectedSave := False;
 end;
 
 {****************************************************}
@@ -1487,14 +1493,29 @@ end;
 
 {**********************************************************}
 procedure TALStrings.SaveToFile(const FileName: AnsiString);
-var
-  Stream: TStream;
+Var afileStream: TfileStream;
+    aTmpFilename: AnsiString;
 begin
-  Stream := TFileStream.Create(String(FileName), fmCreate);
+  if ProtectedSave then aTmpFilename := FileName + '.~tmp'
+  else aTmpFilename := FileName;
   try
-    SaveToStream(Stream);
-  finally
-    Stream.Free;
+
+    aFileStream := TfileStream.Create(String(aTmpFilename),fmCreate);
+    Try
+      SaveToStream(aFileStream);
+    finally
+      aFileStream.Free;
+    end;
+
+    if aTmpFilename <> FileName then begin
+      if TFile.Exists(String(FileName)) then TFile.Delete(String(FileName));
+      TFile.Move(String(aTmpFilename), String(FileName));
+    end;
+
+  except
+    if (aTmpFilename <> FileName) and
+       (TFile.Exists(String(aTmpFilename))) then TFile.Delete(String(aTmpFilename));
+    raise;
   end;
 end;
 
@@ -4932,6 +4953,7 @@ begin
   FNameValueSeparator := '=';
   FStrictDelimiter:= False;
   FUpdateCount:= 0;
+  fProtectedSave := False;
 end;
 
 {*****************************}
@@ -5540,14 +5562,29 @@ end;
 
 {****************************************************************************}
 procedure TALStringsU.SaveToFile(const FileName: string; Encoding: TEncoding);
-var
-  Stream: TStream;
+Var afileStream: TfileStream;
+    aTmpFilename: String;
 begin
-  Stream := TFileStream.Create(FileName, fmCreate);
+  if ProtectedSave then aTmpFilename := FileName + '.~tmp'
+  else aTmpFilename := FileName;
   try
-    SaveToStream(Stream, Encoding);
-  finally
-    Stream.Free;
+
+    aFileStream := TfileStream.Create(aTmpFilename,fmCreate);
+    Try
+      SaveToStream(aFileStream, Encoding);
+    finally
+      aFileStream.Free;
+    end;
+
+    if aTmpFilename <> FileName then begin
+      if TFile.Exists(FileName) then TFile.Delete(FileName);
+      TFile.Move(aTmpFilename, FileName);
+    end;
+
+  except
+    if (aTmpFilename <> FileName) and
+       (TFile.Exists(aTmpFilename)) then TFile.Delete(aTmpFilename);
+    raise;
   end;
 end;
 

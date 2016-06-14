@@ -122,27 +122,26 @@ var aCountryCode: AnsiString;
 begin
 
   PhoneNumber := ALTrim(PhoneNumber);  //1rt trim the aPhoneNumber
-  if not altryStrToInt64(PhoneNumber, result) then begin  //if the aPhoneNumber is already an integer then their is nothing to do
-
-    aCountryCode := '';
-    P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
-    while P1 > 0 do begin
-      P2 := ALPosEx(']', PhoneNumber, P1+1);
-      if P2 = P1 + 3 then begin
-        aCountryCode := ALUpperCase(ALCopyStr(PhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
-        if (length(aCountryCode) = 2) and
-           (aCountryCode[1] in ['A'..'Z']) and
-           (aCountryCode[2] in ['A'..'Z']) then begin
-          delete(PhoneNumber,P1,4); // "[FR] 06.34.54.12.22" => " 06.34.54.12.22"
-          PhoneNumber := ALtrim(PhoneNumber); // " 06.34.54.12.22" => "06.34.54.12.22"
-          break; // break the loop, we found the country code hint
-        end
-        else aCountryCode := '';
-      end;
-      P1 := AlPosEx('[',PhoneNumber, P1+1);
+  aCountryCode := '';
+  P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
+  while P1 > 0 do begin
+    P2 := ALPosEx(']', PhoneNumber, P1+1);
+    if P2 = P1 + 3 then begin
+      aCountryCode := ALUpperCase(ALCopyStr(PhoneNumber, P1+1, 2)); // [FR] 06.34.54.12.22 => FR
+      if (length(aCountryCode) = 2) and
+         (aCountryCode[1] in ['A'..'Z']) and
+         (aCountryCode[2] in ['A'..'Z']) then begin
+        delete(PhoneNumber,P1,4); // "[FR] 06.34.54.12.22" => " 06.34.54.12.22"
+        PhoneNumber := ALtrim(PhoneNumber); // " 06.34.54.12.22" => "06.34.54.12.22"
+        break; // break the loop, we found the country code hint
+      end
+      else aCountryCode := '';
     end;
-    result := ALStrPhoneNumberToInt64(PhoneNumber, aCountryCode);
+    P1 := AlPosEx('[',PhoneNumber, P1+1);
   end;
+  result := ALStrPhoneNumberToInt64(PhoneNumber, aCountryCode); //even if the aPhoneNumber is already an integer we need to format it
+                                                                //because user can gave us +330625142445 but it's must be stored as
+                                                                //                         +33625142445
 
 end;
 

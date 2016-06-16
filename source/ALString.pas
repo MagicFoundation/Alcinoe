@@ -1805,7 +1805,7 @@ begin
   while I > 0 do
   begin
     case Result[I] of
-      '.', '[', ']', '(', ')', '?', '*', '+', '{', '}', '^', '$', '|', '\', '/':
+      '.', '[', ']', '(', ')', '?', '*', '+', '{', '}', '^', '$', '|', '\', '/' {NOTE: '/' was added from the delphi original TPerlRegEx}:
         Insert('\', Result, I);
       #0:
         begin
@@ -6757,8 +6757,14 @@ function ALIsDecimal(const S: AnsiString): boolean;
 var i: integer;
 begin
   result := true;
-  for i := 1 to length(S) do begin
-    if not (S[i] in ['0'..'9','-']) then begin
+  for i := low(s) to high(S) do begin
+    if i=low(s) then begin
+      if not (S[i] in ['0'..'9','-','+']) then begin
+        result := false;
+        break;
+      end;
+    end
+    else if not (S[i] in ['0'..'9']) then begin
       result := false;
       break;
     end;

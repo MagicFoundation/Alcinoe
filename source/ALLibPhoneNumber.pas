@@ -117,11 +117,26 @@ end;
  [FR] 06.34.54.12.22, extract country code if it is possible and
  converts this number to an Int64 representation looking like 33634541222 }
 function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64;
+
+  function _IsDecimal(const S: AnsiString): boolean;
+  var i: integer;
+  begin
+    result := true;
+    for i := low(s) to high(S) do begin
+      if not (S[i] in ['0'..'9']) then begin
+        result := false;
+        break;
+      end;
+    end;
+  end;
+
 var aCountryCode: AnsiString;
     P1, P2: integer;
 begin
 
   PhoneNumber := ALTrim(PhoneNumber);  //1rt trim the aPhoneNumber
+  if _IsDecimal(PhoneNumber) then exit(ALStrToint64(PhoneNumber)); // if their is not the '+' sign we can do nothing because ALStrPhoneNumberToInt64 will return 0
+
   aCountryCode := '';
   P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country
   while P1 > 0 do begin

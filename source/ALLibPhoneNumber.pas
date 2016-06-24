@@ -121,7 +121,8 @@ function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64;
   function _IsDecimal(const S: AnsiString): boolean;
   var i: integer;
   begin
-    result := true;
+    result := s <> '';
+    if not result then exit;
     for i := low(s) to high(S) do begin
       if not (S[i] in ['0'..'9']) then begin
         result := false;

@@ -136,7 +136,8 @@ var aCountryCode: AnsiString;
 begin
 
   PhoneNumber := ALTrim(PhoneNumber);  //1rt trim the aPhoneNumber
-  if _IsDecimal(PhoneNumber) then exit(ALStrToint64(PhoneNumber)); // if their is not the '+' sign we can do nothing because ALStrPhoneNumberToInt64 will return 0
+  if _IsDecimal(PhoneNumber) and alTryStrToInt64(PhoneNumber, result) then exit; // if their is not the '+' sign we can do nothing because ALStrPhoneNumberToInt64 will return 0
+                                                                                 // if alTryStrToInt64 not success it's mean it's a tooo big number, so better to return 0
 
   aCountryCode := '';
   P1 := AlPos('[',PhoneNumber);  // look if their is some prefix or suffix like [FR] to give an hint about the country

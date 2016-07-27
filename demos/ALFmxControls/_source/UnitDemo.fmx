@@ -3,7 +3,7 @@ object DemoForm: TDemoForm
   Top = 0
   ClientHeight = 480
   ClientWidth = 640
-  Quality = HighQuality
+  Quality = HighPerformance
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]

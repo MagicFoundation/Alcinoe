@@ -1,4 +1,4 @@
-@SET BDS=C:\Program Files (x86)\Embarcadero\Studio\17.0
+@SET BDS=C:\Program Files (x86)\Embarcadero\Studio\18.0
 @SET FrameworkDir=C:\Windows\Microsoft.NET\Framework\v3.5
 @SET FrameworkVersion=v3.5
 @SET PATH=%FrameworkDir%;%PATH%
@@ -26,19 +26,19 @@ IF ERRORLEVEL 1 pause
 del *.deployproj.local /s
 IF ERRORLEVEL 1 pause
 
-rmdir /s /q source\dcu\Win32\seattle
+rmdir /s /q source\dcu\Win32\berlin
 IF ERRORLEVEL 1 pause
 
-mkdir source\dcu\Win32\seattle
+mkdir source\dcu\Win32\berlin
 IF ERRORLEVEL 1 pause
 
-rmdir /s /q lib\alcinoe\Win32\seattle
+rmdir /s /q lib\alcinoe\Win32\berlin
 IF ERRORLEVEL 1 pause
 
-mkdir lib\alcinoe\Win32\seattle
+mkdir lib\alcinoe\Win32\berlin
 IF ERRORLEVEL 1 pause
 
-MSBuild source\Alcinoe_seattle.dproj /t:build /p:Config=Release /p:Platform=Win32
+MSBuild source\Alcinoe_berlin.dproj /t:build /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 pause
 
 if "%INPUT%"=="Y" goto BUILD_DEMOS
@@ -232,10 +232,10 @@ IF ERRORLEVEL 1 pause
 
 :END
 
-rmdir /s /q source\dcu\Win32\seattle
+rmdir /s /q source\dcu\Win32\berlin
 IF ERRORLEVEL 1 pause
 
-mkdir source\dcu\Win32\seattle
+mkdir source\dcu\Win32\berlin
 IF ERRORLEVEL 1 pause
 
 @echo Finished

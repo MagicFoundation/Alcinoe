@@ -199,6 +199,9 @@ type
   //       TALText is updated, MakeBufBitmap is call again)
   TALText = class(TText)
   private
+    {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
+    fdoubleBuffered: boolean;
+    {$ENDIF}
     fSaveDisableAlign: Boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fRestoreLayoutUpdate: boolean;
@@ -230,6 +233,9 @@ type
     procedure clearBufBitmap; virtual;
     procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
     procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
+    {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
+    procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
+    {$ENDIF}
   published
     property doubleBuffered: Boolean read GetdoubleBuffered write setdoubleBuffered default false;
   end;
@@ -2502,12 +2508,8 @@ end;
 function TALDoubleBufferedTextLayoutNG.GetTextRect: TRectF;
 begin
 
-  if fBufBitmap = nil then begin  // << if fBufBitmap = nil it's mean last call to DoRenderLayout was inherited
-    result := inherited GetTextRect;
-    exit;
-  end;
-
-  result := fBufBitmapRect;
+  if fBufBitmap = nil then result := inherited GetTextRect  // << if fBufBitmap = nil it's mean last call to DoRenderLayout was inherited
+  else result := fBufBitmapRect;
 
   //this to take care of the align constraint of the ftextLayout
   if fTextControl.Align in [TAlignLayout.Client,
@@ -2606,6 +2608,11 @@ begin
   end;
 
   {$ENDIF}
+
+  {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
+  fdoubleBuffered := False;
+  {$ENDIF}
+
 end;
 
 {****************************}
@@ -2677,7 +2684,7 @@ begin
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
   result := TALDoubleBufferedTextLayoutNG(Layout).doubleBuffered;
   {$ELSE}
-  result := False;
+  result := fdoubleBuffered;
   {$ENDIF}
 end;
 
@@ -2689,6 +2696,8 @@ begin
     TALDoubleBufferedTextLayoutNG(Layout).doubleBuffered := value;
     AdjustSize;
   end;
+  {$ELSE}
+  fdoubleBuffered := Value;
   {$ENDIF}
 end;
 
@@ -2723,6 +2732,46 @@ begin
   inherited; // will call dorealign that will call AdjustSize
 end;
 
+{*************************************************}
+{$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
+procedure TALText.SetBounds(X, Y, AWidth, AHeight: Single);
+begin
+  if FDisableAlign then begin // i use this to know that we are here because of a call to !!#@{^!! adjustsize that is not virtual
+
+    //this to take care of the align constraint of the ftextLayout
+    if Align in [TAlignLayout.Client,
+                 TAlignLayout.Contents,
+                 TAlignLayout.Top,
+                 TAlignLayout.Bottom,
+                 TAlignLayout.MostTop,
+                 TAlignLayout.MostBottom,
+                 TAlignLayout.VertCenter] then begin
+      x := 0;
+      aWidth := Width;
+    end;
+    if Align in [TAlignLayout.Client,
+                 TAlignLayout.Contents,
+                 TAlignLayout.Left,
+                 TAlignLayout.Right,
+                 TAlignLayout.MostLeft,
+                 TAlignLayout.MostRight,
+                 TAlignLayout.HorzCenter] then begin
+      y := 0;
+      aheight := height;
+    end;
+
+    //this to remove the FTextSettings.Font.Size / 3 from SetBounds(Position.X, Position.Y, R.Width + R.Left * 2 + FTextSettings.Font.Size / 3, R.Height + R.Top * 2);
+    //that is done inside TText.AdjustSize
+    {$IF CompilerVersion <> 31}
+      {$MESSAGE WARN 'Check if FMX.Objects.TText.adjustsize still doing FTextSettings.Font.Size / 3 and adjust the IFDEF'}
+    {$ENDIF}
+    if (AutoSize) and
+       (Text <> '') then AWidth := AWidth - (TextSettings.Font.Size / 3);
+
+  end;
+  inherited SetBounds(X, Y, AWidth, AHeight);
+end;
+{$ENDIF}
 
 procedure Register;
 begin

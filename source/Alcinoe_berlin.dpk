@@ -40,7 +40,6 @@ contains
   ALFmxImgList in 'ALFmxImgList.pas',
   ALReg in 'ALReg.pas',
   ALFmxStdCtrls in 'ALFmxStdCtrls.pas',
-  ALFmxStylesObjects in 'ALFmxStylesObjects.pas',
   ALFmxCommon in 'ALFmxCommon.pas';
 
 end.

@@ -3,9 +3,17 @@ unit ALFmxStdCtrls;
 interface
 
 uses System.Classes,
+     System.Types,
+     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+     FMX.types3D,
+     {$ENDIF}
      System.UITypes,
+     System.ImageList,
      FMX.Controls,
-     FMX.StdCtrls;
+     FMX.Graphics,
+     FMX.StdCtrls,
+     FMX.actnlist,
+     FMX.ImgList;
 
 type
 
@@ -162,12 +170,147 @@ type
     property OnMouseLeave;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBox = class(TControl, IGlyph)
+  public const
+    DesignBorderColor = $A080D080;
+  private
+    fdoubleBuffered: boolean;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    fBufBitmap: TTexture;
+    {$ELSE}
+    fBufBitmap: Tbitmap;
+    {$ENDIF}
+    fBufBitmapRect: TRectF;
+    fBufSize: TsizeF;
+    [weak] fBufImages: TCustomImageList;
+    FbufImageIndex: TImageIndex;
+    //-----
+    FPressing: Boolean;
+    FOnChange: TNotifyEvent;
+    FIsPressed: Boolean;
+    FIsChecked: Boolean;
+    FImageCheckedLink: TImageLink;
+    FImageUncheckedLink: TImageLink;
+    FisImagesChanged: boolean;
+    procedure SetdoubleBuffered(const Value: Boolean);
+    function GetIsChecked: Boolean;
+    procedure SetIsChecked(const Value: Boolean);
+    function GetImages: TCustomImageList;
+    procedure SetImages(const Value: TCustomImageList);
+    { IGlyph }
+    function GetImageIndex: TImageIndex;
+    procedure SetImageIndex(const Value: TImageIndex);
+    function GetImageUncheckedIndex: TImageIndex;
+    procedure SetImageUncheckedIndex(const Value: TImageIndex);
+    function GetImageList: TBaseImageList; inline;
+    procedure SetImageList(const Value: TBaseImageList);
+    function IGlyph.GetImages = GetImageList;
+    procedure IGlyph.SetImages = SetImageList;
+    procedure NonBufferedPaint;
+  protected
+    procedure Paint; override;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    property BufBitmap: TTexture read fBufBitmap;
+    {$ELSE}
+    property BufBitmap: Tbitmap read fBufBitmap;
+    {$ENDIF}
+    procedure DoEndUpdate; override;
+    procedure DoChanged; virtual;
+    function ImageCheckedIndexStored: Boolean; virtual;
+    function ImageUncheckedIndexStored: Boolean; virtual;
+    function ImagesStored: Boolean; virtual;
+    function GetDefaultSize: TSizeF; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    function MakeBufBitmap: TTexture; virtual;
+    {$ELSE}
+    function MakeBufBitmap: Tbitmap; virtual;
+    {$ENDIF}
+    procedure clearBufBitmap; virtual;
+    procedure ImagesChanged;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+  published
+    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default false;
+    property Action;
+    property Align;
+    property Anchors;
+    property CanFocus default True;
+    property CanParentFocus;
+    property ClipChildren default False;
+    property ClipParent default False;
+    property Cursor default crDefault;
+    property DisableFocusEffect;
+    property DragMode default TDragMode.dmManual;
+    property EnableDragHighlight default True;
+    property Enabled;
+    property Locked default False;
+    property Height;
+    property Hint;
+    property HitTest default True;
+    property IsChecked: Boolean read GetIsChecked write SetIsChecked default False;
+    property ImageCheckedIndex: TImageIndex read GetImageIndex write SetImageIndex stored ImageCheckedIndexStored;
+    property ImageUncheckedIndex: TImageIndex read GetImageUncheckedIndex write SetImageUncheckedIndex stored ImageUncheckedIndexStored;
+    property Images: TCustomImageList read GetImages write SetImages stored ImagesStored;
+    property Padding;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TabOrder;
+    property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
+    property ParentShowHint;
+    property ShowHint;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    property OnKeyDown;
+    property OnKeyUp;
+    property OnCanFocus;
+    property OnClick;
+    property OnDblClick;
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
+  end;
+
 procedure Register;
 
 implementation
 
 uses System.SysUtils,
-     FMX.Types;
+     System.Math,
+     system.Math.Vectors,
+     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+     FMX.Canvas.GPU,
+     {$ENDIF}
+     fmx.consts,
+     fmx.utils,
+     FMX.Types,
+     AlfmxCommon;
 
 {*********************************}
 procedure TALBGTrackBar.ApplyStyle;
@@ -624,9 +767,455 @@ begin
   fMinThumbTrackBar.StyleLookup := Value;
 end;
 
+{*************************************************}
+constructor TALCheckbox.Create(AOwner: TComponent);
+begin
+  inherited;
+  fdoubleBuffered := false;
+  fBufBitmap := nil;
+  SetAcceptsControls(False);
+  CanFocus := True;
+  AutoCapture := True;
+  FPressing:= false;
+  FOnChange := nil;
+  FIsPressed := False;
+  FIsChecked := False;
+  FImageCheckedLink := TGlyphImageLink.Create(Self);
+  FImageUncheckedLink := TGlyphImageLink.Create(Self);
+  FisImagesChanged := False;
+end;
+
+{*****************************}
+destructor TALCheckbox.Destroy;
+begin
+  clearBufBitmap;
+  FImageCheckedLink.DisposeOf;
+  FImageUncheckedLink.DisposeOf;
+  inherited;
+end;
+
+{***********************************}
+procedure TALCheckbox.clearBufBitmap;
+begin
+  if fBufBitmap <> nil then begin
+    fBufBitmap.Free;
+    fBufBitmap := nil;
+  end;
+end;
+
+{******************************}
+procedure TALCheckbox.DoChanged;
+begin
+  if Assigned(FOnChange) then
+    FOnChange(Self);
+  Repaint;
+end;
+
+{********************************}
+procedure TALCheckbox.DoEndUpdate;
+begin
+  inherited;
+  if FisImagesChanged then
+    repaint;
+end;
+
+{**********************************}
+procedure TALCheckbox.ImagesChanged;
+begin
+  if ([csLoading, csDestroying, csUpdating] * ComponentState = []) and not IsUpdating then begin
+    repaint;
+    FisImagesChanged := False;
+  end
+  else FisImagesChanged := True;
+end;
+
+{**************************************************************************************}
+procedure TALCheckbox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  if Button = TMouseButton.mbLeft then
+  begin
+    FPressing := True;
+    FIsPressed := True;
+    StartTriggerAnimation(Self, 'IsPressed');
+  end;
+end;
+
+{****************************************************************}
+procedure TALCheckbox.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  if (ssLeft in Shift) and (FPressing) then
+  begin
+    if FIsPressed <> LocalRect.Contains(PointF(X, Y)) then
+    begin
+      FIsPressed := LocalRect.Contains(PointF(X, Y));
+      StartTriggerAnimation(Self, 'IsPressed');
+    end;
+  end;
+end;
+
+{************************************************************************************}
+procedure TALCheckbox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if FPressing then
+  begin
+    inherited;
+    FPressing := False;
+    FIsPressed := False;
+
+    if LocalRect.Contains(PointF(X, Y)) then
+    begin
+      IsChecked := not IsChecked;
+    end
+  end;
+end;
+
+{*********************************************************************************************}
+procedure TALCheckbox.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
+begin
+  inherited;
+  if (KeyChar = ' ') then
+  begin
+    Click; // Emulate mouse click to perform Action.OnExecute
+    IsChecked := not IsChecked;
+    KeyChar := #0;
+  end;
+end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+function TALCheckbox.MakeBufBitmap: TTexture;
+{$ELSE}
+function TALCheckbox.MakeBufBitmap: Tbitmap;
+{$ENDIF}
+
+var aImageIndex: TimageIndex;
+    {$IF defined(ANDROID) or defined(IOS)}
+    aSceneScale: Single;
+    aBitmap: TBitmap;
+    aBitmapSize: TSize;
+    aBitmapData: TBitmapData;
+    {$ENDIF}
+
+begin
+
+  if IsChecked then aImageIndex := ImageCheckedIndex
+  else aImageIndex := ImageUncheckedIndex;
+
+  if ([csLoading, csDestroying, csDesigning] * ComponentState <> []) or
+     (not fdoubleBuffered) or
+     (Scene = nil) or
+     (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
+     (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
+     (Images = nil) or
+     (aImageIndex = -1) then begin
+    clearBufBitmap;
+    exit(nil);
+  end;
+
+  if (fBufBitmap <> nil) and
+     (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
+     (fBufImages = Images) and
+     (FbufImageIndex = aImageIndex) then exit(fBufBitmap);
+
+  clearBufBitmap;
+  fBufSize := Size.Size;
+  fBufImages := Images;
+  FbufImageIndex := aImageIndex;
+
+  {$IF defined(ANDROID) or defined(IOS)}
+
+  //init aSceneScale
+  if Scene <> nil then aSceneScale := Scene.GetSceneScale
+  else aSceneScale := 1;
+
+  //init aBitmapSize / aBitmap / fBufBitmapRect
+  aBitmapSize := TSize.Create(0, 0);
+  aBitmap := nil;
+  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
+  if (Images <> nil) and
+     (fBufBitmapRect.Width >= 1) and
+     (fBufBitmapRect.Height >= 1) and
+     (aImageIndex <> -1) and
+     ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then begin
+    aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * aSceneScale), Round(fBufBitmapRect.Height * aSceneScale));
+    Images.BestSize(aImageIndex, aBitmapSize);
+    aBitmap := Images.Bitmap(aBitmapSize, aImageIndex)
+  end;
+
+  if aBitmap <> nil then begin
+
+    //init fBufBitmapRect
+    fBufBitmapRect := TRectF.Create(0,
+                                    0,
+                                    aBitmap.Width / aSceneScale,
+                                    aBitmap.Height/ aSceneScale).CenterAt(fBufBitmapRect);
+
+    //convert the aBitmapSurface to texture
+    //it's important to make a copy of the aBitmap because it's could be destroyed by the TimageList if
+    //their is not anymore enalf of place in it's own caching system
+    fBufBitmap := TTexture.Create;
+    try
+      fBufBitmap.Assign(aBitmap);
+      //
+      //i don't understand the sheet they do in TTexture.assign! they don't copy the data in the TTexture !
+      //
+      //procedure TTexture.Assign(Source: TPersistent);
+      //begin
+      //  ...
+      //  if not (TCanvasStyle.NeedGPUSurface in TBitmap(Source).CanvasClass.GetCanvasStyle) then
+      //    begin
+      //    if TBitmap(Source).Map(TMapAccess.Read, M) then
+      //    try
+      //      UpdateTexture(M.Data, M.Pitch);
+      //    finally
+      //      TBitmap(Source).Unmap(M);
+      //    end;
+      //  end;
+      //  ...
+      //end;
+      //
+      {$IF CompilerVersion <> 31}
+        {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still not copying the bitmap data in the TTexture if TCanvasStyle.NeedGPUSurface and adjust the IFDEF'}
+      {$ENDIF}
+      if (TCanvasStyle.NeedGPUSurface in aBitmap.CanvasClass.GetCanvasStyle) then begin
+        if aBitmap.Map(TMapAccess.Read, aBitmapData) then begin
+          try
+            fBufBitmap.UpdateTexture(aBitmapData.Data, aBitmapData.Pitch);
+          finally
+            aBitmap.Unmap(aBitmapData);
+          end;
+        end;
+      end;
+    except
+      fBufBitmap.Free;
+      fBufBitmap := nil;
+      raise;
+    end;
+
+  end;
+
+  {$ENDIF}
+
+  result := fBufBitmap;
+
+end;
+
+{*************************************}
+procedure TALCheckbox.NonBufferedPaint;
+const
+  MinCrossSize = 3;
+  MaxCrossSize = 13;
+var
+  TextRect, ImgRect, BitmapRect: TRectF;
+  CrossSize, ScreenScale: Single;
+  Bitmap: TBitmap;
+  BitmapSize: TSize;
+  aImageIndex: TimageIndex;
+begin
+  if IsChecked then aImageIndex := ImageCheckedIndex
+  else aImageIndex := ImageUncheckedIndex;
+  if [csLoading, csDestroying] * ComponentState = [] then
+  begin
+    BitmapSize := TSize.Create(0, 0);
+    Bitmap := nil;
+    ImgRect := LocalRect;
+    if Scene <> nil then
+      ScreenScale := Scene.GetSceneScale
+    else
+      ScreenScale := 1;
+    if (Images <> nil) and (ImgRect.Width >= 1) and (ImgRect.Height >= 1) and (aImageIndex <> -1) and
+      ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then
+    begin
+      BitmapSize := TSize.Create(Round(ImgRect.Width * ScreenScale), Round(ImgRect.Height * ScreenScale));
+      Images.BestSize(aImageIndex, BitmapSize);
+      Bitmap := Images.Bitmap(BitmapSize, aImageIndex)
+    end;
+    if (csDesigning in ComponentState) and not Locked then
+      DrawDesignBorder(DesignBorderColor, DesignBorderColor);
+    if Bitmap <> nil then
+    begin
+      BitmapRect := TRectF.Create(0, 0, Bitmap.Width, Bitmap.Height);
+      ImgRect := TRectF.Create(CenteredRect(ImgRect.Round, TRectF.Create(0, 0, Bitmap.Width / ScreenScale,
+        Bitmap.Height/ ScreenScale).Round));
+      Canvas.DrawBitmap(Bitmap, BitmapRect, ImgRect, AbsoluteOpacity, True);
+    end;
+    if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+    begin
+      TextRect := LocalRect;
+      TextRect.Inflate(0.5, 0.5);
+      Canvas.Stroke.Kind := TBrushKind.Solid;
+      Canvas.Stroke.Color := TAlphaColorRec.Darkgray;
+      Canvas.Stroke.Dash := TStrokeDash.Solid;
+      CrossSize := Trunc(Min(MaxCrossSize, Min(TextRect.Width, TextRect.Height) / 6)) + 1;
+      if CrossSize >= MinCrossSize then
+      begin
+        TextRect.TopLeft.Offset(2, 2);
+        TextRect.BottomRight := TextRect.TopLeft;
+        TextRect.BottomRight.Offset(CrossSize, CrossSize);
+        if Bitmap = nil then
+        begin
+          if Images = nil then
+            Canvas.Stroke.Color := TAlphaColorRec.Red;
+          Canvas.DrawLine(TextRect.TopLeft, TextRect.BottomRight, AbsoluteOpacity);
+          Canvas.DrawLine(TPointF.Create(TextRect.Right, TextRect.Top), TPointF.Create(TextRect.Left, TextRect.Bottom),
+            AbsoluteOpacity);
+          TextRect := TRectF.Create(TextRect.Left, TextRect.Bottom, Width, Height);
+        end;
+        if aImageIndex <> -1 then
+        begin
+          Canvas.Font.Family := 'Small Font';
+          Canvas.Font.Size := 7;
+          TextRect.Bottom := TextRect.Top + Canvas.TextHeight(Inttostr(aImageIndex));
+          if TextRect.Bottom <= Height then
+          begin
+            Canvas.Fill.Color := TAlphaColorRec.Darkgray;
+            Canvas.FillText(TextRect, Inttostr(aImageIndex), False, AbsoluteOpacity, [], TTextAlign.Leading,
+              TTextAlign.Leading);
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+{**************************}
+procedure TALCheckbox.Paint;
+begin
+
+  MakeBufBitmap;
+
+  if fBufBitmap = nil then begin
+    NonBufferedPaint;
+    exit;
+  end;
+
+  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+
+  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+                                       fBufBitmap);
+
+  {$ELSE}
+
+  canvas.DrawBitmap(fBufBitmap,
+                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+                    AbsoluteOpacity, {opacity}
+                    true{highSpeed});
+
+  {$ENDIF}
+
+end;
+
+{************************************************************}
+procedure TALCheckbox.SetdoubleBuffered(const Value: Boolean);
+begin
+  if Value <> fDoubleBuffered then begin
+    fDoubleBuffered := value;
+    if not fDoubleBuffered then clearbufBitmap;
+  end;
+end;
+
+{************************************************}
+function TALCheckbox.GetImageList: TBaseImageList;
+begin
+  Result := GetImages;
+end;
+
+{**************************************************************}
+procedure TALCheckbox.SetImageList(const Value: TBaseImageList);
+begin
+  ValidateInheritance(Value, TCustomImageList);
+  SetImages(TCustomImageList(Value));
+end;
+
+{******************************************}
+function TALCheckbox.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(22, 22);
+end;
+
+{**********************************************}
+function TALCheckbox.GetImageIndex: TImageIndex;
+begin
+  Result := FImageCheckedLink.ImageIndex;
+end;
+
+{************************************************************}
+procedure TALCheckbox.SetImageIndex(const Value: TImageIndex);
+begin
+  if FImageCheckedLink.ImageIndex <> Value then
+    FImageCheckedLink.ImageIndex := Value;
+end;
+
+{*******************************************************}
+function TALCheckbox.GetImageUncheckedIndex: TImageIndex;
+begin
+  Result := FImageUncheckedLink.ImageIndex;
+end;
+
+{*********************************************************************}
+procedure TALCheckbox.SetImageUncheckedIndex(const Value: TImageIndex);
+begin
+  if FImageUncheckedLink.ImageIndex <> Value then
+    FImageUncheckedLink.ImageIndex := Value;
+end;
+
+{****************************************************}
+function TALCheckbox.ImagecheckedIndexStored: Boolean;
+begin
+  Result := (ImageCheckedIndex <> -1);
+end;
+
+{******************************************************}
+function TALCheckbox.ImageUncheckedIndexStored: Boolean;
+begin
+  Result := (ImageUncheckedIndex <> -1);
+end;
+
+{***********************************************}
+function TALCheckbox.GetImages: TCustomImageList;
+begin
+  Result := TCustomImageList(FImageCheckedLink.Images);
+end;
+
+{*************************************************************}
+procedure TALCheckbox.SetImages(const Value: TCustomImageList);
+begin
+  FImageCheckedLink.Images := Value;
+  FImageUncheckedLink.Images := Value;
+end;
+
+{*****************************************}
+function TALCheckbox.ImagesStored: Boolean;
+begin
+  Result := Images <> nil;
+end;
+
+{*****************************************}
+function TALCheckbox.GetIsChecked: Boolean;
+begin
+  Result := FIsChecked;
+end;
+
+{*******************************************************}
+procedure TALCheckbox.SetIsChecked(const Value: Boolean);
+begin
+  if FIsChecked <> Value then
+  begin
+    FIsChecked := Value;
+    StartTriggerAnimation(Self, 'IsChecked');
+    DoChanged;
+  end;
+end;
+
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALRangeTrackBar]);
+  RegisterComponents('Alcinoe', [TALRangeTrackBar, TALCheckBox]);
 end;
 
 end.

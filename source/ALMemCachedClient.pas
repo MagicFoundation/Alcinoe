@@ -114,8 +114,8 @@ type
       FCloseConnection: Boolean;
     public
       constructor Create(const aMsg: AnsiString; const aCloseConnection: Boolean = False);
-      constructor CreateFmt(const Msg: ansistring;
-                            const Args: array of const;
+      constructor CreateFmt(const aMsg: ansistring;
+                            const aArgs: array of const;
                             const aCloseConnection: Boolean = False);
       property CloseConnection: Boolean read FCloseConnection write FCloseConnection;
     end;
@@ -390,13 +390,13 @@ begin
   inherited Create(aMsg);
 end;
 
-{**********************************************************************}
-constructor EAlMemCachedClientException.CreateFmt(const Msg: ansistring;
-                                                  const Args: array of const;
+{***********************************************************************}
+constructor EAlMemCachedClientException.CreateFmt(const aMsg: ansistring;
+                                                  const aArgs: array of const;
                                                   const aCloseConnection: Boolean = False);
 begin
   fCloseConnection := aCloseConnection;
-  inherited CreateFmt(Msg, Args);
+  inherited CreateFmt(aMsg, aArgs);
 end;
 
 {****************************************}
@@ -434,9 +434,9 @@ procedure TAlBaseMemCachedClient.CheckKey(const Key: AnsiString);
 var i: integer;
 begin
   if Key = '' then raise EAlMemCachedClientException.Create('Key can not be empty');
-  if Length(Key) > 250 then raise EAlMemCachedClientException.CreateFmt('Length limit of a key is 250 characters, key value: %s', [Key]);
+  if Length(Key) > 250 then raise EAlMemCachedClientException.CreateFmt('Length limit of a key is 250 characters, key: %s', [Key]);
   for I := 1 to length(Key) do
-    if (Key[I] in [#0..#32]) then raise EAlMemCachedClientException.CreateFmt('The key must not include control characters or whitespace, key value: %s', [Key]);
+    if (Key[I] in [#0..#32]) then raise EAlMemCachedClientException.CreateFmt('The key must not include control characters or whitespace, key: %s', [Key]);
 end;
 
 {************************************************************************}

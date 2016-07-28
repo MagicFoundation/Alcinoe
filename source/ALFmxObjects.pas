@@ -52,7 +52,7 @@ type
     {$ENDIF}
     procedure clearBufBitmap; virtual;
   published
-    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default false;
+    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -84,7 +84,7 @@ type
     {$ENDIF}
     procedure clearBufBitmap; virtual;
   published
-    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default false;
+    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~}
@@ -116,7 +116,7 @@ type
     {$ENDIF}
     procedure clearBufBitmap; virtual;
   published
-    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default false;
+    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
   end;
 
   {~~~~~~~~~~~~~~}
@@ -202,6 +202,8 @@ type
     {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
     fdoubleBuffered: boolean;
     {$ENDIF}
+    FAutoTranslate: Boolean;
+    FAutoConvertFontFamily: boolean;
     fSaveDisableAlign: Boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fRestoreLayoutUpdate: boolean;
@@ -237,7 +239,9 @@ type
     procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
     {$ENDIF}
   published
-    property doubleBuffered: Boolean read GetdoubleBuffered write setdoubleBuffered default false;
+    property doubleBuffered: Boolean read GetdoubleBuffered write setdoubleBuffered default true;
+    property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
+    property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
   end;
 
 procedure Register;
@@ -271,7 +275,7 @@ uses system.SysUtils,
 constructor TALRectangle.Create(AOwner: TComponent);
 begin
   inherited;
-  fdoubleBuffered := false;
+  fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
 
@@ -1187,7 +1191,7 @@ end;
 constructor TALCircle.Create(AOwner: TComponent);
 begin
   inherited;
-  fdoubleBuffered := false;
+  fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
 
@@ -1710,7 +1714,7 @@ end;
 constructor TALLine.Create(AOwner: TComponent);
 begin
   inherited;
-  fdoubleBuffered := false;
+  fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
 
@@ -2078,7 +2082,7 @@ end;
 constructor TALDoubleBufferedTextLayoutNG.Create(const ACanvas: TCanvas; const aTextControl: TALText);
 begin
   inherited Create(ACanvas);
-  fdoubleBuffered := false;
+  fdoubleBuffered := true;
   fBufBitmap := nil;
   fTextControl := aTextControl;
 end;
@@ -2561,6 +2565,7 @@ end;
 {*********************************************}
 constructor TALText.Create(AOwner: TComponent);
 begin
+
   fFontchangeDeactivated := True; // << to deactivate fontchange
   inherited; (* constructor TText.Create(AOwner: TComponent);
                 var
@@ -2585,6 +2590,13 @@ begin
                   end;
                 end; *)
   fFontchangeDeactivated := False; // << to reactivate fontchange
+
+  FAutoConvertFontFamily := True;
+  FAutoTranslate := true;
+  {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
+  fdoubleBuffered := true;
+  {$ENDIF}
+
   {$IF defined(android) or defined(IOS)}
 
   //create the overriden FLayout
@@ -2609,10 +2621,6 @@ begin
 
   {$ENDIF}
 
-  {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
-  fdoubleBuffered := False;
-  {$ENDIF}
-
 end;
 
 {****************************}
@@ -2635,6 +2643,14 @@ begin
                                                      // << and then after when we will paint the control, we will again call DoRenderLayout
                                                      // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
                                                      // << need to redo the bufbitmap
+    if (AutoTranslate) and
+       (Text <> '') and
+       (not (csDesigning in ComponentState)) then
+        Text := Translate(Text);
+    if (AutoConvertFontFamily) and
+       (TextSettings.Font.Family <> '') and
+       (not (csDesigning in ComponentState)) then
+        TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
     Layout.endUpdate;
   end;
   fRestoreLayoutUpdate := False;

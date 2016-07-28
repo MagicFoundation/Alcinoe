@@ -19,7 +19,14 @@ uses System.UITypes,
      {$ENDIF}
      FMX.controls;
 
-Procedure ALFmxMakeBufBitmaps(const aControl: TControl; const NoBufBitmaps4MSWindows: boolean = True);
+type
+  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName): TFontName;
+
+var
+  ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
+
+function  ALConvertFontFamily(const AFamily: TFontName): TFontName;
+Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
@@ -135,8 +142,20 @@ uses system.SysUtils,
      ALFmxObjects,
      ALFmxImgList;
 
-{****************************************************************************************************}
-Procedure ALFmxMakeBufBitmaps(const aControl: TControl; const NoBufBitmaps4MSWindows: boolean = True);
+{****************************************************************}
+function ALConvertFontFamily(const AFamily: TFontName): TFontName;
+begin
+  if AFamily = '' then Exit('');
+  if Assigned(CustomTranslateProc) then begin
+    Result := CustomTranslateProc(AFamily);
+    if Result = '' then Result := AFamily;
+    Exit;
+  end;
+  Result := AFamily;
+end;
+
+{******************************************************}
+Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 var aChild: TControl;
 begin
 
@@ -146,30 +165,22 @@ begin
   acontrol.DisableDisappear := true; // this to keep the style when the control get out of the visible are
                                      // else the style will be freed to be reaplied a little later
 
-  {$IF Defined(MSWINDOWS)}
-  if not NoBufBitmaps4MSWindows then begin
-  {$ENDIF}
-
-    if (aControl is TALText) then begin
-      TALText(aControl).doubleBuffered := True;
-      TALText(aControl).MakeBufBitmap;
-    end
-    else if (aControl is TALRectangle) then begin
-      TALRectangle(aControl).doubleBuffered := True;
-      TALRectangle(aControl).MakeBufBitmap;
-    end
-    else if (aControl is TALGlyph) then begin
-      TALGlyph(aControl).doubleBuffered := True;
-      TALGlyph(aControl).MakeBufBitmap;
-    end
-    else if (aControl is TALLine) then begin
-      TALLine(aControl).doubleBuffered := True;
-      TALLine(aControl).MakeBufBitmap;
-    end;
-
-  {$IF Defined(MSWINDOWS)}
+  if (aControl is TALText) then begin
+    TALText(aControl).doubleBuffered := True;
+    TALText(aControl).MakeBufBitmap;
+  end
+  else if (aControl is TALRectangle) then begin
+    TALRectangle(aControl).doubleBuffered := True;
+    TALRectangle(aControl).MakeBufBitmap;
+  end
+  else if (aControl is TALGlyph) then begin
+    TALGlyph(aControl).doubleBuffered := True;
+    TALGlyph(aControl).MakeBufBitmap;
+  end
+  else if (aControl is TALLine) then begin
+    TALLine(aControl).doubleBuffered := True;
+    TALLine(aControl).MakeBufBitmap;
   end;
-  {$ENDIF}
 
   for aChild in aControl.Controls do
     ALFmxMakeBufBitmaps(aChild);
@@ -1524,5 +1535,8 @@ begin
 
 end;
 {$ENDIF}
+
+initialization
+  ALCustomConvertFontFamilyProc := nil;
 
 end.

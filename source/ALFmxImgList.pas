@@ -44,7 +44,7 @@ type
     {$ENDIF}
     procedure clearBufBitmap; virtual;
   published
-    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default false;
+    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
   end;
 
 procedure Register;
@@ -65,7 +65,7 @@ uses system.Math,
 constructor TALGlyph.Create(AOwner: TComponent);
 begin
   inherited;
-  fdoubleBuffered := false;
+  fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
 

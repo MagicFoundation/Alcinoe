@@ -236,7 +236,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
   published
-    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default false;
+    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property Action;
     property Align;
     property Anchors;
@@ -771,7 +771,7 @@ end;
 constructor TALCheckbox.Create(AOwner: TComponent);
 begin
   inherited;
-  fdoubleBuffered := false;
+  fdoubleBuffered := true;
   fBufBitmap := nil;
   SetAcceptsControls(False);
   CanFocus := True;

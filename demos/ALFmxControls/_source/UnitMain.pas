@@ -714,6 +714,8 @@ begin
   //-----
   fALText := TALTextStopWatch.Create(self);
   fALText.Parent := ALVertScrollBox1;
+  fALText.TextSettings.WordWrap := True;
+  fALText.TextSettings.HorzAlign := TTextAlign.Center;
   fALText.doubleBuffered := True;
   fALText.Align := TalignLayout.Top;
   fALText.Margins.Top := 8;
@@ -724,6 +726,8 @@ begin
   //-----
   fText := TTextStopWatch.Create(self);
   fText.Parent := ALVertScrollBox1;
+  fALText.TextSettings.WordWrap := True;
+  fALText.TextSettings.HorzAlign := TTextAlign.Center;
   fText.Align := TalignLayout.Top;
   fText.Margins.Top := 8;
   fText.Position.Y := button15.Position.Y - button15.Margins.Top;

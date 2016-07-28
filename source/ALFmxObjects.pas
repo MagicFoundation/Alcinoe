@@ -5,6 +5,7 @@ interface
 uses System.Classes,
      System.Types,
      System.UITypes, // [DCC Hint] ALFmxObjects.pas(1418): H2443 Inline function 'TAlphaColorCGFloat.Create' has not been expanded because unit 'System.UITypes' is not specified in USES list
+     System.Rtti,
      {$IF defined(ANDROID)}
      system.Generics.collections,
      Androidapi.JNI.JavaTypes,
@@ -157,34 +158,6 @@ type
   end;
   {$ENDIF}
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALTextAccessPrivate = class(TControl, ITextSettings, IObjectState)
-  protected
-    {$IF CompilerVersion <> 31}
-      {$MESSAGE WARN 'Check if FMX.Objects.TText still has the exact same fields and adjust the IFDEF'}
-    {$ENDIF}
-    // Do not remove these fields, although they are not used.
-    FTextSettings: TTextSettings;
-    FDefaultTextSettings: TTextSettings;
-    FStyledSettings: TStyledSettings;
-    FSavedTextSettings: TTextSettings;
-    FLayout: TTextLayout; // << this field can't be write ( https://quality.embarcadero.com/browse/RSP-15469 )
-    FAutoSize: Boolean;
-    FStretch: Boolean;
-    FIsChanging: Boolean;
-    FAcceleratorKeyInfo: tObject; // << tObject instead of TAcceleratorInfo because i don't have access to the interface of TAcceleratorInfo here
-    { ITextSettings }
-    function GetDefaultTextSettings: TTextSettings; virtual; abstract;
-    function GetTextSettings: TTextSettings; virtual; abstract;
-    function ITextSettings.GetResultingTextSettings = GetTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings); virtual; abstract;
-    procedure SetStyledSettings(const Value: TStyledSettings); virtual; abstract;
-    function GetStyledSettings: TStyledSettings; virtual; abstract;
-    { IObjectState }
-    function SaveState: Boolean; virtual; abstract;
-    function RestoreState: Boolean; virtual; abstract;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   // Note: we can use this class in for exemple Tlabel
   //       by overriding the Tlabel default Style but i
@@ -195,38 +168,77 @@ type
   //       but i made some test and it's work with tlabel (but check carefully
   //       that you define well the properties of the TALText in the
   //       style to not have MakeBufBitmap called several times (applystyle
-  //       don't call beginupdate/endupdate, so everytime a property of the
+  //       don't call beginupdate/endupdate (crazy!!), so everytime a property of the
   //       TALText is updated, MakeBufBitmap is call again)
-  TALText = class(TText)
+  TALText = class(TControl, ITextSettings, IObjectState)
   private
+    fRestoreLayoutUpdateAfterLoaded: boolean;
     {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
     fdoubleBuffered: boolean;
     {$ENDIF}
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
-    fSaveDisableAlign: Boolean;
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-    fRestoreLayoutUpdate: boolean;
-    {$ENDIF}
-    fFontchangeDeactivated: boolean;
-    function GetdoubleBuffered: Boolean;
-    procedure SetdoubleBuffered(const Value: Boolean);
+    FTextSettings: TTextSettings;
+    FDefaultTextSettings: TTextSettings;
+    FStyledSettings: TStyledSettings;
+    FSavedTextSettings: TTextSettings;
+    FLayout: TTextLayout;
+    FAutoSize: Boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function GetBufBitmap: TTexture;
     {$ELSE}
     function GetBufBitmap: Tbitmap;
     {$ENDIF}
+    function GetdoubleBuffered: Boolean;
+    procedure SetdoubleBuffered(const Value: Boolean);
+    procedure SetText(const Value: string);
+    procedure SetFont(const Value: TFont);
+    procedure SetHorzTextAlign(const Value: TTextAlign);
+    procedure SetVertTextAlign(const Value: TTextAlign);
+    procedure SetWordWrap(const Value: Boolean);
+    procedure SetAutoSize(const Value: Boolean);
+    procedure SetColor(const Value: TAlphaColor);
+    procedure SetTrimming(const Value: TTextTrimming);
+    procedure OnFontChanged(Sender: TObject);
+    { ITextSettings }
+    function GetDefaultTextSettings: TTextSettings;
+    function GetTextSettings: TTextSettings;
+    function ITextSettings.GetResultingTextSettings = GetTextSettings;
+    procedure SetTextSettings(const Value: TTextSettings);
+    procedure SetStyledSettings(const Value: TStyledSettings);
+    function GetStyledSettings: TStyledSettings;
+    function GetColor: TAlphaColor;
+    function GetFont: TFont;
+    function GetHorzTextAlign: TTextAlign;
+    function GetTrimming: TTextTrimming;
+    function GetVertTextAlign: TTextAlign;
+    function GetWordWrap: Boolean;
+    function GetText: string;
   protected
-    procedure FontChanged; override;
-    procedure Loaded; override;
-    procedure SetParent(const Value: TFmxObject); override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read GetBufBitmap;
     {$ELSE}
     property BufBitmap: Tbitmap read GetBufBitmap;
     {$ENDIF}
+    procedure SetParent(const Value: TFmxObject); override;
+    procedure FontChanged; virtual;
+    function SupportsPaintStage(const Stage: TPaintStage): Boolean; override;
+    function GetTextSettingsClass: TTextSettingsClass; virtual;
+    procedure Paint; override;
+    function GetData: TValue; override;
+    procedure SetData(const Value: TValue); override;
+    procedure DoRealign; override;
+    procedure AdjustSize;
+    procedure Resize; override;
+    procedure Loaded; override;
+    property Layout: TTextLayout read FLayout;
+    procedure UpdateDefaultTextSettings; virtual;
+    { IObjectState }
+    function SaveState: Boolean; virtual;
+    function RestoreState: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function MakeBufBitmap: TTexture; virtual;
     {$ELSE}
@@ -235,10 +247,59 @@ type
     procedure clearBufBitmap; virtual;
     procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
     procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
-    {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
-    procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
-    {$ENDIF}
+    procedure AfterConstruction; override;
+    property Font: TFont read GetFont write SetFont;
+    property Color: TAlphaColor read GetColor write SetColor;
+    property HorzTextAlign: TTextAlign read GetHorzTextAlign write SetHorzTextAlign;
+    property Trimming: TTextTrimming read GetTrimming write SetTrimming;
+    property VertTextAlign: TTextAlign read GetVertTextAlign write SetVertTextAlign;
+    property WordWrap: Boolean read GetWordWrap write SetWordWrap;
   published
+    property Align;
+    property Anchors;
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
+    property ClipChildren default False;
+    property ClipParent default False;
+    property Cursor default crDefault;
+    property DragMode default TDragMode.dmManual;
+    property EnableDragHighlight default True;
+    property Enabled default True;
+    property Locked default False;
+    property Height;
+    property HitTest default True;
+    property Padding;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property Text: string read GetText write SetText;
+    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property Visible default True;
+    property Width;
+    {Drag and Drop events}
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    {Mouse events}
+    property OnClick;
+    property OnDblClick;
+
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
     property doubleBuffered: Boolean read GetdoubleBuffered write setdoubleBuffered default true;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
     property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
@@ -2480,11 +2541,7 @@ begin
   end;
 
   aDestRect := fBufBitmapRect;
-  if fBufAutosize then aDestRect := aDestRect.CenterAt(FTextControl.LocalRect); // for for 2 raisons:
-                                                                                // 1) when for exemple when align of FTextControl is set then aDestRect could be lower than FTextControl.LocalRect
-                                                                                // 2) because TText add always some extra space in TText.adjusteSize (FTextSettings.Font.Size / 3)
-                                                                                //    i find this behavior ugly but {@#{^ TText.adjusteSize is not virtual so i can't change it :(
-
+  if fBufAutosize then aDestRect := aDestRect.CenterAt(FTextControl.LocalRect);
 
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 
@@ -2511,40 +2568,8 @@ end;
 {$IF defined(android) or defined(IOS)}
 function TALDoubleBufferedTextLayoutNG.GetTextRect: TRectF;
 begin
-
   if fBufBitmap = nil then result := inherited GetTextRect  // << if fBufBitmap = nil it's mean last call to DoRenderLayout was inherited
   else result := fBufBitmapRect;
-
-  //this to take care of the align constraint of the ftextLayout
-  if fTextControl.Align in [TAlignLayout.Client,
-                            TAlignLayout.Contents,
-                            TAlignLayout.Top,
-                            TAlignLayout.Bottom,
-                            TAlignLayout.MostTop,
-                            TAlignLayout.MostBottom,
-                            TAlignLayout.VertCenter] then begin
-    result.Left := 0;
-    result.Width := fTextControl.Width;
-  end;
-  if fTextControl.Align in [TAlignLayout.Client,
-                            TAlignLayout.Contents,
-                            TAlignLayout.Left,
-                            TAlignLayout.Right,
-                            TAlignLayout.MostLeft,
-                            TAlignLayout.MostRight,
-                            TAlignLayout.HorzCenter] then begin
-    result.Top := 0;
-    result.height := fTextControl.height;
-  end;
-
-  //this to remove the FTextSettings.Font.Size / 3 from SetBounds(Position.X, Position.Y, R.Width + R.Left * 2 + FTextSettings.Font.Size / 3, R.Height + R.Top * 2);
-  //that is done inside TText.AdjustSize
-  {$IF CompilerVersion <> 31}
-    {$MESSAGE WARN 'Check if FMX.Objects.TText.adjustsize still doing FTextSettings.Font.Size / 3 and adjust the IFDEF'}
-  {$ENDIF}
-  if (FTextControl.AutoSize) and
-     (FTextControl.Text <> '') then result.Inflate(0, 0, -FTextControl.TextSettings.Font.Size / 3, 0);
-
 end;
 {$ENDIF}
 
@@ -2562,100 +2587,445 @@ begin
 end;
 {$ENDIF}
 
+{**}
+type
+  TALTextTextSettings = class(TTextSettings)
+  public
+    constructor Create(const AOwner: TPersistent); override;
+  published
+    property Font;
+    property FontColor;
+    property Trimming default TTextTrimming.Character;
+    property WordWrap default false;
+    property HorzAlign default TTextAlign.Leading;
+    property VertAlign default TTextAlign.Center;
+  end;
+
+{****************************************************************}
+constructor TALTextTextSettings.Create(const AOwner: TPersistent);
+begin
+  inherited;
+  Trimming := TTextTrimming.Character;
+  WordWrap := false;
+  HorzAlign := TTextAlign.Leading;
+  VertAlign := TTextAlign.Center;
+end;
+
 {*********************************************}
 constructor TALText.Create(AOwner: TComponent);
+var LClass: TTextSettingsClass;
 begin
-
-  fFontchangeDeactivated := True; // << to deactivate fontchange
-  inherited; (* constructor TText.Create(AOwner: TComponent);
-                var
-                  LClass: TTextSettingsClass;
-                begin
-                  inherited;
-                  LClass := GetTextSettingsClass;
-                  if LClass = nil then
-                    LClass := TTextTextSettings;
-                  FLayout := TTextLayoutManager.DefaultTextLayout.Create;
-                  FDefaultTextSettings := LClass.Create(Self);
-                  FDefaultTextSettings.OnChanged := OnFontChanged;
-                  FTextSettings := LClass.Create(Self);
-                  FTextSettings.OnChanged := OnFontChanged;
-                  FTextSettings.BeginUpdate;
-                  try
-                    FTextSettings.IsAdjustChanged := True;
-                  finally
-                    FTextSettings.EndUpdate; // << will call fontchanged but the TALdoubleBufferedTextLayoutNG is not yet
-                                                << assigned. so i introduce the flag fFontchangeDeactivated to deactivate
-                                                << the FontChanged.
-                  end;
-                end; *)
-  fFontchangeDeactivated := False; // << to reactivate fontchange
-
+  inherited;
+  //-----
   FAutoConvertFontFamily := True;
   FAutoTranslate := true;
   {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
   fdoubleBuffered := true;
   {$ENDIF}
-
+  FStyledSettings := [];
+  FSavedTextSettings := nil;
+  FAutoSize := False;
+  //-----
+  LClass := GetTextSettingsClass;
+  if LClass = nil then LClass := TALTextTextSettings;
+  //-----
   {$IF defined(android) or defined(IOS)}
-
-  //create the overriden FLayout
-  TALTextAccessPrivate(self).FLayout.Free;
-  TALTextAccessPrivate(self).FLayout := TALdoubleBufferedTextLayoutNG.Create(nil, self);
-
-  //i use this way to know that the compoment is created via form creation
+  FLayout := TALdoubleBufferedTextLayoutNG.Create(nil, self);
+  {$else}
+  FLayout := TTextLayoutManager.DefaultTextLayout.Create;
+  {$endif}
+  //-----
+  //i use this way to know that the compoment
+  //will load it's properties from the dfm
   if (aOwner <> nil) and
      (csloading in aOwner.ComponentState) then begin
-    fRestoreLayoutUpdate := True;
+    fRestoreLayoutUpdateAfterLoaded := True;
     Layout.BeginUpdate;
   end
-  else fRestoreLayoutUpdate := False;
-
-  //update the Flayout.TextSettings
-  TextSettings.BeginUpdate;
+  else fRestoreLayoutUpdateAfterLoaded := False;
+  //-----
+  FDefaultTextSettings := LClass.Create(Self);
+  FDefaultTextSettings.OnChanged := OnFontChanged; // << i don't understand why this ?
+  FTextSettings := LClass.Create(Self);
+  FTextSettings.OnChanged := OnFontChanged;
+  FTextSettings.BeginUpdate;
   try
-    TextSettings.IsAdjustChanged := True;
+    FTextSettings.IsAdjustChanged := True;
   finally
-    TextSettings.EndUpdate;
+    FTextSettings.EndUpdate; // << this will not call adjustsize because at this time
+                             // << fautosize = false. This will only update the textsettings
+                             // << of the flayout, and if we are in csloading, this will not even
+                             // << call any DoRenderLayout (else yes it's will call DoRenderLayout
+                             // << but with empty text)
   end;
-
-  {$ENDIF}
-
 end;
 
-{****************************}
-procedure TALText.FontChanged;
+{*************************}
+destructor TALText.Destroy;
 begin
-  {$IF defined(android) or defined(IOS)}
-  if not fFontchangeDeactivated then inherited;
-  {$ELSE}
+  FTextSettings.Free;
+  FDefaultTextSettings.Free;
+  FLayout.Free;
+  if FSavedTextSettings <> nil then FSavedTextSettings.Free;
   inherited;
-  {$ENDIF}
+end;
+
+{**********************************}
+procedure TALText.AfterConstruction;
+begin
+  inherited;
+  UpdateDefaultTextSettings; // << normally (except if something was made in inherited child creation)
+                             // << fDefaultTextSettings = FTextSettings so this will do nothing
 end;
 
 {***********************}
 procedure TALText.Loaded;
 begin
-  {$IF defined(android) or defined(IOS)}
-  if fRestoreLayoutUpdate then begin
-    Layout.MaxSize := TPointF.Create(width, height); // << this is important because else when the component is loaded then
-                                                     // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
-                                                     // << and then after when we will paint the control, we will again call DoRenderLayout
-                                                     // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
-                                                     // << need to redo the bufbitmap
-    if (AutoTranslate) and
-       (Text <> '') and
-       (not (csDesigning in ComponentState)) then
-        Text := Translate(Text);
-    if (AutoConvertFontFamily) and
-       (TextSettings.Font.Family <> '') and
-       (not (csDesigning in ComponentState)) then
-        TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
-    Layout.endUpdate;
-  end;
-  fRestoreLayoutUpdate := False;
-  {$ENDIF}
   inherited;
+  UpdateDefaultTextSettings; // << at this step TextSettings was already updated with new value
+                             // << and fontchanged was alread called (with csloading in compomentState) and now fTextSettings.IsAdjustChanged = false
+                             // << so this will (maybe) call FontChanged but nothing will be done inside FontChanged
+                             // << except calling repaint
+  Layout.MaxSize := TPointF.Create(width, height); // << this is important because else when the component is loaded then
+                                                   // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
+                                                   // << and then after when we will paint the control, we will again call DoRenderLayout
+                                                   // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
+                                                   // << need to redo the bufbitmap
+  if (AutoTranslate) and
+     (Text <> '') and
+     (not (csDesigning in ComponentState)) then
+      Text := ALTranslate(Text);
+  if (AutoConvertFontFamily) and
+     (TextSettings.Font.Family <> '') and
+     (not (csDesigning in ComponentState)) then
+      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
+  if fRestoreLayoutUpdateAfterLoaded then begin
+    Layout.endUpdate;
+    AdjustSize;
+  end;
+  fRestoreLayoutUpdateAfterLoaded := False;
+end;
+
+{***********************************************}
+procedure TALText.OnFontChanged(Sender: TObject);
+begin
+  FontChanged;
+end;
+
+{******************************************}
+procedure TALText.UpdateDefaultTextSettings;
+begin
+  FDefaultTextSettings.Assign(FTextSettings);
+end;
+
+{*******************************}
+function TALText.GetData: TValue;
+begin
+  Result := Text;
+end;
+
+{*********************************************}
+procedure TALText.SetData(const Value: TValue);
+begin
+  Text := Value.ToString;
+end;
+
+{****************************}
+procedure TALText.FontChanged;
+begin
+  FLayout.BeginUpdate;
+  try
+    FLayout.WordWrap := WordWrap;
+    FLayout.HorizontalAlign := HorzTextAlign;
+    FLayout.VerticalAlign := VertTextAlign;
+    FLayout.Color := Color;
+    FLayout.Font := Font;
+    FLayout.Opacity := AbsoluteOpacity;
+    FLayout.Trimming := Trimming;
+  finally
+    FLayout.EndUpdate;
+  end;
+  //-----
+  if FTextSettings.IsAdjustChanged then AdjustSize;
+  Repaint;
+end;
+
+{**************************}
+procedure TALText.DoRealign;
+begin
+  inherited;
+  AdjustSize;
+end;
+
+{*****************************************************}
+function TALText.GetDefaultTextSettings: TTextSettings;
+begin
+  Result := FDefaultTextSettings;
+end;
+
+{**********************************************}
+function TALText.GetTextSettings: TTextSettings;
+begin
+  Result := FTextSettings;
+end;
+
+{********************************************************}
+function TALText.GetTextSettingsClass: TTextSettingsClass;
+begin
+  Result := nil;
+end;
+
+{************************************************************}
+procedure TALText.SetTextSettings(const Value: TTextSettings);
+begin
+  FTextSettings.Assign(Value);
+end;
+
+{**************************************************}
+function TALText.GetStyledSettings: TStyledSettings;
+begin
+  Result := FStyledSettings;
+end;
+
+{****************************************************************}
+procedure TALText.SetStyledSettings(const Value: TStyledSettings);
+begin
+  FStyledSettings := Value;
+end;
+
+{*********************************************************************}
+function TALText.SupportsPaintStage(const Stage: TPaintStage): Boolean;
+begin
+  Result := Stage in [TPaintStage.All, TPaintStage.Text];
+end;
+
+{**********************}
+procedure TALText.Paint;
+begin
+  FLayout.BeginUpdate;
+  try
+    FLayout.LayoutCanvas := Self.Canvas;
+    FLayout.TopLeft := LocalRect.TopLeft;
+    FLayout.Opacity := AbsoluteOpacity;
+    FLayout.MaxSize := PointF(LocalRect.Width, LocalRect.Height);
+  finally
+    FLayout.EndUpdate;
+  end;
+  FLayout.RenderLayout(Canvas);
+  if (csDesigning in ComponentState) and not Locked then
+    DrawDesignBorder;
+end;
+
+{*************************************}
+function TALText.GetColor: TAlphaColor;
+begin
+  Result := FTextSettings.FontColor;
+end;
+
+{***************************************************}
+procedure TALText.SetColor(const Value: TAlphaColor);
+begin
+  FTextSettings.FontColor := Value;
+end;
+
+{************************************}
+function TALText.GetWordWrap: Boolean;
+begin
+  Result := FTextSettings.WordWrap;
+end;
+
+{**************************************************}
+procedure TALText.SetWordWrap(const Value: Boolean);
+begin
+  FTextSettings.WordWrap := Value;
+end;
+
+{******************************}
+function TALText.GetFont: TFont;
+begin
+  Result := FTextSettings.Font;
+end;
+
+{********************************************}
+procedure TALText.SetFont(const Value: TFont);
+begin
+  FTextSettings.Font := Value;
+end;
+
+{********************************************}
+function TALText.GetHorzTextAlign: TTextAlign;
+begin
+  Result := FTextSettings.HorzAlign;
+end;
+
+{**********************************************************}
+procedure TALText.SetHorzTextAlign(const Value: TTextAlign);
+begin
+  FTextSettings.HorzAlign := Value;
+end;
+
+{********************************************}
+function TALText.GetVertTextAlign: TTextAlign;
+begin
+  Result := FTextSettings.VertAlign;
+end;
+
+{**********************************************************}
+procedure TALText.SetVertTextAlign(const Value: TTextAlign);
+begin
+  FTextSettings.VertAlign := Value;
+end;
+
+{******************************************}
+function TALText.GetTrimming: TTextTrimming;
+begin
+  Result := FTextSettings.Trimming;
+end;
+
+{********************************************************}
+procedure TALText.SetTrimming(const Value: TTextTrimming);
+begin
+  FTextSettings.Trimming := Value;
+end;
+
+{**********************************}
+function TALText.SaveState: Boolean;
+begin
+  Result := False;
+  if FTextSettings <> nil then
+  begin
+    if FSavedTextSettings = nil then
+      FSavedTextSettings := TTextSettingsClass(FTextSettings.ClassType).Create(nil);
+    FSavedTextSettings.Assign(FTextSettings);
+    Result := True;
+  end;
+end;
+
+{*************************************}
+function TALText.RestoreState: Boolean;
+begin
+  Result := False;
+  if (FSavedTextSettings <> nil) and (FTextSettings <> nil) then
+  begin
+    TextSettings := FSavedTextSettings;
+    FreeAndNil(FSavedTextSettings);
+    Result := True;
+  end;
+end;
+
+{**************************************************}
+procedure TALText.SetAutoSize(const Value: Boolean);
+begin
+  if FAutoSize <> Value then
+  begin
+    FAutoSize := Value;
+    AdjustSize;
+  end;
+end;
+
+{***********************}
+procedure TALText.Resize;
+begin
+  inherited;
+  AdjustSize;
+end;
+
+{***************************}
+procedure TALText.AdjustSize;
+var R: TRectF;
+    AlignRoot: IAlignRoot;
+    LHorzAlign: TTextAlign;
+    LVertAlign: TTextAlign;
+    LOpacity: Single;
+begin
+  if (not FDisableAlign) and
+     (not (csLoading in ComponentState)) and
+     (not isupdating) and
+     (FAutoSize) and
+     (Text <> '') then begin
+
+    FDisableAlign := True;
+    try
+
+      LHorzAlign := FLayout.HorizontalAlign;
+      LVertAlign := FLayout.VerticalAlign;
+      LOpacity := FLayout.Opacity;
+      try
+
+        if WordWrap then R := TRectF.Create(0, 0, Width, MaxSingle)
+        else R := TRectF.Create(0, 0, MaxSingle, MaxSingle);
+        FLayout.BeginUpdate;
+        try
+          FLayout.TopLeft := R.TopLeft;
+          FLayout.MaxSize := PointF(R.Width, R.Height);
+          FLayout.Opacity := AbsoluteOpacity;
+          FLayout.HorizontalAlign := TTextAlign.Leading;
+          FLayout.VerticalAlign := TTextAlign.Leading;
+        finally
+          FLayout.EndUpdate;
+        end;
+
+        R := FLayout.TextRect;
+
+      finally
+        FLayout.BeginUpdate;
+        try
+          FLayout.Opacity := LOpacity;
+          FLayout.HorizontalAlign := LHorzAlign;
+          FLayout.VerticalAlign := LVertAlign;
+        finally
+          FLayout.EndUpdate;
+        end;
+      end;
+
+      //this to take care of the align constraint of the ftextLayout
+      if Align in [TAlignLayout.Client,
+                   TAlignLayout.Contents,
+                   TAlignLayout.Top,
+                   TAlignLayout.Bottom,
+                   TAlignLayout.MostTop,
+                   TAlignLayout.MostBottom,
+                   TAlignLayout.VertCenter] then begin
+        r.Left := 0;
+        r.Width := Width;
+      end;
+      if Align in [TAlignLayout.Client,
+                   TAlignLayout.Contents,
+                   TAlignLayout.Left,
+                   TAlignLayout.Right,
+                   TAlignLayout.MostLeft,
+                   TAlignLayout.MostRight,
+                   TAlignLayout.HorzCenter] then begin
+        r.Top := 0;
+        r.height := height;
+      end;
+
+      //SetBounds(Position.X, Position.Y, R.Width + R.Left * 2 + FTextSettings.Font.Size / 3, R.Height + R.Top * 2);
+      SetBounds(Position.X, Position.Y, R.Width + R.Left * 2, R.Height + R.Top * 2);
+      if Supports(Parent, IAlignRoot, AlignRoot) then AlignRoot.Realign;
+
+    finally
+      FDisableAlign := False;
+    end;
+
+  end;
+end;
+
+{*******************************}
+function TALText.GetText: string;
+begin
+  Result := FLayout.Text;
+end;
+
+{*********************************************}
+procedure TALText.SetText(const Value: string);
+begin
+  if Text <> Value then begin
+    FLayout.LayoutCanvas := Canvas;
+    FLayout.Text := Value;
+    AdjustSize;
+    Repaint;
+  end;
 end;
 
 {***************************************************}
@@ -2667,8 +3037,9 @@ begin
        (Value <> self) and
        (Value is TControl) and
        (TControl(Value).isupdating) then Layout.BeginUpdate; // stupidly when we do setparent the
-                                                             // FisUpdating set to the value of the parent BUT without any
+                                                             // FisUpdating will be set to the value of the parent BUT without any
                                                              // notifications nor any call to beginupdate :(
+                                                             // but when the parent will call endupdate then our EndUpdate will be also called
   end;
 end;
 
@@ -2736,58 +3107,14 @@ procedure TALText.BeginUpdate;
 begin
   inherited;
   Layout.BeginUpdate;
-  fSaveDisableAlign := FDisableAlign;
-  FDisableAlign := True; // to deactivate the TText.AdjustSize
 end;
 
 {**************************}
 procedure TALText.EndUpdate;
 begin
-  FDisableAlign := fSaveDisableAlign; // to reactivate the TText.AdjustSize
   Layout.EndUpdate;
   inherited; // will call dorealign that will call AdjustSize
 end;
-
-{*************************************************}
-{$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
-procedure TALText.SetBounds(X, Y, AWidth, AHeight: Single);
-begin
-  if FDisableAlign then begin // i use this to know that we are here because of a call to !!#@{^!! adjustsize that is not virtual
-
-    //this to take care of the align constraint of the ftextLayout
-    if Align in [TAlignLayout.Client,
-                 TAlignLayout.Contents,
-                 TAlignLayout.Top,
-                 TAlignLayout.Bottom,
-                 TAlignLayout.MostTop,
-                 TAlignLayout.MostBottom,
-                 TAlignLayout.VertCenter] then begin
-      x := 0;
-      aWidth := Width;
-    end;
-    if Align in [TAlignLayout.Client,
-                 TAlignLayout.Contents,
-                 TAlignLayout.Left,
-                 TAlignLayout.Right,
-                 TAlignLayout.MostLeft,
-                 TAlignLayout.MostRight,
-                 TAlignLayout.HorzCenter] then begin
-      y := 0;
-      aheight := height;
-    end;
-
-    //this to remove the FTextSettings.Font.Size / 3 from SetBounds(Position.X, Position.Y, R.Width + R.Left * 2 + FTextSettings.Font.Size / 3, R.Height + R.Top * 2);
-    //that is done inside TText.AdjustSize
-    {$IF CompilerVersion <> 31}
-      {$MESSAGE WARN 'Check if FMX.Objects.TText.adjustsize still doing FTextSettings.Font.Size / 3 and adjust the IFDEF'}
-    {$ENDIF}
-    if (AutoSize) and
-       (Text <> '') then AWidth := AWidth - (TextSettings.Font.Size / 3);
-
-  end;
-  inherited SetBounds(X, Y, AWidth, AHeight);
-end;
-{$ENDIF}
 
 procedure Register;
 begin

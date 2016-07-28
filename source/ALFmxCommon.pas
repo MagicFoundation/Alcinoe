@@ -26,6 +26,7 @@ var
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
 
 function  ALConvertFontFamily(const AFamily: TFontName): TFontName;
+function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
@@ -140,19 +141,33 @@ uses system.SysUtils,
      fmx.consts,
      fmx.controls.presentation,
      ALFmxObjects,
+     AlFmxStdCtrls,
      ALFmxImgList;
 
 {****************************************************************}
 function ALConvertFontFamily(const AFamily: TFontName): TFontName;
 begin
   if AFamily = '' then Exit('');
-  if Assigned(CustomTranslateProc) then begin
-    Result := CustomTranslateProc(AFamily);
+  if Assigned(ALCustomConvertFontFamilyProc) then begin
+    Result := ALCustomConvertFontFamilyProc(AFamily);
     if Result = '' then Result := AFamily;
     Exit;
   end;
   Result := AFamily;
 end;
+
+{*************************************************}
+function  ALTranslate(const AText: string): string;
+begin
+  if AText = '' then Exit('');
+  if Assigned(CustomTranslateProc) then begin
+    result := CustomTranslateProc(AText);
+    if result = '' then Result := AText;
+    Exit;
+  end;
+  Result := translate(AText);
+end;
+
 
 {******************************************************}
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
@@ -174,6 +189,10 @@ begin
     TALRectangle(aControl).MakeBufBitmap;
   end
   else if (aControl is TALGlyph) then begin
+    TALGlyph(aControl).doubleBuffered := True;
+    TALGlyph(aControl).MakeBufBitmap;
+  end
+  else if (aControl is TALCheckBox) then begin
     TALGlyph(aControl).doubleBuffered := True;
     TALGlyph(aControl).MakeBufBitmap;
   end

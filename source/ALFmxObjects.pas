@@ -2531,6 +2531,8 @@ end;
 {$IF defined(android) or defined(IOS)}
 procedure TALDoubleBufferedTextLayoutNG.DoDrawLayout(const ACanvas: TCanvas);
 var aDestRect: TrectF;
+    ADesignatedArea: TrectF;
+    aLocation: TPointF;
 begin
 
   MakeBufBitmap;
@@ -2541,7 +2543,20 @@ begin
   end;
 
   aDestRect := fBufBitmapRect;
-  if fBufAutosize then aDestRect := aDestRect.CenterAt(FTextControl.LocalRect);
+  if fBufAutosize then begin
+    ADesignatedArea := FTextControl.localrect;
+    case FTextControl.HorzTextAlign of
+      TTextAlign.Center: aLocation.X := (ADesignatedArea.Left + ADesignatedArea.Right - aDestRect.Width) / 2;
+      TTextAlign.Leading: aLocation.X := ADesignatedArea.Left;
+      TTextAlign.Trailing: aLocation.X := ADesignatedArea.Right - aDestRect.Width;
+    end;
+    case FTextControl.VertTextAlign of
+      TTextAlign.Center: aLocation.Y := (ADesignatedArea.Top + ADesignatedArea.Bottom - aDestRect.Height) / 2;
+      TTextAlign.Leading: aLocation.Y := ADesignatedArea.Top;
+      TTextAlign.Trailing: aLocation.Y := ADesignatedArea.Bottom - aDestRect.Height;
+    end;
+    aDestRect.SetLocation(aLocation);
+  end;
 
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 

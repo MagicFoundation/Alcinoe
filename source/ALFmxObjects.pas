@@ -184,6 +184,8 @@ type
     FSavedTextSettings: TTextSettings;
     FLayout: TTextLayout;
     FAutoSize: Boolean;
+    fMaxWidth: Single;
+    fMaxHeight: Single;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function GetBufBitmap: TTexture;
     {$ELSE}
@@ -214,6 +216,8 @@ type
     function GetVertTextAlign: TTextAlign;
     function GetWordWrap: Boolean;
     function GetText: string;
+    function IsMaxWidthStored: Boolean;
+    function IsMaxHeightStored: Boolean;
   protected
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read GetBufBitmap;
@@ -280,6 +284,8 @@ type
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property Visible default True;
     property Width;
+    property MaxWidth: single read fMaxWidth write fMaxWidth stored IsMaxWidthStored;       // these properties are usefull when used
+    property MaxHeight: single read fMaxHeight write fMaxHeight stored IsMaxHeightStored;      // with autosize
     {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;
@@ -2215,11 +2221,12 @@ begin
       OR
       (
        (fTextControl.AutoSize) and
-       ((not fTextControl.WordWrap) or                                   // if not wordwrap we don't care because the dimensions returned by this function will not change   << because in TText.AdjustSize:
-        (SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or        // if WordWrap the dimensions returned by this function will depend of the MaxSize.x                << if FAutoSize and (Text <> '') then
-        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position))) //                                                                                                  << if WordWrap then R := TRectF.Create(0, 0, Width, MaxSingle)
-      )                                                                  //                                                                                                  << else R := TRectF.Create(0, 0, MaxSingle, MaxSingle);
-     ) and                                                               //
+       ((SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or // if we already calculate the buf for maxsize.x
+        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position))) and // if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
+       ((SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or // if we already calculate the buf for maxsize.y
+        (SameValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position))) // if fbufBitmapRect.height = MaxSize.y we can not do anything better ;)
+      )
+     ) and
      (fBufText = fTextControl.Text) then exit(fBufBitmap);
 
   clearBufBitmap;
@@ -2232,11 +2239,7 @@ begin
   fBufWordWrap := fTextControl.TextSettings.WordWrap;
   fBufAutosize := fTextControl.AutoSize;
   fBufTrimming := fTextControl.TextSettings.Trimming;
-  if fBufAutosize then begin
-    if fBufWordWrap then fBufSize := TsizeF.Create(MaxSize.x, 10000)
-    else fBufSize := TsizeF.Create(10000, 10000);
-  end
-  else fBufSize := MaxSize;
+  fBufSize := MaxSize;
   fBufText := fTextControl.Text;
 
   {$IF defined(android)}
@@ -2640,6 +2643,8 @@ begin
   FStyledSettings := [];
   FSavedTextSettings := nil;
   FAutoSize := False;
+  fMaxWidth := 65535;
+  fMaxHeight := 65535;
   //-----
   LClass := GetTextSettingsClass;
   if LClass = nil then LClass := TALTextTextSettings;
@@ -2701,20 +2706,28 @@ begin
                              // << and fontchanged was alread called (with csloading in compomentState) and now fTextSettings.IsAdjustChanged = false
                              // << so this will (maybe) call FontChanged but nothing will be done inside FontChanged
                              // << except calling repaint
-  Layout.MaxSize := TPointF.Create(width, height); // << this is important because else when the component is loaded then
-                                                   // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
-                                                   // << and then after when we will paint the control, we will again call DoRenderLayout
-                                                   // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
-                                                   // << need to redo the bufbitmap
+  //-----
   if (AutoTranslate) and
      (Text <> '') and
      (not (csDesigning in ComponentState)) then
       Text := ALTranslate(Text);
+  //-----
   if (AutoConvertFontFamily) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
       TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
+  //-----
   if fRestoreLayoutUpdateAfterLoaded then begin
+    if (FAutoSize) and
+       (Text <> '') then begin
+      if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+      else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+    end
+    else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
+                                                           // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
+                                                           // << and then after when we will paint the control, we will again call DoRenderLayout
+                                                           // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
+                                                           // << need to redo the bufbitmap
     Layout.endUpdate;
     AdjustSize;
   end;
@@ -2967,8 +2980,8 @@ begin
       LOpacity := FLayout.Opacity;
       try
 
-        if WordWrap then R := TRectF.Create(0, 0, Width, MaxSingle)
-        else R := TRectF.Create(0, 0, MaxSingle, MaxSingle);
+        if WordWrap then R := TRectF.Create(0, 0, Min(Width, maxWidth), maxHeight)
+        else R := TRectF.Create(0, 0, maxWidth, MaxHeight);
         FLayout.BeginUpdate;
         try
           FLayout.TopLeft := R.TopLeft;
@@ -3129,6 +3142,18 @@ procedure TALText.EndUpdate;
 begin
   Layout.EndUpdate;
   inherited; // will call dorealign that will call AdjustSize
+end;
+
+{*****************************************}
+function TALText.IsMaxWidthStored: Boolean;
+begin
+  result := compareValue(fMaxWidth, 65535, Tepsilon.position) <> 0;
+end;
+
+{******************************************}
+function TALText.IsMaxHeightStored: Boolean;
+begin
+  result := compareValue(fMaxHeight, 65535, Tepsilon.position) <> 0;
 end;
 
 procedure Register;

@@ -466,7 +466,7 @@ begin
   aLineIndent := aFirstLineIndent;
 
   //if we have at least enalf of height to write the 1rt row
-  if comparevalue(aLineHeight,aMaxHeight,Tepsilon.position) < 0 then begin
+  if comparevalue(aLineHeight,aMaxHeight,Tepsilon.position) <= 0 then begin
 
     //create ameasuredWidth
     ameasuredWidth := TJavaArray<Single>.Create(1);
@@ -793,7 +793,8 @@ begin
       FreeAndNil(ameasuredWidth);
     end;
 
-  end;
+  end
+  else result := true;
 
   //add the end ellipsis
   if aEllipsisLine <> nil then begin
@@ -972,6 +973,9 @@ begin
           aString := CFAttributedStringGetString(aTextAttr); // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object
           if aString = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end; // CFAttributedStringGetString can return NULL if there was a problem creating the object
 
+          //init result
+          result := aLinesCount > 1;
+
           //update aBreakTextItems
           for I := 0 to aLinesCount - 1 do begin
 
@@ -994,9 +998,11 @@ begin
               aLineIndent := 0;
             end;
 
-            // stop if not aWordWrap or after maxheight
-            if (not aWordWrap) or
-               (compareValue(aCurrLineY + adescent, aMaxHeight, TEpsilon.position) > 0) then break;
+            // stop if after maxheight
+            if (compareValue(aCurrLineY + adescent, aMaxHeight, TEpsilon.position) > 0) then begin
+              result := True;
+              break;
+            end;
 
             // update aTotalLinesHeight
             aTotalLinesHeight := aCurrLineY + aDescent;
@@ -1103,9 +1109,14 @@ begin
             aBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
             aTextAttrLn := CFAttributedStringGetLength(aTextAttr);
 
-            //create a new untruncated line
-            aStringRange := CTLineGetStringRange(aBreakTextItem.Line); // return a CFRange structure that contains the range over the backing store string that
-            if (aStringRange.length > 0) and                           // spawned the glyphs, or if the function fails for any reason, an empty range.
+            //init aStringRange
+            aStringRange := CTLineGetStringRange(aBreakTextItem.Line); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
+
+            //init result
+            result := result or (aStringRange.location + aStringRange.length < aTextAttrLn);
+
+            //if the text was breaked
+            if (aStringRange.length > 0) and  // if CTLineGetStringRange fails for any reason, an empty range.
                (aStringRange.location + aStringRange.length < aTextAttrLn) then begin
 
               //create the aEllipsisLine
@@ -1182,7 +1193,17 @@ begin
 
             end;
 
-          end;
+          end
+          else if (not result) and
+                  (aBreakTextItems.Count > aBreakTextItemsStartCount) then begin
+
+            //init aBreakTextItem
+            aBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
+            aTextAttrLn := CFAttributedStringGetLength(aTextAttr);
+
+            //init aStringRange
+            aStringRange := CTLineGetStringRange(aBreakTextItem.Line);
+            result := (aStringRange.location + aStringRange.length < aTextAttrLn);
 
         finally
           CFRelease(aFrame);
@@ -1211,6 +1232,12 @@ begin
       if aLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // otherwise, NULL.
       try
 
+        //init result
+        aTextAttrLn := CFAttributedStringGetLength(aTextAttr);
+        aStringRange := CTLineGetStringRange(aLine); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
+        result := (aStringRange.location + aStringRange.length < aTextAttrLn);
+
+        //init aTruncatedLine
         aTruncatedLine :=  CTLineCreateTruncatedLine(aLine, // line: The line from which to create a truncated line.
                                                      aMaxWidth, // width: The width at which truncation begins. The line is truncated if its width is greater than the width passed in this parameter.
                                                      kCTLineTruncationEnd, // truncationType: The type of truncation to perform if needed.

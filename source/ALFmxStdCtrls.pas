@@ -193,6 +193,7 @@ type
     FImageCheckedLink: TImageLink;
     FImageUncheckedLink: TImageLink;
     FisImagesChanged: boolean;
+    FStretch: Boolean;
     procedure SetdoubleBuffered(const Value: Boolean);
     function GetIsChecked: Boolean;
     procedure SetIsChecked(const Value: Boolean);
@@ -208,6 +209,7 @@ type
     function IGlyph.GetImages = GetImageList;
     procedure IGlyph.SetImages = SetImageList;
     procedure NonBufferedPaint;
+    procedure SetStretch(const Value: Boolean);
   protected
     procedure Paint; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
@@ -257,6 +259,7 @@ type
     property ImageCheckedIndex: TImageIndex read GetImageIndex write SetImageIndex stored ImageCheckedIndexStored;
     property ImageUncheckedIndex: TImageIndex read GetImageUncheckedIndex write SetImageUncheckedIndex stored ImageUncheckedIndexStored;
     property Images: TCustomImageList read GetImages write SetImages stored ImagesStored;
+    property Stretch: Boolean read FStretch write SetStretch default True;
     property Padding;
     property Opacity;
     property Margins;
@@ -783,6 +786,7 @@ begin
   FImageCheckedLink := TGlyphImageLink.Create(Self);
   FImageUncheckedLink := TGlyphImageLink.Create(Self);
   FisImagesChanged := False;
+  FStretch := True;
 end;
 
 {*****************************}
@@ -941,7 +945,7 @@ begin
      (aImageIndex <> -1) and
      ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then begin
     aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * aSceneScale), Round(fBufBitmapRect.Height * aSceneScale));
-    Images.BestSize(aImageIndex, aBitmapSize);
+    if not Stretch then Images.BestSize(aImageIndex, aBitmapSize);
     aBitmap := Images.Bitmap(aBitmapSize, aImageIndex)
   end;
 
@@ -1210,6 +1214,16 @@ begin
     FIsChecked := Value;
     StartTriggerAnimation(Self, 'IsChecked');
     DoChanged;
+  end;
+end;
+
+{*****************************************************}
+procedure TALCheckbox.SetStretch(const Value: Boolean);
+begin
+  if FStretch <> Value then
+  begin
+    FStretch := Value;
+    Repaint;
   end;
 end;
 

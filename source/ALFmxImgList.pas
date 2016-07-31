@@ -45,6 +45,10 @@ type
     procedure clearBufBitmap; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
+    property TouchTargetExpansion;
+    property HitTest default False;
+    property AutoHide default False; // i think it's better to put autohide to false by default !
+                                     // because autohide deactivate the normal behavior of the visible property
   end;
 
 procedure Register;
@@ -67,6 +71,8 @@ begin
   inherited;
   fdoubleBuffered := true;
   fBufBitmap := nil;
+  HitTest := False;
+  Autohide := False;
 end;
 
 {***************************}

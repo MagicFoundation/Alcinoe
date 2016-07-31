@@ -1,4 +1,4 @@
-unit ALFmxCommon;
+ï»¿unit ALFmxCommon;
 
 interface
 
@@ -119,7 +119,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      var aBreakTextItems: TALBreakTextItems;
                      const aFirstLineIndent: single = 0;
                      const aLineSpacing: integer = 0;
-                     const aEllipsisText: string = '…';
+                     const aEllipsisText: string = 'â€¦';
                      const aEllipsisColor: TalphaColor = TAlphaColorRec.Null): boolean; overload; // return true if text was truncated
 
 {$ENDIF}
@@ -193,8 +193,8 @@ begin
     TALGlyph(aControl).MakeBufBitmap;
   end
   else if (aControl is TALCheckBox) then begin
-    TALGlyph(aControl).doubleBuffered := True;
-    TALGlyph(aControl).MakeBufBitmap;
+    TALCheckBox(aControl).doubleBuffered := True;
+    TALCheckBox(aControl).MakeBufBitmap;
   end
   else if (aControl is TALLine) then begin
     TALLine(aControl).doubleBuffered := True;
@@ -403,7 +403,7 @@ var aBreakTextItemsStartCount: integer;
   procedure _initEllipsis;
   begin
     if aEllipsisLine = nil then begin
-      if aEllipsisText = nil then aEllipsisLine := StringtoJString(string('…'))
+      if aEllipsisText = nil then aEllipsisLine := StringtoJString(string('â€¦'))
       else aEllipsisLine := aEllipsisText;
       if aEllipsisColor <> TAlphaColorRec.Null then begin
         aSavedColor := aPaint.getColor;
@@ -1323,7 +1323,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      var aBreakTextItems: TALBreakTextItems;
                      const aFirstLineIndent: single = 0;
                      const aLineSpacing: integer = 0;
-                     const aEllipsisText: string = '…';
+                     const aEllipsisText: string = 'â€¦';
                      const aEllipsisColor: TalphaColor = TAlphaColorRec.Null): boolean; // return true if text was truncated
 
 var aCGColor: CGColorRef;

@@ -143,6 +143,7 @@ type
     fBufTrimming: TTextTrimming;
     fBufSize: TsizeF;
     fBufText: string;
+    fBufTextBreaked: Boolean;
     //-----
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
@@ -2221,10 +2222,18 @@ begin
       OR
       (
        (fTextControl.AutoSize) and
-       ((SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or // if we already calculate the buf for maxsize.x
-        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position))) and // if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
-       ((SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or // if we already calculate the buf for maxsize.y
-        (SameValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position))) // if fbufBitmapRect.height = MaxSize.y we can not do anything better ;)
+       (
+        (SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or // if we already calculate the buf for maxsize.x
+        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position)) or // if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
+        ((not fBufTextBreaked) and
+         (CompareValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position) <= 0)) // if fbufBitmapRect.width <= MaxSize.x and text wasn't breaked we can't do anything better
+       ) and
+       (
+        (SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or // if we already calculate the buf for maxsize.y
+        (SameValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position)) or // if fbufBitmapRect.height = MaxSize.y we can not do anything better ;)
+        ((not fBufTextBreaked) and
+         (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0)) // if fbufBitmapRect.height <= MaxSize.y and text wasn't breaked we can't do anything better
+       )
       )
      ) and
      (fBufText = fTextControl.Text) then exit(fBufBitmap);
@@ -2273,13 +2282,13 @@ begin
   try
 
     //break the text
-    ALBreakText(aPaint, // const aPaint: JPaint;
-                fBufBitmapRect, // var ARect: TRectF;
-                StringtoJString(fBufText), // const AText: JString;
-                fBufWordWrap, //const aWordWrap: Boolean;
-                fBufHorizontalAlign, fBufVerticalAlign, //const AHTextAlign, AVTextAlign: TTextAlign;
-                fBufTrimming,
-                aBreakedTextItems); // var aBreakedTexts: Tarray<Tpair<JString, TpointF>>);
+    fBufTextBreaked := ALBreakText(aPaint, // const aPaint: JPaint;
+                                   fBufBitmapRect, // var ARect: TRectF;
+                                   StringtoJString(fBufText), // const AText: JString;
+                                   fBufWordWrap, //const aWordWrap: Boolean;
+                                   fBufHorizontalAlign, fBufVerticalAlign, //const AHTextAlign, AVTextAlign: TTextAlign;
+                                   fBufTrimming,
+                                   aBreakedTextItems); // var aBreakedTexts: Tarray<Tpair<JString, TpointF>>);
     fbufBitmapRect.Top := fbufBitmapRect.Top / aSceneScale;
     fbufBitmapRect.right := fbufBitmapRect.right / aSceneScale;
     fbufBitmapRect.left := fbufBitmapRect.left / aSceneScale;
@@ -2361,17 +2370,17 @@ begin
     try
 
       //break the text
-      ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
-                  fBufFontColor, //const aFontColor: TalphaColor;
-                  fBuffontSize * aSceneScale, //const aFontSize: single;
-                  fBuffontStyle, //const aFontStyle: TFontStyles;
-                  fBuffontFamily, //const aFontName: String;
-                  fBufBitmapRect, //var ARect: TRectF;
-                  fBufText, // const AText: string;
-                  fBufWordWrap, //const aWordWrap: Boolean;
-                  fBufHorizontalAlign, fBufVerticalAlign, //const AHTextAlign, AVTextAlign: TTextAlign;
-                  fBufTrimming, //const aTrimming: TTextTrimming;
-                  aBreakedTextItems); //var aBreakTextItems: TALBreakTextItems
+      fBufTextBreaked := ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
+                                     fBufFontColor, //const aFontColor: TalphaColor;
+                                     fBuffontSize * aSceneScale, //const aFontSize: single;
+                                     fBuffontStyle, //const aFontStyle: TFontStyles;
+                                     fBuffontFamily, //const aFontName: String;
+                                     fBufBitmapRect, //var ARect: TRectF;
+                                     fBufText, // const AText: string;
+                                     fBufWordWrap, //const aWordWrap: Boolean;
+                                     fBufHorizontalAlign, fBufVerticalAlign, //const AHTextAlign, AVTextAlign: TTextAlign;
+                                     fBufTrimming, //const aTrimming: TTextTrimming;
+                                     aBreakedTextItems); //var aBreakTextItems: TALBreakTextItems
       fbufBitmapRect.Top := fbufBitmapRect.Top / aSceneScale;
       fbufBitmapRect.right := fbufBitmapRect.right / aSceneScale;
       fbufBitmapRect.left := fbufBitmapRect.left / aSceneScale;

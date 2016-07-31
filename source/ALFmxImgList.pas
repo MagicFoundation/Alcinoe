@@ -44,11 +44,24 @@ type
     {$ENDIF}
     procedure clearBufBitmap; virtual;
   published
+    property Cursor default crDefault;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property TouchTargetExpansion;
     property HitTest default False;
     property AutoHide default False; // i think it's better to put autohide to false by default !
                                      // because autohide deactivate the normal behavior of the visible property
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnResize;
   end;
 
 procedure Register;

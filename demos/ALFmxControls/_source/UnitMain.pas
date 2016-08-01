@@ -721,18 +721,18 @@ begin
   fALText.Margins.Top := 8;
   fALText.Position.Y := button15.Position.Y - button15.Margins.Top;
   fALText.Size.Height := 80;
-  fALText.Text := 'TALText Random 😘 😊 😍 😪 😴 😭 👿 🙀 👼 💇 💋 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
+  fALText.Text := 'TALText Random ? ? ? ? ? ? ? ? ? ? ? azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
                   ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
   //-----
   fText := TTextStopWatch.Create(self);
   fText.Parent := ALVertScrollBox1;
-  fALText.TextSettings.WordWrap := True;
-  fALText.TextSettings.HorzAlign := TTextAlign.Center;
+  fText.TextSettings.WordWrap := True;
+  fText.TextSettings.HorzAlign := TTextAlign.Center;
   fText.Align := TalignLayout.Top;
   fText.Margins.Top := 8;
   fText.Position.Y := button15.Position.Y - button15.Margins.Top;
   fText.Size.Height := 80;
-  fText.Text := 'TText Random 😘 😊 😍 😪 😴 😭 👿 🙀 👼 💇 💋 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
+  fText.Text := 'TText Random ? ? ? ? ? ? ? ? ? ? ? azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
                 ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
 
   //-----

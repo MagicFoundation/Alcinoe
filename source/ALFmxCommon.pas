@@ -920,9 +920,6 @@ var aBreakTextItem: TALBreakTextItem;
 
 begin
 
-  //init result
-  result := false;
-
   //init aBreakTextItemsStartCount
   aBreakTextItemsStartCount := aBreakTextItems.Count;
 
@@ -1204,6 +1201,8 @@ begin
             //init aStringRange
             aStringRange := CTLineGetStringRange(aBreakTextItem.Line);
             result := (aStringRange.location + aStringRange.length < aTextAttrLn);
+
+          end;
 
         finally
           CFRelease(aFrame);

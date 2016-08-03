@@ -2644,6 +2644,8 @@ var LClass: TTextSettingsClass;
 begin
   inherited;
   //-----
+  HitTest := False;
+  //-----
   FAutoConvertFontFamily := True;
   FAutoTranslate := true;
   {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}

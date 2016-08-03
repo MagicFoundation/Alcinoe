@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 442
   Top = 108
   Caption = 'Form1'
-  ClientHeight = 490
+  ClientHeight = 760
   ClientWidth = 647
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,7 +15,7 @@ object Form1: TForm1
   TextHeight = 13
   object Label1: TLabel
     Left = 24
-    Top = 206
+    Top = 262
     Width = 22
     Height = 13
     Caption = 'Key'
@@ -28,7 +28,7 @@ object Form1: TForm1
   end
   object Label2: TLabel
     Left = 24
-    Top = 265
+    Top = 321
     Width = 104
     Height = 13
     Caption = 'Unencrypted Data'
@@ -41,10 +41,23 @@ object Form1: TForm1
   end
   object Label3: TLabel
     Left = 333
-    Top = 265
+    Top = 321
     Width = 187
     Height = 13
     Caption = 'Crypted Data (BASE64 Encoded)'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label4: TLabel
+    Left = 24
+    Top = 517
+    Width = 54
+    Height = 13
+    Caption = 'Collisions'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -11
@@ -63,24 +76,24 @@ object Form1: TForm1
   end
   object StatusBar1: TStatusBar
     Left = 0
-    Top = 471
+    Top = 741
     Width = 647
     Height = 19
     Panels = <
       item
-        Width = 140
+        Width = 110
+      end
+      item
+        Width = 120
       end
       item
         Width = 140
       end
       item
-        Width = 200
+        Width = 100
       end
       item
-        Width = 150
-      end
-      item
-        Width = 200
+        Width = 100
       end>
   end
   object ALButton3: TButton
@@ -103,14 +116,14 @@ object Form1: TForm1
   end
   object EditKey: TEdit
     Left = 24
-    Top = 225
+    Top = 281
     Width = 266
     Height = 21
     TabOrder = 4
   end
   object ALMemoDecryptedData: TMemo
     Left = 24
-    Top = 284
+    Top = 340
     Width = 266
     Height = 165
     ScrollBars = ssBoth
@@ -118,7 +131,7 @@ object Form1: TForm1
   end
   object ALMemoCryptedData: TMemo
     Left = 333
-    Top = 284
+    Top = 340
     Width = 290
     Height = 165
     ScrollBars = ssBoth
@@ -234,11 +247,37 @@ object Form1: TForm1
   end
   object Button3: TButton
     Left = 152
-    Top = 140
+    Top = 203
     Width = 138
     Height = 25
     Caption = 'Bench BobJenkinsHash'
     TabOrder = 19
     OnClick = Button3Click
+  end
+  object ALMemoCollisions: TMemo
+    Left = 24
+    Top = 536
+    Width = 599
+    Height = 189
+    ScrollBars = ssBoth
+    TabOrder = 20
+  end
+  object Button4: TButton
+    Left = 154
+    Top = 172
+    Width = 136
+    Height = 25
+    Caption = 'Bench FNV-1a (int64)'
+    TabOrder = 21
+    OnClick = Button4Click
+  end
+  object Button5: TButton
+    Left = 154
+    Top = 140
+    Width = 136
+    Height = 25
+    Caption = 'Bench FNV-1a (int32)'
+    TabOrder = 22
+    OnClick = Button5Click
   end
 end

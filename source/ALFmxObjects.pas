@@ -271,7 +271,7 @@ type
     property Enabled default True;
     property Locked default False;
     property Height;
-    property HitTest default True;
+    property HitTest default False;
     property Padding;
     property Opacity;
     property Margins;

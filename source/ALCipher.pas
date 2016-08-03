@@ -361,7 +361,8 @@ uses {$IF defined(MSWINDOWS)}
      {$IFEND}
      system.Math;
 
-{*************}
+{***************}
+{$IFNDEF NEXTGEN}
 {$WARNINGS OFF}
 //http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
 //https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
@@ -374,6 +375,7 @@ begin
       Result := (Result xor Ord(str[i])) * 1099511628211;
 end;
 {$WARNINGS ON}
+{$ENDIF}
 
 {*************}
 {$WARNINGS OFF}
@@ -388,7 +390,8 @@ begin
 end;
 {$WARNINGS ON}
 
-{**************************************************}
+{***************}
+{$IFNDEF NEXTGEN}
 function ALFnv1aInt32(const str: ansiString): int64;
 var i : Integer;
 begin
@@ -396,6 +399,7 @@ begin
    for i:=low(str) to high(str) do
       Result := (Result xor Ord(str[i])) * 16777619;
 end;
+{$ENDIF}
 
 {*************************************************************************}
 function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int64;

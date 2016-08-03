@@ -369,6 +369,7 @@ type
                          Var buffer: ansiString);
   public
     constructor Create(const NodeName: AnsiString); virtual;
+    procedure MultiThreadPrepare;
     function GetText(const default: AnsiString): AnsiString; overload;
     function GetText: AnsiString; overload;
     procedure SetText(const Value: AnsiString);
@@ -766,6 +767,7 @@ type
                          Var buffer: String);
   public
     constructor Create(const NodeName: String); virtual;
+    procedure MultiThreadPrepare;
     function GetText(const default: String): String; overload;
     function GetText: String; overload;
     procedure SetText(const Value: String);
@@ -1594,62 +1596,10 @@ begin
   inherited;
 end;
 
-{*****************************************************************************}
-//will create all the nodevalue to be sure that multiple thread can safely read
-//at the same time the jsondocument
+{*******************************************}
 procedure TALJSONDocument.MultiThreadPrepare;
-
-  procedure _doMultiThreadPrepare(aNode: TALJsonNode);
-  var i: integer;
-  begin
-
-    if aNode.NodeType = ntText then begin
-
-      case aNode.NodeSubType of
-        nstFloat,
-        nstBoolean,
-        nstDateTime,
-        nstNull,
-        nstInt32,
-        nstTimestamp,
-        nstInt64: aNode.GetNodeValueStr;
-        //nstText: can not be retrieve from int64
-        //nstObject: can not be retrieve from int64
-        //nstArray: can not be retrieve from int64
-        //nstBinary: only the binarysubtype is store in int64
-        //nstObjectID: can not be retrieve from int64
-        //nstRegEx: only the regex option is store in the int64
-        //nstJavascript: can not be retrieve from int64
-      end;
-
-      case aNode.NodeSubType of
-        nstFloat,
-        nstBoolean,
-        nstDateTime,
-        nstNull,
-        nstInt32,
-        nstTimestamp,
-        nstInt64: aNode.GetNodeValueInt64;
-        //nstText: can not be retrieve from int64
-        //nstObject: can not be retrieve from int64
-        //nstArray: can not be retrieve from int64
-        //nstBinary: only the binarysubtype is store in int64
-        //nstObjectID: can not be retrieve from int64
-        //nstRegEx: only the regex option is store in the int64
-        //nstJavascript: can not be retrieve from int64
-      end;
-
-    end
-
-    else begin
-      For i := 0 to aNode.ChildNodes.Count - 1 do
-        _doMultiThreadPrepare(aNode.ChildNodes[i]);
-    end;
-
-  end;
-
 begin
-  _doMultiThreadPrepare(node);
+  node.MultiThreadPrepare;
 end;
 
 {******************************}
@@ -2205,11 +2155,13 @@ Var Buffer: AnsiString;
       _createTextNode(index, Name, Value);
       exit;
     end;
-    if _createFloatNode(index, Name, Value) then exit;
     if _createBooleanNode(index, Name, Value) then exit;
     if _createNullNode(index, Name, Value) then exit;
     if _createInt32Node(index, Name, Value) then exit;
     if _createInt64Node(index, Name, Value) then exit;
+    if _createFloatNode(index, Name, Value) then exit;  // << must be here because else the conversion will succeed for (by exemple) 9223372036854775808
+                                                        // << but the stored value will be different because of double precision that is less than int64
+                                                        // << In fact the same problem with javascript
     if _createDateTimeNode(index, Name, Value) then exit;
     if _createBinaryNode(index, Name, Value) then exit;
     if _createObjectIDNode(index, Name, Value) then exit;
@@ -4774,6 +4726,56 @@ Begin
   fNodeName := NodeName;
 end;
 
+{***************************************************************}
+//will create all the nodevalue and childnodelist to be sure that
+//multiple thread can safely read at the same time the node
+procedure TALJSONNode.MultiThreadPrepare;
+var i: integer;
+begin
+  if NodeType = ntText then begin
+
+    case NodeSubType of
+      nstFloat,
+      nstBoolean,
+      nstDateTime,
+      nstNull,
+      nstInt32,
+      nstTimestamp,
+      nstInt64: GetNodeValueStr;
+      //nstText: can not be retrieve from int64
+      //nstObject: can not be retrieve from int64
+      //nstArray: can not be retrieve from int64
+      //nstBinary: only the binarysubtype is store in int64
+      //nstObjectID: can not be retrieve from int64
+      //nstRegEx: only the regex option is store in the int64
+      //nstJavascript: can not be retrieve from int64
+    end;
+
+    case NodeSubType of
+      nstFloat,
+      nstBoolean,
+      nstDateTime,
+      nstNull,
+      nstInt32,
+      nstTimestamp,
+      nstInt64: GetNodeValueInt64;
+      //nstText: can not be retrieve from int64
+      //nstObject: can not be retrieve from int64
+      //nstArray: can not be retrieve from int64
+      //nstBinary: only the binarysubtype is store in int64
+      //nstObjectID: can not be retrieve from int64
+      //nstRegEx: only the regex option is store in the int64
+      //nstJavascript: can not be retrieve from int64
+    end;
+
+  end
+
+  else begin
+    For i := 0 to ChildNodes.Count - 1 do
+      ChildNodes[i].MultiThreadPrepare;
+  end;
+end;
+
 {******************************************************************************************************************************************}
 function TALJSONNode.AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNode;
 begin
@@ -7130,62 +7132,10 @@ begin
   inherited;
 end;
 
-{*****************************************************************************}
-//will create all the nodevalue to be sure that multiple thread can safely read
-//at the same time the jsondocument
+{********************************************}
 procedure TALJSONDocumentU.MultiThreadPrepare;
-
-  procedure _doMultiThreadPrepare(aNode: TALJSONNodeU);
-  var i: integer;
-  begin
-
-    if aNode.NodeType = ntText then begin
-
-      case aNode.NodeSubType of
-        nstFloat,
-        nstBoolean,
-        nstDateTime,
-        nstNull,
-        nstInt32,
-        nstTimestamp,
-        nstInt64: aNode.GetNodeValueStr;
-        //nstText: can not be retrieve from int64
-        //nstObject: can not be retrieve from int64
-        //nstArray: can not be retrieve from int64
-        //nstBinary: only the binarysubtype is store in int64
-        //nstObjectID: can not be retrieve from int64
-        //nstRegEx: only the regex option is store in the int64
-        //nstJavascript: can not be retrieve from int64
-      end;
-
-      case aNode.NodeSubType of
-        nstFloat,
-        nstBoolean,
-        nstDateTime,
-        nstNull,
-        nstInt32,
-        nstTimestamp,
-        nstInt64: aNode.GetNodeValueInt64;
-        //nstText: can not be retrieve from int64
-        //nstObject: can not be retrieve from int64
-        //nstArray: can not be retrieve from int64
-        //nstBinary: only the binarysubtype is store in int64
-        //nstObjectID: can not be retrieve from int64
-        //nstRegEx: only the regex option is store in the int64
-        //nstJavascript: can not be retrieve from int64
-      end;
-
-    end
-
-    else begin
-      For i := 0 to aNode.ChildNodes.Count - 1 do
-        _doMultiThreadPrepare(aNode.ChildNodes[i]);
-    end;
-
-  end;
-
 begin
-  _doMultiThreadPrepare(node);
+  node.MultiThreadPrepare;
 end;
 
 {*******************************}
@@ -7695,11 +7645,13 @@ Var BufferLength: Integer;
       _createTextNode(index, Name, Value);
       exit;
     end;
-    if _createFloatNode(index, Name, Value) then exit;
     if _createBooleanNode(index, Name, Value) then exit;
     if _createNullNode(index, Name, Value) then exit;
     if _createInt32Node(index, Name, Value) then exit;
     if _createInt64Node(index, Name, Value) then exit;
+    if _createFloatNode(index, Name, Value) then exit;  // << must be here because else the conversion will succeed for (by exemple) 9223372036854775808
+                                                        // << but the stored value will be different because of double precision that is less than int64
+                                                        // << In fact the same problem with javascript
     if _createDateTimeNode(index, Name, Value) then exit;
     if _createBinaryNode(index, Name, Value) then exit;
     if _createObjectIDNode(index, Name, Value) then exit;
@@ -10170,6 +10122,56 @@ Begin
   FDocument := nil;
   FParentNode := nil;
   fNodeName := NodeName;
+end;
+
+{***************************************************************}
+//will create all the nodevalue and childnodelist to be sure that
+//multiple thread can safely read at the same time the node
+procedure TALJSONNodeU.MultiThreadPrepare;
+var i: integer;
+begin
+  if NodeType = ntText then begin
+
+    case NodeSubType of
+      nstFloat,
+      nstBoolean,
+      nstDateTime,
+      nstNull,
+      nstInt32,
+      nstTimestamp,
+      nstInt64: GetNodeValueStr;
+      //nstText: can not be retrieve from int64
+      //nstObject: can not be retrieve from int64
+      //nstArray: can not be retrieve from int64
+      //nstBinary: only the binarysubtype is store in int64
+      //nstObjectID: can not be retrieve from int64
+      //nstRegEx: only the regex option is store in the int64
+      //nstJavascript: can not be retrieve from int64
+    end;
+
+    case NodeSubType of
+      nstFloat,
+      nstBoolean,
+      nstDateTime,
+      nstNull,
+      nstInt32,
+      nstTimestamp,
+      nstInt64: GetNodeValueInt64;
+      //nstText: can not be retrieve from int64
+      //nstObject: can not be retrieve from int64
+      //nstArray: can not be retrieve from int64
+      //nstBinary: only the binarysubtype is store in int64
+      //nstObjectID: can not be retrieve from int64
+      //nstRegEx: only the regex option is store in the int64
+      //nstJavascript: can not be retrieve from int64
+    end;
+
+  end
+
+  else begin
+    For i := 0 to ChildNodes.Count - 1 do
+      ChildNodes[i].MultiThreadPrepare;
+  end;
 end;
 
 {****************************************************************************************************************************************}

@@ -34,6 +34,10 @@ type
     Button1: TButton;
     Button2: TButton;
     Button3: TButton;
+    ALMemoCollisions: TMemo;
+    Label4: TLabel;
+    Button4: TButton;
+    Button5: TButton;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -51,6 +55,8 @@ type
     procedure Button2Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
   public
   end;
@@ -102,6 +108,7 @@ begin
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
   aDictionary := TDictionary<ansiString,ansistring>.create;
   try
     aCounter := 0;
@@ -109,12 +116,15 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25));
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashMD5(aData, false);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
-        if aTmpData <> aData then inc(aCollision);
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
       end
       else aDictionary.Add(aHash, aData);
       inc(acounter);
@@ -156,6 +166,7 @@ begin
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
   aDictionary := TDictionary<ansiString,ansistring>.create;
   try
     aCounter := 0;
@@ -163,12 +174,15 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25));
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashSHA1(aData, false);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
-        if aTmpData <> aData then inc(aCollision);
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
       end
       else aDictionary.Add(aHash, aData);
       inc(acounter);
@@ -376,6 +390,7 @@ begin
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
   aDictionary := TDictionary<integer,ansistring>.create;
   try
     aCounter := 0;
@@ -383,12 +398,15 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25));
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ZCrc32(0, aData[1], length(aData));
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
-        if aTmpData <> aData then inc(aCollision);
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
       end
       else aDictionary.Add(aHash, aData);
       inc(acounter);
@@ -430,6 +448,7 @@ begin
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
   aDictionary := TDictionary<integer,ansistring>.create;
   try
     aCounter := 0;
@@ -437,12 +456,15 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25));
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := ALStringHashCRC32(aData);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
-        if aTmpData <> aData then inc(aCollision);
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
       end
       else aDictionary.Add(aHash, aData);
       inc(acounter);
@@ -485,6 +507,7 @@ begin
   StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
   StatusBar1.Panels[3].Text := '';
   StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
   aDictionary := TDictionary<integer,ansistring>.create;
   try
     aCounter := 0;
@@ -492,12 +515,15 @@ begin
     aLastGUIUpdate := now;
     aStopWatch := TstopWatch.Create;
     while True do begin
-      aData := ALRandomStr(1+random(25));
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
       aStopWatch.Start;
       aHash := BobJenkinsHash(aData[1], Length(aData) * SizeOf(aData[1]), 0);
       aStopWatch.Stop;
       if aDictionary.TryGetValue(aHash, aTmpData) then begin
-        if aTmpData <> aData then inc(aCollision);
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
       end
       else aDictionary.Add(aHash, aData);
       inc(acounter);
@@ -514,6 +540,123 @@ begin
     aDictionary.free;
   end;
 end;
+
+{*********************************************}
+procedure TForm1.Button4Click(Sender: TObject);
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: int64;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<int64,ansistring>;
+    aCollision: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench FNV-1a (int64)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+  StatusBar1.Panels[0].Text := 'FNV-1a (int64)';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aDictionary := TDictionary<int64,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aStopWatch.Start;
+      aHash := ALFnv1aInt64(aData);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+    end;
+  finally
+    aDictionary.free;
+  end;
+end;
+
+{*********************************************}
+procedure TForm1.Button5Click(Sender: TObject);
+Var aData: AnsiString;
+    aTmpData: ansiString;
+    aHash: integer;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    aDictionary: TDictionary<integer,ansistring>;
+    aCollision: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench FNV-1a (int32)';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  randomize;
+  StatusBar1.Panels[0].Text := 'FNV-1a (int32)';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := 'Input: 1 to 25 bytes';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aDictionary := TDictionary<integer,ansistring>.create;
+  try
+    aCounter := 0;
+    aCollision := 0;
+    aLastGUIUpdate := now;
+    aStopWatch := TstopWatch.Create;
+    while True do begin
+      aData := ALRandomStr(1+random(25), ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z']);
+      aStopWatch.Start;
+      aHash := ALFnv1aInt32(aData);
+      aStopWatch.Stop;
+      if aDictionary.TryGetValue(aHash, aTmpData) then begin
+        if aTmpData <> aData then begin
+          ALMemoCollisions.Lines.Add(string(aTmpData + '  =  ' + aData));
+          inc(aCollision);
+        end;
+      end
+      else aDictionary.Add(aHash, aData);
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        StatusBar1.Panels[3].Text := inttostr(aCollision) + ' collisions';
+        StatusBar1.Panels[4].Text := FormatFloat('#,.', aDictionary.Count) + ' keys';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+    end;
+  finally
+    aDictionary.free;
+  end;
+end;
+
 {$WARN SYMBOL_DEPRECATED ON}
 
 {**********************************************************}

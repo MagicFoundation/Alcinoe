@@ -346,7 +346,13 @@ var
   // - you should use this function instead of ALCrc32cfast() nor ALCrc32csse42()
   ALStringHashCrc32: TALStringHashCrc32;
 
+function ALFnv1aInt32(const str: ansiString): int64; inline;
+function ALFnv1aInt64(const str: ansiString): int64; inline;
+
 {$ENDIF}
+
+function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int64; inline;
+function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): int64; inline;
 
 implementation
 
@@ -354,6 +360,53 @@ uses {$IF defined(MSWINDOWS)}
      winapi.MMSystem,
      {$IFEND}
      system.Math;
+
+{*************}
+{$WARNINGS OFF}
+//http://programmers.stackexchange.com/questions/49550/which-hashing-algorithm-is-best-for-uniqueness-and-speed
+//https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
+//http://www.isthe.com/chongo/tech/comp/fnv/index.html#FNV-param
+function ALFnv1aInt64(const str: ansiString): int64;
+var i : Integer;
+begin
+   Result := 14695981039346656037;
+   for i:=low(str) to high(str) do
+      Result := (Result xor Ord(str[i])) * 1099511628211;
+end;
+{$WARNINGS ON}
+
+{*************}
+{$WARNINGS OFF}
+function ALFnv1aInt64U(const str: String; Const encoding: Tencoding): int64;
+var abytes: Tbytes;
+    i : Integer;
+begin
+  aBytes := encoding.GetBytes(str);
+  Result := 14695981039346656037;
+  for i:=low(aBytes) to high(aBytes) do
+    Result := (Result xor aBytes[i]) * 10995116282118;
+end;
+{$WARNINGS ON}
+
+{**************************************************}
+function ALFnv1aInt32(const str: ansiString): int64;
+var i : Integer;
+begin
+   Result := 2166136261;
+   for i:=low(str) to high(str) do
+      Result := (Result xor Ord(str[i])) * 16777619;
+end;
+
+{*************************************************************************}
+function ALFnv1aInt32U(const str: String; Const encoding: Tencoding): int64;
+var abytes: Tbytes;
+    i : Integer;
+begin
+  aBytes := encoding.GetBytes(str);
+  Result := 2166136261;
+  for i:=low(aBytes) to high(aBytes) do
+    Result := (Result xor aBytes[i]) * 16777619;
+end;
 
 {***}
 const

@@ -2155,13 +2155,15 @@ Var Buffer: AnsiString;
       _createTextNode(index, Name, Value);
       exit;
     end;
+    if _createFloatNode(index, Name, Value) then exit;  // << we have the same problem as javascript, if we put here a big number like (by exemple) 9223372036854775808
+                                                        // << then the stored value will be different because of double precision that is less than int64 precision
+                                                        // << it's the way javascript json work, it's have no room for int / int64 :(
+                                                        // << if we want to have the possibility to store int64 precision then we must use node subtype helper
+                                                        // << like NumberLong(9223372036854775808)
     if _createBooleanNode(index, Name, Value) then exit;
     if _createNullNode(index, Name, Value) then exit;
     if _createInt32Node(index, Name, Value) then exit;
     if _createInt64Node(index, Name, Value) then exit;
-    if _createFloatNode(index, Name, Value) then exit;  // << must be here because else the conversion will succeed for (by exemple) 9223372036854775808
-                                                        // << but the stored value will be different because of double precision that is less than int64
-                                                        // << In fact the same problem with javascript
     if _createDateTimeNode(index, Name, Value) then exit;
     if _createBinaryNode(index, Name, Value) then exit;
     if _createObjectIDNode(index, Name, Value) then exit;
@@ -7645,13 +7647,15 @@ Var BufferLength: Integer;
       _createTextNode(index, Name, Value);
       exit;
     end;
+    if _createFloatNode(index, Name, Value) then exit;  // << we have the same problem as javascript, if we put here a big number like (by exemple) 9223372036854775808
+                                                        // << then the stored value will be different because of double precision that is less than int64 precision
+                                                        // << it's the way javascript json work, it's have no room for int / int64 :(
+                                                        // << if we want to have the possibility to store int64 precision then we must use node subtype helper
+                                                        // << like NumberLong(9223372036854775808)
     if _createBooleanNode(index, Name, Value) then exit;
     if _createNullNode(index, Name, Value) then exit;
     if _createInt32Node(index, Name, Value) then exit;
     if _createInt64Node(index, Name, Value) then exit;
-    if _createFloatNode(index, Name, Value) then exit;  // << must be here because else the conversion will succeed for (by exemple) 9223372036854775808
-                                                        // << but the stored value will be different because of double precision that is less than int64
-                                                        // << In fact the same problem with javascript
     if _createDateTimeNode(index, Name, Value) then exit;
     if _createBinaryNode(index, Name, Value) then exit;
     if _createObjectIDNode(index, Name, Value) then exit;

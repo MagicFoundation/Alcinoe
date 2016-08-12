@@ -222,7 +222,13 @@ type
     function GetCookie(Index: Integer): TALHTTPCookie;
     procedure SetCookie(Index: Integer; Cookie: TALHTTPCookie);
   public
-    function Add: TALHTTPCookie;
+    function Add: TALHTTPCookie; overload;
+    function Add(const Name: AnsiString;
+                 const Value: AnsiString;
+                 const Path: AnsiString;
+                 const Domain: AnsiString;
+                 const Expires: int64; // unixDateTime format
+                 const Secure: Boolean): TALHTTPCookie; overload;
     property Items[Index: Integer]: TALHTTPCookie read GetCookie write SetCookie; default;
   end;
 
@@ -668,6 +674,23 @@ end;
 function TALHTTPCookieCollection.Add: TALHTTPCookie;
 begin
   Result := TALHTTPCookie(inherited Add);
+end;
+
+{**********************************************************}
+function TALHTTPCookieCollection.Add(const Name: AnsiString;
+                                     const Value: AnsiString;
+                                     const Path: AnsiString;
+                                     const Domain: AnsiString;
+                                     const Expires: int64; // unixDateTime format
+                                     const Secure: Boolean): TALHTTPCookie;
+begin
+  result := TALHTTPCookie(inherited Add);
+  result.Name := Name;
+  result.Value := Value;
+  result.Path := Path;
+  result.Domain := Domain;
+  result.Expires := unixtoDateTime(Expires);
+  result.Secure := Secure;
 end;
 
 {************************************************************************}

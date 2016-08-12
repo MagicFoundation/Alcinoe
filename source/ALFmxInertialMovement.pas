@@ -16,7 +16,13 @@ uses System.Types,
      System.UITypes,
      System.Classes,
      System.Generics.Collections,
+     System.Messaging,
      FMX.Types;
+
+type
+
+  TALScrollingAcquiredMessage = class(TMessage)
+  end;
 
 const
   ALDefaultStorageTime = 0.15;
@@ -229,7 +235,7 @@ type
     property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;
     property Elasticity: Double read FElasticity write FElasticity stored ElasticityStored nodefault;
     property StorageTime: Double read FStorageTime write FStorageTime stored StorageTimeStored nodefault;
-    property VelocityFactor: TPointF read FVelocityFactor write FVelocityFactor;
+    property VelocityFactor: TPointF read FVelocityFactor write FVelocityFactor; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
     property CurrentVelocity: TALPointD read FCurrentVelocity;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
     property ViewportPositionF: TPointF read GetViewportPositionF write SetViewportPositionF;

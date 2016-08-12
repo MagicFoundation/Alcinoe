@@ -24,10 +24,10 @@ uses System.Classes,
 
 type
 
+  {*************************}
   TALCustomScrollBox = class;
 
-{ TScrollContent }
-
+  {********************************}
   TALScrollContent = class(TContent)
   private
     [weak] FScrollBox: TALCustomScrollBox;
@@ -50,6 +50,7 @@ type
     function PointInObjectLocal(X, Y: Single): Boolean; override;
   end;
 
+  {************************************************}
   TALScrollCalculations = class (TALAniCalculations)
   private
     [Weak] FScrollBox: TALCustomScrollBox;
@@ -62,15 +63,16 @@ type
     property ScrollBox: TALCustomScrollBox read FScrollBox;
   end;
 
-{ TCustomScrollBox }
-
+  {**************************************************}
   TALPositionChangeEvent = procedure (Sender: TObject;
-                              const OldViewportPosition, NewViewportPosition: TPointF;
-                              const ContentSizeChanged: Boolean) of object;
+                                      const OldViewportPosition, NewViewportPosition: TPointF;
+                                      const ContentSizeChanged: Boolean) of object;
 
+  {*******************************************************}
   TALOnCalcContentBoundsEvent = procedure (Sender: TObject;
-                                     var ContentBounds: TRectF) of object;
+                                           var ContentBounds: TRectF) of object;
 
+  {****************************************}
   TALCustomScrollBox = class(TStyledControl)
   private
   const
@@ -85,11 +87,11 @@ type
   var
     FSystemInfoSrv: IFMXSystemInformationService;
     FDisableMouseWheel: Boolean;
-
+    //-----
     FAniCalculations: TALScrollCalculations;
     FLastViewportPosition: TPointF;
     FInInternalAlign: Boolean;
-
+    //-----
     FBackground: TControl;
     FContent: TALScrollContent;
     FContentLayout: TControl;
@@ -97,7 +99,7 @@ type
     FCachedContentSize: TSizeF;
     FCachedAutoShowing: Boolean;
     FOriginalContentLayoutSize: TSizeF;
-
+    //-----
     FShowScrollBars: Boolean;
     FAutoHide: Boolean;
     FHScrollInfo: array of TScrollInfo;
@@ -106,7 +108,7 @@ type
     FVDisablePaint: Boolean;
     FHDisablePaint: Boolean;
     FGDisablePaint: Boolean;
-
+    //-----
     FSizeGripContent: TControl;
     FSizeGripParent: TControl;
     FSizeGrip: TControl;
@@ -159,7 +161,7 @@ type
     procedure AniMouseDown(const Touch: Boolean; const X, Y: Single); virtual;
     procedure AniMouseMove(const Touch: Boolean; const X, Y: Single); virtual;
     procedure AniMouseUp(const Touch: Boolean; const X, Y: Single); virtual;
-
+    //Animation mouse events
     function GetScrollingBehaviours: TScrollingBehaviours;
     procedure Loaded; override;
     procedure PaddingChanged; override;
@@ -221,7 +223,6 @@ type
     property ContentBounds: TRectF read GetContentBounds;
     procedure InvalidateContentSize;
     procedure RealignContent;
-
     property AutoHide: Boolean read FAutoHide write SetAutoHide default True;
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
@@ -283,8 +284,7 @@ type
     property OnMouseLeave;
   end;
 
-{ TScrollBox }
-
+  {**************************************}
   TALScrollBox = class(TALCustomScrollBox)
   protected
     procedure Paint; override;
@@ -351,8 +351,7 @@ type
     property OnCalcContentBounds;
   end;
 
-{ TVertScrollBox }
-
+  {******************************************}
   TALVertScrollBox = class(TALCustomScrollBox)
   protected
     function GetDefaultStyleLookupName: string; override;
@@ -421,8 +420,7 @@ type
     property OnCalcContentBounds;
   end;
 
-{ THorzScrollBox }
-
+  {******************************************}
   TALHorzScrollBox = class(TALCustomScrollBox)
   protected
     function GetDefaultStyleLookupName: string; override;

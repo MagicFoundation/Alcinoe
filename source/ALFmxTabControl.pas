@@ -130,14 +130,13 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
-    procedure HandleSizeChanged; override;
+    procedure Resize; override;
     property ClipChildren default True;
     property Padding;
     property AutoCapture;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
     function SetActiveTabWithTransition(const ATab: TALTabItem;
                                         const ATransition: TALTabTransition;
                                         const AVelocity: double=0): boolean; overload;
@@ -501,32 +500,17 @@ begin
   fTabCount := 0;
 end;
 
-{***************************************************************}
-procedure TALTabControl.SetBounds(X, Y, AWidth, AHeight: Single);
-var aNeedRealignTabs: Boolean;
+{*****************************}
+procedure TALTabControl.Resize;
 begin
-  //this procedure will be call during the oncreate (for exemple) but strangely call to setbounds
-  //will not fire the HandleSizeChanged (but it's call resize if not during loading) !!
-  aNeedRealignTabs := not (SameValue(AWidth, Width, TEpsilon.Position) and SameValue(AHeight, Height, TEpsilon.Position));
-  inherited SetBounds(X, Y, AWidth, AHeight);
-  if aNeedRealignTabs then RealignTabs;
-end;
-
-{****************************************}
-procedure TALTabControl.HandleSizeChanged;
-begin
-  //this will be call during the loading of the control (for exemple)
-  //but not a problem because at this moment the tabcontrol don't have (yet)
-  //any tabitem so RealignTabs will be a noops operation
-  //after this will be called each time the size of the control will be updated
-  inherited;
   RealignTabs;
+  inherited Resize;
 end;
 
 {*****************************}
 procedure TALTabControl.Loaded;
 begin
-  inherited;
+  inherited Loaded;
   RealignTabs;
 end;
 

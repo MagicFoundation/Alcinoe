@@ -119,11 +119,13 @@ type
     FOnCalcContentBounds: TALOnCalcContentBoundsEvent;
     FMouseEvents: Boolean;
     FContentCalculated: Boolean;
+    //-----
     fMouseDownPos: TpointF;
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
     fScrollingAcquiredByOtherMessageID: integer;
     procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+    //-----
     function HScrollIndex: Integer;
     function VScrollIndex: Integer;
     function GetHScrollAlign: TAlignLayout;

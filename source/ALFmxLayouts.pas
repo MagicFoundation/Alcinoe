@@ -507,6 +507,7 @@ uses System.Generics.Collections,
 
 { TScrollContent }
 
+{******************************************************}
 constructor TALScrollContent.Create(AOwner: TComponent);
 begin
   inherited;
@@ -517,6 +518,7 @@ begin
   SetAcceptsControls(False);
 end;
 
+{********************************************}
 function TALScrollContent.GetClipRect: TRectF;
 begin
   if FScrollBox <> nil then
@@ -535,6 +537,7 @@ begin
     Result := inherited GetClipRect;
 end;
 
+{************************************************************}
 function TALScrollContent.ObjectAtPoint(P: TPointF): IControl;
 begin
   Result := inherited ObjectAtPoint(P);
@@ -548,6 +551,7 @@ begin
   end;
 end;
 
+{******************************************************************}
 function TALScrollContent.PointInObjectLocal(X, Y: Single): Boolean;
 var
   ClipRect: TRectF;
@@ -559,6 +563,7 @@ begin
     (Y <= (ClipRect.TopLeft.Y + ClipRect.Height + TouchTargetExpansion.Bottom));
 end;
 
+{****************************************************************}
 procedure TALScrollContent.DoAddObject(const AObject: TFmxObject);
 begin
   inherited;
@@ -566,6 +571,7 @@ begin
     FScrollBox.ContentAddObject(AObject);
 end;
 
+{***********************************************************************************}
 procedure TALScrollContent.DoInsertObject(Index: Integer; const AObject: TFmxObject);
 begin
   inherited;
@@ -573,6 +579,7 @@ begin
     FScrollBox.ContentInsertObject(Index, AObject);
 end;
 
+{***********************************}
 procedure TALScrollContent.DoRealign;
 begin
   if (ScrollBox <> nil) and ScrollBox.FContentCalculated then
@@ -581,6 +588,7 @@ begin
   FLastHeight := Height;
 end;
 
+{*******************************************************************}
 procedure TALScrollContent.DoRemoveObject(const AObject: TFmxObject);
 begin
   if FScrollBox <> nil then
@@ -590,6 +598,7 @@ begin
     FScrollBox.ContentRemoveObject(AObject);
 end;
 
+{************************************************}
 function TALScrollContent.DoGetUpdateRect: TRectF;
 begin
   if ParentControl is TALCustomScrollBox then
@@ -603,11 +612,13 @@ begin
     Result := inherited DoGetUpdateRect;
 end;
 
+{************************************************}
 function TALScrollContent.GetChildrenRect: TRectF;
 begin
   Result := GetUpdateRect;
 end;
 
+{****************************************}
 procedure TALScrollContent.ContentChanged;
 begin
   inherited;
@@ -623,6 +634,7 @@ end;
 
 { TScrollCalculations }
 
+{************************************************************}
 constructor TALScrollCalculations.Create(AOwner: TPersistent);
 begin
   if not (AOwner is TALCustomScrollBox) then
@@ -631,6 +643,7 @@ begin
   FScrollBox := TALCustomScrollBox(AOwner);
 end;
 
+{****************************************}
 procedure TALScrollCalculations.DoChanged;
 begin
   if (FScrollBox <> nil) and not (csDestroying in FScrollBox.ComponentState) then
@@ -638,6 +651,7 @@ begin
   inherited;
 end;
 
+{**************************************}
 procedure TALScrollCalculations.DoStart;
 begin
   inherited;
@@ -645,6 +659,7 @@ begin
     FScrollBox.StartScrolling;
 end;
 
+{*************************************}
 procedure TALScrollCalculations.DoStop;
 begin
   inherited;
@@ -657,6 +672,7 @@ end;
 type
   TALOpenControl = class (TControl);
 
+{********************************************************}
 constructor TALCustomScrollBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -684,6 +700,7 @@ begin
   fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
 end;
 
+{************************************}
 destructor TALCustomScrollBox.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
@@ -692,11 +709,13 @@ begin
   inherited;
 end;
 
+{***********************************************************************}
 function TALCustomScrollBox.CreateAniCalculations: TALScrollCalculations;
 begin
   Result := TALScrollCalculations.Create(self);
 end;
 
+{**************************************************************************************************}
 procedure TALCustomScrollBox.DoUpdateAniCalculations(const AAniCalculations: TALScrollCalculations);
 begin
   AAniCalculations.Animation := TScrollingBehaviour.Animation in GetScrollingBehaviours;
@@ -708,6 +727,7 @@ begin
   AAniCalculations.AutoShowing := TScrollingBehaviour.AutoShowing in GetScrollingBehaviours;
 end;
 
+{*************************************************}
 procedure TALCustomScrollBox.UpdateAniCalculations;
 begin
   if not (csDestroying in ComponentState) then
@@ -723,6 +743,7 @@ begin
   end;
 end;
 
+{************************************************}
 function TALCustomScrollBox.GetSceneScale: Single;
 begin
   Result := 0;
@@ -732,6 +753,7 @@ begin
     Result := 1;
 end;
 
+{******************************************}
 procedure TALCustomScrollBox.UpdateSizeGrip;
 var
   R, GripRect: TRectF;
@@ -821,6 +843,7 @@ begin
   end;
 end;
 
+{*********************************************************************************************}
 procedure TALCustomScrollBox.UpdateVScrollBar(const Value: Single; const ViewportSize: Single);
 begin
   if VScrollBar <> nil then
@@ -838,6 +861,7 @@ begin
   end;
 end;
 
+{*********************************************************************************************}
 procedure TALCustomScrollBox.UpdateHScrollBar(const Value: Single; const ViewportSize: Single);
 begin
   if HScrollBar <> nil then
@@ -855,6 +879,7 @@ begin
   end;
 end;
 
+{*****************************************}
 procedure TALCustomScrollBox.InternalAlign;
 const
   MaxAlignIterations = 5;
@@ -1127,6 +1152,7 @@ begin
   end;
 end;
 
+{**************************************}
 procedure TALCustomScrollBox.ApplyStyle;
 
   function CheckParent(Control: TControl): boolean;
@@ -1198,6 +1224,7 @@ begin
   RealignContent;
 end;
 
+{*************************************}
 procedure TALCustomScrollBox.FreeStyle;
 var
   I: Integer;
@@ -1222,6 +1249,7 @@ begin
   FSizeGrip := nil;
 end;
 
+{******************************************************}
 function TALCustomScrollBox.DoCalcContentBounds: TRectF;
 const
   RightSide = [TAlignLayout.Top, TAlignLayout.MostTop, TAlignLayout.Bottom, TAlignLayout.MostBottom];
@@ -1263,11 +1291,13 @@ begin
   end;
 end;
 
+{***************************************************}
 function TALCustomScrollBox.GetContentBounds: TRectF;
 begin
   Result := FContentBounds;
 end;
 
+{************************************************}
 function TALCustomScrollBox.HScrollIndex: Integer;
 var
   B: Boolean;
@@ -1285,6 +1315,7 @@ begin
   end;
 end;
 
+{************************************************}
 function TALCustomScrollBox.VScrollIndex: Integer;
 var
   B: Boolean;
@@ -1302,6 +1333,7 @@ begin
   end;
 end;
 
+{********************************************************}
 function TALCustomScrollBox.GetHScrollAlign: TAlignLayout;
 var
   I: Integer;
@@ -1313,6 +1345,7 @@ begin
     Result := TAlignLayout.None;
 end;
 
+{****************************************************}
 function TALCustomScrollBox.GetHScrollBar: TScrollBar;
 var
   I: Integer;
@@ -1324,6 +1357,7 @@ begin
     Result := nil;
 end;
 
+{****************************************************}
 function TALCustomScrollBox.GetHScrollMargins: TRectF;
 var
   I: Integer;
@@ -1335,6 +1369,7 @@ begin
     Result := TRectF.Create(0, 0, 0, 0);
 end;
 
+{********************************************************}
 function TALCustomScrollBox.GetVScrollAlign: TAlignLayout;
 var
   I: Integer;
@@ -1346,6 +1381,7 @@ begin
     Result := TAlignLayout.None;
 end;
 
+{****************************************************}
 function TALCustomScrollBox.GetVScrollBar: TScrollBar;
 var
   I: Integer;
@@ -1357,6 +1393,7 @@ begin
     Result := nil;
 end;
 
+{****************************************************}
 function TALCustomScrollBox.GetVScrollMargins: TRectF;
 var
   I: Integer;
@@ -1368,6 +1405,7 @@ begin
     Result := TRectF.Create(0, 0, 0, 0);
 end;
 
+{***********************************************}
 function TALCustomScrollBox.GetTabList: ITabList;
 begin
   if FContent <> nil then
@@ -1376,6 +1414,7 @@ begin
     Result := inherited GetTabList;
 end;
 
+{*******************************************************}
 procedure TALCustomScrollBox.DoRealignContent(R: TRectF);
 begin
   if FContent <> nil then
@@ -1386,6 +1425,7 @@ begin
   end;
 end;
 
+{*************************************}
 procedure TALCustomScrollBox.DoRealign;
 var
   LDisablePaint, LDisableInternalAlign: Boolean;
@@ -1405,6 +1445,7 @@ begin
   end;
 end;
 
+{**********************************************}
 function TALCustomScrollBox.ContentRect: TRectF;
 begin
   if ContentLayout <> nil then
@@ -1413,8 +1454,8 @@ begin
     Result := LocalRect;
 end;
 
-procedure TALCustomScrollBox.ViewportPositionChange(const OldViewportPosition, NewViewportPosition: TPointF;
-                                            const ContentSizeChanged: boolean);
+{**********************************************************************************************************************************************}
+procedure TALCustomScrollBox.ViewportPositionChange(const OldViewportPosition, NewViewportPosition: TPointF; const ContentSizeChanged: boolean);
 begin
   if Assigned(FOnViewportPositionChange) then
     FOnViewportPositionChange(self,
@@ -1423,6 +1464,7 @@ begin
                               ContentSizeChanged);
 end;
 
+{**************************************************}
 function TALCustomScrollBox.VScrollBarValue: Single;
 begin
   if FAniCalculations <> nil then
@@ -1431,6 +1473,7 @@ begin
     Result := 0;
 end;
 
+{**************************************************}
 function TALCustomScrollBox.HScrollBarValue: Single;
 begin
   if FAniCalculations <> nil then
@@ -1439,18 +1482,21 @@ begin
     Result := 0;
 end;
 
+{**************************************************************}
 procedure TALCustomScrollBox.HScrollChangeProc(Sender: TObject);
 begin
   if (not FInInternalAlign) and (AniCalculations <> nil) then
     HScrollChange;
 end;
 
+{**************************************************************}
 procedure TALCustomScrollBox.VScrollChangeProc(Sender: TObject);
 begin
   if (not FInInternalAlign) and (AniCalculations <> nil) then
     VScrollChange;
 end;
 
+{*****************************************}
 procedure TALCustomScrollBox.HScrollChange;
 begin
   ViewportPosition := PointF(HScrollBar.Value, ViewportPosition.Y);
@@ -1461,6 +1507,7 @@ begin
   AniCalculations.Shown := True;
 end;
 
+{*****************************************}
 procedure TALCustomScrollBox.VScrollChange;
 begin
   ViewportPosition := TPointF.Create(ViewportPosition.X, VScrollBar.Value);
@@ -1471,11 +1518,13 @@ begin
   AniCalculations.Shown := True;
 end;
 
+{****************************************************************}
 function TALCustomScrollBox.CreateScrollContent: TALScrollContent;
 begin
   Result := TALScrollContent.Create(Self);
 end;
 
+{***********************************************************************}
 function TALCustomScrollBox.GetScrollingBehaviours: TScrollingBehaviours;
 var
   StyleDescriptor: TStyleDescription;
@@ -1495,6 +1544,7 @@ begin
   end;
 end;
 
+{***********************************************************}
 procedure TALCustomScrollBox.MousePosToAni(var X, Y: Single);
 var
   LPoint: TPointF;
@@ -1508,8 +1558,8 @@ begin
   end;
 end;
 
-procedure TALCustomScrollBox.MouseDown(Button: TMouseButton; Shift: TShiftState;
-  X, Y: Single);
+{*********************************************************************************************}
+procedure TALCustomScrollBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   FMouseEvents := True;
   inherited;
@@ -1520,6 +1570,7 @@ begin
   end;
 end;
 
+{***********************************************************************}
 procedure TALCustomScrollBox.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   FMouseEvents := True;
@@ -1531,8 +1582,8 @@ begin
   end;
 end;
 
-procedure TALCustomScrollBox.MouseUp(Button: TMouseButton; Shift: TShiftState;
-  X, Y: Single);
+{*******************************************************************************************}
+procedure TALCustomScrollBox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   FMouseEvents := True;
   inherited;
@@ -1543,6 +1594,7 @@ begin
   end;
 end;
 
+{****************************************}
 procedure TALCustomScrollBox.DoMouseLeave;
 begin
   inherited;
@@ -1555,6 +1607,7 @@ begin
   end;
 end;
 
+{*****************************************************************************************************}
 procedure TALCustomScrollBox.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
 var
   Offset: Single;
@@ -1601,6 +1654,7 @@ begin
   end;
 end;
 
+{********************************************}
 procedure TALCustomScrollBox.SaveDisablePaint;
 begin
   FVDisablePaint := False;
@@ -1623,6 +1677,7 @@ begin
   end;
 end;
 
+{*******************************************}
 procedure TALCustomScrollBox.SetDisablePaint;
 begin
   if VScrollBar <> nil then
@@ -1633,18 +1688,21 @@ begin
     TALOpenControl(FSizeGrip).FDisablePaint := True;
 end;
 
+{*************************************************}
 procedure TALCustomScrollBox.InvalidateContentSize;
 begin
   FCachedContentSize := TSizeF.Create(0, 0);
   FContentBounds := TRectF.Empty;
 end;
 
+{******************************************}
 procedure TALCustomScrollBox.RealignContent;
 begin
   InvalidateContentSize;
   Realign;
 end;
 
+{***********************************************}
 procedure TALCustomScrollBox.RestoreDisablePaint;
 begin
   if VScrollBar <> nil then
@@ -1655,6 +1713,7 @@ begin
     TALOpenControl(FSizeGrip).FDisablePaint := FGDisablePaint;
 end;
 
+{************************************}
 procedure TALCustomScrollBox.Painting;
 begin
   inherited;
@@ -1667,6 +1726,7 @@ begin
   end;
 end;
 
+{**************************************}
 procedure TALCustomScrollBox.AfterPaint;
 begin
   try
@@ -1682,6 +1742,7 @@ begin
   end;
 end;
 
+{**********************************************************************************}
 procedure TALCustomScrollBox.AniMouseDown(const Touch: Boolean; const X, Y: Single);
 begin
   fScrollingAcquiredByMe := False;
@@ -1690,6 +1751,7 @@ begin
   AniCalculations.MouseDown(X, Y);
 end;
 
+{**********************************************************************************}
 procedure TALCustomScrollBox.AniMouseMove(const Touch: Boolean; const X, Y: Single);
 begin
   if (AniCalculations.Down) and
@@ -1706,6 +1768,7 @@ begin
     AniCalculations.Shown := True;
 end;
 
+{********************************************************************************}
 procedure TALCustomScrollBox.AniMouseUp(const Touch: Boolean; const X, Y: Single);
 begin
   AniCalculations.MouseUp(X, Y);
@@ -1714,6 +1777,7 @@ begin
     AniCalculations.Shown := False;
 end;
 
+{******************************************************************}
 procedure TALCustomScrollBox.DoAddObject(const AObject: TFmxObject);
 begin
   if IsAddToContent(AObject) then
@@ -1722,6 +1786,7 @@ begin
     inherited;
 end;
 
+{*********************************************************************************}
 procedure TALCustomScrollBox.UpdateOriginalContentLayoutSize(const Force: Boolean);
 begin
   if Force or (FOriginalContentLayoutSize.cx < 0) then
@@ -1736,6 +1801,7 @@ begin
       FOriginalContentLayoutSize.cy := LocalRect.Height;
 end;
 
+{**********************************}
 procedure TALCustomScrollBox.Loaded;
 begin
   inherited;
@@ -1743,11 +1809,13 @@ begin
   UpdateOriginalContentLayoutSize(False);
 end;
 
+{******************************************}
 procedure TALCustomScrollBox.PaddingChanged;
 begin
   Content.Padding.Assign(Padding);
 end;
 
+{**********************************}
 procedure TALCustomScrollBox.Center;
 begin
   if ContentLayout <> nil then
@@ -1755,6 +1823,7 @@ begin
       (ContentBounds.Height - ContentLayout.Height) / 2);
 end;
 
+{**********************************************************}
 procedure TALCustomScrollBox.ScrollBy(const Dx, Dy: Single);
 begin
   if VScrollBar <> nil then
@@ -1763,15 +1832,18 @@ begin
     HScrollBar.Value := HScrollBar.Value - Dx;
 end;
 
+{**********************************************************}
 procedure TALCustomScrollBox.ScrollTo(const Dx, Dy: Single);
 begin
   ScrollBy(Dx, Dy);
 end;
 
+{**********************************************************}
 procedure TALCustomScrollBox.InViewRect(const Rect: TRectF);
 begin
 end;
 
+{*************************************************************}
 procedure TALCustomScrollBox.SetAutoHide(const Value: Boolean);
 begin
   if FAutoHide <> Value then
@@ -1781,6 +1853,7 @@ begin
   end;
 end;
 
+{*******************************************************************}
 procedure TALCustomScrollBox.SetShowScrollBars(const Value: Boolean);
 begin
   if FShowScrollBars <> Value then
@@ -1792,6 +1865,7 @@ begin
   end;
 end;
 
+{*****************************************************************}
 procedure TALCustomScrollBox.SetShowSizeGrip(const Value: Boolean);
 begin
   if FShowSizeGrip <> Value then
@@ -1801,6 +1875,7 @@ begin
   end;
 end;
 
+{*******************************************************}
 function TALCustomScrollBox.GetViewportPosition: TPointF;
 var
   LScale, X, Y: Double;
@@ -1811,6 +1886,7 @@ begin
   Result := TPointF.Create(X, Y);
 end;
 
+{*********************************************************************}
 procedure TALCustomScrollBox.SetViewportPosition(const Value: TPointF);
 var
   LScale, X, Y: Double;
@@ -1821,6 +1897,7 @@ begin
   AniCalculations.ViewportPosition := TALPointD.Create(Round(X * LScale) / LScale, Round(Y * LScale) / LScale);
 end;
 
+{***********************************************************}
 procedure TALCustomScrollBox.DefineProperties(Filer: TFiler);
 const
   VP = 'Viewport';
@@ -1832,6 +1909,7 @@ begin
   Filer.DefineProperty(VP + '.Height', ReadContentLayoutHeight, WriteContentLayoutHeight, True);
 end;
 
+{***************************************************************************}
 procedure TALCustomScrollBox.ReadPartSize(Reader: TReader; var Size: Single);
 var
   LValue: Double;
@@ -1848,16 +1926,19 @@ begin
   Size := RoundTo(LValue, -1);
 end;
 
+{********************************************************************}
 procedure TALCustomScrollBox.ReadContentLayoutHeight(Reader: TReader);
 begin
   ReadPartSize(Reader, FOriginalContentLayoutSize.cy);
 end;
 
+{*******************************************************************}
 procedure TALCustomScrollBox.ReadContentLayoutWidth(Reader: TReader);
 begin
   ReadPartSize(Reader, FOriginalContentLayoutSize.cx);
 end;
 
+{*********************************************************************}
 procedure TALCustomScrollBox.WriteContentLayoutHeight(Writer: TWriter);
 begin
   if ContentLayout <> nil then
@@ -1865,6 +1946,7 @@ begin
   Writer.WriteFloat(RoundTo(FOriginalContentLayoutSize.cy, -1));
 end;
 
+{********************************************************************}
 procedure TALCustomScrollBox.WriteContentLayoutWidth(Writer: TWriter);
 begin
   if ContentLayout <> nil then
@@ -1872,23 +1954,27 @@ begin
   Writer.WriteFloat(RoundTo(FOriginalContentLayoutSize.cx, -1));
 end;
 
+{****************************************************************}
 procedure TALCustomScrollBox.Sort(Compare: TFmxObjectSortCompare);
 begin
   FContent.Sort(Compare);
 end;
 
+{******************************************}
 procedure TALCustomScrollBox.StartScrolling;
 begin
   if Scene <> nil then
     Scene.ChangeScrollingState(Self, True);
 end;
 
+{*****************************************}
 procedure TALCustomScrollBox.StopScrolling;
 begin
   if Scene <> nil then
     Scene.ChangeScrollingState(nil, False);
 end;
 
+{***********************************************}
 function TALCustomScrollBox.ClientHeight: Single;
 begin
   if ContentLayout <> nil then
@@ -1897,6 +1983,7 @@ begin
     Result := Height;
 end;
 
+{**********************************************}
 function TALCustomScrollBox.ClientWidth: Single;
 begin
   if ContentLayout <> nil then
@@ -1905,6 +1992,7 @@ begin
     Result := Width;
 end;
 
+{*****************************************************************************************************}
 procedure TALCustomScrollBox.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   //the scrolling was acquired by another control (like a scrollbox for exemple)
@@ -1915,6 +2003,7 @@ begin
   end;
 end;
 
+{***********************************************************************}
 procedure TALCustomScrollBox.CMGesture(var EventInfo: TGestureEventInfo);
 var
   LP: TPointF;
@@ -1937,6 +2026,7 @@ begin
     inherited;
 end;
 
+{*****************************************************************************}
 function TALCustomScrollBox.IsAddToContent(const AObject: TFmxObject): Boolean;
 begin
   Result := (FContent <> nil)
@@ -1951,32 +2041,38 @@ begin
              (AObject = FSizeGrip));
 end;
 
+{********************************************}
 function TALCustomScrollBox.IsOpaque: Boolean;
 begin
   Result := False;
 end;
 
+{***********************************************************************}
 procedure TALCustomScrollBox.ContentAddObject(const AObject: TFmxObject);
 begin
   RealignContent;
 end;
 
+{******************************************************************************************}
 procedure TALCustomScrollBox.ContentInsertObject(Index: Integer; const AObject: TFmxObject);
 begin
   RealignContent;
 end;
 
+{**************************************************************************}
 procedure TALCustomScrollBox.ContentRemoveObject(const AObject: TFmxObject);
 begin
   RealignContent;
 end;
 
+{**************************************************************************}
 procedure TALCustomScrollBox.ContentBeforeRemoveObject(AObject: TFmxObject);
 begin
 end;
 
 { TScrollBox }
 
+{***************************}
 procedure TALScrollBox.Paint;
 begin
   inherited;
@@ -1986,6 +2082,7 @@ end;
 
 { TVertScrollBox }
 
+{****************************************************}
 function TALVertScrollBox.DoCalcContentBounds: TRectF;
 begin
   if (FContent <> nil) and (ContentLayout <> nil) then
@@ -1995,12 +2092,14 @@ begin
     Result.Width := ContentLayout.Width;
 end;
 
+{************************************************************************************************}
 procedure TALVertScrollBox.DoUpdateAniCalculations(const AAniCalculations: TALScrollCalculations);
 begin
   inherited DoUpdateAniCalculations(AAniCalculations);
   AAniCalculations.TouchTracking := AAniCalculations.TouchTracking - [ttHorizontal];
 end;
 
+{*******************************}
 procedure TALVertScrollBox.Paint;
 begin
   inherited;
@@ -2008,6 +2107,7 @@ begin
     DrawDesignBorder(DesignBorderColor or TAlphaColorRec.Alpha, DesignBorderColor);
 end;
 
+{**********************************************************}
 function TALVertScrollBox.GetDefaultStyleLookupName: string;
 begin
   Result := 'scrollboxstyle';
@@ -2015,6 +2115,7 @@ end;
 
 { THorzScrollBox }
 
+{****************************************************}
 function TALHorzScrollBox.DoCalcContentBounds: TRectF;
 begin
   if (FContent <> nil) and (ContentLayout <> nil) then
@@ -2024,18 +2125,20 @@ begin
     Result.Height := ContentLayout.Height;
 end;
 
+{************************************************************************************************}
 procedure TALHorzScrollBox.DoUpdateAniCalculations(const AAniCalculations: TALScrollCalculations);
 begin
   inherited DoUpdateAniCalculations(AAniCalculations);
   AAniCalculations.TouchTracking := AAniCalculations.TouchTracking - [ttVertical];
 end;
 
-
+{**********************************************************}
 function TALHorzScrollBox.GetDefaultStyleLookupName: string;
 begin
   Result := 'scrollboxstyle';
 end;
 
+{*******************************}
 procedure TALHorzScrollBox.Paint;
 begin
   inherited;

@@ -7,6 +7,7 @@ interface
 uses System.Classes,
      System.UITypes,
      System.Types,
+     System.Messaging,
      FMX.Types,
      FMX.Controls,
      FMX.Ani,
@@ -100,6 +101,11 @@ type
     FOnViewportPositionChange: TALTabPositionChangeEvent;
     FAniTransition: TFloatAnimation;
     fOnAniTransitionInit: TALAniTransitionInit;
+    fMouseDownPos: single;
+    FDeadZoneBeforeAcquireScrolling: Integer;
+    fScrollingAcquiredByMe: boolean;
+    fScrollingAcquiredByOtherMessageID: integer;
+    procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetTabIndex(const Value: Integer);
     function GetActiveTab: TALTabItem;
     procedure SetActiveTab(const Value: TALTabItem);
@@ -150,6 +156,7 @@ type
     property Tabs[AIndex: Integer]: TALTabItem read GetTabItem;
     property AniCalculations: TALAniCalculations read FAniCalculations;
     property AniTransition: TFloatAnimation read FAniTransition;
+    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default ALDefaultDeadZoneBeforeAcquireScrolling;
   published
     property Align;
     property Anchors;
@@ -375,6 +382,10 @@ begin
   FRealigningTabs := False;
   AutoCapture := True;
   SetAcceptsControls(True);
+  FDeadZoneBeforeAcquireScrolling := ALDefaultDeadZoneBeforeAcquireScrolling;
+  fMouseDownPos := 0;
+  fScrollingAcquiredByMe := False;
+  fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
   //-----
   FAniCalculations := TALTabControlAniCalculations.Create(Self);
   FAniCalculations.Animation := true; // Specifies whether to customize inertial scrolling by taking into account the DecelerationRate property when calculating parameters of inertial scrolling.
@@ -402,6 +413,7 @@ end;
 {*******************************}
 destructor TALTabControl.Destroy;
 begin
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
   FAniCalculations.DisposeOf;
   FAniCalculations := nil;
   FAniTransition.DisposeOf;
@@ -605,6 +617,19 @@ begin
     FOnChange(Self);
 end;
 
+{************************************************************************************************}
+procedure TALTabControl.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+begin
+  //the scrolling was acquired by another control (like a scrollbox for exemple)
+  if Sender <> self then begin
+    fAniCalculations.MouseLeave;
+    fAniCalculations.animation := False;
+    fAniCalculations.animation := true;
+    FMouseEvents := False;
+    fGestureEvents := False;
+  end;
+end;
+
 {******************************************************************}
 procedure TALTabControl.CMGesture(var EventInfo: TGestureEventInfo);
 var LP: TPointF;
@@ -619,13 +644,23 @@ begin
   if (not FMouseEvents) and (EventInfo.GestureID = igiPan) then begin
     LP := AbsoluteToLocal(EventInfo.Location);
     if TInteractiveGestureFlag.gfBegin in EventInfo.Flags then begin
+      fScrollingAcquiredByMe := False;
+      fMouseDownPos := LP.X;
       fGestureEvents := true;
       FAniCalculations.averaging := true;
       AniCalculations.MouseDown(LP.X, LP.Y)
     end
     else if fGestureEvents and
-            (EventInfo.Flags = []) then AniCalculations.MouseMove(LP.X, LP.Y)
-    else if TInteractiveGestureFlag.gfEnd in EventInfo.Flags then begin
+            (EventInfo.Flags = []) then begin
+      if (not fScrollingAcquiredByMe) and
+         (abs(fMouseDownPos - LP.X) > fDeadZoneBeforeAcquireScrolling) then begin
+        fScrollingAcquiredByMe := True;
+        TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create, True);
+      end;
+      AniCalculations.MouseMove(LP.X, LP.Y)
+    end
+    else if fGestureEvents and
+            (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then begin
       AniCalculations.MouseUp(LP.X, LP.Y);
       fGestureEvents := False;
     end;
@@ -643,6 +678,8 @@ begin
   FMouseEvents := not fGestureEvents;
   inherited;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
+    fScrollingAcquiredByMe := False;
+    fMouseDownPos := x;
     FAniCalculations.averaging := ssTouch in Shift;
     AniCalculations.MouseDown(X, Y);
   end;
@@ -652,8 +689,14 @@ end;
 procedure TALTabControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  if FMouseEvents then
+  if FMouseEvents then begin
+    if (not fScrollingAcquiredByMe) and
+       (abs(fMouseDownPos - x) > fDeadZoneBeforeAcquireScrolling) then begin
+      fScrollingAcquiredByMe := True;
+      TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create, True);
+    end;
     AniCalculations.MouseMove(X, Y);
+  end;
 end;
 
 {**************************************************************************************}

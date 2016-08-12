@@ -194,7 +194,7 @@ begin
       //  ...
       //end;
       //
-      {$IF CompilerVersion <> 31}
+      {$IF CompilerVersion > 31}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still not copying the bitmap data in the TTexture if TCanvasStyle.NeedGPUSurface and adjust the IFDEF'}
       {$ENDIF}
       if (TCanvasStyle.NeedGPUSurface in aBitmap.CanvasClass.GetCanvasStyle) then begin

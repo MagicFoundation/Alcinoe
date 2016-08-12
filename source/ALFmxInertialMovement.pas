@@ -33,6 +33,7 @@ const
   ALDefaultMinVelocity = 10;
   ALDefaultMaxVelocity = 5000;
   ALDefaultDeadZone = 8;
+  ALDefaultDeadZoneBeforeAcquireScrolling = 16;
 
 type
 

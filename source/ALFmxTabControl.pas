@@ -96,8 +96,6 @@ type
     FRealigningTabs: Boolean;
     FOnChange: TNotifyEvent;
     FAniCalculations: TALAniCalculations;
-    FOnAniStart: TNotifyEvent;
-    FOnAniStop: TNotifyEvent;
     fLastViewportPosition: TpointF;
     FOnViewportPositionChange: TALTabPositionChangeEvent;
     FAniTransition: TFloatAnimation;
@@ -106,7 +104,6 @@ type
     function GetActiveTab: TALTabItem;
     procedure SetActiveTab(const Value: TALTabItem);
     procedure AniTransitionProcess(Sender: TObject);
-    procedure AniTransitionFinish(Sender: TObject);
     { IItemContainer }
     function GetItemsCount: Integer;
     function GetItem(const AIndex: Integer): TFmxObject;
@@ -114,6 +111,7 @@ type
   protected
     procedure Paint; override;
     function GetTabItem(AIndex: Integer): TALTabItem;
+    procedure Loaded; override;
     procedure RealignTabs; virtual;
     procedure ChangeChildren; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
@@ -126,6 +124,7 @@ type
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure DoMouseLeave; override;
+    procedure HandleSizeChanged; override;
     property ClipChildren default True;
     property Padding;
     property AutoCapture;
@@ -190,8 +189,6 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    property OnAniStart: TNotifyEvent read fOnAniStart write fOnAniStart;
-    property OnAniStop: TNotifyEvent read fOnAniStop write fOnAniStop;
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
     property OnAniTransitionInit: TALAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
   end;
@@ -272,6 +269,7 @@ type
     [Weak] FTabControl: TALTabControl;
   protected
     procedure DoStart; override;
+    procedure DoStop; override;
     procedure DoChanged; override;
   public
     constructor Create(AOwner: TPersistent); override;
@@ -291,8 +289,9 @@ end;
 {***********************************************}
 procedure TALTabControlAniCalculations.DoChanged;
 begin
-  inherited;
-  if (FTabControl.FAniTransition.Running) or  // if this event was called from AniTransitionProcess then exit
+  inherited DoChanged;
+  if (csDestroying in FTabControl.ComponentState) or
+     (FTabControl.FAniTransition.Running) or  // if this event was called from AniTransitionProcess then exit
      (not FTabControl.HasActiveTab) then exit; // if their is no activetab then nothing to do then exit
   FTabControl.activeTab.Position.X := FTabControl.activeTab.ViewPortOffset - ViewportPosition.x;
   FTabControl.AniTransitionProcess(nil); // will realign all the tab around activeTab (and update also activetab if neccessary) and fire OnViewportPositionChange
@@ -301,9 +300,13 @@ end;
 {*********************************************}
 procedure TALTabControlAniCalculations.DoStart;
 begin
-  inherited;
-  if assigned(FTabControl.fOnAniStart) then
-    FTabControl.fOnAniStart(FTabControl);
+  inherited DoStart;
+end;
+
+{********************************************}
+procedure TALTabControlAniCalculations.DoStop;
+begin
+  inherited DoStop;
 end;
 
 {*************************************************************}
@@ -355,7 +358,6 @@ begin
   //-----
   FAniTransition := TFloatAnimation.Create(Self);
   FAniTransition.OnProcess := AniTransitionProcess;
-  FAniTransition.OnFinish := AniTransitionFinish;
   FAniTransition.PropertyName := 'Position.X';
   FAniTransition.StartFromCurrent := True;
   FAniTransition.StopValue := 0;
@@ -388,8 +390,6 @@ begin
                                                         // so if you make a big number here, then it's something like if you press the screen without moving for few second, and suddenly
                                                         // move fastly then the velocity will be taken with the time when you move slowly (so a slow velocity)
                                                         // on the other side if to slow then only one point (or even 0) will be keep and their will be no amims at all
-  FOnAniStart := nil;
-  FOnAniStop := nil;
   FOnViewportPositionChange := nil;
   fLastViewportPosition := TpointF.Create(0,0);
   //-----
@@ -493,9 +493,29 @@ end;
 procedure TALTabControl.SetBounds(X, Y, AWidth, AHeight: Single);
 var aNeedRealignTabs: Boolean;
 begin
+  //this procedure will be call during the oncreate (for exemple) but strangely call to setbounds
+  //will not fire the HandleSizeChanged (but it's call resize if not during loading) !!
   aNeedRealignTabs := not (SameValue(AWidth, Width, TEpsilon.Position) and SameValue(AHeight, Height, TEpsilon.Position));
   inherited SetBounds(X, Y, AWidth, AHeight);
   if aNeedRealignTabs then RealignTabs;
+end;
+
+{****************************************}
+procedure TALTabControl.HandleSizeChanged;
+begin
+  //this will be call during the loading of the control (for exemple)
+  //but not a problem because at this moment the tabcontrol don't have (yet)
+  //any tabitem so RealignTabs will be a noops operation
+  //after this will be called each time the size of the control will be updated
+  inherited;
+  RealignTabs;
+end;
+
+{*****************************}
+procedure TALTabControl.Loaded;
+begin
+  inherited;
+  RealignTabs;
 end;
 
 {**********************************************}
@@ -666,7 +686,7 @@ begin
 
   //we do not need to realign tab during transition because transition
   //process is already aligning all tabs
-  if FRealigningTabs then exit;
+  if FRealigningTabs or (csloading in ComponentState) then exit;
 
   //this to permit Tabitem to resize (else tabitem are forbiden to resize)
   FRealigningTabs := True;
@@ -794,13 +814,6 @@ begin
     FOnViewportPositionChange(self, fLastViewportPosition, aNewViewportPosition);
   fLastViewportPosition := aNewViewportPosition;
 
-end;
-
-{***********************************************************}
-procedure TALTabControl.AniTransitionFinish(Sender: TObject);
-begin
-  if assigned(fOnAniStop) then
-    fOnAniStop(self);
 end;
 
 {***********************************************************************}

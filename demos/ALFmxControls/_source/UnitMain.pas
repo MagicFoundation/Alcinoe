@@ -7,7 +7,8 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
-  FMX.ImgList, alFmxImgList, ALFmxStdCtrls;
+  FMX.ImgList, alFmxImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
+  FMX.ScrollBox, FMX.Memo;
 
 type
 
@@ -129,7 +130,7 @@ type
     Button1: TButton;
     Button2: TButton;
     Button15: TButton;
-    ALVertScrollBox1: TVertScrollBox;
+    ALVertScrollBox1: TALVertScrollBox;
     Button4: TButton;
     Text1: TText;
     Button5: TButton;
@@ -156,6 +157,26 @@ type
     Text9: TText;
     Button21: TButton;
     Button22: TButton;
+    Button12: TButton;
+    Button19: TButton;
+    ALTabControl1: TALTabControl;
+    ALTabItem1: TALTabItem;
+    Image1: TImage;
+    ALTabItem2: TALTabItem;
+    Image2: TImage;
+    ALText1: TALText;
+    ALText2: TALText;
+    ALTabItem3: TALTabItem;
+    Image3: TImage;
+    ALTabItem4: TALTabItem;
+    Image4: TImage;
+    ALText3: TALText;
+    ALText4: TALText;
+    ALText5: TALText;
+    ALText6: TALText;
+    ALText7: TALText;
+    ALText8: TALText;
+    ALRectangle9: TALRectangle;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -176,6 +197,15 @@ type
     procedure Button20Click(Sender: TObject);
     procedure Button22Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
+    procedure TabItem1Click(Sender: TObject);
+    procedure Button12Click(Sender: TObject);
+    procedure Button19Click(Sender: TObject);
+    procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
+    procedure ALTabControl1AniTransitionInit(const sender: TObject;
+                                             const aVelocity: Double; var aDuration: Single;
+                                             var aAnimationType: TAnimationType;
+                                             var aInterpolation: TInterpolationType);
+    procedure ALTabControl1Resize(Sender: TObject);
   private
     fALRangeTrackBar: TALRangeTrackBarStopWatch;
     fALcheckbox2: TALcheckboxStopWatch;
@@ -204,10 +234,58 @@ implementation
 
 uses system.Diagnostics,
      system.threading,
+     system.Math,
      UnitDemo,
+     ALFmxInertialMovement,
      ALCommon;
 
 {$R *.fmx}
+
+procedure TForm1.ALTabControl1AniTransitionInit(const sender: TObject;
+                                                const aVelocity: Double;
+                                                var aDuration: Single;
+                                                var aAnimationType: TAnimationType;
+                                                var aInterpolation: TInterpolationType);
+begin
+  // aVelocity = pixels per seconds given by the anicalculations
+  // ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) = the number of pixel we need to scroll
+  // 6 = factor i choose to compensate the deceleration made by the quartic Interpolation
+  if comparevalue(aVelocity, 0) <> 0 then aDuration := abs(ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) / abs(aVelocity)) * 6
+  else aDuration := 0.8;
+  if aDuration > 0.8 then aDuration := 0.8
+  else if aDuration < 0.1 then aDuration := 0.1;
+  aAnimationType := TAnimationType.out;
+  aInterpolation := TInterpolationType.circular;
+end;
+
+procedure TForm1.ALTabControl1Resize(Sender: TObject);
+
+  procedure _updateLabels(const aTab: TalTabItem);
+  var aText1, aText2: TalText;
+      aControl1: Tcontrol;
+  begin
+    aText1 := nil;
+    aText2 := nil;
+    for aControl1 in aTab.Controls do begin
+      if (aControl1 is TalText) and (aControl1.Tag = 1) then aText1 := TalText(aControl1)
+      else if (aControl1 is TalText) and (aControl1.Tag = 2) then aText2 := TalText(aControl1);
+    end;
+    if aText1 <> nil then
+      aText1.Position.X := ((aTab.Width - aText1.Width) / 2) + (aTab.Position.X / 5);
+    if aText2 <> nil then
+      aText2.Position.X := ((aTab.Width - aText2.Width) / 2) + (aTab.Position.X);
+  end;
+
+begin
+  if ALTabControl1.TabIndex > 0 then _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex - 1]);
+  _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex]);
+  if ALTabControl1.TabIndex < ALTabControl1.Tabcount - 1 then _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex + 1]);
+end;
+
+procedure TForm1.ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
+begin
+  ALTabControl1Resize(nil);
+end;
 
 procedure TForm1.Button10Click(Sender: TObject);
 begin
@@ -229,6 +307,11 @@ begin
                         'Paint: ' + FormatFloat('0.#####',fALGlyph.bufPaintMs) + ' ms';
         end);
     end).Start;
+end;
+
+procedure TForm1.Button12Click(Sender: TObject);
+begin
+  ALTabControl1.Next;
 end;
 
 procedure TForm1.Button13Click(Sender: TObject);
@@ -289,6 +372,11 @@ procedure TForm1.Button18Click(Sender: TObject);
 begin
   fcheckbox2.Repaint;
   Text3.Text := 'Paint: ' + FormatFloat('0.#####',fcheckbox2.PaintMs) + ' ms';
+end;
+
+procedure TForm1.Button19Click(Sender: TObject);
+begin
+  ALTabControl1.Previous;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -721,7 +809,7 @@ begin
   fALText.Margins.Top := 8;
   fALText.Position.Y := button15.Position.Y - button15.Margins.Top;
   fALText.Size.Height := 80;
-  fALText.Text := 'TALText Random ? ? ? ? ? ? ? ? ? ? ? azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
+  fALText.Text := 'TALText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
                   ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
   //-----
   fText := TTextStopWatch.Create(self);
@@ -732,7 +820,7 @@ begin
   fText.Margins.Top := 8;
   fText.Position.Y := button15.Position.Y - button15.Margins.Top;
   fText.Size.Height := 80;
-  fText.Text := 'TText Random ? ? ? ? ? ? ? ? ? ? ? azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
+  fText.Text := 'TText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
                 ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
 
   //-----
@@ -816,6 +904,11 @@ begin
   //-----
   ALFmxMakeBufBitmaps(ALVertScrollBox1);
   endupdate;
+end;
+
+procedure TForm1.TabItem1Click(Sender: TObject);
+begin
+
 end;
 
 { TALTextStopWatch }

@@ -32,6 +32,12 @@ IF ERRORLEVEL 1 pause
 mkdir source\dcu\Win32\seattle
 IF ERRORLEVEL 1 pause
 
+rmdir /s /q source\hpp\Win32\seattle
+IF ERRORLEVEL 1 pause
+
+mkdir source\hpp\Win32\seattle
+IF ERRORLEVEL 1 pause
+
 rmdir /s /q lib\alcinoe\Win32\seattle
 IF ERRORLEVEL 1 pause
 

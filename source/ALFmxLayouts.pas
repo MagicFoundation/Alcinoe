@@ -163,7 +163,7 @@ type
     procedure AniMouseDown(const Touch: Boolean; const X, Y: Single); virtual;
     procedure AniMouseMove(const Touch: Boolean; const X, Y: Single); virtual;
     procedure AniMouseUp(const Touch: Boolean; const X, Y: Single); virtual;
-    //Animation mouse events
+    //-----
     function GetScrollingBehaviours: TScrollingBehaviours;
     procedure Loaded; override;
     procedure PaddingChanged; override;
@@ -225,6 +225,7 @@ type
     property ContentBounds: TRectF read GetContentBounds;
     procedure InvalidateContentSize;
     procedure RealignContent;
+    //-----
     property AutoHide: Boolean read FAutoHide write SetAutoHide default True;
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
@@ -1742,6 +1743,17 @@ begin
   end;
 end;
 
+{*****************************************************************************************************}
+procedure TALCustomScrollBox.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+begin
+  //the scrolling was acquired by another control (like a scrollbox for exemple)
+  if Sender <> self then begin
+    fAniCalculations.MouseLeave;
+    fAniCalculations.animation := False;
+    fAniCalculations.animation := true;
+  end;
+end;
+
 {**********************************************************************************}
 procedure TALCustomScrollBox.AniMouseDown(const Touch: Boolean; const X, Y: Single);
 begin
@@ -1990,17 +2002,6 @@ begin
     Result := ContentLayout.Width
   else
     Result := Width;
-end;
-
-{*****************************************************************************************************}
-procedure TALCustomScrollBox.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
-begin
-  //the scrolling was acquired by another control (like a scrollbox for exemple)
-  if Sender <> self then begin
-    fAniCalculations.MouseLeave;
-    fAniCalculations.animation := False;
-    fAniCalculations.animation := true;
-  end;
 end;
 
 {***********************************************************************}

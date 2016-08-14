@@ -41,6 +41,7 @@ type
     procedure SetSelectedInternal(const Value: Boolean);
   protected
     procedure ParentChanged; override;
+    procedure DoRealign; override;
     property Align;
     property RotationAngle;
     property RotationCenter;
@@ -266,6 +267,17 @@ procedure TALTabItem.ParentChanged;
 begin
   inherited ParentChanged;
   FTabControl := FindTabControl;
+end;
+
+{*****************************}
+procedure TALTabItem.DoRealign;
+begin
+  // The loaded will be first called by children and then after by parents,
+  // this mean that loaded (and realign that go with it) will be first called by TabItem (with a default
+  // size of 50x50) and then later called also at the parent level. so better to
+  // avoid the realign at this step
+  if (FTabControl = nil) or (not (csloading in FTabControl.ComponentState)) then
+    inherited DoRealign;
 end;
 
 {**}

@@ -2712,11 +2712,6 @@ end;
 {***********************}
 procedure TALText.Loaded;
 begin
-  inherited;
-  UpdateDefaultTextSettings; // << at this step TextSettings was already updated with new value
-                             // << and fontchanged was alread called (with csloading in compomentState) and now fTextSettings.IsAdjustChanged = false
-                             // << so this will (maybe) call FontChanged but nothing will be done inside FontChanged
-                             // << except calling repaint
   //-----
   if (AutoTranslate) and
      (Text <> '') and
@@ -2727,6 +2722,12 @@ begin
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
       TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
+  //-----
+  inherited;
+  UpdateDefaultTextSettings; // << at this step TextSettings was already updated with new value
+                             // << and fontchanged was alread called (with csloading in compomentState) and now fTextSettings.IsAdjustChanged = false
+                             // << so this will (maybe) call FontChanged but nothing will be done inside FontChanged
+                             // << except calling repaint
   //-----
   if fRestoreLayoutUpdateAfterLoaded then begin
     if (FAutoSize) and

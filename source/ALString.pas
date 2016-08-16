@@ -547,7 +547,7 @@ function  AlInt2BaseN(NumIn: UInt64; const charset: array of ansiChar): ansistri
 function  AlBaseN2Int(const Str: ansiString; const charset: array of ansiChar): UInt64;
 var       ALBase64EncodeString: function(const S: AnsiString): AnsiString;
 var       ALBase64DecodeString: function(const S: AnsiString): AnsiString;
-function  ALIsDecimal(const S: AnsiString; const IgnorePlusMinusSign: boolean = False): boolean;
+function  ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 Function  ALIsInt64 (const S: AnsiString): Boolean;
 Function  ALIsInteger (const S: AnsiString): Boolean;
 Function  ALIsSmallInt (const S: AnsiString): Boolean;
@@ -6754,12 +6754,12 @@ begin
 end;
 
 {*********************************************************************************************}
-function ALIsDecimal(const S: AnsiString; const IgnorePlusMinusSign: boolean = False): boolean;
+function ALIsDecimal(const S: AnsiString; const RejectPlusMinusSign: boolean = False): boolean;
 var i: integer;
 begin
   result := true;
   for i := low(s) to high(S) do begin
-    if (not IgnorePlusMinusSign) and (i=low(s)) then begin
+    if (not RejectPlusMinusSign) and (i=low(s)) then begin
       if not (S[i] in ['0'..'9','-','+']) then begin
         result := false;
         break;

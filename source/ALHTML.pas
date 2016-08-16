@@ -1230,6 +1230,13 @@ begin
         Ch4 := #0;
         Ch5 := #0;
       end
+      else if (CurrPos <= Ln - 1) then begin
+        Ch1 := Str[CurrPos + 1];
+        Ch2 := #0;
+        Ch3 := #0;
+        Ch4 := #0;
+        Ch5 := #0;
+      end
       else begin
         Ch1 := #0;
         Ch2 := #0;
@@ -1283,7 +1290,7 @@ begin
               (ch5 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyUnicodeCharToResult
 
       // delete the \
-      else _CopyAnsiCharToResult(ord(ch1), CurrPos + 2)
+      else if CurrPos <= Ln - 1 then _CopyAnsiCharToResult(Ord(ch1), CurrPos + 2)
 
     end
     else _CopyCurrPosCharToResult;
@@ -1578,6 +1585,13 @@ begin
         Ch4 := #0;
         Ch5 := #0;
       end
+      else if (CurrPos <= Ln - 1) then begin
+        Ch1 := Str[CurrPos + 1];
+        Ch2 := #0;
+        Ch3 := #0;
+        Ch4 := #0;
+        Ch5 := #0;
+      end
       else begin
         Ch1 := #0;
         Ch2 := #0;
@@ -1631,7 +1645,7 @@ begin
               (ch5 in ['A'..'F', 'a'..'f', '0'..'9']) then _CopyUnicodeCharToResult
 
       // delete the \
-      else _CopyCharToResult(ord(Ch1), CurrPos + 2)
+      else if CurrPos <= Ln - 1 then _CopyCharToResult(Ord(ch1), CurrPos + 2)
 
     end
     else _CopyCurrPosCharToResult;

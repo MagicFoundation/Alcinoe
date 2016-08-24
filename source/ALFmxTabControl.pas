@@ -25,11 +25,11 @@ type
 
   {*************************************************************************************************************************}
   TALTabPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
-  TALAniTransitionInit = procedure(const sender: TObject;
-                                   const aVelocity: Double;
-                                   var aDuration: Single;
-                                   var aAnimationType: TAnimationType;
-                                   var aInterpolation: TInterpolationType) of object;
+  TALTabAniTransitionInit = procedure(const sender: TObject;
+                                      const aVelocity: Double;
+                                      var aDuration: Single;
+                                      var aAnimationType: TAnimationType;
+                                      var aInterpolation: TInterpolationType) of object;
 
   {**************************}
   TALTabItem = class(TControl)
@@ -101,7 +101,7 @@ type
     fLastViewportPosition: TpointF;
     FOnViewportPositionChange: TALTabPositionChangeEvent;
     FAniTransition: TFloatAnimation;
-    fOnAniTransitionInit: TALAniTransitionInit;
+    fOnAniTransitionInit: TALTabAniTransitionInit;
     fMouseDownPos: single;
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
@@ -197,7 +197,7 @@ type
     property OnPaint;
     property OnResize;
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property OnAniTransitionInit: TALAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
+    property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
   end;
 
 procedure Register;
@@ -619,8 +619,10 @@ begin
   //the scrolling was acquired by another control (like a scrollbox for exemple)
   if Sender <> self then begin
     fAniCalculations.MouseLeave;
-    fAniCalculations.animation := False;
-    fAniCalculations.animation := true;
+    if fAniCalculations.animation then begin
+      fAniCalculations.animation := False;
+      fAniCalculations.animation := true;
+    end;
     FMouseEvents := False;
     fGestureEvents := False;
   end;

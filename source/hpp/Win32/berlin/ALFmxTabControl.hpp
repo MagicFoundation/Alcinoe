@@ -37,7 +37,7 @@ enum class DECLSPEC_DENUM TALTabTransition : unsigned char { None, Slide };
 
 typedef void __fastcall (__closure *TALTabPositionChangeEvent)(System::TObject* Sender, const System::Types::TPointF &OldViewportPosition, const System::Types::TPointF &NewViewportPosition);
 
-typedef void __fastcall (__closure *TALAniTransitionInit)(System::TObject* const sender, const double aVelocity, float &aDuration, Fmx::Types::TAnimationType &aAnimationType, Fmx::Types::TInterpolationType &aInterpolation);
+typedef void __fastcall (__closure *TALTabAniTransitionInit)(System::TObject* const sender, const double aVelocity, float &aDuration, Fmx::Types::TAnimationType &aAnimationType, Fmx::Types::TInterpolationType &aInterpolation);
 
 class PASCALIMPLEMENTATION TALTabItem : public Fmx::Controls::TControl
 {
@@ -52,6 +52,7 @@ private:
 	
 protected:
 	virtual void __fastcall ParentChanged(void);
+	virtual void __fastcall DoRealign(void);
 	__property Align = {default=0};
 	__property RotationAngle = {default=0};
 	__property RotationCenter;
@@ -122,7 +123,7 @@ private:
 	System::Types::TPointF fLastViewportPosition;
 	TALTabPositionChangeEvent FOnViewportPositionChange;
 	Fmx::Ani::TFloatAnimation* FAniTransition;
-	TALAniTransitionInit fOnAniTransitionInit;
+	TALTabAniTransitionInit fOnAniTransitionInit;
 	float fMouseDownPos;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
@@ -217,7 +218,7 @@ __published:
 	__property OnPaint;
 	__property OnResize;
 	__property TALTabPositionChangeEvent OnViewportPositionChange = {read=FOnViewportPositionChange, write=FOnViewportPositionChange};
-	__property TALAniTransitionInit OnAniTransitionInit = {read=fOnAniTransitionInit, write=fOnAniTransitionInit};
+	__property TALTabAniTransitionInit OnAniTransitionInit = {read=fOnAniTransitionInit, write=fOnAniTransitionInit};
 private:
 	void *__IItemsContainer;	// Fmx::Types::IItemsContainer 
 	

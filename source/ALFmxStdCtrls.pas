@@ -9,165 +9,401 @@ uses System.Classes,
      {$ENDIF}
      System.UITypes,
      System.ImageList,
+     System.Math,
+     System.Rtti,
+     System.Messaging,
+     FMX.types,
+     FMX.stdActns,
      FMX.Controls,
      FMX.Graphics,
      FMX.StdCtrls,
      FMX.actnlist,
-     FMX.ImgList;
+     FMX.ImgList,
+     ALFmxInertialMovement,
+     ALFmxImgList,
+     ALFmxObjects;
 
 type
 
-  //TTrackBar
-  //  TLayout
-  //    TStyleObject (ftrack - horizontal)
-  //      TStyleObject (fTrackHighlight)
-  //        TRectangle
-  //    TStyleObject (ftrack - vertical)
-  //      TStyleObject (fTrackHighlight)
-  //        TRectangle
-  //    TThumb
-  //      TbuttonStyleObject
+  {~~~~~~~~~~~~~~~~~~~~~}
+  TALCustomTrack = class;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMinThumbTrackBar = class;
-  TALMaxThumbTrackBar = class;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTrackThumbGlyph = class(TALGlyph)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Align default TalignLayout.Client;
+    property autohide default true;
+    property Locked default True;
+  end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBGTrackBar = Class(TTrackBar)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTrackThumb = class(TALRectangle)
   private
-    [weak] fMinThumbTrackBar: TALMinThumbTrackBar;
-    [weak] fMaxThumbTrackBar: TALMaxThumbTrackBar;
+    [Weak] fValueRange: TValueRange;
+    [Weak] FTrack: TALCustomTrack;
+    [Weak] FGlyph: TALTrackThumbGlyph;
+    FDownOffset: TPointF;
+    FPressed: Boolean;
+    FDeadZoneBeforeAcquireScrolling: Integer;
+    fScrollingAcquiredByMe: boolean;
+    fScrollingAcquiredByOtherMessageID: integer;
+    procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+    function PointToValue(X, Y: Single): Single;
+  public
+    constructor Create(const ATrack: TALCustomTrack; const aValueRange: TValueRange; const aWithGlyphObj: boolean); reintroduce;
+    destructor Destroy; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    function GetDefaultTouchTargetExpansion: TRectF; override;
+    property IsPressed: Boolean read FPressed;
+    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 5;
+  published
+    property TouchTargetExpansion;
+    property Locked default True;
+    property Position stored false;
+    property Size stored false;
+    property Glyph: TALTrackThumbGlyph read FGlyph;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTrackBackground = class(TALRectangle)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Locked default True;
+    property HitTest default false;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTrackHighlight = class(TALRectangle)
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    property Locked default True;
+    property Position stored false;
+    property HitTest default false;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCustomTrack = class(TControl, IValueRange)
+  private
+    FValueRange: TValueRange;
+    FDefaultValueRange: TBaseValueRange;
+    function GetIsTracking: Boolean;
+    function GetValueRange: TCustomValueRange;
+    procedure SetValueRange(const AValue: TCustomValueRange);
+    procedure SetValueRange_(const Value: TValueRange);
+    function FrequencyStored: Boolean;
+    function MaxStored: Boolean;
+    function MinStored: Boolean;
+    procedure SetThumbSize(const Value: Single);
+    function ThumbSizeStored: Boolean;
+    function ViewportSizeStored: Boolean;
   protected
-    procedure Resize; override;
-    procedure ApplyStyle; override;
+    FOnChange: TNotifyEvent;
+    FOnTracking: TNotifyEvent;
+    FIgnoreViewportSize: Boolean;
+    FOrientation: TOrientation;
+    FTracking: Boolean;
+    FThumbSize: Single;
+    FMinThumbSize: Single;
+    [Weak] FThumb: TALTrackThumb;
+    [Weak] FBackGround: TALTrackBackground;
+    [Weak] FHighlight: TALTrackHighlight;
+    procedure SetViewportSize(const Value: Single); virtual;
+    function GetViewportSize: Single; virtual;
+    function GetFrequency: Single; virtual;
+    procedure SetFrequency(const Value: Single); virtual;
+    function GetMax: Single; virtual;
+    procedure SetMax(const Value: Single); virtual;
+    function GetMin: Single; virtual;
+    procedure SetMin(const Value: Single); virtual;
+    function GetValue: Single; virtual;
+    procedure SetValue(Value: Single); virtual;
+    function ValueStored: Boolean; virtual;
+    function GetData: TValue; override;
+    procedure SetData(const Value: TValue); override;
+    procedure SetOrientation(const Value: TOrientation); virtual;
+    function GetThumbRect(const Value: single; const aThumb: TALTrackThumb): TRectF; overload; virtual;
+    procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+    function GetDefaultTouchTargetExpansion: TRectF; override;
+    function GetThumbSize(var IgnoreViewportSize: Boolean): Integer; virtual;
     procedure DoRealign; override;
-    procedure UpdateHighlight;
+    property IsTracking: Boolean read GetIsTracking;
+    procedure Loaded; override;
+    procedure DoChanged; virtual;
+    procedure DoTracking; virtual;
+    function CreateValueRangeTrack : TValueRange; virtual;
+    property DefaultValueRange: TBaseValueRange read FDefaultValueRange;
+    property ValueRange: TValueRange read FValueRange write SetValueRange_ stored ValueStored;
+    property Value: Single read GetValue write SetValue stored ValueStored nodefault;
+    property Thumb: TALTrackThumb read FThumb;
+    procedure UpdateHighlight; virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure AfterConstruction; override;
+    property Min: Single read GetMin write SetMin stored MinStored nodefault;
+    property Max: Single read GetMax write SetMax stored MaxStored nodefault;
+    property Frequency: Single read GetFrequency write SetFrequency stored FrequencyStored nodefault;
+    property ViewportSize: Single read GetViewportSize write SetViewportSize stored ViewportSizeStored nodefault;
+    property Orientation: TOrientation read FOrientation write SetOrientation;
+    property Tracking: Boolean read FTracking write FTracking default True;
+    property ThumbSize: Single read fThumbSize write SetThumbSize Stored ThumbSizeStored; // << 0 mean the thumb will have the height of the track in horizontal or width of the track in vertical
+    property BackGround: TALTrackBackground read FBackGround;
+    property Highlight: TALTrackHighlight read FHighlight;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnTracking: TNotifyEvent read FOnTracking write FOnTracking;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMinThumbTrackBar = Class(TTrackBar)
-  private
-    [weak] fBGTrackBar: TALBGTrackBar;
-    [weak] fMaxThumbTrackBar: TALMaxThumbTrackBar;
-    procedure OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-    procedure OnThumbMouseLeave(Sender: TObject);
-    procedure OnThumbMouseEnter(Sender: TObject);
-    procedure onThumbApplyStyleLookup(Sender: TObject);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTrackBar = class(TALCustomTrack)
   protected
-    procedure Resize; override;
-    procedure ApplyStyle; override;
-    procedure DoChanged; override;
-    procedure DoTracking; override;
+    function GetDefaultSize: TSizeF; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property ValueRange;
+  published
+    property ThumbSize;
+    property Thumb;
+    property BackGround;
+    property Highlight;
+    property Align;
+    property Anchors;
+    property CanFocus default True;
+    property CanParentFocus;
+    property ClipChildren;
+    property ClipParent;
+    property Cursor;
+    property DisableFocusEffect;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Frequency;
+    property Locked;
+    property Height;
+    property Hint;
+    property HitTest;
+    property Padding;
+    property Min;
+    property Max;
+    property Orientation;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TabOrder;
+    property TabStop;
+    property TouchTargetExpansion;
+    property Tracking;
+    property Value;
+    property Visible;
+    property Width;
+    property ParentShowHint;
+    property ShowHint;
+    {events}
+    property OnChange;
+    property OnTracking;
+    {Drag and Drop events}
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    {Keyboard events}
+    property OnKeyDown;
+    property OnKeyUp;
+    {Mouse events}
+    property OnCanFocus;
+    property OnClick;
+    property OnDblClick;
+    //-----
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    //-----
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMaxThumbTrackBar = Class(TTrackBar)
-  private
-    [weak] fBGTrackBar: TALBGTrackBar;
-    [weak] fMinThumbTrackBar: TALMinThumbTrackBar;
-    procedure OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-    procedure OnThumbMouseLeave(Sender: TObject);
-    procedure OnThumbMouseEnter(Sender: TObject);
-    procedure onThumbApplyStyleLookup(Sender: TObject);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALScrollBar = class(TALCustomTrack)
   protected
-    procedure Resize; override;
-    procedure ApplyStyle; override;
-    procedure DoChanged; override;
-    procedure DoTracking; override;
+    function GetDefaultSize: TSizeF; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property ValueRange;
+  published
+    property Thumb;
+    property BackGround;
+    property Align;
+    property Anchors;
+    property CanFocus default False;
+    property CanParentFocus;
+    property ClipChildren;
+    property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Locked;
+    property Height;
+    property HitTest;
+    property Padding;
+    property Min;
+    property Max;
+    property Orientation;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TabOrder;
+    property TabStop;
+    property TouchTargetExpansion;
+    property Value;
+    property Visible;
+    property Width;
+    property ViewportSize;
+    {events}
+    property OnChange;
+    {Drag and Drop events}
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    {Keyboard events}
+    property OnKeyDown;
+    property OnKeyUp;
+    {Mouse events}
+    property OnCanFocus;
+    property OnClick;
+    property OnDblClick;
+    //-----
+    property OnEnter;
+    property OnExit;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    //-----
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALRangeTrackBar = class(TControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALRangeTrackBar = class(TALCustomTrack)
   private
-    fBGTrackBar: TALBGTrackBar;
-    fMinThumbTrackBar: TALMinThumbTrackBar;
-    fMaxThumbTrackBar: TALMaxThumbTrackBar;
-    procedure SetMax(const Value: Single);
-    procedure SetMin(const Value: Single);
-    function GetMax: Single;
-    function GetMin: Single;
-    function GetFrequency: Single;
-    function GetMaxValue: Single;
-    function GetMinValue: Single;
-    function GetOrientation: TOrientation;
-    function GetSmallChange: Single;
-    procedure SetFrequency(const Value: Single);
-    procedure SetMaxValue(const Value: Single);
-    procedure SetMinValue(const Value: Single);
-    procedure SetOrientation(const Value: TOrientation);
-    procedure SetSmallChange(const Value: Single);
-    procedure SetonApplyStyleLookup(const Value: TNotifyEvent);
-    function GetOnApplyStyleLookup: TNotifyEvent;
-    function GetStyleLookup: string;
-    procedure SetStyleLookup(const Value: string);
+    FMaxValueRange: TValueRange;
   protected
-    FOnChange, FOnTracking, fonThumbApplyStyleLookup: TNotifyEvent;
-    procedure Paint; override;
-    procedure Resize; override;
+    [Weak] FMaxThumb: TALTrackThumb;
+    procedure SetViewportSize(const Value: Single); override;
+    procedure SetFrequency(const Value: Single); override;
+    procedure SetMax(const Value: Single); override;
+    procedure SetMin(const Value: Single); override;
+    function MaxValueStored: Boolean; virtual;
+    function GetDefaultSize: TSizeF; override;
+    function GetMaxValue: Single; virtual;
+    procedure SetMaxValue(Value: Single); virtual;
+    procedure DoRealign; override;
+    procedure UpdateHighlight; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property Frequency: Single read GetFrequency write SetFrequency;
-    property SmallChange: Single read GetSmallChange write SetSmallChange;
-    property Min: Single read GetMin write SetMin;
-    property Max: Single read GetMax write SetMax;
-    property MinValue: Single read GetMinValue write SetMinValue;
-    property MaxValue: Single read GetMaxValue write SetMaxValue;
-    property Orientation: TOrientation read GetOrientation write SetOrientation;
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
-    property OnTracking: TNotifyEvent read FOnTracking write FOnTracking;
-    property onThumbApplyStyleLookup: TNotifyEvent read fonThumbApplyStyleLookup write fonThumbApplyStyleLookup;
-    property onApplyStyleLookup: TNotifyEvent read GetOnApplyStyleLookup write SetonApplyStyleLookup;
-    property StyleLookup: string read GetStyleLookup write SetStyleLookup;
+    property ThumbSize;
+    property MinThumb: TALTrackThumb read FThumb;
+    property MaxThumb: TALTrackThumb read FMaxThumb;
+    property BackGround;
+    property Highlight;
     property Align;
     property Anchors;
+    property CanFocus default True;
+    property CanParentFocus;
     property ClipChildren;
     property ClipParent;
     property Cursor;
-    //property DragMode;
-    //property EnableDragHighlight;
+    property DisableFocusEffect;
+    property DragMode;
+    property EnableDragHighlight;
     property Enabled;
+    property Frequency;
     property Locked;
     property Height;
-    //property HitTest default False;
+    property Hint;
+    property HitTest;
     property Padding;
+    property Min;
+    property Max;
+    property MinValue: Single read GetValue write SetValue stored ValueStored nodefault;
+    property MaxValue: Single read GetMaxValue write SetMaxValue stored MaxValueStored nodefault;
+    property Orientation;
     property Opacity;
     property Margins;
-    //property PopupMenu;
+    property PopupMenu;
     property Position;
-    //property RotationAngle;
-    //property RotationCenter;
+    property RotationAngle;
+    property RotationCenter;
     property Scale;
     property Size;
-    //property TouchTargetExpansion;
-    property Visible;
-    property Width;
     property TabOrder;
     property TabStop;
-    { Events }
-    //property OnPainting;
-    //property OnPaint;
-    property OnResize;
-    { Drag and Drop events }
-    //property OnDragEnter;
-    //property OnDragLeave;
-    //property OnDragOver;
-    //property OnDragDrop;
-    //property OnDragEnd;
-    { Mouse events }
-    //property OnClick;
-    //property OnDblClick;
+    property TouchTargetExpansion;
+    property Tracking;
+    property Value;
+    property Visible;
+    property Width;
+    property ParentShowHint;
+    property ShowHint;
+    {events}
+    property OnChange;
+    property OnTracking;
+    {Drag and Drop events}
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    {Keyboard events}
+    property OnKeyDown;
+    property OnKeyUp;
+    {Mouse events}
+    property OnCanFocus;
+    property OnClick;
+    property OnDblClick;
+    //-----
+    property OnEnter;
+    property OnExit;
     property OnMouseDown;
     property OnMouseMove;
     property OnMouseUp;
-    //property OnMouseWheel;
+    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
+    //-----
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -305,469 +541,861 @@ procedure Register;
 implementation
 
 uses System.SysUtils,
-     System.Math,
      system.Math.Vectors,
+     {$IFDEF ALDPK}
+     DesignIntf,
+     {$ENDIF}
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
      {$ENDIF}
+     FMX.Platform,
      fmx.consts,
      fmx.utils,
-     FMX.Types,
      AlfmxCommon;
 
-{*********************************}
-procedure TALBGTrackBar.ApplyStyle;
+{*******************************************************************************************************************************}
+function _ValueToPos(MinValue, MaxValue, ViewportSize, ThumbSize, TrackSize, Value: Single; IgnoreViewportSize: Boolean): Single;
+var ValRel: Double;
 begin
-  inherited;
-  if assigned(FTrackHighlight) then FTrackHighlight.Align := TALignLayout.None;
-  if assigned(Thumb) then Thumb.Visible := False;
-  TALRangeTrackBar(Parent).MinClipWidth := MinClipWidth;
-  TALRangeTrackBar(Parent).MinClipHeight := MinClipHeight;
-  UpdateHighlight;
-end;
-
-{********************************}
-procedure TALBGTrackBar.DoRealign;
-begin
-  inherited;
-  if assigned(Thumb) then Thumb.Visible := False;
-end;
-
-{*****************************}
-procedure TALBGTrackBar.Resize;
-begin
-  inherited;
-  case Orientation of
-    TOrientation.Horizontal: if height <> TALRangeTrackBar(Parent).width then TALRangeTrackBar(Parent).Height := height;
-    TOrientation.Vertical: if width <> TALRangeTrackBar(Parent).width then TALRangeTrackBar(Parent).width := width;
+  Result := ThumbSize / 2;
+  if (ViewportSize < 0) or IgnoreViewportSize then ViewportSize := 0;
+  ValRel := MaxValue - MinValue - ViewportSize;
+  if ValRel > 0 then begin
+    ValRel := (Value - MinValue) / ValRel;
+    Result := (TrackSize - ThumbSize) * ValRel + Result;
   end;
 end;
 
-{**************************************}
-procedure TALBGTrackBar.UpdateHighlight;
+{*****************************************************************************************************************************}
+function _PosToValue(MinValue, MaxValue, ViewportSize, ThumbSize, TrackSize, Pos: Single; IgnoreViewportSize: Boolean): Single;
+var ValRel: Double;
 begin
-  if FTrackHighlight <> nil then
-  begin
-    case Orientation of
-      TOrientation.Horizontal: begin
-        if (fMinThumbTrackBar.Thumb <> nil) and (fMaxThumbTrackBar.Thumb <> nil) then begin
-          FTrackHighlight.position.X := fMinThumbTrackBar.GetThumbRect.Left - fMinThumbTrackBar.Thumb.Margins.Left;
-          FTrackHighlight.Width := Round((fMaxThumbTrackBar.GetThumbRect.Left + fMaxThumbTrackBar.GetThumbRect.Right) / 2) - FTrackHighlight.position.X;
-        end
-        else begin
-          FTrackHighlight.position.X := 0;
-          FTrackHighlight.Width := 0;
-        end;
+  Result := MinValue;
+  if (ViewportSize < 0) or IgnoreViewportSize then ViewportSize := 0;
+  ValRel := TrackSize - ThumbSize;
+  if ValRel > 0 then begin
+    ValRel := (Pos - ThumbSize / 2) / ValRel;
+    if ValRel < 0 then ValRel := 0;
+    if ValRel > 1 then ValRel := 1;
+    Result := MinValue + ValRel * (MaxValue - MinValue - ViewportSize);
+  end;
+end;
+
+{********************************************************}
+constructor TALTrackThumbGlyph.Create(AOwner: TComponent);
+begin
+  inherited;
+  Align := TalignLayout.Client;
+  autohide := true;
+  locked := True;
+end;
+
+{***************************************************************************************************************************}
+constructor TALTrackThumb.Create(const ATrack: TALCustomTrack; const aValueRange: TValueRange; const aWithGlyphObj: boolean);
+begin
+  inherited create(ATrack);
+  FPressed := False;
+  FTrack := ATrack;
+  FValueRange := aValueRange;
+  CanFocus := False;
+  CanParentFocus := True;
+  AutoCapture := True;
+  Locked := True;
+  if aWithGlyphObj then begin
+    fGlyph := TALTrackThumbGlyph.Create(self);
+    fGlyph.Parent := self;
+    fGlyph.Stored := False;
+    fGlyph.SetSubComponent(True);
+    fGlyph.Name := 'Glyph';
+  end
+  else fGlyph := nil;
+  FDeadZoneBeforeAcquireScrolling := 5;
+  fScrollingAcquiredByMe := False;
+  fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
+end;
+
+{*******************************}
+destructor TALTrackThumb.Destroy;
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
+  inherited;
+end;
+
+{********************************************************}
+function TALTrackThumb.PointToValue(X, Y: Single): Single;
+var P: TPointF;
+begin
+  Result := 0;
+  if (Parent is TControl) then begin
+    if FTrack.Orientation = TOrientation.Horizontal then begin
+      P := FTrack.ScreenToLocal(LocalToScreen(TPointF.Create(X, 0)));
+      P.X := P.X - FDownOffset.X + Width / 2;
+      Result := _PosToValue(FTrack.Min, FTrack.Max, FTrack.ViewportSize, Self.Width, FTrack.Width, P.X, FTrack.FIgnoreViewportSize);
+    end
+    else begin
+      P := FTrack.ScreenToLocal(LocalToScreen(TPointF.Create(0, Y)));
+      P.Y := P.Y - FDownOffset.Y + Height / 2;
+      Result := _PosToValue(FTrack.Min, FTrack.Max, FTrack.ViewportSize, Self.Height, FTrack.Height, P.Y, FTrack.FIgnoreViewportSize);
+    end;
+  end;
+end;
+
+{************************************************************}
+function TALTrackThumb.GetDefaultTouchTargetExpansion: TRectF;
+var DeviceSrv: IFMXDeviceService;
+begin
+  if SupportsPlatformService(IFMXDeviceService, DeviceSrv) and
+    (TDeviceFeature.HasTouchScreen in DeviceSrv.GetFeatures) then
+    Result := TRectF.Create(DefaultTouchTargetExpansion,
+                            DefaultTouchTargetExpansion,
+                            DefaultTouchTargetExpansion,
+                            DefaultTouchTargetExpansion)
+  else
+    Result := inherited ;
+end;
+
+{************************************************************************************************}
+procedure TALTrackThumb.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+begin
+  //the scrolling was acquired by another control (like a scrollbox for exemple)
+  if Sender <> self then begin
+    if FPressed then begin
+      FPressed := False;
+      if (not FValueRange.Tracking) then FValueRange.Tracking := True;
+    end;
+  end;
+end;
+
+{****************************************************************************************}
+procedure TALTrackThumb.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  if (Button = TMouseButton.mbLeft) and Enabled then begin
+    BringToFront;
+    repaint;
+    FPressed := True;
+    fScrollingAcquiredByMe := False;
+    FDownOffset := PointF(X, Y);
+    FTrack.SetFocus;
+    fValueRange.Tracking := FTrack.Tracking;
+    StartTriggerAnimation(Self, 'IsPressed');
+    ApplyTriggerEffect(Self, 'IsPressed');
+  end;
+end;
+
+{******************************************************************}
+procedure TALTrackThumb.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  inherited;
+  if FPressed and Enabled then begin
+
+    if (not fScrollingAcquiredByMe) and
+       (abs(FDownOffset.x - x) > fDeadZoneBeforeAcquireScrolling) then begin
+      fScrollingAcquiredByMe := True;
+      TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create, True);
+    end;
+
+    try
+      FValueRange.Value := PointToValue(X, Y);
+    except
+      FPressed := False;
+      raise;
+    end;
+
+  end;
+end;
+
+{**************************************************************************************}
+procedure TALTrackThumb.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var LValue: Single;
+begin
+  LValue := PointToValue(X, Y);
+  inherited;
+  if FPressed then begin
+    FPressed := False;
+    try
+      if (not FValueRange.Tracking) then begin
+        FValueRange.Value := LValue;
+        FValueRange.Tracking := True;
       end;
-      TOrientation.Vertical: begin
-        if (fMinThumbTrackBar.Thumb <> nil) and (fMaxThumbTrackBar.Thumb <> nil) then begin
-          FTrackHighlight.position.y := fMinThumbTrackBar.GetThumbRect.Top - fMinThumbTrackBar.Thumb.Margins.Top;
-          FTrackHighlight.Height := Round((fMaxThumbTrackBar.GetThumbRect.Top + fMaxThumbTrackBar.GetThumbRect.Bottom) / 2) - FTrackHighlight.position.y;
-        end
-        else begin
-          FTrackHighlight.position.y := 0;
-          FTrackHighlight.Height := 0;
+    finally
+      StartTriggerAnimation(Self, 'IsPressed');
+      ApplyTriggerEffect(Self, 'IsPressed');
+    end;
+  end;
+end;
+
+{********************************************************}
+constructor TALTrackBackground.Create(AOwner: TComponent);
+begin
+  inherited;
+  Locked := True;
+  HitTest := False;
+end;
+
+{*******************************************************}
+constructor TALTrackHighlight.Create(AOwner: TComponent);
+begin
+  inherited;
+  Locked := True;
+  HitTest := False;
+end;
+
+type
+
+  {**************************************}
+  TALValueRangeTrack = class (TValueRange)
+  private
+    [Weak] FTrack: TALCustomTrack;
+    FValueChanged: Boolean;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure DoBeforeChange; override;
+    procedure DoChanged; override;
+    procedure DoAfterChange; override;
+    property Track: TALCustomTrack read FTrack;
+  end;
+
+{********************************************************}
+constructor TALValueRangeTrack.Create(AOwner: TComponent);
+begin
+  ValidateInheritance(AOwner, TALCustomTrack, false{CanBeNil});
+  inherited;
+  FTrack := TALCustomTrack(AOwner);
+end;
+
+{******************************************}
+procedure TALValueRangeTrack.DoBeforeChange;
+begin
+  FValueChanged := (not SameValue(Value, New.Value));
+  inherited;
+end;
+
+{*************************************}
+procedure TALValueRangeTrack.DoChanged;
+begin
+  FTrack.Realign;
+  FTrack.DoTracking;
+  inherited;
+end;
+
+{*****************************************}
+procedure TALValueRangeTrack.DoAfterChange;
+begin
+  if FValueChanged then
+  try
+    FTrack.DoChanged;
+  finally
+    FValueChanged := False;
+  end;
+  inherited;
+end;
+
+{****************************************************}
+constructor TALCustomTrack.Create(AOwner: TComponent);
+begin
+  inherited;
+  //-----
+  FValueRange := CreateValueRangeTrack;
+  FDefaultValueRange := TBaseValueRange.Create;
+  FOrientation := TOrientation.Horizontal;
+  FIgnoreViewportSize := false;
+  FTracking := True;
+  FThumbSize := 0;
+  FMinThumbSize := 5;
+  FOnChange := nil;
+  FOnTracking := nil;
+  FBackGround := nil;
+  FHighlight := nil;
+  FThumb := nil;
+end;
+
+{********************************}
+destructor TALCustomTrack.Destroy;
+begin
+  FreeAndNil(FDefaultValueRange);
+  FreeAndNil(FValueRange);
+  inherited;
+end;
+
+{*****************************************}
+procedure TALCustomTrack.AfterConstruction;
+begin
+  inherited;
+  DefaultValueRange.Assign(FValueRange.New);
+  realign;
+end;
+
+{******************************}
+procedure TALCustomTrack.Loaded;
+begin
+  if not (csDestroying in ComponentState) then begin
+    if FValueRange.IsChanged then
+      FValueRange.Changed(True);
+  end;
+  inherited;
+end;
+
+{**********************************************************}
+function TALCustomTrack.CreateValueRangeTrack : TValueRange;
+begin
+  Result := TALValueRangeTrack.Create(Self);
+end;
+
+{**************************************}
+function TALCustomTrack.GetData: TValue;
+begin
+  Result := Value;
+end;
+
+{*************************************************************}
+function TALCustomTrack.GetDefaultTouchTargetExpansion: TRectF;
+var DeviceSrv: IFMXDeviceService;
+begin
+  if SupportsPlatformService(IFMXDeviceService, DeviceSrv) and
+    (TDeviceFeature.HasTouchScreen in DeviceSrv.GetFeatures) then
+    Result := TRectF.Create(DefaultTouchTargetExpansion,
+                            DefaultTouchTargetExpansion,
+                            DefaultTouchTargetExpansion,
+                            DefaultTouchTargetExpansion)
+  else
+    Result := inherited ;
+end;
+
+{****************************************************}
+procedure TALCustomTrack.SetData(const Value: TValue);
+begin
+  if Value.IsType<TNotifyEvent> then OnChange := Value.AsType<TNotifyEvent>()
+  else if Value.IsOrdinal then Self.Value := Value.AsOrdinal
+  else if Value.IsType<Single> then Self.Value := Value.AsType<Single>
+  else Self.Value := Min
+end;
+
+{*********************************************************************************************}
+function TALCustomTrack.GetThumbRect(const Value: single; const aThumb: TALTrackThumb): TRectF;
+var Pos, Size: Single;
+begin
+  Result := LocalRect;
+  Size := GetThumbSize(FIgnoreViewportSize);
+  case Orientation of
+    TOrientation.Horizontal:
+      begin
+        Pos := _ValueToPos(Min, Max, ViewportSize, Size, Width, Value, FIgnoreViewportSize);
+        Size := Size / 2;
+        Result := RectF(Pos - Size, 0, Pos + Size, Height);
+      end;
+    TOrientation.Vertical:
+      begin
+        Pos := _ValueToPos(Min, Max, ViewportSize, Size, Height, Value, FIgnoreViewportSize);
+        Size := Size / 2;
+        Result := RectF(0, Pos - Size, Width, Pos + Size);
+      end;
+  end;
+  if (aThumb <> nil) and
+     (aThumb.Parent <> nil) and
+     (aThumb.Parent is TControl) then begin
+   if RectWidth(Result) > TControl(aThumb.Parent).Padding.left +
+                           aThumb.Margins.left +
+                           TControl(aThumb.Parent).Padding.right -
+                           aThumb.Margins.right then begin
+      Result.left := Round(Result.left + TControl(aThumb.Parent).Padding.left + aThumb.Margins.left);
+      Result.right := Round(Result.right - TControl(aThumb.Parent).Padding.right - aThumb.Margins.right);
+    end;
+    Result.top := Round(Result.top + TControl(aThumb.Parent).Padding.top + aThumb.Margins.top);
+    Result.bottom := Round(Result.bottom - TControl(aThumb.Parent).Padding.bottom - aThumb.Margins.bottom);
+  end;
+end;
+
+{*****************************************************************************}
+function TALCustomTrack.GetThumbSize(var IgnoreViewportSize: Boolean): Integer;
+var
+  lSize: Double;
+begin
+  Result := 0;
+  lSize := FMinThumbSize;
+  case Orientation of
+    TOrientation.Horizontal:
+      begin
+        if ViewportSize > 0 then lSize := ViewportSize / (Max - Min) * Width
+        else if SameValue(FThumbSize, 0) then lSize := Height
+        else lSize := FThumbSize;
+        Result := Round(System.Math.Min(System.Math.MaxValue([lSize, Height / 2, FMinThumbSize]), Width));
+      end;
+    TOrientation.Vertical:
+      begin
+        if ViewportSize > 0 then lSize := ViewportSize / (Max - Min) * Height
+        else if SameValue(FThumbSize, 0) then lSize := Width
+        else lSize := FThumbSize;
+        Result := Round(System.Math.Min(System.Math.MaxValue([lSize, Width / 2, FMinThumbSize]), Height));
+      end;
+  end;
+  if Result < FMinThumbSize then Result := 0;
+  IgnoreViewportSize := Result <= (lSize - 1);
+end;
+
+{*******************************************}
+function TALCustomTrack.ValueStored: Boolean;
+begin
+  Result := not SameValue(Value, DefaultValueRange.Value);
+end;
+
+{*********************************************************}
+procedure TALCustomTrack.SetThumbSize(const Value: Single);
+begin
+  if not SameValue(Value, fThumbSize) then begin
+    fThumbSize := Value;
+    Realign;
+  end;
+end;
+
+{***********************************************}
+function TALCustomTrack.ThumbSizeStored: Boolean;
+begin
+  Result := (not SameValue(fThumbSize, 0));
+end;
+
+{**************************************************}
+function TALCustomTrack.ViewportSizeStored: Boolean;
+begin
+  Result := not SameValue(ViewportSize, DefaultValueRange.ViewportSize);
+end;
+
+{***********************************************}
+function TALCustomTrack.FrequencyStored: Boolean;
+begin
+  Result := not SameValue(Frequency, DefaultValueRange.Frequency);
+end;
+
+{*****************************************}
+function TALCustomTrack.MaxStored: Boolean;
+begin
+  Result := not SameValue(Max, DefaultValueRange.Max);
+end;
+
+{*****************************************}
+function TALCustomTrack.MinStored: Boolean;
+begin
+  Result := not SameValue(Min, DefaultValueRange.Min);
+end;
+
+{*************************************}
+function TALCustomTrack.GetMax: Single;
+begin
+  Result := FValueRange.Max;
+end;
+
+{***************************************************}
+procedure TALCustomTrack.SetMax(const Value: Single);
+begin
+  FValueRange.Max := Value;
+end;
+
+{***************************************************}
+procedure TALCustomTrack.SetMin(const Value: Single);
+begin
+  FValueRange.Min := Value;
+end;
+
+{*************************************}
+function TALCustomTrack.GetMin: Single;
+begin
+  Result := FValueRange.Min;
+end;
+
+{*********************************************************}
+procedure TALCustomTrack.SetFrequency(const Value: Single);
+begin
+  FValueRange.Frequency := Value;
+end;
+
+{*******************************************}
+function TALCustomTrack.GetFrequency: Single;
+begin
+  Result := FValueRange.Frequency;
+end;
+
+{***************************************}
+function TALCustomTrack.GetValue: Single;
+begin
+  Result := FValueRange.Value;
+end;
+
+{***********************************************}
+procedure TALCustomTrack.SetValue(Value: Single);
+begin
+  FValueRange.Value := Value;
+end;
+
+{**********************************************}
+function TALCustomTrack.GetViewportSize: Single;
+begin
+  Result := FValueRange.ViewportSize;
+end;
+
+{************************************************************}
+procedure TALCustomTrack.SetViewportSize(const Value: Single);
+begin
+  FValueRange.ViewportSize := Value;
+end;
+
+{*******************************************************}
+function TALCustomTrack.GetValueRange: TCustomValueRange;
+begin
+  Result := FValueRange;
+end;
+
+{**********************************************************************}
+procedure TALCustomTrack.SetValueRange(const AValue: TCustomValueRange);
+begin
+  FValueRange.Assign(AValue);
+end;
+
+{****************************************************************}
+procedure TALCustomTrack.SetValueRange_(const Value: TValueRange);
+begin
+  FValueRange.Assign(Value);
+end;
+
+{*********************************}
+procedure TALCustomTrack.DoRealign;
+var R: TRectF;
+begin
+  inherited;
+  if FThumb <> nil then begin
+    R := GetThumbRect(Value, FThumb);
+    FThumb.Visible := not ((R.Right <= R.Left) or (R.Bottom <= R.Top));
+    FThumb.BoundsRect := R;
+  end;
+  UpdateHighlight;
+end;
+
+{***************************************}
+procedure TALCustomTrack.UpdateHighlight;
+var r: TRectF;
+begin
+  r := GetThumbRect(Value, FThumb);
+  if (FbackGround <> nil) then r.Offset(-fbackground.Margins.Left, -fbackground.Margins.top);
+  if FHighlight <> nil then begin
+    case Orientation of
+      TOrientation.Horizontal: FHighlight.Width := Round((r.Left + r.Right) / 2);
+      TOrientation.Vertical: FHighlight.Height := Round((r.Top + r.Bottom) / 2);
+    end;
+  end;
+end;
+
+{*********************************}
+procedure TALCustomTrack.DoChanged;
+begin
+  if not (csLoading in ComponentState) and Assigned(FOnChange) then
+    FOnChange(Self);
+end;
+
+{**********************************}
+procedure TALCustomTrack.DoTracking;
+begin
+  if not (csLoading in ComponentState) and Assigned(FOnTracking) then
+    FOnTracking(Self);
+end;
+
+{************************************************************************************************}
+procedure TALCustomTrack.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
+var inc: Single;
+    LValue: Single;
+begin
+  inc := Frequency;
+  if inc = 0 then inc := 1;
+  inherited;
+  case Key of
+    vkHome: LValue := Min;
+    vkEnd: LValue := Max;
+    vkUp: LValue := Value - inc;
+    vkDown: LValue := Value + inc;
+    vkLeft: LValue := Value - inc;
+    vkRight: LValue := Value + inc;
+    else Exit;
+  end;
+  Key := 0;
+  SetValue(LValue);
+end;
+
+{*****************************************************************}
+procedure TALCustomTrack.SetOrientation(const Value: TOrientation);
+begin
+  if FOrientation <> Value then begin
+    FOrientation := Value;
+    if not (csLoading in ComponentState) then begin
+      SetBounds(Position.X, Position.Y, Size.Height, Size.Width);
+      if FOrientation=TOrientation.Horizontal then begin
+        if FBackGround <> nil then begin
+          FBackGround.Align := TalignLayout.none;
+          FBackGround.Size.Height := FBackGround.Size.Width;
+          FBackGround.Margins.Left := FBackGround.Margins.Top;
+          FBackGround.Margins.right := FBackGround.Margins.Bottom;
+          FBackGround.Margins.Top := 0;
+          FBackGround.Margins.Bottom := 0;
+          FBackGround.Align := TalignLayout.VertCenter;
+        end;
+        //-----
+        if FHighlight <> nil then begin
+          FHighlight.Size.Height := FBackGround.Size.height;
+          FHighlight.Size.Width := 0;
+        end;
+      end
+      else begin
+        if FBackGround <> nil then begin
+          FBackGround.Align := TalignLayout.none;
+          FBackGround.Size.Width := FBackGround.Size.Height;
+          FBackGround.Margins.top := FBackGround.Margins.Left;
+          FBackGround.Margins.Bottom := FBackGround.Margins.right;
+          FBackGround.Margins.left := 0;
+          FBackGround.Margins.right := 0;
+          FBackGround.Align := TalignLayout.HorzCenter;
+        end;
+        //-----
+        if FHighlight <> nil then begin
+          FHighlight.Size.Width := FBackGround.Size.width;
+          FHighlight.Size.Height := 0;
         end;
       end;
     end;
   end;
 end;
 
-{**********************************************************************************************************************}
-procedure TALMinThumbTrackBar.OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+{*********************************************}
+function TALCustomTrack.GetIsTracking: Boolean;
 begin
-  BringToFront;
-  if assigned(TALRangeTrackBar(Parent).OnMouseDown) then
-    TALRangeTrackBar(Parent).OnMouseDown(Parent, Button, Shift, X, Y);
+  Result := (FThumb <> nil) and FThumb.FPressed;
 end;
 
-{********************************************************************************************************************}
-procedure TALMinThumbTrackBar.OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseUp) then
-    TALRangeTrackBar(Parent).OnMouseUp(Parent, Button, Shift, X, Y);
-end;
-
-{************************************************************************************************}
-procedure TALMinThumbTrackBar.OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseMove) then
-    TALRangeTrackBar(Parent).OnMouseMove(Parent, Shift, X, Y);
-end;
-
-{***************************************************************}
-procedure TALMinThumbTrackBar.OnThumbMouseLeave(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseLeave) then
-    TALRangeTrackBar(Parent).OnMouseLeave(Parent);
-end;
-
-{***************************************************************}
-procedure TALMinThumbTrackBar.OnThumbMouseEnter(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseEnter) then
-    TALRangeTrackBar(Parent).OnMouseEnter(Parent);
-end;
-
-{*********************************************************************}
-procedure TALMinThumbTrackBar.onThumbApplyStyleLookup(Sender: TObject);
-begin
-
-  // TThumb
-  //   TbuttonStyleObject
-
-  if assigned(TALRangeTrackBar(Parent).onThumbApplyStyleLookup) then
-    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender);
-
-  if (value >= fMaxThumbTrackBar.Max) and
-     (assigned(Thumb)) then BringToFront
-  else if (value <= Min) and
-          (assigned(fMaxThumbTrackBar.Thumb)) then fMaxThumbTrackBar.BringToFront;
-
-
-end;
-
-{***************************************}
-procedure TALMinThumbTrackBar.ApplyStyle;
+{*************************************************}
+constructor TALTrackBar.Create(AOwner: TComponent);
 begin
   inherited;
-  if assigned(FTrack) then FTrack.visible := False;
-  if assigned(Thumb) then begin
-    Thumb.OnMouseDown := OnThumbMouseDown;
-    Thumb.OnMouseUp := OnThumbMouseUp;
-    Thumb.OnMouseMove := OnThumbMouseMove;
-    Thumb.OnMouseLeave := OnThumbMouseLeave;
-    Thumb.OnMouseEnter := OnThumbMouseEnter;
-    Thumb.OnApplyStyleLookup := onThumbApplyStyleLookup;
-  end;
-  fBGTrackBar.UpdateHighlight;
+  CanFocus := True;
+  SetAcceptsControls(False);
+  //-----
+  FBackGround := TALTrackBackground.Create(self);
+  FBackGround.Parent := self;
+  FBackGround.Stored := False;
+  FBackGround.SetSubComponent(True);
+  FBackGround.Name := 'BackGround';
+  FBackGround.Align := TalignLayout.VertCenter;
+  FBackGround.Size.Height := 2;
+  FBackGround.Margins.Left := 16;
+  FBackGround.Margins.right := 16;
+  FBackGround.Stroke.Kind := TBrushKind.None;
+  fBackGround.Fill.Color := $ffc5c5c5;
+  //-----
+  FHighlight := TALTrackHighlight.Create(FBackGround);
+  FHighlight.Parent := FBackGround;
+  FHighlight.Stored := False;
+  FHighlight.SetSubComponent(True);
+  FHighlight.Name := 'Highlight';
+  FHighlight.Position.Point := TpointF.Create(0,0);
+  FHighlight.Size.Height := 2;
+  FHighlight.Size.Width := 0;
+  FHighlight.Stroke.Kind := TBrushKind.None;
+  FHighlight.Fill.Color := $ff167efc;
+  //-----
+  FThumb := TALTrackThumb.Create(self, fValueRange, true{aWithGlyphObj});
+  FThumb.Parent := self;
+  FThumb.Stored := False;
+  FThumb.SetSubComponent(True);
+  FThumb.Name := 'Thumb';
+  FThumb.XRadius := 16;
+  FThumb.yRadius := 16;
+  FThumb.Stroke.Kind := TBrushKind.solid;
+  fThumb.Stroke.Color := $ffd5d5d5;
+  FThumb.Fill.Color := $ffffffff;
 end;
 
-{***********************************}
-procedure TALMinThumbTrackBar.Resize;
+{******************************************}
+function TALTrackBar.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(150, 32);
+end;
+
+{**************************************************}
+constructor TALScrollBar.Create(AOwner: TComponent);
 begin
   inherited;
-  fBGTrackBar.UpdateHighlight;
+  CanFocus := False;
+  SetAcceptsControls(False);
+  //-----
+  FThumb := TALTrackThumb.Create(self, FvalueRange, False{aWithGlyphObj});
+  FThumb.Parent := self;
+  FThumb.Stored := False;
+  FThumb.SetSubComponent(True);
+  FThumb.Name := 'Thumb';
+  FThumb.Stroke.Kind := TBrushKind.none;
+  FThumb.Fill.Color := $47000000;
 end;
 
-{***************************************}
-procedure TALMinThumbTrackBar.DoTracking;
+{*******************************************}
+function TALScrollBar.GetDefaultSize: TSizeF;
 begin
-  if Value > fMaxThumbTrackBar.value then Value := fMaxThumbTrackBar.value
-  else begin
-    inherited;
-    if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnTracking) then
-      TALRangeTrackBar(parent).FOnTracking(parent);
-    fBGTrackBar.UpdateHighlight;
-  end;
-end;
-
-{**************************************}
-procedure TALMinThumbTrackBar.DoChanged;
-begin
-  inherited;
-  if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnChange) then
-    TALRangeTrackBar(parent).FOnChange(parent);
-  fBGTrackBar.UpdateHighlight;
-end;
-
-{**********************************************************************************************************************}
-procedure TALMaxThumbTrackBar.OnThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  BringToFront;
-  if assigned(TALRangeTrackBar(Parent).OnMouseDown) then
-    TALRangeTrackBar(Parent).OnMouseDown(Parent, Button, Shift, X, Y);
-end;
-
-{********************************************************************************************************************}
-procedure TALMaxThumbTrackBar.OnThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseUp) then
-    TALRangeTrackBar(Parent).OnMouseUp(Parent, Button, Shift, X, Y);
-end;
-
-{************************************************************************************************}
-procedure TALMaxThumbTrackBar.OnThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseMove) then
-    TALRangeTrackBar(Parent).OnMouseMove(Parent, Shift, X, Y);
-end;
-
-{***************************************************************}
-procedure TALMaxThumbTrackBar.OnThumbMouseLeave(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseLeave) then
-    TALRangeTrackBar(Parent).OnMouseLeave(Parent);
-end;
-
-{***************************************************************}
-procedure TALMaxThumbTrackBar.OnThumbMouseEnter(Sender: TObject);
-begin
-  if assigned(TALRangeTrackBar(Parent).OnMouseEnter) then
-    TALRangeTrackBar(Parent).OnMouseEnter(Parent);
-end;
-
-{*********************************************************************}
-procedure TALMaxThumbTrackBar.onThumbApplyStyleLookup(Sender: TObject);
-begin
-
-  // TThumb
-  //   TbuttonStyleObject
-
-  if assigned(TALRangeTrackBar(Parent).onThumbApplyStyleLookup) then
-    TALRangeTrackBar(Parent).onThumbApplyStyleLookup(Sender);
-
-  if (value <= fMinThumbTrackBar.min) and
-     (assigned(Thumb)) then BringToFront
-  else if (value >= max) and
-          (assigned(fMinThumbTrackBar.Thumb)) then fMinThumbTrackBar.BringToFront;
-
-end;
-
-{***************************************}
-procedure TALMaxThumbTrackBar.ApplyStyle;
-begin
-  inherited;
-  if assigned(FTrack) then FTrack.visible := False;
-  if assigned(Thumb) then begin
-    Thumb.OnMouseDown := OnThumbMouseDown;
-    Thumb.OnMouseUp := OnThumbMouseUp;
-    Thumb.OnMouseMove := OnThumbMouseMove;
-    Thumb.OnMouseLeave := OnThumbMouseLeave;
-    Thumb.OnMouseEnter := OnThumbMouseEnter;
-    Thumb.OnApplyStyleLookup := onThumbApplyStyleLookup;
-  end;
-  fBGTrackBar.UpdateHighlight;
-end;
-
-{***********************************}
-procedure TALMaxThumbTrackBar.Resize;
-begin
-  inherited;
-  fBGTrackBar.UpdateHighlight;
-end;
-
-{***************************************}
-procedure TALMaxThumbTrackBar.DoTracking;
-begin
-  if Value < fMinThumbTrackBar.value then value := fMinThumbTrackBar.value
-  else begin
-    inherited;
-    if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnTracking) then
-      TALRangeTrackBar(parent).FOnTracking(parent);
-    fBGTrackBar.UpdateHighlight;
-  end;
-end;
-
-{**************************************}
-procedure TALMaxThumbTrackBar.DoChanged;
-begin
-  inherited;
-  if not (csLoading in ComponentState) and Assigned(TALRangeTrackBar(parent).FOnChange) then
-    TALRangeTrackBar(parent).FOnChange(parent);
-  fBGTrackBar.UpdateHighlight;
+  Result := TSizeF.Create(150, 4);
 end;
 
 {******************************************************}
 constructor TALRangeTrackBar.Create(AOwner: TComponent);
 begin
   inherited;
+  FMaxValueRange := CreateValueRangeTrack;
+  FMaxValueRange.Value := FMaxValueRange.Max;
+  CanFocus := True;
+  SetAcceptsControls(False);
   //-----
-  CanParentFocus := True;
-  HitTest := False;
+  FBackGround := TALTrackBackground.Create(self);
+  FBackGround.Parent := self;
+  FBackGround.Stored := False;
+  FBackGround.SetSubComponent(True);
+  FBackGround.Name := 'BackGround';
+  FBackGround.Align := TalignLayout.VertCenter;
+  FBackGround.Size.Height := 2;
+  FBackGround.Margins.Left := 16;
+  FBackGround.Margins.right := 16;
+  FBackGround.Stroke.Kind := TBrushKind.None;
+  fBackGround.Fill.Color := $ffc5c5c5;
   //-----
-  FOnChange := nil;
-  FOnTracking := nil;
-  fonThumbApplyStyleLookup := nil;
+  FHighlight := TALTrackHighlight.Create(FBackGround);
+  FHighlight.Parent := FBackGround;
+  FHighlight.Stored := False;
+  FHighlight.SetSubComponent(True);
+  FHighlight.Name := 'Highlight';
+  FHighlight.Position.Point := TpointF.Create(0,0);
+  FHighlight.Size.Height := 2;
+  FHighlight.Size.Width := 0;
+  FHighlight.Stroke.Kind := TBrushKind.None;
+  FHighlight.Fill.Color := $ff167efc;
   //-----
-  fBGTrackBar := TALBGTrackBar.Create(self);
+  FThumb := TALTrackThumb.Create(self, FvalueRange, true{aWithGlyphObj});
+  FThumb.Parent := self;
+  FThumb.Stored := False;
+  FThumb.SetSubComponent(True);
+  FThumb.Name := 'MinThumb';
+  FThumb.XRadius := 16;
+  FThumb.yRadius := 16;
+  FThumb.Stroke.Kind := TBrushKind.solid;
+  fThumb.Stroke.Color := $ffd5d5d5;
+  FThumb.Fill.Color := $ffffffff;
   //-----
-  Width := fBGTrackBar.Width;
-  height := fBGTrackBar.Height;
-  //-----
-  fBGTrackBar.Stored := False;
-  fBGTrackBar.Parent := Self;
-  fBGTrackBar.Align := TalignLayout.Client;
-  fBGTrackBar.HitTest := False;
-  //-----
-  fMaxThumbTrackBar := TALMaxThumbTrackBar.Create(self);
-  fMaxThumbTrackBar.Stored := False;
-  fMaxThumbTrackBar.Parent := Self;
-  fMaxThumbTrackBar.Align := TalignLayout.Client;
-  fMaxThumbTrackBar.HitTest := False;
-  //-----
-  fMinThumbTrackBar := TALMinThumbTrackBar.Create(self);
-  fMinThumbTrackBar.Stored := False;
-  fMinThumbTrackBar.Parent := Self;
-  fMinThumbTrackBar.Align := TalignLayout.Client;
-  fMinThumbTrackBar.HitTest := False;
-  //-----
-  fBGTrackBar.fMinThumbTrackBar := fMinThumbTrackBar;
-  fBGTrackBar.fMaxThumbTrackBar := fMaxThumbTrackBar;
-  //-----
-  fMinThumbTrackBar.fBGTrackBar := fBGTrackBar;
-  fMinThumbTrackBar.fMaxThumbTrackBar := fMaxThumbTrackBar;
-  //-----
-  fMaxThumbTrackBar.fBGTrackBar := fBGTrackBar;
-  fMaxThumbTrackBar.fMinThumbTrackBar := fMinThumbTrackBar;
-  //-----
-  SetMin(fMinThumbTrackBar.Min);
-  SetMax(fMaxThumbTrackBar.Max);
-end;
-
-{*******************************}
-procedure TALRangeTrackBar.Paint;
-begin
-  inherited;
-  if (csDesigning in ComponentState) and not Locked then
-    DrawDesignBorder;
+  FMaxThumb := TALTrackThumb.Create(self, fMaxValueRange, true{aWithGlyphObj});
+  FMaxThumb.Parent := self;
+  FMaxThumb.Stored := False;
+  FMaxThumb.SetSubComponent(True);
+  FMaxThumb.Name := 'MaxThumb';
+  FMaxThumb.XRadius := 16;
+  FMaxThumb.yRadius := 16;
+  FMaxThumb.Stroke.Kind := TBrushKind.solid;
+  fMaxThumb.Stroke.Color := $ffd5d5d5;
+  FMaxThumb.Fill.Color := $ffffffff;
 end;
 
 {**********************************}
 destructor TALRangeTrackBar.Destroy;
 begin
-  freeandnil(fMaxThumbTrackBar);
-  freeandnil(fMinThumbTrackBar);
-  freeandnil(fBGTrackBar);
+  FreeAndNil(FMaxValueRange);
   inherited;
 end;
 
-{********************************}
-procedure TALRangeTrackBar.Resize;
+{***********************************************}
+function TALRangeTrackBar.GetDefaultSize: TSizeF;
 begin
-  inherited;
-  case Orientation of
-    TOrientation.Horizontal: if height <> fbgTrackBar.Height then height := fbgTrackBar.Height;
-    TOrientation.Vertical: if Width <> fbgTrackBar.Width then Width := fbgTrackBar.Width;
+  Result := TSizeF.Create(200, 32);
+end;
+
+{***********************************}
+procedure TALRangeTrackBar.DoRealign;
+var R: TRectF;
+begin
+  //realign is call be TALValueRangeTrack.DoChanged;
+  //so we can check here if minValue <= MaxValue
+  if minValue > MaxValue then begin
+    if fThumb.IsPressed then MinValue := MaxValue
+    else MaxValue := MinValue;
+    exit; // no need to continue, this function will be called again
   end;
+  if FMaxThumb <> nil then begin
+    R := GetThumbRect(MaxValue, FMaxThumb);
+    FMaxThumb.Visible := not ((R.Right <= R.Left) or (R.Bottom <= R.Top));
+    FMaxThumb.BoundsRect := R;
+  end;
+  inherited DoRealign;
 end;
 
-{***************************************}
-function TALRangeTrackBar.GetMax: Single;
+{*****************************************}
+procedure TALRangeTrackBar.UpdateHighlight;
+var rMin, rMax: TRectF;
 begin
-  result := fMaxThumbTrackBar.Max;
-end;
-
-{*****************************************************}
-procedure TALRangeTrackBar.SetMax(const Value: Single);
-begin
-  fBGTrackBar.Max := Value;
-  fMinThumbTrackBar.Max := Value;
-  fMaxThumbTrackBar.Max := Value;
-  //-----
-  fMinThumbTrackBar.Value := Min;
-  fMaxThumbTrackBar.Value := max;
-end;
-
-{***************************************}
-function TALRangeTrackBar.GetMin: Single;
-begin
-  result := fMinThumbTrackBar.Min;
-end;
-
-{*****************************************************}
-procedure TALRangeTrackBar.SetMin(const Value: Single);
-begin
-  fBGTrackBar.Min := Value;
-  fMinThumbTrackBar.Min := Value;
-  fMaxThumbTrackBar.Min := Value;
-  //-----
-  fMinThumbTrackBar.Value := Min;
-  fMaxThumbTrackBar.Value := max;
-end;
-
-{*********************************************}
-function TALRangeTrackBar.GetFrequency: Single;
-begin
-  result := fBGTrackBar.Frequency;
-end;
-
-{***********************************************************}
-procedure TALRangeTrackBar.SetFrequency(const Value: Single);
-begin
-  fBGTrackBar.Frequency := Value;
-  fMaxThumbTrackBar.Frequency := Value;
-  fMinThumbTrackBar.Frequency := Value;
+  rMin := GetThumbRect(Value, FThumb);
+  rMax := GetThumbRect(MaxValue, FMaxThumb);
+  if (FbackGround <> nil) then begin
+    rMin.Offset(-fbackground.Margins.Left, -fbackground.Margins.top);
+    rMax.Offset(-fbackground.Margins.Left, -fbackground.Margins.top);
+  end;
+  if FHighlight <> nil then begin
+    case Orientation of
+      TOrientation.Horizontal: begin
+        FHighlight.setbounds(Round((rMin.Left + rMin.Right) / 2),
+                             FHighlight.Position.y,
+                             Round((rMax.Left + rMax.Right) / 2) - Round((rMin.Left + rMin.Right) / 2),
+                             FHighlight.Height);
+      end;
+      TOrientation.Vertical: begin
+        FHighlight.setbounds(FHighlight.Position.x,
+                             Round((rMin.Top + rMin.Bottom) / 2),
+                             FHighlight.width,
+                             Round((rMax.Top + rMax.Bottom) / 2) - Round((rMin.Top + rMin.Bottom) / 2));
+      end;
+    end;
+  end;
 end;
 
 {********************************************}
 function TALRangeTrackBar.GetMaxValue: Single;
 begin
-  result := fMaxThumbTrackBar.Value;
+  Result := FMaxValueRange.Value;
 end;
 
-{**********************************************************}
-procedure TALRangeTrackBar.SetMaxValue(const Value: Single);
+{****************************************************}
+procedure TALRangeTrackBar.SetMaxValue(Value: Single);
 begin
-  fMaxThumbTrackBar.value := Value;
+  FMaxValueRange.Value := Value;
 end;
 
-{********************************************}
-function TALRangeTrackBar.GetMinValue: Single;
+{************************************************}
+function TALRangeTrackBar.MaxValueStored: Boolean;
 begin
-  result := fMinThumbTrackBar.Value;
+  Result := not SameValue(MaxValue, DefaultValueRange.Value);
 end;
 
-{**********************************************************}
-procedure TALRangeTrackBar.SetMinValue(const Value: Single);
+{***********************************************************}
+procedure TALRangeTrackBar.SetFrequency(const Value: Single);
 begin
-  fMinThumbTrackBar.value := Value;
-end;
-
-{************************************************************}
-function TALRangeTrackBar.GetOnApplyStyleLookup: TNotifyEvent;
-begin
-  result := fbgTrackBar.OnApplyStyleLookup;
-end;
-
-{**************************************************************************}
-procedure TALRangeTrackBar.SetonApplyStyleLookup(const Value: TNotifyEvent);
-begin
-  fbgTrackBar.OnApplyStyleLookup := Value;
-  fMaxThumbTrackBar.OnApplyStyleLookup := Value;
-  fMinThumbTrackBar.OnApplyStyleLookup := Value;
+  inherited;
+  FMaxValueRange.Frequency := Value;
 end;
 
 {*****************************************************}
-function TALRangeTrackBar.GetOrientation: TOrientation;
+procedure TALRangeTrackBar.SetMax(const Value: Single);
 begin
-  result := fBGTrackBar.Orientation;
+  inherited;
+  FMaxValueRange.Max := Value;
 end;
 
-{*******************************************************************}
-procedure TALRangeTrackBar.SetOrientation(const Value: TOrientation);
+{*****************************************************}
+procedure TALRangeTrackBar.SetMin(const Value: Single);
 begin
-  fBGTrackBar.Orientation := Value;
-  fMaxThumbTrackBar.Orientation := Value;
-  fMinThumbTrackBar.Orientation := Value;
+  inherited;
+  FMaxValueRange.Min := Value;
 end;
 
-{***********************************************}
-function TALRangeTrackBar.GetSmallChange: Single;
+{**************************************************************}
+procedure TALRangeTrackBar.SetViewportSize(const Value: Single);
 begin
-  result := fBGTrackBar.SmallChange;
-end;
-
-{*************************************************************}
-procedure TALRangeTrackBar.SetSmallChange(const Value: Single);
-begin
-  fBGTrackBar.SmallChange := Value;
-  fMaxThumbTrackBar.SmallChange := Value;
-  fMinThumbTrackBar.SmallChange := Value;
-end;
-
-{***********************************************}
-function TALRangeTrackBar.GetStyleLookup: string;
-begin
-  result := fBGTrackBar.StyleLookup;
-end;
-
-{*************************************************************}
-procedure TALRangeTrackBar.SetStyleLookup(const Value: string);
-begin
-  fBGTrackBar.StyleLookup := Value;
-  fMaxThumbTrackBar.StyleLookup := Value;
-  fMinThumbTrackBar.StyleLookup := Value;
+  inherited;
+  FMaxValueRange.ViewportSize := Value;
 end;
 
 {*************************************************}
@@ -1229,7 +1857,51 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALRangeTrackBar, TALCheckBox]);
+  RegisterComponents('Alcinoe', [TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox]);
+  {$IFDEF ALDPK}
+  UnlistPublishedProperty(TALTrackThumbGlyph, 'Locked');
+  UnlistPublishedProperty(TALTrackThumbGlyph, 'StyleName');
+  //-----
+  UnlistPublishedProperty(TALTrackThumb, 'Locked');
+  UnlistPublishedProperty(TALTrackThumb, 'StyleName');
+  UnlistPublishedProperty(TALTrackThumb, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
+  UnlistPublishedProperty(TALTrackThumb, 'Align');
+  UnlistPublishedProperty(TALTrackThumb, 'Position');
+  UnlistPublishedProperty(TALTrackThumb, 'Size');
+  UnlistPublishedProperty(TALTrackThumb, 'PopupMenu');
+  UnlistPublishedProperty(TALTrackThumb, 'DragMode');
+  UnlistPublishedProperty(TALTrackThumb, 'OnDragEnd');
+  UnlistPublishedProperty(TALTrackThumb, 'OnDragEnter');
+  UnlistPublishedProperty(TALTrackThumb, 'OnDragLeave');
+  UnlistPublishedProperty(TALTrackThumb, 'OnDragOver');
+  UnlistPublishedProperty(TALTrackThumb, 'OnDragDrop');
+  UnlistPublishedProperty(TALTrackThumb, 'EnableDragHighlight');
+  //-----
+  UnlistPublishedProperty(TALTrackBackground, 'Locked');
+  UnlistPublishedProperty(TALTrackBackground, 'StyleName');
+  UnlistPublishedProperty(TALTrackBackground, 'PopupMenu');
+  UnlistPublishedProperty(TALTrackBackground, 'DragMode');
+  UnlistPublishedProperty(TALTrackBackground, 'OnDragEnd');
+  UnlistPublishedProperty(TALTrackBackground, 'OnDragEnter');
+  UnlistPublishedProperty(TALTrackBackground, 'OnDragLeave');
+  UnlistPublishedProperty(TALTrackBackground, 'OnDragOver');
+  UnlistPublishedProperty(TALTrackBackground, 'OnDragDrop');
+  UnlistPublishedProperty(TALTrackBackground, 'EnableDragHighlight');
+  //-----
+  UnlistPublishedProperty(TALTrackHighlight, 'Locked');
+  UnlistPublishedProperty(TALTrackHighlight, 'StyleName');
+  UnlistPublishedProperty(TALTrackHighlight, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
+  UnlistPublishedProperty(TALTrackHighlight, 'Align');
+  UnlistPublishedProperty(TALTrackHighlight, 'Position');
+  UnlistPublishedProperty(TALTrackHighlight, 'PopupMenu');
+  UnlistPublishedProperty(TALTrackHighlight, 'DragMode');
+  UnlistPublishedProperty(TALTrackHighlight, 'OnDragEnd');
+  UnlistPublishedProperty(TALTrackHighlight, 'OnDragEnter');
+  UnlistPublishedProperty(TALTrackHighlight, 'OnDragLeave');
+  UnlistPublishedProperty(TALTrackHighlight, 'OnDragOver');
+  UnlistPublishedProperty(TALTrackHighlight, 'OnDragDrop');
+  UnlistPublishedProperty(TALTrackHighlight, 'EnableDragHighlight');
+  {$ENDIF}
 end;
 
 end.

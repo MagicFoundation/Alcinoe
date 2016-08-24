@@ -34,6 +34,7 @@ const
   ALDefaultMaxVelocity = 5000;
   ALDefaultDeadZone = 8;
   ALDefaultDeadZoneBeforeAcquireScrolling = 16;
+  ALDefaultVelocityFactor = 1;
 
 type
 
@@ -99,7 +100,7 @@ type
       Time: TDateTime;
     end;
   private
-    FVelocityFactor: TPointF;
+    FVelocityFactor: Double;
     FEnabled: Boolean;
     FInTimerProc: Boolean;
     FTouchTracking: TTouchTracking;
@@ -165,6 +166,7 @@ type
     function DecelerationRateStored: Boolean;
     function ElasticityStored: Boolean;
     function StorageTimeStored: Boolean;
+    function VelocityFactorStored: boolean;
     procedure CalcVelocity(const Time: TDateTime = 0);
     procedure InternalStart;
     procedure InternalTerminated;
@@ -227,16 +229,11 @@ type
     property AutoShowing: Boolean read FAutoShowing write SetAutoShowing default False;
     property Averaging: Boolean read FAveraging write FAveraging default False;
     property BoundsAnimation: Boolean read FBoundsAnimation write SetBoundsAnimation default True;
-    property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property TouchTracking: TTouchTracking read FTouchTracking write SetTouchTracking default [ttVertical, ttHorizontal];
     property TargetCount: Integer read GetTargetCount;
     procedure SetTargets(const ATargets: array of TTarget);
     procedure GetTargets(var ATargets: array of TTarget);
     procedure UpdatePosImmediately(const Force: Boolean = False);
-    property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;
-    property Elasticity: Double read FElasticity write FElasticity stored ElasticityStored nodefault;
-    property StorageTime: Double read FStorageTime write FStorageTime stored StorageTimeStored nodefault;
-    property VelocityFactor: TPointF read FVelocityFactor write FVelocityFactor; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
     property CurrentVelocity: TALPointD read FCurrentVelocity;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
     property ViewportPositionF: TPointF read GetViewportPositionF write SetViewportPositionF;
@@ -252,6 +249,12 @@ type
     property OnStart: TNotifyEvent read FOnStart write FOnStart;
     property OnChanged: TNotifyEvent read FOnTimer write FOnTimer;
     property OnStop: TNotifyEvent read FOnStop write FOnStop;
+  published
+    property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
+    property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;
+    property Elasticity: Double read FElasticity write FElasticity stored ElasticityStored nodefault;
+    property StorageTime: Double read FStorageTime write FStorageTime stored StorageTimeStored nodefault;
+    property VelocityFactor: Double read FVelocityFactor write FVelocityFactor stored VelocityFactorStored nodefault; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
   end;
 
 implementation
@@ -449,7 +452,6 @@ end;
 constructor TALAniCalculations.Create(AOwner: TPersistent);
 begin
   inherited Create;
-  FVelocityFactor := TPointf.create(1,1);
   FOwner := AOwner;
   FTimerHandle := TFmxHandle(-1);
   BeginUpdate;
@@ -497,6 +499,7 @@ begin
     DecelerationRate := LSource.DecelerationRate;
     Elasticity := LSource.Elasticity;
     StorageTime := LSource.StorageTime;
+    VelocityFactor := LSource.VelocityFactor;
   end
   else if Source = nil then
   begin
@@ -513,6 +516,7 @@ begin
     DecelerationRate := ALDecelerationRateNormal;
     Elasticity := ALDefaultElasticity;
     StorageTime := ALDefaultStorageTime;
+    VelocityFactor := ALDefaultVelocityFactor;
   end
   else
     inherited;
@@ -899,6 +903,11 @@ end;
 function TALAniCalculations.StorageTimeStored: Boolean;
 begin
   Result := not SameValue(FStorageTime, ALDefaultStorageTime);
+end;
+
+function TALAniCalculations.VelocityFactorStored: Boolean;
+begin
+  Result := not SameValue(fVelocityFactor, ALDefaultVelocityFactor);
 end;
 
 procedure TALAniCalculations.DoStop;
@@ -1424,8 +1433,8 @@ begin
         FCurrentVelocity.Y := FCurrentVelocity.Y * VAbs;
       end;
     end;
-    fCurrentVelocity.X := fCurrentVelocity.X * fVelocityFactor.x;
-    fCurrentVelocity.Y := fCurrentVelocity.y * fVelocityFactor.y;
+    fCurrentVelocity.X := fCurrentVelocity.X * fVelocityFactor;
+    fCurrentVelocity.Y := fCurrentVelocity.y * fVelocityFactor;
   end;
   UpdateTimer;
 end;

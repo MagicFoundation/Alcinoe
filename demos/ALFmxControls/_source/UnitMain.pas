@@ -177,6 +177,9 @@ type
     ALText7: TALText;
     ALText8: TALText;
     ALRectangle9: TALRectangle;
+    ALRangeTrackBar1: TALRangeTrackBar;
+    ALTrackBar1: TALTrackBar;
+    Button14: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -194,10 +197,8 @@ type
     procedure Button16Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
     procedure Button18Click(Sender: TObject);
-    procedure Button20Click(Sender: TObject);
     procedure Button22Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
-    procedure TabItem1Click(Sender: TObject);
     procedure Button12Click(Sender: TObject);
     procedure Button19Click(Sender: TObject);
     procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
@@ -206,8 +207,16 @@ type
                                              var aAnimationType: TAnimationType;
                                              var aInterpolation: TInterpolationType);
     procedure ALTabControl1Resize(Sender: TObject);
+    procedure ALVertScrollBox1ScrollBarInit(const sender: TObject;
+      const aScrollBar: TALScrollBoxBar);
+    procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Single);
+    procedure VScrollBarThumbMouseLeave(Sender: TObject);
+    procedure VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Single);
+    procedure VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Single);
   private
-    fALRangeTrackBar: TALRangeTrackBarStopWatch;
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
     fLine: TLineStopWatch;
@@ -285,6 +294,80 @@ end;
 procedure TForm1.ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
 begin
   ALTabControl1Resize(nil);
+end;
+
+procedure TForm1.ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
+begin
+  //special case for windows
+  if not ALVertScrollBox1.HasTouchScreen then begin
+    if aScrollBar.Orientation = Torientation.Vertical then begin
+      aScrollBar.Width := 8;
+      aScrollBar.Margins.Right := 3;
+      aScrollBar.Thumb.XRadius := 4;
+      aScrollBar.Thumb.yRadius := 4;
+    end;
+  end;
+end;
+
+procedure TForm1.VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
+begin
+  if not ALVertScrollBox1.HasTouchScreen then begin
+    with (sender as TALTrackThumb) do begin
+      if tag = 0 then begin // 0 = out and not down
+        tag := 1; // 1 = in and not down
+        Fill.Color := $64000000;
+        (sender as TALTrackThumb).InvalidateRect(localrect);
+      end
+      else if tag = 10 then  // 10 = out and down
+        tag := 11; // 11 = in and down
+    end;
+  end;
+end;
+
+procedure TForm1.VScrollBarThumbMouseLeave(Sender: TObject);
+begin
+  if not ALVertScrollBox1.HasTouchScreen then begin
+    with (sender as TALTrackThumb) do begin
+      if tag = 1 then begin // 1 = in and not down
+        tag := 0; // 0 = out and not down
+        Fill.Color := $47000000;
+        (sender as TALTrackThumb).InvalidateRect(localrect);
+      end
+      else if tag = 11 then // 11 = in and down
+        tag := 10; // 10 = out and down
+    end;
+  end;
+end;
+
+procedure TForm1.VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if not ALVertScrollBox1.HasTouchScreen then begin
+    with (sender as TALTrackThumb) do begin
+      if tag = 1 then // 1 = in and not down
+        tag := 11 // 11 = in and down
+      else
+        tag := 10; // 10 = out and down
+      Fill.Color := $96000000;
+      (sender as TALTrackThumb).InvalidateRect(localrect);
+    end;
+  end;
+end;
+
+procedure TForm1.VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  if not ALVertScrollBox1.HasTouchScreen then begin
+    with (sender as TALTrackThumb) do begin
+      if tag = 11 then begin // 11 = in and down
+        tag := 1; // 1 = in and not down
+        Fill.Color := $64000000;
+      end
+      else if tag = 10 then begin // 10 = out and down
+        tag := 0; // 0 = out and not down
+        Fill.Color := $47000000;
+      end;
+      (sender as TALTrackThumb).InvalidateRect(localrect);
+    end;
+  end;
 end;
 
 procedure TForm1.Button10Click(Sender: TObject);
@@ -421,7 +504,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -435,7 +518,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -449,7 +532,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -463,7 +546,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -477,7 +560,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -529,7 +612,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -542,7 +625,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -555,7 +638,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -568,7 +651,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -581,7 +664,7 @@ begin
     aChildRectangle.Align := TalignLayout.right;
     aChildRectangle.Margins.Left := 0;
     aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := 15;
+    aChildRectangle.Margins.Right := random(15);
     aChildRectangle.Margins.Bottom := 10;
     aChildRectangle.Position.Y := 0;
     aChildRectangle.Size.width := 25;
@@ -615,12 +698,6 @@ procedure TForm1.Button9Click(Sender: TObject);
 begin
   fRectangle3.Repaint;
   Text5.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle3.PaintMs) + ' ms';
-end;
-
-procedure TForm1.Button20Click(Sender: TObject);
-begin
-  fALRangeTrackBar.Repaint;
-  Text7.Text := 'Paint: ' + FormatFloat('0.#####',fALRangeTrackBar.PaintMs) + ' ms';
 end;
 
 procedure TForm1.Button21Click(Sender: TObject);
@@ -890,26 +967,11 @@ begin
   fline.Height := 1;
   fline.Position.Y := button16.Position.Y - button16.Margins.Top;
   fline.LineType := TLineType.Top;
-
-  //-----
-  fALRangeTrackBar := TALRangeTrackBarStopWatch.Create(self);
-  fALRangeTrackBar.Parent := ALVertScrollBox1;
-  fALRangeTrackBar.Align := TalignLayout.Top;
-  fALRangeTrackBar.Margins.Top := 8;
-  fALRangeTrackBar.Margins.right := 25;
-  fALRangeTrackBar.Margins.left := 25;
-  fALRangeTrackBar.Position.Y := button20.Position.Y - button20.Margins.Top;
-  text7.Position.Y := button20.Position.Y - button20.Margins.height + button20.Margins.Top + + button20.Margins.bottom;
-
   //-----
   ALFmxMakeBufBitmaps(ALVertScrollBox1);
   endupdate;
 end;
 
-procedure TForm1.TabItem1Click(Sender: TObject);
-begin
-
-end;
 
 { TALTextStopWatch }
 

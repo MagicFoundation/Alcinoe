@@ -66,6 +66,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_Define>ALDPK;$(DCC_Define)</DCC_Define>
         <DCC_HppOutput>.\hpp\$(Platform)\berlin\</DCC_HppOutput>
         <DesignOnlyPackage>true</DesignOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>

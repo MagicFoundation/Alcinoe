@@ -134,7 +134,7 @@ private:
 	
 	
 private:
-	System::Types::TPointF FVelocityFactor;
+	double FVelocityFactor;
 	bool FEnabled;
 	bool FInTimerProc;
 	System::Uitypes::TTouchTracking FTouchTracking;
@@ -200,6 +200,7 @@ private:
 	bool __fastcall DecelerationRateStored(void);
 	bool __fastcall ElasticityStored(void);
 	bool __fastcall StorageTimeStored(void);
+	bool __fastcall VelocityFactorStored(void);
 	void __fastcall CalcVelocity(const System::TDateTime Time = 0.000000E+00);
 	void __fastcall InternalStart(void);
 	void __fastcall InternalTerminated(void);
@@ -264,16 +265,11 @@ public:
 	__property bool AutoShowing = {read=FAutoShowing, write=SetAutoShowing, default=0};
 	__property bool Averaging = {read=FAveraging, write=FAveraging, default=0};
 	__property bool BoundsAnimation = {read=FBoundsAnimation, write=SetBoundsAnimation, default=1};
-	__property System::Word Interval = {read=FInterval, write=SetInterval, default=10};
 	__property System::Uitypes::TTouchTracking TouchTracking = {read=FTouchTracking, write=SetTouchTracking, default=3};
 	__property int TargetCount = {read=GetTargetCount, nodefault};
 	void __fastcall SetTargets(const TTarget *ATargets, const int ATargets_High);
 	void __fastcall GetTargets(TTarget *ATargets, const int ATargets_High);
 	void __fastcall UpdatePosImmediately(const bool Force = false);
-	__property double DecelerationRate = {read=FDecelerationRate, write=FDecelerationRate, stored=DecelerationRateStored};
-	__property double Elasticity = {read=FElasticity, write=FElasticity, stored=ElasticityStored};
-	__property double StorageTime = {read=FStorageTime, write=FStorageTime, stored=StorageTimeStored};
-	__property System::Types::TPointF VelocityFactor = {read=FVelocityFactor, write=FVelocityFactor};
 	__property TALPointD CurrentVelocity = {read=FCurrentVelocity};
 	__property TALPointD ViewportPosition = {read=FViewportPosition, write=SetViewportPosition};
 	__property System::Types::TPointF ViewportPositionF = {read=GetViewportPositionF, write=SetViewportPositionF};
@@ -289,6 +285,13 @@ public:
 	__property System::Classes::TNotifyEvent OnStart = {read=FOnStart, write=FOnStart};
 	__property System::Classes::TNotifyEvent OnChanged = {read=FOnTimer, write=FOnTimer};
 	__property System::Classes::TNotifyEvent OnStop = {read=FOnStop, write=FOnStop};
+	
+__published:
+	__property System::Word Interval = {read=FInterval, write=SetInterval, default=10};
+	__property double DecelerationRate = {read=FDecelerationRate, write=FDecelerationRate, stored=DecelerationRateStored};
+	__property double Elasticity = {read=FElasticity, write=FElasticity, stored=ElasticityStored};
+	__property double StorageTime = {read=FStorageTime, write=FStorageTime, stored=StorageTimeStored};
+	__property double VelocityFactor = {read=FVelocityFactor, write=FVelocityFactor, stored=VelocityFactorStored};
 };
 
 
@@ -302,6 +305,7 @@ static const System::Int8 ALDefaultMinVelocity = System::Int8(0xa);
 static const System::Word ALDefaultMaxVelocity = System::Word(0x1388);
 static const System::Int8 ALDefaultDeadZone = System::Int8(0x8);
 static const System::Int8 ALDefaultDeadZoneBeforeAcquireScrolling = System::Int8(0x10);
+static const System::Int8 ALDefaultVelocityFactor = System::Int8(0x1);
 }	/* namespace Alfmxinertialmovement */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXINERTIALMOVEMENT)
 using namespace Alfmxinertialmovement;

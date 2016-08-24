@@ -352,11 +352,11 @@ begin
   // init aTargetTabIndex
   aTargetTabIndex := fTabControl.tabindex;
   if compareValue(aVelocity, 0, Tepsilon.Position) > 0 then begin
-    if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) < 0 then
+    if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) <= 0 then
       if not fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.next) then exit; // the bounds animation will play
   end
   else if compareValue(aVelocity, 0, Tepsilon.Position) < 0 then begin
-    if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) > 0 then
+    if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) >= 0 then
       if not fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.back) then exit; // the bounds animation will play
   end;
 

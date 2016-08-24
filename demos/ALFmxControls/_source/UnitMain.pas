@@ -259,7 +259,7 @@ begin
   // aVelocity = pixels per seconds given by the anicalculations
   // ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) = the number of pixel we need to scroll
   // 6 = factor i choose to compensate the deceleration made by the quartic Interpolation
-  if comparevalue(aVelocity, 0) <> 0 then aDuration := abs(ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) / abs(aVelocity)) * 6
+  if comparevalue(aVelocity, 0) <> 0 then aDuration := abs((ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X)) / aVelocity) * 6
   else aDuration := 0.8;
   if aDuration > 0.8 then aDuration := 0.8
   else if aDuration < 0.1 then aDuration := 0.1;

@@ -180,6 +180,10 @@ type
     ALRangeTrackBar1: TALRangeTrackBar;
     ALTrackBar1: TALTrackBar;
     Button14: TButton;
+    Layout1: TLayout;
+    Layout2: TLayout;
+    Layout3: TLayout;
+    Layout4: TLayout;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -216,6 +220,8 @@ type
       Shift: TShiftState; X, Y: Single);
     procedure VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Single);
+    procedure ALTabControl1AniStart(Sender: TObject);
+    procedure ALTabControl1AniStop(Sender: TObject);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -249,6 +255,16 @@ uses system.Diagnostics,
      ALCommon;
 
 {$R *.fmx}
+
+procedure TForm1.ALTabControl1AniStart(Sender: TObject);
+begin
+//
+end;
+
+procedure TForm1.ALTabControl1AniStop(Sender: TObject);
+begin
+//
+end;
 
 procedure TForm1.ALTabControl1AniTransitionInit(const sender: TObject;
                                                 const aVelocity: Double;
@@ -901,50 +917,40 @@ begin
                 ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
 
   //-----
-  fALGlyph := TALGlyphStopWatch.Create(self);
-  fALGlyph.Parent := ALVertScrollBox1;
+  fALGlyph := TALGlyphStopWatch.Create(layout1);
+  fALGlyph.Parent := layout1;
   fALGlyph.doubleBuffered := True;
-  fALGlyph.Align := TalignLayout.Top;
-  fALGlyph.Margins.Top := 8;
-  fALGlyph.Position.Y := Button11.Position.Y - Button11.Margins.Top;
   fALGlyph.Size.Height := 22;
+  fALGlyph.Size.width := 22;
+  fALGlyph.Position.Point := TpointF.Create(0,0);
   fALGlyph.Images := ImageList1;
   fALGlyph.ImageIndex := 0;
-  fALGlyph.Stretch := false;
   //-----
-  fGlyph := TGlyphStopWatch.Create(self);
-  fGlyph.Parent := ALVertScrollBox1;
-  fGlyph.Align := TalignLayout.Top;
-  fGlyph.Margins.Top := 8;
-  fGlyph.Position.Y := Button11.Position.Y - Button11.Margins.Top;
+  fGlyph := TGlyphStopWatch.Create(layout2);
+  fGlyph.Parent := layout2;
   fGlyph.Size.Height := 22;
+  fGlyph.Size.width := 22;
+  fGlyph.Position.Point := TpointF.Create(0,0);
   fGlyph.Images := ImageList1;
   fGlyph.ImageIndex := 0;
-  fGlyph.Stretch := false;
 
   //-----
-  fALcheckbox2 := TALcheckboxStopWatch.Create(self);
-  fALcheckbox2.Parent := ALVertScrollBox1;
-  fALcheckbox2.Align := TalignLayout.Top;
+  fALcheckbox2 := TALcheckboxStopWatch.Create(layout3);
+  fALcheckbox2.Parent := layout3;
   fALcheckbox2.doubleBuffered := True;
   fALcheckbox2.Images := ImageList1;
   fALcheckbox2.ImageCheckedIndex := 1;
   fALcheckbox2.ImageUncheckedIndex := 2;
-  fALcheckbox2.Margins.Top := 8;
-  fALcheckbox2.Margins.right := 25;
-  fALcheckbox2.Margins.left := 25;
-  fALcheckbox2.Position.Y := button17.Position.Y - button17.Margins.Top;
   fALcheckbox2.Height := 22;
+  fALcheckbox2.width := 22;
+  fALcheckbox2.Position.Point := TpointF.Create(0,0);
   //-----
-  fcheckbox2 := TcheckboxStopWatch.Create(self);
-  fcheckbox2.Parent := ALVertScrollBox1;
-  fcheckbox2.Align := TalignLayout.Top;
+  fcheckbox2 := TcheckboxStopWatch.Create(layout4);
+  fcheckbox2.Parent := layout4;
   fcheckbox2.Text := '';
-  fcheckbox2.Margins.Top := 8;
-  fcheckbox2.Margins.right := 25;
-  fcheckbox2.Margins.left := 25;
-  fcheckbox2.Position.Y := button17.Position.Y - button17.Margins.Top;
   fcheckbox2.Height := 22;
+  fcheckbox2.width := 22;
+  fcheckbox2.Position.Point := TpointF.Create(0,0);
 
   //-----
   fALline := TALLineStopWatch.Create(self);

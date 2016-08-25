@@ -102,6 +102,8 @@ type
     FOnViewportPositionChange: TALTabPositionChangeEvent;
     FAniTransition: TFloatAnimation;
     fOnAniTransitionInit: TALTabAniTransitionInit;
+    fOnAniStart: TnotifyEvent;
+    fOnAniStop: TnotifyEvent;
     fMouseDownPos: single;
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
@@ -111,6 +113,7 @@ type
     function GetActiveTab: TALTabItem;
     procedure SetActiveTab(const Value: TALTabItem);
     procedure AniTransitionProcess(Sender: TObject);
+    procedure AniTransitionFinish(Sender: TObject);
     { IItemContainer }
     function GetItemsCount: Integer;
     function GetItem(const AIndex: Integer): TFmxObject;
@@ -140,7 +143,8 @@ type
     destructor Destroy; override;
     function SetActiveTabWithTransition(const ATab: TALTabItem;
                                         const ATransition: TALTabTransition;
-                                        const AVelocity: double=0): boolean; overload;
+                                        const AVelocity: double=0;
+                                        const ALaunchAniStartEvent: boolean = True): boolean; overload;
     function SetActiveTabWithTransition(const ATabIndex: integer; ATransition: TALTabTransition): boolean; overload;
     function FindVisibleTab(var Index: Integer; const FindKind: TFindKind): Boolean; overload;
     function FindVisibleTab(const FindKind: TFindKind): Integer; overload;
@@ -198,6 +202,8 @@ type
     property OnResize;
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
     property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
+    property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
+    property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
   end;
 
 procedure Register;
@@ -285,6 +291,8 @@ type
   TALTabControlAniCalculations = class(TALAniCalculations)
   private
     [Weak] FTabControl: TALTabControl;
+    fRunning: Boolean;
+    Procedure LaunchAniTransition;
   protected
     procedure DoStart; override;
     procedure DoStop; override;
@@ -293,6 +301,7 @@ type
     constructor Create(AOwner: TPersistent); override;
     procedure MouseDown(X, Y: Double); override;
     procedure MouseUp(X, Y: Double); override;
+    procedure MouseLeave; override;
     property TabControl: TALTabControl read FTabControl;
   end;
 
@@ -302,6 +311,7 @@ begin
   ValidateInheritance(AOwner, TALTabControl, False);
   inherited;
   FTabControl := TALTabControl(AOwner);
+  fRunning := False;
 end;
 
 {***********************************************}
@@ -319,12 +329,26 @@ end;
 procedure TALTabControlAniCalculations.DoStart;
 begin
   inherited DoStart;
+
+  if down and // << strangely when we do animation := False (in ScrollingAcquiredByOtherHandler) DoStart is called :(
+     (not fRunning) and
+     (assigned(FTabControl.fOnAniStart)) and
+     (not FTabControl.AniTransition.Running) then FTabControl.fOnAniStart(FTabControl);
+
+  if down then fRunning := true;
 end;
 
 {********************************************}
 procedure TALTabControlAniCalculations.DoStop;
 begin
   inherited DoStop;
+
+  if (not down) and
+     (fRunning) and
+     (not FTabControl.AniTransition.Running) and
+     (assigned(FTabControl.fOnAniStop)) then FTabControl.fOnAniStop(FTabControl);
+
+  if (not down) then fRunning := False;
 end;
 
 {*************************************************************}
@@ -334,14 +358,11 @@ begin
   if down then FTabControl.FAniTransition.StopAtCurrent;
 end;
 
-{***********************************************************}
-procedure TALTabControlAniCalculations.MouseUp(X, Y: Double);
+{*********************************************************}
+Procedure TALTabControlAniCalculations.LaunchAniTransition;
 var aVelocity: double;
     aTargetTabIndex: integer;
 begin
-
-  //inherited
-  inherited MouseUp(X, Y);
 
   // exit or if their is no activetab
   if (not FTabControl.HasActiveTab) then exit;
@@ -350,6 +371,7 @@ begin
   aVelocity := currentVelocity.X;
 
   // init aTargetTabIndex
+  fRunning := true;
   aTargetTabIndex := fTabControl.tabindex;
   if compareValue(aVelocity, 0, Tepsilon.Position) > 0 then begin
     if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) <= 0 then
@@ -361,12 +383,35 @@ begin
   end;
 
   // Stop the animation
-  animation := False; // this to stop the scroll and reset
-  animation := True;  // the velocity
+  fRunning := False;
+  if animation then begin
+    animation := False; // this to stop the scroll and reset
+    animation := True;  // the velocity
+  end;
 
   // SetActiveTabWithTransition + aVelocity
-  fTabControl.SetActiveTabWithTransition(fTabControl.tabs[aTargetTabIndex], TALTabTransition.Slide, aVelocity);
+  fTabControl.SetActiveTabWithTransition(fTabControl.tabs[aTargetTabIndex], TALTabTransition.Slide, aVelocity, false{ALaunchAniStartEvent});
 
+end;
+
+{***********************************************************}
+procedure TALTabControlAniCalculations.MouseUp(X, Y: Double);
+var aDown: Boolean;
+begin
+  aDown := Down;
+  fRunning := False;
+  inherited MouseUp(X, Y);
+  if aDown then LaunchAniTransition;
+end;
+
+{************************************************}
+procedure TALTabControlAniCalculations.MouseLeave;
+var aDown: Boolean;
+begin
+  aDown := Down;
+  fRunning := False;
+  inherited MouseLeave;
+  if aDown then LaunchAniTransition;
 end;
 
 {***************************************************}
@@ -376,10 +421,13 @@ begin
   //-----
   FAniTransition := TFloatAnimation.Create(Self);
   FAniTransition.OnProcess := AniTransitionProcess;
+  FAniTransition.OnFinish := AniTransitionFinish;
   FAniTransition.PropertyName := 'Position.X';
   FAniTransition.StartFromCurrent := True;
   FAniTransition.StopValue := 0;
   fOnAniTransitionInit := nil;
+  fOnAniStart := nil;
+  fOnAniStop := nil;
   //-----
   FTabCount := 0;
   FMouseEvents := False;
@@ -618,11 +666,11 @@ procedure TALTabControl.ScrollingAcquiredByOtherHandler(const Sender: TObject; c
 begin
   //the scrolling was acquired by another control (like a scrollbox for exemple)
   if Sender <> self then begin
-    fAniCalculations.MouseLeave;
     if fAniCalculations.animation then begin
       fAniCalculations.animation := False;
       fAniCalculations.animation := true;
     end;
+    fAniCalculations.MouseLeave;
     FMouseEvents := False;
     fGestureEvents := False;
   end;
@@ -857,10 +905,19 @@ begin
 
 end;
 
+{***********************************************************}
+procedure TALTabControl.AniTransitionFinish(Sender: TObject);
+begin
+  if (assigned(fOnAniStop)) and
+     (not fAniCalculations.down) then
+    fOnAniStop(Self);
+end;
+
 {***********************************************************************}
 function TALTabControl.SetActiveTabWithTransition(const ATab: TALTabItem;
                                                   const ATransition: TALTabTransition;
-                                                  const AVelocity: double=0): boolean;
+                                                  const AVelocity: double=0;
+                                                  const ALaunchAniStartEvent: boolean = True): boolean;
 var aDuration: Single;
     aAnimationType: TAnimationType;
     aInterpolation: TInterpolationType;
@@ -888,6 +945,8 @@ begin
     FAniTransition.Duration := aDuration;
     FAniTransition.AnimationType := aAnimationType;
     FAniTransition.Interpolation := aInterpolation;
+    if (ALaunchAniStartEvent) and
+       (assigned(fOnAniStart)) then fOnAniStart(self);
     FAniTransition.start;
 
   end

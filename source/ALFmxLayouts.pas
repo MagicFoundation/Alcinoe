@@ -99,6 +99,8 @@ type
     fGestureEvents: Boolean;
     FOnViewportPositionChange: TALScrollBoxPositionChangeEvent;
     fOnScrollBarInit: TALScrollBoxBarInit;
+    fOnAniStart: TnotifyEvent;
+    fOnAniStop: TnotifyEvent;
     fMouseDownPos: TpointF;
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
@@ -140,6 +142,8 @@ type
     property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default ALDefaultDeadZoneBeforeAcquireScrolling;
     property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
+    property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
+    property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
   end;
 
   {**************************************}
@@ -201,6 +205,8 @@ type
     { ScrollBox events }
     property OnViewportPositionChange;
     property OnScrollBarInit;
+    property OnAniStart;
+    property OnAniStop;
   end;
 
   {******************************************}
@@ -263,6 +269,8 @@ type
     { ScrollBox events }
     property OnViewportPositionChange;
     property OnScrollBarInit;
+    property OnAniStart;
+    property OnAniStop;
   end;
 
   {******************************************}
@@ -325,6 +333,8 @@ type
     { ScrollBox events }
     property OnViewportPositionChange;
     property OnScrollBarInit;
+    property OnAniStart;
+    property OnAniStop;
   end;
 
 procedure Register;
@@ -425,6 +435,9 @@ begin
   inherited DoStart;
   if (FScrollBox.Scene <> nil) and not (csDestroying in FScrollBox.ComponentState) then
     FScrollBox.Scene.ChangeScrollingState(FScrollBox, True);
+  if (down) and // << strangely when we do animation := False (in ScrollingAcquiredByOtherHandler) DoStart is called :(
+     (assigned(fscrollBox.fOnAniStart)) then
+    fscrollBox.fOnAniStart(fscrollBox);
 end;
 
 {*******************************************}
@@ -433,6 +446,9 @@ begin
   inherited DoStop;
   if (FScrollBox.Scene <> nil) and not (csDestroying in FScrollBox.ComponentState) then
     FScrollBox.Scene.ChangeScrollingState(nil, False);
+  if (not down) and
+     (assigned(fscrollBox.fOnAniStop)) then
+    fscrollBox.fOnAniStop(fscrollBox);
 end;
 
 {*****************************************************}
@@ -478,6 +494,8 @@ begin
   fGestureEvents := False;
   FOnViewportPositionChange := nil;
   fOnScrollBarInit := nil;
+  fOnAniStart := nil;
+  fOnAniStop := nil;
   fAniCalculations := CreateAniCalculations;
   //-----
   FVScrollBar := nil;
@@ -671,11 +689,11 @@ procedure TALCustomScrollBox.ScrollingAcquiredByOtherHandler(const Sender: TObje
 begin
   //the scrolling was acquired by another control (like a scrollbox for exemple)
   if Sender <> self then begin
-    fAniCalculations.MouseLeave;
     if fAniCalculations.animation then begin
       fAniCalculations.animation := False;
       fAniCalculations.animation := true;
     end;
+    fAniCalculations.MouseLeave;
     FMouseEvents := False;
     fGestureEvents := False;
   end;

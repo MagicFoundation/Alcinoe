@@ -44,7 +44,7 @@ IF ERRORLEVEL 1 pause
 mkdir lib\alcinoe\Win32\berlin
 IF ERRORLEVEL 1 pause
 
-MSBuild source\Alcinoe_berlin.dproj /t:build /p:Config=Release /p:Platform=Win32
+MSBuild source\Alcinoe_berlin.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 pause
 
 if "%INPUT%"=="Y" goto BUILD_DEMOS
@@ -128,8 +128,8 @@ IF ERRORLEVEL 1 pause
 CHDIR demos\
 FOR /R %%J IN (*.dproj) DO (	
   echo %%J			
-  MSBuild %%J /t:build /p:Config=Release /p:Platform=Win32
-  MSBuild %%J /t:build /p:Config=RELEASE /p:Platform=Win64
+  MSBuild %%J /p:Config=Release /p:Platform=Win32
+  MSBuild %%J /p:Config=RELEASE /p:Platform=Win64
   IF ERRORLEVEL 1 pause
 )
 CHDIR ..
@@ -177,7 +177,7 @@ if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
   del ..\BlowPipeEmail\*.skincfg /s
   IF ERRORLEVEL 1 pause
   
-  MSBuild ..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj /t:build /p:Config=Release /p:Platform=Win32
+  MSBuild ..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj /p:Config=Release /p:Platform=Win32
   IF ERRORLEVEL 1 pause
   
   xcopy ..\BlowPipeEmail\BlowPipeEmail.exe demos\BlowPipeEmail /s
@@ -217,7 +217,7 @@ if exist ..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
   del ..\BlowPipeSMS\*.skincfg /s
   IF ERRORLEVEL 1 pause
   
-  MSBuild ..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj /t:build /p:Config=Release /p:Platform=Win32
+  MSBuild ..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj /p:Config=Release /p:Platform=Win32
   IF ERRORLEVEL 1 pause
   
   xcopy ..\BlowPipeSMS\BlowPipeSMS.exe demos\BlowPipeSMS /s

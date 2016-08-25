@@ -131,6 +131,8 @@ private:
 	bool fGestureEvents;
 	TALScrollBoxPositionChangeEvent FOnViewportPositionChange;
 	TALScrollBoxBarInit fOnScrollBarInit;
+	System::Classes::TNotifyEvent fOnAniStart;
+	System::Classes::TNotifyEvent fOnAniStop;
 	System::Types::TPointF fMouseDownPos;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
@@ -174,6 +176,8 @@ public:
 	__property int DeadZoneBeforeAcquireScrolling = {read=FDeadZoneBeforeAcquireScrolling, write=FDeadZoneBeforeAcquireScrolling, default=16};
 	__property TALScrollBoxBarInit OnScrollBarInit = {read=fOnScrollBarInit, write=fOnScrollBarInit};
 	__property ClipChildren = {default=1};
+	__property System::Classes::TNotifyEvent OnAniStart = {read=fOnAniStart, write=fOnAniStart};
+	__property System::Classes::TNotifyEvent OnAniStop = {read=fOnAniStop, write=fOnAniStop};
 };
 
 
@@ -236,6 +240,8 @@ __published:
 	__property OnMouseLeave;
 	__property OnViewportPositionChange;
 	__property OnScrollBarInit;
+	__property OnAniStart;
+	__property OnAniStop;
 public:
 	/* TALCustomScrollBox.Destroy */ inline __fastcall virtual ~TALScrollBox(void) { }
 	
@@ -302,6 +308,8 @@ __published:
 	__property OnMouseLeave;
 	__property OnViewportPositionChange;
 	__property OnScrollBarInit;
+	__property OnAniStart;
+	__property OnAniStop;
 public:
 	/* TALCustomScrollBox.Destroy */ inline __fastcall virtual ~TALVertScrollBox(void) { }
 	
@@ -368,6 +376,8 @@ __published:
 	__property OnMouseLeave;
 	__property OnViewportPositionChange;
 	__property OnScrollBarInit;
+	__property OnAniStart;
+	__property OnAniStop;
 public:
 	/* TALCustomScrollBox.Destroy */ inline __fastcall virtual ~TALHorzScrollBox(void) { }
 	

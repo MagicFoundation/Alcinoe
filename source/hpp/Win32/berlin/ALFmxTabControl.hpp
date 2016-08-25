@@ -124,6 +124,8 @@ private:
 	TALTabPositionChangeEvent FOnViewportPositionChange;
 	Fmx::Ani::TFloatAnimation* FAniTransition;
 	TALTabAniTransitionInit fOnAniTransitionInit;
+	System::Classes::TNotifyEvent fOnAniStart;
+	System::Classes::TNotifyEvent fOnAniStop;
 	float fMouseDownPos;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
@@ -133,6 +135,7 @@ private:
 	TALTabItem* __fastcall GetActiveTab(void);
 	void __fastcall SetActiveTab(TALTabItem* const Value);
 	void __fastcall AniTransitionProcess(System::TObject* Sender);
+	void __fastcall AniTransitionFinish(System::TObject* Sender);
 	int __fastcall GetItemsCount(void);
 	Fmx::Types::TFmxObject* __fastcall GetItem(const int AIndex);
 	
@@ -160,7 +163,7 @@ protected:
 public:
 	__fastcall virtual TALTabControl(System::Classes::TComponent* AOwner);
 	__fastcall virtual ~TALTabControl(void);
-	bool __fastcall SetActiveTabWithTransition(TALTabItem* const ATab, const TALTabTransition ATransition, const double AVelocity = 0.000000E+00)/* overload */;
+	bool __fastcall SetActiveTabWithTransition(TALTabItem* const ATab, const TALTabTransition ATransition, const double AVelocity = 0.000000E+00, const bool ALaunchAniStartEvent = true)/* overload */;
 	bool __fastcall SetActiveTabWithTransition(const int ATabIndex, TALTabTransition ATransition)/* overload */;
 	bool __fastcall FindVisibleTab(int &Index, const TFindKind FindKind)/* overload */;
 	int __fastcall FindVisibleTab(const TFindKind FindKind)/* overload */;
@@ -219,6 +222,8 @@ __published:
 	__property OnResize;
 	__property TALTabPositionChangeEvent OnViewportPositionChange = {read=FOnViewportPositionChange, write=FOnViewportPositionChange};
 	__property TALTabAniTransitionInit OnAniTransitionInit = {read=fOnAniTransitionInit, write=fOnAniTransitionInit};
+	__property System::Classes::TNotifyEvent OnAniStart = {read=fOnAniStart, write=fOnAniStart};
+	__property System::Classes::TNotifyEvent OnAniStop = {read=fOnAniStop, write=fOnAniStop};
 private:
 	void *__IItemsContainer;	// Fmx::Types::IItemsContainer 
 	

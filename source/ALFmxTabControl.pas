@@ -160,7 +160,7 @@ type
     property Tabs[AIndex: Integer]: TALTabItem read GetTabItem;
     property AniCalculations: TALAniCalculations read FAniCalculations;
     property AniTransition: TFloatAnimation read FAniTransition;
-    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default ALDefaultDeadZoneBeforeAcquireScrolling;
+    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 16;
   published
     property Align;
     property Anchors;
@@ -330,10 +330,10 @@ procedure TALTabControlAniCalculations.DoStart;
 begin
   inherited DoStart;
 
-  if down and // << strangely when we do animation := False (in ScrollingAcquiredByOtherHandler) DoStart is called :(
-     (not fRunning) and
+  if (not fRunning) and
      (assigned(FTabControl.fOnAniStart)) and
-     (not FTabControl.AniTransition.Running) then FTabControl.fOnAniStart(FTabControl);
+     (not FTabControl.AniTransition.Running) and
+     (not (csDestroying in FTabControl.ComponentState)) then FTabControl.fOnAniStart(FTabControl);
 
   if down then fRunning := true;
 end;
@@ -343,10 +343,10 @@ procedure TALTabControlAniCalculations.DoStop;
 begin
   inherited DoStop;
 
-  if (not down) and
-     (fRunning) and
+  if (fRunning) and
      (not FTabControl.AniTransition.Running) and
-     (assigned(FTabControl.fOnAniStop)) then FTabControl.fOnAniStop(FTabControl);
+     (assigned(FTabControl.fOnAniStop)) and
+     (not (csDestroying in FTabControl.ComponentState)) then FTabControl.fOnAniStop(FTabControl);
 
   if (not down) then fRunning := False;
 end;
@@ -371,23 +371,22 @@ begin
   aVelocity := currentVelocity.X;
 
   // init aTargetTabIndex
-  fRunning := true;
   aTargetTabIndex := fTabControl.tabindex;
   if compareValue(aVelocity, 0, Tepsilon.Position) > 0 then begin
     if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) <= 0 then
-      if not fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.next) then exit; // the bounds animation will play
+      fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.next); // if not found the bounds animation will play
   end
   else if compareValue(aVelocity, 0, Tepsilon.Position) < 0 then begin
     if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) >= 0 then
-      if not fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.back) then exit; // the bounds animation will play
+      fTabControl.FindVisibleTab(aTargetTabIndex, TALTabControl.TFindKind.back); // if not found the bounds animation will play
   end;
 
   // Stop the animation
   fRunning := False;
-  if animation then begin
-    animation := False; // this to stop the scroll and reset
-    animation := True;  // the velocity
-  end;
+  Enabled := False; // this to stop the timer
+                    // because timer it's problem when we are in bound
+                    // Enabled := False will work only because interval = 0
+                    // ##{^#{^ anicalculations is very hard to understand :(
 
   // SetActiveTabWithTransition + aVelocity
   fTabControl.SetActiveTabWithTransition(fTabControl.tabs[aTargetTabIndex], TALTabTransition.Slide, aVelocity, false{ALaunchAniStartEvent});
@@ -441,7 +440,7 @@ begin
   FRealigningTabs := False;
   AutoCapture := True;
   SetAcceptsControls(True);
-  FDeadZoneBeforeAcquireScrolling := ALDefaultDeadZoneBeforeAcquireScrolling;
+  FDeadZoneBeforeAcquireScrolling := 16;
   fMouseDownPos := 0;
   fScrollingAcquiredByMe := False;
   fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
@@ -451,7 +450,8 @@ begin
   FAniCalculations.AutoShowing := False;  // Enables the smooth hiding and showing of scroll bars.
   FAniCalculations.averaging := false;  // Specifies whether to average an inertial moving velocity taking into account all existing points on a trajectory.
   FAniCalculations.BoundsAnimation := true; // the TTargetType.Min and TTargetType.Max must be set. this make a bound the the animation reach the min or max of the scrooling area
-  FAniCalculations.Interval := ALDefaultIntervalOfAni; // DefaultIntervalOfAni 10 ms for ~100 frames per second - Defines the interval between successive updates of the pictures of the inertial moving.
+  FAniCalculations.Interval := 0; // DefaultIntervalOfAni 10 ms for ~100 frames per second - Defines the interval between successive updates of the pictures of the inertial moving.
+                                  // we don't need any inertial moving with FAniCalculations - we use FAniCalculations just to calculate the velocity
   FAniCalculations.TouchTracking := [ttHorizontal]; // Defines the possible directions of the inertial scrolling initiated by the touch input.
   FAniCalculations.DecelerationRate := ALDecelerationRateNormal; // DecelerationRateNormal (1.95) - Determines the deceleration rate of inertial scrolling.
   FAniCalculations.Elasticity := ALDefaultElasticity; // By default, the scroll view "bounces" back when scrolling exceeds the bounds of the content.
@@ -665,12 +665,8 @@ end;
 procedure TALTabControl.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   //the scrolling was acquired by another control (like a scrollbox for exemple)
-  if Sender <> self then begin
-    if fAniCalculations.animation then begin
-      fAniCalculations.animation := False;
-      fAniCalculations.animation := true;
-    end;
-    fAniCalculations.MouseLeave;
+  if fAniCalculations.down and (Sender <> self) then begin
+    fAniCalculations.MouseLeave; // instead of down := false to reposition the tabitem
     FMouseEvents := False;
     fGestureEvents := False;
   end;

@@ -33,7 +33,6 @@ const
   ALDefaultMinVelocity = 10;
   ALDefaultMaxVelocity = 5000;
   ALDefaultDeadZone = 8;
-  ALDefaultDeadZoneBeforeAcquireScrolling = 16;
   ALDefaultVelocityFactor = 1;
 
 type
@@ -234,7 +233,7 @@ type
     procedure SetTargets(const ATargets: array of TTarget);
     procedure GetTargets(var ATargets: array of TTarget);
     procedure UpdatePosImmediately(const Force: Boolean = False);
-    property CurrentVelocity: TALPointD read FCurrentVelocity;
+    property CurrentVelocity: TALPointD read FCurrentVelocity write FCurrentVelocity;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
     property ViewportPositionF: TPointF read GetViewportPositionF write SetViewportPositionF;
     property LastTimeCalc: TDateTime read FLastTimeCalc;

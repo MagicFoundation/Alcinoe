@@ -139,7 +139,7 @@ type
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
     property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default ALDefaultDeadZoneBeforeAcquireScrolling;
+    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 32;
     property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
@@ -433,10 +433,13 @@ end;
 procedure TALScrollBoxAniCalculations.DoStart;
 begin
   inherited DoStart;
-  if (FScrollBox.Scene <> nil) and not (csDestroying in FScrollBox.ComponentState) then
+
+  if (FScrollBox.Scene <> nil) and
+     (not (csDestroying in FScrollBox.ComponentState)) then
     FScrollBox.Scene.ChangeScrollingState(FScrollBox, True);
-  if (down) and // << strangely when we do animation := False (in ScrollingAcquiredByOtherHandler) DoStart is called :(
-     (assigned(fscrollBox.fOnAniStart)) then
+
+  if (assigned(fscrollBox.fOnAniStart)) and
+     (not (csDestroying in FScrollBox.ComponentState)) then
     fscrollBox.fOnAniStart(fscrollBox);
 end;
 
@@ -444,10 +447,13 @@ end;
 procedure TALScrollBoxAniCalculations.DoStop;
 begin
   inherited DoStop;
-  if (FScrollBox.Scene <> nil) and not (csDestroying in FScrollBox.ComponentState) then
+
+  if (FScrollBox.Scene <> nil) and
+     (not (csDestroying in FScrollBox.ComponentState)) then
     FScrollBox.Scene.ChangeScrollingState(nil, False);
-  if (not down) and
-     (assigned(fscrollBox.fOnAniStop)) then
+
+  if (assigned(fscrollBox.fOnAniStop)) and
+     (not (csDestroying in FScrollBox.ComponentState)) then
     fscrollBox.fOnAniStop(fscrollBox);
 end;
 
@@ -503,7 +509,7 @@ begin
   FContent := CreateContent;
   //-----
   fMouseDownPos := TpointF.Create(0,0);
-  FDeadZoneBeforeAcquireScrolling := ALDefaultDeadZoneBeforeAcquireScrolling;
+  FDeadZoneBeforeAcquireScrolling := 32;
   fScrollingAcquiredByMe := False;
   fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
 end;
@@ -688,12 +694,9 @@ end;
 procedure TALCustomScrollBox.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
   //the scrolling was acquired by another control (like a scrollbox for exemple)
-  if Sender <> self then begin
-    if fAniCalculations.animation then begin
-      fAniCalculations.animation := False;
-      fAniCalculations.animation := true;
-    end;
-    fAniCalculations.MouseLeave;
+  if fAniCalculations.down and (Sender <> self) then begin
+    fAniCalculations.Down := false;
+    fAniCalculations.CurrentVelocity := TalPointD.Create(0,0);
     FMouseEvents := False;
     fGestureEvents := False;
   end;

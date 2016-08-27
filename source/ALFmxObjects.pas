@@ -37,6 +37,8 @@ type
     fBufSize: TsizeF;
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
+    procedure FillChanged(Sender: TObject); override;
+    procedure StrokeChanged(Sender: TObject); override;
     procedure Paint; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read fBufBitmap;
@@ -69,6 +71,8 @@ type
     fBufSize: TsizeF;
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
+    procedure FillChanged(Sender: TObject); override;
+    procedure StrokeChanged(Sender: TObject); override;
     procedure Paint; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read fBufBitmap;
@@ -101,6 +105,8 @@ type
     fBufSize: TsizeF;
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
+    procedure FillChanged(Sender: TObject); override;
+    procedure StrokeChanged(Sender: TObject); override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read fBufBitmap;
     {$ELSE}
@@ -361,6 +367,20 @@ begin
     fBufBitmap.Free;
     fBufBitmap := nil;
   end;
+end;
+
+{**************************************************}
+procedure TALRectangle.FillChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  inherited;
+end;
+
+{****************************************************}
+procedure TALRectangle.StrokeChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  inherited;
 end;
 
 {************************************}
@@ -1279,6 +1299,20 @@ begin
   end;
 end;
 
+{***********************************************}
+procedure TALCircle.FillChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  inherited;
+end;
+
+{*************************************************}
+procedure TALCircle.StrokeChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  inherited;
+end;
+
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 function TALCircle.MakeBufBitmap: TTexture;
@@ -1800,6 +1834,20 @@ begin
     fBufBitmap.Free;
     fBufBitmap := nil;
   end;
+end;
+
+{*********************************************}
+procedure TALLine.FillChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  inherited;
+end;
+
+{***********************************************}
+procedure TALLine.StrokeChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  inherited;
 end;
 
 {************************************}

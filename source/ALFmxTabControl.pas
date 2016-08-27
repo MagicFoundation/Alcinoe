@@ -400,7 +400,7 @@ begin
   aDown := Down;
   fRunning := False;
   inherited MouseUp(X, Y);
-  if aDown then LaunchAniTransition;
+  if aDown and Moved then LaunchAniTransition;
 end;
 
 {************************************************}
@@ -410,7 +410,7 @@ begin
   aDown := Down;
   fRunning := False;
   inherited MouseLeave;
-  if aDown then LaunchAniTransition;
+  if aDown and Moved then LaunchAniTransition;
 end;
 
 {***************************************************}

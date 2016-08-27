@@ -137,11 +137,15 @@ private:
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
 	int fScrollingAcquiredByOtherMessageID;
+	float fMaxContentWidth;
+	float fMaxContentHeight;
 	void __fastcall ScrollingAcquiredByOtherHandler(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
 	float __fastcall GetSceneScale(void);
 	void __fastcall SetShowScrollBars(const bool Value);
 	void __fastcall SetAutoHide(const bool Value);
 	void __fastcall setAniCalculations(TALScrollBoxAniCalculations* const Value);
+	bool __fastcall isMaxContentHeightStored(void);
+	bool __fastcall isMaxContentWidthStored(void);
 	
 protected:
 	virtual void __fastcall Loaded(void);
@@ -159,6 +163,8 @@ protected:
 	virtual void __fastcall MouseWheel(System::Classes::TShiftState Shift, int WheelDelta, bool &Handled);
 	__property TALScrollBoxBar* HScrollBar = {read=FHScrollBar};
 	__property TALScrollBoxBar* VScrollBar = {read=FVScrollBar};
+	__property float MaxContentWidth = {read=fMaxContentWidth, write=fMaxContentWidth, stored=isMaxContentWidthStored};
+	__property float MaxContentHeight = {read=fMaxContentHeight, write=fMaxContentHeight, stored=isMaxContentHeightStored};
 	
 public:
 	__fastcall virtual TALCustomScrollBox(System::Classes::TComponent* AOwner);
@@ -173,7 +179,7 @@ public:
 	__property bool DisableMouseWheel = {read=FDisableMouseWheel, write=FDisableMouseWheel, default=0};
 	__property bool ShowScrollBars = {read=FShowScrollBars, write=SetShowScrollBars, default=1};
 	__property TALScrollBoxPositionChangeEvent OnViewportPositionChange = {read=FOnViewportPositionChange, write=FOnViewportPositionChange};
-	__property int DeadZoneBeforeAcquireScrolling = {read=FDeadZoneBeforeAcquireScrolling, write=FDeadZoneBeforeAcquireScrolling, default=16};
+	__property int DeadZoneBeforeAcquireScrolling = {read=FDeadZoneBeforeAcquireScrolling, write=FDeadZoneBeforeAcquireScrolling, default=32};
 	__property TALScrollBoxBarInit OnScrollBarInit = {read=fOnScrollBarInit, write=fOnScrollBarInit};
 	__property ClipChildren = {default=1};
 	__property System::Classes::TNotifyEvent OnAniStart = {read=fOnAniStart, write=fOnAniStart};
@@ -192,6 +198,8 @@ public:
 	__fastcall virtual TALScrollBox(System::Classes::TComponent* AOwner);
 	
 __published:
+	__property MaxContentWidth = {default=0};
+	__property MaxContentHeight = {default=0};
 	__property HScrollBar;
 	__property VScrollBar;
 	__property AniCalculations;
@@ -261,6 +269,7 @@ public:
 	__fastcall virtual TALVertScrollBox(System::Classes::TComponent* AOwner);
 	
 __published:
+	__property MaxContentWidth = {default=0};
 	__property VScrollBar;
 	__property AniCalculations;
 	__property Align = {default=0};
@@ -329,6 +338,7 @@ public:
 	__fastcall virtual TALHorzScrollBox(System::Classes::TComponent* AOwner);
 	
 __published:
+	__property MaxContentHeight = {default=0};
 	__property HScrollBar;
 	__property AniCalculations;
 	__property Align = {default=0};

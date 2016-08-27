@@ -63,6 +63,7 @@ type
     [weak] FScrollBox: TALCustomScrollBox;
   protected
     procedure DoChanged; override;
+    procedure Resize; override;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -105,11 +106,16 @@ type
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
     fScrollingAcquiredByOtherMessageID: integer;
+    fMaxContentWidth: Single;
+    fMaxContentHeight: single;
+    fAnchoredContentOffset: TPointF;
     procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
     function GetSceneScale: Single;
     procedure SetShowScrollBars(const Value: Boolean);
     procedure SetAutoHide(const Value: Boolean);
     procedure setAniCalculations(const Value: TALScrollBoxAniCalculations);
+    function isMaxContentHeightStored: Boolean;
+    function isMaxContentWidthStored: Boolean;
   protected
     procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
@@ -126,6 +132,8 @@ type
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     property HScrollBar: TALScrollBoxBar read fHScrollBar;
     property VScrollBar: TALScrollBoxBar read fVScrollBar;
+    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored;
+    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -218,6 +226,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property MaxContentWidth;
     property VScrollBar;
     property AniCalculations;
     property Align;
@@ -282,6 +291,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property MaxContentHeight;
     property HScrollBar;
     property AniCalculations;
     property Align;
@@ -342,6 +352,7 @@ procedure Register;
 implementation
 
 uses System.SysUtils,
+     System.Math,
      System.Math.Vectors,
      {$IFDEF ALDPK}
      DesignIntf,
@@ -387,7 +398,8 @@ procedure TALScrollBoxAniCalculations.DoChanged;
   begin
     X := Round(ViewportPosition.X * fSceneScale) / fSceneScale;
     Y := Round(ViewportPosition.Y * fSceneScale) / fSceneScale;
-    Result := TPointF.Create(X, Y);
+    Result := TPointF.Create(X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
+                             Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
   end;
 
 var aNewViewportPosition: TPointF;
@@ -480,6 +492,13 @@ begin
   inherited DoChanged;
 end;
 
+{*******************************}
+procedure TALScrollBoxBar.Resize;
+begin
+  inherited;
+  FScrollBox.Realign;
+end;
+
 {********************************************************}
 constructor TALCustomScrollBox.Create(AOwner: TComponent);
 var aDeviceService: IFMXDeviceService;
@@ -503,6 +522,9 @@ begin
   fOnAniStart := nil;
   fOnAniStop := nil;
   fAniCalculations := CreateAniCalculations;
+  fMaxContentWidth := 0;
+  fMaxContentHeight := 0;
+  fAnchoredContentOffset := TpointF.Create(0,0);
   //-----
   FVScrollBar := nil;
   FHScrollBar := nil;
@@ -530,6 +552,18 @@ begin
   if Result <= 0 then Result := 1;
 end;
 
+{************************************************************}
+function TALCustomScrollBox.isMaxContentHeightStored: Boolean;
+begin
+  result := not sameValue(fMaxContentHeight, 0, Tepsilon.Position);
+end;
+
+{***********************************************************}
+function TALCustomScrollBox.isMaxContentWidthStored: Boolean;
+begin
+  result := not sameValue(fMaxContentWidth, 0, Tepsilon.Position);
+end;
+
 {****************************************************}
 function TALCustomScrollBox.CalcContentBounds: TRectF;
 var I: Integer;
@@ -546,6 +580,7 @@ begin
       end;
   if result.Top < 0 then result.Top := 0;
   if result.left < 0 then result.left := 0;
+  fAnchoredContentOffset := TpointF.Create(0, 0);
 end;
 
 {***********************************************}
@@ -610,7 +645,11 @@ procedure TALCustomScrollBox.DoRealign;
     aNewTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
     aNewTargets[0].Point := Tpointf.Create(0,0);
     aNewTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
-    aNewTargets[1].Point := TpointF.Create(aContentRect.Width - width, aContentRect.Height - height);
+    if (fHScrollBar <> nil) and
+       (fVScrollBar <> nil) then aNewTargets[1].Point := TpointF.Create(aContentRect.Width - width, aContentRect.Height - height)
+    else if (fVScrollBar <> nil) then aNewTargets[1].Point := TpointF.Create(0, aContentRect.Height - height)
+    else if (fHScrollBar <> nil) then aNewTargets[1].Point := TpointF.Create(aContentRect.Width - width, 0)
+    else aNewTargets[1].Point := TpointF.Create(0, 0);
     AniCalculations.SetTargets(aNewTargets);
   end;
 
@@ -623,7 +662,10 @@ begin
 
     if (FContent <> nil) then begin
       aContentRect := CalcContentBounds;
-      Content.SetBoundsRect(aContentRect);
+      Content.SetBounds(aContentRect.Left + fAnchoredContentOffset.x,
+                        aContentRect.Top + fAnchoredContentOffset.y,
+                        aContentRect.Width,
+                        aContentRect.Height);
       _UpdateVScrollBar(aContentRect);
       _UpdateHScrollBar(aContentRect);
       _UpdateAnimationTargets(aContentRect);
@@ -639,12 +681,12 @@ end;
 function TALCustomScrollBox.CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar;
 begin
   Result := TALScrollBoxBar.Create(self);
+  Result.Parent := self;
+  Result.Stored := False;
+  Result.SetSubComponent(True);
+  Result.Locked := True;
   Result.Beginupdate;
   try
-    Result.Parent := self;
-    Result.Stored := False;
-    Result.SetSubComponent(True);
-    Result.Locked := True;
     Result.Orientation := aOrientation;
     result.Thumb.HitTest := not HasTouchScreen; // at design time (windows) will be always true = default value
                                                 // this mean that true will be never save in the dfm! only false
@@ -895,7 +937,11 @@ end;
 function TALVertScrollBox.CalcContentBounds: TRectF;
 begin
   Result := inherited CalcContentBounds;
-  Result.Width := Width;
+  if not sameValue(fMaxContentWidth, 0, Tepsilon.Position) then begin
+    result.Width := Min(fMaxContentWidth, Width);
+    fAnchoredContentOffset.X := Round(((Width - result.Width) / 2) * getSceneScale) / getSceneScale;
+  end
+  else Result.Width := Width;
 end;
 
 {******************************************************}
@@ -925,6 +971,11 @@ function TALHorzScrollBox.CalcContentBounds: TRectF;
 begin
   Result := inherited CalcContentBounds;
   Result.Height := Height;
+  if not sameValue(fMaxContentHeight, 0, Tepsilon.Position) then begin
+    result.Height := min(Height, fMaxContentHeight);
+    fAnchoredContentOffset.Y := Round(((Height - result.Height) / 2) * getSceneScale) / getSceneScale;
+  end
+  else Result.Height := Height;
 end;
 
 {******************************************************}

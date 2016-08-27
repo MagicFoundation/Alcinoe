@@ -87,6 +87,7 @@ private:
 	
 protected:
 	virtual void __fastcall DoChanged(void);
+	virtual void __fastcall Resize(void);
 	
 public:
 	__fastcall virtual TALScrollBoxBar(System::Classes::TComponent* AOwner);
@@ -139,6 +140,7 @@ private:
 	int fScrollingAcquiredByOtherMessageID;
 	float fMaxContentWidth;
 	float fMaxContentHeight;
+	System::Types::TPointF fAnchoredContentOffset;
 	void __fastcall ScrollingAcquiredByOtherHandler(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
 	float __fastcall GetSceneScale(void);
 	void __fastcall SetShowScrollBars(const bool Value);
@@ -198,8 +200,6 @@ public:
 	__fastcall virtual TALScrollBox(System::Classes::TComponent* AOwner);
 	
 __published:
-	__property MaxContentWidth = {default=0};
-	__property MaxContentHeight = {default=0};
 	__property HScrollBar;
 	__property VScrollBar;
 	__property AniCalculations;

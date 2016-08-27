@@ -270,7 +270,7 @@ public:
 	void __fastcall SetTargets(const TTarget *ATargets, const int ATargets_High);
 	void __fastcall GetTargets(TTarget *ATargets, const int ATargets_High);
 	void __fastcall UpdatePosImmediately(const bool Force = false);
-	__property TALPointD CurrentVelocity = {read=FCurrentVelocity};
+	__property TALPointD CurrentVelocity = {read=FCurrentVelocity, write=FCurrentVelocity};
 	__property TALPointD ViewportPosition = {read=FViewportPosition, write=SetViewportPosition};
 	__property System::Types::TPointF ViewportPositionF = {read=GetViewportPositionF, write=SetViewportPositionF};
 	__property System::TDateTime LastTimeCalc = {read=FLastTimeCalc};
@@ -304,7 +304,6 @@ static const System::Int8 ALDefaultElasticity = System::Int8(0x64);
 static const System::Int8 ALDefaultMinVelocity = System::Int8(0xa);
 static const System::Word ALDefaultMaxVelocity = System::Word(0x1388);
 static const System::Int8 ALDefaultDeadZone = System::Int8(0x8);
-static const System::Int8 ALDefaultDeadZoneBeforeAcquireScrolling = System::Int8(0x10);
 static const System::Int8 ALDefaultVelocityFactor = System::Int8(0x1);
 }	/* namespace Alfmxinertialmovement */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXINERTIALMOVEMENT)

@@ -46,6 +46,8 @@ private:
 	void __fastcall SetdoubleBuffered(const bool Value);
 	
 protected:
+	virtual void __fastcall FillChanged(System::TObject* Sender);
+	virtual void __fastcall StrokeChanged(System::TObject* Sender);
 	virtual void __fastcall Paint(void);
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
 	
@@ -72,6 +74,8 @@ private:
 	void __fastcall SetdoubleBuffered(const bool Value);
 	
 protected:
+	virtual void __fastcall FillChanged(System::TObject* Sender);
+	virtual void __fastcall StrokeChanged(System::TObject* Sender);
 	virtual void __fastcall Paint(void);
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
 	
@@ -98,6 +102,8 @@ private:
 	void __fastcall SetdoubleBuffered(const bool Value);
 	
 protected:
+	virtual void __fastcall FillChanged(System::TObject* Sender);
+	virtual void __fastcall StrokeChanged(System::TObject* Sender);
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
 	
 public:

@@ -22,6 +22,11 @@ uses System.Types,
 type
 
   TALScrollingAcquiredMessage = class(TMessage)
+  private
+    FAcquired: boolean;
+  public
+    constructor Create(const AAcquired: boolean);
+    property Acquired: boolean read FAcquired;
   end;
 
 const
@@ -277,6 +282,7 @@ const
 var
   ALEpsilonRange: Integer;
 
+{************************************************************************************}
 function ALAniSign(const CurrentValue, TargetValue, EpsilonPoint: Double): TValueSign;
 begin
   Result := -CompareValue(CurrentValue, TargetValue, EpsilonPoint);
@@ -284,89 +290,102 @@ end;
 
 { TALPointD }
 
+{***********************************************}
 constructor TALPointD.Create(const P: TALPointD);
 begin
   self.X := P.X;
   self.Y := P.Y;
 end;
 
+{***********************************************}
 constructor TALPointD.Create(const X, Y: Double);
 begin
   self.X := X;
   self.Y := Y;
 end;
 
+{********************************************}
 constructor TALPointD.Create(const P: TPoint);
 begin
   self.X := P.X;
   self.Y := P.Y;
 end;
 
+{*********************************************}
 constructor TALPointD.Create(const P: TPointF);
 begin
   self.X := P.X;
   self.Y := P.Y;
 end;
 
+{*****************************************************************}
 class operator TALPointD.Equal(const Lhs, Rhs: TALPointD): Boolean;
 begin
   Result := SameValue(Lhs.X, Rhs.X) and
     SameValue(Lhs.Y, Rhs.Y);
 end;
 
+{*******************************************************************}
 class operator TALPointD.Implicit(const APointF: TPointF): TALPointD;
 begin
   Result.X := APointF.X;
   Result.Y := APointF.Y;
 end;
 
+{********************************************************************}
 class operator TALPointD.NotEqual(const Lhs, Rhs: TALPointD): Boolean;
 begin
   Result := not(Lhs = Rhs);
 end;
 
+{*****************************************************************}
 class operator TALPointD.Add(const Lhs, Rhs: TALPointD): TALPointD;
 begin
   Result.X := Lhs.X + Rhs.X;
   Result.Y := Lhs.Y + Rhs.Y;
 end;
 
+{**********************************************************************}
 class operator TALPointD.Subtract(const Lhs, Rhs: TALPointD): TALPointD;
 begin
   Result.X := Lhs.X - Rhs.X;
   Result.Y := Lhs.Y - Rhs.Y;
 end;
 
+{*****************************}
 function TALPointD.Abs: Double;
 begin
   Result := Sqrt(Sqr(self.X) + Sqr(self.Y));
 end;
 
+{*******************************************************}
 function TALPointD.Distance(const P2: TALPointD): Double;
 begin
   Result := Sqrt(Sqr(self.X - P2.X) + Sqr(self.Y - P2.Y));
 end;
 
+{***********************************************}
 procedure TALPointD.Offset(const DX, DY: Double);
 begin
   self.X := self.X + DX;
   self.Y := self.Y + DY;
 end;
 
+{**************************************************}
 procedure TALPointD.SetLocation(const P: TALPointD);
 begin
   self.X := RoundTo(P.X, ALEpsilonRange);
   self.Y := RoundTo(P.Y, ALEpsilonRange);
 end;
 
-{ TALRectD }
-
+{***************************************************}
 constructor TALRectD.Create(const Origin: TALPointD);
 begin
   TopLeft := Origin;
   BottomRight := Origin;
 end;
 
+{******************************************************************}
 constructor TALRectD.Create(const Left, Top, Right, Bottom: Double);
 begin
   self.Left := Left;
@@ -375,79 +394,91 @@ begin
   self.Bottom := Bottom;
 end;
 
+{**************************************}
 class function TALRectD.Empty: TALRectD;
 begin
   Result := TALRectD.Create(0, 0, 0, 0);
 end;
 
+{***************************************************************}
 class operator TALRectD.Equal(const Lhs, Rhs: TALRectD): Boolean;
 begin
   Result := (Lhs.TopLeft = Rhs.TopLeft) and (Lhs.BottomRight = Rhs.BottomRight);
 end;
 
+{******************************************************************}
 class operator TALRectD.NotEqual(const Lhs, Rhs: TALRectD): Boolean;
 begin
   Result := not(Lhs = Rhs);
 end;
 
+{**********************************}
 function TALRectD.GetHeight: Double;
 begin
   Result := self.Bottom - self.Top;
 end;
 
+{************************************************}
 procedure TALRectD.SetHeight(const Value: Double);
 begin
   self.Bottom := self.Top + Value;
 end;
 
+{*********************************}
 function TALRectD.GetWidth: Double;
 begin
   Result := self.Right - self.Left;
 end;
 
+{***********************************************}
 procedure TALRectD.SetWidth(const Value: Double);
 begin
   self.Right := self.Left + Value;
 end;
 
+{***********************************************}
 procedure TALRectD.Inflate(const DX, DY: Double);
 begin
   TopLeft.Offset(-DX, -DY);
   BottomRight.Offset(DX, DY);
 end;
 
+{**********************************************}
 procedure TALRectD.Offset(const DX, DY: Double);
 begin
   TopLeft.Offset(DX, DY);
   BottomRight.Offset(DX, DY);
 end;
 
+{**************************************}
 function TALRectD.GetTopLeft: TALPointD;
 begin
   Result.X := Left;
   Result.Y := Top;
 end;
 
+{************************************************}
 procedure TALRectD.SetTopLeft(const P: TALPointD);
 begin
   Left := P.X;
   Top := P.Y;
 end;
 
+{******************************************}
 function TALRectD.GetBottomRight: TALPointD;
 begin
   Result.X := Right;
   Result.Y := Bottom;
 end;
 
+{****************************************************}
 procedure TALRectD.SetBottomRight(const P: TALPointD);
 begin
   Right := P.X;
   Bottom := P.Y;
 end;
 
-{ TAniCalculations }
-
+{*********************************************************}
 constructor TALAniCalculations.Create(AOwner: TPersistent);
 begin
   inherited Create;
@@ -460,6 +491,7 @@ begin
   Assign(nil);
 end;
 
+{************************************}
 destructor TALAniCalculations.Destroy;
 begin
   StopTimer;
@@ -467,6 +499,7 @@ begin
   inherited;
 end;
 
+{*********************************************}
 procedure TALAniCalculations.AfterConstruction;
 begin
   inherited;
@@ -475,6 +508,7 @@ begin
   EndUpdate;
 end;
 
+{*******************************************************}
 procedure TALAniCalculations.Assign(Source: TPersistent);
 var
   LSource: TALAniCalculations;
@@ -521,6 +555,7 @@ begin
     inherited;
 end;
 
+{*******************************************************************}
 function TALAniCalculations.GetInternalTouchTracking: TTouchTracking;
 begin
   Result := FTouchTracking;
@@ -535,16 +570,19 @@ begin
   end;
 end;
 
+{*********************************************}
 function TALAniCalculations.GetOpacity: Single;
 begin
   Result := Min(1, Max(0, FOpacity));
 end;
 
+{************************************************}
 function TALAniCalculations.GetOwner: TPersistent;
 begin
   Result := FOwner;
 end;
 
+{**************************************************************}
 procedure TALAniCalculations.SetAnimation(const Value: Boolean);
 begin
   if FAnimation <> Value then
@@ -558,6 +596,7 @@ begin
   end;
 end;
 
+{********************************************************************}
 procedure TALAniCalculations.SetBoundsAnimation(const Value: Boolean);
 begin
   if FBoundsAnimation <> Value then
@@ -567,6 +606,7 @@ begin
   end;
 end;
 
+{*********************************************************}
 procedure TALAniCalculations.SetDown(const Value: Boolean);
 var
   LTarget: TTarget;
@@ -602,6 +642,7 @@ begin
   end;
 end;
 
+{*****************************************}
 procedure TALAniCalculations.InternalStart;
 begin
   if (not FInDoStart) and (not FStarted) then
@@ -616,6 +657,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TALAniCalculations.InternalTerminated;
 var
   LTarget: TTarget;
@@ -635,6 +677,7 @@ begin
   end;
 end;
 
+{**************************************************************************************}
 function TALAniCalculations.IsSmall(const P: TALPointD; const Epsilon: Double): Boolean;
 var
   LTouchTracking: TTouchTracking;
@@ -650,11 +693,13 @@ begin
     Result := True
 end;
 
+{***************************************************************}
 function TALAniCalculations.IsSmall(const P: TALPointD): Boolean;
 begin
   Result := IsSmall(P, ALEpsilonPoint);
 end;
 
+{************************************************************}
 procedure TALAniCalculations.SetEnabled(const Value: Boolean);
 begin
   if FEnabled <> Value then
@@ -677,6 +722,7 @@ begin
   end;
 end;
 
+{**********************************************************}
 procedure TALAniCalculations.SetInterval(const Value: Word);
 begin
   if FInterval <> Value then
@@ -688,12 +734,14 @@ begin
   end;
 end;
 
+{********************************************************}
 function TALAniCalculations.GetViewportPositionF: TPointF;
 begin
   Result.X := FViewportPosition.X;
   Result.Y := FViewportPosition.Y;
 end;
 
+{***********************************************************************}
 procedure TALAniCalculations.SetViewportPosition(const Value: TALPointD);
 var
   LChanged: Boolean;
@@ -719,6 +767,7 @@ begin
   end;
 end;
 
+{**********************************************************************}
 procedure TALAniCalculations.SetViewportPositionF(const Value: TPointF);
 var
   NewValue: TALPointD;
@@ -727,6 +776,7 @@ begin
   ViewportPosition := NewValue;
 end;
 
+{*************************************************************************}
 procedure TALAniCalculations.SetTouchTracking(const Value: TTouchTracking);
 begin
   if FTouchTracking <> Value then
@@ -736,6 +786,7 @@ begin
   end;
 end;
 
+{**********************************************************}
 procedure TALAniCalculations.SetShown(const Value: Boolean);
 var
   NewVisible, ChangeOpacity: Boolean;
@@ -751,6 +802,7 @@ begin
   end;
 end;
 
+{**************************************}
 procedure TALAniCalculations.StartTimer;
 begin
   if FTimerHandle = TFmxHandle(-1) then
@@ -759,6 +811,7 @@ begin
   end;
 end;
 
+{*************************************}
 procedure TALAniCalculations.StopTimer;
 begin
   if FTimerHandle <> TFmxHandle(-1) then
@@ -768,6 +821,7 @@ begin
   end;
 end;
 
+{********************************************************************************************************************}
 procedure TALAniCalculations.DoCalc(const DeltaTime: Double; var NewPoint, NewVelocity: TALPointD; var Done: Boolean);
 var
   EnableTargetX: Boolean;
@@ -866,55 +920,65 @@ begin
   end;
 end;
 
+{***********************************}
 procedure TALAniCalculations.DoStart;
 begin
   if Assigned(FOnStart) then
     FOnStart(self);
 end;
 
+{*************************************}
 procedure TALAniCalculations.DoChanged;
 begin
   if Assigned(FOnTimer) then
     FOnTimer(self);
 end;
 
+{****************************************************}
 function TALAniCalculations.ElasticityStored: Boolean;
 begin
   Result := not SameValue(FElasticity, ALDefaultElasticity);
 end;
 
+{***************************************}
 procedure TALAniCalculations.BeginUpdate;
 begin
   Inc(FUpdateCount);
 end;
 
+{*************************************}
 procedure TALAniCalculations.EndUpdate;
 begin
   if FUpdateCount > 0 then
     Dec(FUpdateCount);
 end;
 
+{**********************************************************}
 function TALAniCalculations.DecelerationRateStored: Boolean;
 begin
   Result := not SameValue(FDecelerationRate, ALDecelerationRateNormal);
 end;
 
+{*****************************************************}
 function TALAniCalculations.StorageTimeStored: Boolean;
 begin
   Result := not SameValue(FStorageTime, ALDefaultStorageTime);
 end;
 
+{********************************************************}
 function TALAniCalculations.VelocityFactorStored: Boolean;
 begin
   Result := not SameValue(fVelocityFactor, ALDefaultVelocityFactor);
 end;
 
+{**********************************}
 procedure TALAniCalculations.DoStop;
 begin
   if Assigned(FOnStop) then
     FOnStop(self);
 end;
 
+{*******************************************************************************}
 function TALAniCalculations.DoStopScrolling(CurrentTime: TDateTime = 0): Boolean;
 var
   T: Double;
@@ -930,6 +994,7 @@ begin
   end;
 end;
 
+{*************************************}
 procedure TALAniCalculations.TimerProc;
 var
   D, T: TDateTime;
@@ -980,11 +1045,13 @@ begin
   end;
 end;
 
+{**************************************************}
 function TALAniCalculations.GetTargetCount: Integer;
 begin
   Result := Length(FTargets);
 end;
 
+{**********************************************************************}
 procedure TALAniCalculations.GetTargets(var ATargets: array of TTarget);
 var
   N, I: Integer;
@@ -995,6 +1062,7 @@ begin
   UpdateTimer;
 end;
 
+{************************************************************************}
 procedure TALAniCalculations.SetTargets(const ATargets: array of TTarget);
   function FindMaxTarget(var Target: TTarget): Boolean;
   var
@@ -1066,6 +1134,7 @@ begin
     UpdatePosImmediately;
 end;
 
+{*******************************************************************}
 function TALAniCalculations.FindTarget(var Target: TTarget): Boolean;
 var
   MinR: Double;
@@ -1174,6 +1243,7 @@ begin
   end;
 end;
 
+{****************************************}
 procedure TALAniCalculations.UpdateTarget;
 var
   SignPos: TValueSign;
@@ -1203,6 +1273,7 @@ begin
   end;
 end;
 
+{**********************************************************}
 procedure TALAniCalculations.UpdateViewportPositionByBounds;
   function NotBoundsAni(const Vert: Boolean): Boolean;
   begin
@@ -1241,6 +1312,7 @@ begin
   end;
 end;
 
+{***************************************}
 procedure TALAniCalculations.UpdateTimer;
 var
   EnableTimer, NewVisible, ChangeOpacity, LSmall: Boolean;
@@ -1280,6 +1352,7 @@ begin
   Enabled := EnableTimer;
 end;
 
+{******************************************************************************}
 procedure TALAniCalculations.UpdatePosImmediately(const Force: Boolean = False);
 var
   NewViewportPosition, OldViewportPosition: TALPointD;
@@ -1308,6 +1381,7 @@ begin
   end;
 end;
 
+{***********************************************************}
 procedure TALAniCalculations.InternalCalc(DeltaTime: Double);
 var
   NewPoint, NewVelocity: TALPointD;
@@ -1344,6 +1418,7 @@ begin
   end;
 end;
 
+{*******************************************}
 procedure TALAniCalculations.InternalChanged;
 var
   T: TDateTime;
@@ -1364,6 +1439,7 @@ begin
   end;
 end;
 
+{****************************************************************}
 procedure TALAniCalculations.SetAutoShowing(const Value: Boolean);
 begin
   if FAutoShowing <> Value then
@@ -1381,11 +1457,13 @@ begin
   end;
 end;
 
+{**************************************************}
 function TALAniCalculations.GetLowVelocity: Boolean;
 begin
   Result := IsSmall(FCurrentVelocity, MinVelocity);
 end;
 
+{***************************************************************}
 procedure TALAniCalculations.CalcVelocity(const Time: TDateTime);
 var
   D, VAbs: Double;
@@ -1438,6 +1516,7 @@ begin
   UpdateTimer;
 end;
 
+{***********************************************}
 procedure TALAniCalculations.Clear(T: TDateTime);
 begin
   if FPointTime.Count > 0 then
@@ -1450,6 +1529,7 @@ begin
   end;
 end;
 
+{****************************************************}
 function TALAniCalculations.GetPositionCount: Integer;
 begin
   if FPointTime <> nil then
@@ -1458,6 +1538,7 @@ begin
     Result := 0;
 end;
 
+{***************************************************************************}
 function TALAniCalculations.PosToView(const APosition: TALPointD): TALPointD;
 var
   X, Y, D: Double;
@@ -1488,6 +1569,7 @@ begin
   Result := TALPointD.Create(P.X - X, P.Y - Y);
 end;
 
+{************************************************************************}
 function TALAniCalculations.GetPositions(const Index: Integer): TALPointD;
 begin
   if (index < 0) or (index >= PositionCount) then
@@ -1496,6 +1578,7 @@ begin
   Result := FPointTime[index].Point;
 end;
 
+{****************************************************************************}
 function TALAniCalculations.GetPositionTimes(const Index: Integer): TDateTime;
 begin
   if (index < 0) or (index >= PositionCount) then
@@ -1504,6 +1587,7 @@ begin
   Result := FPointTime[index].Time;
 end;
 
+{**********************************************************************************************}
 function TALAniCalculations.AddPointTime(const X, Y: Double; const Time: TDateTime): TPointTime;
 begin
   if Time > 0 then
@@ -1530,6 +1614,7 @@ begin
   end;
 end;
 
+{***************************************************}
 procedure TALAniCalculations.MouseDown(X, Y: Double);
 begin
   if Down then
@@ -1545,6 +1630,7 @@ begin
   UpdateTimer;
 end;
 
+{***************************************************}
 procedure TALAniCalculations.MouseMove(X, Y: Double);
 var
   NewVal: TPointTime;
@@ -1601,6 +1687,7 @@ begin
   end;
 end;
 
+{*************************************************}
 procedure TALAniCalculations.MouseUp(X, Y: Double);
 begin
   if Down then
@@ -1616,6 +1703,7 @@ begin
   end;
 end;
 
+{**************************************}
 procedure TALAniCalculations.MouseLeave;
 var
   PointTime: TPointTime;
@@ -1638,6 +1726,7 @@ begin
   end;
 end;
 
+{****************************************************}
 procedure TALAniCalculations.MouseWheel(X, Y: Double);
 var
   DX, DY: Double;
@@ -1658,6 +1747,7 @@ begin
   end;
 end;
 
+{**********************************************************}
 procedure TALAniCalculations.SetMouseTarget(Value: TTarget);
 var
   NewTargets: array of TTarget;
@@ -1705,6 +1795,12 @@ begin
     end;
   end;
   SetTargets(NewTargets);
+end;
+
+{***********************************************************************}
+constructor TALScrollingAcquiredMessage.Create(const AAcquired: boolean);
+begin
+  fAcquired := AAcquired;
 end;
 
 initialization

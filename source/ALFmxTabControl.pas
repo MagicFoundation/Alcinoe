@@ -107,7 +107,9 @@ type
     fMouseDownPos: single;
     FDeadZoneBeforeAcquireScrolling: Integer;
     fScrollingAcquiredByMe: boolean;
+    fScrollingAcquiredByOther: boolean;
     fScrollingAcquiredByOtherMessageID: integer;
+    procedure setScrollingAcquiredByMe(const Value: boolean);
     procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetTabIndex(const Value: Integer);
     function GetActiveTab: TALTabItem;
@@ -443,6 +445,7 @@ begin
   FDeadZoneBeforeAcquireScrolling := 16;
   fMouseDownPos := 0;
   fScrollingAcquiredByMe := False;
+  fScrollingAcquiredByOther := False;
   fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
   //-----
   FAniCalculations := TALTabControlAniCalculations.Create(Self);
@@ -661,15 +664,31 @@ begin
     FOnChange(Self);
 end;
 
+{*********************************************************************}
+procedure TALTabControl.setScrollingAcquiredByMe(const Value: boolean);
+begin
+  if Value <> fScrollingAcquiredByMe  then begin
+    fScrollingAcquiredByMe := Value;
+    TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create(Value), True);
+  end;
+end;
+
 {************************************************************************************************}
 procedure TALTabControl.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was acquired by another control (like a scrollbox for exemple)
-  if fAniCalculations.down and (Sender <> self) then begin
-    fAniCalculations.MouseLeave; // instead of down := false to reposition the tabitem
-    FMouseEvents := False;
-    fGestureEvents := False;
-  end;
+  //the scrolling was acquired or released by another control (like a scrollbox for exemple)
+  //the problem is that the scrolling could be acquired BEFORE the mousedown is fired in parent control (baah yes)
+  //so we need the var fScrollingAcquiredByOther to handle this
+  if (Sender = self) then exit;
+  if TALScrollingAcquiredMessage(M).Acquired then begin
+    if fAniCalculations.down then begin
+      fAniCalculations.MouseLeave; // instead of down := false to reposition the tabitem
+      FMouseEvents := False;
+      fGestureEvents := False;
+    end;
+    fScrollingAcquiredByOther := True;
+  end
+  else fScrollingAcquiredByOther := False;
 end;
 
 {******************************************************************}
@@ -686,23 +705,23 @@ begin
   if (not FMouseEvents) and (EventInfo.GestureID = igiPan) then begin
     LP := AbsoluteToLocal(EventInfo.Location);
     if TInteractiveGestureFlag.gfBegin in EventInfo.Flags then begin
-      fScrollingAcquiredByMe := False;
-      fMouseDownPos := LP.X;
-      fGestureEvents := true;
-      FAniCalculations.averaging := true;
-      AniCalculations.MouseDown(LP.X, LP.Y)
+      if not fScrollingAcquiredByOther then begin
+        setScrollingAcquiredByMe(False);
+        fMouseDownPos := LP.X;
+        fGestureEvents := true;
+        FAniCalculations.averaging := true;
+        AniCalculations.MouseDown(LP.X, LP.Y);
+      end;
     end
     else if fGestureEvents and
             (EventInfo.Flags = []) then begin
       if (not fScrollingAcquiredByMe) and
-         (abs(fMouseDownPos - LP.X) > fDeadZoneBeforeAcquireScrolling) then begin
-        fScrollingAcquiredByMe := True;
-        TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create, True);
-      end;
+         (abs(fMouseDownPos - LP.X) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
       AniCalculations.MouseMove(LP.X, LP.Y)
     end
     else if fGestureEvents and
             (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then begin
+      setScrollingAcquiredByMe(False);
       AniCalculations.MouseUp(LP.X, LP.Y);
       fGestureEvents := False;
     end;
@@ -719,8 +738,8 @@ procedure TALTabControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y
 begin
   FMouseEvents := not fGestureEvents;
   inherited;
-  if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    fScrollingAcquiredByMe := False;
+  if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
+    setScrollingAcquiredByMe(False);
     fMouseDownPos := x;
     FAniCalculations.averaging := ssTouch in Shift;
     AniCalculations.MouseDown(X, Y);
@@ -733,10 +752,7 @@ begin
   inherited;
   if FMouseEvents then begin
     if (not fScrollingAcquiredByMe) and
-       (abs(fMouseDownPos - x) > fDeadZoneBeforeAcquireScrolling) then begin
-      fScrollingAcquiredByMe := True;
-      TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create, True);
-    end;
+       (abs(fMouseDownPos - x) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
     AniCalculations.MouseMove(X, Y);
   end;
 end;
@@ -746,6 +762,7 @@ procedure TALTabControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: 
 begin
   inherited;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
+    setScrollingAcquiredByMe(False);
     AniCalculations.MouseUp(X, Y);
     FMouseEvents := False;
   end;
@@ -756,6 +773,7 @@ procedure TALTabControl.DoMouseLeave;
 begin
   inherited;
   if FMouseEvents then begin
+    setScrollingAcquiredByMe(False);
     AniCalculations.MouseLeave;
     FMouseEvents := False;
   end;

@@ -403,6 +403,7 @@ protected:
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
 	virtual float __fastcall GetMaxValue(void);
 	virtual void __fastcall SetMaxValue(float Value);
+	virtual void __fastcall Loaded(void);
 	virtual void __fastcall DoRealign(void);
 	virtual void __fastcall UpdateHighlight(void);
 	

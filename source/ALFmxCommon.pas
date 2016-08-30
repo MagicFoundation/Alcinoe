@@ -188,6 +188,10 @@ begin
     TALRectangle(aControl).doubleBuffered := True;
     TALRectangle(aControl).MakeBufBitmap;
   end
+  else if (aControl is TALCircle) then begin
+    TALCircle(aControl).doubleBuffered := True;
+    TALCircle(aControl).MakeBufBitmap;
+  end
   else if (aControl is TALGlyph) then begin
     TALGlyph(aControl).doubleBuffered := True;
     TALGlyph(aControl).MakeBufBitmap;

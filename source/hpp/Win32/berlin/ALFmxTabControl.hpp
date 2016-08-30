@@ -129,7 +129,9 @@ private:
 	float fMouseDownPos;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
+	bool fScrollingAcquiredByOther;
 	int fScrollingAcquiredByOtherMessageID;
+	void __fastcall setScrollingAcquiredByMe(const bool Value);
 	void __fastcall ScrollingAcquiredByOtherHandler(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
 	void __fastcall SetTabIndex(const int Value);
 	TALTabItem* __fastcall GetActiveTab(void);

@@ -38,8 +38,13 @@ class PASCALIMPLEMENTATION TALScrollingAcquiredMessage : public System::Messagin
 {
 	typedef System::Messaging::TMessageBase inherited;
 	
+private:
+	bool FAcquired;
+	
 public:
-	/* TObject.Create */ inline __fastcall TALScrollingAcquiredMessage(void) : System::Messaging::TMessageBase() { }
+	__fastcall TALScrollingAcquiredMessage(const bool AAcquired);
+	__property bool Acquired = {read=FAcquired, nodefault};
+public:
 	/* TObject.Destroy */ inline __fastcall virtual ~TALScrollingAcquiredMessage(void) { }
 	
 };

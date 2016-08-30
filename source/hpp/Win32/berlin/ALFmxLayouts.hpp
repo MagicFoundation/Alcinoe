@@ -137,10 +137,12 @@ private:
 	System::Types::TPointF fMouseDownPos;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
+	bool fScrollingAcquiredByOther;
 	int fScrollingAcquiredByOtherMessageID;
 	float fMaxContentWidth;
 	float fMaxContentHeight;
 	System::Types::TPointF fAnchoredContentOffset;
+	void __fastcall setScrollingAcquiredByMe(const bool Value);
 	void __fastcall ScrollingAcquiredByOtherHandler(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
 	float __fastcall GetSceneScale(void);
 	void __fastcall SetShowScrollBars(const bool Value);

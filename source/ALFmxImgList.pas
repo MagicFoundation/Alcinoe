@@ -5,6 +5,9 @@ interface
 uses System.Classes,
      System.UITypes,
      System.Types,
+     {$IFDEF DEBUG}
+     System.Diagnostics,
+     {$ENDIF}
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.types3D,
      {$ENDIF}
@@ -63,6 +66,12 @@ type
     property OnMouseLeave;
     property OnResize;
   end;
+
+{$IFDEF debug}
+var
+  AlDebugGlyphMakeBufBitmapCount: integer;
+  AlDebugGlyphMakeBufBitmapStopWatch: TstopWatch;
+{$endif}
 
 procedure Register;
 
@@ -142,6 +151,12 @@ begin
   fBufImages := Images;
   FbufImageIndex := ImageIndex;
 
+  {$IFDEF debug}
+  inc(AlDebugGlyphMakeBufBitmapCount);
+  AlDebugGlyphMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
+
   {$IF defined(ANDROID) or defined(IOS)}
 
   //init aSceneScale
@@ -218,6 +233,12 @@ begin
 
   result := fBufBitmap;
 
+  {$IFDEF debug}
+  finally
+    AlDebugGlyphMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
 end;
 
 {************************}
@@ -266,5 +287,8 @@ end;
 
 initialization
   RegisterFmxClasses([TALGlyph]);
+  {$IFDEF debug}
+  AlDebugGlyphMakeBufBitmapStopWatch := TstopWatch.Create;
+  {$endif}
 
 end.

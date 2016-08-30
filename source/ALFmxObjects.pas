@@ -6,6 +6,9 @@ uses System.Classes,
      System.Types,
      System.UITypes, // [DCC Hint] ALFmxObjects.pas(1418): H2443 Inline function 'TAlphaColorCGFloat.Create' has not been expanded because unit 'System.UITypes' is not specified in USES list
      System.Rtti,
+     {$IFDEF DEBUG}
+     System.Diagnostics,
+     {$ENDIF}
      {$IF defined(ANDROID)}
      system.Generics.collections,
      Androidapi.JNI.JavaTypes,
@@ -317,6 +320,21 @@ type
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
     property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
   end;
+
+{$IFDEF debug}
+var
+  AlDebugRectangleMakeBufBitmapCount: integer;
+  AlDebugCircleMakeBufBitmapCount: integer;
+  AlDebugLineMakeBufBitmapCount: integer;
+  AlDebugTextMakeBufBitmapCount: integer;
+  AlDebugTextInheritedDoRenderLayoutCount: integer;
+  AlDebugTextInheritedDoDrawLayoutCount: integer;
+
+  AlDebugRectangleMakeBufBitmapStopWatch: TstopWatch;
+  AlDebugCircleMakeBufBitmapStopWatch: TstopWatch;
+  AlDebugLineMakeBufBitmapStopWatch: TstopWatch;
+  AlDebugTextMakeBufBitmapStopWatch: TstopWatch;
+{$endif}
 
 procedure Register;
 
@@ -853,6 +871,12 @@ begin
   clearBufBitmap;
   fBufSize := Size.Size;
 
+  {$IFDEF debug}
+  inc(AlDebugRectangleMakeBufBitmapCount);
+  AlDebugRectangleMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
+
   {$IFDEF ANDROID}
 
   //init aSceneScale
@@ -1234,6 +1258,12 @@ begin
 
   result := fBufBitmap;
 
+  {$IFDEF debug}
+  finally
+    AlDebugRectangleMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
 end;
 
 {***************************}
@@ -1375,6 +1405,12 @@ begin
 
   clearBufBitmap;
   fBufSize := Size.Size;
+
+  {$IFDEF debug}
+  inc(AlDebugCircleMakeBufBitmapCount);
+  AlDebugCircleMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
 
   {$IFDEF ANDROID}
 
@@ -1771,6 +1807,12 @@ begin
 
   result := fBufBitmap;
 
+  {$IFDEF debug}
+  finally
+    AlDebugCircleMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
 end;
 
 {************************}
@@ -1898,6 +1940,12 @@ begin
 
   clearBufBitmap;
   fBufSize := Size.Size;
+
+  {$IFDEF debug}
+  inc(AlDebugLineMakeBufBitmapCount);
+  AlDebugLineMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
 
   {$IFDEF ANDROID}
 
@@ -2152,6 +2200,12 @@ begin
 
   result := fBufBitmap;
 
+  {$IFDEF debug}
+  finally
+    AlDebugLineMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
 end;
 
 {**********************}
@@ -2298,6 +2352,12 @@ begin
   fBufTrimming := fTextControl.TextSettings.Trimming;
   fBufSize := MaxSize;
   fBufText := fTextControl.Text;
+
+  {$IFDEF debug}
+  inc(AlDebugTextMakeBufBitmapCount);
+  AlDebugTextMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
 
   {$IF defined(android)}
 
@@ -2564,6 +2624,12 @@ begin
 
   result := fBufBitmap;
 
+  {$IFDEF debug}
+  finally
+    AlDebugTextMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
 end;
 {$ENDIF}
 
@@ -2583,7 +2649,12 @@ end;
 procedure TALDoubleBufferedTextLayoutNG.DoRenderLayout;
 begin
   MakeBufBitmap; // recreate the fBufBitmap
-  if fBufBitmap = nil then inherited DoRenderLayout; // if no fBufBitmap then inherited
+  if fBufBitmap = nil then begin
+    {$IFDEF debug}
+    inc(AlDebugTextInheritedDoRenderLayoutCount);
+    {$endif}
+    inherited DoRenderLayout; // if no fBufBitmap then inherited
+  end;
 end;
 {$ENDIF}
 
@@ -2598,6 +2669,9 @@ begin
   MakeBufBitmap;
 
   if fBufBitmap = nil then begin
+    {$IFDEF debug}
+    inc(AlDebugTextInheritedDoDrawLayoutCount);
+    {$endif}
     inherited DoDrawLayout(ACanvas);
     exit;
   end;
@@ -2778,16 +2852,6 @@ begin
                              // << except calling repaint
   //-----
   if fRestoreLayoutUpdateAfterLoaded then begin
-    if (FAutoSize) and
-       (Text <> '') then begin
-      if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
-      else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
-    end
-    else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
-                                                           // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
-                                                           // << and then after when we will paint the control, we will again call DoRenderLayout
-                                                           // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
-                                                           // << need to redo the bufbitmap
     Layout.endUpdate;
     AdjustSize;
   end;
@@ -3200,6 +3264,16 @@ end;
 {**************************}
 procedure TALText.EndUpdate;
 begin
+  if (FAutoSize) and
+     (Text <> '') then begin
+    if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
+    else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+  end
+  else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
+                                                         // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
+                                                         // << and then after when we will paint the control, we will again call DoRenderLayout
+                                                         // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
+                                                         // << need to redo the bufbitmap
   Layout.EndUpdate;
   inherited; // will call dorealign that will call AdjustSize
 end;
@@ -3223,6 +3297,12 @@ end;
 
 initialization
   RegisterFmxClasses([TALRectangle, TALCircle, TALLine, TALText]);
+  {$IFDEF debug}
+  AlDebugRectangleMakeBufBitmapStopWatch := TstopWatch.Create;
+  AlDebugCircleMakeBufBitmapStopWatch := TstopWatch.Create;
+  AlDebugLineMakeBufBitmapStopWatch := TstopWatch.Create;
+  AlDebugTextMakeBufBitmapStopWatch := TstopWatch.Create;
+  {$endif}
 
 end.
 

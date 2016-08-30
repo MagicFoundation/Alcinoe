@@ -4,14 +4,17 @@ interface
 
 uses System.Classes,
      System.Types,
-     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     FMX.types3D,
+     {$IFDEF DEBUG}
+     System.Diagnostics,
      {$ENDIF}
      System.UITypes,
      System.ImageList,
      System.Math,
      System.Rtti,
      System.Messaging,
+     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+     FMX.types3D,
+     {$ENDIF}
      FMX.types,
      FMX.stdActns,
      FMX.Controls,
@@ -329,6 +332,7 @@ type
     function GetDefaultSize: TSizeF; override;
     function GetMaxValue: Single; virtual;
     procedure SetMaxValue(Value: Single); virtual;
+    procedure Loaded; override;
     procedure DoRealign; override;
     procedure UpdateHighlight; override;
   public
@@ -539,6 +543,12 @@ type
     property OnPaint;
     property OnResize;
   end;
+
+{$IFDEF debug}
+var
+  AlDebugCheckBoxMakeBufBitmapCount: integer;
+  AlDebugCheckBoxMakeBufBitmapStopWatch: TstopWatch;
+{$endif}
 
 procedure Register;
 
@@ -1349,6 +1359,17 @@ begin
   Result := TSizeF.Create(200, 32);
 end;
 
+{********************************}
+procedure TALRangeTrackBar.Loaded;
+begin
+  if not (csDestroying in ComponentState) then begin
+    if FMaxValueRange.IsChanged then
+      FMaxValueRange.Changed(True);
+  end;
+  inherited;
+end;
+
+
 {***********************************}
 procedure TALRangeTrackBar.DoRealign;
 var R: TRectF;
@@ -1601,6 +1622,12 @@ begin
   fBufImages := Images;
   FbufImageIndex := aImageIndex;
 
+  {$IFDEF debug}
+  inc(AlDebugCheckBoxMakeBufBitmapCount);
+  AlDebugCheckBoxMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
+
   {$IF defined(ANDROID) or defined(IOS)}
 
   //init aSceneScale
@@ -1677,6 +1704,11 @@ begin
 
   result := fBufBitmap;
 
+  {$IFDEF debug}
+  finally
+    AlDebugCheckBoxMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
 end;
 
 {*************************************}
@@ -1947,5 +1979,10 @@ begin
   UnlistPublishedProperty(TALTrackHighlight, 'EnableDragHighlight');
   {$ENDIF}
 end;
+
+initialization
+  {$IFDEF debug}
+  AlDebugCheckBoxMakeBufBitmapStopWatch := TstopWatch.Create;
+  {$endif}
 
 end.

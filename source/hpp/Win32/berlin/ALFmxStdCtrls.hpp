@@ -74,10 +74,13 @@ private:
 	TALCustomTrack* FTrack;
 	TALTrackThumbGlyph* FGlyph;
 	System::Types::TPointF FDownOffset;
+	float fTrackDownOffset;
 	bool FPressed;
 	int FDeadZoneBeforeAcquireScrolling;
 	bool fScrollingAcquiredByMe;
+	bool fScrollingAcquiredByOther;
 	int fScrollingAcquiredByOtherMessageID;
+	void __fastcall setScrollingAcquiredByMe(const bool Value);
 	void __fastcall ScrollingAcquiredByOtherHandler(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
 	float __fastcall PointToValue(float X, float Y);
 	
@@ -87,6 +90,7 @@ public:
 	virtual void __fastcall MouseDown(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall MouseMove(System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall MouseUp(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
+	virtual void __fastcall DoMouseLeave(void);
 	virtual System::Types::TRectF __fastcall GetDefaultTouchTargetExpansion(void);
 	__property bool IsPressed = {read=FPressed, nodefault};
 	__property int DeadZoneBeforeAcquireScrolling = {read=FDeadZoneBeforeAcquireScrolling, write=FDeadZoneBeforeAcquireScrolling, default=5};

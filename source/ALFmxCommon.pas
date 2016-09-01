@@ -2,9 +2,11 @@
 
 interface
 
-uses System.UITypes,
+uses System.classes,
+     System.UITypes,
      System.Types,
-     Fmx.types,
+     System.Generics.Collections,
+     System.Math.Vectors,
      {$IF defined(ios)}
      system.Generics.collections,
      iOSapi.CoreGraphics,
@@ -13,10 +15,13 @@ uses System.UITypes,
      Macapi.CoreFoundation,
      {$ENDIF}
      {$IF defined(ANDROID)}
-     system.Generics.collections,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.JavaTypes,
      {$ENDIF}
+     Fmx.types,
+     FMX.TextLayout,
+     FMX.graphics,
+     FMX.Effects,
      FMX.controls;
 
 type
@@ -124,13 +129,174 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
 
 {$ENDIF}
 
+Type
+
+  {$IF CompilerVersion <> 31}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
+  {$ENDIF}
+  TALControlAccessPrivate = class(TFmxObject)
+  private const
+    InitialControlsCapacity = 10;
+  public const
+    DefaultTouchTargetExpansion = 6;
+    DefaultDisabledOpacity = 0.6;
+    DesignBorderColor = $A0909090;
+  protected class var
+    FPaintStage: TPaintStage;
+  public
+    FOnMouseUp: TMouseEvent;
+    FOnMouseDown: TMouseEvent;
+    FOnMouseMove: TMouseMoveEvent;
+    FOnMouseWheel: TMouseWheelEvent;
+    FOnClick: TNotifyEvent;
+    FOnDblClick: TNotifyEvent;
+    FHitTest: Boolean;
+    FClipChildren: Boolean;
+    FAutoCapture: Boolean;
+    FPadding: TBounds;
+    FMargins: TBounds;
+    FTempCanvas: TCanvas;
+    FRotationAngle: Single;
+    FPosition: TPosition;
+    FScale: TPosition;
+    FSkew: TPosition;
+    FRotationCenter: TPosition;
+    FCanFocus: Boolean;
+    FOnCanFocus: TCanFocusEvent;
+    FOnEnter: TNotifyEvent;
+    FOnExit: TNotifyEvent;
+    FClipParent: Boolean;
+    FOnMouseLeave: TNotifyEvent;
+    FOnMouseEnter: TNotifyEvent;
+    FOnPaint: TOnPaintEvent;
+    FOnPainting: TOnPaintEvent;
+    FCursor: TCursor;
+    FInheritedCursor: TCursor;
+    FDragMode: TDragMode;
+    FEnableDragHighlight: Boolean;
+    FOnDragEnter: TDragEnterEvent;
+    FOnDragDrop: TDragDropEvent;
+    FOnDragLeave: TNotifyEvent;
+    FOnDragOver: TDragOverEvent;
+    FOnDragEnd: TNotifyEvent;
+    FIsDragOver: Boolean;
+    FOnKeyDown: TKeyEvent;
+    FOnKeyUp: TKeyEvent;
+    FOnTap: TTapEvent;
+    FHint: string;
+    FActionHint: string;
+    FShowHint: Boolean;
+    FPopupMenu: TCustomPopupMenu;
+    FRecalcEnabled, FEnabled, FAbsoluteEnabled: Boolean;
+    FTabList: TTabList;
+    FOnResize: TNotifyEvent;
+    FDisableEffect: Boolean;
+    FAcceptsControls: Boolean;
+    FControls: TControlList;
+    FEnableExecuteAction: Boolean;
+    FCanParentFocus: Boolean;
+    FMinClipHeight: Single;
+    FMinClipWidth: Single;
+    FSmallSizeControl: Boolean;
+    FTouchTargetExpansion: TBounds;
+    FOnDeactivate: TNotifyEvent;
+    FOnActivate: TNotifyEvent;
+    FSimpleTransform: Boolean;
+    FFixedSize: TSize;
+    FEffects: TList<TEffect>;
+    FDisabledOpacity: Single;
+    [Weak] FParentControl: TControl;
+    FParentContent: IContent;
+    FUpdateRect: TRectF;
+    FTabStop: Boolean;
+    FDisableDisappear: Integer;
+    FAnchorMove: Boolean;
+    FApplyingEffect: Boolean;
+    FInflated: Boolean;
+    FOnApplyStyleLookup: TNotifyEvent;
+    FAlign: TAlignLayout;
+    FAnchors: TAnchors;
+    FUpdateEffects: Boolean; // << i personnally need to access this private field
+    FDisableFocusEffect: Boolean;
+    FTouchManager: TTouchManager;
+    FOnGesture: TGestureEvent;
+    FVisible: Boolean;
+    FPressed: Boolean;
+    FPressedPosition: TPointF;
+    FDoubleClick: Boolean;
+    FParentShowHint: Boolean;
+    FScene: IScene;
+    FLastHeight: Single;
+    FLastWidth: Single;
+    FSize: TControlSize;
+    FLocalMatrix: TMatrix;
+    FAbsoluteMatrix: TMatrix;
+    FInvAbsoluteMatrix: TMatrix;
+    FEffectBitmap: TBitmap;
+    FLocked: Boolean;
+    FOpacity, FAbsoluteOpacity: Single;
+    FInPaintTo: Boolean;
+    FInPaintToAbsMatrix, FInPaintToInvMatrix: TMatrix;
+    FAbsoluteHasEffect: Boolean;
+    FAbsoluteHasDisablePaintEffect: Boolean;
+    FAbsoluteHasAfterPaintEffect: Boolean;
+    FUpdating: Integer; // << i personnally need to access this protected field
+    FNeedAlign: Boolean;
+    FDisablePaint: Boolean;
+    FDisableAlign: Boolean;
+    FRecalcOpacity: Boolean;
+    FRecalcUpdateRect: Boolean;
+    FRecalcAbsolute: Boolean;
+    FRecalcHasEffect: Boolean;
+    FHasClipParent: TControl;
+    FRecalcHasClipParent: Boolean;
+    FDesignInteractive: Boolean;
+    FDesignSelectionMarks: Boolean;
+    FIsMouseOver: Boolean;
+    FIsFocused: Boolean;
+    FAnchorRules: TPointF;
+    FAnchorOrigin: TPointF;
+    FOriginalParentSize: TPointF;
+    FLeft: Single;
+    FTop: Single;
+    FExplicitLeft: Single;
+    FExplicitTop: Single;
+    FExplicitWidth: Single;
+    FExplicitHeight: Single;
+  end;
+
+  {$IF CompilerVersion <> 31}
+    {$MESSAGE WARN 'Check if FMX.TextLayout.TTextLayout still has the exact same fields and adjust the IFDEF'}
+  {$ENDIF}
+  TALTextLayoutAccessPrivate = class abstract
+  public const
+    MaxLayoutSize: TPointF = (X: $FFFF; Y: $FFFF);
+  public
+    FAttributes: TList<TTextAttributedRange>;
+    FFont: TFont;
+    FColor: TAlphaColor;
+    FText: string;
+    FWordWrap : Boolean;
+    FHorizontalAlign: TTextAlign;
+    FVerticalAlign: TTextAlign;
+    FPadding: TBounds;
+    FNeedUpdate: Boolean;
+    FMaxSize: TPointF;
+    FTopLeft: TPointF;
+    FUpdating: Integer; // << i personnally need to access this protected field
+    FOpacity: Single;
+    FTrimming: TTextTrimming;
+    FRightToLeft: Boolean;
+    [weak] FCanvas: TCanvas;
+    FMessageId: Integer;
+  end;
+
 implementation
 
 uses system.SysUtils,
      System.Character,
      System.UIConsts,
      System.Math,
-     System.Math.Vectors,
      {$IF defined(ANDROID)}
      Androidapi.JNIBridge,
      Androidapi.Helpers,

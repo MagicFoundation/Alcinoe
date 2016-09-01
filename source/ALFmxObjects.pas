@@ -253,6 +253,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure SetNewScene(AScene: IScene); override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function MakeBufBitmap: TTexture; virtual;
     {$ELSE}
@@ -2296,7 +2297,7 @@ begin
 
   if (csDesigning in fTextControl.ComponentState) or
      (not fdoubleBuffered) or
-     (fTextControl.Scene = nil) or
+     (fTextControl.Scene = nil) or // << fTextControl.Scene = nil mean mostly the fTextControl (or his parent) is not yet assigned to any form
      (fTextControl.text.IsEmpty) then begin
     clearBufBitmap;
     exit(nil);
@@ -2649,7 +2650,9 @@ end;
 procedure TALDoubleBufferedTextLayoutNG.DoRenderLayout;
 begin
   MakeBufBitmap; // recreate the fBufBitmap
-  if fBufBitmap = nil then begin
+  if (fBufBitmap = nil) and
+     (fTextControl.Scene <> nil) and // << fTextControl.Scene = nil mean mostly the fTextControl (or his parent) is not yet assigned to any form so do nothing
+     (not fTextControl.text.IsEmpty) then begin
     {$IFDEF debug}
     inc(AlDebugTextInheritedDoRenderLayoutCount);
     {$endif}
@@ -2669,11 +2672,18 @@ begin
   MakeBufBitmap;
 
   if fBufBitmap = nil then begin
+
+    if (fTextControl.Scene = nil) or // << fTextControl.Scene = nil mean mostly the fTextControl (or his parent) is not yet assigned to any form so i don't even know how we can be here !
+       (fTextControl.text.IsEmpty) then exit;
+
     {$IFDEF debug}
     inc(AlDebugTextInheritedDoDrawLayoutCount);
     {$endif}
+
     inherited DoDrawLayout(ACanvas);
+
     exit;
+
   end;
 
   aDestRect := fBufBitmapRect;
@@ -2717,7 +2727,11 @@ end;
 {$IF defined(android) or defined(IOS)}
 function TALDoubleBufferedTextLayoutNG.GetTextRect: TRectF;
 begin
-  if fBufBitmap = nil then result := inherited GetTextRect  // << if fBufBitmap = nil it's mean last call to DoRenderLayout was inherited
+  if fBufBitmap = nil then begin
+    if (fTextControl.Scene = nil) or // << fTextControl.Scene = nil mean mostly the fTextControl (or his parent) is not yet assigned to any form so return 0
+       (fTextControl.text.IsEmpty) then result := TrectF.Create(0,0,0,0)
+    else result := inherited GetTextRect  // << if fBufBitmap = nil it's mean last call to DoRenderLayout was inherited
+  end
   else result := fBufBitmapRect;
 end;
 {$ENDIF}
@@ -3094,7 +3108,8 @@ begin
      (not (csLoading in ComponentState)) and
      (not isupdating) and
      (FAutoSize) and
-     (Text <> '') then begin
+     (Text <> '') and
+     (scene <> nil) then begin
 
     FDisableAlign := True;
     try
@@ -3185,14 +3200,32 @@ procedure TALText.SetParent(const Value: TFmxObject);
 begin
   if FParent <> Value then begin
     inherited;
+    // stupidly when we do setparent the
+    // FisUpdating will be set to the value of the parent BUT without any
+    // notifications nor any call to beginupdate :(
+    // but when the parent will call endupdate then our EndUpdate will be also called
     if (Value <> nil) and
        (Value <> self) and
-       (Value is TControl) and
-       (TControl(Value).isupdating) then Layout.BeginUpdate; // stupidly when we do setparent the
-                                                             // FisUpdating will be set to the value of the parent BUT without any
-                                                             // notifications nor any call to beginupdate :(
-                                                             // but when the parent will call endupdate then our EndUpdate will be also called
+       (Value is TControl) then begin
+      if TALControlAccessPrivate(Value).FUpdating > TALTextLayoutAccessPrivate(Layout).fupdating then begin
+        while TALControlAccessPrivate(Value).FUpdating > TALTextLayoutAccessPrivate(Layout).fupdating do
+          Layout.BeginUpdate;
+      end
+      else if TALControlAccessPrivate(Value).FUpdating < TALTextLayoutAccessPrivate(Layout).fupdating then begin
+        while (TALControlAccessPrivate(Value).FUpdating < TALTextLayoutAccessPrivate(Layout).fupdating) and
+              (TALControlAccessPrivate(Value).FUpdating > 0) do
+          Layout.EndUpdate;
+      end;
+    end;
   end;
+end;
+
+{********************************************}
+procedure TALText.SetNewScene(AScene: IScene);
+begin
+  inherited SetNewScene(AScene);
+  AdjustSize; // << because before scene was maybe nil so adjustsize returned 0
+              //    or maybe also is that now scenescale changed so need to recalculate the size of TALText
 end;
 
 {*******************************}

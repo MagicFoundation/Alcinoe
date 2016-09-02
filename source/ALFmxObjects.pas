@@ -322,6 +322,9 @@ type
     property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
   end;
 
+procedure ALLockTexts(const aParentControl: Tcontrol);
+procedure ALUnLockTexts(const aParentControl: Tcontrol);
+
 {$IFDEF debug}
 var
   AlDebugRectangleMakeBufBitmapCount: integer;
@@ -2919,8 +2922,13 @@ end;
 {**************************}
 procedure TALText.DoRealign;
 begin
-  inherited;
+  //in original delphi source code it's was
+  //inherited;
+  //AdjustSize;
+  //but i think it's must be the oposite !
+  //https://quality.embarcadero.com/browse/RSP-15761
   AdjustSize;
+  inherited;
 end;
 
 {*****************************************************}
@@ -3111,7 +3119,9 @@ begin
      (Text <> '') and
      (scene <> nil) then begin
 
-    FDisableAlign := True;
+    FDisableAlign := True;  // i don't understand why in the original delphi source code they do like this - but i feel lazzy to fully study why so i leave it
+                            // this mean that we can't add aligned control inside the TalText because when we will update the size of the taltext via adjustsize
+                            // then we will not realign all the childs
     try
 
       LHorzAlign := FLayout.HorizontalAlign;
@@ -3222,8 +3232,16 @@ end;
 
 {********************************************}
 procedure TALText.SetNewScene(AScene: IScene);
+var aParentControl: Tcontrol;
 begin
   inherited SetNewScene(AScene);
+
+  aParentControl := parentControl;
+  while aParentControl <> nil do begin
+    if aParentControl.IsUpdating then exit
+    else aParentControl := aParentControl.parentControl;
+  end;
+
   AdjustSize; // << because before scene was maybe nil so adjustsize returned 0
               //    or maybe also is that now scenescale changed so need to recalculate the size of TALText
 end;
@@ -3244,6 +3262,15 @@ function TALText.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 begin
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+  FLayout.BeginUpdate;
+  try
+    FLayout.LayoutCanvas := Self.Canvas;  // useless
+    FLayout.TopLeft := LocalRect.TopLeft; // useless
+    FLayout.Opacity := AbsoluteOpacity;  // useless
+    FLayout.MaxSize := PointF(LocalRect.Width, LocalRect.Height);
+  finally
+    FLayout.EndUpdate;
+  end;
   result := TALDoubleBufferedTextLayoutNG(Layout).MakeBufBitmap;
   {$ELSE}
   result := nil;
@@ -3321,6 +3348,47 @@ end;
 function TALText.IsMaxHeightStored: Boolean;
 begin
   result := compareValue(fMaxHeight, 65535, Tepsilon.position) <> 0;
+end;
+
+{**************************************************}
+//unfortunatly the way the beginupdate/endupdate and
+//realign work is not very efficient for TALText.
+//because when we do endupdate then we will first
+//call endupdate to the most far away childreen, and
+//go up like :
+//  acontrol1
+//    acontrol2
+//      aalText1
+//then doing acontrol1.endupdate then we will do in this order :
+//      aalText1.endupdate => realign and then adjustsize
+//    acontrol2.endupdate => realign and then maybe again TalText1.adjustsize
+//  acontrol1.endupdate => realign and then maybe again TalText1.adjustsize
+//this is a problem because we will calculate several time the bufbitmap
+//to mitigate this we can do
+//  ALLockTexts(acontrol1);
+//  acontrol1.endupdate;
+//  ALUnLockTexts(acontrol1);
+procedure ALLockTexts(const aParentControl: Tcontrol);
+var I: Integer;
+begin
+  if aParentControl is TalText then begin
+    aParentControl.BeginUpdate;
+    exit;
+  end;
+  for I := 0 to aParentControl.Controls.Count - 1 do
+    ALLockTexts(aParentControl.Controls[i]);
+end;
+
+{******************************************************}
+procedure ALUnLockTexts(const aParentControl: Tcontrol);
+var I: Integer;
+begin
+  if aParentControl is TalText then begin
+    aParentControl.EndUpdate;
+    exit;
+  end;
+  for I := 0 to aParentControl.Controls.Count - 1 do
+    ALUnLockTexts(aParentControl.Controls[i]);
 end;
 
 procedure Register;

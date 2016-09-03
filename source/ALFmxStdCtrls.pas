@@ -439,8 +439,6 @@ type
     FisImagesChanged: boolean;
     FStretch: Boolean;
     procedure SetdoubleBuffered(const Value: Boolean);
-    function GetIsChecked: Boolean;
-    procedure SetIsChecked(const Value: Boolean);
     function GetImages: TCustomImageList;
     procedure SetImages(const Value: TCustomImageList);
     { IGlyph }
@@ -467,6 +465,8 @@ type
     function ImageUncheckedIndexStored: Boolean; virtual;
     function ImagesStored: Boolean; virtual;
     function GetDefaultSize: TSizeF; override;
+    function GetIsChecked: Boolean; virtual;
+    procedure SetIsChecked(const Value: Boolean); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -542,6 +542,23 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+  end;
+
+  {*********************************}
+  TAlRadioButton = class(TALCheckBox)
+  private
+    FGroupName: string;
+    function GetGroupName: string;
+    procedure SetGroupName(const Value: string);
+    function GroupNameStored: Boolean;
+    procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
+  protected
+    procedure SetIsChecked(const Value: Boolean); override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
   end;
 
 {$IFDEF debug}
@@ -1931,9 +1948,78 @@ begin
   end;
 end;
 
+{****************************************************}
+constructor TALRadioButton.Create(AOwner: TComponent);
+begin
+  inherited;
+  TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
+end;
+
+{********************************}
+destructor TALRadioButton.Destroy;
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
+  inherited;
+end;
+
+{**********************************************************}
+procedure TALRadioButton.SetIsChecked(const Value: Boolean);
+var M: TRadioButtonGroupMessage;
+begin
+  if FIsChecked <> Value then begin
+    FIsChecked := Value;
+    if (csDesigning in ComponentState) and FIsChecked then FIsChecked := Value // allows check/uncheck in design-mode
+    else begin
+      FIsChecked := Value;
+      if Value then begin
+        M := TRadioButtonGroupMessage.Create(GroupName);
+        TMessageManager.DefaultManager.SendMessage(Self, M, True);
+      end;
+    end;
+    StartTriggerAnimation(Self, 'IsChecked');
+    DoChanged;
+  end;
+end;
+
+{*******************************************}
+function TALRadioButton.GetGroupName: string;
+begin
+  Result := FGroupName;
+end;
+
+{**********************************************************************************}
+procedure TALRadioButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
+begin
+  if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and
+     (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then
+    IsChecked := False;
+end;
+
+{***********************************************}
+function TALRadioButton.GroupNameStored: Boolean;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _GroupNameIsSet(AGroupName: string): Boolean;
+  begin
+    AGroupName := AGroupName.Trim;
+    Result := (not AGroupName.IsEmpty) and (AGroupName <> '0') and (AGroupName <> '-1');
+  end;
+
+begin
+  Result := _GroupNameIsSet(FGroupName);
+end;
+
+{*********************************************************}
+procedure TALRadioButton.SetGroupName(const Value: string);
+var S: string;
+begin
+  S := Value.Trim;
+  if FGroupName <> S then FGroupName := Value;
+end;
+
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox]);
+  RegisterComponents('Alcinoe', [TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton]);
   {$IFDEF ALDPK}
   UnlistPublishedProperty(TALTrackThumbGlyph, 'Locked');
   UnlistPublishedProperty(TALTrackThumbGlyph, 'StyleName');

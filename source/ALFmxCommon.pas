@@ -8,7 +8,6 @@ uses System.classes,
      System.Generics.Collections,
      System.Math.Vectors,
      {$IF defined(ios)}
-     system.Generics.collections,
      iOSapi.CoreGraphics,
      iOSapi.CocoaTypes,
      iOSapi.CoreText,
@@ -300,9 +299,6 @@ uses system.SysUtils,
      {$IF defined(ANDROID)}
      Androidapi.JNIBridge,
      Androidapi.Helpers,
-     {$ENDIF}
-     {$IF defined(IOS)}
-     FMX.graphics,
      {$ENDIF}
      fmx.consts,
      fmx.controls.presentation,

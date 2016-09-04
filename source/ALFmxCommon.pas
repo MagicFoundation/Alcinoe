@@ -50,7 +50,7 @@ type
 
 function  ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
 procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
-function  ALGetFontName(const AFontFamily: String; aFontStyle: TFontStyles): string;
+function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -486,20 +486,62 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-function  ALGetFontName(const AFontFamily: String; aFontStyle: TFontStyles): string;
+function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
+
 const
-  BoldStyleSuffix = '-Bold'; //Do not localize
-  BoldItalicStyleSuffix = '-BoldOblique'; //Do not localize
-  ItalicStyleSuffix = '-Oblique'; //Do not localize
+  /// <summary> Rotating matrix to simulate Italic font attribute </summary>
+  ItalicMatrix: CGAffineTransform = (
+    a: 1;
+    b: 0;
+    c: 0.176326981; //~tan(10 degrees)
+    d: 1;
+    tx: 0;
+    ty: 0
+  );
+
+var
+  LFontRef, NewFontRef: CTFontRef;
+  Matrix: PCGAffineTransform;
+
 begin
-  if (TFontStyle.fsBold in aFontStyle) and (TFontStyle.fsItalic in aFontStyle) then
-    Result := AFontFamily + BoldItalicStyleSuffix
-  else if TFontStyle.fsBold in aFontStyle then
-    Result := AFontFamily + BoldStyleSuffix
-  else if TFontStyle.fsItalic in aFontStyle then
-    Result := AFontFamily + ItalicStyleSuffix
-  else
-    Result := AFontFamily;
+
+  Result := nil;
+  Matrix := nil;
+  LFontRef := CTFontCreateWithName(CFSTR(AFontFamily){name}, AFontSize{size}, nil{matrix}); // Returns a CTFontRef that best matches the name provided with size and matrix attributes.
+  try
+
+    if TFontStyle.fsItalic in AFontStyle then begin
+      NewFontRef := CTFontCreateCopyWithSymbolicTraits(LFontRef, 0, nil, kCTFontItalicTrait, kCTFontItalicTrait);  // Return a new font reference in the same family with the given symbolic traits. or NULL if none is found in the system.
+      if NewFontRef <> nil then begin
+        CFRelease(LFontRef);
+        LFontRef := NewFontRef;
+      end
+      else begin
+        // Font has no Italic version, applying transform matrix
+        Matrix := @ItalicMatrix;
+        NewFontRef := CTFontCreateWithName(CFSTR(AFontFamily), AFontSize, @ItalicMatrix);
+        if NewFontRef <> nil then begin
+          CFRelease(LFontRef);
+          LFontRef := NewFontRef;
+        end;
+      end;
+    end;
+
+    if TFontStyle.fsBold in AFontStyle then begin
+      NewFontRef := CTFontCreateCopyWithSymbolicTraits(LFontRef, 0, Matrix, kCTFontBoldTrait, kCTFontBoldTrait);
+      if NewFontRef <> nil then begin
+        CFRelease(LFontRef);
+        LFontRef := NewFontRef;
+      end;
+    end;
+
+    Result := LFontRef;
+
+  except
+    CFRelease(LFontRef);
+    // don't raise any exception, return simply nil
+  end;
+
 end;
 {$ENDIF}
 
@@ -1075,6 +1117,7 @@ var aBreakTextItem: TALBreakTextItem;
     aLineIndent: single;
     aOffset: single;
     aRuns: CFArrayRef;
+    aTruncatedRuns: CFArrayRef;
     aRunsCount: CFIndex;
     aRun: CTRunRef;
     aGlyphCount: CFIndex;
@@ -1397,11 +1440,6 @@ begin
       if aLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // otherwise, NULL.
       try
 
-        //init result
-        aTextAttrLn := CFAttributedStringGetLength(aTextAttr);
-        aStringRange := CTLineGetStringRange(aLine); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
-        result := (aStringRange.location + aStringRange.length < aTextAttrLn);
-
         //init aTruncatedLine
         aTruncatedLine :=  CTLineCreateTruncatedLine(aLine, // line: The line from which to create a truncated line.
                                                      aMaxWidth, // width: The width at which truncation begins. The line is truncated if its width is greater than the width passed in this parameter.
@@ -1411,6 +1449,17 @@ begin
                                                                      //                  truncation token is used and the line is simply cut off.
         if aTruncatedLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end; // CTLineCreateTruncatedLine return A reference to a truncated CTLine object if the call was successful; otherwise, NULL.
 
+        //init result - i didn't find a better way to do this !
+        aRuns := CTLineGetGlyphRuns(aLine); // Returns the array of glyph runs that make up the line object.
+                                            // Each CTLine object contains an array of glyph run (CTRun) objects. A glyph run is a
+                                            // set of consecutive glyphs that share the same attributes and direction. The typesetter
+                                            // creates glyph runs as it produces lines from character strings, attributes, and font objects.
+                                            // This means that a line is constructed of one or more glyphs runs. Glyph runs can draw
+                                            // themselves into a graphic context, if desired, although most clients have no need to
+                                            // interact directly with glyph runs.
+        aTruncatedRuns := CTLineGetGlyphRuns(aTruncatedline);
+        result := CFArrayGetCount(aRuns) <> CFArrayGetCount(aTruncatedRuns); // aTruncatedRuns[0] contain all the characters
+                                                                             // aTruncatedRuns[1] contain only one character, the last '...' (if the line was truncated)
         //init aMeasuredWidth
         aMeasuredWidth := CTLineGetTypographicBounds(aTruncatedLine, // line: The line whose typographic bounds are calculated.
                                                      @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
@@ -1537,7 +1586,8 @@ begin
   aCGColor := CGColorCreate(aColorSpace, @aAlphaColor);
   try
 
-    aFont := CTFontCreateWithName(CFSTR(ALGetFontName(aFontName, aFontStyle)){name}, aFontSize{size}, nil{matrix}); // Returns a new font reference for the given name.
+    aFont := ALGetCTFontRef(aFontName, aFontSize, aFontStyle); // Returns a new font reference for the given name.
+    if aFont = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;
     try
 
       aTextString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AText[Low(string)], Length(AText));

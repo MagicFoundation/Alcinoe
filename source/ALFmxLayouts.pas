@@ -14,12 +14,19 @@ uses System.Classes,
      System.Types,
      System.UITypes,
      System.Messaging,
+     FMX.layouts,
      FMX.Types,
      FMX.Controls,
      ALFmxStdCtrls,
      ALFmxInertialMovement;
 
 type
+
+  {************************}
+  TALLayout = class(TLayout)
+  protected
+    procedure DoRealign; override;
+  end;
 
   {*************************}
   TALCustomScrollBox = class;
@@ -365,6 +372,20 @@ uses System.SysUtils,
      FMX.utils,
      FMX.Ani;
 
+{*******************************************************************************************************}
+// http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly
+// https://quality.embarcadero.com/browse/RSP-15768
+// often we assign some event to some control onresize (like TText with autosize=True) to 
+// resize their parentcontrols to the same size as them. But in this way the problem is that if 
+// we resize the parentcontrol during it's dorealign process then it will not call again dorealign
+procedure TALLayout.DoRealign;
+var aOriginalSize: TpointF;
+begin
+  aOriginalSize := Size.Size;
+  inherited;
+  if not aOriginalSize.EqualsTo(Size.Size) then DoRealign;
+end;
+
 {*********************************************************}
 constructor TALScrollBoxContent.Create(AOwner: TComponent);
 begin
@@ -657,27 +678,35 @@ procedure TALCustomScrollBox.DoRealign;
   end;
 
 var aContentRect: TrectF;
-
+    aDoRealignAgain: boolean;
 begin
+
   if fDisableAlign then exit;
   fDisableAlign := True;
   try
 
+    aDoRealignAgain := False;
     if (FContent <> nil) then begin
       aContentRect := CalcContentBounds;
       Content.SetBounds(aContentRect.Left + fAnchoredContentOffset.x,
                         aContentRect.Top + fAnchoredContentOffset.y,
                         aContentRect.Width,
                         aContentRect.Height);
-      _UpdateVScrollBar(aContentRect);
-      _UpdateHScrollBar(aContentRect);
-      _UpdateAnimationTargets(aContentRect);
-      fAniCalculations.DoChanged;
+      if aContentRect.EqualsTo(CalcContentBounds, Tepsilon.Position) then  begin
+        _UpdateVScrollBar(aContentRect);
+        _UpdateHScrollBar(aContentRect);
+        _UpdateAnimationTargets(aContentRect);
+        fAniCalculations.DoChanged;
+      end
+      else aDoRealignAgain := True;
     end;
 
   finally
     fDisableAlign := false;
   end;
+
+  if aDoRealignAgain then DoRealign;
+
 end;
 
 {*********************************************************************************************}
@@ -1020,7 +1049,7 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
+  RegisterComponents('Alcinoe', [TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
   {$IFDEF ALDPK}
   UnlistPublishedProperty(TALScrollBoxBar, 'Locked');
   UnlistPublishedProperty(TALScrollBoxBar, 'StyleName');

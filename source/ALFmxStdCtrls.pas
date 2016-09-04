@@ -548,6 +548,7 @@ type
   TAlRadioButton = class(TALCheckBox)
   private
     FGroupName: string;
+    fMandatory: boolean;
     function GetGroupName: string;
     procedure SetGroupName(const Value: string);
     function GroupNameStored: Boolean;
@@ -559,6 +560,7 @@ type
     destructor Destroy; override;
   published
     property GroupName: string read GetGroupName write SetGroupName stored GroupNameStored nodefault;
+    property Mandatory: Boolean read fMandatory write fMandatory default false;
   end;
 
 {$IFDEF debug}
@@ -1952,6 +1954,8 @@ end;
 constructor TALRadioButton.Create(AOwner: TComponent);
 begin
   inherited;
+  FGroupName := '';
+  fMandatory := false;
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
@@ -1967,9 +1971,9 @@ procedure TALRadioButton.SetIsChecked(const Value: Boolean);
 var M: TRadioButtonGroupMessage;
 begin
   if FIsChecked <> Value then begin
-    FIsChecked := Value;
     if (csDesigning in ComponentState) and FIsChecked then FIsChecked := Value // allows check/uncheck in design-mode
     else begin
+      if (not value) and fMandatory then exit;
       FIsChecked := Value;
       if Value then begin
         M := TRadioButtonGroupMessage.Create(GroupName);
@@ -1989,10 +1993,18 @@ end;
 
 {**********************************************************************************}
 procedure TALRadioButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
+var aOldMandatory: Boolean;
 begin
   if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and
-     (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then
-    IsChecked := False;
+     (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then begin
+    aOldMandatory := fMandatory;
+    fMandatory := False;
+    try
+      IsChecked := False;
+    finally
+      fMandatory := aOldMandatory;
+    end;
+  end;
 end;
 
 {***********************************************}

@@ -47,6 +47,7 @@ class DELPHICLASS TALTrackBar;
 class DELPHICLASS TALScrollBar;
 class DELPHICLASS TALRangeTrackBar;
 class DELPHICLASS TALCheckBox;
+class DELPHICLASS TAlRadioButton;
 //-- type declarations -------------------------------------------------------
 class PASCALIMPLEMENTATION TALTrackThumbGlyph : public Alfmximglist::TALGlyph
 {
@@ -506,8 +507,6 @@ private:
 	bool FisImagesChanged;
 	bool FStretch;
 	void __fastcall SetdoubleBuffered(const bool Value);
-	bool __fastcall GetIsChecked(void);
-	void __fastcall SetIsChecked(const bool Value);
 	Fmx::Imglist::TCustomImageList* __fastcall GetImages(void);
 	void __fastcall SetImages(Fmx::Imglist::TCustomImageList* const Value);
 	System::Uitypes::TImageIndex __fastcall GetImageIndex(void);
@@ -528,6 +527,8 @@ protected:
 	virtual bool __fastcall ImageUncheckedIndexStored(void);
 	virtual bool __fastcall ImagesStored(void);
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
+	virtual bool __fastcall GetIsChecked(void);
+	virtual void __fastcall SetIsChecked(const bool Value);
 	
 public:
 	__fastcall virtual TALCheckBox(System::Classes::TComponent* AOwner);
@@ -617,6 +618,31 @@ public:
 	operator Fmx::Actnlist::IGlyph*(void) { return (Fmx::Actnlist::IGlyph*)&__IGlyph; }
 	#endif
 	
+};
+
+
+class PASCALIMPLEMENTATION TAlRadioButton : public TALCheckBox
+{
+	typedef TALCheckBox inherited;
+	
+private:
+	System::UnicodeString FGroupName;
+	bool fMandatory;
+	System::UnicodeString __fastcall GetGroupName(void);
+	void __fastcall SetGroupName(const System::UnicodeString Value);
+	bool __fastcall GroupNameStored(void);
+	void __fastcall GroupMessageCall(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
+	
+protected:
+	virtual void __fastcall SetIsChecked(const bool Value);
+	
+public:
+	__fastcall virtual TAlRadioButton(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TAlRadioButton(void);
+	
+__published:
+	__property System::UnicodeString GroupName = {read=GetGroupName, write=SetGroupName, stored=GroupNameStored};
+	__property bool Mandatory = {read=fMandatory, write=fMandatory, default=0};
 };
 
 

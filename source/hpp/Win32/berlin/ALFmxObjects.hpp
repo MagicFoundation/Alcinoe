@@ -183,6 +183,7 @@ protected:
 public:
 	__fastcall virtual TALText(System::Classes::TComponent* AOwner);
 	__fastcall virtual ~TALText(void);
+	virtual void __fastcall SetNewScene(Fmx::Controls::_di_IScene AScene);
 	virtual Fmx::Graphics::TBitmap* __fastcall MakeBufBitmap(void);
 	virtual void __fastcall clearBufBitmap(void);
 	virtual void __fastcall BeginUpdate(void);
@@ -274,6 +275,8 @@ public:
 
 
 //-- var, const, procedure ---------------------------------------------------
+extern DELPHI_PACKAGE void __fastcall ALLockTexts(Fmx::Controls::TControl* const aParentControl);
+extern DELPHI_PACKAGE void __fastcall ALUnLockTexts(Fmx::Controls::TControl* const aParentControl);
 extern DELPHI_PACKAGE void __fastcall Register(void);
 }	/* namespace Alfmxobjects */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXOBJECTS)

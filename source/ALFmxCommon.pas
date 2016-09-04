@@ -1120,6 +1120,7 @@ var aBreakTextItem: TALBreakTextItem;
     aTruncatedRuns: CFArrayRef;
     aRunsCount: CFIndex;
     aRun: CTRunRef;
+    aTruncatedRun: CTRunRef;
     aGlyphCount: CFIndex;
     aStringRange: CFRange;
     aStringIndex: CFIndex;
@@ -1447,7 +1448,7 @@ begin
                                                      aEllipsisLine); // truncationToken: This token is added at the point where truncation took place, to indicate that the line was truncated.
                                                                      //                  Usually, the truncation token is the ellipsis character (U+2026). If this parameter is set to NULL, then no
                                                                      //                  truncation token is used and the line is simply cut off.
-        if aTruncatedLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end; // CTLineCreateTruncatedLine return A reference to a truncated CTLine object if the call was successful; otherwise, NULL.
+        if aTruncatedLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(True); end; // CTLineCreateTruncatedLine return A reference to a truncated CTLine object if the call was successful; otherwise, NULL.
 
         //init result - i didn't find a better way to do this !
         aRuns := CTLineGetGlyphRuns(aLine); // Returns the array of glyph runs that make up the line object.
@@ -1457,9 +1458,22 @@ begin
                                             // This means that a line is constructed of one or more glyphs runs. Glyph runs can draw
                                             // themselves into a graphic context, if desired, although most clients have no need to
                                             // interact directly with glyph runs.
+        aRunsCount := CFArrayGetCount(aRuns);
         aTruncatedRuns := CTLineGetGlyphRuns(aTruncatedline);
-        result := CFArrayGetCount(aRuns) <> CFArrayGetCount(aTruncatedRuns); // aTruncatedRuns[0] contain all the characters
-                                                                             // aTruncatedRuns[1] contain only one character, the last '...' (if the line was truncated)
+        result := aRunsCount <> CFArrayGetCount(aTruncatedRuns); // aTruncatedRuns[0] contain all the characters
+                                                                 // aTruncatedRuns[1] contain only one character, the last '...' (if the line was truncated)
+        if (not result) then begin
+          //their is also the case where the aTruncatedline contain ONLY aEllipsisLine ...
+          //in this way CFArrayGetCount(aRuns) = CFArrayGetCount(aTruncatedRuns) :(
+          //funcking ios i didn't find a good way to compare the char in the run
+          for i := aRunsCount - 1 downto 0 do begin
+            aRun := CFArrayGetValueAtIndex(aRuns, i);
+            aTruncatedRun := CFArrayGetValueAtIndex(aTruncatedRuns, i);
+            result := CTRunGetGlyphCount(aRun) <> CTRunGetGlyphCount(aTruncatedRun); // off course if aLine contain the same number of char than in aEllipsis then we are fucked
+            if result then break;
+          end;
+        end;
+
         //init aMeasuredWidth
         aMeasuredWidth := CTLineGetTypographicBounds(aTruncatedLine, // line: The line whose typographic bounds are calculated.
                                                      @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.

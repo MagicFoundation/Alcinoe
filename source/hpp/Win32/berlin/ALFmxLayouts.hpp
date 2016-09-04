@@ -18,6 +18,7 @@
 #include <System.Types.hpp>
 #include <System.UITypes.hpp>
 #include <System.Messaging.hpp>
+#include <FMX.Layouts.hpp>
 #include <FMX.Types.hpp>
 #include <FMX.Controls.hpp>
 #include <ALFmxStdCtrls.hpp>
@@ -28,6 +29,7 @@
 namespace Alfmxlayouts
 {
 //-- forward type declarations -----------------------------------------------
+class DELPHICLASS TALLayout;
 class DELPHICLASS TALScrollBoxContent;
 class DELPHICLASS TALScrollBoxAniCalculations;
 class DELPHICLASS TALScrollBoxBar;
@@ -36,6 +38,21 @@ class DELPHICLASS TALScrollBox;
 class DELPHICLASS TALVertScrollBox;
 class DELPHICLASS TALHorzScrollBox;
 //-- type declarations -------------------------------------------------------
+class PASCALIMPLEMENTATION TALLayout : public Fmx::Layouts::TLayout
+{
+	typedef Fmx::Layouts::TLayout inherited;
+	
+protected:
+	virtual void __fastcall DoRealign(void);
+public:
+	/* TLayout.Create */ inline __fastcall virtual TALLayout(System::Classes::TComponent* AOwner) : Fmx::Layouts::TLayout(AOwner) { }
+	
+public:
+	/* TControl.Destroy */ inline __fastcall virtual ~TALLayout(void) { }
+	
+};
+
+
 class PASCALIMPLEMENTATION TALScrollBoxContent : public Fmx::Controls::TContent
 {
 	typedef Fmx::Controls::TContent inherited;

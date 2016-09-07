@@ -110,7 +110,7 @@ const
   SE_ENABLE_DELEGATION_NAME = 'SeEnableDelegationPrivilege';
   SE_MANAGE_VOLUME_NAME = 'SeManageVolumePrivilege';
 
-Function AlGetEnvironmentString: AnsiString;
+function AlGetEnvironmentString: AnsiString;
 function ALWinExec(const aCommandLine: AnsiString;
                    const aCurrentDirectory: AnsiString;
                    const aEnvironment: AnsiString;
@@ -119,7 +119,9 @@ function ALWinExec(const aCommandLine: AnsiString;
 function ALWinExec(const aCommandLine: AnsiString;
                    aInputStream: Tstream;
                    aOutputStream: TStream): Dword; overload;
-Procedure ALWinExec(const aUserName: ANSIString;
+procedure ALWinExec(const aCommandLine: AnsiString;
+                    const aCurrentDirectory: AnsiString); overload;
+procedure ALWinExec(const aUserName: ANSIString;
                     const aPassword: ANSIString;
                     const aCommandLine: ANSIString;
                     const aCurrentDirectory: AnsiString;
@@ -335,6 +337,43 @@ Begin
                       aInputStream,
                       aOutputStream);
 End;
+
+{************************************************}
+procedure ALWinExec(const aCommandLine: AnsiString;
+                    const aCurrentDirectory: AnsiString);
+Var aProcessInformation: TProcessInformation;
+    aStartupInfo: TStartupInfoA;
+    aSecurityAttributes: TSecurityAttributes;
+    aPCurrentDirectory: Pointer;
+begin
+
+  // Set up the security attributes struct.
+  aSecurityAttributes.nLength := sizeof(TSecurityAttributes);
+  aSecurityAttributes.lpSecurityDescriptor := nil;
+  aSecurityAttributes.bInheritHandle := true;
+
+  // Set up the start up info struct.
+  ZeroMemory(@aStartupInfo,sizeof(TStartupInfo));
+  aStartupInfo.cb := sizeof(TStartupInfo);
+  aStartupInfo.dwFlags := STARTF_USESTDHANDLES;
+
+  if aCurrentDirectory <> '' then aPCurrentDirectory := PAnsiChar(aCurrentDirectory)
+  else aPCurrentDirectory := nil;
+
+  // Launch the process
+  if not CreateProcessA(nil,                     // pointer to name of executable module
+                        PAnsiChar(aCommandLine), // pointer to command line string
+                        @aSecurityAttributes,    // pointer to process security attributes
+                        nil,                     // pointer to thread security attributes
+                        false,                   // handle inheritance flag
+                        CREATE_NO_WINDOW,        // creation flags
+                        nil,                     // pointer to new environment block
+                        aPCurrentDirectory,      // pointer to current directory name
+                        aStartupInfo,            // pointer to STARTUPINFO
+                        aProcessInformation)     // pointer to PROCESS_INFORMATION
+  then RaiseLastOSError;
+
+end;
 
 {**********************************************}
 Procedure ALWinExec(const aUserName: ANSIString;

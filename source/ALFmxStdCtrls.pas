@@ -2079,6 +2079,7 @@ begin
 end;
 
 initialization
+  RegisterFmxClasses([TALCheckBox, TALRadioButton, TALScrollBar, TALTrackBar, TALRangeTrackBar]);
   {$IFDEF debug}
   AlDebugCheckBoxMakeBufBitmapStopWatch := TstopWatch.Create;
   {$endif}

@@ -1100,6 +1100,4 @@ end;
 initialization
   RegisterFmxClasses([TALTabControl, TALTabItem]);
 
-finalization
-
 end.

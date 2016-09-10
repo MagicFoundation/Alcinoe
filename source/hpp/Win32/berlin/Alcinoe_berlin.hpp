@@ -17,7 +17,6 @@
 #include <ALFmxLayouts.hpp>
 #include <ALFmxObjects.hpp>
 #include <ALFmxImgList.hpp>
-#include <ALReg.hpp>
 #include <ALFmxStdCtrls.hpp>
 #include <ALFmxCommon.hpp>
 #include <ALFmxTabControl.hpp>

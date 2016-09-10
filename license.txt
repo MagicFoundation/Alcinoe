@@ -1,5 +1,5 @@
 All files included in the archive are 
-Copyright (C) 1999-2012 by Arkadia Software Engineering
+Copyright (C) 1999-2016 by Arkadia Software Engineering
 
 The component is fully free. You can use it any kind of 
 software. But you must point to original author in your 

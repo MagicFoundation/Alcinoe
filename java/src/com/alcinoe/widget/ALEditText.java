@@ -12,10 +12,6 @@ public class ALEditText extends EditText {
   private ALSoftInputListener mSoftInputListener;
     
   private static class SoftInputReceiver extends ResultReceiver {
-    private static final int RESULT_UNCHANGED_HIDDEN = 1;
-    private static final int RESULT_SHOWN = 2;
-    private static final int RESULT_HIDDEN = 3;
-    private static final int RESULT_UNCHANGED_SHOWN = 0;
     private ALSoftInputListener mListener;
    
     public SoftInputReceiver(ALSoftInputListener listener) {
@@ -25,17 +21,14 @@ public class ALEditText extends EditText {
 
     public void onReceiveResult(int result, Bundle data) {
       switch (result) {
-        case RESULT_UNCHANGED_SHOWN /*0*/:
-        case RESULT_SHOWN /*2*/:
-          if (this.mListener != null) {
-            this.mListener.onSoftInputShown();
-          }
-        case RESULT_UNCHANGED_HIDDEN /*1*/:
-        case RESULT_HIDDEN /*3*/:
-          if (this.mListener != null) {
-            this.mListener.onSoftInputHidden();
-          }
-        default:
+        case InputMethodManager.RESULT_UNCHANGED_SHOWN:
+        case InputMethodManager.RESULT_SHOWN: 
+          if (this.mListener != null) { this.mListener.onSoftInputShown(); }
+          break;
+        case InputMethodManager.RESULT_UNCHANGED_HIDDEN:
+        case InputMethodManager.RESULT_HIDDEN:
+          if (this.mListener != null) { this.mListener.onSoftInputHidden(); }
+          break;
       }
     }
   }

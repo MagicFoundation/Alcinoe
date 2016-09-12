@@ -6,11 +6,40 @@ import android.content.Context;
 import android.os.ResultReceiver;
 import android.os.Bundle;
 import android.view.inputmethod.InputMethodManager;
+import android.view.KeyEvent;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
+import com.alcinoe.text.method.ALKeyPreImeListener;
 
 public class ALEditText extends EditText {
   private ALSoftInputListener mSoftInputListener;
-    
+  private ALKeyPreImeListener mKeyPreImeListener;
+      
+  public ALEditText(Context context){
+    super(context);
+  } 
+
+  public ALEditText(Context context, AttributeSet attrs){
+    super(context, attrs);
+  } 
+           
+  public ALEditText(Context context, AttributeSet attrs, int defStyleAttr){
+    super(context, attrs, defStyleAttr);
+  } 
+           
+  public ALEditText(Context context, AttributeSet attrs, int defStyleAttr,  int defStyleRes){
+    super(context, attrs, defStyleAttr, defStyleRes);
+  } 
+
+  @Override
+  public boolean onKeyPreIme(int keyCode, KeyEvent event) {
+    if (mKeyPreImeListener != null) return mKeyPreImeListener.onKeyPreIme(keyCode, event); 
+    return super.onKeyPreIme(keyCode, event);
+  }
+  
+  public void SetKeyPreImeListener(ALKeyPreImeListener listener) {
+    this.mKeyPreImeListener = listener;
+  }
+
   private static class SoftInputReceiver extends ResultReceiver {
     private ALSoftInputListener mListener;
    
@@ -23,31 +52,15 @@ public class ALEditText extends EditText {
       switch (result) {
         case InputMethodManager.RESULT_UNCHANGED_SHOWN:
         case InputMethodManager.RESULT_SHOWN: 
-          if (this.mListener != null) { this.mListener.onSoftInputShown(); }
+          if (this.mListener != null) this.mListener.onSoftInputShown(); 
           break;
         case InputMethodManager.RESULT_UNCHANGED_HIDDEN:
         case InputMethodManager.RESULT_HIDDEN:
-          if (this.mListener != null) { this.mListener.onSoftInputHidden(); }
+          if (this.mListener != null) this.mListener.onSoftInputHidden();
           break;
       }
     }
   }
-
-  public ALEditText(Context context){
-    super(context);
-  } 
-
-  public ALEditText(Context context, AttributeSet attrs){
-    super(context, attrs);
-  } 
-                  
-  public ALEditText(Context context, AttributeSet attrs, int defStyleAttr){
-    super(context, attrs, defStyleAttr);
-  } 
-                  
-  public ALEditText(Context context, AttributeSet attrs, int defStyleAttr,  int defStyleRes){
-    super(context, attrs, defStyleAttr, defStyleRes);
-  } 
 
   public void showSoftInput() {
     SoftInputReceiver receiver = new SoftInputReceiver(this.mSoftInputListener);

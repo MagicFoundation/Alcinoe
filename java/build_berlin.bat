@@ -3,16 +3,22 @@ cls
 
 setlocal
 
-REM ----------------------------------------------
+REM -----------------------------------------------------
 REM
 REM Update the path below according to your system
+REM Please notice that we use the SDK of Marshmallow (23)
+REM instead of the default lollipop (22) used by Delphi
+REM Berlin. This because we want the text selection
+REM like https://developer.android.com/about/versions/marshmallow/android-6.0-changes.html#behavior-text-selection
+REM Please install the SDK build tools and the SDK Platform 
+REM of Marshmallow (23) using C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\SDK Manager.exe
 REM
-REM ----------------------------------------------
+REM -----------------------------------------------------
 
 if x%ANDROID% == x set ANDROID="C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows"
-set ANDROID_PLATFORM=%ANDROID%\platforms\android-22
-set DX_LIB=%ANDROID%\build-tools\22.0.1\lib
-set DX_PATH=%ANDROID%\build-tools\22.0.1
+set ANDROID_PLATFORM=%ANDROID%\platforms\android-23
+set DX_LIB=%ANDROID%\build-tools\23.0.3\lib
+set DX_PATH=%ANDROID%\build-tools\23.0.3
 set JDK_PATH="C:\Program Files\Java\jdk1.7.0_25\bin"
 set EMBO_DEX_DEBUG="C:\Program Files (x86)\Embarcadero\Studio\18.0\lib\android\debug\classes.dex"
 set EMBO_DEX_RELEASE="C:\Program Files (x86)\Embarcadero\Studio\18.0\lib\android\release\classes.dex"

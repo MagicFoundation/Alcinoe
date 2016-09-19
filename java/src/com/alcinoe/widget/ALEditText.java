@@ -3,28 +3,24 @@ package com.alcinoe.widget;
 import android.widget.EditText;
 import android.util.AttributeSet;
 import android.content.Context;
-import android.os.ResultReceiver;
-import android.os.Bundle;
-import android.view.View;
 import android.view.ViewGroup;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.ActionMode;
-import android.view.ActionMode.Callback;
-import android.view.ActionMode.Callback2;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 import android.view.ViewParent;
 import android.app.Activity;
 import android.graphics.Rect;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
 import com.alcinoe.text.method.ALKeyPreImeListener;
 
 public class ALEditText extends EditText {
   private ALSoftInputListener mSoftInputListener;
   private ALKeyPreImeListener mKeyPreImeListener;
-      
+  private OnGlobalLayoutListener mOnGlobalLayoutListener;
+        
   public ALEditText(Context context){
     super(context);
   } 
@@ -39,8 +35,9 @@ public class ALEditText extends EditText {
            
   public ALEditText(Context context, AttributeSet attrs, int defStyleAttr,  int defStyleRes){
     super(context, attrs, defStyleAttr, defStyleRes);
+    this.mOnGlobalLayoutListener = null;  
   } 
-
+  
   @Override
   public boolean onKeyPreIme(int keyCode, KeyEvent event) {
     if (mKeyPreImeListener != null) return mKeyPreImeListener.onKeyPreIme(keyCode, event); 
@@ -49,40 +46,47 @@ public class ALEditText extends EditText {
   
   public void SetKeyPreImeListener(ALKeyPreImeListener listener) {
     this.mKeyPreImeListener = listener;
-  }
+ 
+    final Activity activity = (Activity) this.getContext(); 
+    final ViewGroup decoreview = (ViewGroup) activity.getWindow().getDecorView();
 
-  private static class SoftInputReceiver extends ResultReceiver {
-    private ALSoftInputListener mListener;
-   
-    public SoftInputReceiver(ALSoftInputListener listener) {
-      super(null);
-      this.mListener = listener;
+    if (this.mOnGlobalLayoutListener != null) {
+      decoreview.getViewTreeObserver().removeOnGlobalLayoutListener(this.mOnGlobalLayoutListener);
+      this.mOnGlobalLayoutListener = null;    
     }
 
-    public void onReceiveResult(int result, Bundle data) {
-      switch (result) {
-        case InputMethodManager.RESULT_UNCHANGED_SHOWN:
-        case InputMethodManager.RESULT_SHOWN: 
-          if (this.mListener != null) this.mListener.onSoftInputShown(); 
-          break;
-        case InputMethodManager.RESULT_UNCHANGED_HIDDEN:
-        case InputMethodManager.RESULT_HIDDEN:
-          if (this.mListener != null) this.mListener.onSoftInputHidden();
-          break;
-      }
+    if (listener != null) {
+      this.mOnGlobalLayoutListener = new OnGlobalLayoutListener() {
+
+          private float convertPixelsToDp(float px, Context context){
+            DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+            float dp = px / ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+            return dp;
+          }
+
+          @Override
+          public void onGlobalLayout() {              
+              Rect contentrect = new Rect();
+              Rect totalrect = new Rect();
+              decoreview.getWindowVisibleDisplayFrame(contentrect);
+              decoreview.getDrawingRect(totalrect);
+              if (convertPixelsToDp(totalrect.height(), (Context) activity) - convertPixelsToDp(contentrect.height(), (Context) activity) > 120) { mSoftInputListener.onSoftInputShown(); }
+              else {mSoftInputListener.onSoftInputHidden(); }
+           }
+      };
+      decoreview.getViewTreeObserver().addOnGlobalLayoutListener(this.mOnGlobalLayoutListener);  
     }
+
   }
 
   public void showSoftInput() {
-    SoftInputReceiver receiver = new SoftInputReceiver(this.mSoftInputListener);
     InputMethodManager imm = getInputMethodManager();
-    imm.showSoftInput(this, 0, receiver);
+    imm.showSoftInput(this, 0);
   }
 
   public void HideSoftInput() {
-    SoftInputReceiver receiver = new SoftInputReceiver(this.mSoftInputListener);
     InputMethodManager imm = getInputMethodManager();
-    imm.hideSoftInputFromWindow(getWindowToken(), 0, receiver);
+    imm.hideSoftInputFromWindow(getWindowToken(), 0);
   }
   
   public void SetSoftInputListener(ALSoftInputListener listener) {

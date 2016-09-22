@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ 
+  <style name="AppTheme.EditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item> <!-- this will also remove all paddings -->  
+  </style>
+ 
+  <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar"> 
+    <item name="android:editTextStyle">@style/AppTheme.EditTextStyle</item>
+    <item name="android:colorAccent">#ff0288d1</item> <!-- use to setup the color of the text selection handles -->   
+  </style>
+
+</resources>

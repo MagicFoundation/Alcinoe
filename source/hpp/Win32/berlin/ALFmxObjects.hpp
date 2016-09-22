@@ -39,6 +39,7 @@ class PASCALIMPLEMENTATION TALRectangle : public Fmx::Objects::TRectangle
 	typedef Fmx::Objects::TRectangle inherited;
 	
 private:
+	float FScreenScale;
 	bool fdoubleBuffered;
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;
@@ -67,6 +68,7 @@ class PASCALIMPLEMENTATION TALCircle : public Fmx::Objects::TCircle
 	typedef Fmx::Objects::TCircle inherited;
 	
 private:
+	float FScreenScale;
 	bool fdoubleBuffered;
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;
@@ -95,6 +97,7 @@ class PASCALIMPLEMENTATION TALLine : public Fmx::Objects::TLine
 	typedef Fmx::Objects::TLine inherited;
 	
 private:
+	float FScreenScale;
 	bool fdoubleBuffered;
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;
@@ -128,9 +131,6 @@ private:
 	bool FAutoTranslate;
 	bool FAutoConvertFontFamily;
 	Fmx::Graphics::TTextSettings* FTextSettings;
-	Fmx::Graphics::TTextSettings* FDefaultTextSettings;
-	Fmx::Types::TStyledSettings FStyledSettings;
-	Fmx::Graphics::TTextSettings* FSavedTextSettings;
 	Fmx::Textlayout::TTextLayout* FLayout;
 	bool FAutoSize;
 	float fMaxWidth;
@@ -147,11 +147,8 @@ private:
 	void __fastcall SetColor(const System::Uitypes::TAlphaColor Value);
 	void __fastcall SetTrimming(const Fmx::Types::TTextTrimming Value);
 	void __fastcall OnFontChanged(System::TObject* Sender);
-	Fmx::Graphics::TTextSettings* __fastcall GetDefaultTextSettings(void);
 	Fmx::Graphics::TTextSettings* __fastcall GetTextSettings(void);
 	void __fastcall SetTextSettings(Fmx::Graphics::TTextSettings* const Value);
-	void __fastcall SetStyledSettings(const Fmx::Types::TStyledSettings Value);
-	Fmx::Types::TStyledSettings __fastcall GetStyledSettings(void);
 	System::Uitypes::TAlphaColor __fastcall GetColor(void);
 	Fmx::Graphics::TFont* __fastcall GetFont(void);
 	Fmx::Types::TTextAlign __fastcall GetHorzTextAlign(void);
@@ -176,9 +173,6 @@ protected:
 	virtual void __fastcall Resize(void);
 	virtual void __fastcall Loaded(void);
 	__property Fmx::Textlayout::TTextLayout* Layout = {read=FLayout};
-	virtual void __fastcall UpdateDefaultTextSettings(void);
-	virtual bool __fastcall SaveState(void);
-	virtual bool __fastcall RestoreState(void);
 	
 public:
 	__fastcall virtual TALText(System::Classes::TComponent* AOwner);
@@ -188,7 +182,6 @@ public:
 	virtual void __fastcall clearBufBitmap(void);
 	virtual void __fastcall BeginUpdate(void);
 	virtual void __fastcall EndUpdate(void);
-	virtual void __fastcall AfterConstruction(void);
 	__property Fmx::Graphics::TFont* Font = {read=GetFont, write=SetFont};
 	__property System::Uitypes::TAlphaColor Color = {read=GetColor, write=SetColor, nodefault};
 	__property Fmx::Types::TTextAlign HorzTextAlign = {read=GetHorzTextAlign, write=SetHorzTextAlign, nodefault};
@@ -243,34 +236,6 @@ __published:
 	__property bool doubleBuffered = {read=GetdoubleBuffered, write=SetdoubleBuffered, default=1};
 	__property bool AutoTranslate = {read=FAutoTranslate, write=FAutoTranslate, default=1};
 	__property bool AutoConvertFontFamily = {read=FAutoConvertFontFamily, write=FAutoConvertFontFamily, default=1};
-private:
-	void *__IObjectState;	// Fmx::Types::IObjectState 
-	void *__ITextSettings;	// Fmx::Graphics::ITextSettings 
-	
-public:
-	#if defined(MANAGED_INTERFACE_OPERATORS)
-	// {0402E1A6-1F75-4D28-BFEA-8092803B00EE}
-	operator Fmx::Types::_di_IObjectState()
-	{
-		Fmx::Types::_di_IObjectState intf;
-		this->GetInterface(intf);
-		return intf;
-	}
-	#else
-	operator Fmx::Types::IObjectState*(void) { return (Fmx::Types::IObjectState*)&__IObjectState; }
-	#endif
-	#if defined(MANAGED_INTERFACE_OPERATORS)
-	// {FD99635D-D8DB-4E26-B36F-97D3AABBCCB3}
-	operator Fmx::Graphics::_di_ITextSettings()
-	{
-		Fmx::Graphics::_di_ITextSettings intf;
-		this->GetInterface(intf);
-		return intf;
-	}
-	#else
-	operator Fmx::Graphics::ITextSettings*(void) { return (Fmx::Graphics::ITextSettings*)&__ITextSettings; }
-	#endif
-	
 };
 
 

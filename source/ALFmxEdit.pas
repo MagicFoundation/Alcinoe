@@ -16,6 +16,13 @@ uses System.Types,
      Androidapi.JNI.Widget,
      Androidapi.JNI.JavaTypes,
      ALAndroidApi,
+     {$ELSEIF defined(IOS)}
+     System.TypInfo,
+     iOSapi.Foundation,
+     iOSapi.UIKit,
+     Macapi.ObjectiveC,
+     Macapi.ObjCRuntime,
+     ALIosNativeControl,
      {$ELSE}
      FMX.Edit,
      {$ENDIF}
@@ -107,40 +114,152 @@ type
     FKeyPreImeListener: TALKeyPreImeListener;
     FFocusChangeListener: TALFocusChangeListener;
     fApplicationEventMessageID: integer;
+    fReturnKeyType: TReturnKeyType;
+    fKeyboardType: TVirtualKeyboardType;
+    fPassword: boolean;
+    FTextSettings: TTextSettings;
+    procedure DoSetInputType(const aKeyboardType: TVirtualKeyboardType; const aPassword: Boolean);
+    procedure setKeyboardType(const Value: TVirtualKeyboardType);
+    function GetKeyboardType: TVirtualKeyboardType;
+    procedure setPassword(const Value: Boolean);
+    function GetPassword: Boolean;
+    procedure DoSetReturnKeyType(const Value: TReturnKeyType);
+    procedure setReturnKeyType(const Value: TReturnKeyType);
+    function GetReturnKeyType: TReturnKeyType;
+    function GetTextPrompt: String;
+    procedure setTextPrompt(const Value: String);
+    function GetTextSettings: TTextSettings;
+    procedure SetTextSettings(const Value: TTextSettings);
+    function getText: String;
+    procedure SetText(const Value: String);
+    procedure OnFontChanged(Sender: TObject);
     procedure ApplicationEventHandler(const Sender : TObject; const M : TMessage);
   protected
     FEditText: JALEditText;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure ParentChanged; override;
     procedure DoAbsoluteChanged; override;
-    procedure Move; override;
     procedure Resize; override;
-    procedure Show; override;
-    procedure Hide; override;
+    procedure VisibleChanged; override;
     procedure ChangeOrder; override;
     procedure DoEnter; override;
     procedure DoExit; override;
-    procedure setInputType(const aKeyboardType: TVirtualKeyboardType; const aPassword: Boolean);
-    procedure setReturnKeyType(const aReturnKeyType: TReturnKeyType);
-    property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    procedure realignContent; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure realignContent; virtual;
+    property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
+    property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
+    property Password: Boolean read GetPassword write SetPassword default False;
+    property TextPrompt: String read GetTextPrompt write setTextPrompt;
+    property Text: String read getText write SetText;
+    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
   end;
 {$endif}
 
 {$IF defined(ios)}
 type
 
+  {***********************************}
+  IALTextField = interface(UITextField)
+    ['{EF9E2F3E-4C60-4094-97EF-F7885B88E2C8}']
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure ControlEventEditingChanged; cdecl;
+    procedure ControlEventEditingDidEnd; cdecl;
+    function canBecomeFirstResponder: Boolean; cdecl;
+    function canPerformAction(action: SEL; withSender: Pointer): Boolean; cdecl;
+  end;
+
+  {******************************}
+  TALIosTextFieldDelegate = class;
+  TALIosEdit = class;
+
+  {******************************************}
+  TALIosTextField = class(TALIosNativeControl)
+  private
+    [Weak] FEditControl: TALIosEdit;
+    FTextFieldDelegate: TALIosTextFieldDelegate;
+    function GetView: UITextField;
+  protected
+    function GetObjectiveCClass: PTypeInfo; override;
+  public
+    constructor Create; overload; override;
+    constructor Create(const AControl: TControl); overload; override;
+    destructor Destroy; override;
+    procedure ControlEventEditingChanged; cdecl;
+    procedure ControlEventEditingDidEnd; cdecl;
+    function canPerformAction(action: SEL; withSender: Pointer): Boolean; cdecl;
+    function canBecomeFirstResponder: Boolean; cdecl;
+    property View: UITextField read GetView;
+  end;
+
+  {************************************************************}
+  TALIosTextFieldDelegate = class(TOCLocal, UITextFieldDelegate)
+  private
+    [Weak] FTextField: TALIosTextField;
+  public
+    constructor Create(const ATextField: TALIosTextField);
+    function textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean; cdecl;
+    procedure textFieldDidBeginEditing(textField: UITextField); cdecl;
+    procedure textFieldDidEndEditing(textField: UITextField); cdecl;
+    function textFieldShouldBeginEditing(textField: UITextField): Boolean; cdecl;
+    function textFieldShouldClear(textField: UITextField): Boolean; cdecl;
+    function textFieldShouldEndEditing(textField: UITextField): Boolean; cdecl;
+    function textFieldShouldReturn(textField: UITextField): Boolean; cdecl;
+  end;
+
   {**************************}
   TALIosEdit = class(TControl)
   private
+    fOnChangeTracking: TNotifyEvent;
+    FAttributedString: NSMutableAttributedString;
+    FTextSettings: TTextSettings;
+    procedure setKeyboardType(const Value: TVirtualKeyboardType);
+    function GetKeyboardType: TVirtualKeyboardType;
+    procedure setPassword(const Value: Boolean);
+    function GetPassword: Boolean;
+    procedure setReturnKeyType(const Value: TReturnKeyType);
+    function GetReturnKeyType: TReturnKeyType;
+    function GetTextPrompt: String;
+    procedure setTextPrompt(const Value: String);
+    function GetTextSettings: TTextSettings;
+    procedure SetTextSettings(const Value: TTextSettings);
+    function getText: String;
+    procedure SetText(const Value: String);
+    procedure DoFontChanged(const aText: String);
+    procedure OnFontChanged(Sender: TObject);
   protected
+    FTextField: TALIosTextField;
+    procedure AncestorVisibleChanged(const Visible: Boolean); override;
+    procedure AncestorParentChanged; override;
+    procedure ParentChanged; override;
+    procedure ClipChildrenChanged; override;
+    procedure DoAbsoluteChanged; override;
+    procedure DoRootChanged; override;
+    procedure Resize; override;
+    procedure VisibleChanged; override;
+    procedure ChangeOrder; override;
+    procedure DoEnter; override;
+    procedure DoExit; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure RecalcOpacity; override;
+    procedure RecalcEnabled; override;
+    function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
+    property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
+    property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
+    property Password: Boolean read GetPassword write SetPassword default False;
+    property TextPrompt: String read GetTextPrompt write setTextPrompt;
+    property Text: String read getText write SetText;
+    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
   end;
+
 {$endif}
 
 type
@@ -152,10 +271,10 @@ type
     FTextSettings: TTextSettings;
     {$IF defined(android)}
     fEditControl: TALAndroidEdit;
-    fKeyboardType: TVirtualKeyboardType;
-    fPassword: boolean;
-    fReturnKeyType: TReturnKeyType;
     function GetAndroidEditText: JALEditText;
+    {$ELSEIF defined(IOS)}
+    fEditControl: TALIosEdit;
+    function GetIosTextField: TALIosTextField;
     {$ELSE}
     fEditControl: TEdit;
     {$ENDIF}
@@ -171,7 +290,7 @@ type
     function GetKeyboardType: TVirtualKeyboardType;
     procedure SetPassword(const Value: Boolean);
     function GetPassword: Boolean;
-    procedure SetReturnKeyType(Value: TReturnKeyType);
+    procedure SetReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
   protected
     function GetDefaultSize: TSizeF; override;
@@ -181,6 +300,8 @@ type
     destructor Destroy; override;
     {$IF defined(android)}
     property AndroidEditText: JALEditText read GetAndroidEditText;
+    {$ELSEIF defined(IOS)}
+    property IosTextField: TALIosTextField read GetIosTextField;
     {$ENDIF}
   published
     property TabOrder;
@@ -232,7 +353,35 @@ uses System.SysUtils,
      FMX.Helpers.Android,
      FMX.Forms,
      AlFmxCommon;
+{$ELSEIF defined(IOS)}
+uses System.SysUtils,
+     Macapi.CoreFoundation,
+     Macapi.Helpers,
+     iOSapi.CoreText,
+     FMX.Helpers.iOS,
+     FMX.Consts,
+     AlFmxCommon;
 {$endif}
+
+{**}
+type
+  TALEditTextSettings = class(TTextSettings)
+  public
+    constructor Create(const AOwner: TPersistent); override;
+  published
+    property Font;
+    property FontColor;
+    property HorzAlign default TTextAlign.Leading;
+    property VertAlign default TTextAlign.Center;
+  end;
+
+{****************************************************************}
+constructor TALEditTextSettings.Create(const AOwner: TPersistent);
+begin
+  inherited;
+  HorzAlign := TTextAlign.Leading;
+  VertAlign := TTextAlign.Center;
+end;
 
 {$IF defined(android)}
 
@@ -248,6 +397,8 @@ begin
   CanFocus := True;
   fApplicationEventMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   fOnChangeTracking := nil;
+  FTextSettings := TALEditTextSettings.Create(Self);
+  FTextSettings.OnChanged := OnFontChanged;
   //-----
   CallInUIThreadAndWaitFinishing(
     procedure
@@ -295,6 +446,8 @@ begin
       //-----
       FEditText.setShowSoftInputOnFocus(false);
       fEditText.setSingleLine(True);
+      DoSetReturnKeyType(tReturnKeyType.Default); // << init fReturnKeyType to tReturnKeyType.Default
+      DoSetInputType(TVirtualKeyboardType.default, false {aPassword}); // << init fKeyboardType to TVirtualKeyboardType.default and fPassword to false
       //-----
       MainActivity.getViewStack.addView(nil); // << this will "disable" all the view but i m not sure is we really need to do this
                                               //    but as emb team don't write any comments it's hard to know what really mean
@@ -355,6 +508,7 @@ begin
       FLayout := nil;
 
     end);
+  FTextSettings.free;
   inherited;
 end;
 
@@ -449,15 +603,8 @@ begin
   RealignContent;
 end;
 
-{****************************}
-procedure TALAndroidEdit.Hide;
-begin
-  inherited;
-  RealignContent;
-end;
-
-{****************************}
-procedure TALAndroidEdit.Move;
+{**************************************}
+procedure TALAndroidEdit.VisibleChanged;
 begin
   inherited;
   RealignContent;
@@ -472,13 +619,6 @@ end;
 
 {******************************}
 procedure TALAndroidEdit.Resize;
-begin
-  inherited;
-  RealignContent;
-end;
-
-{****************************}
-procedure TALAndroidEdit.Show;
 begin
   inherited;
   RealignContent;
@@ -577,8 +717,8 @@ begin
     end);
 end;
 
-{*********************************************************************************************************}
-procedure TALAndroidEdit.setInputType(const aKeyboardType: TVirtualKeyboardType; const aPassword: Boolean);
+{***********************************************************************************************************}
+procedure TALAndroidEdit.DoSetInputType(const aKeyboardType: TVirtualKeyboardType; const aPassword: Boolean);
 var aInputType: integer;
 begin
 
@@ -621,8 +761,10 @@ begin
   // TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS: Variation of TYPE_CLASS_TEXT: entering e-mail address inside of a web form.
   // TYPE_TEXT_VARIATION_WEB_PASSWORD: Variation of TYPE_CLASS_TEXT: entering password inside of a web form.
 
-  aInputType := 0;
-  case aKeyboardType of
+  fKeyboardType := aKeyboardType;
+  fPassword := aPassword;
+
+  case fKeyboardType of
     TVirtualKeyboardType.Alphabet:              aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
     TVirtualKeyboardType.URL:                   aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_VARIATION_URI;
     TVirtualKeyboardType.NamePhonePad:          aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT;
@@ -633,8 +775,8 @@ begin
     else {TVirtualKeyboardType.Default}         aInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT;
   end;
 
-  if aPassword then begin
-    case aKeyboardType of
+  if fPassword then begin
+    case fKeyboardType of
       TVirtualKeyboardType.NumbersAndPunctuation: aInputType := aInputType or TJInputType.JavaClass.TYPE_NUMBER_VARIATION_PASSWORD;
       TVirtualKeyboardType.NumberPad:             aInputType := aInputType or TJInputType.JavaClass.TYPE_NUMBER_VARIATION_PASSWORD;
       TVirtualKeyboardType.PhonePad:;
@@ -646,19 +788,52 @@ begin
     end;
   end;
 
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      FEditText.setInputType(aInputType);
-    end);
+  FEditText.setInputType(aInputType);
 
 end;
 
-{******************************************************************************}
-procedure TALAndroidEdit.setReturnKeyType(const aReturnKeyType: TReturnKeyType);
+{**************************************************************************}
+procedure TALAndroidEdit.setKeyboardType(const Value: TVirtualKeyboardType);
+begin
+  if (value <> fKeyboardType) then begin
+    CallInUIThreadAndWaitFinishing(
+      procedure
+      begin
+        DoSetInputType(Value, fPassword);
+      end);
+  end;
+end;
+
+{************************************************************}
+function TALAndroidEdit.GetKeyboardType: TVirtualKeyboardType;
+begin
+  result := fKeyboardType;
+end;
+
+{*********************************************************}
+procedure TALAndroidEdit.setPassword(const Value: Boolean);
+begin
+  if (value <> fPassword) then begin
+    CallInUIThreadAndWaitFinishing(
+      procedure
+      begin
+        DoSetInputType(fKeyboardType, Value);
+      end);
+  end;
+end;
+
+{*******************************************}
+function TALAndroidEdit.GetPassword: Boolean;
+begin
+  result := fPassword;
+end;
+
+{***********************************************************************}
+procedure TALAndroidEdit.DoSetReturnKeyType(const Value: TReturnKeyType);
 var aimeOptions: integer;
 begin
-  case aReturnKeyType of
+  fReturnKeyType := Value;
+  case fReturnKeyType of
     TReturnKeyType.Done:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_DONE;
     TReturnKeyType.Go:            aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_GO;
     TReturnKeyType.Next:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NEXT;
@@ -666,13 +841,134 @@ begin
     TReturnKeyType.Send:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_SEND;
     else {TReturnKeyType.Default} aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE;
   end;
+  FEditText.setImeOptions(aimeOptions);
+end;
 
+{*********************************************************************}
+procedure TALAndroidEdit.setReturnKeyType(const Value: TReturnKeyType);
+begin
+  if (value <> fReturnKeyType) then begin
+    CallInUIThreadAndWaitFinishing(
+      procedure
+      begin
+        DoSetReturnKeyType(Value);
+      end);
+  end;
+end;
+
+{*******************************************************}
+function TALAndroidEdit.GetReturnKeyType: TReturnKeyType;
+begin
+  result := fReturnKeyType;
+end;
+
+{********************************************}
+function TALAndroidEdit.GetTextPrompt: String;
+var aHint: JCharSequence;
+begin
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
-      FEditText.setImeOptions(aimeOptions);
+      aHint := FEditText.getHint;
     end);
+  result := JCharSequenceToStr(aHint);
+end;
 
+{**********************************************************}
+procedure TALAndroidEdit.setTextPrompt(const Value: String);
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      FEditText.setHint(StrToJCharSequence(Value));
+    end);
+end;
+
+{**************************************}
+function TALAndroidEdit.getText: String;
+var aText: JCharSequence;
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      aText := FEditText.gettext;
+    end);
+  result := JCharSequenceToStr(aText);
+end;
+
+{****************************************************}
+procedure TALAndroidEdit.SetText(const Value: String);
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      FEditText.setText(StrToJCharSequence(Value), TJTextView_BufferType.javaClass.EDITABLE);
+    end);
+end;
+
+{******************************************************}
+procedure TALAndroidEdit.OnFontChanged(Sender: TObject);
+var aTypeface: JTypeface;
+    aStyle: integer;
+    aGravity: integer;
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      //-----
+      feditText.setTextColor(ftextsettings.fontcolor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
+      feditText.setTextSize(ftextsettings.font.size); // << Set the default text size to the given value, interpreted as "scaled pixel" units.
+                                                      //    This size is adjusted based on the current density and user font size preference.
+      //-----
+      if (TFontStyle.fsBold in ftextsettings.font.style) and
+         (TFontStyle.fsItalic in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.BOLD_ITALIC
+      else if (TFontStyle.fsBold in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.BOLD
+      else if (TFontStyle.fsItalic in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.ITALIC
+      else aStyle := TJTypeface.JavaClass.NORMAL;
+      aTypeface := TJTypeface.JavaClass.create(StringToJString(ftextsettings.font.Family), aStyle);
+      feditText.setTypeface(aTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
+                                        //    Typeface families actually have bold and italic variants, so you may need to use setTypeface(Typeface, int)
+                                        //     to get the appearance that you actually want.
+      aTypeface := nil;
+      //-----
+      //top	              0x30	     	Push object to the top of its container, not changing its size.
+      //bottom	          0x50	     	Push object to the bottom of its container, not changing its size.
+      //left	            0x03	     	Push object to the left of its container, not changing its size.
+      //right            	0x05      	Push object to the right of its container, not changing its size.
+      //center_vertical	  0x10      	Place object in the vertical center of its container, not changing its size.
+      //fill_vertical	    0x70      	Grow the vertical size of the object if needed so it completely fills its container.
+      //center_horizontal	0x01	     	Place object in the horizontal center of its container, not changing its size.
+      //fill_horizontal	  0x07      	Grow the horizontal size of the object if needed so it completely fills its container.
+      //center	          0x11	     	Place the object in the center of its container in both the vertical and horizontal axis, not changing its size.
+      //fill	            0x77	     	Grow the horizontal and vertical size of the object if needed so it completely fills its container.
+      //clip_vertical	    0x80	     	Additional option that can be set to have the top and/or bottom edges of the child clipped to its container's bounds. The clip will be based on the vertical gravity: a top gravity will clip the bottom edge, a bottom gravity will clip the top edge, and neither will clip both edges.
+      //clip_horizontal	  0x08       	Additional option that can be set to have the left and/or right edges of the child clipped to its container's bounds. The clip will be based on the horizontal gravity: a left gravity will clip the right edge, a right gravity will clip the left edge, and neither will clip both edges.
+      //start	            0x00800003	Push object to the beginning of its container, not changing its size.
+      //end	              0x00800005	Push object to the end of its container, not changing its size.
+      case ftextsettings.HorzAlign of
+        TTextAlign.Center: aGravity := $01; // center_horizontal 0x01
+        TTextAlign.Leading: aGravity := $03; // left 0x03
+        TTextAlign.Trailing: aGravity := $05; // right 0x05
+      end;
+      case ftextsettings.VertAlign of
+        TTextAlign.Center: aGravity := aGravity or $10; // center_vertical 0x10
+        TTextAlign.Leading: aGravity := aGravity or $30; // top 0x30
+        TTextAlign.Trailing: aGravity := aGravity or $50; // bottom 0x50
+      end;
+      feditText.setgravity(aGravity);
+    end);
+end;
+
+{*****************************************************}
+function TALAndroidEdit.GetTextSettings: TTextSettings;
+begin
+  Result := FTextSettings;
+end;
+
+{*******************************************************************}
+procedure TALAndroidEdit.SetTextSettings(const Value: TTextSettings);
+begin
+  FTextSettings.Assign(Value);
 end;
 
 {*****************************************************************************************}
@@ -827,13 +1123,12 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.afterTextChanged', '(Text changed)', TalLogType.VERBOSE);
   {$ENDIF}
-  if assigned(fEditControl.fOnChangeTracking) then begin
-    TThread.Queue(nil,
-      procedure
-      begin
+  TThread.Queue(nil,
+    procedure
+    begin
+      if assigned(fEditControl.fOnChangeTracking) then
         fEditControl.fOnChangeTracking(fEditControl);
-      end);
-  end;
+    end);
 end;
 
 {**************************************************************************************************************************}
@@ -893,37 +1188,432 @@ end;
 
 {$IF defined(ios)}
 
-{************************************************}
-constructor TALIosEdit.Create(AOwner: TComponent);
+{*********************************}
+constructor TALIosTextField.Create;
 begin
+  inherited;
+  FTextFieldDelegate := TALIosTextFieldDelegate.Create(Self);
+  View.setExclusiveTouch(True);
+  View.setBorderStyle(UITextBorderStyleNone);
+  View.setDelegate((FTextFieldDelegate as ILocalObject).GetObjectID);
+  RegisterNativeEventHandler('ControlEventEditingChanged', UIControlEventEditingChanged);
+  RegisterNativeEventHandler('ControlEventEditingDidEnd', UIControlEventEditingDidEnd);
+end;
+
+{***********************************************************}
+constructor TALIosTextField.Create(const AControl: TControl);
+begin
+  fEditControl := TalIosEdit(AControl);
+  inherited;
+end;
+
+{*********************************}
+destructor TALIosTextField.Destroy;
+begin
+  UnRegisterNativeEventHandler('ControlEventEditingChanged', UIControlEventEditingChanged);
+  UnRegisterNativeEventHandler('ControlEventEditingDidEnd', UIControlEventEditingDidEnd);
+  View.setDelegate(nil);
+  FTextFieldDelegate.Free;
+  inherited;
+end;
+
+{********************************************************}
+function TALIosTextField.canBecomeFirstResponder: Boolean;
+begin
+  Result := Control.CanFocus and Control.HitTest;
+end;
+
+{***********************************************************************************}
+function TALIosTextField.canPerformAction(action: SEL; withSender: Pointer): Boolean;
+begin
+  Result := UIView(Super).canPerformAction(action, withSender);
+end;
+
+{***************************************************}
+procedure TALIosTextField.ControlEventEditingChanged;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosTextField.ControlEventEditingChanged', '', TalLogType.VERBOSE);
+  {$ENDIF}
+  if assigned(fEditControl.fOnChangeTracking) then
+    fEditControl.fOnChangeTracking(fEditControl);
+end;
+
+{**************************************************}
+procedure TALIosTextField.ControlEventEditingDidEnd;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosTextField.ControlEventEditingDidEnd', '', TalLogType.VERBOSE);
+  {$ENDIF}
+  if assigned(fEditControl.fOnChangeTracking) then
+    fEditControl.fOnChangeTracking(fEditControl);  // << when we change the word via the sugestion (clicking on the selection) then ControlEventEditingChanged is not fired
+                                                   //    imediatly, only on the next key press ... but if we don't press any key but instead close
+                                                   //    the keyboad then the event will be never fired ! so we catch here this case
+end;
+
+{*****************************************************}
+function TALIosTextField.GetObjectiveCClass: PTypeInfo;
+begin
+  Result := TypeInfo(IALTextField);
+end;
+
+{********************************************}
+function TALIosTextField.GetView: UITextField;
+begin
+  Result := inherited GetView<UITextField>;
+end;
+
+{****************************************************************************}
+constructor TALIosTextFieldDelegate.Create(const ATextField: TALIosTextField);
+begin
+  inherited Create;
+  FTextField := ATextField;
+  if FTextField = nil then
+    raise EArgumentNilException.Create(Format(SWrongParameter, ['ATextField']));
+end;
+
+{***********************************************************************************************************************************************}
+function TALIosTextFieldDelegate.textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean;
+begin
+  Result := True;
+end;
+
+{*********************************************************************************}
+procedure TALIosTextFieldDelegate.textFieldDidBeginEditing(textField: UITextField);
+begin
+  if not FTextField.Control.IsFocused then
+    FTextField.Control.SetFocus;
+end;
+
+{*******************************************************************************}
+procedure TALIosTextFieldDelegate.textFieldDidEndEditing(textField: UITextField);
+begin
+end;
+
+{********************************************************************************************}
+function TALIosTextFieldDelegate.textFieldShouldBeginEditing(textField: UITextField): Boolean;
+begin
+  Result := True;
+end;
+
+{*************************************************************************************}
+function TALIosTextFieldDelegate.textFieldShouldClear(textField: UITextField): Boolean;
+begin
+  Result := true;
+end;
+
+{******************************************************************************************}
+function TALIosTextFieldDelegate.textFieldShouldEndEditing(textField: UITextField): Boolean;
+begin
+  Result := True;
+end;
+
+{**************************************************************************************}
+function TALIosTextFieldDelegate.textFieldShouldReturn(textField: UITextField): Boolean;
+begin
+  FTextField.ControlEventEditingDidEnd;
+  FTextField.ResetFocus;
+  Result := true;
+end;
+
+{************************************************}
+constructor TalIosEdit.Create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  CanFocus := True;
+  fOnChangeTracking := nil;
+  FTextSettings := TALEditTextSettings.Create(Self);
+  FTextSettings.OnChanged := OnFontChanged;
+  FAttributedString := nil;
+  FTextField := TalIosTextField.create(self);
+  SetReturnKeyType(tReturnKeyType.Default); // << init fReturnKeyType to tReturnKeyType.Default
+  SetKeyboardType(TVirtualKeyboardType.default); // << init fKeyboardType to TVirtualKeyboardType.default
+  SetPassword(false); // << fPassword to false
 end;
 
 {****************************}
-destructor TALIosEdit.Destroy;
+destructor TalIosEdit.Destroy;
 begin
+  freeandNil(FTextField);
+  if FAttributedString <> nil then FAttributedString.release;
+  FTextSettings.free;
+  inherited Destroy;
+end;
+
+{**********************************************************************}
+procedure TalIosEdit.SetKeyboardType(const Value: TVirtualKeyboardType);
+var aUIKeyboardType: UIKeyboardType;
+begin
+  case Value of
+    TVirtualKeyboardType.NumbersAndPunctuation: aUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
+    TVirtualKeyboardType.NumberPad:             aUIKeyboardType := UIKeyboardTypeNumberPad;
+    TVirtualKeyboardType.PhonePad:              aUIKeyboardType := UIKeyboardTypePhonePad;
+    TVirtualKeyboardType.Alphabet:              aUIKeyboardType := UIKeyboardTypeDefault;
+    TVirtualKeyboardType.URL:                   aUIKeyboardType := UIKeyboardTypeURL;
+    TVirtualKeyboardType.NamePhonePad:          aUIKeyboardType := UIKeyboardTypeNamePhonePad;
+    TVirtualKeyboardType.EmailAddress:          aUIKeyboardType := UIKeyboardTypeEmailAddress;
+    else {TVirtualKeyboardType.Default}         aUIKeyboardType := UIKeyboardTypeDefault;
+  end;
+  FTextField.View.setKeyboardType(aUIKeyboardType);
+end;
+
+{********************************************************}
+function TalIosEdit.GetKeyboardType: TVirtualKeyboardType;
+var aUIKeyboardType: UIKeyboardType;
+begin
+  aUIKeyboardType := FTextField.View.KeyboardType;
+  case aUIKeyboardType of
+    UIKeyboardTypeNumbersAndPunctuation: result := TVirtualKeyboardType.NumbersAndPunctuation;
+    UIKeyboardTypeNumberPad:             result := TVirtualKeyboardType.NumberPad;
+    UIKeyboardTypePhonePad:              result := TVirtualKeyboardType.PhonePad;
+    UIKeyboardTypeURL:                   result := TVirtualKeyboardType.URL;
+    UIKeyboardTypeNamePhonePad:          result := TVirtualKeyboardType.NamePhonePad;
+    UIKeyboardTypeEmailAddress:          result := TVirtualKeyboardType.EmailAddress;
+    else                                 result := TVirtualKeyboardType.Default;
+  end;
+end;
+
+{*****************************************************}
+procedure TalIosEdit.SetPassword(const Value: Boolean);
+begin
+  FTextField.View.setSecureTextEntry(Value);
+end;
+
+{***************************************}
+function TalIosEdit.GetPassword: Boolean;
+begin
+  result := FTextField.View.isSecureTextEntry;
+end;
+
+{*****************************************************************}
+procedure TalIosEdit.setReturnKeyType(const Value: TReturnKeyType);
+var aUIReturnKeyType: UIReturnKeyType;
+begin
+  case Value of
+    TReturnKeyType.Done:           aUIReturnKeyType := UIReturnKeyDone;
+    TReturnKeyType.Go:             aUIReturnKeyType := UIReturnKeyGo;
+    TReturnKeyType.Next:           aUIReturnKeyType := UIReturnKeyNext;
+    TReturnKeyType.Search:         aUIReturnKeyType := UIReturnKeySearch;
+    TReturnKeyType.Send:           aUIReturnKeyType := UIReturnKeySend;
+    else {TReturnKeyType.Default}  aUIReturnKeyType := UIReturnKeyDefault;
+  end;
+  FTextField.View.setReturnKeyType(aUIReturnKeyType);
+end;
+
+{***************************************************}
+function TalIosEdit.GetReturnKeyType: TReturnKeyType;
+var aUIReturnKeyType: UIReturnKeyType;
+begin
+  aUIReturnKeyType := FTextField.View.ReturnKeyType;
+  case aUIReturnKeyType of
+    UIReturnKeyDone:    result := TReturnKeyType.Done;
+    UIReturnKeyGo:      result := TReturnKeyType.Go;
+    UIReturnKeyNext:    result := TReturnKeyType.Next;
+    UIReturnKeySearch:  result := TReturnKeyType.Search;
+    UIReturnKeySend:    result := TReturnKeyType.Send;
+    else                result := TReturnKeyType.Default;
+  end;
+end;
+
+{****************************************}
+function TalIosEdit.GetTextPrompt: String;
+begin
+  Result := NSStrToStr(FTextField.View.placeholder);
+end;
+
+{******************************************************}
+procedure TalIosEdit.setTextPrompt(const Value: String);
+begin
+  FTextField.View.setPlaceholder(StrToNSStr(Value));
+end;
+
+{**********************************}
+function TalIosEdit.getText: String;
+begin
+  result := NSStrToStr(TNSString.Wrap(FTextField.View.text));
+end;
+
+{************************************************}
+procedure TalIosEdit.SetText(const Value: String);
+begin
+  if (FAttributedString = nil) or (FAttributedString.length = 0) then DoFontChanged(Value)
+  else begin
+    FAttributedString.replaceCharactersInRange(NSMakeRange(0, FAttributedString.length), StrToNSStr(Value));
+    FTextField.View.setAttributedText(FAttributedString);
+  end;
+end;
+
+{******************************************************}
+procedure TalIosEdit.DoFontChanged(const aText: String);
+var aTextRange: NSRange;
+    aFontRef: CTFontRef;
+    aUnderline: CFNumberRef;
+    aValue: Cardinal;
+begin
+
+  if FAttributedString <> nil then begin
+    FAttributedString.release;
+    FAttributedString := nil;
+  end;
+  FAttributedString := TNSMutableAttributedString.Alloc;
+  FAttributedString := TNSMutableAttributedString.Wrap(FAttributedString.initWithString(StrToNSStr(aText)));
+
+  FAttributedString.beginEditing;
+  try
+    aTextRange := NSMakeRange(0, aText.Length);
+
+    //Font
+    aFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
+    if aFontRef <> nil then
+      try
+        FAttributedString.addAttribute(TNSString.Wrap(kCTFontAttributeName), aFontRef, aTextRange);
+      finally
+        CFRelease(aFontRef);
+      end;
+
+    //Font style
+    if TFontStyle.fsUnderline in fTextSettings.Font.Style then begin
+      aValue := kCTUnderlineStyleSingle;
+      aUnderline := CFNumberCreate(nil, kCFNumberSInt32Type, @aValue);
+      try
+        FAttributedString.addAttribute(TNSString.Wrap(kCTUnderlineStyleAttributeName), aUnderline, aTextRange);
+      finally
+        CFRelease(aUnderline);
+      end;
+    end;
+
+  finally
+    FAttributedString.endEditing;
+  end;
+
+  FTextField.View.setAttributedText(FAttributedString);
+  FTextField.View.setTextAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
+  FTextField.View.setTextColor(AlphaColorToUIColor(fTextSettings.FontColor));
+end;
+
+{**************************************************}
+procedure TalIosEdit.OnFontChanged(Sender: TObject);
+begin
+  DoFontChanged(text);
+end;
+
+{*************************************************}
+function TalIosEdit.GetTextSettings: TTextSettings;
+begin
+  Result := FTextSettings;
+end;
+
+{***************************************************************}
+procedure TalIosEdit.SetTextSettings(const Value: TTextSettings);
+begin
+  FTextSettings.Assign(Value);
+end;
+
+{*********************************}
+procedure TalIosEdit.DoRootChanged;
+begin
+  inherited;
+  FTextField.RootChanged(Root);
+end;
+
+{**************************}
+procedure TalIosEdit.Resize;
+begin
+  inherited;
+  FTextField.size := Size.size;
+end;
+
+{***************************************}
+procedure TalIosEdit.ClipChildrenChanged;
+begin
+  inherited;
+  FTextField.SetClipChildren(ClipChildren);
+end;
+
+{*************************************}
+procedure TalIosEdit.DoAbsoluteChanged;
+begin
+  inherited;
+  if not (csLoading in ComponentState) then
+    FTextField.UpdateFrame;
+end;
+
+{**********************************}
+procedure TalIosEdit.VisibleChanged;
+begin
+  inherited;
+  FTextField.SetVisible(Visible);
+end;
+
+{*******************************}
+procedure TalIosEdit.ChangeOrder;
+begin
+  inherited;
+  FTextField.ChangeOrder;
+end;
+
+{*********************************}
+procedure TalIosEdit.RecalcOpacity;
+begin
+  inherited;
+  FTextField.setAlpha(AbsoluteOpacity);
+end;
+
+{*********************************}
+procedure TalIosEdit.RecalcEnabled;
+begin
+  inherited;
+  FTextField.SetAbsoluteEnabled(AbsoluteEnabled);
+end;
+
+{******************************************************************}
+procedure TalIosEdit.AncestorVisibleChanged(const Visible: Boolean);
+begin
+  inherited;
+  FTextField.AncestorVisibleChanged;
+end;
+
+{*****************************************}
+procedure TalIosEdit.AncestorParentChanged;
+begin
+  inherited;
+  FTextField.RefreshNativeParent;
+end;
+
+{*********************************}
+procedure TalIosEdit.ParentChanged;
+begin
+  inherited;
+  FTextField.RefreshNativeParent;
+end;
+
+{********************************************************************}
+function TalIosEdit.PointInObjectLocal(X: Single; Y: Single): Boolean;
+begin
+  result := FTextField.PointInObjectLocal(X, Y);
+end;
+
+{***************************}
+procedure TalIosEdit.DoEnter;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TalIosEdit.DoEnter', '', TalLogType.VERBOSE);
+  {$ENDIF}
+  inherited DoEnter;
+  FTextField.SetFocus;
+end;
+
+{**************************}
+procedure TalIosEdit.DoExit;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TalIosEdit.DoExit', '', TalLogType.VERBOSE);
+  {$ENDIF}
+  inherited DoExit;
+  FTextField.ResetFocus;
 end;
 
 {$endif}
-
-{**}
-type
-  TALEditTextSettings = class(TTextSettings)
-  public
-    constructor Create(const AOwner: TPersistent); override;
-  published
-    property Font;
-    property FontColor;
-    property HorzAlign default TTextAlign.Leading;
-    property VertAlign default TTextAlign.Center;
-  end;
-
-{****************************************************************}
-constructor TALEditTextSettings.Create(const AOwner: TPersistent);
-begin
-  inherited;
-  HorzAlign := TTextAlign.Leading;
-  VertAlign := TTextAlign.Center;
-end;
 
 {*********************************************}
 constructor TALEdit.Create(AOwner: TComponent);
@@ -939,30 +1629,33 @@ begin
   {$IF defined(android)}
   fEditControl := TALAndroidEdit.Create(self);
   fEditControl.Parent := self;
-  FeditControl.OnChangeTracking := DoChangeTracking;
-  fKeyboardType := TVirtualKeyboardType.Default;
-  fPassword:= false;
-  fReturnKeyType := tReturnKeyType.Default;
-  fEditControl.setInputType(fKeyboardType, fPassword);
-  fEditControl.setReturnKeyType(fReturnKeyType);
+  FeditControl.Stored := False;
+  FeditControl.SetSubComponent(True);
+  FeditControl.Locked := True;
+  {$ELSEIF defined(ios)}
+  fEditControl := TALIosEdit.Create(self);
+  fEditControl.Parent := self;
+  FeditControl.Stored := False;
+  FeditControl.SetSubComponent(True);
+  FeditControl.Locked := True;
   {$ELSE}
   fEditControl := TEdit.Create(self);
   fEditControl.Parent := self;
   FeditControl.Stored := False;
   FeditControl.SetSubComponent(True);
   FeditControl.Locked := True;
-  fEditControl.ControlType := TcontrolType.platform; // << on windows platform is not good as Styled
+  fEditControl.ControlType := TcontrolType.Styled; // << on windows platform is not good as Styled
   FeditControl.StyleLookup := 'transparentedit';
   FeditControl.StyledSettings := []; // Family, Size, Style, FontColor, Other
-  FeditControl.OnChangeTracking := DoChangeTracking;
   fEditControl.KillFocusByReturn := True;
-  fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
-  fEditControl.Password := false; // noops operation
-  fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   {$ENDIF}
   FTextSettings := TALEditTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
   fEditControl.Align := TAlignLayout.Client;
+  FeditControl.OnChangeTracking := DoChangeTracking;
+  fEditControl.Password := false; // noops operation
+  fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
+  fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
 end;
 
 {*************************}
@@ -986,43 +1679,19 @@ begin
   Result := TSizeF.Create(100, 22);
 end;
 
-{*************************************}
-function TALEdit.GetTextPrompt: String;
-{$IF defined(android)}
-var aHint: JCharSequence;
-{$ENDIF}
-begin
-  {$IF defined(android)}
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      aHint := fEditControl.FEditText.getHint;
-    end);
-  result := JCharSequenceToStr(aHint);
-  {$ELSE}
-  result := FeditControl.TextPrompt;
-  {$ENDIF}
-end;
-
-{***************************************************}
-procedure TALEdit.setTextPrompt(const Value: String);
-begin
-  {$IF defined(android)}
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      fEditControl.FEditText.setHint(StrToJCharSequence(Value));
-    end);
-  {$ELSE}
-  FeditControl.TextPrompt := Value;
-  {$ENDIF}
-end;
-
 {********************}
 {$IF defined(android)}
 function TALEdit.GetAndroidEditText: JALEditText;
 begin
   result := fEditControl.FEditText;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(IOS)}
+function TALEdit.GetIosTextField: TALIosTextField;
+begin
+  result := fEditControl.FTextField;
 end;
 {$ENDIF}
 
@@ -1040,170 +1709,75 @@ end;
 
 {***********************************************}
 procedure TALEdit.OnFontChanged(Sender: TObject);
-{$IF defined(android)}
-var aTypeface: JTypeface;
-    aStyle: integer;
-    aGravity: integer;
-{$ENDIF}
 begin
   if csLoading in componentState then exit;
-  {$IF defined(android)}
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      //-----
-      FEditControl.feditText.setTextColor(ftextsettings.fontcolor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
-      FEditControl.feditText.setTextSize(ftextsettings.font.size); // << Set the default text size to the given value, interpreted as "scaled pixel" units.
-                                                                   //    This size is adjusted based on the current density and user font size preference.
-      //-----
-      if (TFontStyle.fsBold in ftextsettings.font.style) and
-         (TFontStyle.fsItalic in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.BOLD_ITALIC
-      else if (TFontStyle.fsBold in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.BOLD
-      else if (TFontStyle.fsItalic in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.ITALIC
-      else aStyle := TJTypeface.JavaClass.NORMAL;
-      aTypeface := TJTypeface.JavaClass.create(StringToJString(ftextsettings.font.Family), aStyle);
-      FEditControl.feditText.setTypeface(aTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
-                                                     //    Typeface families actually have bold and italic variants, so you may need to use setTypeface(Typeface, int)
-                                                     //     to get the appearance that you actually want.
-      aTypeface := nil;
-      //-----
-      //top	              0x30	     	Push object to the top of its container, not changing its size.
-      //bottom	          0x50	     	Push object to the bottom of its container, not changing its size.
-      //left	            0x03	     	Push object to the left of its container, not changing its size.
-      //right            	0x05      	Push object to the right of its container, not changing its size.
-      //center_vertical	  0x10      	Place object in the vertical center of its container, not changing its size.
-      //fill_vertical	    0x70      	Grow the vertical size of the object if needed so it completely fills its container.
-      //center_horizontal	0x01	     	Place object in the horizontal center of its container, not changing its size.
-      //fill_horizontal	  0x07      	Grow the horizontal size of the object if needed so it completely fills its container.
-      //center	          0x11	     	Place the object in the center of its container in both the vertical and horizontal axis, not changing its size.
-      //fill	            0x77	     	Grow the horizontal and vertical size of the object if needed so it completely fills its container.
-      //clip_vertical	    0x80	     	Additional option that can be set to have the top and/or bottom edges of the child clipped to its container's bounds. The clip will be based on the vertical gravity: a top gravity will clip the bottom edge, a bottom gravity will clip the top edge, and neither will clip both edges.
-      //clip_horizontal	  0x08       	Additional option that can be set to have the left and/or right edges of the child clipped to its container's bounds. The clip will be based on the horizontal gravity: a left gravity will clip the right edge, a right gravity will clip the left edge, and neither will clip both edges.
-      //start	            0x00800003	Push object to the beginning of its container, not changing its size.
-      //end	              0x00800005	Push object to the end of its container, not changing its size.
-      case ftextsettings.HorzAlign of
-        TTextAlign.Center: aGravity := $01; // center_horizontal 0x01
-        TTextAlign.Leading: aGravity := $03; // left 0x03
-        TTextAlign.Trailing: aGravity := $05; // right 0x05
-      end;
-      case ftextsettings.VertAlign of
-        TTextAlign.Center: aGravity := aGravity or $10; // center_vertical 0x10
-        TTextAlign.Leading: aGravity := aGravity or $30; // top 0x30
-        TTextAlign.Trailing: aGravity := aGravity or $50; // bottom 0x50
-      end;
-      FEditControl.feditText.setgravity(aGravity);
-    end);
-  //-----
-  {$else}
   FEditControl.TextSettings.Assign(ftextsettings);
-  {$ENDIF}
 end;
 
 {*********************************************}
 procedure TALEdit.SetText(const Value: String);
 begin
-  {$IF defined(android)}
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      fEditControl.FEditText.setText(StrToJCharSequence(Value), TJTextView_BufferType.javaClass.EDITABLE);
-    end);
-  {$ELSE}
   FeditControl.Text := Value;
-  {$ENDIF}
 end;
 
 {*******************************}
 function TALEdit.getText: String;
-{$IF defined(android)}
-var aText: JCharSequence;
-{$ENDIF}
 begin
-  {$IF defined(android)}
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      aText := fEditControl.FEditText.gettext;
-    end);
-  result := JCharSequenceToStr(aText);
-  {$ELSE}
   result := FeditControl.Text;
-  {$ENDIF}
+end;
+
+{*************************************}
+function TALEdit.GetTextPrompt: String;
+begin
+  result := FeditControl.TextPrompt;
+end;
+
+{***************************************************}
+procedure TALEdit.setTextPrompt(const Value: String);
+begin
+  FeditControl.TextPrompt := Value;
 end;
 
 {*************************************************************}
 procedure TALEdit.SetKeyboardType(Value: TVirtualKeyboardType);
 begin
-  {$IF defined(android)}
-  if (value <> fKeyboardType) then begin
-    fKeyboardType := Value;
-    fEditControl.setInputType(fKeyboardType, fPassword);
-  end;
-  {$ELSE}
   FeditControl.KeyboardType := Value;
-  {$ENDIF}
 end;
 
 {*****************************************************}
 function TALEdit.GetKeyboardType: TVirtualKeyboardType;
 begin
-  {$IF defined(android)}
-  result := fKeyboardType;
-  {$ELSE}
   result := FeditControl.KeyboardType;
-  {$ENDIF}
 end;
 
 {**************************************************}
 procedure TALEdit.SetPassword(const Value: Boolean);
 begin
-  {$IF defined(android)}
-  if (value <> fPassword) then begin
-    fPassword := Value;
-    fEditControl.setInputType(fKeyboardType, fPassword);
-  end;
-  {$ELSE}
   FeditControl.Password := Value;
-  {$ENDIF}
 end;
 
 {************************************}
 function TALEdit.GetPassword: Boolean;
 begin
-  {$IF defined(android)}
-  result := fPassword;
-  {$ELSE}
   result := FeditControl.Password;
-  {$ENDIF}
 end;
 
-{********************************************************}
-procedure TALEdit.SetReturnKeyType(Value: TReturnKeyType);
+{**************************************************************}
+procedure TALEdit.SetReturnKeyType(const Value: TReturnKeyType);
 begin
-  {$IF defined(android)}
-  if (value <> fReturnKeyType) then begin
-    fReturnKeyType := Value;
-    fEditControl.setReturnKeyType(fReturnKeyType);
-  end;
-  {$ELSE}
   FeditControl.ReturnKeyType := Value;
-  {$ENDIF}
 end;
 
 {************************************************}
 function TALEdit.GetReturnKeyType: TReturnKeyType;
 begin
-  {$IF defined(android)}
-  result := fReturnKeyType;
-  {$ELSE}
   result := FeditControl.ReturnKeyType;
-  {$ENDIF}
 end;
 
 {**************************************************}
 procedure TALEdit.DoChangeTracking(Sender: TObject);
 begin
-  if assigned(fOnChangeTracking) then
+  if assigned(fOnChangeTracking) and (not (csLoading in componentState)) then
     fOnChangeTracking(self); // << yes need to send self instead of the fEditControl
 end;
 

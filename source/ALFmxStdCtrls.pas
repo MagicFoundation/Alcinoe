@@ -419,6 +419,7 @@ type
   public const
     DesignBorderColor = $A080D080;
   private
+    FScreenScale: single;
     fdoubleBuffered: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
@@ -1484,8 +1485,11 @@ end;
 
 {*************************************************}
 constructor TALCheckbox.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
 begin
   inherited;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
   SetAcceptsControls(False);
@@ -1608,7 +1612,6 @@ function TALCheckbox.MakeBufBitmap: Tbitmap;
 
 var aImageIndex: TimageIndex;
     {$IF defined(ANDROID) or defined(IOS)}
-    aSceneScale: Single;
     aBitmap: TBitmap;
     aBitmapSize: TSize;
     aBitmapData: TBitmapData;
@@ -1649,20 +1652,16 @@ begin
 
   {$IF defined(ANDROID) or defined(IOS)}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init aBitmapSize / aBitmap / fBufBitmapRect
   aBitmapSize := TSize.Create(0, 0);
   aBitmap := nil;
-  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
+  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
   if (Images <> nil) and
      (fBufBitmapRect.Width >= 1) and
      (fBufBitmapRect.Height >= 1) and
      (aImageIndex <> -1) and
      ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then begin
-    aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * aSceneScale), Round(fBufBitmapRect.Height * aSceneScale));
+    aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * FScreenScale), Round(fBufBitmapRect.Height * FScreenScale));
     if not Stretch then Images.BestSize(aImageIndex, aBitmapSize);
     aBitmap := Images.Bitmap(aBitmapSize, aImageIndex)
   end;
@@ -1672,8 +1671,8 @@ begin
     //init fBufBitmapRect
     fBufBitmapRect := TRectF.Create(0,
                                     0,
-                                    aBitmap.Width / aSceneScale,
-                                    aBitmap.Height/ aSceneScale).CenterAt(fBufBitmapRect);
+                                    aBitmap.Width / FScreenScale,
+                                    aBitmap.Height/ FScreenScale).CenterAt(fBufBitmapRect);
 
     //convert the aBitmapSurface to texture
     //it's important to make a copy of the aBitmap because it's could be destroyed by the TimageList if
@@ -1737,7 +1736,7 @@ const
   MaxCrossSize = 13;
 var
   TextRect, ImgRect, BitmapRect: TRectF;
-  CrossSize, ScreenScale: Single;
+  CrossSize: Single;
   Bitmap: TBitmap;
   BitmapSize: TSize;
   aImageIndex: TimageIndex;
@@ -1749,14 +1748,10 @@ begin
     BitmapSize := TSize.Create(0, 0);
     Bitmap := nil;
     ImgRect := LocalRect;
-    if Scene <> nil then
-      ScreenScale := Scene.GetSceneScale
-    else
-      ScreenScale := 1;
     if (Images <> nil) and (ImgRect.Width >= 1) and (ImgRect.Height >= 1) and (aImageIndex <> -1) and
       ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then
     begin
-      BitmapSize := TSize.Create(Round(ImgRect.Width * ScreenScale), Round(ImgRect.Height * ScreenScale));
+      BitmapSize := TSize.Create(Round(ImgRect.Width * FScreenScale), Round(ImgRect.Height * FScreenScale));
       Images.BestSize(aImageIndex, BitmapSize);
       Bitmap := Images.Bitmap(BitmapSize, aImageIndex)
     end;
@@ -1765,8 +1760,8 @@ begin
     if Bitmap <> nil then
     begin
       BitmapRect := TRectF.Create(0, 0, Bitmap.Width, Bitmap.Height);
-      ImgRect := TRectF.Create(CenteredRect(ImgRect.Round, TRectF.Create(0, 0, Bitmap.Width / ScreenScale,
-        Bitmap.Height/ ScreenScale).Round));
+      ImgRect := TRectF.Create(CenteredRect(ImgRect.Round, TRectF.Create(0, 0, Bitmap.Width / FScreenScale,
+        Bitmap.Height/ FScreenScale).Round));
       Canvas.DrawBitmap(Bitmap, BitmapRect, ImgRect, AbsoluteOpacity, True);
     end;
     if (csDesigning in ComponentState) and not Locked and not FInPaintTo then

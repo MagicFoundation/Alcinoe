@@ -492,6 +492,7 @@ public:
 	
 	
 private:
+	float FScreenScale;
 	bool fdoubleBuffered;
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;

@@ -8,7 +8,7 @@ uses
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
   FMX.ImgList, alFmxImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
-  FMX.ScrollBox, FMX.Memo;
+  FMX.ScrollBox, FMX.Memo, FMX.Edit, ALFmxEdit;
 
 type
 
@@ -157,8 +157,6 @@ type
     Text9: TText;
     Button21: TButton;
     Button22: TButton;
-    Button12: TButton;
-    Button19: TButton;
     ALTabControl1: TALTabControl;
     ALTabItem1: TALTabItem;
     Image1: TImage;
@@ -184,6 +182,13 @@ type
     Layout2: TLayout;
     Layout3: TLayout;
     Layout4: TLayout;
+    ALRectangle2: TALRectangle;
+    ALEdit2: TALEdit;
+    Layout7: TLayout;
+    Image7: TImage;
+    Layout8: TLayout;
+    Image8: TImage;
+    Text11: TText;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -203,25 +208,21 @@ type
     procedure Button18Click(Sender: TObject);
     procedure Button22Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
-    procedure Button12Click(Sender: TObject);
-    procedure Button19Click(Sender: TObject);
     procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure ALTabControl1AniTransitionInit(const sender: TObject;
                                              const aVelocity: Double; var aDuration: Single;
                                              var aAnimationType: TAnimationType;
                                              var aInterpolation: TInterpolationType);
     procedure ALTabControl1Resize(Sender: TObject);
-    procedure ALVertScrollBox1ScrollBarInit(const sender: TObject;
-      const aScrollBar: TALScrollBoxBar);
-    procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Single);
+    procedure ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
+    procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure VScrollBarThumbMouseLeave(Sender: TObject);
-    procedure VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Single);
-    procedure VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Single);
-    procedure ALTabControl1AniStart(Sender: TObject);
-    procedure ALTabControl1AniStop(Sender: TObject);
+    procedure VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
+    procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
+    procedure ALVertScrollBox1Click(Sender: TObject);
+    procedure ALEdit2ChangeTracking(Sender: TObject);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -256,14 +257,14 @@ uses system.Diagnostics,
 
 {$R *.fmx}
 
-procedure TForm1.ALTabControl1AniStart(Sender: TObject);
+procedure TForm1.ALEdit2ChangeTracking(Sender: TObject);
 begin
-//
+  ALLog('ALEdit2ChangeTracking', ALEdit2.Text);
 end;
 
-procedure TForm1.ALTabControl1AniStop(Sender: TObject);
+procedure TForm1.ALVertScrollBox1Click(Sender: TObject);
 begin
-//
+  ALEdit2.ResetFocus;
 end;
 
 procedure TForm1.ALTabControl1AniTransitionInit(const sender: TObject;
@@ -408,11 +409,6 @@ begin
     end).Start;
 end;
 
-procedure TForm1.Button12Click(Sender: TObject);
-begin
-  ALTabControl1.Next;
-end;
-
 procedure TForm1.Button13Click(Sender: TObject);
 begin
   fline.Repaint;
@@ -471,11 +467,6 @@ procedure TForm1.Button18Click(Sender: TObject);
 begin
   fcheckbox2.Repaint;
   Text3.Text := 'Paint: ' + FormatFloat('0.#####',fcheckbox2.PaintMs) + ' ms';
-end;
-
-procedure TForm1.Button19Click(Sender: TObject);
-begin
-  ALTabControl1.Previous;
 end;
 
 procedure TForm1.Button2Click(Sender: TObject);
@@ -976,8 +967,24 @@ begin
   //-----
   ALFmxMakeBufBitmaps(ALVertScrollBox1);
   endupdate;
+  ALTabControl1Resize(nil);
 end;
 
+
+procedure TForm1.FormVirtualKeyboardHidden(Sender: TObject;
+  KeyboardVisible: Boolean; const Bounds: TRect);
+begin
+  AlVertScrollBox1.margins.Bottom := 0;
+  AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
+end;
+
+procedure TForm1.FormVirtualKeyboardShown(Sender: TObject;
+  KeyboardVisible: Boolean; const Bounds: TRect);
+begin
+  AlVertScrollBox1.margins.Bottom := Bounds.height;
+  AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
+  AlVertScrollBox1.AniCalculations.TouchTracking := [];
+end;
 
 { TALTextStopWatch }
 

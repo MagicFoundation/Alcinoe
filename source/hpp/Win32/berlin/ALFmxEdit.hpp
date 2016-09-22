@@ -51,6 +51,8 @@ private:
 	Fmx::Types::TVirtualKeyboardType __fastcall GetKeyboardType(void);
 	void __fastcall SetPassword(const bool Value);
 	bool __fastcall GetPassword(void);
+	void __fastcall SetCheckSpelling(const bool Value);
+	bool __fastcall GetCheckSpelling(void);
 	void __fastcall SetReturnKeyType(const Fmx::Types::TReturnKeyType Value);
 	Fmx::Types::TReturnKeyType __fastcall GetReturnKeyType(void);
 	
@@ -77,6 +79,7 @@ __published:
 	__property Hint = {default=0};
 	__property System::UnicodeString TextPrompt = {read=GetTextPrompt, write=setTextPrompt};
 	__property TouchTargetExpansion;
+	__property bool CheckSpelling = {read=GetCheckSpelling, write=SetCheckSpelling, default=1};
 	__property ParentShowHint = {default=1};
 	__property ShowHint;
 	__property System::Classes::TNotifyEvent OnChangeTracking = {read=fOnChangeTracking, write=fOnChangeTracking};

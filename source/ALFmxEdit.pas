@@ -123,6 +123,8 @@ type
     function GetKeyboardType: TVirtualKeyboardType;
     procedure setPassword(const Value: Boolean);
     function GetPassword: Boolean;
+    procedure setCheckSpelling(const Value: Boolean);
+    function GetCheckSpelling: Boolean;
     procedure DoSetReturnKeyType(const Value: TReturnKeyType);
     procedure setReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
@@ -155,6 +157,7 @@ type
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
   end;
 {$endif}
 
@@ -222,6 +225,8 @@ type
     function GetKeyboardType: TVirtualKeyboardType;
     procedure setPassword(const Value: Boolean);
     function GetPassword: Boolean;
+    procedure setCheckSpelling(const Value: Boolean);
+    function GetCheckSpelling: Boolean;
     procedure setReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
     function GetTextPrompt: String;
@@ -258,6 +263,7 @@ type
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
   end;
 
 {$endif}
@@ -290,6 +296,8 @@ type
     function GetKeyboardType: TVirtualKeyboardType;
     procedure SetPassword(const Value: Boolean);
     function GetPassword: Boolean;
+    procedure SetCheckSpelling(const Value: Boolean);
+    function GetCheckSpelling: Boolean;
     procedure SetReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
   protected
@@ -323,7 +331,7 @@ type
     property TouchTargetExpansion;
     //property Caret;
     //property KillFocusByReturn; => always true
-    //property CheckSpelling;
+    property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
     property ParentShowHint;
     property ShowHint;
     //property OnChange;
@@ -389,6 +397,9 @@ end;
 constructor TALAndroidEdit.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.Create', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   inherited create(AOwner);
   //-----
   if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
@@ -479,37 +490,55 @@ begin
     end);
   //-----
   RealignContent;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.Create', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {********************************}
 destructor TALAndroidEdit.Destroy;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.Destroy', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
+
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
-  CallInUIThreadAndWaitFinishing(
-    procedure
+  TUIThreadCaller.ForceRunnablesCollection;
+  TUIThreadCaller.Call<JALEditText, JLinearLayout>(
+    procedure (aEditText: JALEditText; aLinearLayout: JLinearLayout)
     begin
 
-      FEditText.setVisibility(TJView.JavaClass.INVISIBLE);
-      FEditText.setOnFocusChangeListener(nil);
-      FEditText.RemoveTextChangedListener(FTextWatcher);
-      FEditText.setOnEditorActionListener(nil);
-      FEditText.SetSoftInputListener(nil);
-      FEditText.SetKeyPreImeListener(nil);
+      aEditText.setVisibility(TJView.JavaClass.INVISIBLE);
+      aEditText.setOnFocusChangeListener(nil);
+      aEditText.RemoveTextChangedListener(FTextWatcher);
+      aEditText.setOnEditorActionListener(nil);
+      aEditText.SetSoftInputListener(nil);
+      aEditText.SetKeyPreImeListener(nil);
 
-      freeandNil(FFocusChangeListener);
-      freeandNil(FTextWatcher);
-      freeandNil(fEditorActionListener);
-      freeandNil(FSoftInputListener);
-      freeandNil(FKeyPreImeListener);
 
-      FEditText := nil;
-      FLayout.removeAllViews();
-      MainActivity.getViewStack.removeView(FLayout);
-      FLayout := nil;
+      aLinearLayout.removeAllViews();
+      MainActivity.getViewStack.removeView(aLinearLayout);
 
-    end);
+    end, FEditText, FLayout);
+
+  //unfortunatly i can't make the previous instruction with wait
+  //because when the app close, then the wait will never finish :(
+  //but doesn't matter we don't need to free the object below, it's
+  //we be done automatiquely
+  //freeandNil(FFocusChangeListener);
+  //freeandNil(FTextWatcher);
+  //freeandNil(fEditorActionListener);
+  //freeandNil(FSoftInputListener);
+  //freeandNil(FKeyPreImeListener);
+  //FEditText := nil;
+  //FLayout := nil;
+
   FTextSettings.free;
   inherited;
+
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.Destroy', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {**************************************}
@@ -566,6 +595,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.realignContent', 'realignContent', TalLogType.VERBOSE);
   {$ENDIF}
+  if csdestroying in componentState then exit;
   if FLayout <> nil then begin
     if (not (csDesigning in ComponentState)) and
        (Root <> nil) and
@@ -628,7 +658,7 @@ end;
 procedure TALAndroidEdit.DoEnter;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.DoEnter.START', 'START', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.DoEnter', 'start', TalLogType.VERBOSE);
   {$ENDIF}
 
   inherited;
@@ -673,7 +703,7 @@ begin
     end);
 
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.DoEnter.END', 'END', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.DoEnter', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -681,7 +711,7 @@ end;
 procedure TALAndroidEdit.DoExit;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.DoExit', 'DoExit', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.DoExit', 'start', TalLogType.VERBOSE);
   {$ENDIF}
   inherited;
   CallInUIThreadAndWaitFinishing(
@@ -715,6 +745,9 @@ begin
                                               //    }
                                               //
     end);
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.DoExit', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {***********************************************************************************************************}
@@ -826,6 +859,18 @@ end;
 function TALAndroidEdit.GetPassword: Boolean;
 begin
   result := fPassword;
+end;
+
+{**************************************************************}
+procedure TALAndroidEdit.setCheckSpelling(const Value: Boolean);
+begin
+  // do nothing as far as i know their is no much such option but on marshmallow it's activated by default
+end;
+
+{************************************************}
+function TALAndroidEdit.GetCheckSpelling: Boolean;
+begin
+  result := false;
 end;
 
 {***********************************************************************}
@@ -1326,9 +1371,10 @@ begin
   FTextSettings.OnChanged := OnFontChanged;
   FAttributedString := nil;
   FTextField := TalIosTextField.create(self);
-  SetReturnKeyType(tReturnKeyType.Default); // << init fReturnKeyType to tReturnKeyType.Default
-  SetKeyboardType(TVirtualKeyboardType.default); // << init fKeyboardType to TVirtualKeyboardType.default
-  SetPassword(false); // << fPassword to false
+  SetReturnKeyType(tReturnKeyType.Default);
+  SetKeyboardType(TVirtualKeyboardType.default);
+  SetPassword(false);
+  SetCheckSpelling(True);
 end;
 
 {****************************}
@@ -1383,6 +1429,19 @@ end;
 function TalIosEdit.GetPassword: Boolean;
 begin
   result := FTextField.View.isSecureTextEntry;
+end;
+
+{**********************************************************}
+procedure TalIosEdit.SetCheckSpelling(const Value: Boolean);
+begin
+  if Value then FTextField.View.setSpellCheckingType(UITextSpellCheckingTypeYes)
+  else FTextField.View.setSpellCheckingType(UITextSpellCheckingTypeNo)
+end;
+
+{********************************************}
+function TalIosEdit.GetCheckSpelling: Boolean;
+begin
+  result := FTextField.View.SpellCheckingType = UITextSpellCheckingTypeYes;
 end;
 
 {*****************************************************************}
@@ -1656,6 +1715,7 @@ begin
   fEditControl.Password := false; // noops operation
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
+  fEditControl.CheckSpelling := True;
 end;
 
 {*************************}
@@ -1760,6 +1820,18 @@ end;
 function TALEdit.GetPassword: Boolean;
 begin
   result := FeditControl.Password;
+end;
+
+{*******************************************************}
+procedure TALEdit.SetCheckSpelling(const Value: Boolean);
+begin
+  FeditControl.CheckSpelling := Value;
+end;
+
+{*****************************************}
+function TALEdit.GetCheckSpelling: Boolean;
+begin
+  result := FeditControl.CheckSpelling;
 end;
 
 {**************************************************************}

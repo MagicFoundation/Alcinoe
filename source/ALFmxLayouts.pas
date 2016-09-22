@@ -54,7 +54,7 @@ type
   private
     [Weak] FScrollBox: TALCustomScrollBox;
     fLastViewportPosition: TpointF;
-    fSceneScale: single;
+    fScreenScale: single;
   protected
     procedure DoChanged; override;
     procedure DoStart; override;
@@ -94,6 +94,7 @@ type
   {**********************************}
   TALCustomScrollBox = class(TControl)
   private
+    FScreenScale: single;
     FAniCalculations: TALScrollBoxAniCalculations;
     [Weak] FContent: TALScrollBoxContent;
     [Weak] FHScrollBar: TALScrollBoxBar;
@@ -119,7 +120,6 @@ type
     fAnchoredContentOffset: TPointF;
     procedure setScrollingAcquiredByMe(const Value: boolean);
     procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
-    function GetSceneScale: Single;
     procedure SetShowScrollBars(const Value: Boolean);
     procedure SetAutoHide(const Value: Boolean);
     procedure setAniCalculations(const Value: TALScrollBoxAniCalculations);
@@ -409,7 +409,7 @@ begin
   inherited Create(AOwner);
   FScrollBox := TALCustomScrollBox(AOwner);
   fLastViewportPosition := TpointF.Create(0,0);
-  fSceneScale := FScrollBox.GetSceneScale;
+  FScreenScale := FScrollBox.FScreenScale;
 end;
 
 {**********************************************}
@@ -419,8 +419,8 @@ procedure TALScrollBoxAniCalculations.DoChanged;
   function _getPixelAlignedViewportPosition: TPointF;
   var X, Y: Single;
   begin
-    X := Round(ViewportPosition.X * fSceneScale) / fSceneScale;
-    Y := Round(ViewportPosition.Y * fSceneScale) / fSceneScale;
+    X := Round(ViewportPosition.X * FScreenScale) / FScreenScale;
+    Y := Round(ViewportPosition.Y * FScreenScale) / FScreenScale;
     Result := TPointF.Create(X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
                              Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
   end;
@@ -525,8 +525,11 @@ end;
 {********************************************************}
 constructor TALCustomScrollBox.Create(AOwner: TComponent);
 var aDeviceService: IFMXDeviceService;
+    aScreenSrv: IFMXScreenService;
 begin
   inherited Create(AOwner);
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   ClipChildren := True;
   SetAcceptsControls(True);
   AutoCapture := True;
@@ -566,14 +569,6 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
   FreeAndNil(FAniCalculations);
   inherited;
-end;
-
-{************************************************}
-function TALCustomScrollBox.GetSceneScale: Single;
-begin
-  Result := 0;
-  if Scene <> nil then Result := Scene.GetSceneScale;
-  if Result <= 0 then Result := 1;
 end;
 
 {************************************************************}
@@ -986,7 +981,7 @@ begin
   Result := inherited CalcContentBounds;
   if not sameValue(fMaxContentWidth, 0, Tepsilon.Position) then begin
     result.Width := Min(fMaxContentWidth, Width);
-    fAnchoredContentOffset.X := Round(((Width - result.Width) / 2) * getSceneScale) / getSceneScale;
+    fAnchoredContentOffset.X := Round(((Width - result.Width) / 2) * FScreenScale) / FScreenScale;
   end
   else Result.Width := Width;
 end;
@@ -1020,7 +1015,7 @@ begin
   Result.Height := Height;
   if not sameValue(fMaxContentHeight, 0, Tepsilon.Position) then begin
     result.Height := min(Height, fMaxContentHeight);
-    fAnchoredContentOffset.Y := Round(((Height - result.Height) / 2) * getSceneScale) / getSceneScale;
+    fAnchoredContentOffset.Y := Round(((Height - result.Height) / 2) * FScreenScale) / FScreenScale;
   end
   else Result.Height := Height;
 end;

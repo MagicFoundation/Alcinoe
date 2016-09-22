@@ -36,6 +36,11 @@ function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TA
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
 
+Type
+  TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
+
+procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
+
 {$IF defined(IOS)}
 type
 
@@ -299,12 +304,47 @@ uses system.SysUtils,
      {$IF defined(ANDROID)}
      Androidapi.JNIBridge,
      Androidapi.Helpers,
+     ALAndroidApi,
+     {$ENDIF}
+     {$IF defined(IOS)}
+     iOSapi.Foundation,
+     Macapi.Helpers,
      {$ENDIF}
      fmx.consts,
      fmx.controls.presentation,
      ALFmxObjects,
      AlFmxStdCtrls,
      ALFmxImgList;
+
+{***********************************************************************************************}
+procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
+{$IF defined(IOS)}
+var aMsg: String;
+{$ENDIF}
+begin
+  {$IF defined(ANDROID)}
+  case _type of
+    TalLogType.VERBOSE: TJALLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
+    TalLogType.DEBUG: TJALLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
+    TalLogType.INFO: TJALLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
+    TalLogType.WARN: TJALLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
+    TalLogType.ERROR: TJALLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
+    TalLogType.ASSERT: TJALLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
+  end;
+  {$ELSEIF defined(IOS)}
+  // https://forums.developer.apple.com/thread/4685
+  if msg <> '' then aMsg := ' => ' + msg
+  else aMsg := '';
+  case _type of
+    TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + aMsg));
+    TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + aMsg));
+    TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + aMsg));
+    TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + aMsg));
+    TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
+    TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
+  end;
+  {$ENDIF}
+end;
 
 {****************************************************************}
 function ALConvertFontFamily(const AFamily: TFontName): TFontName;

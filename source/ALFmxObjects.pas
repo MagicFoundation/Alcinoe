@@ -30,6 +30,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRectangle = class(TRectangle)
   private
+    FScreenScale: single;
     fdoubleBuffered: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
@@ -64,6 +65,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~}
   TALCircle = class(TCircle)
   private
+    FScreenScale: single;
     fdoubleBuffered: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
@@ -98,6 +100,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~}
   TALLine = class(TLine)
   private
+    FScreenScale: single;
     fdoubleBuffered: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
@@ -136,6 +139,7 @@ type
   {$IF defined(android) or defined(IOS)}
   TALDoubleBufferedTextLayoutNG = class(TTextLayoutNG)
   private
+    FScreenScale: single;
     [weak] fTextControl: TALText;
     fdoubleBuffered: boolean;
     fBufBitmap: TTexture;
@@ -180,7 +184,7 @@ type
   //       style to not have MakeBufBitmap called several times (applystyle
   //       don't call beginupdate/endupdate (crazy!!), so everytime a property of the
   //       TALText is updated, MakeBufBitmap is call again)
-  TALText = class(TControl, ITextSettings, IObjectState)
+  TALText = class(TControl)
   private
     fRestoreLayoutUpdateAfterLoaded: boolean;
     {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
@@ -189,9 +193,6 @@ type
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
     FTextSettings: TTextSettings;
-    FDefaultTextSettings: TTextSettings;
-    FStyledSettings: TStyledSettings;
-    FSavedTextSettings: TTextSettings;
     FLayout: TTextLayout;
     FAutoSize: Boolean;
     fMaxWidth: Single;
@@ -212,13 +213,8 @@ type
     procedure SetColor(const Value: TAlphaColor);
     procedure SetTrimming(const Value: TTextTrimming);
     procedure OnFontChanged(Sender: TObject);
-    { ITextSettings }
-    function GetDefaultTextSettings: TTextSettings;
     function GetTextSettings: TTextSettings;
-    function ITextSettings.GetResultingTextSettings = GetTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
-    procedure SetStyledSettings(const Value: TStyledSettings);
-    function GetStyledSettings: TStyledSettings;
     function GetColor: TAlphaColor;
     function GetFont: TFont;
     function GetHorzTextAlign: TTextAlign;
@@ -246,10 +242,6 @@ type
     procedure Resize; override;
     procedure Loaded; override;
     property Layout: TTextLayout read FLayout;
-    procedure UpdateDefaultTextSettings; virtual;
-    { IObjectState }
-    function SaveState: Boolean; virtual;
-    function RestoreState: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -262,7 +254,6 @@ type
     procedure clearBufBitmap; virtual;
     procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
     procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
-    procedure AfterConstruction; override;
     property Font: TFont read GetFont write SetFont;
     property Color: TAlphaColor read GetColor write SetColor;
     property HorzTextAlign: TTextAlign read GetHorzTextAlign write SetHorzTextAlign;
@@ -306,14 +297,12 @@ type
     {Mouse events}
     property OnClick;
     property OnDblClick;
-
     property OnMouseDown;
     property OnMouseMove;
     property OnMouseUp;
     property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
-
     property OnPainting;
     property OnPaint;
     property OnResize;
@@ -348,6 +337,7 @@ uses system.SysUtils,
      system.Math,
      system.Math.Vectors,
      fmx.consts,
+     fmx.platform,
      {$IF defined(ANDROID)}
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNIBridge,
@@ -369,8 +359,11 @@ uses system.SysUtils,
 
 {**************************************************}
 constructor TALRectangle.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
 begin
   inherited;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
@@ -417,8 +410,7 @@ const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
 {$ENDIF}
 
 {$IF defined(ANDROID)}
-var aSceneScale: Single;
-    aBitmap: Jbitmap;
+var aBitmap: Jbitmap;
     aTmpBitmap: Jbitmap;
     aBitmapSurface: TBitmapSurface;
     aShader: JRadialGradient;
@@ -435,8 +427,7 @@ var aSceneScale: Single;
     aJSrcRect: Jrect;
     i: integer;
 {$ELSEIF defined(IOS)}
-var aSceneScale: Single;
-    aBitmapSurface: TbitmapSurface;
+var aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
     aContext: CGContextRef;
     aAlphaColor: TAlphaColorCGFloat;
@@ -470,8 +461,8 @@ var aSceneScale: Single;
       //-----
       aJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
       aCanvas.drawRoundRect(aJRect{rect},
-                            xRadius * aSceneScale {rx},
-                            yRadius * aSceneScale {ry},
+                            xRadius * FScreenScale {rx},
+                            yRadius * FScreenScale {ry},
                             apaint);
       aJRect := nil;
       //-----
@@ -496,8 +487,8 @@ var aSceneScale: Single;
 
       aPath := TJPath.Create;
       //----
-      aXRadius := xRadius * aSceneScale;
-      aYradius := yRadius * aSceneScale;
+      aXRadius := xRadius * FScreenScale;
+      aYradius := yRadius * FScreenScale;
       if (aXRadius > aRect.width / 2) then aXRadius := aRect.width / 2;
       if (aYradius > aRect.height / 2) then aYradius := aRect.height / 2;
       //----
@@ -508,7 +499,7 @@ var aSceneScale: Single;
       aWidthMinusCorners := (aRect.width - (2 * aXRadius));
       aHeightMinusCorners := (aRect.height - (2 * aYradius));
       //----
-      if (Stroke.Kind <> TBrushKind.None) then aHalfStrokeWidth := (Stroke.Thickness * aSceneScale) / 2
+      if (Stroke.Kind <> TBrushKind.None) then aHalfStrokeWidth := (Stroke.Thickness * FScreenScale) / 2
       else aHalfStrokeWidth := 0;
 
 
@@ -706,8 +697,8 @@ var aSceneScale: Single;
     // use drawPath
     else begin
 
-      aXRadius := xRadius * aSceneScale;
-      aYradius := yRadius * aSceneScale;
+      aXRadius := xRadius * FScreenScale;
+      aYradius := yRadius * FScreenScale;
       if (aXRadius > aRect.width / 2) then aXRadius := aRect.width / 2;
       if (aYradius > aRect.height / 2) then aYradius := aRect.height / 2;
       //----
@@ -718,7 +709,7 @@ var aSceneScale: Single;
       aWidthMinusCorners := (aRect.width - (2 * aXRadius));
       aHeightMinusCorners := (aRect.height - (2 * aYradius));
       //----
-      if (Stroke.Kind <> TBrushKind.None) then aHalfStrokeWidth := (Stroke.Thickness * aSceneScale) / 2
+      if (Stroke.Kind <> TBrushKind.None) then aHalfStrokeWidth := (Stroke.Thickness * FScreenScale) / 2
       else aHalfStrokeWidth := 0;
 
 
@@ -883,13 +874,9 @@ begin
 
   {$IFDEF ANDROID}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init fBufBitmapRect / aRect
-  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
-  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the main bitmap on with we will draw
   aBitmap := TJBitmap.JavaClass.createBitmap(round(aRect.Width),
@@ -905,7 +892,7 @@ begin
     apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
 
     //init aRect
-    if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * aSceneScale) / 2), (-(Stroke.Thickness * aSceneScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * FScreenScale) / 2), (-(Stroke.Thickness * FScreenScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
 
     //fill the rectangle
     if Fill.Kind <> TBrushKind.None then begin
@@ -984,7 +971,7 @@ begin
 
       //init aPaint
       aPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-      aPaint.setStrokeWidth(Stroke.Thickness * aSceneScale);
+      aPaint.setStrokeWidth(Stroke.Thickness * FScreenScale);
 
       //stroke with solid color
       if Stroke.Kind = TBrushKind.Solid then begin
@@ -1029,13 +1016,9 @@ begin
 
   {$ELSEIF DEFINED(IOS)}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init fBufBitmapRect / aRect
-  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
-  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the bitmapSurface
   aBitmapSurface := TbitmapSurface.Create;
@@ -1089,7 +1072,7 @@ begin
         CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
 
         //init aRect
-        if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * aSceneScale) / 2), (-(Stroke.Thickness * aSceneScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+        if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * FScreenScale) / 2), (-(Stroke.Thickness * FScreenScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
 
         //fill the rectangle
         if Fill.Kind <> TBrushKind.None then begin
@@ -1228,7 +1211,7 @@ begin
           if Stroke.Kind = TBrushKind.Solid then begin
             aAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
             CGContextSetRGBStrokeColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
-            CGContextSetLineWidth(aContext, Stroke.Thickness * aSceneScale);
+            CGContextSetLineWidth(aContext, Stroke.Thickness * FScreenScale);
             _DrawPath(True{aDrawOnlyBorder});
             CGContextStrokePath(aContext);
           end;
@@ -1311,8 +1294,11 @@ end;
 
 {***********************************************}
 constructor TALCircle.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
 begin
   inherited;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
@@ -1359,8 +1345,7 @@ const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
 {$ENDIF}
 
 {$IF defined(ANDROID)}
-var aSceneScale: Single;
-    aBitmap: Jbitmap;
+var aBitmap: Jbitmap;
     aTmpBitmap: Jbitmap;
     aBitmapSurface: TBitmapSurface;
     aShader: JRadialGradient;
@@ -1377,8 +1362,7 @@ var aSceneScale: Single;
     aJSrcRect: Jrect;
     i: integer;
 {$ELSEIF defined(IOS)}
-var aSceneScale: Single;
-    aBitmapSurface: TbitmapSurface;
+var aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
     aContext: CGContextRef;
     aAlphaColor: TAlphaColorCGFloat;
@@ -1418,13 +1402,9 @@ begin
 
   {$IFDEF ANDROID}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init fBufBitmapRect / aRect
-  fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), aSceneScale); // to have the pixel aligned width and height
-  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+  fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), FScreenScale); // to have the pixel aligned width and height
+  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the main bitmap on with we will draw
   aBitmap := TJBitmap.JavaClass.createBitmap(round(aRect.Width),
@@ -1440,7 +1420,7 @@ begin
     apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
 
     //init aRect
-    if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * aSceneScale) / 2), (-(Stroke.Thickness * aSceneScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * FScreenScale) / 2), (-(Stroke.Thickness * FScreenScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
 
     //fill the circle
     if Fill.Kind <> TBrushKind.None then begin
@@ -1519,7 +1499,7 @@ begin
 
       //init aPaint
       aPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-      aPaint.setStrokeWidth(Stroke.Thickness * aSceneScale);
+      aPaint.setStrokeWidth(Stroke.Thickness * FScreenScale);
 
       //stroke with solid color
       if Stroke.Kind = TBrushKind.Solid then begin
@@ -1564,13 +1544,9 @@ begin
 
   {$ELSEIF DEFINED(IOS)}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init fBufBitmapRect / aRect
-  fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), aSceneScale); // to have the pixel aligned width and height
-  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+  fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), FScreenScale); // to have the pixel aligned width and height
+  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the bitmapSurface
   aBitmapSurface := TbitmapSurface.Create;
@@ -1624,7 +1600,7 @@ begin
         CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
 
         //init aRect
-        if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * aSceneScale) / 2), (-(Stroke.Thickness * aSceneScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+        if Stroke.Kind <> TBrushKind.None then aRect.Inflate((-(Stroke.Thickness * FScreenScale) / 2), (-(Stroke.Thickness * FScreenScale) / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
 
         //fill the circle
         if Fill.Kind <> TBrushKind.None then begin
@@ -1775,7 +1751,7 @@ begin
           if Stroke.Kind = TBrushKind.Solid then begin
             aAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
             CGContextSetRGBStrokeColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
-            CGContextSetLineWidth(aContext, Stroke.Thickness * aSceneScale);
+            CGContextSetLineWidth(aContext, Stroke.Thickness * FScreenScale);
             CGContextStrokeEllipseInRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
                                                                      aRect.Width,
                                                                      aRect.Height,
@@ -1860,8 +1836,11 @@ end;
 
 {*********************************************}
 constructor TALLine.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
 begin
   inherited;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
 end;
@@ -1908,16 +1887,14 @@ const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
 {$ENDIF}
 
 {$IF defined(ANDROID)}
-var aSceneScale: Single;
-    aBitmap: Jbitmap;
+var aBitmap: Jbitmap;
     aBitmapSurface: TBitmapSurface;
     aCanvas: Jcanvas;
     aPaint: JPaint;
     aRect: TRectf;
     aStrokeWidth: Single;
 {$ELSEIF defined(IOS)}
-var aSceneScale: Single;
-    aBitmapSurface: TbitmapSurface;
+var aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
     aContext: CGContextRef;
     aAlphaColor: TAlphaColorCGFloat;
@@ -1953,35 +1930,31 @@ begin
 
   {$IFDEF ANDROID}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init aStrokeWidth
   if (LineLocation = TLineLocation.InnerWithin) then aStrokeWidth := Min(Stroke.Thickness, Min(Width, Height))
   else aStrokeWidth := Stroke.Thickness;
 
   //init fBufBitmapRect / aRect
   case lineType of
-    TLineType.Diagonal: fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
+    TLineType.Diagonal: fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
     TLineType.Top: begin
-                     fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, Width, aStrokeWidth), aSceneScale); // to have the pixel aligned width and height
+                     fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, Width, aStrokeWidth), FScreenScale); // to have the pixel aligned width and height
                      if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(0, -aStrokeWidth/2);
                    end;
     TLineType.Left: begin
-                      fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, aStrokeWidth, height), aSceneScale); // to have the pixel aligned width and height
+                      fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, aStrokeWidth, height), FScreenScale); // to have the pixel aligned width and height
                       if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(-aStrokeWidth/2, 0);
                     end;
     TLineType.Bottom: begin
-                        fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, height - aStrokeWidth, Width, height), aSceneScale); // to have the pixel aligned width and height
+                        fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, height - aStrokeWidth, Width, height), FScreenScale); // to have the pixel aligned width and height
                         if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(0, aStrokeWidth/2);
                       end;
     TLineType.Right: begin
-                       fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(width - aStrokeWidth, 0, width, height), aSceneScale); // to have the pixel aligned width and height
+                       fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(width - aStrokeWidth, 0, width, height), FScreenScale); // to have the pixel aligned width and height
                        if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(aStrokeWidth/2, 0);
                      end;
   end;
-  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the main bitmap on with we will draw
   aBitmap := TJBitmap.JavaClass.createBitmap(round(aRect.Width),
@@ -2001,7 +1974,7 @@ begin
 
       //init aPaint
       aPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-      aPaint.setStrokeWidth(aStrokeWidth * aSceneScale);
+      aPaint.setStrokeWidth(aStrokeWidth * FScreenScale);
 
       //stroke with solid color
       if Stroke.Kind = TBrushKind.Solid then begin
@@ -2064,35 +2037,31 @@ begin
 
   {$ELSEIF DEFINED(IOS)}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init aStrokeWidth
   if (LineLocation = TLineLocation.InnerWithin) then aStrokeWidth := Min(Stroke.Thickness, Min(Width, Height))
   else aStrokeWidth := Stroke.Thickness;
 
   //init fBufBitmapRect / aRect
   case lineType of
-    TLineType.Diagonal: fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
+    TLineType.Diagonal: fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
     TLineType.Top: begin
-                     fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, Width, aStrokeWidth), aSceneScale); // to have the pixel aligned width and height
+                     fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, Width, aStrokeWidth), FScreenScale); // to have the pixel aligned width and height
                      if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(0, -aStrokeWidth/2);
                    end;
     TLineType.Left: begin
-                      fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, aStrokeWidth, height), aSceneScale); // to have the pixel aligned width and height
+                      fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, aStrokeWidth, height), FScreenScale); // to have the pixel aligned width and height
                       if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(-aStrokeWidth/2, 0);
                     end;
     TLineType.Bottom: begin
-                        fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, height - aStrokeWidth, Width, height), aSceneScale); // to have the pixel aligned width and height
+                        fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, height - aStrokeWidth, Width, height), FScreenScale); // to have the pixel aligned width and height
                         if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(0, aStrokeWidth/2);
                       end;
     TLineType.Right: begin
-                       fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(width - aStrokeWidth, 0, width, height), aSceneScale); // to have the pixel aligned width and height
+                       fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(width - aStrokeWidth, 0, width, height), FScreenScale); // to have the pixel aligned width and height
                        if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(aStrokeWidth/2, 0);
                      end;
   end;
-  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+  aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
   //create the bitmapSurface
   aBitmapSurface := TbitmapSurface.Create;
@@ -2152,7 +2121,7 @@ begin
           if Stroke.Kind = TBrushKind.Solid then begin
             aAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
             CGContextSetRGBStrokeColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
-            CGContextSetLineWidth(aContext, Stroke.Thickness * aSceneScale);
+            CGContextSetLineWidth(aContext, Stroke.Thickness * FScreenScale);
             case lineType of
               TLineType.Diagonal: begin
                                     CGContextBeginPath(acontext);
@@ -2254,8 +2223,11 @@ end;
 {************************************}
 {$IF defined(android) or defined(IOS)}
 constructor TALDoubleBufferedTextLayoutNG.Create(const ACanvas: TCanvas; const aTextControl: TALText);
+var aScreenSrv: IFMXScreenService;
 begin
   inherited Create(ACanvas);
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
   fTextControl := aTextControl;
@@ -2276,8 +2248,7 @@ end;
 function TALDoubleBufferedTextLayoutNG.MakeBufBitmap: TTexture;
 
 {$IF defined(android)}
-var aSceneScale: Single;
-    aBitmap: Jbitmap;
+var aBitmap: Jbitmap;
     aBitmapSurface: TBitmapSurface;
     aRect: TRectf;
     aPaint: JPaint;
@@ -2287,8 +2258,7 @@ var aSceneScale: Single;
     aBreakedTextItems: TALBreakTextItems;
     aBreakedTextItem: TALBreakTextItem;
 {$ELSEIF defined(IOS)}
-var aSceneScale: Single;
-    aBitmapSurface: TbitmapSurface;
+var aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
     aContext: CGContextRef;
     aRect: TRectf;
@@ -2365,12 +2335,8 @@ begin
 
   {$IF defined(android)}
 
-  //init aSceneScale
-  if fTextControl.Scene <> nil then aSceneScale := fTextControl.Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init fBufBitmapRect / aRect
-  fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX * aSceneScale, fBufSize.cY * aSceneScale);
+  fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX * FScreenScale, fBufSize.cY * FScreenScale);
 
   //create aPaint
   aPaint := TJPaint.JavaClass.init;
@@ -2379,7 +2345,7 @@ begin
   aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
   apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
   aPaint.setColor(fBufFontColor);
-  aPaint.setTextSize(fBuffontSize * aSceneScale);
+  aPaint.setTextSize(fBuffontSize * FScreenScale);
   if (TFontStyle.fsBold in fBuffontStyle) and
      (TFontStyle.fsItalic in fBuffontStyle) then aStyle := TJTypeface.JavaClass.BOLD_ITALIC
   else if (TFontStyle.fsBold in fBuffontStyle) then aStyle := TJTypeface.JavaClass.BOLD
@@ -2401,13 +2367,13 @@ begin
                                    fBufHorizontalAlign, fBufVerticalAlign, //const AHTextAlign, AVTextAlign: TTextAlign;
                                    fBufTrimming,
                                    aBreakedTextItems); // var aBreakedTexts: Tarray<Tpair<JString, TpointF>>);
-    fbufBitmapRect.Top := fbufBitmapRect.Top / aSceneScale;
-    fbufBitmapRect.right := fbufBitmapRect.right / aSceneScale;
-    fbufBitmapRect.left := fbufBitmapRect.left / aSceneScale;
-    fbufBitmapRect.bottom := fbufBitmapRect.bottom / aSceneScale;
-    fBufBitmapRect := ALAlignDimensionToPixelCeil(fBufBitmapRect, aSceneScale);
+    fbufBitmapRect.Top := fbufBitmapRect.Top / FScreenScale;
+    fbufBitmapRect.right := fbufBitmapRect.right / FScreenScale;
+    fbufBitmapRect.left := fbufBitmapRect.left / FScreenScale;
+    fbufBitmapRect.bottom := fbufBitmapRect.bottom / FScreenScale;
+    fBufBitmapRect := ALAlignDimensionToPixelCeil(fBufBitmapRect, FScreenScale);
     if fBufAutosize then fBufBitmapRect.Offset(-fBufBitmapRect.left, -fBufBitmapRect.top);
-    aRect := TrectF.Create(0,0,round((fBufBitmapRect.Width)  * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+    aRect := TrectF.Create(0,0,round((fBufBitmapRect.Width)  * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
     //create the main bitmap on with we will draw
     aBitmap := TJBitmap.JavaClass.createBitmap(round(max(1, aRect.Width)),  // max because aRect.Width could = 0 if breaked at 1rt char
@@ -2470,12 +2436,8 @@ begin
   if aColorSpace = nil then exit(nil);         // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
   try
 
-    //init aSceneScale
-    if fTextControl.Scene <> nil then aSceneScale := fTextControl.Scene.GetSceneScale
-    else aSceneScale := 1;
-
     //init fBufBitmapRect / aRect
-    fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX * aSceneScale, fBufSize.cY * aSceneScale);
+    fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX * FScreenScale, fBufSize.cY * FScreenScale);
 
     //create the aBreakedTextItems
     aBreakedTextItems := TALBreakTextItems.Create(true{aOwnsObjects});
@@ -2484,7 +2446,7 @@ begin
       //break the text
       fBufTextBreaked := ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
                                      fBufFontColor, //const aFontColor: TalphaColor;
-                                     fBuffontSize * aSceneScale, //const aFontSize: single;
+                                     fBuffontSize * FScreenScale, //const aFontSize: single;
                                      fBuffontStyle, //const aFontStyle: TFontStyles;
                                      fBuffontFamily, //const aFontName: String;
                                      fBufBitmapRect, //var ARect: TRectF;
@@ -2493,13 +2455,13 @@ begin
                                      fBufHorizontalAlign, fBufVerticalAlign, //const AHTextAlign, AVTextAlign: TTextAlign;
                                      fBufTrimming, //const aTrimming: TTextTrimming;
                                      aBreakedTextItems); //var aBreakTextItems: TALBreakTextItems
-      fbufBitmapRect.Top := fbufBitmapRect.Top / aSceneScale;
-      fbufBitmapRect.right := fbufBitmapRect.right / aSceneScale;
-      fbufBitmapRect.left := fbufBitmapRect.left / aSceneScale;
-      fbufBitmapRect.bottom := fbufBitmapRect.bottom / aSceneScale;
-      fBufBitmapRect := ALAlignDimensionToPixelCeil(fBufBitmapRect, aSceneScale);
+      fbufBitmapRect.Top := fbufBitmapRect.Top / FScreenScale;
+      fbufBitmapRect.right := fbufBitmapRect.right / FScreenScale;
+      fbufBitmapRect.left := fbufBitmapRect.left / FScreenScale;
+      fbufBitmapRect.bottom := fbufBitmapRect.bottom / FScreenScale;
+      fBufBitmapRect := ALAlignDimensionToPixelCeil(fBufBitmapRect, FScreenScale);
       if fBufAutosize then fBufBitmapRect.Offset(-fBufBitmapRect.left, -fBufBitmapRect.top);
-      aRect := TrectF.Create(0,0,round((fBufBitmapRect.Width)  * aSceneScale), round(fBufBitmapRect.height * aSceneScale));
+      aRect := TrectF.Create(0,0,round((fBufBitmapRect.Width)  * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
 
       //create the bitmapSurface
       aBitmapSurface := TbitmapSurface.Create;
@@ -2790,8 +2752,6 @@ begin
   {$IF (not DEFINED(IOS)) and (not DEFINED(ANDROID))}
   fdoubleBuffered := true;
   {$ENDIF}
-  FStyledSettings := [];
-  FSavedTextSettings := nil;
   FAutoSize := False;
   fMaxWidth := 65535;
   fMaxHeight := 65535;
@@ -2814,8 +2774,6 @@ begin
   end
   else fRestoreLayoutUpdateAfterLoaded := False;
   //-----
-  FDefaultTextSettings := LClass.Create(Self);
-  FDefaultTextSettings.OnChanged := OnFontChanged; // << i don't understand why this ?
   FTextSettings := LClass.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
   FTextSettings.BeginUpdate;
@@ -2834,18 +2792,8 @@ end;
 destructor TALText.Destroy;
 begin
   FTextSettings.Free;
-  FDefaultTextSettings.Free;
   FLayout.Free;
-  if FSavedTextSettings <> nil then FSavedTextSettings.Free;
   inherited;
-end;
-
-{**********************************}
-procedure TALText.AfterConstruction;
-begin
-  inherited;
-  UpdateDefaultTextSettings; // << normally (except if something was made in inherited child creation)
-                             // << fDefaultTextSettings = FTextSettings so this will do nothing
 end;
 
 {***********************}
@@ -2863,10 +2811,6 @@ begin
       TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
   //-----
   inherited;
-  UpdateDefaultTextSettings; // << at this step TextSettings was already updated with new value
-                             // << and fontchanged was alread called (with csloading in compomentState) and now fTextSettings.IsAdjustChanged = false
-                             // << so this will (maybe) call FontChanged but nothing will be done inside FontChanged
-                             // << except calling repaint
   //-----
   if fRestoreLayoutUpdateAfterLoaded then begin
     Layout.endUpdate;
@@ -2879,12 +2823,6 @@ end;
 procedure TALText.OnFontChanged(Sender: TObject);
 begin
   FontChanged;
-end;
-
-{******************************************}
-procedure TALText.UpdateDefaultTextSettings;
-begin
-  FDefaultTextSettings.Assign(FTextSettings);
 end;
 
 {*******************************}
@@ -2931,12 +2869,6 @@ begin
   inherited;
 end;
 
-{*****************************************************}
-function TALText.GetDefaultTextSettings: TTextSettings;
-begin
-  Result := FDefaultTextSettings;
-end;
-
 {**********************************************}
 function TALText.GetTextSettings: TTextSettings;
 begin
@@ -2953,18 +2885,6 @@ end;
 procedure TALText.SetTextSettings(const Value: TTextSettings);
 begin
   FTextSettings.Assign(Value);
-end;
-
-{**************************************************}
-function TALText.GetStyledSettings: TStyledSettings;
-begin
-  Result := FStyledSettings;
-end;
-
-{****************************************************************}
-procedure TALText.SetStyledSettings(const Value: TStyledSettings);
-begin
-  FStyledSettings := Value;
 end;
 
 {*********************************************************************}
@@ -3060,31 +2980,6 @@ end;
 procedure TALText.SetTrimming(const Value: TTextTrimming);
 begin
   FTextSettings.Trimming := Value;
-end;
-
-{**********************************}
-function TALText.SaveState: Boolean;
-begin
-  Result := False;
-  if FTextSettings <> nil then
-  begin
-    if FSavedTextSettings = nil then
-      FSavedTextSettings := TTextSettingsClass(FTextSettings.ClassType).Create(nil);
-    FSavedTextSettings.Assign(FTextSettings);
-    Result := True;
-  end;
-end;
-
-{*************************************}
-function TALText.RestoreState: Boolean;
-begin
-  Result := False;
-  if (FSavedTextSettings <> nil) and (FTextSettings <> nil) then
-  begin
-    TextSettings := FSavedTextSettings;
-    FreeAndNil(FSavedTextSettings);
-    Result := True;
-  end;
 end;
 
 {**************************************************}
@@ -3243,7 +3138,6 @@ begin
   end;
 
   AdjustSize; // << because before scene was maybe nil so adjustsize returned 0
-              //    or maybe also is that now scenescale changed so need to recalculate the size of TALText
 end;
 
 {*******************************}

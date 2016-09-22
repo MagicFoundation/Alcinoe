@@ -43,7 +43,8 @@ contains
   ALFmxCommon in 'ALFmxCommon.pas',
   ALFmxTabControl in 'ALFmxTabControl.pas',
   ALFmxDesignEditors in 'ALFmxDesignEditors.pas',
-  ALFmxInertialMovement in 'ALFmxInertialMovement.pas';
+  ALFmxInertialMovement in 'ALFmxInertialMovement.pas',
+  ALFmxEdit in 'ALFmxEdit.pas';
 
 end.
 

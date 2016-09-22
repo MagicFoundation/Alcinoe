@@ -109,6 +109,10 @@ REM ---------------------------
 
 rmdir output /s /q
 
+echo.
+echo Finished
+PAUSE 
+
 :Exit
 
 endlocal

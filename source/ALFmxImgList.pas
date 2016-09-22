@@ -19,6 +19,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~}
   TALGlyph = class(TGlyph)
   private
+    FScreenScale: single;
     fdoubleBuffered: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
@@ -81,16 +82,20 @@ uses system.Math,
      system.Math.Vectors,
      fmx.types,
      fmx.consts,
+     fmx.platform,
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
      {$ENDIF}
      fmx.controls,
      alFmxCommon;
 
-{***********************************************}
+{**********************************************}
 constructor TALGlyph.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
 begin
   inherited;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
   HitTest := False;
@@ -121,8 +126,7 @@ function TALGlyph.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 
 {$IF defined(ANDROID) or defined(IOS)}
-var aSceneScale: Single;
-    aBitmap: TBitmap;
+var aBitmap: TBitmap;
     aBitmapSize: TSize;
     aBitmapData: TBitmapData;
 {$ENDIF}
@@ -159,20 +163,16 @@ begin
 
   {$IF defined(ANDROID) or defined(IOS)}
 
-  //init aSceneScale
-  if Scene <> nil then aSceneScale := Scene.GetSceneScale
-  else aSceneScale := 1;
-
   //init aBitmapSize / aBitmap / fBufBitmapRect
   aBitmapSize := TSize.Create(0, 0);
   aBitmap := nil;
-  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, aSceneScale); // to have the pixel aligned width and height
+  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
   if (Images <> nil) and
      (fBufBitmapRect.Width >= 1) and
      (fBufBitmapRect.Height >= 1) and
      (ImageIndex <> -1) and
      ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then begin
-    aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * aSceneScale), Round(fBufBitmapRect.Height * aSceneScale));
+    aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * FScreenScale), Round(fBufBitmapRect.Height * FScreenScale));
     if not Stretch then Images.BestSize(ImageIndex, aBitmapSize);
     aBitmap := Images.Bitmap(aBitmapSize, ImageIndex)
   end;
@@ -182,8 +182,8 @@ begin
     //init fBufBitmapRect
     fBufBitmapRect := TRectF.Create(0,
                                     0,
-                                    aBitmap.Width / aSceneScale,
-                                    aBitmap.Height/ aSceneScale).CenterAt(fBufBitmapRect);
+                                    aBitmap.Width / FScreenScale,
+                                    aBitmap.Height/ FScreenScale).CenterAt(fBufBitmapRect);
 
     //convert the aBitmapSurface to texture
     //it's important to make a copy of the aBitmap because it's could be destroyed by the TimageList if

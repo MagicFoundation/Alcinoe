@@ -22,6 +22,7 @@
 #include <ALFmxTabControl.hpp>
 #include <ALFmxDesignEditors.hpp>
 #include <ALFmxInertialMovement.hpp>
+#include <ALFmxEdit.hpp>
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
 #include <System.Character.hpp>	// (rtl)

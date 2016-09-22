@@ -34,6 +34,7 @@ class PASCALIMPLEMENTATION TALGlyph : public Fmx::Imglist::TGlyph
 	typedef Fmx::Imglist::TGlyph inherited;
 	
 private:
+	float FScreenScale;
 	bool fdoubleBuffered;
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;

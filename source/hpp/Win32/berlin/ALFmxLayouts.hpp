@@ -79,7 +79,7 @@ class PASCALIMPLEMENTATION TALScrollBoxAniCalculations : public Alfmxinertialmov
 private:
 	TALCustomScrollBox* FScrollBox;
 	System::Types::TPointF fLastViewportPosition;
-	float fSceneScale;
+	float fScreenScale;
 	
 protected:
 	virtual void __fastcall DoChanged(void);
@@ -136,6 +136,7 @@ class PASCALIMPLEMENTATION TALCustomScrollBox : public Fmx::Controls::TControl
 	typedef Fmx::Controls::TControl inherited;
 	
 private:
+	float FScreenScale;
 	TALScrollBoxAniCalculations* FAniCalculations;
 	TALScrollBoxContent* FContent;
 	TALScrollBoxBar* FHScrollBar;
@@ -161,7 +162,6 @@ private:
 	System::Types::TPointF fAnchoredContentOffset;
 	void __fastcall setScrollingAcquiredByMe(const bool Value);
 	void __fastcall ScrollingAcquiredByOtherHandler(System::TObject* const Sender, System::Messaging::TMessageBase* const M);
-	float __fastcall GetSceneScale(void);
 	void __fastcall SetShowScrollBars(const bool Value);
 	void __fastcall SetAutoHide(const bool Value);
 	void __fastcall setAniCalculations(TALScrollBoxAniCalculations* const Value);

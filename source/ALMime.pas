@@ -2,8 +2,7 @@
 www:          http://sourceforge.net/projects/alcinoe/              
 svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
 Author(s):    Jedi Project - JCL
-              Stephane Vander Clock (alcinoe@arkadia.com)              
-Sponsor(s):   Arkadia SA (http://www.arkadia.com)
+              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)             
 
 product:      Alcinoe Mime Functions
 Version:      4.00
@@ -51,11 +50,6 @@ History :     04-05-2012:
               26/06/2012: Add xe2 support
 Link :
 
-* Please send all your feedback to alcinoe@arkadia.com
-* If you have downloaded this source from a website different from 
-  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMime;
 

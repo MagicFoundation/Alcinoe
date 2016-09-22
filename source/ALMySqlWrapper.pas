@@ -3,7 +3,6 @@ www:          http://sourceforge.net/projects/alcinoe/
 svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Sergey Seroukhov (Zeos Database Objects)
               based on Mysql-direct library by Cristian Nicola
-Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALMySqlWrapper
 Version:      4.00
@@ -48,11 +47,6 @@ History :     26/06/2012: Add xe2 support
 Link :        http://www.sourceforge.net/projects/zeoslib
               http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
 
-* Please send all your feedback to alcinoe@arkadia.com
-* If you have downloaded this source from a website different from 
-  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by 
-  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALMySqlWrapper;
 

@@ -4,15 +4,13 @@ svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Henri Gourvest <hgourvest@progdigy.com>
               Olivier Guilbaud <oguilb@free.fr>
               Volkan Ceylan <volkance@hotmail.com>
-              Stéphane Vander Clock (alcinoe@arkadia.com)
+              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
               The Original Code is the UIB code (version 2.1)
 
               The Initial Developer of the Original Code is
               Henri Gourvest <hgourvest@progdigy.com>. Portions
               created by the Initial Developer are Copyright (C)
               by the Initial Developer. All Rights Reserved.
-
-Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXLib
 Version:      4.00
@@ -64,11 +62,6 @@ NOTE :        Same as the UIB version Except
                 *Remove conditional define
                 *remove FstatusVector from TUIBLibrairy
 
-* Please send all your feedback to alcinoe@arkadia.com
-* If you have downloaded this source from a website different from 
-  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by
-  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 
 unit ALFBXLib;

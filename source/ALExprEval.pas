@@ -7,8 +7,7 @@ Author(s):    Jedi Project - JCL
               Petr Vones (pvones)
               Robert Marquardt (marquardt)
               Robert Rossmair (rrossmair)
-              Stephane Vander Clock (alcinoe@arkadia.com)
-Sponsor(s):   Arkadia SA (http://www.arkadia.com)
+              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
 
 product:      Alcinoe Expression Evaluator
 Version:      4.01
@@ -71,11 +70,6 @@ Note :        operator priority (as implemented in this unit)
              "1.5 cmp 1.5" returns 0.0 because 1.5 = 1.5
              "1.5 cmp 0.0" returns 1.0 because 1.5 > 0.0
 
-* Please send all your feedback to alcinoe@arkadia.com
-* If you have downloaded this source from a website different from
-  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by
-  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************}
 unit ALExprEval;
 

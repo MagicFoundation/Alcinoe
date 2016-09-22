@@ -1,9 +1,8 @@
 (**************************************************************
 www:          http://sourceforge.net/projects/alcinoe/
 svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (alcinoe@arkadia.com)
+Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
 Contributors: Igor Ivkin (igor@arkadia.com)
-Sponsor(s):   Arkadia SA (http://www.arkadia.com)
 
 product:      ALLibPhoneNumber
 Version:      1.0
@@ -58,11 +57,6 @@ History :
 
 Link :
 
-* Please send all your feedback to alcinoe@arkadia.com
-* If you have downloaded this source from a website different from
-  sourceforge.net, please get the last version on http://sourceforge.net/projects/alcinoe/
-* Please, help us to keep the development of these components free by
-  promoting the sponsor on http://static.arkadia.com/html/alcinoe_like.html
 **************************************************************)
 unit ALLibPhoneNumber;
 

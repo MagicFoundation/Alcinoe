@@ -1,12 +1,14 @@
-You can download the latest version available at
-http://sourceforge.net/projects/alcinoe/
+Stéphane Vander Clock 
+skype/email: svanderclock@yahoo.fr
 
 you can access the last svn version at:
 svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code 
 or with a web browser at:
 http://alcinoe.svn.sourceforge.net/viewvc/alcinoe/
 
-About support of delphi version
+
+ABOUT SUPPORT OF DELPHI VERSION
+-------------------------------
 
 Actually the source is maintained on last version of 
 Delphi (XE4 - seattle). The modifications to make it 
@@ -17,7 +19,8 @@ who want to work on it is welcome, and I will gave
 him a write access to the svn.
 
 
-About Win64
+ABOUT WIN64
+-----------
 
 Unfortunatly, in win64 we lost all the FastCode heritage. 
 (that was mostly based on ASM). That mean that most of 
@@ -37,7 +40,9 @@ their compiler. but i thing it's an utopia that
 their compiler will produce code that can compete
 with handly optimized ASM
 
-About Delphi D2009+ (Unicode)
+
+ABOUT DELPHI D2009+ (UNICODE)
+-----------------------------
 
 No mistake, Unicode was necessary for a product like Delphi. 
 But the way embarcadero decide to implement it’s questionable! 
@@ -126,6 +131,3 @@ transliteration you will have a warning, but he can not
 always detect the transliteration Ex: MyFunctionNeedPWideChar(Pointer(aPansiChar))
 Here unfortunatly you will not get any "warning" nor 
 any "error" from the compiler.
-
-Everyone that want to join us in the development of this 
-8Bit string framework is welcome !

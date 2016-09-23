@@ -23,14 +23,17 @@ public class ALEditText extends EditText {
         
   public ALEditText(Context context){
     super(context);
+    this.mOnGlobalLayoutListener = null;  
   } 
 
   public ALEditText(Context context, AttributeSet attrs){
     super(context, attrs);
+    this.mOnGlobalLayoutListener = null;  
   } 
            
   public ALEditText(Context context, AttributeSet attrs, int defStyleAttr){
     super(context, attrs, defStyleAttr);
+    this.mOnGlobalLayoutListener = null;  
   } 
            
   public ALEditText(Context context, AttributeSet attrs, int defStyleAttr,  int defStyleRes){
@@ -46,7 +49,21 @@ public class ALEditText extends EditText {
   
   public void SetKeyPreImeListener(ALKeyPreImeListener listener) {
     this.mKeyPreImeListener = listener;
- 
+  }
+
+  public void showSoftInput() {
+    InputMethodManager imm = getInputMethodManager();
+    imm.showSoftInput(this, 0);
+  }
+
+  public void HideSoftInput() {
+    InputMethodManager imm = getInputMethodManager();
+    imm.hideSoftInputFromWindow(getWindowToken(), 0);
+  }
+  
+  public void SetSoftInputListener(ALSoftInputListener listener) {
+    this.mSoftInputListener = listener;
+    
     final Activity activity = (Activity) this.getContext(); 
     final ViewGroup decoreview = (ViewGroup) activity.getWindow().getDecorView();
 
@@ -77,20 +94,6 @@ public class ALEditText extends EditText {
       decoreview.getViewTreeObserver().addOnGlobalLayoutListener(this.mOnGlobalLayoutListener);  
     }
 
-  }
-
-  public void showSoftInput() {
-    InputMethodManager imm = getInputMethodManager();
-    imm.showSoftInput(this, 0);
-  }
-
-  public void HideSoftInput() {
-    InputMethodManager imm = getInputMethodManager();
-    imm.hideSoftInputFromWindow(getWindowToken(), 0);
-  }
-  
-  public void SetSoftInputListener(ALSoftInputListener listener) {
-    this.mSoftInputListener = listener;
   }
   
   protected InputMethodManager getInputMethodManager() {

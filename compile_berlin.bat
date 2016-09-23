@@ -53,58 +53,83 @@ goto END
 
 :BUILD_DEMOS
 
-del demos\*.exe /s
-IF ERRORLEVEL 1 pause
-
-del demos\*.dll /s
-IF ERRORLEVEL 1 pause
-
 del demos\*.vlb /s
 IF ERRORLEVEL 1 pause
 
-del demos\*.ini /s
-IF ERRORLEVEL 1 pause
-
-del demos\*.html /s
-IF ERRORLEVEL 1 pause
-
 CHDIR demos\
-FOR /d /R %%J IN (iOSSimulator) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J rmdir /s /q %%J
-  IF ERRORLEVEL 1 pause
+FOR /d /R %%J IN (Android) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
 )
 CHDIR ..
 
 CHDIR demos\
-FOR /d /R %%J IN (iOSDevice32) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J rmdir /s /q %%J
-  IF ERRORLEVEL 1 pause
+FOR /d /R %%J IN (iOSSimulator) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
 )
 CHDIR ..
 
 CHDIR demos\
-FOR /d /R %%J IN (Osx32) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J rmdir /s /q %%J
-  IF ERRORLEVEL 1 pause
+FOR /d /R %%J IN (iOSDevice32) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
 )
 CHDIR ..
 
 CHDIR demos\
-FOR /d /R %%J IN (Android) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J rmdir /s /q %%J
-  IF ERRORLEVEL 1 pause
+FOR /d /R %%J IN (iOSDevice64) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
 )
 CHDIR ..
 
 CHDIR demos\
-FOR /d /R %%J IN (Debug) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J rmdir /s /q %%J
-  IF ERRORLEVEL 1 pause
+FOR /d /R %%J IN (Osx32) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
+)
+CHDIR ..
+
+CHDIR demos\
+FOR /d /R %%J IN (win32) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
+)
+CHDIR ..
+
+CHDIR demos\
+FOR /d /R %%J IN (win64) DO (	  
+  Echo.%%J | findstr /C:"_source">nul && (
+    REM do not delete inside /_source/
+  ) || (
+    @IF EXIST %%J echo rmdir - %%J			
+    @IF EXIST %%J rmdir /s /q %%J
+  )
 )
 CHDIR ..
 
@@ -118,19 +143,41 @@ FOR /d /R %%J IN (dcu) DO (
   IF ERRORLEVEL 1 pause
 )
 CHDIR ..
-
-del demos\ALCheckSource\*.dproj /s
-IF ERRORLEVEL 1 pause
-
-del demos\ALCheckSource\*.res /s
-IF ERRORLEVEL 1 pause
 
 CHDIR demos\
 FOR /R %%J IN (*.dproj) DO (	
   echo %%J			
-  MSBuild %%J /p:Config=Release /p:Platform=Win32
-  MSBuild %%J /p:Config=RELEASE /p:Platform=Win64
+  MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
   IF ERRORLEVEL 1 pause
+  MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
+  IF ERRORLEVEL 1 pause
+)
+CHDIR ..
+
+CHDIR demos\
+FOR /R %%J IN (ALFmx*.dproj) DO (	
+  echo %%J			
+  MSBuild %%J /p:Config=Release /p:Platform=Android /t:Build
+  MSBuild %%J /p:Config=Release /p:Platform=Android /t:Deploy
+  IF ERRORLEVEL 1 pause
+  MSBuild %%J /p:Config=Release /p:Platform=iOSSimulator /t:Build
+  IF ERRORLEVEL 1 pause
+  MSBuild %%J /p:Config=Release /p:Platform=iOSDevice32 /t:Build
+  IF ERRORLEVEL 1 pause
+  MSBuild %%J /p:Config=Release /p:Platform=iOSDevice64 /t:Build
+  IF ERRORLEVEL 1 pause
+  MSBuild %%J /p:Config=Release /p:Platform=OSX32 /t:Build
+  IF ERRORLEVEL 1 pause
+)
+CHDIR ..
+
+CHDIR demos\
+FOR /d /R %%J IN (Release) DO (	  
+  Echo.%%J | findstr /C:"Android">nul && (
+    @IF EXIST %%J del %%J * /q     
+  ) || (
+    REM skip if not Android/Release
+  )
 )
 CHDIR ..
 
@@ -141,7 +188,6 @@ FOR /d /R %%J IN (dcu) DO (
     rmdir /s /q %%J
     mkdir %%J
   )
-  IF ERRORLEVEL 1 pause
 )
 CHDIR ..
 
@@ -150,86 +196,6 @@ IF ERRORLEVEL 1 pause
 
 xcopy dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
 IF ERRORLEVEL 1 pause
-
-if exist ..\BlowPipeEmail\_build\source\BlowPipeEmail.dpr (
-
-  del ..\BlowPipeEmail\*.rsm /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.stat /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.dcu /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.exe /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.identcache /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.dproj.local /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.vlb /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeEmail\*.skincfg /s
-  IF ERRORLEVEL 1 pause
-  
-  MSBuild ..\BlowPipeEmail\_build\source\BlowPipeEmail.dproj /p:Config=Release /p:Platform=Win32
-  IF ERRORLEVEL 1 pause
-  
-  xcopy ..\BlowPipeEmail\BlowPipeEmail.exe demos\BlowPipeEmail /s
-  IF ERRORLEVEL 1 pause
-  
-  xcopy ..\BlowPipeEmail\sqlite3.dll demos\BlowPipeEmail /s
-  IF ERRORLEVEL 1 pause
-
-  del ..\BlowPipeEmail\*.dcu /s
-  IF ERRORLEVEL 1 pause
-
-)  
-
-if exist ..\BlowPipeSMS\_build\source\BlowPipeSMS.dpr (
-
-  del ..\BlowPipeSMS\*.rsm /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.stat /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.dcu /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.exe /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.identcache /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.dproj.local /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.vlb /s
-  IF ERRORLEVEL 1 pause
-  
-  del ..\BlowPipeSMS\*.skincfg /s
-  IF ERRORLEVEL 1 pause
-  
-  MSBuild ..\BlowPipeSMS\_build\source\BlowPipeSMS.dproj /p:Config=Release /p:Platform=Win32
-  IF ERRORLEVEL 1 pause
-  
-  xcopy ..\BlowPipeSMS\BlowPipeSMS.exe demos\BlowPipeSMS /s
-  IF ERRORLEVEL 1 pause
-  
-  xcopy ..\BlowPipeSMS\sqlite3.dll demos\BlowPipeSMS /s
-  IF ERRORLEVEL 1 pause
-
-  del ..\BlowPipeSMS\*.dcu /s
-  IF ERRORLEVEL 1 pause
-
-)  
 
 del Alcinoe.zip
 

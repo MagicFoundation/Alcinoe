@@ -47,7 +47,7 @@ public class ALEditText extends EditText {
     return super.onKeyPreIme(keyCode, event);
   }
   
-  public void SetKeyPreImeListener(ALKeyPreImeListener listener) {
+  public void setKeyPreImeListener(ALKeyPreImeListener listener) {
     this.mKeyPreImeListener = listener;
   }
 
@@ -56,12 +56,12 @@ public class ALEditText extends EditText {
     imm.showSoftInput(this, 0);
   }
 
-  public void HideSoftInput() {
+  public void hideSoftInput() {
     InputMethodManager imm = getInputMethodManager();
     imm.hideSoftInputFromWindow(getWindowToken(), 0);
   }
   
-  public void SetSoftInputListener(ALSoftInputListener listener) {
+  public void setSoftInputListener(ALSoftInputListener listener) {
     this.mSoftInputListener = listener;
     
     final Activity activity = (Activity) this.getContext(); 

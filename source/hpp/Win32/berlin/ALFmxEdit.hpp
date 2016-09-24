@@ -59,6 +59,8 @@ private:
 protected:
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
 	virtual void __fastcall Loaded(void);
+	virtual void __fastcall StrokeChanged(System::TObject* Sender);
+	virtual void __fastcall SetSides(const Fmx::Types::TSides Value);
 	
 public:
 	__fastcall virtual TALEdit(System::Classes::TComponent* AOwner);

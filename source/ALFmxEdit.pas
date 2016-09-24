@@ -107,7 +107,7 @@ type
   private
     fOnChangeTracking: TNotifyEvent;
     FScreenScale: single;
-    FLayout: JLinearLayout;
+    FLayout: JALControlHostLayout;
     FTextWatcher: TALTextWatcher;
     FEditorActionListener: TALEditorActionListener;
     FSoftInputListener: TALSoftInputListener;
@@ -303,6 +303,8 @@ type
   protected
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
+    procedure StrokeChanged(Sender: TObject); override;
+    procedure SetSides(const Value: TSides); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -415,7 +417,7 @@ begin
     procedure
     var aLayoutParams: JViewGroup_LayoutParams;
     begin
-      FLayout := TJLinearLayout.JavaClass.init(TAndroidHelper.Activity);
+      FLayout := TJALControlHostLayout.JavaClass.init(TAndroidHelper.Activity);
       FLayout.setfocusable(true);               // << this is important to remove the focus from the FeditText
       FLayout.setfocusableInTouchMode(true);    //    else fedittext will always receive back the focus after we remove it
       //-----
@@ -431,6 +433,11 @@ begin
                                                   //      }
                                                   //    }
                                                   //
+      if not FLayout.disableMoveAnimations then begin
+        {$IF defined(DEBUG)}
+        ALLog('JALControlHostLayout.disableMoveAnimations', 'failed', TalLogType.warn);
+        {$ENDIF}
+      end;
       //-----
       FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity);
       FLayout.addview(FEditText);
@@ -504,8 +511,8 @@ begin
 
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
   TUIThreadCaller.ForceRunnablesCollection;
-  TUIThreadCaller.Call<JALEditText, JLinearLayout>(
-    procedure (aEditText: JALEditText; aLinearLayout: JLinearLayout)
+  TUIThreadCaller.Call<JALEditText, JALControlHostLayout>(
+    procedure (aEditText: JALEditText; aControlHostLayout: JALControlHostLayout)
     begin
 
       aEditText.setVisibility(TJView.JavaClass.INVISIBLE);
@@ -516,8 +523,8 @@ begin
       aEditText.SetKeyPreImeListener(nil);
 
 
-      aLinearLayout.removeAllViews();
-      MainActivity.getViewStack.removeView(aLinearLayout);
+      aControlHostLayout.removeAllViews();
+      MainActivity.getViewStack.removeView(aControlHostLayout);
 
     end, FEditText, FLayout);
 
@@ -1681,10 +1688,6 @@ begin
   fOnChangeTracking := nil;
   Cursor := crIBeam;
   CanFocus := True;
-  fill.DefaultColor := $ffffffff;
-  fill.Color := $ffffffff;
-  stroke.DefaultKind := TBrushKind.none;
-  stroke.kind := TBrushKind.none;
   {$IF defined(android)}
   fEditControl := TALAndroidEdit.Create(self);
   fEditControl.Parent := self;
@@ -1716,6 +1719,11 @@ begin
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
   fEditControl.CheckSpelling := True;
+  //-----
+  fill.DefaultColor := $ffffffff;
+  fill.Color := $ffffffff;
+  stroke.DefaultKind := TBrushKind.none;
+  stroke.kind := TBrushKind.none;
 end;
 
 {*************************}
@@ -1853,6 +1861,28 @@ begin
     fOnChangeTracking(self); // << yes need to send self instead of the fEditControl
 end;
 
+{***********************************************}
+procedure TALEdit.StrokeChanged(Sender: TObject);
+var aRect: TrectF;
+begin
+  inherited;
+  if Stroke.Kind = TbrushKind.None then fEditControl.Margins.Rect := TrectF.Create(0,0,0,0)
+  else begin
+    aRect := TrectF.Create(0,0,0,0);
+    if (TSide.Top in Sides) then aRect.Top := Stroke.Thickness;
+    if (TSide.bottom in Sides) then aRect.bottom := Stroke.Thickness;
+    if (TSide.right in Sides) then aRect.right := Stroke.Thickness;
+    if (TSide.left in Sides) then aRect.left := Stroke.Thickness;
+    fEditControl.Margins.Rect := arect;
+  end;
+end;
+
+{**********************************************}
+procedure TALEdit.SetSides(const Value: TSides);
+begin
+  inherited;
+  StrokeChanged(nil);
+end;
 
 procedure Register;
 begin

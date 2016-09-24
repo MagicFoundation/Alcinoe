@@ -273,6 +273,7 @@ type
   {***************************}
   TALEdit = class(TALRectangle)
   private
+    FAutoTranslate: Boolean;
     fOnChangeTracking: TNotifyEvent;
     FTextSettings: TTextSettings;
     {$IF defined(android)}
@@ -330,6 +331,7 @@ type
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property Hint;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
+    property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // << just the TextPrompt
     property TouchTargetExpansion;
     //property Caret;
     //property KillFocusByReturn; => always true
@@ -352,8 +354,8 @@ procedure Register;
 
 implementation
 
- {$IF defined(android)}
-uses System.SysUtils,
+uses {$IF defined(android)}
+     System.SysUtils,
      Androidapi.Helpers,
      Androidapi.Input,
      Androidapi.KeyCodes,
@@ -362,16 +364,16 @@ uses System.SysUtils,
      FMX.Platform.Android,
      FMX.Helpers.Android,
      FMX.Forms,
-     AlFmxCommon;
-{$ELSEIF defined(IOS)}
-uses System.SysUtils,
+     AlFmxCommon,
+     {$ELSEIF defined(IOS)}
+     System.SysUtils,
      Macapi.CoreFoundation,
      Macapi.Helpers,
      iOSapi.CoreText,
      FMX.Helpers.iOS,
      FMX.Consts,
+     {$endif}
      AlFmxCommon;
-{$endif}
 
 {**}
 type
@@ -1685,6 +1687,7 @@ end;
 constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
+  FAutoTranslate := true;
   fOnChangeTracking := nil;
   Cursor := crIBeam;
   CanFocus := True;
@@ -1738,6 +1741,10 @@ end;
 procedure TALEdit.Loaded;
 begin
   inherited;
+  if (AutoTranslate) and
+     (TextPrompt <> '') and
+     (not (csDesigning in ComponentState)) then
+      TextPrompt := ALTranslate(TextPrompt);
   OnFontChanged(nil);
 end;
 

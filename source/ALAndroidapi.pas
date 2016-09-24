@@ -12,6 +12,7 @@ type
 
   {**********************}
   JALEditText = interface;
+  JALControlHostLayout = interface;
   JALLog = interface;
 
   {**********************************************}
@@ -55,11 +56,28 @@ type
   JALEditText = interface(JEditText)
     ['{A3E765A1-44EB-45C0-9AA5-19A38C029CE5}']
     procedure showSoftInput; cdecl;
-    procedure HideSoftInput; cdecl;
-    procedure SetSoftInputListener(listener: JALSoftInputListener); cdecl;
-    procedure SetKeyPreImeListener(listener: JALKeyPreImeListener); cdecl;
+    procedure hideSoftInput; cdecl;
+    procedure setSoftInputListener(listener: JALSoftInputListener); cdecl;
+    procedure setKeyPreImeListener(listener: JALKeyPreImeListener); cdecl;
   end;
   TJALEditText = class(TJavaGenericImport<JALEditTextClass, JALEditText>) end;
+
+  {*******************************************************}
+  JALControlHostLayoutClass = interface(JLinearLayoutClass)
+    ['{4BB0539E-F89F-4C09-BE60-9AD04F4BBA57}']
+    {class} function init(context: JContext): JALControlHostLayout; cdecl; overload;
+    {class} function init(context: JContext; attrs: JAttributeSet): JALControlHostLayout; cdecl; overload;
+    {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer): JALControlHostLayout; cdecl; overload;
+    {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer; defStyleRes: Integer): JALControlHostLayout; cdecl; overload;
+  end;
+
+  {*******************************************************}
+  [JavaSignature('com/alcinoe/widget/ALControlHostLayout')]
+  JALControlHostLayout = interface(JLinearLayout)
+    ['{601855E2-9BCF-4FB6-8438-FD26D55FFD8D}']
+    function disableMoveAnimations: boolean; cdecl;
+  end;
+  TJALControlHostLayout = class(TJavaGenericImport<JALControlHostLayoutClass, JALControlHostLayout>) end;
 
   {***********************************}
   JALLogClass = interface(JObjectClass)

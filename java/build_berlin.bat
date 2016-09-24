@@ -43,6 +43,7 @@ mkdir output 2> nul
 mkdir output\classes 2> nul
 if x%VERBOSE% == x1 SET VERBOSE_FLAG=-verbose
 %JDK_PATH%\javac %VERBOSE_FLAG% -Xlint:deprecation -cp %ANDROID_PLATFORM%\android.jar -d output\classes ^
+src\com\alcinoe\widget\ALControlHostLayout.java ^
 src\com\alcinoe\widget\ALEditText.java ^
 src\com\alcinoe\view\inputmethod\ALSoftInputListener.java ^
 src\com\alcinoe\text\method\ALKeyPreImeListener.java
@@ -79,6 +80,7 @@ mkdir output 2> nul
 mkdir output\classes 2> nul
 if x%VERBOSE% == x1 SET VERBOSE_FLAG=-verbose
 %JDK_PATH%\javac %VERBOSE_FLAG% -Xlint:deprecation -cp %ANDROID_PLATFORM%\android.jar -d output\classes ^
+src\com\alcinoe\widget\ALControlHostLayout.java ^
 src\com\alcinoe\widget\ALEditText.java ^
 src\com\alcinoe\view\inputmethod\ALSoftInputListener.java ^
 src\com\alcinoe\text\method\ALKeyPreImeListener.java

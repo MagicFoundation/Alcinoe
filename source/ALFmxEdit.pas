@@ -364,7 +364,6 @@ uses {$IF defined(android)}
      FMX.Platform.Android,
      FMX.Helpers.Android,
      FMX.Forms,
-     AlFmxCommon,
      {$ELSEIF defined(IOS)}
      System.SysUtils,
      Macapi.CoreFoundation,

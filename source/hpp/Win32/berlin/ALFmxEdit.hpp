@@ -63,6 +63,7 @@ protected:
 	virtual void __fastcall Loaded(void);
 	virtual void __fastcall StrokeChanged(System::TObject* Sender);
 	virtual void __fastcall SetSides(const Fmx::Types::TSides Value);
+	virtual bool __fastcall GetCanFocus(void);
 	
 public:
 	__fastcall virtual TALEdit(System::Classes::TComponent* AOwner);
@@ -73,7 +74,6 @@ __published:
 	__property TabStop = {default=1};
 	__property Cursor = {default=-4};
 	__property CanFocus = {default=1};
-	__property CanParentFocus = {default=0};
 	__property DisableFocusEffect = {default=0};
 	__property Fmx::Types::TVirtualKeyboardType KeyboardType = {read=GetKeyboardType, write=SetKeyboardType, default=0};
 	__property Fmx::Types::TReturnKeyType ReturnKeyType = {read=GetReturnKeyType, write=SetReturnKeyType, default=0};

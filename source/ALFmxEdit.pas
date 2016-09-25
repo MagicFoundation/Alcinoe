@@ -307,6 +307,7 @@ type
     procedure Loaded; override;
     procedure StrokeChanged(Sender: TObject); override;
     procedure SetSides(const Value: TSides); override;
+    function GetCanFocus: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -320,7 +321,7 @@ type
     property TabStop;
     property Cursor default crIBeam;
     property CanFocus default True;
-    property CanParentFocus;
+    //property CanParentFocus;
     property DisableFocusEffect;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
@@ -1696,6 +1697,7 @@ begin
   fOnChangeTracking := nil;
   Cursor := crIBeam;
   CanFocus := True;
+  CanParentFocus := False; // else you must rewrite the GetCanFocus
   {$IF defined(android)}
   fEditControl := TALAndroidEdit.Create(self);
   fEditControl.Parent := self;
@@ -1901,6 +1903,20 @@ procedure TALEdit.SetSides(const Value: TSides);
 begin
   inherited;
   StrokeChanged(nil);
+end;
+
+{************************************}
+function TALEdit.GetCanFocus: Boolean;
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALEdit.GetCanFocus', 'GetCanFocus', TalLogType.VERBOSE);
+  {$ENDIF}
+  result := inherited GetCanFocus;
+  if result then begin
+    fEditControl.SetFocus;
+    exit(false);   // << the canparentfocus is also set to false, so the TCommonCustomForm.NewFocusedControl(const Value: IControl)
+                   //    will do nothing !
+  end;
 end;
 
 procedure Register;

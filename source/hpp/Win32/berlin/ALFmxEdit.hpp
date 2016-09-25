@@ -37,6 +37,7 @@ class PASCALIMPLEMENTATION TALEdit : public Alfmxobjects::TALRectangle
 	
 private:
 	bool FAutoTranslate;
+	bool FAutoConvertFontFamily;
 	System::Classes::TNotifyEvent fOnChangeTracking;
 	Fmx::Graphics::TTextSettings* FTextSettings;
 	Fmx::Edit::TEdit* fEditControl;
@@ -82,6 +83,7 @@ __published:
 	__property Hint = {default=0};
 	__property System::UnicodeString TextPrompt = {read=GetTextPrompt, write=setTextPrompt};
 	__property bool AutoTranslate = {read=FAutoTranslate, write=FAutoTranslate, default=1};
+	__property bool AutoConvertFontFamily = {read=FAutoConvertFontFamily, write=FAutoConvertFontFamily, default=1};
 	__property TouchTargetExpansion;
 	__property bool CheckSpelling = {read=GetCheckSpelling, write=SetCheckSpelling, default=1};
 	__property ParentShowHint = {default=1};

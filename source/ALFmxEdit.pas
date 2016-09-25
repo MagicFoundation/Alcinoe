@@ -274,6 +274,7 @@ type
   TALEdit = class(TALRectangle)
   private
     FAutoTranslate: Boolean;
+    FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
     FTextSettings: TTextSettings;
     {$IF defined(android)}
@@ -332,6 +333,7 @@ type
     property Hint;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // << just the TextPrompt
+    property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
     property TouchTargetExpansion;
     //property Caret;
     //property KillFocusByReturn; => always true
@@ -1690,6 +1692,7 @@ constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoTranslate := true;
+  FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
   Cursor := crIBeam;
   CanFocus := True;
@@ -1742,11 +1745,18 @@ end;
 {***********************}
 procedure TALEdit.Loaded;
 begin
+  if (AutoConvertFontFamily) and
+     (TextSettings.Font.Family <> '') and
+     (not (csDesigning in ComponentState)) then
+      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
+  //-----
   inherited;
+  //-----
   if (AutoTranslate) and
      (TextPrompt <> '') and
      (not (csDesigning in ComponentState)) then
       TextPrompt := ALTranslate(TextPrompt);
+  //-----
   OnFontChanged(nil);
 end;
 

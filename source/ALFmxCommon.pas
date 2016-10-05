@@ -24,12 +24,12 @@ uses System.classes,
      FMX.controls;
 
 type
-  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName; const aFontStyle: TfontStyles): TFontName;
+  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
 
 var
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
 
-function  ALConvertFontFamily(const AFamily: TFontName; const aFontStyle: TfontStyles): TFontName;
+function  ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
 function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
@@ -362,12 +362,12 @@ begin
   {$ENDIF}
 end;
 
-{***********************************************************************************************}
-function ALConvertFontFamily(const AFamily: TFontName; const aFontStyle: TfontStyles): TFontName;
+{************************************************************************************************}
+function ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
 begin
   if AFamily = '' then Exit('');
   if Assigned(ALCustomConvertFontFamilyProc) then begin
-    Result := ALCustomConvertFontFamilyProc(AFamily, aFontStyle);
+    Result := ALCustomConvertFontFamilyProc(AFamily, aFontStyles);
     if Result = '' then Result := AFamily;
     Exit;
   end;

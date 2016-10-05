@@ -24,17 +24,19 @@ uses System.classes,
      FMX.controls;
 
 type
-  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName): TFontName;
+  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName; const aFontStyle: TfontStyles): TFontName;
 
 var
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
 
-function  ALConvertFontFamily(const AFamily: TFontName): TFontName;
+function  ALConvertFontFamily(const AFamily: TFontName; const aFontStyle: TfontStyles): TFontName;
 function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
-function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
-function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
+function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
+function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF; overload;
+function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF; overload;
+function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
 
 Type
   TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
@@ -320,6 +322,8 @@ uses system.SysUtils,
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
 {$IF defined(IOS)}
 var aMsg: String;
+{$ELSEIF defined(MSWINDOWS)}
+var aMsg: String;
 {$ENDIF}
 begin
   {$IF defined(ANDROID)}
@@ -343,15 +347,27 @@ begin
     TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
     TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
   end;
+  {$ELSEIF defined(MSWINDOWS)}
+  // https://forums.developer.apple.com/thread/4685
+  if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+  else aMsg := '';
+  case _type of
+    TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
+    TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
+    TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
+    TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
+    TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
+    TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
+  end;
   {$ENDIF}
 end;
 
-{****************************************************************}
-function ALConvertFontFamily(const AFamily: TFontName): TFontName;
+{***********************************************************************************************}
+function ALConvertFontFamily(const AFamily: TFontName; const aFontStyle: TfontStyles): TFontName;
 begin
   if AFamily = '' then Exit('');
   if Assigned(ALCustomConvertFontFamilyProc) then begin
-    Result := ALCustomConvertFontFamilyProc(AFamily);
+    Result := ALCustomConvertFontFamilyProc(AFamily, aFontStyle);
     if Result = '' then Result := AFamily;
     Exit;
   end;
@@ -442,6 +458,22 @@ begin
   result := Rect;
   result.Width := ceil(Rect.Width * Scale - TEpsilon.Vector) / Scale;
   result.height := ceil(Rect.height * Scale - TEpsilon.Vector) / Scale;
+end;
+
+{*****************************************************************}
+function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF;
+begin
+  result := Rect;
+  result.Width := Round(Rect.Width);
+  result.height := Round(Rect.height);
+end;
+
+{****************************************************************}
+function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF;
+begin
+  result := Rect;
+  result.Width := ceil(Rect.Width - TEpsilon.Vector);
+  result.height := ceil(Rect.height - TEpsilon.Vector);
 end;
 
 {****************}
@@ -686,8 +718,8 @@ begin
   aBreakTextItemsStartCount := aBreakTextItems.Count;
 
   //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight
-  if aRect.Width > 65535 then aRect.Width := 65535;
-  if aRect.height > 65535 then aRect.height := 65535;
+  if aRect.Width > 16384 then aRect.Width := 16384;  // << because on android kitkat (4.4.2) it's look like that aPaint.breakText with maxWidth > 16384 return 0 :(
+  if aRect.height > 16384 then aRect.height := 16384;
   aMaxWidth := ARect.width;
   aMaxHeight := ARect.Height;
   aMaxLineWidth := 0;
@@ -811,7 +843,7 @@ begin
                                       //----
                                       else if aNumberOfChars >= 2 then begin
                                         aChar := aLine.charAt(aNumberOfChars-2);
-                                        if (not aChar.IsWhiteSpace) then begin
+                                        if (not aChar.IsWhiteSpace) or (Achar.ToUCS4Char = $00A0{No-break Space}) then begin
                                           dec(aNumberOfChars);
                                           continue;
                                         end;
@@ -871,7 +903,7 @@ begin
                 //----
                 else if (aTrimming = TTextTrimming.Word) and (aNumberOfChars >= 2) then begin
                   aChar := aLine.charAt(aNumberOfChars-2);
-                  if (not aChar.IsWhiteSpace) then begin
+                  if (not aChar.IsWhiteSpace) or (Achar.ToUCS4Char = $00A0{No-break Space}) then begin
                     dec(aNumberOfChars);
                     continue;
                   end;
@@ -920,7 +952,7 @@ begin
                 //-----
                 if aNumberOfChars >= 2 then begin
                   aChar := aLine.charAt(aNumberOfChars-1);
-                  if (not aChar.IsWhiteSpace) then begin
+                  if (not aChar.IsWhiteSpace) or (Achar.ToUCS4Char = $00A0{No-break Space}) then begin
                     dec(aNumberOfChars);
                     continue;
                   end;
@@ -1289,7 +1321,7 @@ begin
                                                                                  //       ^^
                                                                                  //       aStringIndex=6
 
-                if achar.IsWhiteSpace then dec(aStringIndex)
+                if achar.IsWhiteSpace and (Achar.ToUCS4Char <> $00A0{No-break Space}) then dec(aStringIndex)
                 else break;
               end;
               if aStringIndex >= aStringRange.location + aStringRange.length then break; // no space was detected then stop the loop

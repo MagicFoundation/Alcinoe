@@ -602,6 +602,8 @@ function  ALCopyStr(const aSourceString: AnsiString;
 function  ALStringReplace(const S, OldPattern, NewPattern: AnsiString; Flags: TReplaceFlags): AnsiString;
 {$ENDIF}
 
+function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
+Function  ALNewGUIDStringU(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
 function  ALIfThenU(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 function  ALFormatU(const Format: String; const Args: array of const): String; overload;
 procedure ALFormatU(const Format: String; const Args: array of const; var Result: String); overload;
@@ -1188,6 +1190,51 @@ Begin
   if CreateGUID(aGUID) <> S_OK then RaiseLastOSError;
   Result := ALGUIDToString(aGUID, WithoutBracket, WithoutHyphen);
 End;
+
+{$ENDIF}
+
+{********************************************************************************************************************************}
+function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
+begin
+  if WithoutBracket then begin
+    if WithoutHyphen then begin
+      SetLength(Result, 32);
+      StrLFmt(PChar(Result), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end
+    else begin
+      SetLength(Result, 36);
+      StrLFmt(PChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end;
+  end
+  else begin
+    if WithoutHyphen then begin
+      SetLength(Result, 34);
+      StrLFmt(PChar(Result), 34,'{%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end
+    else begin
+      SetLength(Result, 38);
+      StrLFmt(PChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+        [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+        Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
+    end;
+  end;
+end;
+
+{**************************************************************************************************************}
+Function  ALNewGUIDStringU(const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): String;
+Var aGUID: TGUID;
+Begin
+  if CreateGUID(aGUID) <> S_OK then RaiseLastOSError;
+  Result := ALGUIDToStringU(aGUID, WithoutBracket, WithoutHyphen);
+End;
+
+{$IFNDEF NEXTGEN}
 
 //
 //TALMask is taken from delphi seattle upd1

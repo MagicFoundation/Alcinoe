@@ -306,6 +306,7 @@ uses system.SysUtils,
      {$IF defined(ANDROID)}
      Androidapi.JNIBridge,
      Androidapi.Helpers,
+     Androidapi.JNI.Os,
      ALAndroidApi,
      {$ENDIF}
      {$IF defined(IOS)}
@@ -675,6 +676,7 @@ var aBreakTextItemsStartCount: integer;
     aCurrLineY: integer;
     aMetrics: JPaint_FontMetricsInt;
     ameasuredWidth: TJavaArray<Single>;
+    aTmpMeasuredWidth: Single;
     aSavedColor: TalphaColor;
     aOffset: single;
     i, j: integer;
@@ -787,6 +789,24 @@ begin
                                                                             // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                             // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                             //   bounds where given text will fit
+        //their is a fucking bug on android 4.4.2 that aNumberOfChars
+        //is the number of Glyph and not of char, so ligature like 'fi' are
+        //counted like one glyph :(
+        //very few comments about this on the internet
+        //http://stackoverflow.com/questions/39891726/android-paint-breaktext-not-work-on-kitkat
+        if (aNumberOfChars < aLine.length) and
+           (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+          while aNumberOfChars < aLine.length  do begin
+            aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                    0,
+                                                    aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+            if compareValue(aTmpMeasuredWidth, aMaxWidth - aLineIndent, TEpsilon.Position) > 0 then break
+            else begin
+              inc(aNumberOfChars);
+              ameasuredWidth[0] := aTmpMeasuredWidth;
+            end;
+          end;
+        end;
 
         //the text was breaked
         if (aNumberOfChars < aLine.length)
@@ -826,6 +846,19 @@ begin
                                                                                                                // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                                                // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                                                //   bounds where given text will fit
+                                           if (aNumberOfChars < aLine.length) and
+                                              (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                                             while aNumberOfChars < aLine.length  do begin
+                                               aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                                                       0,
+                                                                                       aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                                               if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
+                                               else begin
+                                                 inc(aNumberOfChars);
+                                                 ameasuredWidth[0] := aTmpMeasuredWidth;
+                                              end;
+                                             end;
+                                           end;
                                            if aNumberOfChars >= aLine.length then break;
                                          end;
                                          //-----
@@ -864,6 +897,19 @@ begin
                                                                                                               // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                                               // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                                               //   bounds where given text will fit
+                                           if (aNumberOfChars < aLine.length) and
+                                              (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                                             while aNumberOfChars < aLine.length  do begin
+                                               aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                                                       0,
+                                                                                       aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                                               if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
+                                               else begin
+                                                 inc(aNumberOfChars);
+                                                 ameasuredWidth[0] := aTmpMeasuredWidth;
+                                              end;
+                                             end;
+                                           end;
                                           if aNumberOfChars >= aLine.length then break;
                                         end;
                                         break;
@@ -876,6 +922,19 @@ begin
                                                                                                           // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                                           // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                                           //   bounds where given text will fit
+                                      if (aNumberOfChars < aLine.length) and
+                                         (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                                        while aNumberOfChars < aLine.length  do begin
+                                          aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                                                  0,
+                                                                                  aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                                          if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
+                                          else begin
+                                            inc(aNumberOfChars);
+                                            ameasuredWidth[0] := aTmpMeasuredWidth;
+                                          end;
+                                        end;
+                                      end;
                                       if aNumberOfChars >= aLine.length then break
                                       else aSaveNumberOfChars:= aNumberOfChars;
                                       //----
@@ -924,6 +983,19 @@ begin
                                                                                         // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                         // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                         //   bounds where given text will fit
+                    if (aNumberOfChars < aLine.length) and
+                       (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                      while aNumberOfChars < aLine.length  do begin
+                        aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                                0,
+                                                                aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                        if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
+                        else begin
+                          inc(aNumberOfChars);
+                          ameasuredWidth[0] := aTmpMeasuredWidth;
+                        end;
+                      end;
+                    end;
                     if aNumberOfChars >= aLine.length then break;
                   end;
                   break;
@@ -936,6 +1008,19 @@ begin
                                                                                     // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                     //   bounds where given text will fit
+                if (aNumberOfChars < aLine.length) and
+                   (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                  while aNumberOfChars < aLine.length  do begin
+                    aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                            0,
+                                                            aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                    if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
+                    else begin
+                      inc(aNumberOfChars);
+                      ameasuredWidth[0] := aTmpMeasuredWidth;
+                    end;
+                  end;
+                end;
                 if aNumberOfChars >= aLine.length then break
                 else aSaveNumberOfChars:= aNumberOfChars;
                 //----
@@ -971,6 +1056,19 @@ begin
                                                                                         // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                         // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                         //   bounds where given text will fit
+                    if (aNumberOfChars < aLine.length) and
+                       (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                      while aNumberOfChars < aLine.length  do begin
+                        aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                                0,
+                                                                aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                        if compareValue(aTmpMeasuredWidth, aMaxWidth - aLineIndent, TEpsilon.Position) > 0 then break
+                        else begin
+                          inc(aNumberOfChars);
+                          ameasuredWidth[0] := aTmpMeasuredWidth;
+                        end;
+                      end;
+                    end;
                     if aNumberOfChars >= aLine.length then break;
                   end;
                   break;
@@ -983,6 +1081,19 @@ begin
                                                                                     // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                     //   bounds where given text will fit
+                if (aNumberOfChars < aLine.length) and
+                   (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+                  while aNumberOfChars < aLine.length  do begin
+                    aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                            0,
+                                                            aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+                    if compareValue(aTmpMeasuredWidth, aMaxWidth - aLineIndent, TEpsilon.Position) > 0 then break
+                    else begin
+                      inc(aNumberOfChars);
+                      ameasuredWidth[0] := aTmpMeasuredWidth;
+                    end;
+                  end;
+                end;
                 if aNumberOfChars >= aLine.length then begin
                   inc(aNumberOfChars); // to skip the separator
                   break;

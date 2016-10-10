@@ -895,7 +895,8 @@ Uses System.RTLConsts,
      System.Ansistrings,
      ALCipher,
      {$ENDIF}
-     ALString;
+     ALString,
+     ALCommon;
 
 {$IFNDEF NEXTGEN}
 
@@ -4954,9 +4955,9 @@ end;
 destructor TALStringsU.Destroy;
 begin
   if (FEncoding <> nil) and (not TEncoding.IsStandardEncoding(FEncoding)) then
-    FreeAndNil(FEncoding);
+    ALFreeAndNil(FEncoding);
   if (FDefaultEncoding <> nil) and (not TEncoding.IsStandardEncoding(FDefaultEncoding)) then
-    FreeAndNil(FDefaultEncoding);
+    ALFreeAndNil(FDefaultEncoding);
   inherited Destroy;
 end;
 
@@ -5471,7 +5472,7 @@ begin
   try
     LoadFromStream(Stream);
   finally
-    Stream.Free;
+    ALFreeAndNil(Stream);
   end;
 end;
 
@@ -5484,7 +5485,7 @@ begin
   try
     LoadFromStream(Stream, Encoding);
   finally
-    Stream.Free;
+    ALFreeAndNil(Stream);
   end;
 end;
 
@@ -5567,7 +5568,7 @@ begin
     Try
       SaveToStream(aFileStream, Encoding);
     finally
-      aFileStream.Free;
+      ALFreeAndNil(aFileStream);
     end;
 
     if aTmpFilename <> FileName then begin
@@ -5717,7 +5718,7 @@ end;
 procedure TALStringsU.SetDefaultEncoding(const Value: TEncoding);
 begin
   if (FDefaultEncoding <> nil) and (not TEncoding.IsStandardEncoding(FDefaultEncoding)) then
-    FDefaultEncoding.Free;
+    ALFreeAndNil(FDefaultEncoding);
   if TEncoding.IsStandardEncoding(Value) then
     FDefaultEncoding := Value
   else if Value <> nil then
@@ -5776,7 +5777,7 @@ end;
 procedure TALStringsU.SetEncoding(const Value: TEncoding);
 begin
   if (FEncoding <> nil) and (not TEncoding.IsStandardEncoding(FEncoding)) then
-    FEncoding.Free;
+    ALFreeAndNil(FEncoding);
   if TEncoding.IsStandardEncoding(Value) then
     FEncoding := Value
   else if Value <> nil then
@@ -5872,7 +5873,7 @@ begin
   // Free the objects that were owned by the list
   if Length(Temp) > 0 then
     for I := 0 to Length(Temp) - 1 do
-      Temp[I].Free;
+      ALFreeAndNil(Temp[I]);
 end;
 
 {****************************************************}
@@ -5973,7 +5974,7 @@ begin
     // Free the objects that were owned by the list
     if Length(Temp) > 0 then
       for I := 0 to Length(Temp) - 1 do
-        Temp[I].Free;
+        ALFreeAndNil(Temp[I]);
 
     Changed;
   end;
@@ -6006,7 +6007,7 @@ begin
     PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
   Changed;
 end;
 
@@ -6256,7 +6257,7 @@ begin
   FList[Index].FObject := AObject;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
 
   Changed;
 end;
@@ -6568,7 +6569,7 @@ begin
   // Free the objects that were owned by the list
   if Length(Temp) > 0 then
     for I := 0 to Length(Temp) - 1 do
-      Temp[I].Free;
+      ALFreeAndNil(Temp[I]);
 end;
 
 {******************************************************}
@@ -6705,7 +6706,7 @@ begin
     // Free the objects that were owned by the list
     if Length(Temp) > 0 then
       for I := 0 to Length(Temp) - 1 do
-        Temp[I].Free;
+        ALFreeAndNil(Temp[I]);
 
     Changed;
   end;
@@ -6739,7 +6740,7 @@ begin
     PPointer(@FList[FCount].FObject)^ := nil;
   end;
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
   Changed;
 end;
 
@@ -7216,7 +7217,7 @@ begin
   FList[Index].FObject := AObject;
 
   if Obj <> nil then
-    Obj.Free;
+    ALFreeAndNil(Obj);
 
   Changed;
 end;

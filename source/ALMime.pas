@@ -168,7 +168,8 @@ Var vAlMimeContentTypeByExtList: TALStrings; {.htm=text/html}
 
 implementation
 
-uses ALString;
+uses ALString,
+     ALCommon;
 
 // Caution: For MimeEncodeStream and all other kinds of multi-buffered
 // Mime encodings (i.e. Files etc.), BufferSize must be set to a multiple of 3.
@@ -950,10 +951,10 @@ begin
     try
       ALMimeEncodeStream(InputStream, OutputStream);
     finally
-      OutputStream.Free;
+      ALFreeAndNil(OutputStream);
     end;
   finally
-    InputStream.Free;
+    ALFreeAndNil(InputStream);
   end;
 end;
 
@@ -968,10 +969,10 @@ begin
     try
       ALMimeEncodeStreamNoCRLF(InputStream, OutputStream);
     finally
-      OutputStream.Free;
+      ALFreeAndNil(OutputStream);
     end;
   finally
-    InputStream.Free;
+    ALFreeAndNil(InputStream);
   end;
 end;
 
@@ -986,10 +987,10 @@ begin
     try
       ALMimeDecodeStream(InputStream, OutputStream);
     finally
-      OutputStream.Free;
+      ALFreeAndNil(OutputStream);
     end;
   finally
-    InputStream.Free;
+    ALFreeAndNil(InputStream);
   end;
 end;
 

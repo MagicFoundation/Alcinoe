@@ -38,11 +38,6 @@ function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
 
-Type
-  TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
-
-procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
-
 {$IF defined(IOS)}
 type
 
@@ -307,61 +302,13 @@ uses system.SysUtils,
      Androidapi.JNIBridge,
      Androidapi.Helpers,
      Androidapi.JNI.Os,
-     ALAndroidApi,
-     {$ENDIF}
-     {$IF defined(IOS)}
-     iOSapi.Foundation,
-     Macapi.Helpers,
      {$ENDIF}
      fmx.consts,
      fmx.controls.presentation,
      ALFmxObjects,
      AlFmxStdCtrls,
-     ALFmxImgList;
-
-{***********************************************************************************************}
-procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
-{$IF defined(IOS)}
-var aMsg: String;
-{$ELSEIF defined(MSWINDOWS)}
-var aMsg: String;
-{$ENDIF}
-begin
-  {$IF defined(ANDROID)}
-  case _type of
-    TalLogType.VERBOSE: TJALLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
-    TalLogType.DEBUG: TJALLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
-    TalLogType.INFO: TJALLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
-    TalLogType.WARN: TJALLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
-    TalLogType.ERROR: TJALLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
-    TalLogType.ASSERT: TJALLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
-  end;
-  {$ELSEIF defined(IOS)}
-  // https://forums.developer.apple.com/thread/4685
-  if msg <> '' then aMsg := ' => ' + msg
-  else aMsg := '';
-  case _type of
-    TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + aMsg));
-    TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + aMsg));
-    TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + aMsg));
-    TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + aMsg));
-    TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
-    TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
-  end;
-  {$ELSEIF defined(MSWINDOWS)}
-  // https://forums.developer.apple.com/thread/4685
-  if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
-  else aMsg := '';
-  case _type of
-    TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
-    TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
-    TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
-    TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
-    TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
-    TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
-  end;
-  {$ENDIF}
-end;
+     ALFmxImgList,
+     AlCommon;
 
 {************************************************************************************************}
 function ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
@@ -1164,7 +1111,7 @@ begin
           aBreakTextItems.Add(aBreakTextItem);
 
         except
-          aBreakTextItem.free;
+          ALFreeAndNil(aBreakTextItem);
           raise;
         end;
 
@@ -1181,7 +1128,7 @@ begin
       end;
 
     finally
-      FreeAndNil(ameasuredWidth);
+      ALFreeAndNil(ameasuredWidth);
     end;
 
   end
@@ -1196,7 +1143,7 @@ begin
       aBreakTextItem.rect := aEllipsisLineRect;
       aBreakTextItems.Add(aBreakTextItem);
     except
-      aBreakTextItem.free;
+      ALFreeAndNil(aBreakTextItem);
       raise;
     end;
   end;
@@ -1484,7 +1431,7 @@ begin
                                                    aAscent + adescent);
               aBreakTextItems.Add(aBreakTextItem);
             except
-              aBreakTextItem.free;
+              ALFreeAndNil(aBreakTextItem);
               raise;
             end;
 
@@ -1691,7 +1638,7 @@ begin
                                                aAscent + adescent);
           aBreakTextItems.Add(aBreakTextItem);
         except
-          aBreakTextItem.free;
+          ALFreeAndNil(aBreakTextItem);
           raise;
         end;
 

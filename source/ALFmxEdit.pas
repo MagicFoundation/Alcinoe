@@ -375,6 +375,7 @@ uses {$IF defined(android)}
      FMX.Helpers.iOS,
      FMX.Consts,
      {$endif}
+     ALCommon,
      AlFmxCommon;
 
 {**}
@@ -547,7 +548,7 @@ begin
   //FEditText := nil;
   //FLayout := nil;
 
-  FTextSettings.free;
+  ALFreeAndNil(FTextSettings);
   inherited;
 
   {$IF defined(DEBUG)}
@@ -1272,7 +1273,7 @@ begin
   UnRegisterNativeEventHandler('ControlEventEditingChanged', UIControlEventEditingChanged);
   UnRegisterNativeEventHandler('ControlEventEditingDidEnd', UIControlEventEditingDidEnd);
   View.setDelegate(nil);
-  FTextFieldDelegate.Free;
+  ALFreeAndNil(FTextFieldDelegate);
   inherited;
 end;
 
@@ -1394,9 +1395,9 @@ end;
 {****************************}
 destructor TalIosEdit.Destroy;
 begin
-  freeandNil(FTextField);
+  ALfreeandNil(FTextField);
   if FAttributedString <> nil then FAttributedString.release;
-  FTextSettings.free;
+  ALFreeAndNil(FTextSettings);
   inherited Destroy;
 end;
 
@@ -1739,8 +1740,8 @@ end;
 {*************************}
 destructor TALEdit.Destroy;
 begin
-  FTextSettings.Free;
-  fEditControl.DisposeOf;
+  ALFreeAndNil(FTextSettings);
+  ALFreeAndNil(fEditControl); // >> will call disposeOF under ARC so it's ok
   inherited;
 end;
 

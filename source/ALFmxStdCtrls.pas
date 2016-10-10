@@ -585,7 +585,8 @@ uses System.SysUtils,
      FMX.Platform,
      fmx.consts,
      fmx.utils,
-     AlfmxCommon;
+     AlCommon,
+     ALFmxCommon;
 
 {*******************************************************************************************************************************}
 function _ValueToPos(MinValue, MaxValue, ViewportSize, ThumbSize, TrackSize, Value: Single; IgnoreViewportSize: Boolean): Single;
@@ -887,8 +888,8 @@ end;
 {********************************}
 destructor TALCustomTrack.Destroy;
 begin
-  FreeAndNil(FDefaultValueRange);
-  FreeAndNil(FValueRange);
+  ALFreeAndNil(FDefaultValueRange);
+  ALFreeAndNil(FValueRange);
   inherited;
 end;
 
@@ -1369,7 +1370,7 @@ end;
 {**********************************}
 destructor TALRangeTrackBar.Destroy;
 begin
-  FreeAndNil(FMaxValueRange);
+  ALFreeAndNil(FMaxValueRange);
   inherited;
 end;
 
@@ -1509,18 +1510,15 @@ end;
 destructor TALCheckbox.Destroy;
 begin
   clearBufBitmap;
-  FImageCheckedLink.DisposeOf;
-  FImageUncheckedLink.DisposeOf;
+  AlFreeAndNil(FImageCheckedLink);   // >> will call disposeOf if necessary
+  AlFreeAndNil(FImageUncheckedLink); // >> will call disposeOf if necessary
   inherited;
 end;
 
 {***********************************}
 procedure TALCheckbox.clearBufBitmap;
 begin
-  if fBufBitmap <> nil then begin
-    fBufBitmap.Free;
-    fBufBitmap := nil;
-  end;
+  ALFreeAndNil(fBufBitmap);
 end;
 
 {******************************}
@@ -1711,8 +1709,7 @@ begin
         end;
       end;
     except
-      fBufBitmap.Free;
-      fBufBitmap := nil;
+      ALFreeAndNil(fBufBitmap);
       raise;
     end;
 

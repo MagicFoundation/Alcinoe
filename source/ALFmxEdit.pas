@@ -1742,8 +1742,6 @@ destructor TALEdit.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
-                                                                     // << need without aRefCountWarn because TalAndroidEdit have a TUIThreadCaller.Call with strong ref
-                                                                     // << to fEditControl inside it's ondestroy. so refcount will be cleared after, so no need to warn now
   inherited;
 end;
 

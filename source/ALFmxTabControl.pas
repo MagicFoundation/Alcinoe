@@ -684,6 +684,7 @@ begin
       fAniCalculations.MouseLeave; // instead of down := false to reposition the tabitem
       FMouseEvents := False;
       fGestureEvents := False;
+      if not FAniTransition.Running then RealignTabs; // << if i try with fAniCalculations.launchanimation i have a flickr because the anim stop and restart at a different speed
     end;
     fScrollingAcquiredByOther := True;
   end

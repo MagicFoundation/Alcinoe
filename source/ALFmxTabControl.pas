@@ -216,7 +216,8 @@ uses System.SysUtils,
      System.Math,
      System.Math.Vectors,
      FMX.Utils,
-     FMX.Consts;
+     FMX.Consts,
+     ALCommon;
 
 {************************************************}
 constructor TALTabItem.Create(AOwner: TComponent);
@@ -476,10 +477,8 @@ end;
 destructor TALTabControl.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
-  FAniCalculations.DisposeOf;
-  FAniCalculations := nil;
-  FAniTransition.DisposeOf;
-  FAniTransition := Nil;
+  ALFreeAndNil(FAniCalculations); // >> will call disposeOF if necessary
+  ALFreeAndNil(FAniTransition);   // >> will call disposeOF if necessary
   inherited;
 end;
 
@@ -1053,7 +1052,7 @@ begin
     else if TabIndex = Index then LTabIndex := Index
     else LTabIndex := -1;
     Obj := (Self as IItemsContainer).GetItem(Index);
-    Obj.DisposeOf;
+    ALFreeAndNil(Obj); // >> will call disposeOF if necessary
     if (LTabIndex >= 0) and FindVisibleTab(LTabIndex, TFindKind.Current) then
       TabIndex := LTabIndex;
   end;
@@ -1069,7 +1068,7 @@ begin
   try
     Result.Parent := Self;
   except
-    FreeAndNil(Result);
+    ALFreeAndNil(Result);
     Raise;
   end;
 end;

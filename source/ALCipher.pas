@@ -353,7 +353,8 @@ implementation
 uses {$IF defined(MSWINDOWS)}
      winapi.MMSystem,
      {$IFEND}
-     system.Math;
+     system.Math,
+     ALCommon;
 
 {***************}
 {$IFNDEF NEXTGEN}
@@ -2007,8 +2008,8 @@ begin
       result := encoding.GetString(Bytes);
     end;
   finally
-    InStream.Free;
-    OutStream.Free;
+    ALFreeAndNil(InStream);
+    ALFreeAndNil(OutStream);
   end;
 end;
 
@@ -2039,8 +2040,8 @@ begin
       result := encoding.GetString(Bytes);
     end;
   finally
-    InStream.Free;
-    OutStream.Free;
+    ALFreeAndNil(InStream);
+    ALFreeAndNil(OutStream);
   end;
 end;
 

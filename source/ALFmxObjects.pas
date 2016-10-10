@@ -355,6 +355,7 @@ uses system.SysUtils,
      FMX.Canvas.GPU,
      FMX.Surfaces,
      {$ENDIF}
+     ALCommon,
      ALFmxCommon;
 
 {**************************************************}
@@ -378,10 +379,7 @@ end;
 {************************************}
 procedure TALRectangle.clearBufBitmap;
 begin
-  if fBufBitmap <> nil then begin
-    fBufBitmap.Free;
-    fBufBitmap := nil;
-  end;
+  ALFreeAndNil(fBufBitmap);
 end;
 
 {**************************************************}
@@ -914,8 +912,8 @@ begin
           _drawRect(false{aDrawOnlyBorder});
           aPaint.setShader(nil);
           aShader := nil;
-          freeandNil(aColors);
-          freeandNil(aStops);
+          ALfreeandNil(aColors);
+          ALfreeandNil(aStops);
         end;
       end
 
@@ -997,8 +995,7 @@ begin
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
-          fBufBitmap.Free;
-          fBufBitmap := nil;
+          ALFreeAndNil(fBufBitmap);
           raise;
         end;
 
@@ -1006,7 +1003,7 @@ begin
       else fBufBitmap := nil;
 
     finally
-      abitmapSurface.Free;
+      ALFreeAndNil(abitmapSurface);
     end;
 
   finally
@@ -1231,14 +1228,12 @@ begin
     try
       fBufBitmap.Assign(aBitmapSurface);
     except
-      fBufBitmap.Free;
-      fBufBitmap := nil;
+      ALFreeAndNil(fBufBitmap);
       raise;
     end;
 
   finally
-    aBitmapSurface.Free;
-    aBitmapSurface := nil;
+    ALFreeAndNil(aBitmapSurface);
   end;
 
   {$ENDIF}
@@ -1313,10 +1308,7 @@ end;
 {*********************************}
 procedure TALCircle.clearBufBitmap;
 begin
-  if fBufBitmap <> nil then begin
-    fBufBitmap.Free;
-    fBufBitmap := nil;
-  end;
+  ALFreeAndNil(fBufBitmap);
 end;
 
 {***********************************************}
@@ -1442,8 +1434,8 @@ begin
           aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
           aPaint.setShader(nil);
           aShader := nil;
-          freeandNil(aColors);
-          freeandNil(aStops);
+          alfreeandNil(aColors);
+          alfreeandNil(aStops);
         end;
       end
 
@@ -1525,8 +1517,7 @@ begin
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
-          fBufBitmap.Free;
-          fBufBitmap := nil;
+          ALFreeAndNil(fBufBitmap);
           raise;
         end;
 
@@ -1534,7 +1525,7 @@ begin
       else fBufBitmap := nil;
 
     finally
-      abitmapSurface.Free;
+      ALFreeAndNil(abitmapSurface);
     end;
 
   finally
@@ -1773,14 +1764,12 @@ begin
     try
       fBufBitmap.Assign(aBitmapSurface);
     except
-      fBufBitmap.Free;
-      fBufBitmap := nil;
+      ALFreeAndNil(fBufBitmap);
       raise;
     end;
 
   finally
-    aBitmapSurface.Free;
-    aBitmapSurface := nil;
+    ALFreeAndNil(aBitmapSurface);
   end;
 
   {$ENDIF}
@@ -1855,10 +1844,7 @@ end;
 {*******************************}
 procedure TALLine.clearBufBitmap;
 begin
-  if fBufBitmap <> nil then begin
-    fBufBitmap.Free;
-    fBufBitmap := nil;
-  end;
+  ALFreeAndNil(fBufBitmap);
 end;
 
 {*********************************************}
@@ -2018,8 +2004,7 @@ begin
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
-          fBufBitmap.Free;
-          fBufBitmap := nil;
+          ALFreeAndNil(fBufBitmap);
           raise;
         end;
 
@@ -2027,7 +2012,7 @@ begin
       else fBufBitmap := nil;
 
     finally
-      abitmapSurface.Free;
+      ALFreeAndNil(abitmapSurface);
     end;
 
   finally
@@ -2159,14 +2144,12 @@ begin
     try
       fBufBitmap.Assign(aBitmapSurface);
     except
-      fBufBitmap.Free;
-      fBufBitmap := nil;
+      ALFreeAndNil(fBufBitmap);
       raise;
     end;
 
   finally
-    aBitmapSurface.Free;
-    aBitmapSurface := nil;
+    ALFreeAndNil(aBitmapSurface);
   end;
 
   {$ENDIF}
@@ -2257,6 +2240,7 @@ var aBitmap: Jbitmap;
     aCanvas: Jcanvas;
     aBreakedTextItems: TALBreakTextItems;
     aBreakedTextItem: TALBreakTextItem;
+    i: integer;
 {$ELSEIF defined(IOS)}
 var aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
@@ -2264,6 +2248,7 @@ var aBitmapSurface: TbitmapSurface;
     aRect: TRectf;
     aBreakedTextItems: TALBreakTextItems;
     aBreakedTextItem: TALBreakTextItem;
+    i: integer;
 {$ENDIF}
 
 begin
@@ -2385,11 +2370,13 @@ begin
       aCanvas := TJCanvas.JavaClass.init(aBitmap);
 
       //draw all texts
-      for aBreakedTextItem in aBreakedTextItems do
+      for i := 0 to aBreakedTextItems.count - 1 do begin
+        aBreakedTextItem := aBreakedTextItems[i];
         aCanvas.drawText(aBreakedTextItem.line{text},
                          aBreakedTextItem.pos.x {x},
                          aBreakedTextItem.pos.y {y},
                          apaint {paint});
+      end;
 
       //free the paint and the canvas
       aPaint := nil;
@@ -2407,8 +2394,7 @@ begin
           try
             fBufBitmap.Assign(aBitmapSurface);
           except
-            fBufBitmap.Free;
-            fBufBitmap := nil;
+            ALFreeAndNil(fBufBitmap);
             raise;
           end;
 
@@ -2416,7 +2402,7 @@ begin
         else fBufBitmap := nil;
 
       finally
-        abitmapSurface.Free;
+        ALFreeAndNil(abitmapSurface);
       end;
 
     finally
@@ -2425,8 +2411,7 @@ begin
     end;
 
   finally
-    aBreakedTextItems.Free;
-    aBreakedTextItems := nil;
+    ALFreeAndNil(aBreakedTextItems);
   end;
 
   {$ELSEIF DEFINED(IOS)}
@@ -2551,7 +2536,8 @@ begin
           CGContextSetAllowsFontSubpixelQuantization(aContext, 1);  // Sets whether or not to allow subpixel quantization for a graphics context
 
           //draw all texts
-          for aBreakedTextItem in aBreakedTextItems do begin
+          for i := 0 to aBreakedTextItems.count - 1 do begin
+            aBreakedTextItem := aBreakedTextItems[i];
             CGContextSetTextPosition(acontext,
                                      aBreakedTextItem.pos.x {x},
                                      aBitmapSurface.Height - aBreakedTextItem.pos.Y);{y}
@@ -2567,19 +2553,16 @@ begin
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
-          fBufBitmap.Free;
-          fBufBitmap := nil;
+          ALFreeAndNil(fBufBitmap);
           raise;
         end;
 
       finally
-        aBitmapSurface.Free;
-        aBitmapSurface := nil;
+        ALFreeAndNil(aBitmapSurface);
       end;
 
     finally
-      aBreakedTextItems.Free;
-      aBreakedTextItems := nil;
+      ALFreeAndNil(aBreakedTextItems);
     end;
 
   finally
@@ -2603,10 +2586,7 @@ end;
 {$IF defined(android) or defined(IOS)}
 procedure TALDoubleBufferedTextLayoutNG.clearBufBitmap;
 begin
-  if fBufBitmap <> nil then begin
-    fBufBitmap.Free;
-    fBufBitmap := nil;
-  end;
+  ALFreeAndNil(fBufBitmap);
 end;
 {$ENDIF}
 
@@ -2791,8 +2771,8 @@ end;
 {*************************}
 destructor TALText.Destroy;
 begin
-  FTextSettings.Free;
-  FLayout.Free;
+  ALFreeAndNil(FTextSettings);
+  ALFreeAndNil(FLayout);
   inherited;
 end;
 

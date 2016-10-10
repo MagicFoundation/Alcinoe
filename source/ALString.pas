@@ -883,6 +883,7 @@ uses System.SysConst,
      {$ENDIF}
      System.Character,
      System.Math,
+     ALcommon,
      ALMime;
 
 {$IFNDEF NEXTGEN}
@@ -1191,7 +1192,7 @@ Begin
   Result := ALGUIDToString(aGUID, WithoutBracket, WithoutHyphen);
 End;
 
-{$ENDIF}
+{$ENDIF !NEXTGEN}
 
 {********************************************************************************************************************************}
 function  ALGUIDToStringU(const Guid: TGUID; const WithoutBracket: boolean = false; const WithoutHyphen: boolean = false): string;
@@ -10306,7 +10307,7 @@ begin
   try
     Result := ALGetBytesFromStream(AFileStream);
   finally
-    AfileStream.Free;
+    ALFreeAndNil(AfileStream);
   end;
 end;
 
@@ -10359,7 +10360,7 @@ begin
   try
     Result := ALGetStringFromStreamU(AFileStream, ADefaultEncoding);
   finally
-    AfileStream.Free;
+    ALFreeAndNil(AfileStream);
   end;
 end;
 

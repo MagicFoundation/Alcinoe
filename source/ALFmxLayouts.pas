@@ -370,7 +370,8 @@ uses System.SysUtils,
      FMX.Consts,
      FMX.Effects,
      FMX.utils,
-     FMX.Ani;
+     FMX.Ani,
+     ALCommon;
 
 {*******************************************************************************************************}
 // http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly
@@ -567,7 +568,7 @@ end;
 destructor TALCustomScrollBox.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
-  FreeAndNil(FAniCalculations);
+  ALFreeAndNil(FAniCalculations);
   inherited;
 end;
 

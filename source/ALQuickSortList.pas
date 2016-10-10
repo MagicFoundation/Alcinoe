@@ -336,7 +336,10 @@ Type
     function  Peek: Double; inline;
   end;
 
-  {-----------------------------------------------------------------}
+  {------------------------}
+  {$IF CompilerVersion > 31}
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-13502 is still not yet implemented'}
+  {$IFEND}
   TALDictionary<TKey,TValue> = class(TEnumerable<TPair<TKey,TValue>>)
   private
     type
@@ -509,6 +512,7 @@ implementation
 uses System.SysUtils,
      System.SysConst,
      System.TypInfo,
+     ALCommon,
      ALString;
 
 {***********************************************************************************}
@@ -799,6 +803,7 @@ begin
   try
     inherited InsertItem(index,aPALIntegerListItem);
   except
+    aPALIntegerListItem^.FObject := nil;
     Dispose(aPALIntegerListItem);
     raise;
   end;
@@ -879,6 +884,7 @@ begin
   try
     inherited insert(index,aPALIntegerListItem);
   except
+    aPALIntegerListItem^.FObject := nil;
     Dispose(aPALIntegerListItem);
     raise;
   end;
@@ -888,7 +894,8 @@ end;
 procedure TALIntegerList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then freeandnil(PALIntegerListItem(Ptr).FObject);
+    if OwnsObjects then ALfreeandnil(PALIntegerListItem(Ptr).FObject)
+    else PALIntegerListItem(Ptr).FObject := nil; // to decrease the refcount in ARC
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -979,6 +986,7 @@ begin
   try
     inherited InsertItem(index,aPALCardinalListItem);
   except
+    aPALCardinalListItem^.FObject := nil;
     Dispose(aPALCardinalListItem);
     raise;
   end;
@@ -1074,6 +1082,7 @@ begin
   try
     inherited insert(index,aPALCardinalListItem);
   except
+    aPALCardinalListItem^.FObject := nil;
     Dispose(aPALCardinalListItem);
     raise;
   end;
@@ -1083,7 +1092,8 @@ end;
 procedure TALCardinalList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then freeandnil(PALCardinalListItem(Ptr).FObject);
+    if OwnsObjects then ALfreeandnil(PALCardinalListItem(Ptr).FObject)
+    else PALCardinalListItem(Ptr).FObject := nil; // to decrease the refcount in ARC
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1174,6 +1184,7 @@ begin
   try
     inherited InsertItem(index,aPALInt64ListItem);
   except
+    aPALInt64ListItem^.FObject := nil;
     Dispose(aPALInt64ListItem);
     raise;
   end;
@@ -1267,6 +1278,7 @@ begin
   try
     inherited insert(index,aPALInt64ListItem);
   except
+    aPALInt64ListItem^.FObject := nil;
     Dispose(aPALInt64ListItem);
     raise;
   end;
@@ -1276,7 +1288,8 @@ end;
 procedure TALInt64List.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then freeandnil(PALInt64ListItem(Ptr).FObject);
+    if OwnsObjects then ALfreeandnil(PALInt64ListItem(Ptr).FObject)
+    else PALInt64ListItem(Ptr).FObject := nil; // to decrease the refcount in ARC
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1367,6 +1380,7 @@ begin
   try
     inherited InsertItem(index,aPALNativeIntListItem);
   except
+    aPALNativeIntListItem^.FObject := nil;
     Dispose(aPALNativeIntListItem);
     raise;
   end;
@@ -1460,6 +1474,7 @@ begin
   try
     inherited insert(index,aPALNativeIntListItem);
   except
+    aPALNativeIntListItem^.FObject := nil;
     Dispose(aPALNativeIntListItem);
     raise;
   end;
@@ -1469,7 +1484,8 @@ end;
 procedure TALNativeIntList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then freeandnil(PALNativeIntListItem(Ptr).FObject);
+    if OwnsObjects then ALfreeandnil(PALNativeIntListItem(Ptr).FObject)
+    else PALNativeIntListItem(Ptr).FObject := nil; // to decrease the refcount in ARC
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1560,6 +1576,7 @@ begin
   try
     inherited InsertItem(index,aPALDoubleListItem);
   except
+    aPALDoubleListItem^.FObject := nil;
     Dispose(aPALDoubleListItem);
     raise;
   end;
@@ -1653,6 +1670,7 @@ begin
   try
     inherited insert(index,aPALDoubleListItem);
   except
+    aPALDoubleListItem^.FObject := nil;
     Dispose(aPALDoubleListItem);
     raise;
   end;
@@ -1662,7 +1680,8 @@ end;
 procedure TALDoubleList.Notify(Ptr: Pointer; Action: TListNotification);
 begin
   if Action = lnDeleted then begin
-    if OwnsObjects then freeandnil(PALDoubleListItem(Ptr).FObject);
+    if OwnsObjects then ALfreeandnil(PALDoubleListItem(Ptr).FObject)
+    else PALDoubleListItem(Ptr).FObject := nil; // to decrease the refcount in ARC
     dispose(ptr);
   end;
   inherited Notify(Ptr, Action);
@@ -1940,8 +1959,8 @@ end;
 destructor TALDictionary<TKey,TValue>.Destroy;
 begin
   Clear;
-  FKeyCollection.Free;
-  FValueCollection.Free;
+  ALFreeAndNil(FKeyCollection);
+  ALFreeAndNil(FValueCollection);
   inherited;
 end;
 
@@ -2412,11 +2431,7 @@ procedure TALObjectDictionary<TKey,TValue>.KeyNotify(const Key: TKey; Action: TC
 begin
   inherited;
   if (Action = cnRemoved) and (doOwnsKeys in FOwnerships) then
-    {$IF CompilerVersion >= 25} {Delphi XE4}
-    PObject(@Key)^.DisposeOf;
-    {$else}
-    PObject(@Key)^.free;
-    {$ifend}
+    ALFreeAndNil(PObject(@Key)^); // >> will call disposeOF if necessary
 end;
 
 {***********************************************************************************************************}
@@ -2424,11 +2439,7 @@ procedure TALObjectDictionary<TKey,TValue>.ValueNotify(const Value: TValue; Acti
 begin
   inherited;
   if (Action = cnRemoved) and (doOwnsValues in FOwnerships) then
-    {$IF CompilerVersion >= 25} {Delphi XE4}
-    PObject(@Value)^.DisposeOf;
-    {$else}
-    PObject(@Value)^.free;
-    {$ifend}
+    ALFreeAndNil(PObject(@Value)^); // >> will call disposeOF if necessary
 end;
 
 {************************************************************************************}

@@ -269,6 +269,7 @@ uses
   System.RTLConsts,
   System.Math.Vectors,
   System.TypInfo,
+  ALCommon,
   FMX.Consts,
   FMX.Platform;
 
@@ -495,7 +496,7 @@ end;
 destructor TALAniCalculations.Destroy;
 begin
   StopTimer;
-  FreeAndNil(FPointTime);
+  ALFreeAndNil(FPointTime);
   inherited;
 end;
 

@@ -87,6 +87,7 @@ uses system.Math,
      FMX.Canvas.GPU,
      {$ENDIF}
      fmx.controls,
+     alCommon,
      alFmxCommon;
 
 {**********************************************}
@@ -112,10 +113,7 @@ end;
 {*********************************}
 procedure TALGlyph.clearBufBitmap;
 begin
-  if fBufBitmap <> nil then begin
-    fBufBitmap.Free;
-    fBufBitmap := nil;
-  end;
+  ALFreeAndNil(fBufBitmap);
 end;
 
 {************************************}
@@ -222,8 +220,7 @@ begin
         end;
       end;
     except
-      fBufBitmap.Free;
-      fBufBitmap := nil;
+      ALFreeAndNil(fBufBitmap);
       raise;
     end;
 

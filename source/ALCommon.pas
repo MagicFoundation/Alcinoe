@@ -70,7 +70,7 @@ var ALFreeAndNilRefCountWarn: boolean;
 threadvar ALCurThreadFreeAndNilRefCountWarn: integer; // 0 = Not set (use value from ALFreeAndNilRefCountWarn)  | 1 Mean true | any other value mean false
 {$ENDIF}
 Procedure ALFreeAndNil(var Obj; const adelayed: boolean = false); overload;
-Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Boolean); overload;
+Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Boolean); overload; {$IFNDEF DEBUG}inline;{$ENDIF}
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Function AlBoolToInt(Value:Boolean):Integer;

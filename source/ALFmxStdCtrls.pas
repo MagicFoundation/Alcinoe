@@ -439,6 +439,10 @@ type
     FImageUncheckedLink: TImageLink;
     FisImagesChanged: boolean;
     FStretch: Boolean;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
     function GetImages: TCustomImageList;
     procedure SetImages(const Value: TCustomImageList);
@@ -581,6 +585,7 @@ uses System.SysUtils,
      {$ENDIF}
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
+     ALFmxTypes3D,
      {$ENDIF}
      FMX.Platform,
      fmx.consts,
@@ -1504,6 +1509,9 @@ begin
   FImageUncheckedLink := TGlyphImageLink.Create(Self);
   FisImagesChanged := False;
   FStretch := True;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  {$ENDIF}
 end;
 
 {*****************************}
@@ -1512,6 +1520,9 @@ begin
   clearBufBitmap;
   AlFreeAndNil(FImageCheckedLink);   // >> will call disposeOf if necessary
   AlFreeAndNil(FImageUncheckedLink); // >> will call disposeOf if necessary
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  {$ENDIF}
   inherited;
 end;
 
@@ -1612,7 +1623,6 @@ var aImageIndex: TimageIndex;
     {$IF defined(ANDROID) or defined(IOS)}
     aBitmap: TBitmap;
     aBitmapSize: TSize;
-    aBitmapData: TBitmapData;
     {$ENDIF}
 
 begin
@@ -1675,39 +1685,9 @@ begin
     //convert the aBitmapSurface to texture
     //it's important to make a copy of the aBitmap because it's could be destroyed by the TimageList if
     //their is not anymore enalf of place in it's own caching system
-    fBufBitmap := TTexture.Create;
+    fBufBitmap := TALTexture.Create(True{aVolatile});
     try
       fBufBitmap.Assign(aBitmap);
-      //
-      //i don't understand the sheet they do in TTexture.assign! they don't copy the data in the TTexture !
-      //
-      //procedure TTexture.Assign(Source: TPersistent);
-      //begin
-      //  ...
-      //  if not (TCanvasStyle.NeedGPUSurface in TBitmap(Source).CanvasClass.GetCanvasStyle) then
-      //    begin
-      //    if TBitmap(Source).Map(TMapAccess.Read, M) then
-      //    try
-      //      UpdateTexture(M.Data, M.Pitch);
-      //    finally
-      //      TBitmap(Source).Unmap(M);
-      //    end;
-      //  end;
-      //  ...
-      //end;
-      //
-      {$IF CompilerVersion <> 31}
-        {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still not copying the bitmap data in the TTexture if TCanvasStyle.NeedGPUSurface and adjust the IFDEF'}
-      {$ENDIF}
-      if (TCanvasStyle.NeedGPUSurface in aBitmap.CanvasClass.GetCanvasStyle) then begin
-        if aBitmap.Map(TMapAccess.Read, aBitmapData) then begin
-          try
-            fBufBitmap.UpdateTexture(aBitmapData.Data, aBitmapData.Pitch);
-          finally
-            aBitmap.Unmap(aBitmapData);
-          end;
-        end;
-      end;
     except
       ALFreeAndNil(fBufBitmap);
       raise;
@@ -1838,6 +1818,14 @@ begin
     if not fDoubleBuffered then clearbufBitmap;
   end;
 end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALCheckbox.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
 
 {************************************************}
 function TALCheckbox.GetImageList: TBaseImageList;

@@ -9,6 +9,7 @@ uses System.Classes,
      System.Diagnostics,
      {$ENDIF}
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+     system.Messaging,
      FMX.types3D,
      {$ENDIF}
      FMX.graphics,
@@ -30,6 +31,10 @@ type
     fBufSize: TsizeF;
     [weak] fBufImages: TCustomImageList;
     FbufImageIndex: TImageIndex;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure Paint; override;
@@ -85,6 +90,7 @@ uses system.Math,
      fmx.platform,
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
+     ALFmxTypes3D,
      {$ENDIF}
      fmx.controls,
      alCommon,
@@ -101,12 +107,18 @@ begin
   fBufBitmap := nil;
   HitTest := False;
   Autohide := False;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  {$ENDIF}
 end;
 
 {***************************}
 destructor TALGlyph.Destroy;
 begin
   clearBufBitmap;
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  {$ENDIF}
   inherited;
 end;
 
@@ -126,7 +138,6 @@ function TALGlyph.MakeBufBitmap: Tbitmap;
 {$IF defined(ANDROID) or defined(IOS)}
 var aBitmap: TBitmap;
     aBitmapSize: TSize;
-    aBitmapData: TBitmapData;
 {$ENDIF}
 
 begin
@@ -186,39 +197,9 @@ begin
     //convert the aBitmapSurface to texture
     //it's important to make a copy of the aBitmap because it's could be destroyed by the TimageList if
     //their is not anymore enalf of place in it's own caching system
-    fBufBitmap := TTexture.Create;
+    fBufBitmap := TALTexture.Create(True{aVolatile});
     try
       fBufBitmap.Assign(aBitmap);
-      //
-      //i don't understand the sheet they do in TTexture.assign! they don't copy the data in the TTexture !
-      //
-      //procedure TTexture.Assign(Source: TPersistent);
-      //begin
-      //  ...
-      //  if not (TCanvasStyle.NeedGPUSurface in TBitmap(Source).CanvasClass.GetCanvasStyle) then
-      //    begin
-      //    if TBitmap(Source).Map(TMapAccess.Read, M) then
-      //    try
-      //      UpdateTexture(M.Data, M.Pitch);
-      //    finally
-      //      TBitmap(Source).Unmap(M);
-      //    end;
-      //  end;
-      //  ...
-      //end;
-      //
-      {$IF CompilerVersion > 31}
-        {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still not copying the bitmap data in the TTexture if TCanvasStyle.NeedGPUSurface and adjust the IFDEF'}
-      {$ENDIF}
-      if (TCanvasStyle.NeedGPUSurface in aBitmap.CanvasClass.GetCanvasStyle) then begin
-        if aBitmap.Map(TMapAccess.Read, aBitmapData) then begin
-          try
-            fBufBitmap.UpdateTexture(aBitmapData.Data, aBitmapData.Pitch);
-          finally
-            aBitmap.Unmap(aBitmapData);
-          end;
-        end;
-      end;
     except
       ALFreeAndNil(fBufBitmap);
       raise;
@@ -276,6 +257,14 @@ begin
     if not fDoubleBuffered then clearbufBitmap;
   end;
 end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALGlyph.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
 
 procedure Register;
 begin

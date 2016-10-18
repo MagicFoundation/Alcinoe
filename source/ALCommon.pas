@@ -67,9 +67,9 @@ type TALCustomDelayedFreeObjectProc = procedure(var aObject: Tobject) of object;
 var ALCustomDelayedFreeObjectProc: TALCustomDelayedFreeObjectProc;
 {$IFDEF DEBUG}
 var ALFreeAndNilRefCountWarn: boolean;
-threadvar ALCurThreadFreeAndNilRefCountWarn: integer; // 0 = Not set (use value from ALFreeAndNilRefCountWarn)  | 1 Mean true | any other value mean false
+threadvar ALCurThreadFreeAndNilNORefCountWarn: boolean;
 {$ENDIF}
-Procedure ALFreeAndNil(var Obj; const adelayed: boolean = false); overload;
+Procedure ALFreeAndNil(var Obj; const adelayed: boolean = false); overload; {$IFNDEF DEBUG}inline;{$ENDIF}
 Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Boolean); overload; {$IFNDEF DEBUG}inline;{$ENDIF}
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -112,17 +112,12 @@ uses system.Classes,
      iOSapi.Foundation,
      Macapi.Helpers,
      {$IFEND}
-     {$IF defined(FMX)}
-     Fmx.types,
-     {$IFEND}
      system.sysutils,
      system.DateUtils;
 
 {***********************************************************************************************}
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
 {$IF defined(IOS)}
-var aMsg: String;
-{$ELSEIF defined(MSWINDOWS) and defined(FMX)}
 var aMsg: String;
 {$IFEND}
 begin
@@ -147,17 +142,18 @@ begin
     TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
     TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
   end;
-  {$ELSEIF defined(MSWINDOWS) and defined(FMX)}
-  if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
-  else aMsg := '';
-  case _type of
-    TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
-    TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
-    TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
-    TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
-    TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
-    TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
-  end;
+  {$ELSEIF defined(MSWINDOWS)}
+  //the Log.d is very too much slow to be really usefull
+  //if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+  //else aMsg := '';
+  //case _type of
+  //  TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
+  //  TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
+  //  TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
+  //  TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
+  //  TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
+  //  TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
+  //end;
   {$IFEND}
 end;
 
@@ -248,16 +244,10 @@ begin
   Temp := TObject(Obj);
   if temp = nil then exit;
   TObject(Obj) := nil;
-  {$IF defined(FMX)}
-  if Temp is TFMXObject then begin
-    TFMXObject(Temp).Parent := nil; // if parent is assigned then their will be a pointer that will forbid the free
-    if assigned(TFMXObject(Temp).Owner) then TFMXObject(Temp).Owner.RemoveComponent(TFMXObject(Temp));
-  end;
-  {$IFEND}
   if adelayed and assigned(ALCustomDelayedFreeObjectProc) then ALCustomDelayedFreeObjectProc(Temp)
   else begin
     {$IF defined(AUTOREFCOUNT)}
-    if temp.refcount = 1 then begin // refcount is an Integer (4 bytes) so it's mean that all read / write are atomic no need to lock (but is this true under ios/android?)
+    if AtomicCmpExchange(temp.refcount{Target}, 0{NewValue}, 0{Compareand}) = 1 then begin // it's seam it's not an atomic operation (http://stackoverflow.com/questions/39987850/is-reading-writing-an-integer-4-bytes-atomic-on-ios-android-like-on-win32-win6)
       temp.Free;
       temp := nil;
     end
@@ -272,8 +262,7 @@ begin
                       // other keeping themselves alive during whole application lifetime.
       {$IF defined(DEBUG)}
       if ALFreeAndNilRefCountWarn and
-        ((ALCurThreadFreeAndNilRefCountWarn = 0) or
-         (ALCurThreadFreeAndNilRefCountWarn = 1)) then begin
+        (not ALCurThreadFreeAndNilNORefCountWarn) then begin
         if (Temp.RefCount - 1) and (not $40000000{Temp.objDisposedFlag}) <> 0 then
           ALLog('ALFreeAndNil', Temp.ClassName + ' | Refcount is not null (' + Inttostr((Temp.RefCount - 1) and (not $40000000{Temp.objDisposedFlag})) + ')', TalLogType.warn);
       end;
@@ -290,13 +279,12 @@ end;
 {*************************************************************************************}
 Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Boolean);
 {$IFDEF DEBUG}
-var aOldCurThreadFreeAndNilRefCountWarn: integer;
+var aOldCurThreadFreeAndNilNoRefCountWarn: boolean;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
-  aOldCurThreadFreeAndNilRefCountWarn := ALCurThreadFreeAndNilRefCountWarn;
-  if aRefCountWarn then ALCurThreadFreeAndNilRefCountWarn := 1
-  else ALCurThreadFreeAndNilRefCountWarn := 2;
+  aOldCurThreadFreeAndNilNoRefCountWarn := ALCurThreadFreeAndNilNORefCountWarn;
+  ALCurThreadFreeAndNilNORefCountWarn := not aRefCountWarn;
   try
   {$ENDIF}
 
@@ -304,7 +292,7 @@ begin
 
   {$IFDEF DEBUG}
   finally
-    ALCurThreadFreeAndNilRefCountWarn := aOldCurThreadFreeAndNilRefCountWarn;
+    ALCurThreadFreeAndNilNORefCountWarn := aOldCurThreadFreeAndNilNORefCountWarn;
   end;
   {$ENDIF}
 end;

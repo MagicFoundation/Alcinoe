@@ -24,6 +24,7 @@
 #include <ALFmxInertialMovement.hpp>
 #include <ALFmxEdit.hpp>
 #include <ALCommon.hpp>
+#include <ALFMXTypes3D.hpp>
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
 #include <System.Character.hpp>	// (rtl)

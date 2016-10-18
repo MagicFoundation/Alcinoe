@@ -10,6 +10,7 @@ uses System.Classes,
      System.Diagnostics,
      {$ENDIF}
      {$IF defined(ANDROID)}
+     system.Messaging,
      system.Generics.collections,
      Androidapi.JNI.JavaTypes,
      FMX.TextLayout.GPU,
@@ -39,6 +40,10 @@ type
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure FillChanged(Sender: TObject); override;
@@ -74,6 +79,10 @@ type
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure FillChanged(Sender: TObject); override;
@@ -109,6 +118,10 @@ type
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure FillChanged(Sender: TObject); override;
@@ -158,6 +171,8 @@ type
     fBufText: string;
     fBufTextBreaked: Boolean;
     //-----
+    FOpenGLContextLostId: integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure DoRenderLayout; override;
@@ -346,6 +361,7 @@ uses system.SysUtils,
      FMX.Canvas.GPU,
      FMX.Helpers.Android,
      FMX.Surfaces,
+     ALFmxTypes3D,
      {$ENDIF}
      {$IF defined(IOS)}
      iOSapi.CocoaTypes,
@@ -354,6 +370,7 @@ uses system.SysUtils,
      iOSapi.UIKit,
      FMX.Canvas.GPU,
      FMX.Surfaces,
+     ALFmxTypes3D,
      {$ENDIF}
      ALCommon,
      ALFmxCommon;
@@ -367,12 +384,18 @@ begin
   else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  {$ENDIF}
 end;
 
 {******************************}
 destructor TALRectangle.Destroy;
 begin
   clearBufBitmap;
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  {$ENDIF}
   inherited;
 end;
 
@@ -991,7 +1014,7 @@ begin
       if JBitmapToSurface(aBitmap, aBitmapSurface) then begin
 
         //convert the bitmapSurface to a TTexture
-        fBufBitmap := TTexture.Create;
+        fBufBitmap := TALTexture.Create(True{aVolatile});
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
@@ -1224,7 +1247,7 @@ begin
     end;
 
     //convert the aBitmapSurface to texture
-    fBufBitmap := TTexture.Create;
+    fBufBitmap := TALTexture.Create(True{aVolatile});
     try
       fBufBitmap.Assign(aBitmapSurface);
     except
@@ -1287,6 +1310,14 @@ begin
   end;
 end;
 
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALRectangle.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
 {***********************************************}
 constructor TALCircle.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
@@ -1296,12 +1327,18 @@ begin
   else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  {$ENDIF}
 end;
 
 {***************************}
 destructor TALCircle.Destroy;
 begin
   clearBufBitmap;
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  {$ENDIF}
   inherited;
 end;
 
@@ -1513,7 +1550,7 @@ begin
       if JBitmapToSurface(aBitmap, aBitmapSurface) then begin
 
         //convert the bitmapSurface to a TTexture
-        fBufBitmap := TTexture.Create;
+        fBufBitmap := TALTexture.Create(True{aVolatile});
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
@@ -1760,7 +1797,7 @@ begin
     end;
 
     //convert the aBitmapSurface to texture
-    fBufBitmap := TTexture.Create;
+    fBufBitmap := TALTexture.Create(True{aVolatile});
     try
       fBufBitmap.Assign(aBitmapSurface);
     except
@@ -1823,6 +1860,14 @@ begin
   end;
 end;
 
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALCircle.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
 {*********************************************}
 constructor TALLine.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
@@ -1832,12 +1877,18 @@ begin
   else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  {$ENDIF}
 end;
 
 {*************************}
 destructor TALLine.Destroy;
 begin
   clearBufBitmap;
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  {$ENDIF}
   inherited;
 end;
 
@@ -2000,7 +2051,7 @@ begin
       if JBitmapToSurface(aBitmap, aBitmapSurface) then begin
 
         //convert the bitmapSurface to a TTexture
-        fBufBitmap := TTexture.Create;
+        fBufBitmap := TALTexture.Create(True{aVolatile});
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
@@ -2140,7 +2191,7 @@ begin
     end;
 
     //convert the aBitmapSurface to texture
-    fBufBitmap := TTexture.Create;
+    fBufBitmap := TALTexture.Create(True{aVolatile});
     try
       fBufBitmap.Assign(aBitmapSurface);
     except
@@ -2204,6 +2255,14 @@ begin
 end;
 
 {************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALLine.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************}
 {$IF defined(android) or defined(IOS)}
 constructor TALDoubleBufferedTextLayoutNG.Create(const ACanvas: TCanvas; const aTextControl: TALText);
 var aScreenSrv: IFMXScreenService;
@@ -2214,6 +2273,7 @@ begin
   fdoubleBuffered := true;
   fBufBitmap := nil;
   fTextControl := aTextControl;
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
 end;
 {$ENDIF}
 
@@ -2222,6 +2282,7 @@ end;
 destructor TALDoubleBufferedTextLayoutNG.Destroy;
 begin
   clearBufBitmap;
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
   inherited;
 end;
 {$ENDIF}
@@ -2390,7 +2451,7 @@ begin
         if JBitmapToSurface(aBitmap, aBitmapSurface) then begin
 
           //convert the bitmapSurface to a TTexture
-          fBufBitmap := TTexture.Create;
+          fBufBitmap := TALTexture.Create(True{aVolatile});
           try
             fBufBitmap.Assign(aBitmapSurface);
           except
@@ -2549,7 +2610,7 @@ begin
         end;
 
         //convert the aBitmapSurface to texture
-        fBufBitmap := TTexture.Create;
+        fBufBitmap := TALTexture.Create(True{aVolatile});
         try
           fBufBitmap.Assign(aBitmapSurface);
         except
@@ -2692,6 +2753,14 @@ begin
       SetNeedUpdate; // << will force to call DoRenderLayout on the next call to RenderLayout
     end;
   end;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALDoubleBufferedTextLayoutNG.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
 end;
 {$ENDIF}
 

@@ -34,8 +34,10 @@ function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
+function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single; overload;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF; overload;
+function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single): single; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
 
 {$IF defined(IOS)}
@@ -400,12 +402,10 @@ begin
   result.height := Round(Rect.height * Scale) / Scale;
 end;
 
-{*************************************************************************************}
-function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
+{*******************************************************************************************}
+function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single;
 begin
-  result := Rect;
-  result.Width := ceil(Rect.Width * Scale - TEpsilon.Vector) / Scale;
-  result.height := ceil(Rect.height * Scale - TEpsilon.Vector) / Scale;
+  result := Round(Dimension * Scale) / Scale;
 end;
 
 {*****************************************************************}
@@ -414,6 +414,20 @@ begin
   result := Rect;
   result.Width := Round(Rect.Width);
   result.height := Round(Rect.height);
+end;
+
+{*************************************************************************************}
+function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
+begin
+  result := Rect;
+  result.Width := ceil(Rect.Width * Scale - TEpsilon.Vector) / Scale;
+  result.height := ceil(Rect.height * Scale - TEpsilon.Vector) / Scale;
+end;
+
+{******************************************************************************************}
+function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single): single;
+begin
+  result := ceil(Dimension * Scale - TEpsilon.Vector) / Scale;
 end;
 
 {****************************************************************}
@@ -735,7 +749,8 @@ begin
                                            ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                             // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                             // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                            //   bounds where given text will fit
+                                                                            //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                            //   it's return for exemple 9 when height = 11
         //their is a fucking bug on android 4.4.2 that aNumberOfChars
         //is the number of Glyph and not of char, so ligature like 'fi' are
         //counted like one glyph :(
@@ -792,7 +807,8 @@ begin
                                                                               ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                                                // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                                                // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                                               //   bounds where given text will fit
+                                                                                                               //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                                               //   it's return for exemple 9 when height = 11
                                            if (aNumberOfChars < aLine.length) and
                                               (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                                              while aNumberOfChars < aLine.length  do begin
@@ -843,7 +859,8 @@ begin
                                                                              ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                                               // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                                               // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                                              //   bounds where given text will fit
+                                                                                                              //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                                              //   it's return for exemple 9 when height = 11
                                            if (aNumberOfChars < aLine.length) and
                                               (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                                              while aNumberOfChars < aLine.length  do begin
@@ -868,7 +885,8 @@ begin
                                                                          ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                                           // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                                           // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                                          //   bounds where given text will fit
+                                                                                                          //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                                          //   it's return for exemple 9 when height = 11
                                       if (aNumberOfChars < aLine.length) and
                                          (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                                         while aNumberOfChars < aLine.length  do begin
@@ -929,7 +947,8 @@ begin
                                                        ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                         // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                         // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                        //   bounds where given text will fit
+                                                                                        //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                        //   it's return for exemple 9 when height = 11
                     if (aNumberOfChars < aLine.length) and
                        (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                       while aNumberOfChars < aLine.length  do begin
@@ -954,7 +973,8 @@ begin
                                                    ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                     // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                    //   bounds where given text will fit
+                                                                                    //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                    //   it's return for exemple 9 when height = 11
                 if (aNumberOfChars < aLine.length) and
                    (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                   while aNumberOfChars < aLine.length  do begin
@@ -1002,7 +1022,8 @@ begin
                                                        ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                         // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                         // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                        //   bounds where given text will fit
+                                                                                        //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                        //   it's return for exemple 9 when height = 11
                     if (aNumberOfChars < aLine.length) and
                        (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                       while aNumberOfChars < aLine.length  do begin
@@ -1027,7 +1048,8 @@ begin
                                                    ameasuredWidth {measuredWidth}); // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
                                                                                     // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
                                                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-                                                                                    //   bounds where given text will fit
+                                                                                    //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+                                                                                    //   it's return for exemple 9 when height = 11
                 if (aNumberOfChars < aLine.length) and
                    (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
                   while aNumberOfChars < aLine.length  do begin

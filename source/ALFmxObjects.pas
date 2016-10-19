@@ -42,7 +42,9 @@ type
     fBufSize: TsizeF;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
@@ -81,7 +83,9 @@ type
     fBufSize: TsizeF;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
@@ -120,7 +124,9 @@ type
     fBufSize: TsizeF;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
@@ -172,7 +178,9 @@ type
     fBufTextBreaked: Boolean;
     //-----
     FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure DoRenderLayout; override;
@@ -386,6 +394,7 @@ begin
   fBufBitmap := nil;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   {$ENDIF}
 end;
 
@@ -395,6 +404,7 @@ begin
   clearBufBitmap;
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
   {$ENDIF}
   inherited;
 end;
@@ -888,6 +898,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
+  ALLog('TALRectangle.MakeBufBitmap', 'TALRectangle.MakeBufBitmap', TalLogType.verbose);
   inc(AlDebugRectangleMakeBufBitmapCount);
   AlDebugRectangleMakeBufBitmapStopWatch.Start;
   try
@@ -1318,6 +1329,14 @@ begin
 end;
 {$ENDIF}
 
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALRectangle.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
 {***********************************************}
 constructor TALCircle.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
@@ -1329,6 +1348,7 @@ begin
   fBufBitmap := nil;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   {$ENDIF}
 end;
 
@@ -1338,6 +1358,7 @@ begin
   clearBufBitmap;
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
   {$ENDIF}
   inherited;
 end;
@@ -1424,6 +1445,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
+  ALLog('TALCircle.MakeBufBitmap', 'TALCircle.MakeBufBitmap', TalLogType.verbose);
   inc(AlDebugCircleMakeBufBitmapCount);
   AlDebugCircleMakeBufBitmapStopWatch.Start;
   try
@@ -1868,6 +1890,14 @@ begin
 end;
 {$ENDIF}
 
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALCircle.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
 {*********************************************}
 constructor TALLine.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
@@ -1879,6 +1909,7 @@ begin
   fBufBitmap := nil;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   {$ENDIF}
 end;
 
@@ -1888,6 +1919,7 @@ begin
   clearBufBitmap;
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
   {$ENDIF}
   inherited;
 end;
@@ -1960,6 +1992,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
+  ALLog('TALLine.MakeBufBitmap', 'TALLine.MakeBufBitmap', TalLogType.verbose);
   inc(AlDebugLineMakeBufBitmapCount);
   AlDebugLineMakeBufBitmapStopWatch.Start;
   try
@@ -2263,6 +2296,14 @@ end;
 {$ENDIF}
 
 {************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALLine.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************}
 {$IF defined(android) or defined(IOS)}
 constructor TALDoubleBufferedTextLayoutNG.Create(const ACanvas: TCanvas; const aTextControl: TALText);
 var aScreenSrv: IFMXScreenService;
@@ -2274,6 +2315,7 @@ begin
   fBufBitmap := nil;
   fTextControl := aTextControl;
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
 end;
 {$ENDIF}
 
@@ -2283,6 +2325,7 @@ destructor TALDoubleBufferedTextLayoutNG.Destroy;
 begin
   clearBufBitmap;
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
   inherited;
 end;
 {$ENDIF}
@@ -2374,6 +2417,7 @@ begin
   fBufText := fTextControl.Text;
 
   {$IFDEF debug}
+  ALLog('TALDoubleBufferedTextLayoutNG.MakeBufBitmap', 'TALDoubleBufferedTextLayoutNG.MakeBufBitmap - text:' + fBufText, TalLogType.verbose);
   inc(AlDebugTextMakeBufBitmapCount);
   AlDebugTextMakeBufBitmapStopWatch.Start;
   try
@@ -2759,6 +2803,14 @@ end;
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 procedure TALDoubleBufferedTextLayoutNG.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALDoubleBufferedTextLayoutNG.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
 begin
   clearBufBitmap;
 end;

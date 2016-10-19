@@ -441,7 +441,9 @@ type
     FStretch: Boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
     function GetImages: TCustomImageList;
@@ -1511,6 +1513,7 @@ begin
   FStretch := True;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   {$ENDIF}
 end;
 
@@ -1522,6 +1525,7 @@ begin
   AlFreeAndNil(FImageUncheckedLink); // >> will call disposeOf if necessary
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
   {$ENDIF}
   inherited;
 end;
@@ -1653,6 +1657,7 @@ begin
   FbufImageIndex := aImageIndex;
 
   {$IFDEF debug}
+  ALLog('TALCheckbox.MakeBufBitmap', 'TALCheckbox.MakeBufBitmap', TalLogType.verbose);
   inc(AlDebugCheckBoxMakeBufBitmapCount);
   AlDebugCheckBoxMakeBufBitmapStopWatch.Start;
   try
@@ -1822,6 +1827,14 @@ end;
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 procedure TALCheckbox.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALCheckbox.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
 begin
   clearBufBitmap;
 end;

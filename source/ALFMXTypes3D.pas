@@ -82,30 +82,40 @@ var
   M: TBitmapData;
 begin
 
-  if Source is TBitmap then begin
-    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-    PixelFormat := TBitmap(Source).PixelFormat;
-    Style := [TTextureStyle.Dynamic];
-    if fVolatile then Style := Style + [TTextureStyle.Volatile];
-    TTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
-    SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
-    if TBitmap(Source).Map(TMapAccess.Read, M) then
-    try
-      UpdateTexture(M.Data, M.Pitch);
-    finally
-      TBitmap(Source).Unmap(M);
-    end;
-  end
+  Tmonitor.enter(Self); // << because when TTexture is used in multithread then this function can be call from background
+                        //    thread when a main thread is calling ContextLostHandler/ContextResetHandler for exemple.
+                        //    so you must update the FMX.Types3D and add in ContextLostHandler/ContextResetHandler also
+                        //    Tmonitor.enter(Self) ... Tmonitor.exit(Self);
+  Try
 
-  else if Source is TBitmapSurface then begin
-    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-    Style := [TTextureStyle.Dynamic];
-    if fVolatile then Style := Style + [TTextureStyle.Volatile];
-    SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
-    UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
-  end
+    if Source is TBitmap then begin
+      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+      PixelFormat := TBitmap(Source).PixelFormat;
+      Style := [TTextureStyle.Dynamic];
+      if fVolatile then Style := Style + [TTextureStyle.Volatile];
+      TTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
+      SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
+      if TBitmap(Source).Map(TMapAccess.Read, M) then
+      try
+        UpdateTexture(M.Data, M.Pitch);
+      finally
+        TBitmap(Source).Unmap(M);
+      end;
+    end
 
-  else inherited ;
+    else if Source is TBitmapSurface then begin
+      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+      Style := [TTextureStyle.Dynamic];
+      if fVolatile then Style := Style + [TTextureStyle.Volatile];
+      SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
+      UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
+    end
+
+    else inherited ;
+
+  Finally
+    Tmonitor.exit(Self);
+  End;
 
 end;
 

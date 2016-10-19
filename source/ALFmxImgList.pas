@@ -33,7 +33,9 @@ type
     FbufImageIndex: TImageIndex;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
@@ -109,6 +111,7 @@ begin
   Autohide := False;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   {$ENDIF}
 end;
 
@@ -118,6 +121,7 @@ begin
   clearBufBitmap;
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
   {$ENDIF}
   inherited;
 end;
@@ -165,6 +169,7 @@ begin
   FbufImageIndex := ImageIndex;
 
   {$IFDEF debug}
+  ALLog('TALGlyph.MakeBufBitmap', 'TALGlyph.MakeBufBitmap', TalLogType.verbose);
   inc(AlDebugGlyphMakeBufBitmapCount);
   AlDebugGlyphMakeBufBitmapStopWatch.Start;
   try
@@ -261,6 +266,14 @@ end;
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 procedure TALGlyph.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALGlyph.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
 begin
   clearBufBitmap;
 end;

@@ -12,7 +12,7 @@ type
   {$IF CompilerVersion <> 31}
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
-  TTextureAccessPrivate = class
+  TALTextureAccessPrivate = class(TInterfacedPersistent)
   public
     FWidth: Integer;
     FHeight: Integer;
@@ -43,7 +43,9 @@ type
 implementation
 
 uses fmx.graphics,
-     fmx.surfaces;
+     fmx.surfaces,
+     ALString,
+     ALCommon;
 
 {**************************************************************}
 constructor TALTexture.Create(const aVolatile: Boolean = False);
@@ -93,7 +95,7 @@ begin
       PixelFormat := TBitmap(Source).PixelFormat;
       Style := [TTextureStyle.Dynamic];
       if fVolatile then Style := Style + [TTextureStyle.Volatile];
-      TTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
+      TALTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
       SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
       if TBitmap(Source).Map(TMapAccess.Read, M) then
       try
@@ -112,6 +114,11 @@ begin
     end
 
     else inherited ;
+
+    {$IFDEF DEBUG}
+    if TALTextureAccessPrivate(self).FBits <> nil then
+      ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatU('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsU) +' KB', TalLogType.Warn);
+    {$ENDIF}
 
   Finally
     Tmonitor.exit(Self);

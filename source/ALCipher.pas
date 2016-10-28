@@ -109,19 +109,33 @@ type
 
 {$IFNDEF NEXTGEN}
 
-var
-  /// the available CPU features, as recognized at program startup
-  ALCpuFeatures: set of
+type
+  /// the potential features, retrieved from an Intel CPU
+  // - see https://en.wikipedia.org/wiki/CPUID#EAX.3D1:_Processor_Info_and_Feature_Bits
+  TALIntelCpuFeature =
    ( { in EDX }
    cfFPU, cfVME, cfDE, cfPSE, cfTSC, cfMSR, cfPAE, cfMCE,
    cfCX8, cfAPIC, cf_d10, cfSEP, cfMTRR, cfPGE, cfMCA, cfCMOV,
    cfPAT, cfPSE36, cfPSN, cfCLFSH, cf_d20, cfDS, cfACPI, cfMMX,
-   cfFXSR, cfSSE, cfSSE2, cfSS, cfHT, cfTM, cfIA_64, cfPBE,
+   cfFXSR, cfSSE, cfSSE2, cfSS, cfHTT, cfTM, cfIA64, cfPBE,
    { in ECX }
-   cfSSE3, cf_c1, cf_c2, cfMON, cfDS_CPL, cf_c5, cf_c6, cfEIST,
-   cfTM2, cfSSSE3, cfCID, cfSSE5, cf_c12, cfCX16, cfxTPR, cf_c15,
-   cf_c16, cf_c17, cf_c18, cfSSE41, cfSSE42, cf_c21, cf_c22, cfPOPCNT,
-   cf_c24, cfAESNI, cf_c26, cf_c27, cfAVX, cf_c29, cf_c30, cf_HYP);
+   cfSSE3, cfCLMUL, cfDS64, cfMON, cfDSCPL, cfVMX, cfSMX, cfEST,
+   cfTM2, cfSSSE3, cfCID, cfSDBG, cfFMA, cfCX16, cfXTPR, cfPDCM,
+   cf_c16, cfPCID, cfDCA, cfSSE41, cfSSE42, cfX2A, cfMOVBE, cfPOPCNT,
+   cfTSC2, cfAESNI, cfXS, cfOSXS, cfAVX, cfF16C, cfRAND, cfHYP,
+   { extended features in EBX, ECX }
+   cfFSGS, cf_b01, cfSGX, cfBMI1, cfHLE, cfAVX2, cf_b06, cfSMEP, cfBMI2,
+   cfERMS, cfINVPCID, cfRTM, cfPQM, cf_b13, cfMPX, cfPQE, cfAVX512F,
+   cfAVX512DQ, cfRDSEED, cfADX, cfSMAP, cfAVX512IFMA, cfPCOMMIT,
+   cfCLFLUSH, cfCLWB, cfIPT, cfAVX512PF, cfAVX512ER, cfAVX512CD,
+   cfSHA, cfAVX512BW, cfAVX512VL, cfPREFW1, cfAVX512VBMI);
+
+  /// all features, as retrieved from an Intel CPU
+  TALIntelCpuFeatures = set of TALIntelCpuFeature;
+
+var
+  /// the available CPU features, as recognized at program startup
+  ALCpuFeatures: TALIntelCpuFeatures;
 
 
 //////////////////////
@@ -339,6 +353,39 @@ var
   // - this variable will use the fastest mean available, e.g. SSE 4.2
   // - you should use this function instead of ALCrc32cfast() nor ALCrc32csse42()
   ALStringHashCrc32: TALStringHashCrc32;
+
+
+const
+
+  CRYPT_VERIFYCONTEXT = $F0000000;
+  CRYPT_NEWKEYSET = $00000008;
+  PROV_RSA_FULL = 1;
+  MS_ENHANCED_PROV_A = ansiString('Microsoft Enhanced Cryptographic Provider v1.0');
+  MS_ENHANCED_PROV_W = string('Microsoft Enhanced Cryptographic Provider v1.0');
+
+type
+  HCRYPTPROV = NativeUInt;
+  PHCRYPTPROV = ^HCRYPTPROV;
+
+function CryptAcquireContextA(phProv: PHCRYPTPROV;
+                              pszContainer: PAnsiChar;
+                              pszProvider: PAnsiChar;
+                              dwProvType: DWORD;
+                              dwFlags: DWORD): BOOL; stdcall;
+function CryptAcquireContextW(phProv: PHCRYPTPROV;
+                              pszContainer: PWideChar;
+                              pszProvider: PWideChar;
+                              dwProvType: DWORD;
+                              dwFlags: DWORD): BOOL; stdcall;
+function CryptReleaseContext(hProv: HCRYPTPROV;
+                             dwFlags: DWORD): BOOL; stdcall;
+function CryptGenRandom(hProv: HCRYPTPROV;
+                        dwLen: DWORD;
+                        pbBuffer: PBYTE): BOOL; stdcall;
+
+function ALRandomBytes(const Len: Cardinal): TBytes;
+function ALRandom32(const ARange: Cardinal): cardinal;
+function ALRandom64(const ARange: UInt64): UInt64;
 
 function ALFnv1aInt32(const str: ansiString): int64; inline;
 function ALFnv1aInt64(const str: ansiString): int64; inline;
@@ -2857,46 +2904,47 @@ procedure _GetCPUID(Param: Cardinal; var Registers: _TRegisters);
 {$IF defined(CPU64BITS)}
 asm // ecx=param, rdx=Registers (Linux: edi,rsi)
   .NOFRAME
-  mov eax,ecx
-  mov r9,rdx
-  mov r10,rbx // preserve rbx
-  xor ebx,ebx
-  xor ecx,ecx
-  xor edx,edx
+  mov     eax, ecx
+  mov     r9, rdx
+  mov     r10, rbx // preserve rbx
+  xor     ebx, ebx
+  xor     ecx, ecx
+  xor     edx, edx
   cpuid
-  mov _TRegisters(r9).&eax,eax
-  mov _TRegisters(r9).&ebx,ebx
-  mov _TRegisters(r9).&ecx,ecx
-  mov _TRegisters(r9).&edx,edx
-  mov rbx,r10
+  mov     _TRegisters(r9).&eax, eax
+  mov     _TRegisters(r9).&ebx, ebx
+  mov     _TRegisters(r9).&ecx, ecx
+  mov     _TRegisters(r9).&edx, edx
+  mov     rbx, r10
 end;
 {$else}
 asm
-  push esi
-  push edi
-  mov esi,edx
-  mov edi,eax
+  push    esi
+  push    edi
+  mov     esi, edx
+  mov     edi, eax
   pushfd
-  pop eax
-  mov edx,eax
-  xor eax,$200000
-  push eax
+  pop     eax
+  mov     edx, eax
+  xor     eax, $200000
+  push    eax
   popfd
   pushfd
-  pop eax
-  xor eax,edx
-  jz @nocpuid
-  push ebx
-  mov eax,edi
+  pop     eax
+  xor     eax, edx
+  jz      @nocpuid
+  push    ebx
+  mov     eax, edi
+  xor     ecx, ecx
   cpuid
-  mov _TRegisters(esi).&eax,eax
-  mov _TRegisters(esi).&ebx,ebx
-  mov _TRegisters(esi).&ecx,ecx
-  mov _TRegisters(esi).&edx,edx
-  pop ebx
+  mov     _TRegisters(esi).&eax, eax
+  mov     _TRegisters(esi).&ebx, ebx
+  mov     _TRegisters(esi).&ecx, ecx
+  mov     _TRegisters(esi).&edx, edx
+  pop     ebx
 @nocpuid:
-  pop edi
-  pop esi
+  pop     edi
+  pop     esi
 end;
 {$ifend}
 
@@ -3135,6 +3183,76 @@ begin
    Result:=ALCrc32cfast(0, Pointer(@str[1]), Length(str));
 end;
 
+{***************************************************************************}
+function CryptAcquireContextA; external ADVAPI32 name 'CryptAcquireContextA';
+
+{***************************************************************************}
+function CryptAcquireContextW; external ADVAPI32 name 'CryptAcquireContextW';
+
+{*************************************************************************}
+function CryptReleaseContext; external ADVAPI32 name 'CryptReleaseContext';
+
+{***************************************************************}
+function CryptGenRandom; external ADVAPI32 name 'CryptGenRandom';
+
+{**************************************************}
+function ALRandomBytes(const Len: Cardinal): TBytes;
+var hProv: HCRYPTPROV;
+begin
+  if (not CryptAcquireContextA(@hProv,
+                               nil,
+                               MS_ENHANCED_PROV_A,
+                               PROV_RSA_FULL,
+                               CRYPT_VERIFYCONTEXT)) and
+     (not CryptAcquireContextA(@hProv,
+                               nil,
+                               MS_ENHANCED_PROV_A,
+                               PROV_RSA_FULL,
+                               CRYPT_NEWKEYSET + CRYPT_VERIFYCONTEXT)) then raiselastOsError;
+  try
+    SetLength(Result,Len);
+    if not CryptGenRandom(hProv,Len,@Result[0]) then raiselastOsError;
+  finally
+    CryptReleaseContext(hProv,0);
+  end;
+end;
+
+{***********************************************}
+// from synCrypto.pas of Synopse mORMot framework
+// get 32-bit value from NIST SP 800-90A compliant RDRAND Intel x86/x64 opcode
+// https://software.intel.com/en-us/articles/intel-digital-random-number-generator-drng-software-implementation-guide
+function _RdRand32: cardinal;
+{$ifdef CPU64BITS}
+asm
+  .noframe
+{$ELSE}
+asm
+{$endif}
+  // rdrand eax: same opcodes for x86 and x64
+  db $0f,$c7,$f0
+  // returns in eax, ignore carry flag (eax=0 won't hurt)
+end;
+
+{****************************************************}
+function ALRandom32(const ARange: Cardinal): cardinal;
+var aBytes: Tbytes;
+begin
+  if cfRAND in ALCpuFeatures then begin
+    result := _RdRand32 mod ARange;
+    exit;
+  end;
+  aBytes := ALRandomBytes(sizeOf(result));
+  move(aBytes[0],result,sizeOf(result));
+  result := result mod ARange;
+end;
+
+{************************************************}
+function ALRandom64(const ARange: UInt64): UInt64;
+begin
+  Result := (UInt64(ALRandom32(ALMAXUInt)) shl 32) or ((UInt64(ALRandom32(ALMAXUInt)) shl 32) shr 32);
+  result := result mod ARange;
+end;
+
 {******************************}
 procedure _TestIntelCpuFeatures;
 var regs: _TRegisters;
@@ -3144,6 +3262,9 @@ begin
   _GetCPUID(1,regs);
   PIntegerArray(@ALCpuFeatures)^[0] := regs.edx;
   PIntegerArray(@ALCpuFeatures)^[1] := regs.ecx;
+  _GetCPUID(7,regs);
+  PIntegerArray(@ALCpuFeatures)^[2] := regs.ebx;
+  PByteArray(@ALCpuFeatures)^[12] := regs.ecx;
 end;
 
 {$ENDIF}

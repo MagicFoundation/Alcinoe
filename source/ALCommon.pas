@@ -88,7 +88,7 @@ Function ALInc(var x: integer; Count: integer): Integer;
 const ALMAXUInt64: UInt64 = 18446744073709551615;
       ALMAXInt64: Int64 = 9223372036854775807;
       ALMAXUInt: cardinal = 4294967295;
-      ALMAXInt: integer = 2147483647; // this is unecessarily because MAXINT system const exists but just for consistency
+      ALMAXInt: int32 = 2147483647;
       ALNullDate = -0.5; // There are no TDateTime values from –1 through 0
                          // dt := -0.5;
                          // writeln(formatFloat('0.0', dt));                    => -0.5

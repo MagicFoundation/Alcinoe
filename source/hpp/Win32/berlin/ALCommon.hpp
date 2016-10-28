@@ -29,7 +29,8 @@ typedef void __fastcall (__closure *TALCustomDelayedFreeObjectProc)(System::TObj
 extern DELPHI_PACKAGE TALCustomDelayedFreeObjectProc ALCustomDelayedFreeObjectProc;
 extern DELPHI_PACKAGE unsigned __int64 ALMAXUInt64;
 extern DELPHI_PACKAGE __int64 ALMAXInt64;
-extern DELPHI_PACKAGE int ALMAXINT;
+extern DELPHI_PACKAGE unsigned ALMAXUInt;
+extern DELPHI_PACKAGE int ALMAXInt;
 #define ALNullDate  (-5.000000E-01)
 extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, const System::UnicodeString msg, const TalLogType _type = (TalLogType)(0x2));
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);

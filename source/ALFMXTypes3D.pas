@@ -43,9 +43,7 @@ type
 implementation
 
 uses fmx.graphics,
-     fmx.surfaces,
-     ALString,
-     ALCommon;
+     fmx.surfaces;
 
 {**************************************************************}
 constructor TALTexture.Create(const aVolatile: Boolean = False);

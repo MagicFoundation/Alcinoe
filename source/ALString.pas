@@ -119,8 +119,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses ALInit,
-     {$IFDEF MSWINDOWS}
+uses {$IFDEF MSWINDOWS}
        Winapi.Windows,
      {$ENDIF}
      System.SysUtils,
@@ -131,6 +130,7 @@ uses ALInit,
      {$IFDEF MACOS}
        Macapi.CoreFoundation,
      {$ENDIF MACOS}
+     ALInit,
      ALStringList;
 
 resourcestring

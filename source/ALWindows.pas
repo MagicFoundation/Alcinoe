@@ -54,11 +54,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows;
-     {$ELSE}
-     Windows;
-     {$IFEND}
+uses Winapi.Windows;
 
 type
 
@@ -76,10 +72,7 @@ type
   TALMemoryStatusEx = _ALMEMORYSTATUSEX;
 
 function ALGlobalMemoryStatusEx(var lpBuffer : TALMEMORYSTATUSEX): BOOL; stdcall; // Windows XP / Windows Server 2003
-Var ALInterlockedCompareExchange64: function(var Destination: LONGLONG; Exchange, Comperand: LONGLONG): LONGLONG; stdcall; // from Windows Vista / Windows Server 2003
 Var ALGetTickCount64: function: int64; stdcall; // from Windows Vista / Windows Server 2008
-Var ALSetProcessWorkingSetSizeEx: function(hProcess: THandle; dwMinimumWorkingSetSize, dwMaximumWorkingSetSize: {$if CompilerVersion >= 23}{Delphi XE2}Size_T{$ELSE}Cardinal{$IFEND}; Flags: DWORD): BOOL; stdcall; // from Windows Vista / Windows Server 2003
-function ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
 function ALCreateProcessWithLogonW(lpUsername: LPCWSTR;  // LPCWSTR
                                    lpDomain: LPCWSTR;  // LPCWSTR
                                    lpPassword: LPCWSTR; // LPCWSTR
@@ -106,12 +99,8 @@ const INVALID_SET_FILE_POINTER = DWORD(-1);
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
+uses System.Ansistrings,
      System.SysUtils;
-     {$ELSE}
-     SysUtils;
-     {$IFEND}
 
 {*****************************************************************************}
 function ALGlobalMemoryStatusEx; external kernel32 name 'GlobalMemoryStatusEx';
@@ -121,14 +110,6 @@ function ALCreateProcessWithLogonW; external advapi32 name 'CreateProcessWithLog
 
 {*************************************************************}
 function AttachConsole; external kernel32 name 'AttachConsole';
-
-{*********************************************************************************}
-function  ALInterlockedExchange64(var Target: LONGLONG; Value: LONGLONG): LONGLONG;
-begin
-  repeat
-    Result := Target;
-  until (ALInterlockedCompareExchange64(Target, Value, Result) = Result);
-end;
 
 {******************************************}
 function ALGetTickCount64XP: int64; stdcall;
@@ -146,8 +127,6 @@ begin
   if kernel32 = 0 then RaiseLastOSError;
   @ALGetTickCount64 := GetProcAddress(kernel32, 'GetTickCount64');
   if not Assigned(ALGetTickCount64) then ALGetTickCount64 := ALGetTickCount64XP;
-  @ALInterlockedCompareExchange64 := GetProcAddress(kernel32, 'InterlockedCompareExchange64');
-  @ALSetProcessWorkingSetSizeEx := GetProcAddress(kernel32, 'SetProcessWorkingSetSizeEx');
 end;
 
 {**********************************************************}
@@ -174,7 +153,7 @@ begin
                      NameUse); // var peUse: SID_NAME_USE
 
   // init buffers according to retrieved data
-  szDomain := {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}AnsiStrAlloc(cbDomain);
+  szDomain := System.Ansistrings.AnsiStrAlloc(cbDomain);
   SID      := AllocMem(cbSID);
   try
 
@@ -188,7 +167,7 @@ begin
                                  NameUse);
 
   finally
-    {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings.{$IFEND}StrDispose(szDomain);
+    System.Ansistrings.StrDispose(szDomain);
     FreeMem(SID);
   end;
 

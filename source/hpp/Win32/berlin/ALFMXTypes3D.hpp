@@ -23,13 +23,13 @@
 namespace Alfmxtypes3d
 {
 //-- forward type declarations -----------------------------------------------
-class DELPHICLASS TTextureAccessPrivate;
+class DELPHICLASS TALTextureAccessPrivate;
 class DELPHICLASS TALTexture;
 //-- type declarations -------------------------------------------------------
 #pragma pack(push,4)
-class PASCALIMPLEMENTATION TTextureAccessPrivate : public System::TObject
+class PASCALIMPLEMENTATION TALTextureAccessPrivate : public System::Classes::TInterfacedPersistent
 {
-	typedef System::TObject inherited;
+	typedef System::Classes::TInterfacedPersistent inherited;
 	
 public:
 	int FWidth;
@@ -45,8 +45,10 @@ public:
 	int FContextLostId;
 	int FContextResetId;
 public:
-	/* TObject.Create */ inline __fastcall TTextureAccessPrivate(void) : System::TObject() { }
-	/* TObject.Destroy */ inline __fastcall virtual ~TTextureAccessPrivate(void) { }
+	/* TPersistent.Destroy */ inline __fastcall virtual ~TALTextureAccessPrivate(void) { }
+	
+public:
+	/* TObject.Create */ inline __fastcall TALTextureAccessPrivate(void) : System::Classes::TInterfacedPersistent() { }
 	
 };
 

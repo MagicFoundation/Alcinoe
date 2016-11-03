@@ -1762,7 +1762,7 @@ begin
             SetString(FTokenAsString, start, cp - start);
             FTokenAsString := ALDequotedStr(FTokenAsString, FTokenAsString[1]);
             if FTokenAsString = '' then FTokenAsNumber := 0
-            else FTokenAsNumber := ALStringHashCrc32(FTokenAsString);
+            else FTokenAsNumber := ALFnv1aInt64(FTokenAsString);
           end;
           
           FCurrTok := etNumber;

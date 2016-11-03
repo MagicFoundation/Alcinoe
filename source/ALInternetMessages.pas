@@ -789,7 +789,8 @@ begin
 
   Result:= CheckAllowedname(namePart) and
            CheckAllowedHostname(serverPart) and
-           CheckAllowedExt(ExtPart);
+           CheckAllowedExt(ExtPart) and
+           (length(Value) <= 254); // http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
 end;
 
 end.

@@ -512,6 +512,7 @@ implementation
 uses System.SysUtils,
      System.SysConst,
      System.TypInfo,
+     System.Math,
      ALCommon,
      ALString;
 
@@ -812,7 +813,7 @@ end;
 {***************************************************************************}
 function TALIntegerList.CompareItems(const Index1, Index2: integer): Integer;
 begin
-  result := PALIntegerListItem(Get(Index1))^.FInteger - PALIntegerListItem(Get(Index2))^.FInteger;
+  result := CompareValue(PALIntegerListItem(Get(Index1))^.FInteger, PALIntegerListItem(Get(Index2))^.FInteger);
 end;
 
 {***********************************************************************}
@@ -1008,8 +1009,8 @@ end;
 function TALCardinalList.Find(item: Cardinal; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {--------------------------------------------------}
-  Function _CompareCardinal(D1,D2: Cardinal): Integer;
+  {---------------------------------------------------------}
+  Function _CompareCardinal(D1,D2: Cardinal): Integer; inline
   Begin
     if D1 < D2 then result := -1
     else if D1 > D2 then result := 1
@@ -1192,33 +1193,20 @@ end;
 
 {*************************************************************************}
 function TALInt64List.CompareItems(const Index1, Index2: integer): Integer;
-var aInt64: Int64;
 begin
-  aInt64 := PALInt64ListItem(Get(Index1))^.FInt64 - PALInt64ListItem(Get(Index2))^.FInt64;
-  if aInt64 < 0 then result := -1
-  else if aInt64 > 0 then result := 1
-  else result := 0;
+  result := compareValue(PALInt64ListItem(Get(Index1))^.FInt64, PALInt64ListItem(Get(Index2))^.FInt64);
 end;
 
 {*******************************************************************}
 function TALInt64List.Find(item: Int64; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
-
-  {--------------------------------------------}
-  Function _CompareInt64(D1,D2: Int64): Integer;
-  Begin
-    if D1 < D2 then result := -1
-    else if D1 > D2 then result := 1
-    else result := 0;
-  end;
-
 begin
   Result := False;
   L := 0;
   H := FCount - 1;
   while L <= H do begin
     I := (L + H) shr 1;
-    C := _CompareInt64(GetItem(I),item);
+    C := CompareValue(GetItem(I),item);
     if C < 0 then L := I + 1
     else begin
       H := I - 1;
@@ -1388,11 +1376,13 @@ end;
 
 {*****************************************************************************}
 function TALNativeIntList.CompareItems(const Index1, Index2: integer): Integer;
-var aNativeInt: NativeInt;
+var aNativeInt1: Cardinal;
+    aNativeInt2: Cardinal;
 begin
-  aNativeInt := PALNativeIntListItem(Get(Index1))^.FNativeInt - PALNativeIntListItem(Get(Index2))^.FNativeInt;
-  if aNativeInt < 0 then result := -1
-  else if aNativeInt > 0 then result := 1
+  aNativeInt1 := PALNativeIntListItem(Get(Index1))^.FNativeInt;
+  aNativeInt2 := PALNativeIntListItem(Get(Index2))^.FNativeInt;
+  if aNativeInt1 < aNativeInt2 then result := -1
+  else if aNativeInt1 > aNativeInt2 then result := 1
   else result := 0;
 end;
 
@@ -1400,8 +1390,8 @@ end;
 function TALNativeIntList.Find(item: NativeInt; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {----------------------------------------------------}
-  Function _CompareNativeInt(D1,D2: NativeInt): Integer;
+  {------------------------------------------------------------}
+  Function _CompareNativeInt(D1,D2: NativeInt): Integer; inline;
   Begin
     if D1 < D2 then result := -1
     else if D1 > D2 then result := 1
@@ -1584,33 +1574,20 @@ end;
 
 {**************************************************************************}
 function TALDoubleList.CompareItems(const Index1, Index2: integer): Integer;
-var aDouble: Double;
 begin
-  aDouble := PALDoubleListItem(Get(Index1))^.FDouble - PALDoubleListItem(Get(Index2))^.FDouble;
-  if adouble < 0 then result := -1
-  else if adouble > 0 then result := 1
-  else result := 0;
+  result := compareValue(PALDoubleListItem(Get(Index1))^.FDouble, PALDoubleListItem(Get(Index2))^.FDouble);
 end;
 
 {*********************************************************************}
 function TALDoubleList.Find(item: Double; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
-
-  {----------------------------------------------}
-  Function _CompareDouble(D1,D2: Double): Integer;
-  Begin
-    if D1 < D2 then result := -1
-    else if D1 > D2 then result := 1
-    else result := 0;
-  end;
-
 begin
   Result := False;
   L := 0;
   H := FCount - 1;
   while L <= H do begin
     I := (L + H) shr 1;
-    C := _CompareDouble(GetItem(I),item);
+    C := compareValue(GetItem(I),item);
     if C < 0 then L := I + 1
     else begin
       H := I - 1;
@@ -1649,7 +1626,7 @@ begin
   if not Sorted then Begin
     Result := 0;
     while (Result < FCount) and (GetItem(result) <> Item) do Inc(Result);
-    if Result = FCount then Result := -1;
+    if sameValue(Result, FCount) then Result := -1;
   end
   else if not Find(Item, Result) then Result := -1;
 end;

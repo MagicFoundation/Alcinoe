@@ -872,7 +872,7 @@ end;
 {*******************************************************************}
 procedure TALIntegerList.Insert(Index: Integer; const Item: Integer);
 begin
-  InsertObject(Index, index, nil);
+  InsertObject(Index, Item, nil);
 end;
 
 {*******************************************************************************************}
@@ -1070,7 +1070,7 @@ end;
 {*********************************************************************}
 procedure TALCardinalList.Insert(Index: Integer; const Item: Cardinal);
 begin
-  InsertObject(Index, index, nil);
+  InsertObject(Index, Item, nil);
 end;
 
 {*********************************************************************************************}
@@ -1253,7 +1253,7 @@ end;
 {***************************************************************}
 procedure TALInt64List.Insert(Index: Integer; const Item: Int64);
 begin
-  InsertObject(Index, index, nil);
+  InsertObject(Index, Item, nil);
 end;
 
 {***************************************************************************************}
@@ -1451,7 +1451,7 @@ end;
 {***********************************************************************}
 procedure TALNativeIntList.Insert(Index: Integer; const Item: NativeInt);
 begin
-  InsertObject(Index, index, nil);
+  InsertObject(Index, Item, nil);
 end;
 
 {***********************************************************************************************}
@@ -1634,7 +1634,7 @@ end;
 {*****************************************************************}
 procedure TALDoubleList.Insert(Index: Integer; const Item: Double);
 begin
-  InsertObject(Index, index, nil);
+  InsertObject(Index, Item, nil);
 end;
 
 {*****************************************************************************************}

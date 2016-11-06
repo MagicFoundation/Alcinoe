@@ -653,9 +653,19 @@ Procedure ALJSONToXML(const aJSONNode: TALJsonNode;
                       const aXMLNode: TALXmlNode;
                       const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
 
-function ALJsonEncodeWithNodeSubTypeHelperFunction(const aValue: AnsiString;
-                                                   const aNodeSubType: TALJSONNodeSubType;
-                                                   const aFormatSettings: TALFormatSettings): AnsiString;
+function ALJsonEncodeFloatWithNodeSubTypeHelper(const aValue: double): AnsiString;
+function ALJsonEncodeTextWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+function ALJsonEncodeBinaryWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+function ALJsonEncodeObjectIDWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+function ALJsonEncodeBooleanWithNodeSubTypeHelper(const aValue: Boolean): AnsiString;
+function ALJsonEncodeDateTimeWithNodeSubTypeHelper(const aValue: TdateTime): AnsiString;
+function ALJsonEncodeJavascriptWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+function ALJsonEncodeInt64WithNodeSubTypeHelper(const aValue: int64): AnsiString;
+function ALJsonEncodeInt32WithNodeSubTypeHelper(const aValue: int32): AnsiString;
+function ALJsonEncodeNullWithNodeSubTypeHelper: AnsiString;
+function ALJsonEncodeWithNodeSubTypeHelper(const aValue: AnsiString;
+                                           const aNodeSubType: TALJSONNodeSubType;
+                                           const aFormatSettings: TALFormatSettings): AnsiString;
 
 function ALJSONTryStrToRegEx(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): boolean;
 function ALJSONTryStrTobinary(const S: AnsiString; out Data: AnsiString; out Subtype: byte): boolean; // return a "byte" string
@@ -1057,9 +1067,19 @@ procedure ALTStringsToJsonU(const aLst: TALStringsU;
                             Const aNameToLowerCase: boolean = false;
                             Const aNullStr: String = 'null');
 
-function ALJsonEncodeWithNodeSubTypeHelperFunctionU(const aValue: String;
-                                                    const aNodeSubType: TALJSONNodeSubType;
-                                                    const aFormatSettings: TALformatSettingsU): String;
+function ALJsonEncodeFloatWithNodeSubTypeHelperU(const aValue: double): String;
+function ALJsonEncodeTextWithNodeSubTypeHelperU(const aValue: String): String;
+function ALJsonEncodeBinaryWithNodeSubTypeHelperU(const aValue: String): String;
+function ALJsonEncodeObjectIDWithNodeSubTypeHelperU(const aValue: String): String;
+function ALJsonEncodeBooleanWithNodeSubTypeHelperU(const aValue: Boolean): String;
+function ALJsonEncodeDateTimeWithNodeSubTypeHelperU(const aValue: TdateTime): String;
+function ALJsonEncodeJavascriptWithNodeSubTypeHelperU(const aValue: String): String;
+function ALJsonEncodeInt64WithNodeSubTypeHelperU(const aValue: int64): String;
+function ALJsonEncodeInt32WithNodeSubTypeHelperU(const aValue: int32): String;
+function ALJsonEncodeNullWithNodeSubTypeHelperU: String;
+function ALJsonEncodeWithNodeSubTypeHelperU(const aValue: String;
+                                            const aNodeSubType: TALJSONNodeSubType;
+                                            const aFormatSettings: TALformatSettingsU): String;
 
 function ALJSONTryStrToRegExU(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): boolean;
 function ALJSONTryStrTobinaryU(const S: String; out Data: String; out Subtype: byte): boolean; // return a base64 encoded string
@@ -6668,26 +6688,86 @@ begin
               aDefaultXMLElementNameForJSONArrayEntries);
 end;
 
-{**************************************************************************}
-function ALJsonEncodeWithNodeSubTypeHelperFunction(const aValue: AnsiString;
-                                                   const aNodeSubType: TALJSONNodeSubType;
-                                                   const aFormatSettings: TALFormatSettings): AnsiString;
+{********************************************************************************}
+function ALJsonEncodeFloatWithNodeSubTypeHelper(const aValue: double): AnsiString;
+begin
+  result := ALFloatToStr(aValue, ALDefaultFormatSettings);
+end;
+
+{***********************************************************************************}
+function ALJsonEncodeTextWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+begin
+  result := '"'+ALJavascriptEncode(aValue)+'"';
+end;
+
+{*************************************************************************************}
+function ALJsonEncodeBinaryWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+begin
+  result := 'BinData(0, "' + ALBase64EncodeString(aValue) + '")';
+end;
+
+{***************************************************************************************}
+function ALJsonEncodeObjectIDWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+begin
+  result := 'ObjectId("'+albintohex(aValue)+'")';
+end;
+
+{***********************************************************************************}
+function ALJsonEncodeBooleanWithNodeSubTypeHelper(const aValue: Boolean): AnsiString;
+begin
+  if aValue then result := 'true'
+  else result := 'false';
+end;
+
+{**************************************************************************************}
+function ALJsonEncodeDateTimeWithNodeSubTypeHelper(const aValue: TdateTime): AnsiString;
+begin
+  result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettings);
+end;
+
+{*****************************************************************************************}
+function ALJsonEncodeJavascriptWithNodeSubTypeHelper(const aValue: AnsiString): AnsiString;
+begin
+  result := aValue;
+end;
+
+{*******************************************************************************}
+function ALJsonEncodeInt64WithNodeSubTypeHelper(const aValue: int64): AnsiString;
+begin
+  result := 'NumberLong(' + ALIntToStr(aValue) + ')';
+end;
+
+{*******************************************************************************}
+function ALJsonEncodeInt32WithNodeSubTypeHelper(const aValue: int32): AnsiString;
+begin
+  result := 'NumberInt(' + ALIntToStr(aValue) + ')';
+end;
+
+{*********************************************************}
+function ALJsonEncodeNullWithNodeSubTypeHelper: AnsiString;
+begin
+  result := 'null';
+end;
+
+{******************************************************************}
+function ALJsonEncodeWithNodeSubTypeHelper(const aValue: AnsiString;
+                                           const aNodeSubType: TALJSONNodeSubType;
+                                           const aFormatSettings: TALFormatSettings): AnsiString;
 begin
   case aNodeSubType of
     nstFloat:      begin
-                     if @aFormatSettings <> @ALDefaultFormatSettings then result := ALFloatToStr(ALStrToFloat(aValue, aFormatSettings), ALDefaultFormatSettings)
+                     if @aFormatSettings <> @ALDefaultFormatSettings then result := ALJsonEncodeFloatWithNodeSubTypeHelper(ALStrToFloat(aValue, aFormatSettings))
                      else result := aValue;
                    end;
-    nstText:       result := '"'+ALJavascriptEncode(aValue)+'"';
-    nstBinary:     result := 'BinData(0, "' + ALBase64EncodeString(aValue) + '")';
-    nstObjectID:   result := 'ObjectId("'+albintohex(aValue)+'")';
-    nstBoolean:    if ALStrToBool(aValue) then result := 'true'
-                   else result := 'false';
-    nstDateTime:   result := ALFormatDateTime('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTime(aValue, aFormatSettings), ALDefaultFormatSettings);
-    nstJavascript: result := aValue;
-    nstInt32:      result := 'NumberInt(' + ALIntToStr(ALstrToInt(aValue)) + ')';
-    nstInt64:      result := 'NumberLong(' + ALIntToStr(ALstrToInt64(aValue)) + ')';
-    nstNull:       result := 'null';
+    nstText:       result := ALJsonEncodeTextWithNodeSubTypeHelper(aValue);
+    nstBinary:     result := ALJsonEncodeBinaryWithNodeSubTypeHelper(aValue);
+    nstObjectID:   result := ALJsonEncodeObjectIDWithNodeSubTypeHelper(aValue);
+    nstBoolean:    result := ALJsonEncodeBooleanWithNodeSubTypeHelper(ALStrToBool(aValue));
+    nstDateTime:   result := ALJsonEncodeDateTimeWithNodeSubTypeHelper(ALStrToDateTime(aValue, aFormatSettings));
+    nstJavascript: result := ALJsonEncodeJavascriptWithNodeSubTypeHelper(aValue);
+    nstInt32:      result := ALJsonEncodeInt32WithNodeSubTypeHelper(ALstrToInt(aValue));
+    nstInt64:      result := ALJsonEncodeInt64WithNodeSubTypeHelper(ALstrToInt64(aValue));
+    nstNull:       result := ALJsonEncodeNullWithNodeSubTypeHelper;
     nstObject:     raise Exception.Create('Unsupported Node SubType');
     nstArray:      raise Exception.Create('Unsupported Node SubType');
     nstRegEx:      raise Exception.Create('Unsupported Node SubType');
@@ -12187,26 +12267,86 @@ begin
 
 end;
 
-{***********************************************************************}
-function ALJsonEncodeWithNodeSubTypeHelperFunctionU(const aValue: String;
-                                                    const aNodeSubType: TALJSONNodeSubType;
-                                                    const aFormatSettings: TALformatSettingsU): String;
+{*****************************************************************************}
+function ALJsonEncodeFloatWithNodeSubTypeHelperU(const aValue: double): String;
+begin
+  result := ALFloatToStrU(aValue, ALDefaultFormatSettingsU);
+end;
+
+{****************************************************************************}
+function ALJsonEncodeTextWithNodeSubTypeHelperU(const aValue: String): String;
+begin
+  result := '"'+ALJavascriptEncodeU(aValue)+'"';
+end;
+
+{******************************************************************************}
+function ALJsonEncodeBinaryWithNodeSubTypeHelperU(const aValue: String): String;
+begin
+  result := 'BinData(0, "' + aValue + '")';
+end;
+
+{********************************************************************************}
+function ALJsonEncodeObjectIDWithNodeSubTypeHelperU(const aValue: String): String;
+begin
+  result := 'ObjectId("'+aValue+'")';
+end;
+
+{********************************************************************************}
+function ALJsonEncodeBooleanWithNodeSubTypeHelperU(const aValue: Boolean): String;
+begin
+  if aValue then result := 'true'
+  else result := 'false';
+end;
+
+{***********************************************************************************}
+function ALJsonEncodeDateTimeWithNodeSubTypeHelperU(const aValue: TdateTime): String;
+begin
+  result := ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsU);
+end;
+
+{**********************************************************************************}
+function ALJsonEncodeJavascriptWithNodeSubTypeHelperU(const aValue: String): String;
+begin
+  result := aValue;
+end;
+
+{****************************************************************************}
+function ALJsonEncodeInt64WithNodeSubTypeHelperU(const aValue: int64): String;
+begin
+  result := 'NumberLong(' + ALIntToStrU(aValue) + ')';
+end;
+
+{****************************************************************************}
+function ALJsonEncodeInt32WithNodeSubTypeHelperU(const aValue: int32): String;
+begin
+  result := 'NumberInt(' + ALIntToStrU(aValue) + ')';
+end;
+
+{******************************************************}
+function ALJsonEncodeNullWithNodeSubTypeHelperU: String;
+begin
+  result := 'null';
+end;
+
+{***************************************************************}
+function ALJsonEncodeWithNodeSubTypeHelperU(const aValue: String;
+                                            const aNodeSubType: TALJSONNodeSubType;
+                                            const aFormatSettings: TALformatSettingsU): String;
 begin
   case aNodeSubType of
     nstFloat:      begin
-                     if @aFormatSettings <> @ALDefaultFormatSettingsU then result := ALFloatToStrU(ALStrToFloatU(aValue, aFormatSettings), ALDefaultFormatSettingsU)
+                     if @aFormatSettings <> @ALDefaultFormatSettings then result := ALJsonEncodeFloatWithNodeSubTypeHelperU(ALStrToFloatU(aValue, aFormatSettings))
                      else result := aValue;
                    end;
-    nstText:       result := '"'+ALJavascriptEncodeU(aValue)+'"';
-    nstBinary:     result := 'BinData(0, "' + aValue + '")';
-    nstObjectID:   result := 'ObjectId("'+aValue+'")';
-    nstBoolean:    if ALStrToBoolU(aValue) then result := 'true'
-                   else result := 'false';
-    nstDateTime:   result := ALFormatDateTimeU('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', ALStrToDateTimeU(aValue, aFormatSettings), ALDefaultFormatSettingsU);
-    nstJavascript: result := aValue;
-    nstInt32:      result := 'NumberInt(' + alinttostrU(ALstrToIntU(aValue)) + ')';
-    nstInt64:      result := 'NumberLong(' + alinttostrU(ALstrToInt64U(aValue)) + ')';
-    nstNull:       result := 'null';
+    nstText:       result := ALJsonEncodeTextWithNodeSubTypeHelperU(aValue);
+    nstBinary:     result := ALJsonEncodeBinaryWithNodeSubTypeHelperU(aValue);
+    nstObjectID:   result := ALJsonEncodeObjectIDWithNodeSubTypeHelperU(aValue);
+    nstBoolean:    result := ALJsonEncodeBooleanWithNodeSubTypeHelperU(ALStrToBoolU(aValue));
+    nstDateTime:   result := ALJsonEncodeDateTimeWithNodeSubTypeHelperU(ALStrToDateTimeU(aValue, aFormatSettings));
+    nstJavascript: result := ALJsonEncodeJavascriptWithNodeSubTypeHelperU(aValue);
+    nstInt32:      result := ALJsonEncodeInt32WithNodeSubTypeHelperU(ALstrToIntU(aValue));
+    nstInt64:      result := ALJsonEncodeInt64WithNodeSubTypeHelperU(ALstrToInt64U(aValue));
+    nstNull:       result := ALJsonEncodeNullWithNodeSubTypeHelperU;
     nstObject:     raise Exception.Create('Unsupported Node SubType');
     nstArray:      raise Exception.Create('Unsupported Node SubType');
     nstRegEx:      raise Exception.Create('Unsupported Node SubType');

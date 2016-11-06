@@ -847,8 +847,6 @@ type
       fFullCollectionName: AnsiString;
       fQuery: AnsiString;
       fReturnFieldsSelector: AnsiString;
-      FStarted: Boolean;
-      FCompleted: Boolean;
       fOnEvent: TAlMongoDBTailMonitoringThreadEvent;
       fOnException: TAlMongoDBTailMonitoringThreadException;
     protected
@@ -862,7 +860,6 @@ type
                          const aReturnFieldsSelector: AnsiString;
                          aOnEvent: TAlMongoDBTailMonitoringThreadEvent;
                          aOnError: TAlMongoDBTailMonitoringThreadException); virtual;
-      procedure AfterConstruction; override;
       Destructor Destroy; override;
       procedure Execute; override;
       property OnEvent: TAlMongoDBTailMonitoringThreadEvent read fOnEvent write fOnEvent;
@@ -2935,14 +2932,14 @@ begin
     aCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
 
     //buid the query
-    aTmpQuery := '{"findAndModify":' + ALJsonEncodeWithNodeSubTypeHelperFunction(aCollectionName,nstText,ALdefaultformatsettings);
+    aTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelper(aCollectionName);
     if query <> '' then aTmpQuery := aTmpQuery + ',"query":'+query;
     if sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+sort;
-    aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(remove),nstBoolean,ALdefaultformatsettings);
+    aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(remove);
     if update <> '' then aTmpQuery := aTmpQuery + ',"update":'+update;
-    aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(new),nstBoolean,ALdefaultformatsettings);
+    aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelper(new);
     if ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+ReturnFieldsSelector;
-    aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
+    aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(InsertIfNotFound);
     aTmpQuery := aTmpQuery + '}';
 
     //do the First query
@@ -4238,14 +4235,14 @@ begin
       aCollectionName := ALCopyStr(FullCollectionName, P1+1, maxint);
 
       //buid the query
-      aTmpQuery := '{"findAndModify":' + ALJsonEncodeWithNodeSubTypeHelperFunction(aCollectionName,nstText,ALdefaultformatsettings);
+      aTmpQuery := '{"findAndModify":' + ALJsonEncodeTextWithNodeSubTypeHelper(aCollectionName);
       if query <> '' then aTmpQuery := aTmpQuery + ',"query":'+query;
       if sort <> '' then aTmpQuery := aTmpQuery + ',"sort":'+sort;
-      aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(remove),nstBoolean,ALdefaultformatsettings);
+      aTmpQuery := aTmpQuery + ',"remove":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(remove);
       if update <> '' then aTmpQuery := aTmpQuery + ',"update":'+update;
-      aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(new),nstBoolean,ALdefaultformatsettings);
+      aTmpQuery := aTmpQuery + ',"new":' + ALJsonEncodeBooleanWithNodeSubTypeHelper(new);
       if ReturnFieldsSelector <> '' then aTmpQuery := aTmpQuery + ',"fields":'+ReturnFieldsSelector;
-      aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeWithNodeSubTypeHelperFunction(albooltostr(InsertIfNotFound),nstBoolean,ALdefaultformatsettings);
+      aTmpQuery := aTmpQuery + ',"upsert":'+ALJsonEncodeBooleanWithNodeSubTypeHelper(InsertIfNotFound);
       aTmpQuery := aTmpQuery + '}';
 
       //do the First query
@@ -4481,37 +4478,19 @@ begin
   fFullCollectionName := aFullCollectionName;
   fQuery := aQuery;
   fReturnFieldsSelector := aReturnFieldsSelector;
-  fStarted := False;
-  fcompleted := False;
   fOnEvent := aOnEvent;
   fOnException := aOnError;
   inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
-{*********************************************************}
-procedure TAlMongoDBTailMonitoringThread.AfterConstruction;
-begin
-  inherited;
-  while (not fStarted) do sleep(1);
-end;
-
 {************************************************}
 destructor TAlMongoDBTailMonitoringThread.Destroy;
 begin
-
-  //first set terminated to true
-  If not Terminated then Terminate;
-
-  //in case the execute in waiting fire the Fsignal
+  Terminate;
   fMongoDBClient.StopTailMonitoring := True;
-  while (not fCompleted) do sleep(1);
-
-  //free the fMongoDBClient
+  WaitFor;
   fMongoDBClient.Free;
-
-  //destroy the object
   inherited;
-
 end;
 
 {*************************************************************************}
@@ -4528,17 +4507,11 @@ end;
 
 {***********************************************}
 procedure TAlMongoDBTailMonitoringThread.Execute;
-var aExtData: Pointer;
 begin
-  //to be sure that the thread was stated
-  fStarted := True;
 
   //loop still not terminated
   while not Terminated do begin
     Try
-
-      //if terminated then exit;
-      if Terminated then Break;
 
       //disconnect
       fMongoDBClient.Disconnect;
@@ -4547,7 +4520,6 @@ begin
       fMongoDBClient.Connect(fHost, fPort);
 
       //select the data
-      aExtData := nil;
       fMongoDBClient.SelectData(fFullCollectionName,
                                 fQuery,
                                 fReturnFieldsSelector,
@@ -4559,7 +4531,7 @@ begin
                                 begin
                                   doEvent(JSONRowData);
                                 end,
-                                aExtData);
+                                nil);
 
     Except
       on E: Exception do begin
@@ -4568,15 +4540,6 @@ begin
       end;
     End;
   end;
-
-  //set completed to true
-  //we need to to this because i don't know why
-  //but on isapi the waitfor (call in thread.free)
-  //never return.
-  //but i don't remenbered if the free was call in the initialization
-  //section of the ISAPI DLL (and that bad to do something like this
-  //in initialization or finalization).
-  fcompleted := True;
 end;
 
 end.

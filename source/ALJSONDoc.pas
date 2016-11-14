@@ -12335,7 +12335,7 @@ function ALJsonEncodeWithNodeSubTypeHelperU(const aValue: String;
 begin
   case aNodeSubType of
     nstFloat:      begin
-                     if @aFormatSettings <> @ALDefaultFormatSettings then result := ALJsonEncodeFloatWithNodeSubTypeHelperU(ALStrToFloatU(aValue, aFormatSettings))
+                     if @aFormatSettings <> @ALDefaultFormatSettingsU then result := ALJsonEncodeFloatWithNodeSubTypeHelperU(ALStrToFloatU(aValue, aFormatSettings))
                      else result := aValue;
                    end;
     nstText:       result := ALJsonEncodeTextWithNodeSubTypeHelperU(aValue);

@@ -43,7 +43,12 @@ type
 implementation
 
 uses fmx.graphics,
-     fmx.surfaces;
+     fmx.surfaces
+     {$IFDEF DEBUG}
+     ,
+     ALCommon,
+     AlString
+     {$ENDIF};
 
 {**************************************************************}
 constructor TALTexture.Create(const aVolatile: Boolean = False);

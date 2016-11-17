@@ -477,7 +477,9 @@ var LocalFileTime: TFileTime;
 begin
   with F do begin
     while FindData.dwFileAttributes and ExcludeAttr <> 0 do
-      if not InternetFindNextFile(F.FindHandle, @F.FindData) then begin
+      // This component uses AnsiString everywhere so previous function (InternetFindNextFile)
+      // was working incorrectly. We need to use version ***A() instead.
+      if not InternetFindNextFileA(F.FindHandle, @F.FindData) then begin
         Result := GetLastError;
         Exit;
       end;
@@ -527,7 +529,9 @@ end;
 function TALWinInetFTPClient.FindNext(var F: TALFtpclientSearchRec): Integer;
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  if InternetFindNextFile(F.FindHandle, @F.FindData) then Result := FindMatchingFile(F)
+  // This component uses AnsiString everywhere so previous function (InternetFindNextFile)
+  // was working incorrectly. We need to use version ***A() instead.
+  if InternetFindNextFileA(F.FindHandle, @F.FindData) then Result := FindMatchingFile(F)
   else Result := GetLastError;
 end;
 

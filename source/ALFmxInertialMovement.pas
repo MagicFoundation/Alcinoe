@@ -216,7 +216,6 @@ type
     property Target: TTarget read FTarget;
     property MinVelocity: Integer read FMinVelocity write FMinVelocity default ALDefaultMinVelocity;
     property MaxVelocity: Integer read FMaxVelocity write FMaxVelocity default ALDefaultMaxVelocity;
-    property DeadZone: Integer read FDeadZone write FDeadZone default ALDefaultDeadZone;
     property CancelTargetX: Boolean read FCancelTargetX;
     property CancelTargetY: Boolean read FCancelTargetY;
   public
@@ -253,6 +252,7 @@ type
     property OnStart: TNotifyEvent read FOnStart write FOnStart;
     property OnChanged: TNotifyEvent read FOnTimer write FOnTimer;
     property OnStop: TNotifyEvent read FOnStop write FOnStop;
+    property DeadZone: Integer read FDeadZone write FDeadZone default ALDefaultDeadZone;
   published
     property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;

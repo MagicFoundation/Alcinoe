@@ -17,6 +17,7 @@ uses System.Classes,
      FMX.types3D,
      {$ENDIF}
      {$IF defined(IOS)}
+     system.Messaging,
      FMX.TextLayout.GPU,
      FMX.types3D,
      {$ENDIF}
@@ -3110,6 +3111,7 @@ var R: TRectF;
 begin
   if (not FDisableAlign) and
      (not (csLoading in ComponentState)) and
+     (not (csDestroying in ComponentState)) and
      (not isupdating) and
      (FAutoSize) and
      (Text <> '') and

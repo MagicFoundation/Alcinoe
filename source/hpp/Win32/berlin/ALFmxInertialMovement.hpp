@@ -252,7 +252,6 @@ protected:
 	__property TTarget Target = {read=FTarget};
 	__property int MinVelocity = {read=FMinVelocity, write=FMinVelocity, default=10};
 	__property int MaxVelocity = {read=FMaxVelocity, write=FMaxVelocity, default=5000};
-	__property int DeadZone = {read=FDeadZone, write=FDeadZone, default=8};
 	__property bool CancelTargetX = {read=FCancelTargetX, nodefault};
 	__property bool CancelTargetY = {read=FCancelTargetY, nodefault};
 	
@@ -290,6 +289,7 @@ public:
 	__property System::Classes::TNotifyEvent OnStart = {read=FOnStart, write=FOnStart};
 	__property System::Classes::TNotifyEvent OnChanged = {read=FOnTimer, write=FOnTimer};
 	__property System::Classes::TNotifyEvent OnStop = {read=FOnStop, write=FOnStop};
+	__property int DeadZone = {read=FDeadZone, write=FDeadZone, default=8};
 	
 __published:
 	__property System::Word Interval = {read=FInterval, write=SetInterval, default=10};

@@ -76,10 +76,8 @@ Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Bo
 Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
-{$IFDEF MSWINDOWS}
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
 function ALGMTNow: TDateTime;
-{$ENDIF}
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
@@ -177,41 +175,19 @@ Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
 
-{****************}
-{$IFDEF MSWINDOWS}
+{********************************************************************************}
 function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
-
-  {--------------------------------------------}
-  function InternalCalcTimeZoneBias : TDateTime;
-  const Time_Zone_ID_DayLight = 2;
-  var TZI: TTimeZoneInformation;
-      TZIResult: Integer;
-      aBias : Integer;
-  begin
-    TZIResult := GetTimeZoneInformation(TZI);
-    if TZIResult = -1 then Result := 0
-    else begin
-      if TZIResult = Time_Zone_ID_DayLight then aBias := TZI.Bias + TZI.DayLightBias
-      else aBias := TZI.Bias + TZI.StandardBias;
-      Result := EncodeTime(Abs(aBias) div 60, Abs(aBias) mod 60, 0, 0);
-      if aBias < 0 then Result := -Result;
-    end;
-  end;
-
 begin
-  Result := aLocalDateTime + InternalCalcTimeZoneBias;
+  result := TTimeZone.Local.ToUniversalTime(aLocalDateTime);
 end;
-{$ENDIF}
 
-{****************}
-{$IFDEF MSWINDOWS}
+{*************************}
 {The same like Now but used
  GMT-time not local time.}
 function ALGMTNow: TDateTime;
 begin
-  result := AlLocalDateTimeToGMTDateTime(NOW);
+  result := TTimeZone.Local.ToUniversalTime(NOW);
 end;
-{$ENDIF}
 
 {******************************************************}
 Function ALInc(var x: integer; Count: integer): Integer;

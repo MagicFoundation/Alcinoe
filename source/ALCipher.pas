@@ -262,8 +262,6 @@ procedure ALCipherGenerateMD5Key(var Key : TALCipherKey128; const Str : AnsiStri
 function  ALStringHashMD5U(const Str : String; Const encoding: Tencoding): String; // result will be hexencoded
 procedure ALCipherGenerateMD5KeyU(var Key : TALCipherKey128; const Str : String; Const encoding: Tencoding);
 
-{$IFNDEF NEXTGEN}
-
 
 //////////////////
 ////// SHA1 //////
@@ -288,18 +286,21 @@ procedure ALCipherHashSHA1(var Digest : TALCipherSHA1Digest; const Buf; BufSize 
 procedure ALCipherUpdateSHA1(var Context : TALCipherSHA1Context; const Buf; BufSize: FixedInt);
 procedure ALCipherFinalizeSHA1(var Context: TALCipherSHA1Context; var Digest : TALCipherSHA1Digest);
 procedure ALStreamHashSHA1(var Digest : TAlCipherSHA1Digest; AStream : TStream); overload;
+{$IFNDEF NEXTGEN}
 function  ALStreamHashSHA1(AStream : TStream): AnsiString; overload;
 procedure ALStringHashSHA1(var Digest : TALCipherSHA1Digest; const Str : AnsiString); overload;
 function  ALStringHashSHA1(const Str : AnsiString; const HexEncode: boolean = true): AnsiString; overload;
+{$ENDIF}
+function  ALStringHashSHA1U(const Str : String; Const encoding: Tencoding): String; // result will be hexencoded
 
 
 /////////////////////////////
 ////// HMAC algorithms //////
 /////////////////////////////
 
+{$IFNDEF NEXTGEN}
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;
 function  ALCalcHMACMD5(const Str, Key : AnsiString): AnsiString;
-
 {$ENDIF}
 
 
@@ -898,8 +899,6 @@ begin
   Key := TALCipherKey128(D);
 end;
 
-{$IFNDEF NEXTGEN}
-
 
 //////////////////
 ////// SHA1 //////
@@ -1112,6 +1111,8 @@ begin
   ALCipherFinalizeSHA1(Context, Digest);
 end;
 
+{$IFNDEF NEXTGEN}
+
 {*******************************************************}
 function AlStreamHashSHA1(AStream : TStream): AnsiString;
 Var aSHA1Digest: TALCipherSHA1Digest;
@@ -1138,10 +1139,24 @@ Begin
   end;
 end;
 
+{$ENDIF}
+
+{********************************************************************************}
+function ALStringHashSHA1U(const Str : String; Const encoding: Tencoding): String;
+Var aSHA1Digest: TAlCipherSHA1Digest;
+    abytes: Tbytes;
+Begin
+  aBytes := encoding.GetBytes(str);
+  ALCipherHashSHA1(aSHA1Digest, pointer(aBytes)^, Length(aBytes));
+  Result := ALBinToHexU(aSHA1Digest, SizeOf(aSHA1Digest));
+end;
+
 
 /////////////////////////////
 ////// HMAC algorithms //////
 /////////////////////////////
+
+{$IFNDEF NEXTGEN}
 
 {****************************************************************}
 function  ALCalcHMACSHA1(const Str, Key : AnsiString): AnsiString;

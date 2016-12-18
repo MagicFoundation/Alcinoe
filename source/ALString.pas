@@ -855,9 +855,10 @@ procedure ALExtractHeaderFieldsWithQuoteEscaped(Separators,
 
 function  ALGetBytesFromStream(const aStream : TStream): Tbytes;
 function  ALGetBytesFromFileU(const filename: String; const ShareMode: Word = fmShareDenyWrite): Tbytes;
-function  ALGetStringFromBufferU(const buf : TBytes; ADefaultEncoding: TEncoding): String;
-function  ALGetStringFromStreamU(const aStream : TStream; ADefaultEncoding: TEncoding) : String;
-function  ALGetStringFromFileU(const filename: String; ADefaultEncoding: TEncoding; const ShareMode: Word = fmShareDenyWrite): String;
+function  ALGetStringFromBufferU(const buf : TBytes; const ADefaultEncoding: TEncoding): String;
+function  ALGetStringFromStreamU(const aStream : TStream; const ADefaultEncoding: TEncoding) : String;
+function  ALGetStringFromFileU(const filename: String; const ADefaultEncoding: TEncoding; const ShareMode: Word = fmShareDenyWrite): String;
+procedure ALSaveStringtoFileU(const Str: String; const filename: String; AEncoding: TEncoding; const WriteBOM: boolean = False);
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
 function  ALRandomStrU(const aLength: Longint): String; overload;
 
@@ -10311,49 +10312,26 @@ begin
   end;
 end;
 
-{****************************************************************************************}
-function  ALGetStringFromBufferU(const buf : TBytes; ADefaultEncoding: TEncoding): String;
+{**********************************************************************************************}
+function  ALGetStringFromBufferU(const buf : TBytes; const ADefaultEncoding: TEncoding): String;
 var encoding : TEncoding;
     n : Integer;
 begin
   encoding:=nil;
   n:=TEncoding.GetBufferEncoding(buf, encoding, ADefaultEncoding);
-
-  //
-  // i thing it's better to raise an error to warn the user that the buf is badly encoded
-  // so i disconnect the code below
-  //
-  // handle UTF-8 directly, encoding.GetString returns an SNoMappingForUnicodeCharacter error
-  // whenever a non-utf-8 character is detected, the implementation below
-  // will return a '?' for non-utf8 characters instead
-  //
-  // var sourceLen, len: integer;
-  //
-  // if encoding=TEncoding.UTF8 then begin
-  //   sourceLen := Length(buf)-n;
-  //   SetLength(Result, sourceLen);
-  //   len := Utf8ToUnicode(Pointer(Result), sourceLen+1, PAnsiChar(buf)+n, sourceLen)-1;
-  //   if len>0 then begin
-  //     if len<>sourceLen then SetLength(Result, len);
-  //   end
-  //   else Result:=''
-  // end
-  // else Result:=encoding.GetString(buf, n, Length(buf)-n);
-  //
-
   Result:=encoding.GetString(buf, n, Length(buf)-n);
 end;
 
-{*********************************************************************************************}
-function  ALGetStringFromStreamU(const aStream : TStream; ADefaultEncoding: TEncoding): String;
+{***************************************************************************************************}
+function  ALGetStringFromStreamU(const aStream : TStream; const ADefaultEncoding: TEncoding): String;
 var buf: Tbytes;
 begin
    Buf := ALGetBytesFromStream(aStream);
    Result:=ALGetStringFromBufferU(buf, ADefaultEncoding);
 end;
 
-{************************************************************************************************************************************}
-function  ALGetStringFromFileU(const filename: String; ADefaultEncoding: TEncoding; const ShareMode: Word = fmShareDenyWrite): String;
+{******************************************************************************************************************************************}
+function  ALGetStringFromFileU(const filename: String; const ADefaultEncoding: TEncoding; const ShareMode: Word = fmShareDenyWrite): String;
 Var AFileStream: TfileStream;
 begin
   AFileStream := TFileStream.Create(filename,fmOpenRead or ShareMode);
@@ -10361,6 +10339,29 @@ begin
     Result := ALGetStringFromStreamU(AFileStream, ADefaultEncoding);
   finally
     ALFreeAndNil(AfileStream);
+  end;
+end;
+
+{******************************************************************************************************************************}
+procedure ALSaveStringtoFileU(const Str: String; const filename: String; AEncoding: TEncoding; const WriteBOM: boolean = False);
+var afileStream: TfileStream;
+    Buffer, Preamble: TBytes;
+begin
+  aFileStream := TfileStream.Create(filename,fmCreate);
+  Try
+
+    Buffer := aEncoding.GetBytes(Str);
+
+    if WriteBOM then begin
+      Preamble := aEncoding.GetPreamble;
+      if Length(Preamble) > 0 then
+        afileStream.WriteBuffer(Preamble, Length(Preamble));
+    end;
+
+    afileStream.WriteBuffer(Buffer, Length(Buffer));
+
+  finally
+    ALFreeAndNil(aFileStream);
   end;
 end;
 

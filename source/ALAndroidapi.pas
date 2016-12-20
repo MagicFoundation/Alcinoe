@@ -2,6 +2,17 @@ unit ALAndroidapi;
 
 interface
 
+//  Java Type    Delphi Type
+//  boolean      Boolean
+//  byte         ShortInt
+//  char         WideChar
+//  double       Double
+//  float        Single
+//  int          Integer
+//  long         Int64
+//  short        SmallInt
+//  void         N/A
+
 uses Androidapi.JNI.Widget,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.Util,
@@ -14,6 +25,7 @@ type
   JALEditText = interface;
   JALControlHostLayout = interface;
   JALLog = interface;
+  JALStatFs = interface;
 
   {**********************************************}
   JALSoftInputListenerClass = interface(IJavaClass)
@@ -120,6 +132,31 @@ type
     ['{AED82B19-8B1E-4F35-85D9-851D6F1B4F54}']
   end;
   TJALLog = class(TJavaGenericImport<JALLogClass, JALLog>) end;
+
+  {***********************************}
+  JALStatFsClass = interface(JObjectClass)
+    ['{E5587205-C324-4FAF-A101-E31BCD83BD4D}']
+    {class} function init(path: JString): JALStatFs; cdecl; // public StatFs(String path)
+  end;
+
+  {**********************************}
+  [JavaSignature('android/os/StatFs')]
+  JALStatFs = interface(JObject)
+    ['{121A2CDF-6B8A-4C8F-BE9A-B2DEDF861CFB}']
+    procedure restat(path: JString); cdecl; // public void restat(String path)
+    function getBlockSize: integer; cdecl; // public int getBlockSize()
+    function getBlockSizeLong: int64; cdecl; // public long getBlockSizeLong()
+    function getBlockCount: integer; cdecl; // public int getBlockCount()
+    function getBlockCountLong: int64; cdecl; // public long getBlockCountLong()
+    function getFreeBlocks: integer; cdecl; // public int getFreeBlocks()
+    function getFreeBlocksLong: int64; cdecl; // public long getFreeBlocksLong()
+    function getFreeBytes: int64; cdecl; // public long getFreeBytes()
+    function getAvailableBlocks: integer; cdecl; // public int getAvailableBlocks()
+    function getAvailableBlocksLong: int64; cdecl; // public long getAvailableBlocksLong()
+    function getAvailableBytes: int64; cdecl; // public long getAvailableBytes()
+    function getTotalBytes: int64; cdecl; // public long getTotalBytes()
+  end;
+  TJALStatFs = class(TJavaGenericImport<JALStatFsClass, JALStatFs>) end;
 
 implementation
 

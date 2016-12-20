@@ -120,7 +120,7 @@ begin
 
     {$IFDEF DEBUG}
     if TALTextureAccessPrivate(self).FBits <> nil then
-      ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatU('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsU) +' KB', TalLogType.Warn);
+      ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatU('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsU) +' kB', TalLogType.Warn);
     {$ENDIF}
 
   Finally

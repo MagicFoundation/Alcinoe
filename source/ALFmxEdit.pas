@@ -1644,21 +1644,21 @@ end;
 procedure TalIosEdit.AncestorVisibleChanged(const Visible: Boolean);
 begin
   inherited;
-  FTextField.AncestorVisibleChanged;
+  if FTextField <> nil then FTextField.AncestorVisibleChanged;  // << this proc is called during the ondestroy also when FTextField is already destroyed
 end;
 
 {*****************************************}
 procedure TalIosEdit.AncestorParentChanged;
 begin
   inherited;
-  FTextField.RefreshNativeParent;
+  if FTextField <> nil then FTextField.RefreshNativeParent;  // << this proc is called during the ondestroy also when FTextField is already destroyed
 end;
 
 {*********************************}
 procedure TalIosEdit.ParentChanged;
 begin
   inherited;
-  FTextField.RefreshNativeParent;
+  if FTextField <> nil then FTextField.RefreshNativeParent; // << this proc is called during the ondestroy also when FTextField is already destroyed
 end;
 
 {********************************************************************}

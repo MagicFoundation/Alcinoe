@@ -355,6 +355,7 @@ var
   // - you should use this function instead of ALCrc32cfast() nor ALCrc32csse42()
   ALStringHashCrc32: TALStringHashCrc32;
 
+{$IFDEF MSWINDOWS}
 
 const
 
@@ -387,6 +388,8 @@ function CryptGenRandom(hProv: HCRYPTPROV;
 function ALRandomBytes(const Len: Cardinal): TBytes;
 function ALRandom32(const ARange: Cardinal): cardinal;
 function ALRandom64(const ARange: UInt64): UInt64;
+
+{$ENDIF}
 
 function ALFnv1aInt32(const str: ansiString): int64; inline;
 function ALFnv1aInt64(const str: ansiString): int64; inline;
@@ -3198,6 +3201,8 @@ begin
    Result:=ALCrc32cfast(0, Pointer(@str[1]), Length(str));
 end;
 
+{$IFDEF MSWINDOWS}
+
 {***************************************************************************}
 function CryptAcquireContextA; external ADVAPI32 name 'CryptAcquireContextA';
 
@@ -3267,6 +3272,8 @@ begin
   Result := (UInt64(ALRandom32(ALMAXUInt)) shl 32) or ((UInt64(ALRandom32(ALMAXUInt)) shl 32) shr 32);
   result := result mod ARange;
 end;
+
+{$ENDIF}
 
 {******************************}
 procedure _TestIntelCpuFeatures;

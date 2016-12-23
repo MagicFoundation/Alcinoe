@@ -291,6 +291,7 @@ type
     FInetConnect: HINTERNET;
     FOnStatusChange: TAlWinInetHTTPClientStatusChangeEvent;
     FDisconnectOnError: Boolean;
+    FIgnoreSecurityErrors: Boolean;
     procedure InitURL(const Value: AnsiString);
     procedure SetAccessType(const Value: TALWinInetHttpInternetOpenAccessType);
     procedure SetInternetOptions(const Value: TAlWininetHTTPClientInternetOptionSet);
@@ -315,6 +316,7 @@ type
     property  InternetOptions: TAlWininetHTTPClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wHttpIo_Keep_connection];
     property  DisconnectOnError: Boolean read FDisconnectOnError write FDisconnectOnError default False; // WinInethttp seam to handle internally the disconnection/reconnection !
     property  OnStatusChange: TAlWinInetHTTPClientStatusChangeEvent read FOnStatusChange write SetOnStatusChange;
+    property  IgnoreSecurityErrors: Boolean read FIgnoreSecurityErrors write FIgnoreSecurityErrors;
   end;
 
 implementation
@@ -374,6 +376,7 @@ begin
   FInternetOptions := [wHttpIo_Keep_connection];
   RequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWinInetHTTPClient)';
   FDisconnectOnError := False;
+  FIgnoreSecurityErrors := False;
 end;
 
 {**************************************}
@@ -469,10 +472,10 @@ end;
 procedure TALWinInetHTTPClient.Connect;
 
   {---------------------------------------------}
-  Function InternalGetProxyServerName: PAnsiChar;
+  Function InternalGetProxyServerName: AnsiString;
   Begin
-    If (ProxyParams.ProxyServer = '') then result := nil
-    else result := PAnsiChar(ProxyParams.ProxyServer + ':' + ALIntToStr(ProxyParams.ProxyPort));
+    If (ProxyParams.ProxyServer = '') then result := ''
+    else result := ProxyParams.ProxyServer + ':' + ALIntToStr(ProxyParams.ProxyPort);
   end;
 
   {-----------------------------------------}
@@ -498,7 +501,8 @@ const AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (INT
                                                                              INTERNET_OPEN_TYPE_PROXY);
 
 var InternetSetStatusCallbackResult: PFNInternetStatusCallback;
-
+    ProxyStr: AnsiString;
+    ProxyPtr: PAnsiChar;
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
   { So take advantage of a cached handle, we'll assume that
@@ -509,10 +513,17 @@ begin
   { Also, could switch to new API introduced in IE4/Preview2}
   if InternetAttemptConnect(0) <> ERROR_SUCCESS then {$IF CompilerVersion >= 23}{Delphi XE2}System.{$IFEND}SysUtils.Abort;
 
+  ProxyStr := InternalGetProxyServerName;
+  if ProxyStr <> '' then begin
+    ProxyPtr := PAnsiChar(ProxyStr);
+  end else begin
+    ProxyPtr := nil;
+  end;
+
   {init FInetRoot}
   FInetRoot := InternetOpenA(PAnsiChar(RequestHeader.UserAgent),
                              AccessTypeArr[FAccessType],
-                             InternalGetProxyServerName,
+                             ProxyPtr,
                              InternalGetProxyBypass,
                              InternalGetInternetOpenFlags);
   CheckError(not Assigned(FInetRoot));
@@ -606,6 +617,8 @@ function TALWinInetHTTPClient.Send(aRequestDataStream: TStream): Integer;
 
 var Request: HINTERNET;
     RetVal: DWord;
+    dwFlags: DWORD;
+    BuffLen: Cardinal;
     BuffSize, Len: Integer;
     INBuffer: _INTERNET_BUFFERSA;
     Buffer: TMemoryStream;
@@ -633,6 +646,16 @@ begin
                                 DWORD_PTR(Self));
 
     CheckError(not Assigned(Request));
+
+    if FIgnoreSecurityErrors and (FURLScheme = INTERNET_SCHEME_HTTPS) then begin
+      BuffLen := SizeOf(dwFlags);
+      CheckError(not InternetQueryOptionA(Request, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@dwFlags), BuffLen));
+      dwFlags := dwFlags or
+        SECURITY_FLAG_IGNORE_REVOCATION or
+        SECURITY_FLAG_IGNORE_UNKNOWN_CA or
+        SECURITY_FLAG_IGNORE_WRONG_USAGE;
+      CheckError(not InternetSetOptionA(Request, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@dwFlags), SizeOf(dwFlags)));
+    end;
 
     { Timeouts }
     if ConnectTimeout > 0 then CheckError(not InternetSetOptionA(Request, INTERNET_OPTION_CONNECT_TIMEOUT, Pointer(@ConnectTimeout), SizeOf(ConnectTimeout)));

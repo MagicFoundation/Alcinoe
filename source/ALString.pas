@@ -548,6 +548,7 @@ Function  ALIsSmallInt (const S: AnsiString): Boolean;
 Function  ALIsFloat (const S: AnsiString; const AFormatSettings: TALFormatSettings): Boolean;
 function  ALFloatToStr(Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString; overload;
 procedure ALFloatToStr(Value: Extended; var S: ansiString; const AFormatSettings: TALFormatSettings); overload;
+function  ALFloatToStrF(Value: Extended; Format: TFloatFormat; Precision, Digits: Integer; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALCurrToStr(Value: Currency; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALFormatFloat(const Format: AnsiString; Value: Extended; const AFormatSettings: TALFormatSettings): AnsiString;
 function  ALFormatCurr(const Format: AnsiString; Value: Currency; const AFormatSettings: TALFormatSettings): AnsiString;
@@ -6866,6 +6867,16 @@ var
 begin
   SetString(S, Buffer, ALFloatToText(Buffer, Value, fvExtended,
     ffGeneral, 15, 0, AFormatSettings));
+end;
+
+{***************************************************************************************************}
+function ALFloatToStrF(Value: Extended; Format: TFloatFormat;
+  Precision, Digits: Integer; const AFormatSettings: TALFormatSettings): AnsiString;
+var
+  Buffer: array[0..63] of AnsiChar;
+begin
+  SetString(Result, Buffer, ALFloatToText(Buffer, Value, fvExtended,
+    Format, Precision, Digits, AFormatSettings));
 end;
 
 {$ENDIF !NEXTGEN}

@@ -76,8 +76,9 @@ Procedure ALFreeAndNil(var Obj; const adelayed: boolean; const aRefCountWarn: Bo
 Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
-function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
-function ALGMTNow: TDateTime;
+function AlLocalDateTimeToUTCDateTime(Const aLocalDateTime: TDateTime): TdateTime;
+function AlUTCDateTimeToLocalDateTime(Const aUTCDateTime: TDateTime): TdateTime;
+function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
@@ -101,6 +102,7 @@ implementation
 uses system.Classes,
      {$IFDEF MSWINDOWS}
      Winapi.Windows,
+     fmx.types,
      {$ENDIF}
      {$IF defined(ANDROID)}
      Androidapi.JNI.JavaTypes,
@@ -116,7 +118,7 @@ uses system.Classes,
 
 {***********************************************************************************************}
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
-{$IF defined(IOS)}
+{$IF defined(IOS) or defined(MSWINDOWS)}
 var aMsg: String;
 {$IFEND}
 begin
@@ -131,28 +133,31 @@ begin
   end;
   {$ELSEIF defined(IOS)}
   // https://forums.developer.apple.com/thread/4685
-  if msg <> '' then aMsg := ' => ' + msg
-  else aMsg := '';
-  case _type of
-    TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + aMsg));
-    TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + aMsg));
-    TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + aMsg));
-    TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + aMsg));
-    TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
-    TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
+  if _type <> TalLogType.VERBOSE  then begin // because log on ios slow down the app so skip verbosity
+    if msg <> '' then aMsg := ' => ' + msg
+    else aMsg := '';
+    case _type of
+      TalLogType.VERBOSE: NSLog(StringToID('[V] ' + Tag + aMsg));
+      TalLogType.DEBUG:   NSLog(StringToID('[D][V] ' + Tag + aMsg));
+      TalLogType.INFO:    NSLog(StringToID('[I][D][V] ' + Tag + aMsg));
+      TalLogType.WARN:    NSLog(StringToID('[W][I][D][V] ' + Tag + aMsg));
+      TalLogType.ERROR:   NSLog(StringToID('[E][W][I][D][V] ' + Tag + aMsg));
+      TalLogType.ASSERT:  NSLog(StringToID('[A][E][W][I][D][V] ' + Tag + aMsg));
+    end;
   end;
   {$ELSEIF defined(MSWINDOWS)}
-  //the Log.d is very too much slow to be really usefull
-  //if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
-  //else aMsg := '';
-  //case _type of
-  //  TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
-  //  TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
-  //  TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
-  //  TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
-  //  TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
-  //  TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
-  //end;
+  if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
+    if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+    else aMsg := '';
+    case _type of
+      TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
+      TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
+      TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
+      TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
+      TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
+      TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
+    end;
+  end;
   {$IFEND}
 end;
 
@@ -176,15 +181,21 @@ Begin
 End;
 
 {********************************************************************************}
-function AlLocalDateTimeToGMTDateTime(Const aLocalDateTime: TDateTime): TdateTime;
+function AlLocalDateTimeToUTCDateTime(Const aLocalDateTime: TDateTime): TdateTime;
 begin
   result := TTimeZone.Local.ToUniversalTime(aLocalDateTime);
 end;
 
+{******************************************************************************}
+function AlUTCDateTimeToLocalDateTime(Const aUTCDateTime: TDateTime): TdateTime;
+begin
+  result := TTimeZone.Local.ToLocalTime(aUTCDateTime);
+end;
+
 {*************************}
 {The same like Now but used
- GMT-time not local time.}
-function ALGMTNow: TDateTime;
+ UTC-time not local time.}
+function ALUTCNow: TDateTime;
 begin
   result := TTimeZone.Local.ToUniversalTime(NOW);
 end;

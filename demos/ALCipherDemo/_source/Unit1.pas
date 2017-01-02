@@ -4,10 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, cxGraphics, ALZlibExApi,
-  cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
-  cxLabel, Shellapi, System.Generics.Defaults, diagnostics,
-  System.Generics.Collections, dateutils;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, ALZlibExApi, Shellapi,
+  System.Generics.Defaults, diagnostics, System.Generics.Collections, dateutils;
 
 type
   TForm1 = class(TForm)
@@ -38,6 +36,9 @@ type
     Label4: TLabel;
     Button4: TButton;
     Button5: TButton;
+    Button6: TButton;
+    Button7: TButton;
+    PaintBox1: TPaintBox;
     procedure ALButton1Click(Sender: TObject);
     procedure ALButton3Click(Sender: TObject);
     procedure ALButton4Click(Sender: TObject);
@@ -57,6 +58,8 @@ type
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
   private
   public
   end;
@@ -654,6 +657,141 @@ begin
     end;
   finally
     aDictionary.free;
+  end;
+end;
+
+{*********************************************}
+procedure TForm1.Button6Click(Sender: TObject);
+Var aHash: int32;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    P, x, y: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench ALRandom32';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  StatusBar1.Panels[0].Text := 'ALRandom32';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aCounter := 0;
+  aLastGUIUpdate := now;
+  aStopWatch := TstopWatch.Create;
+  EditKey.Visible := False;
+  ALMemoDecryptedData.Visible := False;
+  ALMemoCryptedData.Visible := False;
+  ALMemoCollisions.Visible := False;
+  Label4.Visible := False;
+  Label2.Visible := False;
+  Label1.Visible := False;
+  Label3.Visible := False;
+  PaintBox1.Visible := True;
+  application.ProcessMessages;
+  try
+    while True do begin
+      aStopWatch.Start;
+      aHash := ALRandom32(maxint);
+      aStopWatch.Stop;
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+      P := round(((PaintBox1.Width * PaintBox1.Height) / maxint) * aHash);
+      Y := P div PaintBox1.Width;
+      X := P mod PaintBox1.Width;
+      PaintBox1.Canvas.Pixels[x,y] := $0000ff;
+    end;
+  finally
+    EditKey.Visible := true;
+    ALMemoDecryptedData.Visible := true;
+    ALMemoCryptedData.Visible := true;
+    ALMemoCollisions.Visible := true;
+    Label4.Visible := true;
+    Label2.Visible := true;
+    Label1.Visible := true;
+    Label3.Visible := true;
+    PaintBox1.Visible := False;
+  end;
+end;
+
+{***************************************************************}
+Function  Win_MixID(aIDBroker: int32; aIDConfined: int32): Int64;
+Begin
+  if aIDConfined <> 0 then Result := (int64(aIDBroker) shl 32) or ((int64(aIDConfined) shl 32) shr 32)
+  else result := aIDBroker; // this to be able to store the result on a 32 bit value
+End;
+
+{*********************************************}
+procedure TForm1.Button7Click(Sender: TObject);
+Var aHash: int64;
+    aCounter: integer;
+    aStopWatch: TstopWatch;
+    aLastGUIUpdate: Extended;
+    P, x, y: integer;
+begin
+  if (Sender as TButton).Tag = 1 then begin
+    (Sender as TButton).Tag := 0;
+    (Sender as TButton).Caption := 'Bench ALRandom64';
+    exit;
+  end;
+  (Sender as TButton).Tag := 1;
+  (Sender as TButton).Caption := 'Stop';
+  StatusBar1.Panels[0].Text := 'ALRandom64';
+  StatusBar1.Panels[1].Text := '';
+  StatusBar1.Panels[2].Text := '';
+  StatusBar1.Panels[3].Text := '';
+  StatusBar1.Panels[4].Text := '';
+  ALMemoCollisions.Lines.Clear;
+  aCounter := 0;
+  aLastGUIUpdate := now;
+  aStopWatch := TstopWatch.Create;
+  EditKey.Visible := False;
+  ALMemoDecryptedData.Visible := False;
+  ALMemoCryptedData.Visible := False;
+  ALMemoCollisions.Visible := False;
+  Label4.Visible := False;
+  Label2.Visible := False;
+  Label1.Visible := False;
+  Label3.Visible := False;
+  PaintBox1.Visible := True;
+  application.ProcessMessages;
+  try
+    while True do begin
+      aStopWatch.Start;
+      aHash := ALRandom64(ALMaxint64);
+      aStopWatch.Stop;
+      inc(acounter);
+      if millisecondsbetween(now, aLastGUIUpdate) > 200 then begin
+        aLastGUIUpdate := now;
+        StatusBar1.Panels[1].Text := FormatFloat('#,.', (acounter / (aStopWatch.Elapsed.TotalMilliseconds / 1000))) + ' keys/s';
+        if (Sender as TButton).Tag = 0 then break;
+        application.ProcessMessages;
+      end;
+      P := round(((PaintBox1.Width * PaintBox1.Height) / ALMaxint64) * aHash);
+      Y := P div PaintBox1.Width;
+      X := P mod PaintBox1.Width;
+      PaintBox1.Canvas.Pixels[x,y] := $0000ff;
+    end;
+  finally
+    EditKey.Visible := true;
+    ALMemoDecryptedData.Visible := true;
+    ALMemoCryptedData.Visible := true;
+    ALMemoCollisions.Visible := true;
+    Label4.Visible := true;
+    Label2.Visible := true;
+    Label1.Visible := true;
+    Label3.Visible := true;
+    PaintBox1.Visible := False;
   end;
 end;
 

@@ -4364,7 +4364,8 @@ asm
         MOV    ECX, [EBX].DefaultSystemCodePage
         MOV    ECX, [ECX]
 {$ELSE !PIC}
-        MOV    ECX, DefaultSystemCodePage  // maybe we must use 0 instead of DefaultSystemCodePage because if not we receive the error Need imported data reference ($G) to access DefaultSystemCodePage when we compile the dpk
+        //MOV    ECX, DefaultSystemCodePage  // >> we must use CP_UTF8 instead of DefaultSystemCodePage because if not we receive the error Need imported data reference ($G) to access DefaultSystemCodePage when we compile the dpk.
+        MOV    ECX, CP_UTF8
 {$ENDIF}
         CALL   ESI
         POP    ECX

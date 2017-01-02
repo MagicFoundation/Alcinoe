@@ -25,6 +25,13 @@
 #include <ALFmxEdit.hpp>
 #include <ALCommon.hpp>
 #include <ALFMXTypes3D.hpp>
+#include <ALStringList.hpp>
+#include <ALString.hpp>
+#include <ALQuickSortList.hpp>
+#include <ALMime.hpp>
+#include <ALInit.hpp>
+#include <ALCipher.hpp>
+#include <ALAVLBinaryTree.hpp>
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
 #include <System.Character.hpp>	// (rtl)

@@ -46,8 +46,16 @@ contains
   ALFmxInertialMovement in 'ALFmxInertialMovement.pas',
   ALFmxEdit in 'ALFmxEdit.pas',
   ALCommon in 'ALCommon.pas',
-  ALFMXTypes3D in 'ALFMXTypes3D.pas';
+  ALFMXTypes3D in 'ALFMXTypes3D.pas',
+  ALStringList in 'ALStringList.pas',
+  ALString in 'ALString.pas',
+  ALQuickSortList in 'ALQuickSortList.pas',
+  ALMime in 'ALMime.pas',
+  ALInit in 'ALInit.pas',
+  ALCipher in 'ALCipher.pas',
+  ALAVLBinaryTree in 'ALAVLBinaryTree.pas';
 
 end.
+
 
 

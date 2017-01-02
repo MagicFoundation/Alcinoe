@@ -2,6 +2,22 @@
 
 interface
 
+{$IF CompilerVersion >= 25} {Delphi XE4}
+  {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
+{$IFEND}
+
+{$IF Low(string) = 0}
+  {$DEFINE _ZEROBASEDSTRINGS_ON}
+{$IFEND}
+
+{$IF Defined(ANDROID) or defined(IOS)}
+  {$DEFINE _USE_TEXTURE}
+{$IFEND}
+
+{$IF defined(MACOS) and not defined(IOS)}
+  {$DEFINE _MACOS}
+{$IFEND}
+
 uses System.classes,
      System.UITypes,
      System.Types,
@@ -11,12 +27,13 @@ uses System.classes,
      iOSapi.CoreGraphics,
      iOSapi.CocoaTypes,
      iOSapi.CoreText,
-     Macapi.CoreFoundation,
-     {$ENDIF}
+     fmx.types3D,
+     {$IFEND}
      {$IF defined(ANDROID)}
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.JavaTypes,
-     {$ENDIF}
+     fmx.types3D,
+     {$IFEND}
      Fmx.types,
      FMX.TextLayout,
      FMX.graphics,
@@ -55,7 +72,7 @@ type
 function  ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
 procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
 function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
-{$ENDIF}
+{$IFEND}
 
 {$IF defined(ANDROID)}
 
@@ -65,8 +82,12 @@ type
   TALBreakTextItem = class(Tobject)
   public
     line: JString;
-    pos: TpointF;
+    pos: TpointF; // << pos of the bottom on the text (without descent)
     rect: TrectF;
+    fontColor: TalphaColor; // << not initialised by ALBreakText
+    fontStyle: integer; // << not initialised by ALBreakText
+    id: string; // << not initialised by ALBreakText
+    isEllipsis: Boolean;
     constructor Create;
     destructor Destroy; override;
   end;
@@ -79,13 +100,17 @@ function ALBreakText(const aPaint: JPaint;
                      const aWordWrap: Boolean;
                      const AHTextAlign, AVTextAlign: TTextAlign;
                      const aTrimming: TTextTrimming;
-                     var aBreakTextItems: TALBreakTextItems;
-                     const aFirstLineIndent: single = 0;
-                     const aLineSpacing: integer = 0;
+                     const aBreakTextItems: TALBreakTextItems;
+                     var aTotalLines: integer;
+                     const aFirstLineIndent: TpointF;
+                     const aLineSpacing: single = 0;
                      const aEllipsisText: JString = nil;
-                     const aEllipsisColor: TalphaColor = TAlphaColorRec.Null): boolean; // return true if text was truncated
+                     const aEllipsisFontName: String = '';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
 
-{$ENDIF}
+{$IFEND}
 
 {$IF defined(IOS)}
 
@@ -95,23 +120,17 @@ type
   TALBreakTextItem = class(Tobject)
   public
     Line: CTLineRef;
-    pos: TpointF;
+    text: String;
+    pos: TpointF; // << pos of the bottom on the text (without descent)
     rect: TrectF;
+    fontColor: TalphaColor; // << not initialised by ALBreakText
+    fontStyle: TFontStyles; // << not initialised by ALBreakText
+    id: string; // << not initialised by ALBreakText
+    isEllipsis: Boolean;
     constructor Create;
     destructor Destroy; override;
   end;
   TALBreakTextItems = class(TobjectList<TALBreakTextItem>);
-
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-function ALBreakText(var ARect: TRectF;
-                     const aTextAttr: CFAttributedStringRef;
-                     const aWordWrap: Boolean;
-                     const AHTextAlign, AVTextAlign: TTextAlign;
-                     const aTrimming: TTextTrimming;
-                     var aBreakTextItems: TALBreakTextItems;
-                     const aFirstLineIndent: single = 0;
-                     const aLineSpacing: integer = 0;
-                     const aEllipsisAttr: CFAttributedStringRef = nil): boolean; overload;// return true if text was truncated
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 function ALBreakText(const aColorSpace: CGColorSpaceRef;
@@ -123,20 +142,170 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const AText: string;
                      const aWordWrap: Boolean;
                      const AHTextAlign, AVTextAlign: TTextAlign;
-                     const aTrimming: TTextTrimming;
-                     var aBreakTextItems: TALBreakTextItems;
-                     const aFirstLineIndent: single = 0;
-                     const aLineSpacing: integer = 0;
+                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                     const aBreakTextItems: TALBreakTextItems;
+                     var aTotalLines: integer;
+                     const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                     const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                      const aEllipsisText: string = '…';
-                     const aEllipsisColor: TalphaColor = TAlphaColorRec.Null): boolean; overload; // return true if text was truncated
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
 
-{$ENDIF}
+{$IFEND}
+
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+Procedure ALGetTextMetrics(const aFontSize: single;
+                           const aFontStyle: TFontStyles;
+                           const aFontName: String;
+                           var aAscent:Single; // << return aAscent in negative (like in android)
+                           var aDescent:Single);
+
+type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBreakTextItem = class(Tobject)
+  public
+    Line: String;
+    pos: TpointF; // << pos of the bottom on the text (without descent)
+    rect: TrectF;
+    fontColor: TalphaColor; // << not initialised by ALBreakText
+    fontStyle: TFontStyles; // << not initialised by ALBreakText
+    id: string; // << not initialised by ALBreakText
+    isEllipsis: Boolean;
+    constructor Create;
+  end;
+  TALBreakTextItems = class(TobjectList<TALBreakTextItem>);
+
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+function ALbreakText(const aFontSize: single;
+                     const aFontStyle: TFontStyles;
+                     const aFontName: String;
+                     const atext: String;
+                     const aMaxWidth: Single;
+                     var aMeasuredWidth: Single): integer; overload;
+function ALBreakText(const aFontColor: TalphaColor;
+                     const aFontSize: single;
+                     const aFontStyle: TFontStyles;
+                     const aFontName: String;
+                     var ARect: TRectF;
+                     const AText: string;
+                     const aWordWrap: Boolean;
+                     const AHTextAlign, AVTextAlign: TTextAlign;
+                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                     const aBreakTextItems: TALBreakTextItems;
+                     var aTotalLines: integer;
+                     const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                     const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+                     const aEllipsisText: string = '…';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; overload; // // return true if text was breaked in several lines (truncated or not)
+
+{$IFEND}
+
+type
+
+  {~~~~~~~~~~~~~~~~~~~~~}
+  TAlTextElement = record
+    Id: string;
+    rect: TrectF;
+    isEllipsis: Boolean;
+  end;
+  TalTextElements = array of TalTextElement;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDrawMultiLineTextOptions = class(Tobject)
+  public
+    //-----
+    FontName: String;
+    FontSize: single;
+    FontStyle: TFontStyles;
+    FontColor: TalphaColor;
+    //-----
+    EllipsisText: String; // default = '…';
+    EllipsisFontStyle: TFontStyles; // default = [];
+    EllipsisFontColor: TalphaColor; // default = TAlphaColorRec.Null;
+    //-----
+    AutoSize: Boolean; // default = True;
+    WordWrap: Boolean; // default = True;
+    MaxLines: integer; // default = 0;
+    LineSpacing: single; // default = 0;
+    Trimming: TTextTrimming; // default = TTextTrimming.Character;
+    FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
+    //-----
+    HTextAlign: TTextAlign; // default = TTextAlign.Leading;
+    VTextAlign: TTextAlign; // default = TTextAlign.Leading;
+    //-----
+    Fill: TBrush;  // default = none
+    Stroke: TStrokeBrush; // default = none
+    Sides: TSides; // default = AllSides
+    XRadius: Single; // default = 0
+    YRadius: Single; // default = 0
+    Corners: TCorners; // default = AllCorners
+    Padding: TRectF;  // default = 0
+    //-----
+    TextIsHtml: boolean; // default = false;
+    //-----
+    constructor Create;
+    destructor Destroy; override;
+  End;
+
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              var aAscent: single; // out => the Ascent of the last element (in real pixel)
+                              var aDescent: Single; // out => the Descent of the last element (in real pixel)
+                              var aFirstPos: TpointF; // out => the point of the start of the text
+                              var aLastPos: TpointF; // out => the point of the end of the text
+                              var aElements: TalTextElements; // out => the list of rect describing all span elements
+                              var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+procedure ALPaintRectangle({$IF defined(ANDROID)}
+                           const aBitmap: Jbitmap;
+                           {$ELSEIF defined(IOS)}
+                           const aContext: CGContextRef;
+                           const aColorSpace: CGColorSpaceRef;
+                           {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                           const aCanvas: Tcanvas;
+                           {$IFEND}
+                           const Rect: TrectF;
+                           const Fill: TBrush;
+                           const Stroke: TStrokeBrush;
+                           const Sides: TSides;
+                           const Corners: TCorners;
+                           const XRadius: Single = 0;
+                           const YRadius: Single = 0);
+
+{$IF defined(ANDROID)}
+function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: boolean = true): TTexture;
+function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
+{$IFEND}
 
 Type
 
   {$IF CompilerVersion <> 31}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
-  {$ENDIF}
+  {$IFEND}
   TALControlAccessPrivate = class(TFmxObject)
   private const
     InitialControlsCapacity = 10;
@@ -270,7 +439,7 @@ Type
 
   {$IF CompilerVersion <> 31}
     {$MESSAGE WARN 'Check if FMX.TextLayout.TTextLayout still has the exact same fields and adjust the IFDEF'}
-  {$ENDIF}
+  {$IFEND}
   TALTextLayoutAccessPrivate = class abstract
   public const
     MaxLayoutSize: TPointF = (X: $FFFF; Y: $FFFF);
@@ -304,12 +473,25 @@ uses system.SysUtils,
      Androidapi.JNIBridge,
      Androidapi.Helpers,
      Androidapi.JNI.Os,
-     {$ENDIF}
+     Androidapi.Bitmap,
+     FMX.Helpers.Android,
+     fmx.surfaces,
+     ALFmxTypes3D,
+     {$IFEND}
+     {$IF defined(IOS)}
+     iOSapi.UIKit,
+     Macapi.CoreFoundation,
+     Macapi.Helpers,
+     fmx.surfaces,
+     ALFmxTypes3D,
+     {$IFEND}
      fmx.consts,
      fmx.controls.presentation,
      ALFmxObjects,
      AlFmxStdCtrls,
      ALFmxImgList,
+     ALStringList,
+     ALString,
      AlCommon;
 
 {************************************************************************************************}
@@ -465,7 +647,7 @@ begin
   Result.B := Color.B;
   Result.A := Color.A;
 end;
-{$ENDIF}
+{$IFEND}
 
 {****************}
 {$IF defined(IOS)}
@@ -476,7 +658,7 @@ begin
   Result.size.Width := aWidth;
   Result.size.Height := aHeight;
 end;
-{$ENDIF}
+{$IFEND}
 
 {****************}
 {$IF defined(IOS)}
@@ -516,7 +698,7 @@ begin
   if info <> nil then
     outData^ := TAlphaColorCGFloat.Create(TGradient(info).InterpolateColor(inData^));
 end;
-{$ENDIF}
+{$IFEND}
 
 {****************}
 {$IF defined(IOS)}
@@ -577,7 +759,7 @@ begin
   end;
 
 end;
-{$ENDIF}
+{$IFEND}
 
 {********************}
 {$IF defined(ANDROID)}
@@ -585,8 +767,9 @@ constructor TALBreakTextItem.Create;
 begin
   inherited;
   Line := nil;
+  isEllipsis := False;
 end;
-{$ENDIF}
+{$IFEND}
 
 {*********************}
 {$IF defined(ANDROID)}
@@ -595,7 +778,7 @@ begin
   line := Nil;
   inherited;
 end;
-{$ENDIF}
+{$IFEND}
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 // Draw text in a given rectangle and automatically wrap lines.
@@ -609,16 +792,21 @@ function ALBreakText(const aPaint: JPaint;
                      const aWordWrap: Boolean;
                      const AHTextAlign, AVTextAlign: TTextAlign;
                      const aTrimming: TTextTrimming;
-                     var aBreakTextItems: TALBreakTextItems;
-                     const aFirstLineIndent: single = 0;
-                     const aLineSpacing: integer = 0;
+                     const aBreakTextItems: TALBreakTextItems;
+                     var aTotalLines: integer;
+                     const aFirstLineIndent: TpointF;
+                     const aLineSpacing: single = 0;
                      const aEllipsisText: JString = nil;
-                     const aEllipsisColor: TalphaColor = TAlphaColorRec.Null): boolean; // return true if text was truncated
+                     const aEllipsisFontName: String = '';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines or truncated
 
 var aBreakTextItemsStartCount: integer;
     aBreakTextItem: TALBreakTextItem;
     aNumberOfChars: integer;
     aSaveNumberOfChars: integer;
+    aSaveNumberOfCharsIsAccurate: Boolean;
     aLine: jString;
     aLineManuallyBreaked: boolean;
     aLineIndent: Single;
@@ -629,31 +817,70 @@ var aBreakTextItemsStartCount: integer;
     aMaxWidth: single;
     aMaxHeight: single;
     aMaxLineWidth: single;
-    aLineHeight: integer;
-    aTotalLinesHeight: integer;
+    aLineHeight: single;
+    aTotalLinesHeight: single;
     aChar: Char;
     ATextLn: integer;
     ATextIdx: integer;
-    aCurrLineY: integer;
+    aCurrLineY: single;
     aMetrics: JPaint_FontMetricsInt;
     ameasuredWidth: TJavaArray<Single>;
-    aTmpMeasuredWidth: Single;
-    aSavedColor: TalphaColor;
     aOffset: single;
     i, j: integer;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  //their is a fucking bug on android 4.4.2 that aNumberOfChars
+  //is the number of Glyph and not of char, so ligature like 'fi' are
+  //counted like one glyph :(
+  //very few comments about this on the internet
+  //http://stackoverflow.com/questions/39891726/android-paint-breaktext-not-work-on-kitkat
+  procedure _splitLigature(const _MaxWidth: single);
+  var aTmpMeasuredWidth: Single;
+  begin
+    if (aNumberOfChars < aLine.length) and
+       (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
+      while aNumberOfChars < aLine.length  do begin
+        aTmpMeasuredWidth := aPaint.measureText(aLine{text},
+                                                0,
+                                                aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
+        if compareValue(aTmpMeasuredWidth, _MaxWidth, TEpsilon.Position) > 0 then break
+        else begin
+          inc(aNumberOfChars);
+          ameasuredWidth[0] := aTmpMeasuredWidth;
+        end;
+      end;
+    end;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~}
   procedure _initEllipsis;
+  var aSavedColor: TalphaColor;
+      aSavedTypeFace: JTypeface;
+      aTypeFace: JTypeface;
   begin
     if aEllipsisLine = nil then begin
+      //-----
       if aEllipsisText = nil then aEllipsisLine := StringtoJString(string('…'))
       else aEllipsisLine := aEllipsisText;
-      if aEllipsisColor <> TAlphaColorRec.Null then begin
-        aSavedColor := aPaint.getColor;
-        aPaint.setColor(aEllipsisColor);
+      //-----
+      aSavedTypeFace := nil; // stupid warning
+      if aEllipsisFontName <> '' then begin
+        aSavedTypeFace := aPaint.getTypeface;
+        aTypeface := TJTypeface.JavaClass.create(StringToJString(aEllipsisFontName), ALfontStyleToAndroidStyle(aEllipsisFontStyle));
+        aPaint.setTypeface(aTypeface);
+        aTypeface := nil;
       end;
+      //-----
+      aSavedColor := TAlphaColorRec.Null; // stupid warning
+      if aEllipsisFontColor <> TAlphaColorRec.Null then begin
+        aSavedColor := aPaint.getColor;
+        aPaint.setColor(aEllipsisFontColor);
+      end;
+      //-----
       aEllipsisLineLn := aPaint.measureText(aEllipsisLine);
-      if aEllipsisColor <> TAlphaColorRec.Null then aPaint.setColor(aSavedColor);
+      if aEllipsisFontName <> '' then aPaint.setTypeface(aSavedTypeFace);
+      if aEllipsisFontColor <> TAlphaColorRec.Null then aPaint.setColor(aSavedColor);
+      //-----
       case AHTextAlign of
         TTextAlign.Center: begin
                              aEllipsisLinePos := TpointF.create((aMaxWidth - aEllipsisLineLn - aLineIndent) / 2, aCurrLineY);
@@ -669,6 +896,7 @@ var aBreakTextItemsStartCount: integer;
                                                         aEllipsisLinePos.Y - (-1*aMetrics.ascent)),
                                          aEllipsisLineLn,
                                          (-1*aMetrics.ascent) + aMetrics.descent);
+      //-----
     end;
   end;
 
@@ -698,7 +926,8 @@ begin
                                         // aMetrics.descent   => The recommended distance below the baseline for singled spaced text.
                                         // aMetrics.bottom    => The maximum distance below the baseline for the lowest glyph in the font at a given text size
                                         // aMetrics.leading   => The recommended additional space to add between lines of text
-  aCurrLineY := (-1*aMetrics.ascent); // aMetrics.top and aMetrics.ascent are always returned in negative value
+  aCurrLineY := aFirstLineIndent.y + (-1*aMetrics.ascent); // aMetrics.top and aMetrics.ascent are always returned in negative value
+  aTotalLines := 0;
   aLineHeight := aMetrics.descent + aLineSpacing + (-1*aMetrics.ascent);
 
   //init aEllipsisLine
@@ -706,10 +935,10 @@ begin
   aEllipsisLineLn := 0;
 
   //init aLineIndent
-  aLineIndent := aFirstLineIndent;
+  aLineIndent := aFirstLineIndent.x;
 
   //if we have at least enalf of height to write the 1rt row
-  if comparevalue(aLineHeight,aMaxHeight,Tepsilon.position) <= 0 then begin
+  if comparevalue(aFirstLineIndent.y + aMetrics.descent + (-1*aMetrics.Ascent),aMaxHeight,Tepsilon.position) <= 0 then begin
 
     //create ameasuredWidth
     ameasuredWidth := TJavaArray<Single>.Create(1);
@@ -726,16 +955,12 @@ begin
         if i = ATextIdx then begin
           aLine := StringtoJString(string(''));
           aLineManuallyBreaked := True;
-          if (aText.codePointAt(i) = $0D) and
-             (i + 1 < ATextLn) and
-             (aText.codePointAt(i + 1) = $0A) then ATextIdx := ATextIdx + 1; // (MSWINDOWS linebreak = #13#10)
+          result := true;
         end
         else if i > 0 then begin
           aLine := aText.substring(ATextIdx{start}, i{end_}); // skip the $0D/$0A
           aLineManuallyBreaked := True;
-          if (aText.codePointAt(i) = $0D) and
-             (i + 1 < ATextLn) and
-             (aText.codePointAt(i + 1) = $0A) then ATextIdx := ATextIdx + 1; // (MSWINDOWS linebreak = #13#10)
+          result := true;
         end
         else begin
           aLine := aText.substring(ATextIdx{start});
@@ -751,39 +976,16 @@ begin
                                                                             // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                             //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                             //   it's return for exemple 9 when height = 11
-        //their is a fucking bug on android 4.4.2 that aNumberOfChars
-        //is the number of Glyph and not of char, so ligature like 'fi' are
-        //counted like one glyph :(
-        //very few comments about this on the internet
-        //http://stackoverflow.com/questions/39891726/android-paint-breaktext-not-work-on-kitkat
-        if (aNumberOfChars < aLine.length) and
-           (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-          while aNumberOfChars < aLine.length  do begin
-            aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                    0,
-                                                    aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-            if compareValue(aTmpMeasuredWidth, aMaxWidth - aLineIndent, TEpsilon.Position) > 0 then break
-            else begin
-              inc(aNumberOfChars);
-              ameasuredWidth[0] := aTmpMeasuredWidth;
-            end;
-          end;
-        end;
+       _splitLigature(aMaxWidth - aLineIndent);
 
-        //the text was breaked
-        if (aNumberOfChars < aLine.length)
-           or
-           ((aLineManuallyBreaked) and
-            (not aWordWrap) and
-            (aTrimming <> TTextTrimming.None))
-           or
-           ((aLineManuallyBreaked) and
-            (aWordWrap) and
-            (compareValue(aCurrLineY + aLineHeight + aMetrics.descent, aMaxHeight, TEpsilon.position) > 0) and
-            (aTrimming <> TTextTrimming.None)) then begin
+        //init result
+        if aNumberOfChars < aLine.length then result := true;
 
-          //init result
-          result := True;
+        //if we need to break the text
+        if (aNumberOfChars < aLine.length) // << if aNumberOfChars < aLine.length it's evident we will need to break the text
+           or
+           ((aLineManuallyBreaked) and                      // << if their if #13#10 (that we reach because aNumberOfChars >= aLine.length) AND
+            (aTrimming <> TTextTrimming.None)) then begin   // << aTrimming <> TTextTrimming.None (else we don't need to break anything)
 
           //if not aWordWrap
           if not aWordWrap then begin
@@ -809,19 +1011,7 @@ begin
                                                                                                                // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                                                //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                                                //   it's return for exemple 9 when height = 11
-                                           if (aNumberOfChars < aLine.length) and
-                                              (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                                             while aNumberOfChars < aLine.length  do begin
-                                               aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                                                       0,
-                                                                                       aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                                               if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
-                                               else begin
-                                                 inc(aNumberOfChars);
-                                                 ameasuredWidth[0] := aTmpMeasuredWidth;
-                                              end;
-                                             end;
-                                           end;
+                                           _splitLigature(aMaxWidth - aEllipsisLineLn - aLineIndent);
                                            if aNumberOfChars >= aLine.length then break;
                                          end;
                                          //-----
@@ -831,6 +1021,7 @@ begin
                                     _initEllipsis;
                                     //-----
                                     aSaveNumberOfChars := aNumberOfChars;
+                                    aSaveNumberOfCharsIsAccurate := False;
                                     while aNumberOfChars > 0 do begin
                                       //----
                                       if (aNumberOfChars >= aLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
@@ -848,9 +1039,9 @@ begin
                                       //----
                                       else begin
                                         aNumberOfChars := aSaveNumberOfChars;
-                                        if (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                                                     // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                                                     // we considere that aEllipsisText is only one char
+                                        if (not aSaveNumberOfCharsIsAccurate) and (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
+                                                                                                                                            // because of manual linebreak and dec(aNumberOfChars) because initialy
+                                                                                                                                            // we considere that aEllipsisText is only one char
                                         while aNumberOfChars > 0 do begin
                                           aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
                                           aNumberOfChars := aPaint.breakText(aLine {text},
@@ -861,19 +1052,7 @@ begin
                                                                                                               // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                                               //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                                               //   it's return for exemple 9 when height = 11
-                                           if (aNumberOfChars < aLine.length) and
-                                              (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                                             while aNumberOfChars < aLine.length  do begin
-                                               aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                                                       0,
-                                                                                       aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                                               if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
-                                               else begin
-                                                 inc(aNumberOfChars);
-                                                 ameasuredWidth[0] := aTmpMeasuredWidth;
-                                              end;
-                                             end;
-                                           end;
+                                          _splitLigature(aMaxWidth - aEllipsisLineLn - aLineIndent);
                                           if aNumberOfChars >= aLine.length then break;
                                         end;
                                         break;
@@ -887,21 +1066,12 @@ begin
                                                                                                           // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                                           //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                                           //   it's return for exemple 9 when height = 11
-                                      if (aNumberOfChars < aLine.length) and
-                                         (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                                        while aNumberOfChars < aLine.length  do begin
-                                          aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                                                  0,
-                                                                                  aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                                          if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
-                                          else begin
-                                            inc(aNumberOfChars);
-                                            ameasuredWidth[0] := aTmpMeasuredWidth;
-                                          end;
-                                        end;
-                                      end;
+                                      _splitLigature(aMaxWidth - aEllipsisLineLn - aLineIndent);
                                       if aNumberOfChars >= aLine.length then break
-                                      else aSaveNumberOfChars:= aNumberOfChars;
+                                      else begin
+                                        aSaveNumberOfChars:= aNumberOfChars;
+                                        aSaveNumberOfCharsIsAccurate := True;
+                                      end;
                                       //----
                                     end;
                                   end;
@@ -912,13 +1082,15 @@ begin
           else begin
 
             //We are at the last line and aTrimming <> TTextTrimming.None
-            if (compareValue(aCurrLineY + aLineHeight + aMetrics.descent, aMaxHeight, Tepsilon.position) > 0) and
+            if ((compareValue(aCurrLineY + aLineHeight + aMetrics.descent, aMaxHeight, Tepsilon.position) > 0) or
+                ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1))) and
                (aTrimming <> TTextTrimming.None) then begin
 
               //-----
               _initEllipsis;
               //-----
               aSaveNumberOfChars := aNumberOfChars;
+              aSaveNumberOfCharsIsAccurate := False;
               while aNumberOfChars > 0 do begin
                 //----
                 if (aNumberOfChars >= aLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
@@ -936,9 +1108,9 @@ begin
                 //----
                 else begin
                   aNumberOfChars := aSaveNumberOfChars;
-                  if (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
-                                                                               // because of manual linebreak and dec(aNumberOfChars) because initialy
-                                                                               // we considere that aEllipsisText is only one char
+                  if (not aSaveNumberOfCharsIsAccurate) and (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
+                                                                                                                      // because of manual linebreak and dec(aNumberOfChars) because initialy
+                                                                                                                      // we considere that aEllipsisText is only one char
                   while aNumberOfChars > 0 do begin
                     aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
                     aNumberOfChars := aPaint.breakText(aLine {text},
@@ -949,19 +1121,7 @@ begin
                                                                                         // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                         //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                         //   it's return for exemple 9 when height = 11
-                    if (aNumberOfChars < aLine.length) and
-                       (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                      while aNumberOfChars < aLine.length  do begin
-                        aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                                0,
-                                                                aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                        if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
-                        else begin
-                          inc(aNumberOfChars);
-                          ameasuredWidth[0] := aTmpMeasuredWidth;
-                        end;
-                      end;
-                    end;
+                    _splitLigature(aMaxWidth - aEllipsisLineLn - aLineIndent);
                     if aNumberOfChars >= aLine.length then break;
                   end;
                   break;
@@ -975,21 +1135,12 @@ begin
                                                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                     //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                     //   it's return for exemple 9 when height = 11
-                if (aNumberOfChars < aLine.length) and
-                   (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                  while aNumberOfChars < aLine.length  do begin
-                    aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                            0,
-                                                            aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                    if compareValue(aTmpMeasuredWidth, aMaxWidth - aEllipsisLineLn - aLineIndent, TEpsilon.Position) > 0 then break
-                    else begin
-                      inc(aNumberOfChars);
-                      ameasuredWidth[0] := aTmpMeasuredWidth;
-                    end;
-                  end;
-                end;
+                _splitLigature(aMaxWidth - aEllipsisLineLn - aLineIndent);
                 if aNumberOfChars >= aLine.length then break
-                else aSaveNumberOfChars:= aNumberOfChars;
+                else begin
+                  aSaveNumberOfChars:= aNumberOfChars;
+                  aSaveNumberOfCharsIsAccurate := True;
+                end;
                 //----
               end;
 
@@ -999,7 +1150,7 @@ begin
             else begin
 
               aSaveNumberOfChars := aNumberOfChars;
-              inc(aNumberOfChars); // in case the space separator is just after aNumberOfChars
+              if aNumberOfChars < aLine.length then inc(aNumberOfChars); // in case the space separator is just after aNumberOfChars
               while aNumberOfChars > 0 do begin
                 //-----
                 if aNumberOfChars >= 2 then begin
@@ -1024,19 +1175,7 @@ begin
                                                                                         // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                         //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                         //   it's return for exemple 9 when height = 11
-                    if (aNumberOfChars < aLine.length) and
-                       (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                      while aNumberOfChars < aLine.length  do begin
-                        aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                                0,
-                                                                aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                        if compareValue(aTmpMeasuredWidth, aMaxWidth - aLineIndent, TEpsilon.Position) > 0 then break
-                        else begin
-                          inc(aNumberOfChars);
-                          ameasuredWidth[0] := aTmpMeasuredWidth;
-                        end;
-                      end;
-                    end;
+                    _splitLigature(aMaxWidth - aLineIndent);
                     if aNumberOfChars >= aLine.length then break;
                   end;
                   break;
@@ -1050,19 +1189,7 @@ begin
                                                                                     // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
                                                                                     //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
                                                                                     //   it's return for exemple 9 when height = 11
-                if (aNumberOfChars < aLine.length) and
-                   (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-                  while aNumberOfChars < aLine.length  do begin
-                    aTmpMeasuredWidth := aPaint.measureText(aLine{text},
-                                                            0,
-                                                            aNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-                    if compareValue(aTmpMeasuredWidth, aMaxWidth - aLineIndent, TEpsilon.Position) > 0 then break
-                    else begin
-                      inc(aNumberOfChars);
-                      ameasuredWidth[0] := aTmpMeasuredWidth;
-                    end;
-                  end;
-                end;
+                _splitLigature(aMaxWidth - aLineIndent);
                 if aNumberOfChars >= aLine.length then begin
                   inc(aNumberOfChars); // to skip the separator
                   break;
@@ -1086,16 +1213,31 @@ begin
         // their is not enalf of place to write at least one char or
         // we are on the #13/#10
         if aNumberOfChars <= 0 then begin
-          ATextIdx := ATextIdx + 1; // skip the current char or skip the #10
+          if (ATextIdx + 1 < ATextLn) and
+             (aText.codePointAt(ATextIdx) = $0D) and
+             (aText.codePointAt(ATextIdx + 1) = $0A) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
+          else if (ATextIdx < ATextLn) and
+                  (aText.codePointAt(ATextIdx) = $0A) then ATextIdx := ATextIdx + 1 // (UNIX linebreak = #10)
+          else if compareValue(aLineIndent, 0, Tepsilon.Position) <= 0 then begin // if aLineIndent > 0 then maybe we don't have enalf of place to write one char because of the aLineIndent.
+            ATextIdx := ATextIdx + 1; // skip the current char
+            if (ATextIdx < ATextLn) and
+               (aText.CharAT(ATextIdx).IsLowSurrogate) then inc(ATextIdx);
+          end;
           aCurrLineY := aCurrLineY + aLineHeight; // go to next line
+          inc(aTotalLines);
           aLineIndent := 0;
           if (not aWordWrap) or
+             ((aMaxLines > 0) and (aTotalLines >= aMaxLines)) or
              (compareValue(aCurrLineY + aMetrics.descent, aMaxHeight, TEpsilon.position) > 0) then break
           else continue;
         end
         else begin
           aTextIdx := ATextIdx + aNumberOfChars;
-          if aLineManuallyBreaked then ATextIdx := ATextIdx + 1; // skip the #10
+          if (ATextIdx + 1 < ATextLn) and
+             (aText.codePointAt(ATextIdx) = $0D) and
+             (aText.codePointAt(ATextIdx + 1) = $0A) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
+          else if (ATextIdx < ATextLn) and
+                  (aText.codePointAt(ATextIdx) in [$0D, $0A]) then ATextIdx := ATextIdx + 1;
         end;
 
         //init aBreakedText
@@ -1139,12 +1281,14 @@ begin
 
         //update aCurrLineY
         aCurrLineY := aCurrLineY + aLineHeight;
+        inc(aTotalLines);
 
         //update aLineIndent
         aLineIndent := 0;
 
         // stop if not aWordWrap or after maxheight
         if (not aWordWrap) or
+           ((aMaxLines > 0) and (aTotalLines >= aMaxLines)) or
            (compareValue(aCurrLineY + aMetrics.descent, aMaxHeight, TEpsilon.position) > 0) then break;
 
       end;
@@ -1163,6 +1307,7 @@ begin
       aBreakTextItem.line := aEllipsisLine;
       aBreakTextItem.pos := aEllipsisLinePos;
       aBreakTextItem.rect := aEllipsisLineRect;
+      aBreakTextItem.isEllipsis := True;
       aBreakTextItems.Add(aBreakTextItem);
     except
       ALFreeAndNil(aBreakTextItem);
@@ -1177,8 +1322,10 @@ begin
                             aOffset := Floor((aRect.Right - aMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                             aRect.Left := aRect.Left + aOffset;
                             aRect.right := aRect.right - aOffset;
-                            for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do
+                            for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                               aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
+                              aBreakTextItems[I].rect.Offset(-aOffset, 0);
+                            end;
                           end;
        TTextAlign.Leading: begin
                              aRect.Right := min(aRect.Right, aRect.Left + aMaxLineWidth);
@@ -1186,8 +1333,10 @@ begin
        TTextAlign.Trailing: begin
                               aOffset := Floor(aRect.Right - aMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                               aRect.Left := aRect.Left + aOffset;
-                              for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do
+                              for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                                 aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
+                                aBreakTextItems[I].rect.Offset(-aOffset, 0);
+                              end;
                             end;
     end;
   end;
@@ -1209,7 +1358,7 @@ begin
   end;
 
 end;
-{$ENDIF}
+{$IFEND}
 
 {****************}
 {$IF defined(IOS)}
@@ -1217,8 +1366,9 @@ constructor TALBreakTextItem.Create;
 begin
   inherited;
   Line := nil;
+  isEllipsis := False;
 end;
-{$ENDIF}
+{$IFEND}
 
 {****************}
 {$IF defined(IOS)}
@@ -1230,490 +1380,7 @@ begin
   end;
   inherited;
 end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-function ALBreakText(var ARect: TRectF;
-                     const aTextAttr: CFAttributedStringRef;
-                     const aWordWrap: Boolean;
-                     const AHTextAlign, AVTextAlign: TTextAlign;
-                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-                     var aBreakTextItems: TALBreakTextItems;
-                     const aFirstLineIndent: single = 0; // kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent in aTextAttr
-                     const aLineSpacing: integer = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
-                     const aEllipsisAttr: CFAttributedStringRef = nil): boolean; // return true if text was truncated
-
-var aBreakTextItem: TALBreakTextItem;
-    aBreakTextItemsStartCount: integer;
-    aEllipsisLine: CtLineRef;
-    aTextAttrLn: CFIndex;
-    aTmpTextAttr: CFAttributedStringRef;
-    aFramePath: CGMutablePathRef;
-    aFrameSetter: CTFramesetterRef;
-    aFrame: CTFrameRef;
-    alines: CFArrayRef;
-    aline: CTLineRef;
-    aTruncatedLine: CTLineRef;
-    aLinesCount: CFIndex;
-    aMaxWidth: single;
-    aMaxHeight: single;
-    aPrevMaxLineWidth: Single;
-    aMaxLineWidth: single;
-    aPrevCurrLineY: single;
-    aCurrLineY: single;
-    aTotalLinesHeight: single;
-    aAscent, aDescent: CGFloat;
-    aMeasuredWidth: Double;
-    aGlyphMeasuredWidth: Double;
-    aLineIndent: single;
-    aOffset: single;
-    aRuns: CFArrayRef;
-    aTruncatedRuns: CFArrayRef;
-    aRunsCount: CFIndex;
-    aRun: CTRunRef;
-    aTruncatedRun: CTRunRef;
-    aGlyphCount: CFIndex;
-    aStringRange: CFRange;
-    aStringIndex: CFIndex;
-    aString: CFStringRef;
-    aChar: unichar;
-    i: CFIndex;
-
-begin
-
-  //init aBreakTextItemsStartCount
-  aBreakTextItemsStartCount := aBreakTextItems.Count;
-
-  //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight
-  if aRect.Width > 65535 then aRect.Width := 65535;
-  if aRect.height > 65535 then aRect.height := 65535;
-  aMaxWidth := ARect.width;
-  aMaxHeight := ARect.Height;
-  aPrevMaxLineWidth := 0;
-  aMaxLineWidth := 0;
-  aTotalLinesHeight := 0;
-  aPrevCurrLineY := 0;
-
-  //if aWordWrap
-  if aWordWrap then begin
-
-    //Create an immutable path of a rectangle.
-    aFramePath := CGPathCreateWithRect(ALLowerLeftCGRect(ARect.TopLeft{aUpperLeftOrigin},
-                                                         ARect.Width{aWidth},
-                                                         ARect.Height{aHeight},
-                                                         ARect.Height{aGridHeight}),
-                                                         nil{transform});
-    try
-
-      //Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
-      //create and fill text frames with the CTFramesetterCreateFrame call.
-      aFrameSetter := CTFramesetterCreateWithAttributedString(aTextAttr);
-      if aFrameSetter = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateWithAttributedString return NULL if unsuccessful.
-      try
-
-        //Creates an immutable frame using a framesetter.
-        aFrame := CTFramesetterCreateFrame(aframesetter, // framesetter: The framesetter used to create the frame.
-                                           CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                                              // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                                              // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                                           aframePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                                       // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                                           nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                                 // or NULL if there are no such attributes.
-        if aFrame = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateFrame return NULL if unsuccessful.
-        try
-
-          //init alines / aLinesCount
-          alines := CTFrameGetLines(aFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
-          aLinesCount := CFArrayGetCount(aLines);
-
-          //init aString
-          aString := CFAttributedStringGetString(aTextAttr); // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object
-          if aString = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end; // CFAttributedStringGetString can return NULL if there was a problem creating the object
-
-          //init result
-          result := aLinesCount > 1;
-
-          //update aBreakTextItems
-          for I := 0 to aLinesCount - 1 do begin
-
-            //init aline / aMeasuredWidth
-            aline := CFArrayGetValueAtIndex(alines, I);
-            aMeasuredWidth := CTLineGetTypographicBounds(aline, // line: The line whose typographic bounds are calculated.
-                                                         @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                         @aDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                         nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                               // >> return the typographic width of the line. If the line is invalid, this function returns 0.
-
-            //update aCurrLineY / aLineIndent
-            if i = 0 then begin
-              aCurrLineY := aAscent;
-              aLineIndent := aFirstLineIndent;
-            end
-            else begin
-              aPrevCurrLineY := aTotalLinesHeight + aLineSpacing;
-              aCurrLineY := aTotalLinesHeight + aLineSpacing + aAscent;
-              aLineIndent := 0;
-            end;
-
-            // stop if after maxheight
-            if (compareValue(aCurrLineY + adescent, aMaxHeight, TEpsilon.position) > 0) then begin
-              result := True;
-              break;
-            end;
-
-            // update aTotalLinesHeight
-            aTotalLinesHeight := aCurrLineY + aDescent;
-
-            //unfortunatly the lines that are wrapped are not trimed with the last space
-            //so aMeasuredWidth is inacurate. so i must calculate the with of the last char
-            //(the space) to remove it from aMeasuredWidth
-            aRuns := CTLineGetGlyphRuns(aline); // Returns the array of glyph runs that make up the line object.
-                                                // Each CTLine object contains an array of glyph run (CTRun) objects. A glyph run is a
-                                                // set of consecutive glyphs that share the same attributes and direction. The typesetter
-                                                // creates glyph runs as it produces lines from character strings, attributes, and font objects.
-                                                // This means that a line is constructed of one or more glyphs runs. Glyph runs can draw
-                                                // themselves into a graphic context, if desired, although most clients have no need to
-                                                // interact directly with glyph runs.
-            aRunsCount := CFArrayGetCount(aRuns);
-            While aRunsCount > 0 do begin
-              //-----
-              aRun := CFArrayGetValueAtIndex(aRuns, aRunsCount-1);
-              aStringRange := CTRunGetStringRange(aRun); // return The range of characters that originally spawned the glyphs, of if run is invalid, an empty range.
-                                                         // ex for the string
-                                                         // azerty_
-                                                         // ^
-                                                         // location=0 & length=7
-              if aStringRange.length <= 0 then begin // if their is no char in this run (it's possible??) then skip this run
-                dec(aRunsCount);
-                continue;
-              end;
-              //-----
-              aStringIndex := aStringRange.location + aStringRange.length; // azerty_
-                                                                           // 01234567
-                                                                           // ^      ^
-                                                                           // ^      aStringIndex=7
-                                                                           // location=0
-              while aStringIndex > aStringRange.location do begin
-                aChar := CFStringGetCharacterAtIndex(aString, aStringIndex - 1); // azerty_
-                                                                                 // 01234567
-                                                                                 //       ^^
-                                                                                 //       aStringIndex=6
-
-                if achar.IsWhiteSpace and (Achar.ToUCS4Char <> $00A0{No-break Space}) then dec(aStringIndex)
-                else break;
-              end;
-              if aStringIndex >= aStringRange.location + aStringRange.length then break; // no space was detected then stop the loop
-              //-----
-              aGlyphCount := CTRunGetGlyphCount(aRun); // return The number of glyphs that the run contains, or if there are no glyphs in this run, a value of 0.
-                                                       // 7
-              aGlyphCount := aGlyphCount - ((aStringRange.location + aStringRange.length) - aStringIndex); // 7 - (7 - 6) = 6
-              if (aGlyphCount >= 0) then begin
-                aGlyphMeasuredWidth := CTRunGetTypographicBounds(aRun, // run: The run for which to calculate the typographic bounds.
-                                                                 CFRangeMake(aGlyphCount, 0), // range: The portion of the run to measure. If the length of the range is set to 0,
-                                                                                              // then the measure operation continues from the range's start index to the end of the run.
-                                                                                              // azerty_
-                                                                                              // 01234567
-                                                                                              //       ^
-                                                                                              //       aGlyphCount
-                                                                 nil, // ascent: On output, the ascent of the run. This can be set to NULL if not needed.
-                                                                 nil, // descent: On output, the descent of the run. This can be set to NULL if not needed.
-                                                                 nil); // leading: On output, the leading of the run. This can be set to NULL if not needed.
-                aMeasuredWidth := aMeasuredWidth - aGlyphMeasuredWidth;
-              end;
-              //-----
-              if aStringIndex > aStringRange.location then break // it's mean the current run not contain only space, so no need to continue
-              else dec(aRunsCount);
-              //-----
-            end;
-
-            //calculate aMaxLineWidth
-            aPrevMaxLineWidth := aMaxLineWidth;
-            aMaxLineWidth := max(aMaxLineWidth, aMeasuredWidth);
-
-            //update aBreakTextItems
-            aBreakTextItem := TalBreakTextItem.Create;
-            try
-              aBreakTextItem.Line := CFRetain(aline); // Retains a Core Foundation object. we need this because we will later free the aFrame but still need to access the Line
-              case AHTextAlign of
-                TTextAlign.Center: begin
-                                     aBreakTextItem.pos := TpointF.create((aMaxWidth - ameasuredWidth - aLineIndent) / 2, aCurrLineY);
-                                   end;
-                TTextAlign.Leading: begin
-                                      aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
-                                    end;
-                TTextAlign.Trailing: begin
-                                       aBreakTextItem.pos := TpointF.create(aMaxWidth - ameasuredWidth, aCurrLineY);
-                                     end;
-              end;
-              aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
-                                                                  aBreakTextItem.pos.Y - aAscent),
-                                                   ameasuredWidth,
-                                                   aAscent + adescent);
-              aBreakTextItems.Add(aBreakTextItem);
-            except
-              ALFreeAndNil(aBreakTextItem);
-              raise;
-            end;
-
-          end;
-
-          //trim the last line
-          if (aBreakTextItems.Count > aBreakTextItemsStartCount) and
-             (aTrimming <> TTextTrimming.None) and
-             (aEllipsisAttr <> nil) then begin
-
-            //init aBreakTextItem
-            aBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
-            aTextAttrLn := CFAttributedStringGetLength(aTextAttr);
-
-            //init aStringRange
-            aStringRange := CTLineGetStringRange(aBreakTextItem.Line); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
-
-            //init result
-            result := result or (aStringRange.location + aStringRange.length < aTextAttrLn);
-
-            //if the text was breaked
-            if (aStringRange.length > 0) and  // if CTLineGetStringRange fails for any reason, an empty range.
-               (aStringRange.location + aStringRange.length < aTextAttrLn) then begin
-
-              //create the aEllipsisLine
-              aEllipsisLine := CTLineCreateWithAttributedString(aEllipsisAttr); // Creates a single immutable line object directly from an attributed string.
-              if aEllipsisLine <> nil then begin                                // Return Value: A reference to a CTLine object if the call was successful; otherwise, NULL.
-                try
-
-                  aStringRange.length := aTextAttrLn - aStringRange.location;
-                  aTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, aTextAttr, aStringRange); // return a new attributed string whose string and attributes are copied from the specified range of the
-                  if aTmpTextAttr <> nil then begin                                                                    // supplied attributed string. Returns NULL if there was a problem copying the object
-                    try
-
-                      aLine := CTLineCreateWithAttributedString(aTmpTextAttr); // A reference to a CTLine object if the call was successful;
-                      if aLine <> nil then begin                               // otherwise, NULL.
-                        try
-
-                          aTruncatedLine :=  CTLineCreateTruncatedLine(aLine, // line: The line from which to create a truncated line.
-                                                                       aMaxWidth, // width: The width at which truncation begins. The line is truncated if its width is greater than the width passed in this parameter.
-                                                                       kCTLineTruncationEnd, // truncationType: The type of truncation to perform if needed.
-                                                                       aEllipsisLine); // truncationToken: This token is added at the point where truncation took place, to indicate that the line was truncated.
-                                                                                       //                  Usually, the truncation token is the ellipsis character (U+2026). If this parameter is set to NULL, then no
-                                                                                       //                  truncation token is used and the line is simply cut off.
-                          if aTruncatedLine <> nil then begin // CTLineCreateTruncatedLine return A reference to a truncated CTLine object if the call was successful; otherwise, NULL.
-
-                            //init aMeasuredWidth
-                            aMeasuredWidth := CTLineGetTypographicBounds(aTruncatedLine, // line: The line whose typographic bounds are calculated.
-                                                                         @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                                         @aDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                                         nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                                               // >> return the typographic width of the line. If the line is invalid, this function returns 0.
-
-                            //calculate aMaxLineWidth
-                            aMaxLineWidth := max(aPrevMaxLineWidth, aMeasuredWidth);
-                            aCurrLineY := aPrevCurrLineY + aAscent;
-                            aTotalLinesHeight := aCurrLineY + aDescent;
-                            if aBreakTextItems.Count = aBreakTextItemsStartCount + 1 then aLineIndent := aFirstLineIndent
-                            else aLineIndent := 0;
-
-                            //update aBreakTextItems
-                            cfRelease(aBreakTextItem.Line);
-                            aBreakTextItem.Line := aTruncatedLine;
-                            case AHTextAlign of
-                              TTextAlign.Center: begin
-                                                   aBreakTextItem.pos := TpointF.create((aMaxWidth - ameasuredWidth - aLineIndent) / 2, aCurrLineY);
-                                                 end;
-                              TTextAlign.Leading: begin
-                                                    aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
-                                                  end;
-                              TTextAlign.Trailing: begin
-                                                     aBreakTextItem.pos := TpointF.create(aMaxWidth - ameasuredWidth, aCurrLineY);
-                                                   end;
-                            end;
-                            aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
-                                                                                aBreakTextItem.pos.Y - aAscent),
-                                                                 ameasuredWidth,
-                                                                 aAscent + adescent);
-
-                          end;
-
-                        finally
-                          cfRelease(aLine);
-                        end;
-                      end;
-
-                    finally
-                      cfRelease(aTmpTextAttr);
-                    end;
-                  end;
-
-                finally
-                  cfRelease(aEllipsisLine)
-                end;
-              end;
-
-            end;
-
-          end
-          else if (not result) and
-                  (aBreakTextItems.Count > aBreakTextItemsStartCount) then begin
-
-            //init aBreakTextItem
-            aBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
-            aTextAttrLn := CFAttributedStringGetLength(aTextAttr);
-
-            //init aStringRange
-            aStringRange := CTLineGetStringRange(aBreakTextItem.Line);
-            result := (aStringRange.location + aStringRange.length < aTextAttrLn);
-
-          end;
-
-        finally
-          CFRelease(aFrame);
-        end;
-
-      finally
-        CFRelease(aFrameSetter);
-      end;
-
-    finally
-      CFRelease(aFramePath);
-    end;
-
-  end
-
-  //not aWordWrap
-  else begin
-
-    //create the aEllipsisLine
-    if (aTrimming <> TTextTrimming.None) and
-       (aEllipsisAttr <> nil) then aEllipsisLine := CTLineCreateWithAttributedString(aEllipsisAttr) // Creates a single immutable line object directly from an attributed string.
-    else aEllipsisLine := nil;                                                                      // Return Value: A reference to a CTLine object if the call was successful; otherwise, NULL.
-    try
-
-      aLine := CTLineCreateWithAttributedString(aTextAttr);                             // A reference to a CTLine object if the call was successful;
-      if aLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // otherwise, NULL.
-      try
-
-        //init aTruncatedLine
-        aTruncatedLine :=  CTLineCreateTruncatedLine(aLine, // line: The line from which to create a truncated line.
-                                                     aMaxWidth, // width: The width at which truncation begins. The line is truncated if its width is greater than the width passed in this parameter.
-                                                     kCTLineTruncationEnd, // truncationType: The type of truncation to perform if needed.
-                                                     aEllipsisLine); // truncationToken: This token is added at the point where truncation took place, to indicate that the line was truncated.
-                                                                     //                  Usually, the truncation token is the ellipsis character (U+2026). If this parameter is set to NULL, then no
-                                                                     //                  truncation token is used and the line is simply cut off.
-        if aTruncatedLine = nil then begin ARect.Width := 0; ARect.Height := 0; exit(True); end; // CTLineCreateTruncatedLine return A reference to a truncated CTLine object if the call was successful; otherwise, NULL.
-
-        //init result - i didn't find a better way to do this !
-        aRuns := CTLineGetGlyphRuns(aLine); // Returns the array of glyph runs that make up the line object.
-                                            // Each CTLine object contains an array of glyph run (CTRun) objects. A glyph run is a
-                                            // set of consecutive glyphs that share the same attributes and direction. The typesetter
-                                            // creates glyph runs as it produces lines from character strings, attributes, and font objects.
-                                            // This means that a line is constructed of one or more glyphs runs. Glyph runs can draw
-                                            // themselves into a graphic context, if desired, although most clients have no need to
-                                            // interact directly with glyph runs.
-        aRunsCount := CFArrayGetCount(aRuns);
-        aTruncatedRuns := CTLineGetGlyphRuns(aTruncatedline);
-        result := aRunsCount <> CFArrayGetCount(aTruncatedRuns); // aTruncatedRuns[0] contain all the characters
-                                                                 // aTruncatedRuns[1] contain only one character, the last '...' (if the line was truncated)
-        if (not result) then begin
-          //their is also the case where the aTruncatedline contain ONLY aEllipsisLine ...
-          //in this way CFArrayGetCount(aRuns) = CFArrayGetCount(aTruncatedRuns) :(
-          //funcking ios i didn't find a good way to compare the char in the run
-          for i := aRunsCount - 1 downto 0 do begin
-            aRun := CFArrayGetValueAtIndex(aRuns, i);
-            aTruncatedRun := CFArrayGetValueAtIndex(aTruncatedRuns, i);
-            result := CTRunGetGlyphCount(aRun) <> CTRunGetGlyphCount(aTruncatedRun); // off course if aLine contain the same number of char than in aEllipsis then we are fucked
-            if result then break;
-          end;
-        end;
-
-        //init aMeasuredWidth
-        aMeasuredWidth := CTLineGetTypographicBounds(aTruncatedLine, // line: The line whose typographic bounds are calculated.
-                                                     @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                     @aDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                     nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                           // >> return the typographic width of the line. If the line is invalid, this function returns 0.
-
-        //calculate aMaxLineWidth
-        aMaxLineWidth := aMeasuredWidth;
-        aCurrLineY := aAscent;
-        aTotalLinesHeight := aCurrLineY + aDescent;
-        aLineIndent := aFirstLineIndent;
-
-        //update aBreakTextItems
-        aBreakTextItem := TalBreakTextItem.Create;
-        try
-          aBreakTextItem.Line := aTruncatedLine;
-          case AHTextAlign of
-            TTextAlign.Center: begin
-                                 aBreakTextItem.pos := TpointF.create((aMaxWidth - ameasuredWidth - aLineIndent) / 2, aCurrLineY);
-                               end;
-            TTextAlign.Leading: begin
-                                  aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
-                                end;
-            TTextAlign.Trailing: begin
-                                   aBreakTextItem.pos := TpointF.create(aMaxWidth - ameasuredWidth, aCurrLineY);
-                                 end;
-          end;
-          aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
-                                                              aBreakTextItem.pos.Y - aAscent),
-                                               ameasuredWidth,
-                                               aAscent + adescent);
-          aBreakTextItems.Add(aBreakTextItem);
-        except
-          ALFreeAndNil(aBreakTextItem);
-          raise;
-        end;
-
-      finally
-        cfRelease(aLine);
-      end;
-
-    finally
-      if aEllipsisLine <> nil then cfRelease(aEllipsisLine)
-    end;
-
-  end;
-
-  //initialise ARect
-  if compareValue(aMaxLineWidth, aMaxWidth, Tepsilon.Position) < 0 then begin
-    case AHTextAlign of
-       TTextAlign.Center: begin
-                            aOffset := Floor((aRect.Right - aMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                            aRect.Left := aRect.Left + aOffset;
-                            aRect.right := aRect.right - aOffset;
-                            for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do
-                              aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
-                          end;
-       TTextAlign.Leading: begin
-                             aRect.Right := min(aRect.Right, aRect.Left + aMaxLineWidth);
-                           end;
-       TTextAlign.Trailing: begin
-                              aOffset := Floor(aRect.Right - aMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                              aRect.Left := aRect.Left + aOffset;
-                              for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do
-                                aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
-                            end;
-    end;
-  end;
-  if compareValue(aTotalLinesHeight, aMaxHeight, Tepsilon.Position) < 0 then begin
-    case AVTextAlign of
-       TTextAlign.Center: begin
-                            aOffset := (aRect.bottom - aTotalLinesHeight - arect.top) / 2;
-                            aRect.top := aRect.top + aOffset;
-                            aRect.bottom := aRect.bottom - aOffset;
-                          end;
-       TTextAlign.Leading: begin
-                             aRect.bottom := min(aRect.bottom, aRect.top + aTotalLinesHeight);
-                           end;
-       TTextAlign.Trailing: begin
-                              aOffset := aRect.bottom - aTotalLinesHeight - arect.top;
-                              aRect.top := aRect.top + aOffset;
-                            end;
-    end;
-  end;
-
-end;
-{$ENDIF}
+{$IFEND}
 
 {****************}
 {$IF defined(IOS)}
@@ -1726,40 +1393,87 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const AText: string;
                      const aWordWrap: Boolean;
                      const AHTextAlign, AVTextAlign: TTextAlign;
-                     const aTrimming: TTextTrimming;
-                     var aBreakTextItems: TALBreakTextItems;
-                     const aFirstLineIndent: single = 0;
-                     const aLineSpacing: integer = 0;
+                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                     const aBreakTextItems: TALBreakTextItems;
+                     var aTotalLines: integer;
+                     const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                     const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                      const aEllipsisText: string = '…';
-                     const aEllipsisColor: TalphaColor = TAlphaColorRec.Null): boolean; // return true if text was truncated
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
 
-var aCGColor: CGColorRef;
-    aCGEllipsisColor: CGColorRef;
-    aFont: CTFontRef;
-    aTextString: CFStringRef;
-    aTextAttr: CFMutableAttributedStringRef;
+var aBreakTextItemsStartCount: integer;
+    aBreakTextItem: TALBreakTextItem;
+    aEllipsisBreakTextItem: TALBreakTextItem;
+    aEllipsisLine: CtLineRef;
+    aEllipsisWidth: Double;
+    aEllipsisFont: CTFontRef;
     aEllipsisString: CFStringRef;
     aEllipsisAttr: CFMutableAttributedStringRef;
-    aAlphaColor: TAlphaColorCGFloat;
+    aEllipsisColor: CGColorRef;
+    aFramePath: CGMutablePathRef;
+    aFrameSetter: CTFramesetterRef;
+    aFrame: CTFrameRef;
+    alines: CFArrayRef;
+    aline: CTLineRef;
+    aLinesCount: CFIndex;
+    aLineIndent: single;
+    aTextAttr: CFMutableAttributedStringRef;
+    aTmpTextAttr: CFAttributedStringRef;
+    aMaxWidth: single;
+    aMaxHeight: single;
+    aPrevMaxLineWidth: Single;
+    aMaxLineWidth: single;
+    aCurrLineY: single;
+    aTotalLinesHeight: single;
+    aAscent, aDescent: CGFloat;
+    aMeasuredWidth: Double;
     aSettings: array of CTParagraphStyleSetting;
     aParagraphStyle: CTParagraphStyleRef;
-    aCGFloatValue: CGFloat;
-    aByteValue: byte;
+    aCGColor: CGColorRef;
+    aTextString: CFStringRef;
+    aFont: CTFontRef;
+    aOffset: single;
+    aStringRange: CFRange;
+    aFirstLineHeadIndent: CGFloat;
+    aLineSpacingAdjustment: CGFloat;
+    aLineBreakMode: Byte;
+    aAlphaColor: TAlphaColorCGFloat;
+    i: CFIndex;
 
 begin
 
+  //init aBreakTextItemsStartCount
+  aBreakTextItemsStartCount := aBreakTextItems.Count;
+
+  //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight / etc.
+  if aRect.Width > 65535 then aRect.Width := 65535;
+  if aRect.height > 65535 then aRect.height := 65535;
+  aMaxWidth := ARect.width;
+  aMaxHeight := ARect.Height;
+  aPrevMaxLineWidth := 0; // << need this vars because we must recalculate the maxlineWidth for the last lines after the truncation is maded
+  aMaxLineWidth := 0;
+  aTotalLinesHeight := 0;
+  aTotalLines := 0;
+  aLineIndent := aFirstLineIndent.x;
+
+  //create aCGColor
   aAlphaColor := TAlphaColorCGFloat.Create(aFontColor);
   aCGColor := CGColorCreate(aColorSpace, @aAlphaColor);
   try
 
+    //create aFont
     aFont := ALGetCTFontRef(aFontName, aFontSize, aFontStyle); // Returns a new font reference for the given name.
     if aFont = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;
     try
 
+      //create aTextString
       aTextString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AText[Low(string)], Length(AText));
       if aTextString = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;
       try
 
+        //create aTextAttr
         aTextAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
         try
 
@@ -1796,12 +1510,12 @@ begin
             //kCTParagraphStyleSpecifierFirstLineHeadIndent
             //The distance, in points, from the leading margin of a frame to the beginning of the paragraph's first line. This value
             //is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            if aWordWrap and (compareValue(aFirstLineIndent, 0, TEpsilon.position) > 0) then begin
+            if (compareValue(aFirstLineIndent.x, 0, TEpsilon.position) > 0) then begin
               SetLength(aSettings, length(aSettings) + 1);
-              aCGFloatValue := aFirstLineIndent;
+              aFirstLineHeadIndent := aFirstLineIndent.x;
               aSettings[high(aSettings)].spec := kCTParagraphStyleSpecifierFirstLineHeadIndent;
-              aSettings[high(aSettings)].valueSize := SizeOf(aCGFloatValue);
-              aSettings[high(aSettings)].value := @aCGFloatValue;
+              aSettings[high(aSettings)].valueSize := SizeOf(aFirstLineHeadIndent);
+              aSettings[high(aSettings)].value := @aFirstLineHeadIndent;
             end;
             //-----
             //kCTParagraphStyleSpecifierHeadIndent
@@ -1817,6 +1531,17 @@ begin
             //* kCTLineBreakByTruncatingHead: Each line is displayed so that the end fits in the frame and the missing text is indicated by an ellipsis glyph.
             //* kCTLineBreakByTruncatingTail: Each line is displayed so that the beginning fits in the container and the missing text is indicated by an ellipsis glyph.
             //* kCTLineBreakByTruncatingMiddle: Each line is displayed so that the beginning and end fit in the container and the missing text is indicated by an ellipsis glyph in the middle.
+            if not aWordWrap then begin
+              SetLength(aSettings, length(aSettings) + 1);
+              case aTrimming of
+                TTextTrimming.None: aLineBreakMode := kCTLineBreakByClipping;
+                TTextTrimming.Character: aLineBreakMode := kCTLineBreakByCharWrapping;
+                TTextTrimming.Word: aLineBreakMode := kCTLineBreakByWordWrapping;
+              end;
+              aSettings[high(aSettings)].spec := kCTParagraphStyleSpecifierLineBreakMode;
+              aSettings[high(aSettings)].valueSize := SizeOf(aLineBreakMode);
+              aSettings[high(aSettings)].value := @aLineBreakMode;
+            end;
             //-----
             //kCTParagraphStyleSpecifierLineHeightMultiple
             //The line height multiple. The natural line height of the receiver is multiplied by this factor (if positive) before
@@ -1830,12 +1555,12 @@ begin
             //-----
             //kCTParagraphStyleSpecifierLineSpacingAdjustment
             //The space in points added between lines within the paragraph (commonly known as leading).
-            if aWordWrap and (compareValue(aLineSpacing, 0, TEpsilon.position) > 0) then begin
+            if (compareValue(aLineSpacing, 0, TEpsilon.position) > 0) then begin
               SetLength(aSettings, length(aSettings) + 1);
-              aCGFloatValue := aLineSpacing;
+              aLineSpacingAdjustment := aLineSpacing;
               aSettings[high(aSettings)].spec := kCTParagraphStyleSpecifierLineSpacingAdjustment;
-              aSettings[high(aSettings)].valueSize := SizeOf(aCGFloatValue);
-              aSettings[high(aSettings)].value := @aCGFloatValue;
+              aSettings[high(aSettings)].valueSize := SizeOf(aLineSpacingAdjustment);
+              aSettings[high(aSettings)].value := @aLineSpacingAdjustment;
             end;
             //-----
             //kCTParagraphStyleSpecifierMaximumLineHeight
@@ -1879,68 +1604,484 @@ begin
                 CFRelease(aParagraphStyle);
               end;
             end;
-            //-----
           finally
             CFAttributedStringEndEditing(aTextAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
           end;
 
-          if (aEllipsisText <> '') and (aTrimming <> TTextTrimming.None) then begin
 
-            if aEllipsisColor <> TAlphaColorRec.Null then aAlphaColor := TAlphaColorCGFloat.Create(aEllipsisColor)
-            else aAlphaColor := TAlphaColorCGFloat.Create(aFontColor);
-            aCGEllipsisColor := CGColorCreate(aColorSpace, @aAlphaColor);
+
+          /////////////////////////////
+          //Break the text in line(s)//
+          /////////////////////////////
+
+          //Create an immutable path of a rectangle.
+          aFramePath := CGPathCreateWithRect(ALLowerLeftCGRect(tpointf.create(0,0){aUpperLeftOrigin},
+                                                               ARect.Width{aWidth},
+                                                               ARect.Height - aFirstLineIndent.y{aHeight},
+                                                               ARect.Height - aFirstLineIndent.y{aGridHeight}),
+                                                               nil{transform});
+          try
+
+            //Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
+            //create and fill text frames with the CTFramesetterCreateFrame call.
+            aFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(aTextAttr));
+            if aFrameSetter = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateWithAttributedString return NULL if unsuccessful.
             try
 
-              aEllipsisString := CFStringCreateWithCharacters(kCFAllocatorDefault, @aEllipsisText[Low(string)], Length(aEllipsisText));
-              if aEllipsisString = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;
+              //Creates an immutable frame using a framesetter.
+              aFrame := CTFramesetterCreateFrame(aframesetter, // framesetter: The framesetter used to create the frame.
+                                                 CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
+                                                                    // that is to be typeset in lines fitted into the frame. If the length portion of the range is
+                                                                    // set to 0, then the framesetter continues to add lines until it runs out of text or space.
+                                                 aframePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
+                                                             // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
+                                                 nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
+                                                       // or NULL if there are no such attributes.
+              if aFrame = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateFrame return NULL if unsuccessful.
               try
 
-                aEllipsisAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
-                try
+                //init alines / aLinesCount
+                alines := CTFrameGetLines(aFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
+                aLinesCount := CFArrayGetCount(aLines);
 
-                  CFAttributedStringReplaceString(aEllipsisAttr, CFRangeMake(0, 0), aEllipsisString); // Modifies the string of an attributed string.
-                  CFAttributedStringBeginEditing(aEllipsisAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
-                  try
-                    CFAttributedStringSetAttribute(aEllipsisAttr, CFRangeMake(0, CFStringGetLength(aEllipsisString)), kCTFontAttributeName, aFont);
-                    CFAttributedStringSetAttribute(aEllipsisAttr, CFRangeMake(0, CFStringGetLength(aEllipsisString)), kCTForegroundColorAttributeName, aCGEllipsisColor);
-                  finally
-                    CFAttributedStringEndEditing(aEllipsisAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
+                //init result
+                result := aLinesCount > 1;
+
+                //update aBreakTextItems - loop on all lines
+                for I := 0 to aLinesCount - 1 do begin
+
+                  //break if maxline reach
+                  if (aMaxlines > 0) and (aTotalLines >= aMaxlines) then break; // << no need to set the result to true because aLinesCount > 1
+
+                  //break if not wordwrap
+                  if (not aWordwrap) and (aTotalLines >= 1) then break; // << no need to set the result to true because aLinesCount > 1
+
+                  //init aline / aMeasuredWidth
+                  aline := CFArrayGetValueAtIndex(alines, I);
+                  aMeasuredWidth := CTLineGetTypographicBounds(aline, // line: The line whose typographic bounds are calculated.
+                                                               @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                               @aDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                               nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                                     // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+
+                  //unfortunatly the lines that are wrapped are not trimed with the last space
+                  //so aMeasuredWidth is inacurate. so i must trim the trailling char
+                  if i < aLinesCount - 1 then aMeasuredWidth := aMeasuredWidth - CTLineGetTrailingWhitespaceWidth(aline);
+
+                  //update aCurrLineY
+                  if i = 0 then aCurrLineY := aFirstLineIndent.y + aAscent
+                  else aCurrLineY := aTotalLinesHeight + aLineSpacing + aAscent;
+
+                  // stop if after maxheight
+                  if (compareValue(aCurrLineY + adescent, aMaxHeight, TEpsilon.position) > 0) then begin
+                    result := True;
+                    break;
                   end;
 
-                  result := ALBreakText(ARect,
-                                        CFAttributedStringRef(aTextAttr),
-                                        aWordWrap,
-                                        AHTextAlign, AVTextAlign,
-                                        aTrimming,
-                                        aBreakTextItems,
-                                        aFirstLineIndent,
-                                        aLineSpacing,
-                                        CFAttributedStringRef(aEllipsisAttr));
+                  // update aTotalLinesHeight and aTotalLines
+                  aTotalLinesHeight := aCurrLineY + aDescent;
+                  inc(aTotalLines);
 
-                finally
-                  CFRelease(aEllipsisAttr);
+                  //alineindent must be init here (after the break) because alineindent must
+                  //correspond to the last item in aBreakTextItems
+                  if i > 0 then aLineIndent := 0;
+
+                  // calculate aMaxLineWidth
+                  aPrevMaxLineWidth := aMaxLineWidth;
+                  aMaxLineWidth := max(aMaxLineWidth, aMeasuredWidth + aLineIndent);
+
+                  // init aStringRange
+                  aStringRange := CTLineGetStringRange(aline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
+
+                  // update aBreakTextItems
+                  aBreakTextItem := TalBreakTextItem.Create;
+                  try
+
+                    // aBreakTextItem.Line
+                    aBreakTextItem.Line := CFRetain(aline); // Retains a Core Foundation object. we need this because we will later free the aFrame but still need to access the Line
+
+                    // aBreakTextItem.text
+                    if aStringRange.length > 0 then begin
+                      aTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(aTextAttr), aStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
+                      if aTmpTextAttr <> nil then begin
+                        try
+                          aBreakTextItem.text := CFStringRefToStr(CFAttributedStringGetString(aTmpTextAttr));  // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object.
+                        finally
+                          cfRelease(aTmpTextAttr);
+                        end;
+                      end
+                      else aBreakTextItem.text := '';
+                    end
+                    else aBreakTextItem.text := '';
+
+                    // aBreakTextItem.pos / aBreakTextItem.rect
+                    case AHTextAlign of
+                      TTextAlign.Center: begin
+                                           aBreakTextItem.pos := TpointF.create((aMaxWidth - ameasuredWidth - aLineIndent) / 2, aCurrLineY);
+                                         end;
+                      TTextAlign.Leading: begin
+                                            aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
+                                          end;
+                      TTextAlign.Trailing: begin
+                                             aBreakTextItem.pos := TpointF.create(aMaxWidth - ameasuredWidth, aCurrLineY);
+                                           end;
+                    end;
+                    aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
+                                                                        aBreakTextItem.pos.Y - aAscent),
+                                                         ameasuredWidth,
+                                                         aAscent + adescent);
+
+                    // add aBreakTextItem to aBreakTextItems
+                    aBreakTextItems.Add(aBreakTextItem);
+
+                  except
+                    ALFreeAndNil(aBreakTextItem);
+                    raise;
+                  end;
+
                 end;
 
               finally
-                CFRelease(aEllipsisString);
+                CFRelease(aFrame);
               end;
 
             finally
-              CGColorRelease(aCGEllipsisColor);
+              CFRelease(aFrameSetter);
             end;
 
-          end
-          else begin
+          finally
+            CFRelease(aFramePath);
+          end;
 
-            result := ALBreakText(ARect,
-                                  CFAttributedStringRef(aTextAttr),
-                                  aWordWrap,
-                                  AHTextAlign, AVTextAlign,
-                                  aTrimming,
-                                  aBreakTextItems,
-                                  aFirstLineIndent,
-                                  aLineSpacing,
-                                  nil);
+
+
+          //////////////////////////
+          //truncate the last line//
+          //////////////////////////
+
+          if (aBreakTextItems.Count > aBreakTextItemsStartCount) and  //if the text was at least breaked in one line
+             (aStringRange.length > 0) and  // aStringRange was initialised previously
+             (aStringRange.location + aStringRange.length < CFAttributedStringGetLength(CFAttributedStringRef(aTextAttr))) then begin // if the last line do not contain all the chars
+
+            //init result
+            result := True;
+
+            //if aTrimming = TTextTrimming.None or aEllipsisAttr = nil then nothing todo
+            if (aTrimming <> TTextTrimming.None) and
+               (aEllipsisText <> '') then begin
+
+              //create aEllipsisColor
+              if aEllipsisFontColor <> TAlphaColorRec.Null then aAlphaColor := TAlphaColorCGFloat.Create(aEllipsisFontColor)
+              else aAlphaColor := TAlphaColorCGFloat.Create(aFontColor);
+              aEllipsisColor := CGColorCreate(aColorSpace, @aAlphaColor);
+              try
+
+                //create aEllipsisFont
+                aEllipsisFont := ALGetCTFontRef(aFontName, aFontSize, aEllipsisFontStyle); // Returns a new font reference for the given name.
+                if aEllipsisFont <> nil then begin
+                  try
+
+                    //create aEllipsisString
+                    aEllipsisString := CFStringCreateWithCharacters(kCFAllocatorDefault, @aEllipsisText[Low(string)], Length(aEllipsisText));
+                    if aEllipsisString <> nil then begin
+                      try
+
+                        //create aEllipsisAttr
+                        aEllipsisAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
+                        try
+
+                          CFAttributedStringReplaceString(aEllipsisAttr, CFRangeMake(0, 0), aEllipsisString); // Modifies the string of an attributed string.
+                          CFAttributedStringBeginEditing(aEllipsisAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
+                          try
+                            CFAttributedStringSetAttribute(aEllipsisAttr, CFRangeMake(0, CFStringGetLength(aEllipsisString)), kCTFontAttributeName, aEllipsisFont);
+                            CFAttributedStringSetAttribute(aEllipsisAttr, CFRangeMake(0, CFStringGetLength(aEllipsisString)), kCTForegroundColorAttributeName, aEllipsisColor);
+                          finally
+                            CFAttributedStringEndEditing(aEllipsisAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
+                          end;
+
+                          //create the aEllipsisLine
+                          aEllipsisLine := CTLineCreateWithAttributedString(CFAttributedStringRef(aEllipsisAttr)); // Creates a single immutable line object directly from an attributed string.
+                          if aEllipsisLine <> nil then begin                                                       // Return Value: A reference to a CTLine object if the call was successful; otherwise, NULL.
+                            try
+
+                              CFAttributedStringBeginEditing(aTextAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
+                              try
+                                //-----
+                                SetLength(aSettings, 0);
+                                //-----
+                                //kCTParagraphStyleSpecifierAlignment
+                                //The text alignment. Natural text alignment is realized as left or right alignment, depending on the line sweep direction
+                                //of the first script contained in the paragraph. Type: CTTextAlignment. Default: kCTNaturalTextAlignment.
+                                //* kCTTextAlignmentCenter
+                                //* kCTTextAlignmentJustified
+                                //* kCTTextAlignmentLeft
+                                //* kCTTextAlignmentNatural
+                                //* kCTTextAlignmentRight
+                                //-----
+                                //kCTParagraphStyleSpecifierBaseWritingDirection
+                                //The base writing direction of the lines. Type: CTWritingDirection. Default: kCTWritingDirectionNatural. Application: CTFramesetter, CTTypesetter.
+                                //* kCTWritingDirectionNatural: The writing direction is algorithmically determined using the Unicode Bidirectional Algorithm rules P2 and P3.
+                                //* kCTWritingDirectionLeftToRight: The writing direction is left to right.
+                                //* kCTWritingDirectionRightToLeft: The writing direction is right to left.
+                                //-----
+                                //kCTParagraphStyleSpecifierCount
+                                //The number of style specifiers. The purpose is to simplify validation of style specifiers
+                                //-----
+                                //kCTParagraphStyleSpecifierDefaultTabInterval
+                                //The documentwide default tab interval. Tabs after the last specified by kCTParagraphStyleSpecifierTabStops are placed at
+                                //integer multiples of this distance (if positive). Type: CGFloat. Default: 0.0. Application: CTFramesetter, CTTypesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierFirstLineHeadIndent
+                                //The distance, in points, from the leading margin of a frame to the beginning of the paragraph's first line. This value
+                                //is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierHeadIndent
+                                //The distance, in points, from the leading margin of a text container to the beginning of lines other than the first.
+                                //This value is always nonnegative. Type: CGFloat Default: 0.0 Application: CTFramesetter
+                                //-----
+                                //kCTParagraphStyleSpecifierLineBreakMode
+                                //The mode that should be used to break lines when laying out the paragraph's text. Type: CTLineBreakMode.
+                                //Default: kCTLineBreakByWordWrapping. Application: CTFramesetter
+                                //* kCTLineBreakByWordWrapping: Wrapping occurs at word boundaries unless the word itself doesn't fit on a single line.
+                                //* kCTLineBreakByCharWrapping: Wrapping occurs before the first character that doesn't fit.
+                                //* kCTLineBreakByClipping: Lines are simply not drawn past the edge of the frame.
+                                //* kCTLineBreakByTruncatingHead: Each line is displayed so that the end fits in the frame and the missing text is indicated by an ellipsis glyph.
+                                //* kCTLineBreakByTruncatingTail: Each line is displayed so that the beginning fits in the container and the missing text is indicated by an ellipsis glyph.
+                                //* kCTLineBreakByTruncatingMiddle: Each line is displayed so that the beginning and end fit in the container and the missing text is indicated by an ellipsis glyph in the middle.
+                                SetLength(aSettings, length(aSettings) + 1);
+                                case aTrimming of
+                                  TTextTrimming.None: aLineBreakMode := kCTLineBreakByClipping;
+                                  TTextTrimming.Character: aLineBreakMode := kCTLineBreakByCharWrapping;
+                                  TTextTrimming.Word: aLineBreakMode := kCTLineBreakByWordWrapping;
+                                end;
+                                aSettings[high(aSettings)].spec := kCTParagraphStyleSpecifierLineBreakMode;
+                                aSettings[high(aSettings)].valueSize := SizeOf(aLineBreakMode);
+                                aSettings[high(aSettings)].value := @aLineBreakMode;
+                                //-----
+                                //kCTParagraphStyleSpecifierLineHeightMultiple
+                                //The line height multiple. The natural line height of the receiver is multiplied by this factor (if positive) before
+                                //being constrained by minimum and maximum line height. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierLineSpacing
+                                //Deprecated. Use kCTParagraphStyleSpecifierMaximumLineSpacing, kCTParagraphStyleSpecifierMinimumLineSpacing, and
+                                //kCTParagraphStyleSpecifierLineSpaceAdjustment to control space between lines. The space in points added between
+                                //lines within the paragraph (commonly known as leading). This value is always nonnegative. Type: CGFloat.
+                                //Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierLineSpacingAdjustment
+                                //The space in points added between lines within the paragraph (commonly known as leading).
+                                //-----
+                                //kCTParagraphStyleSpecifierMaximumLineHeight
+                                //The maximum height that any line in the frame will occupy, regardless of the font size or size of any
+                                //attached graphic. Glyphs and graphics exceeding this height will overlap neighboring lines.
+                                //A maximum height of 0 implies no line height limit. This value is always nonnegative.
+                                //Type: CGFloat. Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierMaximumLineSpacing
+                                //The maximum space in points between lines within the paragraph (commonly known as leading). This value is always nonnegative.
+                                //-----
+                                //kCTParagraphStyleSpecifierMinimumLineHeight
+                                //The minimum height that any line in the frame will occupy, regardless of the font size or size of any attached graphic.
+                                //This value is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierMinimumLineSpacing
+                                //The minimum space in points between lines within the paragraph (commonly known as leading). This value is always nonnegative.
+                                //-----
+                                //kCTParagraphStyleSpecifierParagraphSpacing
+                                //The space added at the end of the paragraph to separate it from the following paragraph. This value is always nonnegative
+                                //and is determined by adding the previous paragraph's kCTParagraphStyleSpecifierParagraphSpacing setting and the current paragraph's
+                                //kCTParagraphStyleSpecifierParagraphSpacingBefore setting. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierParagraphSpacingBefore
+                                //The distance between the paragraph's top and the beginning of its text content. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierTabStops
+                                //The CTTextTab objects, sorted by location, that define the tab stops for the paragraph style. Type: CFArray of CTTextTabRef.
+                                //Default: 12 left-aligned tabs, spaced by 28.0 points. Application: CTFramesetter, CTTypesetter.
+                                //-----
+                                //kCTParagraphStyleSpecifierTailIndent
+                                //The distance, in points, from the margin of a frame to the end of lines. If positive, this value is the distance from the leading margin
+                                //(for example, the left margin in left-to-right text). If 0 or negative, it's the distance from the trailing margin. Type: CGFloat.
+                                //Default: 0.0. Application: CTFramesetter.
+                                //-----
+                                if length(aSettings) > 0 then begin
+                                  aParagraphStyle := CTParagraphStyleCreate(@aSettings[0], Length(aSettings));
+                                  try
+                                    CFAttributedStringSetAttribute(aTextAttr, CFRangeMake(0, CFStringGetLength(aTextString)), kCTParagraphStyleAttributeName, aParagraphStyle);
+                                  finally
+                                    CFRelease(aParagraphStyle);
+                                  end;
+                                end;
+                                //-----
+                              finally
+                                CFAttributedStringEndEditing(aTextAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
+                              end;
+
+                              //init aEllipsisWidth
+                              aEllipsisWidth := CTLineGetTypographicBounds(aEllipsisLine, // line: The line whose typographic bounds are calculated.
+                                                                           @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                                           @aDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                                           nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                                                 // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+
+                              //Create an immutable path of a rectangle.
+                              aFramePath := CGPathCreateWithRect(ALLowerLeftCGRect(tpointf.create(0,0){aUpperLeftOrigin},
+                                                                                   aMaxWidth - aEllipsisWidth - aLineIndent{aWidth},
+                                                                                   ceil(aAscent+aDescent){aHeight}, // +1 because it's seam when height is exact then it's not work
+                                                                                   ceil(aAscent+aDescent){aGridHeight}),
+                                                                                   nil{transform});
+
+                              try
+
+                                //Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
+                                //create and fill text frames with the CTFramesetterCreateFrame call.
+                                aFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(aTextAttr));
+                                if aFrameSetter <> nil then begin  // CTFramesetterCreateWithAttributedString return NULL if unsuccessful.
+                                  try
+
+                                    //Creates an immutable frame using a framesetter.
+                                    aFrame := CTFramesetterCreateFrame(aframesetter, // framesetter: The framesetter used to create the frame.
+                                                                       CFRangeMake(aStringRange.location, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
+                                                                                                              // that is to be typeset in lines fitted into the frame. If the length portion of the range is
+                                                                                                              // set to 0, then the framesetter continues to add lines until it runs out of text or space.
+                                                                       aframePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
+                                                                                   // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
+                                                                       nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
+                                                                             // or NULL if there are no such attributes.
+                                    if aFrame <> nil then begin // CTFramesetterCreateFrame return NULL if unsuccessful.
+                                      try
+
+                                        //init aBreakTextItem
+                                        aBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
+                                        cfRelease(aBreakTextItem.Line);
+                                        aBreakTextItem.Line := nil; // << i use this as a flag
+
+                                        //init alines / aLinesCount
+                                        alines := CTFrameGetLines(aFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
+                                        aLinesCount := CFArrayGetCount(aLines);
+                                        if aLinesCount > 0 then begin
+
+                                          //init aline / aMeasuredWidth
+                                          aline := CFArrayGetValueAtIndex(alines, 0);
+                                          aMeasuredWidth := CTLineGetTypographicBounds(aline, // line: The line whose typographic bounds are calculated.
+                                                                                       @aAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                                                       @aDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                                                       nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                                                            // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+
+                                          //init aStringRange
+                                          aStringRange := CTLineGetStringRange(aline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
+
+                                          //if their is enalf of place for the text + ellipssis
+                                          if (aStringRange.length > 0) and
+                                             (compareValue(aMeasuredWidth - CTLineGetTrailingWhitespaceWidth(aline), 0, TEpsilon.Position) > 0) and
+                                             (compareValue(aMeasuredWidth + aEllipsisWidth, aMaxWidth - aLineIndent, TEpsilon.Position) <= 0) then begin
+
+                                            //calculate aMaxLineWidth
+                                            aMaxLineWidth := max(aPrevMaxLineWidth, aMeasuredWidth + aLineIndent + aEllipsisWidth);
+
+                                            //update aBreakTextItems.Line
+                                            aBreakTextItem.Line := CFRetain(aline); // Retains a Core Foundation object. we need this because we will later free the aFrame but still need to access the Line
+
+                                            //update aBreakTextItems.text
+                                            if aStringRange.length > 0 then begin
+                                              aTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(aTextAttr), aStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
+                                              if aTmpTextAttr <> nil then begin
+                                                try
+                                                  aBreakTextItem.text := CFStringRefToStr(CFAttributedStringGetString(aTmpTextAttr));  // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object.
+                                                finally
+                                                  cfRelease(aTmpTextAttr);
+                                                end;
+                                              end
+                                              else aBreakTextItem.text := '';
+                                            end
+                                            else aBreakTextItem.text := '';
+
+                                            //update aBreakTextItems.pos & aBreakTextItems.rect
+                                            case AHTextAlign of
+                                              TTextAlign.Center: begin
+                                                                   aBreakTextItem.pos := TpointF.create((aMaxWidth - ameasuredWidth - aEllipsisWidth - aLineIndent) / 2, aBreakTextItem.pos.y);
+                                                                 end;
+                                              TTextAlign.Leading: begin
+                                                                    aBreakTextItem.pos := TpointF.create(aLineIndent, aBreakTextItem.pos.y);
+                                                                  end;
+                                              TTextAlign.Trailing: begin
+                                                                     aBreakTextItem.pos := TpointF.create(aMaxWidth - ameasuredWidth - aEllipsisWidth, aBreakTextItem.pos.y);
+                                                                   end;
+                                            end;
+                                            aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
+                                                                                                aBreakTextItem.pos.Y - aAscent),
+                                                                                 ameasuredWidth,
+                                                                                 aAscent + adescent);
+
+                                          end;
+
+                                        end;
+
+                                        //update aBreakTextItem.rect.Width
+                                        if aBreakTextItem.Line = nil then aBreakTextItem.rect.Width := 0;
+
+                                        //add the ellipsis line
+                                        aEllipsisBreakTextItem := TalBreakTextItem.Create;
+                                        try
+                                          aEllipsisBreakTextItem.Line := CFRetain(aEllipsisLine); // Retains a Core Foundation object.
+                                          aEllipsisBreakTextItem.text := aEllipsisText;
+                                          aEllipsisBreakTextItem.isEllipsis := true;
+                                          aEllipsisBreakTextItem.pos := TpointF.create(aBreakTextItem.pos.x + aBreakTextItem.rect.Width, aBreakTextItem.pos.y);
+                                          aEllipsisBreakTextItem.rect := Trectf.Create(TPointF.Create(aEllipsisBreakTextItem.pos.x,
+                                                                                                      aEllipsisBreakTextItem.pos.Y - aAscent), // if aBreakTextItem.Line = nil then aAscent = aAscent of the ellipsis
+                                                                                       aEllipsisWidth,
+                                                                                       aAscent + adescent); // if aBreakTextItem.Line = nil then aAscent/aDescent = aAscent/aDescent of the ellipsis
+                                          aBreakTextItems.Add(aEllipsisBreakTextItem);
+                                        except
+                                          ALFreeAndNil(aEllipsisBreakTextItem);
+                                          raise;
+                                        end;
+
+                                        //delete the last line if not enalf of place
+                                        if aBreakTextItem.Line = nil then begin
+                                          aMaxLineWidth := max(aPrevMaxLineWidth, aLineIndent + aEllipsisWidth);
+                                          aBreakTextItems.Delete(aBreakTextItems.count - 2);
+                                        end;
+
+                                      finally
+                                        CFRelease(aFrame);
+                                      end;
+                                    end;
+
+                                  finally
+                                    CFRelease(aFrameSetter);
+                                  end;
+                                end;
+
+                              finally
+                                CFRelease(aFramePath);
+                              end;
+
+                            finally
+                              cfRelease(aEllipsisLine);
+                            end;
+                          end;
+
+                        finally
+                          CFRelease(aEllipsisAttr);
+                        end;
+
+                      finally
+                        CFRelease(aEllipsisString);
+                      end;
+                    end;
+
+                  finally
+                    CFRelease(aEllipsisFont);
+                  end;
+                end;
+
+              finally
+                CGColorRelease(aEllipsisColor);
+              end;
+
+            end;
 
           end;
 
@@ -1960,8 +2101,2305 @@ begin
     CGColorRelease(aCGColor);
   end;
 
+
+  //initialise ARect
+  if compareValue(aMaxLineWidth, aMaxWidth, Tepsilon.Position) < 0 then begin
+    case AHTextAlign of
+       TTextAlign.Center: begin
+                            aOffset := Floor((aRect.Right - aMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                            aRect.Left := aRect.Left + aOffset;
+                            aRect.right := aRect.right - aOffset;
+                            for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                              aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
+                              aBreakTextItems[I].rect.Offset(-aOffset, 0);
+                            end;
+                          end;
+       TTextAlign.Leading: begin
+                             aRect.Right := min(aRect.Right, aRect.Left + aMaxLineWidth);
+                           end;
+       TTextAlign.Trailing: begin
+                              aOffset := Floor(aRect.Right - aMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                              aRect.Left := aRect.Left + aOffset;
+                              for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                                aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
+                                aBreakTextItems[I].rect.Offset(-aOffset, 0);
+                              end;
+                            end;
+    end;
+  end;
+  if compareValue(aTotalLinesHeight, aMaxHeight, Tepsilon.Position) < 0 then begin
+    case AVTextAlign of
+       TTextAlign.Center: begin
+                            aOffset := (aRect.bottom - aTotalLinesHeight - arect.top) / 2;
+                            aRect.top := aRect.top + aOffset;
+                            aRect.bottom := aRect.bottom - aOffset;
+                          end;
+       TTextAlign.Leading: begin
+                             aRect.bottom := min(aRect.bottom, aRect.top + aTotalLinesHeight);
+                           end;
+       TTextAlign.Trailing: begin
+                              aOffset := aRect.bottom - aTotalLinesHeight - arect.top;
+                              aRect.top := aRect.top + aOffset;
+                            end;
+    end;
+  end;
+
 end;
-{$ENDIF}
+{$IFEND}
+
+
+{*****************************************}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+Procedure ALGetTextMetrics(const aFontSize: single;
+                           const aFontStyle: TFontStyles;
+                           const aFontName: String;
+                           var aAscent:Single; // << return aAscent in negative (like in android)
+                           var aDescent:Single);
+var aLayout: TTextLayout;
+begin
+  aLayout := TTextLayoutManager.DefaultTextLayout.Create;
+  try
+    aLayout.BeginUpdate;
+    aLayout.Text := '^_'; // << seam that aLayout.TextHeight will be the same for all characters so doesn't matter what we set here
+    aLayout.Font.Family := aFontName;
+    aLayout.Font.Style := aFontStyle;
+    aLayout.Font.Size := aFontSize;
+    aLayout.EndUpdate;
+    aAscent := 0;  // << unfortunatly TTextlayout don't gave any ascent/descent ( https://quality.embarcadero.com/browse/RSP-16645
+                   // << also the canvas.FillText don't ask the base line of the text but the top/left corner so it's better to say
+                   // << that ascent = 0 and descent = height of the font
+    aDescent := aLayout.TextHeight;
+  finally
+    aLayout.Free;
+  end;
+end;
+{$IFEND}
+
+{*****************************************}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+function ALbreakText(const aFontSize: single;
+                     const aFontStyle: TFontStyles;
+                     const aFontName: String;
+                     const atext: String;
+                     const aMaxWidth: Single;
+                     var aMeasuredWidth: Single): integer;
+var aLayout: TTextLayout;
+begin
+  aLayout := TTextLayoutManager.DefaultTextLayout.Create;
+  try
+    aLayout.BeginUpdate;
+    aLayout.Font.Family := aFontName;
+    aLayout.Font.Style := aFontStyle;
+    aLayout.Font.Size := aFontSize;
+    aLayout.MaxSize := Tpointf.Create(aMaxWidth, 65535);
+    aLayout.Trimming := TTextTrimming.Character;
+    aLayout.VerticalAlign := TTextAlign.Leading;
+    aLayout.HorizontalAlign := TTextAlign.Leading;
+    aLayout.WordWrap := False;
+    aLayout.Text := atext;
+    aLayout.EndUpdate;
+    aMeasuredWidth := aLayout.TextWidth;
+    result := aLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0)); // << on macos this function is buggy and you need to update fmx.canvas.mac (see https://quality.embarcadero.com/browse/RSP-16648 and https://quality.embarcadero.com/browse/RSP-16649)
+                                                                                             // << - Tepsilon.Position because if PositionAtPoint = exactly aMeasuredWidth then it's return -1
+    {$IF defined(MSWINDOWS)}
+    if (Result >= 0) and (Result < atext.Length) and atext.Chars[Result].IsHighSurrogate then
+      Inc(Result, 2); // << https://quality.embarcadero.com/browse/RSP-16649
+    {$IFEND}
+    if result < 0 then result := 0;
+  finally
+    aLayout.Free;
+  end;
+end;
+{$IFEND}
+
+{*****************************************}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+constructor TALBreakTextItem.Create;
+begin
+  inherited;
+  Line := '';
+  isEllipsis := False;
+end;
+{$IFEND}
+
+{*****************************************}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+function ALBreakText(const aFontColor: TalphaColor;
+                     const aFontSize: single;
+                     const aFontStyle: TFontStyles;
+                     const aFontName: String;
+                     var ARect: TRectF;
+                     const AText: string;
+                     const aWordWrap: Boolean;
+                     const AHTextAlign, AVTextAlign: TTextAlign;
+                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                     const aBreakTextItems: TALBreakTextItems;
+                     var aTotalLines: integer;
+                     const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                     const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+                     const aEllipsisText: string = '…';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
+
+var aBreakTextItemsStartCount: integer;
+    aBreakTextItem: TALBreakTextItem;
+    aNumberOfChars: integer;
+    aSaveNumberOfChars: integer;
+    aSaveNumberOfCharsIsAccurate: Boolean;
+    aLine: String;
+    aLineManuallyBreaked: boolean;
+    aLineIndent: Single;
+    aEllipsisLine: String;
+    aEllipsisLineLn: single;
+    aEllipsisLinePos: TpointF;
+    aEllipsisLineRect: TrectF;
+    aMaxWidth: single;
+    aMaxHeight: single;
+    aMaxLineWidth: single;
+    aLineHeight: single;
+    aTotalLinesHeight: single;
+    aChar: Char;
+    ATextLn: integer;
+    ATextIdx: integer;
+    aCurrLineY: single;
+    aAscent, aDescent: Single;
+    ameasuredWidth: Single;
+    aOffset: single;
+    i, j: integer;
+
+  {~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _initEllipsis;
+  begin
+    if aEllipsisLine = '' then begin
+      //-----
+      if aEllipsisText = '' then aEllipsisLine := '…'
+      else aEllipsisLine := aEllipsisText;
+      //-----
+      ALbreakText(aFontSize, // const aFontSize: single;
+                  aEllipsisFontStyle, // const aFontStyle: TFontStyles;
+                  aFontName, // const aFontName: String;
+                  aEllipsisLine, // const atext: String;
+                  65535, // const aMaxWidth: Single;
+                  aEllipsisLineLn); // var aMeasuredWidth: Single)
+      //-----
+      case AHTextAlign of
+        TTextAlign.Center: begin
+                             aEllipsisLinePos := TpointF.create((aMaxWidth - aEllipsisLineLn - aLineIndent) / 2, aCurrLineY);
+                           end;
+        TTextAlign.Leading: begin
+                              aEllipsisLinePos := TpointF.create(aLineIndent, aCurrLineY);
+                            end;
+        TTextAlign.Trailing: begin
+                               aEllipsisLinePos := TpointF.create(aMaxWidth - aEllipsisLineLn, aCurrLineY);
+                             end;
+      end;
+      aEllipsisLinerect := Trectf.Create(TPointF.Create(aEllipsisLinePos.x,
+                                                        aEllipsisLinePos.Y - (-1*aAscent)),
+                                         aEllipsisLineLn,
+                                         (-1*aAscent) + aDescent);
+      //-----
+    end;
+  end;
+
+begin
+
+  //init result
+  result := false;
+
+  //init aBreakTextItemsStartCount
+  aBreakTextItemsStartCount := aBreakTextItems.Count;
+
+  //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight
+  if aRect.Width > 65535 then aRect.Width := 65535;
+  if aRect.height > 65535 then aRect.height := 65535;
+  aMaxWidth := ARect.width;
+  aMaxHeight := ARect.Height;
+  aMaxLineWidth := 0;
+  aTotalLinesHeight := 0;
+
+  //init ATextIdx / ATextLn
+  ATextIdx := 0;
+  ATextLn := AText.length;
+
+  //init metics / aCurrLineY / aLineHeight
+  ALGetTextMetrics(aFontSize,
+                   aFontStyle,
+                   aFontName,
+                   aAscent,
+                   aDescent);
+  aCurrLineY := aFirstLineIndent.y + (-1*aAscent); // aMetrics.top and aMetrics.ascent are always returned in negative value
+  aTotalLines := 0;
+  aLineHeight := Adescent + aLineSpacing + (-1*aAscent);
+
+  //init aEllipsisLine
+  aEllipsisLine := '';
+  aEllipsisLineLn := 0;
+
+  //init aLineIndent
+  aLineIndent := aFirstLineIndent.x;
+
+  //if we have at least enalf of height to write the 1rt row
+  if comparevalue(aFirstLineIndent.y + Adescent + (-1*aAscent),aMaxHeight,Tepsilon.position) <= 0 then begin
+
+    //loop still their is some chars
+    while ATextIdx < ATextLn do begin
+
+      // init aline / aLineManuallyBreaked
+      i := aText.indexOf(#13 {c}, ATextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
+      j := aText.indexOf(#10 {c}, ATextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
+      if (i >= 0) and (j >= 0) then I := min(i,j)
+      else I := max(I, J);
+      if i = ATextIdx then begin
+        aLine := '';
+        aLineManuallyBreaked := True;
+        result := true;
+      end
+      else if i > 0 then begin
+        aLine := aText.substring(ATextIdx{start}, i{end_}); // skip the $0D/$0A
+        aLineManuallyBreaked := True;
+        result := true;
+      end
+      else begin
+        aLine := aText.substring(ATextIdx{start});
+        aLineManuallyBreaked := False;
+      end;
+
+      //calculate the number of char in the current line (this work good also if aline is empty)
+      aNumberOfChars := ALbreakText(aFontSize,
+                                    aFontStyle,
+                                    aFontName,
+                                    aLine {text},
+                                    aMaxWidth - aLineIndent, {amaxWidth}
+                                    ameasuredWidth {measuredWidth});
+
+      //init result
+      if aNumberOfChars < aLine.length then result := true;
+
+      //if we need to break the text
+      if (aNumberOfChars < aLine.length) // << if aNumberOfChars < aLine.length it's evident we will need to break the text
+         or
+         ((aLineManuallyBreaked) and                      // << if their if #13#10 (that we reach because aNumberOfChars >= aLine.length) AND
+          (aTrimming <> TTextTrimming.None)) then begin   // << aTrimming <> TTextTrimming.None (else we don't need to break anything)
+
+        //if not aWordWrap
+        if not aWordWrap then begin
+          case aTrimming of
+            TTextTrimming.None: begin
+                                  if aNumberOfChars > 0 then
+                                    aLine := aLine.substring(0, aNumberOfChars);
+                                end;
+            TTextTrimming.Character: begin
+                                       //-----
+                                       _initEllipsis;
+                                       //-----
+                                       if (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
+                                                                                                    // because of manual linebreak and dec(aNumberOfChars) because initialy
+                                                                                                    // we considere that aEllipsisText is only one char
+                                       while aNumberOfChars > 0 do begin
+                                         aLine := aLine.substring(0, aNumberOfChars);
+                                         aNumberOfChars := ALbreakText(aFontSize,
+                                                                       aFontStyle,
+                                                                       aFontName,
+                                                                       aLine {text},
+                                                                       aMaxWidth - aEllipsisLineLn - aLineIndent, {maxWidth}
+                                                                       ameasuredWidth {measuredWidth});
+                                         if aNumberOfChars >= aLine.length then break;
+                                       end;
+                                       //-----
+                                     end;
+            TTextTrimming.Word: begin
+                                  //-----
+                                  _initEllipsis;
+                                  //-----
+                                  aSaveNumberOfChars := aNumberOfChars;
+                                  aSaveNumberOfCharsIsAccurate := False;
+                                  while aNumberOfChars > 0 do begin
+                                    //----
+                                    if (aNumberOfChars >= aLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
+                                      aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
+                                    end
+                                    //----
+                                    else if aNumberOfChars >= 2 then begin
+                                      aChar := aLine.chars[aNumberOfChars-2];
+                                      if (not aChar.IsWhiteSpace) or (Achar.ToUCS4Char = $00A0{No-break Space}) then begin
+                                        dec(aNumberOfChars);
+                                        continue;
+                                      end;
+                                      aLine := aLine.substring(0, aNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish with space
+                                    end
+                                    //----
+                                    else begin
+                                      aNumberOfChars := aSaveNumberOfChars;
+                                      if (not aSaveNumberOfCharsIsAccurate) and (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
+                                                                                                                                          // because of manual linebreak and dec(aNumberOfChars) because initialy
+                                                                                                                                          // we considere that aEllipsisText is only one char
+                                      while aNumberOfChars > 0 do begin
+                                        aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
+                                        aNumberOfChars := ALbreakText(aFontSize,
+                                                                      aFontStyle,
+                                                                      aFontName,
+                                                                      aLine {text},
+                                                                      aMaxWidth - aEllipsisLineLn - aLineIndent, {maxWidth}
+                                                                      ameasuredWidth {measuredWidth});
+                                        if aNumberOfChars >= aLine.length then break;
+                                      end;
+                                      break;
+                                    end;
+                                    //----
+                                    aNumberOfChars := ALbreakText(aFontSize,
+                                                                  aFontStyle,
+                                                                  aFontName,
+                                                                  aLine {text},
+                                                                  aMaxWidth - aEllipsisLineLn - aLineIndent, {maxWidth}
+                                                                  ameasuredWidth {measuredWidth});
+                                    if aNumberOfChars >= aLine.length then break
+                                    else begin
+                                      aSaveNumberOfChars:= aNumberOfChars;
+                                      aSaveNumberOfCharsIsAccurate := True;
+                                    end;
+                                    //----
+                                  end;
+                                end;
+          end;
+        end
+
+        //if aWordWrap
+        else begin
+
+          //We are at the last line and aTrimming <> TTextTrimming.None
+          if ((compareValue(aCurrLineY + aLineHeight + adescent, aMaxHeight, Tepsilon.position) > 0) or
+              ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1))) and
+             (aTrimming <> TTextTrimming.None) then begin
+
+            //-----
+            _initEllipsis;
+            //-----
+            aSaveNumberOfChars := aNumberOfChars;
+            aSaveNumberOfCharsIsAccurate := False;
+            while aNumberOfChars > 0 do begin
+              //----
+              if (aNumberOfChars >= aLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
+                aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
+              end
+              //----
+              else if (aTrimming = TTextTrimming.Word) and (aNumberOfChars >= 2) then begin
+                aChar := aLine.chars[aNumberOfChars-2];
+                if (not aChar.IsWhiteSpace) or (Achar.ToUCS4Char = $00A0{No-break Space}) then begin
+                  dec(aNumberOfChars);
+                  continue;
+                end;
+                aLine := aLine.substring(0, aNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish with space
+              end
+              //----
+              else begin
+                aNumberOfChars := aSaveNumberOfChars;
+                if (not aSaveNumberOfCharsIsAccurate) and (aNumberOfChars < aLine.length) then dec(aNumberOfChars); // (aNumberOfChars < aLine.length) to know that we are not here
+                                                                                                                    // because of manual linebreak and dec(aNumberOfChars) because initialy
+                                                                                                                    // we considere that aEllipsisText is only one char
+                while aNumberOfChars > 0 do begin
+                  aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
+                  aNumberOfChars := ALbreakText(aFontSize,
+                                                aFontStyle,
+                                                aFontName,
+                                                aLine {text},
+                                                aMaxWidth - aEllipsisLineLn - aLineIndent, {maxWidth}
+                                                ameasuredWidth {measuredWidth});
+                  if aNumberOfChars >= aLine.length then break;
+                end;
+                break;
+              end;
+              //----
+              aNumberOfChars := ALbreakText(aFontSize,
+                                            aFontStyle,
+                                            aFontName,
+                                            aLine {text},
+                                            aMaxWidth - aEllipsisLineLn - aLineIndent, {maxWidth}
+                                            ameasuredWidth {measuredWidth});
+              if aNumberOfChars >= aLine.length then break
+              else begin
+                aSaveNumberOfChars:= aNumberOfChars;
+                aSaveNumberOfCharsIsAccurate := True;
+              end;
+              //----
+            end;
+
+          end
+
+          //We are not at the last line or aTrimming = TTextTrimming.None
+          else begin
+
+            aSaveNumberOfChars := aNumberOfChars;
+            if aNumberOfChars < aLine.length then inc(aNumberOfChars); // in case the space separator is just after aNumberOfChars
+            while aNumberOfChars > 0 do begin
+              //-----
+              if aNumberOfChars >= 2 then begin
+                aChar := aLine.chars[aNumberOfChars-1];
+                if (not aChar.IsWhiteSpace) or (Achar.ToUCS4Char = $00A0{No-break Space}) then begin
+                  dec(aNumberOfChars);
+                  continue;
+                end;
+                aLine := aLine.substring(0, aNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish just before the space
+              end
+              //-----
+              else begin
+                aNumberOfChars := aSaveNumberOfChars;
+                if compareValue(aLineIndent, 0, TEpsilon.position) > 0 then aNumberOfChars := 0;
+                while aNumberOfChars > 0 do begin
+                  aLine := aLine.substring(0, aNumberOfChars); // length of aLine is now aNumberOfChars
+                  aNumberOfChars := ALbreakText(aFontSize,
+                                                aFontStyle,
+                                                aFontName,
+                                                aLine {text},
+                                                aMaxWidth - aLineIndent, {maxWidth}
+                                                ameasuredWidth {measuredWidth});
+                  if aNumberOfChars >= aLine.length then break;
+                end;
+                break;
+              end;
+              //-----
+              aNumberOfChars := ALbreakText(aFontSize,
+                                            aFontStyle,
+                                            aFontName,
+                                            aLine {text},
+                                            aMaxWidth - aLineIndent, {maxWidth}
+                                            ameasuredWidth {measuredWidth});
+              if aNumberOfChars >= aLine.length then begin
+                inc(aNumberOfChars); // to skip the separator
+                break;
+              end
+              else aSaveNumberOfChars:= aNumberOfChars;
+              //-----
+            end;
+
+          end;
+
+        end;
+
+      end;
+
+      //init aMaxLineWidth
+      aMaxLineWidth := max(aMaxLineWidth, ameasuredWidth + aEllipsisLineLn + aLineIndent);
+
+      // update aTotalLinesHeight
+      aTotalLinesHeight := aCurrLineY + aDescent;
+
+      // their is not enalf of place to write at least one char or
+      // we are on the #13/#10
+      if aNumberOfChars <= 0 then begin
+        if (ATextIdx + 1 < ATextLn) and
+           (aText.Chars[ATextIdx] = #13) and
+           (aText.Chars[ATextIdx + 1] = #10) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
+        else if (ATextIdx < ATextLn) and
+                (aText.Chars[ATextIdx] = #10) then ATextIdx := ATextIdx + 1 // (UNIX linebreak = #10)
+        else if compareValue(aLineIndent, 0, Tepsilon.Position) <= 0 then begin // if aLineIndent > 0 then maybe we don't have enalf of place to write one char because of the aLineIndent.
+          ATextIdx := ATextIdx + 1; // skip the current char
+          if (ATextIdx < ATextLn) and
+             (aText.Chars[ATextIdx].IsLowSurrogate) then inc(ATextIdx);
+        end;
+        aCurrLineY := aCurrLineY + aLineHeight; // go to next line
+        inc(aTotalLines);
+        aLineIndent := 0;
+        if (not aWordWrap) or
+           ((aMaxLines > 0) and (aTotalLines >= aMaxLines)) or
+           (compareValue(aCurrLineY + aDescent, aMaxHeight, TEpsilon.position) > 0) then break
+        else continue;
+      end
+      else begin
+        aTextIdx := ATextIdx + aNumberOfChars;
+        if (ATextIdx + 1 < ATextLn) and
+           (aText.Chars[ATextIdx] = #13) and
+           (aText.Chars[ATextIdx + 1] = #10) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
+        else if (ATextIdx < ATextLn) and
+                (Ord(aText.Chars[ATextIdx]) in [$0D, $0A]) then ATextIdx := ATextIdx + 1;
+      end;
+
+      //init aBreakedText
+      aBreakTextItem := TalBreakTextItem.Create;
+      try
+
+        //update aBreakTextItem
+        aBreakTextItem.line := aLine;
+        case AHTextAlign of
+          TTextAlign.Center: begin
+                               aBreakTextItem.pos := TpointF.create((aMaxWidth - ameasuredWidth - aEllipsisLineLn - aLineIndent) / 2, aCurrLineY);
+                             end;
+          TTextAlign.Leading: begin
+                                aBreakTextItem.pos := TpointF.create(aLineIndent, aCurrLineY);
+                              end;
+          TTextAlign.Trailing: begin
+                                 aBreakTextItem.pos := TpointF.create(aMaxWidth - ameasuredWidth - aEllipsisLineLn, aCurrLineY);
+                               end;
+        end;
+        aBreakTextItem.rect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x,
+                                                            aBreakTextItem.pos.Y - (-1*aAscent)),
+                                             ameasuredWidth,
+                                             (-1*aAscent) + aDescent);
+
+        //update aEllipsisLinePos / aEllipsisLinerect
+        if aEllipsisLine <> '' then begin
+          aEllipsisLinePos := TpointF.Create(aBreakTextItem.pos.x + ameasuredWidth, aCurrLineY);
+          aEllipsisLinerect := Trectf.Create(TPointF.Create(aBreakTextItem.pos.x + ameasuredWidth,
+                                                            aBreakTextItem.pos.Y - (-1*aAscent)),
+                                             aEllipsisLineLn,
+                                             (-1*aAscent) + aDescent);
+        end;
+
+        // update aBreakTextItems
+        aBreakTextItems.Add(aBreakTextItem);
+
+      except
+        ALFreeAndNil(aBreakTextItem);
+        raise;
+      end;
+
+      //update aCurrLineY
+      aCurrLineY := aCurrLineY + aLineHeight;
+      inc(aTotalLines);
+
+      //update aLineIndent
+      aLineIndent := 0;
+
+      // stop if not aWordWrap or after maxheight
+      if (not aWordWrap) or
+         ((aMaxLines > 0) and (aTotalLines >= aMaxLines)) or
+         (compareValue(aCurrLineY + aDescent, aMaxHeight, TEpsilon.position) > 0) then break;
+
+    end;
+
+  end
+  else result := true;
+
+  //add the end ellipsis
+  if aEllipsisLine <> '' then begin
+    aBreakTextItem := TalBreakTextItem.Create;
+    try
+      aBreakTextItem.line := aEllipsisLine;
+      aBreakTextItem.pos := aEllipsisLinePos;
+      aBreakTextItem.rect := aEllipsisLineRect;
+      aBreakTextItem.isEllipsis := True;
+      aBreakTextItems.Add(aBreakTextItem);
+    except
+      ALFreeAndNil(aBreakTextItem);
+      raise;
+    end;
+  end;
+
+  //initialise ARect
+  if compareValue(aMaxLineWidth, aMaxWidth, Tepsilon.Position) < 0 then begin
+    case AHTextAlign of
+       TTextAlign.Center: begin
+                            aOffset := Floor((aRect.Right - aMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                            aRect.Left := aRect.Left + aOffset;
+                            aRect.right := aRect.right - aOffset;
+                            for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                              aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
+                              aBreakTextItems[I].rect.Offset(-aOffset, 0);
+                            end;
+                          end;
+       TTextAlign.Leading: begin
+                             aRect.Right := min(aRect.Right, aRect.Left + aMaxLineWidth);
+                           end;
+       TTextAlign.Trailing: begin
+                              aOffset := Floor(aRect.Right - aMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                              aRect.Left := aRect.Left + aOffset;
+                              for I := aBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                                aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - aOffset;
+                                aBreakTextItems[I].rect.Offset(-aOffset, 0);
+                              end;
+                            end;
+    end;
+  end;
+  if compareValue(aTotalLinesHeight, aMaxHeight, Tepsilon.Position) < 0 then begin
+    case AVTextAlign of
+       TTextAlign.Center: begin
+                            aOffset := (aRect.bottom - aTotalLinesHeight - arect.top) / 2;
+                            aRect.top := aRect.top + aOffset;
+                            aRect.bottom := aRect.bottom - aOffset;
+                          end;
+       TTextAlign.Leading: begin
+                             aRect.bottom := min(aRect.bottom, aRect.top + aTotalLinesHeight);
+                           end;
+       TTextAlign.Trailing: begin
+                              aOffset := aRect.bottom - aTotalLinesHeight - arect.top;
+                              aRect.top := aRect.top + aOffset;
+                            end;
+    end;
+  end;
+
+end;
+{$IFEND}
+
+{*********************************************}
+constructor TALDrawMultiLineTextOptions.Create;
+begin
+  //-----
+  FontName := '';
+  FontSize := 12;
+  FontStyle := [];
+  FontColor := $ff000000;
+  //-----
+  EllipsisText := '…';
+  EllipsisFontStyle := [];
+  EllipsisFontColor := TAlphaColorRec.Null;
+  //-----
+  AutoSize := True;
+  WordWrap := True;
+  MaxLines := 0;
+  LineSpacing := 0;
+  Trimming := TTextTrimming.Character;
+  FirstLineIndent := Tpointf.create(0,0);
+  //-----
+  HTextAlign := TTextAlign.Leading;
+  VTextAlign := TTextAlign.Leading;
+  //-----
+  Fill := TBrush.Create(TbrushKind.None, $FFE0E0E0);
+  Stroke := TStrokeBrush.Create(TbrushKind.None,  $FF000000);
+  Sides := AllSides;
+  XRadius := 0;
+  YRadius := 0;
+  Corners := AllCorners;
+  Padding := TRectF.Create(0,0,0,0);
+  //-----
+  TextIsHtml := false;
+  //-----
+end;
+
+{*********************************************}
+destructor TALDrawMultiLineTextOptions.Destroy;
+begin
+  ALFreeAndNil(Fill);
+  ALFreeAndNil(Stroke);
+  inherited destroy;
+end;
+
+{*********************}
+{$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              var aAscent: single; // out => the Ascent of the last element (in real pixel)
+                              var aDescent: Single; // out => the Descent of the last element (in real pixel)
+                              var aFirstPos: TpointF; // out => the point of the start of the text
+                              var aLastPos: TpointF; // out => the point of the end of the text
+                              var aElements: TalTextElements; // out => the list of rect describing all span elements
+                              var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function _getFontColorFromTag(const aTag: String; var acolor: TalphaColor): boolean; // tag = <font color="#ffffff">
+  var acolorInt: integer;
+      S1: String;
+  begin
+    result := True;
+    if atag[length(atag)-1] <> '"' then exit(False);
+    if not length(atag) in [22, 24] then exit(False);
+    if atag[14] <> '#' then exit(False);
+    S1 := alcopyStrU(aTag, 15, length(aTag) - 16{- 1 - 15});  // ffffff
+    if length(S1) = 6 then S1 := 'ff' + S1; // ffffffff
+    if not ALTryStrTointU('$'+S1, acolorInt) then exit(False); // $ffffff
+    acolor := TalphaColor(acolorInt);
+  end;
+
+var {$IF defined(ANDROID)}
+    aBitmap: Jbitmap;
+    aPaint: JPaint;
+    aTypeface: JTypeface;
+    aCanvas: Jcanvas;
+    aStyle: integer;
+    {$IFEND}
+    {$IF defined(IOS)}
+    aBitmapSurface: TbitmapSurface;
+    aColorSpace: CGColorSpaceRef;
+    aContext: CGContextRef;
+    aStyle: TfontStyles;
+    aWhiteSpace: Boolean;
+    {$IFEND}
+    {$IF defined(MSWINDOWS) or defined(_MACOS)}
+    aStyle: TfontStyles;
+    {$IFEND}
+    aBreakedTextItems: TALBreakTextItems;
+    aBreakedTextItem: TALBreakTextItem;
+    aBreakedTextItemsCount: integer;
+    aCurrText: String;
+    aTag: String;
+    aBold: integer;
+    aItalic: Integer;
+    aMaxWidth: single;
+    aMaxHeight: Single;
+    aFontColors: Tlist<TalphaColor>;
+    aFontColor: TalphaColor;
+    aSpanIds: TalStringlistU;
+    aSpanID: String;
+    aFirstLineIndent: TpointF;
+    aTmpRect: TrectF;
+    aTotalLines: integer;
+    aTmpTotalLines: integer;
+    aTmpTextBreaked: Boolean;
+    aCurrentLineY: single;
+    aOffset: single;
+    P1, P2: integer;
+    i, j: integer;
+
+begin
+
+  //init out var
+  aTextBreaked := false;
+  aAscent := 0;
+  aDescent := 0;
+  aFirstPos := TpointF.Create(0,0);
+  aLastPos := TpointF.Create(0,0);
+  setlength(aElements, 0);
+  aEllipsisRect := TRectF.Create(0,0,0,0);
+
+  {$IF defined(ANDROID)}
+  //create aPaint
+  aPaint := TJPaint.JavaClass.init;
+  aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+  aPaint.setSubpixelText(true); // Enabling this flag causes glyph advances to be computed with subpixel accuracy.
+  aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+  apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+  aPaint.setTextSize(aOptions.FontSize);
+  {$IFEND}
+
+  {$IF defined(IOS)}
+  //init the color space
+  aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+  if aColorSpace = nil then begin ARect.Width := 0; ARect.Height := 0; exit(nil); end;  // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+  try
+  {$IFEND}
+
+    //init local var
+    {$IFDEF IOS}
+    aWhiteSpace := False;
+    {$ENDIF}
+    aFirstLineIndent := aOptions.FirstLineIndent;
+    aMaxWidth := 0;
+    aMaxHeight := 0;
+    aTotalLines := 0;
+    aBold := 0;
+    aItalic := 0;
+    aFontColors := Tlist<TalphaColor>.create;
+    aSpanIds := TalStringlistU.create;
+    aBreakedTextItems := TalBreakTextItems.Create(true{aOwnsObjects});
+    try
+
+      //loop on all the html elements
+      P1 := 1;
+      while P1 <= length(aText) do begin
+
+
+        /////////////////////////////////////
+        //if the text contain html elements//
+        /////////////////////////////////////
+        if aOptions.TextIsHtml then begin
+
+          //extract aTag / aCurrText
+          if aText[P1] = '<' then begin
+            P2 := AlposExU('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+                                              //           ^P1                  ^P2
+            if P2 <= 0 then break;
+            aTag := AlCopyStrU(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
+            P1 := P2 + 1; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+                          //                                 ^P1
+
+            if aTag = '<b>' then inc(aBold)
+            else if aTag = '</b>' then dec(aBold)
+            else if aTag = '<i>' then inc(aItalic)
+            else if aTag = '</i>' then dec(aItalic)
+            else if alposU('<font color="', aTag) = 1 then begin   // <font color="#ffffff">
+              if not _getFontColorFromTag(aTag, aFontColor) then continue;
+              aFontColors.Add(aFontColor);
+            end
+            else if aTag = '</font>' then begin
+              if aFontColors.count > 0 then aFontColors.Delete(aFontColors.Count - 1);
+            end
+            else if alposU('<span id="', aTag) = 1 then begin // <span id="xxx">
+              if atag[length(atag)-1] <> '"' then continue;
+              aSpanIds.Add(alcopyStrU(aTag, 11, length(aTag) - 12{- 1 - 11})); // xxx
+            end
+            else if aTag = '</span>' then begin
+              if aSpanIds.count > 0 then aSpanIds.Delete(aSpanIds.Count - 1);
+            end;
+
+            continue;
+
+          end
+          else begin
+            P2 := AlposExU('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+                                             //                                 ^P1      ^P2
+            if P2 <= 0 then P2 := Maxint;
+            aCurrText := AlcopyStrU(aText, P1, P2 - P1);  // blablabla
+            aCurrText := ALStringReplaceU(aCurrText, '&gt;', '>', [rfReplaceALL]);
+            aCurrText := ALStringReplaceU(aCurrText, '&lt;', '<', [rfReplaceALL]);
+            {$IFDEF IOS}
+            //because of this http://stackoverflow.com/questions/41334425/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
+            if aWhiteSpace then aCurrText := ' ' + aCurrText;
+            if (P2 > 1) and
+               (P2 <= length(aText)) and
+               (aText[P2 - 1].IsWhiteSpace) then begin
+              setlength(aCurrText, length(aCurrText) - 1);
+              aWhiteSpace := True;
+            end
+            else aWhiteSpace := False;
+            {$ENDIF}
+
+            P1 := P2; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+                      //                                          ^P1
+          end;
+
+        end
+
+
+        ///////////////////////////
+        //if the text is NOT html//
+        ///////////////////////////
+        else begin
+          aCurrText := aText;
+          P1 := Maxint;
+        end;
+
+
+        //////////////////////
+        //draw the curr text//
+        //////////////////////
+        if aCurrText <> '' then begin
+
+          //aFontColor
+          if aFontColors.Count > 0 then aFontColor := aFontColors[aFontColors.Count - 1]
+          else aFontColor := aOptions.FontColor;
+
+          //aSpanID
+          if aSpanIds.Count > 0 then aSpanId := aSpanIds[aSpanIds.Count - 1]
+          else aSpanId := '';
+
+          //aStyle
+          {$IF defined(ANDROID)}
+          if ((TFontStyle.fsBold in aOptions.FontStyle) or (aBold > 0)) and
+             ((TFontStyle.fsItalic in aOptions.FontStyle) or (aItalic > 0)) then aStyle := TJTypeface.JavaClass.BOLD_ITALIC
+          else if ((TFontStyle.fsBold in aOptions.FontStyle) or (aBold > 0)) then aStyle := TJTypeface.JavaClass.BOLD
+          else if ((TFontStyle.fsItalic in aOptions.FontStyle) or (aItalic > 0)) then aStyle := TJTypeface.JavaClass.ITALIC
+          else aStyle := TJTypeface.JavaClass.NORMAL;
+          {$ELSE}
+          if ((TFontStyle.fsBold in aOptions.FontStyle) or (aBold > 0)) and
+             ((TFontStyle.fsItalic in aOptions.FontStyle) or (aItalic > 0)) then aStyle := [TFontStyle.fsBold, TFontStyle.fsItalic]
+          else if ((TFontStyle.fsBold in aOptions.FontStyle) or (aBold > 0)) then aStyle := [TFontStyle.fsBold]
+          else if ((TFontStyle.fsItalic in aOptions.FontStyle) or (aItalic > 0)) then aStyle := [TFontStyle.fsItalic]
+          else aStyle := [];
+          {$IFEND}
+
+          //loop style we draw all the text or at least the ellipsis
+          while True do begin
+
+            //init aPaint
+            {$IF defined(ANDROID)}
+            aPaint.setColor(aFontColor);
+            aTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), aStyle);
+            aPaint.setTypeface(aTypeface);
+            aTypeface := nil;
+            {$IFEND}
+
+            //init aTmpRect / aBreakedTextItemsCount
+            aTmpRect := ARect;
+            aTmpRect.Width := aTmpRect.Width - aOptions.Padding.Left - aOptions.Padding.right;
+            aTmpRect.Height := aTmpRect.Height - aOptions.Padding.top - aOptions.Padding.bottom;
+            aBreakedTextItemsCount := aBreakedTextItems.Count;
+
+            //break the text
+            {$IF defined(ANDROID)}
+            aTmpTextBreaked := ALBreakText(aPaint, // const aPaint: JPaint;
+                                           ATmpRect, // var ARect: TRectF;
+                                           StringtoJString(aCurrText), // const AText: JString;
+                                           aOptions.WordWrap, //const aWordWrap: Boolean;
+                                           TTextAlign.Leading, TTextAlign.Leading, //const AHTextAlign, AVTextAlign: TTextAlign;
+                                           aOptions.Trimming, // const aTrimming: TTextTrimming;
+                                           aBreakedTextItems, // var aBreakedTexts: Tarray<Tpair<JString, TpointF>>);
+                                           aTmpTotalLines, // var aTotalLines: integer
+                                           aFirstLineIndent, // const aFirstLineIndent: TpointF;
+                                           aOptions.LineSpacing, // const aLineSpacing: single = 0;
+                                           StringtoJString(aOptions.EllipsisText), //  const aEllipsisText: JString = nil;
+                                           aOptions.FontName, // const aEllipsisFontName: String = '';
+                                           aOptions.EllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+                                           aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null
+                                           aOptions.MaxLines - aTotalLines + AlifThen(aTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
+            {$ELSEIF defined(IOS)}
+            aTmpTextBreaked := ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
+                                           aFontColor, // const aFontColor: TalphaColor;
+                                           aOptions.FontSize, // const aFontSize: single;
+                                           aStyle, // const aFontStyle: TFontStyles;
+                                           aOptions.FontName, // const aFontName: String;
+                                           ATmpRect, // var ARect: TRectF;
+                                           aCurrText, // const AText: string;
+                                           aOptions.WordWrap, // const aWordWrap: Boolean;
+                                           TTextAlign.Leading, TTextAlign.Leading, // const AHTextAlign, AVTextAlign: TTextAlign;
+                                           aOptions.Trimming, // const aTrimming: TTextTrimming;
+                                           aBreakedTextItems, // const aBreakTextItems: TALBreakTextItems;
+                                           aTmpTotalLines, // var aTotalLines: integer;
+                                           aFirstLineIndent, // const aFirstLineIndent: TpointF;
+                                           aOptions.LineSpacing, // const aLineSpacing: single = 0;
+                                           aOptions.EllipsisText, // const aEllipsisText: string = '…';
+                                           aOptions.EllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+                                           aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                                           aOptions.MaxLines - aTotalLines + AlifThen(aTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
+            {$ELSE}
+            aTmpTextBreaked := ALBreakText(aFontColor, // const aFontColor: TalphaColor;
+                                           aOptions.FontSize, // const aFontSize: single;
+                                           aStyle, // const aFontStyle: TFontStyles;
+                                           aOptions.FontName, // const aFontName: String;
+                                           ATmpRect, // var ARect: TRectF;
+                                           aCurrText, // const AText: string;
+                                           aOptions.WordWrap, // const aWordWrap: Boolean;
+                                           TTextAlign.Leading, TTextAlign.Leading, // const AHTextAlign, AVTextAlign: TTextAlign;
+                                           aOptions.Trimming, // const aTrimming: TTextTrimming;
+                                           aBreakedTextItems, // const aBreakTextItems: TALBreakTextItems;
+                                           aTmpTotalLines, // var aTotalLines: integer;
+                                           aFirstLineIndent, // const aFirstLineIndent: TpointF;
+                                           aOptions.LineSpacing, // const aLineSpacing: single = 0;
+                                           aOptions.EllipsisText, // const aEllipsisText: string = '…';
+                                           aOptions.EllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+                                           aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                                           aOptions.MaxLines - aTotalLines + AlifThen(aTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
+            {$IFEND}
+
+            //if their was not enalf of place to write the ellipsis
+            if (aBreakedTextItems.Count >= 2) and                                                                                          // << more than 2 items
+               (aBreakedTextItems.Count - aBreakedTextItemsCount = 1) and                                                                  // << only 1 item (the ellipsis) was added
+               (aBreakedTextItems[aBreakedTextItems.count - 1].isEllipsis) and                                                             // << last item is an elipsis
+               (comparevalue(aBreakedTextItems[aBreakedTextItems.count - 1].rect.right, ATmpRect.Right, Tepsilon.Position) > 0) then begin // << ellipsis is not inside ATmpRect
+
+              //init aBreakedTextItem
+              // -1 = the ellipsis '...' (the last item)
+              // their is no item for the text that generate the break line
+              // because their is even not enalf of place to write the text himself (all the place was used by the ellipsis)
+              // -2 = the previous text
+              aBreakedTextItem := aBreakedTextItems[aBreakedTextItems.count - 2];
+
+              //if the ellipsis is not on the same line of the aBreakedTextItem then it's mean
+              //we don't have enalf of place on one full row to draw the ellipsis so break the loop
+              if compareValue(aBreakedTextItem.pos.Y,
+                              aBreakedTextItems[aBreakedTextItems.count - 1].pos.y,
+                              Tepsilon.Position) <> 0 then break;
+
+              //get the params from aBreakedTextItem
+              aFontColor := aBreakedTextItem.fontColor;
+              aSpanId := aBreakedTextItem.id;
+              aStyle := aBreakedTextItem.fontStyle;
+              setlength(aCurrText, 2 * length(aCurrText));                         // << i put some space in the end of the previous text to force
+              for I := Low(aCurrText) to High(aCurrText) do aCurrText[i] := ' ';   // << the draw of the ellipsis
+              {$IF defined(ANDROID)}
+              aCurrText := JStringtoString(aBreakedTextItem.line) + aCurrText + '_';
+              {$ELSEIF defined(IOS)}
+              aCurrText := aBreakedTextItem.text + aCurrText + '_';
+              {$ELSE}
+              aCurrText := aBreakedTextItem.line + aCurrText + '_';
+              {$IFEND}
+              aFirstLineIndent := TpointF.Create(aBreakedTextItem.rect.left, aBreakedTextItem.rect.Top);
+
+              //clean the aBreakedTextItems
+              for I := aBreakedTextItems.Count - 1 downto aBreakedTextItems.Count - 2 do
+                aBreakedTextItems.Delete(i);
+
+              //try again
+              P1 := maxint;
+              continue;
+
+            end;
+
+            //stop the loop
+            break;
+
+          end;
+
+          //update aTotalLines
+          if aTotalLines = 0 then aTotalLines := aTmpTotalLines
+          else aTotalLines := aTotalLines + aTmpTotalLines - 1;
+
+          //update aMaxWidth/aMaxHeight
+          aMaxWidth := max(aMaxWidth, ATmpRect.Width);
+          aMaxHeight := max(aMaxHeight, ATmpRect.height);
+
+          //update aTextBreaked
+          aTextBreaked := aTextBreaked or aTmpTextBreaked;
+
+          //update all the aBreakedTextItem
+          for I := aBreakedTextItemsCount to aBreakedTextItems.Count - 1 do begin
+            aBreakedTextItem := aBreakedTextItems[i];
+            //-----
+            if (not aBreakedTextItem.isEllipsis) or (aOptions.EllipsisFontColor = TAlphaColorRec.Null) then aBreakedTextItem.fontColor := aFontColor
+            else aBreakedTextItem.fontColor := aOptions.EllipsisFontColor;
+            //-----
+            {$IF defined(ANDROID)}
+            if (not aBreakedTextItem.isEllipsis) then aBreakedTextItem.FontStyle := aStyle
+            else aBreakedTextItem.FontStyle := ALfontStyleToAndroidStyle(aOptions.EllipsisFontStyle);
+            {$ELSE}
+            if (not aBreakedTextItem.isEllipsis) then aBreakedTextItem.FontStyle := aStyle
+            else aBreakedTextItem.FontStyle := aOptions.EllipsisFontStyle;
+            {$IFEND}
+            //-----
+            if (not aBreakedTextItem.isEllipsis) then aBreakedTextItem.Id := aSpanID
+            else aBreakedTextItem.Id := '';
+          end;
+
+          //Update aFirstLineIndent
+          if aBreakedTextItems.count > aBreakedTextItemsCount then begin
+            aBreakedTextItem := aBreakedTextItems[aBreakedTextItems.count - 1];
+            aFirstLineIndent := TpointF.Create(aBreakedTextItem.rect.Right, aBreakedTextItem.rect.Top);
+            if aBreakedTextItem.isEllipsis then break;
+          end
+          else break;
+
+        end;
+
+      end;
+
+      //initialise ARect
+      if aOptions.Autosize then begin
+        aRect.Width := aMaxWidth + aOptions.Padding.Left + aOptions.Padding.right;
+        aRect.Height := aMaxHeight + aOptions.Padding.top + aOptions.Padding.bottom;
+      end;
+      case aOptions.HTextAlign of
+        TTextAlign.Center: begin
+                             if aBreakedTextItems.Count > 0 then begin
+                               aCurrentLineY := aBreakedTextItems[0].pos.y;
+                               J := 0;
+                               for I := 1 to aBreakedTextItems.Count do begin
+                                 if (I = aBreakedTextItems.Count) or
+                                    (compareValue(aCurrentLineY, aBreakedTextItems[I].pos.y, Tepsilon.Position) <> 0) then begin
+                                   aOffset := Floor((aRect.width -
+                                                       aBreakedTextItems[I-1].rect.Right -
+                                                         aOptions.Padding.Left -
+                                                           aOptions.Padding.right) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                                   while J < I do begin
+                                     aBreakedTextItems[j].pos.X := aBreakedTextItems[j].pos.X + aOptions.Padding.Left + aOffset;
+                                     aBreakedTextItems[j].rect.Offset(aOptions.Padding.Left + aOffset, 0);
+                                     inc(J);
+                                   end;
+                                   if (I <> aBreakedTextItems.Count) then aCurrentLineY := aBreakedTextItems[I].pos.y;
+                                 end;
+                               end;
+                             end;
+                           end;
+        TTextAlign.Leading: begin
+                             for I := 0 to aBreakedTextItems.Count - 1 do begin
+                               aBreakedTextItems[i].pos.X := aBreakedTextItems[i].pos.X + aOptions.Padding.Left;
+                               aBreakedTextItems[i].rect.Offset(aOptions.Padding.Left, 0);
+                             end;
+                           end;
+        TTextAlign.Trailing: begin
+                               if aBreakedTextItems.Count > 0 then begin
+                                 aCurrentLineY := aBreakedTextItems[0].pos.y;
+                                 J := 0;
+                                 for I := 1 to aBreakedTextItems.Count do begin
+                                   if (I = aBreakedTextItems.Count) or
+                                      (compareValue(aCurrentLineY, aBreakedTextItems[I].pos.y, Tepsilon.Position) <> 0) then begin
+                                     aOffset := Floor((aRect.width -
+                                                         aBreakedTextItems[I-1].rect.Right -
+                                                           aOptions.Padding.Left -
+                                                             aOptions.Padding.right)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                                     while J < I do begin
+                                       aBreakedTextItems[j].pos.X := aBreakedTextItems[j].pos.X + aOptions.Padding.Left + aOffset;
+                                       aBreakedTextItems[j].rect.Offset(aOptions.Padding.Left + aOffset, 0);
+                                       inc(J);
+                                     end;
+                                     if (I <> aBreakedTextItems.Count) then aCurrentLineY := aBreakedTextItems[I].pos.y;
+                                   end;
+                                 end;
+                               end;
+                             end;
+      end;
+      case aOptions.VTextAlign of
+        TTextAlign.Center: begin
+                             aOffset := Floor((aRect.height -
+                                                 aMaxHeight -
+                                                   aOptions.Padding.top -
+                                                     aOptions.Padding.bottom) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                             for I := 0 to aBreakedTextItems.Count - 1 do begin
+                               aBreakedTextItems[I].pos.y := aBreakedTextItems[i].pos.y + aOptions.Padding.top + aOffset;
+                               aBreakedTextItems[I].rect.Offset(0, aOptions.Padding.top + aOffset);
+                             end;
+                           end;
+        TTextAlign.Leading: begin
+                             for I := 0 to aBreakedTextItems.Count - 1 do begin
+                               aBreakedTextItems[i].pos.Y := aBreakedTextItems[i].pos.Y + aOptions.Padding.top;
+                               aBreakedTextItems[i].rect.Offset(0, aOptions.Padding.top);
+                             end;
+                           end;
+        TTextAlign.Trailing: begin
+                               aOffset := Floor((aRect.height -
+                                                   aMaxHeight -
+                                                     aOptions.Padding.top -
+                                                       aOptions.Padding.bottom)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                               for I := 0 to aBreakedTextItems.Count - 1 do begin
+                                 aBreakedTextItems[I].pos.y := aBreakedTextItems[i].pos.y + aOptions.Padding.top + aOffset;
+                                 aBreakedTextItems[I].rect.Offset(0, aOptions.Padding.top + aOffset);
+                               end;
+                             end;
+      end;
+      aRect := ALAlignDimensionToPixelCeil(aRect);
+
+      // init out vars
+      if aBreakedTextItems.count > 0 then begin
+        aFirstPos := aBreakedTextItems[0].pos;
+        aBreakedTextItem := aBreakedTextItems[aBreakedTextItems.count - 1];
+        aLastPos := aBreakedTextItem.pos;
+        aLastPos.offset(aBreakedTextItem.rect.width, 0);
+        aAscent := aLastPos.y - aBreakedTextItem.rect.top;
+        aDescent := aBreakedTextItem.rect.bottom - aLastPos.y;
+        if aBreakedTextItem.isEllipsis then aEllipsisRect := aBreakedTextItem.rect
+        else aEllipsisRect := Trectf.Create(0,0,0,0);
+      end;
+
+      //update aElements
+      J := 0;
+      setlength(aElements, aBreakedTextItems.count);
+      for i := 0 to aBreakedTextItems.count - 1 do begin
+        if (aBreakedTextItems[i].id <> '') or (aBreakedTextItems[i].isEllipsis) then begin
+          aElements[j].Id := aBreakedTextItems[i].id;
+          aElements[j].rect := aBreakedTextItems[i].rect;
+          aElements[j].isEllipsis := aBreakedTextItems[i].isEllipsis;
+          inc(j);
+        end;
+      end;
+      setlength(aElements, J);
+
+      {$IF defined(ANDROID)}
+      //create the main bitmap on with we will draw
+      aBitmap := TJBitmap.JavaClass.createBitmap(round(max(1, aRect.Width)),  // max because aRect.Width could = 0 if breaked at 1rt char
+                                                 round(max(1, aRect.Height)), // max no possible but more beautifull to write like this
+                                                 TJBitmap_Config.JavaClass.ARGB_8888); // + 1 * aScreenScale for eventual extra pixels
+      try
+
+        //create the canvas and the paint
+        aCanvas := TJCanvas.JavaClass.init(aBitmap);
+
+        //draw the background
+        if (aOptions.Fill.Kind <> TbrushKind.None) or
+           (aOptions.stroke.Kind <> TbrushKind.None) then begin
+          ALPaintRectangle(aBitmap, // const aBitmap: Jbitmap;
+                           aRect, // const aRect: TrectF;
+                           aOptions.Fill, // const Fill: TBrush;
+                           aOptions.Stroke, // const Stroke: TStrokeBrush;
+                           aOptions.Sides, // const Sides: TSides;
+                           aOptions.Corners, // const Corners: TCorners;
+                           aOptions.XRadius, // const XRadius: Single = 0;
+                           aOptions.YRadius); // const YRadius: Single = 0);
+        end;
+
+        //draw all texts
+        for i := 0 to aBreakedTextItems.count - 1 do begin
+          aBreakedTextItem := aBreakedTextItems[i];
+          //-----
+          aPaint.setColor(aBreakedTextItem.fontColor);
+          //-----
+          aTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), aBreakedTextItem.fontStyle);
+          aPaint.setTypeface(aTypeface);
+          aTypeface := nil;
+          //-----
+          aCanvas.drawText(aBreakedTextItem.line{text},
+                           aBreakedTextItem.pos.x {x},
+                           aBreakedTextItem.pos.y {y},
+                           apaint {paint});
+        end;
+
+        //free the paint and the canvas
+        aPaint := nil;
+        aCanvas := nil;
+
+        //create the result
+        result := ALJBitmaptoTexture(aBitmap);
+
+      finally
+        aBitmap.recycle;
+        aBitmap := nil;
+      end;
+      {$IFEND}
+
+      {$IF defined(IOS)}
+      //create the bitmapSurface
+      aBitmapSurface := TbitmapSurface.Create;
+      try
+
+        //init aBitmapSurface
+        aBitmapSurface.SetSize(round(max(1, aRect.Width)), // max because aRect.Width could = 0 if breaked at 1rt char
+                               round(max(1, aRect.Height))); // max because aRect.height could = 0
+
+
+        //create the context
+        aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                          aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                                          aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                                          8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                             //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                             //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                             //                   chapter of Quartz 2D Programming Guide.
+                                          aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                                //              a value of 0 causes the value to be calculated automatically.
+                                          aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                       //             bitmap graphics contexts.
+                                          kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                            // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                            // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                          kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                    // kCGBitmapByteOrder32Little = Little-endian
+                                                                    // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                    //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                    //             values. The constants for specifying the alpha channel information are declared with the
+                                                                    //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                    //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                    //             and CGImageAlphaInfo constants.)
+                                                                    //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                    //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                    //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+        if aContext = nil then begin ARect.Width := 0; ARect.Height := 0; exit(nil); end;
+        try
+
+          //set the paint default properties
+          CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+          //-----
+          CGContextSetShouldAntialias(aContext, 1); // default: ON
+                                                    // Sets anti-aliasing on or off for a graphics context.
+          CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+          //-----
+          //CGContextSetShouldSmoothFonts(aContext, 1); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
+                                                        // Note that some contexts (such as PostScript contexts) do not support font smoothing.
+                                                        // -----
+                                                        // Enables or disables font smoothing in a graphics context.
+                                                        // When drawing text on a context attached to a color LCD display, Quartz takes advantage of the nature of
+                                                        // LCD monitors to improve the legibility of text. This technique is called Font Smoothing. The pixels
+                                                        // of an LCD monitor are made up of red, green, and blue sub-pixels. If you take these sub-pixels into
+                                                        // account the screen appears to have three times the resolution commonly attributed to it, at least in
+                                                        // one dimension. Font smoothing takes advantage of this increased resolution to improve the rendering of
+                                                        // text. Quartz turns different sub-pixels off and on by changing the color of a pixels along the edge of
+                                                        // letter shapes. Because your eye expects to see a hard line at the edge of the glyphs, the computer tricks
+                                                        // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
+                                                        // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
+                                                        // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
+          //CGContextSetAllowsFontSmoothing(aContext, 1); // Sets whether or not to allow font smoothing for a graphics context.
+          //-----
+          CGContextSetShouldSubpixelPositionFonts(aContext, 1); // default: ON
+                                                                // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
+                                                                // the position of glyphs are always forced to integral pixel boundaries.
+                                                                // -----
+                                                                // Enables or disables subpixel positioning in a graphics context.
+                                                                // Subpixel positioning concerns whether or not the glyphs in a line of
+                                                                // text will be aligned to pixel boundaries or not. If subpixel positioning is
+                                                                // off then when glyphs are drawn their positions might be shifted slightly to
+                                                                // take pixel boundaries in account. This can improve the visual definition of
+                                                                // the glyphs (making them slightly less "blurry") at the expense of honoring
+                                                                // the font metrics.
+          CGContextSetAllowsFontSubpixelPositioning(aContext, 1); // Sets whether or not to allow subpixel positioning for a graphics context
+          //-----
+          CGContextSetShouldSubpixelQuantizeFonts(aContext, 1); // default: ON
+                                                                // Enables or disables subpixel quantization in a graphics context.
+                                                                // -----
+                                                                // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
+                                                                // quantization improves the rendering of fonts whose glyphs are at subpixel positions
+                                                                // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
+                                                                // This improvement, requires additional processing so changing this value can affect text
+                                                                // drawing performance.
+          CGContextSetAllowsFontSubpixelQuantization(aContext, 1);  // Sets whether or not to allow subpixel quantization for a graphics context
+
+          //draw the background
+          if (aOptions.Fill.Kind <> TbrushKind.None) or
+             (aOptions.stroke.Kind <> TbrushKind.None) then begin
+            ALPaintRectangle(aContext, // const aContext: CGContextRef;
+                             aColorSpace, // const aColorSpace: CGColorSpaceRef;
+                             aRect, // const aRect: TrectF;
+                             aOptions.Fill, // const Fill: TBrush;
+                             aOptions.Stroke, // const Stroke: TStrokeBrush;
+                             aOptions.Sides, // const Sides: TSides;
+                             aOptions.Corners, // const Corners: TCorners;
+                             aOptions.XRadius, // const XRadius: Single = 0;
+                             aOptions.YRadius); // const YRadius: Single = 0);
+          end;
+
+          //draw all texts
+          for i := 0 to aBreakedTextItems.count - 1 do begin
+            aBreakedTextItem := aBreakedTextItems[i];
+            CGContextSetTextPosition(acontext,
+                                     aBreakedTextItem.pos.x {x},
+                                     aBitmapSurface.Height - aBreakedTextItem.pos.Y);{y}
+            CTLineDraw(aBreakedTextItem.Line, acontext); // Draws a complete line.
+          end;
+
+        finally
+          CGContextRelease(aContext);
+        end;
+
+        //convert the aBitmapSurface to texture
+        result := TALTexture.Create(True{aVolatile});
+        try
+          result.Assign(aBitmapSurface);
+        except
+          ALFreeAndNil(result);
+          raise;
+        end;
+
+      finally
+        ALFreeAndNil(aBitmapSurface);
+      end;
+      {$IFEND}
+
+      {$IF defined(MSWINDOWS) or defined(_MACOS)}
+      //create the main bitmap on with we will draw
+      result := Tbitmap.Create(round(max(1, aRect.Width)),  // max because aRect.Width could = 0 if breaked at 1rt char
+                               round(max(1, aRect.Height))); // max no possible but more beautifull to write like this
+      try
+
+        //clear the bitmap
+        result.Clear(TAlphaColorRec.Null);
+
+        //begin the scene
+        result.Canvas.BeginScene;
+        try
+
+          //draw the background
+          if (aOptions.Fill.Kind <> TbrushKind.None) or
+             (aOptions.stroke.Kind <> TbrushKind.None) then begin
+            ALPaintRectangle(result.Canvas, // const aBitmap: Jbitmap;
+                             aRect, // const aRect: TrectF;
+                             aOptions.Fill, // const Fill: TBrush;
+                             aOptions.Stroke, // const Stroke: TStrokeBrush;
+                             aOptions.Sides, // const Sides: TSides;
+                             aOptions.Corners, // const Corners: TCorners;
+                             aOptions.XRadius, // const XRadius: Single = 0;
+                             aOptions.YRadius); // const YRadius: Single = 0);
+          end;
+
+          //draw all texts
+          result.Canvas.Fill.Kind := TbrushKind.Solid;
+          result.Canvas.Font.Family := aOptions.FontName;
+          result.Canvas.Font.size := aOptions.FontSize;
+          for i := 0 to aBreakedTextItems.count - 1 do begin
+            aBreakedTextItem := aBreakedTextItems[i];
+            //-----
+            result.Canvas.Fill.Color := aBreakedTextItem.fontColor;
+            result.Canvas.Font.style := aBreakedTextItem.fontStyle;
+            //-----
+            result.Canvas.FillText(aBreakedTextItem.rect, // const ARect: TRectF;
+                                   aBreakedTextItem.line, // const AText: string;
+                                   False, // const WordWrap: Boolean;
+                                   1, // const AOpacity: Single;
+                                   [], // const Flags: TFillTextFlags;
+                                   TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
+          end;
+
+        finally
+          result.Canvas.EndScene;
+        end;
+
+      except
+        ALfreeAndNil(Result);
+        raise;
+      end;
+      {$IFEND}
+
+    finally
+      ALFreeAndNil(aBreakedTextItems);
+      alfreeandnil(aFontColors);
+      alfreeandnil(aSpanIds);
+    end;
+
+  {$IF defined(IOS)}
+  finally
+    CGColorSpaceRelease(aColorSpace);
+  end;
+  {$IFEND}
+
+end;
+{$ENDREGION}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
+
+{************************************************}
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aAscent: single;
+    aDescent: Single;
+    aFirstPos: TpointF;
+    aLastPos: TpointF;
+    aElements: TalTextElements;
+    aEllipsisRect: TRectF;
+begin
+  result := ALDrawMultiLineText(aText,
+                                aRect,
+                                aTextBreaked,
+                                aAscent, // var aAscent: single; // out => the Ascent of the last element (in real pixel)
+                                aDescent, // var aDescent: Single; // out => the Descent of the last element (in real pixel)
+                                aFirstPos, // var aFirstPos: TpointF; // out => the point of the start of the text
+                                aLastPos, // var aLastPos: TpointF; // out => the point of the end of the text
+                                aElements, // var aElements: TalTextElements; // out => the list of rect describing all span elements
+                                aEllipsisRect, // var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+                                aOptions);
+end;
+
+{********************}
+{$IF defined(ANDROID)}
+function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: boolean = true): TTexture;
+var aBitmapSurface: TBitmapSurface;
+begin
+  aBitmapSurface := TBitmapSurface.Create;
+  try
+
+    //convert the JBitmapToSurface to the bitmapSurface
+    if JBitmapToSurface(aBitmap, aBitmapSurface) then begin
+
+      //convert the bitmapSurface to a TTexture
+      result := TALTexture.Create(aVolatileTexture{aVolatile});
+      try
+        result.assign(aBitmapSurface);
+      except
+        ALFreeAndNil(result);
+        raise;
+      end;
+
+    end;
+
+  finally
+    ALFreeAndNil(abitmapSurface);
+  end;
+end;
+{$IFEND}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
+begin
+  if (TFontStyle.fsBold in afontStyle) and
+     (TFontStyle.fsItalic in afontStyle) then result := TJTypeface.JavaClass.BOLD_ITALIC
+  else if (TFontStyle.fsBold in afontStyle) then result := TJTypeface.JavaClass.BOLD
+  else if (TFontStyle.fsItalic in afontStyle) then result := TJTypeface.JavaClass.ITALIC
+  else result := TJTypeface.JavaClass.NORMAL;
+end;
+{$IFEND}
+
+{******************************************************************************************}
+//duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
+function ALGetDrawingShapeRectAndSetThickness(const Rect: TrectF;
+                                              const Fill: TBrush;
+                                              const Stroke: TStrokeBrush;
+                                              const Fit: Boolean;
+                                              var FillShape, DrawShape: Boolean;
+                                              var StrokeThicknessRestoreValue: Single): TRectF;
+const
+  MinRectAreaSize = 0.01;
+begin
+  FillShape := (Fill <> nil) and (Fill.Kind <> TBrushKind.None);
+  DrawShape := (Stroke <> nil) and (Stroke.Kind <> TBrushKind.None);
+
+  if Fit then
+    Result := TRectF.Create(0, 0, 1, 1).FitInto(Rect)
+  else
+    Result := Rect;
+
+  if DrawShape then
+  begin
+    if Result.Width < Stroke.Thickness then
+    begin
+      StrokeThicknessRestoreValue := Stroke.Thickness;
+      FillShape := False;
+      Stroke.Thickness := Min(Result.Width, Result.Height);
+      Result.Left := (Result.Right + Result.Left) * 0.5;
+      Result.Right := Result.Left + MinRectAreaSize;
+    end
+    else
+      Result.Inflate(-Stroke.Thickness * 0.5, 0);
+
+    if Result.Height < Stroke.Thickness then
+    begin
+      if StrokeThicknessRestoreValue < 0.0 then
+        StrokeThicknessRestoreValue := Stroke.Thickness;
+      FillShape := False;
+      Stroke.Thickness := Min(Result.Width, Result.Height);
+      Result.Top := (Result.Bottom + Result.Top) * 0.5;
+      Result.Bottom := Result.Top + MinRectAreaSize;
+    end
+    else
+      Result.Inflate(0, -Stroke.Thickness * 0.5);
+  end;
+end;
+
+{***********************************************}
+procedure ALPaintRectangle({$IF defined(ANDROID)}
+                           const aBitmap: Jbitmap;
+                           {$ELSEIF defined(IOS)}
+                           const aContext: CGContextRef;
+                           const aColorSpace: CGColorSpaceRef;
+                           {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                           const aCanvas: Tcanvas;
+                           {$IFEND}
+                           const Rect: TrectF;
+                           const Fill: TBrush;
+                           const Stroke: TStrokeBrush;
+                           const Sides: TSides;
+                           const Corners: TCorners;
+                           const XRadius: Single = 0;
+                           const YRadius: Single = 0);
+
+{$IF defined(IOS)}
+const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
+{$IFEND}
+
+{$IF defined(ANDROID)}
+var aRect: TrectF;
+    aTmpBitmap: Jbitmap;
+    aShader: JRadialGradient;
+    aCanvas: Jcanvas;
+    aPaint: JPaint;
+    aColors: TJavaArray<Integer>;
+    aStops: TJavaArray<Single>;
+    aPorterDuffXfermode: jPorterDuffXfermode;
+    aBitmapInfo: AndroidBitmapInfo;
+    aPixelBuffer: Pointer;
+    aBitmapData: TBitmapData;
+    aJDestRectf: JrectF;
+    aJSrcRect: Jrect;
+    i: integer;
+{$ELSEIF defined(IOS)}
+var aRect: TrectF;
+    aAlphaColor: TAlphaColorCGFloat;
+    aCallback: CGFunctionCallbacks;
+    aShading: CGShadingRef;
+    aFunc: CGFunctionRef;
+    aBitmapData: TBitmapData;
+    aTMPContext: CGContextRef;
+    aImageRef: CGImageRef;
+    aImage: UIImage;
+{$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+var LShapeRect: TRectF;
+    Off: Single;
+    StrokeThicknessRestoreValue: Single;
+    FillShape, DrawShape: Boolean;
+{$IFEND}
+
+  {$IF defined(ANDROID)}
+  procedure _drawRect(Const aDrawOnlyBorder: Boolean);
+  var aJRect: JRectF;
+      aPath: JPath;
+      aXRadius: single;
+      aYradius: Single;
+      aWidthMinusCorners: single;
+      aHeightMinusCorners: Single;
+      aCorners: TCorners;
+      aHalfStrokeWidth: Single;
+  begin
+
+    // use drawRoundRect
+    if ((compareValue(xRadius, 0, TEpsilon.position) > 0) and
+        (compareValue(YRadius, 0, TEpsilon.position) > 0)) and
+       (corners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+       (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+      //-----
+      aJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
+      aCanvas.drawRoundRect(aJRect{rect},
+                            xRadius {rx},
+                            yRadius {ry},
+                            apaint);
+      aJRect := nil;
+      //-----
+    end
+
+    // use drawRect
+    else if ((compareValue(xRadius, 0, TEpsilon.position) = 0) or
+             (compareValue(YRadius, 0, TEpsilon.position) = 0) or
+             (corners=[])) and
+            (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+      //-----
+      aCanvas.drawRect(aRect.left{left},
+                       aRect.top{top},
+                       aRect.right{right},
+                       aRect.bottom{bottom},
+                       apaint);
+      //-----
+    end
+
+    // use drawPath
+    else begin
+
+      aPath := TJPath.Create;
+      //----
+      aXRadius := xRadius;
+      aYradius := yRadius;
+      if (aXRadius > aRect.width / 2) then aXRadius := aRect.width / 2;
+      if (aYradius > aRect.height / 2) then aYradius := aRect.height / 2;
+      //----
+      if (compareValue(aXRadius, 0, TEpsilon.position) > 0) and
+         (compareValue(aYRadius, 0, TEpsilon.position) > 0) then aCorners := corners
+      else aCorners := [];
+      //----
+      aWidthMinusCorners := (aRect.width - (2 * aXRadius));
+      aHeightMinusCorners := (aRect.height - (2 * aYradius));
+      //----
+      if (Stroke.Kind <> TBrushKind.None) then aHalfStrokeWidth := (Stroke.Thickness) / 2
+      else aHalfStrokeWidth := 0;
+
+
+      //----- TopRight
+      if (TCorner.TopRight in aCorners) then begin
+        aPath.moveTo(aRect.right, aRect.top + aYradius);
+        aPath.rQuadTo(0, -aYradius, -aXRadius, -aYradius);
+        if not aDrawOnlyBorder then aPath.rlineTo(0, -aHalfStrokeWidth);
+      end
+      else begin
+        if not aDrawOnlyBorder then aPath.moveTo(aRect.right + aHalfStrokeWidth, aRect.top + aYradius)
+        else aPath.moveTo(aRect.right, aRect.top + aYradius);
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+           aPath.rLineTo(0, -aYradius -aHalfStrokeWidth);
+           if aDrawOnlyBorder then aPath.rMoveTo(0, aHalfStrokeWidth);
+        end
+        else aPath.rMoveTo(0, -aYradius); // aDrawOnlyBorder AND not TSide.right
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          if not aDrawOnlyBorder then aPath.rLineTo(-aXRadius -aHalfStrokeWidth,0)
+          else begin
+            aPath.rMoveTo(+aHalfStrokeWidth,0);
+            aPath.rLineTo(-aXRadius -aHalfStrokeWidth,0);
+          end;
+        end
+        else aPath.rMoveTo(-aXRadius,0); // aDrawOnlyBorder AND not TSide.top
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.Top in sides) then aPath.rLineTo(-awidthMinusCorners, 0)
+      else aPath.rMoveTo(-awidthMinusCorners, 0);
+
+      //----- TopLeft
+      if (TCorner.TopLeft in aCorners) then begin
+        if not aDrawOnlyBorder then aPath.rlineTo(0, +aHalfStrokeWidth);
+        aPath.rQuadTo(-aXRadius, 0, -aXRadius, aYradius);
+        if not aDrawOnlyBorder then aPath.rlineTo(-aHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          aPath.rLineTo(-aXRadius -aHalfStrokeWidth, 0);
+          if aDrawOnlyBorder then aPath.rMoveTo(aHalfStrokeWidth, 0);
+        end
+        else aPath.rMoveTo(-aXRadius, 0); // aDrawOnlyBorder AND not TSide.top
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          if not aDrawOnlyBorder then aPath.rLineTo(0,aYradius +aHalfStrokeWidth)
+          else begin
+            aPath.rMoveTo(0,-aHalfStrokeWidth);
+            aPath.rLineTo(0,+aYradius +aHalfStrokeWidth);
+          end;
+        end
+        else aPath.rMoveTo(0,aYradius); // aDrawOnlyBorder AND not TSide.left
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.left in sides) then aPath.rLineTo(0, aheightMinusCorners)
+      else aPath.rMoveTo(0, aheightMinusCorners);
+
+      //----- BottomLeft
+      if (TCorner.BottomLeft in aCorners) then begin
+        if not aDrawOnlyBorder then aPath.rlineTo(aHalfStrokeWidth, 0);
+        aPath.rQuadTo(0, aYradius, aXRadius, aYradius);
+        if not aDrawOnlyBorder then aPath.rlineTo(0, aHalfStrokeWidth);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          aPath.rLineTo(0, aYradius +aHalfStrokeWidth);
+          if aDrawOnlyBorder then aPath.rMoveTo(0, -aHalfStrokeWidth);
+        end
+        else aPath.rMoveTo(0, aYradius); // aDrawOnlyBorder AND not TSide.left
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          if not aDrawOnlyBorder then aPath.rLineTo(aXRadius +aHalfStrokeWidth,0)
+          else begin
+            aPath.rMoveTo(-aHalfStrokeWidth,0);
+            aPath.rLineTo(+aXRadius +aHalfStrokeWidth,0);
+          end;
+        end
+        else aPath.rMoveTo(aXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.bottom in sides) then aPath.rLineTo(awidthMinusCorners, 0)
+      else aPath.rMoveTo(awidthMinusCorners, 0);
+
+      //----- BottomRight
+      if (TCorner.BottomRight in aCorners) then begin
+        if not aDrawOnlyBorder then aPath.rlineTo(0, -aHalfStrokeWidth);
+        aPath.rQuadTo(aXRadius, 0, aXRadius, -aYradius);
+        if not aDrawOnlyBorder then aPath.rlineTo(aHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          aPath.rLineTo(aXRadius +aHalfStrokeWidth,0);
+          if aDrawOnlyBorder then aPath.rMoveTo(-aHalfStrokeWidth, 0);
+        end
+        else aPath.rMoveTo(aXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+          if not aDrawOnlyBorder then aPath.rLineTo(0, -aYradius -aHalfStrokeWidth)
+          else begin
+            aPath.rMoveTo(0,+aHalfStrokeWidth);
+            aPath.rLineTo(0,-aYradius -aHalfStrokeWidth);
+          end;
+        end
+        else aPath.rMoveTo(0, -aYradius); // aDrawOnlyBorder AND not TSide.right
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.right in sides) then aPath.rLineTo(0, -aheightMinusCorners)
+      else aPath.rMoveTo(0, -aheightMinusCorners);
+
+      //-----
+      aCanvas.drawPath(apath,aPaint);
+      aPath := nil;
+
+    end;
+  end;
+  {$IFEND}
+
+  {$IF defined(IOS)}
+  procedure _DrawPath(Const aDrawOnlyBorder: Boolean);
+  var aXRadius: single;
+      aYradius: Single;
+      aWidthMinusCorners: single;
+      aHeightMinusCorners: Single;
+      aCorners: TCorners;
+      aHalfStrokeWidth: Single;
+      aCurPoint: TpointF;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _moveTo(x: Single; y: Single);
+    begin
+      CGContextMoveToPoint(aContext, X, aRect.Height - Y);
+      aCurPoint.X := x;
+      aCurPoint.Y := Y;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
+    begin
+      CGContextAddQuadCurveToPoint(aContext,
+                                   aCurPoint.X + dx1{cpx},
+                                   aRect.Height - (aCurPoint.Y + dy1){cpy},
+                                   aCurPoint.X + dx2{x},
+                                   aRect.Height - (aCurPoint.Y + dy2){y});
+      aCurPoint.X := aCurPoint.X + dx2;
+      aCurPoint.Y := aCurPoint.Y + dy2;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rLineTo(dx: Single; dy: Single);
+    begin
+      CGContextAddLineToPoint(aContext, aCurPoint.X + dx{x}, aRect.Height - (aCurPoint.Y + dy{y}));
+      aCurPoint.X := aCurPoint.X + dx;
+      aCurPoint.Y := aCurPoint.Y + dy;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rMoveTo(dx: Single; dy: Single);
+    begin
+      CGContextMoveToPoint(aContext, aCurPoint.X + dx{x}, aRect.Height - (aCurPoint.Y + dy{y}));
+      aCurPoint.X := aCurPoint.X + dx;
+      aCurPoint.Y := aCurPoint.Y + dy;
+    end;
+
+  begin
+
+    // Creates a new empty path in a graphics context.
+    CGContextBeginPath(aContext);
+
+    // use drawRect
+    if ((compareValue(xRadius, 0, TEpsilon.position) = 0) or
+        (compareValue(YRadius, 0, TEpsilon.position) = 0) or
+        (corners=[])) and
+       (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+     //-----
+     CGContextAddRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
+                                                  aRect.Width,
+                                                  aRect.Height,
+                                                  aRect.Height));
+     //-----
+    end
+
+    // use drawPath
+    else begin
+
+      aXRadius := xRadius;
+      aYradius := yRadius;
+      if (aXRadius > aRect.width / 2) then aXRadius := aRect.width / 2;
+      if (aYradius > aRect.height / 2) then aYradius := aRect.height / 2;
+      //----
+      if (compareValue(aXRadius, 0, TEpsilon.position) > 0) and
+         (compareValue(aYRadius, 0, TEpsilon.position) > 0) then aCorners := corners
+      else aCorners := [];
+      //----
+      aWidthMinusCorners := (aRect.width - (2 * aXRadius));
+      aHeightMinusCorners := (aRect.height - (2 * aYradius));
+      //----
+      if (Stroke.Kind <> TBrushKind.None) then aHalfStrokeWidth := (Stroke.Thickness) / 2
+      else aHalfStrokeWidth := 0;
+
+
+      //----- TopRight
+      if (TCorner.TopRight in aCorners) then begin
+        _moveTo(aRect.right, aRect.top + aYradius);
+        _rQuadTo(0, -aYradius, -aXRadius, -aYradius);
+        if not aDrawOnlyBorder then _rlineTo(0, -aHalfStrokeWidth);
+      end
+      else begin
+        if not aDrawOnlyBorder then _moveTo(aRect.right + aHalfStrokeWidth, aRect.top + aYradius)
+        else _moveTo(aRect.right, aRect.top + aYradius);
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+           _rLineTo(0, -aYradius -aHalfStrokeWidth);
+           if aDrawOnlyBorder then _rMoveTo(0, aHalfStrokeWidth);
+        end
+        else _rMoveTo(0, -aYradius); // aDrawOnlyBorder AND not TSide.right
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(-aXRadius -aHalfStrokeWidth,0)
+          else begin
+            _rMoveTo(+aHalfStrokeWidth,0);
+            _rLineTo(-aXRadius -aHalfStrokeWidth,0);
+          end;
+        end
+        else _rMoveTo(-aXRadius,0); // aDrawOnlyBorder AND not TSide.top
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.Top in sides) then _rLineTo(-awidthMinusCorners, 0)
+      else _rMoveTo(-awidthMinusCorners, 0);
+
+      //----- TopLeft
+      if (TCorner.TopLeft in aCorners) then begin
+        if not aDrawOnlyBorder then _rlineTo(0, +aHalfStrokeWidth);
+        _rQuadTo(-aXRadius, 0, -aXRadius, aYradius);
+        if not aDrawOnlyBorder then _rlineTo(-aHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          _rLineTo(-aXRadius -aHalfStrokeWidth, 0);
+          if aDrawOnlyBorder then _rMoveTo(aHalfStrokeWidth, 0);
+        end
+        else _rMoveTo(-aXRadius, 0); // aDrawOnlyBorder AND not TSide.top
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(0,aYradius +aHalfStrokeWidth)
+          else begin
+            _rMoveTo(0,-aHalfStrokeWidth);
+            _rLineTo(0,+aYradius +aHalfStrokeWidth);
+          end;
+        end
+        else _rMoveTo(0,aYradius); // aDrawOnlyBorder AND not TSide.left
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.left in sides) then _rLineTo(0, aheightMinusCorners)
+      else _rMoveTo(0, aheightMinusCorners);
+
+      //----- BottomLeft
+      if (TCorner.BottomLeft in aCorners) then begin
+        if not aDrawOnlyBorder then _rlineTo(aHalfStrokeWidth, 0);
+        _rQuadTo(0, aYradius, aXRadius, aYradius);
+        if not aDrawOnlyBorder then _rlineTo(0, aHalfStrokeWidth);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          _rLineTo(0, aYradius +aHalfStrokeWidth);
+          if aDrawOnlyBorder then _rMoveTo(0, -aHalfStrokeWidth);
+        end
+        else _rMoveTo(0, aYradius); // aDrawOnlyBorder AND not TSide.left
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(aXRadius +aHalfStrokeWidth,0)
+          else begin
+            _rMoveTo(-aHalfStrokeWidth,0);
+            _rLineTo(+aXRadius +aHalfStrokeWidth,0);
+          end;
+        end
+        else _rMoveTo(aXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.bottom in sides) then _rLineTo(awidthMinusCorners, 0)
+      else _rMoveTo(awidthMinusCorners, 0);
+
+      //----- BottomRight
+      if (TCorner.BottomRight in aCorners) then begin
+        if not aDrawOnlyBorder then _rlineTo(0, -aHalfStrokeWidth);
+        _rQuadTo(aXRadius, 0, aXRadius, -aYradius);
+        if not aDrawOnlyBorder then _rlineTo(aHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          _rLineTo(aXRadius +aHalfStrokeWidth,0);
+          if aDrawOnlyBorder then _rMoveTo(-aHalfStrokeWidth, 0);
+        end
+        else _rMoveTo(aXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(0, -aYradius -aHalfStrokeWidth)
+          else begin
+            _rMoveTo(0,+aHalfStrokeWidth);
+            _rLineTo(0,-aYradius -aHalfStrokeWidth);
+          end;
+        end
+        else _rMoveTo(0, -aYradius); // aDrawOnlyBorder AND not TSide.right
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.right in sides) then _rLineTo(0, -aheightMinusCorners)
+      else _rMoveTo(0, -aheightMinusCorners);
+
+    end;
+
+  end;
+  {$IFEND}
+
+  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  function _GetShapeRect: TRectF;
+  begin
+    Result := Rect;
+    if Stroke.Kind <> TBrushKind.None then
+      InflateRect(Result, -(Stroke.Thickness / 2), -(Stroke.Thickness / 2));
+  end;
+  {$IFEND}
+
+begin
+
+  {$IFDEF ANDROID}
+
+  //create the canvas and the paint
+  aCanvas := TJCanvas.JavaClass.init(aBitmap);
+  aPaint := TJPaint.JavaClass.init;
+  aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+  aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+  apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+
+  //init aRect
+  if Stroke.Kind <> TBrushKind.None then begin
+    aRect := TrectF.Create(Rect.Left + (Stroke.Thickness / 2),
+                           Rect.Top + (Stroke.Thickness / 2),
+                           Rect.right - (Stroke.Thickness / 2),
+                           Rect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else aRect := Rect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the rectangle
+  if Fill.Kind <> TBrushKind.None then begin
+
+    //init aPaint
+    aPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full aRect + Stroke.Thickness :( this result&ing in border if the fill is for exemple black and border white
+
+    //fill with gradient
+    if Fill.Kind = TBrushKind.Gradient then begin
+      if Fill.Gradient.Style = TGradientStyle.Radial then begin
+        aColors := TJavaArray<Integer>.Create(Fill.Gradient.Points.Count);
+        aStops := TJavaArray<Single>.Create(Fill.Gradient.Points.Count);
+        for i := 0 to Fill.Gradient.Points.Count - 1 do begin
+          aColors[Fill.Gradient.Points.Count - 1 - i] := integer(Fill.Gradient.Points[i].Color);
+          aStops[Fill.Gradient.Points.Count - 1 - i] := 1 - Fill.Gradient.Points[i].Offset;
+        end;
+        aShader := TJRadialGradient.JavaClass.init(aRect.CenterPoint.x{x}, aRect.CenterPoint.y{y}, aRect.width / 2{radius},  aColors, aStops, TJShader_TileMode.JavaClass.CLAMP{tile});
+        aPaint.setShader(aShader);
+        _drawRect(false{aDrawOnlyBorder});
+        aPaint.setShader(nil);
+        aShader := nil;
+        ALfreeandNil(aColors);
+        ALfreeandNil(aStops);
+      end;
+    end
+
+    //fill with bitmap
+    else if Fill.Kind = TBrushKind.Bitmap then begin
+      if not fill.Bitmap.Bitmap.IsEmpty then begin
+        if fill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
+          //-----
+          aTmpBitmap := TJBitmap.JavaClass.createBitmap(fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height, TJBitmap_Config.JavaClass.ARGB_8888);
+          //-----
+          FillChar(aBitmapInfo, SizeOf(aBitmapInfo), 0);
+          if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID, @aBitmapInfo) = 0) and
+             (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID, @aPixelBuffer) = 0) then
+          try
+            if fill.Bitmap.Bitmap.Map(TMapAccess.Read, aBitmapData) then
+            try
+              System.Move(aBitmapData.Data^, aPixelBuffer^, aBitmapData.Pitch * aBitmapData.Height);
+            finally
+              fill.Bitmap.Bitmap.Unmap(aBitmapData);
+            end;
+          finally
+            AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID);
+          end;
+          //-----
+          _drawRect(false{aDrawOnlyBorder});
+          aPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
+          aJDestRectf := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
+          aJSrcRect := TJRect.JavaClass.init(0, 0, fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height);
+          aPaint.setXfermode(aPorterDuffXfermode);
+          aCanvas.drawBitmap(aTMPBitmap, aJSrcRect, aJDestRectf, apaint);
+          aPaint.setXfermode(nil);
+          aPorterDuffXfermode := nil;
+          aJSrcRect := nil;
+          aJDestRectf := nil;
+          //-----
+          aTmpBitmap.recycle;
+          aTmpBitmap := nil;
+          //-----
+        end;
+      end;
+    end
+
+    //fill with solid color
+    else if Fill.Kind = TBrushKind.Solid then begin
+      aPaint.setColor(Fill.Color);
+      _drawRect(false{aDrawOnlyBorder});
+    end;
+
+  end;
+
+  //stroke the rectangle
+  if Stroke.Kind <> TBrushKind.None then begin
+
+    //init aPaint
+    aPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
+    aPaint.setStrokeWidth(Stroke.Thickness);
+
+    //stroke with solid color
+    if Stroke.Kind = TBrushKind.Solid then begin
+      aPaint.setColor(Stroke.Color);
+      _drawRect(true{aDrawOnlyBorder});
+    end;
+
+  end;
+
+  //free the paint and the canvas
+  aPaint := nil;
+  aCanvas := nil;
+
+  {$ELSEIF DEFINED(IOS)}
+
+  //set the paint default properties
+  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+  //-----
+  CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+  CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+
+  //init aRect
+  if Stroke.Kind <> TBrushKind.None then begin
+    aRect := TrectF.Create(Rect.Left + (Stroke.Thickness / 2),
+                           Rect.Top + (Stroke.Thickness / 2),
+                           Rect.right - (Stroke.Thickness / 2),
+                           Rect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else aRect := Rect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the rectangle
+  if Fill.Kind <> TBrushKind.None then begin
+
+    //fill with gradient
+    if Fill.Kind = TBrushKind.Gradient then begin
+      if Fill.Gradient.Style = TGradientStyle.Radial then begin
+        CGContextSaveGState(aContext);
+        //-----
+        aCallback.version := 0;
+        aCallback.evaluate := @ALGradientEvaluateCallback;
+        aCallback.releaseInfo:= nil;
+        aFunc := CGFunctionCreate(fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
+                                  1, // domainDimension - The number of inputs.
+                                  @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                                  4, // rangeDimension - The number of outputs.
+                                  nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
+                                  @aCallback); // callbacks - A pointer to a callback function table.
+        try
+          aShading := CGShadingCreateRadial(aColorSpace, // colorspace
+                                            CGPoint.Create(TPointF.Create(aRect.Width / 2, aRect.height / 2)), // start - The center of the starting circle, in the shading's target coordinate space.
+                                            aRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
+                                            CGPoint.Create(TPointF.Create(aRect.Width / 2, aRect.Height / 2)), // end - The center of the ending circle, in the shading's target coordinate space.
+                                            0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
+                                            aFunc, // function
+                                            1, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                                            1); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+          try
+            _DrawPath(false{aDrawOnlyBorder});
+            CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
+                                     // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
+                                     // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
+                                     // save the graphics state before you clip and restore the graphics state after you’ve completed
+                                     // any clipped drawing.
+            CGContextDrawShading(aContext, aShading);
+          finally
+            CGShadingRelease(aShading);
+          end;
+        finally
+          CGFunctionRelease(aFunc);
+        end;
+        //-----
+        CGContextRestoreGState(aContext);
+      end;
+    end
+
+    //fill with bitmap
+    else if Fill.Kind = TBrushKind.Bitmap then begin
+      if not fill.Bitmap.Bitmap.IsEmpty then begin
+        if fill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
+          if fill.Bitmap.Bitmap.Map(TMapAccess.Read, aBitmapData) then
+          try
+            aTMPContext := CGBitmapContextCreate(aBitmapData.Data, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                 aBitmapData.Width, // width: The width, in pixels, of the required bitmap.
+                                                 aBitmapData.Height, // height: The height, in pixels, of the required bitmap.
+                                                 8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                    //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                    //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                    //                   chapter of Quartz 2D Programming Guide.
+                                                 aBitmapData.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                                               //              a value of 0 causes the value to be calculated automatically.
+                                                 aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                              //             bitmap graphics contexts.
+                                                 kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                   // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                   // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                 kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                           // kCGBitmapByteOrder32Little = Little-endian
+                                                                           // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                           //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                           //             values. The constants for specifying the alpha channel information are declared with the
+                                                                           //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                           //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                           //             and CGImageAlphaInfo constants.)
+                                                                           //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                           //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                           //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            if aContext <> nil then begin
+              try
+                aImageRef := CGBitmapContextCreateImage(aTMPContext);
+                if aImageRef <> nil then
+                try
+                  aImage := TUIImage.Wrap(TUIImage.alloc.initWithCGImage(aImageRef));
+                  if aImage <> nil then
+                  try
+                    CGContextSaveGState(aContext);
+                    //-----
+                    _DrawPath(false{aDrawOnlyBorder});
+                    CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
+                                             // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
+                                             // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
+                                             // save the graphics state before you clip and restore the graphics state after you’ve completed
+                                             // any clipped drawing.
+                    CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                       ALLowerLeftCGRect(aRect.TopLeft,
+                                                         aRect.Width,
+                                                         aRect.Height,
+                                                         aRect.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                       aImage.CGImage); // image The image to draw.
+                    //-----
+                    CGContextRestoreGState(aContext);
+                  finally
+                    aImage.release;
+                  end;
+                finally
+                  CGImageRelease(aImageRef);
+                end;
+              finally
+                CGContextRelease(aTMPContext);
+              end;
+            end;
+          finally
+            fill.Bitmap.Bitmap.Unmap(aBitmapData);
+          end;
+        end;
+      end;
+    end
+
+    //fill with solid color
+    else if Fill.Kind = TBrushKind.Solid then begin
+      aAlphaColor := TAlphaColorCGFloat.Create(Fill.Color);
+      CGContextSetRGBFillColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
+      _DrawPath(false{aDrawOnlyBorder});
+      CGContextFillPath(aContext);
+    end;
+
+  end;
+
+  //stroke the rectangle
+  if Stroke.Kind <> TBrushKind.None then begin
+
+    //stroke with solid color
+    if Stroke.Kind = TBrushKind.Solid then begin
+      aAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
+      CGContextSetRGBStrokeColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
+      CGContextSetLineWidth(aContext, Stroke.Thickness);
+      _DrawPath(True{aDrawOnlyBorder});
+      CGContextStrokePath(aContext);
+    end;
+
+  end;
+
+  {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+  StrokeThicknessRestoreValue := Stroke.Thickness;
+  try
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(Rect, Fill, Stroke, False, FillShape, DrawShape, StrokeThicknessRestoreValue);
+
+    if Sides <> AllSides then
+    begin
+      Off := LShapeRect.Left;
+      if not(TSide.Top in Sides) then
+        LShapeRect.Top := LShapeRect.Top - Off;
+      if not(TSide.Left in Sides) then
+        LShapeRect.Left := LShapeRect.Left - Off;
+      if not(TSide.Bottom in Sides) then
+        LShapeRect.Bottom := LShapeRect.Bottom + Off;
+      if not(TSide.Right in Sides) then
+        LShapeRect.Right := LShapeRect.Right + Off;
+      if FillShape then
+        aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Fill, TCornerType.Round{CornerType});
+      if DrawShape then
+        aCanvas.DrawRectSides(_GetShapeRect, XRadius, YRadius, Corners,  1{AbsoluteOpacity}, Sides, Stroke, TCornerType.Round{CornerType});
+    end
+    else
+    begin
+      if FillShape then
+        aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Fill, TCornerType.Round{CornerType});
+      if DrawShape then
+        aCanvas.DrawRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Stroke, TCornerType.Round{CornerType});
+    end;
+  finally
+    if StrokeThicknessRestoreValue <> Stroke.Thickness then
+      Stroke.Thickness := StrokeThicknessRestoreValue;
+  end;
+  {$IFEND}
+
+end;
 
 initialization
   ALCustomConvertFontFamilyProc := nil;

@@ -36,8 +36,9 @@ extern DELPHI_PACKAGE void __fastcall ALLog(const System::UnicodeString Tag, con
 extern DELPHI_PACKAGE int __fastcall AlBoolToInt(bool Value);
 extern DELPHI_PACKAGE bool __fastcall AlIntToBool(int Value);
 extern DELPHI_PACKAGE int __fastcall ALMediumPos(int LTotal, int LBorder, int LObject);
-extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToGMTDateTime(const System::TDateTime aLocalDateTime);
-extern DELPHI_PACKAGE System::TDateTime __fastcall ALGMTNow(void);
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlLocalDateTimeToUTCDateTime(const System::TDateTime aLocalDateTime);
+extern DELPHI_PACKAGE System::TDateTime __fastcall AlUTCDateTimeToLocalDateTime(const System::TDateTime aUTCDateTime);
+extern DELPHI_PACKAGE System::TDateTime __fastcall ALUTCNow(void);
 extern DELPHI_PACKAGE int __fastcall ALInc(int &x, int Count);
 extern DELPHI_PACKAGE System::TDateTime __fastcall ALUnixMsToDateTime(const __int64 aValue);
 extern DELPHI_PACKAGE __int64 __fastcall ALDateTimeToUnixMs(const System::TDateTime aValue);

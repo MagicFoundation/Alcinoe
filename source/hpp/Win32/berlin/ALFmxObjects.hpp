@@ -32,6 +32,7 @@ namespace Alfmxobjects
 class DELPHICLASS TALRectangle;
 class DELPHICLASS TALCircle;
 class DELPHICLASS TALLine;
+class DELPHICLASS TALDoubleBufferedTextLayout;
 class DELPHICLASS TALText;
 //-- type declarations -------------------------------------------------------
 class PASCALIMPLEMENTATION TALRectangle : public Fmx::Objects::TRectangle
@@ -121,13 +122,54 @@ __published:
 };
 
 
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION TALDoubleBufferedTextLayout : public Fmx::Textlayout::TTextLayout
+{
+	typedef Fmx::Textlayout::TTextLayout inherited;
+	
+private:
+	float FScreenScale;
+	TALText* fTextControl;
+	Fmx::Graphics::TBitmap* fBufBitmap;
+	System::Types::TRectF fBufBitmapRect;
+	Fmx::Types::TTextAlign fBufHorizontalAlign;
+	Fmx::Types::TTextAlign fBufVerticalAlign;
+	System::Uitypes::TAlphaColor fBuffontColor;
+	System::Uitypes::TFontName fBuffontFamily;
+	System::Uitypes::TFontStyles fBuffontStyle;
+	float fBuffontSize;
+	bool fBufWordWrap;
+	bool fBufAutosize;
+	Fmx::Types::TTextTrimming fBufTrimming;
+	System::Types::TSizeF fBufSize;
+	System::UnicodeString fBufText;
+	bool fBufTextBreaked;
+	
+protected:
+	virtual void __fastcall DoRenderLayout(void);
+	virtual void __fastcall DoDrawLayout(Fmx::Graphics::TCanvas* const ACanvas);
+	virtual float __fastcall GetTextHeight(void);
+	virtual float __fastcall GetTextWidth(void);
+	virtual System::Types::TRectF __fastcall GetTextRect(void);
+	virtual int __fastcall DoPositionAtPoint(const System::Types::TPointF &APoint);
+	virtual Fmx::Graphics::TRegion __fastcall DoRegionForRange(const Fmx::Textlayout::TTextRange &ARange);
+	
+public:
+	__fastcall TALDoubleBufferedTextLayout(Fmx::Graphics::TCanvas* const ACanvas, TALText* const aTextControl);
+	__fastcall virtual ~TALDoubleBufferedTextLayout(void);
+	virtual Fmx::Graphics::TBitmap* __fastcall MakeBufBitmap(void);
+	virtual void __fastcall clearBufBitmap(void);
+	virtual void __fastcall ConvertToPath(Fmx::Graphics::TPathData* const APath);
+};
+
+#pragma pack(pop)
+
 class PASCALIMPLEMENTATION TALText : public Fmx::Controls::TControl
 {
 	typedef Fmx::Controls::TControl inherited;
 	
 private:
 	bool fRestoreLayoutUpdateAfterLoaded;
-	bool fdoubleBuffered;
 	bool FAutoTranslate;
 	bool FAutoConvertFontFamily;
 	Fmx::Graphics::TTextSettings* FTextSettings;
@@ -135,6 +177,18 @@ private:
 	bool FAutoSize;
 	float fMaxWidth;
 	float fMaxHeight;
+	float FYRadius;
+	float FXRadius;
+	Fmx::Types::TCorners FCorners;
+	Fmx::Types::TSides FSides;
+	Fmx::Graphics::TBrush* FFill;
+	Fmx::Graphics::TStrokeBrush* FStroke;
+	float fLineSpacing;
+	bool fTextIsHtml;
+	void __fastcall SetFill(Fmx::Graphics::TBrush* const Value);
+	void __fastcall SetStroke(Fmx::Graphics::TStrokeBrush* const Value);
+	bool __fastcall IsCornersStored(void);
+	bool __fastcall IsSidesStored(void);
 	Fmx::Graphics::TBitmap* __fastcall GetBufBitmap(void);
 	bool __fastcall GetdoubleBuffered(void);
 	void __fastcall SetdoubleBuffered(const bool Value);
@@ -161,6 +215,12 @@ private:
 	
 protected:
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=GetBufBitmap};
+	virtual void __fastcall FillChanged(System::TObject* Sender);
+	virtual void __fastcall StrokeChanged(System::TObject* Sender);
+	virtual void __fastcall SetXRadius(const float Value);
+	virtual void __fastcall SetYRadius(const float Value);
+	virtual void __fastcall SetCorners(const Fmx::Types::TCorners Value);
+	virtual void __fastcall SetSides(const Fmx::Types::TSides Value);
 	virtual void __fastcall SetParent(Fmx::Types::TFmxObject* const Value);
 	virtual void __fastcall FontChanged(void);
 	virtual bool __fastcall SupportsPaintStage(const Fmx::Controls::TPaintStage Stage);
@@ -236,6 +296,14 @@ __published:
 	__property bool doubleBuffered = {read=GetdoubleBuffered, write=SetdoubleBuffered, default=1};
 	__property bool AutoTranslate = {read=FAutoTranslate, write=FAutoTranslate, default=1};
 	__property bool AutoConvertFontFamily = {read=FAutoConvertFontFamily, write=FAutoConvertFontFamily, default=1};
+	__property Fmx::Graphics::TBrush* Fill = {read=FFill, write=SetFill};
+	__property Fmx::Graphics::TStrokeBrush* Stroke = {read=FStroke, write=SetStroke};
+	__property Fmx::Types::TCorners Corners = {read=FCorners, write=SetCorners, stored=IsCornersStored, nodefault};
+	__property Fmx::Types::TSides Sides = {read=FSides, write=SetSides, stored=IsSidesStored, nodefault};
+	__property float XRadius = {read=FXRadius, write=SetXRadius};
+	__property float YRadius = {read=FYRadius, write=SetYRadius};
+	__property float LineSpacing = {read=fLineSpacing, write=fLineSpacing};
+	__property bool TextIsHtml = {read=fTextIsHtml, write=fTextIsHtml, default=0};
 };
 
 

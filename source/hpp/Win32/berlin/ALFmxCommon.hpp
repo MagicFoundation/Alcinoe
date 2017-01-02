@@ -32,10 +32,99 @@
 namespace Alfmxcommon
 {
 //-- forward type declarations -----------------------------------------------
+class DELPHICLASS TALBreakTextItem;
+class DELPHICLASS TALBreakTextItems;
+struct TAlTextElement;
+class DELPHICLASS TALDrawMultiLineTextOptions;
 class DELPHICLASS TALControlAccessPrivate;
 class DELPHICLASS TALTextLayoutAccessPrivate;
 //-- type declarations -------------------------------------------------------
 typedef System::Uitypes::TFontName __fastcall (*TALCustomConvertFontFamilyProc)(const System::Uitypes::TFontName AFamily, const System::Uitypes::TFontStyles aFontStyles);
+
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION TALBreakTextItem : public System::TObject
+{
+	typedef System::TObject inherited;
+	
+public:
+	System::UnicodeString Line;
+	System::Types::TPointF pos;
+	System::Types::TRectF rect;
+	System::Uitypes::TAlphaColor fontColor;
+	System::Uitypes::TFontStyles fontStyle;
+	System::UnicodeString id;
+	bool isEllipsis;
+	__fastcall TALBreakTextItem(void);
+public:
+	/* TObject.Destroy */ inline __fastcall virtual ~TALBreakTextItem(void) { }
+	
+};
+
+#pragma pack(pop)
+
+class PASCALIMPLEMENTATION TALBreakTextItems : public System::Generics::Collections::TObjectList__1<TALBreakTextItem*>
+{
+	typedef System::Generics::Collections::TObjectList__1<TALBreakTextItem*> inherited;
+	
+public:
+	/* {System_Generics_Collections}TObjectList<ALFmxCommon_TALBreakTextItem>.Create */ inline __fastcall TALBreakTextItems(bool AOwnsObjects)/* overload */ : System::Generics::Collections::TObjectList__1<TALBreakTextItem*>(AOwnsObjects) { }
+	/* {System_Generics_Collections}TObjectList<ALFmxCommon_TALBreakTextItem>.Create */ inline __fastcall TALBreakTextItems(const System::DelphiInterface<System::Generics::Defaults::IComparer__1<TALBreakTextItem*> > AComparer, bool AOwnsObjects)/* overload */ : System::Generics::Collections::TObjectList__1<TALBreakTextItem*>(AComparer, AOwnsObjects) { }
+	/* {System_Generics_Collections}TObjectList<ALFmxCommon_TALBreakTextItem>.Create */ inline __fastcall TALBreakTextItems(System::Generics::Collections::TEnumerable__1<TALBreakTextItem*>* const Collection, bool AOwnsObjects)/* overload */ : System::Generics::Collections::TObjectList__1<TALBreakTextItem*>(Collection, AOwnsObjects) { }
+	/* {System_Generics_Collections}TObjectList<ALFmxCommon_TALBreakTextItem>.Destroy */ inline __fastcall virtual ~TALBreakTextItems(void) { }
+	
+public:
+	/* {System_Generics_Collections}TList<ALFmxCommon_TALBreakTextItem>.Create */ inline __fastcall TALBreakTextItems(void)/* overload */ : System::Generics::Collections::TObjectList__1<TALBreakTextItem*>() { }
+	/* {System_Generics_Collections}TList<ALFmxCommon_TALBreakTextItem>.Create */ inline __fastcall TALBreakTextItems(const System::DelphiInterface<System::Generics::Defaults::IComparer__1<TALBreakTextItem*> > AComparer)/* overload */ : System::Generics::Collections::TObjectList__1<TALBreakTextItem*>(AComparer) { }
+	/* {System_Generics_Collections}TList<ALFmxCommon_TALBreakTextItem>.Create */ inline __fastcall TALBreakTextItems(System::Generics::Collections::TEnumerable__1<TALBreakTextItem*>* const Collection)/* overload */ : System::Generics::Collections::TObjectList__1<TALBreakTextItem*>(Collection) { }
+	
+};
+
+
+struct DECLSPEC_DRECORD TAlTextElement
+{
+public:
+	System::UnicodeString Id;
+	System::Types::TRectF rect;
+	bool isEllipsis;
+};
+
+
+typedef System::DynamicArray<TAlTextElement> TalTextElements;
+
+#pragma pack(push,4)
+class PASCALIMPLEMENTATION TALDrawMultiLineTextOptions : public System::TObject
+{
+	typedef System::TObject inherited;
+	
+public:
+	System::UnicodeString FontName;
+	float FontSize;
+	System::Uitypes::TFontStyles FontStyle;
+	System::Uitypes::TAlphaColor FontColor;
+	System::UnicodeString EllipsisText;
+	System::Uitypes::TFontStyles EllipsisFontStyle;
+	System::Uitypes::TAlphaColor EllipsisFontColor;
+	bool AutoSize;
+	bool WordWrap;
+	int MaxLines;
+	float LineSpacing;
+	Fmx::Types::TTextTrimming Trimming;
+	System::Types::TPointF FirstLineIndent;
+	Fmx::Types::TTextAlign HTextAlign;
+	Fmx::Types::TTextAlign VTextAlign;
+	Fmx::Graphics::TBrush* Fill;
+	Fmx::Graphics::TStrokeBrush* Stroke;
+	Fmx::Types::TSides Sides;
+	float XRadius;
+	float YRadius;
+	Fmx::Types::TCorners Corners;
+	System::Types::TRectF Padding;
+	bool TextIsHtml;
+	__fastcall TALDrawMultiLineTextOptions(void);
+	__fastcall virtual ~TALDrawMultiLineTextOptions(void);
+};
+
+#pragma pack(pop)
 
 class PASCALIMPLEMENTATION TALControlAccessPrivate : public Fmx::Types::TFmxObject
 {
@@ -231,6 +320,12 @@ extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALAlignDimensionToPixelRo
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALAlignDimensionToPixelCeil(const System::Types::TRectF &Rect, const float Scale)/* overload */;
 extern DELPHI_PACKAGE float __fastcall ALAlignDimensionToPixelCeil(const float Dimension, const float Scale)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALAlignDimensionToPixelCeil(const System::Types::TRectF &Rect)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALGetTextMetrics(const float aFontSize, const System::Uitypes::TFontStyles aFontStyle, const System::UnicodeString aFontName, float &aAscent, float &aDescent);
+extern DELPHI_PACKAGE int __fastcall ALbreakText(const float aFontSize, const System::Uitypes::TFontStyles aFontStyle, const System::UnicodeString aFontName, const System::UnicodeString atext, const float aMaxWidth, float &aMeasuredWidth)/* overload */;
+extern DELPHI_PACKAGE bool __fastcall ALbreakText(const System::Uitypes::TAlphaColor aFontColor, const float aFontSize, const System::Uitypes::TFontStyles aFontStyle, const System::UnicodeString aFontName, System::Types::TRectF &ARect, const System::UnicodeString AText, const bool aWordWrap, const Fmx::Types::TTextAlign AHTextAlign, const Fmx::Types::TTextAlign AVTextAlign, const Fmx::Types::TTextTrimming aTrimming, TALBreakTextItems* const aBreakTextItems, int &aTotalLines, const System::Types::TPointF &aFirstLineIndent, const float aLineSpacing = 0.000000E+00f, const System::UnicodeString aEllipsisText = L"\u2026", const System::Uitypes::TFontStyles aEllipsisFontStyle = System::Uitypes::TFontStyles() , const System::Uitypes::TAlphaColor aEllipsisFontColor = (System::Uitypes::TAlphaColor)(0x0), const int aMaxlines = 0x0)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALDrawMultiLineText(const System::UnicodeString aText, System::Types::TRectF &aRect, bool &aTextBreaked, float &aAscent, float &aDescent, System::Types::TPointF &aFirstPos, System::Types::TPointF &aLastPos, TalTextElements &aElements, System::Types::TRectF &aEllipsisRect, TALDrawMultiLineTextOptions* const aOptions)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALDrawMultiLineText(const System::UnicodeString aText, System::Types::TRectF &aRect, bool &aTextBreaked, TALDrawMultiLineTextOptions* const aOptions)/* overload */;
+extern DELPHI_PACKAGE void __fastcall ALPaintRectangle(Fmx::Graphics::TCanvas* const aCanvas, const System::Types::TRectF &Rect, Fmx::Graphics::TBrush* const Fill, Fmx::Graphics::TStrokeBrush* const Stroke, const Fmx::Types::TSides Sides, const Fmx::Types::TCorners Corners, const float XRadius = 0.000000E+00f, const float YRadius = 0.000000E+00f);
 }	/* namespace Alfmxcommon */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXCOMMON)
 using namespace Alfmxcommon;

@@ -1543,7 +1543,7 @@ end;
 {aValue is a Local TDateTime - result is "Sun, 06 Nov 1994 08:49:37 GMT"}
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 begin
-  Result := ALGMTDateTimeToRfc822Str(AlLocalDateTimeToGMTDateTime(aValue));
+  Result := ALGMTDateTimeToRfc822Str(AlLocalDateTimeToUTCDateTime(aValue));
 end;
 {$ENDIF}
 

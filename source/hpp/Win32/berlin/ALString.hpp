@@ -652,6 +652,7 @@ extern DELPHI_PACKAGE bool __fastcall ALIsSmallInt(const System::AnsiString S);
 extern DELPHI_PACKAGE bool __fastcall ALIsFloat(const System::AnsiString S, const TALFormatSettings &AFormatSettings);
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFloatToStr(System::Extended Value, const TALFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFloatToStr(System::Extended Value, System::AnsiString &S, const TALFormatSettings &AFormatSettings)/* overload */;
+extern DELPHI_PACKAGE System::AnsiString __fastcall ALFloatToStrF(System::Extended Value, System::Sysutils::TFloatFormat Format, int Precision, int Digits, const TALFormatSettings &AFormatSettings);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALFloatToStrU(System::Extended Value, const System::Sysutils::TFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFloatToStrU(System::Extended Value, System::UnicodeString &S, const System::Sysutils::TFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALCurrToStr(System::Currency Value, const TALFormatSettings &AFormatSettings);

@@ -189,6 +189,9 @@ type
     Layout8: TLayout;
     Image8: TImage;
     Text11: TText;
+    Button12: TButton;
+    ALText9: TALText;
+    Text8: TText;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);

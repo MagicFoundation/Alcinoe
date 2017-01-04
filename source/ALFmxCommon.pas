@@ -50,6 +50,7 @@ function  ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: Tfont
 function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
+function  ALAlignAbsolutePointToPixelRound(const Point: TPointF; const Scale: single): TpointF;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single; overload;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF; overload;
@@ -108,8 +109,21 @@ function ALBreakText(const aPaint: JPaint;
                      const aEllipsisFontName: String = '';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
-
+                     const aMaxlines: integer = 0): boolean; overload; // return true if text was breaked in several lines (truncated or not)
+function ALBreakText(const aPaint: JPaint;
+                     var ARect: TRectF;
+                     const AText: JString;
+                     const aWordWrap: Boolean;
+                     const AHTextAlign, AVTextAlign: TTextAlign;
+                     const aTrimming: TTextTrimming;
+                     const aBreakTextItems: TALBreakTextItems;
+                     const aFirstLineIndent: TpointF;
+                     const aLineSpacing: single = 0;
+                     const aEllipsisText: JString = nil;
+                     const aEllipsisFontName: String = '';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; inline; overload; // return true if text was breaked in several lines (truncated or not)
 {$IFEND}
 
 {$IF defined(IOS)}
@@ -150,7 +164,24 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aEllipsisText: string = '…';
                      const aEllipsisFontStyle: TFontStyles = [];
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                     const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
+                     const aMaxlines: integer = 0): boolean; overload; // // return true if text was breaked in several lines (truncated or not)
+function ALBreakText(const aColorSpace: CGColorSpaceRef;
+                     const aFontColor: TalphaColor;
+                     const aFontSize: single;
+                     const aFontStyle: TFontStyles;
+                     const aFontName: String;
+                     var ARect: TRectF;
+                     const AText: string;
+                     const aWordWrap: Boolean;
+                     const AHTextAlign, AVTextAlign: TTextAlign;
+                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                     const aBreakTextItems: TALBreakTextItems;
+                     const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                     const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+                     const aEllipsisText: string = '…';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; inline; overload; // // return true if text was breaked in several lines (truncated or not)
 
 {$IFEND}
 
@@ -261,7 +292,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <span id="xxx">...</span>
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              var aTextBreaked: boolean; // out => true is the text was "breaked" in several lines
                               var aAscent: single; // out => the Ascent of the last element (in real pixel)
                               var aDescent: Single; // out => the Descent of the last element (in real pixel)
                               var aFirstPos: TpointF; // out => the point of the start of the text
@@ -276,8 +307,16 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <span id="xxx">...</span>
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
-                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+                              var aTextBreaked: boolean; // out => true is the text was "breaked" in several lines
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; inline; overload;
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; inline; overload;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 procedure ALPaintRectangle({$IF defined(ANDROID)}
@@ -288,7 +327,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
                            const aCanvas: Tcanvas;
                            {$IFEND}
-                           const Rect: TrectF;
+                           const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
                            const Sides: TSides;
@@ -574,6 +613,13 @@ begin
     Result := PremultiplyAlpha(SrcColor)
   else
     Result := SrcColor;
+end;
+
+{*********************************************************************************************}
+function  ALAlignAbsolutePointToPixelRound(const Point: TPointF; const Scale: single): TpointF;
+begin
+  result.x := round(Point.x * Scale) / Scale;
+  result.y := round(Point.y * Scale) / Scale;
 end;
 
 {**************************************************************************************}
@@ -1357,6 +1403,42 @@ begin
     end;
   end;
 
+end;
+{$IFEND}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALBreakText(const aPaint: JPaint;
+                     var ARect: TRectF;
+                     const AText: JString;
+                     const aWordWrap: Boolean;
+                     const AHTextAlign, AVTextAlign: TTextAlign;
+                     const aTrimming: TTextTrimming;
+                     const aBreakTextItems: TALBreakTextItems;
+                     const aFirstLineIndent: TpointF;
+                     const aLineSpacing: single = 0;
+                     const aEllipsisText: JString = nil;
+                     const aEllipsisFontName: String = '';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
+var aTotalLines: integer;
+begin
+  result := ALBreakText(aPaint, // const aPaint: JPaint;
+                        ARect, // var ARect: TRectF;
+                        AText, // const AText: JString;
+                        aWordWrap, // const aWordWrap: Boolean;
+                        AHTextAlign, AVTextAlign, // const AHTextAlign, AVTextAlign: TTextAlign;
+                        aTrimming, // const aTrimming: TTextTrimming;
+                        aBreakTextItems, // const aBreakTextItems: TALBreakTextItems;
+                        aTotalLines, // var aTotalLines: integer;
+                        aFirstLineIndent, // const aFirstLineIndent: TpointF;
+                        aLineSpacing, // const aLineSpacing: single = 0;
+                        aEllipsisText, // const aEllipsisText: JString = nil;
+                        aEllipsisFontName, // const aEllipsisFontName: String = '';
+                        aEllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+                        aEllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                        aMaxlines); //const aMaxlines: integer = 0): boolean;
 end;
 {$IFEND}
 
@@ -2147,6 +2229,48 @@ begin
 end;
 {$IFEND}
 
+{****************}
+{$IF defined(IOS)}
+function ALBreakText(const aColorSpace: CGColorSpaceRef;
+                     const aFontColor: TalphaColor;
+                     const aFontSize: single;
+                     const aFontStyle: TFontStyles;
+                     const aFontName: String;
+                     var ARect: TRectF;
+                     const AText: string;
+                     const aWordWrap: Boolean;
+                     const AHTextAlign, AVTextAlign: TTextAlign;
+                     const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                     const aBreakTextItems: TALBreakTextItems;
+                     const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                     const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+                     const aEllipsisText: string = '…';
+                     const aEllipsisFontStyle: TFontStyles = [];
+                     const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                     const aMaxlines: integer = 0): boolean; inline; overload; // // return true if text was breaked in several lines (truncated or not)
+var aTotalLines: integer;
+begin
+  result := ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
+                        aFontColor, // const aFontColor: TalphaColor;
+                        aFontSize, // const aFontSize: single;
+                        aFontStyle, // const aFontStyle: TFontStyles;
+                        aFontName, // const aFontName: String;
+                        ARect, // var ARect: TRectF;
+                        AText, // const AText: string;
+                        aWordWrap, // const aWordWrap: Boolean;
+                        AHTextAlign, AVTextAlign, // const AHTextAlign, AVTextAlign: TTextAlign;
+                        aTrimming, // const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+                        aBreakTextItems, // const aBreakTextItems: TALBreakTextItems;
+                        aTotalLines, // var aTotalLines: integer;
+                        aFirstLineIndent, // const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+                        aLineSpacing, // const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+                        aEllipsisText, // const aEllipsisText: string = '…';
+                        aEllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+                        aEllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                        aMaxlines); // const aMaxlines: integer = 0): boolean; // // return true if text was breaked in several lines (truncated or not)
+end;
+{$IFEND}
+
 
 {*****************************************}
 {$IF defined(MSWINDOWS) or defined(_MACOS)}
@@ -2782,7 +2906,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <span id="xxx">...</span>
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              var aTextBreaked: boolean; // // out => true is the text was "breaked" in several lines
                               var aAscent: single; // out => the Ascent of the last element (in real pixel)
                               var aDescent: Single; // out => the Descent of the last element (in real pixel)
                               var aFirstPos: TpointF; // out => the point of the start of the text
@@ -3515,7 +3639,6 @@ begin
   {$IFEND}
 
 end;
-{$ENDREGION}
 {$IF defined(_ZEROBASEDSTRINGS_ON)}
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}
@@ -3538,8 +3661,37 @@ var aAscent: single;
     aEllipsisRect: TRectF;
 begin
   result := ALDrawMultiLineText(aText,
-                                aRect,
-                                aTextBreaked,
+                                aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                                aTextBreaked, // out => true is the text was "breaked" in several lines
+                                aAscent, // var aAscent: single; // out => the Ascent of the last element (in real pixel)
+                                aDescent, // var aDescent: Single; // out => the Descent of the last element (in real pixel)
+                                aFirstPos, // var aFirstPos: TpointF; // out => the point of the start of the text
+                                aLastPos, // var aLastPos: TpointF; // out => the point of the end of the text
+                                aElements, // var aElements: TalTextElements; // out => the list of rect describing all span elements
+                                aEllipsisRect, // var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+                                aOptions);
+end;
+
+{************************************************}
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aAscent: single;
+    aDescent: Single;
+    aFirstPos: TpointF;
+    aLastPos: TpointF;
+    aElements: TalTextElements;
+    aEllipsisRect: TRectF;
+    aTextBreaked: boolean;
+begin
+  result := ALDrawMultiLineText(aText,
+                                aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                                aTextBreaked, // out => true is the text was "breaked" in several lines
                                 aAscent, // var aAscent: single; // out => the Ascent of the last element (in real pixel)
                                 aDescent, // var aDescent: Single; // out => the Descent of the last element (in real pixel)
                                 aFirstPos, // var aFirstPos: TpointF; // out => the point of the start of the text
@@ -3644,7 +3796,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
                            const aCanvas: Tcanvas;
                            {$IFEND}
-                           const Rect: TrectF;
+                           const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
                            const Sides: TSides;
@@ -3652,44 +3804,12 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const XRadius: Single = 0;
                            const YRadius: Single = 0);
 
-{$IF defined(IOS)}
-const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
-{$IFEND}
-
-{$IF defined(ANDROID)}
-var aRect: TrectF;
-    aTmpBitmap: Jbitmap;
-    aShader: JRadialGradient;
-    aCanvas: Jcanvas;
-    aPaint: JPaint;
-    aColors: TJavaArray<Integer>;
-    aStops: TJavaArray<Single>;
-    aPorterDuffXfermode: jPorterDuffXfermode;
-    aBitmapInfo: AndroidBitmapInfo;
-    aPixelBuffer: Pointer;
-    aBitmapData: TBitmapData;
-    aJDestRectf: JrectF;
-    aJSrcRect: Jrect;
-    i: integer;
-{$ELSEIF defined(IOS)}
-var aRect: TrectF;
-    aAlphaColor: TAlphaColorCGFloat;
-    aCallback: CGFunctionCallbacks;
-    aShading: CGShadingRef;
-    aFunc: CGFunctionRef;
-    aBitmapData: TBitmapData;
-    aTMPContext: CGContextRef;
-    aImageRef: CGImageRef;
-    aImage: UIImage;
-{$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
-var LShapeRect: TRectF;
-    Off: Single;
-    StrokeThicknessRestoreValue: Single;
-    FillShape, DrawShape: Boolean;
-{$IFEND}
-
+  {$REGION ' _drawRect (ANDROID)'}
   {$IF defined(ANDROID)}
-  procedure _drawRect(Const aDrawOnlyBorder: Boolean);
+  procedure _drawRect(const aCanvas: Jcanvas;
+                      const aPaint: JPaint;
+                      const aRect: TrectF;
+                      Const aDrawOnlyBorder: Boolean);
   var aJRect: JRectF;
       aPath: JPath;
       aXRadius: single;
@@ -3876,9 +3996,12 @@ var LShapeRect: TRectF;
     end;
   end;
   {$IFEND}
+  {$ENDREGION}
 
+  {$REGION ' _DrawPath (IOS)'}
   {$IF defined(IOS)}
-  procedure _DrawPath(Const aDrawOnlyBorder: Boolean);
+  procedure _DrawPath(const aRect: TrectF;
+                      Const aDrawOnlyBorder: Boolean);
   var aXRadius: single;
       aYradius: Single;
       aWidthMinusCorners: single;
@@ -4083,15 +4206,54 @@ var LShapeRect: TRectF;
 
   end;
   {$IFEND}
+  {$ENDREGION}
 
+  {$REGION ' _GetShapeRect (MSWINDOWS / _MACOS)'}
   {$IF defined(MSWINDOWS) or defined(_MACOS)}
   function _GetShapeRect: TRectF;
   begin
-    Result := Rect;
+    Result := DstRect;
     if Stroke.Kind <> TBrushKind.None then
       InflateRect(Result, -(Stroke.Thickness / 2), -(Stroke.Thickness / 2));
   end;
   {$IFEND}
+  {$ENDREGION}
+
+{$IF defined(IOS)}
+const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
+{$IFEND}
+
+{$IF defined(ANDROID)}
+var aRect: TrectF;
+    aTmpBitmap: Jbitmap;
+    aShader: JRadialGradient;
+    aCanvas: Jcanvas;
+    aPaint: JPaint;
+    aColors: TJavaArray<Integer>;
+    aStops: TJavaArray<Single>;
+    aPorterDuffXfermode: jPorterDuffXfermode;
+    aBitmapInfo: AndroidBitmapInfo;
+    aPixelBuffer: Pointer;
+    aBitmapData: TBitmapData;
+    aJDestRectf: JrectF;
+    aJSrcRect: Jrect;
+    i: integer;
+{$ELSEIF defined(IOS)}
+var aRect: TrectF;
+    aAlphaColor: TAlphaColorCGFloat;
+    aCallback: CGFunctionCallbacks;
+    aShading: CGShadingRef;
+    aFunc: CGFunctionRef;
+    aBitmapData: TBitmapData;
+    aTMPContext: CGContextRef;
+    aImageRef: CGImageRef;
+    aImage: UIImage;
+{$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+var LShapeRect: TRectF;
+    Off: Single;
+    StrokeThicknessRestoreValue: Single;
+    FillShape, DrawShape: Boolean;
+{$IFEND}
 
 begin
 
@@ -4106,12 +4268,12 @@ begin
 
   //init aRect
   if Stroke.Kind <> TBrushKind.None then begin
-    aRect := TrectF.Create(Rect.Left + (Stroke.Thickness / 2),
-                           Rect.Top + (Stroke.Thickness / 2),
-                           Rect.right - (Stroke.Thickness / 2),
-                           Rect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    aRect := TrectF.Create(dstRect.Left + (Stroke.Thickness / 2),
+                           dstRect.Top + (Stroke.Thickness / 2),
+                           dstRect.right - (Stroke.Thickness / 2),
+                           dstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
   end
-  else aRect := Rect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+  else aRect := dstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
 
   //fill the rectangle
   if Fill.Kind <> TBrushKind.None then begin
@@ -4130,7 +4292,7 @@ begin
         end;
         aShader := TJRadialGradient.JavaClass.init(aRect.CenterPoint.x{x}, aRect.CenterPoint.y{y}, aRect.width / 2{radius},  aColors, aStops, TJShader_TileMode.JavaClass.CLAMP{tile});
         aPaint.setShader(aShader);
-        _drawRect(false{aDrawOnlyBorder});
+        _drawRect(aCanvas, aPaint, aRect, false{aDrawOnlyBorder});
         aPaint.setShader(nil);
         aShader := nil;
         ALfreeandNil(aColors);
@@ -4159,7 +4321,7 @@ begin
             AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID);
           end;
           //-----
-          _drawRect(false{aDrawOnlyBorder});
+          _drawRect(aCanvas, aPaint, aRect, false{aDrawOnlyBorder});
           aPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
           aJDestRectf := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
           aJSrcRect := TJRect.JavaClass.init(0, 0, fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height);
@@ -4180,7 +4342,7 @@ begin
     //fill with solid color
     else if Fill.Kind = TBrushKind.Solid then begin
       aPaint.setColor(Fill.Color);
-      _drawRect(false{aDrawOnlyBorder});
+      _drawRect(aCanvas, aPaint, aRect, false{aDrawOnlyBorder});
     end;
 
   end;
@@ -4195,7 +4357,7 @@ begin
     //stroke with solid color
     if Stroke.Kind = TBrushKind.Solid then begin
       aPaint.setColor(Stroke.Color);
-      _drawRect(true{aDrawOnlyBorder});
+      _drawRect(aCanvas, aPaint, aRect, true{aDrawOnlyBorder});
     end;
 
   end;
@@ -4214,12 +4376,12 @@ begin
 
   //init aRect
   if Stroke.Kind <> TBrushKind.None then begin
-    aRect := TrectF.Create(Rect.Left + (Stroke.Thickness / 2),
-                           Rect.Top + (Stroke.Thickness / 2),
-                           Rect.right - (Stroke.Thickness / 2),
-                           Rect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    aRect := TrectF.Create(DstRect.Left + (Stroke.Thickness / 2),
+                           DstRect.Top + (Stroke.Thickness / 2),
+                           DstRect.right - (Stroke.Thickness / 2),
+                           DstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
   end
-  else aRect := Rect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+  else aRect := DstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
 
   //fill the rectangle
   if Fill.Kind <> TBrushKind.None then begin
@@ -4248,7 +4410,7 @@ begin
                                             1, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
                                             1); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
           try
-            _DrawPath(false{aDrawOnlyBorder});
+            _DrawPath(aRect, false{aDrawOnlyBorder});
             CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                      // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                                      // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
@@ -4310,7 +4472,7 @@ begin
                   try
                     CGContextSaveGState(aContext);
                     //-----
-                    _DrawPath(false{aDrawOnlyBorder});
+                    _DrawPath(aRect, false{aDrawOnlyBorder});
                     CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                              // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                                              // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
@@ -4345,7 +4507,7 @@ begin
     else if Fill.Kind = TBrushKind.Solid then begin
       aAlphaColor := TAlphaColorCGFloat.Create(Fill.Color);
       CGContextSetRGBFillColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
-      _DrawPath(false{aDrawOnlyBorder});
+      _DrawPath(aRect, false{aDrawOnlyBorder});
       CGContextFillPath(aContext);
     end;
 
@@ -4359,16 +4521,17 @@ begin
       aAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
       CGContextSetRGBStrokeColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
       CGContextSetLineWidth(aContext, Stroke.Thickness);
-      _DrawPath(True{aDrawOnlyBorder});
+      _DrawPath(aRect, True{aDrawOnlyBorder});
       CGContextStrokePath(aContext);
     end;
 
   end;
 
   {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+
   StrokeThicknessRestoreValue := Stroke.Thickness;
   try
-    LShapeRect := ALGetDrawingShapeRectAndSetThickness(Rect, Fill, Stroke, False, FillShape, DrawShape, StrokeThicknessRestoreValue);
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, Fill, Stroke, False, FillShape, DrawShape, StrokeThicknessRestoreValue);
 
     if Sides <> AllSides then
     begin
@@ -4397,6 +4560,7 @@ begin
     if StrokeThicknessRestoreValue <> Stroke.Thickness then
       Stroke.Thickness := StrokeThicknessRestoreValue;
   end;
+
   {$IFEND}
 
 end;

@@ -322,7 +322,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 procedure ALPaintRectangle({$IF defined(ANDROID)}
-                           const aBitmap: Jbitmap;
+                           const aCanvas: Jcanvas;
                            {$ELSEIF defined(IOS)}
                            const aContext: CGContextRef;
                            const aColorSpace: CGColorSpaceRef;
@@ -333,14 +333,14 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
-                           const Sides: TSides;
-                           const Corners: TCorners;
+                           const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
+                           const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
                            const XRadius: Single = 0;
                            const YRadius: Single = 0);
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 procedure ALPaintCircle({$IF defined(ANDROID)}
-                        const aBitmap: Jbitmap;
+                        const aCanvas: Jcanvas;
                         {$ELSEIF defined(IOS)}
                         const aContext: CGContextRef;
                         const aColorSpace: CGColorSpaceRef;
@@ -355,6 +355,7 @@ procedure ALPaintCircle({$IF defined(ANDROID)}
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
                                  Var aBitmap: Jbitmap;
+                                 var aCanvas: Jcanvas;
                                  {$ELSEIF defined(IOS)}
                                  var aBitmapSurface: TbitmapSurface;
                                  Var aContext: CGContextRef;
@@ -366,7 +367,8 @@ Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
                                  const w: integer;
                                  const h: integer);
 procedure ALFreeDrawingSurface({$IF defined(ANDROID)}
-                               Var aBitmap: Jbitmap
+                               Var aBitmap: Jbitmap;
+                               var aCanvas: Jcanvas
                                {$ELSEIF defined(IOS)}
                                var aBitmapSurface: TbitmapSurface;
                                Var aContext: CGContextRef;
@@ -3446,17 +3448,15 @@ begin
 
       //create the drawing surface
       ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
+                             aCanvas, // Var aCanvas: Jcanvas;
                              round(max(1, aRect.Width)), // const w: integer;
                              round(max(1, aRect.Height)));// const h: integer)
       try
 
-        //create the canvas and the paint
-        aCanvas := TJCanvas.JavaClass.init(aBitmap);
-
         //draw the background
         if (aOptions.Fill.Kind <> TbrushKind.None) or
            (aOptions.stroke.Kind <> TbrushKind.None) then begin
-          ALPaintRectangle(aBitmap, // const aBitmap: Jbitmap;
+          ALPaintRectangle(aCanvas, // const aBitmap: Jbitmap;
                            aRect, // const aRect: TrectF;
                            aOptions.Fill, // const Fill: TBrush;
                            aOptions.Stroke, // const Stroke: TStrokeBrush;
@@ -3484,13 +3484,12 @@ begin
 
         //free the paint and the canvas
         aPaint := nil;
-        aCanvas := nil;
 
         //create the result
         result := ALJBitmaptoTexture(aBitmap);
 
       finally
-        ALFreeDrawingSurface(aBitmap);
+        ALFreeDrawingSurface(aBitmap, aCanvas);
       end;
       {$IFEND}
 
@@ -3548,7 +3547,7 @@ begin
       try
 
         //begin the scene
-        result.Canvas.BeginScene;
+        if result.Canvas.BeginScene then
         try
 
           //draw the background
@@ -3756,7 +3755,7 @@ end;
 
 {***********************************************}
 procedure ALPaintRectangle({$IF defined(ANDROID)}
-                           const aBitmap: Jbitmap;
+                           const aCanvas: Jcanvas;
                            {$ELSEIF defined(IOS)}
                            const aContext: CGContextRef;
                            const aColorSpace: CGColorSpaceRef;
@@ -3767,8 +3766,8 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
-                           const Sides: TSides;
-                           const Corners: TCorners;
+                           const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
+                           const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
                            const XRadius: Single = 0;
                            const YRadius: Single = 0);
 
@@ -4195,7 +4194,6 @@ const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
 var aRect: TrectF;
     aTmpBitmap: Jbitmap;
     aShader: JRadialGradient;
-    aCanvas: Jcanvas;
     aPaint: JPaint;
     aColors: TJavaArray<Integer>;
     aStops: TJavaArray<Single>;
@@ -4228,7 +4226,6 @@ begin
   {$IFDEF ANDROID}
 
   //create the canvas and the paint
-  aCanvas := TJCanvas.JavaClass.init(aBitmap);
   aPaint := TJPaint.JavaClass.init;
   aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
   aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
@@ -4332,7 +4329,6 @@ begin
 
   //free the paint and the canvas
   aPaint := nil;
-  aCanvas := nil;
 
   {$ELSEIF DEFINED(IOS)}
 
@@ -4535,7 +4531,7 @@ end;
 
 {********************************************}
 procedure ALPaintCircle({$IF defined(ANDROID)}
-                        const aBitmap: Jbitmap;
+                        const aCanvas: Jcanvas;
                         {$ELSEIF defined(IOS)}
                         const aContext: CGContextRef;
                         const aColorSpace: CGColorSpaceRef;
@@ -4552,10 +4548,8 @@ const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
 {$IFEND}
 
 {$IF defined(ANDROID)}
-var aBitmap: Jbitmap;
-    aTmpBitmap: Jbitmap;
+var aTmpBitmap: Jbitmap;
     aShader: JRadialGradient;
-    aCanvas: Jcanvas;
     aPaint: JPaint;
     aRect: TRectf;
     aColors: TJavaArray<Integer>;
@@ -4588,7 +4582,6 @@ begin
   {$IFDEF ANDROID}
 
   //create the canvas and the paint
-  aCanvas := TJCanvas.JavaClass.init(aBitmap);
   aPaint := TJPaint.JavaClass.init;
   aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
   aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
@@ -4692,7 +4685,6 @@ begin
 
   //free the paint and the canvas
   aPaint := nil;
-  aCanvas := nil;
 
   {$ELSEIF DEFINED(IOS)}
 
@@ -4890,6 +4882,7 @@ end;
 {*****************************************************}
 Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
                                  Var aBitmap: Jbitmap;
+                                 var aCanvas: Jcanvas;
                                  {$ELSEIF defined(IOS)}
                                  var aBitmapSurface: TbitmapSurface;
                                  Var aContext: CGContextRef;
@@ -4906,6 +4899,9 @@ begin
 
   //create the main bitmap on with we will draw
   aBitmap := TJBitmap.JavaClass.createBitmap(W, H, TJBitmap_Config.JavaClass.ARGB_8888);
+
+  //create the canvas and the paint
+  aCanvas := TJCanvas.JavaClass.init(aBitmap);
 
   {$ELSEIF DEFINED(IOS)}
 
@@ -4973,7 +4969,8 @@ end;
 
 {***************************************************}
 procedure ALFreeDrawingSurface({$IF defined(ANDROID)}
-                               Var aBitmap: Jbitmap
+                               Var aBitmap: Jbitmap;
+                               var aCanvas: Jcanvas
                                {$ELSEIF defined(IOS)}
                                var aBitmapSurface: TbitmapSurface;
                                Var aContext: CGContextRef;
@@ -4985,6 +4982,7 @@ begin
 
   {$IFDEF ANDROID}
 
+  aCanvas := nil;
   aBitmap.recycle;
   aBitmap := nil;
 

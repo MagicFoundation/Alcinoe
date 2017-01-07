@@ -27,11 +27,13 @@ uses System.classes,
      iOSapi.CoreGraphics,
      iOSapi.CocoaTypes,
      iOSapi.CoreText,
+     fmx.surfaces,
      fmx.types3D,
      {$IFEND}
      {$IF defined(ANDROID)}
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.JavaTypes,
+     fmx.surfaces,
      fmx.types3D,
      {$IFEND}
      Fmx.types,
@@ -324,6 +326,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            {$ELSEIF defined(IOS)}
                            const aContext: CGContextRef;
                            const aColorSpace: CGColorSpaceRef;
+                           const aGridHeight: Single;
                            {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
                            const aCanvas: Tcanvas;
                            {$IFEND}
@@ -335,9 +338,59 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const XRadius: Single = 0;
                            const YRadius: Single = 0);
 
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+procedure ALPaintCircle({$IF defined(ANDROID)}
+                        const aBitmap: Jbitmap;
+                        {$ELSEIF defined(IOS)}
+                        const aContext: CGContextRef;
+                        const aColorSpace: CGColorSpaceRef;
+                        const aGridHeight: Single;
+                        {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                        const aCanvas: Tcanvas;
+                        {$IFEND}
+                        const dstRect: TrectF;
+                        const Fill: TBrush;
+                        const Stroke: TStrokeBrush);
+
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
+                                 Var aBitmap: Jbitmap;
+                                 {$ELSEIF defined(IOS)}
+                                 var aBitmapSurface: TbitmapSurface;
+                                 Var aContext: CGContextRef;
+                                 Var aColorSpace: CGColorSpaceRef;
+                                 {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                                 Var aBitmap: Tbitmap;
+                                 const aClearBitmap: boolean;
+                                 {$IFEND}
+                                 const w: integer;
+                                 const h: integer);
+procedure ALFreeDrawingSurface({$IF defined(ANDROID)}
+                               Var aBitmap: Jbitmap
+                               {$ELSEIF defined(IOS)}
+                               var aBitmapSurface: TbitmapSurface;
+                               Var aContext: CGContextRef;
+                               Var aColorSpace: CGColorSpaceRef
+                               {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                               Var aBitmap: Tbitmap
+                               {$IFEND});
+{$IF defined(IOS)}
+Procedure ALCreateDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
+                                   Var aContext: CGContextRef;
+                                   Var aColorSpace: CGColorSpaceRef;
+                                   const w: integer;
+                                   const h: integer);
+procedure ALFreeDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
+                                 Var aContext: CGContextRef);
+{$IFEND}
+
+
 {$IF defined(ANDROID)}
 function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: boolean = true): TTexture;
 function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
+{$IFEND}
+{$IF defined(ANDROID) or defined(IOS)}
+function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture;
 {$IFEND}
 
 Type
@@ -514,14 +567,12 @@ uses system.SysUtils,
      Androidapi.JNI.Os,
      Androidapi.Bitmap,
      FMX.Helpers.Android,
-     fmx.surfaces,
      ALFmxTypes3D,
      {$IFEND}
      {$IF defined(IOS)}
      iOSapi.UIKit,
      Macapi.CoreFoundation,
      Macapi.Helpers,
-     fmx.surfaces,
      ALFmxTypes3D,
      {$IFEND}
      fmx.consts,
@@ -3392,10 +3443,11 @@ begin
       setlength(aElements, J);
 
       {$IF defined(ANDROID)}
-      //create the main bitmap on with we will draw
-      aBitmap := TJBitmap.JavaClass.createBitmap(round(max(1, aRect.Width)),  // max because aRect.Width could = 0 if breaked at 1rt char
-                                                 round(max(1, aRect.Height)), // max no possible but more beautifull to write like this
-                                                 TJBitmap_Config.JavaClass.ARGB_8888); // + 1 * aScreenScale for eventual extra pixels
+
+      //create the drawing surface
+      ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
+                             round(max(1, aRect.Width)), // const w: integer;
+                             round(max(1, aRect.Height)));// const h: integer)
       try
 
         //create the canvas and the paint
@@ -3438,148 +3490,62 @@ begin
         result := ALJBitmaptoTexture(aBitmap);
 
       finally
-        aBitmap.recycle;
-        aBitmap := nil;
+        ALFreeDrawingSurface(aBitmap);
       end;
       {$IFEND}
 
       {$IF defined(IOS)}
-      //create the bitmapSurface
-      aBitmapSurface := TbitmapSurface.Create;
+
+      //create the drawing surface
+      ALCreateDrawingSurfaceV2(aBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+                               aContext, //    Var aContext: CGContextRef;
+                               aColorSpace, // const aColorSpace: CGColorSpaceRef;
+                               round(max(1, aRect.Width)), // const w: integer;
+                               round(max(1, aRect.Height)));// const h: integer)
       try
 
-        //init aBitmapSurface
-        aBitmapSurface.SetSize(round(max(1, aRect.Width)), // max because aRect.Width could = 0 if breaked at 1rt char
-                               round(max(1, aRect.Height))); // max because aRect.height could = 0
+        //draw the background
+        if (aOptions.Fill.Kind <> TbrushKind.None) or
+           (aOptions.stroke.Kind <> TbrushKind.None) then begin
+          ALPaintRectangle(aContext, // const aContext: CGContextRef;
+                           aColorSpace, // const aColorSpace: CGColorSpaceRef;
+                           aBitmapSurface.Height, // const aGridHeight: Single;
+                           aRect, // const aRect: TrectF;
+                           aOptions.Fill, // const Fill: TBrush;
+                           aOptions.Stroke, // const Stroke: TStrokeBrush;
+                           aOptions.Sides, // const Sides: TSides;
+                           aOptions.Corners, // const Corners: TCorners;
+                           aOptions.XRadius, // const XRadius: Single = 0;
+                           aOptions.YRadius); // const YRadius: Single = 0);
+        end;
 
-
-        //create the context
-        aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                               //       memory block should be at least (bytesPerRow*height) bytes.
-                                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                          aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
-                                          aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
-                                          8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                             //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                             //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                             //                   chapter of Quartz 2D Programming Guide.
-                                          aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                //              a value of 0 causes the value to be calculated automatically.
-                                          aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                       //             bitmap graphics contexts.
-                                          kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                            // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                            // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                          kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                    // kCGBitmapByteOrder32Little = Little-endian
-                                                                    // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                    //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                    //             values. The constants for specifying the alpha channel information are declared with the
-                                                                    //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                    //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                    //             and CGImageAlphaInfo constants.)
-                                                                    //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                    //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                    //             Graphics Contexts chapter of Quartz 2D Programming Guide.
-        if aContext = nil then begin ARect.Width := 0; ARect.Height := 0; exit(nil); end;
-        try
-
-          //set the paint default properties
-          CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
-          //-----
-          CGContextSetShouldAntialias(aContext, 1); // default: ON
-                                                    // Sets anti-aliasing on or off for a graphics context.
-          CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
-          //-----
-          //CGContextSetShouldSmoothFonts(aContext, 1); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
-                                                        // Note that some contexts (such as PostScript contexts) do not support font smoothing.
-                                                        // -----
-                                                        // Enables or disables font smoothing in a graphics context.
-                                                        // When drawing text on a context attached to a color LCD display, Quartz takes advantage of the nature of
-                                                        // LCD monitors to improve the legibility of text. This technique is called Font Smoothing. The pixels
-                                                        // of an LCD monitor are made up of red, green, and blue sub-pixels. If you take these sub-pixels into
-                                                        // account the screen appears to have three times the resolution commonly attributed to it, at least in
-                                                        // one dimension. Font smoothing takes advantage of this increased resolution to improve the rendering of
-                                                        // text. Quartz turns different sub-pixels off and on by changing the color of a pixels along the edge of
-                                                        // letter shapes. Because your eye expects to see a hard line at the edge of the glyphs, the computer tricks
-                                                        // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
-                                                        // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
-                                                        // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
-          //CGContextSetAllowsFontSmoothing(aContext, 1); // Sets whether or not to allow font smoothing for a graphics context.
-          //-----
-          CGContextSetShouldSubpixelPositionFonts(aContext, 1); // default: ON
-                                                                // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
-                                                                // the position of glyphs are always forced to integral pixel boundaries.
-                                                                // -----
-                                                                // Enables or disables subpixel positioning in a graphics context.
-                                                                // Subpixel positioning concerns whether or not the glyphs in a line of
-                                                                // text will be aligned to pixel boundaries or not. If subpixel positioning is
-                                                                // off then when glyphs are drawn their positions might be shifted slightly to
-                                                                // take pixel boundaries in account. This can improve the visual definition of
-                                                                // the glyphs (making them slightly less "blurry") at the expense of honoring
-                                                                // the font metrics.
-          CGContextSetAllowsFontSubpixelPositioning(aContext, 1); // Sets whether or not to allow subpixel positioning for a graphics context
-          //-----
-          CGContextSetShouldSubpixelQuantizeFonts(aContext, 1); // default: ON
-                                                                // Enables or disables subpixel quantization in a graphics context.
-                                                                // -----
-                                                                // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
-                                                                // quantization improves the rendering of fonts whose glyphs are at subpixel positions
-                                                                // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
-                                                                // This improvement, requires additional processing so changing this value can affect text
-                                                                // drawing performance.
-          CGContextSetAllowsFontSubpixelQuantization(aContext, 1);  // Sets whether or not to allow subpixel quantization for a graphics context
-
-          //draw the background
-          if (aOptions.Fill.Kind <> TbrushKind.None) or
-             (aOptions.stroke.Kind <> TbrushKind.None) then begin
-            ALPaintRectangle(aContext, // const aContext: CGContextRef;
-                             aColorSpace, // const aColorSpace: CGColorSpaceRef;
-                             aRect, // const aRect: TrectF;
-                             aOptions.Fill, // const Fill: TBrush;
-                             aOptions.Stroke, // const Stroke: TStrokeBrush;
-                             aOptions.Sides, // const Sides: TSides;
-                             aOptions.Corners, // const Corners: TCorners;
-                             aOptions.XRadius, // const XRadius: Single = 0;
-                             aOptions.YRadius); // const YRadius: Single = 0);
-          end;
-
-          //draw all texts
-          for i := 0 to aBreakedTextItems.count - 1 do begin
-            aBreakedTextItem := aBreakedTextItems[i];
-            CGContextSetTextPosition(acontext,
-                                     aBreakedTextItem.pos.x {x},
-                                     aBitmapSurface.Height - aBreakedTextItem.pos.Y);{y}
-            CTLineDraw(aBreakedTextItem.Line, acontext); // Draws a complete line.
-          end;
-
-        finally
-          CGContextRelease(aContext);
+        //draw all texts
+        for i := 0 to aBreakedTextItems.count - 1 do begin
+          aBreakedTextItem := aBreakedTextItems[i];
+          CGContextSetTextPosition(acontext,
+                                   aBreakedTextItem.pos.x {x},
+                                   aBitmapSurface.Height - aBreakedTextItem.pos.Y);{y}
+          CTLineDraw(aBreakedTextItem.Line, acontext); // Draws a complete line.
         end;
 
         //convert the aBitmapSurface to texture
-        result := TALTexture.Create(True{aVolatile});
-        try
-          result.Assign(aBitmapSurface);
-        except
-          ALFreeAndNil(result);
-          raise;
-        end;
+        result := ALBitmapSurfacetoTexture(aBitmapSurface);
 
       finally
-        ALFreeAndNil(aBitmapSurface);
+        ALFreeDrawingSurfaceV2(aBitmapSurface, // var aBitmapSurface: TbitmapSurface;
+                               aContext); // Var aContext: CGContextRef;
       end;
+
       {$IFEND}
 
       {$IF defined(MSWINDOWS) or defined(_MACOS)}
-      //create the main bitmap on with we will draw
-      result := Tbitmap.Create(round(max(1, aRect.Width)),  // max because aRect.Width could = 0 if breaked at 1rt char
-                               round(max(1, aRect.Height))); // max no possible but more beautifull to write like this
-      try
 
-        //clear the bitmap
-        result.Clear(TAlphaColorRec.Null);
+      //create the drawing surface
+      ALCreateDrawingSurface(result, // Var aBitmap: Jbitmap;
+                             true, // const aClearBitmap: boolean;
+                             round(max(1, aRect.Width)), // const w: integer;
+                             round(max(1, aRect.Height)));// const h: integer)
+      try
 
         //begin the scene
         result.Canvas.BeginScene;
@@ -3621,7 +3587,7 @@ begin
         end;
 
       except
-        ALfreeAndNil(Result);
+        ALFreeDrawingSurface(result);
         raise;
       end;
       {$IFEND}
@@ -3708,23 +3674,24 @@ var aBitmapSurface: TBitmapSurface;
 begin
   aBitmapSurface := TBitmapSurface.Create;
   try
-
-    //convert the JBitmapToSurface to the bitmapSurface
-    if JBitmapToSurface(aBitmap, aBitmapSurface) then begin
-
-      //convert the bitmapSurface to a TTexture
-      result := TALTexture.Create(aVolatileTexture{aVolatile});
-      try
-        result.assign(aBitmapSurface);
-      except
-        ALFreeAndNil(result);
-        raise;
-      end;
-
-    end;
-
+    if JBitmapToSurface(aBitmap, aBitmapSurface) then result := ALBitmapSurfacetoTexture(aBitmapSurface, aVolatileTexture)
+    else result := nil;
   finally
     ALFreeAndNil(abitmapSurface);
+  end;
+end;
+{$IFEND}
+
+{************************************}
+{$IF defined(ANDROID) or defined(IOS)}
+function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture;
+begin
+  result := TALTexture.Create(aVolatileTexture);
+  try
+    result.Assign(aBitmapSurface);
+  except
+    ALFreeAndNil(result);
+    raise;
   end;
 end;
 {$IFEND}
@@ -3793,6 +3760,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            {$ELSEIF defined(IOS)}
                            const aContext: CGContextRef;
                            const aColorSpace: CGColorSpaceRef;
+                           const aGridHeight: Single;
                            {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
                            const aCanvas: Tcanvas;
                            {$IFEND}
@@ -4482,7 +4450,7 @@ begin
                                        ALLowerLeftCGRect(aRect.TopLeft,
                                                          aRect.Width,
                                                          aRect.Height,
-                                                         aRect.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                                         aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
                                        aImage.CGImage); // image The image to draw.
                     //-----
                     CGContextRestoreGState(aContext);
@@ -4564,6 +4532,543 @@ begin
   {$IFEND}
 
 end;
+
+{********************************************}
+procedure ALPaintCircle({$IF defined(ANDROID)}
+                        const aBitmap: Jbitmap;
+                        {$ELSEIF defined(IOS)}
+                        const aContext: CGContextRef;
+                        const aColorSpace: CGColorSpaceRef;
+                        const aGridHeight: Single;
+                        {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                        const aCanvas: Tcanvas;
+                        {$IFEND}
+                        const dstRect: TrectF;
+                        const Fill: TBrush;
+                        const Stroke: TStrokeBrush);
+
+{$IF defined(IOS)}
+const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
+{$IFEND}
+
+{$IF defined(ANDROID)}
+var aBitmap: Jbitmap;
+    aTmpBitmap: Jbitmap;
+    aShader: JRadialGradient;
+    aCanvas: Jcanvas;
+    aPaint: JPaint;
+    aRect: TRectf;
+    aColors: TJavaArray<Integer>;
+    aStops: TJavaArray<Single>;
+    aPorterDuffXfermode: jPorterDuffXfermode;
+    aBitmapInfo: AndroidBitmapInfo;
+    aPixelBuffer: Pointer;
+    aBitmapData: TBitmapData;
+    aJDestRectf: JrectF;
+    aJSrcRect: Jrect;
+    i: integer;
+{$ELSEIF defined(IOS)}
+var aAlphaColor: TAlphaColorCGFloat;
+    aCallback: CGFunctionCallbacks;
+    aShading: CGShadingRef;
+    aFunc: CGFunctionRef;
+    aRect: TRectf;
+    aBitmapData: TBitmapData;
+    aTMPContext: CGContextRef;
+    aImageRef: CGImageRef;
+    aImage: UIImage;
+{$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+var LShapeRect: TRectF;
+    StrokeThicknessRestoreValue: Single;
+    FillShape, DrawShape: Boolean;
+{$IFEND}
+
+begin
+
+  {$IFDEF ANDROID}
+
+  //create the canvas and the paint
+  aCanvas := TJCanvas.JavaClass.init(aBitmap);
+  aPaint := TJPaint.JavaClass.init;
+  aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+  aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+  apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+
+  //init aRect
+  if Stroke.Kind <> TBrushKind.None then begin
+    aRect := TrectF.Create(dstRect.Left + (Stroke.Thickness / 2),
+                           dstRect.Top + (Stroke.Thickness / 2),
+                           dstRect.right - (Stroke.Thickness / 2),
+                           dstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else aRect := dstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the circle
+  if Fill.Kind <> TBrushKind.None then begin
+
+    //init aPaint
+    aPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full aRect + Stroke.Thickness :( this result&ing in border if the fill is for exemple black and border white
+
+    //fill with gradient
+    if Fill.Kind = TBrushKind.Gradient then begin
+      if Fill.Gradient.Style = TGradientStyle.Radial then begin
+        aColors := TJavaArray<Integer>.Create(Fill.Gradient.Points.Count);
+        aStops := TJavaArray<Single>.Create(Fill.Gradient.Points.Count);
+        for i := 0 to Fill.Gradient.Points.Count - 1 do begin
+          aColors[Fill.Gradient.Points.Count - 1 - i] := integer(Fill.Gradient.Points[i].Color);
+          aStops[Fill.Gradient.Points.Count - 1 - i] := 1 - Fill.Gradient.Points[i].Offset;
+        end;
+        aShader := TJRadialGradient.JavaClass.init(aRect.CenterPoint.x{x}, aRect.CenterPoint.y{y}, aRect.width / 2{radius},  aColors, aStops, TJShader_TileMode.JavaClass.CLAMP{tile});
+        aPaint.setShader(aShader);
+        aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
+        aPaint.setShader(nil);
+        aShader := nil;
+        alfreeandNil(aColors);
+        alfreeandNil(aStops);
+      end;
+    end
+
+    //fill with bitmap
+    else if Fill.Kind = TBrushKind.Bitmap then begin
+      if not fill.Bitmap.Bitmap.IsEmpty then begin
+        if fill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
+          //-----
+          aTmpBitmap := TJBitmap.JavaClass.createBitmap(fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height, TJBitmap_Config.JavaClass.ARGB_8888);
+          //-----
+          FillChar(aBitmapInfo, SizeOf(aBitmapInfo), 0);
+          if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID, @aBitmapInfo) = 0) and
+             (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID, @aPixelBuffer) = 0) then
+          try
+            if fill.Bitmap.Bitmap.Map(TMapAccess.Read, aBitmapData) then
+            try
+              System.Move(aBitmapData.Data^, aPixelBuffer^, aBitmapData.Pitch * aBitmapData.Height);
+            finally
+              fill.Bitmap.Bitmap.Unmap(aBitmapData);
+            end;
+          finally
+            AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (aTmpBitmap as ILocalObject).GetObjectID);
+          end;
+          //-----
+          aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
+          aPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
+          aJDestRectf := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
+          aJSrcRect := TJRect.JavaClass.init(0, 0, fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height);
+          aPaint.setXfermode(aPorterDuffXfermode);
+          aCanvas.drawBitmap(aTMPBitmap, aJSrcRect, aJDestRectf, apaint);
+          aPaint.setXfermode(nil);
+          aPorterDuffXfermode := nil;
+          aJSrcRect := nil;
+          aJDestRectf := nil;
+          //-----
+          aTmpBitmap.recycle;
+          aTmpBitmap := nil;
+          //-----
+        end;
+      end;
+    end
+
+    //fill with solid color
+    else if Fill.Kind = TBrushKind.Solid then begin
+      aPaint.setColor(Fill.Color);
+      aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
+    end;
+
+  end;
+
+  //stroke the circle
+  if Stroke.Kind <> TBrushKind.None then begin
+
+    //init aPaint
+    aPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
+    aPaint.setStrokeWidth(Stroke.Thickness);
+
+    //stroke with solid color
+    if Stroke.Kind = TBrushKind.Solid then begin
+      aPaint.setColor(Stroke.Color);
+      aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
+    end;
+
+  end;
+
+  //free the paint and the canvas
+  aPaint := nil;
+  aCanvas := nil;
+
+  {$ELSEIF DEFINED(IOS)}
+
+  //set the paint default properties
+  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+  //-----
+  CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+  CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+
+  //init aRect
+  if Stroke.Kind <> TBrushKind.None then begin
+    aRect := TrectF.Create(DstRect.Left + (Stroke.Thickness / 2),
+                           DstRect.Top + (Stroke.Thickness / 2),
+                           DstRect.right - (Stroke.Thickness / 2),
+                           DstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else aRect := DstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the circle
+  if Fill.Kind <> TBrushKind.None then begin
+
+    //fill with gradient
+    if Fill.Kind = TBrushKind.Gradient then begin
+      if Fill.Gradient.Style = TGradientStyle.Radial then begin
+        CGContextSaveGState(aContext);
+        //-----
+        aCallback.version := 0;
+        aCallback.evaluate := @ALGradientEvaluateCallback;
+        aCallback.releaseInfo:= nil;
+        aFunc := CGFunctionCreate(fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
+                                  1, // domainDimension - The number of inputs.
+                                  @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                                  4, // rangeDimension - The number of outputs.
+                                  nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
+                                  @aCallback); // callbacks - A pointer to a callback function table.
+        try
+          aShading := CGShadingCreateRadial(aColorSpace, // colorspace
+                                            CGPoint.Create(TPointF.Create(aRect.Width / 2, aRect.height / 2)), // start - The center of the starting circle, in the shading's target coordinate space.
+                                            aRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
+                                            CGPoint.Create(TPointF.Create(aRect.Width / 2, aRect.Height / 2)), // end - The center of the ending circle, in the shading's target coordinate space.
+                                            0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
+                                            aFunc, // function
+                                            1, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                                            1); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+          try
+            CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
+            CGContextAddEllipseInRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
+                                                                  aRect.Width,
+                                                                  aRect.Height,
+                                                                  aGridHeight));
+            CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
+            CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
+                                     // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
+                                     // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
+                                     // save the graphics state before you clip and restore the graphics state after you’ve completed
+                                     // any clipped drawing.
+            CGContextDrawShading(aContext, aShading);
+          finally
+            CGShadingRelease(aShading);
+          end;
+        finally
+          CGFunctionRelease(aFunc);
+        end;
+        //-----
+        CGContextRestoreGState(aContext);
+      end;
+    end
+
+    //fill with bitmap
+    else if Fill.Kind = TBrushKind.Bitmap then begin
+      if not fill.Bitmap.Bitmap.IsEmpty then begin
+        if fill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
+          if fill.Bitmap.Bitmap.Map(TMapAccess.Read, aBitmapData) then
+          try
+            aTMPContext := CGBitmapContextCreate(aBitmapData.Data, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                 aBitmapData.Width, // width: The width, in pixels, of the required bitmap.
+                                                 aBitmapData.Height, // height: The height, in pixels, of the required bitmap.
+                                                 8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                    //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                    //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                    //                   chapter of Quartz 2D Programming Guide.
+                                                 aBitmapData.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                                               //              a value of 0 causes the value to be calculated automatically.
+                                                 aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                              //             bitmap graphics contexts.
+                                                 kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                   // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                   // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                 kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                           // kCGBitmapByteOrder32Little = Little-endian
+                                                                           // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                           //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                           //             values. The constants for specifying the alpha channel information are declared with the
+                                                                           //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                           //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                           //             and CGImageAlphaInfo constants.)
+                                                                           //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                           //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                           //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            if aContext <> nil then begin
+              try
+                aImageRef := CGBitmapContextCreateImage(aTMPContext);
+                if aImageRef <> nil then
+                try
+                  aImage := TUIImage.Wrap(TUIImage.alloc.initWithCGImage(aImageRef));
+                  if aImage <> nil then
+                  try
+                    CGContextSaveGState(aContext);
+                    //-----
+                    CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
+                    CGContextAddEllipseInRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
+                                                                          aRect.Width,
+                                                                          aRect.Height,
+                                                                          aGridHeight)); // Adds an ellipse that fits inside the specified rectangle.
+                    CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
+                    CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
+                                             // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
+                                             // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
+                                             // save the graphics state before you clip and restore the graphics state after you’ve completed
+                                             // any clipped drawing.
+                    CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                       ALLowerLeftCGRect(aRect.TopLeft,
+                                                         aRect.Width,
+                                                         aRect.Height,
+                                                         aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                       aImage.CGImage); // image The image to draw.
+                    //-----
+                    CGContextRestoreGState(aContext);
+                  finally
+                    aImage.release;
+                  end;
+                finally
+                  CGImageRelease(aImageRef);
+                end;
+              finally
+                CGContextRelease(aTMPContext);
+              end;
+            end;
+          finally
+            fill.Bitmap.Bitmap.Unmap(aBitmapData);
+          end;
+        end;
+      end;
+    end
+
+    //fill with solid color
+    else if Fill.Kind = TBrushKind.Solid then begin
+      aAlphaColor := TAlphaColorCGFloat.Create(Fill.Color);
+      CGContextSetRGBFillColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
+      CGContextFillEllipseInRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
+                                                             aRect.Width,
+                                                             aRect.Height,
+                                                             aGridHeight));
+    end;
+
+  end;
+
+  //stroke the circle
+  if Stroke.Kind <> TBrushKind.None then begin
+
+    //stroke with solid color
+    if Stroke.Kind = TBrushKind.Solid then begin
+      aAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
+      CGContextSetRGBStrokeColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
+      CGContextSetLineWidth(aContext, Stroke.Thickness);
+      CGContextStrokeEllipseInRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
+                                                               aRect.Width,
+                                                               aRect.Height,
+                                                               aGridHeight));
+    end;
+
+  end;
+
+  {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+
+  StrokeThicknessRestoreValue := Stroke.Thickness;
+  try
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, Fill, Stroke, True, FillShape, DrawShape, StrokeThicknessRestoreValue);
+    if FillShape then
+      aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, Fill);
+    if DrawShape then
+      aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, Stroke);
+  finally
+    if StrokeThicknessRestoreValue <> Stroke.Thickness then
+      Stroke.Thickness := StrokeThicknessRestoreValue;
+  end;
+
+  {$IFEND}
+
+end;
+
+{*****************************************************}
+Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
+                                 Var aBitmap: Jbitmap;
+                                 {$ELSEIF defined(IOS)}
+                                 var aBitmapSurface: TbitmapSurface;
+                                 Var aContext: CGContextRef;
+                                 Var aColorSpace: CGColorSpaceRef;
+                                 {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                                 Var aBitmap: Tbitmap;
+                                 const aClearBitmap: boolean;
+                                 {$IFEND}
+                                 const w: integer;
+                                 const h: integer);
+begin
+
+  {$IFDEF ANDROID}
+
+  //create the main bitmap on with we will draw
+  aBitmap := TJBitmap.JavaClass.createBitmap(W, H, TJBitmap_Config.JavaClass.ARGB_8888);
+
+  {$ELSEIF DEFINED(IOS)}
+
+  //create the bitmapSurface
+  aBitmapSurface := TbitmapSurface.Create;
+  try
+
+    //init aBitmapSurface
+    aBitmapSurface.SetSize(W,H);
+
+    //init the color space
+    aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+    if aColorSpace = nil then Raise Exception.Create('Call to CGColorSpaceCreateDeviceRGB failed'); // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+    try
+
+      //create the context
+      aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                             //       memory block should be at least (bytesPerRow*height) bytes.
+                                                             //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                             //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                        aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                                        aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                                        8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                           //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                           //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                           //                   chapter of Quartz 2D Programming Guide.
+                                        aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                              //              a value of 0 causes the value to be calculated automatically.
+                                        aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                     //             bitmap graphics contexts.
+                                        kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                          // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                          // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                        kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                  // kCGBitmapByteOrder32Little = Little-endian
+                                                                  // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                  //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                  //             values. The constants for specifying the alpha channel information are declared with the
+                                                                  //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                  //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                  //             and CGImageAlphaInfo constants.)
+                                                                  //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                  //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                  //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+      if aContext = nil then Raise Exception.Create('Call to CGBitmapContextCreate failed');
+
+    Except
+      CGColorSpaceRelease(aColorSpace);
+      raise;
+    end;
+
+  except
+    ALFreeAndNil(aBitmapSurface);
+    raise;
+  end;
+
+  {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+
+  aBitmap := Tbitmap.Create(w, H);
+  if aClearBitmap then aBitmap.Clear(TAlphaColorRec.Null);
+
+  {$IFEND}
+
+end;
+
+{***************************************************}
+procedure ALFreeDrawingSurface({$IF defined(ANDROID)}
+                               Var aBitmap: Jbitmap
+                               {$ELSEIF defined(IOS)}
+                               var aBitmapSurface: TbitmapSurface;
+                               Var aContext: CGContextRef;
+                               Var aColorSpace: CGColorSpaceRef
+                               {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+                               Var aBitmap: Tbitmap
+                               {$IFEND});
+begin
+
+  {$IFDEF ANDROID}
+
+  aBitmap.recycle;
+  aBitmap := nil;
+
+  {$ELSEIF DEFINED(IOS)}
+
+  CGContextRelease(aContext);
+  CGColorSpaceRelease(aColorSpace);
+  ALFreeAndNil(aBitmapSurface);
+
+  {$ELSEIF defined(MSWINDOWS) or defined(_MACOS)}
+
+  ALFreeAndNil(aBitmap);
+
+  {$IFEND}
+
+end;
+
+{****************}
+{$IF defined(IOS)}
+Procedure ALCreateDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
+                                   Var aContext: CGContextRef;
+                                   Var aColorSpace: CGColorSpaceRef;
+                                   const w: integer;
+                                   const h: integer);
+begin
+
+  //create the bitmapSurface
+  aBitmapSurface := TbitmapSurface.Create;
+  try
+
+    //init aBitmapSurface
+    aBitmapSurface.SetSize(W,H);
+
+    //create the context
+    aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                           //       memory block should be at least (bytesPerRow*height) bytes.
+                                                           //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                           //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                      aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                                      aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                                      8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                         //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                         //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                         //                   chapter of Quartz 2D Programming Guide.
+                                      aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                            //              a value of 0 causes the value to be calculated automatically.
+                                      aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                   //             bitmap graphics contexts.
+                                      kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                        // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                        // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                      kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                // kCGBitmapByteOrder32Little = Little-endian
+                                                                // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                //             values. The constants for specifying the alpha channel information are declared with the
+                                                                //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                //             and CGImageAlphaInfo constants.)
+                                                                //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+    if aContext = nil then Raise Exception.Create('Call to CGBitmapContextCreate failed');
+
+  except
+    ALFreeAndNil(aBitmapSurface);
+    raise;
+  end;
+
+end;
+{$IFEND}
+
+{****************}
+{$IF defined(IOS)}
+procedure ALFreeDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
+                                 Var aContext: CGContextRef);
+begin
+
+  CGContextRelease(aContext);
+  ALFreeAndNil(aBitmapSurface);
+
+end;
+{$IFEND}
+
 
 initialization
   ALCustomConvertFontFamilyProc := nil;

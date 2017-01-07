@@ -467,6 +467,7 @@ var aSaveStrokeThickness: single;
     aRect: TRectf;
     {$IF defined(ANDROID)}
     aBitmap: Jbitmap;
+    aCanvas: Jcanvas;
     {$ELSEIF defined(IOS)}
     aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
@@ -523,11 +524,12 @@ begin
 
     //create the drawing surface
     ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
+                           aCanvas, // var aCanvas: Jcanvas;
                            round(aRect.Width), // const w: integer;
                            round(aRect.Height));// const h: integer)
     try
 
-       ALPaintRectangle(aBitmap, // const aBitmap: Jbitmap;
+       ALPaintRectangle(aCanvas, // const aBitmap: Jbitmap;
                         aRect, // const Rect: TrectF;
                         Fill, // const Fill: TBrush;
                         Stroke, // const Stroke: TStrokeBrush;
@@ -539,7 +541,7 @@ begin
       fBufBitmap := ALJBitmaptoTexture(aBitmap);
 
     finally
-      ALFreeDrawingSurface(aBitmap);
+      ALFreeDrawingSurface(aBitmap, aCanvas);
     end;
 
     {$ELSEIF DEFINED(IOS)}
@@ -701,6 +703,7 @@ var aSaveStrokeThickness: single;
     aRect: TRectf;
     {$IF defined(ANDROID)}
     aBitmap: Jbitmap;
+    aCanvas: Jcanvas;
     {$ELSEIF defined(IOS)}
     aBitmapSurface: TbitmapSurface;
     aColorSpace: CGColorSpaceRef;
@@ -746,11 +749,12 @@ begin
 
     //create the drawing surface
     ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
+                           aCanvas, // var aCanvas: Jcanvas;
                            round(aRect.Width), // const w: integer;
                            round(aRect.Height));// const h: integer)
     try
 
-      ALPaintCircle(aBitmap, // const aBitmap: Jbitmap;
+      ALPaintCircle(aCanvas, // const aBitmap: Jbitmap;
                     aRect, // const Rect: TrectF;
                     Fill, // const Fill: TBrush;
                     Stroke); // const Stroke: TStrokeBrush;
@@ -758,7 +762,7 @@ begin
       fBufBitmap := ALJBitmaptoTexture(aBitmap);
 
     finally
-      ALFreeDrawingSurface(aBitmap);
+      ALFreeDrawingSurface(aBitmap, aCanvas);
     end;
 
     {$ELSEIF DEFINED(IOS)}
@@ -988,12 +992,12 @@ begin
 
   //create the drawing surface
   ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
+                         aCanvas, // var aCanvas: Jcanvas;
                          round(aRect.Width), // const w: integer;
                          round(aRect.Height));// const h: integer)
   try
 
     //create the canvas and the paint
-    aCanvas := TJCanvas.JavaClass.init(aBitmap);
     aPaint := TJPaint.JavaClass.init;
     aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
     aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
@@ -1034,13 +1038,12 @@ begin
 
     //free the paint and the canvas
     aPaint := nil;
-    aCanvas := nil;
 
     //convert aBitmap to TALTexture
     fBufBitmap := ALJBitmaptoTexture(aBitmap);
 
   finally
-    ALFreeDrawingSurface(aBitmap);
+    ALFreeDrawingSurface(aBitmap, aCanvas);
   end;
 
   {$ELSEIF DEFINED(IOS)}

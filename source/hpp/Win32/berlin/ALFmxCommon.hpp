@@ -110,6 +110,7 @@ public:
 	float LineSpacing;
 	Fmx::Types::TTextTrimming Trimming;
 	System::Types::TPointF FirstLineIndent;
+	bool FailIfTextBreaked;
 	Fmx::Types::TTextAlign HTextAlign;
 	Fmx::Types::TTextAlign VTextAlign;
 	Fmx::Graphics::TBrush* Fill;

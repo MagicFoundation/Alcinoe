@@ -1313,6 +1313,7 @@ begin
     aOptions.LineSpacing := fTextControl.LineSpacing * FScreenScale;
     aOptions.Trimming := fBufTrimming;
     //aOptions.FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
+    //aOptions.FailIfTextBreaked: boolean; // default = false
     //-----
     aOptions.HTextAlign := fBufHorizontalAlign;
     aOptions.VTextAlign := fBufVerticalAlign;

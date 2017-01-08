@@ -268,6 +268,7 @@ type
     LineSpacing: single; // default = 0;
     Trimming: TTextTrimming; // default = TTextTrimming.Character;
     FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
+    FailIfTextBreaked: boolean; // default = false
     //-----
     HTextAlign: TTextAlign; // default = TTextAlign.Leading;
     VTextAlign: TTextAlign; // default = TTextAlign.Leading;
@@ -2926,6 +2927,7 @@ begin
   LineSpacing := 0;
   Trimming := TTextTrimming.Character;
   FirstLineIndent := Tpointf.create(0,0);
+  FailIfTextBreaked := false;
   //-----
   HTextAlign := TTextAlign.Leading;
   VTextAlign := TTextAlign.Leading;
@@ -3242,6 +3244,9 @@ begin
                                            aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
                                            aOptions.MaxLines - aTotalLines + AlifThen(aTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
             {$IFEND}
+
+            //handle FailIfTextBreaked
+            if aTmpTextBreaked and aOptions.FailIfTextBreaked then begin ARect.Width := 0; ARect.Height := 0; exit(nil); end;
 
             //if their was not enalf of place to write the ellipsis
             if (aBreakedTextItems.Count >= 2) and                                                                                          // << more than 2 items
@@ -3777,6 +3782,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                       const aPaint: JPaint;
                       const aRect: TrectF;
                       Const aDrawOnlyBorder: Boolean);
+
   var aJRect: JRectF;
       aPath: JPath;
       aXRadius: single;
@@ -3969,6 +3975,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
   {$IF defined(IOS)}
   procedure _DrawPath(const aRect: TrectF;
                       Const aDrawOnlyBorder: Boolean);
+
   var aXRadius: single;
       aYradius: Single;
       aWidthMinusCorners: single;
@@ -3980,7 +3987,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _moveTo(x: Single; y: Single);
     begin
-      CGContextMoveToPoint(aContext, X, aRect.Height - Y);
+      CGContextMoveToPoint(aContext, X, aGridHeight - Y);
       aCurPoint.X := x;
       aCurPoint.Y := Y;
     end;
@@ -3990,9 +3997,9 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
     begin
       CGContextAddQuadCurveToPoint(aContext,
                                    aCurPoint.X + dx1{cpx},
-                                   aRect.Height - (aCurPoint.Y + dy1){cpy},
+                                   aGridHeight - (aCurPoint.Y + dy1){cpy},
                                    aCurPoint.X + dx2{x},
-                                   aRect.Height - (aCurPoint.Y + dy2){y});
+                                   aGridHeight - (aCurPoint.Y + dy2){y});
       aCurPoint.X := aCurPoint.X + dx2;
       aCurPoint.Y := aCurPoint.Y + dy2;
     end;
@@ -4000,7 +4007,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rLineTo(dx: Single; dy: Single);
     begin
-      CGContextAddLineToPoint(aContext, aCurPoint.X + dx{x}, aRect.Height - (aCurPoint.Y + dy{y}));
+      CGContextAddLineToPoint(aContext, aCurPoint.X + dx{x}, aGridHeight - (aCurPoint.Y + dy{y}));
       aCurPoint.X := aCurPoint.X + dx;
       aCurPoint.Y := aCurPoint.Y + dy;
     end;
@@ -4008,7 +4015,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rMoveTo(dx: Single; dy: Single);
     begin
-      CGContextMoveToPoint(aContext, aCurPoint.X + dx{x}, aRect.Height - (aCurPoint.Y + dy{y}));
+      CGContextMoveToPoint(aContext, aCurPoint.X + dx{x}, aGridHeight - (aCurPoint.Y + dy{y}));
       aCurPoint.X := aCurPoint.X + dx;
       aCurPoint.Y := aCurPoint.Y + dy;
     end;
@@ -4027,7 +4034,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
      CGContextAddRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
                                                   aRect.Width,
                                                   aRect.Height,
-                                                  aRect.Height));
+                                                  aGridHeight));
      //-----
     end
 
@@ -4947,6 +4954,58 @@ begin
                                                                   //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
                                                                   //             Graphics Contexts chapter of Quartz 2D Programming Guide.
       if aContext = nil then Raise Exception.Create('Call to CGBitmapContextCreate failed');
+      try
+
+        //set the paint default properties
+        CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+        //-----
+        CGContextSetShouldAntialias(aContext, 1); // default: ON
+                                                  // Sets anti-aliasing on or off for a graphics context.
+        CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+        //-----
+        //CGContextSetShouldSmoothFonts(aContext, 1); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
+                                                      // Note that some contexts (such as PostScript contexts) do not support font smoothing.
+                                                      // -----
+                                                      // Enables or disables font smoothing in a graphics context.
+                                                      // When drawing text on a context attached to a color LCD display, Quartz takes advantage of the nature of
+                                                      // LCD monitors to improve the legibility of text. This technique is called Font Smoothing. The pixels
+                                                      // of an LCD monitor are made up of red, green, and blue sub-pixels. If you take these sub-pixels into
+                                                      // account the screen appears to have three times the resolution commonly attributed to it, at least in
+                                                      // one dimension. Font smoothing takes advantage of this increased resolution to improve the rendering of
+                                                      // text. Quartz turns different sub-pixels off and on by changing the color of a pixels along the edge of
+                                                      // letter shapes. Because your eye expects to see a hard line at the edge of the glyphs, the computer tricks
+                                                      // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
+                                                      // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
+                                                      // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
+        //CGContextSetAllowsFontSmoothing(aContext, 1); // Sets whether or not to allow font smoothing for a graphics context.
+        //-----
+        CGContextSetShouldSubpixelPositionFonts(aContext, 1); // default: ON
+                                                              // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
+                                                              // the position of glyphs are always forced to integral pixel boundaries.
+                                                              // -----
+                                                              // Enables or disables subpixel positioning in a graphics context.
+                                                              // Subpixel positioning concerns whether or not the glyphs in a line of
+                                                              // text will be aligned to pixel boundaries or not. If subpixel positioning is
+                                                              // off then when glyphs are drawn their positions might be shifted slightly to
+                                                              // take pixel boundaries in account. This can improve the visual definition of
+                                                              // the glyphs (making them slightly less "blurry") at the expense of honoring
+                                                              // the font metrics.
+        CGContextSetAllowsFontSubpixelPositioning(aContext, 1); // Sets whether or not to allow subpixel positioning for a graphics context
+        //-----
+        CGContextSetShouldSubpixelQuantizeFonts(aContext, 1); // default: ON
+                                                              // Enables or disables subpixel quantization in a graphics context.
+                                                              // -----
+                                                              // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
+                                                              // quantization improves the rendering of fonts whose glyphs are at subpixel positions
+                                                              // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
+                                                              // This improvement, requires additional processing so changing this value can affect text
+                                                              // drawing performance.
+        CGContextSetAllowsFontSubpixelQuantization(aContext, 1);  // Sets whether or not to allow subpixel quantization for a graphics context
+
+      except
+        CGContextRelease(aContext);
+        raise;
+      end;
 
     Except
       CGColorSpaceRelease(aColorSpace);
@@ -5046,6 +5105,58 @@ begin
                                                                 //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
                                                                 //             Graphics Contexts chapter of Quartz 2D Programming Guide.
     if aContext = nil then Raise Exception.Create('Call to CGBitmapContextCreate failed');
+    try
+
+      //set the paint default properties
+      CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+      //-----
+      CGContextSetShouldAntialias(aContext, 1); // default: ON
+                                                // Sets anti-aliasing on or off for a graphics context.
+      CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+      //-----
+      //CGContextSetShouldSmoothFonts(aContext, 1); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
+                                                    // Note that some contexts (such as PostScript contexts) do not support font smoothing.
+                                                    // -----
+                                                    // Enables or disables font smoothing in a graphics context.
+                                                    // When drawing text on a context attached to a color LCD display, Quartz takes advantage of the nature of
+                                                    // LCD monitors to improve the legibility of text. This technique is called Font Smoothing. The pixels
+                                                    // of an LCD monitor are made up of red, green, and blue sub-pixels. If you take these sub-pixels into
+                                                    // account the screen appears to have three times the resolution commonly attributed to it, at least in
+                                                    // one dimension. Font smoothing takes advantage of this increased resolution to improve the rendering of
+                                                    // text. Quartz turns different sub-pixels off and on by changing the color of a pixels along the edge of
+                                                    // letter shapes. Because your eye expects to see a hard line at the edge of the glyphs, the computer tricks
+                                                    // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
+                                                    // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
+                                                    // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
+      //CGContextSetAllowsFontSmoothing(aContext, 1); // Sets whether or not to allow font smoothing for a graphics context.
+      //-----
+      CGContextSetShouldSubpixelPositionFonts(aContext, 1); // default: ON
+                                                            // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
+                                                            // the position of glyphs are always forced to integral pixel boundaries.
+                                                            // -----
+                                                            // Enables or disables subpixel positioning in a graphics context.
+                                                            // Subpixel positioning concerns whether or not the glyphs in a line of
+                                                            // text will be aligned to pixel boundaries or not. If subpixel positioning is
+                                                            // off then when glyphs are drawn their positions might be shifted slightly to
+                                                            // take pixel boundaries in account. This can improve the visual definition of
+                                                            // the glyphs (making them slightly less "blurry") at the expense of honoring
+                                                            // the font metrics.
+      CGContextSetAllowsFontSubpixelPositioning(aContext, 1); // Sets whether or not to allow subpixel positioning for a graphics context
+      //-----
+      CGContextSetShouldSubpixelQuantizeFonts(aContext, 1); // default: ON
+                                                            // Enables or disables subpixel quantization in a graphics context.
+                                                            // -----
+                                                            // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
+                                                            // quantization improves the rendering of fonts whose glyphs are at subpixel positions
+                                                            // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
+                                                            // This improvement, requires additional processing so changing this value can affect text
+                                                            // drawing performance.
+      CGContextSetAllowsFontSubpixelQuantization(aContext, 1);  // Sets whether or not to allow subpixel quantization for a graphics context
+
+    except
+      CGContextRelease(aContext);
+      raise;
+    end;
 
   except
     ALFreeAndNil(aBitmapSurface);

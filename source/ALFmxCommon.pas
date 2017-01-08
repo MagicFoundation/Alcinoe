@@ -393,7 +393,7 @@ function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: bool
 function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
 {$IFEND}
 {$IF defined(ANDROID) or defined(IOS)}
-function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture;
+function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture; inline;
 {$IFEND}
 
 Type

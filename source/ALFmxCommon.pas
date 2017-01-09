@@ -908,7 +908,6 @@ var aBreakTextItemsStartCount: integer;
     aSaveNumberOfChars: integer;
     aSaveNumberOfCharsIsAccurate: Boolean;
     aLine: jString;
-    aLineManuallyBreaked: boolean;
     aLineIndent: Single;
     aEllipsisLine: Jstring;
     aEllipsisLineLn: single;
@@ -1047,24 +1046,21 @@ begin
       //loop still their is some chars
       while ATextIdx < ATextLn do begin
 
-        // init aline / aLineManuallyBreaked
+        // init aline
         i := aText.indexOf($0D {c}, ATextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
         j := aText.indexOf($0A {c}, ATextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
         if (i >= 0) and (j >= 0) then I := min(i,j)
         else I := max(I, J);
         if i = ATextIdx then begin
           aLine := StringtoJString(string(''));
-          aLineManuallyBreaked := True;
           result := true;
         end
         else if i > 0 then begin
           aLine := aText.substring(ATextIdx{start}, i{end_}); // skip the $0D/$0A
-          aLineManuallyBreaked := True;
           result := true;
         end
         else begin
           aLine := aText.substring(ATextIdx{start});
-          aLineManuallyBreaked := False;
         end;
 
         //calculate the number of char in the current line (this work good also if aline is empty)
@@ -1082,10 +1078,7 @@ begin
         if aNumberOfChars < aLine.length then result := true;
 
         //if we need to break the text
-        if (aNumberOfChars < aLine.length) // << if aNumberOfChars < aLine.length it's evident we will need to break the text
-           or
-           ((aLineManuallyBreaked) and                      // << if their if #13#10 (that we reach because aNumberOfChars >= aLine.length) AND
-            (aTrimming <> TTextTrimming.None)) then begin   // << aTrimming <> TTextTrimming.None (else we don't need to break anything)
+        if (aNumberOfChars < aLine.length) then begin // << if aNumberOfChars < aLine.length it's evident we will need to break the text
 
           //if not aWordWrap
           if not aWordWrap then begin
@@ -2363,6 +2356,20 @@ function ALbreakText(const aFontSize: single;
                      var aMeasuredWidth: Single): integer;
 var aLayout: TTextLayout;
 begin
+  // this is true on macos and on windows
+  // if aText = 'A' (only 1 char)
+  // then aLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0))
+  // will return 1 BUT
+  // aLayout.PositionAtPoint(TpointF.Create(0,0))
+  // will return 0
+  // so the conclusion is that aLayout.PositionAtPoint return at the right border
+  // the position of the NEXT character (it's good it's what we need)
+  // -------
+  // also it's seam than aLayout.PositionAtPoint never return an index on a LOW surrogate
+  // (remember that aLayout.PositionAtPoint return at the right border the index of the
+  // NEXT charactere, so it's index-1 that is matter for us and if index <> LOW surrogate then
+  // index-1 <> HIGH surrogate). this because in the delphi source code of PositionAtPoint they do at the end:
+  //  if (Result >= 0) and (Result < Text.Length) and Text.Chars[Result].IsLowSurrogate then Inc(Result);
   aLayout := TTextLayoutManager.DefaultTextLayout.Create;
   try
     aLayout.BeginUpdate;
@@ -2374,15 +2381,13 @@ begin
     aLayout.VerticalAlign := TTextAlign.Leading;
     aLayout.HorizontalAlign := TTextAlign.Leading;
     aLayout.WordWrap := False;
-    aLayout.Text := atext;
+    if (atext <> '') and (atext.Chars[atext.Length - 1].IsLowSurrogate) then aLayout.Text := atext + ' '  // << https://quality.embarcadero.com/browse/RSP-16649
+    else aLayout.Text := atext;
     aLayout.EndUpdate;
     aMeasuredWidth := aLayout.TextWidth;
     result := aLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0)); // << on macos this function is buggy and you need to update fmx.canvas.mac (see https://quality.embarcadero.com/browse/RSP-16648 and https://quality.embarcadero.com/browse/RSP-16649)
                                                                                              // << - Tepsilon.Position because if PositionAtPoint = exactly aMeasuredWidth then it's return -1
-    {$IF defined(MSWINDOWS)}
-    if (Result >= 0) and (Result < atext.Length) and atext.Chars[Result].IsHighSurrogate then
-      Inc(Result, 2); // << https://quality.embarcadero.com/browse/RSP-16649
-    {$IFEND}
+    result := min(atext.Length, result); // remove the extra space we added because of https://quality.embarcadero.com/browse/RSP-16649
     if result < 0 then result := 0;
   finally
     aLayout.Free;
@@ -2426,7 +2431,6 @@ var aBreakTextItemsStartCount: integer;
     aSaveNumberOfChars: integer;
     aSaveNumberOfCharsIsAccurate: Boolean;
     aLine: String;
-    aLineManuallyBreaked: boolean;
     aLineIndent: Single;
     aEllipsisLine: String;
     aEllipsisLineLn: single;
@@ -2523,24 +2527,21 @@ begin
     //loop still their is some chars
     while ATextIdx < ATextLn do begin
 
-      // init aline / aLineManuallyBreaked
+      // init aline
       i := aText.indexOf(#13 {c}, ATextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
       j := aText.indexOf(#10 {c}, ATextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
       if (i >= 0) and (j >= 0) then I := min(i,j)
       else I := max(I, J);
       if i = ATextIdx then begin
         aLine := '';
-        aLineManuallyBreaked := True;
         result := true;
       end
       else if i > 0 then begin
-        aLine := aText.substring(ATextIdx{start}, i{end_}); // skip the $0D/$0A
-        aLineManuallyBreaked := True;
+        aLine := aText.substring(ATextIdx{startIndex}, i - ATextIdx{length}); // skip the $0D/$0A
         result := true;
       end
       else begin
-        aLine := aText.substring(ATextIdx{start});
-        aLineManuallyBreaked := False;
+        aLine := aText.substring(ATextIdx{startIndex});
       end;
 
       //calculate the number of char in the current line (this work good also if aline is empty)
@@ -2555,10 +2556,7 @@ begin
       if aNumberOfChars < aLine.length then result := true;
 
       //if we need to break the text
-      if (aNumberOfChars < aLine.length) // << if aNumberOfChars < aLine.length it's evident we will need to break the text
-         or
-         ((aLineManuallyBreaked) and                      // << if their if #13#10 (that we reach because aNumberOfChars >= aLine.length) AND
-          (aTrimming <> TTextTrimming.None)) then begin   // << aTrimming <> TTextTrimming.None (else we don't need to break anything)
+      if (aNumberOfChars < aLine.length) then begin // << if aNumberOfChars < aLine.length it's evident we will need to break the text
 
         //if not aWordWrap
         if not aWordWrap then begin

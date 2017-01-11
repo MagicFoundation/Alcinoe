@@ -245,7 +245,6 @@ type
   TAlTextElement = record
     Id: string;
     rect: TrectF;
-    isEllipsis: Boolean;
   end;
   TalTextElements = array of TalTextElement;
 
@@ -925,6 +924,7 @@ var aBreakTextItemsStartCount: integer;
     aMetrics: JPaint_FontMetricsInt;
     ameasuredWidth: TJavaArray<Single>;
     aOffset: single;
+    aLineEndWithBreakLine: Boolean;
     i, j: integer;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1053,14 +1053,17 @@ begin
         else I := max(I, J);
         if i = ATextIdx then begin
           aLine := StringtoJString(string(''));
+          aLineEndWithBreakLine := True;
           result := true;
         end
         else if i > 0 then begin
           aLine := aText.substring(ATextIdx{start}, i{end_}); // skip the $0D/$0A
+          aLineEndWithBreakLine := True;
           result := true;
         end
         else begin
           aLine := aText.substring(ATextIdx{start});
+          aLineEndWithBreakLine := False;
         end;
 
         //calculate the number of char in the current line (this work good also if aline is empty)
@@ -1078,7 +1081,17 @@ begin
         if aNumberOfChars < aLine.length then result := true;
 
         //if we need to break the text
-        if (aNumberOfChars < aLine.length) then begin // << if aNumberOfChars < aLine.length it's evident we will need to break the text
+        if (aNumberOfChars < aLine.length) or // << if aNumberOfChars < aLine.length it's evident we will need to break the text
+           (                                                                                                    // <<
+            (aLineEndWithBreakLine) and                                                                         // <<
+            (aTrimming <> TTextTrimming.None) and                                                               // <<
+            (                                                                                                   // << we need this check to add the ellipsis on the last line
+             (not aWordWrap) or                                                                                 // << when the last line finish by a break line (#13#10)
+             ((compareValue(aCurrLineY + aLineHeight + aMetrics.descent, aMaxHeight, Tepsilon.position) > 0) or // <<
+              ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1)))                                             // <<
+            )                                                                                                   // <<
+           )                                                                                                    // <<
+        then begin
 
           //if not aWordWrap
           if not aWordWrap then begin
@@ -1305,12 +1318,31 @@ begin
 
         // their is not enalf of place to write at least one char or
         // we are on the #13/#10
+        // NOTE: we need to remove the breakline because for exemple we have
+        // coco sur le cocotier#13#10
+        // then aline will be equal to
+        // coco sur le cocotier
+        // we draw this line, and then we increate aCurrLineY := aCurrLineY + aLineHeight;
+        // so it's mean the #13#10 was already taking in account, so we must delete it
         if aNumberOfChars <= 0 then begin
           if (ATextIdx + 1 < ATextLn) and
              (aText.codePointAt(ATextIdx) = $0D) and
              (aText.codePointAt(ATextIdx + 1) = $0A) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
           else if (ATextIdx < ATextLn) and
                   (aText.codePointAt(ATextIdx) = $0A) then ATextIdx := ATextIdx + 1 // (UNIX linebreak = #10)
+          else if (ATextIdx < ATextLn) and
+                  ((aText.charAT(ATextIdx).IsWhiteSpace) and
+                   (aText.charAT(ATextIdx).ToUCS4Char <> $00A0{No-break Space})) then ATextIdx := ATextIdx + 1 // (white space) if we don't have place to write
+                                                                                                               // ' blabla' then break it in
+                                                                                                               //
+                                                                                                               //  |yoyoyoyo|
+                                                                                                               //  |blabla  |
+                                                                                                               //
+                                                                                                               //  and not in
+                                                                                                               //
+                                                                                                               //  |yoyoyoyo|
+                                                                                                               //  | blabla |
+                                                                                                               //
           else if compareValue(aLineIndent, 0, Tepsilon.Position) <= 0 then begin // if aLineIndent > 0 then maybe we don't have enalf of place to write one char because of the aLineIndent.
             ATextIdx := ATextIdx + 1; // skip the current char
             if (ATextIdx < ATextLn) and
@@ -1330,7 +1362,7 @@ begin
              (aText.codePointAt(ATextIdx) = $0D) and
              (aText.codePointAt(ATextIdx + 1) = $0A) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
           else if (ATextIdx < ATextLn) and
-                  (aText.codePointAt(ATextIdx) in [$0D, $0A]) then ATextIdx := ATextIdx + 1;
+                  (aText.codePointAt(ATextIdx) = $0A) then ATextIdx := ATextIdx + 1;
         end;
 
         //init aBreakedText
@@ -2448,6 +2480,7 @@ var aBreakTextItemsStartCount: integer;
     aAscent, aDescent: Single;
     ameasuredWidth: Single;
     aOffset: single;
+    aLineEndWithBreakLine: Boolean;
     i, j: integer;
 
   {~~~~~~~~~~~~~~~~~~~~~~}
@@ -2534,14 +2567,17 @@ begin
       else I := max(I, J);
       if i = ATextIdx then begin
         aLine := '';
+        aLineEndWithBreakLine := True;
         result := true;
       end
       else if i > 0 then begin
         aLine := aText.substring(ATextIdx{startIndex}, i - ATextIdx{length}); // skip the $0D/$0A
+        aLineEndWithBreakLine := True;
         result := true;
       end
       else begin
         aLine := aText.substring(ATextIdx{startIndex});
+        aLineEndWithBreakLine := False;
       end;
 
       //calculate the number of char in the current line (this work good also if aline is empty)
@@ -2556,7 +2592,17 @@ begin
       if aNumberOfChars < aLine.length then result := true;
 
       //if we need to break the text
-      if (aNumberOfChars < aLine.length) then begin // << if aNumberOfChars < aLine.length it's evident we will need to break the text
+      if (aNumberOfChars < aLine.length) or // << if aNumberOfChars < aLine.length it's evident we will need to break the text
+         (                                                                                                // <<
+          (aLineEndWithBreakLine) and                                                                     // <<
+          (aTrimming <> TTextTrimming.None) and                                                           // <<
+          (                                                                                               // << we need this check to add the ellipsis on the last line
+           (not aWordWrap) or                                                                             // << when the last line finish by a break line (#13#10)
+           ((compareValue(aCurrLineY + aLineHeight + adescent, aMaxHeight, Tepsilon.position) > 0) or     // <<
+            ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1)))                                         // <<
+          )                                                                                               // <<
+         )                                                                                                // <<
+      then begin
 
         //if not aWordWrap
         if not aWordWrap then begin
@@ -2762,12 +2808,31 @@ begin
 
       // their is not enalf of place to write at least one char or
       // we are on the #13/#10
+      // NOTE: we need to remove the breakline because for exemple we have
+      // coco sur le cocotier#13#10
+      // then aline will be equal to
+      // coco sur le cocotier
+      // we draw this line, and then we increate aCurrLineY := aCurrLineY + aLineHeight;
+      // so it's mean the #13#10 was already taking in account, so we must delete it
       if aNumberOfChars <= 0 then begin
         if (ATextIdx + 1 < ATextLn) and
            (aText.Chars[ATextIdx] = #13) and
            (aText.Chars[ATextIdx + 1] = #10) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
         else if (ATextIdx < ATextLn) and
                 (aText.Chars[ATextIdx] = #10) then ATextIdx := ATextIdx + 1 // (UNIX linebreak = #10)
+        else if (ATextIdx < ATextLn) and
+                ((aText.Chars[ATextIdx].IsWhiteSpace) and
+                 (aText.Chars[ATextIdx].ToUCS4Char <> $00A0{No-break Space})) then ATextIdx := ATextIdx + 1 // (white space) if we don't have place to write
+                                                                                                            // ' blabla' then break it in
+                                                                                                            //
+                                                                                                            //  |yoyoyoyo|
+                                                                                                            //  |blabla  |
+                                                                                                            //
+                                                                                                            //  and not in
+                                                                                                            //
+                                                                                                            //  |yoyoyoyo|
+                                                                                                            //  | blabla |
+                                                                                                            //
         else if compareValue(aLineIndent, 0, Tepsilon.Position) <= 0 then begin // if aLineIndent > 0 then maybe we don't have enalf of place to write one char because of the aLineIndent.
           ATextIdx := ATextIdx + 1; // skip the current char
           if (ATextIdx < ATextLn) and
@@ -2787,7 +2852,7 @@ begin
            (aText.Chars[ATextIdx] = #13) and
            (aText.Chars[ATextIdx + 1] = #10) then ATextIdx := ATextIdx + 2 // (MSWINDOWS linebreak = #13#10)
         else if (ATextIdx < ATextLn) and
-                (Ord(aText.Chars[ATextIdx]) in [$0D, $0A]) then ATextIdx := ATextIdx + 1;
+                (aText.Chars[ATextIdx] = #10) then ATextIdx := ATextIdx + 1;
       end;
 
       //init aBreakedText
@@ -3330,8 +3395,8 @@ begin
             aBreakedTextItem := aBreakedTextItems[aBreakedTextItems.count - 1];
             aFirstLineIndent := TpointF.Create(aBreakedTextItem.rect.Right, aBreakedTextItem.rect.Top);
             if aBreakedTextItem.isEllipsis then break;
-          end
-          else break;
+          end;
+          // else break; << we can't break here, it's maybe juste a ' ' we try to write at the end of the line that was deleted by ALBreakText
 
         end;
 
@@ -3438,10 +3503,9 @@ begin
       J := 0;
       setlength(aElements, aBreakedTextItems.count);
       for i := 0 to aBreakedTextItems.count - 1 do begin
-        if (aBreakedTextItems[i].id <> '') or (aBreakedTextItems[i].isEllipsis) then begin
+        if (aBreakedTextItems[i].id <> '') then begin
           aElements[j].Id := aBreakedTextItems[i].id;
           aElements[j].rect := aBreakedTextItems[i].rect;
-          aElements[j].isEllipsis := aBreakedTextItems[i].isEllipsis;
           inc(j);
         end;
       end;
@@ -3534,8 +3598,7 @@ begin
         result := ALBitmapSurfacetoTexture(aBitmapSurface);
 
       finally
-        ALFreeDrawingSurfaceV2(aBitmapSurface, // var aBitmapSurface: TbitmapSurface;
-                               aContext); // Var aContext: CGContextRef;
+        ALFreeDrawingSurfaceV2(aBitmapSurface, aContext);
       end;
 
       {$IFEND}

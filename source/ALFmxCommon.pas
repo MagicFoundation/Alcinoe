@@ -262,6 +262,8 @@ type
     EllipsisFontColor: TalphaColor; // default = TAlphaColorRec.Null;
     //-----
     AutoSize: Boolean; // default = True;
+    AutoSizeX: Boolean; // default = False;
+    AutoSizeY: Boolean; // default = False;
     WordWrap: Boolean; // default = True;
     MaxLines: integer; // default = 0;
     LineSpacing: single; // default = 0;
@@ -2985,6 +2987,8 @@ begin
   EllipsisFontColor := TAlphaColorRec.Null;
   //-----
   AutoSize := True;
+  AutoSizeX := False;
+  AutoSizeY := False;
   WordWrap := True;
   MaxLines := 0;
   LineSpacing := 0;
@@ -3403,10 +3407,12 @@ begin
       end;
 
       //initialise ARect
-      if aOptions.Autosize then begin
+      if aOptions.Autosize or (aOptions.AutosizeX and aOptions.AutosizeY) then begin
         aRect.Width := aMaxWidth + aOptions.Padding.Left + aOptions.Padding.right;
         aRect.Height := aMaxHeight + aOptions.Padding.top + aOptions.Padding.bottom;
-      end;
+      end
+      else if aOptions.AutosizeX then aRect.Width := aMaxWidth + aOptions.Padding.Left + aOptions.Padding.right
+      else if aOptions.AutosizeY then aRect.Height := aMaxHeight + aOptions.Padding.top + aOptions.Padding.bottom;
       case aOptions.HTextAlign of
         TTextAlign.Center: begin
                              if aBreakedTextItems.Count > 0 then begin

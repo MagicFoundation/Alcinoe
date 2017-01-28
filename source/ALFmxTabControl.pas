@@ -217,6 +217,7 @@ uses System.SysUtils,
      System.Math.Vectors,
      FMX.Utils,
      FMX.Consts,
+     ALFmxCommon,
      ALCommon;
 
 {************************************************}

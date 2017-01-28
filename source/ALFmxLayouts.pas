@@ -371,6 +371,7 @@ uses System.SysUtils,
      FMX.Effects,
      FMX.utils,
      FMX.Ani,
+     AlFmxCommon,
      ALCommon;
 
 {*******************************************************************************************************}
@@ -663,13 +664,13 @@ procedure TALCustomScrollBox.DoRealign;
   begin
     SetLength(aNewTargets, 2);
     aNewTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
-    aNewTargets[0].Point := Tpointf.Create(0,0);
+    aNewTargets[0].Point := TALPointD.Create(0,0);
     aNewTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
     if (fHScrollBar <> nil) and
-       (fVScrollBar <> nil) then aNewTargets[1].Point := TpointF.Create(aContentRect.Width - width, aContentRect.Height - height)
-    else if (fVScrollBar <> nil) then aNewTargets[1].Point := TpointF.Create(0, aContentRect.Height - height)
-    else if (fHScrollBar <> nil) then aNewTargets[1].Point := TpointF.Create(aContentRect.Width - width, 0)
-    else aNewTargets[1].Point := TpointF.Create(0, 0);
+       (fVScrollBar <> nil) then aNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, aContentRect.Height - height)
+    else if (fVScrollBar <> nil) then aNewTargets[1].Point := TALPointD.Create(0, aContentRect.Height - height)
+    else if (fHScrollBar <> nil) then aNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, 0)
+    else aNewTargets[1].Point := TALPointD.Create(0, 0);
     AniCalculations.SetTargets(aNewTargets);
   end;
 

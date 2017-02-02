@@ -163,8 +163,6 @@ type
     property UpVelocity: TALPointD read FUpVelocity;
     property UpPosition: TALPointD read FUpPosition;
     property UpDownTime: TDateTime read FUpDownTime;
-    property MinTarget: TTarget read FMinTarget;
-    property MaxTarget: TTarget read FMaxTarget;
     property Target: TTarget read FTarget;
     property MinVelocity: Integer read FMinVelocity write FMinVelocity default ALDefaultMinVelocity;
     property MaxVelocity: Integer read FMaxVelocity write FMaxVelocity default ALDefaultMaxVelocity;
@@ -188,6 +186,8 @@ type
     property TargetCount: Integer read GetTargetCount;
     procedure SetTargets(const ATargets: array of TTarget);
     procedure GetTargets(var ATargets: array of TTarget);
+    property MinTarget: TTarget read FMinTarget;
+    property MaxTarget: TTarget read FMaxTarget;
     procedure UpdatePosImmediately(const Force: Boolean = False);
     property CurrentVelocity: TALPointD read FCurrentVelocity write FCurrentVelocity;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;

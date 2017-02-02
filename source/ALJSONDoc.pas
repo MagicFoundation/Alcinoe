@@ -2434,8 +2434,8 @@ Var Buffer: AnsiString;
 
        If (c = '\') and
           (P1 < BufferLength) and
-          (Buffer[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
-                                                        //         ^^^P1
+          (Buffer[P1 + 1] in ['\', aQuoteChar]) then inc(p1, 2) // ... "...\"..."
+                                                                //         ^^^P1
        else if c = aQuoteChar then begin
          ALCopyStr(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
          if DecodeJSONReferences then ALUTF8JavascriptDecodeV(CurrName); // ..."...
@@ -2675,8 +2675,8 @@ Var Buffer: AnsiString;
 
        If (c = '\') and
           (P1 < BufferLength) and
-          (Buffer[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
-                                                        //         ^^^P1
+          (Buffer[P1 + 1] in ['\', aQuoteChar]) then inc(p1, 2) // ... "...\"..."
+                                                                //         ^^^P1
        else if c = aQuoteChar then begin
          ALCopyStr(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
          if DecodeJSONReferences then ALUTF8JavascriptDecodeV(currValue); // ..."...
@@ -8102,8 +8102,8 @@ Var BufferLength: Integer;
 
        If (c = '\') and
           (P1 < BufferLength) and
-          (Buffer[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
-                                                        //         ^^^P1
+          (Buffer[P1 + 1] in ['\', aQuoteChar]) then inc(p1, 2) // ... "...\"..."
+                                                                //         ^^^P1
        else if c = aQuoteChar then begin
          ALCopyStrU(Buffer,CurrName,BufferPos + 1,P1-BufferPos - 1);
          if DecodeJSONReferences then ALJavascriptDecodeVU(CurrName); // ..."...
@@ -8340,8 +8340,8 @@ Var BufferLength: Integer;
 
        If (c = '\') and
           (P1 < BufferLength) and
-          (Buffer[P1 + 1] = aQuoteChar) then inc(p1, 2) // ... "...\"..."
-                                                        //         ^^^P1
+          (Buffer[P1 + 1] in ['\', aQuoteChar]) then inc(p1, 2) // ... "...\"..."
+                                                                //         ^^^P1
        else if c = aQuoteChar then begin
          ALCopyStrU(Buffer,currValue,BufferPos + 1,P1-BufferPos - 1);
          if DecodeJSONReferences then ALJavascriptDecodeVU(currValue); // ..."...

@@ -4,10 +4,9 @@ interface
 
 uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
      StdCtrls, ALString, ALJsonDoc, ExtCtrls,
-     ALStringList, Shellapi, cxGraphics, cxControls, cxLookAndFeels,
-     cxLookAndFeelPainters, cxContainer, cxEdit, cxLabel, ALMime, Vcl.Dialogs,
+     ALStringList, Shellapi, ALMime, Vcl.Dialogs,
      Contnrs, alFiles, diagnostics, superobject, DBXJSON, DBXplatform, IOUtils,
-     dwsJSON, Execute.JSON, system.JSON, system.Generics.collections,
+     dwsJSON, Execute.JSON, system.Generics.collections,
      system.UITypes;
 
 type
@@ -33,7 +32,6 @@ type
     procedure ButtonCreateDynamicallyJsonDocumentClick(Sender: TObject);
     procedure ButtonSaveToBsonClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure cxWwwArkadiaComLabelClick(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -901,12 +899,6 @@ begin
       end;
 
    end;
-end;
-
-{**********************************************************}
-procedure TForm1.cxWwwArkadiaComLabelClick(Sender: TObject);
-begin
-  ShellExecute(Application.Handle,'open','http://www.arkadia.com',nil,nil, SW_SHOWNORMAL);
 end;
 
 {*********************************************}

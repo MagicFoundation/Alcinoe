@@ -47,7 +47,7 @@ object Form1: TForm1
       '"spouse":"",'
       '"address":{},'
       '"phones":[],'
-      '"regex": /<TAG\b[^>]*>(.*?)</TAG>/im,'
+      '"regex": /<TAG\b[^>]*>(.*?)<TAG>/im,'
       '"binary": BinData(0, "JliB6gIMRuSphAD2KmhzgQ=="),'
       '"ObjectId": ObjectId ( "507f1f77bcf86cd799439011" ),'
       

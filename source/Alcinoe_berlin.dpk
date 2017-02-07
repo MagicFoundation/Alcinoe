@@ -53,7 +53,8 @@ contains
   ALMime in 'ALMime.pas',
   ALInit in 'ALInit.pas',
   ALCipher in 'ALCipher.pas',
-  ALAVLBinaryTree in 'ALAVLBinaryTree.pas';
+  ALAVLBinaryTree in 'ALAVLBinaryTree.pas',
+  ALVideoPlayer in 'ALVideoPlayer.pas';
 
 end.
 

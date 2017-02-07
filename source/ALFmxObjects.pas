@@ -414,7 +414,7 @@ uses system.SysUtils,
 constructor TALRectangle.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
 begin
-  inherited;
+  inherited Create(AOwner);
   if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
   else FScreenScale := 1;
   fdoubleBuffered := true;
@@ -1281,7 +1281,7 @@ begin
   fBufText := fTextControl.Text;
 
   {$IFDEF debug}
-  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'TALDoubleBufferedTextLayout.MakeBufBitmap - text:' + fBufText + ' - MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY), TalLogType.verbose);
+  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'text:' + fBufText + ' - MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY), TalLogType.verbose);
   inc(AlDebugTextMakeBufBitmapCount);
   AlDebugTextMakeBufBitmapStopWatch.Start;
   try

@@ -16,6 +16,7 @@
 #include <SysInit.hpp>
 #include <System.Classes.hpp>
 #include <FMX.Graphics.hpp>
+#include <ALFmxCommon.hpp>
 #include <ALFmxObjects.hpp>
 #include <FMX.Objects.hpp>
 #include <FMX.Controls.hpp>
@@ -33,6 +34,8 @@ class DELPHICLASS TALVideoPlayerSurface;
 typedef void __fastcall (__closure *TALBufferingUpdateNotifyEvent)(System::TObject* const Sender, const int mp);
 
 typedef void __fastcall (__closure *TALVideoSizeChangedNotifyEvent)(System::TObject* const Sender, const int width, const int height);
+
+enum DECLSPEC_DENUM TVideoPlayerState : unsigned char { vpsInitialized, vpsPreparing, vpsPrepared, vpsStarted, vpsPaused, vpsStopped, vpsPlaybackCompleted, vpsIdle, vpsError };
 
 class PASCALIMPLEMENTATION TALWinVideoPlayer : public System::TObject
 {
@@ -74,26 +77,27 @@ public:
 };
 
 
-#pragma pack(push,4)
 class PASCALIMPLEMENTATION TALVideoPlayer : public System::TObject
 {
 	typedef System::TObject inherited;
 	
 private:
 	TALWinVideoPlayer* fVideoPlayerControl;
+	System::Classes::TNotifyEvent fOnCompletionEvent;
+	System::Classes::TNotifyEvent fOnErrorEvent;
+	System::Classes::TNotifyEvent fOnPreparedEvent;
+	bool FAutoStartWhenPrepared;
+	TVideoPlayerState fState;
 	Fmx::Graphics::TBitmap* __fastcall GetBitmap(void);
 	TALBufferingUpdateNotifyEvent __fastcall GetOnBufferingUpdateEvent(void);
-	System::Classes::TNotifyEvent __fastcall GetOnCompletionEvent(void);
-	System::Classes::TNotifyEvent __fastcall GetOnErrorEvent(void);
 	System::Classes::TNotifyEvent __fastcall GetOnFrameAvailableEvent(void);
-	System::Classes::TNotifyEvent __fastcall GetOnPreparedEvent(void);
 	TALVideoSizeChangedNotifyEvent __fastcall GetonVideoSizeChangedEvent(void);
 	void __fastcall SetOnBufferingUpdateEvent(const TALBufferingUpdateNotifyEvent Value);
-	void __fastcall SetOnCompletionEvent(const System::Classes::TNotifyEvent Value);
-	void __fastcall SetOnErrorEvent(const System::Classes::TNotifyEvent Value);
 	void __fastcall SetOnFrameAvailableEvent(const System::Classes::TNotifyEvent Value);
-	void __fastcall SetOnPreparedEvent(const System::Classes::TNotifyEvent Value);
 	void __fastcall SetonVideoSizeChangedEvent(const TALVideoSizeChangedNotifyEvent Value);
+	void __fastcall doOnCompletion(System::TObject* Sender);
+	void __fastcall doOnError(System::TObject* Sender);
+	void __fastcall doOnPrepared(System::TObject* Sender);
 	
 public:
 	__fastcall virtual TALVideoPlayer(void);
@@ -104,22 +108,23 @@ public:
 	int __fastcall getVideoWidth(void);
 	bool __fastcall isPlaying(void);
 	void __fastcall pause(void);
-	void __fastcall prepareAsync(const bool aStartWhenReady = false);
+	void __fastcall prepareAsync(const bool aAutoStartWhenPrepared = false);
 	void __fastcall Start(void);
 	void __fastcall Stop(void);
 	void __fastcall seekTo(const int msec);
 	void __fastcall setDataSource(const System::UnicodeString aDataSource);
 	void __fastcall setLooping(const bool looping);
 	__property Fmx::Graphics::TBitmap* Bitmap = {read=GetBitmap};
-	__property System::Classes::TNotifyEvent OnError = {read=GetOnErrorEvent, write=SetOnErrorEvent};
-	__property System::Classes::TNotifyEvent OnPrepared = {read=GetOnPreparedEvent, write=SetOnPreparedEvent};
+	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
+	__property System::Classes::TNotifyEvent OnPrepared = {read=fOnPreparedEvent, write=fOnPreparedEvent};
 	__property System::Classes::TNotifyEvent OnFrameAvailable = {read=GetOnFrameAvailableEvent, write=SetOnFrameAvailableEvent};
 	__property TALBufferingUpdateNotifyEvent OnBufferingUpdate = {read=GetOnBufferingUpdateEvent, write=SetOnBufferingUpdateEvent};
-	__property System::Classes::TNotifyEvent OnCompletion = {read=GetOnCompletionEvent, write=SetOnCompletionEvent};
+	__property System::Classes::TNotifyEvent OnCompletion = {read=fOnCompletionEvent, write=fOnCompletionEvent};
 	__property TALVideoSizeChangedNotifyEvent onVideoSizeChangedEvent = {read=GetonVideoSizeChangedEvent, write=SetonVideoSizeChangedEvent};
+	__property TVideoPlayerState State = {read=fState, nodefault};
+	__property bool AutoStartWhenPrepared = {read=FAutoStartWhenPrepared, write=FAutoStartWhenPrepared, nodefault};
 };
 
-#pragma pack(pop)
 
 class PASCALIMPLEMENTATION TALVideoPlayerSurface : public Alfmxobjects::TALRectangle
 {
@@ -127,6 +132,7 @@ class PASCALIMPLEMENTATION TALVideoPlayerSurface : public Alfmxobjects::TALRecta
 	
 private:
 	TALVideoPlayer* fVideoPlayer;
+	void __fastcall OnFrameAvailable(System::TObject* Sender);
 	
 protected:
 	virtual void __fastcall Paint(void);

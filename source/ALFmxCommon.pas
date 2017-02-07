@@ -42,30 +42,32 @@ uses System.classes,
      FMX.Effects,
      FMX.controls;
 
-type
-
   {*******************}
   {$IFDEF AUTOREFCOUNT}
-  // One of the very very rare advantage i found to AUTOREFCOUNT
-  // i use this control to detect from a procedure like
-  //
-  //   tthread.queue(nil,
-  //   procedure
-  //   begin
-  //     if not fLifeObj.alive then exit;
-  //   end);
-  //
-  // that the calling object or anything else is still alive
-  // this object will be free when noone will reference it (all
-  // the queue methode have been executed)
-  // when the object is not alive anymore we simply say
-  // fLifeObj.alive := False;
-  TALLifeObj = class(Tobject)
-  public
-    alive: boolean;
-    constructor Create; virtual;
-    destructor Destroy; override;
-  end;
+
+  type
+
+    // One of the very very rare advantage i found to AUTOREFCOUNT
+    // i use this control to detect from a procedure like
+    //
+    //   tthread.queue(nil,
+    //   procedure
+    //   begin
+    //     if not fLifeObj.alive then exit;
+    //   end);
+    //
+    // that the calling object or anything else is still alive
+    // this object will be free when noone will reference it (all
+    // the queue methode have been executed)
+    // when the object is not alive anymore we simply say
+    // fLifeObj.alive := False;
+    TALLifeObj = class(Tobject)
+    public
+      alive: boolean;
+      constructor Create; virtual;
+      destructor Destroy; override;
+    end;
+
   {$ENDIF}
 
 type
@@ -876,19 +878,23 @@ uses system.SysUtils,
      ALString,
      AlCommon;
 
-{****************************}
+{*******************}
+{$IFDEF AUTOREFCOUNT}
 constructor TALLifeObj.Create;
 begin
   aLive := True;
 end;
+{$ENDIF}
 
-{****************************}
+{*******************}
+{$IFDEF AUTOREFCOUNT}
 destructor TALLifeObj.Destroy;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALLifeObj.Destroy', 'TALLifeObj.Destroy', TalLogType.verbose);
   {$IFEND}
 end;
+{$ENDIF}
 
 {***********************************************}
 function ALRectWidth(const Rect: TRect): Integer;

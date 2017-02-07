@@ -285,7 +285,9 @@ type
   TALVideoPlayerSurface = class(TALRectangle)
   private
     fVideoPlayer: TALVideoPlayer;
+    {$IF defined(android)}
     procedure OnFrameAvailable(Sender: Tobject);
+    {$ENDIF}
   protected
     procedure Paint; override;
   public
@@ -884,9 +886,9 @@ begin
   {$IF defined(android)}
   fVideoPlayerControl := TALAndroidVideoPlayer.Create;
   {$ELSEIF defined(IOS)}
-  fVideoPlayerControl := nil;
+  fVideoPlayerControl := nil; exit;
   {$ELSEIF defined(MSWINDOWS)}
-  fVideoPlayerControl := nil;
+  fVideoPlayerControl := nil; exit;
   {$ENDIF}
   //-----
   fVideoPlayerControl.OnCompletion := doOnCompletion;
@@ -1110,7 +1112,9 @@ constructor TALVideoPlayerSurface.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   fVideoPlayer := TALVideoPlayer.create;
+  {$IF defined(android)}
   fVideoPlayer.OnFrameAvailable := OnFrameAvailable;
+  {$endif}
   fill.DefaultColor := $ff000000;
   fill.Color := $ff000000;
   stroke.DefaultKind := TBrushKind.none;
@@ -1124,11 +1128,13 @@ begin
   inherited;
 end;
 
-{****************************************************************}
+{********************}
+{$IF defined(android)}
 procedure TALVideoPlayerSurface.OnFrameAvailable(Sender: Tobject);
 begin
   repaint;
 end;
+{$endif}
 
 {************************************}
 procedure TALVideoPlayerSurface.Paint;

@@ -170,7 +170,9 @@ type
     class operator Equal(const Lhs, Rhs: TALRectD): Boolean;
     class operator NotEqual(const Lhs, Rhs: TALRectD): Boolean;
     class operator Implicit(const Source: TRect): TALRectD;
+    {$IFNDEF ALDPK} // << else i receive Unsupported language feature: 'operator explicit'
     class operator Explicit(const Source: TALRectD): TRect;
+    {$ENDIF}
 
     // union of two rectangles
     class operator Add(const Lhs, Rhs: TALRectD): TALRectD;
@@ -654,7 +656,7 @@ function ALJBitmaptoTexture(const aBitmap: Jbitmap; const aVolatileTexture: bool
 function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
 {$IFEND}
 {$IF defined(ANDROID) or defined(IOS)}
-function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture; inline;
+function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture;
 {$IFEND}
 
 Type
@@ -1482,11 +1484,13 @@ begin
   Result := TALRectD.Create(Source);
 end;
 
-{**************************************************************}
+{*************}
+{$IFNDEF ALDPK}
 class operator TALRectD.Explicit(const Source: TALRectD): TRect;
 begin
   Result := Source.Round;
 end;
+{$ENDIF}
 
 {**************************************************************}
 class operator TALRectD.Add(const Lhs, Rhs: TALRectD): TALRectD;
@@ -6503,7 +6507,6 @@ begin
 
 end;
 {$IFEND}
-
 
 initialization
   ALCustomConvertFontFamilyProc := nil;

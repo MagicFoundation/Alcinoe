@@ -132,7 +132,6 @@ class PASCALIMPLEMENTATION TALVideoPlayerSurface : public Alfmxobjects::TALRecta
 	
 private:
 	TALVideoPlayer* fVideoPlayer;
-	void __fastcall OnFrameAvailable(System::TObject* Sender);
 	
 protected:
 	virtual void __fastcall Paint(void);

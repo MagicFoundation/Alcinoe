@@ -32,6 +32,7 @@
 #include <ALInit.hpp>
 #include <ALCipher.hpp>
 #include <ALAVLBinaryTree.hpp>
+#include <ALVideoPlayer.hpp>
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
 #include <System.Character.hpp>	// (rtl)

@@ -17,6 +17,8 @@
 #include <System.Classes.hpp>
 #include <FMX.Types.hpp>
 #include <FMX.Types3D.hpp>
+#include <FMX.Materials.Canvas.hpp>
+#include <FMX.Materials.hpp>
 
 //-- user supplied -----------------------------------------------------------
 
@@ -25,6 +27,7 @@ namespace Alfmxtypes3d
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS TALTextureAccessPrivate;
 class DELPHICLASS TALTexture;
+class DELPHICLASS TALCanvasExternalOESTextureMaterial;
 //-- type declarations -------------------------------------------------------
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION TALTextureAccessPrivate : public System::Classes::TInterfacedPersistent
@@ -61,16 +64,31 @@ class PASCALIMPLEMENTATION TALTexture : public Fmx::Types3d::TTexture
 	
 private:
 	bool fVolatile;
+	bool FisExternalOES;
 	
 public:
 	__fastcall TALTexture(const bool aVolatile);
 	virtual void __fastcall Assign(System::Classes::TPersistent* Source);
+	__property bool isExternalOES = {read=FisExternalOES, nodefault};
 public:
 	/* TTexture.Destroy */ inline __fastcall virtual ~TALTexture(void) { }
 	
 };
 
 #pragma pack(pop)
+
+class PASCALIMPLEMENTATION TALCanvasExternalOESTextureMaterial : public Fmx::Materials::Canvas::TCanvasTextureMaterial
+{
+	typedef Fmx::Materials::Canvas::TCanvasTextureMaterial inherited;
+	
+protected:
+	virtual void __fastcall DoInitialize(void);
+public:
+	/* TMaterial.Create */ inline __fastcall virtual TALCanvasExternalOESTextureMaterial(void) : Fmx::Materials::Canvas::TCanvasTextureMaterial() { }
+	/* TMaterial.Destroy */ inline __fastcall virtual ~TALCanvasExternalOESTextureMaterial(void) { }
+	
+};
+
 
 //-- var, const, procedure ---------------------------------------------------
 }	/* namespace Alfmxtypes3d */

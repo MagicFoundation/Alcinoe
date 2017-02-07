@@ -8,7 +8,8 @@ uses
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
   FMX.ImgList, alFmxImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
-  FMX.ScrollBox, FMX.Memo, FMX.Edit, ALFmxEdit;
+  FMX.ScrollBox, FMX.Memo, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
+  FMX.Filter.Effects;
 
 type
 
@@ -192,6 +193,23 @@ type
     Button12: TButton;
     ALText9: TALText;
     Text8: TText;
+    ALVideoPlayerSurface1: TALVideoPlayerSurface;
+    Text12: TText;
+    MonochromeEffect1: TMonochromeEffect;
+    RippleEffect1: TRippleEffect;
+    MagnifyEffect1: TMagnifyEffect;
+    SmoothMagnifyEffect1: TSmoothMagnifyEffect;
+    WaveEffect1: TWaveEffect;
+    BandedSwirlEffect1: TBandedSwirlEffect;
+    PencilStrokeEffect1: TPencilStrokeEffect;
+    PaperSketchEffect1: TPaperSketchEffect;
+    PixelateEffect1: TPixelateEffect;
+    ALText10: TALText;
+    ContrastEffect1: TContrastEffect;
+    TilerEffect1: TTilerEffect;
+    MaskToAlphaEffect1: TMaskToAlphaEffect;
+    EmbossEffect1: TEmbossEffect;
+    PinchEffect1: TPinchEffect;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -226,6 +244,8 @@ type
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure ALVertScrollBox1Click(Sender: TObject);
     procedure ALEdit2ChangeTracking(Sender: TObject);
+    procedure ALVideoPlayerSurface1Click(Sender: TObject);
+    procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -326,6 +346,61 @@ begin
       aScrollBar.Thumb.XRadius := 4;
       aScrollBar.Thumb.yRadius := 4;
     end;
+  end;
+end;
+
+procedure TForm1.ALVertScrollBox1ViewportPositionChange(Sender: TObject;const OldViewportPosition, NewViewportPosition: TPointF);
+begin
+
+  if (ALVideoPlayerSurface1.Position.y + ALVideoPlayerSurface1.Height >= NewViewportPosition.Y) and
+     (ALVideoPlayerSurface1.Position.y < NewViewportPosition.Y + height) then begin
+    if ALVideoPlayerSurface1.VideoPlayer.state in [vpsPrepared, vpsPaused] then ALVideoPlayerSurface1.VideoPlayer.Start
+    else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := true;
+  end
+  else begin
+    if ALVideoPlayerSurface1.VideoPlayer.state in [vpsStarted] then ALVideoPlayerSurface1.VideoPlayer.Pause
+    else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := False;
+  end;
+
+end;
+
+procedure TForm1.ALVideoPlayerSurface1Click(Sender: TObject);
+begin
+
+  BandedSwirlEffect1.Enabled := false;
+  ContrastEffect1.Enabled := false;
+  MagnifyEffect1.Enabled := false;
+  MonochromeEffect1.Enabled := false;
+  RippleEffect1.Enabled := false;
+  SmoothMagnifyEffect1.Enabled := false;
+  WaveEffect1.Enabled := false;
+  PencilStrokeEffect1.Enabled := false;
+  PaperSketchEffect1.Enabled := false;
+  PixelateEffect1.Enabled := false;
+  TilerEffect1.Enabled := false;
+  MaskToAlphaEffect1.Enabled := false;
+  EmbossEffect1.Enabled := false;
+  PinchEffect1.Enabled := false;
+  Text12.Text := 'Z-order work !';
+
+ALVideoPlayerSurface1.Tag := ALVideoPlayerSurface1.Tag + 1;
+  if ALVideoPlayerSurface1.Tag > 15 then ALVideoPlayerSurface1.Tag := 0;
+
+  case ALVideoPlayerSurface1.Tag of
+    1: begin BandedSwirlEffect1.Enabled := true; Text12.Text := 'BandedSwirlEffect'; end;
+    2: begin ContrastEffect1.Enabled := true; Text12.Text := 'ContrastEffect'; end;
+    3: begin MagnifyEffect1.Enabled := true; Text12.Text := 'MagnifyEffect'; end;
+    4: begin MonochromeEffect1.Enabled := true; Text12.Text := 'MonochromeEffect'; end;
+    5: begin RippleEffect1.Enabled := true; Text12.Text := 'RippleEffect'; end;
+    6: begin SmoothMagnifyEffect1.Enabled := true; Text12.Text := 'SmoothMagnifyEffect'; end;
+    7: begin WaveEffect1.Enabled := true; Text12.Text := 'WaveEffect'; end;
+    8: begin PencilStrokeEffect1.Enabled := true; Text12.Text := 'PencilStrokeEffect'; end;
+    9: begin PaperSketchEffect1.Enabled := true; Text12.Text := 'PaperSketchEffect'; end;
+    10: begin PixelateEffect1.Enabled := true; Text12.Text := 'PixelateEffect'; end;
+    11: begin TilerEffect1.Enabled := true; Text12.Text := 'TilerEffect'; end;
+    12: begin MaskToAlphaEffect1.Enabled := true; Text12.Text := 'MaskToAlphaEffect'; end;
+    13: begin EmbossEffect1.Enabled := true; Text12.Text := 'EmbossEffect'; end;
+    14: begin PinchEffect1.Enabled := true; Text12.Text := 'PinchEffect'; end;
   end;
 end;
 
@@ -471,6 +546,7 @@ begin
   fcheckbox2.Repaint;
   Text3.Text := 'Paint: ' + FormatFloat('0.#####',fcheckbox2.PaintMs) + ' ms';
 end;
+
 
 procedure TForm1.Button2Click(Sender: TObject);
 Var aDemoForm: TDemoForm;
@@ -784,6 +860,13 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   beginupdate;
 
+  //-----
+  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+  ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4');
+  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
+  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
+  ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
+  ALVideoPlayerSurface1.VideoPlayer.prepareAsync(False{AutoStartWhenPrepared});
   //-----
   fALRectangle1 := TALRectangleStopWatch.Create(self);
   fALRectangle1.Parent := ALVertScrollBox1;

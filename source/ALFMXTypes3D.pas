@@ -55,7 +55,7 @@ type
   TALCustomContextIOSAccess = class(TCustomContextIOS); // << i need to access protected CreateSharedContext
   {$ENDIF}
 
-{$IF defined(ANDROID) or defined(IOS)}
+{$IF defined(ANDROID)}
 procedure ALInitializeExternalOESTexture(const Texture: TALTexture);
 {$ENDIF}
 
@@ -165,8 +165,8 @@ begin
 
 end;
 
-{************************************}
-{$IF defined(ANDROID) or defined(IOS)}
+{********************}
+{$IF defined(ANDROID)}
 procedure ALInitializeExternalOESTexture(const Texture: TALTexture);
 var Tex: GLuint;
 begin

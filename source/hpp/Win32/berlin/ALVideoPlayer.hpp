@@ -51,18 +51,20 @@ private:
 	TALVideoSizeChangedNotifyEvent fonVideoSizeChangedEvent;
 	
 public:
-	virtual int __fastcall getCurrentPosition(void) = 0 ;
-	virtual int __fastcall getDuration(void) = 0 ;
-	virtual int __fastcall getVideoHeight(void) = 0 ;
-	virtual int __fastcall getVideoWidth(void) = 0 ;
-	virtual bool __fastcall isPlaying(void) = 0 ;
-	virtual void __fastcall pause(void) = 0 ;
-	virtual void __fastcall prepareAsync(const bool aStartWhenReady = false) = 0 ;
-	virtual void __fastcall Start(void) = 0 ;
-	virtual void __fastcall Stop(void) = 0 ;
-	virtual void __fastcall seekTo(const int msec) = 0 ;
-	virtual void __fastcall setDataSource(const System::UnicodeString aDataSource) = 0 ;
-	virtual void __fastcall setLooping(const bool looping) = 0 ;
+	__fastcall virtual TALWinVideoPlayer(void);
+	__fastcall virtual ~TALWinVideoPlayer(void);
+	int __fastcall getCurrentPosition(void);
+	int __fastcall getDuration(void);
+	int __fastcall getVideoHeight(void);
+	int __fastcall getVideoWidth(void);
+	bool __fastcall isPlaying(void);
+	void __fastcall pause(void);
+	void __fastcall prepareAsync(void);
+	void __fastcall Start(void);
+	void __fastcall Stop(void);
+	void __fastcall seekTo(const int msec);
+	void __fastcall setDataSource(const System::UnicodeString aDataSource);
+	void __fastcall setLooping(const bool looping);
 	__property Fmx::Graphics::TBitmap* bitmap = {read=fbitmap};
 	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
 	__property System::Classes::TNotifyEvent OnPrepared = {read=FOnPreparedEvent, write=FOnPreparedEvent};
@@ -70,10 +72,6 @@ public:
 	__property TALBufferingUpdateNotifyEvent OnBufferingUpdate = {read=fOnBufferingUpdateEvent, write=fOnBufferingUpdateEvent};
 	__property System::Classes::TNotifyEvent OnCompletion = {read=fOnCompletionEvent, write=fOnCompletionEvent};
 	__property TALVideoSizeChangedNotifyEvent onVideoSizeChangedEvent = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
-public:
-	/* TObject.Create */ inline __fastcall TALWinVideoPlayer(void) : System::TObject() { }
-	/* TObject.Destroy */ inline __fastcall virtual ~TALWinVideoPlayer(void) { }
-	
 };
 
 
@@ -132,6 +130,7 @@ class PASCALIMPLEMENTATION TALVideoPlayerSurface : public Alfmxobjects::TALRecta
 	
 private:
 	TALVideoPlayer* fVideoPlayer;
+	void __fastcall OnFrameAvailable(System::TObject* Sender);
 	
 protected:
 	virtual void __fastcall Paint(void);

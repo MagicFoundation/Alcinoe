@@ -246,6 +246,7 @@ type
     procedure ALEdit2ChangeTracking(Sender: TObject);
     procedure ALVideoPlayerSurface1Click(Sender: TObject);
     procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
+    procedure FormResize(Sender: TObject);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -383,7 +384,7 @@ begin
   PinchEffect1.Enabled := false;
   Text12.Text := 'Z-order work !';
 
-ALVideoPlayerSurface1.Tag := ALVideoPlayerSurface1.Tag + 1;
+  ALVideoPlayerSurface1.Tag := ALVideoPlayerSurface1.Tag + 1;
   if ALVideoPlayerSurface1.Tag > 15 then ALVideoPlayerSurface1.Tag := 0;
 
   case ALVideoPlayerSurface1.Tag of
@@ -862,9 +863,10 @@ begin
 
   //-----
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
-  ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4');
+  ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4'); // << no sound on ios, don't know why :(
   //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
   //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
+  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://techslides.com/demos/samples/sample.mp4'); // << this have sound on ios
   ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
   ALVideoPlayerSurface1.VideoPlayer.prepareAsync(False{AutoStartWhenPrepared});
   //-----
@@ -1056,6 +1058,10 @@ begin
   ALTabControl1Resize(nil);
 end;
 
+procedure TForm1.FormResize(Sender: TObject);
+begin
+  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+end;
 
 procedure TForm1.FormVirtualKeyboardHidden(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);

@@ -152,7 +152,7 @@ uses
 {$IFDEF MACOS}
   Macapi.CoreFoundation,
 {$ENDIF}
-  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils, ALfmxTypes3D;
+  FMX.Consts, FMX.Canvas.GPU, FMX.Materials, FMX.Utils;
 
 
 function GLGetErrorFlags: Integer;
@@ -179,7 +179,7 @@ begin
   {$IFDEF ANDROID}
   Log.d('[Context Exception]: ' + Format(LoadResString(ResStringRec), Args));
   {$ENDIF}
-  Raise EContext3DException.CreateResFmt(ResStringRec, Args);   // https://quality.embarcadero.com/browse/RSP-15426
+  EContext3DException.CreateResFmt(ResStringRec, Args);
 end;
 
 function MultisampleTypeToNumber(const Multisample: TMultisample): Integer;
@@ -900,18 +900,11 @@ begin
   begin
     if AType = GL_FRAGMENT_SHADER then
     begin
-      if (length(ACode) = 0) or (ACode[0] <> $23 {'#'}) then begin  // https://quality.embarcadero.com/browse/RSP-16829
-        SetLength(code, Length(GLESHeaderHigh) + Length(ACode));
-        for I := 0 to High(GLESHeaderHigh) do
-          code[I] := GLESHeaderHigh[I];
-        for I := 0 to High(ACode) do
-          code[Length(GLESHeaderHigh) + I] := ACode[I];
-      end
-      else begin
-        SetLength(code, Length(ACode));
-        for I := 0 to High(ACode) do
-          code[I] := ACode[I];
-      end;
+      SetLength(code, Length(GLESHeaderHigh) + Length(ACode));
+      for I := 0 to High(GLESHeaderHigh) do
+        code[I] := GLESHeaderHigh[I];
+      for I := 0 to High(ACode) do
+        code[Length(GLESHeaderHigh) + I] := ACode[I];
     end else begin
       SetLength(code, Length(ACode));
       for I := 0 to High(ACode) do
@@ -1195,13 +1188,8 @@ begin
 
         if Texture = nil then
           glBindTexture(GL_TEXTURE_2D, 0)
-        else begin
-          {$IF defined(ANDROID)}
-          if (Texture is TalTexture) and TalTexture(Texture).isExternalOES then glBindTexture(GL_TEXTURE_EXTERNAL_OES, Texture.Handle)  // << https://quality.embarcadero.com/browse/RSP-16830
-          else
-          {$ENDIF}
+        else
           glBindTexture(GL_TEXTURE_2D, Texture.Handle);
-        end;
 
         glUniform1i(Variable.Index, Variable.TextureUnit);
         glActiveTexture(GL_TEXTURE0);

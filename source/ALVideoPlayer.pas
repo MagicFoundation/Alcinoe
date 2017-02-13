@@ -90,6 +90,9 @@ type
       {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
       TALBufferingUpdateListener = class(TJavaLocal, JMediaPlayer_OnBufferingUpdateListener)
       private
+        {$IF defined(DEBUG)}
+        fPercentBuffered: integer;
+        {$ENDIF}
         [Weak] FVideoPlayerControl: TALAndroidVideoPlayer;
       public
         constructor Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
@@ -125,8 +128,11 @@ type
     fonVideoSizeChangedListener: TALVideoSizeChangedListener;
     FOpenGLContextLostId: integer;
     FOpenGLContextResetId: Integer;
+    fVideoWidth: integer;
+    fVideoHeight: integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
+    procedure removeListeners;
   protected
   public
     constructor Create; virtual;
@@ -149,7 +155,7 @@ type
     property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent;
     property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read fOnBufferingUpdateEvent write fOnBufferingUpdateEvent;
     property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent;
-    property onVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
+    property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
 
@@ -241,7 +247,7 @@ type
     property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent;
     property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read fOnBufferingUpdateEvent write fOnBufferingUpdateEvent;
     property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent;
-    property onVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
+    property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
 
@@ -278,7 +284,7 @@ type
     property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent;
     property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read fOnBufferingUpdateEvent write fOnBufferingUpdateEvent;
     property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent;
-    property onVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
+    property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
 
@@ -295,27 +301,29 @@ type
     fVideoPlayerControl: TALWinVideoPlayer;
     {$ENDIF}
     //-----
-    fOnCompletionEvent: TNotifyEvent;
     fOnErrorEvent: TNotifyEvent;
     fOnPreparedEvent: TNotifyEvent;
+    fOnFrameAvailableEvent: TNotifyEvent;
+    fOnBufferingUpdateEvent: TALBufferingUpdateNotifyEvent;
+    fOnCompletionEvent: TNotifyEvent;
+    fonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
     //-----
     FAutoStartWhenPrepared: Boolean;
     fState: TVideoPlayerState;
+    //-----
+    FTag: NativeInt;
     //-----
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function GetBitmap: TalTexture;
     {$ELSE}
     function GetBitmap: TBitmap;
     {$ENDIF}
-    function GetOnBufferingUpdateEvent: TALBufferingUpdateNotifyEvent;
-    function GetOnFrameAvailableEvent: TNotifyEvent;
-    function GetonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
-    procedure SetOnBufferingUpdateEvent(const Value: TALBufferingUpdateNotifyEvent);
-    procedure SetOnFrameAvailableEvent(const Value: TNotifyEvent);
-    procedure SetonVideoSizeChangedEvent(const Value: TALVideoSizeChangedNotifyEvent);
     procedure doOnCompletion(Sender: TObject);
     procedure doOnError(Sender: TObject);
     procedure doOnPrepared(Sender: TObject);
+    procedure doOnFrameAvailable(Sender: TObject);
+    procedure doOnBufferingUpdate(const Sender: TObject; const mp: integer);
+    procedure doOnVideoSizeChanged(const Sender: TObject; const width: Integer; const height: Integer);
   protected
   public
     constructor Create; virtual;
@@ -339,12 +347,13 @@ type
     {$ENDIF}
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
-    property OnFrameAvailable: TNotifyEvent read GetOnFrameAvailableEvent write SetOnFrameAvailableEvent;
-    property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read GetOnBufferingUpdateEvent write SetOnBufferingUpdateEvent;
+    property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent;
+    property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read fOnBufferingUpdateEvent write fOnBufferingUpdateEvent;
     property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent;
-    property onVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent read GetonVideoSizeChangedEvent write SetonVideoSizeChangedEvent;
+    property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
     property State: TVideoPlayerState read fState;
     property AutoStartWhenPrepared: boolean read FAutoStartWhenPrepared write FAutoStartWhenPrepared;
+    property Tag: NativeInt read FTag write FTag default 0;
   end;
 
   {*****************************************}
@@ -409,14 +418,14 @@ var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
-  inc(fTotalFramesProcessed);
-  if fTotalFramesProcessed >= 100 then begin
+  if (fTotalFramesProcessed = 0) or (fTotalFramesProcessed >= 100) then begin
     fStopWatch.Stop;
     ALLog('TALAndroidVideoPlayer.onFrameAvailable', 'fps: ' + ALFormatFloatU('0.00', (fTotalFramesProcessed) / max(1, (fStopWatch.Elapsed.TotalMilliseconds / 1000)), AlDefaultFormatSettingsU) +
                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     fTotalFramesProcessed := 0;
     fStopWatch := TStopWatch.StartNew;
   end;
+  inc(fTotalFramesProcessed);
   {$ENDIF}
 
   //SurfaceTexture objects may be created on any thread. updateTexImage() may only be called on the
@@ -430,10 +439,30 @@ begin
     procedure
     begin
       if not aLifeObj.alive then exit;
-      if fVideoPlayerControl.fSurfaceTexture <> nil then
+
+      if (fVideoPlayerControl.fSurfaceTexture <> nil) and
+         (fVideoPlayerControl.fbitmap <> nil) then begin
+        if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
+           (fVideoPlayerControl.fbitmap.Height <> fVideoPlayerControl.fVideoHeight) then begin
+          TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FWidth := fVideoPlayerControl.fVideoWidth;
+          TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FHeight := fVideoPlayerControl.fVideoHeight; // we can't use setsize because it's fill finalise the texture
+                                                                                                            // but with/height are used only in
+                                                                                                            // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
+                                                                                                            // begin
+                                                                                                            //   ...
+                                                                                                            //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
+                                                                                                            //   ...
+                                                                                                            //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
+                                                                                                            //   ...
+                                                                                                            // end
+                                                                                                            // so i don't need to finalize the texture !!
+        end;
         fVideoPlayerControl.fSurfaceTexture.updateTexImage;
+      end;
+
       if assigned(fVideoPlayerControl.fOnFrameAvailableEvent) then
         fVideoPlayerControl.fOnFrameAvailableEvent(fVideoPlayerControl);
+
     end);
 
 end;
@@ -535,20 +564,8 @@ begin
     procedure
     begin
       if not aLifeObj.alive then exit;
-      if assigned(TALTextureAccessPrivate(fVideoPlayerControl.fBitmap)) then begin
-        TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FWidth := width;
-        TALTextureAccessPrivate(fVideoPlayerControl.fBitmap).FHeight := height; // we can't use setsize because it's fill finalise the texture
-                                                                                // but with/height are used only in
-                                                                                // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
-                                                                                // begin
-                                                                                //   ...
-                                                                                //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
-                                                                                //   ...
-                                                                                //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
-                                                                                //   ...
-                                                                                // end
-                                                                                // so i don't need to finalize the texture !!
-      end;
+      fVideoPlayerControl.FVideoWidth := width;
+      fVideoPlayerControl.fVideoHeight := height;
       if assigned(fVideoPlayerControl.fonVideoSizeChangedEvent) then
         fVideoPlayerControl.fonVideoSizeChangedEvent(fVideoPlayerControl, width, height);
     end);
@@ -559,6 +576,9 @@ end;
 constructor TALAndroidVideoPlayer.TALBufferingUpdateListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
 begin
   inherited Create;
+  {$IF defined(DEBUG)}
+  fPercentBuffered := 0;
+  {$ENDIF}
   fVideoPlayerControl := aVideoPlayerControl;
 end;
 
@@ -568,10 +588,12 @@ var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
-  //if percent > 0 then
-  //  ALLog('TALAndroidVideoPlayer.onBufferingUpdate', 'percent buffered: ' + ALinttostrU(percent) + '%'+
-  //                                                   ' - percent played: ' + ALIntToStrU(round((100 / fVideoPlayerControl.FVideoPlayer.getDuration) * fVideoPlayerControl.FVideoPlayer.getCurrentPosition))+'%' +
-  //                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  if fPercentBuffered <> percent then begin
+    ALLog('TALAndroidVideoPlayer.onBufferingUpdate', 'percent buffered: ' + ALinttostrU(percent) + '%'+
+                                                     ' - percent played: ' + ALIntToStrU(round((100 / fVideoPlayerControl.FMediaPlayer.getDuration) * fVideoPlayerControl.FMediaPlayer.getCurrentPosition))+'%' +
+                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+    fPercentBuffered := percent;
+  end;
   {$ENDIF}
 
   if assigned(fVideoPlayerControl.fOnBufferingUpdateEvent) then begin
@@ -620,6 +642,10 @@ end;
 constructor TALAndroidVideoPlayer.Create;
 begin
 
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.Create', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+
   //-----
   inherited create;
 
@@ -636,6 +662,10 @@ begin
   //-----
   fBitmap := TalTexture.Create(False);
   ALInitializeEXTERNALOESTexture(fBitmap);
+
+  //-----
+  fVideoWidth := 0;
+  fVideoHeight := 0;
 
   //-----
   FMediaPlayer := TJMediaPlayer.JavaClass.init;
@@ -674,54 +704,48 @@ end;
 destructor TALAndroidVideoPlayer.Destroy;
 begin
 
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.Destroy', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+
   //stop all futur TThread.queue to execute
   //and also signal that the object is destroying
   fLifeObj.alive := False;
 
-  //to make sure none of the listeners get called anymore
-  //FVideoPlayer.reset will do
+  // to make sure none of the listeners get called anymore
+  // FVideoPlayer.reset will do
   //
-  //  mEventHandler.removeCallbacksAndMessages(null);
+  //   mEventHandler.removeCallbacksAndMessages(null);
   //
-  //i do it inside the UIThread BECAUSe it's seam that the
-  //eventHandler is bound to the UI THread :
+  // i do it inside the UIThread BECAUSe it's seam that the
+  // eventHandler is bound to the UI THread :
   //
-  //  Looper looper;
-  //  if ((looper = Looper.myLooper()) != null) {
-  //    mEventHandler = new EventHandler(this, looper);
-  //  } else if ((looper = Looper.getMainLooper()) != null) {
-  //    mEventHandler = new EventHandler(this, looper);
-  //  } else {
-  //    mEventHandler = null;
-  //  }
+  //   Looper looper;
+  //   if ((looper = Looper.myLooper()) != null) {
+  //     mEventHandler = new EventHandler(this, looper);
+  //   } else if ((looper = Looper.getMainLooper()) != null) {
+  //     mEventHandler = new EventHandler(this, looper);
+  //   } else {
+  //     mEventHandler = null;
+  //   }
   //
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    begin
-      FMediaPlayer.reset;
-    end);
+  //
+  CallInUIThreadAndWaitFinishing(removeListeners); // i must use removeListeners else
+                                                   // a strong ref to FMediaPlayer is keep and
+                                                   // later their is an exception when delphi
+                                                   // try (again) to free the object (who is already freed)
 
-  //-----
-  FMediaPlayer.setOnErrorListener(nil);
+  //----
   alfreeandNil(FOnErrorListener);
-  //-----
-  FMediaPlayer.setOnPreparedListener(nil);
   alfreeandNil(FOnPreparedListener);
-  //-----
-  FMediaPlayer.setOnVideoSizeChangedListener(nil);
   alfreeandNil(fonVideoSizeChangedListener);
-  //-----
-  FMediaPlayer.setOnBufferingUpdateListener(nil);
   alfreeandNil(fOnBufferingUpdateListener);
-  //-----
-  FMediaPlayer.setOnCompletionListener(nil);
   alfreeandNil(fOnCompletionListener);
   //-----
   FMediaPlayer.setSurface(nil);
   FMediaPlayer.release;
   FMediaPlayer := nil;
   //-----
-  fSurfaceTexture.setOnFrameAvailableListener(nil);
   alfreeAndNil(FOnFrameAvailableListener);
   fSurfaceTexture.release;
   fSurfaceTexture := nil;
@@ -739,6 +763,17 @@ begin
   //-----
   inherited;
 
+end;
+
+{**********************************************}
+Procedure TALAndroidVideoPlayer.removeListeners;
+begin
+  FMediaPlayer.setOnErrorListener(nil);
+  FMediaPlayer.setOnPreparedListener(nil);
+  FMediaPlayer.setOnVideoSizeChangedListener(nil);
+  FMediaPlayer.setOnBufferingUpdateListener(nil);
+  FMediaPlayer.setOnCompletionListener(nil);
+  fSurfaceTexture.setOnFrameAvailableListener(nil);
 end;
 
 {***************************************************************************************************}
@@ -1147,6 +1182,11 @@ end;
 {***********************************}
 constructor TALIOSVideoPlayer.Create;
 begin
+
+  {$IF defined(DEBUG)}
+  ALLog('TALIOSVideoPlayer.Create', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+
   inherited;
   FPlayer := nil;
   FPlayerItem := nil;
@@ -1165,11 +1205,17 @@ begin
   fOnErrorEvent := nil;
   FOnPreparedEvent := nil;
   fonVideoSizeChangedEvent := nil;
+
 end;
 
 {***********************************}
 destructor TALIOSVideoPlayer.Destroy;
 begin
+
+  {$IF defined(DEBUG)}
+  ALLog('TALIOSVideoPlayer.Destroy', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+
   if FNotificationsDelegate <> nil then begin
     TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).removeObserver(FNotificationsDelegate.GetObjectID);
     AlFreeAndNil(FNotificationsDelegate);
@@ -1216,6 +1262,7 @@ begin
   end;
   //-----
   inherited;
+
 end;
 
 {****************************************************}
@@ -1787,16 +1834,24 @@ begin
   fVideoPlayerControl := TALWinVideoPlayer.Create;
   {$ENDIF}
   //-----
-  fVideoPlayerControl.OnCompletion := doOnCompletion;
   fVideoPlayerControl.OnError := DoOnError;
   fVideoPlayerControl.OnPrepared := doOnPrepared;
+  fVideoPlayerControl.OnFrameAvailable := doOnFrameAvailable;
+  fVideoPlayerControl.OnBufferingUpdate := doOnBufferingUpdate;
+  fVideoPlayerControl.OnCompletion := doOnCompletion;
+  fVideoPlayerControl.onVideoSizeChanged := doonVideoSizeChanged;
   //-----
-  fOnCompletionEvent := nil;
   fOnErrorEvent := nil;
   fOnPreparedEvent := nil;
+  fOnFrameAvailableEvent := nil;
+  fOnBufferingUpdateEvent := nil;
+  fOnCompletionEvent := nil;
+  fonVideoSizeChangedEvent := nil;
   //-----
   FAutoStartWhenPrepared := False;
   fState := vpsIdle; // << When a MediaPlayer object is just created using new or after reset() is called, it is in the Idle state
+  //-----
+  fTag := 0;
 end;
 
 {********************************}
@@ -1949,14 +2004,14 @@ end;
 procedure TALVideoPlayer.doOnCompletion(Sender: TObject);
 begin
   fState := vpsPlayBackCompleted;
-  if assigned(fOnCompletionEvent) then fOnCompletionEvent(Sender);
+  if assigned(fOnCompletionEvent) then fOnCompletionEvent(Self);
 end;
 
 {**************************************************}
 procedure TALVideoPlayer.doOnError(Sender: TObject);
 begin
   fState := vpsError;
-  if assigned(fOnErrorEvent) then fOnErrorEvent(Sender);
+  if assigned(fOnErrorEvent) then fOnErrorEvent(Self);
 end;
 
 {*****************************************************}
@@ -1964,43 +2019,25 @@ procedure TALVideoPlayer.doOnPrepared(Sender: TObject);
 begin
   fState := vpsPrepared;
   if FAutoStartWhenPrepared then start;
-  if assigned(fOnPreparedEvent) then fOnPreparedEvent(Sender);
+  if assigned(fOnPreparedEvent) then fOnPreparedEvent(Self);
 end;
 
-{*******************************************************************************}
-function TALVideoPlayer.GetOnBufferingUpdateEvent: TALBufferingUpdateNotifyEvent;
+{***********************************************************}
+procedure TALVideoPlayer.doOnFrameAvailable(Sender: TObject);
 begin
-  result := fVideoPlayerControl.fOnBufferingUpdateEvent;
+  if assigned(fOnFrameAvailableEvent) then fOnFrameAvailableEvent(Self);
 end;
 
-{*********************************************************************************************}
-procedure TALVideoPlayer.SetOnBufferingUpdateEvent(const Value: TALBufferingUpdateNotifyEvent);
+{*************************************************************************************}
+procedure TALVideoPlayer.doOnBufferingUpdate(const Sender: TObject; const mp: integer);
 begin
-  fVideoPlayerControl.fOnBufferingUpdateEvent := Value;
+  if assigned(fOnBufferingUpdateEvent) then fOnBufferingUpdateEvent(Self, mp);
 end;
 
-{*************************************************************}
-function TALVideoPlayer.GetOnFrameAvailableEvent: TNotifyEvent;
+{****************************************************************************************************************}
+procedure TALVideoPlayer.doOnVideoSizeChanged(const Sender: TObject; const width: Integer; const height: Integer);
 begin
-  result := fVideoPlayerControl.fOnFrameAvailableEvent;
-end;
-
-{***************************************************************************}
-procedure TALVideoPlayer.SetOnFrameAvailableEvent(const Value: TNotifyEvent);
-begin
-  fVideoPlayerControl.fOnFrameAvailableEvent := Value;
-end;
-
-{*********************************************************************************}
-function TALVideoPlayer.GetonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
-begin
-  result := fVideoPlayerControl.fonVideoSizeChangedEvent;
-end;
-
-{***********************************************************************************************}
-procedure TALVideoPlayer.SetonVideoSizeChangedEvent(const Value: TALVideoSizeChangedNotifyEvent);
-begin
-  fVideoPlayerControl.fonVideoSizeChangedEvent := Value;
+  if assigned(fOnVideoSizeChangedEvent) then fOnVideoSizeChangedEvent(Self, width, height);
 end;
 
 {***********************************************************}

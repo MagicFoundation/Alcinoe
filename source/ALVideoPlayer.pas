@@ -149,6 +149,7 @@ type
     procedure seekTo(const msec: Integer);
     procedure setDataSource(Const aDataSource: String); // Sets or get the data source (file-path or http/rtsp URL) to use.
     procedure setLooping(const looping: Boolean);
+    procedure setVolume(const Value: Single);
     property bitmap: TalTexture read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -241,6 +242,7 @@ type
     procedure seekTo(const msec: Integer);
     procedure setDataSource(Const aDataSource: String); // Sets or get the data source (file-path or http/rtsp URL) to use.
     procedure setLooping(const looping: Boolean);
+    procedure setVolume(const Value: Single);
     property bitmap: TalTexture read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -278,6 +280,7 @@ type
     procedure seekTo(const msec: Integer);
     procedure setDataSource(Const aDataSource: String); // Sets or get the data source (file-path or http/rtsp URL) to use.
     procedure setLooping(const looping: Boolean);
+    procedure setVolume(const Value: Single);
     property bitmap: TBitmap read fbitmap;
     property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
     property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
@@ -312,6 +315,8 @@ type
     fState: TVideoPlayerState;
     //-----
     FTag: NativeInt;
+    [Weak] FTagObject: TObject;
+    FTagFloat: Single;
     //-----
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function GetBitmap: TalTexture;
@@ -340,6 +345,7 @@ type
     procedure seekTo(const msec: Integer);
     procedure setDataSource(Const aDataSource: String); // Sets or get the data source (file-path or http/rtsp URL) to use.
     procedure setLooping(const looping: Boolean);
+    procedure setVolume(const Value: Single);
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property Bitmap: TALTexture read Getbitmap;
     {$ELSE}
@@ -354,6 +360,8 @@ type
     property State: TVideoPlayerState read fState;
     property AutoStartWhenPrepared: boolean read FAutoStartWhenPrepared write FAutoStartWhenPrepared;
     property Tag: NativeInt read FTag write FTag default 0;
+    property TagObject: TObject read FTagObject write FTagObject;
+    property TagFloat: Single read FTagFloat write FTagFloat;
   end;
 
   {*****************************************}
@@ -1000,6 +1008,23 @@ begin
   FMediaPlayer.setLooping(looping);
 end;
 
+{***********************************************************}
+//Sets the volume on this player. This API is recommended for
+//balancing the output of audio streams within an application.
+//Unless you are writing an application to control user settings,
+//this API should be used in preference to setStreamVolume(int, int, int)
+//which sets the volume of ALL streams of a particular type. Note
+//that the passed volume values are raw scalars in range 0.0 to 1.0.
+//UI controls should be scaled logarithmically.
+procedure TALAndroidVideoPlayer.setVolume(const Value: Single);
+var aVolume: Single;
+begin
+  aVolume := Value;
+  if aVolume < 0 then aVolume := 0
+  else if aVolume > 1 then aVolume := 1;
+  FMediaPlayer.setVolume(aVolume, aVolume);
+end;
+
 {$ENDIF}
 
 {$IF defined(IOS)}
@@ -1245,7 +1270,10 @@ begin
   //-----
   AlFreeAndNil(FKVODelegate);
   //-----
-  alfreeAndNil(fbitmap);
+  if fbitmap <> nil then begin
+    ITextureAccess(fBitmap).Handle := 0;
+    alfreeAndNil(fbitmap);
+  end;
   //-----
   if fTextureRef <> 0 then begin
     CFRelease(pointer(fTextureRef));
@@ -1478,22 +1506,17 @@ begin
   P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)); // Creates and returns an NSURL object initialized with a provided URL string
   if P = nil then raise EFileNotFoundException.Create(SFileNotFound); // If the URL string was malformed or nil, returns nil.
   aURL := TNSUrl.Wrap(P);
-  try
-
-    FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(aURL)); // return A new player item, prepared to use URL.
-                                                                                      // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
-                                                                                      // Associating the player item with an AVPlayer immediately begins enqueuing its media
-                                                                                      // and preparing it for playback. If the URL contains valid data that can be used by
-                                                                                      // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
-                                                                                      // URL contains no valid data or otherwise can't be used by the player item, its status
-                                                                                      // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
-                                                                                      // by querying the player item’s error property.
-    FPlayerItem.retain;
-
-  finally
-    aURL.release;
-    aURL := nil;
-  end;
+  FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(aURL)); // return A new player item, prepared to use URL.
+                                                                                    // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
+                                                                                    // Associating the player item with an AVPlayer immediately begins enqueuing its media
+                                                                                    // and preparing it for playback. If the URL contains valid data that can be used by
+                                                                                    // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
+                                                                                    // URL contains no valid data or otherwise can't be used by the player item, its status
+                                                                                    // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
+                                                                                    // by querying the player item’s error property.
+  FPlayerItem.retain;
+  //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
+  //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
 
   //-----
   FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
@@ -1558,6 +1581,18 @@ begin
     exit;
   end;
   fLooping := Looping;
+end;
+
+{*********************************************************}
+procedure TALIOSVideoPlayer.setVolume(const Value: Single);
+var aVolume: Single;
+begin
+  if not (fState in [vpsIdle, vpsInitialized, vpsStopped, vpsPrepared, vpsStarted, vpsPaused, vpsPlaybackCompleted]) then exit;
+  aVolume := Value;
+  if aVolume < 0 then aVolume := 0
+  else if aVolume > 1 then aVolume := 1;
+  FPlayer.setVolume(aVolume); // The audio playback volume for the player, ranging from 0.0 through 1.0 on a linear scale.
+                              // A value of 0.0 indicates silence; a value of 1.0 (the default) indicates full audio volume for the player instance.
 end;
 
 {***************************************************************}
@@ -1819,6 +1854,11 @@ procedure TALWinVideoPlayer.setLooping(const looping: Boolean);
 begin
 end;
 
+{*********************************************************}
+procedure TALWinVideoPlayer.setVolume(const Value: Single);
+begin
+end;
+
 {$ENDIF}
 
 {********************************}
@@ -1852,6 +1892,8 @@ begin
   fState := vpsIdle; // << When a MediaPlayer object is just created using new or after reset() is called, it is in the Idle state
   //-----
   fTag := 0;
+  FTagObject := nil;
+  FTagFloat := 0.0;
 end;
 
 {********************************}
@@ -1974,6 +2016,16 @@ end;
 procedure TALVideoPlayer.setLooping(const looping: Boolean);
 begin
   fVideoPlayerControl.setLooping(looping);
+end;
+
+{*********************************************************}
+//Valid Sates: Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted
+//Invalid states: Error
+//On Success State: -
+//On Error State: -
+procedure TALVideoPlayer.setVolume(const Value: Single);
+begin
+  fVideoPlayerControl.setVolume(Value);
 end;
 
 {*********************************************************}

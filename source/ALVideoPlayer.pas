@@ -3,6 +3,7 @@ unit ALVideoPlayer;
 interface
 
 uses system.Classes,
+     System.SyncObjs,
      {$IF defined(DEBUG)}
      system.diagnostics,
      {$endIF}
@@ -52,7 +53,7 @@ type
       private
         {$IF defined(DEBUG)}
         fTotalFramesProcessed: integer;
-        fStopWatch: TstopWatch;
+        fFpsStopWatch: TstopWatch;
         {$ENDIF}
         [Weak] FVideoPlayerControl: TALAndroidVideoPlayer;
       public
@@ -126,12 +127,8 @@ type
     FOnPreparedListener: TALPreparedListener;
     fonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
     fonVideoSizeChangedListener: TALVideoSizeChangedListener;
-    FOpenGLContextLostId: integer;
-    FOpenGLContextResetId: Integer;
     fVideoWidth: integer;
     fVideoHeight: integer;
-    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
-    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     procedure removeListeners;
   protected
   public
@@ -143,6 +140,7 @@ type
     function getVideoWidth: integer;
     function isPlaying: boolean;
     procedure pause;
+    procedure prepare;
     procedure prepareAsync;
     procedure Start;
     procedure Stop;
@@ -214,6 +212,10 @@ type
     FKVODelegate: TALKVODelegate;
     fNotificationsDelegate: TALNotificationsDelegate;
     FFrameRefreshTimer: TTimer;
+    fhasNONewPixelBufferForItemTimeCounter: integer;
+    {$IFDEF DEBUG}
+    fFrameRefreshCounter: integer;
+    {$ENDIF}
     fbitmap: TALTexture;
     fTextureRef: CVOpenGLESTextureRef;
     fvideoTextureCacheRef: CVOpenGLESTextureCacheRef;
@@ -225,8 +227,17 @@ type
     fOnErrorEvent: TNotifyEvent;
     FOnPreparedEvent: TnotifyEvent;
     fonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
-    procedure FrameRefreshOnTimer(Sender: TObject);
+    fonReadyEvent: TnotifyEvent;
+    fOnItemDidPlayToEndTimeEvent: TnotifyEvent;
+    fOnItemFailedToPlayToEndTimeEvent: TnotifyEvent;
   protected
+    procedure doOnFrameRefresh(Sender: TObject);
+    procedure doOnReady;
+    procedure doOnItemDidPlayToEndTime;
+    procedure doOnItemFailedToPlayToEndTime;
+    property onReady: TnotifyEvent read fonReadyEvent write fonReadyEvent;
+    property OnItemDidPlayToEndTime: TnotifyEvent read fOnItemDidPlayToEndTimeEvent write fOnItemDidPlayToEndTimeEvent;
+    property OnItemFailedToPlayToEndTime: TnotifyEvent read fOnItemFailedToPlayToEndTimeEvent write fOnItemFailedToPlayToEndTimeEvent;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -236,6 +247,7 @@ type
     function getVideoWidth: integer;
     function isPlaying: boolean;
     procedure pause;
+    procedure prepare;
     procedure prepareAsync;
     procedure Start;
     procedure Stop;
@@ -274,6 +286,7 @@ type
     function getVideoWidth: integer;
     function isPlaying: boolean;
     procedure pause;
+    procedure prepare;
     procedure prepareAsync;
     procedure Start;
     procedure Stop;
@@ -339,6 +352,7 @@ type
     function getVideoWidth: integer;
     function isPlaying: boolean;
     procedure pause;
+    procedure prepare(const aAutoStartWhenPrepared: Boolean=False);
     procedure prepareAsync(const aAutoStartWhenPrepared: Boolean=False);
     procedure Start;
     procedure Stop;
@@ -358,6 +372,108 @@ type
     property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent;
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
     property State: TVideoPlayerState read fState;
+    property AutoStartWhenPrepared: boolean read FAutoStartWhenPrepared write FAutoStartWhenPrepared;
+    property Tag: NativeInt read FTag write FTag default 0;
+    property TagObject: TObject read FTagObject write FTagObject;
+    property TagFloat: Single read FTagFloat write FTagFloat;
+  end;
+
+  {***********************************}
+  TALVideoPlayerAsync = class(TThread)
+  private
+    fSignal: Tevent;
+    FReady: Boolean;
+    //-----
+    {$IF defined(android)}
+    fVideoPlayerControl: TALAndroidVideoPlayer;
+    {$ELSEIF defined(IOS)}
+    fVideoPlayerControl: TALIOSVideoPlayer;
+    {$ELSE definied(MSWINDOWS)}
+    fVideoPlayerControl: TALWinVideoPlayer;
+    {$ENDIF}
+    //-----
+    fOnErrorEvent: TNotifyEvent;
+    fOnPreparedEvent: TNotifyEvent;
+    fOnFrameAvailableEvent: TNotifyEvent;
+    fOnBufferingUpdateEvent: TALBufferingUpdateNotifyEvent;
+    fOnCompletionEvent: TNotifyEvent;
+    fonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
+    //-----
+    FAutoStartWhenPrepared: Boolean;
+    fState: integer; // the integer representation of TVideoPlayerState;
+    //-----
+    FTag: NativeInt;
+    [Weak] FTagObject: TObject;
+    FTagFloat: Single;
+    //-----
+    fDoSetDataSource: Boolean;
+    fDoSetDataSourceValue: String;
+    fDoPrepare: Boolean;
+    fDoPause: Boolean;
+    fDoStart: Boolean;
+    fDoStop: Boolean;
+    fDoSetVolume: Boolean;
+    fDoSetVolumeValue: integer;
+    fDoSetLooping: boolean;
+    fDoSetLoopingValue: boolean;
+    fDoSeekTo: boolean;
+    fDoSeekToValue: integer;
+    fDoGetDuration: Boolean;
+    fDoGetDurationSignal: Tevent;
+    fDoGetDurationValue: integer;
+    {$IF defined(IOS)}
+    fDoOnReady: boolean;
+    fDoOnItemDidPlayToEndTime: Boolean;
+    fDoOnItemFailedToPlayToEndTime: boolean;
+    {$endif}
+    //-----
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    function GetBitmap: TalTexture;
+    {$ELSE}
+    function GetBitmap: TBitmap;
+    {$ENDIF}
+    function getState: TVideoPlayerState;
+    procedure doOnCompletion(Sender: TObject);
+    procedure doOnError(Sender: TObject);
+    procedure doOnPrepared(Sender: TObject);
+    procedure doOnFrameAvailable(Sender: TObject);
+    procedure doOnBufferingUpdate(const Sender: TObject; const mp: integer);
+    procedure doOnVideoSizeChanged(const Sender: TObject; const width: Integer; const height: Integer);
+    {$IF defined(IOS)}
+    procedure OnReady(Sender: TObject);
+    procedure OnItemDidPlayToEndTime(Sender: TObject);
+    procedure OnItemFailedToPlayToEndTime(Sender: TObject);
+    {$endif}
+  protected
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Execute; override;
+    //function getCurrentPosition: integer;
+    function getDuration: integer;
+    //function getVideoHeight: integer;
+    //function getVideoWidth: integer;
+    //function isPlaying: boolean;
+    procedure pause;
+    procedure prepare(const aAutoStartWhenPrepared: Boolean=False);
+    procedure Start;
+    procedure Stop;
+    procedure seekTo(const msec: Integer);
+    procedure setDataSource(Const aDataSource: String); // Sets or get the data source (file-path or http/rtsp URL) to use.
+    procedure setLooping(const looping: Boolean);
+    procedure setVolume(const Value: Single);
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    property Bitmap: TALTexture read Getbitmap;
+    {$ELSE}
+    property Bitmap: TBitmap read Getbitmap;
+    {$ENDIF}
+    property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent; // << always fired in the main thread
+    property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent; // << always fired in the main thread
+    property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent; // << always fired in the main thread
+    property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read fOnBufferingUpdateEvent write fOnBufferingUpdateEvent; // << always fired in the main thread
+    property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent; // << always fired in the main thread
+    property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent; // << always fired in the main thread
+    property State: TVideoPlayerState read GetState;
     property AutoStartWhenPrepared: boolean read FAutoStartWhenPrepared write FAutoStartWhenPrepared;
     property Tag: NativeInt read FTag write FTag default 0;
     property TagObject: TObject read FTagObject write FTagObject;
@@ -415,7 +531,7 @@ begin
   inherited Create;
   {$IF defined(DEBUG)}
   fTotalFramesProcessed := 0;
-  fStopWatch := TStopWatch.StartNew;
+  fFpsStopWatch := TStopWatch.StartNew;
   {$ENDIF}
   fVideoPlayerControl := aVideoPlayerControl;
 end;
@@ -427,11 +543,11 @@ begin
 
   {$IF defined(DEBUG)}
   if (fTotalFramesProcessed = 0) or (fTotalFramesProcessed >= 100) then begin
-    fStopWatch.Stop;
-    ALLog('TALAndroidVideoPlayer.onFrameAvailable', 'fps: ' + ALFormatFloatU('0.00', (fTotalFramesProcessed) / max(1, (fStopWatch.Elapsed.TotalMilliseconds / 1000)), AlDefaultFormatSettingsU) +
+    fFpsStopWatch.Stop;
+    ALLog('TALAndroidVideoPlayer.onFrameAvailable', 'fps: ' + ALFormatFloatU('0.00', (fTotalFramesProcessed) / max(1, (ffpsStopWatch.Elapsed.TotalMilliseconds / 1000)), AlDefaultFormatSettingsU) +
                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     fTotalFramesProcessed := 0;
-    fStopWatch := TStopWatch.StartNew;
+    fFpsStopWatch := TStopWatch.StartNew;
   end;
   inc(fTotalFramesProcessed);
   {$ENDIF}
@@ -441,10 +557,15 @@ begin
   //is called on an arbitrary thread, so unless special care is taken updateTexImage() should not be
   //called directly from the callback.
   // >> so i as understand i can call updateTexImage in other thread than the current thread, it's
-  // >> seam to be thread safe
+  // >> seam to be thread safe - i already make opengl multithread however the updateTexImage seam
+  // >> seam to take around 1ms only so their is no really purpose to run it in a different thread than
+  // >> the main thread (who already have the OpenGL ES context)
   aLifeObj := fVideoPlayerControl.fLifeObj;
   tthread.queue(nil,
     procedure
+    {$IF defined(DEBUG)}
+    var aStopWatch: TStopWatch;
+    {$ENDIF}
     begin
       if not aLifeObj.alive then exit;
 
@@ -465,7 +586,20 @@ begin
                                                                                                             // end
                                                                                                             // so i don't need to finalize the texture !!
         end;
+
+        {$IF defined(DEBUG)}
+        if (fTotalFramesProcessed mod 100 = 0) then aStopWatch := TStopWatch.StartNew;
+        {$ENDIF}
+
         fVideoPlayerControl.fSurfaceTexture.updateTexImage;
+
+        {$IFDEF DEBUG}
+        if (fTotalFramesProcessed mod 100 = 0) then begin
+          aStopWatch.Stop;
+          ALLog('TALAndroidVideoPlayer.onFrameAvailable.updateTexImage', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+        end;
+        {$ENDIF}
+
       end;
 
       if assigned(fVideoPlayerControl.fOnFrameAvailableEvent) then
@@ -596,7 +730,7 @@ var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
-  if fPercentBuffered <> percent then begin
+  if abs(fPercentBuffered - percent) > 5 then begin // i don't know why percent bufferend go up and go down under android
     ALLog('TALAndroidVideoPlayer.onBufferingUpdate', 'percent buffered: ' + ALinttostrU(percent) + '%'+
                                                      ' - percent played: ' + ALIntToStrU(round((100 / fVideoPlayerControl.FMediaPlayer.getDuration) * fVideoPlayerControl.FMediaPlayer.getCurrentPosition))+'%' +
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
@@ -664,12 +798,16 @@ begin
   fLifeObj := TALLifeObj.Create;
 
   //-----
-  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
-  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
-
-  //-----
-  fBitmap := TalTexture.Create(False);
-  ALInitializeEXTERNALOESTexture(fBitmap);
+  // i use synchronize in case the TALAndroidVideoPlayer was
+  // created in a different thread than the main thread because
+  // only the main thread have the openGL ES context (except if
+  // you modified the delphi source code to make opengl ES multithread)
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      fBitmap := TalTexture.Create(False);
+      ALInitializeEXTERNALOESTexture(fBitmap);
+    end);
 
   //-----
   fVideoWidth := 0;
@@ -759,11 +897,15 @@ begin
   fSurfaceTexture := nil;
 
   //-----
-  alFreeandNil(fbitmap);
-
-  //-----
-  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
-  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
+  // i use synchronize in case the TALAndroidVideoPlayer was
+  // created in a different thread than the main thread because
+  // only the main thread have the openGL ES context (except if
+  // you modified the delphi source code to make opengl ES multithread)
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      alFreeandNil(fbitmap);
+    end);
 
   //-----
   fLifeObj := nil; // << it's the autorefcount process that must free this object
@@ -782,56 +924,6 @@ begin
   FMediaPlayer.setOnBufferingUpdateListener(nil);
   FMediaPlayer.setOnCompletionListener(nil);
   fSurfaceTexture.setOnFrameAvailableListener(nil);
-end;
-
-{***************************************************************************************************}
-procedure TALAndroidVideoPlayer.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
-begin
-
-  //----
-  if FMediaPlayer.isPlaying then begin
-    FMediaPlayer.pause;
-    fStartMediaPlayerOnOpenGLContextReset := True;
-  end
-  else fStartMediaPlayerOnOpenGLContextReset := false;
-
-  //----
-  FMediaPlayer.setSurface(nil);
-
-  //----
-  fSurfaceTexture.setOnFrameAvailableListener(nil);
-  fSurfaceTexture.release;
-  fSurfaceTexture := nil;
-
-  //----
-  AlFReeAndNil(fBitmap);
-
-end;
-
-{****************************************************************************************************}
-procedure TALAndroidVideoPlayer.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
-begin
-
-  //-----
-  alfreeAndNil(fBitmap); // << in case
-  fBitmap := TalTexture.Create(False);
-  ALInitializeEXTERNALOESTexture(fBitmap);
-
-  //-----
-  if fSurfaceTexture <> nil then begin
-    fSurfaceTexture.setOnFrameAvailableListener(nil);
-    fSurfaceTexture.release;
-    fSurfaceTexture := nil;
-  end;
-  fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
-  fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener);
-
-  //-----
-  FMediaPlayer.setSurface(TJSurface.JavaClass.init((fSurfaceTexture)));
-
-  //----
-  if fStartMediaPlayerOnOpenGLContextReset then FMediaPlayer.start;
-
 end;
 
 {******************************************************}
@@ -963,6 +1055,29 @@ begin
   {$ENDIF}
 end;
 
+{************************************************}
+//Prepares the player for playback, synchronously.
+//After setting the datasource and the display surface,
+//you need to either call prepare() or prepareAsync().
+//For files, it is OK to call prepare(), which blocks
+//until MediaPlayer is ready for playback.
+procedure TALAndroidVideoPlayer.prepare;
+{$IFDEF DEBUG}
+var aStopWatch: TstopWatch;
+{$ENDIF}
+begin
+  {$IFDEF DEBUG}
+  aStopWatch := TstopWatch.StartNew;
+  {$ENDIF}
+
+  FMediaPlayer.prepare;
+
+  {$IFDEF DEBUG}
+  aStopWatch.Stop;
+  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  {$ENDIF}
+end;
+
 {*************************************************}
 //Prepares the player for playback, asynchronously.
 //After setting the datasource and the display surface,
@@ -1029,6 +1144,12 @@ end;
 
 {$IF defined(IOS)}
 
+{***}
+const
+  _FrameRefreshInterval: integer = 28; // << will get a roundly fps of 30
+                                       // << not 34 ms (1000 / 30 = 34) because we need also to take in account the
+                                       // << timetaken to build the texture (around 2-4 ms)
+
 {************************************************************************************************}
 constructor TALIOSVideoPlayer.TALKVODelegate.Create(const aVideoPlayerControl: TALIOSVideoPlayer);
 begin
@@ -1038,76 +1159,18 @@ end;
 
 {**********************************************************************************************************************************************}
 procedure TALIOSVideoPlayer.TALKVODelegate.observeValueForKeyPath(keyPath: NSString; ofObject: Pointer; change: NSDictionary; context: Pointer);
-var aPixelBufferAttributes: NSMutableDictionary;
 begin
+
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
 
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.observeValueForKeyPath', 'Status:' +  alinttostrU(TNSNumber.Wrap(change.allvalues.objectAtIndex(0)).integerValue()) +
                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  //AVPlayerItemStatusFailed = 2;
-  //AVPlayerItemStatusReadyToPlay = 1;
-  //AVPlayerItemStatusUnknown = 0;
-  //AVPlayerStatusFailed = 2;
-  //AVPlayerStatusReadyToPlay = 1;
-  //AVPlayerStatusUnknown = 0;
-  if (fVideoPlayerControl.fPlayer.status = AVPlayerStatusReadyToPlay) and // The player’s status indicates whether the player can be used for playback.
-                                                                          // When the value of this property is failed, you can no longer use the player
-                                                                          // for playback and you need to create a new instance to replace it. If this
-                                                                          // happens, you can check the value of the player’s error property to determine
-                                                                          // the nature of the failure.
-                                                                          // This property is key value observable using Key-value observing.
-                                                                          // NOTE: The player’s status does not indicate its readiness to play a specific
-                                                                          // player item. You should instead use the status property of AVPlayerItem to make
-                                                                          // that determination.
-     (fVideoPlayerControl.FPlayerItem.status = AVPlayerItemStatusReadyToPlay) // When a player item is created, its status is unknown, meaning its media hasn’t
-                                                                              // been loaded and has not yet been enqueued for playback. Associating a player
-                                                                              // item with an AVPlayer immediately begins enqueuing the item’s media and preparing
-                                                                              // it for playback. When the player item’s media has been loaded and is ready
-                                                                              // for use, its status will change to readyToPlay. You can observe this
-                                                                              // change using key-value observing.
-  then begin
-
-    //i need to do this here because of bug like :
-    //https://forums.developer.apple.com/thread/27589
-    //http://stackoverflow.com/questions/24800742/iosavplayeritemvideooutput-hasnewpixelbufferforitemtime-doesnt-work-correctly
-    if fVideoPlayerControl.FPlayerItemVideoOutput = nil then begin
-      aPixelBufferAttributes := TNSMutableDictionary.Create;
-      try
-        aPixelBufferAttributes.setObject(TNSNumber.OCClass.numberWithInt(kCVPixelFormatType_32BGRA), Pointer(kCVPixelBufferPixelFormatTypeKey));
-        fVideoPlayerControl.FPlayerItemVideoOutput := TAVPlayerItemVideoOutput.Wrap(TAVPlayerItemVideoOutput.Alloc.initWithPixelBufferAttributes(aPixelBufferAttributes)); // Initializes and returns a video output object using the specified
-                                                                                                                                                                           // pixel buffer attributes.
-                                                                                                                                                                           // The pixel buffer attributes required for video output. For a list
-                                                                                                                                                                           // of pixel buffer attributes you can include in this dictionary, see
-                                                                                                                                                                           // the CVPixelBuffer.h header file in the Core Video framework.
-      finally
-        aPixelBufferAttributes.release;
-        aPixelBufferAttributes := nil;
-      end;
-      fVideoPlayerControl.FPlayerItemVideoOutput.retain;
-      fVideoPlayerControl.FPlayerItem.addOutput(fVideoPlayerControl.FPlayerItemVideoOutput);
-    end;
-
-    //fire the fOnPreparedEvent
-    if fVideoPlayerControl.fState = vpsPreparing then begin
-      fVideoPlayerControl.fState := vpsPrepared;
-      if assigned(fVideoPlayerControl.fOnPreparedEvent) then
-        fVideoPlayerControl.fOnPreparedEvent(fVideoPlayerControl);
-    end;
-
-  end
-  else if (fVideoPlayerControl.fPlayer.status = AVPlayerStatusFailed) or
-          (fVideoPlayerControl.FPlayerItem.status = AVPlayerItemStatusFailed) then begin
-
-    //fire the fOnErrorEvent
-    if fVideoPlayerControl.fState <> vpsError then begin
-      fVideoPlayerControl.fState := vpsError;
-      if assigned(fVideoPlayerControl.fOnErrorEvent) then
-        fVideoPlayerControl.fOnErrorEvent(fVideoPlayerControl);
-    end;
-
-  end;
+  if assigned(fVideoPlayerControl.fonReadyEvent) then fVideoPlayerControl.fonReadyEvent(self)
+  else fVideoPlayerControl.doOnReady;
 
 end;
 
@@ -1123,18 +1186,15 @@ end;
 procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemDidPlayToEndTime;
 begin
 
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
+
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemDidPlayToEndTime', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  if fVideoPlayerControl.fLooping then begin
-    fVideoPlayerControl.FPlayer.seekToTime(CMTimeMake(0, 1));
-    fVideoPlayerControl.FPlayer.play;
-  end
-  else begin
-    fVideoPlayerControl.FFrameRefreshTimer.Enabled := False;
-    fVideoPlayerControl.fState := vpsPlaybackCompleted;
-  end;
+  if assigned(fVideoPlayerControl.fOnItemDidPlayToEndTimeEvent) then fVideoPlayerControl.fOnItemDidPlayToEndTimeEvent(self)
+  else fVideoPlayerControl.DoOnItemDidPlayToEndTime;
 
 end;
 
@@ -1145,17 +1205,15 @@ end;
 procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemFailedToPlayToEndTime;
 begin
 
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
+
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemFailedToPlayToEndTime', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  //fire the fOnErrorEvent
-  if fVideoPlayerControl.fState <> vpsError then begin
-    fVideoPlayerControl.FFrameRefreshTimer.Enabled := False;
-    fVideoPlayerControl.fState := vpsError;
-    if assigned(fVideoPlayerControl.fOnErrorEvent) then
-      fVideoPlayerControl.fOnErrorEvent(fVideoPlayerControl);
-  end;
+  if assigned(fVideoPlayerControl.fOnItemFailedToPlayToEndTimeEvent) then fVideoPlayerControl.fOnItemFailedToPlayToEndTimeEvent(self)
+  else fVideoPlayerControl.DoOnItemFailedToPlayToEndTime;
 
 end;
 
@@ -1163,9 +1221,14 @@ end;
 //Posted when the item’s current time has changed discontinuously.
 procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemTimeJumped;
 begin
+
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
+
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemTimeJumped', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
+
 end;
 
 {*******************************************************************}
@@ -1177,20 +1240,30 @@ end;
 //not continue.
 procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemPlaybackStalled;
 begin
+
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
+
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemPlaybackStalled', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   //we do nothing here, the fVideoPlayerControl.FFrameRefreshTimer will do himself the job
   //to detect when the playback stalled and will do himself a pause / restart
+
 end;
 
 {**************************************************}
 //Posted when a new access log entry has been added.
 procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemNewAccessLogEntry;
 begin
+
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
+
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemNewAccessLogEntry', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
+
 end;
 
 {*************************************************}
@@ -1199,9 +1272,14 @@ end;
 //accessible via errorLog(), respectively.
 procedure TALIOSVideoPlayer.TALNotificationsDelegate.ItemNewErrorLogEntry;
 begin
+
+  //this is always fired in the main thread
+  //http://stackoverflow.com/questions/7880742/ios-are-methods-called-by-delegates-and-observers-executed-on-the-main-thread
+
   {$IF defined(DEBUG)}
   allog('TALIOSVideoPlayer.ItemNewErrorLogEntry', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
+
 end;
 
 {***********************************}
@@ -1219,6 +1297,10 @@ begin
   FKVODelegate := nil;
   FNotificationsDelegate := nil;
   FFrameRefreshTimer := nil;
+  fhasNONewPixelBufferForItemTimeCounter := 0;
+  {$IFDEF DEBUG}
+  fFrameRefreshCounter := 0;
+  {$ENDIF}
   fbitmap := nil;
   fTextureRef := 0;
   fvideoTextureCacheRef := 0;
@@ -1230,6 +1312,9 @@ begin
   fOnErrorEvent := nil;
   FOnPreparedEvent := nil;
   fonVideoSizeChangedEvent := nil;
+  fonReadyEvent := nil;
+  fOnItemDidPlayToEndTimeEvent := nil;
+  fonItemFailedToPlayToEndTimeEvent := nil;
 
 end;
 
@@ -1241,24 +1326,54 @@ begin
   ALLog('TALIOSVideoPlayer.Destroy', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  if FNotificationsDelegate <> nil then begin
-    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).removeObserver(FNotificationsDelegate.GetObjectID);
-    AlFreeAndNil(FNotificationsDelegate);
-  end;
   //-----
   if FFrameRefreshTimer <> nil then begin
     FFrameRefreshTimer.Enabled := False;
     alFreeAndNil(FFrameRefreshTimer);
   end;
+
+  //-----
+  TThread.Synchronize(nil,
+    procedure
+    begin
+      if FNotificationsDelegate <> nil then begin
+        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).removeObserver(FNotificationsDelegate.GetObjectID);
+        AlFreeAndNil(FNotificationsDelegate);
+      end;
+      //-----
+      if FPlayer <> nil then
+        FPlayer.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('status')); // << i do it inside synchronize because as Observers are always called in mainthread better to remove it from here
+      //-----
+      if FPlayerItem <> nil then
+        FPlayerItem.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('status')); // << i do it inside synchronize because as Observers are always called in mainthread better to remove it from here
+      //-----
+      if fbitmap <> nil then begin
+        ITextureAccess(fBitmap).Handle := 0;
+        alfreeAndNil(fbitmap);
+      end;
+      //-----
+      if fTextureRef <> 0 then begin
+        CFRelease(pointer(fTextureRef));
+        fTextureRef := 0;
+      end;
+      //-----
+      if fvideoTextureCacheRef <> 0 then begin
+        CVOpenGLESTextureCacheFlush(fvideoTextureCacheRef, 0);  // The texture cache automatically flushes currently unused resources when you call the
+                                                                // CVOpenGLESTextureCacheCreateTextureFromImage function, but can you can also flush the
+                                                                // cache explicitly by calling this function. The EAGLContext associated with the cache
+                                                                // may be used to delete or unbind textures.
+        CFrelease(pointer(fvideoTextureCacheRef));
+        fvideoTextureCacheRef := 0;
+      end;
+    end);
+
   //-----
   if FPlayer <> nil then begin
-    FPlayer.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('status'));
     FPlayer.release;
     FPlayer := nil;
   end;
   //-----
   if FPlayerItem <> nil then begin
-    FPlayerItem.removeObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), StrToNSStr('status'));
     FPlayerItem.release;
     FPlayerItem := nil;
   end;
@@ -1269,25 +1384,7 @@ begin
   end;
   //-----
   AlFreeAndNil(FKVODelegate);
-  //-----
-  if fbitmap <> nil then begin
-    ITextureAccess(fBitmap).Handle := 0;
-    alfreeAndNil(fbitmap);
-  end;
-  //-----
-  if fTextureRef <> 0 then begin
-    CFRelease(pointer(fTextureRef));
-    fTextureRef := 0;
-  end;
-  //-----
-  if fvideoTextureCacheRef <> 0 then begin
-    CVOpenGLESTextureCacheFlush(fvideoTextureCacheRef, 0);  // The texture cache automatically flushes currently unused resources when you call the
-                                                            // CVOpenGLESTextureCacheCreateTextureFromImage function, but can you can also flush the
-                                                            // cache explicitly by calling this function. The EAGLContext associated with the cache
-                                                            // may be used to delete or unbind textures.
-    CFrelease(pointer(fvideoTextureCacheRef));
-    fvideoTextureCacheRef := 0;
-  end;
+
   //-----
   inherited;
 
@@ -1362,10 +1459,10 @@ begin
   result := fState = vpsStarted;
 end;
 
-{***************************************}
-procedure TALIOSVideoPlayer.prepareAsync;
+{**********************************}
+procedure TALIOSVideoPlayer.prepare;
 begin
-  if not (fState in [vpsInitialized, vpsStopped]) then raise Exception.Create('prepareAsync can be call only in the Initialized or Stopped state');
+  if not (fState in [vpsInitialized, vpsStopped]) then raise Exception.Create('prepare/prepareAsync can be call only in the Initialized or Stopped state');
   if (fPlayer.status = AVPlayerStatusReadyToPlay) and // The player’s status indicates whether the player can be used for playback.
                                                       // When the value of this property is failed, you can no longer use the player
                                                       // for playback and you need to create a new instance to replace it. If this
@@ -1389,6 +1486,12 @@ begin
   else fState := vpsPreparing;
 end;
 
+{***************************************}
+procedure TALIOSVideoPlayer.prepareAsync;
+begin
+  prepare;
+end;
+
 {********************************}
 procedure TALIOSVideoPlayer.pause;
 {$IFDEF DEBUG}
@@ -1409,7 +1512,7 @@ begin
 
   FPlayer.pause; // Pauses playback of the current item.
                  // Calling this method is the same as setting the rate to 0.0.
-  FFrameRefreshTimer.Enabled := False;
+  if FFrameRefreshTimer <> nil then FFrameRefreshTimer.Enabled := False;
   fState := vpsPaused;
 
   {$IFDEF DEBUG}
@@ -1420,10 +1523,9 @@ end;
 
 {********************************}
 procedure TALIOSVideoPlayer.Start;
-var aAudioSession: AVAudioSession;
-    {$IFDEF DEBUG}
-    aStopWatch: TstopWatch;
-    {$ENDIF}
+{$IFDEF DEBUG}
+var aStopWatch: TstopWatch;
+{$ENDIF}
 begin
   {$IFDEF DEBUG}
   aStopWatch := TstopWatch.StartNew;
@@ -1437,13 +1539,19 @@ begin
     exit;
   end;
 
-  aAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
-  aAudioSession.setCategory(AVAudioSessionCategoryPlayback, nil);
-  aAudioSession.setActive(True, nil);
+  TThread.queue(nil,
+    procedure
+    var aAudioSession: AVAudioSession;
+    begin
+      aAudioSession := TAVAudioSession.Wrap(TAVAudioSession.OCClass.sharedInstance);
+      aAudioSession.setCategory(AVAudioSessionCategoryPlayback, nil);
+      aAudioSession.setActive(True, nil);
+    end);
+
   FPlayer.play; // Begins playback of the current item.
                 // Calling this method is the same as setting the rate to 1.0.
-  FFrameRefreshTimer.Tag := 0;
-  FFrameRefreshTimer.Enabled := True;
+  fhasNONewPixelBufferForItemTimeCounter := 0;
+  if FFrameRefreshTimer <> nil then FFrameRefreshTimer.Enabled := True;
   fState := vpsStarted;
 
   {$IFDEF DEBUG}
@@ -1472,7 +1580,7 @@ begin
 
   FPlayer.pause; // Pauses playback of the current item.
                  // Calling this method is the same as setting the rate to 0.0.
-  FFrameRefreshTimer.Enabled := False;
+  if FFrameRefreshTimer <> nil then FFrameRefreshTimer.Enabled := False;
   fState := vpsStopped;
 
   {$IFDEF DEBUG}
@@ -1534,33 +1642,41 @@ begin
                           nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
 
   //-----
-  fNotificationsDelegate := TALNotificationsDelegate.Create(self);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), nil);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), nil);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), nil);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), nil);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), nil);
-  TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), nil);
-
-  //-----
-  FFrameRefreshTimer := TTimer.Create(nil);
-  FFrameRefreshTimer.Interval := 34; // equivalent to a fps of 30
-  FFrameRefreshTimer.OnTimer := FrameRefreshOnTimer;
-  FFrameRefreshTimer.Enabled := False;
-
-  //-----
-  fBitmap := TalTexture.Create(False);
-  fBitmap.PixelFormat := TCustomContextIOS.PixelFormat;
-
-  //-----
-  if CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
-                                  nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
-                                  (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
-                                  nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
-                                  @fvideoTextureCacheRef) <> kCVReturnSuccess then begin // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
-    fState := vpsError;
-    raise Exception.Create('CVOpenGLESTextureCacheCreate failed!');
+  if TThread.Current.ThreadID = MainThreadID then begin
+    FFrameRefreshTimer := TTimer.Create(nil);
+    FFrameRefreshTimer.Interval := _FrameRefreshInterval; // equivalent to a fps of 30
+    FFrameRefreshTimer.OnTimer := doOnFrameRefresh;
+    FFrameRefreshTimer.Enabled := False;
   end;
+
+  TThread.Synchronize(nil,
+  procedure
+  begin
+
+    //-----
+    fBitmap := TalTexture.Create(False);
+    fBitmap.PixelFormat := TCustomContextIOS.PixelFormat;
+
+    //-----
+    fNotificationsDelegate := TALNotificationsDelegate.Create(self);
+    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), nil);
+    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), nil);
+    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), nil);
+    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), nil);
+    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), nil);
+    TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), nil);
+
+    //-----
+    if CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
+                                    nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
+                                    (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
+                                    nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
+                                    @fvideoTextureCacheRef) <> kCVReturnSuccess then begin // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
+      fState := vpsError;
+      raise Exception.Create('CVOpenGLESTextureCacheCreate failed!');
+    end;
+
+  end);
 
   //-----
   fState := vpsInitialized;
@@ -1595,11 +1711,11 @@ begin
                               // A value of 0.0 indicates silence; a value of 1.0 (the default) indicates full audio volume for the player instance.
 end;
 
-{***************************************************************}
-procedure TALIOSVideoPlayer.FrameRefreshOnTimer(Sender: TObject);
+{************************************************************}
+procedure TALIOSVideoPlayer.doOnFrameRefresh(Sender: TObject);
 var aPixelBuffer: CVPixelBufferRef;
     {$IFDEF DEBUG}
-    aStopWatch: TstopWatch;
+    aStopWatch1, aStopWatch2: TstopWatch;
     {$ENDIF}
     aPrevTextureRef: CVOpenGLESTextureRef;
     aWidth, aHeight: integer;
@@ -1608,7 +1724,7 @@ begin
 
   //stop the timer if we encoutered some error
   if fState <> vpsStarted then begin
-    FFrameRefreshTimer.Enabled := False;
+    if FFrameRefreshTimer <> nil then FFrameRefreshTimer.Enabled := False;
     Exit;
   end;
 
@@ -1616,7 +1732,7 @@ begin
   if FPlayerItemVideoOutput = nil then exit;
 
   {$IFDEF DEBUG}
-  aStopWatch := TstopWatch.StartNew;
+  aStopWatch1 := TstopWatch.StartNew;
   {$ENDIF}
 
   T := fPlayer.currentTime; // << Returns the current time of the current player item
@@ -1641,89 +1757,104 @@ begin
     end;
     try
 
-      //-----
-      aPrevTextureRef := fTextureRef;
-      aWidth := CVPixelBufferGetWidth(aPixelBuffer); // Returns the width of the pixel buffer.
-      aHeight := CVPixelBufferGetHeight(aPixelBuffer); // Returns the height of the pixel buffer.
+      TThread.Synchronize(nil,
+        procedure
+        begin
 
-      //-----
-      // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
-      // CVImageBuffer and associated parameters. This operation creates a live binding between the image buffer
-      // and the underlying texture object. The EAGLContext associated with the cache may be modified to create,
-      // delete, or bind textures. When used as a source texture or GL_COLOR_ATTACHMENT, the image buffer must be
-      // unlocked before rendering. The source or render buffer texture should not be re-used until the rendering
-      // has completed. This can be guaranteed by calling glFlush()
-      //
-      // The texture cache automatically flushes currently unused resources when you call the
-      // CVOpenGLESTextureCacheCreateTextureFromImage function
-      if CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
-                                                      fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                      aPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
-                                                      nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
-                                                      GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
-                                                      GL_RGBA,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                      aWidth, // width: The width of the texture image.
-                                                      aHeight, // height The height of the texture image.
-                                                      GL_BGRA_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
-                                                      GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
-                                                      0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
-                                                      @fTextureRef) <> kCVReturnSuccess then begin // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
-        {$IFDEF DEBUG}
-        ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'CVOpenGLESTextureCacheCreateTextureFromImage failed!', TalLogType.Error);
-        {$ENDIF}
-        exit;
-      end;
+          {$IFDEF DEBUG}
+          aStopWatch2 := TstopWatch.StartNew;
+          {$ENDIF}
 
-      glActiveTexture(GL_TEXTURE0);
-      glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(fTextureRef));
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      case fBitmap.MagFilter of
-        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      end;
-      case fBitmap.MinFilter of
-        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      end;
-      glBindTexture(GL_TEXTURE_2D, 0);
+          //-----
+          aPrevTextureRef := fTextureRef;
+          aWidth := CVPixelBufferGetWidth(aPixelBuffer); // Returns the width of the pixel buffer.
+          aHeight := CVPixelBufferGetHeight(aPixelBuffer); // Returns the height of the pixel buffer.
 
-      //-----
-      if aPrevTextureRef <> 0 then
-        cfRElease(pointer(aPrevTextureRef));
+          //-----
+          // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
+          // CVImageBuffer and associated parameters. This operation creates a live binding between the image buffer
+          // and the underlying texture object. The EAGLContext associated with the cache may be modified to create,
+          // delete, or bind textures. When used as a source texture or GL_COLOR_ATTACHMENT, the image buffer must be
+          // unlocked before rendering. The source or render buffer texture should not be re-used until the rendering
+          // has completed. This can be guaranteed by calling glFlush()
+          //
+          // The texture cache automatically flushes currently unused resources when you call the
+          // CVOpenGLESTextureCacheCreateTextureFromImage function
+          if CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
+                                                          fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
+                                                          aPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+                                                          nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
+                                                          GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
+                                                          GL_RGBA,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
+                                                          aWidth, // width: The width of the texture image.
+                                                          aHeight, // height The height of the texture image.
+                                                          GL_BGRA_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
+                                                          GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
+                                                          0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
+                                                          @fTextureRef) <> kCVReturnSuccess then begin // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
+            {$IFDEF DEBUG}
+            ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'CVOpenGLESTextureCacheCreateTextureFromImage failed!', TalLogType.Error);
+            {$ENDIF}
+            exit;
+          end;
 
-      //-----
-      TALTextureAccessPrivate(fBitmap).FWidth := aWidth;
-      TALTextureAccessPrivate(fBitmap).FHeight := aHeight; // we can't use setsize because it's fill finalise the texture
-                                                           // but with/height are used only in
-                                                           // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
-                                                           // begin
-                                                           //   ...
-                                                           //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
-                                                           //   ...
-                                                           //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
-                                                           //   ...
-                                                           // end
-                                                           // so i don't need to finalize the texture !!
-      ITextureAccess(fBitmap).Handle := CVOpenGLESTextureGetName(fTextureRef);
+          glActiveTexture(GL_TEXTURE0);
+          glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(fTextureRef));
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+          case fBitmap.MagFilter of
+            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+          end;
+          case fBitmap.MinFilter of
+            TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+          end;
+          glBindTexture(GL_TEXTURE_2D, 0);
+
+          //-----
+          if aPrevTextureRef <> 0 then
+            cfRElease(pointer(aPrevTextureRef));
+
+          //-----
+          TALTextureAccessPrivate(fBitmap).FWidth := aWidth;
+          TALTextureAccessPrivate(fBitmap).FHeight := aHeight; // we can't use setsize because it's fill finalise the texture
+                                                               // but with/height are used only in
+                                                               // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
+                                                               // begin
+                                                               //   ...
+                                                               //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
+                                                               //   ...
+                                                               //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
+                                                               //   ...
+                                                               // end
+                                                               // so i don't need to finalize the texture !!
+          ITextureAccess(fBitmap).Handle := CVOpenGLESTextureGetName(fTextureRef);
+
+          //-----
+          if assigned(FonFrameAvailableEvent) then
+            FonFrameAvailableEvent(self);
+
+          {$IFDEF DEBUG}
+          aStopWatch2.stop;
+          {$ENDIF}
+
+        end);
 
     finally
       CVPixelBufferRelease(aPixelBuffer);
     end;
 
     //-----
-    FFrameRefreshTimer.Tag := 0;
-
-    //-----
-    if assigned(FonFrameAvailableEvent) then
-      FonFrameAvailableEvent(self);
+    fhasNONewPixelBufferForItemTimeCounter := 0;
 
     {$IFDEF DEBUG}
-    FFrameRefreshTimer.TagFloat := FFrameRefreshTimer.TagFloat + 1;
-    if round(FFrameRefreshTimer.TagFloat) mod 100 = 0 then begin
-      aStopWatch.Stop;
-      FFrameRefreshTimer.TagFloat := 0;
-      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+    inc(fFrameRefreshCounter);
+    if fFrameRefreshCounter mod 100 = 0 then begin
+      aStopWatch1.Stop;
+      fFrameRefreshCounter := 0;
+      ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'Total TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch1.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
+                                                     ' - Synchronize TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch2.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
     end;
     {$ENDIF}
 
@@ -1737,8 +1868,8 @@ begin
     //sometime we continusly receive hasNewPixelBufferForItemTime:NO
     //for exemple cut the wifi off during playback, they you will have stalled (normal)
     //but later when you will put the player on you will continue to receive hasNewPixelBufferForItemTime:NO
-    FFrameRefreshTimer.Tag := FFrameRefreshTimer.Tag + 1;
-    if (FFrameRefreshTimer.tag > 30) and // << with an interval of 34 ms mean more than 1s without anything
+    inc(fhasNONewPixelBufferForItemTimeCounter);
+    if (fhasNONewPixelBufferForItemTimeCounter > 30) and // << with an interval of 34 ms mean more than 1s without anything
        ((fPlayerItem.isPlaybackBufferFull) or // Indicates whether the internal media buffer is full and that further I/O is suspended.
                                               // Despite the playback buffer reaching capacity there might not exist sufficient statistical
                                               // data to support a playbackLikelyToKeepUp prediction of YES.
@@ -1758,11 +1889,112 @@ begin
       {$ENDIF}
       fPlayer.pause;
       fPlayer.play;
-      FFrameRefreshTimer.tag := 0;
+      fhasNONewPixelBufferForItemTimeCounter := 0;
     end;
 
   end;
 
+end;
+
+{************************************}
+procedure TALIOSVideoPlayer.doOnReady;
+var aPixelBufferAttributes: NSMutableDictionary;
+begin
+
+  //AVPlayerItemStatusFailed = 2;
+  //AVPlayerItemStatusReadyToPlay = 1;
+  //AVPlayerItemStatusUnknown = 0;
+  //AVPlayerStatusFailed = 2;
+  //AVPlayerStatusReadyToPlay = 1;
+  //AVPlayerStatusUnknown = 0;
+  if (fPlayer.status = AVPlayerStatusReadyToPlay) and // The player’s status indicates whether the player can be used for playback.
+                                                      // When the value of this property is failed, you can no longer use the player
+                                                      // for playback and you need to create a new instance to replace it. If this
+                                                      // happens, you can check the value of the player’s error property to determine
+                                                      // the nature of the failure.
+                                                      // This property is key value observable using Key-value observing.
+                                                      // NOTE: The player’s status does not indicate its readiness to play a specific
+                                                      // player item. You should instead use the status property of AVPlayerItem to make
+                                                      // that determination.
+     (FPlayerItem.status = AVPlayerItemStatusReadyToPlay) // When a player item is created, its status is unknown, meaning its media hasn’t
+                                                          // been loaded and has not yet been enqueued for playback. Associating a player
+                                                          // item with an AVPlayer immediately begins enqueuing the item’s media and preparing
+                                                          // it for playback. When the player item’s media has been loaded and is ready
+                                                          // for use, its status will change to readyToPlay. You can observe this
+                                                          // change using key-value observing.
+  then begin
+
+    //i need to do this here because of bug like :
+    //https://forums.developer.apple.com/thread/27589
+    //http://stackoverflow.com/questions/24800742/iosavplayeritemvideooutput-hasnewpixelbufferforitemtime-doesnt-work-correctly
+    if FPlayerItemVideoOutput = nil then begin
+      aPixelBufferAttributes := TNSMutableDictionary.Create;
+      try
+        aPixelBufferAttributes.setObject(TNSNumber.OCClass.numberWithInt(kCVPixelFormatType_32BGRA), Pointer(kCVPixelBufferPixelFormatTypeKey));
+        FPlayerItemVideoOutput := TAVPlayerItemVideoOutput.Wrap(TAVPlayerItemVideoOutput.Alloc.initWithPixelBufferAttributes(aPixelBufferAttributes)); // Initializes and returns a video output object using the specified
+                                                                                                                                                       // pixel buffer attributes.
+                                                                                                                                                       // The pixel buffer attributes required for video output. For a list
+                                                                                                                                                       // of pixel buffer attributes you can include in this dictionary, see
+                                                                                                                                                       // the CVPixelBuffer.h header file in the Core Video framework.
+      finally
+        aPixelBufferAttributes.release;
+        aPixelBufferAttributes := nil;
+      end;
+      FPlayerItemVideoOutput.retain;
+      FPlayerItem.addOutput(FPlayerItemVideoOutput);
+    end;
+
+    //fire the fOnPreparedEvent
+    if fState = vpsPreparing then begin
+      fState := vpsPrepared;
+      if assigned(fOnPreparedEvent) then
+        fOnPreparedEvent(self);
+    end;
+
+  end
+  else if (fPlayer.status = AVPlayerStatusFailed) or
+          (FPlayerItem.status = AVPlayerItemStatusFailed) then begin
+
+    //fire the fOnErrorEvent
+    if fState <> vpsError then begin
+      fState := vpsError;
+      if assigned(fOnErrorEvent) then
+        fOnErrorEvent(self);
+    end;
+
+  end;
+
+end;
+
+{***************************************************}
+procedure TALIOSVideoPlayer.doOnItemDidPlayToEndTime;
+begin
+  if fLooping then begin
+    FPlayer.seekToTime(CMTimeMake(0, 1));
+    FPlayer.play;
+  end
+  else begin
+    if FFrameRefreshTimer <> nil then FFrameRefreshTimer.Enabled := False;
+    fState := vpsPlaybackCompleted;
+    if assigned(fOnCompletionEvent) then
+      fOnCompletionEvent(self);
+  end;
+end;
+
+{********************************************************}
+procedure TALIOSVideoPlayer.doOnItemFailedToPlayToEndTime;
+begin
+  if fState <> vpsError then begin
+
+    if FFrameRefreshTimer <> nil then
+      FFrameRefreshTimer.Enabled := False;
+
+    fState := vpsError;
+
+    if assigned(fOnErrorEvent) then
+      fOnErrorEvent(self);
+
+  end;
 end;
 
 {$ENDIF}
@@ -1821,6 +2053,11 @@ end;
 
 {********************************}
 procedure TALWinVideoPlayer.pause;
+begin
+end;
+
+{**********************************}
+procedure TALWinVideoPlayer.prepare;
 begin
 end;
 
@@ -1980,6 +2217,18 @@ end;
 //Invalid states: Idle, Prepared, Started, Paused, PlaybackCompleted, Error
 //On Success State: Preparing
 //On Error State: Calling this method in an invalid state throws an IllegalStateException.
+procedure TALVideoPlayer.prepare(const aAutoStartWhenPrepared: Boolean);
+begin
+  FAutoStartWhenPrepared := aAutoStartWhenPrepared;
+  fState := vpsPreparing;
+  fVideoPlayerControl.prepare;
+end;
+
+{*********************************}
+//Valid Sates: Initialized, Stopped
+//Invalid states: Idle, Prepared, Started, Paused, PlaybackCompleted, Error
+//On Success State: Preparing
+//On Error State: Calling this method in an invalid state throws an IllegalStateException.
 procedure TALVideoPlayer.prepareAsync(const aAutoStartWhenPrepared: Boolean);
 begin
   FAutoStartWhenPrepared := aAutoStartWhenPrepared;
@@ -2018,7 +2267,7 @@ begin
   fVideoPlayerControl.setLooping(looping);
 end;
 
-{*********************************************************}
+{**************************************************************************************}
 //Valid Sates: Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted
 //Invalid states: Error
 //On Success State: -
@@ -2091,6 +2340,476 @@ procedure TALVideoPlayer.doOnVideoSizeChanged(const Sender: TObject; const width
 begin
   if assigned(fOnVideoSizeChangedEvent) then fOnVideoSizeChangedEvent(Self, width, height);
 end;
+
+{*************************************}
+constructor TALVideoPlayerAsync.Create;
+begin
+
+  fSignal := TEvent.Create(nil, false{ManualReset}, false, '');
+  FReady := False;
+  //-----
+  fVideoPlayerControl := nil;
+  //-----
+  fOnErrorEvent := nil;
+  fOnPreparedEvent := nil;
+  fOnFrameAvailableEvent := nil;
+  fOnBufferingUpdateEvent := nil;
+  fOnCompletionEvent := nil;
+  fonVideoSizeChangedEvent := nil;
+  //-----
+  FAutoStartWhenPrepared := False;
+  fState := integer(vpsIdle); // << When a MediaPlayer object is just created using new or after reset() is called, it is in the Idle state
+  //-----
+  fTag := 0;
+  FTagObject := nil;
+  FTagFloat := 0.0;
+
+  //-----
+  fDoSetDataSource := False;
+  //fDoSetDataSourceValue: String;
+  fDoPrepare := False;
+  fDoPause := False;
+  fDoStart := False;
+  fDoStop := False;
+  fDoSetVolume := False;
+  //fDoSetVolumeValue: single;
+  fDoSetLooping := False;
+  //fDoSetLoopingValue: boolean;
+  fDoSeekTo := False;
+  //fDoSeekToValue: integer;
+  fDoGetDuration := False;
+  fDoGetDurationSignal := TEvent.Create(nil, True{ManualReset}, false, '');
+  //fDoGetDurationValue: integer;
+  {$IF defined(IOS)}
+  fDoOnReady := False;
+  fDoOnItemDidPlayToEndTime := False;
+  fDoOnItemFailedToPlayToEndTime := False;
+  {$ENDIF}
+
+  //-----
+  inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
+
+end;
+
+{*************************************}
+destructor TALVideoPlayerAsync.Destroy;
+begin
+  Terminate;
+  fSignal.SetEvent;
+  WaitFor;
+  ALFreeAndNil(fSignal);
+  ALFreeAndNil(fDoGetDurationSignal);
+  inherited;
+end;
+
+{************************************}
+procedure TALVideoPlayerAsync.Execute;
+{$IF defined(IOS)}
+var aTimeout: LongWord;
+{$ENDIF}
+begin
+
+  {$IF defined(IOS)}
+  aTimeout := INFINITE;
+  {$ENDIF}
+
+  {$IF defined(android)}
+  fVideoPlayerControl := TALAndroidVideoPlayer.Create;
+  {$ELSEIF defined(IOS)}
+  fVideoPlayerControl := TALIOSVideoPlayer.Create;
+  {$ELSEIF defined(MSWINDOWS)}
+  fVideoPlayerControl := TALWinVideoPlayer.Create;
+  {$ENDIF}
+  try
+
+    //init fVideoPlayerControl
+    fVideoPlayerControl.OnError := DoOnError;
+    fVideoPlayerControl.OnPrepared := doOnPrepared;
+    fVideoPlayerControl.OnFrameAvailable := doOnFrameAvailable;
+    fVideoPlayerControl.OnBufferingUpdate := doOnBufferingUpdate;
+    fVideoPlayerControl.OnCompletion := doOnCompletion;
+    fVideoPlayerControl.onVideoSizeChanged := doOnVideoSizeChanged;
+    {$IF defined(IOS)}
+    fVideoPlayerControl.onReady := OnReady;
+    fVideoPlayerControl.OnItemDidPlayToEndTime := OnItemDidPlayToEndTime;
+    fVideoPlayerControl.OnItemFailedToPlayToEndTime := OnItemFailedToPlayToEndTime;
+    {$endif}
+
+    //open FReady
+    FReady := True;
+
+    //loop still not terminated
+    while not Terminated do begin
+      Try
+
+        //wait the signal
+        FSignal.WaitFor({$IF defined(IOS)}aTimeout{$ELSE}INFINITE{$ENDIF});
+
+        //fDoSetDataSource
+        if fDoSetDataSource then begin
+          if Terminated then Break;
+          AtomicExchange(fState, integer(vpsInitialized));
+          fVideoPlayerControl.setDataSource(fDoSetDataSourceValue);
+          fDoSetDataSource := False;
+        end;
+
+        //fDoOnReady
+        {$IF defined(IOS)}
+        if fDoOnReady then begin
+          if Terminated then Break;
+          fVideoPlayerControl.doOnReady;
+          fDoOnReady := False;
+        end;
+        {$endif}
+
+        //fDoOnItemDidPlayToEndTime
+        {$IF defined(IOS)}
+        if fDoOnItemDidPlayToEndTime then begin
+          if Terminated then Break;
+          fVideoPlayerControl.DoOnItemDidPlayToEndTime;
+          fDoOnItemDidPlayToEndTime := False;
+          aTimeout := INFINITE;
+        end;
+        {$endif}
+
+        //fDoOnItemFailedToPlayToEndTime
+        {$IF defined(IOS)}
+        if fDoOnItemFailedToPlayToEndTime then begin
+          if Terminated then Break;
+          fVideoPlayerControl.DoOnItemFailedToPlayToEndTime;
+          fDoOnItemFailedToPlayToEndTime := False;
+          aTimeout := INFINITE;
+        end;
+        {$endif}
+
+        //fDoSetVolume
+        if fDoSetVolume then begin
+          if Terminated then Break;
+          fVideoPlayerControl.setVolume(AtomicCmpExchange(fDoSetVolumeValue, -1, -1) / 100);
+          fDoSetVolume := False;
+        end;
+
+        //fDoSetLooping
+        if fDoSetLooping then begin
+          if Terminated then Break;
+          fVideoPlayerControl.setLooping(fDoSetLoopingValue);
+          fDoSetLooping := False;
+        end;
+
+        //fDoPrepare
+        if fDoPrepare then begin
+          if Terminated then Break;
+          AtomicExchange(fState, integer(vpsPreparing));
+          fVideoPlayerControl.prepare;
+          fDoPrepare := False;
+        end;
+
+        //fDoStart
+        if fDoStart then begin
+          if Terminated then Break;
+          if State <> vpsStarted then begin
+            AtomicExchange(fState, integer(vpsStarted));
+            fVideoPlayerControl.Start;
+          end;
+          fDoStart := False;
+          {$IF defined(IOS)}
+          aTimeout := _FrameRefreshInterval;
+          {$ENDIF}
+        end;
+
+        //fDoSeekTo
+        if fDoSeekTo then begin
+          if Terminated then Break;
+          fVideoPlayerControl.seekTo(AtomicCmpExchange(fDoSeekToValue, -1, -1));
+          fDoSeekTo := False;
+        end;
+
+        //fDoGetDuration
+        if fDoGetDuration then begin
+          if Terminated then Break;
+          AtomicExchange(fDoGetDurationValue, fVideoPlayerControl.GetDuration);
+          fDoGetDuration := False;
+          fDoGetDurationSignal.SetEvent;
+        end;
+
+        //fDoPause
+        if fDoPause then begin
+          if Terminated then Break;
+          if State <> vpsPaused then begin
+            AtomicExchange(fState, integer(vpsPaused));
+            fVideoPlayerControl.pause;
+          end;
+          fDoPause := False;
+          {$IF defined(IOS)}
+          aTimeout := INFINITE;
+          {$ENDIF}
+        end;
+
+        //fDoStop
+        if fDoStop then begin
+          if Terminated then Break;
+          if State <> vpsStopped then begin
+            AtomicExchange(fState, integer(vpsStopped));
+            fVideoPlayerControl.Stop;
+          end;
+          fDoStop := False;
+          {$IF defined(IOS)}
+          aTimeout := INFINITE;
+          {$ENDIF}
+        end;
+
+        //doOnFrameRefresh
+        {$IF defined(IOS)}
+        if Terminated then Break;
+        fVideoPlayerControl.doOnFrameRefresh(nil);
+        {$ENDIF}
+
+      Except
+        on E: Exception do begin
+          DoOnError(self);
+        end;
+      End;
+    end;
+
+    //close FReady
+    FReady := False;
+
+  finally
+    AlFreeAndNil(fVideoPlayerControl);
+  end;
+
+end;
+
+{******************************************************************}
+//Valid Sates: Prepared, Started, Paused, Stopped, PlaybackCompleted
+//Invalid states: Idle, Initialized, Error
+//On Success State: -
+//On Error State: Error
+function TALVideoPlayerAsync.getDuration: integer;
+begin
+  fDoGetDurationSignal.ResetEvent;
+  fDogetDuration := True;
+  fSignal.SetEvent;
+  fDoGetDurationSignal.WaitFor;
+  result := AtomicCmpExchange(fDogetDurationValue, -1, -1);
+end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+function TALVideoPlayerAsync.GetBitmap: TalTexture;
+{$ELSE}
+function TALVideoPlayerAsync.GetBitmap: Tbitmap;
+{$ENDIF}
+begin
+  if not FReady then result := nil
+  else result := fVideoPlayerControl.Bitmap;
+end;
+
+{*******************************************************}
+function TALVideoPlayerAsync.getState: TVideoPlayerState;
+begin
+  result := TVideoPlayerState(AtomicCmpExchange(Fstate, -1, -1));
+end;
+
+{************************************************}
+//Valid Sates: Started, Paused, PlaybackCompleted
+//Invalid states: Idle, Initialized, Prepared, Stopped, Error
+//On Success State: Paused
+//On Error State: Error
+procedure TALVideoPlayerAsync.pause;
+begin
+  fDoStart := False;
+  if fDoPause then exit;
+  fDoPause := True;
+  fSignal.SetEvent;
+end;
+
+{*********************************}
+//Valid Sates: Initialized, Stopped
+//Invalid states: Idle, Prepared, Started, Paused, PlaybackCompleted, Error
+//On Success State: Preparing
+//On Error State: Calling this method in an invalid state throws an IllegalStateException.
+procedure TALVideoPlayerAsync.prepare(const aAutoStartWhenPrepared: Boolean);
+begin
+  FAutoStartWhenPrepared := aAutoStartWhenPrepared;
+  fDoPrepare := True;
+  fSignal.SetEvent;
+end;
+
+{*********************************************************}
+//Valid Sates: Prepared, Started, Paused, PlaybackCompleted
+//Invalid states: Idle, Initialized, Stopped, Error
+//On Success State: -
+//On Error State: Error
+procedure TALVideoPlayerAsync.seekTo(const msec: Integer);
+begin
+  AtomicExchange(fDoSeekToValue, msec);
+  fDoSeekTo := True;
+  fSignal.SetEvent;
+end;
+
+{*****************}
+//Valid Sates: Idle
+//Invalid states: Initialized, Prepared, Started, Paused, Stopped, PlaybackCompleted, Error
+//On Success State: Initialized
+//On Error State: Calling this method in an invalid state throws an IllegalStateException.
+procedure TALVideoPlayerAsync.setDataSource(const aDataSource: String);
+begin
+  fDoSetDataSourceValue := aDataSource;
+  fDoSetDataSource := True;
+  fSignal.SetEvent;
+end;
+
+{*************************************************************************************}
+//Valid Sates: Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted
+//Invalid states: Error
+//On Success State: -
+//On Error State: Error
+procedure TALVideoPlayerAsync.setLooping(const looping: Boolean);
+begin
+  fDoSetLoopingValue := looping;
+  fDoSetLooping := true;
+  fSignal.SetEvent;
+end;
+
+{**************************************************************************************}
+//Valid Sates: Idle, Initialized, Stopped, Prepared, Started, Paused, PlaybackCompleted
+//Invalid states: Error
+//On Success State: -
+//On Error State: -
+procedure TALVideoPlayerAsync.setVolume(const Value: Single);
+begin
+  AtomicExchange(fDoSetVolumeValue, round(Value * 100));
+  fDoSetVolume := True;
+  fSignal.SetEvent;
+end;
+
+{*********************************************************}
+//Valid Sates: Prepared, Started, Paused, PlaybackCompleted
+//Invalid states: Idle, Initialized, Stopped, Error
+//On Success State: Started
+//On Error State: Error
+procedure TALVideoPlayerAsync.Start;
+begin
+  fDoPause := False;
+  fDoStop := False;
+  if fDoStart then exit;
+  fDoStart := True;
+  fSignal.SetEvent;
+end;
+
+{******************************************************************}
+//Valid Sates: Prepared, Started, Stopped, Paused, PlaybackCompleted
+//Invalid states: Idle, Initialized, Error
+//On Success State: Stopped
+//On Error State: Error
+procedure TALVideoPlayerAsync.Stop;
+begin
+  fDoStart := False;
+  if fDoStop then exit;
+  fDoStop := True;
+  fSignal.SetEvent;
+end;
+
+{*******************************************}
+//launched from the main or background thread
+procedure TALVideoPlayerAsync.doOnCompletion(Sender: TObject);
+begin
+  AtomicExchange(fState, integer(vpsPlayBackCompleted));
+  if assigned(fOnCompletionEvent) then begin
+    if TThread.Current.ThreadID = MainThreadID then fOnCompletionEvent(Self)
+    else begin
+      TThread.synchronize(nil,
+        procedure
+        begin
+          fOnCompletionEvent(Self)
+        end);
+    end;
+  end;
+end;
+
+{*******************************************}
+//launched from the main or background thread
+procedure TALVideoPlayerAsync.doOnError(Sender: TObject);
+begin
+  AtomicExchange(fState, integer(vpsError));
+  if assigned(fOnErrorEvent) then begin
+    if TThread.Current.ThreadID = MainThreadID then fOnErrorEvent(Self)
+    else begin
+      TThread.synchronize(nil,
+        procedure
+        begin
+          fOnErrorEvent(Self)
+        end);
+    end;
+  end;
+end;
+
+{*******************************************}
+//launched from the main or background thread
+procedure TALVideoPlayerAsync.doOnPrepared(Sender: TObject);
+begin
+  AtomicExchange(fState, integer(vpsPrepared));
+  if FAutoStartWhenPrepared then start;
+  if assigned(fOnPreparedEvent) then begin
+    if TThread.Current.ThreadID = MainThreadID then fOnPreparedEvent(Self)
+    else begin
+      TThread.synchronize(nil,
+        procedure
+        begin
+          fOnPreparedEvent(Self)
+        end);
+    end;
+  end;
+end;
+
+{************************************}
+//always launched from the main thread
+procedure TALVideoPlayerAsync.doOnFrameAvailable(Sender: TObject);
+begin
+  if assigned(fOnFrameAvailableEvent) then fOnFrameAvailableEvent(Self);
+end;
+
+{************************************}
+//always launched from the main thread
+procedure TALVideoPlayerAsync.doOnBufferingUpdate(const Sender: TObject; const mp: integer);
+begin
+  if assigned(fOnBufferingUpdateEvent) then fOnBufferingUpdateEvent(Self, mp);
+end;
+
+{************************************}
+//always launched from the main thread
+procedure TALVideoPlayerAsync.doOnVideoSizeChanged(const Sender: TObject; const width: Integer; const height: Integer);
+begin
+  if assigned(fOnVideoSizeChangedEvent) then fOnVideoSizeChangedEvent(Self, width, height);
+end;
+
+{****************}
+{$IF defined(IOS)}
+procedure TALVideoPlayerAsync.OnReady(Sender: TObject);
+begin
+  fDoOnReady := True;
+  fSignal.SetEvent;
+end;
+{$endif}
+
+{****************}
+{$IF defined(IOS)}
+procedure TALVideoPlayerAsync.OnItemDidPlayToEndTime(Sender: TObject);
+begin
+  fDoOnItemDidPlayToEndTime := True;
+  fSignal.setEvent;
+end;
+{$endif}
+
+{****************}
+{$IF defined(IOS)}
+procedure TALVideoPlayerAsync.OnItemFailedToPlayToEndTime(Sender: TObject);
+begin
+  fDoOnItemFailedToPlayToEndTime := True;
+  fSignal.setEvent;
+end;
+{$endif}
 
 {***********************************************************}
 constructor TALVideoPlayerSurface.Create(AOwner: TComponent);

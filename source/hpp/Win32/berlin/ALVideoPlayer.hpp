@@ -15,6 +15,7 @@
 #include <System.hpp>
 #include <SysInit.hpp>
 #include <System.Classes.hpp>
+#include <System.SyncObjs.hpp>
 #include <FMX.Graphics.hpp>
 #include <ALFmxCommon.hpp>
 #include <ALFmxObjects.hpp>
@@ -29,6 +30,7 @@ namespace Alvideoplayer
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS TALWinVideoPlayer;
 class DELPHICLASS TALVideoPlayer;
+class DELPHICLASS TALVideoPlayerAsync;
 class DELPHICLASS TALVideoPlayerSurface;
 //-- type declarations -------------------------------------------------------
 typedef void __fastcall (__closure *TALBufferingUpdateNotifyEvent)(System::TObject* const Sender, const int mp);
@@ -59,19 +61,21 @@ public:
 	int __fastcall getVideoWidth(void);
 	bool __fastcall isPlaying(void);
 	void __fastcall pause(void);
+	void __fastcall prepare(void);
 	void __fastcall prepareAsync(void);
 	void __fastcall Start(void);
 	void __fastcall Stop(void);
 	void __fastcall seekTo(const int msec);
 	void __fastcall setDataSource(const System::UnicodeString aDataSource);
 	void __fastcall setLooping(const bool looping);
+	void __fastcall setVolume(const float Value);
 	__property Fmx::Graphics::TBitmap* bitmap = {read=fbitmap};
 	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
 	__property System::Classes::TNotifyEvent OnPrepared = {read=FOnPreparedEvent, write=FOnPreparedEvent};
 	__property System::Classes::TNotifyEvent OnFrameAvailable = {read=fOnFrameAvailableEvent, write=fOnFrameAvailableEvent};
 	__property TALBufferingUpdateNotifyEvent OnBufferingUpdate = {read=fOnBufferingUpdateEvent, write=fOnBufferingUpdateEvent};
 	__property System::Classes::TNotifyEvent OnCompletion = {read=fOnCompletionEvent, write=fOnCompletionEvent};
-	__property TALVideoSizeChangedNotifyEvent onVideoSizeChangedEvent = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
+	__property TALVideoSizeChangedNotifyEvent onVideoSizeChanged = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
 };
 
 
@@ -81,21 +85,24 @@ class PASCALIMPLEMENTATION TALVideoPlayer : public System::TObject
 	
 private:
 	TALWinVideoPlayer* fVideoPlayerControl;
-	System::Classes::TNotifyEvent fOnCompletionEvent;
 	System::Classes::TNotifyEvent fOnErrorEvent;
 	System::Classes::TNotifyEvent fOnPreparedEvent;
+	System::Classes::TNotifyEvent fOnFrameAvailableEvent;
+	TALBufferingUpdateNotifyEvent fOnBufferingUpdateEvent;
+	System::Classes::TNotifyEvent fOnCompletionEvent;
+	TALVideoSizeChangedNotifyEvent fonVideoSizeChangedEvent;
 	bool FAutoStartWhenPrepared;
 	TVideoPlayerState fState;
+	NativeInt FTag;
+	System::TObject* FTagObject;
+	float FTagFloat;
 	Fmx::Graphics::TBitmap* __fastcall GetBitmap(void);
-	TALBufferingUpdateNotifyEvent __fastcall GetOnBufferingUpdateEvent(void);
-	System::Classes::TNotifyEvent __fastcall GetOnFrameAvailableEvent(void);
-	TALVideoSizeChangedNotifyEvent __fastcall GetonVideoSizeChangedEvent(void);
-	void __fastcall SetOnBufferingUpdateEvent(const TALBufferingUpdateNotifyEvent Value);
-	void __fastcall SetOnFrameAvailableEvent(const System::Classes::TNotifyEvent Value);
-	void __fastcall SetonVideoSizeChangedEvent(const TALVideoSizeChangedNotifyEvent Value);
 	void __fastcall doOnCompletion(System::TObject* Sender);
 	void __fastcall doOnError(System::TObject* Sender);
 	void __fastcall doOnPrepared(System::TObject* Sender);
+	void __fastcall doOnFrameAvailable(System::TObject* Sender);
+	void __fastcall doOnBufferingUpdate(System::TObject* const Sender, const int mp);
+	void __fastcall doOnVideoSizeChanged(System::TObject* const Sender, const int width, const int height);
 	
 public:
 	__fastcall virtual TALVideoPlayer(void);
@@ -106,21 +113,97 @@ public:
 	int __fastcall getVideoWidth(void);
 	bool __fastcall isPlaying(void);
 	void __fastcall pause(void);
+	void __fastcall prepare(const bool aAutoStartWhenPrepared = false);
 	void __fastcall prepareAsync(const bool aAutoStartWhenPrepared = false);
 	void __fastcall Start(void);
 	void __fastcall Stop(void);
 	void __fastcall seekTo(const int msec);
 	void __fastcall setDataSource(const System::UnicodeString aDataSource);
 	void __fastcall setLooping(const bool looping);
+	void __fastcall setVolume(const float Value);
 	__property Fmx::Graphics::TBitmap* Bitmap = {read=GetBitmap};
 	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
 	__property System::Classes::TNotifyEvent OnPrepared = {read=fOnPreparedEvent, write=fOnPreparedEvent};
-	__property System::Classes::TNotifyEvent OnFrameAvailable = {read=GetOnFrameAvailableEvent, write=SetOnFrameAvailableEvent};
-	__property TALBufferingUpdateNotifyEvent OnBufferingUpdate = {read=GetOnBufferingUpdateEvent, write=SetOnBufferingUpdateEvent};
+	__property System::Classes::TNotifyEvent OnFrameAvailable = {read=fOnFrameAvailableEvent, write=fOnFrameAvailableEvent};
+	__property TALBufferingUpdateNotifyEvent OnBufferingUpdate = {read=fOnBufferingUpdateEvent, write=fOnBufferingUpdateEvent};
 	__property System::Classes::TNotifyEvent OnCompletion = {read=fOnCompletionEvent, write=fOnCompletionEvent};
-	__property TALVideoSizeChangedNotifyEvent onVideoSizeChangedEvent = {read=GetonVideoSizeChangedEvent, write=SetonVideoSizeChangedEvent};
+	__property TALVideoSizeChangedNotifyEvent onVideoSizeChanged = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
 	__property TVideoPlayerState State = {read=fState, nodefault};
 	__property bool AutoStartWhenPrepared = {read=FAutoStartWhenPrepared, write=FAutoStartWhenPrepared, nodefault};
+	__property NativeInt Tag = {read=FTag, write=FTag, default=0};
+	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
+	__property float TagFloat = {read=FTagFloat, write=FTagFloat};
+};
+
+
+class PASCALIMPLEMENTATION TALVideoPlayerAsync : public System::Classes::TThread
+{
+	typedef System::Classes::TThread inherited;
+	
+private:
+	System::Syncobjs::TEvent* fSignal;
+	bool FReady;
+	TALWinVideoPlayer* fVideoPlayerControl;
+	System::Classes::TNotifyEvent fOnErrorEvent;
+	System::Classes::TNotifyEvent fOnPreparedEvent;
+	System::Classes::TNotifyEvent fOnFrameAvailableEvent;
+	TALBufferingUpdateNotifyEvent fOnBufferingUpdateEvent;
+	System::Classes::TNotifyEvent fOnCompletionEvent;
+	TALVideoSizeChangedNotifyEvent fonVideoSizeChangedEvent;
+	bool FAutoStartWhenPrepared;
+	int fState;
+	NativeInt FTag;
+	System::TObject* FTagObject;
+	float FTagFloat;
+	bool fDoSetDataSource;
+	System::UnicodeString fDoSetDataSourceValue;
+	bool fDoPrepare;
+	bool fDoPause;
+	bool fDoStart;
+	bool fDoStop;
+	bool fDoSetVolume;
+	int fDoSetVolumeValue;
+	bool fDoSetLooping;
+	bool fDoSetLoopingValue;
+	bool fDoSeekTo;
+	int fDoSeekToValue;
+	bool fDoGetDuration;
+	System::Syncobjs::TEvent* fDoGetDurationSignal;
+	int fDoGetDurationValue;
+	Fmx::Graphics::TBitmap* __fastcall GetBitmap(void);
+	TVideoPlayerState __fastcall getState(void);
+	void __fastcall doOnCompletion(System::TObject* Sender);
+	void __fastcall doOnError(System::TObject* Sender);
+	void __fastcall doOnPrepared(System::TObject* Sender);
+	void __fastcall doOnFrameAvailable(System::TObject* Sender);
+	void __fastcall doOnBufferingUpdate(System::TObject* const Sender, const int mp);
+	void __fastcall doOnVideoSizeChanged(System::TObject* const Sender, const int width, const int height);
+	
+public:
+	__fastcall virtual TALVideoPlayerAsync(void);
+	__fastcall virtual ~TALVideoPlayerAsync(void);
+	virtual void __fastcall Execute(void);
+	int __fastcall getDuration(void);
+	void __fastcall pause(void);
+	void __fastcall prepare(const bool aAutoStartWhenPrepared = false);
+	HIDESBASE void __fastcall Start(void);
+	void __fastcall Stop(void);
+	void __fastcall seekTo(const int msec);
+	void __fastcall setDataSource(const System::UnicodeString aDataSource);
+	void __fastcall setLooping(const bool looping);
+	void __fastcall setVolume(const float Value);
+	__property Fmx::Graphics::TBitmap* Bitmap = {read=GetBitmap};
+	__property System::Classes::TNotifyEvent OnError = {read=fOnErrorEvent, write=fOnErrorEvent};
+	__property System::Classes::TNotifyEvent OnPrepared = {read=fOnPreparedEvent, write=fOnPreparedEvent};
+	__property System::Classes::TNotifyEvent OnFrameAvailable = {read=fOnFrameAvailableEvent, write=fOnFrameAvailableEvent};
+	__property TALBufferingUpdateNotifyEvent OnBufferingUpdate = {read=fOnBufferingUpdateEvent, write=fOnBufferingUpdateEvent};
+	__property System::Classes::TNotifyEvent OnCompletion = {read=fOnCompletionEvent, write=fOnCompletionEvent};
+	__property TALVideoSizeChangedNotifyEvent onVideoSizeChanged = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
+	__property TVideoPlayerState State = {read=getState, nodefault};
+	__property bool AutoStartWhenPrepared = {read=FAutoStartWhenPrepared, write=FAutoStartWhenPrepared, nodefault};
+	__property NativeInt Tag = {read=FTag, write=FTag, default=0};
+	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
+	__property float TagFloat = {read=FTagFloat, write=FTagFloat};
 };
 
 

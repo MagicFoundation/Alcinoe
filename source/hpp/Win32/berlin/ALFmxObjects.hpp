@@ -29,12 +29,86 @@
 namespace Alfmxobjects
 {
 //-- forward type declarations -----------------------------------------------
+class DELPHICLASS TalImage;
 class DELPHICLASS TALRectangle;
 class DELPHICLASS TALCircle;
 class DELPHICLASS TALLine;
 class DELPHICLASS TALDoubleBufferedTextLayout;
 class DELPHICLASS TALText;
 //-- type declarations -------------------------------------------------------
+enum DECLSPEC_DENUM TALImageWrapMode : unsigned char { Original, Fit, Stretch, Tile, Center, Place, FitAndCrop };
+
+class PASCALIMPLEMENTATION TalImage : public Fmx::Controls::TControl
+{
+	typedef Fmx::Controls::TControl inherited;
+	
+private:
+	System::UnicodeString fResourceName;
+	TALImageWrapMode FWrapMode;
+	float FScreenScale;
+	Fmx::Graphics::TBitmap* fBufBitmap;
+	System::Types::TRectF fBufBitmapRect;
+	System::Types::TSizeF fBufSize;
+	void __fastcall SetWrapMode(const TALImageWrapMode Value);
+	void __fastcall setResourceName(const System::UnicodeString Value);
+	
+protected:
+	virtual void __fastcall Paint(void);
+	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
+	
+public:
+	__fastcall virtual TalImage(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TalImage(void);
+	virtual Fmx::Graphics::TBitmap* __fastcall MakeBufBitmap(void);
+	virtual void __fastcall clearBufBitmap(void);
+	
+__published:
+	__property Align = {default=0};
+	__property Anchors;
+	__property ClipChildren = {default=0};
+	__property ClipParent = {default=0};
+	__property Cursor = {default=0};
+	__property DragMode = {default=0};
+	__property EnableDragHighlight = {default=1};
+	__property Enabled = {default=1};
+	__property Locked = {default=0};
+	__property Height;
+	__property Hint = {default=0};
+	__property HitTest = {default=1};
+	__property Padding;
+	__property Opacity;
+	__property Margins;
+	__property PopupMenu;
+	__property Position;
+	__property RotationAngle = {default=0};
+	__property RotationCenter;
+	__property Scale;
+	__property Size;
+	__property Visible = {default=1};
+	__property Width;
+	__property System::UnicodeString ResourceName = {read=fResourceName, write=setResourceName};
+	__property TALImageWrapMode WrapMode = {read=FWrapMode, write=SetWrapMode, default=1};
+	__property ParentShowHint = {default=1};
+	__property ShowHint;
+	__property OnDragEnter;
+	__property OnDragLeave;
+	__property OnDragOver;
+	__property OnDragDrop;
+	__property OnDragEnd;
+	__property OnClick;
+	__property OnDblClick;
+	__property OnMouseDown;
+	__property OnMouseMove;
+	__property OnMouseUp;
+	__property OnMouseWheel;
+	__property OnMouseEnter;
+	__property OnMouseLeave;
+	__property OnPainting;
+	__property OnPaint;
+	__property OnResize;
+};
+
+
 class PASCALIMPLEMENTATION TALRectangle : public Fmx::Objects::TRectangle
 {
 	typedef Fmx::Objects::TRectangle inherited;

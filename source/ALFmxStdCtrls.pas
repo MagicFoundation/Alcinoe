@@ -23,21 +23,119 @@ uses System.Classes,
      FMX.actnlist,
      FMX.ImgList,
      ALFmxInertialMovement,
-     ALFmxImgList,
      ALFmxObjects;
 
 type
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALAniIndicator = class(Tcontrol)
+  private
+    fTimer: TTimer;
+    finterval: integer;
+    FFrameCount: Integer;
+    FRowCount: Integer;
+    fResourceName: String;
+    fFrameIndex: TSmallPoint;
+    FScreenScale: single;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    fBufBitmap: TTexture;
+    {$ELSE}
+    fBufBitmap: Tbitmap;
+    {$ENDIF}
+    fBufBitmapRect: TRectF;
+    fBufSize: TsizeF;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
+    {$ENDIF}
+    procedure setResourceName(const Value: String);
+    procedure onTimer(sender: Tobject);
+    function ResourceNameStored: Boolean;
+  protected
+    procedure Paint; override;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    property BufBitmap: TTexture read fBufBitmap;
+    {$ELSE}
+    property BufBitmap: Tbitmap read fBufBitmap;
+    {$ENDIF}
+    function EnabledStored: Boolean; override;
+    procedure SetEnabled(const Value: Boolean); override;
+    function GetDefaultSize: TSizeF; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    function MakeBufBitmap: TTexture; virtual;
+    {$ELSE}
+    function MakeBufBitmap: Tbitmap; virtual;
+    {$ENDIF}
+    procedure clearBufBitmap; virtual;
+  published
+    property Align;
+    property Anchors;
+    property Cursor default crDefault;
+    property DragMode default TDragMode.dmManual;
+    property EnableDragHighlight default True;
+    property Enabled default False;
+    property Locked default False;
+    property Height;
+    property Hint;
+    property HitTest default True;
+    property Padding;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TouchTargetExpansion;
+    property Visible default True;
+    property Width;
+    property FrameCount: Integer read FFrameCount write FFrameCount default 20;
+    property RowCount: Integer read FRowCount write FRowCount default 4;
+    property interval: integer read finterval write finterval default 50;
+    property ResourceName: String read fResourceName write setResourceName stored ResourceNameStored;
+    property ParentShowHint;
+    property ShowHint;
+    {Drag and Drop events}
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    {Keyboard events}
+    property OnKeyDown;
+    property OnKeyUp;
+    {Mouse events}
+    property OnCanFocus;
+    property OnEnter;
+    property OnExit;
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
+  end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
   TALCustomTrack = class;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALTrackThumbGlyph = class(TALGlyph)
+  TALTrackThumbGlyph = class(TALImage)
   public
     constructor Create(AOwner: TComponent); override;
   published
     property Align default TalignLayout.Client;
-    property autohide default true;
     property Locked default True;
   end;
 
@@ -414,13 +512,10 @@ type
     property OnResize;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBox = class(TControl, IGlyph)
-  public const
-    DesignBorderColor = $A080D080;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBox = class(TControl)
   private
     FScreenScale: single;
-    fdoubleBuffered: boolean;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     fBufBitmap: TTexture;
     {$ELSE}
@@ -428,37 +523,24 @@ type
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
-    [weak] fBufImages: TCustomImageList;
-    FbufImageIndex: TImageIndex;
+    FbufResourceName: String;
     //-----
     FPressing: Boolean;
     FOnChange: TNotifyEvent;
     FIsPressed: Boolean;
     FIsChecked: Boolean;
-    FImageCheckedLink: TImageLink;
-    FImageUncheckedLink: TImageLink;
-    FisImagesChanged: boolean;
-    FStretch: Boolean;
+    fImageCheckedResourceName: String;
+    fImageUncheckedResourceName: String;
+    FWrapMode: TALImageWrapMode;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
     FOpenGLContextResetId: Integer;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
-    procedure SetdoubleBuffered(const Value: Boolean);
-    function GetImages: TCustomImageList;
-    procedure SetImages(const Value: TCustomImageList);
-    { IGlyph }
-    function GetImageIndex: TImageIndex;
-    procedure SetImageIndex(const Value: TImageIndex);
-    function GetImageUncheckedIndex: TImageIndex;
-    procedure SetImageUncheckedIndex(const Value: TImageIndex);
-    function GetImageList: TBaseImageList; inline;
-    procedure SetImageList(const Value: TBaseImageList);
-    function IGlyph.GetImages = GetImageList;
-    procedure IGlyph.SetImages = SetImageList;
-    procedure NonBufferedPaint;
-    procedure SetStretch(const Value: Boolean);
+    procedure setImageCheckedResourceName(const Value: String);
+    procedure setImageUncheckedResourceName(const Value: String);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
   protected
     procedure Paint; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
@@ -466,14 +548,12 @@ type
     {$ELSE}
     property BufBitmap: Tbitmap read fBufBitmap;
     {$ENDIF}
-    procedure DoEndUpdate; override;
     procedure DoChanged; virtual;
-    function ImageCheckedIndexStored: Boolean; virtual;
-    function ImageUncheckedIndexStored: Boolean; virtual;
-    function ImagesStored: Boolean; virtual;
     function GetDefaultSize: TSizeF; override;
     function GetIsChecked: Boolean; virtual;
     procedure SetIsChecked(const Value: Boolean); virtual;
+    function ImageCheckedResourceNameStored: Boolean; virtual;
+    function ImageUncheckedResourceNameStored: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -483,13 +563,11 @@ type
     function MakeBufBitmap: Tbitmap; virtual;
     {$ENDIF}
     procedure clearBufBitmap; virtual;
-    procedure ImagesChanged;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
   published
-    property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property Action;
     property Align;
     property Anchors;
@@ -507,10 +585,9 @@ type
     property Hint;
     property HitTest default True;
     property IsChecked: Boolean read GetIsChecked write SetIsChecked default False;
-    property ImageCheckedIndex: TImageIndex read GetImageIndex write SetImageIndex stored ImageCheckedIndexStored;
-    property ImageUncheckedIndex: TImageIndex read GetImageUncheckedIndex write SetImageUncheckedIndex stored ImageUncheckedIndexStored;
-    property Images: TCustomImageList read GetImages write SetImages stored ImagesStored;
-    property Stretch: Boolean read FStretch write SetStretch default True;
+    property ImageCheckedResourceName: String read fImageCheckedResourceName write setImageCheckedResourceName stored ImageCheckedResourceNameStored;
+    property ImageUncheckedResourceName: String read fImageUncheckedResourceName write setImageUncheckedResourceName stored ImageUncheckedResourceNameStored;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
     property Padding;
     property Opacity;
     property Margins;
@@ -562,6 +639,8 @@ type
     procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
   protected
     procedure SetIsChecked(const Value: Boolean); override;
+    function ImageCheckedResourceNameStored: Boolean; override;
+    function ImageUncheckedResourceNameStored: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -572,7 +651,10 @@ type
 
 {$IFDEF debug}
 var
+  AlDebugAniIndicatorMakeBufBitmapCount: integer;
   AlDebugCheckBoxMakeBufBitmapCount: integer;
+
+  AlDebugAniIndicatorMakeBufBitmapStopWatch: TstopWatch;
   AlDebugCheckBoxMakeBufBitmapStopWatch: TstopWatch;
 {$endif}
 
@@ -583,7 +665,9 @@ implementation
 uses System.SysUtils,
      system.Math.Vectors,
      {$IFDEF ALDPK}
+     system.IOUtils,
      DesignIntf,
+     toolsApi,
      {$ENDIF}
      {$IF DEFINED(IOS) or DEFINED(ANDROID)}
      FMX.Canvas.GPU,
@@ -594,6 +678,224 @@ uses System.SysUtils,
      fmx.utils,
      AlCommon,
      ALFmxCommon;
+
+{*****************************************************}
+constructor TALAniIndicator.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
+begin
+  inherited Create(AOwner);
+  finterval := 50;
+  FFrameCount := 20;
+  FRowCount := 4;
+  fResourceName := 'aniindicator_540x432';
+  fFrameIndex := TSmallPoint.Create(0,0);
+  fTimer := TTimer.Create(self);
+  fTimer.Enabled := False;
+  fTimer.Interval := finterval;
+  fTimer.OnTimer := onTimer;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
+  fBufBitmap := nil;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
+  {$ENDIF}
+  Enabled := False;
+  SetAcceptsControls(False);
+end;
+
+{*********************************}
+destructor TALAniIndicator.Destroy;
+begin
+  fTimer.Enabled := False;
+  ALFreeAndNil(fTimer);
+  clearBufBitmap;
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
+  {$ENDIF}
+  inherited;
+end;
+
+{**********************************************}
+function TALAniIndicator.EnabledStored: Boolean;
+begin
+  result := Enabled;
+end;
+
+{**********************************************}
+function TALAniIndicator.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(36, 36);
+end;
+
+{***************************************}
+procedure TALAniIndicator.clearBufBitmap;
+begin
+  ALFreeAndNil(fBufBitmap);
+end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+function TALAniIndicator.MakeBufBitmap: TTexture;
+{$ELSE}
+function TALAniIndicator.MakeBufBitmap: Tbitmap;
+{$ENDIF}
+
+{$IFDEF ALDPK}
+var aFileName: String;
+{$ENDIF}
+
+begin
+
+  if (Scene = nil) or
+     //--- don't do bufbitmap is size=0
+     (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
+     (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
+     //--- don't do bufbitmap if fResourceName is empty
+     (fResourceName = '')
+  then begin
+    clearBufBitmap;
+    exit(nil);
+  end;
+
+  if (fBufBitmap <> nil) and
+     (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+
+  clearBufBitmap;
+  fBufSize := Size.Size;
+
+  {$IFDEF debug}
+  ALLog('TALAniIndicator.MakeBufBitmap', 'TALAniIndicator.MakeBufBitmap', TalLogType.verbose);
+  inc(AlDebugAniIndicatorMakeBufBitmapCount);
+  AlDebugAniIndicatorMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
+
+    {$IFDEF ALDPK}
+    aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+    if not TFile.Exists(aFileName) then begin
+      aFileName := aFileName + '.png';
+      if not TFile.Exists(aFileName) then aFileName := '';
+    end;
+    {$ENDIF}
+
+    fBufBitmapRect := LocalRect;
+    {$IFDEF ALDPK}
+    if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
+    else fBufBitmap := nil;
+    {$ELSE}
+    fBufBitmap := ALLoadResizeAndFitResourceImageV3(fResourceName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale);
+    {$ENDIF}
+    result := fBufBitmap;
+
+  {$IFDEF debug}
+  finally
+    AlDebugAniIndicatorMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
+end;
+
+{*************************************************}
+procedure TALAniIndicator.onTimer(sender: Tobject);
+begin
+  inc(fFrameIndex.x);
+  if fFrameIndex.x >= FFrameCount div FRowCount then begin
+    fFrameIndex.x := 0;
+    inc(fFrameIndex.Y);
+    if fFrameIndex.Y >= FRowCount then fFrameIndex.Y := 0;
+  end;
+  repaint;
+end;
+
+{******************************}
+procedure TALAniIndicator.Paint;
+var R: TRectF;
+begin
+
+  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  begin
+    R := LocalRect;
+    InflateRect(R, -0.5, -0.5);
+    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  end;
+
+  MakeBufBitmap;
+
+  if fBufBitmap = nil then begin
+    inherited paint;
+    exit;
+  end;
+
+  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+
+  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+                                       TRectF.Create(TPointF.Create(fFrameIndex.x * Width * fScreenScale,
+                                                                    fFrameIndex.Y * Height * fScreenScale),
+                                                     Width * fScreenScale,
+                                                     Height * fScreenScale), // ARect
+                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+                                       fBufBitmap);
+
+  {$ELSE}
+
+  canvas.DrawBitmap(fBufBitmap,
+                    TRectF.Create(TPointF.Create(fFrameIndex.x * Width * fScreenScale,
+                                                 fFrameIndex.Y * Height * fScreenScale),
+                                  Width * fScreenScale,
+                                  Height * fScreenScale), // SrcRect
+                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+                    AbsoluteOpacity, {opacity}
+                    true{highSpeed});
+
+  {$ENDIF}
+
+end;
+
+{***************************************************}
+function TALAniIndicator.ResourceNameStored: Boolean;
+begin
+  result := fResourceName <> 'aniindicator_540x432';
+end;
+
+{*********************************************************}
+procedure TALAniIndicator.SetEnabled(const Value: Boolean);
+begin
+  if Enabled <> Value then begin
+    inherited;
+    fTimer.Enabled := Enabled;
+  end;
+end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALAniIndicator.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+  fTimer.enabled := False;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALAniIndicator.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+  fTimer.enabled := Enabled;
+end;
+{$ENDIF}
+
+{*************************************************************}
+procedure TALAniIndicator.setResourceName(const Value: String);
+begin
+  if FResourceName <> Value then begin
+    clearBufBitmap;
+    FResourceName := Value;
+    Repaint;
+  end;
+end;
 
 {*******************************************************************************************************************************}
 function _ValueToPos(MinValue, MaxValue, ViewportSize, ThumbSize, TrackSize, Value: Single; IgnoreViewportSize: Boolean): Single;
@@ -628,7 +930,6 @@ constructor TALTrackThumbGlyph.Create(AOwner: TComponent);
 begin
   inherited;
   Align := TalignLayout.Client;
-  autohide := true;
   locked := True;
 end;
 
@@ -1498,7 +1799,6 @@ begin
   inherited;
   if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
   else FScreenScale := 1;
-  fdoubleBuffered := true;
   fBufBitmap := nil;
   SetAcceptsControls(False);
   CanFocus := True;
@@ -1507,10 +1807,9 @@ begin
   FOnChange := nil;
   FIsPressed := False;
   FIsChecked := False;
-  FImageCheckedLink := TGlyphImageLink.Create(Self);
-  FImageUncheckedLink := TGlyphImageLink.Create(Self);
-  FisImagesChanged := False;
-  FStretch := True;
+  fImageCheckedResourceName := 'checkbox_checked_22x22';
+  fImageUncheckedResourceName := 'checkbox_unchecked_22x22';
+  FWrapMode := TALImageWrapMode.Fit;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
   FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
@@ -1521,8 +1820,6 @@ end;
 destructor TALCheckbox.Destroy;
 begin
   clearBufBitmap;
-  AlFreeAndNil(FImageCheckedLink);   // >> will call disposeOf if necessary
-  AlFreeAndNil(FImageUncheckedLink); // >> will call disposeOf if necessary
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
   TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
@@ -1542,24 +1839,6 @@ begin
   if Assigned(FOnChange) then
     FOnChange(Self);
   Repaint;
-end;
-
-{********************************}
-procedure TALCheckbox.DoEndUpdate;
-begin
-  inherited;
-  if FisImagesChanged then
-    repaint;
-end;
-
-{**********************************}
-procedure TALCheckbox.ImagesChanged;
-begin
-  if ([csLoading, csDestroying, csUpdating] * ComponentState = []) and not IsUpdating then begin
-    repaint;
-    FisImagesChanged := False;
-  end
-  else FisImagesChanged := True;
 end;
 
 {**************************************************************************************}
@@ -1623,24 +1902,20 @@ function TALCheckbox.MakeBufBitmap: TTexture;
 function TALCheckbox.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 
-var aImageIndex: TimageIndex;
-    {$IF defined(ANDROID) or defined(IOS)}
-    aBitmap: TBitmap;
-    aBitmapSize: TSize;
+var aResourceName: String;
+    {$IFDEF ALDPK}
+    aFileName: String;
     {$ENDIF}
 
 begin
 
-  if IsChecked then aImageIndex := ImageCheckedIndex
-  else aImageIndex := ImageUncheckedIndex;
+  if IsChecked then aResourceName := ImageCheckedResourceName
+  else aResourceName := ImageUncheckedResourceName;
 
-  if ([csLoading, csDestroying, csDesigning] * ComponentState <> []) or
-     (not fdoubleBuffered) or
-     (Scene = nil) or
+  if (Scene = nil) or
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
-     (Images = nil) or
-     (aImageIndex = -1) then begin
+     (aResourceName = '') then begin
     clearBufBitmap;
     exit(nil);
   end;
@@ -1648,13 +1923,11 @@ begin
   if (fBufBitmap <> nil) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
-     (fBufImages = Images) and
-     (FbufImageIndex = aImageIndex) then exit(fBufBitmap);
+     (FbufResourceName = aResourceName) then exit(fBufBitmap);
 
   clearBufBitmap;
   fBufSize := Size.Size;
-  fBufImages := Images;
-  FbufImageIndex := aImageIndex;
+  FbufResourceName := aResourceName;
 
   {$IFDEF debug}
   ALLog('TALCheckbox.MakeBufBitmap', 'TALCheckbox.MakeBufBitmap', TalLogType.verbose);
@@ -1663,136 +1936,131 @@ begin
   try
   {$endif}
 
-  {$IF defined(ANDROID) or defined(IOS)}
-
-  //init aBitmapSize / aBitmap / fBufBitmapRect
-  aBitmapSize := TSize.Create(0, 0);
-  aBitmap := nil;
-  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
-  if (Images <> nil) and
-     (fBufBitmapRect.Width >= 1) and
-     (fBufBitmapRect.Height >= 1) and
-     (aImageIndex <> -1) and
-     ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then begin
-    aBitmapSize := TSize.Create(Round(fBufBitmapRect.Width * FScreenScale), Round(fBufBitmapRect.Height * FScreenScale));
-    if not Stretch then Images.BestSize(aImageIndex, aBitmapSize);
-    aBitmap := Images.Bitmap(aBitmapSize, aImageIndex)
-  end;
-
-  if aBitmap <> nil then begin
-
-    //init fBufBitmapRect
-    fBufBitmapRect := TRectF.Create(0,
-                                    0,
-                                    aBitmap.Width / FScreenScale,
-                                    aBitmap.Height/ FScreenScale).CenterAt(fBufBitmapRect);
-
-    //convert the aBitmapSurface to texture
-    //it's important to make a copy of the aBitmap because it's could be destroyed by the TimageList if
-    //their is not anymore enalf of place in it's own caching system
-    fBufBitmap := TALTexture.Create(True{aVolatile});
-    try
-      fBufBitmap.Assign(aBitmap);
-    except
-      ALFreeAndNil(fBufBitmap);
-      raise;
+    {$IFDEF ALDPK}
+    aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + aResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+    if not TFile.Exists(aFileName) then begin
+      aFileName := aFileName + '.png';
+      if not TFile.Exists(aFileName) then aFileName := '';
     end;
+    {$ENDIF}
 
-  end;
+    case FWrapMode of
 
-  {$ENDIF}
+      //Display the image with its original dimensions:
+      //* The image is placed in the upper-left corner of the rectangle of the control.
+      //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
+      //  which fits in the rectangle of the control, is shown. The image is not resized.
+      TALImageWrapMode.Original:
+        begin
+          Result := nil; // todo
+        end;
 
-  result := fBufBitmap;
+      //Best fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+      //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
+      //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
+      //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
+      //  should be displayed. The image is displayed centered in the rectangle of the control.
+      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+      //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+      TALImageWrapMode.Fit:
+        begin
+          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+          {$IFDEF ALDPK}
+          if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := nil;
+          {$ELSE}
+          fBufBitmap := ALLoadResizeAndFitResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          {$ENDIF}
+          result := fBufBitmap;
+          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                    CenterAt(fBufBitmapRect);
+        end;
+
+      //Stretch the image to fill the entire rectangle of the control.
+      TALImageWrapMode.Stretch:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Tile (multiply) the image to cover the entire rectangle of the control:
+      //* If the image is larger than the rectangle of the control, then only the
+      //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
+      //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
+      //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
+      //  the upper-left corner of the rectangle of the control.
+      TALImageWrapMode.Tile:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Center the image to the rectangle of the control:
+      //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
+      TALImageWrapMode.Center:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
+      //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
+      //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+      //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
+      TALImageWrapMode.Place:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Best fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+      //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
+      //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
+      //  AND the height of the resized image is equal to the height of the rectangle of the control.
+      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+      //  the rectangle of the control. Whole the image should be displayed.
+      TALImageWrapMode.FitAndCrop:
+        begin
+          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+          {$IFDEF ALDPK}
+          if aFileName <> '' then fBufBitmap := ALLoadResizeAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := nil;
+          {$ELSE}
+          fBufBitmap := ALLoadResizeAndCropResourceImageV3(aResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          {$ENDIF}
+          result := fBufBitmap;
+          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                    CenterAt(fBufBitmapRect);
+        end;
+
+      //to hide a stupid warning else
+      else Result := nil;
+
+    end;
 
   {$IFDEF debug}
   finally
     AlDebugCheckBoxMakeBufBitmapStopWatch.Stop;
   end;
   {$endif}
-end;
 
-{*************************************}
-procedure TALCheckbox.NonBufferedPaint;
-const
-  MinCrossSize = 3;
-  MaxCrossSize = 13;
-var
-  TextRect, ImgRect, BitmapRect: TRectF;
-  CrossSize: Single;
-  Bitmap: TBitmap;
-  BitmapSize: TSize;
-  aImageIndex: TimageIndex;
-begin
-  if IsChecked then aImageIndex := ImageCheckedIndex
-  else aImageIndex := ImageUncheckedIndex;
-  if [csLoading, csDestroying] * ComponentState = [] then
-  begin
-    BitmapSize := TSize.Create(0, 0);
-    Bitmap := nil;
-    ImgRect := LocalRect;
-    if (Images <> nil) and (ImgRect.Width >= 1) and (ImgRect.Height >= 1) and (aImageIndex <> -1) and
-      ([csLoading, csUpdating, csDestroying] * Images.ComponentState = []) then
-    begin
-      BitmapSize := TSize.Create(Round(ImgRect.Width * FScreenScale), Round(ImgRect.Height * FScreenScale));
-      Images.BestSize(aImageIndex, BitmapSize);
-      Bitmap := Images.Bitmap(BitmapSize, aImageIndex)
-    end;
-    if (csDesigning in ComponentState) and not Locked then
-      DrawDesignBorder(DesignBorderColor, DesignBorderColor);
-    if Bitmap <> nil then
-    begin
-      BitmapRect := TRectF.Create(0, 0, Bitmap.Width, Bitmap.Height);
-      ImgRect := TRectF.Create(CenteredRect(ImgRect.Round, TRectF.Create(0, 0, Bitmap.Width / FScreenScale,
-        Bitmap.Height/ FScreenScale).Round));
-      Canvas.DrawBitmap(Bitmap, BitmapRect, ImgRect, AbsoluteOpacity, True);
-    end;
-    if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
-    begin
-      TextRect := LocalRect;
-      TextRect.Inflate(0.5, 0.5);
-      Canvas.Stroke.Kind := TBrushKind.Solid;
-      Canvas.Stroke.Color := TAlphaColorRec.Darkgray;
-      Canvas.Stroke.Dash := TStrokeDash.Solid;
-      CrossSize := Trunc(Min(MaxCrossSize, Min(TextRect.Width, TextRect.Height) / 6)) + 1;
-      if CrossSize >= MinCrossSize then
-      begin
-        TextRect.TopLeft.Offset(2, 2);
-        TextRect.BottomRight := TextRect.TopLeft;
-        TextRect.BottomRight.Offset(CrossSize, CrossSize);
-        if Bitmap = nil then
-        begin
-          if Images = nil then
-            Canvas.Stroke.Color := TAlphaColorRec.Red;
-          Canvas.DrawLine(TextRect.TopLeft, TextRect.BottomRight, AbsoluteOpacity);
-          Canvas.DrawLine(TPointF.Create(TextRect.Right, TextRect.Top), TPointF.Create(TextRect.Left, TextRect.Bottom),
-            AbsoluteOpacity);
-          TextRect := TRectF.Create(TextRect.Left, TextRect.Bottom, Width, Height);
-        end;
-        if aImageIndex <> -1 then
-        begin
-          Canvas.Font.Family := 'Small Font';
-          Canvas.Font.Size := 7;
-          TextRect.Bottom := TextRect.Top + Canvas.TextHeight(Inttostr(aImageIndex));
-          if TextRect.Bottom <= Height then
-          begin
-            Canvas.Fill.Color := TAlphaColorRec.Darkgray;
-            Canvas.FillText(TextRect, Inttostr(aImageIndex), False, AbsoluteOpacity, [], TTextAlign.Leading,
-              TTextAlign.Leading);
-          end;
-        end;
-      end;
-    end;
-  end;
 end;
 
 {**************************}
 procedure TALCheckbox.Paint;
+var R: TRectF;
 begin
+
+  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  begin
+    R := LocalRect;
+    InflateRect(R, -0.5, -0.5);
+    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  end;
 
   MakeBufBitmap;
 
   if fBufBitmap = nil then begin
-    NonBufferedPaint;
+    inherited paint;
     exit;
   end;
 
@@ -1815,15 +2083,6 @@ begin
 
 end;
 
-{************************************************************}
-procedure TALCheckbox.SetdoubleBuffered(const Value: Boolean);
-begin
-  if Value <> fDoubleBuffered then begin
-    fDoubleBuffered := value;
-    if not fDoubleBuffered then clearbufBitmap;
-  end;
-end;
-
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 procedure TALCheckbox.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
@@ -1840,80 +2099,52 @@ begin
 end;
 {$ENDIF}
 
-{************************************************}
-function TALCheckbox.GetImageList: TBaseImageList;
-begin
-  Result := GetImages;
-end;
-
-{**************************************************************}
-procedure TALCheckbox.SetImageList(const Value: TBaseImageList);
-begin
-  ValidateInheritance(Value, TCustomImageList);
-  SetImages(TCustomImageList(Value));
-end;
-
 {******************************************}
 function TALCheckbox.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(22, 22);
 end;
 
-{**********************************************}
-function TALCheckbox.GetImageIndex: TImageIndex;
+{***********************************************************}
+function TALCheckBox.ImageCheckedResourceNameStored: Boolean;
 begin
-  Result := FImageCheckedLink.ImageIndex;
-end;
-
-{************************************************************}
-procedure TALCheckbox.SetImageIndex(const Value: TImageIndex);
-begin
-  if FImageCheckedLink.ImageIndex <> Value then
-    FImageCheckedLink.ImageIndex := Value;
-end;
-
-{*******************************************************}
-function TALCheckbox.GetImageUncheckedIndex: TImageIndex;
-begin
-  Result := FImageUncheckedLink.ImageIndex;
-end;
-
-{*********************************************************************}
-procedure TALCheckbox.SetImageUncheckedIndex(const Value: TImageIndex);
-begin
-  if FImageUncheckedLink.ImageIndex <> Value then
-    FImageUncheckedLink.ImageIndex := Value;
-end;
-
-{****************************************************}
-function TALCheckbox.ImagecheckedIndexStored: Boolean;
-begin
-  Result := (ImageCheckedIndex <> -1);
-end;
-
-{******************************************************}
-function TALCheckbox.ImageUncheckedIndexStored: Boolean;
-begin
-  Result := (ImageUncheckedIndex <> -1);
-end;
-
-{***********************************************}
-function TALCheckbox.GetImages: TCustomImageList;
-begin
-  Result := TCustomImageList(FImageCheckedLink.Images);
+  result := fImageCheckedResourceName <> 'checkbox_checked_22x22';
 end;
 
 {*************************************************************}
-procedure TALCheckbox.SetImages(const Value: TCustomImageList);
+function TALCheckBox.ImageUncheckedResourceNameStored: Boolean;
 begin
-  FImageCheckedLink.Images := Value;
-  FImageUncheckedLink.Images := Value;
+  result := fImageUnCheckedResourceName <> 'checkbox_unchecked_22x22';
 end;
 
-{*****************************************}
-function TALCheckbox.ImagesStored: Boolean;
+{***************************************************************}
+procedure TALCheckBox.SetWrapMode(const Value: TALImageWrapMode);
 begin
-  Result := Images <> nil;
+  if FWrapMode <> Value then begin
+    clearBufBitmap;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{*********************************************************************}
+procedure TALCheckbox.setImageCheckedResourceName(const Value: String);
+begin
+  if fImageCheckedResourceName <> Value then begin
+    clearBufBitmap;
+    fImageCheckedResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{***********************************************************************}
+procedure TALCheckbox.setImageUncheckedResourceName(const Value: String);
+begin
+  if fImageUncheckedResourceName <> Value then begin
+    clearBufBitmap;
+    fImageUncheckedResourceName := Value;
+    Repaint;
+  end;
 end;
 
 {*****************************************}
@@ -1933,20 +2164,12 @@ begin
   end;
 end;
 
-{*****************************************************}
-procedure TALCheckbox.SetStretch(const Value: Boolean);
-begin
-  if FStretch <> Value then
-  begin
-    FStretch := Value;
-    Repaint;
-  end;
-end;
-
 {****************************************************}
 constructor TALRadioButton.Create(AOwner: TComponent);
 begin
   inherited;
+  fImageCheckedResourceName := 'radio_checked_22x22';
+  fImageUncheckedResourceName := 'radio_unchecked_22x22';
   FGroupName := '';
   fMandatory := false;
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
@@ -1976,6 +2199,18 @@ begin
     StartTriggerAnimation(Self, 'IsChecked');
     DoChanged;
   end;
+end;
+
+{**************************************************************}
+function TALRadioButton.ImageCheckedResourceNameStored: Boolean;
+begin
+  result := fImageCheckedResourceName <> 'radio_checked_22x22';
+end;
+
+{****************************************************************}
+function TALRadioButton.ImageUncheckedResourceNameStored: Boolean;
+begin
+  result := fImageUnCheckedResourceName <> 'radio_unchecked_22x22';
 end;
 
 {*******************************************}
@@ -2024,7 +2259,7 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton]);
+  RegisterComponents('Alcinoe', [TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton]);
   {$IFDEF ALDPK}
   UnlistPublishedProperty(TALTrackThumbGlyph, 'Locked');
   UnlistPublishedProperty(TALTrackThumbGlyph, 'StyleName');
@@ -2072,8 +2307,9 @@ begin
 end;
 
 initialization
-  RegisterFmxClasses([TALCheckBox, TALRadioButton, TALScrollBar, TALTrackBar, TALRangeTrackBar]);
+  RegisterFmxClasses([TALAniIndicator, TALCheckBox, TALRadioButton, TALScrollBar, TALTrackBar, TALRangeTrackBar]);
   {$IFDEF debug}
+  AlDebugAniIndicatorMakeBufBitmapStopWatch := TstopWatch.Create;
   AlDebugCheckBoxMakeBufBitmapStopWatch := TstopWatch.Create;
   {$endif}
 

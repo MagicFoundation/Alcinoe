@@ -93,9 +93,9 @@ private:
 	TALVideoSizeChangedNotifyEvent fonVideoSizeChangedEvent;
 	bool FAutoStartWhenPrepared;
 	TVideoPlayerState fState;
-	NativeInt FTag;
+	__int64 FTag;
 	System::TObject* FTagObject;
-	float FTagFloat;
+	double FTagFloat;
 	Fmx::Graphics::TBitmap* __fastcall GetBitmap(void);
 	void __fastcall doOnCompletion(System::TObject* Sender);
 	void __fastcall doOnError(System::TObject* Sender);
@@ -130,9 +130,9 @@ public:
 	__property TALVideoSizeChangedNotifyEvent onVideoSizeChanged = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
 	__property TVideoPlayerState State = {read=fState, nodefault};
 	__property bool AutoStartWhenPrepared = {read=FAutoStartWhenPrepared, write=FAutoStartWhenPrepared, nodefault};
-	__property NativeInt Tag = {read=FTag, write=FTag, default=0};
+	__property __int64 Tag = {read=FTag, write=FTag, default=0};
 	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
-	__property float TagFloat = {read=FTagFloat, write=FTagFloat};
+	__property double TagFloat = {read=FTagFloat, write=FTagFloat};
 };
 
 
@@ -152,9 +152,9 @@ private:
 	TALVideoSizeChangedNotifyEvent fonVideoSizeChangedEvent;
 	bool FAutoStartWhenPrepared;
 	int fState;
-	NativeInt FTag;
+	__int64 FTag;
 	System::TObject* FTagObject;
-	float FTagFloat;
+	double FTagFloat;
 	bool fDoSetDataSource;
 	System::UnicodeString fDoSetDataSourceValue;
 	bool fDoPrepare;
@@ -201,9 +201,9 @@ public:
 	__property TALVideoSizeChangedNotifyEvent onVideoSizeChanged = {read=fonVideoSizeChangedEvent, write=fonVideoSizeChangedEvent};
 	__property TVideoPlayerState State = {read=getState, nodefault};
 	__property bool AutoStartWhenPrepared = {read=FAutoStartWhenPrepared, write=FAutoStartWhenPrepared, nodefault};
-	__property NativeInt Tag = {read=FTag, write=FTag, default=0};
+	__property __int64 Tag = {read=FTag, write=FTag, default=0};
 	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
-	__property float TagFloat = {read=FTagFloat, write=FTagFloat};
+	__property double TagFloat = {read=FTagFloat, write=FTagFloat};
 };
 
 
@@ -214,6 +214,7 @@ class PASCALIMPLEMENTATION TALVideoPlayerSurface : public Alfmxobjects::TALRecta
 private:
 	TALVideoPlayer* fVideoPlayer;
 	void __fastcall OnFrameAvailable(System::TObject* Sender);
+	void __fastcall SetVideoPlayer(TALVideoPlayer* const Value);
 	
 protected:
 	virtual void __fastcall Paint(void);
@@ -221,7 +222,7 @@ protected:
 public:
 	__fastcall virtual TALVideoPlayerSurface(System::Classes::TComponent* AOwner);
 	__fastcall virtual ~TALVideoPlayerSurface(void);
-	__property TALVideoPlayer* VideoPlayer = {read=fVideoPlayer, write=fVideoPlayer};
+	__property TALVideoPlayer* VideoPlayer = {read=fVideoPlayer, write=SetVideoPlayer};
 };
 
 

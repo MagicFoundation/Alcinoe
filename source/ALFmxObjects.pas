@@ -27,6 +27,150 @@ uses System.Classes,
 
 type
 
+  TALImageWrapMode = (
+      //Display the image with its original dimensions:
+      //* The image is placed in the upper-left corner of the rectangle of the control.
+      //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
+      //  which fits in the rectangle of the control, is shown. The image is not resized.
+      Original,
+
+      //Best fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+      //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
+      //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
+      //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
+      //  should be displayed. The image is displayed centered in the rectangle of the control.
+      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+      //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+      Fit,
+
+      //Stretch the image to fill the entire rectangle of the control.
+      Stretch,
+
+      //Tile (multiply) the image to cover the entire rectangle of the control:
+      //* If the image is larger than the rectangle of the control, then only the
+      //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
+      //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
+      //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
+      //  the upper-left corner of the rectangle of the control.
+      Tile,
+
+      //Center the image to the rectangle of the control:
+      //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
+      Center,
+
+      //Fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
+      //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
+      //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+      //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
+      Place,
+
+      //Best fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+      //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
+      //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
+      //  AND the height of the resized image is equal to the height of the rectangle of the control.
+      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+      //  the rectangle of the control. Whole the image should be displayed.
+      FitAndCrop
+  );
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  //Under delphi, we have multi-res bitmap for Timage or Tglyph. this mean that we can gave several bitmap for several screen scale.
+  //Exemple with a screen scale of 1 i will gave a bitmap of 100x100, for the screen scale of 1.5 i will gave a bitmap of 150*150, etc..
+  //so taking care that most screen scale are 1, 1.5, 2, 3, and 4 we must provide 4 pictures. In 99.9999 % of the case the developer will
+  //simply do a normal resize of the image (under photoshop or similar app) in the 5 of fewer screen scale (seriously is their any developer
+  //who will gave radically different image between scale 1 and scale n ?)
+  //But the resize algo to resize picture is quite powerful and often negligible. So if we gave only one bitmap (at the most biggest scale, 4)
+  //it's must be good/powerfull and it's will reduce also the size of the app.
+  //also from smartphone to tablet i notice that to keep a good ratio i must increase all the font size, and image by 15%. So using multires
+  //bitmap and if i want to avoid any resize (the purpose of multires bitmap as i understand) i must have 10 bitmaps per image !!
+  //so all of this to say that multi-res bitmap is a fundamentally wrong concept
+  TalImage = class(TControl)
+  private
+    fResourceName: String;
+    FWrapMode: TALImageWrapMode;
+    FScreenScale: single;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    fBufBitmap: TTexture;
+    {$ELSE}
+    fBufBitmap: Tbitmap;
+    {$ENDIF}
+    fBufBitmapRect: TRectF;
+    fBufSize: TsizeF;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    FOpenGLContextLostId: integer;
+    FOpenGLContextResetId: Integer;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
+    {$ENDIF}
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure setResourceName(const Value: String);
+  protected
+    procedure Paint; override;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    property BufBitmap: TTexture read fBufBitmap;
+    {$ELSE}
+    property BufBitmap: Tbitmap read fBufBitmap;
+    {$ENDIF}
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+    function MakeBufBitmap: TTexture; virtual;
+    {$ELSE}
+    function MakeBufBitmap: Tbitmap; virtual;
+    {$ENDIF}
+    procedure clearBufBitmap; virtual;
+  published
+    property Align;
+    property Anchors;
+    property ClipChildren default False;
+    property ClipParent default False;
+    property Cursor default crDefault;
+    property DragMode default TDragMode.dmManual;
+    property EnableDragHighlight default True;
+    property Enabled default True;
+    property Locked default False;
+    property Height;
+    property Hint;
+    property HitTest default True;
+    property Padding;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property Visible default True;
+    property Width;
+    property ResourceName: String read fResourceName write setResourceName;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
+    property ParentShowHint;
+    property ShowHint;
+    {Drag and Drop events}
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    {Mouse events}
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALRectangle = class(TRectangle)
   private
@@ -371,6 +515,7 @@ procedure ALUnLockTexts(const aParentControl: Tcontrol);
 
 {$IFDEF debug}
 var
+  AlDebugImageMakeBufBitmapCount: integer;
   AlDebugRectangleMakeBufBitmapCount: integer;
   AlDebugCircleMakeBufBitmapCount: integer;
   AlDebugLineMakeBufBitmapCount: integer;
@@ -378,6 +523,7 @@ var
   AlDebugTextInheritedDoRenderLayoutCount: integer;
   AlDebugTextInheritedDoDrawLayoutCount: integer;
 
+  AlDebugImageMakeBufBitmapStopWatch: TstopWatch;
   AlDebugRectangleMakeBufBitmapStopWatch: TstopWatch;
   AlDebugCircleMakeBufBitmapStopWatch: TstopWatch;
   AlDebugLineMakeBufBitmapStopWatch: TstopWatch;
@@ -393,6 +539,10 @@ uses system.SysUtils,
      system.Math.Vectors,
      fmx.consts,
      fmx.platform,
+     {$IFDEF ALDPK}
+     system.ioutils,
+     ToolsAPI,
+     {$ENDIF}
      {$IF defined(ANDROID)}
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNIBridge,
@@ -409,6 +559,261 @@ uses system.SysUtils,
      {$ENDIF}
      ALCommon,
      ALFmxCommon;
+
+{**********************************************}
+constructor TALImage.Create(AOwner: TComponent);
+var aScreenSrv: IFMXScreenService;
+begin
+  inherited Create(AOwner);
+  fResourceName := '';
+  FWrapMode := TALImageWrapMode.Fit;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
+  else FScreenScale := 1;
+  fBufBitmap := nil;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
+  {$ENDIF}
+  SetAcceptsControls(False);
+end;
+
+{**************************}
+destructor TALImage.Destroy;
+begin
+  clearBufBitmap;
+  {$IF defined(ANDROID) or defined(IOS)}
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
+  {$ENDIF}
+  inherited;
+end;
+
+{********************************}
+procedure TALImage.clearBufBitmap;
+begin
+  ALFreeAndNil(fBufBitmap);
+end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+function TALImage.MakeBufBitmap: TTexture;
+{$ELSE}
+function TALImage.MakeBufBitmap: Tbitmap;
+{$ENDIF}
+
+{$IFDEF ALDPK}
+var aFileName: String;
+{$ENDIF}
+
+begin
+
+  if (Scene = nil) or
+     //--- don't do bufbitmap is size=0
+     (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
+     (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
+     //--- don't do bufbitmap if fResourceName is empty
+     (fResourceName = '')
+  then begin
+    clearBufBitmap;
+    exit(nil);
+  end;
+
+  if (fBufBitmap <> nil) and
+     (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+
+  clearBufBitmap;
+  fBufSize := Size.Size;
+
+  {$IFDEF debug}
+  ALLog('TALImage.MakeBufBitmap', 'TALImage.MakeBufBitmap', TalLogType.verbose);
+  inc(AlDebugImageMakeBufBitmapCount);
+  AlDebugImageMakeBufBitmapStopWatch.Start;
+  try
+  {$endif}
+
+    {$IFDEF ALDPK}
+    aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+    if not TFile.Exists(aFileName) then begin
+      aFileName := aFileName + '.png';
+      if not TFile.Exists(aFileName) then aFileName := '';
+    end;
+    {$ENDIF}
+
+    case FWrapMode of
+
+      //Display the image with its original dimensions:
+      //* The image is placed in the upper-left corner of the rectangle of the control.
+      //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
+      //  which fits in the rectangle of the control, is shown. The image is not resized.
+      TALImageWrapMode.Original:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Best fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+      //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
+      //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
+      //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
+      //  should be displayed. The image is displayed centered in the rectangle of the control.
+      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+      //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+      TALImageWrapMode.Fit:
+        begin
+          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+          {$IFDEF ALDPK}
+          if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := nil;
+          {$ELSE}
+          fBufBitmap := ALLoadResizeAndFitResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          {$ENDIF}
+          result := fBufBitmap;
+          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                    CenterAt(fBufBitmapRect);
+        end;
+
+      //Stretch the image to fill the entire rectangle of the control.
+      TALImageWrapMode.Stretch:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Tile (multiply) the image to cover the entire rectangle of the control:
+      //* If the image is larger than the rectangle of the control, then only the
+      //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
+      //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
+      //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
+      //  the upper-left corner of the rectangle of the control.
+      TALImageWrapMode.Tile:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Center the image to the rectangle of the control:
+      //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
+      TALImageWrapMode.Center:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
+      //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
+      //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+      //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
+      TALImageWrapMode.Place:
+        begin
+          Result := nil; // todo
+        end;
+
+      //Best fit the image in the rectangle of the control:
+      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+      //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
+      //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
+      //  AND the height of the resized image is equal to the height of the rectangle of the control.
+      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+      //  the rectangle of the control. Whole the image should be displayed.
+      TALImageWrapMode.FitAndCrop:
+        begin
+          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+          {$IFDEF ALDPK}
+          if aFileName <> '' then fBufBitmap := ALLoadResizeAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := nil;
+          {$ELSE}
+          fBufBitmap := ALLoadResizeAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          {$ENDIF}
+          result := fBufBitmap;
+          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                    CenterAt(fBufBitmapRect);
+        end;
+
+      //to hide a stupid warning else
+      else Result := nil;
+
+    end;
+
+  {$IFDEF debug}
+  finally
+    AlDebugImageMakeBufBitmapStopWatch.Stop;
+  end;
+  {$endif}
+
+end;
+
+{***********************}
+procedure TALImage.Paint;
+var R: TRectF;
+begin
+
+  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  begin
+    R := LocalRect;
+    InflateRect(R, -0.5, -0.5);
+    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  end;
+
+  MakeBufBitmap;
+
+  if fBufBitmap = nil then begin
+    inherited paint;
+    exit;
+  end;
+
+  {$IF DEFINED(IOS) or DEFINED(ANDROID)}
+
+  TCustomCanvasGpu(Canvas).DrawTexture(canvas.AlignToPixel(fBufBitmapRect), // ATexRect (destRec)
+                                       TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+                                       fBufBitmap);
+
+  {$ELSE}
+
+  canvas.DrawBitmap(fBufBitmap,
+                    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+                    canvas.AlignToPixel(fBufBitmapRect), {DestRect}
+                    AbsoluteOpacity, {opacity}
+                    true{highSpeed});
+
+  {$ENDIF}
+
+end;
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALImage.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF DEFINED(IOS) or DEFINED(ANDROID)}
+procedure TALImage.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  clearBufBitmap;
+end;
+{$ENDIF}
+
+{************************************************************}
+procedure TalImage.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if FWrapMode <> Value then begin
+    clearBufBitmap;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{******************************************************}
+procedure TalImage.setResourceName(const Value: String);
+begin
+  if FResourceName <> Value then begin
+    clearBufBitmap;
+    FResourceName := Value;
+    Repaint;
+  end;
+end;
 
 {**************************************************}
 constructor TALRectangle.Create(AOwner: TComponent);
@@ -614,7 +1019,7 @@ begin
   canvas.DrawBitmap(fBufBitmap,
                     TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
                     canvas.AlignToPixel(fBufBitmapRect), {DestRect}
-                    opacity, {opacity}
+                    AbsoluteOpacity, {opacity}
                     true{highSpeed});
 
   {$ENDIF}
@@ -2155,12 +2560,13 @@ end;
 
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALRectangle, TALCircle, TALLine, TALText]);
+  RegisterComponents('Alcinoe', [TALImage, TALRectangle, TALCircle, TALLine, TALText]);
 end;
 
 initialization
-  RegisterFmxClasses([TALRectangle, TALCircle, TALLine, TALText]);
+  RegisterFmxClasses([TALImage, TALRectangle, TALCircle, TALLine, TALText]);
   {$IFDEF debug}
+  AlDebugImageMakeBufBitmapStopWatch := TstopWatch.Create;
   AlDebugRectangleMakeBufBitmapStopWatch := TstopWatch.Create;
   AlDebugCircleMakeBufBitmapStopWatch := TstopWatch.Create;
   AlDebugLineMakeBufBitmapStopWatch := TstopWatch.Create;

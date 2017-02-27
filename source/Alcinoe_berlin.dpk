@@ -38,7 +38,6 @@ requires
 contains
   ALFmxLayouts in 'ALFmxLayouts.pas',
   ALFmxObjects in 'ALFmxObjects.pas',
-  ALFmxImgList in 'ALFmxImgList.pas',
   ALFmxStdCtrls in 'ALFmxStdCtrls.pas',
   ALFmxCommon in 'ALFmxCommon.pas',
   ALFmxTabControl in 'ALFmxTabControl.pas',

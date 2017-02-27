@@ -29,7 +29,6 @@
 #include <FMX.ActnList.hpp>
 #include <FMX.ImgList.hpp>
 #include <ALFmxInertialMovement.hpp>
-#include <ALFmxImgList.hpp>
 #include <ALFmxObjects.hpp>
 #include <FMX.Objects.hpp>
 
@@ -38,6 +37,7 @@
 namespace Alfmxstdctrls
 {
 //-- forward type declarations -----------------------------------------------
+class DELPHICLASS TALAniIndicator;
 class DELPHICLASS TALTrackThumbGlyph;
 class DELPHICLASS TALTrackThumb;
 class DELPHICLASS TALTrackBackground;
@@ -49,19 +49,103 @@ class DELPHICLASS TALRangeTrackBar;
 class DELPHICLASS TALCheckBox;
 class DELPHICLASS TAlRadioButton;
 //-- type declarations -------------------------------------------------------
-class PASCALIMPLEMENTATION TALTrackThumbGlyph : public Alfmximglist::TALGlyph
+class PASCALIMPLEMENTATION TALAniIndicator : public Fmx::Controls::TControl
 {
-	typedef Alfmximglist::TALGlyph inherited;
+	typedef Fmx::Controls::TControl inherited;
+	
+private:
+	Fmx::Types::TTimer* fTimer;
+	int finterval;
+	int FFrameCount;
+	int FRowCount;
+	System::UnicodeString fResourceName;
+	System::Types::TSmallPoint fFrameIndex;
+	float FScreenScale;
+	Fmx::Graphics::TBitmap* fBufBitmap;
+	System::Types::TRectF fBufBitmapRect;
+	System::Types::TSizeF fBufSize;
+	void __fastcall setResourceName(const System::UnicodeString Value);
+	void __fastcall onTimer(System::TObject* sender);
+	bool __fastcall ResourceNameStored(void);
+	
+protected:
+	virtual void __fastcall Paint(void);
+	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
+	virtual bool __fastcall EnabledStored(void);
+	virtual void __fastcall SetEnabled(const bool Value);
+	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
+	
+public:
+	__fastcall virtual TALAniIndicator(System::Classes::TComponent* AOwner);
+	__fastcall virtual ~TALAniIndicator(void);
+	virtual Fmx::Graphics::TBitmap* __fastcall MakeBufBitmap(void);
+	virtual void __fastcall clearBufBitmap(void);
+	
+__published:
+	__property Align = {default=0};
+	__property Anchors;
+	__property Cursor = {default=0};
+	__property DragMode = {default=0};
+	__property EnableDragHighlight = {default=1};
+	__property Enabled = {default=0};
+	__property Locked = {default=0};
+	__property Height;
+	__property Hint = {default=0};
+	__property HitTest = {default=1};
+	__property Padding;
+	__property Opacity;
+	__property Margins;
+	__property PopupMenu;
+	__property Position;
+	__property RotationAngle = {default=0};
+	__property RotationCenter;
+	__property Scale;
+	__property Size;
+	__property TouchTargetExpansion;
+	__property Visible = {default=1};
+	__property Width;
+	__property int FrameCount = {read=FFrameCount, write=FFrameCount, default=20};
+	__property int RowCount = {read=FRowCount, write=FRowCount, default=4};
+	__property int interval = {read=finterval, write=finterval, default=50};
+	__property System::UnicodeString ResourceName = {read=fResourceName, write=setResourceName, stored=ResourceNameStored};
+	__property ParentShowHint = {default=1};
+	__property ShowHint;
+	__property OnDragEnter;
+	__property OnDragLeave;
+	__property OnDragOver;
+	__property OnDragDrop;
+	__property OnDragEnd;
+	__property OnKeyDown;
+	__property OnKeyUp;
+	__property OnCanFocus;
+	__property OnEnter;
+	__property OnExit;
+	__property OnClick;
+	__property OnDblClick;
+	__property OnMouseDown;
+	__property OnMouseMove;
+	__property OnMouseUp;
+	__property OnMouseWheel;
+	__property OnMouseEnter;
+	__property OnMouseLeave;
+	__property OnPainting;
+	__property OnPaint;
+	__property OnResize;
+};
+
+
+class PASCALIMPLEMENTATION TALTrackThumbGlyph : public Alfmxobjects::TalImage
+{
+	typedef Alfmxobjects::TalImage inherited;
 	
 public:
 	__fastcall virtual TALTrackThumbGlyph(System::Classes::TComponent* AOwner);
 	
 __published:
 	__property Align = {default=9};
-	__property autohide = {default=1};
 	__property Locked = {default=1};
 public:
-	/* TALGlyph.Destroy */ inline __fastcall virtual ~TALTrackThumbGlyph(void) { }
+	/* TalImage.Destroy */ inline __fastcall virtual ~TALTrackThumbGlyph(void) { }
 	
 };
 
@@ -487,63 +571,44 @@ class PASCALIMPLEMENTATION TALCheckBox : public Fmx::Controls::TControl
 {
 	typedef Fmx::Controls::TControl inherited;
 	
-public:
-	static const unsigned DesignBorderColor = unsigned(0xa080d080);
-	
-	
 private:
 	float FScreenScale;
-	bool fdoubleBuffered;
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;
 	System::Types::TSizeF fBufSize;
-	Fmx::Imglist::TCustomImageList* fBufImages;
-	System::Uitypes::TImageIndex FbufImageIndex;
+	System::UnicodeString FbufResourceName;
 	bool FPressing;
 	System::Classes::TNotifyEvent FOnChange;
 	bool FIsPressed;
 	bool FIsChecked;
-	System::Imagelist::TImageLink* FImageCheckedLink;
-	System::Imagelist::TImageLink* FImageUncheckedLink;
-	bool FisImagesChanged;
-	bool FStretch;
-	void __fastcall SetdoubleBuffered(const bool Value);
-	Fmx::Imglist::TCustomImageList* __fastcall GetImages(void);
-	void __fastcall SetImages(Fmx::Imglist::TCustomImageList* const Value);
-	System::Uitypes::TImageIndex __fastcall GetImageIndex(void);
-	void __fastcall SetImageIndex(const System::Uitypes::TImageIndex Value);
-	System::Uitypes::TImageIndex __fastcall GetImageUncheckedIndex(void);
-	void __fastcall SetImageUncheckedIndex(const System::Uitypes::TImageIndex Value);
-	System::Imagelist::TBaseImageList* __fastcall GetImageList(void);
-	void __fastcall SetImageList(System::Imagelist::TBaseImageList* const Value);
-	void __fastcall NonBufferedPaint(void);
-	void __fastcall SetStretch(const bool Value);
+	System::UnicodeString fImageCheckedResourceName;
+	System::UnicodeString fImageUncheckedResourceName;
+	Alfmxobjects::TALImageWrapMode FWrapMode;
+	void __fastcall setImageCheckedResourceName(const System::UnicodeString Value);
+	void __fastcall setImageUncheckedResourceName(const System::UnicodeString Value);
+	void __fastcall SetWrapMode(const Alfmxobjects::TALImageWrapMode Value);
 	
 protected:
 	virtual void __fastcall Paint(void);
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
-	virtual void __fastcall DoEndUpdate(void);
 	virtual void __fastcall DoChanged(void);
-	virtual bool __fastcall ImageCheckedIndexStored(void);
-	virtual bool __fastcall ImageUncheckedIndexStored(void);
-	virtual bool __fastcall ImagesStored(void);
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
 	virtual bool __fastcall GetIsChecked(void);
 	virtual void __fastcall SetIsChecked(const bool Value);
+	virtual bool __fastcall ImageCheckedResourceNameStored(void);
+	virtual bool __fastcall ImageUncheckedResourceNameStored(void);
 	
 public:
 	__fastcall virtual TALCheckBox(System::Classes::TComponent* AOwner);
 	__fastcall virtual ~TALCheckBox(void);
 	virtual Fmx::Graphics::TBitmap* __fastcall MakeBufBitmap(void);
 	virtual void __fastcall clearBufBitmap(void);
-	void __fastcall ImagesChanged(void);
 	virtual void __fastcall MouseDown(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall MouseMove(System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall MouseUp(System::Uitypes::TMouseButton Button, System::Classes::TShiftState Shift, float X, float Y);
 	virtual void __fastcall KeyDown(System::Word &Key, System::WideChar &KeyChar, System::Classes::TShiftState Shift);
 	
 __published:
-	__property bool doubleBuffered = {read=fdoubleBuffered, write=SetdoubleBuffered, default=1};
 	__property Action;
 	__property Align = {default=0};
 	__property Anchors;
@@ -561,10 +626,9 @@ __published:
 	__property Hint = {default=0};
 	__property HitTest = {default=1};
 	__property bool IsChecked = {read=GetIsChecked, write=SetIsChecked, default=0};
-	__property System::Uitypes::TImageIndex ImageCheckedIndex = {read=GetImageIndex, write=SetImageIndex, stored=ImageCheckedIndexStored, nodefault};
-	__property System::Uitypes::TImageIndex ImageUncheckedIndex = {read=GetImageUncheckedIndex, write=SetImageUncheckedIndex, stored=ImageUncheckedIndexStored, nodefault};
-	__property Fmx::Imglist::TCustomImageList* Images = {read=GetImages, write=SetImages, stored=ImagesStored};
-	__property bool Stretch = {read=FStretch, write=SetStretch, default=1};
+	__property System::UnicodeString ImageCheckedResourceName = {read=fImageCheckedResourceName, write=setImageCheckedResourceName, stored=ImageCheckedResourceNameStored};
+	__property System::UnicodeString ImageUncheckedResourceName = {read=fImageUncheckedResourceName, write=setImageUncheckedResourceName, stored=ImageUncheckedResourceNameStored};
+	__property Alfmxobjects::TALImageWrapMode WrapMode = {read=FWrapMode, write=SetWrapMode, default=1};
 	__property Padding;
 	__property Opacity;
 	__property Margins;
@@ -603,22 +667,6 @@ __published:
 	__property OnPainting;
 	__property OnPaint;
 	__property OnResize;
-private:
-	void *__IGlyph;	// Fmx::Actnlist::IGlyph 
-	
-public:
-	#if defined(MANAGED_INTERFACE_OPERATORS)
-	// {62BDCA4F-820A-4058-B57A-FE8931DB3CCC}
-	operator Fmx::Actnlist::_di_IGlyph()
-	{
-		Fmx::Actnlist::_di_IGlyph intf;
-		this->GetInterface(intf);
-		return intf;
-	}
-	#else
-	operator Fmx::Actnlist::IGlyph*(void) { return (Fmx::Actnlist::IGlyph*)&__IGlyph; }
-	#endif
-	
 };
 
 
@@ -636,6 +684,8 @@ private:
 	
 protected:
 	virtual void __fastcall SetIsChecked(const bool Value);
+	virtual bool __fastcall ImageCheckedResourceNameStored(void);
+	virtual bool __fastcall ImageUncheckedResourceNameStored(void);
 	
 public:
 	__fastcall virtual TAlRadioButton(System::Classes::TComponent* AOwner);

@@ -102,7 +102,6 @@ implementation
 uses system.Classes,
      {$IFDEF MSWINDOWS}
      Winapi.Windows,
-     fmx.types,
      {$ENDIF}
      {$IF defined(ANDROID)}
      Androidapi.JNI.JavaTypes,
@@ -150,12 +149,12 @@ begin
     if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
     else aMsg := '';
     case _type of
-      TalLogType.VERBOSE: Log.d('[V] ' + Tag + aMsg + ' |');
-      TalLogType.DEBUG:   Log.d('[D][V] ' + Tag + aMsg + ' |');
-      TalLogType.INFO:    Log.d('[I][D][V] ' + Tag + aMsg + ' |');
-      TalLogType.WARN:    Log.d('[W][I][D][V] ' + Tag + aMsg + ' |');
-      TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
-      TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
+      TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + Tag + aMsg + ' |'));
+      TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + Tag + aMsg + ' |'));
+      TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + Tag + aMsg + ' |'));
+      TalLogType.WARN:    OutputDebugString(pointer('[W][I][D][V] ' + Tag + aMsg + ' |'));
+      TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + Tag + aMsg + ' |'));
+      TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + Tag + aMsg + ' |'));
     end;
   end;
   {$IFEND}

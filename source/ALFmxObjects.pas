@@ -145,6 +145,7 @@ type
     property RotationCenter;
     property Scale;
     property Size;
+    property TouchTargetExpansion;
     property Visible default True;
     property Width;
     property ResourceName: String read fResourceName write setResourceName;

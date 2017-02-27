@@ -17,9 +17,7 @@ uses Windows,
      ComCtrls,
      SyncObjs,
      AlPhpRunner,
-     ALStringList,
-     cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
-  cxContainer, cxEdit, cxLabel;
+     ALStringList;
 
 type
   TForm1 = class(TForm)

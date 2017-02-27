@@ -4,9 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, ALFbxClient,
-  cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer,
-  cxEdit, cxLabel, Shellapi;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, ALFbxClient, Shellapi;
 
 type
 

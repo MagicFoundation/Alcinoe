@@ -4,9 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StrUtils, ExtCtrls, StdCtrls, cxGraphics,
-  cxControls, cxLookAndFeels, cxLookAndFeelPainters, cxContainer, cxEdit,
-  cxLabel, Shellapi, Soap.EncdDecd, System.Diagnostics, ALMime, system.NetEncoding;
+  Dialogs, StrUtils, ExtCtrls, StdCtrls, Shellapi, Soap.EncdDecd,
+  System.Diagnostics, ALMime, system.NetEncoding;
 
 type
   TForm1 = class(TForm)

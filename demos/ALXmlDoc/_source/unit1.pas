@@ -5,8 +5,7 @@ interface
 uses Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls,
      Forms, Dialogs, Contnrs, StdCtrls, xmldom, XMLIntf, msxmldom,
      XMLDoc, ALString, AlXmlDoc, ExtCtrls, ALFiles,
-     ALStringList, cxGraphics, cxControls, cxLookAndFeels,
-     cxLookAndFeelPainters, cxContainer, cxEdit, cxLabel, Shellapi;
+     ALStringList, Shellapi;
 
 type
 

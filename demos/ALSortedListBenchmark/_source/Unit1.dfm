@@ -45,7 +45,7 @@ object Form1: TForm1
     Align = alBottom
     Color = clWhite
     TabOrder = 0
-    ExplicitTop = 208
+    DefaultCanvas = 'TGDIPlusCanvas'
     PrintMargins = (
       15
       24
@@ -53,13 +53,10 @@ object Form1: TForm1
       24)
     ColorPaletteIndex = 7
     object Series1: TBarSeries
+      Legend.Text = 'TALAVLStringList'
       LegendTitle = 'TALAVLStringList'
-      Marks.Angle = 90
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
+      Marks.Angle = 90
       Emboss.Color = 8618883
       Shadow.Color = 8618883
       XValues.Name = 'X'
@@ -68,13 +65,10 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series2: TBarSeries
+      Legend.Text = 'TALHashedStringList'
       LegendTitle = 'TALHashedStringList'
-      Marks.Angle = 90
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
+      Marks.Angle = 90
       Emboss.Color = 8684676
       Shadow.Color = 8684676
       XValues.Name = 'X'
@@ -83,13 +77,10 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series3: TBarSeries
+      Legend.Text = 'TALStringList'
       LegendTitle = 'TALStringList'
-      Marks.Angle = 90
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
+      Marks.Angle = 90
       Emboss.Color = 8750469
       Shadow.Color = 8750469
       XValues.Name = 'X'
@@ -98,13 +89,10 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series4: TBarSeries
+      Legend.Text = 'TStringList'
       LegendTitle = 'TStringList'
-      Marks.Angle = 90
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
+      Marks.Angle = 90
       Emboss.Color = 8750469
       Shadow.Color = 8750469
       XValues.Name = 'X'
@@ -113,13 +101,10 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series5: TBarSeries
+      Legend.Text = 'TALIntegerList'
       LegendTitle = 'TALIntegerList'
-      Marks.Angle = 65
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
+      Marks.Angle = 65
       Emboss.Color = 8684676
       Shadow.Color = 8684676
       XValues.Name = 'X'
@@ -128,11 +113,8 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series6: TBarSeries
+      Legend.Text = 'TALNvStringList'
       LegendTitle = 'TALNvStringList'
-      Marks.Arrow.Visible = True
-      Marks.Callout.Brush.Color = clBlack
-      Marks.Callout.Arrow.Visible = True
-      Marks.ShapeStyle = fosRoundRectangle
       Marks.Visible = False
       Emboss.Color = 8487297
       Shadow.Color = 8487297

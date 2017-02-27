@@ -18,8 +18,7 @@ uses Windows,
      ALWebSpider,
      AlAVLBinaryTree,
      ExtCtrls,
-     cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
-  cxContainer, cxEdit, cxLabel, Shellapi;
+     Shellapi;
 
 type
 

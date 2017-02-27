@@ -2,6 +2,10 @@ unit ALVideoPlayer;
 
 interface
 
+{$IF defined(MACOS) and not defined(IOS)}
+  {$DEFINE _MACOS}
+{$IFEND}
+
 uses system.Classes,
      System.SyncObjs,
      {$IF defined(DEBUG)}
@@ -308,6 +312,45 @@ type
   end;
   {$endIF}
 
+  {*******************}
+  {$IF defined(_MACOS)}
+  TALMacOSVideoPlayer = class(Tobject)
+  private
+    fbitmap: TBitmap;
+    fOnFrameAvailableEvent: TNotifyEvent;
+    fOnBufferingUpdateEvent: TALBufferingUpdateNotifyEvent;
+    fOnCompletionEvent: TNotifyEvent;
+    fOnErrorEvent: TNotifyEvent;
+    FOnPreparedEvent: TnotifyEvent;
+    fonVideoSizeChangedEvent: TALVideoSizeChangedNotifyEvent;
+  protected
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    function getCurrentPosition: integer;
+    function getDuration: integer;
+    function getVideoHeight: integer;
+    function getVideoWidth: integer;
+    function isPlaying: boolean;
+    procedure pause;
+    procedure prepare;
+    procedure prepareAsync;
+    procedure Start;
+    procedure Stop;
+    procedure seekTo(const msec: Integer);
+    procedure setDataSource(Const aDataSource: String); // Sets or get the data source (file-path or http/rtsp URL) to use.
+    procedure setLooping(const looping: Boolean);
+    procedure setVolume(const Value: Single);
+    property bitmap: TBitmap read fbitmap;
+    property OnError: TNotifyEvent read fOnErrorEvent write fOnErrorEvent;
+    property OnPrepared: TNotifyEvent read fOnPreparedEvent write fOnPreparedEvent;
+    property OnFrameAvailable: TNotifyEvent read fOnFrameAvailableEvent write fOnFrameAvailableEvent;
+    property OnBufferingUpdate: TALBufferingUpdateNotifyEvent read fOnBufferingUpdateEvent write fOnBufferingUpdateEvent;
+    property OnCompletion: TNotifyEvent read fOnCompletionEvent write fOnCompletionEvent;
+    property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
+  end;
+  {$endIF}
+
 type
 
   {*****************************}
@@ -317,8 +360,10 @@ type
     fVideoPlayerControl: TALAndroidVideoPlayer;
     {$ELSEIF defined(IOS)}
     fVideoPlayerControl: TALIOSVideoPlayer;
-    {$ELSE definied(MSWINDOWS)}
+    {$ELSEIF defined(MSWINDOWS)}
     fVideoPlayerControl: TALWinVideoPlayer;
+    {$ELSEIF defined(_MACOS)}
+    fVideoPlayerControl: TALMacOSVideoPlayer;
     {$ENDIF}
     //-----
     fOnErrorEvent: TNotifyEvent;
@@ -392,8 +437,10 @@ type
     fVideoPlayerControl: TALAndroidVideoPlayer;
     {$ELSEIF defined(IOS)}
     fVideoPlayerControl: TALIOSVideoPlayer;
-    {$ELSE definied(MSWINDOWS)}
+    {$ELSEIF defined(MSWINDOWS)}
     fVideoPlayerControl: TALWinVideoPlayer;
+    {$ELSEIF defined(_MACOS)}
+    fVideoPlayerControl: TALMacOsVideoPlayer;
     {$ENDIF}
     //-----
     fOnErrorEvent: TNotifyEvent;
@@ -2153,6 +2200,105 @@ end;
 
 {$ENDIF}
 
+{$IF defined(_MACOS)}
+
+{*************************************}
+constructor TALMacOSVideoPlayer.Create;
+begin
+  inherited;
+  fbitmap := nil;
+  fOnFrameAvailableEvent := nil;
+  fOnBufferingUpdateEvent := nil;
+  fOnCompletionEvent := nil;
+  fOnErrorEvent := nil;
+  FOnPreparedEvent := nil;
+  fonVideoSizeChangedEvent := nil;
+end;
+
+{*************************************}
+destructor TALMacOSVideoPlayer.Destroy;
+begin
+  ALFreeAndNil(fbitmap);
+  inherited;
+end;
+
+{*******************************************************}
+function TALMacOSVideoPlayer.getCurrentPosition: integer;
+begin
+  result := 0;
+end;
+
+{************************************************}
+function TALMacOSVideoPlayer.getDuration: integer;
+begin
+  result := 0;
+end;
+
+{***************************************************}
+function TALMacOSVideoPlayer.getVideoHeight: integer;
+begin
+  result := 0;
+end;
+
+{**************************************************}
+function TALMacOSVideoPlayer.getVideoWidth: integer;
+begin
+  result := 0;
+end;
+
+{**********************************************}
+function TALMacOSVideoPlayer.isPlaying: boolean;
+begin
+  result := False;
+end;
+
+{**********************************}
+procedure TALMacOSVideoPlayer.pause;
+begin
+end;
+
+{************************************}
+procedure TALMacOSVideoPlayer.prepare;
+begin
+end;
+
+{*****************************************}
+procedure TALMacOSVideoPlayer.prepareAsync;
+begin
+end;
+
+{**********************************}
+procedure TALMacOSVideoPlayer.Start;
+begin
+end;
+
+{*********************************}
+procedure TALMacOSVideoPlayer.Stop;
+begin
+end;
+
+{********************************************************}
+procedure TALMacOSVideoPlayer.seekTo(const msec: Integer);
+begin
+end;
+
+{*********************************************************************}
+procedure TALMacOSVideoPlayer.setDataSource(Const aDataSource: String);
+begin
+end;
+
+{***************************************************************}
+procedure TALMacOSVideoPlayer.setLooping(const looping: Boolean);
+begin
+end;
+
+{***********************************************************}
+procedure TALMacOSVideoPlayer.setVolume(const Value: Single);
+begin
+end;
+
+{$ENDIF}
+
 {********************************}
 constructor TALVideoPlayer.Create;
 begin
@@ -2164,6 +2310,8 @@ begin
   fVideoPlayerControl := TALIOSVideoPlayer.Create;
   {$ELSEIF defined(MSWINDOWS)}
   fVideoPlayerControl := TALWinVideoPlayer.Create;
+  {$ELSEIF defined(_MACOS)}
+  fVideoPlayerControl := TALMacOSVideoPlayer.Create;
   {$ENDIF}
   //-----
   fVideoPlayerControl.OnError := DoOnError;
@@ -2474,6 +2622,8 @@ begin
   fVideoPlayerControl := TALIOSVideoPlayer.Create;
   {$ELSEIF defined(MSWINDOWS)}
   fVideoPlayerControl := TALWinVideoPlayer.Create;
+  {$ELSEIF defined(_MACOS)}
+  fVideoPlayerControl := TALMacOSVideoPlayer.Create;
   {$ENDIF}
   try
 

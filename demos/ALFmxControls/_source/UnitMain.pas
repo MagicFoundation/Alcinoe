@@ -7,9 +7,9 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.StdCtrls,
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
-  FMX.ImgList, alFmxImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
+  FMX.ImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
   FMX.ScrollBox, FMX.Memo, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
-  FMX.Filter.Effects;
+  FMX.Filter.Effects, system.Messaging;
 
 type
 
@@ -62,24 +62,6 @@ type
     {$ENDIF}
   End;
   TTextStopWatch = Class(TText)
-  public
-     PaintMs: double;
-     procedure Paint; override;
-  End;
-
-  TALGlyphStopWatch = Class(TALGlyph)
-  protected
-     bufPaintMs: double;
-     bufCreatePaintMs: double;
-     procedure Paint; override;
-  public
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     function MakeBufBitmap: TTexture; override;
-    {$ELSE}
-     function MakeBufBitmap: Tbitmap; override;
-    {$ENDIF}
-  End;
-  TGlyphStopWatch = Class(TGlyph)
   public
      PaintMs: double;
      procedure Paint; override;
@@ -143,10 +125,6 @@ type
     Button8: TButton;
     Button9: TButton;
     Text5: TText;
-    Button10: TButton;
-    Text6: TText;
-    Button11: TButton;
-    ImageList1: TImageList;
     Button13: TButton;
     Text10: TText;
     Button16: TButton;
@@ -160,15 +138,14 @@ type
     Button22: TButton;
     ALTabControl1: TALTabControl;
     ALTabItem1: TALTabItem;
-    Image1: TImage;
     ALTabItem2: TALTabItem;
-    Image2: TImage;
+    Image2: TALImage;
     ALText1: TALText;
     ALText2: TALText;
     ALTabItem3: TALTabItem;
-    Image3: TImage;
+    Image3: TALImage;
     ALTabItem4: TALTabItem;
-    Image4: TImage;
+    image4: TalImage;
     ALText3: TALText;
     ALText4: TALText;
     ALText5: TALText;
@@ -179,8 +156,6 @@ type
     ALRangeTrackBar1: TALRangeTrackBar;
     ALTrackBar1: TALTrackBar;
     Button14: TButton;
-    Layout1: TLayout;
-    Layout2: TLayout;
     Layout3: TLayout;
     Layout4: TLayout;
     ALRectangle2: TALRectangle;
@@ -210,6 +185,10 @@ type
     MaskToAlphaEffect1: TMaskToAlphaEffect;
     EmbossEffect1: TEmbossEffect;
     PinchEffect1: TPinchEffect;
+    alImage1: TalImage;
+    ALLayout1: TALLayout;
+    ALAniIndicator1: TALAniIndicator;
+    Button19: TButton;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -221,8 +200,6 @@ type
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
-    procedure Button11Click(Sender: TObject);
     procedure Button13Click(Sender: TObject);
     procedure Button16Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
@@ -253,8 +230,6 @@ type
     fLine: TLineStopWatch;
     fALLine: TALLineStopWatch;
     fText: TTextStopWatch;
-    fGlyph: TGlyphStopWatch;
-    fALGlyph: TALGlyphStopWatch;
     fALText: TALTextStopWatch;
     fALRectangle1: TALRectangleStopWatch;
     fRectangle1: TRectangleStopWatch;
@@ -264,6 +239,8 @@ type
     fRectangle3: TRectangleStopWatch;
     fALCircle1: TALCircleStopWatch;
     fCircle1: TCircleStopWatch;
+    FOpenGLContextResetId: Integer;
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage);
   public
   end;
 
@@ -361,6 +338,15 @@ begin
   else begin
     if ALVideoPlayerSurface1.VideoPlayer.state in [vpsStarted] then ALVideoPlayerSurface1.VideoPlayer.Pause
     else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := False;
+  end;
+
+
+  if (ALLayout1.Position.y + ALLayout1.Height >= NewViewportPosition.Y) and
+     (ALLayout1.Position.y < NewViewportPosition.Y + height) then begin
+    ALAniIndicator1.enabled := true;
+  end
+  else begin
+    ALAniIndicator1.enabled := False;
   end;
 
 end;
@@ -464,28 +450,6 @@ begin
       (sender as TALTrackThumb).InvalidateRect(localrect);
     end;
   end;
-end;
-
-procedure TForm1.Button10Click(Sender: TObject);
-begin
-  fGlyph.Repaint;
-  Text6.Text := 'Paint: ' + FormatFloat('0.#####',fGlyph.PaintMs) + ' ms';
-end;
-
-procedure TForm1.Button11Click(Sender: TObject);
-begin
-  fALGlyph.clearBufBitmap;
-  fALGlyph.repaint;
-  TTask.Create (procedure ()
-    begin
-      sleep(250);
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Text6.Text := 'buffer creation: ' + FormatFloat('0.#####',fALGlyph.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALGlyph.bufPaintMs) + ' ms';
-        end);
-    end).Start;
 end;
 
 procedure TForm1.Button13Click(Sender: TObject);
@@ -859,6 +823,7 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   beginupdate;
 
   //-----
@@ -996,30 +961,8 @@ begin
                 ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
 
   //-----
-  fALGlyph := TALGlyphStopWatch.Create(layout1);
-  fALGlyph.Parent := layout1;
-  fALGlyph.doubleBuffered := True;
-  fALGlyph.Size.Height := 22;
-  fALGlyph.Size.width := 22;
-  fALGlyph.Position.Point := TpointF.Create(0,0);
-  fALGlyph.Images := ImageList1;
-  fALGlyph.ImageIndex := 0;
-  //-----
-  fGlyph := TGlyphStopWatch.Create(layout2);
-  fGlyph.Parent := layout2;
-  fGlyph.Size.Height := 22;
-  fGlyph.Size.width := 22;
-  fGlyph.Position.Point := TpointF.Create(0,0);
-  fGlyph.Images := ImageList1;
-  fGlyph.ImageIndex := 0;
-
-  //-----
   fALcheckbox2 := TALcheckboxStopWatch.Create(layout3);
   fALcheckbox2.Parent := layout3;
-  fALcheckbox2.doubleBuffered := True;
-  fALcheckbox2.Images := ImageList1;
-  fALcheckbox2.ImageCheckedIndex := 1;
-  fALcheckbox2.ImageUncheckedIndex := 2;
   fALcheckbox2.Height := 22;
   fALcheckbox2.width := 22;
   fALcheckbox2.Position.Point := TpointF.Create(0,0);
@@ -1076,6 +1019,19 @@ begin
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
   AlVertScrollBox1.AniCalculations.TouchTracking := [];
+end;
+
+procedure TForm1.OpenGLContextResetHandler(const Sender: TObject;const Msg: TMessage); // << because of this fucking bug https://quality.embarcadero.com/browse/RSP-11484
+begin
+  {$IFDEF ANDROID}
+  ALVideoPlayerSurface1.VideoPlayer := TALVideoPlayer.Create;
+  ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4'); // << no sound on ios, don't know why :(
+  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
+  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
+  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://techslides.com/demos/samples/sample.mp4'); // << this have sound on ios
+  ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
+  ALVideoPlayerSurface1.VideoPlayer.prepareAsync(False{AutoStartWhenPrepared});
+  {$ENDIF}
 end;
 
 { TALTextStopWatch }
@@ -1154,49 +1110,6 @@ begin
 end;
 
 procedure TALRectangleStopWatch.Paint;
-var aStopWatch: TstopWatch;
-    aRemovebufCreatePaintMs: boolean;
-begin
-  canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aRemovebufCreatePaintMs := (BufBitmap = nil);
-  aStopWatch := TstopWatch.StartNew;
-  inherited paint;
-  aStopWatch.stop;
-  bufPaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  if aRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
-end;
-
-{ TGlyphStopWatch }
-
-procedure TGlyphStopWatch.Paint;
-var aStopWatch: TstopWatch;
-begin
-  canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
-  inherited paint;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-end;
-
-{ TALGlyphStopWatch }
-
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
- function TALGlyphStopWatch.MakeBufBitmap: TTexture;
-{$ELSE}
- function TALGlyphStopWatch.MakeBufBitmap: Tbitmap;
-{$ENDIF}
-var aStopWatch: TstopWatch;
-begin
-  if (BufBitmap = nil) then begin
-    aStopWatch := TstopWatch.StartNew;
-    result := inherited MakeBufBitmap;
-    aStopWatch.stop;
-    bufCreatePaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  end
-  else result := inherited MakeBufBitmap;
-end;
-
-procedure TALGlyphStopWatch.Paint;
 var aStopWatch: TstopWatch;
     aRemovebufCreatePaintMs: boolean;
 begin

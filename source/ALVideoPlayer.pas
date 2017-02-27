@@ -110,7 +110,6 @@ type
       end;
 
   private
-    fStartMediaPlayerOnOpenGLContextReset: boolean;
     fLifeObj: TALLifeObj;
     FMediaPlayer: JMediaPlayer;
     fSurfaceTexture: JSurfaceTexture;
@@ -129,6 +128,11 @@ type
     fonVideoSizeChangedListener: TALVideoSizeChangedListener;
     fVideoWidth: integer;
     fVideoHeight: integer;
+    FOpenGLContextLostId: Integer;
+    FOpenGLContextResetId: Integer;
+    FIsOpenGLContextLost: Boolean;
+    procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
+    procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage);
     procedure removeListeners;
   protected
   public
@@ -327,9 +331,9 @@ type
     FAutoStartWhenPrepared: Boolean;
     fState: TVideoPlayerState;
     //-----
-    FTag: NativeInt;
+    FTag: int64;
     [Weak] FTagObject: TObject;
-    FTagFloat: Single;
+    FTagFloat: Double;
     //-----
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function GetBitmap: TalTexture;
@@ -373,9 +377,9 @@ type
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
     property State: TVideoPlayerState read fState;
     property AutoStartWhenPrepared: boolean read FAutoStartWhenPrepared write FAutoStartWhenPrepared;
-    property Tag: NativeInt read FTag write FTag default 0;
+    property Tag: int64 read FTag write FTag default 0;
     property TagObject: TObject read FTagObject write FTagObject;
-    property TagFloat: Single read FTagFloat write FTagFloat;
+    property TagFloat: Double read FTagFloat write FTagFloat;
   end;
 
   {***********************************}
@@ -402,9 +406,9 @@ type
     FAutoStartWhenPrepared: Boolean;
     fState: integer; // the integer representation of TVideoPlayerState;
     //-----
-    FTag: NativeInt;
+    FTag: int64;
     [Weak] FTagObject: TObject;
-    FTagFloat: Single;
+    FTagFloat: Double;
     //-----
     fDoSetDataSource: Boolean;
     fDoSetDataSourceValue: String;
@@ -475,9 +479,9 @@ type
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent; // << always fired in the main thread
     property State: TVideoPlayerState read GetState;
     property AutoStartWhenPrepared: boolean read FAutoStartWhenPrepared write FAutoStartWhenPrepared;
-    property Tag: NativeInt read FTag write FTag default 0;
+    property Tag: int64 read FTag write FTag default 0;
     property TagObject: TObject read FTagObject write FTagObject;
-    property TagFloat: Single read FTagFloat write FTagFloat;
+    property TagFloat: Double read FTagFloat write FTagFloat;
   end;
 
   {*****************************************}
@@ -485,12 +489,13 @@ type
   private
     fVideoPlayer: TALVideoPlayer;
     procedure OnFrameAvailable(Sender: Tobject);
+    procedure SetVideoPlayer(const Value: TALVideoPlayer);
   protected
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property VideoPlayer: TALVideoPlayer read fVideoPlayer write fVideoPlayer;
+    property VideoPlayer: TALVideoPlayer read fVideoPlayer write SetVideoPlayer;
   end;
 
 procedure register;
@@ -569,6 +574,8 @@ begin
     begin
       if not aLifeObj.alive then exit;
 
+      if fVideoPlayerControl.FIsOpenGLContextLost then exit;
+
       if (fVideoPlayerControl.fSurfaceTexture <> nil) and
          (fVideoPlayerControl.fbitmap <> nil) then begin
         if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
@@ -622,14 +629,14 @@ var aLifeObj: TALLifeObj;
 begin
 
   //what int: the type of error that has occurred:
-  //MEDIA_ERROR_UNKNOWN
-  //MEDIA_ERROR_SERVER_DIED
+  //MEDIA_ERROR_UNKNOWN (1)
+  //MEDIA_ERROR_SERVER_DIED (100)
   //
   //extra	int: an extra code, specific to the error. Typically implementation dependent.
-  //MEDIA_ERROR_IO
-  //MEDIA_ERROR_MALFORMED
-  //MEDIA_ERROR_UNSUPPORTED
-  //MEDIA_ERROR_TIMED_OUT
+  //MEDIA_ERROR_IO (-1004)
+  //MEDIA_ERROR_MALFORMED (-1007)
+  //MEDIA_ERROR_UNSUPPORTED (-1010)
+  //MEDIA_ERROR_TIMED_OUT (-110)
   //MEDIA_ERROR_SYSTEM (-2147483648) - low-level system error.
 
   {$IF defined(DEBUG)}
@@ -638,8 +645,9 @@ begin
                                          ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
   {$ENDIF}
 
-  result := false; // True if the method handled the error, false if it didn't. Returning false, or not having an
-                   // OnErrorListener at all, will cause the OnCompletionListener to be called.
+  fVideoPlayerControl.FMediaPlayer.reset; // << else i have infinite loop here, onError is continuasly called (try to disconnect the wifi and you will see) - stupid behavior !!
+  result := True; // True if the method handled the error, false if it didn't. Returning false, or not having an
+                  // OnErrorListener at all, will cause the OnCompletionListener to be called.
 
   if assigned(fVideoPlayerControl.fOnErrorEvent) then begin
     aLifeObj := fVideoPlayerControl.fLifeObj;
@@ -732,7 +740,6 @@ begin
   {$IF defined(DEBUG)}
   if abs(fPercentBuffered - percent) > 5 then begin // i don't know why percent bufferend go up and go down under android
     ALLog('TALAndroidVideoPlayer.onBufferingUpdate', 'percent buffered: ' + ALinttostrU(percent) + '%'+
-                                                     ' - percent played: ' + ALIntToStrU(round((100 / fVideoPlayerControl.FMediaPlayer.getDuration) * fVideoPlayerControl.FMediaPlayer.getCurrentPosition))+'%' +
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
     fPercentBuffered := percent;
   end;
@@ -792,7 +799,9 @@ begin
   inherited create;
 
   //-----
-  fStartMediaPlayerOnOpenGLContextReset := False;
+  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
+  FIsOpenGLContextLost := False;
 
   //-----
   fLifeObj := TALLifeObj.Create;
@@ -853,6 +862,10 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.Destroy', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
+
+  //-----
+  TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
+  TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
 
   //stop all futur TThread.queue to execute
   //and also signal that the object is destroying
@@ -926,6 +939,26 @@ begin
   fSurfaceTexture.setOnFrameAvailableListener(nil);
 end;
 
+{***************************************************************************************************}
+procedure TALAndroidVideoPlayer.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.OpenGLContextLostHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+  FIsOpenGLContextLost := True;
+end;
+
+{****************************************************************************************************}
+procedure TALAndroidVideoPlayer.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
+begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidVideoPlayer.OpenGLContextResetHandler', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
+  //FIsOpenGLContextLost := False; // normally i must recreate the fbitmap.handle but i don't have time to debug (i need to know how to recreate an open GL texture with a defined name)
+                                   // and in my app i don't need this because on OpenGLContextLostHandler i simply destroy all the videoplayer to
+                                   // recreate them on OpenGLContextResetHandler
+end;
+
 {******************************************************}
 //Gets the current playback position. return the current
 //position in milliseconds
@@ -994,6 +1027,7 @@ var aStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.pause', 'Begin', TalLogType.VERBOSE);
   aStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
@@ -1001,7 +1035,7 @@ begin
 
   {$IFDEF DEBUG}
   aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.pause', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.pause', 'End - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1017,6 +1051,7 @@ var aStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.start', 'Begin', TalLogType.VERBOSE);
   aStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
@@ -1024,7 +1059,7 @@ begin
 
   {$IFDEF DEBUG}
   aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.start', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.start', 'End - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1044,6 +1079,7 @@ var aStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.stop', 'Begin', TalLogType.VERBOSE);
   aStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
@@ -1051,7 +1087,7 @@ begin
 
   {$IFDEF DEBUG}
   aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.stop', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.stop', 'End - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1067,6 +1103,7 @@ var aStopWatch: TstopWatch;
 {$ENDIF}
 begin
   {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.prepare', 'Begin', TalLogType.VERBOSE);
   aStopWatch := TstopWatch.StartNew;
   {$ENDIF}
 
@@ -1074,7 +1111,7 @@ begin
 
   {$IFDEF DEBUG}
   aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.prepare', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.prepare', 'End - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1092,13 +1129,14 @@ var aStopWatch: TstopWatch;
 begin
   {$IFDEF DEBUG}
   aStopWatch := TstopWatch.StartNew;
+  ALLog('TALAndroidVideoPlayer.prepareAsync', 'Begin', TalLogType.VERBOSE);
   {$ENDIF}
 
   FMediaPlayer.prepareAsync;
 
   {$IFDEF DEBUG}
   aStopWatch.Stop;
-  ALLog('TALAndroidVideoPlayer.prepareAsync', 'timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+  ALLog('TALAndroidVideoPlayer.prepareAsync', 'End - timeTaken: ' + ALFormatFloatU('0.00', aStopWatch.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1113,6 +1151,9 @@ end;
 //Sets the data source (file-path or http/rtsp URL) to use.
 procedure TALAndroidVideoPlayer.setDataSource(const aDataSource: String);
 begin
+  {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.setDataSource', 'aDataSource: ' + aDataSource, TalLogType.VERBOSE);
+  {$ENDIF}
   FMediaPlayer.setDataSource(StringToJString(aDataSource));
 end;
 
@@ -1120,6 +1161,9 @@ end;
 //Sets the player to be looping or non-looping.
 procedure TALAndroidVideoPlayer.setLooping(const looping: Boolean);
 begin
+  {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.setLooping', 'looping: ' + alBoolTostrU(looping), TalLogType.VERBOSE);
+  {$ENDIF}
   FMediaPlayer.setLooping(looping);
 end;
 
@@ -1134,6 +1178,9 @@ end;
 procedure TALAndroidVideoPlayer.setVolume(const Value: Single);
 var aVolume: Single;
 begin
+  {$IFDEF DEBUG}
+  ALLog('TALAndroidVideoPlayer.setVolume', 'Value: ' + alFloattostrU(Value, ALDefaultFormatSettingsU), TalLogType.VERBOSE);
+  {$ENDIF}
   aVolume := Value;
   if aVolume < 0 then aVolume := 0
   else if aVolume > 1 then aVolume := 1;
@@ -1924,6 +1971,10 @@ begin
                                                           // change using key-value observing.
   then begin
 
+    {$IFDEF DEBUG}
+    ALLog('TALIOSVideoPlayer.doOnReady', 'Ready', TalLogType.VERBOSE);
+    {$ENDIF}
+
     //i need to do this here because of bug like :
     //https://forums.developer.apple.com/thread/27589
     //http://stackoverflow.com/questions/24800742/iosavplayeritemvideooutput-hasnewpixelbufferforitemtime-doesnt-work-correctly
@@ -1954,6 +2005,10 @@ begin
   end
   else if (fPlayer.status = AVPlayerStatusFailed) or
           (FPlayerItem.status = AVPlayerItemStatusFailed) then begin
+
+    {$IFDEF DEBUG}
+    ALLog('TALIOSVideoPlayer.doOnReady', 'Failed', TalLogType.Error);
+    {$ENDIF}
 
     //fire the fOnErrorEvent
     if fState <> vpsError then begin
@@ -2448,17 +2503,17 @@ begin
         //fDoSetDataSource
         if fDoSetDataSource then begin
           if Terminated then Break;
+          fDoSetDataSource := False;
           AtomicExchange(fState, integer(vpsInitialized));
           fVideoPlayerControl.setDataSource(fDoSetDataSourceValue);
-          fDoSetDataSource := False;
         end;
 
         //fDoOnReady
         {$IF defined(IOS)}
         if fDoOnReady then begin
           if Terminated then Break;
-          fVideoPlayerControl.doOnReady;
           fDoOnReady := False;
+          fVideoPlayerControl.doOnReady;
         end;
         {$endif}
 
@@ -2466,9 +2521,9 @@ begin
         {$IF defined(IOS)}
         if fDoOnItemDidPlayToEndTime then begin
           if Terminated then Break;
-          fVideoPlayerControl.DoOnItemDidPlayToEndTime;
           fDoOnItemDidPlayToEndTime := False;
-          aTimeout := INFINITE;
+          fVideoPlayerControl.DoOnItemDidPlayToEndTime;
+          if fVideoPlayerControl.fState = vpsPlaybackCompleted then aTimeout := INFINITE;
         end;
         {$endif}
 
@@ -2476,8 +2531,8 @@ begin
         {$IF defined(IOS)}
         if fDoOnItemFailedToPlayToEndTime then begin
           if Terminated then Break;
-          fVideoPlayerControl.DoOnItemFailedToPlayToEndTime;
           fDoOnItemFailedToPlayToEndTime := False;
+          fVideoPlayerControl.DoOnItemFailedToPlayToEndTime;
           aTimeout := INFINITE;
         end;
         {$endif}
@@ -2485,33 +2540,33 @@ begin
         //fDoSetVolume
         if fDoSetVolume then begin
           if Terminated then Break;
-          fVideoPlayerControl.setVolume(AtomicCmpExchange(fDoSetVolumeValue, -1, -1) / 100);
           fDoSetVolume := False;
+          fVideoPlayerControl.setVolume(AtomicCmpExchange(fDoSetVolumeValue, -1, -1) / 100);
         end;
 
         //fDoSetLooping
         if fDoSetLooping then begin
           if Terminated then Break;
-          fVideoPlayerControl.setLooping(fDoSetLoopingValue);
           fDoSetLooping := False;
+          fVideoPlayerControl.setLooping(fDoSetLoopingValue);
         end;
 
         //fDoPrepare
         if fDoPrepare then begin
           if Terminated then Break;
+          fDoPrepare := False;
           AtomicExchange(fState, integer(vpsPreparing));
           fVideoPlayerControl.prepare;
-          fDoPrepare := False;
         end;
 
         //fDoStart
         if fDoStart then begin
           if Terminated then Break;
+          fDoStart := False;
           if State <> vpsStarted then begin
             AtomicExchange(fState, integer(vpsStarted));
             fVideoPlayerControl.Start;
           end;
-          fDoStart := False;
           {$IF defined(IOS)}
           aTimeout := _FrameRefreshInterval;
           {$ENDIF}
@@ -2520,26 +2575,26 @@ begin
         //fDoSeekTo
         if fDoSeekTo then begin
           if Terminated then Break;
-          fVideoPlayerControl.seekTo(AtomicCmpExchange(fDoSeekToValue, -1, -1));
           fDoSeekTo := False;
+          fVideoPlayerControl.seekTo(AtomicCmpExchange(fDoSeekToValue, -1, -1));
         end;
 
         //fDoGetDuration
         if fDoGetDuration then begin
           if Terminated then Break;
-          AtomicExchange(fDoGetDurationValue, fVideoPlayerControl.GetDuration);
           fDoGetDuration := False;
+          AtomicExchange(fDoGetDurationValue, fVideoPlayerControl.GetDuration);
           fDoGetDurationSignal.SetEvent;
         end;
 
         //fDoPause
         if fDoPause then begin
           if Terminated then Break;
+          fDoPause := False;
           if State <> vpsPaused then begin
             AtomicExchange(fState, integer(vpsPaused));
             fVideoPlayerControl.pause;
           end;
-          fDoPause := False;
           {$IF defined(IOS)}
           aTimeout := INFINITE;
           {$ENDIF}
@@ -2548,11 +2603,11 @@ begin
         //fDoStop
         if fDoStop then begin
           if Terminated then Break;
+          fDoStop := False;
           if State <> vpsStopped then begin
             AtomicExchange(fState, integer(vpsStopped));
             fVideoPlayerControl.Stop;
           end;
-          fDoStop := False;
           {$IF defined(IOS)}
           aTimeout := INFINITE;
           {$ENDIF}
@@ -2566,6 +2621,13 @@ begin
 
       Except
         on E: Exception do begin
+          {$IF defined(DEBUG)}
+          ALLog('TALVideoPlayerAsync.Execute', 'Error: ' + E.Message, TalLogType.Error);
+          {$ENDIF}
+          {$IF defined(IOS)}
+          aTimeout := INFINITE;
+          {$ENDIF}
+          AtomicExchange(fState, integer(vpsError));
           DoOnError(self);
         end;
       End;
@@ -2834,6 +2896,16 @@ end;
 procedure TALVideoPlayerSurface.OnFrameAvailable(Sender: Tobject);
 begin
   repaint;
+end;
+
+{**************************************************************************}
+procedure TALVideoPlayerSurface.SetVideoPlayer(const Value: TALVideoPlayer);
+begin
+  if fVideoPlayer <> Value then begin
+    if (fVideoPlayer <> nil) then ALfreeAndNil(fVideoPlayer);
+    fVideoPlayer := Value;
+    if fVideoPlayer <> nil then fVideoPlayer.OnFrameAvailable := OnFrameAvailable;
+  end;
 end;
 
 {************************************}

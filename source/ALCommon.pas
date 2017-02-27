@@ -146,7 +146,7 @@ begin
     end;
   //end;
   {$ELSEIF defined(MSWINDOWS)}
-  //if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
+  if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
     if msg <> '' then aMsg := ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
     else aMsg := '';
     case _type of
@@ -157,7 +157,7 @@ begin
       TalLogType.ERROR:   Log.d('[E][W][I][D][V] ' + Tag + aMsg + ' |');
       TalLogType.ASSERT:  Log.d('[A][E][W][I][D][V] ' + Tag + aMsg + ' |');
     end;
-  //end;
+  end;
   {$IFEND}
 end;
 

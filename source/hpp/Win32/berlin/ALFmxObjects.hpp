@@ -84,6 +84,7 @@ __published:
 	__property RotationCenter;
 	__property Scale;
 	__property Size;
+	__property TouchTargetExpansion;
 	__property Visible = {default=1};
 	__property Width;
 	__property System::UnicodeString ResourceName = {read=fResourceName, write=setResourceName};

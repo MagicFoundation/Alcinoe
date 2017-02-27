@@ -1807,8 +1807,8 @@ begin
   FOnChange := nil;
   FIsPressed := False;
   FIsChecked := False;
-  fImageCheckedResourceName := 'checkbox_checked_22x22';
-  fImageUncheckedResourceName := 'checkbox_unchecked_22x22';
+  fImageCheckedResourceName := 'checkbox_checked_88x88';
+  fImageUncheckedResourceName := 'checkbox_unchecked_88x88';
   FWrapMode := TALImageWrapMode.Fit;
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
@@ -2108,13 +2108,13 @@ end;
 {***********************************************************}
 function TALCheckBox.ImageCheckedResourceNameStored: Boolean;
 begin
-  result := fImageCheckedResourceName <> 'checkbox_checked_22x22';
+  result := fImageCheckedResourceName <> 'checkbox_checked_88x88';
 end;
 
 {*************************************************************}
 function TALCheckBox.ImageUncheckedResourceNameStored: Boolean;
 begin
-  result := fImageUnCheckedResourceName <> 'checkbox_unchecked_22x22';
+  result := fImageUnCheckedResourceName <> 'checkbox_unchecked_88x88';
 end;
 
 {***************************************************************}
@@ -2168,8 +2168,8 @@ end;
 constructor TALRadioButton.Create(AOwner: TComponent);
 begin
   inherited;
-  fImageCheckedResourceName := 'radio_checked_22x22';
-  fImageUncheckedResourceName := 'radio_unchecked_22x22';
+  fImageCheckedResourceName := 'radio_checked_88x88';
+  fImageUncheckedResourceName := 'radio_unchecked_88x88';
   FGroupName := '';
   fMandatory := false;
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
@@ -2204,13 +2204,13 @@ end;
 {**************************************************************}
 function TALRadioButton.ImageCheckedResourceNameStored: Boolean;
 begin
-  result := fImageCheckedResourceName <> 'radio_checked_22x22';
+  result := fImageCheckedResourceName <> 'radio_checked_88x88';
 end;
 
 {****************************************************************}
 function TALRadioButton.ImageUncheckedResourceNameStored: Boolean;
 begin
-  result := fImageUnCheckedResourceName <> 'radio_unchecked_22x22';
+  result := fImageUnCheckedResourceName <> 'radio_unchecked_88x88';
 end;
 
 {*******************************************}

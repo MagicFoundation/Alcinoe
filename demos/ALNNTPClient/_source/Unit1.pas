@@ -16,9 +16,7 @@ uses Windows,
      ExtCtrls,
      ComCtrls,
      SyncObjs,
-     AlNNTPClient,
-     cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
-  cxContainer, cxEdit, cxLabel;
+     AlNNTPClient;
 
 type
   TForm1 = class(TForm)

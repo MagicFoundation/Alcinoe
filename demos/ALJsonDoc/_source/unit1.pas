@@ -7,7 +7,7 @@ uses Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
      ALStringList, Shellapi, ALMime, Vcl.Dialogs,
      Contnrs, alFiles, diagnostics, superobject, DBXJSON, DBXplatform, IOUtils,
      dwsJSON, Execute.JSON, system.Generics.collections,
-     system.UITypes;
+     system.UITypes, system.JSON;
 
 type
 

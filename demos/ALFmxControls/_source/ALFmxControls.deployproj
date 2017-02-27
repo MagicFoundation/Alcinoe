@@ -5,9 +5,9 @@
     </ProjectExtensions>
     <PropertyGroup>
         <DeviceId Condition="'$(Platform)'=='Android'">3204d0ab8ff96111</DeviceId>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice32'">1269d5786e75bc1b4c1469f4bacd0b66bb640f13</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">iPhone5</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">21E9193D-3F1A-4504-B664-CDB0617D7380</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'">
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_57x57.png" Condition="'$(Config)'=='Debug'">
@@ -402,15 +402,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
-            <DeployClass>iPad_Setting58</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1536x2008.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Default-Portrait@2x.png</RemoteName>
@@ -425,6 +416,15 @@
             <RemoteName>ResourceRules.plist</RemoteName>
             <DeployClass>ProjectiOSDeviceResourceRules</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls.app\</RemoteDir>
+            <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+            <DeployClass>iPad_Setting58</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1053,6 +1053,15 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Win32'">
+        <DeployFile Include="resources\four_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>four_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="..\Win32\Debug\ALFmxControls.exe" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\</RemoteDir>
             <RemoteName>ALFmxControls.exe</RemoteName>
@@ -1062,6 +1071,33 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
+        </DeployFile>
+        <DeployFile Include="resources\tree_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>tree_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\one_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>one_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\two_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>two_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='OSX32'">
@@ -1222,6 +1258,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="resources\four_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>four_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="..\Android\Debug\libALFmxControls.so" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
             <RemoteName>libALFmxControls.so</RemoteName>
@@ -1341,6 +1386,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="resources\two_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>two_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFmxControls\res\drawable-normal\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
@@ -1373,6 +1427,15 @@
             <RemoteName>libALFmxControls.so</RemoteName>
             <DeployClass>AndroidLibnativeArmeabiFile</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\one_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>one_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1427,6 +1490,15 @@
             <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>Android_LauncherIcon36</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\tree_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>tree_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1515,19 +1587,19 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1242x2208.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
-            <DeployClass>iPad_AppIcon152</DeployClass>
+            <RemoteName>Default-736h@3x.png</RemoteName>
+            <DeployClass>iPhone_Launch1242</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_1242x2208.png" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>Default-736h@3x.png</RemoteName>
-            <DeployClass>iPhone_Launch1242</DeployClass>
+            <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+            <DeployClass>iPad_AppIcon152</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -1691,6 +1763,15 @@
             <RemoteName>Default-568h@2x.png</RemoteName>
             <DeployClass>iPhone_Launch640x1136</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\four_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls.app\StartUp\Documents\</RemoteDir>
+            <RemoteName>four_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1983,6 +2064,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="resources\tree_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls.app\StartUp\Documents\</RemoteDir>
+            <RemoteName>tree_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_40x40.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>FM_SpotlightSearchIcon_40x40.png</RemoteName>
@@ -2015,6 +2105,15 @@
             <RemoteName>Default-Portrait@2x.png</RemoteName>
             <DeployClass>iPad_Launch1536</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\two_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls.app\StartUp\Documents\</RemoteDir>
+            <RemoteName>two_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -2123,6 +2222,15 @@
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Default-Landscape-736h@3x.png</RemoteName>
             <DeployClass>iPhone_Launch2208</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\one_720x720.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls.app\StartUp\Documents\</RemoteDir>
+            <RemoteName>one_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>

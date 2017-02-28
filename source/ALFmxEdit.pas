@@ -219,7 +219,6 @@ type
   TALIosEdit = class(TControl)
   private
     fOnChangeTracking: TNotifyEvent;
-    FAttributedString: NSMutableAttributedString;
     FTextSettings: TTextSettings;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
@@ -235,7 +234,7 @@ type
     procedure SetTextSettings(const Value: TTextSettings);
     function getText: String;
     procedure SetText(const Value: String);
-    procedure DoFontChanged(const aText: String);
+    procedure DoFontChanged;
     procedure OnFontChanged(Sender: TObject);
   protected
     FTextField: TALIosTextField;
@@ -1384,7 +1383,6 @@ begin
   fOnChangeTracking := nil;
   FTextSettings := TALEditTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
-  FAttributedString := nil;
   FTextField := TalIosTextField.create(self);
   SetReturnKeyType(tReturnKeyType.Default);
   SetKeyboardType(TVirtualKeyboardType.default);
@@ -1396,7 +1394,6 @@ end;
 destructor TalIosEdit.Destroy;
 begin
   ALfreeandNil(FTextField);
-  if FAttributedString <> nil then FAttributedString.release;
   ALFreeAndNil(FTextSettings);
   inherited Destroy;
 end;
@@ -1510,65 +1507,57 @@ end;
 {************************************************}
 procedure TalIosEdit.SetText(const Value: String);
 begin
-  if (FAttributedString = nil) or (FAttributedString.length = 0) then DoFontChanged(Value)
-  else begin
-    FAttributedString.replaceCharactersInRange(NSMakeRange(0, FAttributedString.length), StrToNSStr(Value));
-    FTextField.View.setAttributedText(FAttributedString);
-  end;
+  FTextField.View.setText(StrToNSStr(Value));
 end;
 
-{******************************************************}
-procedure TalIosEdit.DoFontChanged(const aText: String);
-var aTextRange: NSRange;
+{*********************************}
+procedure TalIosEdit.DoFontChanged;
+var aDictionary: NSDictionary;
     aFontRef: CTFontRef;
-    aUnderline: CFNumberRef;
-    aValue: Cardinal;
 begin
-
-  if FAttributedString <> nil then begin
-    FAttributedString.release;
-    FAttributedString := nil;
-  end;
-  FAttributedString := TNSMutableAttributedString.Alloc;
-  FAttributedString := TNSMutableAttributedString.Wrap(FAttributedString.initWithString(StrToNSStr(aText)));
-
-  FAttributedString.beginEditing;
-  try
-    aTextRange := NSMakeRange(0, aText.Length);
 
     //Font
     aFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
-    if aFontRef <> nil then
+    if aFontRef <> nil then begin
       try
-        FAttributedString.addAttribute(TNSString.Wrap(kCTFontAttributeName), aFontRef, aTextRange);
+
+        aDictionary := TNSDictionary.Wrap(
+                         TNSDictionary.OCClass.dictionaryWithObject(
+                           aFontRef,
+                           (TNSString.Wrap(kCTFontAttributeName) as ILocalObject).GetObjectID));
+        FTextField.View.setdefaultTextAttributes(aDictionary); // << Setting this property applies the specified attributes to the entire
+                                                               // << text of the text field. Unset attributes maintain their default values.
+                                                               // << note: seam that i can't later call aDictionary.release or i have an error
+
+        //i need to put this also in the aDictionary elso but i don't know yet how to put in
+        //aDictionary more than one item ... and sincerely i don't need fsUnderline !!
+        //var aUnderline: CFNumberRef;
+        //    aValue: Cardinal;
+        //if TFontStyle.fsUnderline in fTextSettings.Font.Style then begin
+        //  aValue := kCTUnderlineStyleSingle;
+        //  aUnderline := CFNumberCreate(nil, kCFNumberSInt32Type, @aValue);
+        //  try
+        //    FAttributedString.addAttribute(TNSString.Wrap(kCTUnderlineStyleAttributeName), aUnderline, aTextRange);
+        //  finally
+        //    CFRelease(aUnderline);
+        //  end;
+        //end;
+
       finally
         CFRelease(aFontRef);
       end;
-
-    //Font style
-    if TFontStyle.fsUnderline in fTextSettings.Font.Style then begin
-      aValue := kCTUnderlineStyleSingle;
-      aUnderline := CFNumberCreate(nil, kCFNumberSInt32Type, @aValue);
-      try
-        FAttributedString.addAttribute(TNSString.Wrap(kCTUnderlineStyleAttributeName), aUnderline, aTextRange);
-      finally
-        CFRelease(aUnderline);
-      end;
     end;
 
-  finally
-    FAttributedString.endEditing;
-  end;
+    //TextAlignment and TextColor
+    FTextField.View.setTextAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
+    FTextField.View.setTextColor(AlphaColorToUIColor(fTextSettings.FontColor));
 
-  FTextField.View.setAttributedText(FAttributedString);
-  FTextField.View.setTextAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
-  FTextField.View.setTextColor(AlphaColorToUIColor(fTextSettings.FontColor));
 end;
 
 {**************************************************}
 procedure TalIosEdit.OnFontChanged(Sender: TObject);
 begin
-  DoFontChanged(text);
+  DoFontChanged;
 end;
 
 {*************************************************}

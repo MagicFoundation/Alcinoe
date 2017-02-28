@@ -144,6 +144,7 @@ public:
 __published:
 	__property Align = {default=9};
 	__property Locked = {default=1};
+	__property HitTest = {default=0};
 public:
 	/* TalImage.Destroy */ inline __fastcall virtual ~TALTrackThumbGlyph(void) { }
 	

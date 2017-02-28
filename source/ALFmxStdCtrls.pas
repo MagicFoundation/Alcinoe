@@ -137,6 +137,7 @@ type
   published
     property Align default TalignLayout.Client;
     property Locked default True;
+    property HitTest default false;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -931,6 +932,7 @@ begin
   inherited;
   Align := TalignLayout.Client;
   locked := True;
+  HitTest := False;
 end;
 
 {***************************************************************************************************************************}

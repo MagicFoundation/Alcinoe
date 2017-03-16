@@ -108,6 +108,7 @@ uses System.Math,
      {$IFDEF MSWINDOWS}
      System.Win.Comobj,
      Winapi.Ole2,
+     Winapi.ActiveX,
      {$ENDIF}
      ALString,
      ALQuickSortList;
@@ -1668,14 +1669,39 @@ end;
  similar to browser's console, so you can send even the code
  like this "2+2" => returns "4".}
 function ALRunJavascript(const aCode: AnsiString): AnsiString;
-var aJavaScript: OleVariant;
+var HandleResult: HResult;
+
+    {$REGION '_MakeExecution'}
+    // see: http://stackoverflow.com/questions/2653797/why-does-couninitialize-cause-an-error-on-exit
+    // we create COM-object with CreateOleObject here to make that its creation is handled inside of
+    // THIS scope (function MakeExecution) and its destroying is handled inside of this function too
+    // on the last "end;" of this function.
+    function _MakeExecution(const aCode: AnsiString): AnsiString;
+    var aJavaScript: OleVariant;
+    begin
+      aJavaScript          := CreateOleObject('ScriptControl');
+      aJavaScript.Language := 'JavaScript';
+      result               := AnsiString(aJavaScript.Eval(String(aCode)));
+    end;
+    {$ENDREGION}
+
 begin
-  CoInitialize(nil);
+  // we create here the COM-server that will be actually destroyed
+  // on calling of CoUninitialize. What it will do on destroy it depends
+  // on the operation system.
+  //              |
+  //              V
+  HandleResult := CoInitializeEx(nil, COINIT_MULTITHREADED);
+  if HandleResult <> S_OK then raise EALException.Create('ALRunJavascript: cannot initialize OLE-object');
   try
-    aJavaScript          := CreateOleObject('ScriptControl');
-    aJavaScript.Language := 'JavaScript';
-    result               := AnsiString(aJavaScript.Eval(String(aCode)));
+    result := _MakeExecution(aCode);
   finally
+    // Here we deactivate and destroy the COM-server. When it will be destroyed then all the existing
+    // OLE-objects will be orphaned, so normally they should be already killed at this time. BUT the
+    // problem here that COM-objects mostly destroyed when we reach the end of scope (assume last "end;"
+    // of the function). So when the objects are created in THIS scope they will be killed after this
+    // CoUninitialize but they cannot be killed on that step because COM-server is already destroyed and
+    // no links are kept. This way COM-objects are created in the another scope (local function makeExecution).
     CoUninitialize;
   end;
 end;
@@ -1845,7 +1871,7 @@ Begin
          (flag3 or (P3 <= 0))
       then begin
         TagParams[i] := S1 + S2 + S3;
-        tagParams.Delete(i+2);
+        TagParams.Delete(i+2);
       end
       else TagParams[i] := S1 + S2;
       tagParams.Delete(i+1);

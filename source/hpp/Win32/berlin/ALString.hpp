@@ -653,6 +653,11 @@ extern DELPHI_PACKAGE bool __fastcall ALIsFloat(const System::AnsiString S, cons
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFloatToStr(System::Extended Value, const TALFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFloatToStr(System::Extended Value, System::AnsiString &S, const TALFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALFloatToStrF(System::Extended Value, System::Sysutils::TFloatFormat Format, int Precision, int Digits, const TALFormatSettings &AFormatSettings);
+extern DELPHI_PACKAGE bool __fastcall ALIsDecimalU(const System::UnicodeString S, const bool RejectPlusMinusSign = false);
+extern DELPHI_PACKAGE bool __fastcall ALIsIntegerU(const System::UnicodeString S);
+extern DELPHI_PACKAGE bool __fastcall ALIsInt64U(const System::UnicodeString S);
+extern DELPHI_PACKAGE bool __fastcall ALIsSmallIntU(const System::UnicodeString S);
+extern DELPHI_PACKAGE bool __fastcall ALIsFloatU(const System::UnicodeString S, const System::Sysutils::TFormatSettings &AFormatSettings);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALFloatToStrU(System::Extended Value, const System::Sysutils::TFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE void __fastcall ALFloatToStrU(System::Extended Value, System::UnicodeString &S, const System::Sysutils::TFormatSettings &AFormatSettings)/* overload */;
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALCurrToStr(System::Currency Value, const TALFormatSettings &AFormatSettings);
@@ -769,6 +774,8 @@ extern DELPHI_PACKAGE System::AnsiString __fastcall ALHTTPEncode(const System::A
 extern DELPHI_PACKAGE System::AnsiString __fastcall ALHTTPDecode(const System::AnsiString AStr);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFields(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, char * Content, Alstringlist::TALStrings* Strings, bool HttpDecode, bool StripQuotes = false);
 extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscaped(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, char * Content, Alstringlist::TALStrings* Strings, bool HttpDecode, bool StripQuotes = false);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall ALHTTPDecodeU(const System::UnicodeString AStr);
+extern DELPHI_PACKAGE void __fastcall ALExtractHeaderFieldsWithQuoteEscapedU(const System::Sysutils::TSysCharSet &Separators, const System::Sysutils::TSysCharSet &WhiteSpace, const System::Sysutils::TSysCharSet &Quotes, System::WideChar * Content, Alstringlist::TALStringsU* Strings, bool HttpDecode, bool StripQuotes = false);
 extern DELPHI_PACKAGE void __fastcall ALStringInitialization(void);
 }	/* namespace Alstring */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALSTRING)

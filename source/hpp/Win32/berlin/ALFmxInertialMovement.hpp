@@ -219,6 +219,7 @@ public:
 	__property Alfmxcommon::TALPointD CurrentVelocity = {read=FCurrentVelocity, write=FCurrentVelocity};
 	__property Alfmxcommon::TALPointD ViewportPosition = {read=FViewportPosition, write=SetViewportPosition};
 	__property System::Types::TPointF ViewportPositionF = {read=GetViewportPositionF, write=SetViewportPositionF};
+	__property Alfmxcommon::TALPointD DownPosition = {read=FDownPosition, write=FDownPosition};
 	__property System::TDateTime LastTimeCalc = {read=FLastTimeCalc};
 	__property bool Down = {read=FDown, write=SetDown, nodefault};
 	__property float Opacity = {read=GetOpacity};

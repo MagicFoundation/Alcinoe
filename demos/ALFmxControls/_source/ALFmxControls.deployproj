@@ -7,7 +7,7 @@
         <DeviceId Condition="'$(Platform)'=='Android'">3204d0ab8ff96111</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">21E9193D-3F1A-4504-B664-CDB0617D7380</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSSimulator'">iPhone5</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice64'">
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_57x57.png" Condition="'$(Config)'=='Debug'">
@@ -28,20 +28,20 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="..\iOSDevice64\Debug\ALFmxControls.info.plist" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>Info.plist</RemoteName>
-            <DeployClass>ProjectiOSInfoPList</DeployClass>
-            <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_750x1334.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Default-667h@2x.png</RemoteName>
             <DeployClass>iPhone_Launch750</DeployClass>
             <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="..\iOSDevice64\Debug\ALFmxControls.info.plist" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls.app\</RemoteDir>
+            <RemoteName>Info.plist</RemoteName>
+            <DeployClass>ProjectiOSInfoPList</DeployClass>
+            <Operation>1</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -402,6 +402,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls.app\</RemoteDir>
+            <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+            <DeployClass>iPad_Setting58</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1536x2008.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Default-Portrait@2x.png</RemoteName>
@@ -416,15 +425,6 @@
             <RemoteName>ResourceRules.plist</RemoteName>
             <DeployClass>ProjectiOSDeviceResourceRules</DeployClass>
             <Operation>1</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
-            <DeployClass>iPad_Setting58</DeployClass>
-            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1053,6 +1053,24 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='Win32'">
+        <DeployFile Include="resources\checkbox_unchecked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>checkbox_unchecked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\radio_unchecked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>radio_unchecked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="resources\four_720x720.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\</RemoteDir>
             <RemoteName>four_720x720.png</RemoteName>
@@ -1072,6 +1090,24 @@
             <Overwrite>True</Overwrite>
             <Required>True</Required>
         </DeployFile>
+        <DeployFile Include="resources\checkbox_checked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>checkbox_checked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\radio_checked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>radio_checked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="resources\tree_720x720.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\</RemoteDir>
             <RemoteName>tree_720x720.png</RemoteName>
@@ -1081,9 +1117,27 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="resources\thumb_144x144.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>thumb_144x144.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="resources\one_720x720.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\</RemoteDir>
             <RemoteName>one_720x720.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\aniindicator_540x432.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\</RemoteDir>
+            <RemoteName>aniindicator_540x432.png</RemoteName>
             <DeployClass>ProjectFile</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1200,6 +1254,15 @@
             <RemoteName>splash_image.png</RemoteName>
             <DeployClass>Android_SplashImage426</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\radio_checked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>radio_checked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1386,6 +1449,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="resources\checkbox_checked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>checkbox_checked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="resources\two_720x720.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
             <RemoteName>two_720x720.png</RemoteName>
@@ -1503,6 +1575,42 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="resources\radio_unchecked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>radio_unchecked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\aniindicator_540x432.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>aniindicator_540x432.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\checkbox_unchecked_88x88.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>checkbox_unchecked_88x88.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="resources\thumb_144x144.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
+            <RemoteName>thumb_144x144.png</RemoteName>
+            <DeployClass>ProjectFile</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls\library\lib\armeabi\</RemoteDir>
             <RemoteName>libALFmxControls.so</RemoteName>
@@ -1578,10 +1686,10 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Condition="'$(Config)'=='Release'">
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
-            <DeployClass>iPad_SpotLight80</DeployClass>
+            <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+            <DeployClass>iPad_AppIcon152</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
@@ -1596,10 +1704,10 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
-            <DeployClass>iPad_AppIcon152</DeployClass>
+            <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+            <DeployClass>iPad_SpotLight80</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>

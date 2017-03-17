@@ -113,6 +113,8 @@ type
     FSoftInputListener: TALSoftInputListener;
     FKeyPreImeListener: TALKeyPreImeListener;
     FFocusChangeListener: TALFocusChangeListener;
+    fFormActivateMessageID: integer;
+    fFormDeactivateMessageID: integer;
     fApplicationEventMessageID: integer;
     fReturnKeyType: TReturnKeyType;
     fKeyboardType: TVirtualKeyboardType;
@@ -135,7 +137,9 @@ type
     function getText: String;
     procedure SetText(const Value: String);
     procedure OnFontChanged(Sender: TObject);
-    procedure ApplicationEventHandler(const Sender : TObject; const M : TMessage);
+    procedure FormActivateHandler(const Sender: TObject; const M: TMessage);
+    procedure FormDeactivateHandler(const Sender: TObject; const M: TMessage);
+    procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
   protected
     FEditText: JALEditText;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
@@ -412,6 +416,8 @@ begin
   else FScreenScale := 1;
   //-----
   CanFocus := True;
+  fFormActivateMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TFormActivateMessage, FormActivateHandler);
+  fFormDeactivateMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TFormDeactivateMessage, FormDeActivateHandler);
   fApplicationEventMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   fOnChangeTracking := nil;
   FTextSettings := TALEditTextSettings.Create(Self);
@@ -516,6 +522,8 @@ begin
   ALLog('TALAndroidEdit.Destroy', 'start', TalLogType.VERBOSE);
   {$ENDIF}
 
+  TMessageManager.DefaultManager.Unsubscribe(TFormActivateMessage, fFormActivateMessageID);
+  TMessageManager.DefaultManager.Unsubscribe(TFormDeactivateMessage, fFormDeactivateMessageID);
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
   TUIThreadCaller.ForceRunnablesCollection;
   TUIThreadCaller.Call<JALEditText, JALControlHostLayout>(
@@ -1056,6 +1064,18 @@ begin
   if isfocused and
      (M is TApplicationEventMessage) and
      ((M as TApplicationEventMessage).Value.Event = TApplicationEvent.EnteredBackground) then resetfocus;
+end;
+
+{*************************************************************************************}
+procedure TALAndroidEdit.FormActivateHandler(const Sender: TObject; const M: TMessage);
+begin
+  RealignContent;
+end;
+
+{***************************************************************************************}
+procedure TALAndroidEdit.FormDeactivateHandler(const Sender: TObject; const M: TMessage);
+begin
+  RealignContent;
 end;
 
 {*******************************************************************************************}

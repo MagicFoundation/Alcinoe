@@ -4396,19 +4396,62 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                               var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
                               const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  Function _getFontColorFromTag(const aTag: String; var acolor: TalphaColor): boolean; // tag = <font color="#ffffff">
-  var acolorInt: integer;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _getInfosFromTag(const aTag: String;
+                             const aSpanIds: TalStringlistU;
+                             const aFontColors: Tlist<TalphaColor>); // tag = <font color="#ffffff" id="xxx">
+  var aParamList: TAlStringListU;
+      acolorInt: integer;
       S1: String;
   begin
-    result := True;
-    if atag[length(atag)-1] <> '"' then exit(False);
-    if not length(atag) in [22, 24] then exit(False);
-    if atag[14] <> '#' then exit(False);
-    S1 := alcopyStrU(aTag, 15, length(aTag) - 16{- 1 - 15});  // ffffff
-    if length(S1) = 6 then S1 := 'ff' + S1; // ffffffff
-    if not ALTryStrTointU('$'+S1, acolorInt) then exit(False); // $ffffff
-    acolor := TalphaColor(acolorInt);
+
+    if aTag = '' then begin
+      aSpanIds.Add('');
+      if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
+       else aFontColors.Add(aOptions.FontColor);
+      exit;
+    end;
+
+    aParamList := TALStringListU.Create;
+    try
+
+      ALExtractHeaderFieldsWithQuoteEscapedU([' ', #9, #13, #10],
+                                             [' ', #9, #13, #10],
+                                             ['"', ''''],
+                                             PChar(aTag),
+                                             aParamList,
+                                             False,
+                                             True{StripQuotes});
+
+      aSpanIds.Add(aParamList.Values['id']);
+
+      S1 := aParamList.Values['color'];
+      if S1 <> '' then begin
+
+        if S1[low(S1)] = '#' then begin
+          S1[low(S1)] := '$';
+          if length(S1) = 7 then insert('ff', S1, 2); // $ffffffff
+          if not ALTryStrTointU(S1, acolorInt) then begin
+            if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
+            else aFontColors.Add(aOptions.FontColor);
+          end
+          else aFontColors.Add(TalphaColor(acolorInt));
+        end
+        else begin
+          if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
+          else aFontColors.Add(aOptions.FontColor);
+        end;
+
+      end
+      else begin
+        if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
+        else aFontColors.Add(aOptions.FontColor);
+      end;
+
+    finally
+      aParamList.Free;
+    end;
+
   end;
 
 var {$IF defined(ANDROID)}
@@ -4506,6 +4549,8 @@ begin
 
           //extract aTag / aCurrText
           if aText[P1] = '<' then begin
+
+            //-----
             P2 := AlposExU('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                                               //           ^P1                  ^P2
             if P2 <= 0 then break;
@@ -4513,25 +4558,47 @@ begin
             P1 := P2 + 1; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                           //                                 ^P1
 
-            if aTag = '<b>' then inc(aBold)
-            else if aTag = '</b>' then dec(aBold)
-            else if aTag = '<i>' then inc(aItalic)
-            else if aTag = '</i>' then dec(aItalic)
-            else if alposU('<font color="', aTag) = 1 then begin   // <font color="#ffffff">
-              if not _getFontColorFromTag(aTag, aFontColor) then continue;
-              aFontColors.Add(aFontColor);
+            //-----
+            if alposU('<b', aTag) = 1 then begin
+              _getInfosFromTag(AlcopyStrU(aTag, 4, length(aTag) - 4), aSpanIds, aFontColors);
+              inc(aBold);
+            end
+            else if aTag = '</b>' then begin
+              if aSpanIds.count > 0 then aSpanIds.Delete(aSpanIds.Count - 1);
+              if aFontColors.count > 0 then aFontColors.Delete(aFontColors.Count - 1);
+              dec(aBold);
+            end
+
+            //-----
+            else if alposU('<i', aTag) = 1 then begin
+              _getInfosFromTag(AlcopyStrU(aTag, 4, length(aTag) - 4), aSpanIds, aFontColors);
+              inc(aItalic)
+            end
+            else if aTag = '</i>' then begin
+              if aSpanIds.count > 0 then aSpanIds.Delete(aSpanIds.Count - 1);
+              if aFontColors.count > 0 then aFontColors.Delete(aFontColors.Count - 1);
+              dec(aItalic)
+            end
+
+            //-----
+            else if alposU('<font', aTag) = 1 then begin   // <font color="#ffffff">
+              _getInfosFromTag(AlcopyStrU(aTag, 7, length(aTag) - 7), aSpanIds, aFontColors);
             end
             else if aTag = '</font>' then begin
+              if aSpanIds.count > 0 then aSpanIds.Delete(aSpanIds.Count - 1);
               if aFontColors.count > 0 then aFontColors.Delete(aFontColors.Count - 1);
             end
-            else if alposU('<span id="', aTag) = 1 then begin // <span id="xxx">
-              if atag[length(atag)-1] <> '"' then continue;
-              aSpanIds.Add(alcopyStrU(aTag, 11, length(aTag) - 12{- 1 - 11})); // xxx
+
+            //-----
+            else if alposU('<span', aTag) = 1 then begin // <span id="xxx">
+              _getInfosFromTag(AlcopyStrU(aTag, 7, length(aTag) - 7), aSpanIds, aFontColors);
             end
             else if aTag = '</span>' then begin
               if aSpanIds.count > 0 then aSpanIds.Delete(aSpanIds.Count - 1);
+              if aFontColors.count > 0 then aFontColors.Delete(aFontColors.Count - 1);
             end;
 
+            //-----
             continue;
 
           end

@@ -96,6 +96,10 @@ interface
   {$ENDIF}
 {$ENDIF}
 
+{$IF Low(string) = 0}
+  {$DEFINE _ZEROBASEDSTRINGS_ON}
+{$ENDIF}
+
 // http://docwiki.embarcadero.com/RADStudio/en/Conditional_compilation_(Delphi)
 // http://docwiki.embarcadero.com/RADStudio/en/Compiler_Versions
 {$IFDEF CPUX86}
@@ -652,6 +656,11 @@ var       ALBase64EncodeStringU: function(const S: String; const AEncoding: TEnc
 var       ALBase64DecodeStringU: function(const S: String; const AEncoding: TEncoding = nil): String;
 var       ALBase64EncodeBytesU: function(const Bytes: Tbytes): String;
 var       ALBase64DecodeBytesU: function(const S: String): Tbytes;
+function  ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
+Function  ALIsInt64U(const S: String): Boolean;
+Function  ALIsIntegerU(const S: String): Boolean;
+Function  ALIsSmallIntU(const S: String): Boolean;
+Function  ALIsFloatU(const S: String; const AFormatSettings: TALFormatSettingsU): Boolean;
 function  ALFloatToStrU(Value: Extended; const AFormatSettings: TALFormatSettingsU): String; overload; inline;
 procedure ALFloatToStrU(Value: Extended; var S: String; const AFormatSettings: TALFormatSettingsU); overload; inline;
 var       ALCurrToStrU: function(Value: Currency; const AFormatSettings: TALFormatSettingsU): string;
@@ -862,6 +871,16 @@ function  ALGetStringFromFileU(const filename: String; const ADefaultEncoding: T
 procedure ALSaveStringtoFileU(const Str: String; const filename: String; AEncoding: TEncoding; const WriteBOM: boolean = False);
 function  ALRandomStrU(const aLength: Longint; const aCharset: Array of Char): String; overload;
 function  ALRandomStrU(const aLength: Longint): String; overload;
+function  ALHTTPDecodeU(const AStr: String): String;
+{$WARN SYMBOL_DEPRECATED OFF}
+procedure ALExtractHeaderFieldsWithQuoteEscapedU(Separators,
+                                                 WhiteSpace,
+                                                 Quotes: TSysCharSet;
+                                                 Content: PChar;
+                                                 Strings: TALStringsU;
+                                                 HttpDecode: Boolean;
+                                                 StripQuotes: Boolean = False);
+{$WARN SYMBOL_DEPRECATED ON}
 
 {$IFNDEF NEXTGEN}
 Const cAlUTF8Bom = ansiString(#$EF) + ansiString(#$BB) + ansiString(#$BF);
@@ -6843,7 +6862,7 @@ Function  ALIsFloat (const S: AnsiString; const AFormatSettings: TALFormatSettin
 var i: integer;
     aDouble: Double;
 begin
-  for i := 1 to length(S) do begin
+  for i := low(s) to high(s) do begin
     if not (S[i] in ['0'..'9','-',AFormatSettings.DecimalSeparator]) then begin
       result := false;
       exit;
@@ -6881,6 +6900,64 @@ begin
 end;
 
 {$ENDIF !NEXTGEN}
+
+{***************************}
+{$WARN SYMBOL_DEPRECATED OFF}
+function ALIsDecimalU(const S: String; const RejectPlusMinusSign: boolean = False): boolean;
+var i: integer;
+begin
+  result := true;
+  for i := low(s) to high(S) do begin
+    if (not RejectPlusMinusSign) and (i=low(s)) then begin
+      if not CharInSet(S[i], ['0'..'9','-','+']) then begin
+        result := false;
+        break;
+      end;
+    end
+    else if not CharInSet(S[i], ['0'..'9']) then begin
+      result := false;
+      break;
+    end;
+  end;
+end;
+{$WARN SYMBOL_DEPRECATED ON}
+
+{**********************************************}
+Function ALIsIntegerU(const S: String): Boolean;
+var i: integer;
+Begin
+  result := ALIsDecimalU(S) and ALTryStrToIntU(S, i);
+End;
+
+{********************************************}
+Function ALIsInt64U(const S: String): Boolean;
+var i : int64;
+Begin
+  Result := ALIsDecimalU(S) and ALTryStrToInt64U(S, I);
+End;
+
+{***********************************************}
+Function ALIsSmallIntU(const S: String): Boolean;
+var i : Integer;
+Begin
+  Result := ALIsDecimalU(S) and ALTryStrToIntU(S, I) and (i <= 32767) and (I >= -32768);
+End;
+
+{***************************}
+{$WARN SYMBOL_DEPRECATED OFF}
+Function  ALIsFloatU(const S: String; const AFormatSettings: TALFormatSettingsU): Boolean;
+var i: integer;
+    aDouble: Double;
+begin
+  for i := low(s) to high(s) do begin
+    if not CharInSet(S[i], ['0'..'9','-',AFormatSettings.DecimalSeparator]) then begin
+      result := false;
+      exit;
+    end;
+  end;
+  result := ALTryStrToFloatU(s,aDouble,AFormatSettings);
+end;
+{$WARN SYMBOL_DEPRECATED ON}
 
 {****************************************************************************************}
 function ALFloatToStrU(Value: Extended; const AFormatSettings: TALFormatSettingsU): String;
@@ -11925,6 +12002,162 @@ Begin
 end;
 
 {$ENDIF}
+
+{************************************************************}
+//the difference between this function and the delphi function
+//HttpApp.HttpDecode is that this function will not raise any
+//error (EConvertError) when the url will contain % that
+//are not encoded
+function ALHTTPDecodeU(const AStr: String): String;
+var Sp, Rp, Cp, Tp: PChar;
+    int: integer;
+    S: String;
+begin
+  SetLength(Result, Length(AStr));
+  Sp := PChar(AStr);
+  Rp := PChar(Result);
+  while Sp^ <> #0 do begin
+    case Sp^ of
+      '+': Rp^ := ' ';
+      '%': begin
+             Tp := Sp;
+             Inc(Sp);
+
+             //escaped % (%%)
+             if Sp^ = '%' then Rp^ := '%'
+
+             // %<hex> encoded character
+             else begin
+               Cp := Sp;
+               Inc(Sp);
+               if (Cp^ <> #0) and (Sp^ <> #0) then begin
+                 S := Char('$') + Char(Cp^) + Char(Sp^);
+                 if ALTryStrToIntU(s,int) then Rp^ := Char(int)
+                 else begin
+                   Rp^ := '%';
+                   Sp := Tp;
+                 end;
+               end
+               else begin
+                 Rp^ := '%';
+                 Sp := Tp;
+               end;
+             end;
+           end;
+      else Rp^ := Sp^;
+    end;
+    Inc(Rp);
+    Inc(Sp);
+  end;
+  SetLength(Result, Rp - PChar(Result));
+end;
+
+{**************************************************************************************}
+{same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
+{$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+{$WARN SYMBOL_DEPRECATED OFF}
+procedure ALExtractHeaderFieldsWithQuoteEscapedU(Separators,
+                                                 WhiteSpace,
+                                                 Quotes: TSysCharSet;
+                                                 Content: PChar;
+                                                 Strings: TALStringsU;
+                                                 HttpDecode: Boolean;
+                                                 StripQuotes: Boolean = False);
+
+var Head, Tail, NextTail: PChar;
+    EOS, InQuote: Boolean;
+    QuoteChar: Char;
+    ExtractedField: String;
+    SeparatorsWithQuotesAndNulChar: TSysCharSet;
+    QuotesWithNulChar: TSysCharSet;
+
+  {-------------------------------------------------------}
+  //as i don't want to add the parameter namevalueseparator
+  //to the function, we will stripquote only if the string end
+  //with the quote or start with the quote
+  //ex: "name"="value"  =>  name=value
+  //ex: "name"=value    =>  name=value
+  //ex: name="value"    =>  name=value
+  function DoStripQuotes(const S: String): String;
+  var I: Integer;
+      StripQuoteChar: Char;
+      canStripQuotesOnLeftSide: boolean;
+  begin
+    Result := S;
+    if StripQuotes then begin
+
+      canStripQuotesOnLeftSide := True;
+      if (length(result) > 0) and charInSet(result[length(result)], quotes) then begin
+        StripQuoteChar := result[length(result)];
+        Delete(Result, length(result), 1);
+        i := Length(Result);
+        while i > 0 do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            if (i > 1) and (Result[I-1] = StripQuoteChar) then dec(i)
+            else begin
+              canStripQuotesOnLeftSide := i > 1;
+              break;
+            end;
+          end;
+          dec(i);
+        end;
+      end;
+
+      if (canStripQuotesOnLeftSide) and (length(result) > 0) and charInSet(result[1], quotes) then begin
+        StripQuoteChar := result[1];
+        Delete(Result, 1, 1);
+        i := 1;
+        while i <= Length(Result) do begin
+          if (Result[I] = StripQuoteChar) then begin
+            Delete(Result, I, 1);
+            if (i < Length(Result)) and (Result[I+1] = StripQuoteChar) then inc(i)
+            else break;
+          end;
+          inc(i);
+        end;
+      end;
+
+    end;
+  end;
+
+Begin
+  if (Content = nil) or (Content^ = #0) then Exit;
+  SeparatorsWithQuotesAndNulChar := Separators + Quotes + [#0];
+  QuotesWithNulChar := Quotes + [#0];
+  Tail := Content;
+  QuoteChar := #0;
+  repeat
+    while charInSet(Tail^, WhiteSpace) do Inc(Tail);
+    Head := Tail;
+    InQuote := False;
+    while True do begin
+      while (InQuote and not charInSet(Tail^, QuotesWithNulChar)) or not charInSet(Tail^, SeparatorsWithQuotesAndNulChar) do Inc(Tail);
+      if charInSet(Tail^, Quotes) then begin
+        if (QuoteChar <> #0) and (QuoteChar = Tail^) then begin
+          NextTail := Tail + 1;
+          if NextTail^ = Tail^ then inc(tail)
+          else QuoteChar := #0;
+        end
+        else If QuoteChar = #0 then QuoteChar := Tail^;
+        InQuote := QuoteChar <> #0;
+        Inc(Tail);
+      end
+      else Break;
+    end;
+    EOS := Tail^ = #0;
+    if Head^ <> #0 then begin
+      SetString(ExtractedField, Head, Tail-Head);
+      if HttpDecode then Strings.Add(ALHTTPDecodeU(DoStripQuotes(ExtractedField)))
+      else Strings.Add(DoStripQuotes(ExtractedField));
+    end;
+    Inc(Tail);
+  until EOS;
+end;
+{$WARN SYMBOL_DEPRECATED ON}
+{$IF defined(_ZEROBASEDSTRINGS_ON)}
+  {$ZEROBASEDSTRINGS ON}
+{$IFEND}
 
 {*******************************}
 Procedure ALStringInitialization;

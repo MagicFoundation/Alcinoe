@@ -192,6 +192,7 @@ type
     property CurrentVelocity: TALPointD read FCurrentVelocity write FCurrentVelocity;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
     property ViewportPositionF: TPointF read GetViewportPositionF write SetViewportPositionF;
+    property DownPosition: TALPointD read fDownPosition write fDownPosition;
     property LastTimeCalc: TDateTime read FLastTimeCalc;
     property Down: Boolean read FDown write SetDown;
     property Opacity: Single read GetOpacity;

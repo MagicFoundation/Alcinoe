@@ -2330,8 +2330,8 @@ var aBreakTextItemsStartCount: integer;
         JStr1 := StringToJString(aEllipsisFontName); // << https://quality.embarcadero.com/browse/RSP-14187
         aTypeface := TJTypeface.JavaClass.create(JStr1, ALfontStyleToAndroidStyle(aEllipsisFontStyle));
         aPaint.setTypeface(aTypeface);
-        JStr1 := nil;
         aTypeface := nil;
+        JStr1 := nil;
       end;
       //-----
       aSavedColor := TAlphaColorRec.Null; // stupid warning
@@ -4681,8 +4681,8 @@ begin
             JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
             aTypeface := TJTypeface.JavaClass.create(JStr1, aStyle);
             aPaint.setTypeface(aTypeface);
-            JStr1 := nil;
             aTypeface := nil;
+            JStr1 := nil;
             {$IFEND}
 
             //init aTmpRect / aBreakedTextItemsCount
@@ -4987,8 +4987,8 @@ begin
           JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
           aTypeface := TJTypeface.JavaClass.create(JStr1, aBreakedTextItem.fontStyle);
           aPaint.setTypeface(aTypeface);
-          JStr1 := nil;
           aTypeface := nil;
+          JStr1 := nil;
           //-----
           aCanvas.drawText(aBreakedTextItem.line{text},
                            aBreakedTextItem.pos.x {x},

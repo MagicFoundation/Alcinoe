@@ -2317,6 +2317,7 @@ var aBreakTextItemsStartCount: integer;
   var aSavedColor: TalphaColor;
       aSavedTypeFace: JTypeface;
       aTypeFace: JTypeface;
+      JStr1: Jstring;
   begin
     if aEllipsisLine = nil then begin
       //-----
@@ -2326,8 +2327,10 @@ var aBreakTextItemsStartCount: integer;
       aSavedTypeFace := nil; // stupid warning
       if aEllipsisFontName <> '' then begin
         aSavedTypeFace := aPaint.getTypeface;
-        aTypeface := TJTypeface.JavaClass.create(StringToJString(aEllipsisFontName), ALfontStyleToAndroidStyle(aEllipsisFontStyle));
+        JStr1 := StringToJString(aEllipsisFontName); // << https://quality.embarcadero.com/browse/RSP-14187
+        aTypeface := TJTypeface.JavaClass.create(JStr1, ALfontStyleToAndroidStyle(aEllipsisFontStyle));
         aPaint.setTypeface(aTypeface);
+        JStr1 := nil;
         aTypeface := nil;
       end;
       //-----
@@ -2408,6 +2411,7 @@ begin
       while ATextIdx < ATextLn do begin
 
         // init aline
+        aLine := nil; // << https://quality.embarcadero.com/browse/RSP-14187
         i := aText.indexOf($0D {c}, ATextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
         j := aText.indexOf($0A {c}, ATextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
         if (i >= 0) and (j >= 0) then I := min(i,j)
@@ -2781,6 +2785,7 @@ begin
 
     finally
       ALFreeAndNil(ameasuredWidth);
+      aLine := nil; // << https://quality.embarcadero.com/browse/RSP-14187
     end;
 
   end
@@ -2791,6 +2796,7 @@ begin
     aBreakTextItem := TalBreakTextItem.Create;
     try
       aBreakTextItem.line := aEllipsisLine;
+      aEllipsisLine := nil;
       aBreakTextItem.pos := aEllipsisLinePos;
       aBreakTextItem.rect := aEllipsisLineRect;
       aBreakTextItem.isEllipsis := True;
@@ -4491,6 +4497,7 @@ var {$IF defined(ANDROID)}
     aTmpTextBreaked: Boolean;
     aCurrentLineY: single;
     aOffset: single;
+    JStr1, JStr2: JString;
     P1, P2: integer;
     i, j: integer;
 
@@ -4671,8 +4678,10 @@ begin
             //init aPaint
             {$IF defined(ANDROID)}
             aPaint.setColor(aFontColor);
-            aTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), aStyle);
+            JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
+            aTypeface := TJTypeface.JavaClass.create(JStr1, aStyle);
             aPaint.setTypeface(aTypeface);
+            JStr1 := nil;
             aTypeface := nil;
             {$IFEND}
 
@@ -4684,9 +4693,11 @@ begin
 
             //break the text
             {$IF defined(ANDROID)}
+            JStr1 := StringtoJString(aCurrText); // << https://quality.embarcadero.com/browse/RSP-14187
+            JStr2 := StringtoJString(aOptions.EllipsisText); // << https://quality.embarcadero.com/browse/RSP-14187
             aTmpTextBreaked := ALBreakText(aPaint, // const aPaint: JPaint;
                                            ATmpRect, // var ARect: TRectF;
-                                           StringtoJString(aCurrText), // const AText: JString;
+                                           JStr1, // const AText: JString;
                                            aOptions.WordWrap, //const aWordWrap: Boolean;
                                            TTextAlign.Leading, TTextAlign.Leading, //const AHTextAlign, AVTextAlign: TTextAlign;
                                            aOptions.Trimming, // const aTrimming: TTextTrimming;
@@ -4694,11 +4705,13 @@ begin
                                            aTmpTotalLines, // var aTotalLines: integer
                                            aFirstLineIndent, // const aFirstLineIndent: TpointF;
                                            aOptions.LineSpacing, // const aLineSpacing: single = 0;
-                                           StringtoJString(aOptions.EllipsisText), //  const aEllipsisText: JString = nil;
+                                           JStr2, //  const aEllipsisText: JString = nil;
                                            aOptions.FontName, // const aEllipsisFontName: String = '';
                                            aOptions.EllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
                                            aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null
                                            aOptions.MaxLines - aTotalLines + AlifThen(aTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
+            JStr1 := nil;
+            JStr2 := nil;
             {$ELSEIF defined(IOS)}
             aTmpTextBreaked := ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
                                            aFontColor, // const aFontColor: TalphaColor;
@@ -4971,8 +4984,10 @@ begin
           //-----
           aPaint.setColor(aBreakedTextItem.fontColor);
           //-----
-          aTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), aBreakedTextItem.fontStyle);
+          JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
+          aTypeface := TJTypeface.JavaClass.create(JStr1, aBreakedTextItem.fontStyle);
           aPaint.setTypeface(aTypeface);
+          JStr1 := nil;
           aTypeface := nil;
           //-----
           aCanvas.drawText(aBreakedTextItem.line{text},

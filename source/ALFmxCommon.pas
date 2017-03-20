@@ -4466,6 +4466,7 @@ var {$IF defined(ANDROID)}
     aTypeface: JTypeface;
     aCanvas: Jcanvas;
     aStyle: integer;
+    JStr1, JStr2: JString;
     {$IFEND}
     {$IF defined(IOS)}
     aBitmapSurface: TbitmapSurface;
@@ -4497,7 +4498,6 @@ var {$IF defined(ANDROID)}
     aTmpTextBreaked: Boolean;
     aCurrentLineY: single;
     aOffset: single;
-    JStr1, JStr2: JString;
     P1, P2: integer;
     i, j: integer;
 

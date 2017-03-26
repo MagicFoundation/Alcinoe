@@ -74,6 +74,11 @@ type
 
   TALPointDType = array [0..1] of Double;
 
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
+  {$IFEND}
   PALPointD = ^TALPointD;
   TALPointD = record
     class function Create(const AX, AY: Double): TALPointD; overload; static; inline;
@@ -145,6 +150,10 @@ type
   tagPOINTF = TALPointD;
   {$NODEFINE tagPOINTF}
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
+  {$IFEND}
   PALSizeD = ^TALSizeD;
   TALSizeD = record
     cx: Double;
@@ -171,11 +180,17 @@ type
     function Subtract(const Point: TALSizeD): TALSizeD;
     function Distance(const P2: TALSizeD): Double;
     function IsZero: Boolean;
+    /// <summary>Returns size with swapped width and height</summary>
+    function SwapDimensions: TALSizeD;
     // properties
     property Width: Double read cx write cx;
     property Height: Double read cy write cy;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
+  {$IFEND}
   PALRectD = ^TALRectD;
   TALRectD = record
   private
@@ -744,10 +759,14 @@ function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aV
 
 Type
 
-  {$IF CompilerVersion <> 31}
+  {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$IFEND}
   TALControlAccessPrivate = class(TFmxObject)
+  {$IF CompilerVersion > 31} // berlin
+  private type
+    TDelayedEvent = (Resize, Resized);
+  {$IFEND}
   private const
     InitialControlsCapacity = 10;
   public const
@@ -803,6 +822,9 @@ Type
     FRecalcEnabled, FEnabled, FAbsoluteEnabled: Boolean;
     FTabList: TTabList;
     FOnResize: TNotifyEvent;
+    {$IF CompilerVersion > 31}  // berlin
+    FOnResized: TNotifyEvent;
+    {$IFEND}
     FDisableEffect: Boolean;
     FAcceptsControls: Boolean;
     FControls: TControlList;
@@ -825,6 +847,10 @@ Type
     FDisableDisappear: Integer;
     FAnchorMove: Boolean;
     FApplyingEffect: Boolean;
+    {$IF CompilerVersion > 31} // berlin
+    FExitingOrEntering: Boolean;
+    FDelayedEvents: set of TDelayedEvent;
+    {$IFEND}
     FInflated: Boolean;
     FOnApplyStyleLookup: TNotifyEvent;
     FAlign: TAlignLayout;
@@ -878,7 +904,7 @@ Type
     FExplicitHeight: Single;
   end;
 
-  {$IF CompilerVersion <> 31}
+  {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if FMX.TextLayout.TTextLayout still has the exact same fields and adjust the IFDEF'}
   {$IFEND}
   TALTextLayoutAccessPrivate = class abstract
@@ -1533,20 +1559,20 @@ end;
 {************************************************************************************************}
 function TALRectD.SnapToPixel(const AScale: Double; const APlaceBetweenPixels: Boolean): TALRectD;
 var
-  LScale: Double;
+  LScale, HalfPixel: Double;
 begin
   if AScale <= 0 then
     LScale := 1
   else
     LScale := AScale;
-  Result.Left := System.Round(Self.Left * LScale) / LScale;
-  Result.Top := System.Round(Self.Top * LScale) / LScale;
+  Result.Left := System.Trunc(Self.Left * LScale) / LScale;
+  Result.Top := System.Trunc(Self.Top * LScale) / LScale;
   Result.Width := System.Round(Self.Width * LScale) / LScale;
   Result.Height := System.Round(Self.Height * LScale) / LScale;
   if APlaceBetweenPixels then
   begin
-    LScale := LScale / 2;
-    Result.Offset(LScale, LScale);
+    HalfPixel := 1 / (2 * LScale);
+    Result.Offset(HalfPixel, HalfPixel);
   end;
 end;
 
@@ -1917,6 +1943,12 @@ begin
   Result.cy := cy - Point.cy;
 end;
 
+{*****************************************}
+function TALSizeD.SwapDimensions: TALSizeD;
+begin
+  Result := TALSizeD.Create(Height, Width);
+end;
+
 {*******************************************************************}
 class operator TALSizeD.Subtract(const Lhs, Rhs: TALSizeD): TALSizeD;
 begin
@@ -1975,7 +2007,6 @@ begin
   end;
   Result := translate(AText);
 end;
-
 
 {******************************************************}
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
@@ -5220,7 +5251,10 @@ begin
 end;
 {$IFEND}
 
-{******************************************************************************************}
+{************************}
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if ALGetDrawingShapeRectAndSetThickness still has the same implementation and adjust the IFDEF'}
+{$IFEND}
 //duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
 function ALGetDrawingShapeRectAndSetThickness(const Rect: TrectF;
                                               const Fill: TBrush;
@@ -6728,17 +6762,15 @@ var aBitmap: TBitmap;
     aTmpCropCenter: TPointF;
 begin
 
-  {$IF CompilerVersion > 31} {Delphi berlin}
-    remove the Tthread.Synchronize because now normally Tbitmap are multithread
-  {$IFEND}
-
   //init local var
   aTmpCropCenter := aCropCenter;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   //synchronize because Tbitmap is not multithread
   Tthread.Synchronize(nil,
   Procedure
   begin
+  {$IFEND}
 
     aBitmap := ALResizeAndCropImageV1(aStream, W, H, aTmpCropCenter);
     try
@@ -6766,7 +6798,9 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
+  {$IFEND}
 
   result := aTmpResult;
 
@@ -7142,17 +7176,15 @@ var aBitmap: TBitmap;
     aTmpCropCenter: TPointF;
 begin
 
-  {$IF CompilerVersion > 31} {Delphi berlin}
-    remove the Tthread.Synchronize because now normally Tbitmap are multithread
-  {$IFEND}
-
   //init local var
   aTmpCropCenter := aCropCenter;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   //synchronize because Tbitmap is not multithread
   Tthread.Synchronize(nil,
   Procedure
   begin
+  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -7185,7 +7217,9 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
+  {$IFEND}
 
   result := aTmpResult;
 
@@ -7200,17 +7234,15 @@ var aBitmap: TBitmap;
     aTmpCropCenter: TPointF;
 begin
 
-  {$IF CompilerVersion > 31} {Delphi berlin}
-    remove the Tthread.Synchronize because now normally Tbitmap are multithread
-  {$IFEND}
-
   //init local var
   aTmpCropCenter := aCropCenter;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   //synchronize because Tbitmap is not multithread
   Tthread.Synchronize(nil,
   Procedure
   begin
+  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -7241,7 +7273,9 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
+  {$IFEND}
 
   result := aTmpResult;
 
@@ -8027,14 +8061,12 @@ var aBitmap: TBitmap;
     aTmpResult: Tbitmap;
 begin
 
-  {$IF CompilerVersion > 31} {Delphi berlin}
-    remove the Tthread.Synchronize because now normally Tbitmap are multithread
-  {$IFEND}
-
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   //synchronize because Tbitmap is not multithread
   Tthread.Synchronize(nil,
   Procedure
   begin
+  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -8070,7 +8102,9 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
+  {$IFEND}
 
   result := aTmpResult;
 
@@ -8084,14 +8118,12 @@ var aBitmap: TBitmap;
     aTmpResult: Tbitmap;
 begin
 
-  {$IF CompilerVersion > 31} {Delphi berlin}
-    remove the Tthread.Synchronize because now normally Tbitmap are multithread
-  {$IFEND}
-
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   //synchronize because Tbitmap is not multithread
   Tthread.Synchronize(nil,
   Procedure
   begin
+  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -8126,7 +8158,9 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
+  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
+  {$IFEND}
 
   result := aTmpResult;
 

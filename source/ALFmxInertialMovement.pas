@@ -4,8 +4,8 @@ unit ALFmxInertialMovement;
 //https://quality.embarcadero.com/browse/RSP-15273
 //i couldn't update the Tanicalculation and was forced to fully copy/past the entire unit :(
 //i rename Tanicalculation in TALAnicalculation to not made any confusion
-{$IF CompilerVersion > 31}
-  {$MESSAGE WARN 'Check if FMX.InertialMovement.pas was not updated from the version in delphi berlin 10.1 and adjust the IFDEF'}
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if FMX.InertialMovement.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 interface
@@ -95,7 +95,8 @@ type
     FInDoStop: Boolean;
     FMoved: Boolean;
     FStarted: Boolean;
-    FBoundsAnimation: Boolean;
+    FBoundsAnimationAtMinTarget: Boolean;
+    FBoundsAnimationAtMaxTarget: Boolean;
     FAutoShowing: Boolean;
     FOpacity: Single;
     FShown: Boolean;
@@ -126,7 +127,10 @@ type
     procedure CalcVelocity(const Time: TDateTime = 0);
     procedure InternalStart;
     procedure InternalTerminated;
+    function GetBoundsAnimation: Boolean;
     procedure SetBoundsAnimation(const Value: Boolean);
+    procedure SetBoundsAnimationAtMinTarget(const Value: Boolean);
+    procedure SetBoundsAnimationAtMaxTarget(const Value: Boolean);
     procedure UpdateViewportPositionByBounds;
     procedure SetAutoShowing(const Value: Boolean);
     procedure SetShown(const Value: Boolean);
@@ -181,7 +185,9 @@ type
     property Animation: Boolean read FAnimation write SetAnimation default False;
     property AutoShowing: Boolean read FAutoShowing write SetAutoShowing default False;
     property Averaging: Boolean read FAveraging write FAveraging default False;
-    property BoundsAnimation: Boolean read FBoundsAnimation write SetBoundsAnimation default True;
+    property BoundsAnimation: Boolean read GetBoundsAnimation write SetBoundsAnimation default True;
+    property BoundsAnimationAtMinTarget: Boolean read FBoundsAnimationAtMinTarget write SetBoundsAnimationAtMinTarget default True;
+    property BoundsAnimationAtMaxTarget: Boolean read FBoundsAnimationAtMaxTarget write SetBoundsAnimationAtMaxTarget default True;
     property TouchTracking: TTouchTracking read FTouchTracking write SetTouchTracking default [ttVertical, ttHorizontal];
     property TargetCount: Integer read GetTargetCount;
     procedure SetTargets(const ATargets: array of TTarget);
@@ -287,7 +293,8 @@ begin
     Animation := LSource.Animation;
     AutoShowing := LSource.AutoShowing;
     Averaging := LSource.Averaging;
-    BoundsAnimation := LSource.BoundsAnimation;
+    BoundsAnimationAtMinTarget := LSource.BoundsAnimationAtMinTarget;
+    BoundsAnimationAtMaxTarget := LSource.BoundsAnimationAtMaxTarget;
     Interval := LSource.Interval;
     TouchTracking := LSource.TouchTracking;
     SetLength(LTargets, LSource.TargetCount);
@@ -306,7 +313,8 @@ begin
     Animation := False;
     AutoShowing := False;
     Averaging := False;
-    BoundsAnimation := True;
+    BoundsAnimationAtMinTarget := True;
+    BoundsAnimationAtMaxTarget := True;
     Interval := ALDefaultIntervalOfAni;
     TouchTracking := [ttVertical, ttHorizontal];
     SetTargets([]);
@@ -360,12 +368,41 @@ begin
   end;
 end;
 
+{******************************************************}
+function TALAniCalculations.GetBoundsAnimation: Boolean;
+begin
+  result := FBoundsAnimationAtMinTarget and
+            FBoundsAnimationAtMaxTarget;
+end;
+
 {********************************************************************}
 procedure TALAniCalculations.SetBoundsAnimation(const Value: Boolean);
 begin
-  if FBoundsAnimation <> Value then
+  if (FBoundsAnimationAtMinTarget <> Value) or
+     (FBoundsAnimationAtMaxTarget <> Value) then
   begin
-    FBoundsAnimation := Value;
+    FBoundsAnimationAtMinTarget := Value;
+    FBoundsAnimationAtMaxTarget := Value;
+    SetViewportPosition(ViewportPosition);
+  end;
+end;
+
+{*******************************************************************************}
+procedure TALAniCalculations.SetBoundsAnimationAtMinTarget(const Value: Boolean);
+begin
+  if FBoundsAnimationAtMinTarget <> Value then
+  begin
+    FBoundsAnimationAtMinTarget := Value;
+    SetViewportPosition(ViewportPosition);
+  end;
+end;
+
+{*******************************************************************************}
+procedure TALAniCalculations.SetBoundsAnimationAtMaxTarget(const Value: Boolean);
+begin
+  if FBoundsAnimationAtMaxTarget <> Value then
+  begin
+    FBoundsAnimationAtMaxTarget := Value;
     SetViewportPosition(ViewportPosition);
   end;
 end;
@@ -1039,23 +1076,24 @@ end;
 
 {**********************************************************}
 procedure TALAniCalculations.UpdateViewportPositionByBounds;
-  function NotBoundsAni(const Vert: Boolean): Boolean;
+
+  function NotBoundsAni(const Vert: Boolean; const aBoundsAnimation: Boolean): Boolean;
   begin
     if Vert then
-      Result := not(BoundsAnimation and (ttVertical in TouchTracking))
+      Result := not(aBoundsAnimation and (ttVertical in TouchTracking))
     else
-      Result := not(BoundsAnimation and (ttHorizontal in TouchTracking));
+      Result := not(aBoundsAnimation and (ttHorizontal in TouchTracking));
   end;
 
 begin
   if FMinTarget.TargetType = TTargetType.Min then
   begin
-    if (FViewportPosition.X < FMinTarget.Point.X) and NotBoundsAni(False) then
+    if (FViewportPosition.X < FMinTarget.Point.X) and NotBoundsAni(False, BoundsAnimationatMinTarget) then
     begin
       FViewportPosition.X := FMinTarget.Point.X;
       FCurrentVelocity.X := 0;
     end;
-    if (FViewportPosition.Y < FMinTarget.Point.Y) and NotBoundsAni(True) then
+    if (FViewportPosition.Y < FMinTarget.Point.Y) and NotBoundsAni(True, BoundsAnimationatMinTarget) then
     begin
       FViewportPosition.Y := FMinTarget.Point.Y;
       FCurrentVelocity.Y := 0;
@@ -1063,12 +1101,12 @@ begin
   end;
   if FMaxTarget.TargetType = TTargetType.Max then
   begin
-    if (FViewportPosition.X > FMaxTarget.Point.X) and NotBoundsAni(False) then
+    if (FViewportPosition.X > FMaxTarget.Point.X) and NotBoundsAni(False, BoundsAnimationatMaxTarget) then
     begin
       FViewportPosition.X := FMaxTarget.Point.X;
       FCurrentVelocity.X := 0;
     end;
-    if (FViewportPosition.Y > FMaxTarget.Point.Y) and NotBoundsAni(True) then
+    if (FViewportPosition.Y > FMaxTarget.Point.Y) and NotBoundsAni(True, BoundsAnimationatMaxTarget) then
     begin
       FViewportPosition.Y := FMaxTarget.Point.Y;
       FCurrentVelocity.Y := 0;

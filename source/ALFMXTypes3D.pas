@@ -15,7 +15,7 @@ uses System.Classes,
 type
 
   {*************************}
-  {$IF CompilerVersion <> 31}
+  {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextureAccessPrivate = class(TInterfacedPersistent)
@@ -94,8 +94,8 @@ begin
    FisExternalOES := False;
 end;
 
-{*************************}
-{$IF CompilerVersion <> 31}
+{************************}
+{$IF CompilerVersion > 32}
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 //
@@ -124,26 +124,44 @@ var
 begin
 
   if Source is TBitmap then begin
-    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-    PixelFormat := TBitmap(Source).PixelFormat;
-    Style := [TTextureStyle.Dynamic];
-    if fVolatile then Style := Style + [TTextureStyle.Volatile];
-    TALTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
-    SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
-    if TBitmap(Source).Map(TMapAccess.Read, M) then
+    {$IF CompilerVersion >= 32} // tokyo
+    TMonitor.Enter(Self);
     try
-      UpdateTexture(M.Data, M.Pitch);
+    {$ENDIF}
+      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+      PixelFormat := TBitmap(Source).PixelFormat;
+      Style := [TTextureStyle.Dynamic];
+      if fVolatile then Style := Style + [TTextureStyle.Volatile];
+      TALTextureAccessPrivate(self).fTextureScale := TBitmap(Source).BitmapScale;
+      SetSize(TBitmap(Source).Width, TBitmap(Source).Height);
+      if TBitmap(Source).Map(TMapAccess.Read, M) then
+      try
+        UpdateTexture(M.Data, M.Pitch);
+      finally
+        TBitmap(Source).Unmap(M);
+      end;
+    {$IF CompilerVersion >= 32} // tokyo
     finally
-      TBitmap(Source).Unmap(M);
+      TMonitor.exit(Self);
     end;
+    {$ENDIF}
   end
 
   else if Source is TBitmapSurface then begin
-    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-    Style := [TTextureStyle.Dynamic];
-    if fVolatile then Style := Style + [TTextureStyle.Volatile];
-    SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
-    UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
+    {$IF CompilerVersion >= 32} // tokyo
+    TMonitor.Enter(Self);
+    try
+    {$ENDIF}
+      if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
+      Style := [TTextureStyle.Dynamic];
+      if fVolatile then Style := Style + [TTextureStyle.Volatile];
+      SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
+      UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
+    {$IF CompilerVersion >= 32} // tokyo
+    finally
+      TMonitor.exit(Self);
+    end;
+    {$ENDIF}
   end
 
   else inherited ;
@@ -155,22 +173,43 @@ begin
 
 end;
 
-{********************}
+{*************************}
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
+{$ENDIF}
 {$IF defined(ANDROID)}
 procedure ALInitializeExternalOESTexture(const Texture: TALTexture);
 var Tex: GLuint;
 begin
   Texture.FisExternalOES := True;
   Texture.Style := Texture.Style - [TTextureStyle.MipMaps];
+
   {$IFDEF ANDROID}
   if Texture.PixelFormat = TPixelFormat.None then Texture.PixelFormat := TALCustomAndroidContextAccess.PixelFormat;
+  {$ELSEIF defined(IOS)}
+  if Texture.PixelFormat = TPixelFormat.None then Texture.PixelFormat := TALCustomContextIOSAccess.PixelFormat;
+  {$ENDIF}
+
+  {$IF CompilerVersion >= 32} // tokyo
+
+  {$IFDEF ANDROID}
+  if TALCustomAndroidContextAccess.valid then
+  {$ELSEIF defined(IOS)}
+  if TALCustomContextIOSAccess.valid then
+  {$ENDIF}
+
+  {$ELSE}
+
+  {$IFDEF ANDROID}
   TALCustomAndroidContextAccess.CreateSharedContext;
   if TALCustomAndroidContextAccess.IsContextAvailable then
   {$ELSEIF defined(IOS)}
-  if Texture.PixelFormat = TPixelFormat.None then Texture.PixelFormat := TALCustomContextIOSAccess.PixelFormat;
   TALCustomContextIOSAccess.CreateSharedContext;
   if TALCustomContextIOSAccess.IsContextAvailable then
   {$ENDIF}
+
+  {$ENDIF}
+
   begin
     glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, @Tex);

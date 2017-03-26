@@ -1,5 +1,9 @@
 unit ALFmxObjects;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if FMX.Objects.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
 interface
 
 uses System.Classes,
@@ -170,6 +174,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -498,6 +505,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
     property doubleBuffered: Boolean read GetdoubleBuffered write setdoubleBuffered default true;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
     property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;

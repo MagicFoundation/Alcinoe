@@ -72,6 +72,7 @@ public:
 	TALSizeD __fastcall Subtract(const TALSizeD &Point);
 	double __fastcall Distance(const TALSizeD &P2);
 	bool __fastcall IsZero(void);
+	TALSizeD __fastcall SwapDimensions(void);
 	__property double Width = {read=cx, write=cx};
 	__property double Height = {read=cy, write=cy};
 	TALSizeD() {}

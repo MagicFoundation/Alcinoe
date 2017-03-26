@@ -8,5 +8,14 @@ object DemoForm: TDemoForm
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnClose = FormClose
+  OnPaint = FormPaint
   DesignerMasterStyle = 0
+  object ALText1: TALText
+    Align = Top
+    Size.Width = 640.000000000000000000
+    Size.Height = 41.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Analyzing start when velocity > 2000'
+    TextSettings.HorzAlign = Center
+  end
 end

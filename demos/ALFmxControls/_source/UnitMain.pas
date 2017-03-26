@@ -526,6 +526,8 @@ begin
   aVertScrollBox.Parent := aDemoForm;
   aVertScrollBox.BeginUpdate;
   aVertScrollBox.Align := TalignLayout.Client;
+  aVertScrollBox.AniCalculations.Interval := 5; // << mean ideally we must have 200 fps
+  aDemoForm.fALAniCalculations := aVertScrollBox.AniCalculations;
   for I := 1 to 50 do begin
     aRectangle := TALRectangle.Create(aVertScrollBox);
     aRectangle.Parent := aVertScrollBox;
@@ -637,6 +639,8 @@ begin
   aVertScrollBox.Parent := aDemoForm;
   aVertScrollBox.BeginUpdate;
   aVertScrollBox.Align := TalignLayout.Client;
+  aVertScrollBox.AniCalculations.Interval := 5; // << mean ideally we must have 200 fps
+  aDemoForm.fAniCalculations := aVertScrollBox.AniCalculations;
   for I := 1 to 50 do begin
     aRectangle := TRectangle.Create(aVertScrollBox);
     aRectangle.Parent := aVertScrollBox;

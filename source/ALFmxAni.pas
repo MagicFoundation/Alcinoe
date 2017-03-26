@@ -1,5 +1,9 @@
 unit ALFmxAni;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if FMX.Ani.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
 interface
 
 uses System.Classes,

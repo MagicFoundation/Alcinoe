@@ -337,8 +337,8 @@ Type
   end;
 
   {------------------------}
-  {$IF CompilerVersion > 31}
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-13502 is still not yet implemented'}
+  {$IF CompilerVersion > 32} // tokyo
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-13502 is still not yet implemented in System.Generics.Collections.pas'}
   {$IFEND}
   TALDictionary<TKey,TValue> = class(TEnumerable<TPair<TKey,TValue>>)
   private

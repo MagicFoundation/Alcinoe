@@ -916,7 +916,7 @@ object Form1: TForm1
       object SmoothMagnifyEffect1: TSmoothMagnifyEffect
         Enabled = False
         InnerRadius = 0.200000002980232200
-        OuterRadius = 0.400000005960464500
+        OuterRadius = 0.400000005960464400
         Magnification = 2.000000000000000000
         AspectRatio = 1.500000000000000000
       end
@@ -939,7 +939,7 @@ object Form1: TForm1
       end
       object ContrastEffect1: TContrastEffect
         Enabled = False
-        Brightness = 0.400000005960464500
+        Brightness = 0.400000005960464400
         Contrast = 1.000000000000000000
       end
       object TilerEffect1: TTilerEffect

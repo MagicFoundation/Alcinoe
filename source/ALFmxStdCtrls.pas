@@ -1,5 +1,9 @@
 unit ALFmxStdCtrls;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if FMX.StdCtrls.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
 interface
 
 uses System.Classes,
@@ -125,6 +129,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -343,6 +350,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -415,6 +425,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -511,6 +524,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -627,6 +643,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {*********************************}
@@ -1297,7 +1316,6 @@ var
   lSize: Double;
 begin
   Result := 0;
-  lSize := FMinThumbSize;
   case Orientation of
     TOrientation.Horizontal:
       begin
@@ -1313,6 +1331,8 @@ begin
         else lSize := FThumbSize;
         Result := Round(System.Math.Min(System.Math.MaxValue([lSize, Width / 2, FMinThumbSize]), Height));
       end;
+  else
+    lSize := FMinThumbSize;
   end;
   if Result < FMinThumbSize then Result := 0;
   IgnoreViewportSize := Result <= (lSize - 1);

@@ -431,7 +431,7 @@ begin
       FLayout.setfocusable(true);               // << this is important to remove the focus from the FeditText
       FLayout.setfocusableInTouchMode(true);    //    else fedittext will always receive back the focus after we remove it
       //-----
-      {$IF CompilerVersion > 31}
+      {$IF CompilerVersion > 32} // tokyo
         {$MESSAGE WARN 'Check if viewStack.java in classes.dex is still the same as the version in delphi berlin 10.1 and adjust the IFDEF'}
       {$ENDIF}
       MainActivity.getViewStack.addview(FLayout); // << this will add the view

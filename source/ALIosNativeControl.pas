@@ -1,5 +1,9 @@
 unit ALIosNativeControl;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if MX.Presentation.iOS.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
 interface
 
 {$SCOPEDENUMS ON}
@@ -96,6 +100,9 @@ type
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
     function LocalToParentView(const ALocalPoint: TPointF): TPointF;
+    /// <summary>Perform OnKeyDown/OnKeyUp events</summary>
+    /// <returns>Return False if key was blocked</returns>
+    function PressKey(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState): Boolean;
     property Form: TCommonCustomForm read FForm;
     property ZOrderManager: TiOSZOrderManager read GetZOrderManager;
     property AncestorClipRect: TRectF read GetAncestorClipRect;
@@ -314,6 +321,26 @@ begin
   Result := Control.LocalToAbsolute(ALocalPoint);
 end;
 
+{*************************************************************************************************************}
+function TALiOSNativeView.PressKey(const AKey: Word; const AKeyChar: Char; const AShift: TShiftState): Boolean;
+var
+  Key: Word;
+  KeyChar: Char;
+begin
+  Result := True;
+  Key := AKey;
+  KeyChar := AKeyChar;
+  Form.KeyDown(Key, KeyChar, AShift);
+  if (Key <> AKey) or (KeyChar <> AKeyChar) then
+  begin
+    //Blocking input. Documentation provides information about filtering in KeyDown only.
+    Result := False;
+    Key := AKey;
+    KeyChar := AKeyChar;
+  end;
+  Form.KeyUp(Key, KeyChar, AShift);
+end;
+
 {*********************************************}
 procedure TALIosNativeView.RefreshNativeParent;
 begin
@@ -322,7 +349,7 @@ begin
     FindParentView(FParentView);
     if FParentView = nil then begin
       if ZOrderManager <> nil then ZOrderManager.RemoveLink(Control);
-      ClipView.removeFromSuperview
+      ClipView.removeFromSuperview;
     end
     else
       if IsParentViewChanged then begin

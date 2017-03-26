@@ -1,5 +1,9 @@
 unit ALFmxTabControl;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if FMX.TabControl.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
 interface
 
 {$SCOPEDENUMS ON}
@@ -83,6 +87,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
   end;
 
   {**********************************************}
@@ -202,6 +209,9 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
+    {$IF CompilerVersion > 32} // tokyo
+    property OnResized;
+    {$ENDIF}
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
     property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
@@ -987,7 +997,7 @@ begin
 
   if FindKind = TFindKind.Current then
   begin
-    while (I < TabCount) and not Tabs[I].Visible do
+    while (I < TabCount) and (I < 0) or not Tabs[I].Visible do
       Inc(I);
     if I >= TabCount then
     begin

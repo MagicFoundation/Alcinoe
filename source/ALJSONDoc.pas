@@ -442,7 +442,7 @@ type
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: AnsiString read GetNodeValueStr; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
-    property OwnerDocument: TALJSONDocument read GetOwnerDocument Write SetOwnerDocument;
+    property OwnerDocument: TALJSONDocument read GetOwnerDocument;
     property ParentNode: TALJSONNode read GetParentNode;
     property Text: AnsiString read GetText write SetText;
     property int32: integer read GetInt32 write SetInt32;
@@ -865,7 +865,7 @@ type
     property NodeType: TALJSONNodeType read GetNodeType;
     property NodeValue: String read GetNodeValueStr; // same as text property but without formating
     property NodeSubType: TALJSONNodeSubType read GetNodeSubType;
-    property OwnerDocument: TALJSONDocumentU read GetOwnerDocument Write SetOwnerDocument;
+    property OwnerDocument: TALJSONDocumentU read GetOwnerDocument;
     property ParentNode: TALJSONNodeU read GetParentNode;
     property Text: String read GetText write SetText;
     property int32: integer read GetInt32 write SetInt32;
@@ -1666,7 +1666,7 @@ begin
   if Value <> GetActive then begin
     if Value then begin
       FDocumentNode := TALJSONObjectNode.Create;
-      FDocumentNode.OwnerDocument := Self;
+      FDocumentNode.SetOwnerDocument(Self);
     end
     else ReleaseDoc;
   end;
@@ -4810,11 +4810,13 @@ procedure TALJSONNode.SetOwnerDocument(const Value: TALJSONDocument);
 var I: Integer;
     aNodeList: TALJSONNodeList;
 begin
-  FDocument := Value;
-  aNodeList := InternalGetChildNodes;
-  if Assigned(aNodeList) then
-    for I := 0 to aNodeList.Count - 1 do
-      aNodeList[I].SetOwnerDocument(Value);
+  if FDocument <> Value then begin
+    FDocument := Value;
+    aNodeList := InternalGetChildNodes;
+    if Assigned(aNodeList) then
+      for I := 0 to aNodeList.Count - 1 do
+        aNodeList[I].SetOwnerDocument(Value);
+  end;
 end;
 
 {************************}
@@ -4828,9 +4830,11 @@ end;
 {Sets the value of the ParentNode property.}
 procedure TALJSONNode.SetParentNode(const Value: TALJSONNode);
 begin
-  If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
-  else SetOwnerDocument(nil);
-  FParentNode := Value
+  if FParentNode <> Value then begin
+    If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
+    else SetOwnerDocument(nil);
+    FParentNode := Value;
+  end;
 end;
 
 {*******************************************************************}
@@ -7381,7 +7385,7 @@ begin
   if Value <> GetActive then begin
     if Value then begin
       FDocumentNode := TALJSONObjectNodeU.Create;
-      FDocumentNode.OwnerDocument := Self;
+      FDocumentNode.SetOwnerDocument(Self);
     end
     else ReleaseDoc;
   end;
@@ -10387,11 +10391,13 @@ procedure TALJSONNodeU.SetOwnerDocument(const Value: TALJSONDocumentU);
 var I: Integer;
     aNodeList: TALJSONNodeListU;
 begin
-  FDocument := Value;
-  aNodeList := InternalGetChildNodes;
-  if Assigned(aNodeList) then
-    for I := 0 to aNodeList.Count - 1 do
-      aNodeList[I].SetOwnerDocument(Value);
+  if FDocument <> Value then begin
+    FDocument := Value;
+    aNodeList := InternalGetChildNodes;
+    if Assigned(aNodeList) then
+      for I := 0 to aNodeList.Count - 1 do
+        aNodeList[I].SetOwnerDocument(Value);
+  end;
 end;
 
 {************************}
@@ -10405,9 +10411,11 @@ end;
 {Sets the value of the ParentNode property.}
 procedure TALJSONNodeU.SetParentNode(const Value: TALJSONNodeU);
 begin
-  If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
-  else SetOwnerDocument(nil);
-  FParentNode := Value
+  if FParentNode <> Value then begin
+    If assigned(Value) then SetOwnerDocument(Value.OwnerDocument)
+    else SetOwnerDocument(nil);
+    FParentNode := Value;
+  end;
 end;
 
 {*******************************************************************}

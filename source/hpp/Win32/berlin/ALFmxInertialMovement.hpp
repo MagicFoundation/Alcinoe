@@ -120,7 +120,8 @@ private:
 	bool FInDoStop;
 	bool FMoved;
 	bool FStarted;
-	bool FBoundsAnimation;
+	bool FBoundsAnimationAtMinTarget;
+	bool FBoundsAnimationAtMaxTarget;
 	bool FAutoShowing;
 	float FOpacity;
 	bool FShown;
@@ -151,7 +152,10 @@ private:
 	void __fastcall CalcVelocity(const System::TDateTime Time = 0.000000E+00);
 	void __fastcall InternalStart(void);
 	void __fastcall InternalTerminated(void);
+	bool __fastcall GetBoundsAnimation(void);
 	void __fastcall SetBoundsAnimation(const bool Value);
+	void __fastcall SetBoundsAnimationAtMinTarget(const bool Value);
+	void __fastcall SetBoundsAnimationAtMaxTarget(const bool Value);
 	void __fastcall UpdateViewportPositionByBounds(void);
 	void __fastcall SetAutoShowing(const bool Value);
 	void __fastcall SetShown(const bool Value);
@@ -208,7 +212,9 @@ public:
 	__property bool Animation = {read=FAnimation, write=SetAnimation, default=0};
 	__property bool AutoShowing = {read=FAutoShowing, write=SetAutoShowing, default=0};
 	__property bool Averaging = {read=FAveraging, write=FAveraging, default=0};
-	__property bool BoundsAnimation = {read=FBoundsAnimation, write=SetBoundsAnimation, default=1};
+	__property bool BoundsAnimation = {read=GetBoundsAnimation, write=SetBoundsAnimation, default=1};
+	__property bool BoundsAnimationAtMinTarget = {read=FBoundsAnimationAtMinTarget, write=SetBoundsAnimationAtMinTarget, default=1};
+	__property bool BoundsAnimationAtMaxTarget = {read=FBoundsAnimationAtMaxTarget, write=SetBoundsAnimationAtMaxTarget, default=1};
 	__property System::Uitypes::TTouchTracking TouchTracking = {read=FTouchTracking, write=SetTouchTracking, default=3};
 	__property int TargetCount = {read=GetTargetCount, nodefault};
 	void __fastcall SetTargets(const TTarget *ATargets, const int ATargets_High);

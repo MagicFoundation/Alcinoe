@@ -3650,9 +3650,9 @@ var Item: Pointer;
 begin
   if (Index1 < 0) or (Index1 >= FCount) then ALXMLDocError(cALXmlListIndexError, [Index1]);
   if (Index2 < 0) or (Index2 >= FCount) then ALXMLDocError(cALXmlListIndexError, [Index2]);
-  Item := FList[Index1];
-  FList[Index1] := FList[Index2];
-  FList[Index2] := Item;
+  Item := pointer(FList[Index1]);
+  pointer(FList[Index1]) := pointer(FList[Index2]);
+  pointer(FList[Index2]) := Item;
 end;
 
 {***********************************************************}

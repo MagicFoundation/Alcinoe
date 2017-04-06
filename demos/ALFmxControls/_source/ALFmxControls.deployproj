@@ -28,20 +28,20 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_750x1334.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>Default-667h@2x.png</RemoteName>
-            <DeployClass>iPhone_Launch750</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="..\iOSDevice64\Debug\ALFmxControls.info.plist" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Info.plist</RemoteName>
             <DeployClass>ProjectiOSInfoPList</DeployClass>
             <Operation>1</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_750x1334.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFmxControls.app\</RemoteDir>
+            <RemoteName>Default-667h@2x.png</RemoteName>
+            <DeployClass>iPhone_Launch750</DeployClass>
+            <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
@@ -1686,6 +1686,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALFmxControls.app\</RemoteDir>
+            <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+            <DeployClass>iPad_SpotLight80</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
@@ -1699,15 +1708,6 @@
             <RemoteDir>ALFmxControls.app\</RemoteDir>
             <RemoteName>Default-736h@3x.png</RemoteName>
             <DeployClass>iPhone_Launch1242</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALFmxControls.app\</RemoteDir>
-            <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
-            <DeployClass>iPad_SpotLight80</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>

@@ -273,14 +273,14 @@ end;
 {*******************************}
 procedure TALAnimation.DoProcess;
 begin
-  if Assigned(FOnProcess) then
+  if fEnabled and Assigned(FOnProcess) then // << i set that if enabled is false then the FOnProcess will not run
     FOnProcess(Self);
 end;
 
 {******************************}
 procedure TALAnimation.DoFinish;
 begin
-  if Assigned(FOnFinish) then
+  if fEnabled and Assigned(FOnFinish) then // << i set that if enabled is false then the FOnFinish will not run
     FOnFinish(Self);
 end;
 

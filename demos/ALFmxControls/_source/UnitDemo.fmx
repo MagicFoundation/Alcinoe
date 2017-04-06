@@ -2,7 +2,7 @@ object DemoForm: TDemoForm
   Left = 0
   Top = 0
   ClientHeight = 480
-  ClientWidth = 640
+  ClientWidth = 638
   Quality = HighPerformance
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -12,10 +12,35 @@ object DemoForm: TDemoForm
   DesignerMasterStyle = 0
   object ALText1: TALText
     Align = Top
-    Size.Width = 640.000000000000000000
-    Size.Height = 41.000000000000000000
+    AutoSize = True
+    Margins.Bottom = 15.000000000000000000
+    Position.Y = 46.000000000000000000
+    Size.Width = 638.000000000000000000
+    Size.Height = 16.000000000000000000
     Size.PlatformDefault = False
-    Text = 'Analyzing start when velocity > 2000'
+    Text = 'FPS Analyzing start when velocity > 2000'
     TextSettings.HorzAlign = Center
+  end
+  object ALText2: TALText
+    Align = Top
+    AutoSize = True
+    Cursor = crHandPoint
+    HitTest = True
+    Padding.Top = 15.000000000000000000
+    Padding.Bottom = 15.000000000000000000
+    Size.Width = 638.000000000000000000
+    Size.Height = 46.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Calculate the max possible FPS'
+    TextSettings.FontColor = claDodgerblue
+    TextSettings.HorzAlign = Center
+    OnClick = Button1Click
+  end
+  object Timer1: TTimer
+    Enabled = False
+    Interval = 1
+    OnTimer = Timer1Timer
+    Left = 16
+    Top = 8
   end
 end

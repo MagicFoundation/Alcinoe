@@ -11,20 +11,8 @@ INSTALL:
 --------
  
 If you plan to use native control on android (like TALEdit) then you
-will need to create a new classes.dex with contain the alcinoe java source 
-file. The alcinoe java source file need to be compiled to .class files, which 
-are then archived into a .jar file, converted from Java byte code to DEX 
-(Dalvik Executable) format and merged into the normally used (by Delphi's 
-Android deployment process) classes.dex.
-
-Open java/build_xx.bat file in editor and set %ANDROID% and %EMBO_DEX% variables
-or use the already compiled java\dex\xx\classes.dex 
-  
-Delphi default classes.dex file must be unchecked in Deployment window 
-and new java\dex\xx\classes.dex with classes\ remote path name, must be added 
-in the Deployment window. (see classes_dex.png image)
-
-(Thanks to "Brian Long" and "Babak Yaghoobi" for merging dex files)
+will need to include lib\jar\alcinoe\alcinoe.jar (first compile it with 
+compilejar_xxx.bat) in project manager > target plateform > android > Libraries
 
 
 WHAT ARE THE ALCINOE FIREMONKEY CONTROLS:
@@ -34,25 +22,25 @@ THE FACT: Painting of Firmonkey controls can be sometime slow, or say
 differently, not sufficiently fast for a fluid scrolling. For exemple if 
 you simply look the basic Trectangle with round corners, the paint procedure 
 can take around 3 ms! So if you have around 20 visible Trectangles on your 
-screen, then it’s will cost you around 60 ms to repaint the full screen 
-(and normally you don’t have only trectangle, you also have Tlabel, 
-tcheckbox, etc..). After it’s just math, take 100ms to repaint the screen, 
+screen, then it's will cost you around 60 ms to repaint the full screen 
+(and normally you don't have only trectangle, you also have Tlabel, 
+tcheckbox, etc..). After it's just math, take 100ms to repaint the screen, 
 so you can only do around 10 frames per seconds (in reality you will have 
-much less even) so the scrolling can’t be fluid :(
+much less even) so the scrolling can't be fluid :(
 
-THE SOLUTION: I didn’t want to rebuild the firemonkey controls, it’s too 
+THE SOLUTION: I didn't want to rebuild the firemonkey controls, it's too 
 huge job for me, and instead I try to find an intermediate solution. 
-This what I find by adding “doublebuffered” property to the firemonkey 
+This what I find by adding "doublebuffered" property to the firemonkey 
 controls. So instead to repaint and repaint (and repaint) the controls 
 for every single pixels move of the scrollbox, I first paint the control 
-on a “buffer” that I store directly in the GPU memory (through TTexture), 
+on a "buffer" that I store directly in the GPU memory (through TTexture), 
 and when the system ask me to repaint the controls instead of calling 
 again the paint algorithm i simply redraw the buffer TTexture.
 
-THE RESULTS: As I say before it’s took 3 ms just to paint a simple 
+THE RESULTS: As I say before it's took 3 ms just to paint a simple 
 Trectangle with round corners. With my doublebuffered property 
-it’s take now around 0.1 ms ! so now the scroll look much more 
-fluid! It’s a success
+it's take now around 0.1 ms ! so now the scroll look much more 
+fluid! It's a success
 
 
 ABOUT OPENGL DRAW => REPLACED BY NATIVE IOS/ANDROID DRAW

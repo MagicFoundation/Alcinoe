@@ -8,44 +8,61 @@
 set INPUT=
 set /P INPUT=Build demos (Y/N)?: %=%
 
-del *.skincfg /s
-IF ERRORLEVEL 1 pause
+SET FileName=*.skincfg
+del %FileName% /s
+if exist %FileName% pause
 
-del *.rsm /s
-IF ERRORLEVEL 1 pause
+SET FileName=*.rsm
+del %FileName% /s
+if exist %FileName% pause
 
-del *.stat /s
-IF ERRORLEVEL 1 pause
+SET FileName=*.stat
+del %FileName% /s
+if exist %FileName% pause
 
-del *.identcache /s
-IF ERRORLEVEL 1 pause
+SET FileName=*.identcache
+del %FileName% /s
+if exist %FileName% pause
 
-del *.dproj.local /s
-IF ERRORLEVEL 1 pause
+SET FileName=*.dproj.local
+del %FileName% /s
+if exist %FileName% pause
 
-del *.deployproj.local /s
-IF ERRORLEVEL 1 pause
+SET FileName=*.deployproj.local
+del %FileName% /s
+if exist %FileName% pause
 
-rmdir /s /q source\dcu\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=*.deployproj
+del %FileName% /s
+if exist %FileName% pause
 
-mkdir source\dcu\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=*.dres
+del %FileName% /s
+if exist %FileName% pause
 
-rmdir /s /q source\hpp\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=*.rc
+del %FileName% /s
+if exist %FileName% pause
 
-mkdir source\hpp\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=source\dcu\Win32\berlin
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% pause
+mkdir %FileName%
 
-rmdir /s /q lib\alcinoe\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=source\hpp\Win32\berlin
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% pause
+mkdir %FileName%
 
-mkdir lib\alcinoe\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=lib\alcinoe\Win32\berlin
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% pause
+mkdir %FileName%
 
 MSBuild source\Alcinoe_berlin.dproj /p:Config=Release /p:Platform=Win32
 IF ERRORLEVEL 1 pause
+
+call compilejar_berlin.bat off
 
 if "%INPUT%"=="Y" goto BUILD_DEMOS
 if "%INPUT%"=="y" goto BUILD_DEMOS
@@ -53,16 +70,17 @@ goto END
 
 :BUILD_DEMOS
 
-del demos\*.vlb /s
-IF ERRORLEVEL 1 pause
+SET FileName=demos\*.vlb
+del %FileName% /s
+if exist %FileName% pause
 
 CHDIR demos\
 FOR /d /R %%J IN (Android) DO (	  
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
@@ -72,8 +90,8 @@ FOR /d /R %%J IN (iOSSimulator) DO (
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
@@ -83,8 +101,8 @@ FOR /d /R %%J IN (iOSDevice32) DO (
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
@@ -94,8 +112,8 @@ FOR /d /R %%J IN (iOSDevice64) DO (
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
@@ -105,8 +123,8 @@ FOR /d /R %%J IN (Osx32) DO (
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
@@ -116,8 +134,8 @@ FOR /d /R %%J IN (win32) DO (
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
@@ -127,20 +145,19 @@ FOR /d /R %%J IN (win64) DO (
   Echo.%%J | findstr /C:"_source">nul && (
     REM do not delete inside /_source/
   ) || (
-    @IF EXIST %%J echo rmdir - %%J			
-    @IF EXIST %%J rmdir /s /q %%J
+    IF EXIST %%J echo rmdir - %%J			
+    IF EXIST %%J rmdir /s /q %%J
   )
 )
 CHDIR ..
 
 CHDIR demos\
 FOR /d /R %%J IN (dcu) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J (
+  IF EXIST %%J echo rmdir - %%J			
+  IF EXIST %%J (
     rmdir /s /q %%J
     mkdir %%J
   )
-  IF ERRORLEVEL 1 pause
 )
 CHDIR ..
 
@@ -174,7 +191,7 @@ CHDIR ..
 CHDIR demos\
 FOR /d /R %%J IN (Release) DO (	  
   Echo.%%J | findstr /C:"Android">nul && (
-    @IF EXIST %%J del %%J * /q     
+    IF EXIST %%J del %%J * /q     
   ) || (
     REM skip if not Android/Release
   )
@@ -183,8 +200,8 @@ CHDIR ..
 
 CHDIR demos\
 FOR /d /R %%J IN (dcu) DO (	
-  @IF EXIST %%J echo rmdir - %%J			
-  @IF EXIST %%J (
+  IF EXIST %%J echo rmdir - %%J			
+  IF EXIST %%J (
     rmdir /s /q %%J
     mkdir %%J
   )
@@ -197,18 +214,13 @@ IF ERRORLEVEL 1 pause
 xcopy dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
 IF ERRORLEVEL 1 pause
 
-del Alcinoe.zip
-
-C:\Progra~2\7-Zip\7za.exe a -tzip -r Alcinoe.zip * -x!_svn* -x!.svn* -x!*.dcu -x!*.bpl -x!*__history* -x!references* -x!archive*
-IF ERRORLEVEL 1 pause
 
 :END
 
-rmdir /s /q source\dcu\Win32\berlin
-IF ERRORLEVEL 1 pause
-
-mkdir source\dcu\Win32\berlin
-IF ERRORLEVEL 1 pause
+SET FileName=source\dcu\Win32\berlin
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% pause
+mkdir %FileName%
 
 @echo Finished
 PAUSE 

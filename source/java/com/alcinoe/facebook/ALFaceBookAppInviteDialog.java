@@ -3,9 +3,8 @@ package com.alcinoe.facebook;
 import com.facebook.share.widget.AppInviteDialog;
 import com.facebook.share.model.AppInviteContent;
 import android.app.Activity;
-import android.text.TextUtils;
 
-public class ALFaceBookAppInvite {
+public class ALFaceBookAppInviteDialog {
 
   public static boolean canShow() {
       return AppInviteDialog.canShow();

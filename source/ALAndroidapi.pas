@@ -33,8 +33,13 @@ type
   JALLog = interface;
   JALStatFs = interface;
   JALAppInviteInvitation = interface;
+  JALIntentBuilder_PlatformMode = interface;
   JALAppInviteInvitation_IntentBuilder = interface;
-  JALFaceBookAppInvite = interface;
+  JALAppInviteReferral = interface;
+  JALAppInviteInvitationResultListener = interface;
+  JALAppInviteInvitationResult = interface;
+  JALFaceBookAppInviteDialog = interface;
+  JALFaceBookShareLinkDialog = interface;
   JALFacebookAppEventsLogger = interface;
   JALFacebookAppEventsLogger_FlushBehavior = interface;
 
@@ -182,7 +187,23 @@ type
   end;
   TJALAppInviteInvitation = class(TJavaGenericImport<JALAppInviteInvitationClass, JALAppInviteInvitation>) end;
 
-  {***************************************************************}
+  {**************************************************************}
+  JALIntentBuilder_PlatformModeClass = interface(JAnnotationClass)
+    ['{419B2BDC-2EDC-4F0D-B6AD-F9DA715F6F4D}']
+    {class} function _GetPROJECT_PLATFORM_ANDROID: Integer; cdecl;
+    {class} function _GetPROJECT_PLATFORM_IOS: Integer; cdecl;
+    {class} property PROJECT_PLATFORM_ANDROID: Integer read _GetPROJECT_PLATFORM_ANDROID;
+    {class} property PROJECT_PLATFORM_IOS: Integer read _GetPROJECT_PLATFORM_IOS;
+  end;
+
+  {************************************************************************************************}
+  [JavaSignature('com/google/android/gms/appinvite/AppInviteInvitation$IntentBuilder$PlatformMode')]
+  JALIntentBuilder_PlatformMode = interface(JAnnotation)
+    ['{D05F92FA-07BE-4D0E-8C29-20D126B713C5}']
+  end;
+  TJALIntentBuilder_PlatformMode = class(TJavaGenericImport<JALIntentBuilder_PlatformModeClass, JALIntentBuilder_PlatformMode>) end;
+
+  {*****************************************************************}
   JALAppInviteInvitation_IntentBuilderClass = interface(JObjectClass)
     ['{E131213D-5067-4E24-AB74-F9ECBD5611A8}']
     {class} function _GetMAX_CALL_TO_ACTION_TEXT_LENGTH: Integer; cdecl;
@@ -215,19 +236,80 @@ type
   end;
   TJALAppInviteInvitation_IntentBuilder = class(TJavaGenericImport<JALAppInviteInvitation_IntentBuilderClass, JALAppInviteInvitation_IntentBuilder>) end;
 
-  {*************************************************}
-  JALFaceBookAppInviteClass = interface(JObjectClass)
+  {***********************************************}
+  JALAppInviteReferralClass = interface(JObjectClass)
+    ['{D999EBBE-74DC-426B-A6A5-2C63A8EF335A}']
+    {class} function addPlayStoreReferrerToIntent(playStoreReferrerIntent: JIntent; referralIntent: JIntent): JIntent; cdecl; //deprecated
+    {class} function addReferralDataToIntent(invitationId: JString; deepLink: JString; referralIntent: JIntent): JIntent; cdecl; //deprecated
+    {class} function getDeepLink(referralIntent: JIntent): JString; cdecl;
+    {class} function getInvitationId(referralIntent: JIntent): JString; cdecl;
+    {class} function hasReferral(referralIntent: JIntent): Boolean; cdecl;
+    {class} function isOpenedFromPlayStore(referralIntent: JIntent): Boolean; cdecl;
+  end;
+
+  {*******************************************************************}
+  [JavaSignature('com/google/android/gms/appinvite/AppInviteReferral')]
+  JALAppInviteReferral = interface(JObject)
+    ['{0BB52E8A-6921-4821-89DE-79EDD4BE3297}']
+  end;
+  TJALAppInviteReferral = class(TJavaGenericImport<JALAppInviteReferralClass, JALAppInviteReferral>) end;
+
+  {***************************************************************}
+  JALAppInviteInvitationResultListenerClass = interface(IJavaClass)
+    ['{D3768F2A-D5BB-43A5-BE1B-A8133445FB6D}']
+  end;
+
+  {***********************************************************************************}
+  [JavaSignature('com/alcinoe/googleplayservices/ALAppInviteInvitationResultListener')]
+  JALAppInviteInvitationResultListener = interface(IJavaInstance)
+    ['{6FAC6B04-8B86-40A5-935C-476087E55082}']
+    procedure onError(level: integer; code: integer); cdecl;
+    procedure onSuccess(deepLink: JString; invitationId: JString); cdecl;
+  end;
+  TJALAppInviteInvitationResultListener = class(TJavaGenericImport<JALAppInviteInvitationResultListenerClass, JALAppInviteInvitationResultListener>) end;
+
+  {*********************************************************}
+  JALAppInviteInvitationResultClass = interface(JObjectClass)
+    ['{43B2EDB9-2F4C-49EC-8145-C3B3DF7FF178}']
+    {class} function init(activity: JActivity): JALAppInviteInvitationResult; cdecl;
+  end;
+
+  {***************************************************************************}
+  [JavaSignature('com/alcinoe/googleplayservices/ALAppInviteInvitationResult')]
+  JALAppInviteInvitationResult = interface(JObject)
+    ['{6299DA17-EFB1-4954-AA48-760C2B732597}']
+    procedure retrieve(autoLaunchDeepLink: Boolean); cdecl;
+    procedure setListener(listener: JALAppInviteInvitationResultListener); cdecl;
+  end;
+  TJALAppInviteInvitationResult = class(TJavaGenericImport<JALAppInviteInvitationResultClass, JALAppInviteInvitationResult>) end;
+
+  {*******************************************************}
+  JALFaceBookAppInviteDialogClass = interface(JObjectClass)
     ['{3FEB53AB-882F-4D64-8797-C7873A5FF84B}']
     {class} function canShow: boolean; cdecl;
     {class} procedure show(activity: JActivity; applinkUrl: JString; promotionText: JString; promotionCode: JString; previewImageUrl: JString); cdecl;
   end;
 
-  {*********************************************************}
-  [JavaSignature('com/alcinoe/facebook/ALFaceBookAppInvite')]
-  JALFaceBookAppInvite = interface(JObject)
+  {***************************************************************}
+  [JavaSignature('com/alcinoe/facebook/ALFaceBookAppInviteDialog')]
+  JALFaceBookAppInviteDialog = interface(JObject)
     ['{CB1C33F4-A26F-4543-8899-63D25EF5C6E0}']
   end;
-  TJALFaceBookAppInvite = class(TJavaGenericImport<JALFaceBookAppInviteClass, JALFaceBookAppInvite>) end;
+  TJALFaceBookAppInviteDialog = class(TJavaGenericImport<JALFaceBookAppInviteDialogClass, JALFaceBookAppInviteDialog>) end;
+
+  {*******************************************************}
+  JALFaceBookShareLinkDialogClass = interface(JObjectClass)
+    ['{3FEB53AB-882F-4D64-8797-C7873A5FF84B}']
+    {class} function canShow: boolean; cdecl;
+    {class} procedure show(activity: JActivity; contentUrl: Jnet_Uri; contentTitle: JString; contentDescription: JString; imageUrl: Jnet_Uri; quote: JString); cdecl;
+  end;
+
+  {***************************************************************}
+  [JavaSignature('com/alcinoe/facebook/ALFaceBookShareLinkDialog')]
+  JALFaceBookShareLinkDialog = interface(JObject)
+    ['{CB1C33F4-A26F-4543-8899-63D25EF5C6E0}']
+  end;
+  TJALFaceBookShareLinkDialog = class(TJavaGenericImport<JALFaceBookShareLinkDialogClass, JALFaceBookShareLinkDialog>) end;
 
   {*******************************************************************}
   JALFacebookAppEventsLogger_FlushBehaviorClass = interface(JEnumClass)
@@ -316,8 +398,13 @@ begin
   TRegTypes.RegisterType('ALAndroidapi.JALLog', TypeInfo(ALAndroidapi.JALLog));
   TRegTypes.RegisterType('ALAndroidapi.JALStatFs', TypeInfo(ALAndroidapi.JALStatFs));
   TRegTypes.RegisterType('ALAndroidapi.JALAppInviteInvitation', TypeInfo(ALAndroidapi.JALAppInviteInvitation));
+  TRegTypes.RegisterType('ALAndroidapi.JALIntentBuilder_PlatformMode', TypeInfo(ALAndroidapi.JALIntentBuilder_PlatformMode));
   TRegTypes.RegisterType('ALAndroidapi.JALAppInviteInvitation_IntentBuilder', TypeInfo(ALAndroidapi.JALAppInviteInvitation_IntentBuilder));
-  TRegTypes.RegisterType('ALAndroidapi.JALFaceBookAppInvite', TypeInfo(ALAndroidapi.JALFaceBookAppInvite));
+  TRegTypes.RegisterType('ALAndroidapi.JALAppInviteReferral', TypeInfo(ALAndroidapi.JALAppInviteReferral));
+  TRegTypes.RegisterType('ALAndroidapi.JALAppInviteInvitationResultListener', TypeInfo(ALAndroidapi.JALAppInviteInvitationResultListener));
+  TRegTypes.RegisterType('ALAndroidapi.JALAppInviteInvitationResult', TypeInfo(ALAndroidapi.JALAppInviteInvitationResult));
+  TRegTypes.RegisterType('ALAndroidapi.JALFaceBookAppInviteDialog', TypeInfo(ALAndroidapi.JALFaceBookAppInviteDialog));
+  TRegTypes.RegisterType('ALAndroidapi.JALFaceBookShareLinkDialog', TypeInfo(ALAndroidapi.JALFaceBookShareLinkDialog));
   TRegTypes.RegisterType('ALAndroidapi.JALFacebookAppEventsLogger', TypeInfo(ALAndroidapi.JALFacebookAppEventsLogger));
   TRegTypes.RegisterType('ALAndroidapi.JALFacebookAppEventsLogger_FlushBehavior', TypeInfo(ALAndroidapi.JALFacebookAppEventsLogger_FlushBehavior));
 end;

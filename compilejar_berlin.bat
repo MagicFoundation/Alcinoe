@@ -38,14 +38,11 @@ lib\jar\google-play-services\play-services-base.jar;^
 lib\jar\google-play-services\play-services-basement.jar;^
 lib\jar\google-play-services\play-services-appinvite.jar^
  -d source\output^
- source\java\com\alcinoe\widget\ALControlHostLayout.java^
- source\java\com\alcinoe\widget\ALEditText.java^
- source\java\com\alcinoe\view\inputmethod\ALSoftInputListener.java^
- source\java\com\alcinoe\text\method\ALKeyPreImeListener.java^
- source\java\com\alcinoe\facebook\ALFaceBookAppInviteDialog.java^
- source\java\com\alcinoe\facebook\ALFaceBookShareLinkDialog.java^
- source\java\com\alcinoe\googleplayservices\ALAppInviteInvitationResult.java^
- source\java\com\alcinoe\googleplayservices\ALAppInviteInvitationResultListener.java
+ source\java\com\alcinoe\widget\*.java^
+ source\java\com\alcinoe\view\inputmethod\*.java^
+ source\java\com\alcinoe\text\method\*.java^
+ source\java\com\alcinoe\facebook\*.java^
+ source\java\com\alcinoe\googleplayservices\*.java
 IF ERRORLEVEL 1 goto ERROR
 
 echo Creating jar containing the new classes

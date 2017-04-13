@@ -10,69 +10,65 @@ set /P INPUT=Build demos (Y/N)?: %=%
 
 SET FileName=*.skincfg
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.rsm
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.stat
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.identcache
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.dproj.local
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.deployproj.local
 del %FileName% /s
-if exist %FileName% pause
-
-SET FileName=*.deployproj
-del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.dres
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=*.rc
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=source\dcu\Win32\berlin
 IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% pause
+IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
 SET FileName=source\hpp\Win32\berlin
 IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% pause
+IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
 SET FileName=lib\alcinoe\Win32\berlin
 IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% pause
+IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
 MSBuild source\Alcinoe_berlin.dproj /p:Config=Release /p:Platform=Win32
-IF ERRORLEVEL 1 pause
+IF ERRORLEVEL 1 goto ERROR
 
 call compilejar_berlin.bat off
 
 if "%INPUT%"=="Y" goto BUILD_DEMOS
 if "%INPUT%"=="y" goto BUILD_DEMOS
-goto END
+goto FINISHED
 
 :BUILD_DEMOS
 
 SET FileName=demos\*.vlb
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 CHDIR demos\
 FOR /d /R %%J IN (Android) DO (	  
@@ -165,9 +161,9 @@ CHDIR demos\
 FOR /R %%J IN (*.dproj) DO (	
   echo %%J			
   MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
   MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
 )
 CHDIR ..
 
@@ -176,15 +172,15 @@ FOR /R %%J IN (ALFmx*.dproj) DO (
   echo %%J			
   MSBuild %%J /p:Config=Release /p:Platform=Android /t:Build
   MSBuild %%J /p:Config=Release /p:Platform=Android /t:Deploy
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
   MSBuild %%J /p:Config=Release /p:Platform=iOSSimulator /t:Build
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
   MSBuild %%J /p:Config=Release /p:Platform=iOSDevice32 /t:Build
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
   MSBuild %%J /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
   MSBuild %%J /p:Config=Release /p:Platform=OSX32 /t:Build
-  IF ERRORLEVEL 1 pause
+  IF ERRORLEVEL 1 goto ERROR
 )
 CHDIR ..
 
@@ -209,18 +205,24 @@ FOR /d /R %%J IN (dcu) DO (
 CHDIR ..
 
 xcopy dll\tbbmalloc\win32\tbbmalloc.dll demos\ALDatabaseBenchmark\win32 /s
-IF ERRORLEVEL 1 pause
+IF ERRORLEVEL 1 goto ERROR
 
 xcopy dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
-IF ERRORLEVEL 1 pause
+IF ERRORLEVEL 1 goto ERROR
 
 
-:END
+:FINISHED
 
 SET FileName=source\dcu\Win32\berlin
 IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% pause
+IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
 @echo Finished
-PAUSE 
+PAUSE
+goto EXIT 
+
+:ERROR
+pause
+
+:EXIT

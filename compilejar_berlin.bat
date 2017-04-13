@@ -22,33 +22,47 @@ if x%CONFIRM% == x set CONFIRM=on
 
 SET FileName=lib\jar\alcinoe\*.jar
 del %FileName% /s
-if exist %FileName% pause
+if exist %FileName% goto ERROR
 
 SET FileName=source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% pause
+IF EXIST %FileName% goto ERROR
 
 echo Compiling the Java Sources
 mkdir source\output 2> nul
-%JDK_PATH%\javac -Xlint:deprecation -cp %ANDROID_PLATFORM%\android.jar;lib\jar\facebook\facebook-android-sdk.jar;c:\temp\android-support-v4.jar -d source\output ^
-source\java\com\alcinoe\widget\ALControlHostLayout.java ^
-source\java\com\alcinoe\widget\ALEditText.java ^
-source\java\com\alcinoe\view\inputmethod\ALSoftInputListener.java ^
-source\java\com\alcinoe\text\method\ALKeyPreImeListener.java ^
-source\java\com\alcinoe\facebook\ALFaceBookAppInvite.java
-IF ERRORLEVEL 1 pause
+%JDK_PATH%\javac -Xlint:deprecation -cp^
+ %ANDROID_PLATFORM%\android.jar;^
+lib\jar\facebook\facebook-android-sdk.jar;^
+lib\jar\support-v4\support-v4.jar;^
+lib\jar\google-play-services\play-services-base.jar;^
+lib\jar\google-play-services\play-services-basement.jar;^
+lib\jar\google-play-services\play-services-appinvite.jar^
+ -d source\output^
+ source\java\com\alcinoe\widget\ALControlHostLayout.java^
+ source\java\com\alcinoe\widget\ALEditText.java^
+ source\java\com\alcinoe\view\inputmethod\ALSoftInputListener.java^
+ source\java\com\alcinoe\text\method\ALKeyPreImeListener.java^
+ source\java\com\alcinoe\facebook\ALFaceBookAppInviteDialog.java^
+ source\java\com\alcinoe\facebook\ALFaceBookShareLinkDialog.java^
+ source\java\com\alcinoe\googleplayservices\ALAppInviteInvitationResult.java^
+ source\java\com\alcinoe\googleplayservices\ALAppInviteInvitationResultListener.java
+IF ERRORLEVEL 1 goto ERROR
 
 echo Creating jar containing the new classes
 %JDK_PATH%\jar cf lib\jar\alcinoe\alcinoe.jar -C source\output com
-IF ERRORLEVEL 1 pause
+IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
-IF EXIST %FileName% pause
+IF EXIST %FileName% goto ERROR
 
 echo Jar created successfully
 if x%CONFIRM% == xon PAUSE 
+goto EXIT
 
-:Exit
+:ERROR
+pause
+
+:EXIT
 
 endlocal

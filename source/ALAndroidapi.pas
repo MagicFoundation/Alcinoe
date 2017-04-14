@@ -32,6 +32,7 @@ type
   JALControlHostLayout = interface;
   JALLog = interface;
   JALStatFs = interface;
+  JALGoogleApiAvailability = interface;
   JALAppInviteInvitation = interface;
   JALIntentBuilder_PlatformMode = interface;
   JALAppInviteInvitation_IntentBuilder = interface;
@@ -179,6 +180,20 @@ type
     ['{34D1F50D-8EF5-4374-9B5F-384E93E3BF92}']
     {class} function init: JALAppInviteInvitation; cdecl;
   end;
+
+  {*****************************************************}
+  JALGoogleApiAvailabilityClass = interface(JObjectClass)
+    ['{11C8E911-BFBD-4A4C-A0E0-0156EF08DBB6}']
+    {class} function init: JALGoogleApiAvailability; cdecl;
+    {class} function isGooglePlayServicesAvailable(activity: JActivity): integer; cdecl;
+  end;
+
+  {***********************************************************************}
+  [JavaSignature('com/alcinoe/googleplayservices/ALGoogleApiAvailability')]
+  JALGoogleApiAvailability = interface(JObject)
+    ['{6D8D7ED6-6AB0-42EE-8924-920842A615C5}']
+  end;
+  TJALGoogleApiAvailability = class(TJavaGenericImport<JALGoogleApiAvailabilityClass, JALGoogleApiAvailability>) end;
 
   {*********************************************************************}
   [JavaSignature('com/google/android/gms/appinvite/AppInviteInvitation')]
@@ -397,6 +412,7 @@ begin
   TRegTypes.RegisterType('ALAndroidapi.JALControlHostLayout', TypeInfo(ALAndroidapi.JALControlHostLayout));
   TRegTypes.RegisterType('ALAndroidapi.JALLog', TypeInfo(ALAndroidapi.JALLog));
   TRegTypes.RegisterType('ALAndroidapi.JALStatFs', TypeInfo(ALAndroidapi.JALStatFs));
+  TRegTypes.RegisterType('ALAndroidapi.JALGoogleApiAvailability', TypeInfo(ALAndroidapi.JALGoogleApiAvailability));
   TRegTypes.RegisterType('ALAndroidapi.JALAppInviteInvitation', TypeInfo(ALAndroidapi.JALAppInviteInvitation));
   TRegTypes.RegisterType('ALAndroidapi.JALIntentBuilder_PlatformMode', TypeInfo(ALAndroidapi.JALIntentBuilder_PlatformMode));
   TRegTypes.RegisterType('ALAndroidapi.JALAppInviteInvitation_IntentBuilder', TypeInfo(ALAndroidapi.JALAppInviteInvitation_IntentBuilder));

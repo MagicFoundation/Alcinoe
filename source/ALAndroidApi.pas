@@ -17,11 +17,7 @@ uses Androidapi.JNI.Widget,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.Util,
      Androidapi.JNIBridge,
-     Androidapi.JNI.JavaTypes,
-     Androidapi.JNI.Accounts,
-     Androidapi.JNI.Os,
-     Androidapi.JNI.Net,
-     Androidapi.JNI.App;
+     Androidapi.JNI.JavaTypes;
 
 type
 

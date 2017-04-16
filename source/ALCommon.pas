@@ -123,12 +123,12 @@ var aMsg: String;
 begin
   {$IF defined(ANDROID)}
   case _type of
-    TalLogType.VERBOSE: TJALLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
-    TalLogType.DEBUG: TJALLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
-    TalLogType.INFO: TJALLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
-    TalLogType.WARN: TJALLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
-    TalLogType.ERROR: TJALLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
-    TalLogType.ASSERT: TJALLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
+    TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(msg));
+    TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(msg));
+    TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(msg));
+    TalLogType.WARN: TJLog.JavaClass.w(StringToJString(Tag), StringToJString(msg));
+    TalLogType.ERROR: TJLog.JavaClass.e(StringToJString(Tag), StringToJString(msg));
+    TalLogType.ASSERT: TJLog.JavaClass.wtf(StringToJString(Tag), StringToJString(msg)); // << wtf for What a Terrible Failure but everyone know that it's for what the fuck !
   end;
   {$ELSEIF defined(IOS)}
   // https://forums.developer.apple.com/thread/4685

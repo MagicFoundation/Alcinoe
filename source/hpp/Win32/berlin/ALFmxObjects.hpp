@@ -18,11 +18,13 @@
 #include <System.Types.hpp>
 #include <System.UITypes.hpp>
 #include <System.Rtti.hpp>
+#include <FMX.Effects.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Types.hpp>
 #include <FMX.TextLayout.hpp>
 #include <FMX.Graphics.hpp>
 #include <FMX.Objects.hpp>
+#include <ALFmxCommon.hpp>
 
 //-- user supplied -----------------------------------------------------------
 
@@ -120,11 +122,15 @@ private:
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;
 	System::Types::TSizeF fBufSize;
+	Alfmxcommon::TALShadow* fShadow;
+	Fmx::Effects::TShadowEffect* fShadowEffect;
 	void __fastcall SetdoubleBuffered(const bool Value);
+	void __fastcall SetShadow(Alfmxcommon::TALShadow* const Value);
 	
 protected:
 	virtual void __fastcall FillChanged(System::TObject* Sender);
 	virtual void __fastcall StrokeChanged(System::TObject* Sender);
+	virtual void __fastcall ShadowChanged(System::TObject* Sender);
 	virtual void __fastcall Paint(void);
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
 	
@@ -136,6 +142,7 @@ public:
 	
 __published:
 	__property bool doubleBuffered = {read=fdoubleBuffered, write=SetdoubleBuffered, default=1};
+	__property Alfmxcommon::TALShadow* shadow = {read=fShadow, write=SetShadow};
 };
 
 
@@ -149,11 +156,15 @@ private:
 	Fmx::Graphics::TBitmap* fBufBitmap;
 	System::Types::TRectF fBufBitmapRect;
 	System::Types::TSizeF fBufSize;
+	Alfmxcommon::TALShadow* fShadow;
+	Fmx::Effects::TShadowEffect* fShadowEffect;
 	void __fastcall SetdoubleBuffered(const bool Value);
+	void __fastcall SetShadow(Alfmxcommon::TALShadow* const Value);
 	
 protected:
 	virtual void __fastcall FillChanged(System::TObject* Sender);
 	virtual void __fastcall StrokeChanged(System::TObject* Sender);
+	virtual void __fastcall ShadowChanged(System::TObject* Sender);
 	virtual void __fastcall Paint(void);
 	__property Fmx::Graphics::TBitmap* BufBitmap = {read=fBufBitmap};
 	
@@ -165,6 +176,7 @@ public:
 	
 __published:
 	__property bool doubleBuffered = {read=fdoubleBuffered, write=SetdoubleBuffered, default=1};
+	__property Alfmxcommon::TALShadow* shadow = {read=fShadow, write=SetShadow};
 };
 
 

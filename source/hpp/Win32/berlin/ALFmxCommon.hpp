@@ -32,6 +32,7 @@
 namespace Alfmxcommon
 {
 //-- forward type declarations -----------------------------------------------
+class DELPHICLASS TALShadow;
 struct TALSizeD;
 struct TALRectD;
 __interface TALResizeImageGetDestSizeFunct;
@@ -43,6 +44,43 @@ class DELPHICLASS TALDrawMultiLineTextOptions;
 class DELPHICLASS TALControlAccessPrivate;
 class DELPHICLASS TALTextLayoutAccessPrivate;
 //-- type declarations -------------------------------------------------------
+class PASCALIMPLEMENTATION TALShadow : public System::Classes::TPersistent
+{
+	typedef System::Classes::TPersistent inherited;
+	
+private:
+	bool fenabled;
+	float fblur;
+	float fOffsetX;
+	float fOffsetY;
+	System::Uitypes::TAlphaColor fShadowColor;
+	System::Classes::TNotifyEvent FOnChanged;
+	void __fastcall SetEnabled(const bool Value);
+	void __fastcall setblur(const float Value);
+	void __fastcall setOffsetX(const float Value);
+	void __fastcall setOffsetY(const float Value);
+	void __fastcall setShadowColor(const System::Uitypes::TAlphaColor Value);
+	bool __fastcall IsblurStored(void);
+	bool __fastcall IsOffsetXStored(void);
+	bool __fastcall IsOffsetYStored(void);
+	
+public:
+	__fastcall TALShadow(void);
+	virtual void __fastcall Assign(System::Classes::TPersistent* Source);
+	__property System::Classes::TNotifyEvent OnChanged = {read=FOnChanged, write=FOnChanged};
+	
+__published:
+	__property bool enabled = {read=fenabled, write=SetEnabled, default=0};
+	__property float blur = {read=fblur, write=setblur, stored=IsblurStored};
+	__property float OffsetX = {read=fOffsetX, write=setOffsetX, stored=IsOffsetXStored};
+	__property float OffsetY = {read=fOffsetY, write=setOffsetY, stored=IsOffsetYStored};
+	__property System::Uitypes::TAlphaColor ShadowColor = {read=fShadowColor, write=setShadowColor, default=-1778384896};
+public:
+	/* TPersistent.Destroy */ inline __fastcall virtual ~TALShadow(void) { }
+	
+};
+
+
 typedef System::StaticArray<double, 2> TALPointDType;
 
 typedef TALPointD *PALPointD;
@@ -469,8 +507,8 @@ extern DELPHI_PACKAGE bool __fastcall ALbreakText(const System::Uitypes::TAlphaC
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALDrawMultiLineText(const System::UnicodeString aText, System::Types::TRectF &aRect, bool &aTextBreaked, float &aAscent, float &aDescent, System::Types::TPointF &aFirstPos, System::Types::TPointF &aLastPos, TalTextElements &aElements, System::Types::TRectF &aEllipsisRect, TALDrawMultiLineTextOptions* const aOptions)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALDrawMultiLineText(const System::UnicodeString aText, System::Types::TRectF &aRect, bool &aTextBreaked, TALDrawMultiLineTextOptions* const aOptions)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALDrawMultiLineText(const System::UnicodeString aText, System::Types::TRectF &aRect, TALDrawMultiLineTextOptions* const aOptions)/* overload */;
-extern DELPHI_PACKAGE void __fastcall ALPaintRectangle(Fmx::Graphics::TCanvas* const aCanvas, const System::Types::TRectF &dstRect, Fmx::Graphics::TBrush* const Fill, Fmx::Graphics::TStrokeBrush* const Stroke, const Fmx::Types::TSides Sides = (Fmx::Types::TSides() << Fmx::Types::TSide::Top << Fmx::Types::TSide::Left << Fmx::Types::TSide::Bottom << Fmx::Types::TSide::Right ), const Fmx::Types::TCorners Corners = (Fmx::Types::TCorners() << Fmx::Types::TCorner::TopLeft << Fmx::Types::TCorner::TopRight << Fmx::Types::TCorner::BottomLeft << Fmx::Types::TCorner::BottomRight ), const float XRadius = 0.000000E+00f, const float YRadius = 0.000000E+00f);
-extern DELPHI_PACKAGE void __fastcall ALPaintCircle(Fmx::Graphics::TCanvas* const aCanvas, const System::Types::TRectF &dstRect, Fmx::Graphics::TBrush* const Fill, Fmx::Graphics::TStrokeBrush* const Stroke);
+extern DELPHI_PACKAGE void __fastcall ALPaintRectangle(Fmx::Graphics::TCanvas* const aCanvas, const System::Types::TRectF &dstRect, Fmx::Graphics::TBrush* const Fill, Fmx::Graphics::TStrokeBrush* const Stroke, TALShadow* const Shadow, const Fmx::Types::TSides Sides = (Fmx::Types::TSides() << Fmx::Types::TSide::Top << Fmx::Types::TSide::Left << Fmx::Types::TSide::Bottom << Fmx::Types::TSide::Right ), const Fmx::Types::TCorners Corners = (Fmx::Types::TCorners() << Fmx::Types::TCorner::TopLeft << Fmx::Types::TCorner::TopRight << Fmx::Types::TCorner::BottomLeft << Fmx::Types::TCorner::BottomRight ), const float XRadius = 0.000000E+00f, const float YRadius = 0.000000E+00f);
+extern DELPHI_PACKAGE void __fastcall ALPaintCircle(Fmx::Graphics::TCanvas* const aCanvas, const System::Types::TRectF &dstRect, Fmx::Graphics::TBrush* const Fill, Fmx::Graphics::TStrokeBrush* const Stroke, TALShadow* const Shadow);
 extern DELPHI_PACKAGE void __fastcall ALCreateDrawingSurface(Fmx::Graphics::TBitmap* &aBitmap, const bool aClearBitmap, const int w, const int h);
 extern DELPHI_PACKAGE void __fastcall ALFreeDrawingSurface(Fmx::Graphics::TBitmap* &aBitmap);
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;

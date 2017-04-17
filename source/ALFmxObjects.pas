@@ -4,6 +4,10 @@ unit ALFmxObjects;
   {$MESSAGE WARN 'Check if FMX.Objects.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
+{$IF defined(MACOS) and not defined(IOS)}
+  {$DEFINE _MACOS}
+{$IFEND}
+
 interface
 
 uses System.Classes,
@@ -23,14 +27,19 @@ uses System.Classes,
      FMX.TextLayout.GPU,
      FMX.types3D,
      {$ENDIF}
+     {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+     FMX.effects,
+     {$ENDIF}
      FMX.controls,
      FMX.types,
      FMX.textlayout,
      FMX.graphics,
-     FMX.objects;
+     FMX.objects,
+     ALFmxCommon;
 
 type
 
+  {~~~~~~~~~~~~~~~~~~}
   TALImageWrapMode = (
       //Display the image with its original dimensions:
       //* The image is placed in the upper-left corner of the rectangle of the control.
@@ -191,6 +200,10 @@ type
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
+    fShadow: TALShadow;
+    {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+    fShadowEffect: TshadowEffect;
+    {$ENDIF}
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
     FOpenGLContextResetId: Integer;
@@ -198,9 +211,11 @@ type
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
+    procedure SetShadow(const Value: TALShadow);
   protected
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
+    procedure ShadowChanged(Sender: TObject); virtual;
     procedure Paint; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read fBufBitmap;
@@ -218,6 +233,7 @@ type
     procedure clearBufBitmap; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
+    property shadow: TALShadow read fshadow write SetShadow;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -232,6 +248,10 @@ type
     {$ENDIF}
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
+    fShadow: TALShadow;
+    {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+    fShadowEffect: TshadowEffect;
+    {$ENDIF}
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
     FOpenGLContextResetId: Integer;
@@ -239,9 +259,11 @@ type
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
+    procedure SetShadow(const Value: TALShadow);
   protected
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
+    procedure ShadowChanged(Sender: TObject); virtual;
     procedure Paint; override;
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     property BufBitmap: TTexture read fBufBitmap;
@@ -259,6 +281,7 @@ type
     procedure clearBufBitmap; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
+    property shadow: TALShadow read fshadow write SetShadow;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~}
@@ -568,8 +591,7 @@ uses system.SysUtils,
      FMX.Surfaces,
      ALFmxTypes3D,
      {$ENDIF}
-     ALCommon,
-     ALFmxCommon;
+     ALCommon;
 
 {**********************************************}
 constructor TALImage.Create(AOwner: TComponent);
@@ -835,6 +857,11 @@ begin
   else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
+  fShadow := TalShadow.Create;
+  fShadow.OnChanged := ShadowChanged;
+  {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+  fShadowEffect := nil;
+  {$ENDIF}
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
   FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
@@ -845,6 +872,10 @@ end;
 destructor TALRectangle.Destroy;
 begin
   clearBufBitmap;
+  alFreeAndNil(fShadow);
+  {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+  AlFreeAndNil(fShadowEffect);
+  {$ENDIF}
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
   TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
@@ -872,6 +903,35 @@ begin
   inherited;
 end;
 
+{****************************************************}
+procedure TALRectangle.ShadowChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+  if not (csDesigning in ComponentState) then begin // http://stackoverflow.com/questions/43455030/how-to-create-at-design-time-a-component-that-will-be-not-stored-in-the-form
+    if shadow.enabled then begin
+      if not assigned(fShadowEffect) then begin
+        fShadowEffect := TshadowEffect.Create(self);
+        fShadowEffect.Parent := self;
+        fShadowEffect.SetSubComponent(False);
+      end;
+      fShadowEffect.ShadowColor := shadow.ShadowColor;
+      fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                   // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+      fShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
+                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+      fShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                  // we use the opacity of the color instead
+      fShadowEffect.softness := fShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
+                                                   // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                   // i calculate approximatly that 0.5 = around 12 for blur
+    end
+    else AlFreeAndNil(fShadowEffect);
+  end;
+  {$ENDIF}
+  if FUpdating = 0 then Repaint;
+end;
+
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 function TALRectangle.MakeBufBitmap: TTexture;
@@ -880,6 +940,9 @@ function TALRectangle.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 
 var aSaveStrokeThickness: single;
+    aSaveShadowOffsetX: single;
+    aSaveShadowOffsetY: single;
+    aSaveShadowBlur: single;
     aRect: TRectf;
     {$IF defined(ANDROID)}
     aBitmap: Jbitmap;
@@ -929,11 +992,24 @@ begin
   //init fBufBitmapRect / aRect
   fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
   aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
+  if Shadow.enabled then begin
+    fBufBitmapRect.Inflate(Shadow.blur, Shadow.blur); // add the extra space needed to draw the shadow
+    fBufBitmapRect := ALAlignDimensionToPixelRound(fBufBitmapRect, FScreenScale); // to have the pixel aligned width and height
+    aRect.Offset(Shadow.blur * FScreenScale, Shadow.blur * FScreenScale);
+  end;
 
   //translate Stroke.Thickness from virtual to real pixel
   Stroke.OnChanged := Nil;
   aSaveStrokeThickness := Stroke.Thickness;
   Stroke.Thickness := Stroke.Thickness * fScreenScale;
+  //-----
+  Shadow.OnChanged := nil;
+  aSaveShadowOffsetX := Shadow.OffsetX;
+  aSaveShadowOffsetY := Shadow.OffsetY;
+  aSaveShadowBlur := Shadow.Blur;
+  Shadow.OffsetX := Shadow.OffsetX * fScreenScale;
+  Shadow.OffsetY := Shadow.OffsetY * fScreenScale;
+  Shadow.Blur := Shadow.Blur * fScreenScale;
   try
 
     {$IFDEF ANDROID}
@@ -941,14 +1017,15 @@ begin
     //create the drawing surface
     ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
                            aCanvas, // var aCanvas: Jcanvas;
-                           round(aRect.Width), // const w: integer;
-                           round(aRect.Height));// const h: integer)
+                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+                           round(fBufBitmapRect.height * FScreenScale));// const h: integer)
     try
 
        ALPaintRectangle(aCanvas, // const aBitmap: Jbitmap;
                         aRect, // const Rect: TrectF;
                         Fill, // const Fill: TBrush;
                         Stroke, // const Stroke: TStrokeBrush;
+                        Shadow, // const Shadow: TALShadow
                         Sides, // const Sides: TSides;
                         Corners, // const Corners: TCorners;
                         XRadius * fScreenScale, // const XRadius: Single = 0;
@@ -966,8 +1043,8 @@ begin
     ALCreateDrawingSurface(aBitmapSurface, // var aBitmapSurface: TbitmapSurface;
                            aContext, //    Var aContext: CGContextRef;
                            aColorSpace, // Var aColorSpace: CGColorSpaceRef;
-                           round(aRect.Width), // const w: integer;
-                           round(aRect.Height));// const h: integer)
+                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+                           round(fBufBitmapRect.height * FScreenScale));// const h: integer)
     try
 
        ALPaintRectangle(aContext, // const aContext: CGContextRef;
@@ -976,6 +1053,7 @@ begin
                         aRect, // const Rect: TrectF;
                         Fill, // const Fill: TBrush;
                         Stroke, // const Stroke: TStrokeBrush;
+                        Shadow, // const Shadow: TALShadow
                         Sides, // const Sides: TSides;
                         Corners, // const Corners: TCorners;
                         XRadius * fScreenScale, // const XRadius: Single = 0;
@@ -994,6 +1072,11 @@ begin
   finally
     Stroke.Thickness := aSaveStrokeThickness;
     Stroke.OnChanged := StrokeChanged;
+    //-----
+    Shadow.OffsetX := aSaveShadowOffsetX;
+    Shadow.OffsetY := aSaveShadowOffsetY;
+    Shadow.Blur := aSaveShadowBlur;
+    Shadow.OnChanged := ShadowChanged;
   end;
 
   //set the result
@@ -1046,6 +1129,12 @@ begin
   end;
 end;
 
+{*******************************************************}
+procedure TALRectangle.SetShadow(const Value: TALShadow);
+begin
+  FShadow.Assign(Value);
+end;
+
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 procedure TALRectangle.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
@@ -1071,6 +1160,11 @@ begin
   else FScreenScale := 1;
   fdoubleBuffered := true;
   fBufBitmap := nil;
+  fShadow := TalShadow.Create;
+  fShadow.OnChanged := ShadowChanged;
+  {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+  fShadowEffect := nil;
+  {$ENDIF}
   {$IF defined(ANDROID) or defined(IOS)}
   FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
   FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
@@ -1081,6 +1175,10 @@ end;
 destructor TALCircle.Destroy;
 begin
   clearBufBitmap;
+  alFreeAndNil(fShadow);
+  {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+  AlFreeandNil(fShadowEffect);
+  {$ENDIF}
   {$IF defined(ANDROID) or defined(IOS)}
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
   TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
@@ -1108,6 +1206,32 @@ begin
   inherited;
 end;
 
+{*************************************************}
+procedure TALCircle.ShadowChanged(Sender: TObject);
+begin
+  clearBufBitmap;
+  {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
+  if shadow.enabled then begin
+    if not assigned(fShadowEffect) then begin
+      fShadowEffect := TshadowEffect.Create(self);
+      fShadowEffect.Parent := self;
+    end;
+    fShadowEffect.ShadowColor := shadow.ShadowColor;
+    fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                 // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+    fShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
+                                   // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+    fShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                // we use the opacity of the color instead
+    fShadowEffect.softness := fShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
+                                                 // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                 // i calculate approximatly that 0.5 = around 12 for blur
+  end
+  else AlFreeAndNil(fShadowEffect);
+  {$ENDIF}
+  if FUpdating = 0 then Repaint;
+end;
+
 {************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 function TALCircle.MakeBufBitmap: TTexture;
@@ -1116,6 +1240,9 @@ function TALCircle.MakeBufBitmap: Tbitmap;
 {$ENDIF}
 
 var aSaveStrokeThickness: single;
+    aSaveShadowOffsetX: single;
+    aSaveShadowOffsetY: single;
+    aSaveShadowBlur: single;
     aRect: TRectf;
     {$IF defined(ANDROID)}
     aBitmap: Jbitmap;
@@ -1154,11 +1281,24 @@ begin
   //init fBufBitmapRect / aRect
   fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), FScreenScale); // to have the pixel aligned width and height
   aRect := TrectF.Create(0,0,round(fBufBitmapRect.Width * FScreenScale), round(fBufBitmapRect.height * FScreenScale));
+  if Shadow.enabled then begin
+    fBufBitmapRect.Inflate(Shadow.blur, Shadow.blur); // add the extra space needed to draw the shadow
+    fBufBitmapRect := ALAlignDimensionToPixelRound(fBufBitmapRect, FScreenScale); // to have the pixel aligned width and height
+    aRect.Offset(Shadow.blur * FScreenScale, Shadow.blur * FScreenScale);
+  end;
 
   //translate Stroke.Thickness from virtual to real pixel
   Stroke.OnChanged := Nil;
   aSaveStrokeThickness := Stroke.Thickness;
   Stroke.Thickness := Stroke.Thickness * fScreenScale;
+  //-----
+  Shadow.OnChanged := nil;
+  aSaveShadowOffsetX := Shadow.OffsetX;
+  aSaveShadowOffsetY := Shadow.OffsetY;
+  aSaveShadowBlur := Shadow.Blur;
+  Shadow.OffsetX := Shadow.OffsetX * fScreenScale;
+  Shadow.OffsetY := Shadow.OffsetY * fScreenScale;
+  Shadow.Blur := Shadow.Blur * fScreenScale;
   try
 
     {$IFDEF ANDROID}
@@ -1166,14 +1306,15 @@ begin
     //create the drawing surface
     ALCreateDrawingSurface(aBitmap, // Var aBitmap: Jbitmap;
                            aCanvas, // var aCanvas: Jcanvas;
-                           round(aRect.Width), // const w: integer;
-                           round(aRect.Height));// const h: integer)
+                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+                           round(fBufBitmapRect.Height * FScreenScale));// const h: integer)
     try
 
       ALPaintCircle(aCanvas, // const aBitmap: Jbitmap;
                     aRect, // const Rect: TrectF;
                     Fill, // const Fill: TBrush;
-                    Stroke); // const Stroke: TStrokeBrush;
+                    Stroke, // const Stroke: TStrokeBrush;
+                    Shadow); // const Shadow: TALShadow
 
       fBufBitmap := ALJBitmaptoTexture(aBitmap);
 
@@ -1187,8 +1328,8 @@ begin
     ALCreateDrawingSurface(aBitmapSurface, // var aBitmapSurface: TbitmapSurface;
                            aContext, //    Var aContext: CGContextRef;
                            aColorSpace, // Var aColorSpace: CGColorSpaceRef;
-                           round(aRect.Width), // const w: integer;
-                           round(aRect.Height));// const h: integer)
+                           round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+                           round(fBufBitmapRect.Height * FScreenScale));// const h: integer)
     try
 
       ALPaintCircle(aContext, // const aContext: CGContextRef;
@@ -1196,7 +1337,8 @@ begin
                     aBitmapSurface.Height, // const aGridHeight: Single;
                     aRect, // const Rect: TrectF;
                     Fill, // const Fill: TBrush;
-                    Stroke); // const Stroke: TStrokeBrush;
+                    Stroke, // const Stroke: TStrokeBrush;
+                    Shadow); // const Shadow: TALShadow
 
       fBufBitmap := ALBitmapSurfacetoTexture(aBitmapSurface);
 
@@ -1211,6 +1353,11 @@ begin
   finally
     Stroke.Thickness := aSaveStrokeThickness;
     Stroke.OnChanged := StrokeChanged;
+    //-----
+    Shadow.OffsetX := aSaveShadowOffsetX;
+    Shadow.OffsetY := aSaveShadowOffsetY;
+    Shadow.Blur := aSaveShadowBlur;
+    Shadow.OnChanged := ShadowChanged;
   end;
 
   //set the result
@@ -1261,6 +1408,12 @@ begin
     fDoubleBuffered := value;
     if not fDoubleBuffered then clearbufBitmap;
   end;
+end;
+
+{****************************************************}
+procedure TALCircle.SetShadow(const Value: TALShadow);
+begin
+  FShadow.Assign(Value);
 end;
 
 {************************************}

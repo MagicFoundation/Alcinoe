@@ -72,6 +72,38 @@ uses System.classes,
 
 type
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALShadow = class(TPersistent)
+  private
+    fenabled: boolean;
+    fblur: Single;
+    fOffsetX: Single;
+    fOffsetY: Single;
+    fShadowColor: TAlphaColor;
+    FOnChanged: TNotifyEvent;
+    procedure SetEnabled(const Value: boolean);
+    procedure setblur(const Value: Single);
+    procedure setOffsetX(const Value: Single);
+    procedure setOffsetY(const Value: Single);
+    procedure setShadowColor(const Value: TAlphaColor);
+    function IsblurStored: Boolean;
+    function IsOffsetXStored: Boolean;
+    function IsOffsetYStored: Boolean;
+  protected
+  public
+    constructor Create;
+    procedure Assign(Source: TPersistent); override;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+  published
+    property enabled: boolean read fEnabled Write SetEnabled default false;
+    property blur: Single read fblur write setblur stored IsblurStored;
+    property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored;
+    property OffsetY: Single read fOffsetY write setOffsetY stored IsOffsetYStored;
+    property ShadowColor: TAlphaColor read fShadowColor write setShadowColor default $96000000;
+  end;
+
+type
+
   TALPointDType = array [0..1] of Double;
 
 
@@ -695,6 +727,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
+                           const Shadow: TALShadow; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
                            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
                            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
                            const XRadius: Single = 0;
@@ -712,7 +745,8 @@ procedure ALPaintCircle({$IF defined(ANDROID)}
                         {$IFEND}
                         const dstRect: TrectF;
                         const Fill: TBrush;
-                        const Stroke: TStrokeBrush);
+                        const Stroke: TStrokeBrush;
+                        const Shadow: TALShadow); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
@@ -976,6 +1010,99 @@ begin
   {$IFEND}
 end;
 {$ENDIF}
+
+{***************************}
+constructor TALShadow.Create;
+begin
+  inherited Create;
+  fenabled := False;
+  fblur := 12;
+  fOffsetX := 0;
+  fOffsetY := 0;
+  fShadowColor := $96000000;
+  FOnChanged := nil;
+end;
+
+{**********************************************}
+procedure TALShadow.Assign(Source: TPersistent);
+var aSaveChange: TNotifyEvent;
+begin
+  if Source is TALShadow then begin
+    aSaveChange := FOnChanged;
+    FOnChanged := nil;
+    fenabled := TALShadow(Source).fenabled;
+    fblur := TALShadow(Source).fblur;
+    fOffsetX := TALShadow(Source).fOffsetX;
+    fOffsetY := TALShadow(Source).fOffsetY;
+    fShadowColor := TALShadow(Source).fShadowColor;
+    FOnChanged := aSaveChange;
+    if Assigned(FOnChanged) then FOnChanged(Self);
+  end
+  else inherited;
+end;
+
+{***************************************}
+function TALShadow.IsblurStored: Boolean;
+begin
+  result := not SameValue(fBlur, 12, Tepsilon.Position);
+end;
+
+{******************************************}
+function TALShadow.IsOffsetXStored: Boolean;
+begin
+  result := not SameValue(fBlur, 0, Tepsilon.Position);
+end;
+
+{******************************************}
+function TALShadow.IsOffsetYStored: Boolean;
+begin
+  result := not SameValue(fBlur, 0, Tepsilon.Position);
+end;
+
+{***************************************************}
+procedure TALShadow.SetEnabled(const Value: boolean);
+begin
+  if fEnabled <> Value then begin
+    fEnabled := Value;
+    if Assigned(FOnChanged) then FOnChanged(Self);
+  end;
+end;
+
+{***********************************************}
+procedure TALShadow.setblur(const Value: Single);
+begin
+  if Fblur <> Value then begin
+    Fblur := Value;
+    if Assigned(FOnChanged) then FOnChanged(Self);
+  end;
+end;
+
+{**************************************************}
+procedure TALShadow.setOffsetX(const Value: Single);
+begin
+  if fOffsetX <> Value then begin
+    fOffsetX := Value;
+    if Assigned(FOnChanged) then FOnChanged(Self);
+  end;
+end;
+
+{**************************************************}
+procedure TALShadow.setOffsetY(const Value: Single);
+begin
+  if fOffsetY <> Value then begin
+    fOffsetY := Value;
+    if Assigned(FOnChanged) then FOnChanged(Self);
+  end;
+end;
+
+{***********************************************************}
+procedure TALShadow.setShadowColor(const Value: TAlphaColor);
+begin
+  if FShadowColor <> Value then begin
+    FShadowColor := Value;
+    if Assigned(FOnChanged) then FOnChanged(Self);
+  end;
+end;
 
 {***********************************************}
 function ALRectWidth(const Rect: TRect): Integer;
@@ -5003,6 +5130,7 @@ begin
                            aRect, // const aRect: TrectF;
                            aOptions.Fill, // const Fill: TBrush;
                            aOptions.Stroke, // const Stroke: TStrokeBrush;
+                           nil, // const Shadow: TALShadow
                            aOptions.Sides, // const Sides: TSides;
                            aOptions.Corners, // const Corners: TCorners;
                            aOptions.XRadius, // const XRadius: Single = 0;
@@ -5057,6 +5185,7 @@ begin
                            aRect, // const aRect: TrectF;
                            aOptions.Fill, // const Fill: TBrush;
                            aOptions.Stroke, // const Stroke: TStrokeBrush;
+                           nil, // const Shadow: TALShadow
                            aOptions.Sides, // const Sides: TSides;
                            aOptions.Corners, // const Corners: TCorners;
                            aOptions.XRadius, // const XRadius: Single = 0;
@@ -5101,6 +5230,7 @@ begin
                              aRect, // const aRect: TrectF;
                              aOptions.Fill, // const Fill: TBrush;
                              aOptions.Stroke, // const Stroke: TStrokeBrush;
+                             nil, // const Shadow: TALShadow
                              aOptions.Sides, // const Sides: TSides;
                              aOptions.Corners, // const Corners: TCorners;
                              aOptions.XRadius, // const XRadius: Single = 0;
@@ -5313,6 +5443,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
+                           const Shadow: TALShadow; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
                            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
                            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
                            const XRadius: Single = 0;
@@ -5341,12 +5472,20 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
        (corners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
        (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
       //-----
+      if (not aDrawOnlyBorder) and
+         (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+
       aJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
       aCanvas.drawRoundRect(aJRect{rect},
                             xRadius {rx},
                             yRadius {ry},
                             apaint);
       aJRect := nil;
+
+      if (not aDrawOnlyBorder) and
+         (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.clearShadowLayer;
       //-----
     end
 
@@ -5356,11 +5495,19 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
              (corners=[])) and
             (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
       //-----
+      if (not aDrawOnlyBorder) and
+         (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+
       aCanvas.drawRect(aRect.left{left},
                        aRect.top{top},
                        aRect.right{right},
                        aRect.bottom{bottom},
                        apaint);
+
+      if (not aDrawOnlyBorder) and
+         (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.clearShadowLayer;
       //-----
     end
 
@@ -5505,8 +5652,17 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
       else aPath.rMoveTo(0, -aheightMinusCorners);
 
       //-----
+      if (not aDrawOnlyBorder) and
+         (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
+
       aCanvas.drawPath(apath,aPaint);
       aPath := nil;
+
+      if (not aDrawOnlyBorder) and
+         (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.clearShadowLayer;
+      //-----
 
     end;
   end;
@@ -5756,6 +5912,7 @@ var aRect: TrectF;
 {$ELSEIF defined(IOS)}
 var aRect: TrectF;
     aAlphaColor: TAlphaColorCGFloat;
+    aColor: CGColorRef;
     aCallback: CGFunctionCallbacks;
     aShading: CGShadingRef;
     aFunc: CGFunctionRef;
@@ -5929,7 +6086,31 @@ begin
                                      // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                      // save the graphics state before you clip and restore the graphics state after you’ve completed
                                      // any clipped drawing.
+            //-----
+            if (Shadow <> nil) and
+               (Shadow.enabled) then begin
+              aAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+              aColor := CGColorCreate(aColorSpace, @aAlphaColor);
+              try
+                CGContextSetShadowWithColor(aContext,
+                                            CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                                            Shadow.blur, // blur
+                                            aColor); // color
+              finally
+                CGColorRelease(aColor);
+              end;
+            end;
+            //-----
             CGContextDrawShading(aContext, aShading);
+            //-----
+            if (Shadow <> nil) and
+               (Shadow.enabled) then begin
+              CGContextSetShadowWithColor(aContext,
+                                          CGSizeMake(0, 0), // offset
+                                          0, // blur
+                                          nil); // color
+            end;
+            //-----
           finally
             CGShadingRelease(aShading);
           end;
@@ -5991,12 +6172,35 @@ begin
                                              // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                              // save the graphics state before you clip and restore the graphics state after you’ve completed
                                              // any clipped drawing.
+                    //-----
+                    if (Shadow <> nil) and
+                       (Shadow.enabled) then begin
+                      aAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+                      aColor := CGColorCreate(aColorSpace, @aAlphaColor);
+                      try
+                        CGContextSetShadowWithColor(aContext,
+                                                    CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                                                    Shadow.blur, // blur
+                                                    aColor); // color
+                      finally
+                        CGColorRelease(aColor);
+                      end;
+                    end;
+                    //-----
                     CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
                                        ALLowerLeftCGRect(aRect.TopLeft,
                                                          aRect.Width,
                                                          aRect.Height,
                                                          aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
                                        aImage.CGImage); // image The image to draw.
+                    //-----
+                    if (Shadow <> nil) and
+                       (Shadow.enabled) then begin
+                      CGContextSetShadowWithColor(aContext,
+                                                  CGSizeMake(0, 0), // offset
+                                                  0, // blur
+                                                  nil); // color
+                    end;
                     //-----
                     CGContextRestoreGState(aContext);
                   finally
@@ -6021,7 +6225,30 @@ begin
       aAlphaColor := TAlphaColorCGFloat.Create(Fill.Color);
       CGContextSetRGBFillColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
       _DrawPath(aRect, false{aDrawOnlyBorder});
+      //-----
+      if (Shadow <> nil) and
+         (Shadow.enabled) then begin
+        aAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+        aColor := CGColorCreate(aColorSpace, @aAlphaColor);
+        try
+          CGContextSetShadowWithColor(aContext,
+                                      CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                                      Shadow.blur, // blur
+                                      aColor); // color
+        finally
+          CGColorRelease(aColor);
+        end;
+      end;
+      //-----
       CGContextFillPath(aContext);
+      //-----
+      if (Shadow <> nil) and
+         (Shadow.enabled) then begin
+        CGContextSetShadowWithColor(aContext,
+                                    CGSizeMake(0, 0), // offset
+                                    0, // blur
+                                    nil); // color
+      end;
     end;
 
   end;
@@ -6090,7 +6317,8 @@ procedure ALPaintCircle({$IF defined(ANDROID)}
                         {$IFEND}
                         const dstRect: TrectF;
                         const Fill: TBrush;
-                        const Stroke: TStrokeBrush);
+                        const Stroke: TStrokeBrush;
+                        const Shadow: TALShadow); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
 
 {$IF defined(IOS)}
 const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
@@ -6112,6 +6340,7 @@ var aTmpBitmap: Jbitmap;
     i: integer;
 {$ELSEIF defined(IOS)}
 var aAlphaColor: TAlphaColorCGFloat;
+    aColor: CGColorRef;
     aCallback: CGFunctionCallbacks;
     aShading: CGShadingRef;
     aFunc: CGFunctionRef;
@@ -6162,7 +6391,11 @@ begin
         end;
         aShader := TJRadialGradient.JavaClass.init(aRect.CenterPoint.x{x}, aRect.CenterPoint.y{y}, aRect.width / 2{radius},  aColors, aStops, TJShader_TileMode.JavaClass.CLAMP{tile});
         aPaint.setShader(aShader);
+        if (Shadow <> nil) and
+           (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
         aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
+        if (Shadow <> nil) and
+           (Shadow.enabled) then aPaint.clearShadowLayer;
         aPaint.setShader(nil);
         aShader := nil;
         alfreeandNil(aColors);
@@ -6196,7 +6429,11 @@ begin
           aJDestRectf := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
           aJSrcRect := TJRect.JavaClass.init(0, 0, fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height);
           aPaint.setXfermode(aPorterDuffXfermode);
+          if (Shadow <> nil) and
+             (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
           aCanvas.drawBitmap(aTMPBitmap, aJSrcRect, aJDestRectf, apaint);
+          if (Shadow <> nil) and
+             (Shadow.enabled) then aPaint.clearShadowLayer;
           aPaint.setXfermode(nil);
           aPorterDuffXfermode := nil;
           aJSrcRect := nil;
@@ -6212,7 +6449,11 @@ begin
     //fill with solid color
     else if Fill.Kind = TBrushKind.Solid then begin
       aPaint.setColor(Fill.Color);
+      if (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, Shadow.ShadowColor{shadowColor});
       aCanvas.drawCircle(aRect.CenterPoint.x{cx}, aRect.CenterPoint.y{cy}, aRect.width / 2{radius}, apaint);
+      if (Shadow <> nil) and
+         (Shadow.enabled) then aPaint.clearShadowLayer;
     end;
 
   end;
@@ -6290,7 +6531,31 @@ begin
                                      // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                      // save the graphics state before you clip and restore the graphics state after you’ve completed
                                      // any clipped drawing.
+            //-----
+            if (Shadow <> nil) and
+               (Shadow.enabled) then begin
+              aAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+              aColor := CGColorCreate(aColorSpace, @aAlphaColor);
+              try
+                CGContextSetShadowWithColor(aContext,
+                                            CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                                            Shadow.blur, // blur
+                                            aColor); // color
+              finally
+                CGColorRelease(aColor);
+              end;
+            end;
+            //-----
             CGContextDrawShading(aContext, aShading);
+            //-----
+            if (Shadow <> nil) and
+               (Shadow.enabled) then begin
+              CGContextSetShadowWithColor(aContext,
+                                          CGSizeMake(0, 0), // offset
+                                          0, // blur
+                                          nil); // color
+            end;
+            //-----
           finally
             CGShadingRelease(aShading);
           end;
@@ -6357,12 +6622,35 @@ begin
                                              // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                              // save the graphics state before you clip and restore the graphics state after you’ve completed
                                              // any clipped drawing.
+                    //-----
+                    if (Shadow <> nil) and
+                       (Shadow.enabled) then begin
+                      aAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+                      aColor := CGColorCreate(aColorSpace, @aAlphaColor);
+                      try
+                        CGContextSetShadowWithColor(aContext,
+                                                    CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                                                    Shadow.blur, // blur
+                                                    aColor); // color
+                      finally
+                        CGColorRelease(aColor);
+                      end;
+                    end;
+                    //-----
                     CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
                                        ALLowerLeftCGRect(aRect.TopLeft,
                                                          aRect.Width,
                                                          aRect.Height,
                                                          aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
                                        aImage.CGImage); // image The image to draw.
+                    //-----
+                    if (Shadow <> nil) and
+                       (Shadow.enabled) then begin
+                      CGContextSetShadowWithColor(aContext,
+                                                  CGSizeMake(0, 0), // offset
+                                                  0, // blur
+                                                  nil); // color
+                    end;
                     //-----
                     CGContextRestoreGState(aContext);
                   finally
@@ -6386,10 +6674,34 @@ begin
     else if Fill.Kind = TBrushKind.Solid then begin
       aAlphaColor := TAlphaColorCGFloat.Create(Fill.Color);
       CGContextSetRGBFillColor(aContext, aAlphaColor.R, aAlphaColor.G, aAlphaColor.B, aAlphaColor.A);
+      //-----
+      if (Shadow <> nil) and
+         (Shadow.enabled) then begin
+        aAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+        aColor := CGColorCreate(aColorSpace, @aAlphaColor);
+        try
+          CGContextSetShadowWithColor(aContext,
+                                      CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                                      Shadow.blur, // blur
+                                      aColor); // color
+        finally
+          CGColorRelease(aColor);
+        end;
+      end;
+      //-----
       CGContextFillEllipseInRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
                                                              aRect.Width,
                                                              aRect.Height,
                                                              aGridHeight));
+      //-----
+      if (Shadow <> nil) and
+         (Shadow.enabled) then begin
+        CGContextSetShadowWithColor(aContext,
+                                    CGSizeMake(0, 0), // offset
+                                    0, // blur
+                                    nil); // color
+      end;
+      //-----
     end;
 
   end;

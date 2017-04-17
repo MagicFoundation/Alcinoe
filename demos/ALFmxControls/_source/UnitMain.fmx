@@ -64,11 +64,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 763.000000000000000000
+      Position.Y = 962.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 15
+      TabOrder = 16
       Text = 'Bench TALText Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button15Click
@@ -82,7 +82,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 8
+      TabOrder = 9
       Text = 'Bench TRectangle (stroke + corners) Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button4Click
@@ -104,7 +104,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 11
+      TabOrder = 12
       Text = 'Bench TALRectangle (stroke + corners) Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button255Click
@@ -113,11 +113,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 812.000000000000000000
+      Position.Y = 1011.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 13
+      TabOrder = 14
       Text = 'Bench TText Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button3Click
@@ -125,7 +125,7 @@ object Form1: TForm1
     object Text4: TText
       Align = Top
       HitTest = False
-      Position.Y = 853.000000000000000000
+      Position.Y = 1052.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -139,7 +139,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 10
+      TabOrder = 11
       Text = 'Bench TALRectangle (stroke) Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button6Click
@@ -153,7 +153,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 6
+      TabOrder = 7
       Text = 'Bench TRectangle (stroke) Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button7Click
@@ -175,7 +175,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 9
+      TabOrder = 10
       Text = 'Bench TALRectangle Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button8Click
@@ -207,11 +207,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1429.000000000000000000
+      Position.Y = 1628.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 21
+      TabOrder = 22
       Text = 'Bench Tline'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button13Click
@@ -219,7 +219,7 @@ object Form1: TForm1
     object Text10: TText
       Align = Top
       HitTest = False
-      Position.Y = 1470.000000000000000000
+      Position.Y = 1669.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -229,11 +229,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1380.000000000000000000
+      Position.Y = 1579.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 20
+      TabOrder = 21
       Text = 'Bench TALline'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button16Click
@@ -242,11 +242,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1242.000000000000000000
+      Position.Y = 1441.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 23
+      TabOrder = 24
       Text = 'Bench TALcheckbox (without text)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button17Click
@@ -255,11 +255,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1291.000000000000000000
+      Position.Y = 1490.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 24
+      TabOrder = 25
       Text = 'Bench Tcheckbox (without text)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button18Click
@@ -267,7 +267,7 @@ object Form1: TForm1
     object Text3: TText
       Align = Top
       HitTest = False
-      Position.Y = 1332.000000000000000000
+      Position.Y = 1531.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -277,11 +277,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2594.000000000000000000
+      Position.Y = 2793.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 95
+      TabOrder = 96
       Text = 'TALRangeTrackbar'
       TextSettings.Font.Size = 13.000000000000000000
     end
@@ -291,7 +291,7 @@ object Form1: TForm1
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2396.000000000000000000
+      Position.Y = 2595.000000000000000000
       Size.Width = 288.000000000000000000
       Size.Height = 57.000000000000000000
       Size.PlatformDefault = False
@@ -303,7 +303,7 @@ object Form1: TForm1
     object Text9: TText
       Align = Top
       HitTest = False
-      Position.Y = 715.000000000000000000
+      Position.Y = 914.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
@@ -314,7 +314,7 @@ object Form1: TForm1
       ClipParent = True
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 674.000000000000000000
+      Position.Y = 873.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
@@ -327,11 +327,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 625.000000000000000000
+      Position.Y = 824.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 5
+      TabOrder = 6
       Text = 'Bench TALCircle Paint'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button22Click
@@ -339,7 +339,7 @@ object Form1: TForm1
     object ALRectangle9: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 2096.000000000000000000
+      Position.Y = 2295.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -544,11 +544,11 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2550.000000000000000000
+      Position.Y = 2749.000000000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 36.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 43
+      TabOrder = 44
     end
     object ALTrackBar1: TALTrackBar
       Thumb.Fill.Color = claWhite
@@ -578,21 +578,21 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 2461.000000000000000000
+      Position.Y = 2660.000000000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 48
+      TabOrder = 49
     end
     object Button14: TButton
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 2501.000000000000000000
+      Position.Y = 2700.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 44
+      TabOrder = 45
       Text = 'TALTrackbar'
       TextSettings.Font.Size = 13.000000000000000000
     end
@@ -602,11 +602,11 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 1182.000000000000000000
+      Position.Y = 1381.000000000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 65
+      TabOrder = 66
     end
     object Layout4: TLayout
       Align = Top
@@ -614,16 +614,16 @@ object Form1: TForm1
       Margins.Top = 8.000000000000000000
       Margins.Right = 25.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 1212.000000000000000000
+      Position.Y = 1411.000000000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 52
+      TabOrder = 53
     end
     object ALRectangle2: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 2805.000000000000000000
+      Position.Y = 3004.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
@@ -796,7 +796,7 @@ object Form1: TForm1
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2635.000000000000000000
+      Position.Y = 2834.000000000000000000
       Size.Width = 288.000000000000000000
       Size.Height = 170.000000000000000000
       Size.PlatformDefault = False
@@ -816,11 +816,11 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1006.000000000000000000
+      Position.Y = 1205.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 14
+      TabOrder = 15
       Text = 'HTML TEXT'
       TextSettings.Font.Size = 13.000000000000000000
     end
@@ -836,7 +836,7 @@ object Form1: TForm1
       Margins.Right = 25.000000000000000000
       Margins.Bottom = 5.000000000000000000
       Position.X = 25.000000000000000000
-      Position.Y = 905.000000000000000000
+      Position.Y = 1104.000000000000000000
       Size.Width = 270.000000000000000000
       Size.Height = 88.000000000000000000
       Size.PlatformDefault = False
@@ -872,7 +872,7 @@ object Form1: TForm1
     end
     object ALVideoPlayerSurface1: TALVideoPlayerSurface
       Align = Top
-      Position.Y = 1510.000000000000000000
+      Position.Y = 1709.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -916,7 +916,7 @@ object Form1: TForm1
       object SmoothMagnifyEffect1: TSmoothMagnifyEffect
         Enabled = False
         InnerRadius = 0.200000002980232200
-        OuterRadius = 0.400000005960464400
+        OuterRadius = 0.400000005960464500
         Magnification = 2.000000000000000000
         AspectRatio = 1.500000000000000000
       end
@@ -939,7 +939,7 @@ object Form1: TForm1
       end
       object ContrastEffect1: TContrastEffect
         Enabled = False
-        Brightness = 0.400000005960464400
+        Brightness = 0.400000005960464500
         Contrast = 1.000000000000000000
       end
       object TilerEffect1: TTilerEffect
@@ -972,7 +972,7 @@ object Form1: TForm1
       Margins.Right = 15.000000000000000000
       Margins.Bottom = 15.000000000000000000
       Position.X = 15.000000000000000000
-      Position.Y = 1825.000000000000000000
+      Position.Y = 2024.000000000000000000
       Size.Width = 290.000000000000000000
       Size.Height = 256.000000000000000000
       Size.PlatformDefault = False
@@ -996,11 +996,11 @@ object Form1: TForm1
     end
     object ALLayout1: TALLayout
       Align = Top
-      Position.Y = 1047.000000000000000000
+      Position.Y = 1246.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 105
+      TabOrder = 106
       object ALAniIndicator1: TALAniIndicator
         Align = Center
         Enabled = True
@@ -1010,13 +1010,51 @@ object Form1: TForm1
       Align = Top
       StyledSettings = [Family, Style, FontColor]
       Margins.Top = 8.000000000000000000
-      Position.Y = 1133.000000000000000000
+      Position.Y = 1332.000000000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 12
+      TabOrder = 13
       Text = 'TALAniIndicator'
       TextSettings.Font.Size = 13.000000000000000000
+    end
+    object ALRectangle1: TALRectangle
+      Align = Top
+      Fill.Color = claBurlywood
+      Margins.Left = 30.000000000000000000
+      Margins.Top = 30.000000000000000000
+      Margins.Right = 30.000000000000000000
+      Margins.Bottom = 30.000000000000000000
+      Position.X = 30.000000000000000000
+      Position.Y = 647.000000000000000000
+      Size.Width = 260.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      XRadius = 8.000000000000000000
+      YRadius = 8.000000000000000000
+      shadow.enabled = True
+    end
+    object Button10: TButton
+      Align = Top
+      StyledSettings = [Family, Style, FontColor]
+      Margins.Top = 8.000000000000000000
+      Position.Y = 735.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 41.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 5
+      Text = 'TalRectangle with fast drawing shadow'
+      TextSettings.Font.Size = 13.000000000000000000
+      OnClick = Button22Click
+    end
+    object Text6: TText
+      Align = Top
+      HitTest = False
+      Position.Y = 776.000000000000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.Font.Size = 11.000000000000000000
     end
   end
 end

@@ -161,9 +161,9 @@ CHDIR demos\
 FOR /R %%J IN (*.dproj) DO (	
   echo %%J			
   MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
   MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
 )
 CHDIR ..
 
@@ -172,15 +172,15 @@ FOR /R %%J IN (ALFmx*.dproj) DO (
   echo %%J			
   MSBuild %%J /p:Config=Release /p:Platform=Android /t:Build
   MSBuild %%J /p:Config=Release /p:Platform=Android /t:Deploy
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
   MSBuild %%J /p:Config=Release /p:Platform=iOSSimulator /t:Build
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
   MSBuild %%J /p:Config=Release /p:Platform=iOSDevice32 /t:Build
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
   MSBuild %%J /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
   MSBuild %%J /p:Config=Release /p:Platform=OSX32 /t:Build
-  IF ERRORLEVEL 1 goto ERROR
+  IF ERRORLEVEL 1 PAUSE
 )
 CHDIR ..
 

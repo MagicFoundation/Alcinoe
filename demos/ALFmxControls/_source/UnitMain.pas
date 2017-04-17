@@ -189,6 +189,9 @@ type
     ALLayout1: TALLayout;
     ALAniIndicator1: TALAniIndicator;
     Button19: TButton;
+    ALRectangle1: TALRectangle;
+    Button10: TButton;
+    Text6: TText;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);

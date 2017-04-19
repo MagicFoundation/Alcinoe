@@ -727,7 +727,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
-                           const Shadow: TALShadow; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+                           const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
                            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
                            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
                            const XRadius: Single = 0;
@@ -746,7 +746,7 @@ procedure ALPaintCircle({$IF defined(ANDROID)}
                         const dstRect: TrectF;
                         const Fill: TBrush;
                         const Stroke: TStrokeBrush;
-                        const Shadow: TALShadow); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+                        const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
@@ -5443,7 +5443,7 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
                            const dstRect: TrectF;
                            const Fill: TBrush;
                            const Stroke: TStrokeBrush;
-                           const Shadow: TALShadow; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+                           const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
                            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
                            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
                            const XRadius: Single = 0;
@@ -6318,7 +6318,7 @@ procedure ALPaintCircle({$IF defined(ANDROID)}
                         const dstRect: TrectF;
                         const Fill: TBrush;
                         const Stroke: TStrokeBrush;
-                        const Shadow: TALShadow); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+                        const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
 
 {$IF defined(IOS)}
 const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);

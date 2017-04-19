@@ -366,6 +366,7 @@ uses {$IF defined(android)}
      Androidapi.Input,
      Androidapi.KeyCodes,
      Androidapi.JNI.App,
+     Androidapi.JNI.Util,
      FMX.Platform,
      FMX.Platform.Android,
      FMX.Helpers.Android,
@@ -984,8 +985,7 @@ begin
     begin
       //-----
       feditText.setTextColor(ftextsettings.fontcolor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
-      feditText.setTextSize(ftextsettings.font.size); // << Set the default text size to the given value, interpreted as "scaled pixel" units.
-                                                      //    This size is adjusted based on the current density and user font size preference.
+      feditText.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, ftextsettings.font.size); // << Set the default text size to a given unit and value.
       //-----
       if (TFontStyle.fsBold in ftextsettings.font.style) and
          (TFontStyle.fsItalic in ftextsettings.font.style) then aStyle := TJTypeface.JavaClass.BOLD_ITALIC

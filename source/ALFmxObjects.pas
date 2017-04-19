@@ -908,26 +908,25 @@ procedure TALRectangle.ShadowChanged(Sender: TObject);
 begin
   clearBufBitmap;
   {$IF DEFINED(MSWindows) or DEFINED(_MACOS)}
-  if not (csDesigning in ComponentState) then begin // http://stackoverflow.com/questions/43455030/how-to-create-at-design-time-a-component-that-will-be-not-stored-in-the-form
-    if shadow.enabled then begin
-      if not assigned(fShadowEffect) then begin
-        fShadowEffect := TshadowEffect.Create(self);
-        fShadowEffect.Parent := self;
-        fShadowEffect.SetSubComponent(False);
-      end;
-      fShadowEffect.ShadowColor := shadow.ShadowColor;
-      fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+  if shadow.enabled then begin
+    if not assigned(fShadowEffect) then begin
+      fShadowEffect := TshadowEffect.Create(self);
+      fShadowEffect.Parent := self;
+      fShadowEffect.SetSubComponent(true);
+      fShadowEffect.stored := False;
+    end;
+    fShadowEffect.ShadowColor := shadow.ShadowColor;
+    fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                 // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+    fShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
                                    // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-      fShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-      fShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                  // we use the opacity of the color instead
-      fShadowEffect.softness := fShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
-                                                   // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                   // i calculate approximatly that 0.5 = around 12 for blur
-    end
-    else AlFreeAndNil(fShadowEffect);
-  end;
+    fShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                // we use the opacity of the color instead
+    fShadowEffect.softness := fShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
+                                                 // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                 // i calculate approximatly that 0.5 = around 12 for blur
+  end
+  else AlFreeAndNil(fShadowEffect);
   {$ENDIF}
   if FUpdating = 0 then Repaint;
 end;
@@ -968,6 +967,8 @@ begin
       ((SameValue(xRadius, 0, TEpsilon.position)) or
        (SameValue(yRadius, 0, TEpsilon.position)) or
        (corners=[]))
+      and
+      (not fShadow.enabled)
       and
       (Fill.Kind in [TBrushKind.None, TBrushKind.Solid]))
   then begin
@@ -1215,6 +1216,8 @@ begin
     if not assigned(fShadowEffect) then begin
       fShadowEffect := TshadowEffect.Create(self);
       fShadowEffect.Parent := self;
+      fShadowEffect.SetSubComponent(true);
+      fShadowEffect.stored := False;
     end;
     fShadowEffect.ShadowColor := shadow.ShadowColor;
     fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.

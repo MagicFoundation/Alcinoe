@@ -28,6 +28,7 @@ type
   JALControlHostLayout = interface;
   JLog = interface;
   JStatFs = interface;
+  JLocalBroadcastManager = interface;
 
   {***********************************************}
   JALSoftInputListenerClass = interface(IJavaClass)
@@ -160,6 +161,23 @@ type
   end;
   TJStatFs = class(TJavaGenericImport<JStatFsClass, JStatFs>) end;
 
+  {***************************************************}
+  JLocalBroadcastManagerClass = interface(JObjectClass)
+    ['{03179F7E-C439-4369-93CC-AA2BADC54398}']
+    {class} function getInstance(context: JContext): JLocalBroadcastManager; cdecl;
+  end;
+
+  {*****************************************************************}
+  [JavaSignature('android/support/v4/content/LocalBroadcastManager')]
+  JLocalBroadcastManager = interface(JObject)
+    ['{6C255CD6-D94E-40BC-A758-EC4965A40725}']
+    procedure registerReceiver(receiver: JBroadcastReceiver; filter: JIntentFilter); cdecl;
+    function sendBroadcast(intent: JIntent): Boolean; cdecl;
+    procedure sendBroadcastSync(intent: JIntent); cdecl;
+    procedure unregisterReceiver(receiver: JBroadcastReceiver); cdecl;
+  end;
+  TJLocalBroadcastManager = class(TJavaGenericImport<JLocalBroadcastManagerClass, JLocalBroadcastManager>) end;
+
 implementation
 
 procedure RegisterTypes;
@@ -170,6 +188,7 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JALControlHostLayout', TypeInfo(ALAndroidApi.JALControlHostLayout));
   TRegTypes.RegisterType('ALAndroidApi.JLog', TypeInfo(ALAndroidApi.JLog));
   TRegTypes.RegisterType('ALAndroidApi.JStatFs', TypeInfo(ALAndroidApi.JStatFs));
+  TRegTypes.RegisterType('ALAndroidApi.JLocalBroadcastManager', TypeInfo(ALAndroidApi.JLocalBroadcastManager));
 end;
 
 initialization

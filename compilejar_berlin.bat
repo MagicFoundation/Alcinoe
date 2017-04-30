@@ -16,6 +16,7 @@ REM -----------------------------------------------------
 
 if x%ANDROID% == x set ANDROID="C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows"
 set ANDROID_PLATFORM=%ANDROID%\platforms\android-23
+set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\18.0\lib\android\release\fmx.jar"
 set JDK_PATH="C:\Program Files\Java\jdk1.7.0_25\bin"
 set CONFIRM=%1
 if x%CONFIRM% == x set CONFIRM=on
@@ -31,17 +32,25 @@ IF EXIST %FileName% goto ERROR
 echo Compiling the Java Sources
 mkdir source\output 2> nul
 %JDK_PATH%\javac -Xlint:deprecation -cp^
- %ANDROID_PLATFORM%\android.jar;^
+ %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
+lib\jar\shortcutbadger\shortcutbadger.jar;^
 lib\jar\facebook\facebook-android-sdk.jar;^
-lib\jar\support-v4\support-v4.jar;^
+lib\jar\support-v4\support-core-utils.jar;^
+lib\jar\support-v4\support-fragment.jar;^
+lib\jar\support-v4\support-compat.jar;^
+lib\jar\support-annotations\support-annotations.jar;^
 lib\jar\google-play-services\play-services-base.jar;^
 lib\jar\google-play-services\play-services-basement.jar;^
-lib\jar\google-play-services\play-services-appinvite.jar^
+lib\jar\google-play-services\play-services-appinvite.jar;^
+lib\jar\firebase\firebase-iid.jar;^
+lib\jar\firebase\firebase-messaging.jar^
  -d source\output^
  source\java\com\alcinoe\widget\*.java^
  source\java\com\alcinoe\view\inputmethod\*.java^
  source\java\com\alcinoe\text\method\*.java^
  source\java\com\alcinoe\facebook\*.java^
+ source\java\com\alcinoe\firebase\iid\*.java^
+ source\java\com\alcinoe\firebase\messaging\*.java^
  source\java\com\alcinoe\googleplayservices\*.java
 IF ERRORLEVEL 1 goto ERROR
 

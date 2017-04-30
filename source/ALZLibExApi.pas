@@ -219,25 +219,25 @@ implementation
 *************************************************************************************************}
 
 {$ifdef WIN64}
-{$L ..\lib\zlib\win64\deflate.obj}
-{$L ..\lib\zlib\win64\inflate.obj}
-{$L ..\lib\zlib\win64\inftrees.obj}
-{$L ..\lib\zlib\win64\infback.obj}
-{$L ..\lib\zlib\win64\inffast.obj}
-{$L ..\lib\zlib\win64\trees.obj}
-{$L ..\lib\zlib\win64\compress.obj}
-{$L ..\lib\zlib\win64\adler32.obj}
-{$L ..\lib\zlib\win64\crc32.obj}
+{$L ..\lib\obj\zlib\win64\deflate.obj}
+{$L ..\lib\obj\zlib\win64\inflate.obj}
+{$L ..\lib\obj\zlib\win64\inftrees.obj}
+{$L ..\lib\obj\zlib\win64\infback.obj}
+{$L ..\lib\obj\zlib\win64\inffast.obj}
+{$L ..\lib\obj\zlib\win64\trees.obj}
+{$L ..\lib\obj\zlib\win64\compress.obj}
+{$L ..\lib\obj\zlib\win64\adler32.obj}
+{$L ..\lib\obj\zlib\win64\crc32.obj}
 {$else}
-{$L ..\lib\zlib\win32\deflate.obj}
-{$L ..\lib\zlib\win32\inflate.obj}
-{$L ..\lib\zlib\win32\inftrees.obj}
-{$L ..\lib\zlib\win32\infback.obj}
-{$L ..\lib\zlib\win32\inffast.obj}
-{$L ..\lib\zlib\win32\trees.obj}
-{$L ..\lib\zlib\win32\compress.obj}
-{$L ..\lib\zlib\win32\adler32.obj}
-{$L ..\lib\zlib\win32\crc32.obj}
+{$L ..\lib\obj\zlib\win32\deflate.obj}
+{$L ..\lib\obj\zlib\win32\inflate.obj}
+{$L ..\lib\obj\zlib\win32\inftrees.obj}
+{$L ..\lib\obj\zlib\win32\infback.obj}
+{$L ..\lib\obj\zlib\win32\inffast.obj}
+{$L ..\lib\obj\zlib\win32\trees.obj}
+{$L ..\lib\obj\zlib\win32\compress.obj}
+{$L ..\lib\obj\zlib\win32\adler32.obj}
+{$L ..\lib\obj\zlib\win32\crc32.obj}
 {$endif}
 
 {** macros **************************************************************************************}

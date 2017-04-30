@@ -70,10 +70,10 @@
         <DCC_HppOutput>.\hpp\$(Platform)\tokyo\</DCC_HppOutput>
         <DesignOnlyPackage>true</DesignOnlyPackage>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
-        <DCC_DcpOutput>..\lib\alcinoe\$(Platform)\tokyo\</DCC_DcpOutput>
+        <DCC_DcpOutput>..\lib\bpl\alcinoe\$(Platform)\tokyo\</DCC_DcpOutput>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_BplOutput>..\lib\alcinoe\$(Platform)\tokyo\</DCC_BplOutput>
+        <DCC_BplOutput>..\lib\bpl\alcinoe\$(Platform)\tokyo\</DCC_BplOutput>
         <SanitizedProjectName>Alcinoe_tokyo</SanitizedProjectName>
         <GenPackage>true</GenPackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
@@ -81,7 +81,7 @@
         <DCC_Description>Alcinoe</DCC_Description>
         <GenDll>true</GenDll>
         <DCC_DcuOutput>.\dcu\$(Platform)\tokyo\</DCC_DcuOutput>
-        <DCC_ExeOutput>..\lib\alcinoe\$(Platform)\</DCC_ExeOutput>
+        <DCC_ExeOutput>..\lib\bpl\alcinoe\$(Platform)\</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
         <DCC_S>false</DCC_S>
@@ -215,7 +215,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\lib\alcinoe\Win32\tokyo\Alcinoe_tokyo.bpl" Configuration="Release" Class="ProjectOutput">
+                <DeployFile LocalName="..\lib\bpl\alcinoe\Win32\tokyo\Alcinoe_tokyo.bpl" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Alcinoe_tokyo.bpl</RemoteName>
                         <Overwrite>true</Overwrite>

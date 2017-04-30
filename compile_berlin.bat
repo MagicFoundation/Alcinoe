@@ -50,7 +50,7 @@ IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%
 
-SET FileName=lib\alcinoe\Win32\berlin
+SET FileName=lib\bpl\alcinoe\Win32\berlin
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 mkdir %FileName%

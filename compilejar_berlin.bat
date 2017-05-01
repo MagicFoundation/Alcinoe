@@ -12,12 +12,15 @@ REM like https://developer.android.com/about/versions/marshmallow/android-6.0-ch
 REM Please install the SDK build tools and the SDK Platform 
 REM of Marshmallow (23) using C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\SDK Manager.exe
 REM
+REM JDK 1.8/1.7 Compatibility Gotcha: http://www.draconianoverlord.com/2014/04/01/jdk-compatibility.html
+REM
 REM -----------------------------------------------------
 
 if x%ANDROID% == x set ANDROID="C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows"
-set ANDROID_PLATFORM=%ANDROID%\platforms\android-23
+set ANDROID_PLATFORM=%ANDROID%\platforms\android-25
 set FMX_JAR="C:\Program Files (x86)\Embarcadero\Studio\18.0\lib\android\release\fmx.jar"
-set JDK_PATH="C:\Program Files\Java\jdk1.7.0_25\bin"
+set JDK_PATH="C:\Program Files\Java\jdk1.8.0_131\bin"
+set JDK_PATH1_7="C:\Program Files\Java\jdk1.7.0_80\bin"
 set CONFIRM=%1
 if x%CONFIRM% == x set CONFIRM=on
 
@@ -31,7 +34,7 @@ IF EXIST %FileName% goto ERROR
 
 echo Compiling the Java Sources
 mkdir source\output 2> nul
-%JDK_PATH%\javac -Xlint:deprecation -cp^
+%JDK_PATH%\javac -source 1.7 -target 1.7 -bootclasspath %JDK_PATH1_7%\jre\lib\rt.jar -Xlint:deprecation -cp^
  %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
 lib\jar\shortcutbadger\shortcutbadger.jar;^
 lib\jar\facebook\facebook-android-sdk.jar;^
@@ -55,7 +58,7 @@ lib\jar\firebase\firebase-messaging.jar^
 IF ERRORLEVEL 1 goto ERROR
 
 echo Creating jar containing the new classes
-%JDK_PATH%\jar cf lib\jar\alcinoe\alcinoe.jar -C source\output com
+%JDK_PATH1_7%\jar cf lib\jar\alcinoe\alcinoe.jar -C source\output com
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output

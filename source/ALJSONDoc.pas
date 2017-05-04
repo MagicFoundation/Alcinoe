@@ -424,19 +424,32 @@ type
     procedure LoadFromBSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
     procedure LoadFromBSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeList read GetChildNodes write SetChildNodes;
-    function GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString;
-    function GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double;
-    function GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime;
-    function GetChildNodeValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
-    function GetChildNodeValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
-    function GetChildNodeValueInt32(const nodeName: ansiString; const default: Integer): Integer;
-    function GetChildNodeValueInt64(const nodeName: ansiString; const default: Int64): Int64;
-    function GetChildNodeValueBool(const nodeName: ansiString; const default: Boolean): Boolean;
-    function GetChildNodeValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString;
-    function GetChildNodeValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString;
-    function GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
-    function GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
-    function GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte;
+    function GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double; overload;
+    function GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime; overload;
+    function GetChildNodeValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildNodeValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildNodeValueInt32(const nodeName: ansiString; const default: Integer): Integer; overload;
+    function GetChildNodeValueInt64(const nodeName: ansiString; const default: Int64): Int64; overload;
+    function GetChildNodeValueBool(const nodeName: ansiString; const default: Boolean): Boolean; overload;
+    function GetChildNodeValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildNodeValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString; overload;
+    function GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte; overload;
+    function GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double; overload;
+    function GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime; overload;
+    function GetChildNodeValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildNodeValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildNodeValueInt32(const path: array of ansiString; const default: Integer): Integer; overload;
+    function GetChildNodeValueInt64(const path: array of ansiString; const default: Int64): Int64; overload;
+    function GetChildNodeValueBool(const path: array of ansiString; const default: Boolean): Boolean; overload;
+    function GetChildNodeValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString; overload;
+    function GetChildNodeValueRegEx(const path: array of ansiString; const default: ansiString): ansiString; overload;
+    function GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString; overload;  // return a "byte" string
+    function GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte; overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read fNodeName write fNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
@@ -847,19 +860,32 @@ type
     procedure LoadFromBSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
     procedure LoadFromBSONFile(const FileName: String; Const ClearChildNodes: Boolean = True);
     property ChildNodes: TALJSONNodeListU read GetChildNodes write SetChildNodes;
-    function GetChildNodeValueText(const nodeName: String; const default: String): String;
-    function GetChildNodeValueFloat(const nodeName: String; const default: Double): Double;
-    function GetChildNodeValueDateTime(const nodeName: String; const default: TDateTime): TDateTime;
-    function GetChildNodeValueTimestamp(const nodeName: String; const default: TALBSONTimestamp): TALBSONTimestamp;
-    function GetChildNodeValueObjectID(const nodeName: String; const default: String): String;  // return a hex string
-    function GetChildNodeValueInt32(const nodeName: String; const default: Integer): Integer;
-    function GetChildNodeValueInt64(const nodeName: String; const default: Int64): Int64;
-    function GetChildNodeValueBool(const nodeName: String; const default: Boolean): Boolean;
-    function GetChildNodeValueJavascript(const nodeName: String; const default: String): String;
-    function GetChildNodeValueRegEx(const nodeName: String; const default: String): String;
-    function GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions;
-    function GetChildNodeValueBinary(const nodeName: String; const default: String): String;  // return a base64 encoded string
-    function GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte;
+    function GetChildNodeValueText(const nodeName: String; const default: String): String; overload;
+    function GetChildNodeValueFloat(const nodeName: String; const default: Double): Double; overload;
+    function GetChildNodeValueDateTime(const nodeName: String; const default: TDateTime): TDateTime; overload;
+    function GetChildNodeValueTimestamp(const nodeName: String; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildNodeValueObjectID(const nodeName: String; const default: String): String; overload; // return a hex string
+    function GetChildNodeValueInt32(const nodeName: String; const default: Integer): Integer; overload;
+    function GetChildNodeValueInt64(const nodeName: String; const default: Int64): Int64; overload;
+    function GetChildNodeValueBool(const nodeName: String; const default: Boolean): Boolean; overload;
+    function GetChildNodeValueJavascript(const nodeName: String; const default: String): String; overload;
+    function GetChildNodeValueRegEx(const nodeName: String; const default: String): String; overload;
+    function GetChildNodeValueRegExOptions(const nodeName: String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildNodeValueBinary(const nodeName: String; const default: String): String; overload;  // return a base64 encoded string
+    function GetChildNodeValueBinarySubType(const nodeName: String; const default: byte): byte; overload;
+    function GetChildNodeValueText(const path: array of String; const default: String): String; overload;
+    function GetChildNodeValueFloat(const path: array of String; const default: Double): Double; overload;
+    function GetChildNodeValueDateTime(const path: array of String; const default: TDateTime): TDateTime; overload;
+    function GetChildNodeValueTimestamp(const path: array of String; const default: TALBSONTimestamp): TALBSONTimestamp; overload;
+    function GetChildNodeValueObjectID(const path: array of String; const default: String): String; overload;  // return a hex string
+    function GetChildNodeValueInt32(const path: array of String; const default: Integer): Integer; overload;
+    function GetChildNodeValueInt64(const path: array of String; const default: Int64): Int64; overload;
+    function GetChildNodeValueBool(const path: array of String; const default: Boolean): Boolean; overload;
+    function GetChildNodeValueJavascript(const path: array of String; const default: String): String; overload;
+    function GetChildNodeValueRegEx(const path: array of String; const default: String): String; overload;
+    function GetChildNodeValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions; overload;
+    function GetChildNodeValueBinary(const path: array of String; const default: String): String; overload;  // return a base64 encoded string
+    function GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte; overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: String read fNodeName write fNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
@@ -4287,6 +4313,240 @@ function TALJSONNode.GetChildNodeValueBinarySubType(const nodeName: ansiString; 
 var aNode: TALJSONNode;
 begin
   aNode := ChildNodes.findNode(nodeName);
+  if (aNode = nil) then result := default
+  else result := aNode.GetBinarySubType(default);
+end;
+
+{*****************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetText(default);
+end;
+
+{**********************************************************************************************************}
+function TALJSONNode.GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetFloat(default);
+end;
+
+{*******************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetDateTime(default);
+end;
+
+{**********************************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetTimestamp(default);
+end;
+
+{*********************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetObjectID(default);
+end;
+
+{************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueInt32(const path: array of ansiString; const default: Integer): Integer;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetInt32(default);
+end;
+
+{*********************************************************************************************************}
+function TALJSONNode.GetChildNodeValueInt64(const path: array of ansiString; const default: Int64): Int64;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetInt64(default);
+end;
+
+{***********************************************************************************************************}
+function TALJSONNode.GetChildNodeValueBool(const path: array of ansiString; const default: Boolean): Boolean;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetBool(default);
+end;
+
+{***********************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetJavascript(default);
+end;
+
+{******************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueRegEx(const path: array of ansiString; const default: ansiString): ansiString;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetRegEx(default);
+end;
+
+{*******************************************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetRegExOptions(default);
+end;
+
+{*******************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetBinary(default);
+end;
+
+{**************************************************************************************************************}
+function TALJSONNode.GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte;
+var aNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
   if (aNode = nil) then result := default
   else result := aNode.GetBinarySubType(default);
 end;
@@ -9868,6 +10128,240 @@ function TALJSONNodeU.GetChildNodeValueBinarySubType(const nodeName: String; con
 var aNode: TALJSONNodeU;
 begin
   aNode := ChildNodes.findNode(nodeName);
+  if (aNode = nil) then result := default
+  else result := aNode.GetBinarySubType(default);
+end;
+
+{******************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueText(const path: array of String; const default: String): String;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetText(default);
+end;
+
+{*******************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueFloat(const path: array of String; const default: Double): Double;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetFloat(default);
+end;
+
+{****************************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueDateTime(const path: array of String; const default: TDateTime): TDateTime;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetDateTime(default);
+end;
+
+{*******************************************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueTimestamp(const path: array of String; const default: TALBSONTimestamp): TALBSONTimestamp;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetTimestamp(default);
+end;
+
+{**********************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueObjectID(const path: array of String; const default: String): String; // return a hex string
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetObjectID(default);
+end;
+
+{*********************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueInt32(const path: array of String; const default: Integer): Integer;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetInt32(default);
+end;
+
+{*****************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueInt64(const path: array of String; const default: Int64): Int64;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetInt64(default);
+end;
+
+{********************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueBool(const path: array of String; const default: Boolean): Boolean;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetBool(default);
+end;
+
+{************************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueJavascript(const path: array of String; const default: String): String;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetJavascript(default);
+end;
+
+{*******************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueRegEx(const path: array of String; const default: String): String;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetRegEx(default);
+end;
+
+{****************************************************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueRegExOptions(const path: array of String; const default: TALPerlRegExOptions): TALPerlRegExOptions;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetRegExOptions(default);
+end;
+
+{********************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueBinary(const path: array of String; const default: String): String;  // return a base64 encoded string
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then result := default
+  else result := aNode.GetBinary(default);
+end;
+
+{***********************************************************************************************************}
+function TALJSONNodeU.GetChildNodeValueBinarySubType(const path: array of String; const default: byte): byte;
+var aNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aNode := aNode.ChildNodes.findNode(path[i]);
+    if (aNode = nil) then begin
+      result := default;
+      exit;
+    end;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
   if (aNode = nil) then result := default
   else result := aNode.GetBinarySubType(default);
 end;

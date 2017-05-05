@@ -93,8 +93,9 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
         // notification_ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
         // notification_vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
         // notification_visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
+        // notification_priority - Relative priority for this notification
         // notification_badgecount - update the shortcut badge count with this number 
-                     
+                             
         intent.setClass(this, FMXNativeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, /* context	Context: The Context in which this PendingIntent should start the activity. */
@@ -170,6 +171,9 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
         } 
         if (data.containsKey("notification_visibility")) { 
           notificationBuilder = notificationBuilder.setVisibility(Integer.parseInt(data.get("notification_visibility")));
+        }
+        if (data.containsKey("notification_priority")) { 
+          notificationBuilder = notificationBuilder.setPriority(Integer.parseInt(data.get("notification_priority")));
         }
         notificationBuilder = notificationBuilder.setDefaults(NotificationCompat.DEFAULT_LIGHTS);
         notificationBuilder = notificationBuilder.setWhen(System.currentTimeMillis());

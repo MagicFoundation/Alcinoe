@@ -65,6 +65,7 @@
 // notification_ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
 // notification_vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
 // notification_visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
+// notification_priority - Relative priority for this notification
 // notification_badgecount - update the shortcut badge count with this number
 //
 // -----

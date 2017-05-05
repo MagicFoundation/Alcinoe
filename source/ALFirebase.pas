@@ -188,6 +188,7 @@ type
     {$REGION ' IOS'}
     {$IF defined(IOS)}
     fTokenRefreshNotificationListener: TTokenRefreshNotificationListener;
+    procedure FIRInstanceIDdeleteIDHandler(error: NSError);
     {$ENDIF}
     {$ENDREGION}
 
@@ -197,6 +198,7 @@ type
     property onTokenRefresh: TALFirebaseInstanceIdClientTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
     property FirebaseMessagingClient: TALFirebaseMessagingClient read fFirebaseMessagingClient write fFirebaseMessagingClient;
     function getToken: String; virtual;
+    procedure deleteInstanceId; virtual; // Resets Instance ID and revokes all tokens.
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -430,6 +432,16 @@ begin
   {$ENDIF}
 end;
 
+{*****************************************************}
+procedure TALFirebaseInstanceIdClient.deleteInstanceId; // Resets Instance ID and revokes all tokens.
+begin
+  {$IF defined(android)}
+  TJFirebaseInstanceId.javaclass.getInstance().deleteInstanceId;
+  {$ELSEIF defined(IOS)}
+  TFIRInstanceID.Wrap(TFIRInstanceID.OCClass.instanceID).deleteIDWithHandler(FIRInstanceIDdeleteIDHandler);
+  {$ENDIF}
+end;
+
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
@@ -505,6 +517,17 @@ end;
 function TALFirebaseInstanceIdClient.TTokenRefreshNotificationListener.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(ITokenRefreshNotification);
+end;
+
+{*********************************************************************************}
+procedure TALFirebaseInstanceIdClient.FIRInstanceIDdeleteIDHandler(error: NSError);
+begin
+  {$IFDEF DEBUG}
+  if (error <> nil) then allog('TALFirebaseInstanceIdClient.FIRInstanceIDdeleteIDHandler', 'Unable to delete the tokens associated with the app identity - ' + NSStrToStr(error.localizedDescription) +
+                                                                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
+  else allog('TALFirebaseInstanceIdClient.FIRInstanceIDdeleteIDHandler', 'All the tokens associated with the app identity are deleted' +
+                                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  {$ENDIF}
 end;
 
 {$ENDIF}
@@ -840,6 +863,7 @@ var aPayload: TalStringListU;
 begin
 
   if (Intent = nil) or
+     (Intent.getAction = nil) or
      (Intent.getAction.compareTo(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED) <> 0) then exit;
 
   aPayload := TalStringListU.Create;

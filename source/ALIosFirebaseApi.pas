@@ -97,6 +97,8 @@ type
   // FOUNDATION_EXPORT NSString * __nonnull const kFIRInstanceIDTokenRefreshNotification;
   function kFIRInstanceIDTokenRefreshNotification: NSString; cdecl;
 
+type
+
   {*********************************************************************}
   // The completion handler invoked when the InstanceID token returns. If
   // the call fails we return the appropriate `error code` as described below.
@@ -123,13 +125,14 @@ type
   // @param error    The error if fetching the identity fails else nil.
   // typedef void(^FIRInstanceIDHandler)(NSString * __nullable identity, NSError * __nullable error);
 
- {***********************}
- // @related FIRInstanceID
- // The completion handler invoked when the app identity and all the tokens associated
- // with it are deleted. Returns a valid error object in case of failure else nil.
- // @param error The error if deleting the identity and all the tokens associated with
- //              it fails else nil.
- // typedef void(^FIRInstanceIDDeleteHandler)(NSError * __nullable error);
+  {***********************}
+  // @related FIRInstanceID
+  // The completion handler invoked when the app identity and all the tokens associated
+  // with it are deleted. Returns a valid error object in case of failure else nil.
+  // @param error The error if deleting the identity and all the tokens associated with
+  //              it fails else nil.
+  // typedef void(^FIRInstanceIDDeleteHandler)(NSError * __nullable error);
+  FIRInstanceIDDeleteHandler = procedure(error: NSError) of object;
 
 Type
 
@@ -285,6 +288,7 @@ type
 
     // Resets Instance ID and revokes all tokens.
     // - (void)deleteIDWithHandler:(nonnull FIRInstanceIDDeleteHandler)handler;
+    procedure deleteIDWithHandler(handler: FIRInstanceIDDeleteHandler); cdecl;
 
   end;
   TFIRInstanceID = class(TOCGenericImport<FIRInstanceIDClass, FIRInstanceID>) end;

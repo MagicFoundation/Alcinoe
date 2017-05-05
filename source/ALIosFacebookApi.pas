@@ -314,14 +314,15 @@ implementation
 
 {$IF defined(CPUARM)}
 
-procedure StubProc1; cdecl; external 'FBSDKCoreKit' name 'OBJC_CLASS_$_FBSDKAccessToken';
-procedure StubProc2; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKAppInviteContent';
-procedure StubProc3; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKAppInviteDialog';
-procedure StubProc4; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingContent';
-procedure StubProc5; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareLinkContent';
-procedure StubProc6; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharing';
-procedure StubProc7; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingDialog';
-procedure StubProc8; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareDialog';
+procedure StubProc1; cdecl; external 'Bolts' name 'OBJC_CLASS_$_BFAppLink';
+procedure StubProc2; cdecl; external 'FBSDKCoreKit' name 'OBJC_CLASS_$_FBSDKAccessToken';
+procedure StubProc3; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKAppInviteContent';
+procedure StubProc4; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKAppInviteDialog';
+procedure StubProc5; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingContent';
+procedure StubProc6; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareLinkContent';
+procedure StubProc7; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharing';
+procedure StubProc8; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKSharingDialog';
+procedure StubProc9; cdecl; external 'FBSDKShareKit' name 'OBJC_CLASS_$_FBSDKShareDialog';
 
 {$ELSE}
 

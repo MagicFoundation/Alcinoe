@@ -14,6 +14,8 @@ type
   JFirebaseOptions_Builder = interface;
   JFirebaseApp = interface;
   JFirebaseInstanceId = interface;
+  JFirebaseCrash = interface;
+  JALFirebaseCrash = interface;
   JALFirebaseMessagingService = interface;
   JALFirebaseInstanceIdService = interface;
 
@@ -105,6 +107,35 @@ type
   end;
   TJFirebaseInstanceId = class(TJavaGenericImport<JFirebaseInstanceIdClass, JFirebaseInstanceId>) end;
 
+  {*******************************************}
+  JFirebaseCrashClass = interface(JObjectClass)
+    ['{FCBF6418-8A73-4F32-B25C-2880506D47A0}']
+    {class} function getInstance(firebaseApp: JFirebaseApp): JFirebaseCrash; cdecl; // deprecated
+    {class} procedure log(message: JString); cdecl;
+    {class} procedure logcat(level: integer; tag: JString; message: Jstring); cdecl;
+    {class} procedure report(throwable: JThrowable); cdecl;
+  end;
+
+  {********************************************************}
+  [JavaSignature('com/google/firebase/crash/FirebaseCrash')]
+  JFirebaseCrash = interface(JObject)
+    ['{82654DD1-C648-4225-A830-EC2F29D5E5DC}']
+  end;
+  TJFirebaseCrash = class(TJavaGenericImport<JFirebaseCrashClass, JFirebaseCrash>) end;
+
+  {*********************************************}
+  JALFirebaseCrashClass = interface(JObjectClass)
+    ['{1E95FA99-4427-4240-B72A-18305A61D8C1}']
+    {class} procedure report(message: Jstring); cdecl;
+  end;
+
+  {***********************************************************}
+  [JavaSignature('com/alcinoe/firebase/crash/ALFirebaseCrash')]
+  JALFirebaseCrash = interface(JObject)
+    ['{7E2C3E8B-DE0A-4E2D-87FB-4822063725DA}']
+  end;
+  TJALFirebaseCrash = class(TJavaGenericImport<JALFirebaseCrashClass, JALFirebaseCrash>) end;
+
   {******************************************************}
   JALFirebaseMessagingServiceClass = interface(JObjectClass)
     ['{0A2D87AC-C8A8-4565-8EC9-598592836070}']
@@ -141,6 +172,8 @@ begin
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseOptions_Builder', TypeInfo(ALAndroidFirebaseApi.JFirebaseOptions_Builder));
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseApp', TypeInfo(ALAndroidFirebaseApi.JFirebaseApp));
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseInstanceId', TypeInfo(ALAndroidFirebaseApi.JFirebaseInstanceId));
+  TRegTypes.RegisterType('ALAndroidFirebaseApi.JFirebaseCrash', TypeInfo(ALAndroidFirebaseApi.JFirebaseCrash));
+  TRegTypes.RegisterType('ALAndroidFirebaseApi.JALFirebaseCrash', TypeInfo(ALAndroidFirebaseApi.JALFirebaseCrash));
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JALFirebaseMessagingService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseMessagingService));
   TRegTypes.RegisterType('ALAndroidFirebaseApi.JALFirebaseInstanceIdService', TypeInfo(ALAndroidFirebaseApi.JALFirebaseInstanceIdService));
 end;

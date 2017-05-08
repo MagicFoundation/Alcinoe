@@ -513,6 +513,25 @@ type
   TFIRMessaging = class(TOCGenericImport<FIRMessagingClass, FIRMessaging>) end;
   PFIRMessaging = Pointer;
 
+{*******************************************************************************************}
+// http://stackoverflow.com/questions/43843006/how-to-call-in-delphi-an-ios-variadic-function
+// @abstract Logs a message to the Firebase Crash Reporter system.
+// @discussion This method adds a message to the crash reporter
+//   logging system.  The recent logs will be sent with the crash
+//   report when the application exits abnormally.  Note that the
+//   timestamp of this message and the timestamp of the console
+//   message may differ by a few milliseconds.
+// Messages should be brief as the total size of the message payloads
+//   is limited by the uploader and may change between releases of the
+//   crash reporter.  Excessively long messages will be truncated
+//   safely but that will introduce a delay in submitting the message.
+// @warning Raises an NSInvalidArgumentException if @p format is nil.
+// @param format A format string.
+// @param ap A variable argument list.
+// FOUNDATION_EXTERN NS_FORMAT_FUNCTION(1, 0)
+// void FIRCrashLogv(NSString *format, va_list ap);
+procedure FIRCrashLogv(format: PNSString); cdecl; varargs; external 'FirebaseCrash' name 'FIRCrashLogv';
+
 implementation
 
 uses Macapi.Helpers,
@@ -536,6 +555,7 @@ procedure StubProc3; cdecl; external 'FirebaseInstanceID' name 'OBJC_CLASS_$_FIR
 procedure StubProc4; cdecl; external 'GoogleToolboxForMac' name 'OBJC_CLASS_$_GTMABAddressBook';
 procedure StubProc5; cdecl; external 'FirebaseMessaging' name 'OBJC_CLASS_$_FIRMessaging';
 procedure StubProc6; cdecl; external 'Protobuf' name 'OBJC_CLASS_$_GPBRootObject';
+procedure StubProc7; cdecl; external '/usr/lib/libc++.dylib';
 
 {$ELSE}
 

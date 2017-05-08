@@ -1,0 +1,12 @@
+framework module FirebaseCrash {
+  umbrella header "FirebaseCrash.h"
+  export *
+  module * { export *}
+  link "sqlite3"
+  link "z"
+  link framework "CoreGraphics"
+  link framework "CoreTelephony"
+  link framework "Foundation"
+  link framework "SystemConfiguration"
+  link framework "UIKit"
+}

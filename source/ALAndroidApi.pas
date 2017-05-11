@@ -29,6 +29,7 @@ type
   JLog = interface;
   JStatFs = interface;
   JLocalBroadcastManager = interface;
+  JPreferenceManager = interface;
 
   {***********************************************}
   JALSoftInputListenerClass = interface(IJavaClass)
@@ -178,6 +179,19 @@ type
   end;
   TJLocalBroadcastManager = class(TJavaGenericImport<JLocalBroadcastManagerClass, JLocalBroadcastManager>) end;
 
+  {***************************************************}
+  JPreferenceManagerClass = interface(JObjectClass)
+    ['{2BCBB8F6-B5EE-441E-B01B-5F7E37A783B5}']
+    {class} function getDefaultSharedPreferences(context: JContext): JSharedPreferences; cdecl;
+  end;
+
+  {*****************************************************}
+  [JavaSignature('android/preference/PreferenceManager')]
+  JPreferenceManager = interface(JObject)
+    ['{62FC9030-B469-461B-98AD-C5E3F9AAACBA}']
+  end;
+  TJPreferenceManager = class(TJavaGenericImport<JPreferenceManagerClass, JPreferenceManager>) end;
+
 implementation
 
 procedure RegisterTypes;
@@ -189,6 +203,7 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JLog', TypeInfo(ALAndroidApi.JLog));
   TRegTypes.RegisterType('ALAndroidApi.JStatFs', TypeInfo(ALAndroidApi.JStatFs));
   TRegTypes.RegisterType('ALAndroidApi.JLocalBroadcastManager', TypeInfo(ALAndroidApi.JLocalBroadcastManager));
+  TRegTypes.RegisterType('ALAndroidApi.JPreferenceManager', TypeInfo(ALAndroidApi.JPreferenceManager));
 end;
 
 initialization

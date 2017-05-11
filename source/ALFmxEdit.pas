@@ -737,11 +737,11 @@ begin
   ALLog('TALAndroidEdit.DoExit', 'start', TalLogType.VERBOSE);
   {$ENDIF}
   inherited;
-  CallInUIThreadAndWaitFinishing(
-    procedure
+  TUIThreadCaller.Call<JALEditText>( // << when i do CallInUIThreadAndWaitFinishing i have in some situation threadlock :(
+    procedure (aEditText: JALEditText)
     begin
-      FEditText.HideSoftInput;
-      FEditText.clearfocus; // << this will gave the focus to the fLayout in fact and in this way remove it from the FeditText
+      aEditText.HideSoftInput;
+      aEditText.clearfocus; // << this will gave the focus to the fLayout in fact and in this way remove it from the FeditText
       MainActivity.getViewStack.addView(nil); // << this will "disable" all the view - important to fully close the virtual keyboard
                                               //
                                               //    public class ViewStack {
@@ -767,7 +767,7 @@ begin
                                               //      }
                                               //    }
                                               //
-    end);
+    end, FEditText);
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.DoExit', 'end', TalLogType.VERBOSE);
   {$ENDIF}

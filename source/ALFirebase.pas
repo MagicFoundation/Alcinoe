@@ -95,7 +95,7 @@
 //
 // ANDROID: data message                        + app in FOREGROUND              : NO ALERT - NO BADGE - we receive the data message
 // ANDROID: data & custom notification message  + app FOREGROUND                 : NO ALERT - NO BADGE - we receive the data message
-// ANDROID: data message                        + app in BACKGROUND / NO RUNNING : NO ALERT - NO BADGE - we DON'T receive the data message
+// ANDROID: data message                        + app in BACKGROUND / NO RUNNING : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive the data message
 // ANDROID: data & custom notification message  + app BACKGROUND / NO RUNNING    : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message
 //
 // -----
@@ -328,6 +328,7 @@ uses system.SysUtils,
      alJsondoc,
      {$ENDIF}
      AlString,
+     alJsonDoc,
      alcommon;
 
 /////////////////////////////////
@@ -832,22 +833,64 @@ end;
 
 {**********************************************************************************************}
 procedure TALFirebaseMessagingClient.applicationEvent(const Sender: TObject; const M: TMessage);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _handlePendingDataMessage;
+  var aJsonDoc: TalJsonDocumentU;
+      aMessagesNode: TalJsonNodeU;
+      aPayload: TalStringListU;
+      i: integer;
+  begin
+    Try
+      aJsonDoc := TalJsonDocumentU.create;
+      try
+        aJsonDoc.LoadFromJSONString(JstringToString(TJALFirebaseMessagingService.JavaClass.getPendingDataMessages));
+        aMessagesNode := aJsonDoc.ChildNodes.FindNode('messages');
+        if (aMessagesNode <> nil) and assigned(fOnMessageReceived) then begin
+          aPayload := TalStringListU.Create;
+          try
+            for I := 0 to aMessagesNode.ChildNodes.Count - 1 do begin
+              aPayload.Clear;
+              ALJSONToTStringsU(aMessagesNode.ChildNodes[i], aPayload);
+              fOnMessageReceived(aPayload);
+            end;
+          finally
+            alFreeAndNil(aPayload);
+          end;
+        end;
+      finally
+        ALFreeAndNil(aJsonDoc, false{adelayed}, false{aRefCountWarn});
+      end;
+    except
+      {$IFDEF DEBUG}
+      on E: Exception do
+        allog('TALFirebaseMessagingClient.applicationEvent._handlePendingDataMessage', E.Message, TalLogType.ERROR);
+      {$ENDIF}
+    end;
+  end;
+
 var aWasConnected: Boolean;
 begin
   if M is TApplicationEventMessage then begin
     case (M as TApplicationEventMessage).Value.Event of
+      TApplicationEvent.WillBecomeForeground: begin
+                                                if connected then connect;
+                                                _handlePendingDataMessage;
+                                              end;
       TApplicationEvent.BecameActive: begin
                                         if connected then connect;
+                                        _handlePendingDataMessage;
                                         if not FStartupIndentProcessed then begin
                                           FStartupIndentProcessed := True;
                                           HandleNotificationIntent(MainActivity.getIntent); // it's seam that BecameActive will be fire after the formCreate so everything is OK if
                                         end;                                                // we create the TALFirebaseMessagingClient in the formCreate
                                       end;
-      TApplicationEvent.EnteredBackground: begin
-                                             aWasConnected := fconnected;
-                                             disconnect;
-                                             fconnected := aWasConnected;
-                                           end;
+      TApplicationEvent.EnteredBackground,
+      TApplicationEvent.WillBecomeInactive: begin
+                                              aWasConnected := fconnected;
+                                              disconnect;
+                                              fconnected := aWasConnected;
+                                            end;
     end;
   end;
 end;
@@ -1239,18 +1282,20 @@ procedure TALFirebaseMessagingClient.applicationEvent(const Sender: TObject; con
 begin
   if M is TApplicationEventMessage then begin
     case (M as TApplicationEventMessage).Value.Event of
+      TApplicationEvent.WillBecomeForeground,
       TApplicationEvent.BecameActive: begin
                                         if connected then connect;
                                       end;
-      TApplicationEvent.EnteredBackground: begin
-                                             // Call this before `teardown` when your app is going to the background.
-                                             // Since the FIRMessaging connection won't be allowed to live when in background it is
-                                             // prudent to close the connection.
-                                             TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).disconnect;
-                                             {$IFDEF DEBUG}
-                                             allog('TALFirebaseMessagingClient.applicationEvent','Disconnected from FCM', TalLogType.VERBOSE);
-                                             {$ENDIF}
-                                           end;
+      TApplicationEvent.EnteredBackground,
+      TApplicationEvent.WillBecomeInactive: begin
+                                              // Call this before `teardown` when your app is going to the background.
+                                              // Since the FIRMessaging connection won't be allowed to live when in background it is
+                                              // prudent to close the connection.
+                                              TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).disconnect;
+                                              {$IFDEF DEBUG}
+                                              allog('TALFirebaseMessagingClient.applicationEvent','Disconnected from FCM', TalLogType.VERBOSE);
+                                              {$ENDIF}
+                                            end;
     end;
   end;
 end;

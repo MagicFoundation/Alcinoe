@@ -141,6 +141,7 @@ type
     ['{0A2D87AC-C8A8-4565-8EC9-598592836070}']
     {class} function _GetACTION_MESSAGERECEIVED: JString; cdecl;
     {class} property ACTION_MESSAGERECEIVED: JString read _GetACTION_MESSAGERECEIVED;
+    {class} function getPendingDataMessages: JString; cdecl;
   end;
 
   {**************************************************************************}

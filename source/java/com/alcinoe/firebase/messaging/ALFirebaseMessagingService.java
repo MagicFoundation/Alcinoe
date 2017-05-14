@@ -168,23 +168,24 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
                 
             // actually i support these params, but nothing forbid to extends them
             // notification - Must be equal to 1 to activate showing of custom notification when no receiver
-            // notification_tag - A string identifier for this notification. 
-            // notification_color - The accent color to use
-            // notification_text - Set the second line of text in the platform notification template.
-            // notification_title - Set the first line of text in the platform notification template.
-            // notification_largeicon - url of the large icon to use - Add a large icon to the notification content view
-            // notification_number - must equal to "auto" to increase the number of items this notification represents.
-            // notification_onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.      
-            // notification_smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
-            // notification_ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
-            // notification_vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
-            // notification_visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
-            // notification_priority - Relative priority for this notification
-            // notification_sound - Set the sound to play
-            // notification_badgecount - update the shortcut badge count with this number 
+            // notification.tag - A string identifier for this notification. 
+            // notification.color - The accent color to use
+            // notification.text - Set the second line of text in the platform notification template.
+            // notification.title - Set the first line of text in the platform notification template.
+            // notification.largeicon - url of the large icon to use - Add a large icon to the notification content view
+            // notification.number - must equal to "auto" to increase the number of items this notification represents.
+            // notification.onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.      
+            // notification.smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
+            // notification.ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
+            // notification.vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
+            // notification.visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
+            // notification.priority - Relative priority for this notification
+            // notification.sound - Set the sound to play
+            // notification.badgecount - update the shortcut badge count with this number 
                                  
             int defaults = NotificationCompat.DEFAULT_LIGHTS;
             
+            intent.putExtra("notification.presented", "1"); /* this to know in delphi code that it's a notification presented to the user (so if we receive mean he click it) */
             intent.setClass(this, FMXNativeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, /* context	Context: The Context in which this PendingIntent should start the activity. */
@@ -200,19 +201,19 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
                                                                                                            be supplied when the actual send happens. */
             
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-            if (data.containsKey("notification_color")) { 
-              notificationBuilder = notificationBuilder.setColor(Integer.parseInt(data.get("notification_color")));
+            if (data.containsKey("notification.color")) { 
+              notificationBuilder = notificationBuilder.setColor(Integer.parseInt(data.get("notification.color")));
             }
-            if (data.containsKey("notification_text")) { 
-              notificationBuilder = notificationBuilder.setContentText(data.get("notification_text"));
+            if (data.containsKey("notification.text")) { 
+              notificationBuilder = notificationBuilder.setContentText(data.get("notification.text"));
             }
-            if (data.containsKey("notification_title")) { 
-              notificationBuilder = notificationBuilder.setContentTitle(data.get("notification_title"));
+            if (data.containsKey("notification.title")) { 
+              notificationBuilder = notificationBuilder.setContentTitle(data.get("notification.title"));
             }
-            if (data.containsKey("notification_largeicon")) { 
+            if (data.containsKey("notification.largeicon")) { 
               try {
               
-                URL url = new URL(data.get("notification_largeicon"));
+                URL url = new URL(data.get("notification.largeicon"));
                 Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
                 if (bitmap != null) {
       
@@ -229,51 +230,51 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
               
               } catch(Throwable e) { Log.e("ALFirebaseMessagingService.onMessageReceived", "Exception", e); }
             }
-            if (data.containsKey("notification_number") && 
-                data.containsKey("notification_tag") && 
-                data.get("notification_number").equals("auto")) { 
+            if (data.containsKey("notification.number") && 
+                data.containsKey("notification.tag") && 
+                data.get("notification.number").equals("auto")) { 
               SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-              int currentCount = sp.getInt("notification_count_" + data.get("notification_tag"), 0);
+              int currentCount = sp.getInt("notification.count_" + data.get("notification.tag"), 0);
               SharedPreferences.Editor editor = sp.edit();
-              editor.putInt("notification_count_" + data.get("notification_tag"), currentCount + 1);
+              editor.putInt("notification.count_" + data.get("notification.tag"), currentCount + 1);
               editor.commit();
               if (currentCount > 0) { notificationBuilder = notificationBuilder.setNumber(currentCount + 1); }
             }
-            else if (data.containsKey("notification_number")) {
-              notificationBuilder = notificationBuilder.setNumber(Integer.parseInt(data.get("notification_number")));  
+            else if (data.containsKey("notification.number")) {
+              notificationBuilder = notificationBuilder.setNumber(Integer.parseInt(data.get("notification.number")));  
             }
-            if (data.containsKey("notification_onlyalertonce") && data.get("notification_onlyalertonce").equals("1")) { 
+            if (data.containsKey("notification.onlyalertonce") && data.get("notification.onlyalertonce").equals("1")) { 
               notificationBuilder = notificationBuilder.setOnlyAlertOnce(true);
             } 
-            if (data.containsKey("notification_smallicon")) { 
+            if (data.containsKey("notification.smallicon")) { 
               notificationBuilder = notificationBuilder.setSmallIcon(
                 this.getApplicationContext().getResources().getIdentifier(
-                  data.get("notification_smallicon"), // name	String: The name of the desired resource.
+                  data.get("notification.smallicon"), // name	String: The name of the desired resource.
                   "drawable", // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
                   this.getApplicationContext().getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
             }                  
-            if (data.containsKey("notification_ticker")) { 
-              notificationBuilder = notificationBuilder.setTicker(data.get("notification_ticker"));
+            if (data.containsKey("notification.ticker")) { 
+              notificationBuilder = notificationBuilder.setTicker(data.get("notification.ticker"));
             }
-            if (data.containsKey("notification_vibrate")) { 
-              if (data.get("notification_vibrate").equals("default")) {
+            if (data.containsKey("notification.vibrate")) { 
+              if (data.get("notification.vibrate").equals("default")) {
                 defaults = defaults | NotificationCompat.DEFAULT_VIBRATE;
                 notificationBuilder = notificationBuilder.setVibrate(new long[] { 0, 1200 });
               }
             } 
-            if (data.containsKey("notification_visibility")) { 
-              notificationBuilder = notificationBuilder.setVisibility(Integer.parseInt(data.get("notification_visibility")));
+            if (data.containsKey("notification.visibility")) { 
+              notificationBuilder = notificationBuilder.setVisibility(Integer.parseInt(data.get("notification.visibility")));
             }
-            if (data.containsKey("notification_priority")) { 
-              notificationBuilder = notificationBuilder.setPriority(Integer.parseInt(data.get("notification_priority")));
+            if (data.containsKey("notification.priority")) { 
+              notificationBuilder = notificationBuilder.setPriority(Integer.parseInt(data.get("notification.priority")));
             }
-            if (data.containsKey("notification_sound")) { 
-              if (data.get("notification_sound").equals("default")) {
+            if (data.containsKey("notification.sound")) { 
+              if (data.get("notification.sound").equals("default")) {
                 defaults = defaults | NotificationCompat.DEFAULT_SOUND;
                 notificationBuilder = notificationBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
               }
               else {
-                notificationBuilder = notificationBuilder.setSound(Uri.parse(data.get("notification_sound")));
+                notificationBuilder = notificationBuilder.setSound(Uri.parse(data.get("notification.sound")));
               }
             }
             notificationBuilder = notificationBuilder.setDefaults(defaults);
@@ -282,12 +283,12 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
             notificationBuilder = notificationBuilder.setAutoCancel(true);
             notificationBuilder = notificationBuilder.setContentIntent(pendingIntent);
             
-            if (data.containsKey("notification_badgecount")) { 
-              ShortcutBadger.applyCount(this.getApplicationContext(), Integer.parseInt(data.get("notification_badgecount")));
+            if (data.containsKey("notification.badgecount")) { 
+              ShortcutBadger.applyCount(this.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
             } 
         
             NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);    
-            notificationManager.notify(data.get("notification_tag"), /* tag	String: A string identifier for this notification. May be null. */ 
+            notificationManager.notify(data.get("notification.tag"), /* tag	String: A string identifier for this notification. May be null. */ 
                                        0, /* id	int: An identifier for this notification. The pair (tag, id) must be unique within your application. */  
                                        notificationBuilder.build()); /* notification	Notification: A Notification object describing what to show the user. Must not be null. */  
           
@@ -300,10 +301,10 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
             String jsonTxt = getPendingDataMessagesInternal();
             JSONObject jsonRoot = new JSONObject(jsonTxt);       
             
-            /* max 100 items to not exagerate the size of the queue */
+            /* max 1000 items to not exagerate the size of the queue */
             JSONArray messagesNode = jsonRoot.optJSONArray("messages");
-            if ((messagesNode != null) && (messagesNode.length() >= 100) && (Build.VERSION.SDK_INT >= 19)) { messagesNode.remove(0); }
-            if ((messagesNode == null) || (messagesNode.length() < 100)) { 
+            if ((messagesNode != null) && (messagesNode.length() >= 1000) && (Build.VERSION.SDK_INT >= 19)) { messagesNode.remove(0); }
+            if ((messagesNode == null) || (messagesNode.length() < 1000)) { 
   
               /* update the json */
               JSONObject newNode = new JSONObject();

@@ -32,17 +32,17 @@
 //  "data": {
 //
 //    "notification": "1",
-//    "notification_tag": "myTag",
-//    "notification_title": "TOTO",
-//    "notification_smallicon": "notification_icon",
-//    "notification_largeicon": "https://scontent.xx.fbcdn.net/v/t31.0-8/10296216_10152247072841144_868918792214465059_o.jpg?oh=b3d2aea191053493a1fede2fe2fba1fb&oe=5999CD99",
-//    "notification_text": "I m toto",
-//    "notification_vibrate": "1",
-//    "notification_color":"152",
-//    "notification_onlyalertonce":"1",
-//    "notification_badgecount":"5",
-//    "notification_number": "1",
-//    "notification_ticker":"I m toto ticker",
+//    "notification.tag": "myTag",
+//    "notification.title": "TOTO",
+//    "notification.smallicon": "notification_icon",
+//    "notification.largeicon": "https://scontent.xx.fbcdn.net/v/t31.0-8/10296216_10152247072841144_868918792214465059_o.jpg?oh=b3d2aea191053493a1fede2fe2fba1fb&oe=5999CD99",
+//    "notification.text": "I m toto",
+//    "notification.vibrate": "1",
+//    "notification.color":"152",
+//    "notification.onlyalertonce":"1",
+//    "notification.badgecount":"5",
+//    "notification.number": "1",
+//    "notification.ticker":"I m toto ticker",
 //
 //    "my_key" : { "my_other_value": "xxx" },
 //    "my_custom_key" : "my_custom_value",
@@ -54,23 +54,28 @@
 // actually for the notification alert i support these params, but nothing forbid to extends them
 //
 // notification - Must be equal to 1 to activate showing of custom notification when no receiver
-// notification_tag - A string identifier for this notification.
-// notification_color - The accent color to use
-// notification_text - Set the second line of text in the platform notification template.
-// notification_title - Set the first line of text in the platform notification template.
-// notification_largeicon - url of the large icon to use - Add a large icon to the notification content view
-// notification_number - must equal to "auto" to increase automatiquely the number of items this notification represents.
-// notification_onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.
-// notification_smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
-// notification_ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
-// notification_vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
-// notification_visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
-// notification_priority - Relative priority for this notification
-// notification_badgecount - update the shortcut badge count with this number
+// notification.tag - A string identifier for this notification.
+// notification.color - The accent color to use
+// notification.text - Set the second line of text in the platform notification template.
+// notification.title - Set the first line of text in the platform notification template.
+// notification.largeicon - url of the large icon to use - Add a large icon to the notification content view
+// notification.number - must equal to "auto" to increase automatiquely the number of items this notification represents.
+// notification.onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.
+// notification.smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
+// notification.ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
+// notification.vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
+// notification.visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
+// notification.priority - Relative priority for this notification
+// notification.badgecount - update the shortcut badge count with this number
+// notification.present - only for IOS 10+, it's equal to 1 then even if the app is in foreground the notification will be presented to the end user
+//
+// ALFirebaseMessaging will append theses params :
+//
+// notification.presented - added by the ALFirebaseMessaging Framework to each notification presented to end user (so it's mean user tapped on it)
 //
 // -----
 //
-// On android you can choose to replace a notification alert with a new version (with the notification_tag in the data payload)
+// On android you can choose to replace a notification alert with a new version (with the notification.tag in the data payload)
 // but this is not possible under IOS
 //
 // -----
@@ -325,7 +330,6 @@ uses system.SysUtils,
      Macapi.ObjCRuntime,
      FMX.Helpers.iOS,
      ALMacapiObjCRuntime,
-     alJsondoc,
      {$ENDIF}
      AlString,
      alJsonDoc,
@@ -977,25 +981,46 @@ end;
 procedure TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler(center: UNUserNotificationCenter;
                                                                                                                                         willPresentNotification: UNNotification;
                                                                                                                                         withCompletionHandler: TUserNotificationCenterWillPresentNotificationCompletionHandler);
-var aImp: procedure(self: pointer; _cmd: pointer; const options); cdecl;
+var aImp: procedure(aOptions: UNNotificationPresentationOptions); cdecl;
+    aPresent: boolean;
     aOptions: UNNotificationPresentationOptions;
     aMessage: TPushRemoteNotificationMessage;
+    aJsonDoc: TalJsonDocumentU;
+    aJsonStr: String;
 begin
 
   {$IF CompilerVersion > 31} // berlin
     {$MESSAGE WARN 'check if this is not already implemented in FMX.Platform.iOS'}
   {$ENDIF}
 
-  aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(willPresentNotification.request.content.userInfo)));
+  // if 'notification.present' is in the data payload, then it's mean it's
+  // an alert we want to show
+  aJsonDoc := TalJsonDocumentU.create;
+  try
+    aJsonStr := _NSDictionaryToJSON(willPresentNotification.request.content.userInfo);
+    if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
+    aOptions := UNNotificationPresentationOptionNone;
+    aPresent := ALStrToBoolU(aJsonDoc.Node.GetChildNodeValueText('notification.present', '0'));
+    if aPresent then begin
+      aOptions := aOptions or UNNotificationPresentationOptionAlert;
+      if aJsonDoc.Node.ChildNodes.FindNode('notification.badgecount') <> nil then aOptions := aOptions or UNNotificationPresentationOptionBadge;
+      if aJsonDoc.Node.ChildNodes.FindNode('notification.sound') <> nil then aOptions := aOptions or UNNotificationPresentationOptionSound;
+    end;
+  finally
+    ALFreeAndNil(aJsonDoc);
+  end;
+
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler', aMessage.Value.Notification +
+  allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterWillPresentNotificationWithCompletionHandler', aJsonStr +
                                                                                                                                          ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
-  TMessageManager.DefaultManager.SendMessage(nil, aMessage);
+  if not aPresent then begin
+    aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(aJsonStr));
+    TMessageManager.DefaultManager.SendMessage(nil, aMessage);
+  end;
 
   @aImp := imp_implementationWithBlock(withCompletionHandler);
-  aOptions := UNNotificationPresentationOptionNone;
-  aImp(self, nil, aOptions);
+  aImp(aOptions);
   imp_removeBlock(@aImp);
 
 end;
@@ -1005,15 +1030,26 @@ end;
 procedure TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler(center: UNUserNotificationCenter;
                                                                                                                                                didReceiveNotificationResponse: UNNotificationResponse;
                                                                                                                                                withCompletionHandler: TUserNotificationCenterDidReceiveNotificationResponseCompletionHandler); cdecl;
-var aImp: procedure(self: pointer; _cmd: pointer); cdecl;
+var aImp: procedure(); cdecl;
     aMessage: TPushRemoteNotificationMessage;
+    aJsonDoc: TalJsonDocumentU;
+    aJsonStr: String;
 begin
 
   {$IF CompilerVersion > 31} // berlin
     {$MESSAGE WARN 'check if this is not already implemented in FMX.Platform.iOS'}
   {$ENDIF}
 
-  aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(_NSDictionaryToJSON(didReceiveNotificationResponse.notification.request.content.userInfo)));
+  aJsonDoc := TalJsonDocumentU.create;
+  try
+    aJsonStr := _NSDictionaryToJSON(didReceiveNotificationResponse.notification.request.content.userInfo);
+    if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
+    if aJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil then
+      aJsonDoc.Node.AddChild('notification.presented').Text := '1';
+    aMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(aJsonDoc.JSON));
+  finally
+    ALFreeAndNil(aJsonDoc);
+  end;
   {$IFDEF DEBUG}
   allog('TALFirebaseMessagingClient.TUserNotificationCenterDelegate.userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler', aMessage.Value.Notification +
                                                                                                                                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
@@ -1021,7 +1057,7 @@ begin
   TMessageManager.DefaultManager.SendMessage(nil, aMessage);
 
   @aImp := imp_implementationWithBlock(withCompletionHandler);
-  aImp(self, nil);
+  aImp();
   imp_removeBlock(@aImp);
 
 end;
@@ -1051,125 +1087,64 @@ end;
 {*********************************************************************************************************************}
 procedure TALFirebaseMessagingClient.applicationDidReceiveRemoteNotification(const Sender: TObject; const M: TMessage);
 var aPayload: TalStringListU;
+    aJsonDoc: TalJsonDocumentU;
     aJsonStr: String;
 begin
-
-  // If you are receiving a notification message while your app is in the background,
-  // this callback will not be fired till the user taps on the notification launching the application.
-
-  //WE SEND (WITHOUT NOTIFICATION):
-  //{
-  //   "to":"fFN...GA",
-  //   "xxx_to":"eMbq...xX",
-  //   "xxx_notification":{
-  //      "body":"great match!",
-  //      "title":"Portugal vs. Denmark",
-  //      "icon":"myicon"
-  //   },
-  //   "data":{
-  //      "notification":"1",
-  //      "notification_tag":"aze118",
-  //      "my_17_key":{
-  //         "my_uuu_value":"aze"
-  //      },
-  //      "notification_title":"TOTO17",
-  //      "notification_smallicon":"notification_icon",
-  //      "notification_largeicon":"https://scontent.xx.fbcdn.net/v/t31.0-8/10296216_10152247072841144_868918792214465059_o.jpg?oh=b3d2aea191053493a1fede2fe2fba1fb&oe=5999CD99",
-  //      "notification_text":"la tete a toto",
-  //      "notification_vibrate":"1",
-  //      "notification_color":"152",
-  //      "notification_onlyalertonce":"1",
-  //      "notification_updateshortcutbadgecount":"1",
-  //      "notification_number":"1",
-  //      "notification_ticker":"yooooooo",
-  //      "my_custom_key":"my_custom_value",
-  //      "other_key":true
-  //   }
-  //}
-  //
-  //WE RECEIVE HERE:
-  //{
-  // "notification_smallicon":"notification_icon",
-  // "notification":"1",
-  // "notification_title":"TOTO17",
-  // "notification_vibrate":"1",
-  // "notification_number":"1",
-  // "notification_text":"la tete a toto",
-  // "notification_ticker":"yooooooo",
-  // "my_17_key":"{\"my_uuu_value\":\"aze\"}",
-  // "my_custom_key":"my_custom_value",
-  // "other_key":"true",
-  // "from":"530584534733",
-  // "notification_color":"152",
-  // "notification_onlyalertonce":"1",
-  // "notification_updateshortcutbadgecount":"1",
-  // "notification_tag":"aze118",
-  // "notification_largeicon":"https:\/\/scontent.xx.fbcdn.net\/v\/t31.0-8\/10296216_10152247072841144_868918792214465059_o.jpg?oh=b3d2aea191053493a1fede2fe2fba1fb&oe=5999CD99"
-  //}
-
-
-
-  //WE SEND (WITH NOTIFICATION):
-  //{
-  //   "to":"fFN...GA",
-  //   "xxx_to":"eMbq...xX",
-  //   "notification":{
-  //      "body":"great match!",
-  //      "title":"Portugal vs. Denmark",
-  //      "icon":"myicon"
-  //   },
-  //   "data":{
-  //      "notification":"1",
-  //      "notification_tag":"aze118",
-  //      "my_17_key":{
-  //         "my_uuu_value":"aze"
-  //      },
-  //      "notification_title":"TOTO17",
-  //      "notification_smallicon":"notification_icon",
-  //      "notification_largeicon":"https://scontent.xx.fbcdn.net/v/t31.0-8/10296216_10152247072841144_868918792214465059_o.jpg?oh=b3d2aea191053493a1fede2fe2fba1fb&oe=5999CD99",
-  //      "notification_text":"la tete a toto",
-  //      "notification_vibrate":"1",
-  //      "notification_color":"152",
-  //      "notification_onlyalertonce":"1",
-  //      "notification_updateshortcutbadgecount":"1",
-  //      "notification_number":"1",
-  //      "notification_ticker":"yooooooo",
-  //      "my_custom_key":"my_custom_value",
-  //      "other_key":true
-  //   }
-  //}
-  //
-  //WE RECEIVE HERE:
-  //{
-  // "notification_smallicon":"notification_icon",
-  // "notification":"1",
-  // "my_custom_key":"my_custom_value",
-  // "notification_title":"TOTO17",
-  // "notification_number":"1",
-  // "notification_vibrate":"1",
-  // "notification_text":"la tete a toto",
-  // "my_17_key":"{\"my_uuu_value\":\"aze\"}",
-  // "gcm.message_id":"0:149328200873309322924134b",
-  // "other_key":"true",
-  // "notification_ticker":"yooooooo",
-  // "aps":{
-  //    "alert":{
-  //       "body":"great match!",
-  //       "title":"Portugal vs. Denmark"
-  //    }
-  // },
-  // "notification_color":"152",
-  // "notification_onlyalertonce":"1",
-  // "notification_updateshortcutbadgecount":"1",
-  // "notification_tag":"aze118",
-  // "notification_largeicon":"https:\/\/scontent.xx.fbcdn.net\/v\/t31.0-8\/10296216_10152247072841144_868918792214465059_o.jpg?oh=b3d2aea191053493a1fede2fe2fba1fb&oe=5999CD99"
-  //}
 
   aPayload := TalStringListU.Create;
   try
 
-    if (M is TPushRemoteNotificationMessage) then aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
-    else if (M is TPushStartupNotificationMessage) then aJsonStr := (M as TPushStartupNotificationMessage).Value.Notification
+    if (M is TPushRemoteNotificationMessage) then begin
+
+      //ios 9-
+      if not TOSVersion.Check(10) then begin
+
+        // Just received notification (Foreground)
+        if sharedApplication.applicationState = UIApplicationStateActive then begin
+          aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
+        end
+
+        // launched by taping notification
+        else if sharedApplication.applicationState = UIApplicationStateInactive then begin
+          aJsonDoc := TalJsonDocumentU.create;
+          try
+            aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification;
+            if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
+            if ((ALStrToBoolU(aJsonDoc.Node.GetChildNodeValueText('notification', '0'))) or
+                (aJsonDoc.Node.childnodes.findnode('aps') <> nil)) and
+               (aJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil) then
+              aJsonDoc.Node.AddChild('notification.presented').Text := '1';
+            aJsonStr := aJsonDoc.JSON;
+          finally
+            ALFreeAndNil(aJsonDoc);
+          end;
+        end
+
+        // Just received notification (Background)
+        else if sharedApplication.applicationState = UIApplicationStateBackground then begin
+          aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
+        end;
+        
+      end
+
+      //ios 10+
+      else aJsonStr := (M as TPushRemoteNotificationMessage).Value.Notification
+
+    end
+    
+    else if (M is TPushStartupNotificationMessage) then begin
+      aJsonDoc := TalJsonDocumentU.create;
+      try
+        aJsonStr := (M as TPushStartupNotificationMessage).Value.Notification;
+        if aJsonStr <> '' then aJsonDoc.LoadFromJSONString(aJsonStr);
+        if aJsonDoc.Node.ChildNodes.FindNode('notification.presented') = nil then
+          aJsonDoc.Node.AddChild('notification.presented').Text := '1';
+        aJsonStr := aJsonDoc.JSON;
+      finally
+        ALFreeAndNil(aJsonDoc);
+      end;
+    end
+    
     else aJsonStr := '';
 
     {$IFDEF DEBUG}
@@ -1178,7 +1153,7 @@ begin
     {$ENDIF}
 
     if aJsonStr <> '' then ALJSONToTStringsU(aJsonStr, ALDefaultFormatSettingsU, aPayload);
-
+        
     if assigned(fOnMessageReceived) then
       fOnMessageReceived(aPayload);
 

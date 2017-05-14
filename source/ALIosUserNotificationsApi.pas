@@ -94,7 +94,7 @@ type
   //NSTimeInterval = Double;
   //TUserNotificationsCompletionHandler1 = procedure(param1: NSSet) of object;
   //TUserNotificationsCompletionHandler2 = procedure(param1: UNNotificationSettings) of object;
-  //TUserNotificationsWithCompletionHandler = procedure(param1: NSError) of object;
+  TUserNotificationsWithCompletionHandler = procedure(error: NSError) of object;
   //TUserNotificationsCompletionHandler3 = procedure(param1: NSArray) of object;
 
   //UNUserNotificationCenterSupport = interface(IObjectiveC)
@@ -281,34 +281,67 @@ type
   TUNNotificationContent = class(TOCGenericImport<UNNotificationContentClass, UNNotificationContent>) end;
   PUNNotificationContent = Pointer;
 
-  //UNMutableNotificationContentClass = interface(UNNotificationContentClass)
-  //  ['{CCD07642-CB5B-4A43-92D3-81485B3B57F9}']
-  //end;
-  //UNMutableNotificationContent = interface(UNNotificationContent)
-  //  ['{E20D6B4A-67CB-499E-8C37-26046454DAE5}']
-  //  procedure setAttachments(attachments: NSArray); cdecl;
-  //  function attachments: NSArray; cdecl;
-  //  procedure setBadge(badge: NSNumber); cdecl;
-  //  function badge: NSNumber; cdecl;
-  //  procedure setBody(body: NSString); cdecl;
-  //  function body: NSString; cdecl;
-  //  procedure setCategoryIdentifier(categoryIdentifier: NSString); cdecl;
-  //  function categoryIdentifier: NSString; cdecl;
-  //  procedure setLaunchImageName(launchImageName: NSString); cdecl;
-  //  function launchImageName: NSString; cdecl;
-  //  procedure setSound(sound: UNNotificationSound); cdecl;
-  //  function sound: UNNotificationSound; cdecl;
-  //  procedure setSubtitle(subtitle: NSString); cdecl;
-  //  function subtitle: NSString; cdecl;
-  //  procedure setThreadIdentifier(threadIdentifier: NSString); cdecl;
-  //  function threadIdentifier: NSString; cdecl;
-  //  procedure setTitle(title: NSString); cdecl;
-  //  function title: NSString; cdecl;
-  //  procedure setUserInfo(userInfo: NSDictionary); cdecl;
-  //  function userInfo: NSDictionary; cdecl;
-  //end;
-  //TUNMutableNotificationContent = class (TOCGenericImport<UNMutableNotificationContentClass, UNMutableNotificationContent>) end;
-  //PUNMutableNotificationContent = Pointer;
+  {***************************************************************}
+  //@interface UNMutableNotificationContent : UNNotificationContent
+  UNMutableNotificationContentClass = interface(UNNotificationContentClass)
+  ['{4BA5670A-A0F7-42D3-9B55-BB1036B4FF94}']
+  end;
+  UNMutableNotificationContent = interface(UNNotificationContent)
+  ['{AF4CDFC1-F933-4892-B307-80DFCFF609D0}']
+
+    // Optional array of attachments.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSArray <UNNotificationAttachment *> *attachments __TVOS_PROHIBITED;
+    procedure setAttachments(attachments: NSArray); cdecl;
+    function attachments: NSArray; cdecl;
+
+    // The application badge number. nil means no change. 0 to hide.
+    // @property (NS_NONATOMIC_IOSONLY, copy, nullable) NSNumber *badge;
+    procedure setBadge(badge: NSNumber); cdecl;
+    function badge: NSNumber; cdecl;
+
+    // The body of the notification. Use -[NSString localizedUserNotificationStringForKey:arguments:] to provide a string that will be localized at the time that the notification is presented.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSString *body __TVOS_PROHIBITED;
+    procedure setBody(body: NSString); cdecl;
+    function body: NSString; cdecl;
+
+    // The identifier for a registered UNNotificationCategory that will be used to determine the appropriate actions to display for the notification.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSString *categoryIdentifier __TVOS_PROHIBITED;
+    procedure setCategoryIdentifier(categoryIdentifier: NSString); cdecl;
+    function categoryIdentifier: NSString; cdecl;
+
+    // The launch image that will be used when the app is opened from the notification.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSString *launchImageName __TVOS_PROHIBITED;
+    procedure setLaunchImageName(launchImageName: NSString); cdecl;
+    function launchImageName: NSString; cdecl;
+
+    // The sound that will be played for the notification.
+    // @property (NS_NONATOMIC_IOSONLY, copy, nullable) UNNotificationSound *sound __TVOS_PROHIBITED;
+    procedure setSound(sound: UNNotificationSound); cdecl;
+    function sound: UNNotificationSound; cdecl;
+
+    // The subtitle of the notification. Use -[NSString localizedUserNotificationStringForKey:arguments:] to provide a string that will be localized at the time that the notification is presented.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSString *subtitle __TVOS_PROHIBITED;
+    procedure setSubtitle(subtitle: NSString); cdecl;
+    function subtitle: NSString; cdecl;
+
+    // The unique identifier for the thread or conversation related to this notification request. It will be used to visually group notifications together.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSString *threadIdentifier __TVOS_PROHIBITED;
+    procedure setThreadIdentifier(threadIdentifier: NSString); cdecl;
+    function threadIdentifier: NSString; cdecl;
+
+    // The title of the notification. Use -[NSString localizedUserNotificationStringForKey:arguments:] to provide a string that will be localized at the time that the notification is presented.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSString *title __TVOS_PROHIBITED;
+    procedure setTitle(title: NSString); cdecl;
+    function title: NSString; cdecl;
+
+    // Apps can set the userInfo for locally scheduled notification requests. The contents of the push payload will be set as the userInfo for remote notifications.
+    // @property (NS_NONATOMIC_IOSONLY, copy) NSDictionary *userInfo;
+    procedure setUserInfo(userInfo: NSDictionary); cdecl;
+    function userInfo: NSDictionary; cdecl;
+
+  end;
+  TUNMutableNotificationContent = class (TOCGenericImport<UNMutableNotificationContentClass, UNMutableNotificationContent>) end;
+  PUNMutableNotificationContent = Pointer;
 
   {************************************************************************}
   // @interface UNNotificationTrigger : NSObject <NSCopying, NSSecureCoding>
@@ -474,7 +507,7 @@ type
 
     // Notification requests can be scheduled to notify the user via time and location. See UNNotificationTrigger for more information. Calling -addNotificationRequest: will replace an existing notification request with the same identifier. A notification request with the identifier as an existing delivered notifications will alert for the new notification request and replace the existing delivered notification when it is triggered. The number of pending notification requests that may be scheduled by an application at any one time is limited by the system.
     // - (void)addNotificationRequest:(UNNotificationRequest *)request withCompletionHandler:(nullable void(^)(NSError *__nullable error))completionHandler;
-    // procedure addNotificationRequest(request: UNNotificationRequest;withCompletionHandler: TUserNotificationsWithCompletionHandler); cdecl;
+    procedure addNotificationRequest(request: UNNotificationRequest; withCompletionHandler: TUserNotificationsWithCompletionHandler); cdecl;
 
     // Notification requests that are waiting for their trigger to fire
     // - (void)getPendingNotificationRequestsWithCompletionHandler:(void(^)(NSArray<UNNotificationRequest *> *requests))completionHandler;

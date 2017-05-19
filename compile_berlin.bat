@@ -185,6 +185,20 @@ FOR /R %%J IN (ALFmx*.dproj) DO (
 CHDIR ..
 
 CHDIR demos\
+MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
+MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
+IF ERRORLEVEL 1 PAUSE
+MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
+IF ERRORLEVEL 1 PAUSE
+CHDIR ..
+
+CHDIR demos\
 FOR /d /R %%J IN (Release) DO (	  
   Echo.%%J | findstr /C:"Android">nul && (
     IF EXIST %%J del %%J * /q     
@@ -204,10 +218,10 @@ FOR /d /R %%J IN (dcu) DO (
 )
 CHDIR ..
 
-xcopy dll\tbbmalloc\win32\tbbmalloc.dll demos\ALDatabaseBenchmark\win32 /s
+xcopy lib\dll\tbbmalloc\win32\tbbmalloc.dll demos\ALDatabaseBenchmark\win32 /s
 IF ERRORLEVEL 1 goto ERROR
 
-xcopy dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
+xcopy lib\dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
 IF ERRORLEVEL 1 goto ERROR
 
 

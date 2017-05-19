@@ -5,8 +5,8 @@
         <FrameworkType>FMX</FrameworkType>
         <MainSource>ALFirebaseMessagingDemo.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
-        <Platform Condition="'$(Platform)'==''">iOSSimulator</Platform>
+        <Config Condition="'$(Config)'==''">Release</Config>
+        <Platform Condition="'$(Platform)'==''">Android</Platform>
         <TargetedPlatforms>1119</TargetedPlatforms>
         <AppType>Application</AppType>
     </PropertyGroup>
@@ -59,6 +59,30 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice32' and '$(Cfg_1)'=='true') or '$(Cfg_1_iOSDevice32)'!=''">
+        <Cfg_1_iOSDevice32>true</Cfg_1_iOSDevice32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_1)'=='true') or '$(Cfg_1_iOSDevice64)'!=''">
+        <Cfg_1_iOSDevice64>true</Cfg_1_iOSDevice64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSSimulator' and '$(Cfg_1)'=='true') or '$(Cfg_1_iOSSimulator)'!=''">
+        <Cfg_1_iOSSimulator>true</Cfg_1_iOSSimulator>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_1)'=='true') or '$(Cfg_1_OSX32)'!=''">
+        <Cfg_1_OSX32>true</Cfg_1_OSX32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
         <Cfg_1_Win32>true</Cfg_1_Win32>
         <CfgParent>Cfg_1</CfgParent>
@@ -82,6 +106,30 @@
         <Cfg_2>true</Cfg_2>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice32' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice32)'!=''">
+        <Cfg_2_iOSDevice32>true</Cfg_2_iOSDevice32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
+        <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSSimulator' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSSimulator)'!=''">
+        <Cfg_2_iOSSimulator>true</Cfg_2_iOSSimulator>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='OSX32' and '$(Cfg_2)'=='true') or '$(Cfg_2_OSX32)'!=''">
+        <Cfg_2_OSX32>true</Cfg_2_OSX32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
         <Cfg_2_Win32>true</Cfg_2_Win32>
         <CfgParent>Cfg_2</CfgParent>
@@ -95,6 +143,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
+        <DCC_CodePage>65001</DCC_CodePage>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
         <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
@@ -120,7 +169,6 @@
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <DisabledSysJars>google-play-billing.dex.jar;google-analytics-v2.dex.jar;cloud-messaging.dex.jar;android-support-v4.dex.jar;google-play-licensing.dex.jar;google-play-services.dex.jar</DisabledSysJars>
-        <DCC_CodePage>65001</DCC_CodePage>
         <PostBuildEvent><![CDATA[$(PROJECTDIR)\android\AddRJavaToClassesDex.bat "$(PROJECTDIR)" "$(OUTPUTPATH)" "$(SDKAaptPath)" "$(SDKApiLevelPath)" "$(JavaDxPath)" "$(JDKPath)"
 $(PostBuildEvent)]]></PostBuildEvent>
         <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
@@ -132,6 +180,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCC_LinkerOptions>--version-script=..\..\..\source\goExports.vsr</DCC_LinkerOptions>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice32)'!=''">
+        <DCC_LinkerOptions>-force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseCore.framework\FirebaseCore -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseAnalytics.framework\FirebaseAnalytics -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseInstanceID.framework\FirebaseInstanceID -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseMessaging.framework\FirebaseMessaging -force_load C:\Dev\Alcinoe\lib\ios\firebase\GoogleToolboxForMac.framework\GoogleToolboxForMac -force_load C:\Dev\Alcinoe\lib\ios\firebase\Protobuf.framework\Protobuf -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseCrash.framework\FirebaseCrash</DCC_LinkerOptions>
         <iPhone_Spotlight40>$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_40x40.png</iPhone_Spotlight40>
         <iPad_AppIcon72>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_72x72.png</iPad_AppIcon72>
         <iPad_Launch1536>$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1536x2008.png</iPad_Launch1536>
@@ -174,6 +223,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <iPhone_Spotlight80>$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png</iPhone_Spotlight80>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
+        <DCC_LinkerOptions>-force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseCore.framework\FirebaseCore -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseAnalytics.framework\FirebaseAnalytics -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseInstanceID.framework\FirebaseInstanceID -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseMessaging.framework\FirebaseMessaging -force_load C:\Dev\Alcinoe\lib\ios\firebase\GoogleToolboxForMac.framework\GoogleToolboxForMac -force_load C:\Dev\Alcinoe\lib\ios\firebase\Protobuf.framework\Protobuf -force_load C:\Dev\Alcinoe\lib\ios\firebase\FirebaseCrash.framework\FirebaseCrash</DCC_LinkerOptions>
         <iPhone_Spotlight40>$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_40x40.png</iPhone_Spotlight40>
         <iPad_AppIcon72>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_72x72.png</iPad_AppIcon72>
         <iPad_Launch1536>$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1536x2008.png</iPad_Launch1536>
@@ -256,6 +306,8 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_OSX32)'!=''">
+        <Manifest_File>(None)</Manifest_File>
+        <Debugger_Launcher>/usr/X11/bin/xterm -e &quot;%debuggee%&quot;</Debugger_Launcher>
         <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <BT_BuildType>Debug</BT_BuildType>
@@ -289,15 +341,33 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <VerInfo_Build>1</VerInfo_Build>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_iOSDevice32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_iOSDevice64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_iOSSimulator)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_OSX32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <AppEnableHighDPI>true</AppEnableHighDPI>
-        <DCC_CodePage>65001</DCC_CodePage>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
     </PropertyGroup>
@@ -311,11 +381,32 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <VerInfo_Build>1</VerInfo_Build>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_iOSDevice32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+        <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_iOSSimulator)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_OSX32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>1033</VerInfo_Locale>
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
         <AppEnableHighDPI>true</AppEnableHighDPI>
     </PropertyGroup>
@@ -401,20 +492,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="android\res\values-zu\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-zu</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-zh-rCN\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-zh-rCN</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-be\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-be</RemoteDir>
@@ -436,23 +513,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-km\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-km</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-ml\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-ml</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ka\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ka</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -464,30 +527,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-pt-rPT\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-pt-rPT</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ka\values.xml" Configuration="Release" Class="File">
+                <DeployFile LocalName="android\res\values-ka\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-ka</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ar\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ar</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-si\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-si</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -495,13 +537,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                 <DeployFile LocalName="android\res\values-da\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-da</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sl\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sl</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -520,9 +555,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\ALFirebaseMessagingDemo.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>ALFirebaseMessagingDemo.exe</RemoteName>
+                <DeployFile LocalName="android\res\values-sq\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sq</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -546,84 +582,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-es-rUS\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-es-rUS</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-ja\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-ja</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="..\Android\Debug\AndroidManifest.xml" Configuration="Debug" Class="ProjectAndroidManifest">
-                    <Platform Name="Android">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\mipmap-xxxhdpi\ic_launcher.png" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-kn\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-kn</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ne\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ne</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-es\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-es</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-fa\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-fa</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-pt-rBR\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-pt-rBR</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sq\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sq</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-tl\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-tl</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-th\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-th</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -635,10 +596,34 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\mipmap-xxhdpi\ic_launcher.png" Configuration="Debug" Class="File">
+                <DeployFile LocalName="..\Android\Debug\AndroidManifest.xml" Configuration="Debug" Class="ProjectAndroidManifest">
                     <Platform Name="Android">
-                        <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
-                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(NDKBasePath)\prebuilt\android-arm\gdbserver\gdbserver" Configuration="Release" Class="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-es\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-es</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-pt-rBR\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-pt-rBR</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-th\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-th</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -680,22 +665,8 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-zu\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-zu</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-hr\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-hr</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -713,16 +684,553 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-az\values.xml" Configuration="Debug" Class="File">
+                <DeployFile LocalName="android\res\values-in\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-in</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-is\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-is</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-az\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-az</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-in\values.xml" Configuration="Debug" Class="File">
+                <DeployFile LocalName="android\res\values-ca\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ca</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ta\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ta</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-bs\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-bs</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-vi\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-vi</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-lv\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-lv</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-am\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-am</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sl\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sl</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-eu\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-eu</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sv\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sv</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ko\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ko</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-mk\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-mk</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-iw\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-iw</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Android\Release\libALFirebaseMessagingDemo.so" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Android">
+                        <RemoteName>libALFirebaseMessagingDemo.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Android\Release\classes.dex" Configuration="Release" Class="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteName>classes.dex</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxxhdpi\notification_icon.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <RemoteName>notification_icon.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ms\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ms</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\notification_icon.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <RemoteName>notification_icon.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\notification_icon.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <RemoteName>notification_icon.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-de\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-de</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ms\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ms</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\notification_icon.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <RemoteName>notification_icon.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-lt\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-lt</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\notification_icon.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <RemoteName>notification_icon.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ne\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ne</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sr\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sr</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\mipmap-xhdpi\ic_launcher.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-tr\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-tr</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteName>libALFirebaseMessagingDemo.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sq\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sq</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-pt-rBR\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-pt-rBR</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-iw\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-iw</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Android\Debug\classes.dex" Configuration="Debug" Class="AndroidClassesDexFile">
+                    <Platform Name="Android">
+                        <RemoteName>classes.dex</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-be\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-be</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\mipmap-hdpi\ic_launcher.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\mipmap-hdpi</RemoteDir>
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-my\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-my</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-th\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-th</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\mipmap-xxhdpi\ic_launcher.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sk\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sk</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sk\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sk</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sr\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sr</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ja\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ja</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(NDKBasePath)\prebuilt\android-arm\gdbserver\gdbserver" Configuration="Debug" Class="AndroidGDBServer">
+                    <Platform Name="Android">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ro\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ro</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-in\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-in</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-nb\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-nb</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ru\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ru</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-cs\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-cs</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-my\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-my</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-bn\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-bn</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-zh-rCN\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-zh-rCN</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ru\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ru</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-te\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-te</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sw\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sw</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-vi\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-vi</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-zu\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-zu</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-zh-rCN\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-zh-rCN</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-km\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-km</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-pt-rPT\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-pt-rPT</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-si\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-si</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ka\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ka</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ar\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ar</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-sl\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-sl</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-zu\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-zu</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win32\Debug\ALFirebaseMessagingDemo.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>ALFirebaseMessagingDemo.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-kn\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-kn</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-es-rUS\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-es-rUS</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\mipmap-xxxhdpi\ic_launcher.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-ne\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-ne</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-fa\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-fa</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-tl\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-tl</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\mipmap-xxhdpi\ic_launcher.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+                        <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-hr\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-hr</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-uz\values.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-uz</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-az\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-az</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -734,10 +1242,8 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-uz\values.xml" Configuration="Release" Class="File">
+                <DeployFile LocalName="..\Android\Release\AndroidManifest.xml" Configuration="Release" Class="ProjectAndroidManifest">
                     <Platform Name="Android">
-                        <RemoteDir>res\values-uz</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -790,13 +1296,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-is\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-is</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-lv\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-lv</RemoteDir>
@@ -832,16 +1331,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-az\values.xml" Configuration="Release" Class="File">
+                <DeployFile LocalName="android\res\values-hu\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
-                        <RemoteDir>res\values-az</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ca\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ca</RemoteDir>
+                        <RemoteDir>res\values-hu</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -853,30 +1345,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-hu\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-hu</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-bs\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-bs</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-si\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-si</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-gl\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-gl</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -888,38 +1359,23 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiFile">
+                    <Platform Name="Android">
+                        <RemoteName>libALFirebaseMessagingDemo.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-gl\values.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-gl</RemoteDir>
+                        <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="android\res\drawable-xxxhdpi\notification_icon.png" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ta\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ta</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-lv\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-lv</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-vi\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-vi</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-am\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-am</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -930,23 +1386,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-eu\values.xml" Configuration="Release" Class="File">
+                <DeployFile LocalName="android\res\values-zh-rHK\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
-                        <RemoteDir>res\values-eu</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sl\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sl</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ko\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ko</RemoteDir>
+                        <RemoteDir>res\values-zh-rHK</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -958,9 +1400,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-sv\values.xml" Configuration="Release" Class="File">
+                <DeployFile LocalName="android\res\values-ta\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
-                        <RemoteDir>res\values-sv</RemoteDir>
+                        <RemoteDir>res\values-ta</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -972,34 +1414,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-ta\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ta</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-hi\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-hi</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-iw\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-iw</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-mk\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-mk</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-uk\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-uk</RemoteDir>
@@ -1007,9 +1421,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-zh-rHK\values.xml" Configuration="Debug" Class="File">
+                <DeployFile LocalName="android\res\values-hi\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
-                        <RemoteDir>res\values-zh-rHK</RemoteDir>
+                        <RemoteDir>res\values-hi</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1042,13 +1456,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\drawable-xxxhdpi\notification_icon.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
-                        <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-nl\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-nl</RemoteDir>
@@ -1077,34 +1484,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-ms\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ms</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\drawable-mdpi\notification_icon.png" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-mdpi</RemoteDir>
-                        <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\drawable-hdpi\notification_icon.png" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-hdpi</RemoteDir>
-                        <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-de\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-de</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-fi\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-fi</RemoteDir>
@@ -1112,30 +1491,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-ms\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ms</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\drawable-mdpi\notification_icon.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-mdpi</RemoteDir>
-                        <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-es-rUS\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-es-rUS</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-lt\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-lt</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1154,20 +1512,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\drawable-xhdpi\notification_icon.png" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
-                        <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-el\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-el</RemoteDir>
@@ -1182,31 +1526,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-ne\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ne</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sr\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sr</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-en-rGB\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-en-rGB</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\mipmap-xhdpi\ic_launcher.png" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\mipmap-xhdpi</RemoteDir>
-                        <RemoteName>ic_launcher.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1231,36 +1554,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-tr\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-tr</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Debug" Class="AndroidLibnativeMipsFile">
-                    <Platform Name="Android">
-                        <RemoteName>libALFirebaseMessagingDemo.so</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sq\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sq</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-am\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-am</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-pt-rBR\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-pt-rBR</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1306,17 +1602,16 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-iw\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-iw</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-zh-rTW\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-zh-rTW</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeMipsFile">
+                    <Platform Name="Android">
+                        <RemoteName>libALFirebaseMessagingDemo.so</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1362,26 +1657,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\Android\Debug\classes.dex" Configuration="Debug" Class="AndroidClassesDexFile">
-                    <Platform Name="Android">
-                        <RemoteName>classes.dex</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-be\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-be</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\mipmap-hdpi\ic_launcher.png" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\mipmap-hdpi</RemoteDir>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-lo\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-lo</RemoteDir>
@@ -1389,23 +1664,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-my\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-my</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-mn\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-mn</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-th\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-th</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1445,13 +1706,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\mipmap-xxhdpi\ic_launcher.png" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-da\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-da</RemoteDir>
@@ -1459,47 +1713,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-sk\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sk</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sk\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sk</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ja\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ja</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(NDKBasePath)\prebuilt\android-arm\gdbserver\gdbserver" Configuration="Debug" Class="AndroidGDBServer">
-                    <Platform Name="Android">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-mn\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-mn</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-in\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-in</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1511,9 +1727,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-nb\values.xml" Configuration="Debug" Class="File">
+                <DeployFile LocalName="android\res\values-uk\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
-                        <RemoteDir>res\values-nb</RemoteDir>
+                        <RemoteDir>res\values-uk</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1525,24 +1741,10 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-cs\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-cs</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\drawable-xhdpi\notification_icon.png" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <RemoteName>notification_icon.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ro\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ro</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1567,13 +1769,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-bn\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-bn</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\mipmap-xhdpi\ic_launcher.png" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\mipmap-xhdpi</RemoteDir>
@@ -1581,44 +1776,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-my\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-my</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-gl\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-gl</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ru\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ru</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-sr\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sr</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-uk\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-uk</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1630,23 +1790,9 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-zh-rCN\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-zh-rCN</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-bs\values.xml" Configuration="Release" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-bs</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-ru\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-ru</RemoteDir>
                         <RemoteName>values.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -1679,27 +1825,6 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="android\res\values-sw\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-sw</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-te\values.xml" Configuration="Debug" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-te</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="android\res\values-vi\values.xml" Configuration="Release" Class="File">
-                    <Platform Name="Android">
-                        <RemoteDir>res\values-vi</RemoteDir>
-                        <RemoteName>values.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="android\res\values-ky\values.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\values-ky</RemoteDir>
@@ -1707,12 +1832,27 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
@@ -2063,27 +2203,12 @@ $(PostBuildEvent)]]></PostBuildEvent>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  
+  <%VersionInfoPListKeys%>
+  <%ExtraInfoPListKeys%>
+ 
+  <key>FacebookAutoLogAppEventsEnabled</key>
+  <false/>
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>fb224667374702876</string>
+      </array>
+    </dict>
+  </array>
+  <key>FacebookAppID</key>
+  <string>224667374702876</string>
+  <key>FacebookDisplayName</key>
+  <string>ALFacebookLogin</string>
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+    <string>fbapi</string>
+    <string>fb-messenger-api</string>
+    <string>fbauth2</string>
+    <string>fbshareextension</string>
+  </array>
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>human-readable reason for photo access</string>
+  
+</dict>
+</plist>

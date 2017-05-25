@@ -30,6 +30,8 @@ type
   JStatFs = interface;
   JLocalBroadcastManager = interface;
   JPreferenceManager = interface;
+  JAsyncTask_Status = interface;
+  JAsyncTask = interface;
 
   {***********************************************}
   JALSoftInputListenerClass = interface(IJavaClass)
@@ -192,6 +194,50 @@ type
   end;
   TJPreferenceManager = class(TJavaGenericImport<JPreferenceManagerClass, JPreferenceManager>) end;
 
+  {********************************************}
+  JAsyncTask_StatusClass = interface(JEnumClass)
+    ['{16452E24-44D5-4E84-990E-3C1916FB372B}']
+    {class} function _GetFINISHED: JAsyncTask_Status; cdecl;
+    {class} function _GetPENDING: JAsyncTask_Status; cdecl;
+    {class} function _GetRUNNING: JAsyncTask_Status; cdecl;
+    {class} function valueOf(name: JString): JAsyncTask_Status; cdecl;//Deprecated
+    {class} function values: TJavaObjectArray<JAsyncTask_Status>; cdecl;//Deprecated
+    {class} property FINISHED: JAsyncTask_Status read _GetFINISHED;
+    {class} property PENDING: JAsyncTask_Status read _GetPENDING;
+    {class} property RUNNING: JAsyncTask_Status read _GetRUNNING;
+  end;
+
+  {********************************************}
+  [JavaSignature('android/os/AsyncTask$Status')]
+  JAsyncTask_Status = interface(JEnum)
+    ['{96B0BCE7-1312-49B9-9F33-43541680B0E7}']
+  end;
+  TJAsyncTask_Status = class(TJavaGenericImport<JAsyncTask_StatusClass, JAsyncTask_Status>) end;
+
+  {***************************************}
+  JAsyncTaskClass = interface(JObjectClass)
+    ['{73C141D6-F8D7-4FE4-BFA3-3441B6367189}']
+    {class} function _GetSERIAL_EXECUTOR: JExecutor; cdecl;
+    {class} function _GetTHREAD_POOL_EXECUTOR: JExecutor; cdecl;
+    {class} function init: JAsyncTask; cdecl;
+    {class} property SERIAL_EXECUTOR: JExecutor read _GetSERIAL_EXECUTOR;
+    {class} property THREAD_POOL_EXECUTOR: JExecutor read _GetTHREAD_POOL_EXECUTOR;
+  end;
+
+  {*************************************}
+  [JavaSignature('android/os/AsyncTask')]
+  JAsyncTask = interface(JObject)
+    ['{8BC49850-F199-4620-BCFF-ACDA1D69417A}']
+    function cancel(mayInterruptIfRunning: Boolean): Boolean; cdecl;
+    procedure execute(runnable: JRunnable); cdecl; overload;
+    function getStatus: JAsyncTask_Status; cdecl;
+    function isCancelled: Boolean; cdecl;
+    function get: JObject; cdecl; overload;
+    function get(timeout: Int64; &unit: JTimeUnit): JObject; cdecl; overload;
+  end;
+  TJAsyncTask = class(TJavaGenericImport<JAsyncTaskClass, JAsyncTask>) end;
+
+
 implementation
 
 procedure RegisterTypes;
@@ -204,6 +250,8 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JStatFs', TypeInfo(ALAndroidApi.JStatFs));
   TRegTypes.RegisterType('ALAndroidApi.JLocalBroadcastManager', TypeInfo(ALAndroidApi.JLocalBroadcastManager));
   TRegTypes.RegisterType('ALAndroidApi.JPreferenceManager', TypeInfo(ALAndroidApi.JPreferenceManager));
+  TRegTypes.RegisterType('ALAndroidApi.JAsyncTask_Status', TypeInfo(ALAndroidApi.JAsyncTask_Status));
+  TRegTypes.RegisterType('ALAndroidApi.JAsyncTask', TypeInfo(ALAndroidApi.JAsyncTask));
 end;
 
 initialization

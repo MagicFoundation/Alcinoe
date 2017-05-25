@@ -1,30 +1,30 @@
-ProjectDir="c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source" 
+ProjectDir="C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source" 
 SDKAaptPath="C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" 
 SDKApiLevelPath="C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\platforms\android-25\android.jar" 
 JavaDxPath="C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\dx.bat" 
 JavaDxJarPath=C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\lib\dx.jar 
 JDKPath="C:\Program Files\Java\jdk1.8.0_131"\bin 
 JDKPath1_7="C:\Program Files\Java\jdk1.7.0_80\bin" 
-OutputPath=c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\classes.dex 
-APKPath=c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\ALFirebaseMessagingDemo\bin\ALFirebaseMessagingDemo.apk 
+OutputPath=C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\classes.dex 
+APKPath=C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\ALFirebaseMessagingDemo\bin\ALFirebaseMessagingDemo.apk 
  
 Create R.java - com.google.android.gms 
-"C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source\android\libraries\com.google.android.gms\AndroidManifest.xml -I "C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\platforms\android-25\android.jar" -S "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\ 
+"C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source\android\libraries\com.google.android.gms\AndroidManifest.xml -I "C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\platforms\android-25\android.jar" -S "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\ 
  
 Compile R.java into R$ classes - com.google.android.gms 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src\com\google\android\gms\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src\com\google\android\gms\*.java 
  
 Create R.java - com.google.firebase.crash 
-"C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" package -f -m -M c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source\android\libraries\com.google.firebase.crash\AndroidManifest.xml -I "C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\platforms\android-25\android.jar" -S "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\res -J "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\ 
+"C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" package -f -m -M C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source\android\libraries\com.google.firebase.crash\AndroidManifest.xml -I "C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\platforms\android-25\android.jar" -S "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\res -J "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src --auto-add-overlay --output-text-symbols "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\ 
  
 Compile R.java into R$ classes - com.google.firebase.crash 
-"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\obj "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src\com\google\firebase\crash\*.java 
+"C:\Program Files\Java\jdk1.7.0_80\bin"\javac -d "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\obj "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\src\com\google\firebase\crash\*.java 
  
 Build a classes.dex that include the R$ classes 
-call "C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\dx.bat" --dex --output="c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\classes.dex "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\obj 
+call "C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\dx.bat" --dex --output="C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\classes.dex "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\obj 
  
 Merge the classes.dex 
-"C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\lib\dx.jar com.android.dx.merge.DexMerger "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\final_classes.dex "c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\classes.dex c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\classes.dex 
+"C:\Program Files\Java\jdk1.8.0_131"\bin\java -cp C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\lib\dx.jar com.android.dx.merge.DexMerger "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\final_classes.dex "C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\_source"\android\tmp\classes.dex C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\classes.dex 
 Result compacted from 3418.0KiB to 2121.1KiB to save 1296.8KiB
 Merged dex #1 (12 defs/3.0KiB)
 Merged dex #2 (1993 defs/2751.1KiB)
@@ -36,7 +36,7 @@ Move the classes.dex
 remove the tmp dir 
  
 R.txt - You can compare against the output of: 
-"C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" dump resources c:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\ALFirebaseMessagingDemo\bin\ALFirebaseMessagingDemo.apk 
+"C:\Users\Public\Documents\Embarcadero\Studio\18.0\PlatformSDKs\android-sdk-windows\build-tools\25.0.3\aapt.exe" dump resources C:\Dev\Alcinoe\demos\ALFirebaseMessagingDemo\Android\Release\ALFirebaseMessagingDemo\bin\ALFirebaseMessagingDemo.apk 
  
 int drawable notification_icon 0x7f020000
 int integer google_play_services_version 0x7f050000

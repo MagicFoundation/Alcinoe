@@ -24,6 +24,7 @@ uses System.classes,
      System.Generics.Collections,
      System.Math.Vectors,
      {$IF defined(ios)}
+     iOSapi.Foundation,
      iOSapi.CoreGraphics,
      iOSapi.CocoaTypes,
      iOSapi.CoreText,
@@ -791,6 +792,16 @@ function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
 function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface; const aVolatileTexture: boolean = true): TTexture;
 {$IFEND}
 
+{$IF defined(ANDROID)}
+function ALStringsToJArrayList(const AStrings: TArray<String>): JArrayList;
+function ALJSetToStrings(const ASet: JSet): TArray<String>;
+{$IFEND}
+
+{$IF defined(IOS)}
+function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
+function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
+{$IFEND}
+
 Type
 
   {$IF CompilerVersion > 32} // tokyo
@@ -980,7 +991,7 @@ uses system.SysUtils,
      {$IFEND}
      {$IF defined(IOS)}
      iOSapi.UIKit,
-     iOSapi.Foundation,
+     Macapi.ObjectiveC,
      Macapi.CoreFoundation,
      Macapi.Helpers,
      ALFmxTypes3D,
@@ -5378,6 +5389,73 @@ begin
   else if (TFontStyle.fsBold in afontStyle) then result := TJTypeface.JavaClass.BOLD
   else if (TFontStyle.fsItalic in afontStyle) then result := TJTypeface.JavaClass.ITALIC
   else result := TJTypeface.JavaClass.NORMAL;
+end;
+{$IFEND}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALStringsToJArrayList(const AStrings: TArray<String>): JArrayList;
+var S: JString;
+    AString: String;
+begin
+  Result := TJArrayList.JavaClass.init(Length(AStrings));
+  for AString in AStrings do begin
+    S := StringToJString(AString);
+    Result.add(S);
+  end;
+end;
+{$IFEND}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALJSetToStrings(const ASet: JSet): TArray<String>;
+var Iterator: JIterator;
+    Index: Integer;
+    S: JString;
+begin
+  SetLength(Result, ASet.size);
+  Index := 0;
+  Iterator := ASet.iterator;
+  while Iterator.hasNext do begin
+    S := TJString.Wrap((Iterator.next as ILocalObject).GetObjectID);
+    if S <> nil then begin
+      Result[Index] := JStringToString(S);
+      Inc(Index);
+    end;
+  end;
+  SetLength(Result, Index);
+end;
+{$IFEND}
+
+{****************}
+{$IF defined(IOS)}
+function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
+var S: NSString;
+    AString: String;
+begin
+  Result := TNSMutableArray.Create;
+  for AString in AStrings do begin
+    S := StrToNSStr(AString);
+    Result.addObject((S as ILocalObject).GetObjectID);
+  end;
+end;
+{$IFEND}
+
+{****************}
+{$IF defined(IOS)}
+function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
+var StringArray: NSArray;
+    AString: String;
+    I: Integer;
+begin
+  if ANSSet <> nil then begin
+    SetLength(Result, ANSSet.count);
+    StringArray := ANSSet.allObjects;
+    for I := 0 to StringArray.Count - 1 do begin
+      AString := NSStrToStr(TNSString.Wrap(StringArray.objectAtIndex(I)));
+      Result[I] := AString;
+    end;
+  end;
 end;
 {$IFEND}
 

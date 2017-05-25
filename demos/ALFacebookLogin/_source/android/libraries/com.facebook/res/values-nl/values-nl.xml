@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="com_facebook_device_auth_instructions">Ga naar &lt;b>facebook.com/device&lt;/b> en voer de bovenstaande code in.</string>
+    <string name="com_facebook_image_download_unknown_error">Onverwachte fout tijdens het downloaden van een afbeelding.</string>
+    <string name="com_facebook_internet_permission_error_message">Voor aanmelding via webweergave is de toestemming INTERNET vereist</string>
+    <string name="com_facebook_internet_permission_error_title">AndroidManifest Error</string>
+    <string name="com_facebook_like_button_liked">Vind ik leuk</string>
+    <string name="com_facebook_like_button_not_liked">Vind ik leuk</string>
+    <string name="com_facebook_loading">Laden…</string>
+    <string name="com_facebook_loginview_cancel_action">Annuleren</string>
+    <string name="com_facebook_loginview_log_in_button">Aanmelden</string>
+    <string name="com_facebook_loginview_log_in_button_continue">Doorgaan met Facebook</string>
+    <string name="com_facebook_loginview_log_in_button_long">Aanmelden met Facebook</string>
+    <string name="com_facebook_loginview_log_out_action">Afmelden</string>
+    <string name="com_facebook_loginview_log_out_button">Afmelden</string>
+    <string name="com_facebook_loginview_logged_in_as">Aangemeld als: %1$s</string>
+    <string name="com_facebook_loginview_logged_in_using_facebook">Aangemeld via Facebook</string>
+    <string name="com_facebook_send_button_text">Verzenden</string>
+    <string name="com_facebook_share_button_text">Delen</string>
+    <string name="com_facebook_smart_device_instructions">Om je account te verbinden, open je de Facebook-app op je mobiele apparaat en controleer of je meldingen ziet.</string>
+    <string name="com_facebook_smart_device_instructions_or">- OF -</string>
+    <string name="com_facebook_smart_login_confirmation_cancel">Ben jij dit niet?</string>
+    <string name="com_facebook_smart_login_confirmation_title">Aanmelden bevestigen</string>
+    <string name="com_facebook_tooltip_default">Jij hebt de controle. Kies welke informatie je met apps wilt delen.</string>
+    <string name="messenger_send_button_text">Verzenden</string>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="com_facebook_device_auth_instructions">Posjetite adresu &lt;b>facebook.com/device&lt;/b> i unesite gore prikazan kod.</string>
+    <string name="com_facebook_image_download_unknown_error">Prilikom preuzimanja slike došlo je do neočekivane pogreške.</string>
+    <string name="com_facebook_internet_permission_error_message">Za prijavu u aplikaciju WebView potrebna je dozvola INTERNET</string>
+    <string name="com_facebook_internet_permission_error_title">Pogreška datoteke AndroidManifest</string>
+    <string name="com_facebook_like_button_liked">Označeno sa "sviđa mi se"</string>
+    <string name="com_facebook_like_button_not_liked">Sviđa mi se</string>
+    <string name="com_facebook_loading">Učitavanje u tijeku…</string>
+    <string name="com_facebook_loginview_cancel_action">Odustani</string>
+    <string name="com_facebook_loginview_log_in_button">Prijavi se</string>
+    <string name="com_facebook_loginview_log_in_button_continue">Nastavite s korištenjem Facebooka</string>
+    <string name="com_facebook_loginview_log_in_button_long">Prijava putem Facebooka</string>
+    <string name="com_facebook_loginview_log_out_action">Odjavi se</string>
+    <string name="com_facebook_loginview_log_out_button">Odjavi se</string>
+    <string name="com_facebook_loginview_logged_in_as">Prijavljen kao: %1$s</string>
+    <string name="com_facebook_loginview_logged_in_using_facebook">Prijavljen putem Facebooka</string>
+    <string name="com_facebook_send_button_text">Pošalji</string>
+    <string name="com_facebook_share_button_text">Dijeli</string>
+    <string name="com_facebook_smart_device_instructions">Da biste povezali račun, otvorite aplikaciju Facebook na mobilnom uređaju i potražite obavijesti.</string>
+    <string name="com_facebook_smart_device_instructions_or">- ILI -</string>
+    <string name="com_facebook_smart_login_confirmation_cancel">To niste vi?</string>
+    <string name="com_facebook_smart_login_confirmation_title">Potvrda prijave</string>
+    <string name="com_facebook_tooltip_default">Vi odlučujete – odaberite koje podatke želite dijeliti u aplikacijama.</string>
+</resources>

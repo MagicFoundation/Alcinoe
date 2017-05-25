@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="com_facebook_device_auth_instructions">Keresd fel a &lt;b>facebook.com/device&lt;/b> címet, és írd be a fent megjelenített kódot.</string>
+    <string name="com_facebook_image_download_unknown_error">Váratlan hiba történt egy kép betöltése közben.</string>
+    <string name="com_facebook_internet_permission_error_message">A webes bejelentkezéshez szükséges a jogosultság az internet használatára.</string>
+    <string name="com_facebook_internet_permission_error_title">AndroidManifest-hiba</string>
+    <string name="com_facebook_like_button_liked">Kedveled</string>
+    <string name="com_facebook_like_button_not_liked">Tetszik</string>
+    <string name="com_facebook_loading">Betöltés…</string>
+    <string name="com_facebook_loginview_cancel_action">Törlés</string>
+    <string name="com_facebook_loginview_log_in_button">Bejelentkezés</string>
+    <string name="com_facebook_loginview_log_in_button_continue">Folytatás a Facebookkal</string>
+    <string name="com_facebook_loginview_log_in_button_long">Bejelentkezés a Facebook használatával</string>
+    <string name="com_facebook_loginview_log_out_action">Kijelentkezés</string>
+    <string name="com_facebook_loginview_log_out_button">Kijelentkezés</string>
+    <string name="com_facebook_loginview_logged_in_as">Bejelentkezve %1$s néven</string>
+    <string name="com_facebook_loginview_logged_in_using_facebook">Bejelentkezve a Facebook használatával</string>
+    <string name="com_facebook_send_button_text">Küldés</string>
+    <string name="com_facebook_share_button_text">Megosztás</string>
+    <string name="com_facebook_smart_device_instructions">A fiók hozzákapcsolásához nyisd meg a Facebook alkalmazást a mobilkészülékeden, és nézd meg az értesítéseket.</string>
+    <string name="com_facebook_smart_device_instructions_or">- VAGY -</string>
+    <string name="com_facebook_smart_login_confirmation_cancel">Nem te vagy az?</string>
+    <string name="com_facebook_smart_login_confirmation_title">Bejelentkezés megerősítése</string>
+    <string name="com_facebook_tooltip_default">A döntés a kezedben van: kiválaszthatod, hogy milyen adatokat osztasz meg az alkalmazásokkal.</string>
+</resources>

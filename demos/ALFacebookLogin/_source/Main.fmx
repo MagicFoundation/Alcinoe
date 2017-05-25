@@ -1,0 +1,64 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 718
+  ClientWidth = 463
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object ButtonFacebookLogin: TButton
+    Align = Top
+    Size.Width = 463.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = 'Login with Facebook'
+    OnClick = ButtonFacebookLoginClick
+  end
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    TextSettings.WordWrap = True
+    Align = Client
+    Size.Width = 463.000000000000000000
+    Size.Height = 458.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Viewport.Width = 459.000000000000000000
+    Viewport.Height = 454.000000000000000000
+  end
+  object ButtonLogoutFromFacebook: TButton
+    Align = Top
+    Position.Y = 65.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Logout from Facebook'
+    OnClick = ButtonLogoutFromFacebookClick
+  end
+  object ButtonGetCurrentTokenInfos: TButton
+    Align = Top
+    Position.Y = 130.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Get Current Token Infos'
+    OnClick = ButtonGetCurrentTokenInfosClick
+  end
+  object ButtonGetCurrentUserInfos: TButton
+    Align = Top
+    Position.Y = 195.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 65.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Get Current User Profile Infos'
+    OnClick = ButtonGetCurrentUserInfosClick
+  end
+end

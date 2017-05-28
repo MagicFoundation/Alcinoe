@@ -15,6 +15,7 @@ uses System.Classes,
      FMX.Types,
      FMX.Controls,
      FMX.Ani,
+     ALFmxLayouts,
      ALFmxInertialMovement;
 
 type
@@ -24,16 +25,15 @@ type
   TALTabItem = class;
   TALTabItemClass = class of TALTabItem;
 
-  {*******************************}
-  TALTabTransition = (None, Slide);
+  {****************************************}
+  TALTabTransition = (None, Slide, FadeOut);
 
   {*************************************************************************************************************************}
   TALTabPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
   TALTabAniTransitionInit = procedure(const sender: TObject;
+                                      const ATransition: TALTabTransition;
                                       const aVelocity: Double;
-                                      var aDuration: Single;
-                                      var aAnimationType: TAnimationType;
-                                      var aInterpolation: TInterpolationType) of object;
+                                      const aAnimation: TFloatAnimation) of object;
 
   {**************************}
   TALTabItem = class(TControl)
@@ -108,6 +108,7 @@ type
     fLastViewportPosition: TpointF;
     FOnViewportPositionChange: TALTabPositionChangeEvent;
     FAniTransition: TFloatAnimation;
+    FAniTransitionOverlay: TALLayout;
     fOnAniTransitionInit: TALTabAniTransitionInit;
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
@@ -121,8 +122,11 @@ type
     procedure SetTabIndex(const Value: Integer);
     function GetActiveTab: TALTabItem;
     procedure SetActiveTab(const Value: TALTabItem);
-    procedure AniTransitionProcess(Sender: TObject);
-    procedure AniTransitionFinish(Sender: TObject);
+    function getAnimationEnabled: boolean;
+    procedure setAnimationEnabled(const Value: boolean);
+    procedure AniTransitionSlideProcess(Sender: TObject);
+    procedure AniTransitionSlideFinish(Sender: TObject);
+    procedure AniTransitionFadeOutFinish(Sender: TObject);
     { IItemContainer }
     function GetItemsCount: Integer;
     function GetItem(const AIndex: Integer): TFmxObject;
@@ -174,6 +178,7 @@ type
     property Align;
     property Anchors;
     property ActiveTab: TALTabItem read GetActiveTab write SetActiveTab stored False;
+    property AnimationEnabled: boolean read getAnimationEnabled write setAnimationEnabled default true;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
@@ -241,6 +246,10 @@ begin
   Enabled := True;
   Visible := True;
   HitTest := False;
+  position.X := -65535; // this because some tab can contain control without z-order like TALEdit and
+                        // when the tab (all the tab) is first created, it's created at a visible pos to be later realigned
+                        // by the tabcontrol. this cause the TALEdit to be show for very short time, waiting the realignment
+                        // so workaround is to create instead the Tabitem at an invisible position
 end;
 
 {************************************************************}
@@ -333,10 +342,10 @@ procedure TALTabControlAniCalculations.DoChanged;
 begin
   inherited DoChanged;
   if (csDestroying in FTabControl.ComponentState) or
-     (FTabControl.FAniTransition.Running) or  // if this event was called from AniTransitionProcess then exit
+     (FTabControl.FAniTransition.Running) or  // if this event was called from AniTransitionSlideProcess then exit
      (not FTabControl.HasActiveTab) then exit; // if their is no activetab then nothing to do then exit
   FTabControl.activeTab.Position.X := FTabControl.activeTab.ViewPortOffset - ViewportPosition.x;
-  FTabControl.AniTransitionProcess(nil); // will realign all the tab around activeTab (and update also activetab if neccessary) and fire OnViewportPositionChange
+  FTabControl.AniTransitionSlideProcess(nil); // will realign all the tab around activeTab (and update also activetab if neccessary) and fire OnViewportPositionChange
 end;
 
 {*********************************************}
@@ -433,11 +442,7 @@ begin
   inherited;
   //-----
   FAniTransition := TFloatAnimation.Create(Self);
-  FAniTransition.OnProcess := AniTransitionProcess;
-  FAniTransition.OnFinish := AniTransitionFinish;
-  FAniTransition.PropertyName := 'Position.X';
-  FAniTransition.StartFromCurrent := True;
-  FAniTransition.StopValue := 0;
+  FAniTransitionOverlay := nil;
   fOnAniTransitionInit := nil;
   fOnAniStart := nil;
   fOnAniStop := nil;
@@ -587,6 +592,19 @@ begin
   RealignTabs;
 end;
 
+{**************************************************}
+function TALTabControl.getAnimationEnabled: boolean;
+begin
+  result := ttHorizontal in FAniCalculations.TouchTracking;
+end;
+
+{****************************************************************}
+procedure TALTabControl.setAnimationEnabled(const Value: boolean);
+begin
+  if value then FAniCalculations.TouchTracking := [ttHorizontal]
+  else FAniCalculations.TouchTracking := [];
+end;
+
 {**********************************************}
 function TALTabControl.GetActiveTab: TALTabItem;
 begin
@@ -711,31 +729,34 @@ begin
   //      to detect when mouse go out of the screen. with CMGesture their
   //      will be (often) no final event with TInteractiveGestureFlag.gfEnd
   //      https://quality.embarcadero.com/browse/RSP-15617
+  if AnimationEnabled then begin
 
-  //This is used when scrolling with the finger on top of a control (like a TButton).
-  if (not FMouseEvents) and (EventInfo.GestureID = igiPan) then begin
-    LP := AbsoluteToLocal(EventInfo.Location);
-    if TInteractiveGestureFlag.gfBegin in EventInfo.Flags then begin
-      if not fScrollingAcquiredByOther then begin
+    //This is used when scrolling with the finger on top of a control (like a TButton).
+    if (not FMouseEvents) and (EventInfo.GestureID = igiPan) then begin
+      LP := AbsoluteToLocal(EventInfo.Location);
+      if TInteractiveGestureFlag.gfBegin in EventInfo.Flags then begin
+        if not fScrollingAcquiredByOther then begin
+          setScrollingAcquiredByMe(False);
+          fMouseDownPos := LP.X;
+          fGestureEvents := true;
+          FAniCalculations.averaging := true;
+          AniCalculations.MouseDown(LP.X, LP.Y);
+        end;
+      end
+      else if fGestureEvents and
+              (EventInfo.Flags = []) then begin
+        if (not fScrollingAcquiredByMe) and
+           (abs(fMouseDownPos - LP.X) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
+        AniCalculations.MouseMove(LP.X, LP.Y)
+      end
+      else if fGestureEvents and
+              (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then begin
         setScrollingAcquiredByMe(False);
-        fMouseDownPos := LP.X;
-        fGestureEvents := true;
-        FAniCalculations.averaging := true;
-        AniCalculations.MouseDown(LP.X, LP.Y);
+        AniCalculations.MouseUp(LP.X, LP.Y);
+        fGestureEvents := False;
       end;
-    end
-    else if fGestureEvents and
-            (EventInfo.Flags = []) then begin
-      if (not fScrollingAcquiredByMe) and
-         (abs(fMouseDownPos - LP.X) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
-      AniCalculations.MouseMove(LP.X, LP.Y)
-    end
-    else if fGestureEvents and
-            (TInteractiveGestureFlag.gfEnd in EventInfo.Flags) then begin
-      setScrollingAcquiredByMe(False);
-      AniCalculations.MouseUp(LP.X, LP.Y);
-      fGestureEvents := False;
     end;
+
   end;
 
   //important to let parent (like TScrollBox) continue
@@ -749,6 +770,7 @@ procedure TALTabControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y
 begin
   FMouseEvents := not fGestureEvents;
   inherited;
+  if not AnimationEnabled then exit;
   if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
     setScrollingAcquiredByMe(False);
     fMouseDownPos := x;
@@ -761,6 +783,7 @@ end;
 procedure TALTabControl.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
   inherited;
+  if not AnimationEnabled then exit;
   if FMouseEvents then begin
     if (not fScrollingAcquiredByMe) and
        (abs(fMouseDownPos - x) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
@@ -772,6 +795,7 @@ end;
 procedure TALTabControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
+  if not AnimationEnabled then exit;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
     setScrollingAcquiredByMe(False);
     AniCalculations.MouseUp(X, Y);
@@ -783,6 +807,7 @@ end;
 procedure TALTabControl.DoMouseLeave;
 begin
   inherited;
+  if not AnimationEnabled then exit;
   if FMouseEvents then begin
     setScrollingAcquiredByMe(False);
     AniCalculations.MouseLeave;
@@ -867,8 +892,8 @@ begin
 
 end;
 
-{************************************************************}
-procedure TALTabControl.AniTransitionProcess(Sender: TObject);
+{*****************************************************************}
+procedure TALTabControl.AniTransitionSlideProcess(Sender: TObject);
 var aTargetTabItem: TALTabItem;
     aNewViewportPosition: TPointF;
     i, k: integer;
@@ -916,7 +941,7 @@ begin
     end;
   end;
 
-  //update FAniCalculations.ViewportPosition if the AniTransitionProcess
+  //update FAniCalculations.ViewportPosition if the AniTransitionSlideProcess
   //was called from the fAniTransition
   if (Sender <> nil) then
     FAniCalculations.ViewportPosition := TAlPointD.Create(activeTab.ViewPortOffset - activeTab.Position.Point.X, 0);
@@ -930,11 +955,23 @@ begin
 
 end;
 
-{***********************************************************}
-procedure TALTabControl.AniTransitionFinish(Sender: TObject);
+{****************************************************************}
+procedure TALTabControl.AniTransitionSlideFinish(Sender: TObject);
 begin
   if (assigned(fOnAniStop)) and
      (not fAniCalculations.down) then
+    fOnAniStop(Self);
+end;
+
+{******************************************************************}
+procedure TALTabControl.AniTransitionFadeOutFinish(Sender: TObject);
+var aOldActiveTab: TalTabItem;
+begin
+  aOldActiveTab := ActiveTab;
+  ActiveTab := TALTabItem(TfloatAnimation(Sender).TagObject);
+  aOldActiveTab.Opacity := 1;
+  ALFreeAndNil(FAniTransitionOverlay);
+  if (assigned(fOnAniStop)) then
     fOnAniStop(Self);
 end;
 
@@ -943,11 +980,9 @@ function TALTabControl.SetActiveTabWithTransition(const ATab: TALTabItem;
                                                   const ATransition: TALTabTransition;
                                                   const AVelocity: double=0;
                                                   const ALaunchAniStartEvent: boolean = True): boolean;
-var aDuration: Single;
-    aAnimationType: TAnimationType;
-    aInterpolation: TInterpolationType;
 begin
 
+  ALFreeAndNil(FAniTransitionOverlay);
   FAniTransition.StopAtCurrent;
 
   if (ATab = nil) then exit(false);
@@ -958,18 +993,55 @@ begin
 
     FAniTransition.Parent := ATab;
     FAniTransition.TagObject := ATab;
-    aDuration := 0.3;
-    aAnimationType := TAnimationType.In;
-    aInterpolation := TInterpolationType.Linear;
+    FAniTransition.OnProcess := AniTransitionSlideProcess;
+    FAniTransition.OnFinish := AniTransitionSlideFinish;
+    FAniTransition.PropertyName := 'Position.X';
+    FAniTransition.StartFromCurrent := True;
+    FAniTransition.StopValue := 0;
+
+    FAniTransition.Duration := 0.3;
+    FAniTransition.AnimationType := TAnimationType.In;
+    FAniTransition.Interpolation := TInterpolationType.Linear;
     if assigned(fOnAniTransitionInit) then
       fOnAniTransitionInit(self,
+                           ATransition,
                            AVelocity,
-                           aDuration,
-                           aAnimationType,
-                           aInterpolation);
-    FAniTransition.Duration := aDuration;
-    FAniTransition.AnimationType := aAnimationType;
-    FAniTransition.Interpolation := aInterpolation;
+                           FAniTransition);
+
+    if (ALaunchAniStartEvent) and
+       (assigned(fOnAniStart)) then fOnAniStart(self);
+    FAniTransition.start;
+
+  end
+  else if (ATransition = TALTabTransition.FadeOut) and
+          (HasActiveTab) then begin
+
+    FAniTransitionOverlay := TalLayout.Create(self); // << FAniTransitionOverlay is to deactivate all mouse / touch event
+    FAniTransitionOverlay.Parent := self;
+    FAniTransitionOverlay.Position.Point := TpointF.Create(0,0);
+    FAniTransitionOverlay.Size.Size := TpointF.Create(Width, Height);
+    FAniTransitionOverlay.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
+    FAniTransitionOverlay.HitTest := True;
+    FAniTransitionOverlay.Visible := True;
+    FAniTransitionOverlay.BringToFront;
+
+    FAniTransition.Parent := ActiveTab;
+    FAniTransition.TagObject := ATab;
+    FAniTransition.OnProcess := nil;
+    FaniTransition.OnFinish := AniTransitionFadeOutFinish;
+    FAniTransition.PropertyName := 'Opacity';
+    FAniTransition.StartFromCurrent := True;
+    FAniTransition.StopValue := 0;
+
+    FAniTransition.Duration := 0.3;
+    FAniTransition.AnimationType := TAnimationType.out;
+    FAniTransition.Interpolation := TInterpolationType.Linear;
+    if assigned(fOnAniTransitionInit) then
+      fOnAniTransitionInit(self,
+                           ATransition,
+                           AVelocity,
+                           FAniTransition);
+
     if (ALaunchAniStartEvent) and
        (assigned(fOnAniStart)) then fOnAniStart(self);
     FAniTransition.start;

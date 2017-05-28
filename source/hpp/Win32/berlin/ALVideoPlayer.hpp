@@ -214,7 +214,6 @@ class PASCALIMPLEMENTATION TALVideoPlayerSurface : public Alfmxobjects::TALRecta
 private:
 	TALVideoPlayer* fVideoPlayer;
 	void __fastcall OnFrameAvailable(System::TObject* Sender);
-	void __fastcall SetVideoPlayer(TALVideoPlayer* const Value);
 	
 protected:
 	virtual void __fastcall Paint(void);
@@ -222,7 +221,8 @@ protected:
 public:
 	__fastcall virtual TALVideoPlayerSurface(System::Classes::TComponent* AOwner);
 	__fastcall virtual ~TALVideoPlayerSurface(void);
-	__property TALVideoPlayer* VideoPlayer = {read=fVideoPlayer, write=SetVideoPlayer};
+	void __fastcall resetVideoPlayer(void);
+	__property TALVideoPlayer* VideoPlayer = {read=fVideoPlayer};
 };
 
 

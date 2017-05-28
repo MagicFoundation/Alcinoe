@@ -36,13 +36,20 @@ class PASCALIMPLEMENTATION TALEdit : public Alfmxobjects::TALRectangle
 	typedef Alfmxobjects::TALRectangle inherited;
 	
 private:
+	System::UnicodeString fDefStyleAttr;
 	bool FAutoTranslate;
 	bool FAutoConvertFontFamily;
 	System::Classes::TNotifyEvent fOnChangeTracking;
 	Fmx::Graphics::TTextSettings* FTextSettings;
+	System::Uitypes::TAlphaColor fTextPromptColor;
 	Fmx::Edit::TEdit* fEditControl;
+	System::Uitypes::TAlphaColor fTintColor;
 	System::UnicodeString __fastcall GetTextPrompt(void);
 	void __fastcall setTextPrompt(const System::UnicodeString Value);
+	System::Uitypes::TAlphaColor __fastcall GetTextPromptColor(void);
+	void __fastcall setTextPromptColor(const System::Uitypes::TAlphaColor Value);
+	System::Uitypes::TAlphaColor __fastcall GetTintColor(void);
+	void __fastcall setTintColor(const System::Uitypes::TAlphaColor Value);
 	Fmx::Graphics::TTextSettings* __fastcall GetTextSettings(void);
 	void __fastcall SetTextSettings(Fmx::Graphics::TTextSettings* const Value);
 	void __fastcall OnFontChanged(System::TObject* Sender);
@@ -57,6 +64,12 @@ private:
 	bool __fastcall GetCheckSpelling(void);
 	void __fastcall SetReturnKeyType(const Fmx::Types::TReturnKeyType Value);
 	Fmx::Types::TReturnKeyType __fastcall GetReturnKeyType(void);
+	void __fastcall SetDefStyleAttr(const System::UnicodeString Value);
+	System::Classes::TNotifyEvent __fastcall GetOnEnter(void);
+	void __fastcall SetOnEnter(System::Classes::TNotifyEvent AValue);
+	System::Classes::TNotifyEvent __fastcall GetOnExit(void);
+	void __fastcall SetOnExit(System::Classes::TNotifyEvent AValue);
+	void __fastcall CreateEditControl(void);
 	
 protected:
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
@@ -70,6 +83,7 @@ public:
 	__fastcall virtual ~TALEdit(void);
 	
 __published:
+	__property System::UnicodeString DefStyleAttr = {read=fDefStyleAttr, write=SetDefStyleAttr};
 	__property TabOrder = {default=-1};
 	__property TabStop = {default=1};
 	__property Cursor = {default=-4};
@@ -82,6 +96,8 @@ __published:
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
 	__property Hint = {default=0};
 	__property System::UnicodeString TextPrompt = {read=GetTextPrompt, write=setTextPrompt};
+	__property System::Uitypes::TAlphaColor TextPromptColor = {read=GetTextPromptColor, write=setTextPromptColor, default=0};
+	__property System::Uitypes::TAlphaColor TintColor = {read=GetTintColor, write=setTintColor, default=0};
 	__property bool AutoTranslate = {read=FAutoTranslate, write=FAutoTranslate, default=1};
 	__property bool AutoConvertFontFamily = {read=FAutoConvertFontFamily, write=FAutoConvertFontFamily, default=1};
 	__property TouchTargetExpansion;
@@ -91,9 +107,8 @@ __published:
 	__property System::Classes::TNotifyEvent OnChangeTracking = {read=fOnChangeTracking, write=fOnChangeTracking};
 	__property OnKeyDown;
 	__property OnKeyUp;
-	__property OnCanFocus;
-	__property OnEnter;
-	__property OnExit;
+	__property System::Classes::TNotifyEvent OnEnter = {read=GetOnEnter, write=SetOnEnter};
+	__property System::Classes::TNotifyEvent OnExit = {read=GetOnExit, write=SetOnExit};
 };
 
 

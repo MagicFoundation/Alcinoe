@@ -31,6 +31,7 @@ uses System.Types,
      Fmx.controls,
      ALFmxObjects;
 
+{$REGION ' ANDROID'}
 {$IF defined(android)}
 type
 
@@ -120,6 +121,7 @@ type
     fKeyboardType: TVirtualKeyboardType;
     fPassword: boolean;
     FTextSettings: TTextSettings;
+    fHideSoftInputOnExit: Boolean;
     procedure DoSetInputType(const aKeyboardType: TVirtualKeyboardType; const aPassword: Boolean);
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
@@ -132,6 +134,8 @@ type
     function GetReturnKeyType: TReturnKeyType;
     function GetTextPrompt: String;
     procedure setTextPrompt(const Value: String);
+    function GetTextPromptColor: TAlphaColor;
+    procedure setTextPromptColor(const Value: TAlphaColor);
     function GetTextSettings: TTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
     function getText: String;
@@ -151,20 +155,24 @@ type
     procedure DoEnter; override;
     procedure DoExit; override;
     procedure realignContent; virtual;
+    property HideSoftInputOnExit: boolean read fHideSoftInputOnExit write fHideSoftInputOnExit;
   public
-    constructor Create(AOwner: TComponent); override;
+    constructor Create(const AOwner: TComponent; const aDefStyleAttr: String = ''); reintroduce; virtual;
     destructor Destroy; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
     property Password: Boolean read GetPassword write SetPassword default False;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
+    property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor; // << null mean use the default color
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
   end;
 {$endif}
+{$ENDREGION}
 
+{$REGION ' IOS'}
 {$IF defined(ios)}
 type
 
@@ -222,6 +230,7 @@ type
   {**************************}
   TALIosEdit = class(TControl)
   private
+    fTextPromptColor: TalphaColor;
     fOnChangeTracking: TNotifyEvent;
     FTextSettings: TTextSettings;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
@@ -234,6 +243,11 @@ type
     function GetReturnKeyType: TReturnKeyType;
     function GetTextPrompt: String;
     procedure setTextPrompt(const Value: String);
+    function GetTextPromptColor: TAlphaColor;
+    procedure setTextPromptColor(const Value: TAlphaColor);
+    procedure applyTextPromptWithColor(const aStr: String; const aColor: TAlphaColor);
+    function GetTintColor: TAlphaColor;
+    procedure setTintColor(const Value: TAlphaColor);
     function GetTextSettings: TTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
     function getText: String;
@@ -260,26 +274,33 @@ type
     procedure RecalcEnabled; override;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
-    property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
-    property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
+    property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
+    property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
     property Password: Boolean read GetPassword write SetPassword default False;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
+    property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
+    property TintColor: TAlphaColor read GetTintColor write setTintColor; // << null mean use the default color
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
   end;
 
 {$endif}
+{$ENDREGION}
 
 type
 
   {***************************}
   TALEdit = class(TALRectangle)
   private
+    fDefStyleAttr: String;
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
     FTextSettings: TTextSettings;
+    {$IF not defined(IOS)}
+    fTintColor: TalphaColor;
+    {$ENDIF}
     {$IF defined(android)}
     fEditControl: TALAndroidEdit;
     function GetAndroidEditText: JALEditText;
@@ -287,10 +308,15 @@ type
     fEditControl: TALIosEdit;
     function GetIosTextField: TALIosTextField;
     {$ELSE}
+    fTextPromptColor: TalphaColor;
     fEditControl: TEdit;
     {$ENDIF}
     function GetTextPrompt: String;
     procedure setTextPrompt(const Value: String);
+    function GetTextPromptColor: TAlphaColor;
+    procedure setTextPromptColor(const Value: TAlphaColor);
+    function GetTintColor: TAlphaColor;
+    procedure setTintColor(const Value: TAlphaColor);
     function GetTextSettings: TTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
     procedure OnFontChanged(Sender: TObject);
@@ -305,6 +331,12 @@ type
     function GetCheckSpelling: Boolean;
     procedure SetReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
+    procedure SetDefStyleAttr(const Value: String);
+    Function GetOnEnter: TNotifyEvent;
+    Procedure SetOnEnter(AValue: TNotifyEvent);
+    Function GetOnExit: TNotifyEvent;
+    Procedure SetOnExit(AValue: TNotifyEvent);
+    procedure CreateEditControl;
   protected
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
@@ -320,6 +352,11 @@ type
     property IosTextField: TALIosTextField read GetIosTextField;
     {$ENDIF}
   published
+    property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
+                                                                            // << reference to a style resource that supplies defaults values for the StyledAttributes.
+                                                                            // << exemple of use: https://stackoverflow.com/questions/5051753/how-do-i-apply-a-style-programmatically
+                                                                            // << NOTE: !!IMPORTANT!! This properties must be defined the very first because the stream system
+                                                                            // <<       must load it the very first
     property TabOrder;
     property TabStop;
     property Cursor default crIBeam;
@@ -336,6 +373,8 @@ type
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property Hint;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
+    property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default TextPromptColor
+    property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColorRec.null; // << IOS only - the color of the cursor caret and the text selection handles. null mean use the default TintColor
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // << just the TextPrompt
     property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
     property TouchTargetExpansion;
@@ -351,9 +390,8 @@ type
     //property OnValidate;
     property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
-    property OnCanFocus;
-    property OnEnter;
-    property OnExit;
+    property OnEnter: TnotifyEvent Read GetOnEnter Write SetOnEnter;
+    property OnExit: TnotifyEvent Read GetOnExit Write SetOnExit;
   end;
 
 procedure Register;
@@ -374,12 +412,15 @@ uses {$IF defined(android)}
      {$ELSEIF defined(IOS)}
      System.SysUtils,
      Macapi.CoreFoundation,
+     iOSapi.CoreGraphics,
+     iOSapi.CocoaTypes,
      Macapi.Helpers,
      iOSapi.CoreText,
      FMX.Helpers.iOS,
      FMX.Consts,
      {$endif}
      ALCommon,
+     ALString,
      AlFmxCommon;
 
 {**}
@@ -402,10 +443,15 @@ begin
   VertAlign := TTextAlign.Center;
 end;
 
+{$REGION ' ANDROID'}
 {$IF defined(android)}
 
-{****************************************************}
-constructor TALAndroidEdit.Create(AOwner: TComponent);
+{$IF CompilerVersion > 31} // berlin
+  {$MESSAGE WARN 'remove all Thread.queue/CallInUIThread/CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
+{$ENDIF}
+
+{********************************************************************************************}
+constructor TALAndroidEdit.Create(const AOwner: TComponent; const aDefStyleAttr: String = '');
 var aScreenSrv: IFMXScreenService;
 begin
   {$IF defined(DEBUG)}
@@ -423,6 +469,7 @@ begin
   fOnChangeTracking := nil;
   FTextSettings := TALEditTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
+  fHideSoftInputOnExit := True;
   //-----
   CallInUIThreadAndWaitFinishing(
     procedure
@@ -453,7 +500,15 @@ begin
         {$ENDIF}
       end;
       //-----
-      FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity);
+      if aDefStyleAttr = '' then FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity)
+      else FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity, // context: JContext;
+                                                    nil, // attrs: JAttributeSet;
+                                                    TAndroidHelper. // defStyleAttr: Integer
+                                                      Context.
+                                                        getResources().
+                                                          getIdentifier(StringToJstring(aDefStyleAttr), // name	String: The name of the desired resource.
+                                                                        StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                                                        TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
       FLayout.addview(FEditText);
       //-----
       FFocusChangeListener := TALFocusChangeListener.Create(Self);
@@ -528,7 +583,7 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
   TUIThreadCaller.ForceRunnablesCollection;
   TUIThreadCaller.Call<JALEditText, JALControlHostLayout>(
-    procedure (aEditText: JALEditText; aControlHostLayout: JALControlHostLayout)
+    procedure (aEditText: JALEditText; aLayout: JALControlHostLayout)
     begin
 
       aEditText.setVisibility(TJView.JavaClass.INVISIBLE);
@@ -539,8 +594,8 @@ begin
       aEditText.SetKeyPreImeListener(nil);
 
 
-      aControlHostLayout.removeAllViews();
-      MainActivity.getViewStack.removeView(aControlHostLayout);
+      aLayout.removeAllViews();
+      MainActivity.getViewStack.removeView(aLayout);
 
     end, FEditText, FLayout);
 
@@ -567,9 +622,6 @@ end;
 {**************************************}
 procedure TALAndroidEdit.realignContent;
 
-var aPos: TPointF;
-    aBounds: TRect;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _GetRealBounds: TRect;
   var aNativeWin: JWindow;
@@ -586,32 +638,42 @@ var aPos: TPointF;
 
   {~~~~~~~~~~~~~~~~~~~~~}
   procedure _showContent;
+  var aPos: TPointF;
+      R: TRect;
+      aEditText: JALEditText;
+      aLayout: JALControlHostLayout;
   begin
-    TUIThreadCaller.Call<TRect>(
-      procedure (R: TRect)
-      begin
-        MainActivity.getViewStack.setPosition(FLayout, R.Left, R.Top);
-        MainActivity.getViewStack.setSize(FLayout, R.Right, R.Bottom);
-      end, aBounds);
+    aPos := LocalToAbsolute(TPointF.Zero) * FScreenScale;
+    R := Rect(Round(aPos.X), Round(aPos.Y), Round(Width * FScreenScale), Round(Height * FScreenScale));
+    aEditText:= FEditText;
+    aLayout:= fLayout;
     CallInUIThread(
       procedure
       begin
-        if FEditText.getVisibility <> TJView.JavaClass.VISIBLE then
-          FEditText.setVisibility(TJView.JavaClass.VISIBLE);
+        MainActivity.getViewStack.setPosition(aLayout, R.Left, R.Top);
+        MainActivity.getViewStack.setSize(aLayout, R.Right, R.Bottom);
+        if aEditText.getVisibility <> TJView.JavaClass.VISIBLE then
+          aEditText.setVisibility(TJView.JavaClass.VISIBLE);
       end);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
   procedure _HideContent;
+  var R: TRect;
+      aEditText: JALEditText;
+      aLayout: JALControlHostLayout;
   begin
-    TUIThreadCaller.Call<TRect>(
-      procedure (R: TRect)
+    R := _GetRealBounds;
+    aEditText:= FEditText;
+    aLayout:= fLayout;
+    CallInUIThread(
+      procedure
       begin
-        if FEditText.getVisibility <> TJView.JavaClass.INVISIBLE then begin
-          FEditText.setVisibility(TJView.JavaClass.INVISIBLE);
-          MainActivity.getViewStack.setPosition(FLayout, R.Right * 2 , R.Height * 2);
+        if aEditText.getVisibility <> TJView.JavaClass.INVISIBLE then begin
+          aEditText.setVisibility(TJView.JavaClass.INVISIBLE);
+          MainActivity.getViewStack.setPosition(aLayout, R.Right * 2 , R.Height * 2);
         end;
-      end, _GetRealBounds);
+      end);
   end;
 
 begin
@@ -623,8 +685,6 @@ begin
     if (not (csDesigning in ComponentState)) and
        (Root <> nil) and
        (Root.GetObject is TCommonCustomForm) then begin
-      aPos := LocalToAbsolute(TPointF.Zero) * FScreenScale;
-      aBounds := Rect(Round(aPos.X), Round(aPos.Y), Round(Width * FScreenScale), Round(Height * FScreenScale));
       if Visible and
          ParentedVisible and
         (TCommonCustomForm(Root.GetObject)).Visible and
@@ -717,6 +777,7 @@ begin
     end);
 
   sleep(250); // << it's look like we need to wait before the view is fully activated - else the soft keyboard will not work
+              // << don't ask me why ! if someone know i would really like to know :)
 
   CallInUIThreadAndWaitFinishing(
     procedure
@@ -736,11 +797,13 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.DoExit', 'start', TalLogType.VERBOSE);
   {$ENDIF}
+
   inherited;
-  TUIThreadCaller.Call<JALEditText>( // << when i do CallInUIThreadAndWaitFinishing i have in some situation threadlock :(
-    procedure (aEditText: JALEditText)
+
+  TUIThreadCaller.Call<JALEditText, boolean>( // << when i do CallInUIThreadAndWaitFinishing i have in some situation threadlock :(
+    procedure (aEditText: JALEditText; aHideSoftInputOnExit: boolean)
     begin
-      aEditText.HideSoftInput;
+      if aHideSoftInputOnExit then aEditText.HideSoftInput;
       aEditText.clearfocus; // << this will gave the focus to the fLayout in fact and in this way remove it from the FeditText
       MainActivity.getViewStack.addView(nil); // << this will "disable" all the view - important to fully close the virtual keyboard
                                               //
@@ -767,7 +830,8 @@ begin
                                               //      }
                                               //    }
                                               //
-    end, FEditText);
+    end, FEditText, fHideSoftInputOnExit);
+
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.DoExit', 'end', TalLogType.VERBOSE);
   {$ENDIF}
@@ -952,6 +1016,29 @@ begin
     end);
 end;
 
+{******************************************************}
+function TALAndroidEdit.GetTextPromptColor: TAlphaColor;
+var aColor: TAlphaColor;
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      aColor := FEditText.getCurrentHintTextColor;
+    end);
+  result := aColor;
+end;
+
+{********************************************************************}
+procedure TALAndroidEdit.setTextPromptColor(const Value: TAlphaColor);
+begin
+  if Value = TalphaColorRec.null then exit;
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      FEditText.setHintTextColor(Value);
+    end);
+end;
+
 {**************************************}
 function TALAndroidEdit.getText: String;
 var aText: JCharSequence;
@@ -984,7 +1071,7 @@ begin
     procedure
     begin
       //-----
-      feditText.setTextColor(ftextsettings.fontcolor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
+      feditText.setTextColor(integer(ftextsettings.fontcolor)); // << Sets the text color for all the states (normal, selected, focused) to be this color.
       feditText.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, ftextsettings.font.size); // << Set the default text size to a given unit and value.
       //-----
       if (TFontStyle.fsBold in ftextsettings.font.style) and
@@ -1089,25 +1176,57 @@ end;
 procedure TALAndroidEdit.TALFocusChangeListener.onFocusChange(v: JView; hasFocus: Boolean);
 begin
   {$IF defined(DEBUG)}
-  if hasFocus then ALLog('TALAndroidEdit.onFocusChange', 'hasFocus: true', TalLogType.VERBOSE)
-  else ALLog('TALAndroidEdit.onFocusChange', 'hasFocus: false', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.onFocusChange', 'hasFocus: ' + alBoolToStrU(hasFocus, 'YES', 'NO'), TalLogType.VERBOSE);
   {$ENDIF}
   if hasFocus then begin
     TThread.Queue(nil,
       procedure
+      var aCurrentFocusedControl: TALAndroidEdit;
+          aOldHideSoftInputOnExit: Boolean;
       begin
-        if not FEditcontrol.isfocused then
-          FEditcontrol.SetFocus;
+
+        {$IF defined(DEBUG)}
+        ALLog('TALAndroidEdit.onFocusChange.queue.hasFocus:YES', 'FEditcontrol.isfocused: ' + alBoolToStrU(FEditcontrol.isfocused, 'YES', 'NO'), TalLogType.VERBOSE);
+        {$ENDIF}
+
+        if not FEditcontrol.isfocused then begin
+
+          aCurrentFocusedControl := nil;
+          aOldHideSoftInputOnExit := False; // to hide stupid warning bug
+          if (FEditcontrol.root <> nil) and
+             (FEditcontrol.root.GetFocused <> nil) and
+             (FEditcontrol.root.GetFocused is TALAndroidEdit) then begin
+            aCurrentFocusedControl := TALAndroidEdit(FEditcontrol.root.GetFocused);
+            aOldHideSoftInputOnExit := aCurrentFocusedControl.HideSoftInputOnExit;
+            aCurrentFocusedControl.HideSoftInputOnExit := False;
+          end;
+          try
+
+            FEditcontrol.SetFocus;
+
+          finally
+            if aCurrentFocusedControl <> nil then
+              aCurrentFocusedControl.HideSoftInputOnExit := aOldHideSoftInputOnExit;
+          end;
+
+        end;
+
       end);
   end
   else begin
     TThread.Queue(nil,
       procedure
       begin
+
+        {$IF defined(DEBUG)}
+        ALLog('TALAndroidEdit.onFocusChange.queue.hasFocus:NO', 'FEditcontrol.isfocused: ' + alBoolToStrU(FEditcontrol.isfocused, 'YES', 'NO'), TalLogType.VERBOSE);
+        {$ENDIF}
+
         if FEditcontrol.isfocused then
           FEditcontrol.resetfocus;
+
       end);
-  end
+  end;
 end;
 
 {*****************************************************************************************}
@@ -1264,7 +1383,9 @@ begin
 end;
 
 {$endif}
+{$ENDREGION}
 
+{$REGION ' IOS'}
 {$IF defined(ios)}
 
 {*********************************}
@@ -1401,6 +1522,7 @@ begin
   inherited create(AOwner);
   CanFocus := True;
   fOnChangeTracking := nil;
+  fTextPromptColor := TalphaColorRec.Null;
   FTextSettings := TALEditTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
   FTextField := TalIosTextField.create(self);
@@ -1515,7 +1637,74 @@ end;
 {******************************************************}
 procedure TalIosEdit.setTextPrompt(const Value: String);
 begin
-  FTextField.View.setPlaceholder(StrToNSStr(Value));
+  applyTextPromptWithColor(Value, fTextPromptColor);
+end;
+
+{**************************************************}
+function TalIosEdit.GetTextPromptColor: TAlphaColor;
+begin
+  result := fTextPromptColor;
+end;
+
+{****************************************************************}
+procedure TalIosEdit.setTextPromptColor(const Value: TAlphaColor);
+begin
+  if Value <> fTextPromptColor then begin
+    fTextPromptColor := Value;
+    applyTextPromptWithColor(GetTextPrompt, fTextPromptColor);
+  end;
+end;
+
+{*******************************************************************************************}
+procedure TalIosEdit.applyTextPromptWithColor(const aStr: String; const aColor: TAlphaColor);
+var aTextPromptAttr: NSMutableAttributedString;
+    aTextRange: NSRange;
+    aUIColor: UIColor;
+begin
+  if (aColor = tAlphaColorRec.Null) or aStr.IsEmpty then FTextField.View.setPlaceholder(StrToNSStr(aStr))
+  else begin
+
+    aTextPromptAttr := TNSMutableAttributedString.Wrap(TNSMutableAttributedString.Alloc.initWithString(StrToNSStr(aStr)));
+    try
+
+      aTextPromptAttr.beginEditing;
+      try
+
+        aTextRange := NSMakeRange(0, aStr.Length);
+        aUIColor := AlphaColorToUIColor(aColor);
+        aTextPromptAttr.addAttribute(NSForegroundColorAttributeName, (aUIColor as ILocalObject).GetObjectID, aTextRange);
+        //NOTE: if i try to release the aUIColor i have an exception
+        //      so it's seam something acquire it
+
+      finally
+        aTextPromptAttr.endEditing;
+      end;
+
+      FTextField.View.setAttributedPlaceholder(aTextPromptAttr);
+
+    finally
+      aTextPromptAttr.release;
+    end;
+
+  end;
+end;
+
+{********************************************}
+function TalIosEdit.GetTintColor: TAlphaColor;
+var red: CGFloat;
+    green: CGFloat;
+    blue: CGFloat;
+    alpha: CGFloat;
+begin
+  if not FTextField.View.tintColor.getRed(@red, @green, @blue, @alpha) then result := TalphaColorRec.Null
+  else result := TAlphaColorF.Create(single(red), single(green), single(blue), single(alpha)).ToAlphaColor;
+end;
+
+{**********************************************************}
+procedure TalIosEdit.setTintColor(const Value: TAlphaColor);
+begin
+  if Value <> TalphaColorRec.Null then
+    FTextField.View.setTintColor(AlphaColorToUIColor(Value));
 end;
 
 {**********************************}
@@ -1697,19 +1886,60 @@ begin
 end;
 
 {$endif}
+{$ENDREGION}
 
 {*********************************************}
 constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
+  fDefStyleAttr := '';
   FAutoTranslate := true;
   FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
   Cursor := crIBeam;
   CanFocus := True;
   CanParentFocus := False; // else you must rewrite the GetCanFocus
+  //-----
+  fEditControl := nil;
   {$IF defined(android)}
-  fEditControl := TALAndroidEdit.Create(self);
+  //i use this way to know that the compoment
+  //will load it's properties from the dfm
+  if (aOwner = nil) or
+     (not (csloading in aOwner.ComponentState)) then CreateEditControl; // because we must first know the value of DefStyleAttr to create the fEditControl
+  {$ELSE}
+  CreateEditControl;
+  {$ENDIF}
+  //-----
+  {$IF (not defined(android)) and (not defined(IOS))}
+  fTextPromptColor := TalphaColorRec.Null;
+  {$ENDIF}
+  {$IF (not defined(IOS))}
+  fTintColor := TalphaColorRec.Null;
+  {$ENDIF}
+  //-----
+  FTextSettings := TALEditTextSettings.Create(Self);
+  FTextSettings.OnChanged := OnFontChanged;
+  //-----
+  fill.DefaultColor := $ffffffff;
+  fill.Color := $ffffffff;
+  stroke.DefaultKind := TBrushKind.none;
+  stroke.kind := TBrushKind.none;
+end;
+
+{*************************}
+destructor TALEdit.Destroy;
+begin
+  ALFreeAndNil(FTextSettings);
+  ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+  inherited;
+end;
+
+{**********************************}
+procedure TALEdit.CreateEditControl;
+begin
+  if fEditControl <> nil then exit;
+  {$IF defined(android)}
+  fEditControl := TALAndroidEdit.Create(self, fDefStyleAttr);
   fEditControl.Parent := self;
   FeditControl.Stored := False;
   FeditControl.SetSubComponent(True);
@@ -1731,32 +1961,19 @@ begin
   FeditControl.StyledSettings := []; // Family, Size, Style, FontColor, Other
   fEditControl.KillFocusByReturn := True;
   {$ENDIF}
-  FTextSettings := TALEditTextSettings.Create(Self);
-  FTextSettings.OnChanged := OnFontChanged;
   fEditControl.Align := TAlignLayout.Client;
   FeditControl.OnChangeTracking := DoChangeTracking;
   fEditControl.Password := false; // noops operation
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
   fEditControl.CheckSpelling := True;
-  //-----
-  fill.DefaultColor := $ffffffff;
-  fill.Color := $ffffffff;
-  stroke.DefaultKind := TBrushKind.none;
-  stroke.kind := TBrushKind.none;
-end;
-
-{*************************}
-destructor TALEdit.Destroy;
-begin
-  ALFreeAndNil(FTextSettings);
-  ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
-  inherited;
 end;
 
 {***********************}
 procedure TALEdit.Loaded;
 begin
+  if FEditControl = nil then CreateEditControl;
+  //-----
   if (AutoConvertFontFamily) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
@@ -1769,7 +1986,20 @@ begin
      (not (csDesigning in ComponentState)) then
       TextPrompt := ALTranslate(TextPrompt);
   //-----
+  StrokeChanged(stroke);
   OnFontChanged(nil);
+end;
+
+{*****************************************************}
+procedure TALEdit.SetDefStyleAttr(const Value: String);
+begin
+  if Value <> fDefStyleAttr then begin
+    fDefStyleAttr := Value;
+    {$IFDEF ANDROID}
+    ALFreeAndNil(fEditControl, false{adelayed}, false{aRefCountWarn}); // << will call disposeOF under ARC so it's ok
+    CreateEditControl;
+    {$ENDIF}
+  end;
 end;
 
 {**************************************}
@@ -1782,6 +2012,7 @@ end;
 {$IF defined(android)}
 function TALEdit.GetAndroidEditText: JALEditText;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := fEditControl.FEditText;
 end;
 {$ENDIF}
@@ -1790,6 +2021,7 @@ end;
 {$IF defined(IOS)}
 function TALEdit.GetIosTextField: TALIosTextField;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := fEditControl.FTextField;
 end;
 {$ENDIF}
@@ -1810,79 +2042,164 @@ end;
 procedure TALEdit.OnFontChanged(Sender: TObject);
 begin
   if csLoading in componentState then exit;
+  if FEditControl = nil then CreateEditControl;
   FEditControl.TextSettings.Assign(ftextsettings);
 end;
 
 {*********************************************}
 procedure TALEdit.SetText(const Value: String);
 begin
+  if FEditControl = nil then CreateEditControl;
   FeditControl.Text := Value;
 end;
 
 {*******************************}
 function TALEdit.getText: String;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := FeditControl.Text;
 end;
 
 {*************************************}
 function TALEdit.GetTextPrompt: String;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := FeditControl.TextPrompt;
 end;
 
 {***************************************************}
 procedure TALEdit.setTextPrompt(const Value: String);
 begin
+  if FEditControl = nil then CreateEditControl;
   FeditControl.TextPrompt := Value;
+end;
+
+{***********************************************}
+function TALEdit.GetTextPromptColor: TAlphaColor;
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(android) or defined(ios)}
+  result := FeditControl.TextPromptColor;
+  {$ELSE}
+  result := fTextPromptColor;
+  {$ENDIF}
+end;
+
+{*************************************************************}
+procedure TALEdit.setTextPromptColor(const Value: TAlphaColor);
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(android) or defined(ios)}
+  FeditControl.TextPromptColor := Value;
+  {$ELSE}
+  fTextPromptColor := Value;
+  {$ENDIF}
+end;
+
+{*****************************************}
+function TALEdit.GetTintColor: TAlphaColor;
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(ios)}
+  result := FeditControl.TintColor;
+  {$ELSE}
+  result := fTintColor;
+  {$ENDIF}
+end;
+
+{*******************************************************}
+procedure TALEdit.setTintColor(const Value: TAlphaColor);
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(ios)}
+  FeditControl.TintColor := Value;
+  {$ELSE}
+  fTintColor := Value;
+  {$ENDIF}
 end;
 
 {*************************************************************}
 procedure TALEdit.SetKeyboardType(Value: TVirtualKeyboardType);
 begin
+  if FEditControl = nil then CreateEditControl;
   FeditControl.KeyboardType := Value;
 end;
 
 {*****************************************************}
 function TALEdit.GetKeyboardType: TVirtualKeyboardType;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := FeditControl.KeyboardType;
 end;
 
 {**************************************************}
 procedure TALEdit.SetPassword(const Value: Boolean);
 begin
+  if FEditControl = nil then CreateEditControl;
   FeditControl.Password := Value;
 end;
 
 {************************************}
 function TALEdit.GetPassword: Boolean;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := FeditControl.Password;
 end;
 
 {*******************************************************}
 procedure TALEdit.SetCheckSpelling(const Value: Boolean);
 begin
+  if FEditControl = nil then CreateEditControl;
   FeditControl.CheckSpelling := Value;
 end;
 
 {*****************************************}
 function TALEdit.GetCheckSpelling: Boolean;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := FeditControl.CheckSpelling;
 end;
 
 {**************************************************************}
 procedure TALEdit.SetReturnKeyType(const Value: TReturnKeyType);
 begin
+  if FEditControl = nil then CreateEditControl;
   FeditControl.ReturnKeyType := Value;
 end;
 
 {************************************************}
 function TALEdit.GetReturnKeyType: TReturnKeyType;
 begin
+  if FEditControl = nil then CreateEditControl;
   result := FeditControl.ReturnKeyType;
+end;
+
+{****************************************}
+Function TALEdit.GetOnEnter: TNotifyEvent;
+begin
+  if FEditControl = nil then CreateEditControl;
+  Result := FEditControl.OnEnter;
+end;
+
+{*************************************************}
+Procedure TALEdit.SetOnEnter(AValue: TNotifyEvent);
+begin
+  if FEditControl = nil then CreateEditControl;
+  FEditControl.OnEnter := Avalue;
+end;
+
+{***************************************}
+Function TALEdit.GetOnExit: TNotifyEvent;
+begin
+  if FEditControl = nil then CreateEditControl;
+  Result := FEditControl.OnExit;
+end;
+
+{************************************************}
+Procedure TALEdit.SetOnExit(AValue: TNotifyEvent);
+begin
+  if FEditControl = nil then CreateEditControl;
+  FEditControl.OnExit := Avalue;
 end;
 
 {**************************************************}
@@ -1896,7 +2213,9 @@ end;
 procedure TALEdit.StrokeChanged(Sender: TObject);
 var aRect: TrectF;
 begin
-  inherited;
+  inherited StrokeChanged(Sender);
+  if csLoading in componentState then exit;
+  if FEditControl = nil then CreateEditControl;
   if Stroke.Kind = TbrushKind.None then fEditControl.Margins.Rect := TrectF.Create(0,0,0,0)
   else begin
     aRect := TrectF.Create(0,0,0,0);
@@ -1911,7 +2230,7 @@ end;
 {**********************************************}
 procedure TALEdit.SetSides(const Value: TSides);
 begin
-  inherited;
+  inherited SetSides(Value);
   StrokeChanged(nil);
 end;
 
@@ -1921,6 +2240,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALEdit.GetCanFocus', 'GetCanFocus', TalLogType.VERBOSE);
   {$ENDIF}
+  if FEditControl = nil then CreateEditControl;
   result := inherited GetCanFocus;
   if result then begin
     fEditControl.SetFocus;

@@ -53,7 +53,7 @@ public class ALEditText extends EditText {
 
   public void showSoftInput() {
     InputMethodManager imm = getInputMethodManager();
-    imm.showSoftInput(this, 0);
+    imm.showSoftInput(this, InputMethodManager.SHOW_FORCED);
   }
 
   public void hideSoftInput() {

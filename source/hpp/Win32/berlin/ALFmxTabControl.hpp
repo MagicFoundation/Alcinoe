@@ -21,6 +21,7 @@
 #include <FMX.Types.hpp>
 #include <FMX.Controls.hpp>
 #include <FMX.Ani.hpp>
+#include <ALFmxLayouts.hpp>
 #include <ALFmxInertialMovement.hpp>
 
 //-- user supplied -----------------------------------------------------------
@@ -33,11 +34,11 @@ class DELPHICLASS TALTabControl;
 //-- type declarations -------------------------------------------------------
 typedef System::TMetaClass* TALTabItemClass;
 
-enum class DECLSPEC_DENUM TALTabTransition : unsigned char { None, Slide };
+enum class DECLSPEC_DENUM TALTabTransition : unsigned char { None, Slide, FadeOut };
 
 typedef void __fastcall (__closure *TALTabPositionChangeEvent)(System::TObject* Sender, const System::Types::TPointF &OldViewportPosition, const System::Types::TPointF &NewViewportPosition);
 
-typedef void __fastcall (__closure *TALTabAniTransitionInit)(System::TObject* const sender, const double aVelocity, float &aDuration, Fmx::Types::TAnimationType &aAnimationType, Fmx::Types::TInterpolationType &aInterpolation);
+typedef void __fastcall (__closure *TALTabAniTransitionInit)(System::TObject* const sender, const TALTabTransition ATransition, const double aVelocity, Fmx::Ani::TFloatAnimation* const aAnimation);
 
 class PASCALIMPLEMENTATION TALTabItem : public Fmx::Controls::TControl
 {
@@ -123,6 +124,7 @@ private:
 	System::Types::TPointF fLastViewportPosition;
 	TALTabPositionChangeEvent FOnViewportPositionChange;
 	Fmx::Ani::TFloatAnimation* FAniTransition;
+	Alfmxlayouts::TALLayout* FAniTransitionOverlay;
 	TALTabAniTransitionInit fOnAniTransitionInit;
 	System::Classes::TNotifyEvent fOnAniStart;
 	System::Classes::TNotifyEvent fOnAniStop;
@@ -136,8 +138,11 @@ private:
 	void __fastcall SetTabIndex(const int Value);
 	TALTabItem* __fastcall GetActiveTab(void);
 	void __fastcall SetActiveTab(TALTabItem* const Value);
-	void __fastcall AniTransitionProcess(System::TObject* Sender);
-	void __fastcall AniTransitionFinish(System::TObject* Sender);
+	bool __fastcall getAnimationEnabled(void);
+	void __fastcall setAnimationEnabled(const bool Value);
+	void __fastcall AniTransitionSlideProcess(System::TObject* Sender);
+	void __fastcall AniTransitionSlideFinish(System::TObject* Sender);
+	void __fastcall AniTransitionFadeOutFinish(System::TObject* Sender);
 	int __fastcall GetItemsCount(void);
 	Fmx::Types::TFmxObject* __fastcall GetItem(const int AIndex);
 	
@@ -187,6 +192,7 @@ __published:
 	__property Align = {default=0};
 	__property Anchors;
 	__property TALTabItem* ActiveTab = {read=GetActiveTab, write=SetActiveTab, stored=false};
+	__property bool AnimationEnabled = {read=getAnimationEnabled, write=setAnimationEnabled, default=1};
 	__property Cursor = {default=0};
 	__property DragMode = {default=0};
 	__property EnableDragHighlight = {default=1};

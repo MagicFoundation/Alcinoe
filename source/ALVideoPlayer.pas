@@ -536,13 +536,13 @@ type
   private
     fVideoPlayer: TALVideoPlayer;
     procedure OnFrameAvailable(Sender: Tobject);
-    procedure SetVideoPlayer(const Value: TALVideoPlayer);
   protected
     procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property VideoPlayer: TALVideoPlayer read fVideoPlayer write SetVideoPlayer;
+    procedure resetVideoPlayer;
+    property VideoPlayer: TALVideoPlayer read fVideoPlayer;
   end;
 
 procedure register;
@@ -3042,20 +3042,18 @@ begin
   inherited;
 end;
 
+{***********************************************}
+procedure TALVideoPlayerSurface.resetVideoPlayer;
+begin
+  alFreeAndNil(fVideoPlayer);
+  fVideoPlayer := TALVideoPlayer.create;
+  fVideoPlayer.OnFrameAvailable := OnFrameAvailable;
+end;
+
 {****************************************************************}
 procedure TALVideoPlayerSurface.OnFrameAvailable(Sender: Tobject);
 begin
   repaint;
-end;
-
-{**************************************************************************}
-procedure TALVideoPlayerSurface.SetVideoPlayer(const Value: TALVideoPlayer);
-begin
-  if fVideoPlayer <> Value then begin
-    if (fVideoPlayer <> nil) then ALfreeAndNil(fVideoPlayer);
-    fVideoPlayer := Value;
-    if fVideoPlayer <> nil then fVideoPlayer.OnFrameAvailable := OnFrameAvailable;
-  end;
 end;
 
 {************************************}

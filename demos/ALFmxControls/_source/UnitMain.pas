@@ -9,7 +9,7 @@ uses
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
   FMX.ImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
   FMX.ScrollBox, FMX.Memo, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
-  FMX.Filter.Effects, system.Messaging;
+  FMX.Filter.Effects, system.Messaging, FMX.ani;
 
 type
 
@@ -160,10 +160,6 @@ type
     Layout4: TLayout;
     ALRectangle2: TALRectangle;
     ALEdit2: TALEdit;
-    Layout7: TLayout;
-    Image7: TImage;
-    Layout8: TLayout;
-    Image8: TImage;
     Text11: TText;
     Button12: TButton;
     ALText9: TALText;
@@ -192,6 +188,12 @@ type
     ALRectangle1: TALRectangle;
     Button10: TButton;
     Text6: TText;
+    ALRectangle3: TALRectangle;
+    ALEdit1: TALEdit;
+    Layout1: TLayout;
+    Image1: TImage;
+    Layout2: TLayout;
+    Image5: TImage;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -211,9 +213,9 @@ type
     procedure Button21Click(Sender: TObject);
     procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure ALTabControl1AniTransitionInit(const sender: TObject;
-                                             const aVelocity: Double; var aDuration: Single;
-                                             var aAnimationType: TAnimationType;
-                                             var aInterpolation: TInterpolationType);
+                                             const ATransition: TALTabTransition;
+                                             const aVelocity: Double;
+                                             const aAnimation: TFloatAnimation);
     procedure ALTabControl1Resize(Sender: TObject);
     procedure ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
     procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
@@ -227,6 +229,8 @@ type
     procedure ALVideoPlayerSurface1Click(Sender: TObject);
     procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure FormResize(Sender: TObject);
+    procedure ALEditEnter(Sender: TObject);
+    procedure ALEditExit(Sender: TObject);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -243,6 +247,7 @@ type
     fALCircle1: TALCircleStopWatch;
     fCircle1: TCircleStopWatch;
     FOpenGLContextResetId: Integer;
+    FVKKeyboardOpen: boolean;
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage);
   public
   end;
@@ -266,26 +271,35 @@ begin
   ALLog('ALEdit2ChangeTracking', ALEdit2.Text);
 end;
 
+procedure TForm1.ALEditEnter(Sender: TObject);
+begin
+  ALLog('ALEditEnter', 'ALEditEnter');
+end;
+
+procedure TForm1.ALEditExit(Sender: TObject);
+begin
+  ALLog('ALEditExit', 'ALEditExit');
+end;
+
 procedure TForm1.ALVertScrollBox1Click(Sender: TObject);
 begin
-  ALEdit2.ResetFocus;
+  SetFocused(nil);
 end;
 
 procedure TForm1.ALTabControl1AniTransitionInit(const sender: TObject;
+                                                const ATransition: TALTabTransition;
                                                 const aVelocity: Double;
-                                                var aDuration: Single;
-                                                var aAnimationType: TAnimationType;
-                                                var aInterpolation: TInterpolationType);
+                                                const aAnimation: TFloatAnimation);
 begin
   // aVelocity = pixels per seconds given by the anicalculations
   // ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) = the number of pixel we need to scroll
   // 6 = factor i choose to compensate the deceleration made by the quartic Interpolation
-  if comparevalue(aVelocity, 0) <> 0 then aDuration := abs((ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X)) / aVelocity) * 6
-  else aDuration := 0.8;
-  if aDuration > 0.8 then aDuration := 0.8
-  else if aDuration < 0.1 then aDuration := 0.1;
-  aAnimationType := TAnimationType.out;
-  aInterpolation := TInterpolationType.circular;
+  if comparevalue(aVelocity, 0) <> 0 then aAnimation.Duration := abs((ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X)) / aVelocity) * 6
+  else aAnimation.Duration := 0.8;
+  if aAnimation.Duration > 0.8 then aAnimation.Duration := 0.8
+  else if aAnimation.Duration < 0.1 then aAnimation.Duration := 0.1;
+  aAnimation.AnimationType := TAnimationType.out;
+  aAnimation.Interpolation := TInterpolationType.circular;
 end;
 
 procedure TForm1.ALTabControl1Resize(Sender: TObject);
@@ -335,7 +349,15 @@ begin
 
   if (ALVideoPlayerSurface1.Position.y + ALVideoPlayerSurface1.Height >= NewViewportPosition.Y) and
      (ALVideoPlayerSurface1.Position.y < NewViewportPosition.Y + height) then begin
-    if ALVideoPlayerSurface1.VideoPlayer.state in [vpsPrepared, vpsPaused] then ALVideoPlayerSurface1.VideoPlayer.Start
+    if ALVideoPlayerSurface1.VideoPlayer.state in [vpsIdle] then begin
+      ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4'); // << no sound on ios, don't know why :(
+      //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
+      //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
+      //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://techslides.com/demos/samples/sample.mp4'); // << this have sound on ios
+      ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
+      ALVideoPlayerSurface1.VideoPlayer.prepareAsync(True{AutoStartWhenPrepared});
+    end
+    else if ALVideoPlayerSurface1.VideoPlayer.state in [vpsPrepared, vpsPaused] then ALVideoPlayerSurface1.VideoPlayer.Start
     else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := true;
   end
   else begin
@@ -832,17 +854,12 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+  FVKKeyboardOpen := False;
   FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   beginupdate;
 
   //-----
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
-  ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4'); // << no sound on ios, don't know why :(
-  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
-  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
-  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://techslides.com/demos/samples/sample.mp4'); // << this have sound on ios
-  ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
-  ALVideoPlayerSurface1.VideoPlayer.prepareAsync(False{AutoStartWhenPrepared});
   //-----
   fALRectangle1 := TALRectangleStopWatch.Create(self);
   fALRectangle1.Parent := ALVertScrollBox1;
@@ -1018,13 +1035,27 @@ end;
 procedure TForm1.FormVirtualKeyboardHidden(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);
 begin
-  AlVertScrollBox1.margins.Bottom := 0;
-  AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
+  ALLog('FormVirtualKeyboardHidden', 'FormVirtualKeyboardHidden');
+  FVKKeyboardOpen := False;
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+      sleep(50);
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          if FVKKeyboardOpen then exit;
+          AlVertScrollBox1.margins.Bottom := 0;
+          AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
+        end);
+    end).Start;
 end;
 
 procedure TForm1.FormVirtualKeyboardShown(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);
 begin
+  ALLog('FormVirtualKeyboardShown', 'FormVirtualKeyboardShown');
+  FVKKeyboardOpen := True;
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
   AlVertScrollBox1.AniCalculations.TouchTracking := [];
@@ -1033,13 +1064,16 @@ end;
 procedure TForm1.OpenGLContextResetHandler(const Sender: TObject;const Msg: TMessage); // << because of this fucking bug https://quality.embarcadero.com/browse/RSP-11484
 begin
   {$IFDEF ANDROID}
-  ALVideoPlayerSurface1.VideoPlayer := TALVideoPlayer.Create;
-  ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4'); // << no sound on ios, don't know why :(
-  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
-  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
-  //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://techslides.com/demos/samples/sample.mp4'); // << this have sound on ios
-  ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
-  ALVideoPlayerSurface1.VideoPlayer.prepareAsync(False{AutoStartWhenPrepared});
+  if ALVideoPlayerSurface1.VideoPlayer.state <> vpsIdle then begin
+    ALVideoPlayerSurface1.resetVideoPlayer;
+    ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_normal.mp4'); // << no sound on ios, don't know why :(
+    //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4');
+    //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4');
+    //ALVideoPlayerSurface1.VideoPlayer.setDataSource('http://techslides.com/demos/samples/sample.mp4'); // << this have sound on ios
+    ALVideoPlayerSurface1.VideoPlayer.setLooping(true);
+    ALVideoPlayerSurface1.VideoPlayer.prepareAsync(False{AutoStartWhenPrepared});
+  end
+  else ALVideoPlayerSurface1.resetVideoPlayer;
   {$ENDIF}
 end;
 

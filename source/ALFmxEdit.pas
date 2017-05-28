@@ -1697,7 +1697,7 @@ var red: CGFloat;
     alpha: CGFloat;
 begin
   if not FTextField.View.tintColor.getRed(@red, @green, @blue, @alpha) then result := TalphaColorRec.Null
-  else result := TAlphaColorF.Create(single(red), single(green), single(blue), single(alpha)).ToAlphaColor;
+  else result := TAlphaColorF.Create(red, green, blue, alpha).ToAlphaColor;
 end;
 
 {**********************************************************}

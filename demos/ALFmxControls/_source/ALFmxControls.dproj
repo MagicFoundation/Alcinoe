@@ -219,10 +219,10 @@
         <iPhone_Launch640>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_640x960.png</iPhone_Launch640>
         <iPhone_Launch750>$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_750x1334.png</iPhone_Launch750>
         <iPad_AppIcon144>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_144x144.png</iPad_AppIcon144>
-        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=club.kiskis.app;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;CFBundleResourceSpecification=ResourceRules.plist;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;FMLocalNotificationPermission=false;UIBackgroundModes=</VerInfo_Keys>
+        <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &amp; iPad;CFBundleResourceSpecification=ResourceRules.plist;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;FMLocalNotificationPermission=false;UIBackgroundModes=</VerInfo_Keys>
         <iPad_AppIcon72>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_72x72.png</iPad_AppIcon72>
         <iPad_Launch1024x768>$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_1024x768.png</iPad_Launch1024x768>
-        <VerInfo_BundleId>club.kiskis.app</VerInfo_BundleId>
+        <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_iOSDevice64)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -503,9 +503,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="resources\aniindicator_540x432.png" Configuration="Release" Class="ProjectFile">
-                    <Platform Name="Android">
-                        <RemoteDir>.\assets\internal\</RemoteDir>
+                <DeployFile LocalName="resources\tree_720x720.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="iOSDevice32">
+                        <RemoteDir>StartUp\Documents\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -541,8 +541,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_144x144.png" Configuration="Debug" Class="iPad_AppIcon144">
-                    <Platform Name="iOSDevice64">
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
+                    <Platform Name="Android">
+                        <RemoteName>splash_image.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -552,9 +553,8 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
-                    <Platform Name="Android">
-                        <RemoteName>splash_image.png</RemoteName>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_144x144.png" Configuration="Debug" Class="iPad_AppIcon144">
+                    <Platform Name="iOSDevice64">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -567,6 +567,13 @@
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_1536x2048.png" Configuration="Debug" Class="iPad_Launch1536x2048">
                     <Platform Name="iOSDevice32">
                         <RemoteName>Default-Portrait@2x~ipad.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -639,6 +646,34 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png" Configuration="Debug" Class="iPad_AppIcon152">
                     <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -724,6 +759,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\values-v21\attrs.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21\</RemoteDir>
+                        <RemoteName>attrs.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_1024x748.png" Configuration="Release" Class="iPad_Launch1024">
                     <Platform Name="iOSDevice32">
                         <RemoteName>Default-Landscape.png</RemoteName>
@@ -793,6 +835,20 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Debug" Class="Android_SplashImage640">
                     <Platform Name="Android">
                         <RemoteName>splash_image.png</RemoteName>
@@ -817,6 +873,13 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_76x76.png" Configuration="Debug" Class="iPad_AppIcon76">
                     <Platform Name="iOSDevice64">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -919,6 +982,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\values\attrs.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values\</RemoteDir>
+                        <RemoteName>attrs.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\Win32\Debug\ALFmxControls.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>ALFmxControls.exe</RemoteName>
@@ -976,15 +1046,15 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Configuration="Debug" Class="iPad_Launch2048">
-                    <Platform Name="iOSDevice32">
-                        <RemoteName>Default-Landscape@2x.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="..\Android\Release\libALFmxControls.so" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Android">
                         <RemoteName>libALFmxControls.so</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Configuration="Debug" Class="iPad_Launch2048">
+                    <Platform Name="iOSDevice32">
+                        <RemoteName>Default-Landscape@2x.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1216,6 +1286,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Debug" Class="Android_SplashImage960">
                     <Platform Name="Android">
                         <RemoteName>splash_image.png</RemoteName>
@@ -1225,6 +1302,13 @@
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Release" Class="Android_LauncherIcon72">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1253,6 +1337,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
@@ -1271,6 +1362,13 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_50x50.png" Configuration="Release" Class="iPad_SpotLight50">
                     <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\values-v21\attrs.xml" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values-v21\</RemoteDir>
+                        <RemoteName>attrs.xml</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1399,6 +1497,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_768x1004.png" Configuration="Release" Class="iPad_Launch768">
                     <Platform Name="iOSSimulator">
                         <RemoteName>Default~ipad.png</RemoteName>
@@ -1448,9 +1553,30 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="resources\checkbox_checked_88x88.png" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Android">
                         <RemoteDir>.\assets\internal\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1462,6 +1588,13 @@
                 <DeployFile LocalName="resources\one_720x720.png" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1526,6 +1659,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\iOSDevice64\Debug\ResourceRules.plist" Configuration="Debug" Class="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <RemoteName>ResourceRules.plist</RemoteName>
@@ -1540,6 +1680,13 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_40x40.png" Configuration="Release" Class="iPad_SpotLight40">
                     <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1643,6 +1790,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\values\attrs.xml" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\values\</RemoteDir>
+                        <RemoteName>attrs.xml</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Debug" Class="Android_LauncherIcon48">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
@@ -1668,6 +1822,13 @@
                 <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Release" Class="Android_LauncherIcon144">
                     <Platform Name="Android">
                         <RemoteName>ic_launcher.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -1776,6 +1937,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png" Configuration="Release" Class="iPad_SpotLight80">
                     <Platform Name="iOSDevice32">
                         <Overwrite>true</Overwrite>
@@ -1866,6 +2034,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImagePortrait_768x1004.png" Configuration="Debug" Class="iPad_Launch768">
                     <Platform Name="iOSSimulator">
                         <RemoteName>Default~ipad.png</RemoteName>
@@ -1936,6 +2111,13 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_76x76.png" Configuration="Release" Class="iPad_AppIcon76">
                     <Platform Name="iOSSimulator">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxhdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -2030,6 +2212,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="android\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Debug" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="resources\one_720x720.png" Configuration="Release" Class="ProjectFile">
                     <Platform Name="Android">
                         <RemoteDir>.\assets\internal\</RemoteDir>
@@ -2057,6 +2246,13 @@
                 <DeployFile LocalName="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageLandscape_2048x1496.png" Configuration="Debug" Class="iPad_Launch2048">
                     <Platform Name="iOSSimulator">
                         <RemoteName>Default-Landscape@2x.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="android\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png" Configuration="Release" Class="File">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi\</RemoteDir>
+                        <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -2113,33 +2309,18 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="resources\tree_720x720.png" Configuration="Debug" Class="ProjectFile">
-                    <Platform Name="iOSDevice32">
-                        <RemoteDir>StartUp\Documents\</RemoteDir>
+                <DeployFile LocalName="resources\aniindicator_540x432.png" Configuration="Release" Class="ProjectFile">
+                    <Platform Name="Android">
+                        <RemoteDir>.\assets\internal\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployClass Name="DependencyModule">
-                    <Platform Name="Win32">
-                        <Operation>0</Operation>
-                        <Extensions>.dll;.bpl</Extensions>
-                    </Platform>
+                <DeployClass Name="ProjectiOSDeviceResourceRules">
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="OSX32">
-                        <RemoteDir>Contents\MacOS</RemoteDir>
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
-                    </Platform>
-                    <Platform Name="iOSSimulator">
-                        <Operation>1</Operation>
-                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectOSXResource">
@@ -2491,12 +2672,27 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <DeployClass Name="ProjectiOSDeviceResourceRules">
+                <DeployClass Name="DependencyModule">
+                    <Platform Name="Win32">
+                        <Operation>0</Operation>
+                        <Extensions>.dll;.bpl</Extensions>
+                    </Platform>
                     <Platform Name="iOSDevice64">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSX32">
+                        <RemoteDir>Contents\MacOS</RemoteDir>
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="iOSDevice32">
                         <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
                     </Platform>
                 </DeployClass>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>

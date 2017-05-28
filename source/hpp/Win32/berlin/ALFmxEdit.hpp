@@ -41,9 +41,9 @@ private:
 	bool FAutoConvertFontFamily;
 	System::Classes::TNotifyEvent fOnChangeTracking;
 	Fmx::Graphics::TTextSettings* FTextSettings;
+	System::Uitypes::TAlphaColor fTintColor;
 	System::Uitypes::TAlphaColor fTextPromptColor;
 	Fmx::Edit::TEdit* fEditControl;
-	System::Uitypes::TAlphaColor fTintColor;
 	System::UnicodeString __fastcall GetTextPrompt(void);
 	void __fastcall setTextPrompt(const System::UnicodeString Value);
 	System::Uitypes::TAlphaColor __fastcall GetTextPromptColor(void);

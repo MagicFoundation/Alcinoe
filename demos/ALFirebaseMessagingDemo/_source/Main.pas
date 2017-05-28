@@ -408,10 +408,10 @@ end;
 procedure TForm1.UserNotificationCenteraddNotificationRequestWithCompletionHandler(error: NSError);
 begin
   {$IFDEF DEBUG}
-  if (error <> nil) then allog('Tkiskis_MainForm.UserNotificationCenteraddNotificationRequestWithCompletionHandler', 'ERROR - ' + NSStrToStr(error.localizedDescription) +
-                                                                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
-  else allog('Tkiskis_MainForm.UserNotificationCenteraddNotificationRequestWithCompletionHandler', 'SUCCESS' +
-                                                                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
+  if (error <> nil) then allog('TForm1.UserNotificationCenteraddNotificationRequestWithCompletionHandler', 'ERROR - ' + NSStrToStr(error.localizedDescription) +
+                                                                                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error)
+  else allog('TForm1.UserNotificationCenteraddNotificationRequestWithCompletionHandler', 'SUCCESS' +
+                                                                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 end;
 {$ENDIF}

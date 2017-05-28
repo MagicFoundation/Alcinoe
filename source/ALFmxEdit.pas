@@ -581,6 +581,13 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TFormActivateMessage, fFormActivateMessageID);
   TMessageManager.DefaultManager.Unsubscribe(TFormDeactivateMessage, fFormDeactivateMessageID);
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
+
+  FFocusChangeListener.FEditControl := nil;
+  FTextWatcher.FEditControl := nil;
+  fEditorActionListener.FEditControl := nil;
+  FSoftInputListener.FEditControl := nil;
+  FKeyPreImeListener.FEditControl := nil;
+
   TUIThreadCaller.ForceRunnablesCollection;
   TUIThreadCaller.Call<JALEditText, JALControlHostLayout>(
     procedure (aEditText: JALEditText; aLayout: JALControlHostLayout)
@@ -1185,6 +1192,8 @@ begin
           aOldHideSoftInputOnExit: Boolean;
       begin
 
+        if fEditControl = nil then exit;
+
         {$IF defined(DEBUG)}
         ALLog('TALAndroidEdit.onFocusChange.queue.hasFocus:YES', 'FEditcontrol.isfocused: ' + alBoolToStrU(FEditcontrol.isfocused, 'YES', 'NO'), TalLogType.VERBOSE);
         {$ENDIF}
@@ -1217,6 +1226,8 @@ begin
     TThread.Queue(nil,
       procedure
       begin
+
+        if fEditControl = nil then exit;
 
         {$IF defined(DEBUG)}
         ALLog('TALAndroidEdit.onFocusChange.queue.hasFocus:NO', 'FEditcontrol.isfocused: ' + alBoolToStrU(FEditcontrol.isfocused, 'YES', 'NO'), TalLogType.VERBOSE);
@@ -1299,6 +1310,7 @@ begin
     TThread.Queue(nil,
      procedure
      begin
+       if fEditControl = nil then exit;
        sleep(250); // << the problem is we leave the finger on the back button, then the keyevent is send again and again
                    //    so leave 250 ms to remove the finger
        FEditcontrol.resetfocus;
@@ -1324,6 +1336,7 @@ begin
   TThread.Queue(nil,
     procedure
     begin
+      if fEditControl = nil then exit;
       if assigned(fEditControl.fOnChangeTracking) then
         fEditControl.fOnChangeTracking(fEditControl);
     end);
@@ -1375,6 +1388,7 @@ begin
     TThread.Queue(nil,
      procedure
      begin
+       if fEditControl = nil then exit;
        FEditcontrol.resetfocus;
      end);
 
@@ -1922,8 +1936,10 @@ begin
   //-----
   fill.DefaultColor := $ffffffff;
   fill.Color := $ffffffff;
+  stroke.OnChanged := Nil;
   stroke.DefaultKind := TBrushKind.none;
   stroke.kind := TBrushKind.none;
+  stroke.OnChanged := StrokeChanged;
 end;
 
 {*************************}

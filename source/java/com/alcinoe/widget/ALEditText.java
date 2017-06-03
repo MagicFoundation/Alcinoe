@@ -134,7 +134,7 @@ public class ALEditText extends EditText {
   // http://stackoverflow.com/questions/39396662/edittext-how-to-activate-copy-paste-popup-without-any-actionbar
   // so actually i decide to show the actionbar only via the floating way
   // to backport the floating actionbar of android api > 23 to lollipop (api 22) and lowest device
-  // i copy the full source code of marshmallow floatingaction bar in alcinoe. I was also forced
+  // i copy the full source code of marshmallow floating action bar in alcinoe. I was also forced
   // to update the original source code because the floating action node was made like the sub Window
   // of the decorview, and in this way it's draw BEHIND our EditText
   // https://stackoverflow.com/questions/39561133/why-my-edittext-copy-paste-menu-is-under-the-edittext-how-change-the-z-order-of

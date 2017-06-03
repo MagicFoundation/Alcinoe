@@ -28,13 +28,17 @@ SET FileName=lib\jar\alcinoe\*.jar
 del %FileName% /s
 if exist %FileName% goto ERROR
 
+SET FileName=lib\jar\alcinoe\res
+IF EXIST %FileName% rmdir /s /q %FileName%
+IF EXIST %FileName% goto ERROR
+
 SET FileName=source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
 
 echo Compiling the Java Sources
 mkdir source\output 2> nul
-%JDK_PATH%\javac -source 1.7 -target 1.7 -bootclasspath %JDK_PATH1_7%\jre\lib\rt.jar -Xlint:deprecation -cp^
+%JDK_PATH%\javac -source 1.7 -target 1.7 -bootclasspath %JDK_PATH1_7%\jre\lib\rt.jar -Xlint:unchecked -Xlint:deprecation -cp^
  %ANDROID_PLATFORM%\android.jar;%FMX_JAR%;^
 lib\jar\shortcutbadger\shortcutbadger.jar;^
 lib\jar\facebook\facebook-android-sdk.jar;^
@@ -49,8 +53,14 @@ lib\jar\firebase\firebase-iid.jar;^
 lib\jar\firebase\firebase-crash.jar;^
 lib\jar\firebase\firebase-messaging.jar^
  -d source\output^
- source\java\com\alcinoe\widget\*.java^
+ source\java\android\view\*.java^
+ source\java\com\android\internal\*.java^
+ source\java\com\alcinoe\*.java^
+ source\java\com\alcinoe\util\*.java^
+ source\java\com\alcinoe\view\*.java^
+ source\java\com\alcinoe\view\menu\*.java^
  source\java\com\alcinoe\view\inputmethod\*.java^
+ source\java\com\alcinoe\widget\*.java^
  source\java\com\alcinoe\text\method\*.java^
  source\java\com\alcinoe\facebook\*.java^
  source\java\com\alcinoe\firebase\iid\*.java^
@@ -59,13 +69,20 @@ lib\jar\firebase\firebase-messaging.jar^
  source\java\com\alcinoe\googleplayservices\*.java
 IF ERRORLEVEL 1 goto ERROR
 
+SET FileName=source\output\com\alcinoe\*.class
+del %FileName%
+if exist %FileName% goto ERROR
+
 echo Creating jar containing the new classes
-%JDK_PATH1_7%\jar cf lib\jar\alcinoe\alcinoe.jar -C source\output com
+%JDK_PATH1_7%\jar cf lib\jar\alcinoe\alcinoe.jar -C source\output com\alcinoe\
 IF ERRORLEVEL 1 goto ERROR
 
 SET FileName=source\output
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR
+
+xcopy source\data\android\res lib\jar\alcinoe\res\ /s
+IF ERRORLEVEL 1 goto ERROR
 
 echo Jar created successfully
 if x%CONFIRM% == xon PAUSE 

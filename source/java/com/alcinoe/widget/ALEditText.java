@@ -7,38 +7,58 @@ import android.view.ViewGroup;
 import android.view.ActionMode;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewParent;
 import android.app.Activity;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.ViewTreeObserver.OnPreDrawListener;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
+import com.alcinoe.view.ALFloatingActionMode;
 import com.alcinoe.text.method.ALKeyPreImeListener;
+import com.alcinoe.view.ALActionMode;
 
 public class ALEditText extends EditText {
   private ALSoftInputListener mSoftInputListener;
   private ALKeyPreImeListener mKeyPreImeListener;
   private OnGlobalLayoutListener mOnGlobalLayoutListener;
-        
+  private ActionMode mFloatingActionMode;
+  private View mFloatingActionModeOriginatingView;
+  private OnPreDrawListener mFloatingToolbarPreDrawListener;
+  private ALFloatingToolbar mFloatingToolbar;    
+  private Context mContext;    
+  private int mDefStyleAttr;
+
   public ALEditText(Context context){
     super(context);
-    this.mOnGlobalLayoutListener = null;  
+    mContext = context;
+    mDefStyleAttr = 0;
+    mOnGlobalLayoutListener = null;  
   } 
 
   public ALEditText(Context context, AttributeSet attrs){
     super(context, attrs);
-    this.mOnGlobalLayoutListener = null;  
+    mContext = context;
+    mDefStyleAttr = 0;
+    mOnGlobalLayoutListener = null;  
   } 
            
   public ALEditText(Context context, AttributeSet attrs, int defStyleAttr){
     super(context, attrs, defStyleAttr);
-    this.mOnGlobalLayoutListener = null;  
+    mContext = context;
+    mDefStyleAttr = defStyleAttr;
+    mOnGlobalLayoutListener = null;  
   } 
            
   public ALEditText(Context context, AttributeSet attrs, int defStyleAttr,  int defStyleRes){
     super(context, attrs, defStyleAttr, defStyleRes);
-    this.mOnGlobalLayoutListener = null;  
+    mContext = context;
+    mDefStyleAttr = defStyleAttr;
+    mOnGlobalLayoutListener = null;  
   } 
   
   @Override
@@ -100,37 +120,154 @@ public class ALEditText extends EditText {
     return (InputMethodManager) getContext().getSystemService("input_method");
   }
 
-  //when the view are added via windowManager.addView(view, Layout_Params)
-  //then it's seam that startActionMode will not work by himself and we
-  //must do the code below to start it (and you can not imagine how much hard i
-  //worked to find this strange behavior). HOWEVER the other problem i have
-  //if that on lollipop the copy/past popup is added in this ugly and not understandable
-  //#{@#^ ACTIONBAR. the problem with this actionbar is that it's need to be in 
-  //the decorview, but the actual framework of delphi don't permit this (if we
-  //do so, it's will be simply drawed blank). If version < lollipop (22) then it's
-  //no problem because it's will be normal popup and in version > lollipop (22) then
-  //no problem also because it's will be floating actionbar like popup menu that
-  //work ok with the delphi framework.
-  //http://stackoverflow.com/questions/39506977/is-it-possible-to-show-the-android-actionbar-in-delphi-firemonkey-app
-  //http://stackoverflow.com/questions/39517011/how-to-move-my-actionbar-in-my-own-dedicated-view
-  //http://stackoverflow.com/questions/39396662/edittext-how-to-activate-copy-paste-popup-without-any-actionbar
-  //so actually i decide to show the actionbar only via the floating way (this way)
-  //all previous device right now no copy option (but past work). if someone want to implement
-  //a copy/past menu for lollipop he is welcome 
-  //http://stackoverflow.com/questions/39501339/how-to-replace-the-actionbar-by-a-popup-menu
+  // when the view are added via windowManager.addView(view, Layout_Params)
+  // then it's seam that startActionMode will not work by himself and we
+  // must do the code below to start it (and you can not imagine how much hard i
+  // worked to find this strange behavior). HOWEVER the other problem i have
+  // if that on lollipop the copy/past popup is added in this ugly and not understandable
+  // #{@#^ ACTIONBAR. the problem with this actionbar is that it's need to be in 
+  // the decorview, but the actual framework of delphi don't permit this (if we
+  // do so, it's will be simply drawed blank). If version < lollipop (22) then it's
+  // no problem because it's will be normal popup and in version > lollipop (22) then
+  // no problem also because it's will be floating actionbar like popup menu that
+  // work ok with the delphi framework.
+  // http://stackoverflow.com/questions/39396662/edittext-how-to-activate-copy-paste-popup-without-any-actionbar
+  // so actually i decide to show the actionbar only via the floating way
+  // to backport the floating actionbar of android api > 23 to lollipop (api 22) and lowest device
+  // i copy the full source code of marshmallow floatingaction bar in alcinoe. I was also forced
+  // to update the original source code because the floating action node was made like the sub Window
+  // of the decorview, and in this way it's draw BEHIND our EditText
+  // https://stackoverflow.com/questions/39561133/why-my-edittext-copy-paste-menu-is-under-the-edittext-how-change-the-z-order-of
+  // i replace in floatingtoolbar the type of the windows from TYPE_APPLICATION_ABOVE_SUB_PANEL to 
+  // TYPE_APPLICATION
+  @Override
+  public ActionMode startActionMode(ActionMode.Callback callback) {    
+
+    ALActionMode.Callback2 wrappedCallback = new ActionModeCallback2Wrapper(callback);
+    ActionMode mode = null;
+    mode = createFloatingActionMode(this, wrappedCallback);
+    if (mode != null && wrappedCallback.onCreateActionMode(mode, mode.getMenu())) {
+        setHandledFloatingActionMode(mode);
+    } else {
+        mode = null;
+    }
+    return mode;
+  
+  }
+
   @Override
   public ActionMode startActionMode(ActionMode.Callback callback, int type) {    
-    this.invalidate(); // << don't ask me why but without this the floating actionbar is not showed after the first
-                       //    selection is maded (ie on the first double click on some word for exemple) in the EditText
-    ViewParent parent = getParent();
-    if (parent == null) return null;
-    Activity activity = (Activity) this.getContext(); 
-    ViewGroup decoreview = (ViewGroup) activity.getWindow().getDecorView();
-    try {
-        return decoreview.startActionModeForChild(this, callback, type); 
-    } catch (AbstractMethodError ame) {
-        // Older implementations of custom views might not implement this.
-        return decoreview.startActionModeForChild(this, callback); 
+    return startActionMode(callback);    
+  }
+
+  private void cleanupFloatingActionModeViews() {
+      if (mFloatingToolbar != null) {
+          mFloatingToolbar.dismiss();
+          mFloatingToolbar = null;
+      }
+      if (mFloatingActionModeOriginatingView != null) {
+          if (mFloatingToolbarPreDrawListener != null) {
+              mFloatingActionModeOriginatingView.getViewTreeObserver()
+                  .removeOnPreDrawListener(mFloatingToolbarPreDrawListener);
+              mFloatingToolbarPreDrawListener = null;
+          }
+          mFloatingActionModeOriginatingView = null;
+      }
+  }
+  
+
+  @Override
+  public void onWindowFocusChanged(boolean hasWindowFocus) {
+      super.onWindowFocusChanged(hasWindowFocus);
+      if (mFloatingActionMode != null) {
+          mFloatingActionMode.onWindowFocusChanged(hasWindowFocus);
+      }
+  }
+  
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+
+    if (mFloatingToolbar != null) {
+        mFloatingToolbar.dismiss();
+        mFloatingToolbar = null;
     }
   }
+
+  private ActionMode createFloatingActionMode(
+          View originatingView, ALActionMode.Callback2 callback) {
+      if (mFloatingActionMode != null) {
+          mFloatingActionMode.finish();
+      }
+      cleanupFloatingActionModeViews();
+      final ALFloatingActionMode mode =
+              new ALFloatingActionMode(mContext, callback, originatingView);
+      mFloatingActionModeOriginatingView = originatingView;
+      mFloatingToolbarPreDrawListener =
+          new OnPreDrawListener() {
+              @Override
+              public boolean onPreDraw() {
+                  mode.updateViewLocationInWindow();
+                  return true;
+              }
+          };
+      return mode;
+  } 
+
+  private void setHandledFloatingActionMode(ActionMode mode) {
+      mFloatingActionMode = mode;
+      mFloatingToolbar = new ALFloatingToolbar(mContext, ((Activity) mContext).getWindow(), mDefStyleAttr);
+      ((ALFloatingActionMode) mFloatingActionMode).setFloatingToolbar(mFloatingToolbar);
+      mFloatingActionMode.invalidate();  // Will show the floating toolbar if necessary.
+      mFloatingActionModeOriginatingView.getViewTreeObserver()
+          .addOnPreDrawListener(mFloatingToolbarPreDrawListener);
+  }
+
+  /**
+   * Clears out internal references when the action mode is destroyed.
+   */
+  private class ActionModeCallback2Wrapper extends ALActionMode.Callback2 {
+      private final ActionMode.Callback mWrapped;
+
+      public ActionModeCallback2Wrapper(ActionMode.Callback wrapped) {
+          mWrapped = wrapped;
+      }
+
+      public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+          return mWrapped.onCreateActionMode(mode, menu);
+      }
+
+      @SuppressWarnings("deprecation")
+      public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+          requestFitSystemWindows();
+          return mWrapped.onPrepareActionMode(mode, menu);
+      }
+
+      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+          return mWrapped.onActionItemClicked(mode, item);
+      }
+
+      @SuppressWarnings("deprecation")
+      public void onDestroyActionMode(ActionMode mode) {
+          mWrapped.onDestroyActionMode(mode);
+          cleanupFloatingActionModeViews();
+          mFloatingActionMode = null;
+          requestFitSystemWindows();
+      }
+
+      @Override
+      public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
+          try {
+            if (mWrapped instanceof ActionMode.Callback2) {
+                ((ActionMode.Callback2) mWrapped).onGetContentRect(mode, view, outRect);
+            } else {
+                super.onGetContentRect(mode, view, outRect);
+            }
+          } catch (Throwable e) {
+              // Older implementations of custom views might not implement this.
+              super.onGetContentRect(mode, view, outRect);
+          }
+      }
+  }
+
 }

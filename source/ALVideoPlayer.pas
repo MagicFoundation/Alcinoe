@@ -45,7 +45,8 @@ type
                        vpsIdle, // << When a MediaPlayer object is just created using new or after reset() is called, it is in the Idle state
                        vpsError);
 
-  {********************}
+  {*****************}
+  {$REGION 'ANDROID'}
   {$IF defined(ANDROID)}
   TALAndroidVideoPlayer = class(Tobject)
   private
@@ -114,7 +115,6 @@ type
       end;
 
   private
-    fLifeObj: TALLifeObj;
     FMediaPlayer: JMediaPlayer;
     fSurfaceTexture: JSurfaceTexture;
     fbitmap: TALTexture;
@@ -137,11 +137,11 @@ type
     FIsOpenGLContextLost: Boolean;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage);
-    procedure removeListeners;
   protected
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    procedure synchDestroy();
     function getCurrentPosition: integer;
     function getDuration: integer;
     function getVideoHeight: integer;
@@ -165,8 +165,10 @@ type
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
+  {$ENDREGION}
 
-  {****************}
+  {*************}
+  {$REGION 'IOS'}
   {$IF defined(IOS)}
   TALIOSVideoPlayer = class(Tobject)
   private
@@ -272,8 +274,10 @@ type
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
+  {$ENDREGION}
 
-  {**********************}
+  {*******************}
+  {$REGION 'MSWINDOWS'}
   {$IF defined(MSWINDOWS)}
   TALWinVideoPlayer = class(Tobject)
   private
@@ -311,8 +315,10 @@ type
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
+  {$ENDREGION}
 
-  {*******************}
+  {****************}
+  {$REGION '_MACOS'}
   {$IF defined(_MACOS)}
   TALMacOSVideoPlayer = class(Tobject)
   private
@@ -350,6 +356,7 @@ type
     property onVideoSizeChanged: TALVideoSizeChangedNotifyEvent read fonVideoSizeChangedEvent write fonVideoSizeChangedEvent;
   end;
   {$endIF}
+  {$ENDREGION}
 
 type
 
@@ -575,7 +582,12 @@ uses system.SysUtils,
      fmx.controls,
      AlCommon;
 
+{$REGION ' ANDROID'}
 {$IF defined(ANDROID)}
+
+{$IF CompilerVersion > 31} // berlin
+  {$MESSAGE WARN 'remove all Thread.queue/CallInUIThread/CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
+{$ENDIF}
 
 {*******************************************************************************************************************}
 constructor TALAndroidVideoPlayer.TALFrameAvailableListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
@@ -590,7 +602,6 @@ end;
 
 {**********************************************************************************************************}
 procedure TALAndroidVideoPlayer.TALFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
-var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
@@ -612,14 +623,14 @@ begin
   // >> seam to be thread safe - i already make opengl multithread however the updateTexImage seam
   // >> seam to take around 1ms only so their is no really purpose to run it in a different thread than
   // >> the main thread (who already have the OpenGL ES context)
-  aLifeObj := fVideoPlayerControl.fLifeObj;
   tthread.queue(nil,
     procedure
     {$IF defined(DEBUG)}
     var aStopWatch: TStopWatch;
     {$ENDIF}
     begin
-      if not aLifeObj.alive then exit;
+
+      if fVideoPlayerControl = nil then exit;
 
       if fVideoPlayerControl.FIsOpenGLContextLost then exit;
 
@@ -672,7 +683,6 @@ end;
 
 {*******************************************************************************************************}
 function TALAndroidVideoPlayer.TALErrorListener.onError(mp: JMediaPlayer; what, extra: Integer): Boolean;
-var aLifeObj: TALLifeObj;
 begin
 
   //what int: the type of error that has occurred:
@@ -692,20 +702,17 @@ begin
                                          ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
   {$ENDIF}
 
-  fVideoPlayerControl.FMediaPlayer.reset; // << else i have infinite loop here, onError is continuasly called (try to disconnect the wifi and you will see) - stupid behavior !!
+  if mp <> nil then mp.reset; // << else i have infinite loop here, onError is continuasly called (try to disconnect the wifi and you will see) - stupid behavior !!
   result := True; // True if the method handled the error, false if it didn't. Returning false, or not having an
                   // OnErrorListener at all, will cause the OnCompletionListener to be called.
 
-  if assigned(fVideoPlayerControl.fOnErrorEvent) then begin
-    aLifeObj := fVideoPlayerControl.fLifeObj;
-    tthread.queue(nil,
-      procedure
-      begin
-        if not aLifeObj.alive then exit;
-        if assigned(fVideoPlayerControl.fOnErrorEvent) then
-          fVideoPlayerControl.fOnErrorEvent(fVideoPlayerControl);
-      end);
-  end;
+  tthread.queue(nil,
+    procedure
+    begin
+      if fVideoPlayerControl = nil then exit;
+      if assigned(fVideoPlayerControl.fOnErrorEvent) then
+        fVideoPlayerControl.fOnErrorEvent(fVideoPlayerControl);
+    end);
 
 end;
 
@@ -718,23 +725,19 @@ end;
 
 {*******************************************************************************}
 procedure TALAndroidVideoPlayer.TALPreparedListener.onPrepared(mp: JMediaPlayer);
-var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.onPrepared', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  if assigned(fVideoPlayerControl.fOnPreparedEvent) then begin
-    aLifeObj := fVideoPlayerControl.fLifeObj;
-    tthread.queue(nil,
-      procedure
-      begin
-        if not aLifeObj.alive then exit;
-        if assigned(fVideoPlayerControl.fOnPreparedEvent) then
-          fVideoPlayerControl.fOnPreparedEvent(fVideoPlayerControl);
-      end);
-  end;
+  tthread.queue(nil,
+    procedure
+    begin
+      if fVideoPlayerControl = nil then exit;
+      if assigned(fVideoPlayerControl.fOnPreparedEvent) then
+        fVideoPlayerControl.fOnPreparedEvent(fVideoPlayerControl);
+    end);
 
 end;
 
@@ -747,7 +750,6 @@ end;
 
 {***********************************************************************************************************************}
 procedure TALAndroidVideoPlayer.TALVideoSizeChangedListener.onVideoSizeChanged(mp: JMediaPlayer; width, height: Integer);
-var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
@@ -756,11 +758,10 @@ begin
                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  aLifeObj := fVideoPlayerControl.fLifeObj;
   tthread.queue(nil,
     procedure
     begin
-      if not aLifeObj.alive then exit;
+      if fVideoPlayerControl = nil then exit;
       fVideoPlayerControl.FVideoWidth := width;
       fVideoPlayerControl.fVideoHeight := height;
       if assigned(fVideoPlayerControl.fonVideoSizeChangedEvent) then
@@ -781,7 +782,6 @@ end;
 
 {***************************************************************************************************************}
 procedure TALAndroidVideoPlayer.TALBufferingUpdateListener.onBufferingUpdate(mp: JMediaPlayer; percent: Integer);
-var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
@@ -792,16 +792,13 @@ begin
   end;
   {$ENDIF}
 
-  if assigned(fVideoPlayerControl.fOnBufferingUpdateEvent) then begin
-    aLifeObj := fVideoPlayerControl.fLifeObj;
-    tthread.queue(nil,
-      procedure
-      begin
-        if not aLifeObj.alive then exit;
-        if assigned(fVideoPlayerControl.fOnBufferingUpdateEvent) then
-          fVideoPlayerControl.fOnBufferingUpdateEvent(fVideoPlayerControl, percent);
-      end);
-  end;
+  tthread.queue(nil,
+    procedure
+    begin
+      if fVideoPlayerControl = nil then exit;
+      if assigned(fVideoPlayerControl.fOnBufferingUpdateEvent) then
+        fVideoPlayerControl.fOnBufferingUpdateEvent(fVideoPlayerControl, percent);
+    end);
 
 end;
 
@@ -814,23 +811,19 @@ end;
 
 {***********************************************************************************}
 procedure TALAndroidVideoPlayer.TALCompletionListener.onCompletion(mp: JMediaPlayer);
-var aLifeObj: TALLifeObj;
 begin
 
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.onCompletion', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  if assigned(fVideoPlayerControl.fOnCompletionEvent) then begin
-    aLifeObj := fVideoPlayerControl.fLifeObj;
-    tthread.queue(nil,
-      procedure
-      begin
-        if not aLifeObj.alive then exit;
-        if assigned(fVideoPlayerControl.fOnCompletionEvent) then
-          fVideoPlayerControl.fOnCompletionEvent(fVideoPlayerControl);
-      end);
-  end;
+  tthread.queue(nil,
+    procedure
+    begin
+      if fVideoPlayerControl = nil then exit;
+      if assigned(fVideoPlayerControl.fOnCompletionEvent) then
+        fVideoPlayerControl.fOnCompletionEvent(fVideoPlayerControl);
+    end);
 
 end;
 
@@ -846,23 +839,27 @@ begin
   inherited create;
 
   //-----
-  FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
-  FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   FIsOpenGLContextLost := False;
-
-  //-----
-  fLifeObj := TALLifeObj.Create;
 
   //-----
   // i use synchronize in case the TALAndroidVideoPlayer was
   // created in a different thread than the main thread because
   // only the main thread have the openGL ES context (except if
   // you modified the delphi source code to make opengl ES multithread)
+  // Note also that TMessageManager.DefaultManager.SubscribeToMessage can
+  // be call only in the main thread
   TThread.Synchronize(nil,
     procedure
     begin
+
+      //----
+      FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
+      FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
+
+      //----
       fBitmap := TalTexture.Create(False);
       ALInitializeEXTERNALOESTexture(fBitmap);
+
     end);
 
   //-----
@@ -911,12 +908,39 @@ begin
   {$ENDIF}
 
   //-----
+  // i use synchronize in case the TALAndroidVideoPlayer was
+  // created in a different thread than the main thread because
+  // only the main thread have the openGL ES context (except if
+  // you modified the delphi source code to make opengl ES multithread)
+  // Note also that TMessageManager.DefaultManager.Unsubscribe can be call
+  // only in the main thread
+  TThread.Synchronize(nil, synchDestroy);
+
+  //-----
+  inherited;
+
+end;
+
+{*******************************************}
+// this procedure because of this nasty bug :
+// https://stackoverflow.com/questions/44349397/under-android-why-tthread-synchronize-followed-by-callinuithread-result-in-app?noredirect=1#comment75706313_44349397
+procedure TALAndroidVideoPlayer.synchDestroy;
+var aMediaPlayer: JMediaPlayer;
+    aSurfaceTexture: JSurfaceTexture;
+    abitmap: TALTexture;
+begin
+
+  //-----
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
   TMessageManager.DefaultManager.Unsubscribe(TContextResetMessage, FOpenGLContextResetId);
 
-  //stop all futur TThread.queue to execute
-  //and also signal that the object is destroying
-  fLifeObj.alive := False;
+  //-----
+  fOnErrorListener.FVideoPlayerControl := nil;
+  fOnPreparedListener.FVideoPlayerControl := nil;
+  fOnVideoSizeChangedListener.FVideoPlayerControl := nil;
+  fOnBufferingUpdateListener.FVideoPlayerControl := nil;
+  fOnCompletionListener.FVideoPlayerControl := nil;
+  fOnFrameAvailableListener.FVideoPlayerControl := nil;
 
   // to make sure none of the listeners get called anymore
   // FVideoPlayer.reset will do
@@ -936,54 +960,52 @@ begin
   //   }
   //
   //
-  CallInUIThreadAndWaitFinishing(removeListeners); // i must use removeListeners else
-                                                   // a strong ref to FMediaPlayer is keep and
-                                                   // later their is an exception when delphi
-                                                   // try (again) to free the object (who is already freed)
-
-  //----
-  alfreeandNil(FOnErrorListener);
-  alfreeandNil(FOnPreparedListener);
-  alfreeandNil(fonVideoSizeChangedListener);
-  alfreeandNil(fOnBufferingUpdateListener);
-  alfreeandNil(fOnCompletionListener);
-  //-----
-  FMediaPlayer.setSurface(nil);
-  FMediaPlayer.release;
-  FMediaPlayer := nil;
-  //-----
-  alfreeAndNil(FOnFrameAvailableListener);
-  fSurfaceTexture.release;
-  fSurfaceTexture := nil;
-
-  //-----
-  // i use synchronize in case the TALAndroidVideoPlayer was
-  // created in a different thread than the main thread because
-  // only the main thread have the openGL ES context (except if
-  // you modified the delphi source code to make opengl ES multithread)
-  TThread.Synchronize(nil,
+  aMediaPlayer := FMediaPlayer;
+  aSurfaceTexture := fSurfaceTexture;
+  abitmap := fbitmap;
+  CallInUiThread(
     procedure
     begin
-      alFreeandNil(fbitmap);
+
+      //-----
+      aMediaPlayer.setOnErrorListener(nil);
+      aMediaPlayer.setOnPreparedListener(nil);
+      aMediaPlayer.setOnVideoSizeChangedListener(nil);
+      aMediaPlayer.setOnBufferingUpdateListener(nil);
+      aMediaPlayer.setOnCompletionListener(nil);
+      aMediaPlayer.setSurface(nil);
+      aMediaPlayer.release;
+      aMediaPlayer := nil;
+      aSurfaceTexture.setOnFrameAvailableListener(nil);
+      aSurfaceTexture.release;
+      aSurfaceTexture := nil;
+
+      //-----
+      // i use Queue in case the TALAndroidVideoPlayer was
+      // created in a different thread than the main thread because
+      // only the main thread have the openGL ES context (except if
+      // you modified the delphi source code to make opengl ES multithread)
+      TThread.Queue(nil,
+        procedure
+        begin
+          alFreeandNil(abitmap);
+        end);
+
     end);
 
-  //-----
-  fLifeObj := nil; // << it's the autorefcount process that must free this object
+  //unfortunatly i can't make the previous instruction with wait
+  //because when the app close, then the wait will never finish :(
+  //but doesn't matter we don't need to free the object below, it's
+  //we be done automatiquely
+  //alfreeandNil(FOnErrorListener);
+  //alfreeandNil(FOnPreparedListener);
+  //alfreeandNil(fonVideoSizeChangedListener);
+  //alfreeandNil(fOnBufferingUpdateListener);
+  //alfreeandNil(fOnCompletionListener);
+  //alfreeandNil(FOnFrameAvailableListener);
+  //FMediaPlayer := nil;
+  //fSurfaceTexture := nil;
 
-  //-----
-  inherited;
-
-end;
-
-{**********************************************}
-Procedure TALAndroidVideoPlayer.removeListeners;
-begin
-  FMediaPlayer.setOnErrorListener(nil);
-  FMediaPlayer.setOnPreparedListener(nil);
-  FMediaPlayer.setOnVideoSizeChangedListener(nil);
-  FMediaPlayer.setOnBufferingUpdateListener(nil);
-  FMediaPlayer.setOnCompletionListener(nil);
-  fSurfaceTexture.setOnFrameAvailableListener(nil);
 end;
 
 {***************************************************************************************************}
@@ -1235,7 +1257,9 @@ begin
 end;
 
 {$ENDIF}
+{$ENDREGION}
 
+{$REGION ' IOS'}
 {$IF defined(IOS)}
 
 {***}
@@ -2100,7 +2124,9 @@ begin
 end;
 
 {$ENDIF}
+{$ENDREGION}
 
+{$REGION 'MSWINDOWS'}
 {$IF defined(MSWINDOWS)}
 
 {***********************************}
@@ -2199,7 +2225,9 @@ begin
 end;
 
 {$ENDIF}
+{$ENDREGION}
 
+{$REGION '_MACOS'}
 {$IF defined(_MACOS)}
 
 {*************************************}
@@ -2298,10 +2326,15 @@ begin
 end;
 
 {$ENDIF}
+{$ENDREGION}
 
 {********************************}
 constructor TALVideoPlayer.Create;
 begin
+   {$IFDEF DEBUG}
+  ALLog('TALVideoPlayer.Create', 'Start', TalLogType.VERBOSE);
+  {$ENDIF}
+
   inherited create;
   //-----
   {$IF defined(android)}
@@ -2334,13 +2367,23 @@ begin
   fTag := 0;
   FTagObject := nil;
   FTagFloat := 0.0;
+
+   {$IFDEF DEBUG}
+  ALLog('TALVideoPlayer.Create', 'END', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {********************************}
 destructor TALVideoPlayer.Destroy;
 begin
+  {$IFDEF DEBUG}
+  ALLog('TALVideoPlayer.Destroy', 'Start', TalLogType.VERBOSE);
+  {$ENDIF}
   AlFreeAndNil(fVideoPlayerControl);
   inherited;
+  {$IFDEF DEBUG}
+  ALLog('TALVideoPlayer.Destroy', 'END', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {*************************************************************************************}

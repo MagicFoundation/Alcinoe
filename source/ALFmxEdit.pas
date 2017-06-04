@@ -588,7 +588,6 @@ begin
   FSoftInputListener.FEditControl := nil;
   FKeyPreImeListener.FEditControl := nil;
 
-  TUIThreadCaller.ForceRunnablesCollection;
   TUIThreadCaller.Call<JALEditText, JALControlHostLayout>(
     procedure (aEditText: JALEditText; aLayout: JALControlHostLayout)
     begin
@@ -599,7 +598,6 @@ begin
       aEditText.setOnEditorActionListener(nil);
       aEditText.SetSoftInputListener(nil);
       aEditText.SetKeyPreImeListener(nil);
-
 
       aLayout.removeAllViews();
       MainActivity.getViewStack.removeView(aLayout);
@@ -1050,6 +1048,12 @@ end;
 function TALAndroidEdit.getText: String;
 var aText: JCharSequence;
 begin
+  // i don't understand why but on some device, just after the app is created
+  // and not already fully working then the instruction CallInUIThreadAndWaitFinishing
+  // below will never finished :( i see it on a galaxy tab 3 (so low quality device)
+  // when in onAfterTextChanged we try to retrieve the text. Anyway i hope in tokyo update 1
+  // they will correct the threading problem and this error will dispear ... because
+  // else i have no solution
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
@@ -2059,7 +2063,13 @@ procedure TALEdit.OnFontChanged(Sender: TObject);
 begin
   if csLoading in componentState then exit;
   if FEditControl = nil then CreateEditControl;
-  FEditControl.TextSettings.Assign(ftextsettings);
+  FEditControl.TextSettings.BeginUpdate;
+  try
+    FEditControl.TextSettings.IsChanged := True;
+    FEditControl.TextSettings.Assign(ftextsettings);
+  finally
+    FEditControl.TextSettings.EndUpdate;
+  end;
 end;
 
 {*********************************************}

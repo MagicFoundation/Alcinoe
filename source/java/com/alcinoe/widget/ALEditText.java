@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.os.Build;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
@@ -26,7 +27,7 @@ public class ALEditText extends EditText {
   private ALSoftInputListener mSoftInputListener;
   private ALKeyPreImeListener mKeyPreImeListener;
   private OnGlobalLayoutListener mOnGlobalLayoutListener;
-  private ActionMode mFloatingActionMode;
+  private ALFloatingActionMode mFloatingActionMode;
   private View mFloatingActionModeOriginatingView;
   private OnPreDrawListener mFloatingToolbarPreDrawListener;
   private ALFloatingToolbar mFloatingToolbar;    
@@ -144,7 +145,7 @@ public class ALEditText extends EditText {
   public ActionMode startActionMode(ActionMode.Callback callback) {    
 
     ALActionMode.Callback2 wrappedCallback = new ActionModeCallback2Wrapper(callback);
-    ActionMode mode = null;
+    ALFloatingActionMode mode = null;
     mode = createFloatingActionMode(this, wrappedCallback);
     if (mode != null && wrappedCallback.onCreateActionMode(mode, mode.getMenu())) {
         setHandledFloatingActionMode(mode);
@@ -194,7 +195,7 @@ public class ALEditText extends EditText {
     }
   }
 
-  private ActionMode createFloatingActionMode(
+  private ALFloatingActionMode createFloatingActionMode(
           View originatingView, ALActionMode.Callback2 callback) {
       if (mFloatingActionMode != null) {
           mFloatingActionMode.finish();
@@ -214,10 +215,10 @@ public class ALEditText extends EditText {
       return mode;
   } 
 
-  private void setHandledFloatingActionMode(ActionMode mode) {
+  private void setHandledFloatingActionMode(ALFloatingActionMode mode) {
       mFloatingActionMode = mode;
       mFloatingToolbar = new ALFloatingToolbar(mContext, ((Activity) mContext).getWindow(), mDefStyleAttr);
-      ((ALFloatingActionMode) mFloatingActionMode).setFloatingToolbar(mFloatingToolbar);
+      mFloatingActionMode.setFloatingToolbar(mFloatingToolbar);
       mFloatingActionMode.invalidate();  // Will show the floating toolbar if necessary.
       mFloatingActionModeOriginatingView.getViewTreeObserver()
           .addOnPreDrawListener(mFloatingToolbarPreDrawListener);
@@ -257,15 +258,15 @@ public class ALEditText extends EditText {
 
       @Override
       public void onGetContentRect(ActionMode mode, View view, Rect outRect) {
-          try {
+          if (Build.VERSION.SDK_INT >= 23) {
             if (mWrapped instanceof ActionMode.Callback2) {
                 ((ActionMode.Callback2) mWrapped).onGetContentRect(mode, view, outRect);
             } else {
                 super.onGetContentRect(mode, view, outRect);
             }
-          } catch (Throwable e) {
-              // Older implementations of custom views might not implement this.
-              super.onGetContentRect(mode, view, outRect);
+          }
+          else {
+            super.onGetContentRect(mode, view, outRect);            
           }
       }
   }

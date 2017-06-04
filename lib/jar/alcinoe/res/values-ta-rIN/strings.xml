@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+  <string name="al_prepend_shortcut_label">"மெனு+"</string>
+  <string name="al_menu_space_shortcut_label">"இடைவெளி"</string>
+  <string name="al_menu_enter_shortcut_label">"உள்ளிடு"</string>
+  <string name="al_menu_delete_shortcut_label">"நீக்கு"</string>
+  <string name="al_floating_toolbar_open_overflow_description">"கூடுதல் விருப்பங்கள்"</string>
+  <string name="al_floating_toolbar_close_overflow_description">"மேல்தோன்றலை மூடு"</string>
+
+</resources>

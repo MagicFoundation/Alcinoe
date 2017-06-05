@@ -42,15 +42,20 @@ type
   // the design of the androidText can be done in the res/styles.xml
   // please see the example of the demos\AlFmxcontrols.dproj
   //
-  // know BUG:
-  //   * actiomode copy/paste popup is under my EditText - http://stackoverflow.com/questions/39561133/why-the-actiomode-copy-paste-popup-is-under-my-edittext
-  //   * actionmode translate-contextual-menu not work - http://stackoverflow.com/questions/39540693/how-to-enable-the-translate-contextual-menu-in-my-edittext
-  //   * no actionbar on lollipop: http://stackoverflow.com/questions/39506977/is-it-possible-to-show-the-android-actionbar-in-delphi-firemonkey-app
-  //                               http://stackoverflow.com/questions/39501339/how-to-replace-the-actionbar-by-a-popup-menu
-  //                               http://stackoverflow.com/questions/39396662/edittext-how-to-activate-copy-paste-popup-without-any-actionbar
+  // know bug: it's not really a bug, but if you show several edit on the form
+  //           then all these edits are in their own window. the problem on android
+  //           is that the window system management doesn't permit to change the
+  //           z-order of the popup windows with same type. i look in the source code, and if we can
+  //           access com.android.server.wm.WindowManagerService then it's could be easy
+  //           because Z-order is just defined by the order of some internal list of WindowState (ie WindowList)
+  //           (see addAppWindowToListLocked for example). as a workaround the only solution
+  //           i found was to remove the window from the app and then add it again (because
+  //           last added window is always on the top). but this cause little nasty effect because
+  //           the edit is visually hidden to be latter visually show again .. we will say it's a
+  //           click effect ;) we need the z-order because of the keyword suggestion popup windows that
+  //           could be behind other edit
+  //           https://stackoverflow.com/questions/44231597/how-to-change-the-z-order-of-window-added-via-windowmanager
   //
-  // I didn't find yet how to set the background color of the floating actionbar under
-  // marshmallow: http://stackoverflow.com/questions/39570788/how-to-customize-the-background-of-the-floating-actionbar
   TALAndroidEdit = class(TControl)
   private
 
@@ -471,6 +476,8 @@ begin
   FTextSettings.OnChanged := OnFontChanged;
   fHideSoftInputOnExit := True;
   //-----
+  inc(ALViewStackCount);
+  //-----
   CallInUIThreadAndWaitFinishing(
     procedure
     var aLayoutParams: JViewGroup_LayoutParams;
@@ -587,6 +594,8 @@ begin
   fEditorActionListener.FEditControl := nil;
   FSoftInputListener.FEditControl := nil;
   FKeyPreImeListener.FEditControl := nil;
+
+  dec(ALViewStackCount);
 
   TUIThreadCaller.Call<JALEditText, JALControlHostLayout>(
     procedure (aEditText: JALEditText; aLayout: JALControlHostLayout)
@@ -744,6 +753,7 @@ end;
 
 {*******************************}
 procedure TALAndroidEdit.DoEnter;
+var aTmpViewStackCount: integer;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.DoEnter', 'start', TalLogType.VERBOSE);
@@ -751,9 +761,15 @@ begin
 
   inherited;
 
+  aTmpViewStackCount := ALViewStackCount; // << because ALViewStackCount can be accessed only from main Thread
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
+      if aTmpViewStackCount > 1 then begin
+        MainActivity.getViewStack.Removeview(FLayout);
+        MainActivity.getViewStack.addview(FLayout);
+        MainActivity.getViewStack.addview(nil);
+      end;
       MainActivity.getViewStack.addview(FLayout); // << this will "activate" the view - important to enable the virtual keyboard
                                                   //
                                                   //    public class ViewStack {

@@ -641,7 +641,13 @@ public final class ALFloatingToolbar {
             int rootViewTopOnWindow = mTmpCoords[1];
             int windowLeftOnScreen = rootViewLeftOnScreen - rootViewLeftOnWindow;
             int windowTopOnScreen = rootViewTopOnScreen - rootViewTopOnWindow;
-            mCoordsOnWindow.set(x - windowLeftOnScreen, y - windowTopOnScreen);
+            
+            // It's seam that now the status bar is taking in account when showing the popupWindow
+            // don't know really why, i will not take days to understand, just offset the height
+            // of the status bar and everything is fine
+            int statusBarHeight = mViewPortOnScreen.top;
+            
+            mCoordsOnWindow.set(x - windowLeftOnScreen, y - windowTopOnScreen - statusBarHeight);
         }
 
         private int getToolbarHeightWithVerticalMargin() {

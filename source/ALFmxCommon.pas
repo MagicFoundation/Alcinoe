@@ -9196,6 +9196,8 @@ end;
 
 initialization
   ALCustomConvertFontFamilyProc := nil;
+  {$IFDEF ANDROID}
   ALViewStackCount := 0;
+  {$ENDIF}
 
 end.

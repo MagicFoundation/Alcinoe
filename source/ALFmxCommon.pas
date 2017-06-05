@@ -947,6 +947,10 @@ Type
     FMessageId: Integer;
   end;
 
+{$IFDEF ANDROID}
+var ALViewStackCount: integer;
+{$ENDIF}
+
 implementation
 
 uses system.SysUtils,
@@ -9192,5 +9196,6 @@ end;
 
 initialization
   ALCustomConvertFontFamilyProc := nil;
+  ALViewStackCount := 0;
 
 end.

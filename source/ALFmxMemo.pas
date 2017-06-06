@@ -27,6 +27,24 @@ uses System.Types,
      AlFMXEdit,
      ALFmxObjects;
 
+{$REGION ' WINDOWS / MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+type
+
+  {**************************}
+  TALStyledMemo = class(TMemo)
+  private
+    fWasEntered: Boolean;
+    procedure OnApplyStyleLookupImpl(sender: Tobject);
+  protected
+    procedure DoEnter; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+{$endif}
+{$ENDREGION}
+
 type
 
   {***************************}
@@ -50,7 +68,7 @@ type
     fLineSpacingMultiplier: Single;
     fTextPrompt: String;
     fTextPromptColor: TalphaColor;
-    fMemoControl: TMemo;
+    fMemoControl: TALStyledMemo;
     {$ENDIF}
     function GetTextPrompt: String;
     procedure setTextPrompt(const Value: String);
@@ -142,7 +160,8 @@ implementation
 uses system.Math,
      system.Math.Vectors,
      fmx.consts,
-     {$IF defined(IOS)}
+     {$IF defined(ANDROID)}
+     {$ELSEIF defined(IOS)}
      System.SysUtils,
      Macapi.CoreFoundation,
      iOSapi.CoreGraphics,
@@ -151,7 +170,13 @@ uses system.Math,
      iOSapi.CoreText,
      FMX.Helpers.iOS,
      FMX.Consts,
-     {$endif}
+     {$ELSE}
+     FMX.Styles.Objects,
+     FMX.BehaviorManager,
+     FMX.StdCtrls,
+     FMX.Memo.style,
+     FMX.Layouts,
+     {$ENDIF}
      ALCommon,
      ALString,
      AlFmxCommon;
@@ -177,6 +202,89 @@ begin
   VertAlign := TTextAlign.Leading;
   WordWrap := True;
 end;
+
+{$REGION ' WINDOWS / MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+
+{***************************************************}
+constructor TALStyledMemo.Create(AOwner: TComponent);
+begin
+  inherited create(AOwner);
+  fWasEntered := False;
+  OnApplyStyleLookup := OnApplyStyleLookupImpl;
+end;
+
+{**}
+type
+  _TOpenControl = class (TControl);
+
+{******************************}
+procedure TALStyledMemo.DoEnter;
+begin
+  if not fWasEntered then begin
+    _TOpenControl(content).FRecalcUpdateRect := True; // << without this the caret is not show when you first click on the Memo
+                                                      // << #{\#@#{^ emb team they really don't test anything they do :(
+                                                      // << mistake you can found in 1 min it's not normal they are in production
+    fWasEntered := True;
+  end;
+  inherited;
+end;
+
+{**************************************************************}
+procedure TALStyledMemo.OnApplyStyleLookupImpl(sender: Tobject);
+Var aPaddingTop: Single;
+    aPaddingRight: single;
+    I, j, k, l: integer;
+begin
+
+  // TALStyledMemo
+  //   TStyledMemo
+  //      TLayout
+  //         TActiveStyleObject
+  //            TLayout
+  //            TScrollBar
+  //            TScrollBar
+  //            TLayout
+  //               TSmallScrollBar
+  //               TSmallScrollBar
+  //   TScrollContent
+  for I := 0 to controls.Count - 1 do begin
+    if (controls[i] is TStyledMemo) then begin // << TStyledMemo
+      for j := 0 to controls[i].controls.Count - 1 do begin
+        if (controls[i].Controls[j] is TLayout) then begin // << TLayout
+          for k := 0 to controls[i].Controls[j].controls.Count - 1 do begin
+             if (controls[i].Controls[j].Controls[k] is TActiveStyleObject) then begin // << TActiveStyleObject
+              with (controls[i].Controls[j].Controls[k] as TActiveStyleObject) do begin
+                ActiveLink.Clear;
+                SourceLink.Clear;
+                aPaddingTop := Padding.Top;
+                aPaddingRight := Padding.right;
+              end;
+              for l := 0 to controls[i].Controls[j].Controls[k].controls.Count - 1 do begin
+                if (controls[i].Controls[j].Controls[k].Controls[l] is TScrollBar) then begin // << TScrollBar
+                  with (controls[i].Controls[j].Controls[k].Controls[l] as TScrollBar) do begin
+                    if Align = TalignLayout.Right then begin
+                      Align := TalignLayout.None;
+                      Height := Tcontrol(self.Parent).Height;
+                      anchors := [TAnchorKind.akright,TAnchorKind.akTop,TAnchorKind.akBottom];
+                      Tcontrol(self.Parent).Padding.Right := Tcontrol(self.Parent).Padding.Right + width;
+                      position.y := position.y - Tcontrol(self.Parent).Padding.Top - aPaddingTop;
+                      position.x := position.x + Tcontrol(self.Parent).Padding.right + aPaddingRight;
+                    end;
+                  end;
+                end;
+              end;
+            end;
+          end;
+        end;
+      end;
+    end;
+  end;
+
+end;
+
+{$endif}
+{$ENDREGION}
 
 {*********************************************}
 constructor TALMemo.Create(AOwner: TComponent);
@@ -248,14 +356,15 @@ begin
   FMemoControl.Locked := True;
   FMemoControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   {$ELSE}
-  fMemoControl := TMemo.Create(self);
+  fMemoControl := TALStyledMemo.Create(self);
   fMemoControl.Parent := self;
   FMemoControl.Stored := False;
   FMemoControl.SetSubComponent(True);
   FMemoControl.Locked := True;
   FMemoControl.ControlType := TcontrolType.Styled; // << on windows platform is not good as Styled
-  FMemoControl.StyleLookup := 'transparentedit';
   FMemoControl.StyledSettings := []; // Family, Size, Style, FontColor, Other
+  FMemoControl.Bounces := TBehaviorBoolean.False;
+  FMemoControl.AutoHide := TBehaviorBoolean.False;
   {$ENDIF}
   FMemoControl.Align := TAlignLayout.Client;
   FMemoControl.OnChangeTracking := DoChangeTracking;

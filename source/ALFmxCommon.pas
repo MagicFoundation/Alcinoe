@@ -951,6 +951,11 @@ Type
 var ALViewStackCount: integer;
 {$ENDIF}
 
+{$IFDEF ANDROID}
+function ALControlNeedKeyboard(const aControl: IControl): Boolean;
+procedure ALObtainKeyboardRect(var aBounds: TRect);
+{$ENDIF}
+
 implementation
 
 uses system.SysUtils,
@@ -963,7 +968,9 @@ uses system.SysUtils,
      Androidapi.JNI.Os,
      Androidapi.Bitmap,
      FMX.Helpers.Android,
+     FMX.platForm.android,
      ALFmxTypes3D,
+     alFmxEdit,
      {$IFEND}
      {$IF defined(IOS)}
      iOSapi.UIKit,
@@ -9193,6 +9200,29 @@ begin
     ALfreeandNil(aStream);
   end;
 end;
+
+{**************}
+{$IFDEF ANDROID}
+function ALControlNeedKeyboard(const aControl: IControl): Boolean;
+begin
+  result := (aControl <> nil) and
+            (aControl is TALAndroidEdit);
+end;
+{$ENDIF}
+
+{**************}
+{$IFDEF ANDROID}
+procedure ALObtainKeyboardRect(var aBounds: TRect);
+var aContentRect, aTotalRect: JRect;
+begin
+  aContentRect := TJRect.Create;
+  aTotalRect := TJRect.Create;
+  MainActivity.getWindow.getDecorView.getWindowVisibleDisplayFrame(aContentRect);
+  MainActivity.getWindow.getDecorView.getDrawingRect(aTotalRect);
+  aBounds := TRectF.Create(ConvertPixelToPoint(TPointF.Create(aTotalRect.left, aContentRect.bottom)), // topleft
+                           ConvertPixelToPoint(TPointF.Create(aTotalRect.right, aTotalRect.bottom))).Truncate;  //bottomRight
+end;
+{$ENDIF}
 
 initialization
   ALCustomConvertFontFamilyProc := nil;

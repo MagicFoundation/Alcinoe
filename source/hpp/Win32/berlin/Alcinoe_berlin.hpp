@@ -32,6 +32,7 @@
 #include <ALCipher.hpp>
 #include <ALAVLBinaryTree.hpp>
 #include <ALVideoPlayer.hpp>
+#include <ALFmxMemo.hpp>
 #include <Winapi.Windows.hpp>	// (rtl)
 #include <Winapi.PsAPI.hpp>	// (rtl)
 #include <System.Character.hpp>	// (rtl)
@@ -159,6 +160,12 @@
 #include <ToolsAPI.hpp>	// (designide)
 #include <Proxies.hpp>	// (designide)
 #include <DesignEditors.hpp>	// (designide)
+#include <FMX.ScrollBox.Style.hpp>	// (fmx)
+#include <FMX.ScrollBox.Win.hpp>	// (fmx)
+#include <FMX.ScrollBox.hpp>	// (fmx)
+#include <FMX.Memo.Style.hpp>	// (fmx)
+#include <FMX.Memo.Win.hpp>	// (fmx)
+#include <FMX.Memo.hpp>	// (fmx)
 
 //-- user supplied -----------------------------------------------------------
 

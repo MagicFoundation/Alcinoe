@@ -1,7 +1,7 @@
 unit ALIosNativeControl;
 
-{$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if MX.Presentation.iOS.pas was not updated and adjust the IFDEF'}
+{$IF CompilerVersion > 31} // berlin
+  {$MESSAGE WARN 'Check if FMX.Presentation.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 interface

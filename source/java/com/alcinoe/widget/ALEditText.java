@@ -16,6 +16,8 @@ import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.os.Build;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
@@ -119,6 +121,20 @@ public class ALEditText extends EditText {
   
   protected InputMethodManager getInputMethodManager() {
     return (InputMethodManager) getContext().getSystemService("input_method");
+  }
+
+  @Override
+  public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+    InputConnection connection = super.onCreateInputConnection(outAttrs);
+    int imeActions = outAttrs.imeOptions&EditorInfo.IME_MASK_ACTION;
+    if ((imeActions&EditorInfo.IME_ACTION_DONE) != 0) {
+      outAttrs.imeOptions ^= imeActions;
+      outAttrs.imeOptions |= EditorInfo.IME_ACTION_DONE;
+      if ((outAttrs.imeOptions&EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0) {
+          outAttrs.imeOptions &= ~EditorInfo.IME_FLAG_NO_ENTER_ACTION;
+      }
+    }
+    return connection;
   }
 
   // when the view are added via windowManager.addView(view, Layout_Params)

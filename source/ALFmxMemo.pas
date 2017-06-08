@@ -11,6 +11,7 @@ uses System.Types,
      System.UITypes,
      {$IF defined(ANDROID)}
      ALANdroidApi,
+     AlFMXEdit,
      {$ELSEIF defined(IOS)}
      System.TypInfo,
      iOSapi.Foundation,
@@ -25,7 +26,6 @@ uses System.Types,
      FMX.types,
      Fmx.Graphics,
      Fmx.controls,
-     AlFMXEdit,
      ALFmxObjects;
 
 {$REGION ' IOS'}
@@ -324,7 +324,6 @@ uses {$IF defined(ANDROID)}
      {$ELSEIF defined(IOS)}
      System.SysUtils,
      Macapi.CoreFoundation,
-     iOSapi.CoreGraphics,
      iOSapi.CocoaTypes,
      Macapi.Helpers,
      iOSapi.CoreText,
@@ -340,7 +339,6 @@ uses {$IF defined(ANDROID)}
      system.Math.Vectors,
      fmx.consts,
      ALCommon,
-     ALString,
      AlFmxCommon;
 
 {**}

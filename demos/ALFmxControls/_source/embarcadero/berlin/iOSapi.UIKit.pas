@@ -4733,6 +4733,8 @@ type
     procedure unmarkText; cdecl;
     { UITextInput }
     function markedTextRange: UITextRange; cdecl;
+    procedure setTextContainerInset(textContainerInset: UIEdgeInsets); cdecl; // << https://quality.embarcadero.com/browse/RSP-18314
+    function textContainerInset: UIEdgeInsets; cdecl; // << https://quality.embarcadero.com/browse/RSP-18314
   end;
   TUITextView = class(TOCGenericImport<UITextViewClass, UITextView>)  end;
 

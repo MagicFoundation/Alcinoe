@@ -21,7 +21,6 @@
 #include <FMX.Types.hpp>
 #include <FMX.Graphics.hpp>
 #include <FMX.Controls.hpp>
-#include <ALFmxEdit.hpp>
 #include <ALFmxObjects.hpp>
 #include <FMX.ScrollBox.hpp>
 #include <FMX.Controls.Presentation.hpp>
@@ -41,11 +40,21 @@ class PASCALIMPLEMENTATION TALStyledMemo : public Fmx::Memo::TMemo
 	
 private:
 	Fmx::Types::TBounds* FPadding;
-	bool fWasEntered;
 	float fVertScrollBarWidth;
+	Alfmxobjects::TALText* fTextPromptControl;
+	System::Classes::TNotifyEvent FOnChangeTracking;
+	Fmx::Graphics::TTextSettings* FTextSettings;
 	void __fastcall OnApplyStyleLookupImpl(System::TObject* sender);
 	HIDESBASE void __fastcall SetPadding(Fmx::Types::TBounds* const Value);
 	HIDESBASE Fmx::Types::TBounds* __fastcall GetPadding(void);
+	System::UnicodeString __fastcall GetTextPrompt(void);
+	void __fastcall setTextPrompt(const System::UnicodeString Value);
+	System::Uitypes::TAlphaColor __fastcall GetTextPromptColor(void);
+	void __fastcall setTextPromptColor(const System::Uitypes::TAlphaColor Value);
+	void __fastcall OnChangeTrackingImpl(System::TObject* sender);
+	HIDESBASE Fmx::Graphics::TTextSettings* __fastcall GetTextSettings(void);
+	HIDESBASE void __fastcall SetTextSettings(Fmx::Graphics::TTextSettings* const Value);
+	void __fastcall OnFontChanged(System::TObject* Sender);
 	
 protected:
 	virtual void __fastcall DoEnter(void);
@@ -53,7 +62,11 @@ protected:
 public:
 	__fastcall virtual TALStyledMemo(System::Classes::TComponent* AOwner)/* overload */;
 	__fastcall virtual ~TALStyledMemo(void);
+	__property System::UnicodeString TextPrompt = {read=GetTextPrompt, write=setTextPrompt};
+	__property System::Uitypes::TAlphaColor TextPromptColor = {read=GetTextPromptColor, write=setTextPromptColor, default=0};
 	__property Fmx::Types::TBounds* Padding = {read=GetPadding, write=SetPadding};
+	__property System::Classes::TNotifyEvent OnChangeTracking = {read=FOnChangeTracking, write=FOnChangeTracking};
+	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
 };
 
 
@@ -72,8 +85,6 @@ private:
 	System::Uitypes::TAlphaColor fTintColor;
 	float fLineSpacingMultiplier;
 	float fLineSpacingExtra;
-	System::UnicodeString fTextPrompt;
-	System::Uitypes::TAlphaColor fTextPromptColor;
 	TALStyledMemo* fMemoControl;
 	System::UnicodeString __fastcall GetTextPrompt(void);
 	void __fastcall setTextPrompt(const System::UnicodeString Value);

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+  <string name="al_prepend_shortcut_label">"ምናሌ+"</string>
+  <string name="al_menu_space_shortcut_label">"ቦታ"</string>
+  <string name="al_menu_enter_shortcut_label">"አሰገባ"</string>
+  <string name="al_menu_delete_shortcut_label">"ሰርዝ"</string>
+  <string name="al_floating_toolbar_open_overflow_description">"ተጨማሪ አማራጮች"</string>
+  <string name="al_floating_toolbar_close_overflow_description">"ትርፍ ፍሰትን ዝጋ"</string>
+
+</resources>

@@ -7,8 +7,8 @@ object Form1: TForm1
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  FullScreen = True
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnResize = FormResize
   OnVirtualKeyboardShown = FormVirtualKeyboardShown
   OnVirtualKeyboardHidden = FormVirtualKeyboardHidden
@@ -622,41 +622,9 @@ object Form1: TForm1
       Size.PlatformDefault = False
       TabOrder = 53
     end
-    object ALRectangle2: TALRectangle
-      Align = Top
-      Fill.Color = xFF0087B4
-      Margins.Bottom = 25.000000000000000000
-      Position.Y = 3051.937500000000000000
-      Size.Width = 320.000000000000000000
-      Size.Height = 86.000000000000000000
-      Size.PlatformDefault = False
-      Stroke.Kind = None
-      object ALEdit2: TALEdit
-        Align = Center
-        Fill.Color = xFF0087B4
-        Margins.Left = 25.000000000000000000
-        Margins.Right = 25.000000000000000000
-        Sides = [Bottom]
-        Size.Width = 270.000000000000000000
-        Size.Height = 39.000000000000000000
-        Size.PlatformDefault = False
-        Stroke.Color = xFF80C3DA
-        Stroke.Kind = Solid
-        DefStyleAttr = 'BlueBGTextViewStyle'
-        TabOrder = 0
-        TextSettings.FontColor = claWhite
-        TextPrompt = 'Write something here'
-        TextPromptColor = xFF80C3DA
-        TintColor = claWhite
-        OnChangeTracking = ALEdit2ChangeTracking
-        OnEnter = ALEditEnter
-        OnExit = ALEditExit
-      end
-    end
-    object Text11: TText
+    object Text11: TALText
       Align = Top
       AutoSize = True
-      HitTest = False
       Margins.Left = 16.000000000000000000
       Margins.Top = 15.000000000000000000
       Margins.Right = 16.000000000000000000
@@ -664,18 +632,19 @@ object Form1: TForm1
       Position.X = 16.000000000000000000
       Position.Y = 2861.367187500000000000
       Size.Width = 288.000000000000000000
-      Size.Height = 175.570312500000000000
+      Size.Height = 160.000000000000000000
       Size.PlatformDefault = False
       Text = 
-        'Below the Native Android/IOS TALEdit (On windows/mac use standar' +
-        't TEdit). The selection cursor are deactivated on android 21 (lo' +
-        'llipop) but work perfectly well on upper version (like marshamal' +
-        'low) or lower version (like kitkat), you can read more info abou' +
-        't this in the readme_firemonkey.txt. You can try under Android t' +
-        'o move the screen on the horizontal when editing to see one of t' +
-        'he advantage of using native editText. On marshmallow and up you' +
-        ' can also see badly written word underlined in red and correctio' +
-        'n popup.'
+        'Below the Native Android/IOS TALEdit/TALMemo (On windows/mac use' +
+        ' standart TEdit/TMemo). You can try under Android to move the sc' +
+        'reen on the horizontal when editing to see one of the advantage ' +
+        'of using native editText. On marshmallow and up you can also see' +
+        ' badly written word underlined in red and correction popup. <b>T' +
+        'he drawback of these controls is that under android they not scr' +
+        'oll very well  so you must avoid to use it on some scrollbox.</b' +
+        '>'
+      TextSettings.WordWrap = True
+      TextIsHtml = True
     end
     object Button12: TButton
       Align = Top
@@ -740,12 +709,13 @@ object Form1: TForm1
       TextSettings.FontColor = claCrimson
     end
     object ALVideoPlayerSurface1: TALVideoPlayerSurface
+      Touch.InteractiveGestures = [DoubleTap]
       Align = Top
       Position.Y = 1708.484375000000000000
       Size.Width = 320.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
-      OnClick = ALVideoPlayerSurface1Click
+      OnClick = ALVideoPlayerSurface1DblClick
       object Text12: TText
         Align = Top
         HitTest = False
@@ -854,11 +824,11 @@ object Form1: TForm1
         'nt windows placed on the top of the form, so without z-order and' +
         ' scrolling animation is disaster. Finally as we have the texture' +
         ' of each frame, we can apply on it all the effect we want (black' +
-        ' and white, noise, etc..) ! You can try to <b>click</b> on the v' +
-        'ideo to see the effect in action ... <b>Note: </b> Delphi berlin' +
-        ' do not support GL_TEXTURE_EXTERNAL_OES (requiered by android), ' +
-        'so we must update the original delphi source code (only few line' +
-        's of code is neccessary to make it working)'
+        ' and white, noise, etc..) ! You can try to <b>double click</b> o' +
+        'n the video to see the effect in action ... <b>Note: </b> Delphi' +
+        ' berlin do not support GL_TEXTURE_EXTERNAL_OES (requiered by and' +
+        'roid), so we must update the original delphi source code (only f' +
+        'ew lines of code is neccessary to make it working)'
       TextSettings.WordWrap = True
       TextSettings.HorzAlign = Center
       TextIsHtml = True
@@ -869,7 +839,7 @@ object Form1: TForm1
       Size.Width = 320.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 106
+      TabOrder = 105
       object ALAniIndicator1: TALAniIndicator
         Align = Center
         Enabled = True
@@ -928,7 +898,7 @@ object Form1: TForm1
     object ALRectangle3: TALRectangle
       Align = Top
       Fill.Color = claWhite
-      Position.Y = 3162.937500000000000000
+      Position.Y = 3181.367187500000000000
       Size.Width = 320.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
@@ -939,8 +909,8 @@ object Form1: TForm1
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        TextPrompt = 'Write something here'
-        OnChangeTracking = ALEdit2ChangeTracking
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Write single line here'
         OnEnter = ALEditEnter
         OnExit = ALEditExit
       end
@@ -1096,6 +1066,28 @@ object Form1: TForm1
           Size.PlatformDefault = False
         end
       end
+    end
+    object ALMemo1: TALMemo
+      Align = Top
+      Fill.Color = xFF0087B4
+      Padding.Left = 8.000000000000000000
+      Padding.Top = 8.000000000000000000
+      Padding.Right = 8.000000000000000000
+      Padding.Bottom = 8.000000000000000000
+      Margins.Bottom = 25.000000000000000000
+      Position.Y = 3036.367187500000000000
+      Size.Width = 320.000000000000000000
+      Size.Height = 120.000000000000000000
+      Size.PlatformDefault = False
+      DefStyleAttr = 'BlueBGTextViewStyle'
+      TabOrder = 109
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.FontColor = claWhite
+      TextPrompt = 'Write multiple lines here'
+      TextPromptColor = xFF80C3DA
+      LineSpacingMultiplier = 1.200000047683716000
+      TintColor = claWhite
+      OnExit = ALMemo1Exit
     end
   end
 end

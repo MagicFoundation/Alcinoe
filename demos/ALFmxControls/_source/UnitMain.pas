@@ -8,8 +8,11 @@ uses
   FMX.Controls.Presentation, FMX.Objects, ALFmxObjects, FMX.Layouts,
   ALFmxLayouts, fmx.types3D, ALFmxCommon, System.ImageList,
   FMX.ImgList, ALFmxStdCtrls, FMX.TabControl, ALFmxTabControl,
-  FMX.ScrollBox, FMX.Memo, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
-  FMX.Filter.Effects, system.Messaging, FMX.ani;
+  FMX.ScrollBox, FMX.Edit, ALFmxEdit, ALVideoPlayer, FMX.Effects,
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  Grijjy.ErrorReporting,
+  {$ENDIF}
+  FMX.Filter.Effects, system.Messaging, FMX.ani, alFmxMemo;
 
 type
 
@@ -158,9 +161,7 @@ type
     Button14: TButton;
     Layout3: TLayout;
     Layout4: TLayout;
-    ALRectangle2: TALRectangle;
-    ALEdit2: TALEdit;
-    Text11: TText;
+    Text11: TALText;
     Button12: TButton;
     ALText9: TALText;
     Text8: TText;
@@ -194,6 +195,7 @@ type
     Image1: TImage;
     Layout2: TLayout;
     Image5: TImage;
+    ALMemo1: TALMemo;
     procedure Button2Click(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
@@ -225,12 +227,13 @@ type
     procedure FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure ALVertScrollBox1Click(Sender: TObject);
-    procedure ALEdit2ChangeTracking(Sender: TObject);
-    procedure ALVideoPlayerSurface1Click(Sender: TObject);
+    procedure ALVideoPlayerSurface1DblClick(Sender: TObject);
     procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure FormResize(Sender: TObject);
     procedure ALEditEnter(Sender: TObject);
     procedure ALEditExit(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure ALMemo1Exit(Sender: TObject);
   private
     fALcheckbox2: TALcheckboxStopWatch;
     fcheckbox2: TcheckboxStopWatch;
@@ -248,7 +251,14 @@ type
     fCircle1: TCircleStopWatch;
     FOpenGLContextResetId: Integer;
     FVKKeyboardOpen: boolean;
+    fLastClickDT: TdateTime;
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage);
+    {$IF Defined(IOS) or Defined(ANDROID)}
+    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
+    {$ENDIF}
+    {$IF Defined(MSWINDOWS) or Defined(_MACOS)}
+    procedure ApplicationExceptionHandler(Sender: TObject; E: Exception);
+    {$ENDIF}
   public
   end;
 
@@ -261,15 +271,11 @@ uses system.Diagnostics,
      system.threading,
      system.Math,
      UnitDemo,
+     system.DateUtils,
      ALFmxInertialMovement,
      ALCommon;
 
 {$R *.fmx}
-
-procedure TForm1.ALEdit2ChangeTracking(Sender: TObject);
-begin
-  ALLog('ALEdit2ChangeTracking', ALEdit2.Text);
-end;
 
 procedure TForm1.ALEditEnter(Sender: TObject);
 begin
@@ -279,6 +285,11 @@ end;
 procedure TForm1.ALEditExit(Sender: TObject);
 begin
   ALLog('ALEditExit', 'ALEditExit');
+end;
+
+procedure TForm1.ALMemo1Exit(Sender: TObject);
+begin
+ //
 end;
 
 procedure TForm1.ALVertScrollBox1Click(Sender: TObject);
@@ -376,8 +387,13 @@ begin
 
 end;
 
-procedure TForm1.ALVideoPlayerSurface1Click(Sender: TObject);
+procedure TForm1.ALVideoPlayerSurface1DblClick(Sender: TObject);
 begin
+  if milliSecondsBetween(fLastClickDT, NOW) > 300 then begin
+    fLastClickDT := NOW;
+    exit;
+  end;
+  fLastClickDT := Now;
 
   BandedSwirlEffect1.Enabled := false;
   ContrastEffect1.Enabled := false;
@@ -854,6 +870,14 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
+
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  Application.OnException := TgoExceptionReporter.ExceptionHandler;
+  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
+  {$ELSE}
+  Application.OnException := ApplicationExceptionHandler;
+  {$ENDIF}
+
   FVKKeyboardOpen := False;
   FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
   beginupdate;
@@ -1027,20 +1051,66 @@ begin
   ALTabControl1Resize(nil);
 end;
 
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+
+  {$IF Defined(IOS) or Defined(ANDROID)}
+  TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
+  {$ENDIF}
+
+  ALLog('FormDestroy', 'FormDestroy');
+end;
+
+{$IF Defined(IOS) or Defined(ANDROID)}
+procedure TForm1.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
+var aReport: IgoExceptionReport;
+begin
+  aReport := TgoExceptionReportMessage(M).Report;
+  allog('ERROR', aReport.Report, TalLogType.error);
+
+  {$IF Defined(IOS)}
+  TThread.CreateAnonymousThread(
+    procedure
+    begin
+      TThread.Synchronize(nil,
+      procedure
+      begin
+        Halt(1); // << This is the only way i found to crash the app :(
+      end);
+    end).Start;
+  {$ELSE}
+  Application.Terminate;
+  {$ENDIF}
+
+end;
+{$ENDIF}
+
+{$IF Defined(MSWINDOWS) or Defined(_MACOS)}
+procedure TForm1.ApplicationExceptionHandler(Sender: TObject; E: Exception);
+begin
+  Application.Terminate;
+end;
+{$ENDIF}
+
 procedure TForm1.FormResize(Sender: TObject);
 begin
+  ALLog('FormResize', 'width: ' + FloatToStr(width) + ' - ' + FloatToStr(height));
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
 end;
 
 procedure TForm1.FormVirtualKeyboardHidden(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);
 begin
+
   ALLog('FormVirtualKeyboardHidden', 'FormVirtualKeyboardHidden');
   FVKKeyboardOpen := False;
+
+  // wait 100 ms before to remove the padding in case the keyboard is
+  // just swaping control
   TThread.CreateAnonymousThread(
     procedure
     begin
-      sleep(50);
+      sleep(100);
       TThread.Synchronize(nil,
         procedure
         begin
@@ -1049,20 +1119,53 @@ begin
           AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
         end);
     end).Start;
+
 end;
 
 procedure TForm1.FormVirtualKeyboardShown(Sender: TObject;
   KeyboardVisible: Boolean; const Bounds: TRect);
 begin
+
   ALLog('FormVirtualKeyboardShown', 'FormVirtualKeyboardShown');
   FVKKeyboardOpen := True;
+
+  // when the keyboard is show, sometime the suggestion bar of the keyboard
+  // is not show imediatly. so wait around 250ms before visually hide it via
+  // the padding
+  {$IFDEF ANDROID}
+  if AlVertScrollBox1.margins.Bottom > Bounds.height then begin
+    TThread.CreateAnonymousThread(
+      procedure
+      var aTmpBound: TRect;
+      begin
+        sleep(250);
+        TThread.Synchronize(nil,
+          procedure
+          begin
+            if not FVKKeyboardOpen then exit;
+            ALObtainKeyboardRect(aTmpBound);
+            AlVertScrollBox1.margins.Bottom := aTmpBound.height;
+            AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
+            AlVertScrollBox1.AniCalculations.TouchTracking := [];
+          end);
+      end).Start;
+  end
+  else begin
+    AlVertScrollBox1.margins.Bottom := Bounds.height;
+    AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
+    AlVertScrollBox1.AniCalculations.TouchTracking := [];
+  end;
+  {$ELSE}
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
   AlVertScrollBox1.AniCalculations.TouchTracking := [];
+  {$ENDIF}
+
 end;
 
 procedure TForm1.OpenGLContextResetHandler(const Sender: TObject;const Msg: TMessage); // << because of this fucking bug https://quality.embarcadero.com/browse/RSP-11484
 begin
+  ALLog('TForm1.OpenGLContextResetHandler', 'start');
   {$IFDEF ANDROID}
   if ALVideoPlayerSurface1.VideoPlayer.state <> vpsIdle then begin
     ALVideoPlayerSurface1.resetVideoPlayer;
@@ -1075,6 +1178,7 @@ begin
   end
   else ALVideoPlayerSurface1.resetVideoPlayer;
   {$ENDIF}
+  ALLog('TForm1.OpenGLContextResetHandler', 'end');
 end;
 
 { TALTextStopWatch }

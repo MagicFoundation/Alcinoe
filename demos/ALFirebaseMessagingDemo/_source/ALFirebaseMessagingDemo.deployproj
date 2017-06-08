@@ -4,7 +4,7 @@
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
     <PropertyGroup>
-        <DeviceId Condition="'$(Platform)'=='Android'">3204d0ab8ff96111</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='Android'">MVOZHEYTGYL7JJYH</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSDevice32'"/>
         <DeviceId Condition="'$(Platform)'=='iOSDevice64'"/>
         <DeviceId Condition="'$(Platform)'=='iOSSimulator'">iPhone5</DeviceId>
@@ -135,6 +135,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="android\res\values-es\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALFirebaseMessagingDemo\res\values-es\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="..\Android\Debug\libALFirebaseMessagingDemo.so" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFirebaseMessagingDemo\library\lib\armeabi-v7a\</RemoteDir>
             <RemoteName>libALFirebaseMessagingDemo.so</RemoteName>
@@ -144,15 +153,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
             <Required>True</Required>
-        </DeployFile>
-        <DeployFile Include="android\res\values-es\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALFirebaseMessagingDemo\res\values-es\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
         </DeployFile>
         <DeployFile Include="android\res\values-bg\values.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALFirebaseMessagingDemo\res\values-bg\</RemoteDir>

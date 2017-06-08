@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+  <string name="al_prepend_shortcut_label">"Menua+"</string>
+  <string name="al_menu_space_shortcut_label">"zuriunea tekla"</string>
+  <string name="al_menu_enter_shortcut_label">"sartu tekla"</string>
+  <string name="al_menu_delete_shortcut_label">"ezabatu"</string>
+  <string name="al_floating_toolbar_open_overflow_description">"Aukera gehiago"</string>
+  <string name="al_floating_toolbar_close_overflow_description">"Itxi gainfluxua"</string>
+
+</resources>

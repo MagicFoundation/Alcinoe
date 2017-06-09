@@ -235,7 +235,7 @@ type
     [Weak] FTextField: TALIosTextField;
   public
     constructor Create(const ATextField: TALIosTextField);
-    function textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean; cdecl;
+    function textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean; cdecl; // << this work even without [MethodName('textField:shouldChangeCharactersInRange:replacementString:')] - better name would be textFieldShouldChangeCharactersInRange but i prefer to keep the name given by Delphi
     procedure textFieldDidBeginEditing(textField: UITextField); cdecl;
     procedure textFieldDidEndEditing(textField: UITextField); cdecl;
     function textFieldShouldBeginEditing(textField: UITextField): Boolean; cdecl;

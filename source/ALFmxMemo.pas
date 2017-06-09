@@ -72,7 +72,6 @@ type
     [Weak] FTextView: TALIosTextView;
   public
     constructor Create(const ATextView: TALIosTextView);
-    function textView(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean; cdecl;
     procedure textViewDidBeginEditing(textView: UITextView); cdecl;
     procedure textViewDidChange(textView: UITextView); cdecl;
     procedure textViewDidChangeSelection(textView: UITextView); cdecl;
@@ -430,12 +429,6 @@ begin
   FTextView := ATextView;
   if FTextView = nil then
     raise EArgumentNilException.Create(Format(SWrongParameter, ['ATextView']));
-end;
-
-{***********************************************************************************************************************************}
-function TALIosTextViewDelegate.TextView(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
-begin
-  Result := True;
 end;
 
 {*****************************************************************************}
@@ -986,6 +979,7 @@ destructor TALStyledMemo.Destroy;
 begin
   ALFreeAndNil(FPadding);
   alFreeAndNil(FTextSettings);
+  ALFreeAndNil(fTextPromptControl);
   inherited;
 end;
 
@@ -1006,6 +1000,8 @@ end;
 procedure TALStyledMemo.OnChangeTrackingImpl(sender: Tobject);
 begin
   fTextPromptControl.Visible := text = '';
+  if assigned(fOnChangeTracking) and (not (csLoading in componentState)) then
+    fOnChangeTracking(self);
 end;
 
 {**************************************************************}
@@ -1119,12 +1115,13 @@ end;
 procedure TALStyledMemo.OnFontChanged(Sender: TObject);
 var aPreviousColor: TalphaColor;
 begin
-  aPreviousColor := fTextPromptControl.Color;
+  fTextPromptControl.TextSettings.BeginUpdate;
   try
-    fTextPromptControl.TextSettings.IsChanged := True;
+    aPreviousColor := fTextPromptControl.Color;
     fTextPromptControl.TextSettings.Assign(FTextSettings);
-  finally
     fTextPromptControl.color := aPreviousColor;
+  finally
+    fTextPromptControl.TextSettings.EndUpdate;
   end;
   inherited TextSettings := fTextSettings;
 end;
@@ -1257,7 +1254,7 @@ end;
 {**************************************}
 function TALMemo.GetDefaultSize: TSizeF;
 begin
-  Result := TSizeF.Create(100, 22);
+  Result := TSizeF.Create(100, 88);
 end;
 
 {********************}

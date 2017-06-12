@@ -167,6 +167,7 @@ type
     procedure ChangeOrder; override;
     procedure DoEnter; override;
     procedure DoExit; override;
+    procedure DoEndUpdate; override;
     procedure realignContent; virtual;
     property HideSoftInputOnExit: boolean read fHideSoftInputOnExit write fHideSoftInputOnExit;
   public
@@ -284,6 +285,7 @@ type
     procedure ChangeOrder; override;
     procedure DoEnter; override;
     procedure DoExit; override;
+    procedure DoEndUpdate; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -315,6 +317,8 @@ type
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
+    fOnEnter: TNotifyEvent;
+    fOnExit: TNotifyEvent;
     FTextSettings: TTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
@@ -339,7 +343,9 @@ type
     procedure OnFontChanged(Sender: TObject);
     function getText: String;
     procedure SetText(const Value: String);
-    procedure DoChangeTracking(Sender: TObject);
+    procedure OnChangeTrackingImpl(Sender: TObject);
+    procedure OnEnterImpl(Sender: TObject);
+    procedure OnExitImpl(Sender: TObject);
     procedure SetKeyboardType(Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
     procedure SetPassword(const Value: Boolean);
@@ -349,10 +355,6 @@ type
     procedure SetReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
-    Function GetOnEnter: TNotifyEvent;
-    Procedure SetOnEnter(AValue: TNotifyEvent);
-    Function GetOnExit: TNotifyEvent;
-    Procedure SetOnExit(AValue: TNotifyEvent);
     procedure CreateEditControl;
   protected
     function GetDefaultSize: TSizeF; override;
@@ -407,8 +409,8 @@ type
     //property OnValidate;
     property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
-    property OnEnter: TnotifyEvent Read GetOnEnter Write SetOnEnter;
-    property OnExit: TnotifyEvent Read GetOnExit Write SetOnExit;
+    property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
+    property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
   end;
 
 procedure Register;
@@ -707,6 +709,7 @@ procedure TALAndroidEdit.realignContent;
   end;
 
 begin
+  if IsUpdating then exit;
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.realignContent', 'realignContent', TalLogType.VERBOSE);
   {$ENDIF}
@@ -723,6 +726,13 @@ begin
     end
     else _HideContent;
   end;
+end;
+
+{***********************************}
+procedure TALAndroidEdit.DoEndUpdate;
+begin
+  inherited;
+  RealignContent;
 end;
 
 {**********************************************************************}
@@ -1991,6 +2001,13 @@ begin
   FTextField.ResetFocus;
 end;
 
+{*******************************}
+procedure TalIosEdit.DoEndUpdate;
+begin
+  inherited;
+  if FTextField <> nil then FTextField.RefreshNativeParent;
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -2002,6 +2019,8 @@ begin
   FAutoTranslate := true;
   FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
+  fOnEnter := nil;
+  fOnExit := nil;
   Cursor := crIBeam;
   CanFocus := True;
   CanParentFocus := False; // else you must rewrite the GetCanFocus
@@ -2070,7 +2089,9 @@ begin
   fEditControl.KillFocusByReturn := True;
   {$ENDIF}
   fEditControl.Align := TAlignLayout.Client;
-  FeditControl.OnChangeTracking := DoChangeTracking;
+  FeditControl.OnChangeTracking := OnChangeTrackingImpl;
+  FeditControl.OnEnter := OnEnterImpl;
+  FeditControl.OnExit := OnExitImpl;
   fEditControl.Password := false; // noops operation
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
@@ -2288,39 +2309,25 @@ begin
   result := FeditControl.ReturnKeyType;
 end;
 
-{****************************************}
-Function TALEdit.GetOnEnter: TNotifyEvent;
-begin
-  if FEditControl = nil then CreateEditControl;
-  Result := FEditControl.OnEnter;
-end;
-
-{*************************************************}
-Procedure TALEdit.SetOnEnter(AValue: TNotifyEvent);
-begin
-  if FEditControl = nil then CreateEditControl;
-  FEditControl.OnEnter := Avalue;
-end;
-
-{***************************************}
-Function TALEdit.GetOnExit: TNotifyEvent;
-begin
-  if FEditControl = nil then CreateEditControl;
-  Result := FEditControl.OnExit;
-end;
-
-{************************************************}
-Procedure TALEdit.SetOnExit(AValue: TNotifyEvent);
-begin
-  if FEditControl = nil then CreateEditControl;
-  FEditControl.OnExit := Avalue;
-end;
-
-{**************************************************}
-procedure TALEdit.DoChangeTracking(Sender: TObject);
+{******************************************************}
+procedure TALEdit.OnChangeTrackingImpl(Sender: TObject);
 begin
   if assigned(fOnChangeTracking) and (not (csLoading in componentState)) then
     fOnChangeTracking(self); // << yes need to send self instead of the fEditControl
+end;
+
+{*********************************************}
+procedure TALEdit.OnEnterImpl(Sender: TObject);
+begin
+  if assigned(fOnEnter) and (not (csLoading in componentState)) then
+    fOnEnter(self); // << yes need to send self instead of the fEditControl
+end;
+
+{********************************************}
+procedure TALEdit.OnExitImpl(Sender: TObject);
+begin
+  if assigned(fOnExit) and (not (csLoading in componentState)) then
+    fOnExit(self); // << yes need to send self instead of the fEditControl
 end;
 
 {***********************************************}

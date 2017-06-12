@@ -136,6 +136,7 @@ type
     procedure ChangeOrder; override;
     procedure DoEnter; override;
     procedure DoExit; override;
+    procedure DoEndUpdate; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -209,6 +210,8 @@ type
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
+    fOnEnter: TNotifyEvent;
+    fOnExit: TNotifyEvent;
     FTextSettings: TTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
@@ -241,7 +244,9 @@ type
     procedure OnFontChanged(Sender: TObject);
     function getText: String;
     procedure SetText(const Value: String);
-    procedure DoChangeTracking(Sender: TObject);
+    procedure OnChangeTrackingImpl(Sender: TObject);
+    procedure OnEnterImpl(Sender: TObject);
+    procedure OnExitImpl(Sender: TObject);
     procedure SetKeyboardType(Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
     procedure SetCheckSpelling(const Value: Boolean);
@@ -249,10 +254,6 @@ type
     procedure SetReturnKeyType(const Value: TReturnKeyType);
     function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
-    Function GetOnEnter: TNotifyEvent;
-    Procedure SetOnEnter(AValue: TNotifyEvent);
-    Function GetOnExit: TNotifyEvent;
-    Procedure SetOnExit(AValue: TNotifyEvent);
     procedure SetPadding(const Value: TBounds);
     function GetPadding: TBounds;
     procedure CreateMemoControl;
@@ -310,8 +311,8 @@ type
     //property OnValidate;
     property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
-    property OnEnter: TnotifyEvent Read GetOnEnter Write SetOnEnter;
-    property OnExit: TnotifyEvent Read GetOnExit Write SetOnExit;
+    property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
+    property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
     property Padding: TBounds read GetPadding write SetPadding;
   end;
 
@@ -940,6 +941,13 @@ begin
   FTextView.ResetFocus;
 end;
 
+{*******************************}
+procedure TALIosMemo.DoEndUpdate;
+begin
+  inherited;
+  if FTextView <> nil then FTextView.RefreshNativeParent;
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -1139,6 +1147,8 @@ begin
   FAutoTranslate := true;
   FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
+  fOnEnter := nil;
+  fOnExit := nil;
   Cursor := crIBeam;
   CanFocus := True;
   CanParentFocus := False; // else you must rewrite the GetCanFocus
@@ -1212,7 +1222,9 @@ begin
   FMemoControl.AutoHide := TBehaviorBoolean.False;
   {$ENDIF}
   FMemoControl.Align := TAlignLayout.Client;
-  FMemoControl.OnChangeTracking := DoChangeTracking;
+  FMemoControl.OnChangeTracking := OnChangeTrackingImpl;
+  FMemoControl.OnEnter := OnEnterImpl;
+  FMemoControl.OnExit := OnExitImpl;
   FMemoControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
   FMemoControl.CheckSpelling := True;
 end;
@@ -1479,34 +1491,6 @@ begin
   {$ENDIF}
 end;
 
-{****************************************}
-function TALMemo.GetOnEnter: TNotifyEvent;
-begin
-  if FMemoControl = nil then CreateMemoControl;
-  Result := FMemoControl.OnEnter;
-end;
-
-{*************************************************}
-procedure TALMemo.SetOnEnter(AValue: TNotifyEvent);
-begin
-  if FMemoControl = nil then CreateMemoControl;
-  FMemoControl.OnEnter := Avalue;
-end;
-
-{***************************************}
-function TALMemo.GetOnExit: TNotifyEvent;
-begin
-  if FMemoControl = nil then CreateMemoControl;
-  Result := FMemoControl.OnExit;
-end;
-
-{************************************************}
-procedure TALMemo.SetOnExit(AValue: TNotifyEvent);
-begin
-  if FMemoControl = nil then CreateMemoControl;
-  FMemoControl.OnExit := Avalue;
-end;
-
 {*******************************************************}
 procedure TALMemo.PaddingChangedHandler(Sender: TObject);
 begin
@@ -1527,11 +1511,25 @@ begin
   result := fPadding;
 end;
 
-{**************************************************}
-procedure TALMemo.DoChangeTracking(Sender: TObject);
+{******************************************************}
+procedure TALMemo.OnChangeTrackingImpl(Sender: TObject);
 begin
   if assigned(fOnChangeTracking) and (not (csLoading in componentState)) then
-    fOnChangeTracking(self); // << yes need to send self instead of the FMemoControl
+    fOnChangeTracking(self); // << yes need to send self instead of the fEditControl
+end;
+
+{*********************************************}
+procedure TALMemo.OnEnterImpl(Sender: TObject);
+begin
+  if assigned(fOnEnter) and (not (csLoading in componentState)) then
+    fOnEnter(self); // << yes need to send self instead of the fEditControl
+end;
+
+{********************************************}
+procedure TALMemo.OnExitImpl(Sender: TObject);
+begin
+  if assigned(fOnExit) and (not (csLoading in componentState)) then
+    fOnExit(self); // << yes need to send self instead of the fEditControl
 end;
 
 {***********************************************}

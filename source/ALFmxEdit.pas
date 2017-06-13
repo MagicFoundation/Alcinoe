@@ -173,6 +173,7 @@ type
   public
     constructor Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''); reintroduce; virtual;
     destructor Destroy; override;
+    procedure RecalcOpacity; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
@@ -649,6 +650,21 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.Destroy', 'end', TalLogType.VERBOSE);
   {$ENDIF}
+end;
+
+{*************************************}
+procedure TALAndroidEdit.RecalcOpacity;
+var aAbsoluteOpacity: Single;
+    aEditText: JALEditText;
+begin
+  inherited;
+  aEditText:= FEditText;
+  aAbsoluteOpacity := AbsoluteOpacity;
+  CallInUIThread(
+    procedure
+    begin
+      aEditText.setAlpha(aAbsoluteOpacity);
+    end);
 end;
 
 {**************************************}

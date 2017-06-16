@@ -136,7 +136,6 @@ type
     procedure ChangeOrder; override;
     procedure DoEnter; override;
     procedure DoExit; override;
-    procedure DoEndUpdate; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -272,6 +271,8 @@ type
     {$ELSEIF defined(IOS)}
     property IosTextView: TALIosTextView read GetIosTextView;
     {$ENDIF}
+    Procedure AddNativeView;
+    Procedure RemoveNativeView;
   published
     property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
                                                                             // << reference to a style resource that supplies defaults values for the StyledAttributes.
@@ -941,13 +942,6 @@ begin
   FTextView.ResetFocus;
 end;
 
-{*******************************}
-procedure TALIosMemo.DoEndUpdate;
-begin
-  inherited;
-  if FTextView <> nil then FTextView.RefreshNativeParent;
-end;
-
 {$endif}
 {$ENDREGION}
 
@@ -1570,6 +1564,22 @@ begin
     exit(false);   // << the canparentfocus is also set to false, so the TCommonCustomForm.NewFocusedControl(const Value: IControl)
                    //    will do nothing !
   end;
+end;
+
+{******************************}
+Procedure TALMemo.AddNativeView;
+begin
+  {$IF defined(android)}
+  FMemoControl.AddNativeView;
+  {$ENDIF}
+end;
+
+{*********************************}
+Procedure TALMemo.RemoveNativeView;
+begin
+  {$IF defined(android)}
+  FMemoControl.RemoveNativeView;
+  {$ENDIF}
 end;
 
 procedure Register;

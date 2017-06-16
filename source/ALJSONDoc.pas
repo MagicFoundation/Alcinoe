@@ -692,6 +692,10 @@ Function ALFindJsonNodeByInt32ChildNodeValue(const JsonNode:TalJsonNode;
                                              Const ChildNodeName: AnsiString;
                                              Const ChildNodeValue : Int32;
                                              Const Recurse: Boolean = False): TALJsonNode;
+Function ALFindJsonNodeByTextChildNodeValue(const JsonNode:TalJsonNode;
+                                            Const ChildNodeName: AnsiString;
+                                            Const ChildNodeValue : AnsiString;
+                                            Const Recurse: Boolean = False): TALJsonNode;
 
 {$ENDIF}
 
@@ -1119,6 +1123,10 @@ Function ALFindJsonNodeByInt32ChildNodeValueU(const JsonNode:TalJsonNodeU;
                                               Const ChildNodeName: String;
                                               Const ChildNodeValue : Int32;
                                               Const Recurse: Boolean = False): TalJsonNodeU;
+Function ALFindJsonNodeByTextChildNodeValueU(const JsonNode:TalJsonNodeU;
+                                             Const ChildNodeName: String;
+                                             Const ChildNodeValue : String;
+                                             Const Recurse: Boolean = False): TALJsonNodeU;
 
 implementation
 
@@ -1157,6 +1165,35 @@ Begin
                                                     ChildNodeName,
                                                     ChildNodeValue,
                                                     Recurse);
+      if assigned(Result) then break;
+    end;
+  end;
+end;
+
+{*********************************************************************}
+Function ALFindJsonNodeByTextChildNodeValue(const JsonNode:TalJsonNode;
+                                            Const ChildNodeName: AnsiString;
+                                            Const ChildNodeValue : AnsiString;
+                                            Const Recurse: Boolean = False): TALJsonNode;
+var i, J : integer;
+Begin
+  result := nil;
+  if not (JsonNode.NodeType in [ntObject, ntArray]) then Exit;
+  for i := 0 to JsonNode.ChildNodes.Count - 1 do begin
+    for J := 0 to JsonNode.ChildNodes[i].ChildNodes.Count - 1 do begin
+      If (JsonNode.ChildNodes[i].ChildNodes[j].NodeType = nttext) and
+         (JsonNode.ChildNodes[i].ChildNodes[j].NodesubType = nstText) and
+         (ALSametext(JsonNode.ChildNodes[i].ChildNodes[j].NodeName, ChildNodeName)) and
+         (JsonNode.ChildNodes[i].ChildNodes[j].text = ChildNodeValue) then begin
+        result := JsonNode.ChildNodes[i];
+        exit;
+      end;
+    end;
+    if Recurse then begin
+      result := ALFindJsonNodeByTextChildNodeValue(JsonNode.ChildNodes[i],
+                                                   ChildNodeName,
+                                                   ChildNodeValue,
+                                                   Recurse);
       if assigned(Result) then break;
     end;
   end;
@@ -7066,6 +7103,35 @@ Begin
                                                      ChildNodeName,
                                                      ChildNodeValue,
                                                      Recurse);
+      if assigned(Result) then break;
+    end;
+  end;
+end;
+
+{***********************************************************************}
+Function ALFindJsonNodeByTextChildNodeValueU(const JsonNode:TalJsonNodeU;
+                                             Const ChildNodeName: String;
+                                             Const ChildNodeValue : String;
+                                             Const Recurse: Boolean = False): TALJsonNodeU;
+var i, J : integer;
+Begin
+  result := nil;
+  if not (JsonNode.NodeType in [ntObject, ntArray]) then Exit;
+  for i := 0 to JsonNode.ChildNodes.Count - 1 do begin
+    for J := 0 to JsonNode.ChildNodes[i].ChildNodes.Count - 1 do begin
+      If (JsonNode.ChildNodes[i].ChildNodes[j].NodeType = nttext) and
+         (JsonNode.ChildNodes[i].ChildNodes[j].NodesubType = nstText) and
+         (ALSametextU(JsonNode.ChildNodes[i].ChildNodes[j].NodeName, ChildNodeName)) and
+         (JsonNode.ChildNodes[i].ChildNodes[j].text = ChildNodeValue) then begin
+        result := JsonNode.ChildNodes[i];
+        exit;
+      end;
+    end;
+    if Recurse then begin
+      result := ALFindJsonNodeByTextChildNodeValueU(JsonNode.ChildNodes[i],
+                                                    ChildNodeName,
+                                                    ChildNodeValue,
+                                                    Recurse);
       if assigned(Result) then break;
     end;
   end;

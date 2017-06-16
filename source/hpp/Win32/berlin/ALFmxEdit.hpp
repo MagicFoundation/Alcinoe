@@ -40,6 +40,8 @@ private:
 	bool FAutoTranslate;
 	bool FAutoConvertFontFamily;
 	System::Classes::TNotifyEvent fOnChangeTracking;
+	System::Classes::TNotifyEvent fOnEnter;
+	System::Classes::TNotifyEvent fOnExit;
 	Fmx::Graphics::TTextSettings* FTextSettings;
 	System::Uitypes::TAlphaColor fTintColor;
 	System::Uitypes::TAlphaColor fTextPromptColor;
@@ -55,7 +57,9 @@ private:
 	void __fastcall OnFontChanged(System::TObject* Sender);
 	System::UnicodeString __fastcall getText(void);
 	void __fastcall SetText(const System::UnicodeString Value);
-	void __fastcall DoChangeTracking(System::TObject* Sender);
+	void __fastcall OnChangeTrackingImpl(System::TObject* Sender);
+	void __fastcall OnEnterImpl(System::TObject* Sender);
+	void __fastcall OnExitImpl(System::TObject* Sender);
 	void __fastcall SetKeyboardType(Fmx::Types::TVirtualKeyboardType Value);
 	Fmx::Types::TVirtualKeyboardType __fastcall GetKeyboardType(void);
 	void __fastcall SetPassword(const bool Value);
@@ -65,10 +69,6 @@ private:
 	void __fastcall SetReturnKeyType(const Fmx::Types::TReturnKeyType Value);
 	Fmx::Types::TReturnKeyType __fastcall GetReturnKeyType(void);
 	void __fastcall SetDefStyleAttr(const System::UnicodeString Value);
-	System::Classes::TNotifyEvent __fastcall GetOnEnter(void);
-	void __fastcall SetOnEnter(System::Classes::TNotifyEvent AValue);
-	System::Classes::TNotifyEvent __fastcall GetOnExit(void);
-	void __fastcall SetOnExit(System::Classes::TNotifyEvent AValue);
 	void __fastcall CreateEditControl(void);
 	
 protected:
@@ -81,6 +81,8 @@ protected:
 public:
 	__fastcall virtual TALEdit(System::Classes::TComponent* AOwner);
 	__fastcall virtual ~TALEdit(void);
+	void __fastcall AddNativeView(void);
+	void __fastcall RemoveNativeView(void);
 	
 __published:
 	__property System::UnicodeString DefStyleAttr = {read=fDefStyleAttr, write=SetDefStyleAttr};
@@ -107,8 +109,8 @@ __published:
 	__property System::Classes::TNotifyEvent OnChangeTracking = {read=fOnChangeTracking, write=fOnChangeTracking};
 	__property OnKeyDown;
 	__property OnKeyUp;
-	__property System::Classes::TNotifyEvent OnEnter = {read=GetOnEnter, write=SetOnEnter};
-	__property System::Classes::TNotifyEvent OnExit = {read=GetOnExit, write=SetOnExit};
+	__property System::Classes::TNotifyEvent OnEnter = {read=fOnEnter, write=fOnEnter};
+	__property System::Classes::TNotifyEvent OnExit = {read=fOnExit, write=fOnExit};
 };
 
 

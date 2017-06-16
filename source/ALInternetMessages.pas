@@ -731,6 +731,7 @@ end;
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+{$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: AnsiString): boolean;
 
  {------------------------------------------------------}
@@ -809,6 +810,7 @@ begin
            CheckAllowedExt(ExtPart) and
            (length(Value) <= 254); // http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
 end;
+{$WARN SYMBOL_DEPRECATED ON}
 {$IF defined(_ZEROBASEDSTRINGS_ON)}
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}
@@ -817,6 +819,7 @@ end;
 
 {*********************}
 {$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+{$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmailU(const Value: String): boolean;
 
  {--------------------------------------------------}
@@ -895,6 +898,7 @@ begin
            CheckAllowedExt(ExtPart) and
            (length(Value) <= 254); // http://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address
 end;
+{$WARN SYMBOL_DEPRECATED ON}
 {$IF defined(_ZEROBASEDSTRINGS_ON)}
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}

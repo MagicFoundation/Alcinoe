@@ -470,6 +470,7 @@ function ALBreakText(const aPaint: JPaint;
                      const aTrimming: TTextTrimming;
                      const aBreakTextItems: TALBreakTextItems;
                      var aTotalLines: integer;
+                     var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                      const aFirstLineIndent: TpointF;
                      const aLineSpacing: single = 0;
                      const aEllipsisText: JString = nil;
@@ -526,6 +527,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
                      const aBreakTextItems: TALBreakTextItems;
                      var aTotalLines: integer;
+                     var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                      const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
                      const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                      const aEllipsisText: string = '…';
@@ -595,6 +597,7 @@ function ALBreakText(const aFontColor: TalphaColor;
                      const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
                      const aBreakTextItems: TALBreakTextItems;
                      var aTotalLines: integer;
+                     var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                      const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
                      const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                      const aEllipsisText: string = '…';
@@ -661,13 +664,24 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <span id="xxx">...</span>
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                              var aTextBreaked: boolean; // out => true is the text was "breaked" in several lines
+                              var aTextBreaked: boolean; // out => true if the text was "breaked" in several lines
+                              var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                               var aAscent: single; // out => the Ascent of the last element (in real pixel)
                               var aDescent: Single; // out => the Descent of the last element (in real pixel)
                               var aFirstPos: TpointF; // out => the point of the start of the text
                               var aLastPos: TpointF; // out => the point of the end of the text
                               var aElements: TalTextElements; // out => the list of rect describing all span elements
                               var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                               const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
 function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
                                                    //   <b>...</b>
@@ -2388,6 +2402,7 @@ function ALBreakText(const aPaint: JPaint;
                      const aTrimming: TTextTrimming;
                      const aBreakTextItems: TALBreakTextItems;
                      var aTotalLines: integer;
+                     var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                      const aFirstLineIndent: TpointF;
                      const aLineSpacing: single = 0;
                      const aEllipsisText: JString = nil;
@@ -2501,6 +2516,7 @@ begin
 
   //init result
   result := false;
+  aAllTextDrawed := true;
 
   //init aBreakTextItemsStartCount
   aBreakTextItemsStartCount := aBreakTextItems.Count;
@@ -2594,6 +2610,7 @@ begin
 
           //if not aWordWrap
           if not aWordWrap then begin
+            aAllTextDrawed := False; // aNumberOfChars < aLine.length so in anycase we will not draw all the text
             case aTrimming of
               TTextTrimming.None: begin
                                     if aNumberOfChars > 0 then
@@ -2692,6 +2709,7 @@ begin
                (aTrimming <> TTextTrimming.None) then begin
 
               //-----
+              aAllTextDrawed := False; // if we are at the last line then in anycase we will not draw all the text
               _initEllipsis;
               //-----
               aSaveNumberOfChars := aNumberOfChars;
@@ -2754,6 +2772,12 @@ begin
             //We are not at the last line or aTrimming = TTextTrimming.None
             else begin
 
+              //We are at the last line and aTrimming = TTextTrimming.None and more line available
+              if (aTrimming <> TTextTrimming.None) and
+                 ((compareValue(aCurrLineY + aLineHeight + aMetrics.descent, aMaxHeight, Tepsilon.position) > 0) or
+                  ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1))) then aAllTextDrawed := False;
+
+              //cut the line
               aSaveNumberOfChars := aNumberOfChars;
               if aNumberOfChars < aLine.length then inc(aNumberOfChars); // in case the space separator is just after aNumberOfChars
               while aNumberOfChars > 0 do begin
@@ -3003,6 +3027,7 @@ function ALBreakText(const aPaint: JPaint;
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
                      const aMaxlines: integer = 0): boolean; // return true if text was breaked in several lines (truncated or not)
 var aTotalLines: integer;
+    aAllTextDrawed: boolean;
 begin
   result := ALBreakText(aPaint, // const aPaint: JPaint;
                         ARect, // var ARect: TRectF;
@@ -3012,6 +3037,7 @@ begin
                         aTrimming, // const aTrimming: TTextTrimming;
                         aBreakTextItems, // const aBreakTextItems: TALBreakTextItems;
                         aTotalLines, // var aTotalLines: integer;
+                        aAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                         aFirstLineIndent, // const aFirstLineIndent: TpointF;
                         aLineSpacing, // const aLineSpacing: single = 0;
                         aEllipsisText, // const aEllipsisText: JString = nil;
@@ -3058,6 +3084,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
                      const aBreakTextItems: TALBreakTextItems;
                      var aTotalLines: integer;
+                     var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                      const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
                      const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                      const aEllipsisText: string = '…';
@@ -3105,6 +3132,9 @@ var aBreakTextItemsStartCount: integer;
     i: CFIndex;
 
 begin
+
+  //init aAllTextDrawed
+  aAllTextDrawed := True;
 
   //init aBreakTextItemsStartCount
   aBreakTextItemsStartCount := aBreakTextItems.Count;
@@ -3337,6 +3367,7 @@ begin
                   // stop if after maxheight
                   if (compareValue(aCurrLineY + adescent, aMaxHeight, TEpsilon.position) > 0) then begin
                     result := True;
+                    aAllTextDrawed := False;
                     break;
                   end;
 
@@ -3427,6 +3458,7 @@ begin
 
             //init result
             result := True;
+            aAllTextDrawed := False;
 
             //if aTrimming = TTextTrimming.None or aEllipsisAttr = nil then nothing todo
             if (aTrimming <> TTextTrimming.None) and
@@ -3745,7 +3777,15 @@ begin
 
             end;
 
-          end;
+          end
+          else if (aBreakTextItems.Count = aBreakTextItemsStartCount) and  // If no line was added
+                  (not AText.IsEmpty) then begin // and the text was not empty
+
+            //init result
+            result := True;
+            aAllTextDrawed := False;
+
+          end
 
         finally
           CFRelease(aTextAttr);
@@ -3829,6 +3869,7 @@ function ALBreakText(const aColorSpace: CGColorSpaceRef;
                      const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
                      const aMaxlines: integer = 0): boolean; inline; overload; // // return true if text was breaked in several lines (truncated or not)
 var aTotalLines: integer;
+    aAllTextDrawed: boolean;
 begin
   result := ALBreakText(aColorSpace, // const aColorSpace: CGColorSpaceRef;
                         aFontColor, // const aFontColor: TalphaColor;
@@ -3842,6 +3883,7 @@ begin
                         aTrimming, // const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
                         aBreakTextItems, // const aBreakTextItems: TALBreakTextItems;
                         aTotalLines, // var aTotalLines: integer;
+                        aAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                         aFirstLineIndent, // const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
                         aLineSpacing, // const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                         aEllipsisText, // const aEllipsisText: string = '…';
@@ -3951,6 +3993,7 @@ function ALBreakText(const aFontColor: TalphaColor;
                      const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
                      const aBreakTextItems: TALBreakTextItems;
                      var aTotalLines: integer;
+                     var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                      const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
                      const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
                      const aEllipsisText: string = '…';
@@ -4022,6 +4065,7 @@ begin
 
   //init result
   result := false;
+  aAllTextDrawed := True;
 
   //init aBreakTextItemsStartCount
   aBreakTextItemsStartCount := aBreakTextItems.Count;
@@ -4107,6 +4151,7 @@ begin
 
         //if not aWordWrap
         if not aWordWrap then begin
+          aAllTextDrawed := False; // aNumberOfChars < aLine.length so in anycase we will not draw all the text
           case aTrimming of
             TTextTrimming.None: begin
                                   if aNumberOfChars > 0 then
@@ -4196,6 +4241,7 @@ begin
              (aTrimming <> TTextTrimming.None) then begin
 
             //-----
+            aAllTextDrawed := False; // if we are at the last line then in anycase we will not draw all the text
             _initEllipsis;
             //-----
             aSaveNumberOfChars := aNumberOfChars;
@@ -4252,6 +4298,12 @@ begin
           //We are not at the last line or aTrimming = TTextTrimming.None
           else begin
 
+            //We are at the last line and aTrimming = TTextTrimming.None and more line available
+            if (aTrimming = TTextTrimming.None) and
+               ((compareValue(aCurrLineY + aLineHeight + adescent, aMaxHeight, Tepsilon.position) > 0) or
+                ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1))) then aAllTextDrawed := False;
+
+            //Cut the line
             aSaveNumberOfChars := aNumberOfChars;
             if aNumberOfChars < aLine.length then inc(aNumberOfChars); // in case the space separator is just after aNumberOfChars
             while aNumberOfChars > 0 do begin
@@ -4527,7 +4579,8 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <span id="xxx">...</span>
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                              var aTextBreaked: boolean; // // out => true is the text was "breaked" in several lines
+                              var aTextBreaked: boolean; // out => true if the text was "breaked" in several lines
+                              var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                               var aAscent: single; // out => the Ascent of the last element (in real pixel)
                               var aDescent: Single; // out => the Descent of the last element (in real pixel)
                               var aFirstPos: TpointF; // out => the point of the start of the text
@@ -4630,6 +4683,7 @@ var {$IF defined(ANDROID)}
     aTotalLines: integer;
     aTmpTotalLines: integer;
     aTmpTextBreaked: Boolean;
+    aTmpAllTextDrawed: Boolean;
     aCurrentLineY: single;
     aOffset: single;
     P1, P2: integer;
@@ -4639,6 +4693,7 @@ begin
 
   //init out var
   aTextBreaked := false;
+  aAllTextDrawed := True;
   aAscent := 0;
   aDescent := 0;
   aFirstPos := TpointF.Create(0,0);
@@ -4837,6 +4892,7 @@ begin
                                            aOptions.Trimming, // const aTrimming: TTextTrimming;
                                            aBreakedTextItems, // var aBreakedTexts: Tarray<Tpair<JString, TpointF>>);
                                            aTmpTotalLines, // var aTotalLines: integer
+                                           aTmpAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                                            aFirstLineIndent, // const aFirstLineIndent: TpointF;
                                            aOptions.LineSpacing, // const aLineSpacing: single = 0;
                                            JStr2, //  const aEllipsisText: JString = nil;
@@ -4859,6 +4915,7 @@ begin
                                            aOptions.Trimming, // const aTrimming: TTextTrimming;
                                            aBreakedTextItems, // const aBreakTextItems: TALBreakTextItems;
                                            aTmpTotalLines, // var aTotalLines: integer;
+                                           aTmpAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                                            aFirstLineIndent, // const aFirstLineIndent: TpointF;
                                            aOptions.LineSpacing, // const aLineSpacing: single = 0;
                                            aOptions.EllipsisText, // const aEllipsisText: string = '…';
@@ -4877,6 +4934,7 @@ begin
                                            aOptions.Trimming, // const aTrimming: TTextTrimming;
                                            aBreakedTextItems, // const aBreakTextItems: TALBreakTextItems;
                                            aTmpTotalLines, // var aTotalLines: integer;
+                                           aTmpAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                                            aFirstLineIndent, // const aFirstLineIndent: TpointF;
                                            aOptions.LineSpacing, // const aLineSpacing: single = 0;
                                            aOptions.EllipsisText, // const aEllipsisText: string = '…';
@@ -4947,6 +5005,7 @@ begin
 
           //update aTextBreaked
           aTextBreaked := aTextBreaked or aTmpTextBreaked;
+          aAllTextDrawed := aAllTextDrawed and aTmpAllTextDrawed;
 
           //update all the aBreakedTextItem
           for I := aBreakedTextItemsCount to aBreakedTextItems.Count - 1 do begin
@@ -5267,6 +5326,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                               const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
 var aAscent: single;
     aDescent: Single;
@@ -5278,6 +5338,38 @@ begin
   result := ALDrawMultiLineText(aText,
                                 aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                                 aTextBreaked, // out => true is the text was "breaked" in several lines
+                                aAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
+                                aAscent, // var aAscent: single; // out => the Ascent of the last element (in real pixel)
+                                aDescent, // var aDescent: Single; // out => the Descent of the last element (in real pixel)
+                                aFirstPos, // var aFirstPos: TpointF; // out => the point of the start of the text
+                                aLastPos, // var aLastPos: TpointF; // out => the point of the end of the text
+                                aElements, // var aElements: TalTextElements; // out => the list of rect describing all span elements
+                                aEllipsisRect, // var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+                                aOptions);
+end;
+
+{************************************************}
+function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
+                                                   //   <b>...</b>
+                                                   //   <i>...</i>
+                                                   //   <font color="#xxxxxx">...</font>
+                                                   //   <span id="xxx">...</span>
+                                                   // other < > must be encoded with &lt; and &gt;
+                              var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                              var aTextBreaked: boolean; // true is the text was "breaked" in several lines
+                              const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aAscent: single;
+    aDescent: Single;
+    aFirstPos: TpointF;
+    aLastPos: TpointF;
+    aElements: TalTextElements;
+    aEllipsisRect: TRectF;
+    aAllTextDrawed: boolean;
+begin
+  result := ALDrawMultiLineText(aText,
+                                aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                                aTextBreaked, // out => true is the text was "breaked" in several lines
+                                aAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                                 aAscent, // var aAscent: single; // out => the Ascent of the last element (in real pixel)
                                 aDescent, // var aDescent: Single; // out => the Descent of the last element (in real pixel)
                                 aFirstPos, // var aFirstPos: TpointF; // out => the point of the start of the text
@@ -5303,10 +5395,12 @@ var aAscent: single;
     aElements: TalTextElements;
     aEllipsisRect: TRectF;
     aTextBreaked: boolean;
+    aAllTextDrawed: boolean;
 begin
   result := ALDrawMultiLineText(aText,
                                 aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                                 aTextBreaked, // out => true is the text was "breaked" in several lines
+                                aAllTextDrawed, // var aAllTextDrawed: boolean; // out => true if all the text was drawed (no need of any Ellipsis)
                                 aAscent, // var aAscent: single; // out => the Ascent of the last element (in real pixel)
                                 aDescent, // var aDescent: Single; // out => the Descent of the last element (in real pixel)
                                 aFirstPos, // var aFirstPos: TpointF; // out => the point of the start of the text

@@ -352,6 +352,7 @@ type
     fBufSize: TsizeF;
     fBufText: string;
     fBufTextBreaked: Boolean;
+    fBufAllTextDrawed: Boolean;
     //-----
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     FOpenGLContextLostId: integer;
@@ -1833,7 +1834,8 @@ begin
        ) and
        (
         (SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or // if we already calculate the buf for maxsize.y
-        (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0) // if fbufBitmapRect.height <= MaxSize.y we can't do anything better
+        ((fBufAllTextDrawed) and
+         (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0)) // if fbufBitmapRect.height <= MaxSize.y and all text was drawed then we can't do anything better
        )
       )
      ) and
@@ -1853,7 +1855,8 @@ begin
   fBufText := fTextControl.Text;
 
   {$IFDEF debug}
-  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'text:' + fBufText + ' - MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY), TalLogType.verbose);
+  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'text:' + fBufText +
+                                                     ' - MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY), TalLogType.verbose);
   inc(AlDebugTextMakeBufBitmapCount);
   AlDebugTextMakeBufBitmapStopWatch.Start;
   try
@@ -1909,7 +1912,14 @@ begin
     fBufBitmap := ALDrawMultiLineText(fBufText, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
                                       fBufBitmapRect, // var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                                       fBufTextBreaked,
+                                      fBufAllTextDrawed,
                                       aOptions);
+    {$IFDEF debug}
+    ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap.ALDrawMultiLineText', 'text:' + fBufText +
+                                                                           ' - fBufBitmapRect: '+floattostr(fBufBitmapRect.width)+'x'+floattostr(fBufBitmapRect.height) +
+                                                                           ' - fBufTextBreaked: '+ BoolToStr(fBufTextBreaked, true) +
+                                                                           ' - fBufAllTextDrawed: '+ BoolToStr(fBufAllTextDrawed, true), TalLogType.verbose);
+    {$endif}
 
     //align fbufBitmapRect
     if aOptions.AutoSize and (not fBufAutosize) then begin

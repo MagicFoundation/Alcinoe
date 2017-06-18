@@ -231,6 +231,7 @@ private:
 	System::Types::TSizeF fBufSize;
 	System::UnicodeString fBufText;
 	bool fBufTextBreaked;
+	bool fBufAllTextDrawed;
 	
 protected:
 	virtual void __fastcall DoRenderLayout(void);

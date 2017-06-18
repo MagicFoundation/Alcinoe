@@ -21,6 +21,7 @@
 #include <FMX.Types.hpp>
 #include <FMX.Graphics.hpp>
 #include <FMX.Controls.hpp>
+#include <ALFmxEdit.hpp>
 #include <ALFmxObjects.hpp>
 #include <FMX.ScrollBox.hpp>
 #include <FMX.Controls.Presentation.hpp>
@@ -85,6 +86,7 @@ private:
 	Fmx::Graphics::TTextSettings* FTextSettings;
 	Fmx::Types::TReturnKeyType fReturnKeyType;
 	System::Uitypes::TAlphaColor fTintColor;
+	Alfmxedit::TALAutocapitalizationType fAutocapitalizationType;
 	float fLineSpacingMultiplier;
 	float fLineSpacingExtra;
 	TALStyledMemo* fMemoControl;
@@ -110,6 +112,8 @@ private:
 	void __fastcall OnExitImpl(System::TObject* Sender);
 	void __fastcall SetKeyboardType(Fmx::Types::TVirtualKeyboardType Value);
 	Fmx::Types::TVirtualKeyboardType __fastcall GetKeyboardType(void);
+	void __fastcall setAutocapitalizationType(const Alfmxedit::TALAutocapitalizationType Value);
+	Alfmxedit::TALAutocapitalizationType __fastcall GetAutocapitalizationType(void);
 	void __fastcall SetCheckSpelling(const bool Value);
 	bool __fastcall GetCheckSpelling(void);
 	void __fastcall SetReturnKeyType(const Fmx::Types::TReturnKeyType Value);
@@ -119,6 +123,7 @@ private:
 	HIDESBASE Fmx::Types::TBounds* __fastcall GetPadding(void);
 	void __fastcall CreateMemoControl(void);
 	HIDESBASE void __fastcall PaddingChangedHandler(System::TObject* Sender);
+	bool __fastcall GetContainFocus(void);
 	
 protected:
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
@@ -141,6 +146,7 @@ __published:
 	__property CanFocus = {default=1};
 	__property DisableFocusEffect = {default=0};
 	__property Fmx::Types::TVirtualKeyboardType KeyboardType = {read=GetKeyboardType, write=SetKeyboardType, default=0};
+	__property Alfmxedit::TALAutocapitalizationType AutocapitalizationType = {read=GetAutocapitalizationType, write=setAutocapitalizationType, default=0};
 	__property Fmx::Types::TReturnKeyType ReturnKeyType = {read=GetReturnKeyType, write=SetReturnKeyType, default=0};
 	__property System::UnicodeString Text = {read=getText, write=SetText};
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
@@ -162,6 +168,7 @@ __published:
 	__property System::Classes::TNotifyEvent OnEnter = {read=fOnEnter, write=fOnEnter};
 	__property System::Classes::TNotifyEvent OnExit = {read=fOnExit, write=fOnExit};
 	__property Fmx::Types::TBounds* Padding = {read=GetPadding, write=SetPadding};
+	__property bool ContainFocus = {read=GetContainFocus, nodefault};
 };
 
 

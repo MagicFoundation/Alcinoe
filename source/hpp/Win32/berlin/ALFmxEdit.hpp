@@ -31,6 +31,8 @@ namespace Alfmxedit
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS TALEdit;
 //-- type declarations -------------------------------------------------------
+enum DECLSPEC_DENUM TALAutocapitalizationType : unsigned char { acNone, acWords, acSentences, acAllCharacters };
+
 class PASCALIMPLEMENTATION TALEdit : public Alfmxobjects::TALRectangle
 {
 	typedef Alfmxobjects::TALRectangle inherited;
@@ -44,6 +46,7 @@ private:
 	System::Classes::TNotifyEvent fOnExit;
 	Fmx::Graphics::TTextSettings* FTextSettings;
 	System::Uitypes::TAlphaColor fTintColor;
+	TALAutocapitalizationType fAutocapitalizationType;
 	System::Uitypes::TAlphaColor fTextPromptColor;
 	Fmx::Edit::TEdit* fEditControl;
 	System::UnicodeString __fastcall GetTextPrompt(void);
@@ -62,6 +65,8 @@ private:
 	void __fastcall OnExitImpl(System::TObject* Sender);
 	void __fastcall SetKeyboardType(Fmx::Types::TVirtualKeyboardType Value);
 	Fmx::Types::TVirtualKeyboardType __fastcall GetKeyboardType(void);
+	void __fastcall setAutocapitalizationType(const TALAutocapitalizationType Value);
+	TALAutocapitalizationType __fastcall GetAutocapitalizationType(void);
 	void __fastcall SetPassword(const bool Value);
 	bool __fastcall GetPassword(void);
 	void __fastcall SetCheckSpelling(const bool Value);
@@ -70,6 +75,7 @@ private:
 	Fmx::Types::TReturnKeyType __fastcall GetReturnKeyType(void);
 	void __fastcall SetDefStyleAttr(const System::UnicodeString Value);
 	void __fastcall CreateEditControl(void);
+	bool __fastcall GetContainFocus(void);
 	
 protected:
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
@@ -92,6 +98,7 @@ __published:
 	__property CanFocus = {default=1};
 	__property DisableFocusEffect = {default=0};
 	__property Fmx::Types::TVirtualKeyboardType KeyboardType = {read=GetKeyboardType, write=SetKeyboardType, default=0};
+	__property TALAutocapitalizationType AutocapitalizationType = {read=GetAutocapitalizationType, write=setAutocapitalizationType, default=0};
 	__property Fmx::Types::TReturnKeyType ReturnKeyType = {read=GetReturnKeyType, write=SetReturnKeyType, default=0};
 	__property bool Password = {read=GetPassword, write=SetPassword, default=0};
 	__property System::UnicodeString Text = {read=getText, write=SetText};
@@ -111,6 +118,7 @@ __published:
 	__property OnKeyUp;
 	__property System::Classes::TNotifyEvent OnEnter = {read=fOnEnter, write=fOnEnter};
 	__property System::Classes::TNotifyEvent OnExit = {read=fOnExit, write=fOnExit};
+	__property bool ContainFocus = {read=GetContainFocus, nodefault};
 };
 
 

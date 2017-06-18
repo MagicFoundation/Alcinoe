@@ -31,6 +31,15 @@ uses System.Types,
      Fmx.controls,
      ALFmxObjects;
 
+Type
+
+  {**********************************}
+  TALAutocapitalizationType = (acNone, // Specifies that there is no automatic text capitalization.
+                               acWords, // Specifies automatic capitalization of the first letter of each word.
+                               acSentences, // Specifies automatic capitalization of the first letter of each sentence.
+                               acAllCharacters); // Specifies automatic capitalization of all characters, such as for entry of two-character state abbreviations for the United States.
+
+
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 type
@@ -203,6 +212,7 @@ type
     procedure DoEndUpdate; override;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
+    procedure ParentChanged; override;
     procedure DoAbsoluteChanged; override;
     procedure Resize; override;
     procedure VisibleChanged; override;
@@ -298,6 +308,8 @@ type
     FTextSettings: TTextSettings;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
+    procedure setAutocapitalizationType(const Value: TALAutocapitalizationType);
+    function GetAutocapitalizationType: TALAutocapitalizationType;
     procedure setPassword(const Value: Boolean);
     function GetPassword: Boolean;
     procedure setCheckSpelling(const Value: Boolean);
@@ -329,6 +341,7 @@ type
     procedure ChangeOrder; override;
     procedure DoEnter; override;
     procedure DoExit; override;
+    procedure DoEndUpdate; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -338,6 +351,7 @@ type
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
+    property AutocapitalizationType: TALAutocapitalizationType read GetAutocapitalizationType write SetAutocapitalizationType;
     property Password: Boolean read GetPassword write SetPassword default False;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
@@ -365,6 +379,7 @@ type
     FTextSettings: TTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
+    fAutocapitalizationType: TALAutocapitalizationType;
     fEditControl: TALAndroidEdit;
     function GetAndroidEditText: JALEditText;
     {$ELSEIF defined(IOS)}
@@ -372,6 +387,7 @@ type
     function GetIosTextField: TALIosTextField;
     {$ELSE}
     fTintColor: TalphaColor;
+    fAutocapitalizationType: TALAutocapitalizationType;
     fTextPromptColor: TalphaColor;
     fEditControl: TEdit;
     {$ENDIF}
@@ -391,6 +407,8 @@ type
     procedure OnExitImpl(Sender: TObject);
     procedure SetKeyboardType(Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
+    procedure setAutocapitalizationType(const Value: TALAutocapitalizationType);
+    function GetAutocapitalizationType: TALAutocapitalizationType;
     procedure SetPassword(const Value: Boolean);
     function GetPassword: Boolean;
     procedure SetCheckSpelling(const Value: Boolean);
@@ -399,6 +417,7 @@ type
     function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
     procedure CreateEditControl;
+    function GetContainFocus: Boolean;
   protected
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
@@ -428,6 +447,7 @@ type
     //property CanParentFocus;
     property DisableFocusEffect;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
+    property AutocapitalizationType: TALAutocapitalizationType read GetAutocapitalizationType write SetAutocapitalizationType default TALAutocapitalizationType.acNone;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     property Password: Boolean read GetPassword write SetPassword default False;
     //property ReadOnly;
@@ -456,6 +476,7 @@ type
     property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
     property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
+    property ContainFocus: Boolean read GetContainFocus;
   end;
 
 procedure Register;
@@ -855,6 +876,16 @@ end;
 
 {*********************************************}
 procedure TALAndroidEdit.AncestorParentChanged;
+begin
+  inherited;
+  // stupidly when we do setparent the
+  // FisUpdating will be set to the value of the parent BUT without any
+  // notifications nor any call to endupdate :(
+  RealignContent(true{force});
+end;
+
+{*************************************}
+procedure TALAndroidEdit.ParentChanged; // << i don't know if i really need it, normally AncestorParentChanged must be enalf but cost nothing to add it
 begin
   inherited;
   // stupidly when we do setparent the
@@ -1800,6 +1831,7 @@ begin
   FTextField := TalIosTextField.create(self);
   SetReturnKeyType(tReturnKeyType.Default);
   SetKeyboardType(TVirtualKeyboardType.default);
+  setAutocapitalizationType(TALAutocapitalizationType.acNone);
   SetPassword(false);
   SetCheckSpelling(True);
 end;
@@ -1845,6 +1877,32 @@ begin
   end;
 end;
 
+{*************************************************************************************}
+procedure TalIosEdit.setAutocapitalizationType(const Value: TALAutocapitalizationType);
+var aUITextAutocapitalizationType: UITextAutocapitalizationType;
+begin
+  case Value of
+    TALAutocapitalizationType.acWords:          aUITextAutocapitalizationType := UITextAutocapitalizationTypeWords;
+    TALAutocapitalizationType.acSentences:      aUITextAutocapitalizationType := UITextAutocapitalizationTypeSentences;
+    TALAutocapitalizationType.acAllCharacters:  aUITextAutocapitalizationType := UITextAutocapitalizationTypeAllCharacters;
+    else {TALAutocapitalizationType.acNone}     aUITextAutocapitalizationType := UITextAutocapitalizationTypeNone;
+  end;
+  FTextField.View.setAutocapitalizationType(aUITextAutocapitalizationType);
+end;
+
+{***********************************************************************}
+function TalIosEdit.GetAutocapitalizationType: TALAutocapitalizationType;
+var aUITextAutocapitalizationType: UITextAutocapitalizationType;
+begin
+  aUITextAutocapitalizationType := FTextField.View.AutocapitalizationType;
+  case aUITextAutocapitalizationType of
+    UITextAutocapitalizationTypeWords:         result := TALAutocapitalizationType.acWords;
+    UITextAutocapitalizationTypeSentences:     result := TALAutocapitalizationType.acSentences;
+    UITextAutocapitalizationTypeAllCharacters: result := TALAutocapitalizationType.acAllCharacters;
+    else                                       result := TALAutocapitalizationType.acNone;
+  end;
+end;
+
 {*****************************************************}
 procedure TalIosEdit.SetPassword(const Value: Boolean);
 begin
@@ -1860,8 +1918,14 @@ end;
 {**********************************************************}
 procedure TalIosEdit.SetCheckSpelling(const Value: Boolean);
 begin
-  if Value then FTextField.View.setSpellCheckingType(UITextSpellCheckingTypeYes)
-  else FTextField.View.setSpellCheckingType(UITextSpellCheckingTypeNo)
+  if Value then begin
+    FTextField.View.setSpellCheckingType(UITextSpellCheckingTypeYes);
+    FTextField.View.setAutocorrectionType(UITextAutocorrectionTypeDefault);
+  end
+  else begin
+    FTextField.View.setSpellCheckingType(UITextSpellCheckingTypeNo);
+    FTextField.View.setAutocorrectionType(UITextAutocorrectionTypeNo);
+  end;
 end;
 
 {********************************************}
@@ -2157,6 +2221,15 @@ begin
   FTextField.ResetFocus;
 end;
 
+{*******************************}
+procedure TalIosEdit.DoEndUpdate;
+begin
+  inherited;
+  if FTextField <> nil then FTextField.RefreshNativeParent; // << without this, in some case when we are doing beginupdate to the TEdit
+                                                            // << (because in android for exemple we would like to not refresh the position of the control during calculation)
+                                                            // << then when we do endupdate the control is not paint or lost somewhere
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -2189,6 +2262,7 @@ begin
   {$ENDIF}
   {$IF (not defined(IOS))}
   fTintColor := TalphaColorRec.Null;
+  fAutocapitalizationType := TALAutocapitalizationType.acNone;
   {$ENDIF}
   //-----
   FTextSettings := TALEditTextSettings.Create(Self);
@@ -2226,6 +2300,7 @@ begin
   FeditControl.Stored := False;
   FeditControl.SetSubComponent(True);
   FeditControl.Locked := True;
+  fEditControl.AutocapitalizationType := TALAutocapitalizationType.acNone; // noops operation
   {$ELSE}
   fEditControl := TEdit.Create(self);
   fEditControl.Parent := self;
@@ -2416,6 +2491,28 @@ begin
   result := FeditControl.KeyboardType;
 end;
 
+{********************************************************************}
+function TALEdit.GetAutocapitalizationType: TALAutocapitalizationType;
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(ios)}
+  result := FeditControl.AutocapitalizationType;
+  {$ELSE}
+  result := fAutocapitalizationType;
+  {$ENDIF}
+end;
+
+{**********************************************************************************}
+procedure TALEdit.setAutocapitalizationType(const Value: TALAutocapitalizationType);
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(ios)}
+  FeditControl.AutocapitalizationType := Value;
+  {$ELSE}
+  fAutocapitalizationType := Value;
+  {$ENDIF}
+end;
+
 {**************************************************}
 procedure TALEdit.SetPassword(const Value: Boolean);
 begin
@@ -2517,6 +2614,13 @@ begin
     exit(false);   // << the canparentfocus is also set to false, so the TCommonCustomForm.NewFocusedControl(const Value: IControl)
                    //    will do nothing !
   end;
+end;
+
+{****************************************}
+function TALEdit.GetContainFocus: Boolean;
+begin
+  if FEditControl = nil then CreateEditControl;
+  result := isFocused or FEditControl.IsFocused;
 end;
 
 {******************************}

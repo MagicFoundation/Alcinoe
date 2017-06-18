@@ -420,7 +420,7 @@ Type
     Nvs: Boolean; // if NameValueSeparator was present
   end;
 
-  {----------------------------------}
+  {-------------------------------}
   //when duplicate is set to ignore
   //it's take care only about the "name" part
   //and ignore the value part. exemple

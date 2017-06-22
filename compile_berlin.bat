@@ -32,14 +32,6 @@ SET FileName=*.deployproj.local
 del %FileName% /s
 if exist %FileName% goto ERROR
 
-SET FileName=*.dres
-del %FileName% /s
-if exist %FileName% goto ERROR
-
-SET FileName=*.rc
-del %FileName% /s
-if exist %FileName% goto ERROR
-
 SET FileName=source\dcu\Win32\berlin
 IF EXIST %FileName% rmdir /s /q %FileName%
 IF EXIST %FileName% goto ERROR

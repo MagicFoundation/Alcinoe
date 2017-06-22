@@ -77,6 +77,7 @@ type
     procedure hideSoftInput; cdecl;
     procedure setSoftInputListener(listener: JALSoftInputListener); cdecl;
     procedure setKeyPreImeListener(listener: JALKeyPreImeListener); cdecl;
+    procedure setMaxLength(value: integer); cdecl;
   end;
   TJALEditText = class(TJavaGenericImport<JALEditTextClass, JALEditText>) end;
 

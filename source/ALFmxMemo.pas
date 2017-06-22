@@ -1280,7 +1280,6 @@ begin
   FMemoControl.Locked := True;
   FMemoControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   FMemoControl.AutoCapitalizationType := TALAutoCapitalizationType.acNone; // noops operation
-  FMemoControl.OnReturnKey := nil; // noops operation
   {$ELSE}
   fMemoControl := TALStyledMemo.Create(self);
   fMemoControl.Parent := self;

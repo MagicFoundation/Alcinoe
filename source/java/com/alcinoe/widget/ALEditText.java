@@ -20,6 +20,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.ViewTreeObserver.OnPreDrawListener;
+import android.text.InputFilter;
 import com.alcinoe.view.inputmethod.ALSoftInputListener;
 import com.alcinoe.view.ALFloatingActionMode;
 import com.alcinoe.text.method.ALKeyPreImeListener;
@@ -64,6 +65,17 @@ public class ALEditText extends EditText {
     mOnGlobalLayoutListener = null;  
   } 
   
+  public void setMaxLength(int value) {
+  	if (value > 0) {
+  		InputFilter[] filterArray = new InputFilter[1];
+  		filterArray[0] = new InputFilter.LengthFilter(value);
+  		setFilters(filterArray);
+  	}
+  	else {
+  		setFilters(new InputFilter[] {});
+  	}
+  }
+
   @Override
   public boolean onKeyPreIme(int keyCode, KeyEvent event) {
     if (mKeyPreImeListener != null) return mKeyPreImeListener.onKeyPreIme(keyCode, event); 

@@ -31,7 +31,7 @@ namespace Alfmxedit
 //-- forward type declarations -----------------------------------------------
 class DELPHICLASS TALEdit;
 //-- type declarations -------------------------------------------------------
-enum DECLSPEC_DENUM TALAutocapitalizationType : unsigned char { acNone, acWords, acSentences, acAllCharacters };
+enum DECLSPEC_DENUM TALAutoCapitalizationType : unsigned char { acNone, acWords, acSentences, acAllCharacters };
 
 class PASCALIMPLEMENTATION TALEdit : public Alfmxobjects::TALRectangle
 {
@@ -42,11 +42,12 @@ private:
 	bool FAutoTranslate;
 	bool FAutoConvertFontFamily;
 	System::Classes::TNotifyEvent fOnChangeTracking;
+	System::Classes::TNotifyEvent fOnReturnKey;
 	System::Classes::TNotifyEvent fOnEnter;
 	System::Classes::TNotifyEvent fOnExit;
 	Fmx::Graphics::TTextSettings* FTextSettings;
 	System::Uitypes::TAlphaColor fTintColor;
-	TALAutocapitalizationType fAutocapitalizationType;
+	TALAutoCapitalizationType fAutoCapitalizationType;
 	System::Uitypes::TAlphaColor fTextPromptColor;
 	Fmx::Edit::TEdit* fEditControl;
 	System::UnicodeString __fastcall GetTextPrompt(void);
@@ -61,12 +62,14 @@ private:
 	System::UnicodeString __fastcall getText(void);
 	void __fastcall SetText(const System::UnicodeString Value);
 	void __fastcall OnChangeTrackingImpl(System::TObject* Sender);
+	void __fastcall SetOnReturnKey(const System::Classes::TNotifyEvent Value);
+	void __fastcall OnKeyDownImpl(System::TObject* Sender, System::Word &Key, System::WideChar &KeyChar, System::Classes::TShiftState Shift);
 	void __fastcall OnEnterImpl(System::TObject* Sender);
 	void __fastcall OnExitImpl(System::TObject* Sender);
 	void __fastcall SetKeyboardType(Fmx::Types::TVirtualKeyboardType Value);
 	Fmx::Types::TVirtualKeyboardType __fastcall GetKeyboardType(void);
-	void __fastcall setAutocapitalizationType(const TALAutocapitalizationType Value);
-	TALAutocapitalizationType __fastcall GetAutocapitalizationType(void);
+	void __fastcall setAutoCapitalizationType(const TALAutoCapitalizationType Value);
+	TALAutoCapitalizationType __fastcall GetAutoCapitalizationType(void);
 	void __fastcall SetPassword(const bool Value);
 	bool __fastcall GetPassword(void);
 	void __fastcall SetCheckSpelling(const bool Value);
@@ -76,6 +79,8 @@ private:
 	void __fastcall SetDefStyleAttr(const System::UnicodeString Value);
 	void __fastcall CreateEditControl(void);
 	bool __fastcall GetContainFocus(void);
+	void __fastcall SetMaxLength(const int Value);
+	int __fastcall GetMaxLength(void);
 	
 protected:
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
@@ -89,6 +94,8 @@ public:
 	__fastcall virtual ~TALEdit(void);
 	void __fastcall AddNativeView(void);
 	void __fastcall RemoveNativeView(void);
+	void __fastcall setSelection(const int aStart, const int aStop)/* overload */;
+	void __fastcall setSelection(const int aindex)/* overload */;
 	
 __published:
 	__property System::UnicodeString DefStyleAttr = {read=fDefStyleAttr, write=SetDefStyleAttr};
@@ -98,9 +105,10 @@ __published:
 	__property CanFocus = {default=1};
 	__property DisableFocusEffect = {default=0};
 	__property Fmx::Types::TVirtualKeyboardType KeyboardType = {read=GetKeyboardType, write=SetKeyboardType, default=0};
-	__property TALAutocapitalizationType AutocapitalizationType = {read=GetAutocapitalizationType, write=setAutocapitalizationType, default=0};
+	__property TALAutoCapitalizationType AutoCapitalizationType = {read=GetAutoCapitalizationType, write=setAutoCapitalizationType, default=0};
 	__property Fmx::Types::TReturnKeyType ReturnKeyType = {read=GetReturnKeyType, write=SetReturnKeyType, default=0};
 	__property bool Password = {read=GetPassword, write=SetPassword, default=0};
+	__property int MaxLength = {read=GetMaxLength, write=SetMaxLength, default=0};
 	__property System::UnicodeString Text = {read=getText, write=SetText};
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
 	__property Hint = {default=0};
@@ -114,8 +122,7 @@ __published:
 	__property ParentShowHint = {default=1};
 	__property ShowHint;
 	__property System::Classes::TNotifyEvent OnChangeTracking = {read=fOnChangeTracking, write=fOnChangeTracking};
-	__property OnKeyDown;
-	__property OnKeyUp;
+	__property System::Classes::TNotifyEvent OnReturnKey = {read=fOnReturnKey, write=SetOnReturnKey};
 	__property System::Classes::TNotifyEvent OnEnter = {read=fOnEnter, write=fOnEnter};
 	__property System::Classes::TNotifyEvent OnExit = {read=fOnExit, write=fOnExit};
 	__property bool ContainFocus = {read=GetContainFocus, nodefault};

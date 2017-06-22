@@ -34,7 +34,7 @@ uses System.Types,
 Type
 
   {**********************************}
-  TALAutocapitalizationType = (acNone, // Specifies that there is no automatic text capitalization.
+  TALAutoCapitalizationType = (acNone, // Specifies that there is no automatic text capitalization.
                                acWords, // Specifies automatic capitalization of the first letter of each word.
                                acSentences, // Specifies automatic capitalization of the first letter of each sentence.
                                acAllCharacters); // Specifies automatic capitalization of all characters, such as for entry of two-character state abbreviations for the United States.
@@ -166,6 +166,7 @@ type
     fTextPrompt: String;
     FPadding: TBounds;
     fOnChangeTracking: TNotifyEvent;
+    fOnReturnKey: TNotifyEvent;
     FScreenScale: single;
     fFormActivateMessageID: integer;
     fFormDeactivateMessageID: integer;
@@ -176,6 +177,7 @@ type
     FTextSettings: TTextSettings;
     fHideSoftInputOnExit: Boolean;
     fIsMultiline: Boolean;
+    fMaxLength: integer;
     procedure DoSetInputType(const aEditText: JALEditText;
                              const aKeyboardType: TVirtualKeyboardType;
                              const aPassword: Boolean;
@@ -203,6 +205,8 @@ type
     procedure SetLineSpacingExtra(const Value: single);
     procedure SetPadding(const Value: TBounds);
     function GetPadding: TBounds;
+    procedure SetMaxLength(const Value: integer);
+    function GetMaxLength: integer;
     procedure OnFontChanged(Sender: TObject);
     procedure FormActivateHandler(const Sender: TObject; const M: TMessage);
     procedure FormDeactivateHandler(const Sender: TObject; const M: TMessage);
@@ -227,12 +231,16 @@ type
     procedure RecalcOpacity; override;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
+    Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
+    Procedure setSelection(const aindex: integer); overload;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property OnReturnKey: TNotifyEvent read fOnReturnKey write fOnReturnKey;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
     property Password: Boolean read GetPassword write SetPassword default False;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor; // << null mean use the default color
+    property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
@@ -305,11 +313,13 @@ type
     FTextField: TALIosTextField;
     fTextPromptColor: TalphaColor;
     fOnChangeTracking: TNotifyEvent;
+    fOnReturnKey: TNotifyEvent;
     FTextSettings: TTextSettings;
+    fMaxLength: integer;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
-    procedure setAutocapitalizationType(const Value: TALAutocapitalizationType);
-    function GetAutocapitalizationType: TALAutocapitalizationType;
+    procedure setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
+    function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure setPassword(const Value: Boolean);
     function GetPassword: Boolean;
     procedure setCheckSpelling(const Value: Boolean);
@@ -349,13 +359,15 @@ type
     procedure RecalcEnabled; override;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property OnReturnKey: TNotifyEvent read fOnReturnKey write fOnReturnKey;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
-    property AutocapitalizationType: TALAutocapitalizationType read GetAutocapitalizationType write SetAutocapitalizationType;
+    property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType;
     property Password: Boolean read GetPassword write SetPassword default False;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
     property TintColor: TAlphaColor read GetTintColor write setTintColor; // << null mean use the default color
+    property MaxLength: integer read fMaxLength write fMaxLength default 0;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
@@ -374,12 +386,13 @@ type
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
+    fOnReturnKey: TNotifyEvent;
     fOnEnter: TNotifyEvent;
     fOnExit: TNotifyEvent;
     FTextSettings: TTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
-    fAutocapitalizationType: TALAutocapitalizationType;
+    fAutoCapitalizationType: TALAutoCapitalizationType;
     fEditControl: TALAndroidEdit;
     function GetAndroidEditText: JALEditText;
     {$ELSEIF defined(IOS)}
@@ -387,7 +400,7 @@ type
     function GetIosTextField: TALIosTextField;
     {$ELSE}
     fTintColor: TalphaColor;
-    fAutocapitalizationType: TALAutocapitalizationType;
+    fAutoCapitalizationType: TALAutoCapitalizationType;
     fTextPromptColor: TalphaColor;
     fEditControl: TEdit;
     {$ENDIF}
@@ -403,12 +416,19 @@ type
     function getText: String;
     procedure SetText(const Value: String);
     procedure OnChangeTrackingImpl(Sender: TObject);
+    {$IF defined(ios) OR defined(android)}
+    procedure OnReturnKeyImpl(Sender: TObject);
+    {$ENDIF}
+    procedure SetOnReturnKey(const Value: TNotifyEvent);
+    {$IF (not defined(ios)) and (not defined(android))}
+    procedure OnKeyDownImpl(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+    {$ENDIF}
     procedure OnEnterImpl(Sender: TObject);
     procedure OnExitImpl(Sender: TObject);
     procedure SetKeyboardType(Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
-    procedure setAutocapitalizationType(const Value: TALAutocapitalizationType);
-    function GetAutocapitalizationType: TALAutocapitalizationType;
+    procedure setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
+    function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure SetPassword(const Value: Boolean);
     function GetPassword: Boolean;
     procedure SetCheckSpelling(const Value: Boolean);
@@ -418,6 +438,8 @@ type
     procedure SetDefStyleAttr(const Value: String);
     procedure CreateEditControl;
     function GetContainFocus: Boolean;
+    procedure SetMaxLength(const Value: integer);
+    function GetMaxLength: integer;
   protected
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
@@ -434,6 +456,8 @@ type
     {$ENDIF}
     Procedure AddNativeView;
     Procedure RemoveNativeView;
+    Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
+    Procedure setSelection(const aindex: integer); overload;
   published
     property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
                                                                             // << reference to a style resource that supplies defaults values for the StyledAttributes.
@@ -447,11 +471,11 @@ type
     //property CanParentFocus;
     property DisableFocusEffect;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
-    property AutocapitalizationType: TALAutocapitalizationType read GetAutocapitalizationType write SetAutocapitalizationType default TALAutocapitalizationType.acNone;
+    property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType default TALAutoCapitalizationType.acNone;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     property Password: Boolean read GetPassword write SetPassword default False;
     //property ReadOnly;
-    //property MaxLength;
+    property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     //property FilterChar;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
@@ -469,11 +493,12 @@ type
     property ShowHint;
     //property OnChange;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property OnReturnKey: TNotifyEvent read fOnReturnKey write SetOnReturnKey;
     //property OnTyping;
     //property OnValidating;
     //property OnValidate;
-    property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
-    property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
+    //property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
+    //property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
     property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
     property ContainFocus: Boolean read GetContainFocus;
@@ -556,10 +581,12 @@ begin
   fFormDeactivateMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TFormDeactivateMessage, FormDeActivateHandler);
   fApplicationEventMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
   fOnChangeTracking := nil;
+  fOnReturnKey := nil;
   FTextSettings := TALEditTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
   fHideSoftInputOnExit := True;
   fIsMultiline := aIsMultiline;
+  fMaxLength := 0;
   fTextPrompt := '';
   fReturnKeyType := tReturnKeyType.Default;
   fKeyboardType := TVirtualKeyboardType.default;
@@ -1011,6 +1038,26 @@ begin
   {$ENDIF}
 end;
 
+{*********************************************************************************}
+Procedure TALAndroidEdit.setSelection(const aStart: integer; const aStop: Integer);
+begin
+  TUIThreadCaller.Call<TALUIMembers>(
+    procedure (aUIMembers: TALUIMembers)
+    begin
+      aUIMembers.fEditText.setSelection(aStart, aStop);
+    end, FUIMembers);
+end;
+
+{***********************************************************}
+Procedure TALAndroidEdit.setSelection(const aindex: integer);
+begin
+  TUIThreadCaller.Call<TALUIMembers>(
+    procedure (aUIMembers: TALUIMembers)
+    begin
+      aUIMembers.fEditText.setSelection(aindex);
+    end, FUIMembers);
+end;
+
 {*******************************************************************}
 procedure TALAndroidEdit.DoSetInputType(const aEditText: JALEditText;
                                         const aKeyboardType: TVirtualKeyboardType;
@@ -1239,6 +1286,24 @@ end;
 function TALAndroidEdit.GetPadding: TBounds;
 begin
   result := FPadding;
+end;
+
+{**********************************************************}
+procedure TALAndroidEdit.SetMaxLength(const Value: integer);
+begin
+  if value <> FMaxLength then begin
+    TUIThreadCaller.Call<TALUIMembers>(
+      procedure (aUIMembers: TALUIMembers)
+      begin
+        aUIMembers.fEditText.setMaxLength(Value);
+      end, FUIMembers);
+  end;
+end;
+
+{********************************************}
+function TALAndroidEdit.GetMaxLength: integer;
+begin
+  result := FMaxLength;
 end;
 
 {********************************************}
@@ -1648,7 +1713,8 @@ begin
      procedure
      begin
        if fEditControl = nil then exit;
-       FEditcontrol.resetfocus;
+       if assigned(FEditControl.fOnReturnKey) then FEditControl.fOnReturnKey(fEditControl)
+       else FEditcontrol.resetfocus;
      end);
 
   end
@@ -1777,8 +1843,17 @@ end;
 
 {***********************************************************************************************************************************************}
 function TALIosTextFieldDelegate.textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean;
+var aText: NSString;
 begin
-  Result := True;
+  if FTextField.FEditControl.maxLength > 0 then begin
+
+    //https://stackoverflow.com/questions/433337/set-the-maximum-character-length-of-a-uitextfield
+    aText := TNSString.Wrap(textField.text);
+    if shouldChangeCharactersInRange.length + shouldChangeCharactersInRange.location > aText.length then exit(false);
+    result := aText.length + replacementString.length - shouldChangeCharactersInRange.length <= NSUInteger(FTextField.FEditControl.maxLength);
+
+  end
+  else Result := True;
 end;
 
 {*********************************************************************************}
@@ -1815,7 +1890,8 @@ end;
 function TALIosTextFieldDelegate.textFieldShouldReturn(textField: UITextField): Boolean;
 begin
   FTextField.ControlEventEditingDidEnd;
-  FTextField.ResetFocus;
+  if assigned(FTextField.fEditControl.fOnReturnKey) then FTextField.fEditControl.fOnReturnKey(FTextField.fEditControl)
+  else FTextField.ResetFocus;
   Result := true;
 end;
 
@@ -1823,15 +1899,17 @@ end;
 constructor TalIosEdit.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  fMaxLength := 0;
   CanFocus := True;
   fOnChangeTracking := nil;
+  FOnReturnKey := nil;
   fTextPromptColor := TalphaColorRec.Null;
   FTextSettings := TALEditTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
   FTextField := TalIosTextField.create(self);
   SetReturnKeyType(tReturnKeyType.Default);
   SetKeyboardType(TVirtualKeyboardType.default);
-  setAutocapitalizationType(TALAutocapitalizationType.acNone);
+  setAutoCapitalizationType(TALAutoCapitalizationType.acNone);
   SetPassword(false);
   SetCheckSpelling(True);
 end;
@@ -1878,28 +1956,28 @@ begin
 end;
 
 {*************************************************************************************}
-procedure TalIosEdit.setAutocapitalizationType(const Value: TALAutocapitalizationType);
-var aUITextAutocapitalizationType: UITextAutocapitalizationType;
+procedure TalIosEdit.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
+var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
   case Value of
-    TALAutocapitalizationType.acWords:          aUITextAutocapitalizationType := UITextAutocapitalizationTypeWords;
-    TALAutocapitalizationType.acSentences:      aUITextAutocapitalizationType := UITextAutocapitalizationTypeSentences;
-    TALAutocapitalizationType.acAllCharacters:  aUITextAutocapitalizationType := UITextAutocapitalizationTypeAllCharacters;
-    else {TALAutocapitalizationType.acNone}     aUITextAutocapitalizationType := UITextAutocapitalizationTypeNone;
+    TALAutoCapitalizationType.acWords:          aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
+    TALAutoCapitalizationType.acSentences:      aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
+    TALAutoCapitalizationType.acAllCharacters:  aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeAllCharacters;
+    else {TALAutoCapitalizationType.acNone}     aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeNone;
   end;
-  FTextField.View.setAutocapitalizationType(aUITextAutocapitalizationType);
+  FTextField.View.setAutoCapitalizationType(aUITextAutoCapitalizationType);
 end;
 
 {***********************************************************************}
-function TalIosEdit.GetAutocapitalizationType: TALAutocapitalizationType;
-var aUITextAutocapitalizationType: UITextAutocapitalizationType;
+function TalIosEdit.GetAutoCapitalizationType: TALAutoCapitalizationType;
+var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
-  aUITextAutocapitalizationType := FTextField.View.AutocapitalizationType;
-  case aUITextAutocapitalizationType of
-    UITextAutocapitalizationTypeWords:         result := TALAutocapitalizationType.acWords;
-    UITextAutocapitalizationTypeSentences:     result := TALAutocapitalizationType.acSentences;
-    UITextAutocapitalizationTypeAllCharacters: result := TALAutocapitalizationType.acAllCharacters;
-    else                                       result := TALAutocapitalizationType.acNone;
+  aUITextAutoCapitalizationType := FTextField.View.AutoCapitalizationType;
+  case aUITextAutoCapitalizationType of
+    UITextAutoCapitalizationTypeWords:         result := TALAutoCapitalizationType.acWords;
+    UITextAutoCapitalizationTypeSentences:     result := TALAutoCapitalizationType.acSentences;
+    UITextAutoCapitalizationTypeAllCharacters: result := TALAutoCapitalizationType.acAllCharacters;
+    else                                       result := TALAutoCapitalizationType.acNone;
   end;
 end;
 
@@ -2241,6 +2319,7 @@ begin
   FAutoTranslate := true;
   FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
+  FOnReturnKey := nil;
   fOnEnter := nil;
   fOnExit := nil;
   Cursor := crIBeam;
@@ -2262,7 +2341,7 @@ begin
   {$ENDIF}
   {$IF (not defined(IOS))}
   fTintColor := TalphaColorRec.Null;
-  fAutocapitalizationType := TALAutocapitalizationType.acNone;
+  fAutoCapitalizationType := TALAutoCapitalizationType.acNone;
   {$ENDIF}
   //-----
   FTextSettings := TALEditTextSettings.Create(Self);
@@ -2294,13 +2373,15 @@ begin
   FeditControl.Stored := False;
   FeditControl.SetSubComponent(True);
   FeditControl.Locked := True;
+  FeditControl.OnReturnKey := nil; // noops operation
   {$ELSEIF defined(ios)}
   fEditControl := TALIosEdit.Create(self);
   fEditControl.Parent := self;
   FeditControl.Stored := False;
   FeditControl.SetSubComponent(True);
   FeditControl.Locked := True;
-  fEditControl.AutocapitalizationType := TALAutocapitalizationType.acNone; // noops operation
+  fEditControl.AutoCapitalizationType := TALAutoCapitalizationType.acNone; // noops operation
+  FeditControl.OnReturnKey := nil; // noops operation
   {$ELSE}
   fEditControl := TEdit.Create(self);
   fEditControl.Parent := self;
@@ -2311,6 +2392,7 @@ begin
   FeditControl.StyleLookup := 'transparentedit';
   FeditControl.StyledSettings := []; // Family, Size, Style, FontColor, Other
   fEditControl.KillFocusByReturn := True;
+  FeditControl.OnKeyDown := OnKeyDownImpl;
   {$ENDIF}
   fEditControl.Align := TAlignLayout.Client;
   FeditControl.OnChangeTracking := OnChangeTrackingImpl;
@@ -2320,6 +2402,7 @@ begin
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
   fEditControl.CheckSpelling := True;
+  fEditControl.MaxLength := 0; // noops operation
 end;
 
 {***********************}
@@ -2492,24 +2575,24 @@ begin
 end;
 
 {********************************************************************}
-function TALEdit.GetAutocapitalizationType: TALAutocapitalizationType;
+function TALEdit.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   if FEditControl = nil then CreateEditControl;
   {$IF defined(ios)}
-  result := FeditControl.AutocapitalizationType;
+  result := FeditControl.AutoCapitalizationType;
   {$ELSE}
-  result := fAutocapitalizationType;
+  result := fAutoCapitalizationType;
   {$ENDIF}
 end;
 
 {**********************************************************************************}
-procedure TALEdit.setAutocapitalizationType(const Value: TALAutocapitalizationType);
+procedure TALEdit.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   if FEditControl = nil then CreateEditControl;
   {$IF defined(ios)}
-  FeditControl.AutocapitalizationType := Value;
+  FeditControl.AutoCapitalizationType := Value;
   {$ELSE}
-  fAutocapitalizationType := Value;
+  fAutoCapitalizationType := Value;
   {$ENDIF}
 end;
 
@@ -2555,11 +2638,56 @@ begin
   result := FeditControl.ReturnKeyType;
 end;
 
+{***************************************************}
+procedure TALEdit.SetMaxLength(const Value: integer);
+begin
+  if FEditControl = nil then CreateEditControl;
+  FeditControl.MaxLength := Value;
+end;
+
+{*************************************}
+function TALEdit.GetMaxLength: integer;
+begin
+  if FEditControl = nil then CreateEditControl;
+  result := FeditControl.MaxLength;
+end;
+
 {******************************************************}
 procedure TALEdit.OnChangeTrackingImpl(Sender: TObject);
 begin
   if assigned(fOnChangeTracking) and (not (csLoading in componentState)) then
     fOnChangeTracking(self); // << yes need to send self instead of the fEditControl
+end;
+
+{************************************}
+{$IF defined(ios) OR defined(android)}
+procedure TALEdit.OnReturnKeyImpl(Sender: TObject);
+begin
+  if assigned(fOnReturnKey) and (not (csLoading in componentState)) then
+    fOnReturnKey(self); // << yes need to send self instead of the fEditControl
+end;
+{$ENDIF}
+
+{*************************************************}
+{$IF (not defined(ios)) and (not defined(android))}
+procedure TALEdit.OnKeyDownImpl(Sender: TObject; var Key: Word; var KeyChar: WideChar; Shift: TShiftState);
+begin
+  if (Key = vkReturn) and assigned(fOnReturnKey) and (not (csLoading in componentState)) then begin
+    fOnReturnKey(self); // << yes need to send self instead of the fEditControl
+    Key := 0;
+  end;
+end;
+{$ENDIF}
+
+{**********************************************************}
+procedure TALEdit.SetOnReturnKey(const Value: TNotifyEvent);
+begin
+  if FEditControl = nil then CreateEditControl;
+  fOnReturnKey := Value;
+  {$IF defined(ios) OR defined(android)}
+  if assigned(fOnReturnKey) then FEditControl.onReturnKey := OnReturnKeyImpl
+  else FEditControl.onReturnKey := nil;
+  {$ENDIF}
 end;
 
 {*********************************************}
@@ -2626,6 +2754,7 @@ end;
 {******************************}
 Procedure TALEdit.AddNativeView;
 begin
+  if FEditControl = nil then CreateEditControl;
   {$IF defined(android)}
   FeditControl.AddNativeView;
   {$ENDIF}
@@ -2634,8 +2763,27 @@ end;
 {*********************************}
 Procedure TALEdit.RemoveNativeView;
 begin
+  if FEditControl = nil then CreateEditControl;
   {$IF defined(android)}
   FeditControl.RemoveNativeView;
+  {$ENDIF}
+end;
+
+{**************************************************************************}
+Procedure TALEdit.setSelection(const aStart: integer; const aStop: Integer);
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(android)}
+  FeditControl.setSelection(aStart, aStop);
+  {$ENDIF}
+end;
+
+{****************************************************}
+Procedure TALEdit.setSelection(const aindex: integer);
+begin
+  if FEditControl = nil then CreateEditControl;
+  {$IF defined(android)}
+  FeditControl.setSelection(aindex);
   {$ENDIF}
 end;
 

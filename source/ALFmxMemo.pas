@@ -98,10 +98,11 @@ type
     fLineSpacingExtra: single;
     fOnChangeTracking: TNotifyEvent;
     FTextSettings: TTextSettings;
+    fMaxLength: integer;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
-    procedure setAutocapitalizationType(const Value: TALAutocapitalizationType);
-    function GetAutocapitalizationType: TALAutocapitalizationType;
+    procedure setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
+    function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure setPassword(const Value: Boolean);
     function GetPassword: Boolean;
     procedure setCheckSpelling(const Value: Boolean);
@@ -148,11 +149,12 @@ type
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
-    property AutocapitalizationType: TALAutocapitalizationType read GetAutocapitalizationType write SetAutocapitalizationType;
+    property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType;
     property Password: Boolean read GetPassword write SetPassword default False;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
     property TintColor: TAlphaColor read GetTintColor write setTintColor; // << null mean use the default color
+    property MaxLength: integer read fMaxLength write fMaxLength default 0;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
@@ -218,16 +220,15 @@ type
     FTextSettings: TTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
-    fAutocapitalizationType: TALAutocapitalizationType;
+    fAutoCapitalizationType: TALAutoCapitalizationType;
     fMemoControl: TALAndroidEdit;
     function GetAndroidEditText: JALEditText;
     {$ELSEIF defined(IOS)}
     fMemoControl: TALIosMemo;
     function GetIosTextView: TALIosTextView;
     {$ELSE}
-    fReturnKeyType: TReturnKeyType;
     fTintColor: TalphaColor;
-    fAutocapitalizationType: TALAutocapitalizationType;
+    fAutoCapitalizationType: TALAutoCapitalizationType;
     fLineSpacingMultiplier: Single;
     fLineSpacingExtra: Single;
     fMemoControl: TALStyledMemo;
@@ -254,18 +255,18 @@ type
     procedure OnExitImpl(Sender: TObject);
     procedure SetKeyboardType(Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
-    procedure setAutocapitalizationType(const Value: TALAutocapitalizationType);
-    function GetAutocapitalizationType: TALAutocapitalizationType;
+    procedure setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
+    function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure SetCheckSpelling(const Value: Boolean);
     function GetCheckSpelling: Boolean;
-    procedure SetReturnKeyType(const Value: TReturnKeyType);
-    function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
     procedure SetPadding(const Value: TBounds);
     function GetPadding: TBounds;
     procedure CreateMemoControl;
     procedure PaddingChangedHandler(Sender: TObject);
     function GetContainFocus: Boolean;
+    procedure SetMaxLength(const Value: integer);
+    function GetMaxLength: integer;
   protected
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
@@ -282,6 +283,8 @@ type
     {$ENDIF}
     Procedure AddNativeView;
     Procedure RemoveNativeView;
+    Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
+    Procedure setSelection(const aindex: integer); overload;
   published
     property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
                                                                             // << reference to a style resource that supplies defaults values for the StyledAttributes.
@@ -295,10 +298,9 @@ type
     //property CanParentFocus;
     property DisableFocusEffect;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
-    property AutocapitalizationType: TALAutocapitalizationType read GetAutocapitalizationType write SetAutocapitalizationType default TALAutocapitalizationType.acNone;
-    property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
+    property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType default TALAutoCapitalizationType.acNone;
     //property ReadOnly;
-    //property MaxLength;
+    property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     //property FilterChar;
     property Text: String read getText write SetText;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
@@ -320,8 +322,8 @@ type
     //property OnTyping;
     //property OnValidating;
     //property OnValidate;
-    property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
-    property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
+    //property OnKeyDown; // << not work under android - it's like this with their @{[^# virtual keyboard :(
+    //property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
     property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
     property Padding: TBounds read GetPadding write SetPadding;
@@ -487,6 +489,14 @@ end;
 function TALIosTextViewDelegate.textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
 begin
 
+  if FTextView.FMemoControl.maxLength > 0 then begin
+
+    //https://stackoverflow.com/questions/433337/set-the-maximum-character-length-of-a-uitextfield
+    if shouldChangeTextInRange.length + shouldChangeTextInRange.location > textView.text.length then exit(false);
+    if textView.text.length + replacementText.length - shouldChangeTextInRange.length > NSUInteger(FTextView.FMemoControl.maxLength) then exit(False);
+
+  end;
+
   if (replacementText.length > 0) then begin
     if FTextView.FMemoControl.FtextPromptVisible then begin
       textView.setText(StrToNsStr(''));
@@ -527,6 +537,7 @@ end;
 constructor TALIosMemo.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  fMaxLength := 0;
   CanFocus := True;
   FPadding := TBounds.Create(TRectF.Empty);
   fOnChangeTracking := nil;
@@ -540,7 +551,7 @@ begin
   FTextView := TalIosTextView.create(self);
   SetReturnKeyType(tReturnKeyType.Default);
   SetKeyboardType(TVirtualKeyboardType.default);
-  setAutocapitalizationType(TALAutocapitalizationType.acNone);
+  setAutoCapitalizationType(TALAutoCapitalizationType.acNone);
   SetPassword(false);
   SetCheckSpelling(True);
 end;
@@ -588,28 +599,28 @@ begin
 end;
 
 {*************************************************************************************}
-procedure TALIosMemo.setAutocapitalizationType(const Value: TALAutocapitalizationType);
-var aUITextAutocapitalizationType: UITextAutocapitalizationType;
+procedure TALIosMemo.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
+var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
   case Value of
-    TALAutocapitalizationType.acWords:          aUITextAutocapitalizationType := UITextAutocapitalizationTypeWords;
-    TALAutocapitalizationType.acSentences:      aUITextAutocapitalizationType := UITextAutocapitalizationTypeSentences;
-    TALAutocapitalizationType.acAllCharacters:  aUITextAutocapitalizationType := UITextAutocapitalizationTypeAllCharacters;
-    else {TALAutocapitalizationType.acNone}     aUITextAutocapitalizationType := UITextAutocapitalizationTypeNone;
+    TALAutoCapitalizationType.acWords:          aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
+    TALAutoCapitalizationType.acSentences:      aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
+    TALAutoCapitalizationType.acAllCharacters:  aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeAllCharacters;
+    else {TALAutoCapitalizationType.acNone}     aUITextAutoCapitalizationType := UITextAutoCapitalizationTypeNone;
   end;
-  FTextView.View.setAutocapitalizationType(aUITextAutocapitalizationType);
+  FTextView.View.setAutoCapitalizationType(aUITextAutoCapitalizationType);
 end;
 
 {***********************************************************************}
-function TALIosMemo.GetAutocapitalizationType: TALAutocapitalizationType;
-var aUITextAutocapitalizationType: UITextAutocapitalizationType;
+function TALIosMemo.GetAutoCapitalizationType: TALAutoCapitalizationType;
+var aUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
-  aUITextAutocapitalizationType := FTextView.View.AutocapitalizationType;
-  case aUITextAutocapitalizationType of
-    UITextAutocapitalizationTypeWords:         result := TALAutocapitalizationType.acWords;
-    UITextAutocapitalizationTypeSentences:     result := TALAutocapitalizationType.acSentences;
-    UITextAutocapitalizationTypeAllCharacters: result := TALAutocapitalizationType.acAllCharacters;
-    else                                       result := TALAutocapitalizationType.acNone;
+  aUITextAutoCapitalizationType := FTextView.View.AutoCapitalizationType;
+  case aUITextAutoCapitalizationType of
+    UITextAutoCapitalizationTypeWords:         result := TALAutoCapitalizationType.acWords;
+    UITextAutoCapitalizationTypeSentences:     result := TALAutoCapitalizationType.acSentences;
+    UITextAutoCapitalizationTypeAllCharacters: result := TALAutoCapitalizationType.acAllCharacters;
+    else                                       result := TALAutoCapitalizationType.acNone;
   end;
 end;
 
@@ -760,21 +771,24 @@ end;
 function TALIosMemo.getText: String;
 begin
   if fTextPromptVisible then result := ''
-  else result := NSStrToStr(TNSString.Wrap(FTextView.View.text));
+  else result := NSStrToStr(FTextView.View.text);
 end;
 
 {************************************************}
 procedure TALIosMemo.SetText(const Value: String);
 begin
+
   FTextView.View.setText(StrToNSStr(Value));
+
   if fTextPromptVisible and (Value <> '') then begin
     fTextPromptVisible := False;
     DoFontChanged;
   end
-  else if (not fTextPromptVisible) and (Value = '') then begin
+  else if (Value = '') then begin
     fTextPromptVisible := true;
     DoFontChanged;
   end
+
 end;
 
 {*********************************}
@@ -787,6 +801,12 @@ var aTextAttr: NSMutableAttributedString;
     aStr: NSString;
     aNeedResetText: Boolean;
 begin
+
+  {$IF defined(DEBUG)}
+  ALLog('TALIosMemo.DoFontChanged', 'TextPromptVisible: ' + BoolToStr(fTextPromptVisible, true) +
+                                    ' - TextPrompt: ' + fTextPrompt +
+                                    ' - TextPromptColor: ' + inttostr(fTextPromptColor), TalLogType.VERBOSE);
+  {$ENDIF}
 
   if fTextPromptVisible then aStr := StrToNsStr(fTextPrompt)
   else aStr := FTextView.View.text;
@@ -814,7 +834,7 @@ begin
       end;
 
       if fTextPromptVisible then begin
-        if (fTextPromptColor <> TalphaColorRec.Null) then aUIColor := AlphaColorToUIColor(TalphaColorRec.Lightgray)
+        if (fTextPromptColor = TalphaColorRec.Null) then aUIColor := AlphaColorToUIColor(TalphaColorRec.Lightgray)
         else aUIColor := AlphaColorToUIColor(fTextPromptColor);
       end
       else aUIColor := AlphaColorToUIColor(fTextSettings.FontColor);
@@ -1151,6 +1171,7 @@ end;
 procedure TALStyledMemo.setTextPromptColor(const Value: TAlphaColor);
 begin
   fTextPromptControl.Color := Value;
+  fTextPromptControl.clearBufBitmap;
 end;
 
 {******************************************************************}
@@ -1211,13 +1232,12 @@ begin
   {$ENDIF}
   //-----
   {$IF (not defined(android)) and (not defined(IOS))}
-  fReturnKeyType := TReturnKeyType.Default;
   fLineSpacingMultiplier := 1;
   fLineSpacingExtra := 0;
   {$ENDIF}
   {$IF (not defined(IOS))}
   fTintColor := TalphaColorRec.Null;
-  fAutocapitalizationType := TALAutocapitalizationType.acNone;
+  fAutoCapitalizationType := TALAutoCapitalizationType.acNone;
   {$ENDIF}
   //-----
   FTextSettings := TALMemoTextSettings.Create(Self);
@@ -1251,6 +1271,7 @@ begin
   FMemoControl.SetSubComponent(True);
   FMemoControl.Locked := True;
   FMemoControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
+  FMemoControl.OnReturnKey := nil; // noops operation
   {$ELSEIF defined(ios)}
   FMemoControl := TALIosMemo.Create(self);
   FMemoControl.Parent := self;
@@ -1258,7 +1279,8 @@ begin
   FMemoControl.SetSubComponent(True);
   FMemoControl.Locked := True;
   FMemoControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
-  FMemoControl.AutocapitalizationType := TALAutocapitalizationType.acNone; // noops operation
+  FMemoControl.AutoCapitalizationType := TALAutoCapitalizationType.acNone; // noops operation
+  FMemoControl.OnReturnKey := nil; // noops operation
   {$ELSE}
   fMemoControl := TALStyledMemo.Create(self);
   fMemoControl.Parent := self;
@@ -1276,6 +1298,7 @@ begin
   FMemoControl.OnExit := OnExitImpl;
   FMemoControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
   FMemoControl.CheckSpelling := True;
+  FMemoControl.MaxLength := 0; // noops operation
 end;
 
 {***********************}
@@ -1505,24 +1528,24 @@ begin
 end;
 
 {********************************************************************}
-function TALMemo.GetAutocapitalizationType: TALAutocapitalizationType;
+function TALMemo.GetAutoCapitalizationType: TALAutoCapitalizationType;
 begin
   if FMemoControl = nil then CreateMemoControl;
   {$IF defined(ios)}
-  result := FMemoControl.AutocapitalizationType;
+  result := FMemoControl.AutoCapitalizationType;
   {$ELSE}
-  result := fAutocapitalizationType;
+  result := fAutoCapitalizationType;
   {$ENDIF}
 end;
 
 {**********************************************************************************}
-procedure TALMemo.setAutocapitalizationType(const Value: TALAutocapitalizationType);
+procedure TALMemo.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
 begin
   if FMemoControl = nil then CreateMemoControl;
   {$IF defined(ios)}
-  FMemoControl.AutocapitalizationType := Value;
+  FMemoControl.AutoCapitalizationType := Value;
   {$ELSE}
-  fAutocapitalizationType := Value;
+  fAutoCapitalizationType := Value;
   {$ENDIF}
 end;
 
@@ -1540,26 +1563,18 @@ begin
   result := FMemoControl.CheckSpelling;
 end;
 
-{**************************************************************}
-procedure TALMemo.SetReturnKeyType(const Value: TReturnKeyType);
+{***************************************************}
+procedure TALMemo.SetMaxLength(const Value: integer);
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(ios) OR defined(android)}
-  FMemoControl.ReturnKeyType := Value;
-  {$ELSE}
-  fReturnKeyType := Value;
-  {$ENDIF}
+  FMemoControl.MaxLength := Value;
 end;
 
-{************************************************}
-function TALMemo.GetReturnKeyType: TReturnKeyType;
+{*************************************}
+function TALMemo.GetMaxLength: integer;
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(ios) OR defined(android)}
-  result := FMemoControl.ReturnKeyType;
-  {$ELSE}
-  result := fReturnKeyType;
-  {$ENDIF}
+  result := FMemoControl.MaxLength;
 end;
 
 {*******************************************************}
@@ -1653,6 +1668,7 @@ end;
 {******************************}
 Procedure TALMemo.AddNativeView;
 begin
+  if FMemoControl = nil then CreateMemoControl;
   {$IF defined(android)}
   FMemoControl.AddNativeView;
   {$ENDIF}
@@ -1661,8 +1677,27 @@ end;
 {*********************************}
 Procedure TALMemo.RemoveNativeView;
 begin
+  if FMemoControl = nil then CreateMemoControl;
   {$IF defined(android)}
   FMemoControl.RemoveNativeView;
+  {$ENDIF}
+end;
+
+{**************************************************************************}
+Procedure TALMemo.setSelection(const aStart: integer; const aStop: Integer);
+begin
+  if FMemoControl = nil then CreateMemoControl;
+  {$IF defined(android)}
+  FMemoControl.setSelection(aStart, aStop);
+  {$ENDIF}
+end;
+
+{****************************************************}
+Procedure TALMemo.setSelection(const aindex: integer);
+begin
+  if FMemoControl = nil then CreateMemoControl;
+  {$IF defined(android)}
+  FMemoControl.setSelection(aindex);
   {$ENDIF}
 end;
 

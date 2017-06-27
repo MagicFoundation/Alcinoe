@@ -213,6 +213,7 @@ type
     procedure ApplicationEventHandler(const Sender: TObject; const M : TMessage);
     function GetEditText: JALEditText;
   protected
+    procedure requestFocus;
     procedure DoEndUpdate; override;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
@@ -1038,6 +1039,17 @@ begin
   {$ENDIF}
 end;
 
+{************************************}
+procedure TALAndroidEdit.RequestFocus;
+begin
+  TUIThreadCaller.Call<TALUIMembers>(
+    procedure (aUIMembers: TALUIMembers)
+    begin
+      if not aUIMembers.FNativeViewAttached then exit;
+      aUIMembers.fEditText.requestFocus;
+    end, FUIMembers);
+end;
+
 {*********************************************************************************}
 Procedure TALAndroidEdit.setSelection(const aStart: integer; const aStop: Integer);
 begin
@@ -1199,10 +1211,10 @@ var aimeOptions: integer;
 begin
   case aReturnKeyType of
     TReturnKeyType.Done:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_DONE;
-    TReturnKeyType.Go:            aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_GO;
-    TReturnKeyType.Next:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NEXT;
-    TReturnKeyType.Search:        aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_SEARCH;
-    TReturnKeyType.Send:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_SEND;
+    TReturnKeyType.Go:            aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_GO; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    TReturnKeyType.Next:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_NEXT; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    TReturnKeyType.Search:        aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_SEARCH; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
+    TReturnKeyType.Send:          aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_SEND; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
     else {TReturnKeyType.Default} aimeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE;
   end;
   aEditText.setImeOptions(aimeOptions);
@@ -2738,7 +2750,11 @@ begin
   if FEditControl = nil then CreateEditControl;
   result := inherited GetCanFocus;
   if result then begin
+    {$IF defined(Android)}
+    fEditControl.requestFocus;
+    {$ELSE}
     fEditControl.SetFocus;
+    {$ENDIF}
     exit(false);   // << the canparentfocus is also set to false, so the TCommonCustomForm.NewFocusedControl(const Value: IControl)
                    //    will do nothing !
   end;

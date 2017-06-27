@@ -4961,8 +4961,8 @@ begin
 
               //if the ellipsis is not on the same line of the aBreakedTextItem then it's mean
               //we don't have enalf of place on one full row to draw the ellipsis so break the loop
-              if compareValue(aBreakedTextItem.pos.Y,
-                              aBreakedTextItems[aBreakedTextItems.count - 1].pos.y,
+              if compareValue(aBreakedTextItem.rect.Top,  // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
+                              aBreakedTextItems[aBreakedTextItems.count - 1].rect.top,
                               Tepsilon.Position) <> 0 then break;
 
               //get the params from aBreakedTextItem
@@ -5048,11 +5048,11 @@ begin
       case aOptions.HTextAlign of
         TTextAlign.Center: begin
                              if aBreakedTextItems.Count > 0 then begin
-                               aCurrentLineY := aBreakedTextItems[0].pos.y;
+                               aCurrentLineY := aBreakedTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
                                J := 0;
                                for I := 1 to aBreakedTextItems.Count do begin
                                  if (I = aBreakedTextItems.Count) or
-                                    (compareValue(aCurrentLineY, aBreakedTextItems[I].pos.y, Tepsilon.Position) <> 0) then begin
+                                    (compareValue(aCurrentLineY, aBreakedTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
                                    aOffset := Floor((aRect.width -
                                                        aBreakedTextItems[I-1].rect.Right -
                                                          aOptions.Padding.Left -
@@ -5062,7 +5062,7 @@ begin
                                      aBreakedTextItems[j].rect.Offset(aOptions.Padding.Left + aOffset, 0);
                                      inc(J);
                                    end;
-                                   if (I <> aBreakedTextItems.Count) then aCurrentLineY := aBreakedTextItems[I].pos.y;
+                                   if (I <> aBreakedTextItems.Count) then aCurrentLineY := aBreakedTextItems[I].rect.top;
                                  end;
                                end;
                              end;
@@ -5075,11 +5075,11 @@ begin
                            end;
         TTextAlign.Trailing: begin
                                if aBreakedTextItems.Count > 0 then begin
-                                 aCurrentLineY := aBreakedTextItems[0].pos.y;
+                                 aCurrentLineY := aBreakedTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
                                  J := 0;
                                  for I := 1 to aBreakedTextItems.Count do begin
                                    if (I = aBreakedTextItems.Count) or
-                                      (compareValue(aCurrentLineY, aBreakedTextItems[I].pos.y, Tepsilon.Position) <> 0) then begin
+                                      (compareValue(aCurrentLineY, aBreakedTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
                                      aOffset := Floor((aRect.width -
                                                          aBreakedTextItems[I-1].rect.Right -
                                                            aOptions.Padding.Left -
@@ -5089,7 +5089,7 @@ begin
                                        aBreakedTextItems[j].rect.Offset(aOptions.Padding.Left + aOffset, 0);
                                        inc(J);
                                      end;
-                                     if (I <> aBreakedTextItems.Count) then aCurrentLineY := aBreakedTextItems[I].pos.y;
+                                     if (I <> aBreakedTextItems.Count) then aCurrentLineY := aBreakedTextItems[I].rect.top;
                                    end;
                                  end;
                                end;

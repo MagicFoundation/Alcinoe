@@ -392,6 +392,7 @@ __published:
 	__property float YRadius = {read=FYRadius, write=SetYRadius};
 	__property float LineSpacing = {read=fLineSpacing, write=fLineSpacing};
 	__property bool TextIsHtml = {read=fTextIsHtml, write=fTextIsHtml, default=0};
+	__property TouchTargetExpansion;
 };
 
 

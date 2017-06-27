@@ -543,6 +543,7 @@ type
     property YRadius: Single read FYRadius write SetYRadius;
     property LineSpacing: single read fLineSpacing write fLineSpacing;
     property TextIsHtml: boolean read fTextIsHtml write fTextIsHtml default false;
+    property TouchTargetExpansion;
   end;
 
 procedure ALLockTexts(const aParentControl: Tcontrol);

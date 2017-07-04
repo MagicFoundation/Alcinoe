@@ -11,8 +11,8 @@ INSTALL:
 --------
  
 If you plan to use native control on android (like TALEdit) then you
-will need to include lib\jar\alcinoe\alcinoe.jar (first compile it with 
-compilejar_xxx.bat) in project manager > target plateform > android > Libraries
+will need to include lib\jar\alcinoe\alcinoe.jar in 
+project manager > target plateform > android > Libraries
 
 
 WHAT ARE THE ALCINOE FIREMONKEY CONTROLS:

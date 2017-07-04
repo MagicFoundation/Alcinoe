@@ -20,6 +20,8 @@ uses System.Types,
      ALIosNativeControl,
      ALIosScrollBox,
      {$ELSE}
+     FMX.StdCtrls,
+     FMX.Memo.style,
      FMX.Memo,
      {$ENDIF}
      FMX.types,
@@ -143,6 +145,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function getLineHeight: Single; // << it's include the line spacing
+    function getLineCount: integer;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
@@ -174,8 +178,10 @@ type
   {**************************}
   TALStyledMemo = class(TMemo)
   private
+    fReturnKeyType: TReturnKeyType;
+    [Weak] fStyledMemo: TStyledMemo;
     FPadding: TBounds;
-    fVertScrollBarWidth: single;
+    [Weak] FVertScrollBar: TscrollBar;
     fTextPromptControl: TalText;
     FOnChangeTracking: TNotifyEvent;
     FTextSettings: TTextSettings;
@@ -192,14 +198,19 @@ type
     procedure OnFontChanged(Sender: TObject);
   protected
     procedure DoEnter; override;
+    procedure realignScrollBars; virtual;
+    procedure Resize; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function getLineHeight: Single;
+    function getLineCount: integer;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
     property Padding: TBounds read GetPadding write SetPadding;
     property OnChangeTracking: TNotifyEvent read FOnChangeTracking write FOnChangeTracking;
     property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property ReturnKeyType: TReturnKeyType read fReturnKeyType write fReturnKeyType default TReturnKeyType.Default; // << we don't use it
   end;
 
 {$endif}
@@ -259,6 +270,8 @@ type
     function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure SetCheckSpelling(const Value: Boolean);
     function GetCheckSpelling: Boolean;
+    procedure SetReturnKeyType(const Value: TReturnKeyType);
+    function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
     procedure SetPadding(const Value: TBounds);
     function GetPadding: TBounds;
@@ -285,6 +298,9 @@ type
     Procedure RemoveNativeView;
     Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
     Procedure setSelection(const aindex: integer); overload;
+    function getLineHeight: Single; // << it's include the line spacing
+    function getLineCount: Integer;
+    property ContainFocus: Boolean read GetContainFocus;
   published
     property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
                                                                             // << reference to a style resource that supplies defaults values for the StyledAttributes.
@@ -299,6 +315,7 @@ type
     property DisableFocusEffect;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType default TALAutoCapitalizationType.acNone;
+    property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
     //property ReadOnly;
     property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     //property FilterChar;
@@ -327,7 +344,6 @@ type
     property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
     property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
     property Padding: TBounds read GetPadding write SetPadding;
-    property ContainFocus: Boolean read GetContainFocus;
   end;
 
 procedure Register;
@@ -345,8 +361,6 @@ uses {$IF defined(ANDROID)}
      {$ELSE}
      FMX.Styles.Objects,
      FMX.BehaviorManager,
-     FMX.StdCtrls,
-     FMX.Memo.style,
      FMX.Layouts,
      {$ENDIF}
      system.Math,
@@ -563,6 +577,28 @@ begin
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FPadding);
   inherited Destroy;
+end;
+
+{****************************************}
+function TALIosMemo.getLineHeight: Single;
+begin
+  result := (FTextView.View.font.lineHeight * fLineSpacingMultiplier) + fLineSpacingExtra;
+end;
+
+{****************************************}
+function TALIosMemo.getLineCount: integer;
+var aLineHeight: Single;
+begin
+  aLineHeight := getLineHeight;
+  if compareValue(aLineHeight, 0, Tepsilon.Position) > 0 then result := round(FTextView.View.contentSize.height / aLineHeight)
+  else result := 0;
+  {$IF defined(DEBUG)}
+  ALLog('TALIosMemo.getLineCount', 'ContentBounds.Height: ' + floattostr(FTextView.View.contentSize.height) +
+                                   ' - LineHeight: ' + floattostr(aLineHeight) +
+                                   ' - LineCount: ' + inttostr(result) +
+                                   ' - Width: ' + floattostr(Width) +
+                                   ' - Height: ' + floattostr(Height), TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {**********************************************************************}
@@ -875,13 +911,34 @@ end;
 {****************************************************}
 procedure TALIosMemo.SetPadding(const Value: TBounds);
 var aUIEdgeInsets: UIEdgeInsets;
+    aPaddingLeft, aPaddingRight: Single;
 begin
+
+  //unfortunatly padding bottom is not very well
+  //handled under IOS, when you add a new line on a already fully filled memo, the new line
+  //start completely at botton without taking care of the padding
+  //(you must scroll yourself the memo to be able to see the padding)
+  //so i prefer to use instead margins
+
   FPadding.Assign(Value);
-  aUIEdgeInsets.top := Value.top;
+
+  aPaddingLeft := FPadding.left;
+  aPaddingRight := FPadding.right;
+  FPadding.left := 0;
+  FPadding.right := 0;
+  try
+    margins := FPadding;
+  finally
+    FPadding.left := aPaddingleft;
+    FPadding.right := aPaddingright;
+  end;
+
+  aUIEdgeInsets.top := 0;
   aUIEdgeInsets.left := Value.left;
-  aUIEdgeInsets.bottom := Value.bottom;
+  aUIEdgeInsets.bottom := 0;
   aUIEdgeInsets.right := Value.right;
   fTextView.View.setTextContainerInset(aUIEdgeInsets);
+
 end;
 
 {**************************************}
@@ -911,9 +968,15 @@ end;
 
 {**************************}
 procedure TALIosMemo.Resize;
+var aContentOffset: NSPoint;
 begin
   inherited;
   FTextView.size := Size.size;
+  if compareValue(FTextView.View.contentSize.height, Size.size.cy, Tepsilon.Position) <= 0 then begin
+    aContentOffset.x := 0;
+    aContentOffset.y := 0;
+    FTextView.View.setContentOffset(aContentOffset, false{animated}); // << Scroll to top to avoid wrong contentOffset" artefact when line count changes
+  end;
 end;
 
 {***************************************}
@@ -1025,9 +1088,10 @@ end;
 constructor TALStyledMemo.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
+  fStyledMemo := Nil;
   DisableDisappear := true;
   OnApplyStyleLookup := OnApplyStyleLookupImpl;
-  fVertScrollBarWidth := 0;
+  FVertScrollBar := nil;
   FPadding := TBounds.Create(TRectF.Empty);
   FTextSettings := TALMemoTextSettings.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
@@ -1046,6 +1110,7 @@ begin
   fTextPromptControl.color := TalphaColorRec.Null;
   fTextPromptControl.doubleBuffered := True;
   FOnChangeTracking := nil;
+  fReturnKeyType := TReturnKeyType.Default;
   inherited onchangeTracking := OnChangeTrackingImpl;
 end;
 
@@ -1061,6 +1126,7 @@ end;
 {**}
 type
   _TOpenControl = class (TControl);
+  _TStyledMemoProtectedAccess = class(TStyledMemo);
 
 {******************************}
 procedure TALStyledMemo.DoEnter;
@@ -1081,8 +1147,7 @@ end;
 
 {**************************************************************}
 procedure TALStyledMemo.OnApplyStyleLookupImpl(sender: Tobject);
-Var aPaddingTop: Single;
-    aPaddingRight: single;
+Var aScrollBar: TScrollBar;
     I, j, k, l: integer;
 begin
 
@@ -1099,6 +1164,7 @@ begin
   //   TScrollContent
   for I := 0 to controls.Count - 1 do begin
     if (controls[i] is TStyledMemo) then begin // << TStyledMemo
+      fStyledMemo := TStyledMemo(controls[i]);
       for j := 0 to controls[i].controls.Count - 1 do begin
         if (controls[i].Controls[j] is TLayout) then begin // << TLayout
           for k := 0 to controls[i].Controls[j].controls.Count - 1 do begin
@@ -1106,20 +1172,15 @@ begin
               with (controls[i].Controls[j].Controls[k] as TActiveStyleObject) do begin
                 ActiveLink.Clear;
                 SourceLink.Clear;
-                aPaddingTop := Padding.Top;
-                aPaddingRight := Padding.right;
               end;
               for l := 0 to controls[i].Controls[j].Controls[k].controls.Count - 1 do begin
                 if (controls[i].Controls[j].Controls[k].Controls[l] is TScrollBar) then begin // << TScrollBar
-                  with (controls[i].Controls[j].Controls[k].Controls[l] as TScrollBar) do begin
+                  aScrollBar := controls[i].Controls[j].Controls[k].Controls[l] as TScrollBar;
+                  with aScrollBar do begin
                     if Align = TalignLayout.Right then begin
                       Align := TalignLayout.None;
-                      Height := Tcontrol(self.Parent).Height;
-                      anchors := [TAnchorKind.akright,TAnchorKind.akTop,TAnchorKind.akBottom];
-                      fVertScrollBarWidth := width;
-                      self.margins.Right := self.margins.Right + fVertScrollBarWidth;
-                      position.y := position.y - self.margins.Top - aPaddingTop;
-                      position.x := position.x + self.margins.right + aPaddingRight;
+                      FVertScrollBar := aScrollBar;
+                      SetPadding(FPadding);
                     end;
                   end;
                 end;
@@ -1131,6 +1192,29 @@ begin
     end;
   end;
 
+  //align the scrollbars
+  realignScrollBars;
+
+end;
+
+{****************************************}
+procedure TALStyledMemo.realignScrollBars;
+begin
+  if FVertScrollBar = nil then exit;
+  FVertScrollBar.Height := ParentControl.Height;
+  FVertScrollBar.position.y := -margins.Top;
+  FVertScrollBar.position.x := Width - FVertScrollBar.Width + margins.Right;
+end;
+
+{*****************************}
+procedure TALStyledMemo.Resize;
+var aText: String;
+begin
+  inherited;
+  aText := Lines.Text;   // => need to do this bullsheet because sometime the lines are not corectly aligned and it's the
+  Lines.Text := '';      // => only way i found to force this function to run: TStyledMemo.TLines.RenderLayouts;
+  Lines.Text := aText;   // => i m lazzy to open a bug report (and to make the bug demo program) for emb, i do not work for them after all ...
+  realignScrollBars;
 end;
 
 {*******************************************************}
@@ -1138,7 +1222,7 @@ procedure TALStyledMemo.SetPadding(const Value: TBounds);
 var aRect: Trectf;
 begin
   aRect := Value.Rect;
-  aRect.Right := aRect.Right + fVertScrollBarWidth;
+  if fVertScrollBar <> nil then aRect.Right := aRect.Right + fVertScrollBar.Width;
   margins.Rect := aRect;
   FPadding.Assign(Value);
 end;
@@ -1200,6 +1284,22 @@ begin
     fTextPromptControl.TextSettings.EndUpdate;
   end;
   inherited TextSettings := fTextSettings;
+end;
+
+{*******************************************}
+function TALStyledMemo.getLineHeight: Single;
+begin
+  if fStyledMemo <> nil then result := _TStyledMemoProtectedAccess(fStyledMemo).GetLineHeight
+  else result := 0;
+end;
+
+{*******************************************}
+function TALStyledMemo.getLineCount: integer;
+var aLineHeight: Single;
+begin
+  aLineHeight := getLineHeight;
+  if compareValue(aLineHeight, 0, Tepsilon.Position) > 0 then result := round(ContentBounds.Height / aLineHeight)
+  else result := 0;
 end;
 
 {$endif}
@@ -1295,6 +1395,7 @@ begin
   FMemoControl.OnChangeTracking := OnChangeTrackingImpl;
   FMemoControl.OnEnter := OnEnterImpl;
   FMemoControl.OnExit := OnExitImpl;
+  FMemoControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   FMemoControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
   FMemoControl.CheckSpelling := True;
   FMemoControl.MaxLength := 0; // noops operation
@@ -1562,6 +1663,20 @@ begin
   result := FMemoControl.CheckSpelling;
 end;
 
+{**************************************************************}
+procedure TALMemo.SetReturnKeyType(const Value: TReturnKeyType);
+begin
+  if FMemoControl = nil then CreateMemoControl;
+  FMemoControl.ReturnKeyType := Value;
+end;
+
+{************************************************}
+function TALMemo.GetReturnKeyType: TReturnKeyType;
+begin
+  if FMemoControl = nil then CreateMemoControl;
+  result := FMemoControl.ReturnKeyType;
+end;
+
 {***************************************************}
 procedure TALMemo.SetMaxLength(const Value: integer);
 begin
@@ -1686,7 +1801,10 @@ end;
 Procedure TALMemo.setSelection(const aStart: integer; const aStop: Integer);
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(android)}
+  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  FMemoControl.SelStart := aStart;
+  FMemoControl.SelLength := aStop - aStart;
+  {$ELSEIF defined(android)}
   FMemoControl.setSelection(aStart, aStop);
   {$ENDIF}
 end;
@@ -1695,9 +1813,23 @@ end;
 Procedure TALMemo.setSelection(const aindex: integer);
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(android)}
+  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  FMemoControl.SelStart := aindex;
+  {$ELSEIF defined(android)}
   FMemoControl.setSelection(aindex);
   {$ENDIF}
+end;
+
+{*************************************}
+function TALMemo.getLineHeight: single;
+begin
+  result := FMemoControl.getLineHeight;
+end;
+
+{*************************************}
+function TALMemo.getLineCount: Integer;
+begin
+  result := FMemoControl.getLineCount;
 end;
 
 procedure Register;

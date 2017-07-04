@@ -234,6 +234,8 @@ type
     Procedure RemoveNativeView;
     Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
     Procedure setSelection(const aindex: integer); overload;
+    function getLineHeight: Single; // << it's include the line spacing
+    function getLineCount: integer;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property OnReturnKey: TNotifyEvent read fOnReturnKey write fOnReturnKey;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
@@ -459,6 +461,7 @@ type
     Procedure RemoveNativeView;
     Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
     Procedure setSelection(const aindex: integer); overload;
+    property ContainFocus: Boolean read GetContainFocus;
   published
     property DefStyleAttr: String read fDefStyleAttr write SetDefStyleAttr; // << android only - the name of An attribute in the current theme that contains a
                                                                             // << reference to a style resource that supplies defaults values for the StyledAttributes.
@@ -502,7 +505,6 @@ type
     //property OnKeyUp; // << not work under android - it's like this with their @{[^# virtual keyboard :(
     property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
     property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
-    property ContainFocus: Boolean read GetContainFocus;
   end;
 
 procedure Register;
@@ -1068,6 +1070,30 @@ begin
     begin
       aUIMembers.fEditText.setSelection(aindex);
     end, FUIMembers);
+end;
+
+{********************************************}
+function TALAndroidEdit.getLineHeight: Single;
+var aLineHeight: single;
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      aLineHeight := fUIMembers.FEditText.getLineHeight / FScreenScale;
+    end);
+  result := aLineHeight;
+end;
+
+{********************************************}
+function TALAndroidEdit.getLineCount: integer;
+var aLineCount: integer;
+begin
+  CallInUIThreadAndWaitFinishing(
+    procedure
+    begin
+      aLineCount := fUIMembers.FEditText.getLineCount;
+    end);
+  result := aLineCount;
 end;
 
 {*******************************************************************}
@@ -2789,7 +2815,10 @@ end;
 Procedure TALEdit.setSelection(const aStart: integer; const aStop: Integer);
 begin
   if FEditControl = nil then CreateEditControl;
-  {$IF defined(android)}
+  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  FeditControl.SelStart := aStart;
+  FeditControl.SelLength := aStop - aStart;
+  {$ELSEIF defined(android)}
   FeditControl.setSelection(aStart, aStop);
   {$ENDIF}
 end;
@@ -2798,7 +2827,9 @@ end;
 Procedure TALEdit.setSelection(const aindex: integer);
 begin
   if FEditControl = nil then CreateEditControl;
-  {$IF defined(android)}
+  {$IF defined(MSWINDOWS) or defined(_MACOS)}
+  FeditControl.SelStart := aindex;
+  {$ELSEIF defined(android)}
   FeditControl.setSelection(aindex);
   {$ENDIF}
 end;

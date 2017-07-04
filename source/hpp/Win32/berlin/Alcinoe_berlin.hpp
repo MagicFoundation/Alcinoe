@@ -163,9 +163,9 @@
 #include <FMX.ScrollBox.Style.hpp>	// (fmx)
 #include <FMX.ScrollBox.Win.hpp>	// (fmx)
 #include <FMX.ScrollBox.hpp>	// (fmx)
-#include <FMX.Memo.Style.hpp>	// (fmx)
 #include <FMX.Memo.Win.hpp>	// (fmx)
 #include <FMX.Memo.hpp>	// (fmx)
+#include <FMX.Memo.Style.hpp>	// (fmx)
 
 //-- user supplied -----------------------------------------------------------
 

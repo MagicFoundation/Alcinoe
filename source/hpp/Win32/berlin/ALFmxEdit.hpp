@@ -96,6 +96,7 @@ public:
 	void __fastcall RemoveNativeView(void);
 	void __fastcall setSelection(const int aStart, const int aStop)/* overload */;
 	void __fastcall setSelection(const int aindex)/* overload */;
+	__property bool ContainFocus = {read=GetContainFocus, nodefault};
 	
 __published:
 	__property System::UnicodeString DefStyleAttr = {read=fDefStyleAttr, write=SetDefStyleAttr};
@@ -125,7 +126,6 @@ __published:
 	__property System::Classes::TNotifyEvent OnReturnKey = {read=fOnReturnKey, write=SetOnReturnKey};
 	__property System::Classes::TNotifyEvent OnEnter = {read=fOnEnter, write=fOnEnter};
 	__property System::Classes::TNotifyEvent OnExit = {read=fOnExit, write=fOnExit};
-	__property bool ContainFocus = {read=GetContainFocus, nodefault};
 };
 
 

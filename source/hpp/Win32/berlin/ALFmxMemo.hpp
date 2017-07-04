@@ -17,6 +17,8 @@
 #include <System.Types.hpp>
 #include <System.Classes.hpp>
 #include <System.UITypes.hpp>
+#include <FMX.StdCtrls.hpp>
+#include <FMX.Memo.Style.hpp>
 #include <FMX.Memo.hpp>
 #include <FMX.Types.hpp>
 #include <FMX.Graphics.hpp>
@@ -40,8 +42,10 @@ class PASCALIMPLEMENTATION TALStyledMemo : public Fmx::Memo::TMemo
 	typedef Fmx::Memo::TMemo inherited;
 	
 private:
+	Fmx::Types::TReturnKeyType fReturnKeyType;
+	Fmx::Memo::Style::TStyledMemo* fStyledMemo;
 	Fmx::Types::TBounds* FPadding;
-	float fVertScrollBarWidth;
+	Fmx::Stdctrls::TScrollBar* FVertScrollBar;
 	Alfmxobjects::TALText* fTextPromptControl;
 	System::Classes::TNotifyEvent FOnChangeTracking;
 	Fmx::Graphics::TTextSettings* FTextSettings;
@@ -59,15 +63,20 @@ private:
 	
 protected:
 	virtual void __fastcall DoEnter(void);
+	virtual void __fastcall realignScrollBars(void);
+	virtual void __fastcall Resize(void);
 	
 public:
 	__fastcall virtual TALStyledMemo(System::Classes::TComponent* AOwner)/* overload */;
 	__fastcall virtual ~TALStyledMemo(void);
+	float __fastcall getLineHeight(void);
+	int __fastcall getLineCount(void);
 	__property System::UnicodeString TextPrompt = {read=GetTextPrompt, write=setTextPrompt};
 	__property System::Uitypes::TAlphaColor TextPromptColor = {read=GetTextPromptColor, write=setTextPromptColor, default=0};
 	__property Fmx::Types::TBounds* Padding = {read=GetPadding, write=SetPadding};
 	__property System::Classes::TNotifyEvent OnChangeTracking = {read=FOnChangeTracking, write=FOnChangeTracking};
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
+	__property Fmx::Types::TReturnKeyType ReturnKeyType = {read=fReturnKeyType, write=fReturnKeyType, default=0};
 };
 
 
@@ -115,6 +124,8 @@ private:
 	Alfmxedit::TALAutoCapitalizationType __fastcall GetAutoCapitalizationType(void);
 	void __fastcall SetCheckSpelling(const bool Value);
 	bool __fastcall GetCheckSpelling(void);
+	void __fastcall SetReturnKeyType(const Fmx::Types::TReturnKeyType Value);
+	Fmx::Types::TReturnKeyType __fastcall GetReturnKeyType(void);
 	void __fastcall SetDefStyleAttr(const System::UnicodeString Value);
 	HIDESBASE void __fastcall SetPadding(Fmx::Types::TBounds* const Value);
 	HIDESBASE Fmx::Types::TBounds* __fastcall GetPadding(void);
@@ -138,6 +149,9 @@ public:
 	void __fastcall RemoveNativeView(void);
 	void __fastcall setSelection(const int aStart, const int aStop)/* overload */;
 	void __fastcall setSelection(const int aindex)/* overload */;
+	float __fastcall getLineHeight(void);
+	int __fastcall getLineCount(void);
+	__property bool ContainFocus = {read=GetContainFocus, nodefault};
 	
 __published:
 	__property System::UnicodeString DefStyleAttr = {read=fDefStyleAttr, write=SetDefStyleAttr};
@@ -148,6 +162,7 @@ __published:
 	__property DisableFocusEffect = {default=0};
 	__property Fmx::Types::TVirtualKeyboardType KeyboardType = {read=GetKeyboardType, write=SetKeyboardType, default=0};
 	__property Alfmxedit::TALAutoCapitalizationType AutoCapitalizationType = {read=GetAutoCapitalizationType, write=setAutoCapitalizationType, default=0};
+	__property Fmx::Types::TReturnKeyType ReturnKeyType = {read=GetReturnKeyType, write=SetReturnKeyType, default=0};
 	__property int MaxLength = {read=GetMaxLength, write=SetMaxLength, default=0};
 	__property System::UnicodeString Text = {read=getText, write=SetText};
 	__property Fmx::Graphics::TTextSettings* TextSettings = {read=GetTextSettings, write=SetTextSettings};
@@ -167,7 +182,6 @@ __published:
 	__property System::Classes::TNotifyEvent OnEnter = {read=fOnEnter, write=fOnEnter};
 	__property System::Classes::TNotifyEvent OnExit = {read=fOnExit, write=fOnExit};
 	__property Fmx::Types::TBounds* Padding = {read=GetPadding, write=SetPadding};
-	__property bool ContainFocus = {read=GetContainFocus, nodefault};
 };
 
 

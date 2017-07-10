@@ -149,6 +149,8 @@ type
     function getLineCount: integer;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
+    Procedure AddNativeView;
+    Procedure RemoveNativeView;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -1022,6 +1024,18 @@ begin
   FTextView.SetAbsoluteEnabled(AbsoluteEnabled);
 end;
 
+{*********************************}
+Procedure TALIosMemo.AddNativeView;
+begin
+  visible := true;
+end;
+
+{************************************}
+Procedure TALIosMemo.RemoveNativeView;
+begin
+  visible := False;
+end;
+
 {******************************************************************}
 procedure TALIosMemo.AncestorVisibleChanged(const Visible: Boolean);
 begin
@@ -1783,7 +1797,7 @@ end;
 Procedure TALMemo.AddNativeView;
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(android)}
+  {$IF defined(android) or defined(ios)}
   FMemoControl.AddNativeView;
   {$ENDIF}
 end;
@@ -1792,7 +1806,7 @@ end;
 Procedure TALMemo.RemoveNativeView;
 begin
   if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(android)}
+  {$IF defined(android) or defined(ios)}
   FMemoControl.RemoveNativeView;
   {$ENDIF}
 end;

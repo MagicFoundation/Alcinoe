@@ -360,6 +360,8 @@ type
     destructor Destroy; override;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
+    Procedure AddNativeView;
+    Procedure RemoveNativeView;
     function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property OnReturnKey: TNotifyEvent read fOnReturnKey write fOnReturnKey;
@@ -2290,6 +2292,18 @@ begin
   FTextField.SetAbsoluteEnabled(AbsoluteEnabled);
 end;
 
+{*********************************}
+Procedure TalIosEdit.AddNativeView;
+begin
+  visible := true;
+end;
+
+{************************************}
+Procedure TalIosEdit.RemoveNativeView;
+begin
+  visible := False;
+end;
+
 {******************************************************************}
 procedure TalIosEdit.AncestorVisibleChanged(const Visible: Boolean);
 begin
@@ -2797,7 +2811,7 @@ end;
 Procedure TALEdit.AddNativeView;
 begin
   if FEditControl = nil then CreateEditControl;
-  {$IF defined(android)}
+  {$IF defined(android) or defined(ios)}
   FeditControl.AddNativeView;
   {$ENDIF}
 end;
@@ -2806,7 +2820,7 @@ end;
 Procedure TALEdit.RemoveNativeView;
 begin
   if FEditControl = nil then CreateEditControl;
-  {$IF defined(android)}
+  {$IF defined(android) or defined(ios)}
   FeditControl.RemoveNativeView;
   {$ENDIF}
 end;

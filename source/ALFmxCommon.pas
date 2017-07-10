@@ -651,12 +651,22 @@ type
     Padding: TRectF;  // default = 0
     //-----
     TextIsHtml: boolean; // default = false;
+                         // NOTE: it's a partial html implementation, just for styling like <b>, <font color="">, etc.
+                         //       For exemple #13#10 are handle like breakline and not like space
     //-----
     constructor Create;
     destructor Destroy; override;
   End;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+// their is a bug, if you write something like: abcd#13#10<b>abcd</b>
+// then you will obtain
+//     abcd(<b>)abcd(</b>)
+// instead of
+//     abcd(#13#10)
+//     (<b>)abcd(</b>)
+// the workaround is to write instead abcd<b>#13#10abcd</b>
+// not look very hard to correct but i have no time to do it right now
 function  ALDrawMultiLineText(const aText: String; // support only theses EXACT html tag :
                                                    //   <b>...</b>
                                                    //   <i>...</i>

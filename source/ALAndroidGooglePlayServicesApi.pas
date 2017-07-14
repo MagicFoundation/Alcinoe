@@ -7,32 +7,21 @@ uses Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.JavaTypes,
      Androidapi.JNI.Accounts,
      Androidapi.JNI.Net,
-     Androidapi.JNI.App;
+     Androidapi.JNI.App,
+     Androidapi.JNI.Location;
 
 type
 
-  {***********************************}
-  JALGoogleApiAvailability = interface;
+  {*******************************}
   JAppInviteInvitation = interface;
   JIntentBuilder_PlatformMode = interface;
   JAppInviteInvitation_IntentBuilder = interface;
   JAppInviteReferral = interface;
   JALAppInviteInvitationResultListener = interface;
   JALAppInviteInvitationResult = interface;
+  JALLocationServicesListener = interface;
+  JALLocationServices = interface;
 
-  {*****************************************************}
-  JALGoogleApiAvailabilityClass = interface(JObjectClass)
-    ['{11C8E911-BFBD-4A4C-A0E0-0156EF08DBB6}']
-    {class} function init: JALGoogleApiAvailability; cdecl;
-    {class} function isGooglePlayServicesAvailable(activity: JActivity): integer; cdecl;
-  end;
-
-  {***********************************************************************}
-  [JavaSignature('com/alcinoe/googleplayservices/ALGoogleApiAvailability')]
-  JALGoogleApiAvailability = interface(JObject)
-    ['{6D8D7ED6-6AB0-42EE-8924-920842A615C5}']
-  end;
-  TJALGoogleApiAvailability = class(TJavaGenericImport<JALGoogleApiAvailabilityClass, JALGoogleApiAvailability>) end;
 
   {*************************************************}
   JAppInviteInvitationClass = interface(JObjectClass)
@@ -143,17 +132,52 @@ type
   end;
   TJALAppInviteInvitationResult = class(TJavaGenericImport<JALAppInviteInvitationResultClass, JALAppInviteInvitationResult>) end;
 
+  {******************************************************}
+  JALLocationServicesListenerClass = interface(IJavaClass)
+    ['{0C115FE4-04ED-47EE-948A-EC67D83CD9A3}']
+  end;
+
+  {****************************************************************}
+  [JavaSignature('com/alcinoe/location/ALLocationServicesListener')]
+  JALLocationServicesListener = interface(IJavaInstance)
+    ['{613CEAD9-104B-4F6A-B105-200F34DDB5DD}']
+    procedure onLocationChanged(location: JLocation); cdecl;
+  end;
+  TJALLocationServicesListener = class(TJavaGenericImport<JALLocationServicesListenerClass, JALLocationServicesListener>) end;
+
+  {************************************************}
+  JALLocationServicesClass = interface(JObjectClass)
+    ['{253118F7-7CF0-4EBB-8F94-3FD6C560B708}']
+    {class} function init(context: JContext): JALLocationServices; cdecl;
+  end;
+
+  {********************************************************}
+  [JavaSignature('com/alcinoe/location/ALLocationServices')]
+  JALLocationServices = interface(JObject)
+    ['{F0547773-B7C9-4AE4-8838-99CB941CA0CB}']
+    procedure setListener(listener: JALLocationServicesListener); cdecl;
+    procedure startLocationUpdates(startWithLastKnownLocation: boolean;
+                                   interval: Int64;
+                                   fastestInterval: Int64;
+                                   maxWaitTime: Int64;
+                                   priority: integer;
+                                   smallestDisplacement: Single); cdecl;
+    procedure stopLocationUpdates; cdecl;
+  end;
+  TJALLocationServices = class(TJavaGenericImport<JALLocationServicesClass, JALLocationServices>) end;
+
 implementation
 
 procedure RegisterTypes;
 begin
-  TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JALGoogleApiAvailability', TypeInfo(ALAndroidGooglePlayServicesApi.JALGoogleApiAvailability));
   TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JAppInviteInvitation', TypeInfo(ALAndroidGooglePlayServicesApi.JAppInviteInvitation));
   TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JIntentBuilder_PlatformMode', TypeInfo(ALAndroidGooglePlayServicesApi.JIntentBuilder_PlatformMode));
   TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JAppInviteInvitation_IntentBuilder', TypeInfo(ALAndroidGooglePlayServicesApi.JAppInviteInvitation_IntentBuilder));
   TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JAppInviteReferral', TypeInfo(ALAndroidGooglePlayServicesApi.JAppInviteReferral));
   TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JALAppInviteInvitationResultListener', TypeInfo(ALAndroidGooglePlayServicesApi.JALAppInviteInvitationResultListener));
   TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JALAppInviteInvitationResult', TypeInfo(ALAndroidGooglePlayServicesApi.JALAppInviteInvitationResult));
+  TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JALLocationServicesListener', TypeInfo(ALAndroidGooglePlayServicesApi.JALLocationServicesListener));
+  TRegTypes.RegisterType('ALAndroidGooglePlayServicesApi.JALLocationServices', TypeInfo(ALAndroidGooglePlayServicesApi.JALLocationServices));
 end;
 
 initialization

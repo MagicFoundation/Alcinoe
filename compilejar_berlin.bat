@@ -49,6 +49,7 @@ lib\jar\support-annotations\support-annotations.jar;^
 lib\jar\google-play-services\play-services-base.jar;^
 lib\jar\google-play-services\play-services-basement.jar;^
 lib\jar\google-play-services\play-services-appinvite.jar;^
+lib\jar\google-play-services\play-services-location.jar;^
 lib\jar\firebase\firebase-iid.jar;^
 lib\jar\firebase\firebase-crash.jar;^
 lib\jar\firebase\firebase-messaging.jar^
@@ -56,6 +57,8 @@ lib\jar\firebase\firebase-messaging.jar^
  source\java\android\view\*.java^
  source\java\com\android\internal\*.java^
  source\java\com\alcinoe\*.java^
+ source\java\com\alcinoe\content\*.java^
+ source\java\com\alcinoe\location\*.java^
  source\java\com\alcinoe\util\*.java^
  source\java\com\alcinoe\view\*.java^
  source\java\com\alcinoe\view\menu\*.java^

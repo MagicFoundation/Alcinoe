@@ -213,6 +213,11 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
             if (data.containsKey("notification.largeicon")) { 
               try {
               
+                //https://stackoverflow.com/questions/41067081/does-firebasemessagingservice-run-in-the-background-by-default
+                //FirebaseMessagingService's method onMessageReceived(RemoteMessage message) is called "in the background" 
+                //(not on the UI/Main thread). So all work that is done within onMessageReceived(RemoteMessage message) 
+                //should be done synchronously because it's in its own background worker thread.
+                
                 URL url = new URL(data.get("notification.largeicon"));
                 Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
                 if (bitmap != null) {

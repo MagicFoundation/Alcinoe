@@ -1,9 +1,15 @@
 package com.alcinoe.firebase.messaging;
 
-import com.embarcadero.firemonkey.FMXNativeActivity;
-import me.leolin.shortcutbadger.ShortcutBadger;
-import com.google.firebase.messaging.FirebaseMessagingService;
-import com.google.firebase.messaging.RemoteMessage;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.net.URL;
+import java.util.Map;
+import java.io.FileWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import org.json.JSONObject;
+import org.json.JSONArray;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.app.NotificationCompat;
 import android.content.Intent;
@@ -18,16 +24,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.media.RingtoneManager;
 import android.os.Build;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.net.URL;
-import java.util.Map;
-import java.io.FileWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import org.json.JSONObject;
-import org.json.JSONArray;
+import com.google.firebase.messaging.FirebaseMessagingService;
+import com.google.firebase.messaging.RemoteMessage;
+import me.leolin.shortcutbadger.ShortcutBadger;
+import com.embarcadero.firemonkey.FMXNativeActivity;
 
 public class ALFirebaseMessagingService extends FirebaseMessagingService {
         

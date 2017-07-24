@@ -661,7 +661,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALImage.MakeBufBitmap', 'TALImage.MakeBufBitmap', TalLogType.verbose);
+  ALLog('TALImage.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugImageMakeBufBitmapCount);
   AlDebugImageMakeBufBitmapStopWatch.Start;
   try
@@ -986,7 +986,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALRectangle.MakeBufBitmap', 'TALRectangle.MakeBufBitmap', TalLogType.verbose);
+  ALLog('TALRectangle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugRectangleMakeBufBitmapCount);
   AlDebugRectangleMakeBufBitmapStopWatch.Start;
   try
@@ -1277,7 +1277,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALCircle.MakeBufBitmap', 'TALCircle.MakeBufBitmap', TalLogType.verbose);
+  ALLog('TALCircle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugCircleMakeBufBitmapCount);
   AlDebugCircleMakeBufBitmapStopWatch.Start;
   try
@@ -1530,7 +1530,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALLine.MakeBufBitmap', 'TALLine.MakeBufBitmap', TalLogType.verbose);
+  ALLog('TALLine.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugLineMakeBufBitmapCount);
   AlDebugLineMakeBufBitmapStopWatch.Start;
   try
@@ -1856,7 +1856,8 @@ begin
   fBufText := fTextControl.Text;
 
   {$IFDEF debug}
-  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'text:' + fBufText +
+  ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap', 'Name: ' + fTextControl.Name +
+                                                     'text:' + fBufText +
                                                      ' - MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY), TalLogType.verbose);
   inc(AlDebugTextMakeBufBitmapCount);
   AlDebugTextMakeBufBitmapStopWatch.Start;
@@ -1916,7 +1917,8 @@ begin
                                       fBufAllTextDrawed,
                                       aOptions);
     {$IFDEF debug}
-    ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap.ALDrawMultiLineText', 'text:' + fBufText +
+    ALLog('TALDoubleBufferedTextLayout.MakeBufBitmap.ALDrawMultiLineText', 'Name: ' + fTextControl.Name +
+                                                                           'text:' + fBufText +
                                                                            ' - fBufBitmapRect: '+floattostr(fBufBitmapRect.width)+'x'+floattostr(fBufBitmapRect.height) +
                                                                            ' - fBufTextBreaked: '+ BoolToStr(fBufTextBreaked, true) +
                                                                            ' - fBufAllTextDrawed: '+ BoolToStr(fBufAllTextDrawed, true), TalLogType.verbose);

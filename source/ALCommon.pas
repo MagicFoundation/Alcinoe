@@ -27,6 +27,10 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
+{$IFDEF IOS}
+uses iOSapi.Foundation;
+{$ENDIF}
+
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
 procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
@@ -47,6 +51,9 @@ Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 function AlLocalDateTimeToUTCDateTime(Const aLocalDateTime: TDateTime): TdateTime;
 function AlUTCDateTimeToLocalDateTime(Const aUTCDateTime: TDateTime): TdateTime;
+{$IFDEF IOS}
+function ALNSDateToUTCDateTime(const ADateTime: NSDate): TDateTime;
+{$ENDIF}
 function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
@@ -78,7 +85,6 @@ uses system.Classes,
      ALAndroidApi,
      {$IFEND}
      {$IF defined(IOS)}
-     iOSapi.Foundation,
      Macapi.Helpers,
      {$IFEND}
      system.sysutils,
@@ -159,6 +165,17 @@ function AlUTCDateTimeToLocalDateTime(Const aUTCDateTime: TDateTime): TdateTime;
 begin
   result := TTimeZone.Local.ToLocalTime(aUTCDateTime);
 end;
+
+{**********}
+{$IFDEF IOS}
+function ALNSDateToUTCDateTime(const ADateTime: NSDate): TDateTime;
+begin
+  if ADateTime <> nil then
+    Result := ADateTime.TimeIntervalSince1970 / SecsPerDay + EncodeDate(1970, 1, 1)
+  else
+    Result := 0.0;
+end;
+{$ENDIF}
 
 {*************************}
 {The same like Now but used

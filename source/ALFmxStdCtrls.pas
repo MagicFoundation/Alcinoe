@@ -787,7 +787,7 @@ begin
   fBufSize := Size.Size;
 
   {$IFDEF debug}
-  ALLog('TALAniIndicator.MakeBufBitmap', 'TALAniIndicator.MakeBufBitmap', TalLogType.verbose);
+  ALLog('TALAniIndicator.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugAniIndicatorMakeBufBitmapCount);
   AlDebugAniIndicatorMakeBufBitmapStopWatch.Start;
   try
@@ -1952,7 +1952,7 @@ begin
   FbufResourceName := aResourceName;
 
   {$IFDEF debug}
-  ALLog('TALCheckbox.MakeBufBitmap', 'TALCheckbox.MakeBufBitmap', TalLogType.verbose);
+  ALLog('TALCheckbox.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
   inc(AlDebugCheckBoxMakeBufBitmapCount);
   AlDebugCheckBoxMakeBufBitmapStopWatch.Start;
   try

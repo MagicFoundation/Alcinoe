@@ -370,6 +370,7 @@ function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single): single; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
+function  ALAlignToPixelRound(const Rect: TRectF): TRectF;
 function  ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF; overload;
 function  ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
 
@@ -455,6 +456,7 @@ type
     fontColor: TalphaColor; // << not initialised by ALBreakText
     fontStyle: integer; // << not initialised by ALBreakText
     id: string; // << not initialised by ALBreakText
+    imgSrc: string; // << not initialised by ALBreakText
     isEllipsis: Boolean;
     constructor Create;
     destructor Destroy; override;
@@ -508,6 +510,7 @@ type
     fontColor: TalphaColor; // << not initialised by ALBreakText
     fontStyle: TFontStyles; // << not initialised by ALBreakText
     id: string; // << not initialised by ALBreakText
+    imgSrc: string; // << not initialised by ALBreakText
     isEllipsis: Boolean;
     constructor Create;
     destructor Destroy; override;
@@ -574,6 +577,7 @@ type
     fontColor: TalphaColor; // << not initialised by ALBreakText
     fontStyle: TFontStyles; // << not initialised by ALBreakText
     id: string; // << not initialised by ALBreakText
+    imgSrc: string; // << not initialised by ALBreakText
     isEllipsis: Boolean;
     constructor Create;
   end;
@@ -2236,6 +2240,15 @@ begin
   result := Rect;
   result.Width := ceil(Rect.Width - TEpsilon.Vector);
   result.height := ceil(Rect.height - TEpsilon.Vector);
+end;
+
+{********************************************************}
+function  ALAlignToPixelRound(const Rect: TRectF): TRectF;
+begin
+  Result.Left := round(Rect.Left);
+  Result.Top := round(Rect.Top);
+  Result.Right := Result.Left + Round(Rect.Width); // keep ratio horizontally
+  Result.Bottom := Result.Top + Round(Rect.Height); // keep ratio vertically
 end;
 
 {****************}
@@ -4599,10 +4612,10 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                               var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
                               const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _getInfosFromTag(const aTag: String;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _getInfosFromTag(const aTag: String; // color="#ffffff" id="xxx"
                              const aSpanIds: TalStringlistU;
-                             const aFontColors: Tlist<TalphaColor>); // tag = <font color="#ffffff" id="xxx">
+                             const aFontColors: Tlist<TalphaColor>);
   var aParamList: TAlStringListU;
       acolorInt: integer;
       S1: String;
@@ -4657,8 +4670,39 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
 
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _getInfosFromImg(const aTag: String; // src="xxx"
+                             var aSrc: String);
+  var aParamList: TAlStringListU;
+  begin
+
+    if aTag = '' then begin
+      aSrc := '';
+      exit;
+    end;
+
+    aParamList := TALStringListU.Create;
+    try
+
+      ALExtractHeaderFieldsWithQuoteEscapedU([' ', #9, #13, #10],
+                                             [' ', #9, #13, #10],
+                                             ['"', ''''],
+                                             PChar(aTag),
+                                             aParamList,
+                                             False,
+                                             True{StripQuotes});
+
+      aSrc := aParamList.Values['src'];
+
+    finally
+      aParamList.Free;
+    end;
+
+  end;
+
 var {$IF defined(ANDROID)}
     aBitmap: Jbitmap;
+    aImg: Jbitmap;
     aPaint: JPaint;
     aTypeface: JTypeface;
     aCanvas: Jcanvas;
@@ -4667,6 +4711,7 @@ var {$IF defined(ANDROID)}
     {$IFEND}
     {$IF defined(IOS)}
     aBitmapSurface: TbitmapSurface;
+    aImg: CGImageRef;
     aColorSpace: CGColorSpaceRef;
     aContext: CGContextRef;
     aStyle: TfontStyles;
@@ -4674,11 +4719,13 @@ var {$IF defined(ANDROID)}
     {$IFEND}
     {$IF defined(MSWINDOWS) or defined(_MACOS)}
     aStyle: TfontStyles;
+    aImg: Tbitmap;
     {$IFEND}
     aBreakedTextItems: TALBreakTextItems;
     aBreakedTextItem: TALBreakTextItem;
     aBreakedTextItemsCount: integer;
     aCurrText: String;
+    aCurrImgSrc: String;
     aTag: String;
     aBold: integer;
     aItalic: Integer;
@@ -4757,6 +4804,8 @@ begin
           if aText[P1] = '<' then begin
 
             //-----
+            aCurrImgSrc := '';
+            aCurrText := '';
             P2 := AlposExU('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                                               //           ^P1                  ^P2
             if P2 <= 0 then break;
@@ -4776,7 +4825,13 @@ begin
             end
 
             //-----
-            else if alposU('<i', aTag) = 1 then begin
+            else if alposU('<img', aTag) = 1 then begin // <img src="xxx">
+              _getInfosFromImg(AlcopyStrU(aTag, 6, length(aTag) - 6), aCurrImgSrc);
+              aCurrText := '⬛';
+            end
+
+            //-----
+            else if (alposU('<i', aTag) = 1) then begin
               _getInfosFromTag(AlcopyStrU(aTag, 4, length(aTag) - 4), aSpanIds, aFontColors);
               inc(aItalic)
             end
@@ -4805,10 +4860,12 @@ begin
             end;
 
             //-----
-            continue;
+            if aCurrImgSrc = '' then continue;
 
           end
           else begin
+
+            aCurrImgSrc := '';
             P2 := AlposExU('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                                              //                                 ^P1      ^P2
             if P2 <= 0 then P2 := Maxint;
@@ -4818,9 +4875,15 @@ begin
             {$IFDEF IOS}
             //because of this http://stackoverflow.com/questions/41334425/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
             if aWhiteSpace then aCurrText := ' ' + aCurrText;
-            if (P2 > 1) and
-               (P2 <= length(aText)) and
-               (aText[P2 - 1].IsWhiteSpace) then begin
+            if (P2 <= length(aText) - 3) and
+               (aText[P2 + 1] = 'i') and
+               (aText[P2 + 2] = 'm') and
+               (aText[P2 + 3] = 'g') then begin
+              aWhiteSpace := False;
+            end
+            else if (P2 > 1) and
+                    (P2 <= length(aText)) and
+                    (aText[P2 - 1].IsWhiteSpace) then begin
               setlength(aCurrText, length(aCurrText) - 1);
               aWhiteSpace := True;
             end
@@ -4955,6 +5018,13 @@ begin
 
             //handle FailIfTextBreaked
             if aTmpTextBreaked and aOptions.FailIfTextBreaked then begin ARect.Width := 0; ARect.Height := 0; exit(nil); end;
+
+            //update the img
+            if (aCurrImgSrc <> '') and
+               (aBreakedTextItems.Count - aBreakedTextItemsCount = 1) then begin
+              aBreakedTextItem := aBreakedTextItems[aBreakedTextItems.count - 1];
+              aBreakedTextItem.imgsrc := aCurrImgSrc;
+            end;
 
             //if their was not enalf of place to write the ellipsis
             if (aBreakedTextItems.Count >= 2) and                                                                                          // << more than 2 items
@@ -5185,19 +5255,36 @@ begin
         //draw all texts
         for i := 0 to aBreakedTextItems.count - 1 do begin
           aBreakedTextItem := aBreakedTextItems[i];
+          if aBreakedTextItem.imgSrc <> '' then begin
+            aMaxWidth := min(aBreakedTextItem.rect.Width, aBreakedTextItem.rect.Height);
+            aTmpRect := ALAlignToPixelRound(
+                          TrectF.Create(0,0,aMaxWidth,aMaxWidth).
+                            CenterAt(aBreakedTextItem.rect));
+            aImg := ALLoadResizeAndFitResourceImageV2(aBreakedTextItem.imgSrc, aTmpRect.Width, aTmpRect.Height);
+            if aImg <> nil then begin
+              try
+                aCanvas.drawBitmap(aImg, aTmpRect.left {left}, aTmpRect.top {top}, apaint {paint});
+              finally
+                aImg.recycle;
+                aImg := nil;
+              end;
+            end;
+          end
+          else begin
+            aPaint.setColor(aBreakedTextItem.fontColor);
+            //-----
+            JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
+            aTypeface := TJTypeface.JavaClass.create(JStr1, aBreakedTextItem.fontStyle);
+            aPaint.setTypeface(aTypeface);
+            aTypeface := nil;
+            JStr1 := nil;
+            //-----
+            aCanvas.drawText(aBreakedTextItem.line{text},
+                             aBreakedTextItem.pos.x {x},
+                             aBreakedTextItem.pos.y {y},
+                             apaint {paint});
+          end;
           //-----
-          aPaint.setColor(aBreakedTextItem.fontColor);
-          //-----
-          JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
-          aTypeface := TJTypeface.JavaClass.create(JStr1, aBreakedTextItem.fontStyle);
-          aPaint.setTypeface(aTypeface);
-          aTypeface := nil;
-          JStr1 := nil;
-          //-----
-          aCanvas.drawText(aBreakedTextItem.line{text},
-                           aBreakedTextItem.pos.x {x},
-                           aBreakedTextItem.pos.y {y},
-                           apaint {paint});
         end;
 
         //free the paint and the canvas
@@ -5240,10 +5327,31 @@ begin
         //draw all texts
         for i := 0 to aBreakedTextItems.count - 1 do begin
           aBreakedTextItem := aBreakedTextItems[i];
-          CGContextSetTextPosition(acontext,
-                                   aBreakedTextItem.pos.x {x},
-                                   aBitmapSurface.Height - aBreakedTextItem.pos.Y);{y}
-          CTLineDraw(aBreakedTextItem.Line, acontext); // Draws a complete line.
+          if aBreakedTextItem.imgSrc <> '' then begin
+            aMaxWidth := min(aBreakedTextItem.rect.Width, aBreakedTextItem.rect.Height);
+            aTmpRect := ALAlignToPixelRound(
+                          TrectF.Create(0,0,aMaxWidth,aMaxWidth).
+                            CenterAt(aBreakedTextItem.rect));
+            aImg := ALLoadResizeAndFitResourceImageV2(aBreakedTextItem.imgSrc, aTmpRect.Width, aTmpRect.Height);
+            if aImg <> nil then begin
+              Try
+                CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                   ALLowerLeftCGRect(TPointF.Create(aTmpRect.left, aTmpRect.top),
+                                                     aTmpRect.Width,
+                                                     aTmpRect.Height,
+                                                     aBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                   aImg); // image The image to draw.
+              finally
+                CGImageRelease(aImg);
+              End;
+            end;
+          end
+          else begin
+            CGContextSetTextPosition(acontext,
+                                     aBreakedTextItem.pos.x {x},
+                                     aBitmapSurface.Height - aBreakedTextItem.pos.Y);{y}
+            CTLineDraw(aBreakedTextItem.Line, acontext); // Draws a complete line.
+          end;
         end;
 
         //convert the aBitmapSurface to texture
@@ -5288,16 +5396,31 @@ begin
           result.Canvas.Font.size := aOptions.FontSize;
           for i := 0 to aBreakedTextItems.count - 1 do begin
             aBreakedTextItem := aBreakedTextItems[i];
-            //-----
-            result.Canvas.Fill.Color := aBreakedTextItem.fontColor;
-            result.Canvas.Font.style := aBreakedTextItem.fontStyle;
-            //-----
-            result.Canvas.FillText(aBreakedTextItem.rect, // const ARect: TRectF;
-                                   aBreakedTextItem.line, // const AText: string;
-                                   False, // const WordWrap: Boolean;
-                                   1, // const AOpacity: Single;
-                                   [], // const Flags: TFillTextFlags;
-                                   TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
+            if aBreakedTextItem.imgSrc <> '' then begin
+              aMaxWidth := min(aBreakedTextItem.rect.Width, aBreakedTextItem.rect.Height) * 1.15;
+              aTmpRect := ALAlignToPixelRound(
+                            TrectF.Create(0,0,aMaxWidth,aMaxWidth).
+                              CenterAt(aBreakedTextItem.rect));
+              aImg := ALLoadResizeAndFitResourceImageV2(aBreakedTextItem.imgSrc, aTmpRect.Width, aTmpRect.Height);
+              if aImg <> nil then begin
+                try
+                  result.Canvas.drawBitmap(aImg, TrectF.Create(0,0,aTmpRect.Width,aTmpRect.Height), aTmpRect{DstRect}, 1{AOpacity}, false{HighSpeed});
+                finally
+                  ALFreeAndNil(aImg);
+                end;
+              end;
+            end
+            else begin
+              result.Canvas.Fill.Color := aBreakedTextItem.fontColor;
+              result.Canvas.Font.style := aBreakedTextItem.fontStyle;
+              //-----
+              result.Canvas.FillText(aBreakedTextItem.rect, // const ARect: TRectF;
+                                     aBreakedTextItem.line, // const AText: string;
+                                     False, // const WordWrap: Boolean;
+                                     1, // const AOpacity: Single;
+                                     [], // const Flags: TFillTextFlags;
+                                     TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
+            end;
           end;
 
         finally

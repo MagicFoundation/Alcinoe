@@ -320,6 +320,7 @@ uses system.SysUtils,
      {$IF defined(android)}
      androidapi.JNI.JavaTypes,
      Androidapi.JNI.Os,
+     FMX.Helpers.Android,
      FMX.platform.Android,
      ALAndroidShortcutBadgerApi,
      {$ELSEIF defined(IOS)}
@@ -341,13 +342,6 @@ uses system.SysUtils,
 
 {*********************************************}
 constructor TALFirebaseInstanceIdClient.Create;
-
-{$REGION ' ANDROID'}
-{$IF defined(android)}
-var aIntentFilter: JIntentFilter;
-{$ENDIF}
-{$ENDREGION}
-
 begin
 
   inherited Create;
@@ -361,10 +355,13 @@ begin
     // the new token
     FBroadcastReceiverListener := TBroadcastReceiverListener.Create(Self);
     fBroadcastReceiver := TJFMXBroadcastReceiver.JavaClass.init(FBroadcastReceiverListener);
-    //-----
-    aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseInstanceIdService.JavaClass.ACTION_TOKENREFRESHED);
-    TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter); // registerReceiver do synchronized (mReceivers) { } no need to callinUIThread
-
+    TUIThreadCaller.Call<JFMXBroadcastReceiver>(
+      procedure (aBroadcastReceiver: JFMXBroadcastReceiver)
+      var aIntentFilter: JIntentFilter;
+      begin
+        aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseInstanceIdService.JavaClass.ACTION_TOKENREFRESHED);
+        TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(aBroadcastReceiver, aIntentFilter); // registerReceiver do synchronized (mReceivers) { } no need to callinUIThread
+      end, fBroadcastReceiver);
   {$ENDIF}
   {$ENDREGION}
 
@@ -409,8 +406,15 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(fBroadcastReceiver); // unregisterReceiver do synchronized (mReceivers) { } no need to callinUIThread
-    AlFreeAndNil(FBroadcastReceiverListener);
+    FBroadcastReceiverListener.fFirebaseInstanceIdClient := nil;
+    TUIThreadCaller.Call<JFMXBroadcastReceiver>(
+      procedure (aBroadcastReceiver: JFMXBroadcastReceiver)
+      begin
+        TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(aBroadcastReceiver); // unregisterReceiver do synchronized (mReceivers) { } no need to callinUIThread
+      end, fBroadcastReceiver);
+    FBroadcastReceiverListener := nil; // << we can not free it because it's maybe used by the previous instruction
+                                       // << anyway it's not too much matter because with ARC it's will be free automatiquelly
+    fBroadcastReceiver := Nil;
 
   {$ENDIF}
   {$ENDREGION}
@@ -472,11 +476,11 @@ begin
   {$IF CompilerVersion > 31} // berlin
     {$MESSAGE WARN 'remove TThread.synchronize because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
   {$ENDIF}
-  TThread.synchronize(nil,
+  TThread.queue(nil,
     procedure
     begin
-      if assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then
-        fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
+      if assigned(fFirebaseInstanceIdClient) and
+         assigned(fFirebaseInstanceIdClient.fOnTokenRefresh) then fFirebaseInstanceIdClient.fOnTokenRefresh(aToken);
     end);
 
 end;
@@ -653,7 +657,9 @@ begin
     TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, applicationEvent);
     TMessageManager.DefaultManager.Unsubscribe(TMessageReceivedNotification, notificationEvent);
 
-    AlFreeAndNil(FBroadcastReceiverListener);
+    FBroadcastReceiverListener.fFirebaseMessagingClient := nil;
+    FBroadcastReceiverListener := nil; // << we can not free it because it's maybe used by the previous instruction
+                                       // << anyway it's not too much matter because with ARC it's will be free automatiquelly
     fBroadcastReceiver := Nil;
 
   {$ENDIF}
@@ -688,13 +694,6 @@ end;
 
 {*******************************************}
 procedure TALFirebaseMessagingClient.connect;
-
-{$REGION ' ANDROID'}
-{$IF defined(android)}
-var aIntentFilter: JIntentFilter;
-{$ENDIF}
-{$ENDREGION}
-
 begin
 
   // set connected
@@ -706,8 +705,13 @@ begin
     if not fIsPhysicallyConnected then begin
 
       fIsPhysicallyConnected := True;
-      aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED);
-      TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(fBroadcastReceiver, aIntentFilter); // registerReceiver do synchronized (mReceivers) { } no need to callinUIThread
+      TUIThreadCaller.Call<JFMXBroadcastReceiver>(
+        procedure (aBroadcastReceiver: JFMXBroadcastReceiver)
+        var aIntentFilter: JIntentFilter;
+        begin
+          aIntentFilter := TJIntentFilter.JavaClass.init(TJALFirebaseMessagingService.JavaClass.ACTION_MESSAGERECEIVED);
+          TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).registerReceiver(aBroadcastReceiver, aIntentFilter); // registerReceiver do synchronized (mReceivers) { } no need to callinUIThread
+        end, fBroadcastReceiver);
 
       {$IFDEF DEBUG}
       allog('TALFirebaseMessagingClient.connect', 'Physically connected', TalLogType.verbose);
@@ -749,7 +753,11 @@ begin
     if fIsPhysicallyConnected then begin
 
       fIsPhysicallyConnected := False;
-      TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(fBroadcastReceiver);  // unregisterReceiver do synchronized (mReceivers) { } no need to callinUIThread
+      TUIThreadCaller.Call<JFMXBroadcastReceiver>(
+        procedure (aBroadcastReceiver: JFMXBroadcastReceiver)
+        begin
+          TJLocalBroadcastManager.javaclass.getInstance(TAndroidHelper.Context).unregisterReceiver(aBroadcastReceiver);  // unregisterReceiver do synchronized (mReceivers) { } no need to callinUIThread
+        end, fBroadcastReceiver);
 
       {$IFDEF DEBUG}
       allog('TALFirebaseMessagingClient.connect', 'Physically disconnect', TalLogType.verbose);
@@ -814,10 +822,11 @@ begin
   {$IF CompilerVersion > 31} // berlin
     {$MESSAGE WARN 'remove TThread.synchronize because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
   {$ENDIF}
-  TThread.synchronize(nil,
+  TThread.queue(nil,
     procedure
     begin
-      fFirebaseMessagingClient.HandleNotificationIntent(intent);
+      if assigned(fFirebaseMessagingClient) then
+        fFirebaseMessagingClient.HandleNotificationIntent(intent);
     end);
 
 end;

@@ -31,6 +31,7 @@ import com.embarcadero.firemonkey.FMXNativeActivity;
 
 public class ALFirebaseMessagingService extends FirebaseMessagingService {
         
+  private static final String TAG = "ALFirebaseMessagingService";
   public static final String ACTION_MESSAGERECEIVED = "com.alcinoe.firebase.messaging.messageReceived";
   private final static Lock lock = new ReentrantLock(); 
   private static String pendingDataMessagesFilename = "";
@@ -76,7 +77,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
       }
 
     } 
-    catch (Throwable e){ Log.e("ALFirebaseMessagingService.getPendingDataMessagesInternal", "Exception", e); }  
+    catch (Throwable e){ Log.e(TAG, "getPendingDataMessagesInternal - Exception", e); }  
       
     return jsonTxt;  
     
@@ -99,7 +100,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
         if (jsonFile.exists()) { jsonFile.delete(); }
         
       } 
-      catch (Throwable e){ Log.e("ALFirebaseMessagingService.getPendingDataMessages", "Exception", e); }  
+      catch (Throwable e){ Log.e(TAG, "getPendingDataMessages - Exception", e); }  
    
       return jsonTxt;
       
@@ -109,11 +110,11 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
   }
 
   /**
-   * Called when message is received.
+   * Called to process a message received
+   * this procedure is public and static to let possible to call it from other service (for example)
    * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
    */
-  @Override
-  public void onMessageReceived(RemoteMessage remoteMessage) {
+  public static void notify(Context context, RemoteMessage remoteMessage) {
         
     // There are two types of messages data messages and notification messages. Data messages are handled
     // here in onMessageReceived whether the app is in the foreground or background. Data messages are the type
@@ -127,7 +128,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
     try {
 
       //Log
-      Log.v("ALFirebaseMessagingService", "onMessageReceived");
+      Log.v(TAG, "onMessageReceived");
       
       //init data
       Map<String, String> data = remoteMessage.getData();
@@ -149,10 +150,10 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
       boolean receveirIsPresent;
       try{
     
-        receveirIsPresent = LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        receveirIsPresent = LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     
       } catch (Throwable e){ 
-        Log.e("ALFirebaseMessagingService.onMessageReceived", "Exception", e); 
+        Log.e(TAG, "onMessageReceived - Exception", e); 
         receveirIsPresent = false; 
       }  
                      
@@ -186,9 +187,9 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
             int defaults = NotificationCompat.DEFAULT_LIGHTS;
             
             intent.putExtra("notification.presented", "1"); /* this to know in delphi code that it's a notification presented to the user (so if we receive mean he click it) */
-            intent.setClass(this, FMXNativeActivity.class);
+            intent.setClass(context, FMXNativeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, /* context	Context: The Context in which this PendingIntent should start the activity. */
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, /* context	Context: The Context in which this PendingIntent should start the activity. */
                                                                     getUniqueID(), /* requestCode	int: Private request code for the sender */ 
                                                                     intent, /* intents	Intent: Array of Intents of the activities to be launched. */
                                                                     PendingIntent.FLAG_UPDATE_CURRENT); /* flags	int: May be FLAG_ONE_SHOT, - Flag indicating that this PendingIntent can be used only once. 
@@ -200,7 +201,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
                                                                                                            control which unspecified parts of the intent that can 
                                                                                                            be supplied when the actual send happens. */
             
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context);
             if (data.containsKey("notification.color")) { 
               notificationBuilder = notificationBuilder.setColor(Integer.parseInt(data.get("notification.color")));
             }
@@ -233,12 +234,12 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
       
                 }
               
-              } catch(Throwable e) { Log.e("ALFirebaseMessagingService.onMessageReceived", "Exception", e); }
+              } catch(Throwable e) { Log.e(TAG, "onMessageReceived - Exception", e); }
             }
             if (data.containsKey("notification.number") && 
                 data.containsKey("notification.tag") && 
                 data.get("notification.number").equals("auto")) { 
-              SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+              SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
               int currentCount = sp.getInt("notification.count_" + data.get("notification.tag"), 0);
               SharedPreferences.Editor editor = sp.edit();
               editor.putInt("notification.count_" + data.get("notification.tag"), currentCount + 1);
@@ -253,10 +254,10 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
             } 
             if (data.containsKey("notification.smallicon")) { 
               notificationBuilder = notificationBuilder.setSmallIcon(
-                this.getApplicationContext().getResources().getIdentifier(
+                context.getApplicationContext().getResources().getIdentifier(
                   data.get("notification.smallicon"), // name	String: The name of the desired resource.
                   "drawable", // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                  this.getApplicationContext().getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                  context.getApplicationContext().getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
             }                  
             if (data.containsKey("notification.ticker")) { 
               notificationBuilder = notificationBuilder.setTicker(data.get("notification.ticker"));
@@ -289,10 +290,10 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
             notificationBuilder = notificationBuilder.setContentIntent(pendingIntent);
             
             if (data.containsKey("notification.badgecount")) { 
-              ShortcutBadger.applyCount(this.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
+              ShortcutBadger.applyCount(context.getApplicationContext(), Integer.parseInt(data.get("notification.badgecount")));
             } 
         
-            NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);    
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);    
             notificationManager.notify(data.get("notification.tag"), /* tag	String: A string identifier for this notification. May be null. */ 
                                        0, /* id	int: An identifier for this notification. The pair (tag, id) must be unique within your application. */  
                                        notificationBuilder.build()); /* notification	Notification: A Notification object describing what to show the user. Must not be null. */  
@@ -300,7 +301,7 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
           }
                 
           /* NO custom notification is present in data payload */
-          else {
+          else if (pendingDataMessagesFilename != "") {
                 
             /* load the json */
             String jsonTxt = getPendingDataMessagesInternal();
@@ -337,12 +338,23 @@ public class ALFirebaseMessagingService extends FirebaseMessagingService {
         }
       
       } 
-      catch (Throwable e){ Log.e("ALFirebaseMessagingService.onMessageReceived", "Exception", e); }  
+      catch (Throwable e){ Log.e(TAG, "onMessageReceived - Exception", e); }  
         
     } finally {
       lock.unlock();
     }
   
+  }
+
+  /**
+   * Called when message is received.
+   * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
+   */
+  @Override
+  public void onMessageReceived(RemoteMessage remoteMessage) {
+
+    notify(this, remoteMessage);
+
   }
 
 }

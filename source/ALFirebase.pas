@@ -59,13 +59,14 @@
 // notification.text - Set the second line of text in the platform notification template.
 // notification.title - Set the first line of text in the platform notification template.
 // notification.largeicon - url of the large icon to use - Add a large icon to the notification content view
-// notification.number - must equal to "auto" to increase automatiquely the number of items this notification represents.
+// notification.number - must equal to "auto" to increase the number of items this notification represents.
 // notification.onlyalertonce - Set this flag if you would only like the sound, vibrate and ticker to be played if the notification is not already showing.
 // notification.smallicon - The name of the desired resource. - Set the small icon resource, which will be used to represent the notification in the status bar.
 // notification.ticker - Set the "ticker" text which is sent to accessibility services (The pop-up Text in Status Bar when the Notification is Called)
 // notification.vibrate - must equal to 1 to activate the default vibration pattern (0, 1200)
 // notification.visibility - Specify the value of visibility - One of VISIBILITY_PRIVATE (the default), VISIBILITY_SECRET, or VISIBILITY_PUBLIC.
 // notification.priority - Relative priority for this notification
+// notification.sound - Set the sound to play
 // notification.badgecount - update the shortcut badge count with this number
 // notification.present - only for IOS 10+, it's equal to 1 then even if the app is in foreground the notification will be presented to the end user
 //

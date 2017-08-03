@@ -431,6 +431,7 @@ type
     procedure SetChildNodeValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions); overload;
     procedure SetChildNodeValueBinary(const nodeName: ansiString; const value: AnsiString); overload;
     procedure SetChildNodeValueBinarySubType(const nodeName: ansiString; const value: byte); overload;
+    procedure SetChildNodeValueNull(const nodeName: ansiString); overload;
     procedure SetChildNodeValueText(const path: array of ansiString; const value: AnsiString); overload;
     procedure SetChildNodeValueFloat(const path: array of ansiString; const value: Double); overload;
     procedure SetChildNodeValueDateTime(const path: array of ansiString; const value: TDateTime); overload;
@@ -444,6 +445,7 @@ type
     procedure SetChildNodeValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions); overload;
     procedure SetChildNodeValueBinary(const path: array of ansiString; const value: AnsiString); overload;
     procedure SetChildNodeValueBinarySubType(const path: array of ansiString; const value: byte); overload;
+    procedure SetChildNodeValueNull(const path: array of ansiString); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: AnsiString read fNodeName write fNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
@@ -897,6 +899,7 @@ type
     procedure SetChildNodeValueRegExOptions(const nodeName: String; const value: TALPerlRegExOptions); overload;
     procedure SetChildNodeValueBinary(const nodeName: String; const value: String); overload;
     procedure SetChildNodeValueBinarySubType(const nodeName: String; const value: byte); overload;
+    procedure SetChildNodeValueNull(const nodeName: String); overload;
     procedure SetChildNodeValueText(const path: array of String; const value: String); overload;
     procedure SetChildNodeValueFloat(const path: array of String; const value: Double); overload;
     procedure SetChildNodeValueDateTime(const path: array of String; const value: TDateTime); overload;
@@ -910,6 +913,7 @@ type
     procedure SetChildNodeValueRegExOptions(const path: array of String; const value: TALPerlRegExOptions); overload;
     procedure SetChildNodeValueBinary(const path: array of String; const value: String); overload;
     procedure SetChildNodeValueBinarySubType(const path: array of String; const value: byte); overload;
+    procedure SetChildNodeValueNull(const path: array of String); overload;
     property HasChildNodes: Boolean read GetHasChildNodes;
     property NodeName: String read fNodeName write fNodeName;
     property NodeType: TALJSONNodeType read GetNodeType;
@@ -4725,6 +4729,15 @@ begin
   else aNode.SetBinarySubType(value);
 end;
 
+{**********************************************************************}
+procedure TALJSONNode.SetChildNodeValueNull(const nodeName: ansiString);
+var aNode: TALJSONNode;
+begin
+  aNode := ChildNodes.findNode(nodeName);
+  if (aNode = nil) then addChild(nodeName).SetNull(true)
+  else aNode.SetNull(true);
+end;
+
 {****************************************************************************************************}
 procedure TALJSONNode.SetChildNodeValueText(const path: array of ansiString; const value: AnsiString);
 var aNode: TALJSONNode;
@@ -4944,6 +4957,23 @@ begin
   aNode := aNode.ChildNodes.findNode(path[high(path)]);
   if (aNode = nil) then addChild(nodeName).SetBinarySubType(value)
   else aNode.SetBinarySubType(value);
+end;
+
+{***************************************************************************}
+procedure TALJSONNode.SetChildNodeValueNull(const path: array of ansiString);
+var aNode: TALJSONNode;
+    aTmpNode: TALJSONNode;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aTmpNode := aNode.ChildNodes.findNode(path[i]);
+    if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
+    else aNode := aTmpNode;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then addChild(nodeName).SetNull(true)
+  else aNode.SetNull(true);
 end;
 
 {***********************************************}
@@ -10907,6 +10937,15 @@ begin
   else aNode.SetBinarySubType(value);
 end;
 
+{*******************************************************************}
+procedure TALJSONNodeU.SetChildNodeValueNull(const nodeName: String);
+var aNode: TALJSONNodeU;
+begin
+  aNode := ChildNodes.findNode(nodeName);
+  if (aNode = nil) then addChild(nodeName).SetNull(true)
+  else aNode.SetNull(true);
+end;
+
 {*********************************************************************************************}
 procedure TALJSONNodeU.SetChildNodeValueText(const path: array of String; const value: String);
 var aNode: TALJSONNodeU;
@@ -11126,6 +11165,23 @@ begin
   aNode := aNode.ChildNodes.findNode(path[high(path)]);
   if (aNode = nil) then addChild(nodeName).SetBinarySubType(value)
   else aNode.SetBinarySubType(value);
+end;
+
+{************************************************************************}
+procedure TALJSONNodeU.SetChildNodeValueNull(const path: array of String);
+var aNode: TALJSONNodeU;
+    aTmpNode: TALJSONNodeU;
+    i: integer;
+begin
+  aNode := Self;
+  for i := low(path) to high(path) - 1 do begin
+    aTmpNode := aNode.ChildNodes.findNode(path[i]);
+    if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
+    else aNode := aTmpNode;
+  end;
+  aNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aNode = nil) then addChild(nodeName).SetNull(true)
+  else aNode.SetNull(true);
 end;
 
 {***********************************************}

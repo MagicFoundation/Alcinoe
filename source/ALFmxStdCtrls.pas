@@ -179,6 +179,7 @@ type
     property Position stored false;
     property Size stored false;
     property Glyph: TALTrackThumbGlyph read FGlyph;
+    property Cursor default crHandPoint;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -442,6 +443,7 @@ type
     procedure SetMin(const Value: Single); override;
     function MaxValueStored: Boolean; virtual;
     function GetDefaultSize: TSizeF; override;
+    procedure SetValue(Value: Single); override;
     function GetMaxValue: Single; virtual;
     procedure SetMaxValue(Value: Single); virtual;
     procedure Loaded; override;
@@ -958,6 +960,7 @@ end;
 constructor TALTrackThumb.Create(const ATrack: TALCustomTrack; const aValueRange: TValueRange; const aWithGlyphObj: boolean);
 begin
   inherited create(ATrack);
+  cursor := crHandPoint;
   FPressed := False;
   FTrack := ATrack;
   FValueRange := aValueRange;
@@ -1768,6 +1771,14 @@ begin
   end;
 end;
 
+{*************************************************}
+procedure TALRangeTrackBar.SetValue(Value: Single);
+begin
+  inherited SetValue(Value);
+  if (not fThumb.IsPressed) and
+     (GetValue > (max - Min) / 2) then fThumb.BringToFront;
+end;
+
 {********************************************}
 function TALRangeTrackBar.GetMaxValue: Single;
 begin
@@ -1778,6 +1789,8 @@ end;
 procedure TALRangeTrackBar.SetMaxValue(Value: Single);
 begin
   FMaxValueRange.Value := Value;
+  if (not fMaxThumb.IsPressed) and
+     (GetMaxValue < (max - Min) / 2) then fMaxThumb.BringToFront;
 end;
 
 {************************************************}

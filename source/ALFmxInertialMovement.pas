@@ -107,6 +107,7 @@ type
     FDeadZone: Integer;
     FUpdateCount: Integer;
     FElasticityFactor: TPoint;
+    FOnCalcVelocity: TNotifyEvent;
     procedure StartTimer;
     procedure StopTimer;
     procedure TimerProc;
@@ -218,6 +219,7 @@ type
     property Elasticity: Double read FElasticity write FElasticity stored ElasticityStored nodefault;
     property StorageTime: Double read FStorageTime write FStorageTime stored StorageTimeStored nodefault;
     property VelocityFactor: Double read FVelocityFactor write FVelocityFactor stored VelocityFactorStored nodefault; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
+    property OnCalcVelocity: TNotifyEvent read FOnCalcVelocity write FOnCalcVelocity; // << we this you can dynamically calc the velocity
   end;
 
 implementation
@@ -1314,6 +1316,7 @@ begin
     end;
     fCurrentVelocity.X := fCurrentVelocity.X * fVelocityFactor;
     fCurrentVelocity.Y := fCurrentVelocity.y * fVelocityFactor;
+    if assigned(fOnCalcVelocity) then fOnCalcVelocity(self);
   end;
   UpdateTimer;
 end;

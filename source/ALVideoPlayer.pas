@@ -928,6 +928,12 @@ procedure TALAndroidVideoPlayer.synchDestroy;
 var aMediaPlayer: JMediaPlayer;
     aSurfaceTexture: JSurfaceTexture;
     abitmap: TALTexture;
+    aOnErrorListener: TALErrorListener;
+    aOnPreparedListener: TALPreparedListener;
+    aonVideoSizeChangedListener: TALVideoSizeChangedListener;
+    aOnBufferingUpdateListener: TALBufferingUpdateListener;
+    aOnCompletionListener: TALCompletionListener;
+    aOnFrameAvailableListener: TALFrameAvailableListener;
 begin
 
   //-----
@@ -963,11 +969,19 @@ begin
   aMediaPlayer := FMediaPlayer;
   aSurfaceTexture := fSurfaceTexture;
   abitmap := fbitmap;
+  aOnErrorListener := fOnErrorListener;
+  aOnPreparedListener := fOnPreparedListener;
+  aonVideoSizeChangedListener := fonVideoSizeChangedListener;
+  aOnBufferingUpdateListener := fOnBufferingUpdateListener;
+  aOnCompletionListener := fOnCompletionListener;
+  aOnFrameAvailableListener := fOnFrameAvailableListener;
   CallInUiThread(
     procedure
     begin
 
       //-----
+      if aMediaPlayer.isPlaying then aMediaPlayer.stop;
+      aMediaPlayer.reset;
       aMediaPlayer.setOnErrorListener(nil);
       aMediaPlayer.setOnPreparedListener(nil);
       aMediaPlayer.setOnVideoSizeChangedListener(nil);
@@ -989,22 +1003,15 @@ begin
         procedure
         begin
           alFreeandNil(abitmap);
+          alFreeandNil(aOnErrorListener);
+          alFreeandNil(aOnPreparedListener);
+          alFreeandNil(aOnVideoSizeChangedListener);
+          alFreeandNil(aOnBufferingUpdateListener);
+          alFreeandNil(aOnCompletionListener);
+          alFreeandNil(aOnFrameAvailableListener);
         end);
 
     end);
-
-  //unfortunatly i can't make the previous instruction with wait
-  //because when the app close, then the wait will never finish :(
-  //but doesn't matter we don't need to free the object below, it's
-  //we be done automatiquely
-  //alfreeandNil(FOnErrorListener);
-  //alfreeandNil(FOnPreparedListener);
-  //alfreeandNil(fonVideoSizeChangedListener);
-  //alfreeandNil(fOnBufferingUpdateListener);
-  //alfreeandNil(fOnCompletionListener);
-  //alfreeandNil(FOnFrameAvailableListener);
-  //FMediaPlayer := nil;
-  //fSurfaceTexture := nil;
 
 end;
 

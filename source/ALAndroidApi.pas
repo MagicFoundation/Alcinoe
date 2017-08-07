@@ -21,7 +21,9 @@ uses Androidapi.JNI.Widget,
 
 type
 
-  {*******************************}
+  {**************************************}
+  JALDatePickerDialogListener = interface;
+  JALDatePickerDialog = interface;
   JALSoftInputListener = interface;
   JALKeyPreImeListener = interface;
   JALEditText = interface;
@@ -32,6 +34,39 @@ type
   JPreferenceManager = interface;
   JAsyncTask_Status = interface;
   JAsyncTask = interface;
+
+  {******************************************************}
+  JALDatePickerDialogListenerClass = interface(IJavaClass)
+    ['{3EDC638B-74FD-40D8-A09C-B92919C9D85B}']
+  end;
+
+  {***********************************************************}
+  [JavaSignature('com/alcinoe/app/ALDatePickerDialogListener')]
+  JALDatePickerDialogListener = interface(IJavaInstance)
+    ['{9A145783-462B-4E51-AAFC-48F68C79C3EA}']
+    procedure onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer); cdecl;
+  end;
+  TJALDatePickerDialogListener = class(TJavaGenericImport<JALDatePickerDialogListenerClass, JALDatePickerDialogListener>) end;
+
+  {************************************************}
+  JALDatePickerDialogClass = interface(JObjectClass)
+    ['{5CBB555C-9128-492E-BFE9-B0B6AE42F26B}']
+    {class} function init(context: JContext;
+                          button_positive_text: JCharSequence;
+	                        button_negative_text: JCharSequence;
+                          button_neutral_text: JCharSequence): JALDatePickerDialog; cdecl;
+  end;
+
+  {***************************************************}
+  [JavaSignature('com/alcinoe/app/ALDatePickerDialog')]
+  JALDatePickerDialog = interface(JObject)
+    ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
+    procedure show(year: integer;
+                   month: integer;
+                   dayOfMonth: integer); cdecl;
+    procedure setListener(listener: JALDatePickerDialogListener); cdecl;
+  end;
+  TJALDatePickerDialog = class(TJavaGenericImport<JALDatePickerDialogClass, JALDatePickerDialog>) end;
 
   {***********************************************}
   JALSoftInputListenerClass = interface(IJavaClass)
@@ -243,6 +278,8 @@ implementation
 
 procedure RegisterTypes;
 begin
+  TRegTypes.RegisterType('ALAndroidApi.JALDatePickerDialogListener', TypeInfo(ALAndroidApi.JALDatePickerDialogListener));
+  TRegTypes.RegisterType('ALAndroidApi.JALDatePickerDialog', TypeInfo(ALAndroidApi.JALDatePickerDialog));
   TRegTypes.RegisterType('ALAndroidApi.JALSoftInputListener', TypeInfo(ALAndroidApi.JALSoftInputListener));
   TRegTypes.RegisterType('ALAndroidApi.JALKeyPreImeListener', TypeInfo(ALAndroidApi.JALKeyPreImeListener));
   TRegTypes.RegisterType('ALAndroidApi.JALEditText', TypeInfo(ALAndroidApi.JALEditText));

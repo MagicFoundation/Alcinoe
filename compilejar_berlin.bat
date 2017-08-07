@@ -63,6 +63,7 @@ lib\jar\firebase\firebase-messaging.jar^
  source\java\com\alcinoe\view\*.java^
  source\java\com\alcinoe\view\menu\*.java^
  source\java\com\alcinoe\view\inputmethod\*.java^
+ source\java\com\alcinoe\app\*.java^
  source\java\com\alcinoe\widget\*.java^
  source\java\com\alcinoe\text\method\*.java^
  source\java\com\alcinoe\facebook\*.java^

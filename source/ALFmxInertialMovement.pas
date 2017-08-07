@@ -32,7 +32,7 @@ type
 
 const
   ALDefaultStorageTime = 0.15;
-  ALDefaultIntervalOfAni = 10;
+  ALDefaultIntervalOfAni = 16; // << this to have a frame rate of 62.5
   ALDecelerationRateNormal = 1.95;
   ALDecelerationRateFast = 9.5;
   ALDefaultElasticity = 100;

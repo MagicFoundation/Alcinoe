@@ -132,6 +132,7 @@ private:
 	int FDeadZone;
 	int FUpdateCount;
 	System::Types::TPoint FElasticityFactor;
+	System::Classes::TNotifyEvent FOnCalcVelocity;
 	void __fastcall StartTimer(void);
 	void __fastcall StopTimer(void);
 	void __fastcall TimerProc(void);
@@ -241,17 +242,18 @@ public:
 	__property int DeadZone = {read=FDeadZone, write=FDeadZone, default=8};
 	
 __published:
-	__property System::Word Interval = {read=FInterval, write=SetInterval, default=10};
+	__property System::Word Interval = {read=FInterval, write=SetInterval, default=16};
 	__property double DecelerationRate = {read=FDecelerationRate, write=FDecelerationRate, stored=DecelerationRateStored};
 	__property double Elasticity = {read=FElasticity, write=FElasticity, stored=ElasticityStored};
 	__property double StorageTime = {read=FStorageTime, write=FStorageTime, stored=StorageTimeStored};
 	__property double VelocityFactor = {read=FVelocityFactor, write=FVelocityFactor, stored=VelocityFactorStored};
+	__property System::Classes::TNotifyEvent OnCalcVelocity = {read=FOnCalcVelocity, write=FOnCalcVelocity};
 };
 
 
 //-- var, const, procedure ---------------------------------------------------
 #define ALDefaultStorageTime  (1.500000E-01)
-static const System::Int8 ALDefaultIntervalOfAni = System::Int8(0xa);
+static const System::Int8 ALDefaultIntervalOfAni = System::Int8(0x10);
 #define ALDecelerationRateNormal  (1.950000E+00)
 #define ALDecelerationRateFast  (9.500000E+00)
 static const System::Int8 ALDefaultElasticity = System::Int8(0x64);

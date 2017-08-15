@@ -187,6 +187,7 @@ __published:
 	__property Position = {stored=false};
 	__property Size = {stored=false};
 	__property TALTrackThumbGlyph* Glyph = {read=FGlyph};
+	__property Cursor = {default=-21};
 };
 
 
@@ -487,6 +488,7 @@ protected:
 	virtual void __fastcall SetMin(const float Value);
 	virtual bool __fastcall MaxValueStored(void);
 	virtual System::Types::TSizeF __fastcall GetDefaultSize(void);
+	virtual void __fastcall SetValue(float Value);
 	virtual float __fastcall GetMaxValue(void);
 	virtual void __fastcall SetMaxValue(float Value);
 	virtual void __fastcall Loaded(void);

@@ -514,16 +514,16 @@ type
     // - (void)removePendingNotificationRequestsWithIdentifiers:(NSArray<NSString *> *)identifiers;
     // - (void)removeAllPendingNotificationRequests;
     // procedure getPendingNotificationRequestsWithCompletionHandler(completionHandler: TUserNotificationsCompletionHandler3); cdecl;
-    // procedure removePendingNotificationRequestsWithIdentifiers(identifiers: NSArray); cdecl;
-    // procedure removeAllPendingNotificationRequests; cdecl;
+    procedure removePendingNotificationRequestsWithIdentifiers(identifiers: NSArray); cdecl;
+    procedure removeAllPendingNotificationRequests; cdecl;
 
     // Notifications that have been delivered and remain in Notification Center. Notifiations triggered by location cannot be retrieved, but can be removed.
     // - (void)getDeliveredNotificationsWithCompletionHandler:(void(^)(NSArray<UNNotification *> *notifications))completionHandler __TVOS_PROHIBITED;
     // - (void)removeDeliveredNotificationsWithIdentifiers:(NSArray<NSString *> *)identifiers __TVOS_PROHIBITED;
     // - (void)removeAllDeliveredNotifications __TVOS_PROHIBITED;
     // procedure getDeliveredNotificationsWithCompletionHandler(completionHandler: TUserNotificationsCompletionHandler3); cdecl;
-    // procedure removeDeliveredNotificationsWithIdentifiers(identifiers: NSArray); cdecl;
-    // procedure removeAllDeliveredNotifications; cdecl;
+    procedure removeDeliveredNotificationsWithIdentifiers(identifiers: NSArray); cdecl;
+    procedure removeAllDeliveredNotifications; cdecl;
 
   end;
   TUNUserNotificationCenter = class (TOCGenericImport<UNUserNotificationCenterClass, UNUserNotificationCenter>) end;

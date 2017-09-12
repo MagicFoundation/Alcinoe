@@ -4750,9 +4750,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetText(value)
-  else aNode.SetText(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetText(value)
+  else aTmpNode.SetText(value);
 end;
 
 {*************************************************************************************************}
@@ -4767,9 +4767,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetFloat(value)
-  else aNode.SetFloat(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetFloat(value)
+  else aTmpNode.SetFloat(value);
 end;
 
 {*******************************************************************************************************}
@@ -4784,9 +4784,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetDateTime(value)
-  else aNode.SetDateTime(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetDateTime(value)
+  else aTmpNode.SetDateTime(value);
 end;
 
 {***************************************************************************************************************}
@@ -4801,9 +4801,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetTimestamp(value)
-  else aNode.SetTimestamp(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetTimestamp(value)
+  else aTmpNode.SetTimestamp(value);
 end;
 
 {********************************************************************************************************}
@@ -4818,9 +4818,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetObjectID(value)
-  else aNode.SetObjectID(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetObjectID(value)
+  else aTmpNode.SetObjectID(value);
 end;
 
 {**************************************************************************************************}
@@ -4835,9 +4835,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetInt32(value)
-  else aNode.SetInt32(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetInt32(value)
+  else aTmpNode.SetInt32(value);
 end;
 
 {************************************************************************************************}
@@ -4852,9 +4852,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetInt64(value)
-  else aNode.SetInt64(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetInt64(value)
+  else aTmpNode.SetInt64(value);
 end;
 
 {*************************************************************************************************}
@@ -4869,9 +4869,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetBool(value)
-  else aNode.SetBool(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetBool(value)
+  else aTmpNode.SetBool(value);
 end;
 
 {**********************************************************************************************************}
@@ -4886,9 +4886,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetJavascript(value)
-  else aNode.SetJavascript(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetJavascript(value)
+  else aTmpNode.SetJavascript(value);
 end;
 
 {*****************************************************************************************************}
@@ -4903,9 +4903,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetRegEx(value)
-  else aNode.SetRegEx(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetRegEx(value)
+  else aTmpNode.SetRegEx(value);
 end;
 
 {*********************************************************************************************************************}
@@ -4920,9 +4920,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetRegExOptions(value)
-  else aNode.SetRegExOptions(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetRegExOptions(value)
+  else aTmpNode.SetRegExOptions(value);
 end;
 
 {******************************************************************************************************}
@@ -4937,9 +4937,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetBinary(value)
-  else aNode.SetBinary(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetBinary(value)
+  else aTmpNode.SetBinary(value);
 end;
 
 {*******************************************************************************************************}
@@ -4954,9 +4954,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetBinarySubType(value)
-  else aNode.SetBinarySubType(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetBinarySubType(value)
+  else aTmpNode.SetBinarySubType(value);
 end;
 
 {***************************************************************************}
@@ -4971,9 +4971,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetNull(true)
-  else aNode.SetNull(true);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetNull(true)
+  else aTmpNode.SetNull(true);
 end;
 
 {***********************************************}
@@ -10958,9 +10958,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetText(value)
-  else aNode.SetText(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetText(value)
+  else aTmpNode.SetText(value);
 end;
 
 {**********************************************************************************************}
@@ -10975,9 +10975,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetFloat(value)
-  else aNode.SetFloat(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetFloat(value)
+  else aTmpNode.SetFloat(value);
 end;
 
 {****************************************************************************************************}
@@ -10992,9 +10992,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetDateTime(value)
-  else aNode.SetDateTime(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetDateTime(value)
+  else aTmpNode.SetDateTime(value);
 end;
 
 {************************************************************************************************************}
@@ -11009,9 +11009,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetTimestamp(value)
-  else aNode.SetTimestamp(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetTimestamp(value)
+  else aTmpNode.SetTimestamp(value);
 end;
 
 {*************************************************************************************************}
@@ -11026,9 +11026,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetObjectID(value)
-  else aNode.SetObjectID(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetObjectID(value)
+  else aTmpNode.SetObjectID(value);
 end;
 
 {***********************************************************************************************}
@@ -11043,9 +11043,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetInt32(value)
-  else aNode.SetInt32(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetInt32(value)
+  else aTmpNode.SetInt32(value);
 end;
 
 {*********************************************************************************************}
@@ -11060,9 +11060,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetInt64(value)
-  else aNode.SetInt64(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetInt64(value)
+  else aTmpNode.SetInt64(value);
 end;
 
 {**********************************************************************************************}
@@ -11077,9 +11077,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetBool(value)
-  else aNode.SetBool(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetBool(value)
+  else aTmpNode.SetBool(value);
 end;
 
 {***************************************************************************************************}
@@ -11094,9 +11094,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetJavascript(value)
-  else aNode.SetJavascript(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetJavascript(value)
+  else aTmpNode.SetJavascript(value);
 end;
 
 {**********************************************************************************************}
@@ -11111,9 +11111,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetRegEx(value)
-  else aNode.SetRegEx(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetRegEx(value)
+  else aTmpNode.SetRegEx(value);
 end;
 
 {******************************************************************************************************************}
@@ -11128,9 +11128,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetRegExOptions(value)
-  else aNode.SetRegExOptions(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetRegExOptions(value)
+  else aTmpNode.SetRegExOptions(value);
 end;
 
 {***********************************************************************************************}
@@ -11145,9 +11145,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetBinary(value)
-  else aNode.SetBinary(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetBinary(value)
+  else aTmpNode.SetBinary(value);
 end;
 
 {****************************************************************************************************}
@@ -11162,9 +11162,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetBinarySubType(value)
-  else aNode.SetBinarySubType(value);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetBinarySubType(value)
+  else aTmpNode.SetBinarySubType(value);
 end;
 
 {************************************************************************}
@@ -11179,9 +11179,9 @@ begin
     if (aTmpNode = nil) then aNode := aNode.addChild(path[i], ntObject)
     else aNode := aTmpNode;
   end;
-  aNode := aNode.ChildNodes.findNode(path[high(path)]);
-  if (aNode = nil) then addChild(nodeName).SetNull(true)
-  else aNode.SetNull(true);
+  aTmpNode := aNode.ChildNodes.findNode(path[high(path)]);
+  if (aTmpNode = nil) then aNode.addChild(path[high(path)]).SetNull(true)
+  else aTmpNode.SetNull(true);
 end;
 
 {***********************************************}

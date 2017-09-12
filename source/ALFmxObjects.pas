@@ -711,7 +711,16 @@ begin
       //Stretch the image to fill the entire rectangle of the control.
       TALImageWrapMode.Stretch:
         begin
-          Result := nil; // todo
+          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+          {$IFDEF ALDPK}
+          if aFileName <> '' then fBufBitmap := ALLoadResizeAndStretchFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := nil;
+          {$ELSE}
+          fBufBitmap := ALLoadResizeAndStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          {$ENDIF}
+          result := fBufBitmap;
+          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                    CenterAt(fBufBitmapRect);
         end;
 
       //Tile (multiply) the image to cover the entire rectangle of the control:

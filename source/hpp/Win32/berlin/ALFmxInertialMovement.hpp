@@ -19,6 +19,7 @@
 #include <System.Classes.hpp>
 #include <System.Generics.Collections.hpp>
 #include <System.Messaging.hpp>
+#include <System.TypInfo.hpp>
 #include <FMX.Types.hpp>
 #include <ALFmxCommon.hpp>
 #include <System.Generics.Defaults.hpp>
@@ -81,11 +82,13 @@ private:
 	
 	
 private:
+	NativeUInt FTimerHandle;
+	bool fMouseEventReceived;
+	bool FTimerActive;
 	double FVelocityFactor;
 	bool FEnabled;
 	bool FInTimerProc;
 	System::Uitypes::TTouchTracking FTouchTracking;
-	NativeUInt FTimerHandle;
 	System::Word FInterval;
 	Alfmxcommon::TALPointD FCurrentVelocity;
 	Alfmxcommon::TALPointD FUpVelocity;
@@ -104,6 +107,7 @@ private:
 	bool FCancelTargetY;
 	System::Classes::TNotifyEvent FOnStart;
 	System::Classes::TNotifyEvent FOnTimer;
+	System::Classes::TNotifyEvent FOnChanged;
 	System::Classes::TNotifyEvent FOnStop;
 	bool FDown;
 	bool FAnimation;
@@ -231,18 +235,20 @@ public:
 	__property bool Down = {read=FDown, write=SetDown, nodefault};
 	__property float Opacity = {read=GetOpacity};
 	__property bool InTimerProc = {read=FInTimerProc, nodefault};
+	void __fastcall Calculate(void);
 	__property bool Moved = {read=FMoved, nodefault};
 	__property bool LowVelocity = {read=GetLowVelocity, nodefault};
 	void __fastcall BeginUpdate(void);
 	void __fastcall EndUpdate(void);
 	__property int UpdateCount = {read=FUpdateCount, nodefault};
 	__property System::Classes::TNotifyEvent OnStart = {read=FOnStart, write=FOnStart};
-	__property System::Classes::TNotifyEvent OnChanged = {read=FOnTimer, write=FOnTimer};
+	__property System::Classes::TNotifyEvent OnTimer = {read=FOnTimer, write=FOnTimer};
+	__property System::Classes::TNotifyEvent OnChanged = {read=FOnChanged, write=FOnChanged};
 	__property System::Classes::TNotifyEvent OnStop = {read=FOnStop, write=FOnStop};
 	__property int DeadZone = {read=FDeadZone, write=FDeadZone, default=8};
 	
 __published:
-	__property System::Word Interval = {read=FInterval, write=SetInterval, default=16};
+	__property System::Word Interval = {read=FInterval, write=SetInterval, default=10};
 	__property double DecelerationRate = {read=FDecelerationRate, write=FDecelerationRate, stored=DecelerationRateStored};
 	__property double Elasticity = {read=FElasticity, write=FElasticity, stored=ElasticityStored};
 	__property double StorageTime = {read=FStorageTime, write=FStorageTime, stored=StorageTimeStored};
@@ -253,7 +259,7 @@ __published:
 
 //-- var, const, procedure ---------------------------------------------------
 #define ALDefaultStorageTime  (1.500000E-01)
-static const System::Int8 ALDefaultIntervalOfAni = System::Int8(0x10);
+static const System::Int8 ALDefaultIntervalOfAni = System::Int8(0xa);
 #define ALDecelerationRateNormal  (1.950000E+00)
 #define ALDecelerationRateFast  (9.500000E+00)
 static const System::Int8 ALDefaultElasticity = System::Int8(0x64);
@@ -261,6 +267,7 @@ static const System::Int8 ALDefaultMinVelocity = System::Int8(0xa);
 static const System::Word ALDefaultMaxVelocity = System::Word(0x1388);
 static const System::Int8 ALDefaultDeadZone = System::Int8(0x8);
 static const System::Int8 ALDefaultVelocityFactor = System::Int8(0x1);
+extern DELPHI_PACKAGE System::Generics::Collections::TList__1<Fmx::Types::TTimerProc>* ALDisplayTimerProcs;
 }	/* namespace Alfmxinertialmovement */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXINERTIALMOVEMENT)
 using namespace Alfmxinertialmovement;

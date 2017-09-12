@@ -556,6 +556,18 @@ extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndFitResou
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndFitFileImageV1(const System::UnicodeString aFileName, const float W, const float H);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndFitFileImageV2(const System::UnicodeString aFileName, const float W, const float H);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndFitFileImageV3(const System::UnicodeString aFileName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndStretchImageV1(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndStretchImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndStretchImageV2(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndStretchImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndStretchImageV3(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndStretchImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchResourceImageV1(const System::UnicodeString aResName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchResourceImageV2(const System::UnicodeString aResName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchResourceImageV3(const System::UnicodeString aResName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchFileImageV1(const System::UnicodeString aFileName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchFileImageV2(const System::UnicodeString aFileName, const float W, const float H);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchFileImageV3(const System::UnicodeString aFileName, const float W, const float H);
 }	/* namespace Alfmxcommon */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXCOMMON)
 using namespace Alfmxcommon;

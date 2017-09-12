@@ -44,6 +44,7 @@ type
   protected
   public
     constructor Create(const aVolatile: Boolean = False); reintroduce;
+    destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     property isExternalOES: boolean read fisExternalOES;
   end;
@@ -69,6 +70,11 @@ type
   public
   end;
 
+{$IFDEF DEBUG}
+var TotalMemoryUsedByTextures: int64;
+    LastTotalMemoryUsedByTexturesLog: int64;
+{$ENDIF}
+
 implementation
 
 uses {$IF defined(ANDROID)}
@@ -92,6 +98,15 @@ begin
    fVolatile := aVolatile;
    if fVolatile then Style := Style + [TTextureStyle.Volatile];
    FisExternalOES := False;
+end;
+
+{****************************}
+destructor TALTexture.Destroy;
+begin
+  {$IFDEF DEBUG}
+  if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  {$ENDIF}
+  inherited Destroy;
 end;
 
 {************************}
@@ -122,6 +137,10 @@ procedure TALTexture.Assign(Source: TPersistent);
 var
   M: TBitmapData;
 begin
+
+  {$IFDEF DEBUG}
+  if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  {$ENDIF}
 
   if Source is TBitmap then begin
     {$IF CompilerVersion >= 32} // tokyo
@@ -167,6 +186,11 @@ begin
   else inherited ;
 
   {$IFDEF DEBUG}
+  if PixelFormat <> TPixelFormat.None then AtomicIncrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
+  if TThread.GetTickCount - AtomicCmpExchange(LastTotalMemoryUsedByTexturesLog, 0, 0) > 1000 then begin // every 1 sec
+    AtomicExchange(LastTotalMemoryUsedByTexturesLog, TThread.GetTickCount); // oki maybe 2 or 3 log can be show simultaneously. i will not died for this !
+    ALLog('TALTexture', 'TotalMemoryUsedByTextures: ' + ALFormatFloatU('0.##', AtomicCmpExchange(TotalMemoryUsedByTextures, 0, 0) / 1000000, ALDefaultFormatSettingsU) +' MB', TalLogType.verbose);
+  end;
   if TALTextureAccessPrivate(self).FBits <> nil then
     ALLog('TALTexture.Assign', 'Bits: ' + ALFormatFloatU('0.##',(Width * Height * BytesPerPixel) / 1000, ALDefaultFormatSettingsU) +' kB', TalLogType.Warn);
   {$ENDIF}
@@ -433,5 +457,13 @@ begin
     )
   ]);
 end;
+
+
+initialization
+
+  {$IFDEF DEBUG}
+  TotalMemoryUsedByTextures := 0;
+  LastTotalMemoryUsedByTexturesLog := 0;
+  {$ENDIF}
 
 end.

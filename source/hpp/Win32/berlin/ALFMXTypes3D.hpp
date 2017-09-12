@@ -68,11 +68,9 @@ private:
 	
 public:
 	__fastcall TALTexture(const bool aVolatile);
+	__fastcall virtual ~TALTexture(void);
 	virtual void __fastcall Assign(System::Classes::TPersistent* Source);
 	__property bool isExternalOES = {read=FisExternalOES, nodefault};
-public:
-	/* TTexture.Destroy */ inline __fastcall virtual ~TALTexture(void) { }
-	
 };
 
 #pragma pack(pop)

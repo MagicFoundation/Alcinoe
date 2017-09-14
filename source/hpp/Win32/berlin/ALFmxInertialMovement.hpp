@@ -139,7 +139,6 @@ private:
 	System::Classes::TNotifyEvent FOnCalcVelocity;
 	void __fastcall StartTimer(void);
 	void __fastcall StopTimer(void);
-	void __fastcall TimerProc(void);
 	void __fastcall Clear(System::TDateTime T = 0.000000E+00);
 	void __fastcall UpdateTimer(void);
 	void __fastcall SetInterval(const System::Word Value);
@@ -209,6 +208,7 @@ public:
 	__fastcall virtual ~TALAniCalculations(void);
 	virtual void __fastcall AfterConstruction(void);
 	virtual void __fastcall Assign(System::Classes::TPersistent* Source);
+	void __fastcall TimerProc(void);
 	virtual void __fastcall MouseDown(double X, double Y);
 	virtual void __fastcall MouseMove(double X, double Y);
 	virtual void __fastcall MouseLeave(void);
@@ -267,7 +267,7 @@ static const System::Int8 ALDefaultMinVelocity = System::Int8(0xa);
 static const System::Word ALDefaultMaxVelocity = System::Word(0x1388);
 static const System::Int8 ALDefaultDeadZone = System::Int8(0x8);
 static const System::Int8 ALDefaultVelocityFactor = System::Int8(0x1);
-extern DELPHI_PACKAGE System::Generics::Collections::TList__1<Fmx::Types::TTimerProc>* ALDisplayTimerProcs;
+extern DELPHI_PACKAGE System::Generics::Collections::TList__1<TALAniCalculations*>* ALAniCalcTimerProcs;
 }	/* namespace Alfmxinertialmovement */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXINERTIALMOVEMENT)
 using namespace Alfmxinertialmovement;

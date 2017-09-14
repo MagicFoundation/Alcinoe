@@ -57,41 +57,6 @@ const
   ALDefaultDeadZone = 8;
   ALDefaultVelocityFactor = 1;
 
-var
-  ALDisplayTimerProcs: Tlist<TTimerProc>; // << i add this because i don't like the idea that the anicalculations work on a timer
-                                          // << i prefere that the timer proc is call before each paint that at a fixed intervall
-                                          // << (that is never really fixed). so i add this variable but to use it you must update
-                                          // << FMX.Platform.Android and add:
-                                          // <<
-                                          // << procedure TPlatformAndroid.InternalProcessMessages;
-                                          // <<
-                                          // <<   if TThread.CurrentThread.ThreadID = MainThreadID then
-                                          // <<     begin
-                                          // <<       for i := 0 to ALDisplayTimerProcs.Count - 1 do
-                                          // <<         ALDisplayTimerProcs[i]();
-                                          // <<       end;
-                                          // <<
-                                          // <<   just before
-                                          // <<
-                                          // <<   if TWindowManager.Current.RenderIfNeeds then
-                                          // <<     HasEvents := True;
-                                          // <<
-                                          // << and also update :
-                                          // <<
-                                          // << constructor TPlatformAndroid.Create;
-                                          // << begin
-                                          // <<   inherited;
-                                          // <<   ALDisplayTimerProcs := Tlist<TTimerProc>.create; // added to support ALFmxInertialMovement
-                                          // <<   ....
-                                          // << end;
-                                          // <<
-                                          // << destructor TPlatformAndroid.Destroy;
-                                          // << begin
-                                          // <<   ...
-                                          // <<   ALDisplayTimerProcs.Free; // added to support ALFmxInertialMovement
-                                          // <<   inherited;
-                                          // << end;
-
 type
 
   TALAniCalculations = class(TPersistent)
@@ -193,9 +158,6 @@ type
     {$ENDIF}
     procedure StartTimer;
     procedure StopTimer;
-    {$IF not defined(IOS)}
-    procedure TimerProc;
-    {$ENDIF}
     procedure Clear(T: TDateTime = 0);
     procedure UpdateTimer;
     procedure SetInterval(const Value: Word);
@@ -263,6 +225,9 @@ type
     destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure Assign(Source: TPersistent); override;
+    {$IF not defined(IOS)}
+    procedure TimerProc;
+    {$ENDIF}
     procedure MouseDown(X, Y: Double); virtual;
     procedure MouseMove(X, Y: Double); virtual;
     procedure MouseLeave; virtual;
@@ -317,6 +282,41 @@ type
     property OnCalcVelocity: TNotifyEvent read FOnCalcVelocity write FOnCalcVelocity; // << we this you can dynamically calc the velocity
   end;
 
+var
+  ALAniCalcTimerProcs: Tlist<TALAniCalculations>; // << i add this because i don't like the idea that the anicalculations work on a timer
+                                                  // << i prefere that the timer proc is call before each paint that at a fixed intervall
+                                                  // << (that is never really fixed). so i add this variable but to use it you must update
+                                                  // << FMX.Platform.Android and add:
+                                                  // <<
+                                                  // << procedure TPlatformAndroid.InternalProcessMessages;
+                                                  // <<
+                                                  // <<   if TThread.CurrentThread.ThreadID = MainThreadID then
+                                                  // <<     begin
+                                                  // <<       for i := ALAniCalcTimerProcs.Count - 1 downto 0 do
+                                                  // <<         ALAniCalcTimerProcs[i].timerProc;
+                                                  // <<       end;
+                                                  // <<
+                                                  // <<   just before
+                                                  // <<
+                                                  // <<   if TWindowManager.Current.RenderIfNeeds then
+                                                  // <<     HasEvents := True;
+                                                  // <<
+                                                  // << and also update :
+                                                  // <<
+                                                  // << constructor TPlatformAndroid.Create;
+                                                  // << begin
+                                                  // <<   inherited;
+                                                  // <<   ALAniCalcTimerProcs := Tlist<TALAniCalculations>.create; // added to support ALFmxInertialMovement
+                                                  // <<   ....
+                                                  // << end;
+                                                  // <<
+                                                  // << destructor TPlatformAndroid.Destroy;
+                                                  // << begin
+                                                  // <<   ...
+                                                  // <<   ALAniCalcTimerProcs.Free; // added to support ALFmxInertialMovement
+                                                  // <<   inherited;
+                                                  // << end;
+
 implementation
 
 uses System.SysUtils,
@@ -326,6 +326,11 @@ uses System.SysUtils,
      ALCommon,
      {$IFDEF DEBUG}
      AlString,
+     {$ENDIF}
+     {$IFDEF ANDROID}
+     Androidapi.AppGlue,
+     Androidapi.Looper,
+     Fmx.platform.Android,
      {$ENDIF}
      {$IFDEF IOS}
      Macapi.CoreFoundation,
@@ -756,7 +761,7 @@ begin
   {$IFDEF IOS}
   fDisplayLink.setPaused(False);
   {$ELSE}
-  if ALDisplayTimerProcs <> nil then ALDisplayTimerProcs.Add(TimerProc)
+  if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Add(self)
   else begin
     if FTimerHandle = TFmxHandle(-1) then
     begin
@@ -779,7 +784,7 @@ begin
     FPlatformTimer.DestroyTimer(FTimerHandle);
     FTimerHandle := TFmxHandle(-1);
   end
-  else if ALDisplayTimerProcs <> nil then ALDisplayTimerProcs.Remove(TimerProc);
+  else if ALAniCalcTimerProcs <> nil then ALAniCalcTimerProcs.Remove(self);
   {$ENDIF}
 end;
 
@@ -971,6 +976,10 @@ var
   D, T: TDateTime;
   IsInit: Boolean;
   DOpacity: Single;
+  {$IFDEF ANDROID}
+  PEventPollSource: Pandroid_poll_source;
+  EventPollValue: Integer;
+  {$ENDIF}
 begin
 
   if (FTimerActive) and (not FInTimerProc) then
@@ -984,15 +993,40 @@ begin
 
     FInTimerProc := True;
 
+    {$IF CompilerVersion > 31} // berlin
+      {$MESSAGE WARN 'Check if the behavior below is still ok and and adjust the IFDEF'}
+    {$ENDIF}
+    {$IFDEF ANDROID}
+    // you put you finger, you move => result in jerks!
+    // why ? because their is 16ms between each paint, BUT if you call very often the paint,
+    // then maybe you can miss some move event resulting in drop frame (not really dropped
+    // but as you miss the move event look like it's dropped because it's didn't move)
+    // ex:
+    // T=0 paint (ok)
+    // T=16 mouse move (ok)
+    // T=16 paint OK
+    // T=32 paint (aie we didn't receive yet the move move, that maybe is in the nanosecond later) result in drop frame
+    if down and (not fMouseEventReceived) then begin
+      T := FPlatformTimer.getTick;
+      while (not fMouseEventReceived) and (FPlatformTimer.getTick - T < 0.004) do begin
+        EventPollValue := ALooper_pollAll(1, nil, nil, PPointer(@PEventPollSource));
+        if (EventPollValue = ALOOPER_POLL_ERROR) or (EventPollValue = ALOOPER_POLL_TIMEOUT) then continue;
+        if GetAndroidApp.destroyRequested <> 0 then continue;
+        if (PEventPollSource <> nil) and Assigned(PEventPollSource^.process) then PEventPollSource^.process(GetAndroidApp, PEventPollSource);
+      end;
+    end;
+    {$ENDIF}
     {$IFDEF IOS}
     // this hack to handle https://stackoverflow.com/questions/46157947/ios-how-to-check-for-touch-event-between-2-frame-updates
     // so the idea is that if the mouse is down and not yet processed the mouse move then wait max 2 ms
     if down and (not fMouseEventReceived) then begin
-      while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.004, true) = kCFRunLoopRunHandledSource) do
-        if fMouseEventReceived then break;
+      T := FPlatformTimer.getTick;
+      while (not fMouseEventReceived) and (FPlatformTimer.getTick - T < 0.004) do begin
+        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.001, true);
+      end;
     end;
-    fMouseEventReceived := False;
     {$ENDIF}
+    fMouseEventReceived := False;
 
     T := FPlatformTimer.getTick/SecsPerDay;
     IsInit := FLastTimeCalc > 0;
@@ -1803,6 +1837,6 @@ end;
 
 initialization
   ALEpsilonRange := Trunc(Log10(ALEpsilonPoint));
-  ALDisplayTimerProcs := nil;
+  ALAniCalcTimerProcs := nil;
 
 end.

@@ -1078,24 +1078,36 @@ end;
 function TALAndroidEdit.getLineHeight: Single;
 var aLineHeight: single;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.getLineHeight', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
       aLineHeight := fUIMembers.FEditText.getLineHeight / FScreenScale;
     end);
   result := aLineHeight;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.getLineHeight', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {********************************************}
 function TALAndroidEdit.getLineCount: integer;
 var aLineCount: integer;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.getLineCount', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
       aLineCount := fUIMembers.FEditText.getLineCount;
     end);
   result := aLineCount;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.getLineCount', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {*******************************************************************}
@@ -1271,12 +1283,18 @@ end;
 function TALAndroidEdit.GetLineSpacingMultiplier: single;
 var aLineSpacingMultiplier: single;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetLineSpacingMultiplier', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
       aLineSpacingMultiplier := fUIMembers.FEditText.getLineSpacingMultiplier
     end);
   result := aLineSpacingMultiplier;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetLineSpacingMultiplier', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {*********************************************************************}
@@ -1293,12 +1311,18 @@ end;
 function TALAndroidEdit.GetLineSpacingExtra: single;
 var aLineSpacingExtra: single;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetLineSpacingExtra', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
       aLineSpacingExtra := fUIMembers.FEditText.getLineSpacingExtra
     end);
   result := aLineSpacingExtra;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetLineSpacingExtra', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {****************************************************************}
@@ -1369,12 +1393,18 @@ end;
 function TALAndroidEdit.GetTextPromptColor: TAlphaColor;
 var aColor: TAlphaColor;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetTextPromptColor', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
       aColor := fUIMembers.FEditText.getCurrentHintTextColor;
     end);
   result := aColor;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetTextPromptColor', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {********************************************************************}
@@ -1392,6 +1422,9 @@ end;
 function TALAndroidEdit.getText: String;
 var aText: JCharSequence;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.getText', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   // i don't understand why but on some device, just after the app is created
   // and not already fully working then the instruction CallInUIThreadAndWaitFinishing
   // below will never finished :( i see it on a galaxy tab 3 (so low quality device)
@@ -1404,6 +1437,9 @@ begin
       aText := FUIMembers.FEditText.gettext;
     end);
   result := JCharSequenceToStr(aText);
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.getText', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {****************************************************}
@@ -1493,6 +1529,9 @@ end;
 function TALAndroidEdit.GetEditText: JALEditText;
 var aEditText: JALEditText;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetEditText', 'start', TalLogType.VERBOSE);
+  {$ENDIF}
   // wee CallInUIThreadAndWaitFinishing to be sure that the FEditText was
   // created
   CallInUIThreadAndWaitFinishing(
@@ -1501,6 +1540,9 @@ begin
       aEditText := fUIMembers.FEditText;
     end);
   result := aEditText;
+  {$IF defined(DEBUG)}
+  ALLog('TALAndroidEdit.GetEditText', 'end', TalLogType.VERBOSE);
+  {$ENDIF}
 end;
 
 {*****************************************************************************************}

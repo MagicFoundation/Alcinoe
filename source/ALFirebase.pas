@@ -899,12 +899,12 @@ begin
                                           HandleNotificationIntent(MainActivity.getIntent); // it's seam that BecameActive will be fire after the formCreate so everything is OK if
                                         end;                                                // we create the TALFirebaseMessagingClient in the formCreate
                                       end;
-      TApplicationEvent.EnteredBackground,
-      TApplicationEvent.WillBecomeInactive: begin
+      TApplicationEvent.EnteredBackground: begin
                                               aWasConnected := fconnected;
                                               disconnect;
                                               fconnected := aWasConnected;
                                             end;
+      TApplicationEvent.WillBecomeInactive:; // << don't do anything here, because this event is fired when for exemple we open the keyboard
     end;
   end;
 end;
@@ -1271,8 +1271,7 @@ begin
       TApplicationEvent.BecameActive: begin
                                         if connected then connect;
                                       end;
-      TApplicationEvent.EnteredBackground,
-      TApplicationEvent.WillBecomeInactive: begin
+      TApplicationEvent.EnteredBackground: begin
                                               // Call this before `teardown` when your app is going to the background.
                                               // Since the FIRMessaging connection won't be allowed to live when in background it is
                                               // prudent to close the connection.
@@ -1281,6 +1280,9 @@ begin
                                               allog('TALFirebaseMessagingClient.applicationEvent','Disconnected from FCM', TalLogType.VERBOSE);
                                               {$ENDIF}
                                             end;
+      TApplicationEvent.WillBecomeInactive:; // << don't do anything here, because this event is fired when for exemple we open notification center
+                                             // << NOTE: i notice that even calling disconnect from here don't really disconnect the FCM as we still
+                                             // <<       receive the notification in the app
     end;
   end;
 end;

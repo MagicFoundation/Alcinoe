@@ -373,12 +373,38 @@ function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
 function  ALAlignToPixelRound(const Rect: TRectF): TRectF;
 function  ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF; overload;
 function  ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
+function  ALGetFileSize(const FileName : string): Int64;
+function  AlDetectImageExtension(const aFileName: string): String;
 
 type
 
     TALResizeImageGetDestSizeFunct = reference to function(const aOriginalSize: TPointF): TpointF;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+//https://i.stack.imgur.com/CcESX.png - transparent pixel in the mask are removed from the resulting image
+function  ALResizeAndCropAsMaskImageV1(const aStream: TCustomMemoryStream; const aMask: Tbitmap; const aCropCenter: TPointF): Tbitmap; overload;
+function  ALResizeAndCropAsMaskImageV1(const aStream: TCustomMemoryStream; const aMask: Tbitmap): Tbitmap; overload;
+function  ALResizeAndCropAsMaskImageV2(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALResizeAndCropAsMaskImageV2(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALResizeAndCropAsMaskImageV3(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+function  ALResizeAndCropAsMaskImageV3(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+//-----
+function  ALLoadResizeAndCropResourceAsMaskImageV1(const aResName: String; const aMask: Tbitmap; const aCropCenter: TPointF): Tbitmap; overload;
+function  ALLoadResizeAndCropResourceAsMaskImageV1(const aResName: String; const aMask: Tbitmap): Tbitmap; overload;
+function  ALLoadResizeAndCropResourceAsMaskImageV2(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALLoadResizeAndCropResourceAsMaskImageV2(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALLoadResizeAndCropResourceAsMaskImageV3(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+function  ALLoadResizeAndCropResourceAsMaskImageV3(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+
+//resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as round rect
+function  ALResizeAndCropAsRoundRectImageV1(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single; const aCropCenter: TPointF): Tbitmap; overload;
+function  ALResizeAndCropAsRoundRectImageV1(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single): Tbitmap; overload;
+function  ALResizeAndCropAsRoundRectImageV2(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALResizeAndCropAsRoundRectImageV2(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALResizeAndCropAsRoundRectImageV3(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+function  ALResizeAndCropAsRoundRectImageV3(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+
+//resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
 function  ALResizeAndCropAsCircleImageV1(const aStream: TCustomMemoryStream; const W, H: single; const aCropCenter: TPointF): Tbitmap; overload;
 function  ALResizeAndCropAsCircleImageV1(const aStream: TCustomMemoryStream; const W, H: single): Tbitmap; overload;
 function  ALResizeAndCropAsCircleImageV2(const aStream: TCustomMemoryStream; const W, H: single; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
@@ -386,6 +412,14 @@ function  ALResizeAndCropAsCircleImageV2(const aStream: TCustomMemoryStream; con
 function  ALResizeAndCropAsCircleImageV3(const aStream: TCustomMemoryStream; const W, H: single; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
 function  ALResizeAndCropAsCircleImageV3(const aStream: TCustomMemoryStream; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
 //-----
+function  ALLoadResizeAndCropResourceAsCircleImageV1(const aResName: String; const W, H: single; const aCropCenter: TPointF): Tbitmap; overload;
+function  ALLoadResizeAndCropResourceAsCircleImageV1(const aResName: String; const W, H: single): Tbitmap; overload;
+function  ALLoadResizeAndCropResourceAsCircleImageV2(const aResName: String; const W, H: single; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALLoadResizeAndCropResourceAsCircleImageV2(const aResName: String; const W, H: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
+function  ALLoadResizeAndCropResourceAsCircleImageV3(const aResName: String; const W, H: single; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+function  ALLoadResizeAndCropResourceAsCircleImageV3(const aResName: String; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
+
+//resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
 function  ALResizeAndCropImageV1(const aStream: TCustomMemoryStream; const aGetDestSizeFunct: TALResizeImageGetDestSizeFunct; const aCropCenter: TPointF): Tbitmap; overload;
 function  ALResizeAndCropImageV1(const aStream: TCustomMemoryStream; const W, H: single; const aCropCenter: TPointF): Tbitmap; overload;
 function  ALResizeAndCropImageV1(const aStream: TCustomMemoryStream; const W, H: single): Tbitmap; overload;
@@ -409,7 +443,8 @@ function  ALLoadResizeAndCropFileImageV2(const aFileName: String; const W, H: si
 function  ALLoadResizeAndCropFileImageV2(const aFileName: String; const W, H: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
 function  ALLoadResizeAndCropFileImageV3(const aFileName: String; const W, H: single; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
 function  ALLoadResizeAndCropFileImageV3(const aFileName: String; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; overload;
-//-----
+
+//resize the src image to make that one side fit w or h keeping the other side equal or lower than w or h
 function  ALResizeAndFitImageV1(const aStream: TCustomMemoryStream; const aGetDestSizeFunct: TALResizeImageGetDestSizeFunct): Tbitmap; overload;
 function  ALResizeAndFitImageV1(const aStream: TCustomMemoryStream; const W, H: single): Tbitmap; overload;
 function  ALResizeAndFitImageV2(const aStream: TCustomMemoryStream; const aGetDestSizeFunct: TALResizeImageGetDestSizeFunct): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
@@ -424,7 +459,8 @@ function  ALLoadResizeAndFitResourceImageV3(const aResName: String; const W, H: 
 function  ALLoadResizeAndFitFileImageV1(const aFileName: String; const W, H: single): Tbitmap;
 function  ALLoadResizeAndFitFileImageV2(const aFileName: String; const W, H: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
 function  ALLoadResizeAndFitFileImageV3(const aFileName: String; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
-//-----
+
+//resize the src image to make that width = w and height = h
 function  ALResizeAndStretchImageV1(const aStream: TCustomMemoryStream; const aGetDestSizeFunct: TALResizeImageGetDestSizeFunct): Tbitmap; overload;
 function  ALResizeAndStretchImageV1(const aStream: TCustomMemoryStream; const W, H: single): Tbitmap; overload;
 function  ALResizeAndStretchImageV2(const aStream: TCustomMemoryStream; const aGetDestSizeFunct: TALResizeImageGetDestSizeFunct): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; overload;
@@ -439,6 +475,21 @@ function  ALLoadResizeAndStretchResourceImageV3(const aResName: String; const W,
 function  ALLoadResizeAndStretchFileImageV1(const aFileName: String; const W, H: single): Tbitmap;
 function  ALLoadResizeAndStretchFileImageV2(const aFileName: String; const W, H: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
 function  ALLoadResizeAndStretchFileImageV3(const aFileName: String; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+
+//get the oritation From Exif
+Type
+
+  TalExifOrientationInfo = (FLIP_HORIZONTAL,
+                            FLIP_VERTICAL,
+                            NORMAL,
+                            ROTATE_180,
+                            ROTATE_270,
+                            ROTATE_90,
+                            TRANSPOSE,
+                            TRANSVERSE,
+                            UNDEFINED);
+
+function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
 
 
 {$IF defined(IOS)}
@@ -670,7 +721,7 @@ type
     Padding: TRectF;  // default = 0
     //-----
     TextIsHtml: boolean; // default = false;
-                         // NOTE: it's a partial html implementation, just for styling like <b>, <font color="">, etc.
+                         // NOTE: it's a partial html implementation, just for styling like <b>, <font color="">, <img src="xxx">, etc.
                          //       For exemple #13#10 are handle like breakline and not like space
     //-----
     constructor Create;
@@ -691,6 +742,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // out => true if the text was "breaked" in several lines
@@ -707,6 +759,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // true is the text was "breaked" in several lines
@@ -717,6 +770,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // out => true is the text was "breaked" in several lines
@@ -726,6 +780,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF}; inline; overload;
@@ -1015,6 +1070,7 @@ uses system.SysUtils,
      Androidapi.Bitmap,
      Androidapi.JNI.OpenGL,
      Androidapi.Gles2,
+     Androidapi.JNI.Media,
      FMX.Context.GLES,
      FMX.Context.GLES.Android,
      FMX.Helpers.Android,
@@ -1027,6 +1083,7 @@ uses system.SysUtils,
      Macapi.ObjectiveC,
      Macapi.CoreFoundation,
      Macapi.Helpers,
+     ALIosImageIOApi,
      ALFmxTypes3D,
      {$IFEND}
      fmx.consts,
@@ -4622,6 +4679,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // out => true if the text was "breaked" in several lines
@@ -5478,6 +5536,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // true is the text was "breaked" in several lines
@@ -5509,6 +5568,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               var aTextBreaked: boolean; // true is the text was "breaked" in several lines
@@ -5540,6 +5600,7 @@ function  ALDrawMultiLineText(const aText: String; // support only theses EXACT 
                                                    //   <i>...</i>
                                                    //   <font color="#xxxxxx">...</font>
                                                    //   <span id="xxx">...</span>
+                                                   //   <img src="xxx">
                                                    // other < > must be encoded with &lt; and &gt;
                               var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
                               const aOptions: TALDrawMultiLineTextOptions): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
@@ -7423,6 +7484,1039 @@ begin
   Result := ALRectFitInto(R, Bounds, CenterAt, Ratio);
 end;
 
+{******************************************************}
+function ALGetFileSize(const FileName : string) : Int64;
+var aFileStream: TFileStream;
+begin
+  aFileStream := TFileStream.Create(FileName, fmOpenRead);
+  try
+    result := aFileStream.Size;
+  finally
+    alFreeAndNil(aFileStream);
+  end;
+end;
+
+{******************************************************}
+// https://en.wikipedia.org/wiki/List_of_file_signatures
+function  AlDetectImageExtension(const aFileName: string): String;
+var aFileStream: TFileStream;
+    aFirstBytes: Tbytes;
+begin
+  aFileStream := TFileStream.Create(aFileName, fmOpenRead);
+  try
+    if aFileStream.Size < 8 then exit('');
+    SetLength(aFirstBytes, 8);
+    aFileStream.ReadBuffer(aFirstBytes[0], length(aFirstBytes));
+    if (aFirstBytes[0] = $FF) and
+       (aFirstBytes[1] = $D8) then result := 'jpg'  // ÿØ
+    else if (aFirstBytes[0] = $89) and
+            (aFirstBytes[1] = $50) and
+            (aFirstBytes[2] = $4E) and
+            (aFirstBytes[3] = $47) and
+            (aFirstBytes[4] = $0D) and
+            (aFirstBytes[5] = $0A) and
+            (aFirstBytes[6] = $1A ) and
+            (aFirstBytes[7] = $0A) then result := 'png' // .PNG....
+    else if (aFirstBytes[0] = $47) and
+            (aFirstBytes[1] = $49) and
+            (aFirstBytes[2] = $46) then result := 'gif' // GIF
+    else if (aFirstBytes[0] = $42) and
+            (aFirstBytes[1] = $4D) then result := 'bmp' // BM
+    else result := '';
+  finally
+    aFileStream.Free;
+  end;
+end;
+
+{**********************************************************************************************************************************************************************}
+function ALResizeAndCropAsRoundRectImageV1(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single; const aCropCenter: TPointF): Tbitmap;
+var aBitmap: TBitmap;
+    aTmpResult: Tbitmap;
+    aTmpCropCenter: TPointF;
+begin
+
+  //init local var
+  aTmpCropCenter := aCropCenter;
+
+  {$IF CompilerVersion <= 31} {Delphi berlin}
+  //synchronize because Tbitmap is not multithread
+  Tthread.Synchronize(nil,
+  Procedure
+  begin
+  {$IFEND}
+
+    aBitmap := ALResizeAndCropImageV1(aStream, W, H, aTmpCropCenter);
+    try
+
+      aTmpResult := TBitmap.Create(round(W),round(H));
+      try
+
+        aTmpResult.Clear(TAlphaColorRec.Null);
+        if aTmpResult.Canvas.BeginScene then
+        try
+          aTmpResult.Canvas.Fill.Bitmap.Bitmap.Assign(aBitmap);
+          aTmpResult.Canvas.Fill.bitmap.WrapMode := TWrapMode.TileStretch;
+          aTmpResult.Canvas.Fill.Kind := TbrushKind.Bitmap;
+          aTmpResult.Canvas.FillRect(TRectF.Create(0,0, W, H),
+                                     XRadius,
+                                     YRadius,
+                                     AllCorners,
+                                     1 {AOpacity});
+        finally
+          aTmpResult.Canvas.EndScene;
+        end;
+
+      except
+        AlFreeAndNil(aTmpResult);
+        raise;
+      end;
+
+    finally
+      AlFreeAndNil(aBitmap);
+    end;
+
+  {$IF CompilerVersion <= 31} {Delphi berlin}
+  end);
+  {$IFEND}
+
+  result := aTmpResult;
+
+end;
+
+{***********************************************************************************************************************************}
+function ALResizeAndCropAsMaskImageV1(const aStream: TCustomMemoryStream; const aMask: Tbitmap; const aCropCenter: TPointF): Tbitmap;
+var aBitmap: TBitmap;
+    aTmpResult: Tbitmap;
+    aTmpCropCenter: TPointF;
+    D, B, M: TBitmapData;
+    w, h: single;
+begin
+
+  //init local var
+  aTmpCropCenter := aCropCenter;
+  w := aMask.Width;
+  h := aMask.height;
+
+  {$IF CompilerVersion <= 31} {Delphi berlin}
+  //synchronize because Tbitmap is not multithread
+  Tthread.Synchronize(nil,
+  Procedure
+  var C: TAlphaColor;
+      ratio: single;
+      I, J: Integer;
+  begin
+  {$IFEND}
+
+    aBitmap := ALResizeAndCropImageV1(aStream, W, H, aTmpCropCenter);
+    try
+
+      aTmpResult := TBitmap.Create(round(W),round(H));
+      try
+
+        if aTmpResult.Map(TMapAccess.Write, D) then
+        try
+          if aBitmap.Map(TMapAccess.Read, B) then
+          try
+            if aMask.Map(TMapAccess.Read, M) then
+            try
+              for J := 0 to aTmpResult.Height - 1 do
+                for I := 0 to aTmpResult.Width - 1 do
+                begin
+                  C := B.GetPixel(I, J);
+                  TAlphaColorRec(C).A := TAlphaColorRec(M.GetPixel(I, J)).A;
+                  if TAlphaColorRec(C).A < 255 then begin  // << don't ask me why we need to do this :(
+                    ratio := TAlphaColorRec(C).A / 255;
+                    TAlphaColorRec(C).R := round(TAlphaColorRec(C).R * ratio);
+                    TAlphaColorRec(C).G := round(TAlphaColorRec(C).G * ratio);
+                    TAlphaColorRec(C).B := round(TAlphaColorRec(C).B * ratio);
+                  end;
+                  D.SetPixel(I, J, C);
+                end;
+            finally
+              aMask.Unmap(M);
+            end;
+          finally
+            aBitmap.Unmap(B);
+          end;
+        finally
+          aTmpResult.Unmap(D);
+        end;
+
+      except
+        AlFreeAndNil(aTmpResult);
+        raise;
+      end;
+
+    finally
+      AlFreeAndNil(aBitmap);
+    end;
+
+  {$IF CompilerVersion <= 31} {Delphi berlin}
+  end);
+  {$IFEND}
+
+  result := aTmpResult;
+
+end;
+
+{*******************************************************************************************************}
+function ALResizeAndCropAsMaskImageV1(const aStream: TCustomMemoryStream; const aMask: Tbitmap): Tbitmap;
+begin
+  result := ALResizeAndCropAsMaskImageV1(aStream, aMask, TpointF.Create(-50,-50));
+end;
+
+{*******************************************************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsMaskImageV2(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aArray: TJavaArray<Byte>;
+    aBitmap: Jbitmap;
+    aDestRect: TrectF;
+    aSrcRect: TrectF;
+    aJDestRectf: JrectF;
+    aJSrcRect: Jrect;
+    aCanvas: Jcanvas;
+    apaint: JPaint;
+    aPorterDuffXfermode: jPorterDuffXfermode;
+    w, h: Single;
+begin
+  aArray := TJavaArray<Byte>.Create(aStream.Size);
+  try
+    system.Move(aStream.Memory^, aArray.Data^, aStream.Size);
+    aBitmap := TJBitmapFactory.JavaClass.decodeByteArray(aArray, 0, aStream.Size);
+    if aBitmap = nil then Exit(nil);
+    try
+
+      w := aMask.getWidth;
+      h := aMask.getHeight;
+      aDestRect := TrectF.Create(0, 0, W, H);
+      aSrcRect := ALRectFitInto(aDestRect, TrectF.Create(0, 0, aBitmap.getWidth, aBitmap.getHeight), aCropCenter);
+      aJDestRectf := TJRectf.JavaClass.init(aDestRect.left, aDestRect.top, aDestRect.right, aDestRect.bottom);
+      aJSrcRect := TJRect.JavaClass.init(round(aSrcRect.left), round(aSrcRect.top), round(aSrcRect.right), round(aSrcRect.bottom));
+
+      Result := TJBitmap.JavaClass.createBitmap(round(w), round(h), TJBitmap_Config.JavaClass.ARGB_8888);
+
+      aPaint := TJPaint.JavaClass.init;
+      aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+      aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+      apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+      aCanvas := TJCanvas.JavaClass.init(result);
+      aPaint.setStyle(TJPaint_Style.JavaClass.FILL);
+      aCanvas.drawBitmap(aMask, 0{left}, 0{top}, apaint);
+      aPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
+      aPaint.setXfermode(aPorterDuffXfermode);
+      aCanvas.drawBitmap(aBitmap, aJSrcRect, aJDestRectf, apaint);
+      aPorterDuffXfermode := nil;
+      aJSrcRect := nil;
+      aJDestRectf := nil;
+      aCanvas := nil;
+      aPaint := nil;
+
+    finally
+      aBitmap.recycle;
+      aBitmap := nil;
+    end;
+  finally
+    ALFreeandNil(aArray);
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImage: UIimage;
+    aData: NSData;
+    ARatio: single;
+    aDestRect: TrectF;
+    aSrcRect: TrectF;
+    aContext: CGContextRef;
+    aColorSpace: CGColorSpaceRef;
+    w, h: Single;
+begin
+  result := nil;
+  aData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  try
+    if aData.length > 0 then begin
+      aImage := TUIImage.Wrap(TUIImage.alloc.initWithData(aData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      if aImage <> nil then begin
+        try
+          //-----
+          w := CGImageGetWidth(aMask);
+          h := CGImageGetHeight(aMask);
+          //-----
+          aDestRect := TrectF.Create(0, 0, W, H);
+          aSrcRect := ALRectFitInto(aDestRect, TrectF.Create(0, 0, aImage.size.Width, aImage.size.Height), aCropCenter, ARatio);
+          //-----
+          aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+          if aColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+            try
+              aContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                     //       memory block should be at least (bytesPerRow*height) bytes.
+                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                round(W), // width: The width, in pixels, of the required bitmap.
+                                                round(H), // height: The height, in pixels, of the required bitmap.
+                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                   //                   chapter of Quartz 2D Programming Guide.
+                                                   //                   we can also use CGImageGetBitsPerComponent(aImage.CGImage) but 8 it's what we need
+                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                   //              a value of 0 causes the value to be calculated automatically.
+                                                   //              we could also use CGImageGetBytesPerRow(aImage.CGImage) or W * 4
+                                                aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                                      //             bitmap graphics contexts.
+                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                          // kCGBitmapByteOrder32Little = Little-endian
+                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                          //             values. The constants for specifying the alpha channel information are declared with the
+                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                          //             and CGImageAlphaInfo constants.)
+                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              if aContext <> nil then begin
+                try
+                  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
+                  CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextClipToMask(aContext,
+                                      ALLowerLeftCGRect(TpointF.Create(0, 0),
+                                                       w,
+                                                       h,
+                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                      aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
+                  CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                     ALLowerLeftCGRect(TpointF.Create(0-(aSrcRect.Left*aRatio),
+                                                                      0-(aSrcRect.top*aRatio)),
+                                                       w + (aSrcRect.Left*aRatio) + ((aImage.size.Width-aSrcRect.right)*aRatio),
+                                                       h + (aSrcRect.top*aRatio)  + ((aImage.size.Height-aSrcRect.bottom)*aRatio),
+                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                     aImage.CGImage); // image The image to draw.
+                  result := CGBitmapContextCreateImage(aContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+                                                                  // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+                                                                  // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+                                                                  // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+                                                                  // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+                                                                  // you can avoid the actual physical copy of the data.
+                finally
+                  CGContextRelease(aContext);
+                end;
+              end;
+            finally
+              CGColorSpaceRelease(aColorSpace);
+            end;
+          end;
+          //-----
+        finally
+          aImage.release;
+        end;
+      end
+    end;
+  finally
+    aData.release;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := ALResizeAndCropAsMaskImageV1(aStream, aMask, aCropCenter);
+end;
+{$IFEND}
+{$ENDREGION}
+
+{***************************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsMaskImageV2(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+begin
+  result := ALResizeAndCropAsMaskImageV2(aStream, aMask, TpointF.Create(-50,-50));
+end;
+
+{********************************************************************************************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsMaskImageV3(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aTmpBitmap: Jbitmap;
+begin
+
+  aTmpBitmap := ALResizeAndCropAsMaskImageV2(aStream, aMask, aCropCenter);
+  if aTmpBitmap = nil then exit(nil);
+  try
+    result := ALJBitmaptoTexture(aTmpBitmap, aVolatileTexture);
+  finally
+    aTmpBitmap.recycle;
+    aTmpBitmap := nil;
+  end;
+
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImage: UIimage;
+    aData: NSData;
+    ARatio: single;
+    aDestRect: TrectF;
+    aSrcRect: TrectF;
+    aContext: CGContextRef;
+    aColorSpace: CGColorSpaceRef;
+    aBitmapSurface: TBitmapSurface;
+    w, h: Single;
+begin
+  result := nil;
+  aData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  try
+    if aData.length > 0 then begin
+      aImage := TUIImage.Wrap(TUIImage.alloc.initWithData(aData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      if aImage <> nil then begin
+        try
+          aBitmapSurface := TbitmapSurface.Create;
+          try
+            //-----
+            w := CGImageGetWidth(aMask);
+            h := CGImageGetHeight(aMask);
+            //-----
+            aBitmapSurface.SetSize(round(W), round(H));
+            //-----
+            aDestRect := TrectF.Create(0, 0, W, H);
+            aSrcRect := ALRectFitInto(aDestRect, TrectF.Create(0, 0, aImage.size.Width, aImage.size.Height), aCropCenter, ARatio);
+            //-----
+            aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+            if aColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+              try
+                aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
+                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                  round(W), // width: The width, in pixels, of the required bitmap.
+                                                  round(H), // height: The height, in pixels, of the required bitmap.
+                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                     //                   chapter of Quartz 2D Programming Guide.
+                                                     //                   we can also use CGImageGetBitsPerComponent(aImage.CGImage) but 8 it's what we need
+                                                  aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                                        //              a value of 0 causes the value to be calculated automatically.
+                                                                        //              we could also use CGImageGetBytesPerRow(aImage.CGImage) or W * 4
+                                                  aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                               //             bitmap graphics contexts.
+                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                            // kCGBitmapByteOrder32Little = Little-endian
+                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                            //             values. The constants for specifying the alpha channel information are declared with the
+                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                            //             and CGImageAlphaInfo constants.)
+                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                if aContext <> nil then begin
+
+                  try
+                    CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
+                    CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextClipToMask(aContext,
+                                        ALLowerLeftCGRect(TpointF.Create(0, 0),
+                                                         w,
+                                                         h,
+                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                        aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
+                    CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                       ALLowerLeftCGRect(TpointF.Create(0-(aSrcRect.Left*aRatio),
+                                                                        0-(aSrcRect.top*aRatio)),
+                                                         w + (aSrcRect.Left*aRatio) + ((aImage.size.Width-aSrcRect.right)*aRatio),
+                                                         h + (aSrcRect.top*aRatio)  + ((aImage.size.Height-aSrcRect.bottom)*aRatio),
+                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                       aImage.CGImage); // image The image to draw.
+                  finally
+                    CGContextRelease(aContext);
+                  end;
+
+                  result := TALTexture.Create(aVolatileTexture);
+                  try
+                    result.assign(aBitmapSurface);
+                  except
+                    AlFreeAndNil(result);
+                    raise;
+                  end;
+
+                end;
+              finally
+                CGColorSpaceRelease(aColorSpace);
+              end;
+            end;
+          finally
+            AlFreeAndNil(aBitmapSurface);
+          end;
+        finally
+          aImage.release;
+        end;
+      end
+    end;
+  finally
+    aData.release;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := ALResizeAndCropAsMaskImageV1(aStream, aMask, aCropCenter);
+end;
+{$IFEND}
+{$ENDREGION}
+
+{****************************************************************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsMaskImageV3(const aStream: TCustomMemoryStream; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+begin
+  result := ALResizeAndCropAsMaskImageV3(aStream, aMask, TpointF.Create(-50,-50){$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+end;
+
+{************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsMaskImageV1(const aResName: String; const aMask: Tbitmap; const aCropCenter: TPointF): Tbitmap;
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsMaskImageV1(aStream, aMask, aCropCenter);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{********************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsMaskImageV1(const aResName: String; const aMask: Tbitmap): Tbitmap;
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsMaskImageV1(aStream, aMask);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{********************************************************************************************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsMaskImageV2(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsMaskImageV2(aStream, aMask, aCropCenter);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{****************************************************************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsMaskImageV2(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsMaskImageV2(aStream, aMask);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{*********************************************************************************************************************************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsMaskImageV3(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsMaskImageV3(aStream, aMask, aCropCenter{$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{*****************************************************************************************************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsMaskImageV3(const aResName: String; const aMask: {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND}{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsMaskImageV3(aStream, aMask{$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{******************************************************************************************************************************************}
+function ALResizeAndCropAsRoundRectImageV1(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single): Tbitmap;
+begin
+  result := ALResizeAndCropAsRoundRectImageV1(aStream, w, h, XRadius, YRadius, TpointF.Create(-50,-50));
+end;
+
+{**************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsRoundRectImageV2(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aArray: TJavaArray<Byte>;
+    aBitmap: Jbitmap;
+    aDestRect: TrectF;
+    aSrcRect: TrectF;
+    aJDestRectf: JrectF;
+    aJSrcRect: Jrect;
+    aCanvas: Jcanvas;
+    apaint: JPaint;
+    aPorterDuffXfermode: jPorterDuffXfermode;
+begin
+  aArray := TJavaArray<Byte>.Create(aStream.Size);
+  try
+    system.Move(aStream.Memory^, aArray.Data^, aStream.Size);
+    aBitmap := TJBitmapFactory.JavaClass.decodeByteArray(aArray, 0, aStream.Size);
+    if aBitmap = nil then Exit(nil);
+    try
+
+      aDestRect := TrectF.Create(0, 0, W, H);
+      aSrcRect := ALRectFitInto(aDestRect, TrectF.Create(0, 0, aBitmap.getWidth, aBitmap.getHeight), aCropCenter);
+      aJDestRectf := TJRectf.JavaClass.init(aDestRect.left, aDestRect.top, aDestRect.right, aDestRect.bottom);
+      aJSrcRect := TJRect.JavaClass.init(round(aSrcRect.left), round(aSrcRect.top), round(aSrcRect.right), round(aSrcRect.bottom));
+
+      Result := TJBitmap.JavaClass.createBitmap(round(w), round(h), TJBitmap_Config.JavaClass.ARGB_8888);
+
+      aPaint := TJPaint.JavaClass.init;
+      aPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+      aPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+      apaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+      aCanvas := TJCanvas.JavaClass.init(result);
+      aPaint.setStyle(TJPaint_Style.JavaClass.FILL);
+      aCanvas.drawRoundRect(aJDestRectf{rect},
+                            xRadius {rx},
+                            yRadius {ry},
+                            apaint);
+      aPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
+      aPaint.setXfermode(aPorterDuffXfermode);
+      aCanvas.drawBitmap(aBitmap, aJSrcRect, aJDestRectf, apaint);
+      aPorterDuffXfermode := nil;
+      aJSrcRect := nil;
+      aJDestRectf := nil;
+      aCanvas := nil;
+      aPaint := nil;
+
+    finally
+      aBitmap.recycle;
+      aBitmap := nil;
+    end;
+  finally
+    ALFreeandNil(aArray);
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImage: UIimage;
+    aData: NSData;
+    ARatio: single;
+    aDestRect: TrectF;
+    aSrcRect: TrectF;
+    aContext: CGContextRef;
+    aColorSpace: CGColorSpaceRef;
+    aXRadius: single;
+    aYradius: Single;
+    aWidthMinusCorners: single;
+    aHeightMinusCorners: Single;
+    aCurPoint: TpointF;
+    aGridHeight: single;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _moveTo(x: Single; y: Single);
+    begin
+      CGContextMoveToPoint(aContext, X, aGridHeight - Y);
+      aCurPoint.X := x;
+      aCurPoint.Y := Y;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
+    begin
+      CGContextAddQuadCurveToPoint(aContext,
+                                   aCurPoint.X + dx1{cpx},
+                                   aGridHeight - (aCurPoint.Y + dy1){cpy},
+                                   aCurPoint.X + dx2{x},
+                                   aGridHeight - (aCurPoint.Y + dy2){y});
+      aCurPoint.X := aCurPoint.X + dx2;
+      aCurPoint.Y := aCurPoint.Y + dy2;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rLineTo(dx: Single; dy: Single);
+    begin
+      CGContextAddLineToPoint(aContext, aCurPoint.X + dx{x}, aGridHeight - (aCurPoint.Y + dy{y}));
+      aCurPoint.X := aCurPoint.X + dx;
+      aCurPoint.Y := aCurPoint.Y + dy;
+    end;
+
+begin
+  result := nil;
+  aData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  try
+    if aData.length > 0 then begin
+      aImage := TUIImage.Wrap(TUIImage.alloc.initWithData(aData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      if aImage <> nil then begin
+        try
+          //-----
+          aDestRect := TrectF.Create(0, 0, W, H);
+          aSrcRect := ALRectFitInto(aDestRect, TrectF.Create(0, 0, aImage.size.Width, aImage.size.Height), aCropCenter, ARatio);
+          //-----
+          aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+          if aColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+            try
+              aContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                     //       memory block should be at least (bytesPerRow*height) bytes.
+                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                round(W), // width: The width, in pixels, of the required bitmap.
+                                                round(H), // height: The height, in pixels, of the required bitmap.
+                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                   //                   chapter of Quartz 2D Programming Guide.
+                                                   //                   we can also use CGImageGetBitsPerComponent(aImage.CGImage) but 8 it's what we need
+                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                   //              a value of 0 causes the value to be calculated automatically.
+                                                   //              we could also use CGImageGetBytesPerRow(aImage.CGImage) or W * 4
+                                                aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                                      //             bitmap graphics contexts.
+                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                          // kCGBitmapByteOrder32Little = Little-endian
+                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                          //             values. The constants for specifying the alpha channel information are declared with the
+                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                          //             and CGImageAlphaInfo constants.)
+                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              if aContext <> nil then begin
+                try
+                  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
+                  CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
+
+                  aGridHeight := H;
+                  aXRadius := xRadius;
+                  aYradius := yRadius;
+                  if (aXRadius > aDestRect.width / 2) then aXRadius := aDestRect.width / 2;
+                  if (aYradius > aDestRect.height / 2) then aYradius := aDestRect.height / 2;
+                  aWidthMinusCorners := (aDestRect.width - (2 * aXRadius));
+                  aHeightMinusCorners := (aDestRect.height - (2 * aYradius));
+
+                  //----- TopRight
+                  _moveTo(aDestRect.right, aDestRect.top + aYradius);
+                  _rQuadTo(0, -aYradius, -aXRadius, -aYradius);
+                  _rLineTo(-awidthMinusCorners, 0);
+
+                  //----- TopLeft
+                  _rQuadTo(-aXRadius, 0, -aXRadius, aYradius);
+                  _rLineTo(0, aheightMinusCorners);
+
+                  //----- BottomLeft
+                  _rQuadTo(0, aYradius, aXRadius, aYradius);
+                  _rLineTo(awidthMinusCorners, 0);
+
+                  //----- BottomRight
+                  _rQuadTo(aXRadius, 0, aXRadius, -aYradius);
+                  _rLineTo(0, -aheightMinusCorners);
+
+                  CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
+                  CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
+                                           // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
+                                           // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
+                                           // save the graphics state before you clip and restore the graphics state after you’ve completed
+                                           // any clipped drawing.
+                  CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                     ALLowerLeftCGRect(TpointF.Create(0-(aSrcRect.Left*aRatio),
+                                                                      0-(aSrcRect.top*aRatio)),
+                                                       w + (aSrcRect.Left*aRatio) + ((aImage.size.Width-aSrcRect.right)*aRatio),
+                                                       h + (aSrcRect.top*aRatio)  + ((aImage.size.Height-aSrcRect.bottom)*aRatio),
+                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                     aImage.CGImage); // image The image to draw.
+                  result := CGBitmapContextCreateImage(aContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+                                                                  // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+                                                                  // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+                                                                  // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+                                                                  // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+                                                                  // you can avoid the actual physical copy of the data.
+                finally
+                  CGContextRelease(aContext);
+                end;
+              end;
+            finally
+              CGColorSpaceRelease(aColorSpace);
+            end;
+          end;
+          //-----
+        finally
+          aImage.release;
+        end;
+      end
+    end;
+  finally
+    aData.release;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := ALResizeAndCropAsRoundRectImageV1(aStream, W, H, XRadius, YRadius, aCropCenter);
+end;
+{$IFEND}
+{$ENDREGION}
+
+{**********************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsRoundRectImageV2(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+begin
+  result := ALResizeAndCropAsRoundRectImageV2(aStream, w, h, XRadius, YRadius, TpointF.Create(-50,-50));
+end;
+
+{***************************************************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsRoundRectImageV3(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aTmpBitmap: Jbitmap;
+begin
+
+  aTmpBitmap := ALResizeAndCropAsRoundRectImageV2(aStream, W, H, XRadius, YRadius, aCropCenter);
+  if aTmpBitmap = nil then exit(nil);
+  try
+    result := ALJBitmaptoTexture(aTmpBitmap, aVolatileTexture);
+  finally
+    aTmpBitmap.recycle;
+    aTmpBitmap := nil;
+  end;
+
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImage: UIimage;
+    aData: NSData;
+    ARatio: single;
+    aDestRect: TrectF;
+    aSrcRect: TrectF;
+    aContext: CGContextRef;
+    aColorSpace: CGColorSpaceRef;
+    aBitmapSurface: TBitmapSurface;
+    aXRadius: single;
+    aYradius: Single;
+    aWidthMinusCorners: single;
+    aHeightMinusCorners: Single;
+    aCurPoint: TpointF;
+    aGridHeight: single;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _moveTo(x: Single; y: Single);
+    begin
+      CGContextMoveToPoint(aContext, X, aGridHeight - Y);
+      aCurPoint.X := x;
+      aCurPoint.Y := Y;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
+    begin
+      CGContextAddQuadCurveToPoint(aContext,
+                                   aCurPoint.X + dx1{cpx},
+                                   aGridHeight - (aCurPoint.Y + dy1){cpy},
+                                   aCurPoint.X + dx2{x},
+                                   aGridHeight - (aCurPoint.Y + dy2){y});
+      aCurPoint.X := aCurPoint.X + dx2;
+      aCurPoint.Y := aCurPoint.Y + dy2;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rLineTo(dx: Single; dy: Single);
+    begin
+      CGContextAddLineToPoint(aContext, aCurPoint.X + dx{x}, aGridHeight - (aCurPoint.Y + dy{y}));
+      aCurPoint.X := aCurPoint.X + dx;
+      aCurPoint.Y := aCurPoint.Y + dy;
+    end;
+
+begin
+  result := nil;
+  aData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  try
+    if aData.length > 0 then begin
+      aImage := TUIImage.Wrap(TUIImage.alloc.initWithData(aData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      if aImage <> nil then begin
+        try
+          aBitmapSurface := TbitmapSurface.Create;
+          try
+            //-----
+            aBitmapSurface.SetSize(round(W), round(H));
+            //-----
+            aDestRect := TrectF.Create(0, 0, W, H);
+            aSrcRect := ALRectFitInto(aDestRect, TrectF.Create(0, 0, aImage.size.Width, aImage.size.Height), aCropCenter, ARatio);
+            //-----
+            aColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
+            if aColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
+              try
+                aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
+                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                                                  round(W), // width: The width, in pixels, of the required bitmap.
+                                                  round(H), // height: The height, in pixels, of the required bitmap.
+                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                                     //                   chapter of Quartz 2D Programming Guide.
+                                                     //                   we can also use CGImageGetBitsPerComponent(aImage.CGImage) but 8 it's what we need
+                                                  aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                                        //              a value of 0 causes the value to be calculated automatically.
+                                                                        //              we could also use CGImageGetBytesPerRow(aImage.CGImage) or W * 4
+                                                  aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                               //             bitmap graphics contexts.
+                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
+                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                                            // kCGBitmapByteOrder32Little = Little-endian
+                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                                            //             values. The constants for specifying the alpha channel information are declared with the
+                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                                            //             and CGImageAlphaInfo constants.)
+                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                if aContext <> nil then begin
+
+                  try
+                    CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
+                    CGContextSetShouldAntialias(aContext, 1); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(aContext, 1); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
+
+                    aGridHeight := H;
+                    aXRadius := xRadius;
+                    aYradius := yRadius;
+                    if (aXRadius > aDestRect.width / 2) then aXRadius := aDestRect.width / 2;
+                    if (aYradius > aDestRect.height / 2) then aYradius := aDestRect.height / 2;
+                    aWidthMinusCorners := (aDestRect.width - (2 * aXRadius));
+                    aHeightMinusCorners := (aDestRect.height - (2 * aYradius));
+
+                    //----- TopRight
+                    _moveTo(aDestRect.right, aDestRect.top + aYradius);
+                    _rQuadTo(0, -aYradius, -aXRadius, -aYradius);
+                    _rLineTo(-awidthMinusCorners, 0);
+
+                    //----- TopLeft
+                    _rQuadTo(-aXRadius, 0, -aXRadius, aYradius);
+                    _rLineTo(0, aheightMinusCorners);
+
+                    //----- BottomLeft
+                    _rQuadTo(0, aYradius, aXRadius, aYradius);
+                    _rLineTo(awidthMinusCorners, 0);
+
+                    //----- BottomRight
+                    _rQuadTo(aXRadius, 0, aXRadius, -aYradius);
+                    _rLineTo(0, -aheightMinusCorners);
+
+                    CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
+                    CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
+                                             // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
+                                             // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
+                                             // save the graphics state before you clip and restore the graphics state after you’ve completed
+                                             // any clipped drawing.
+                    CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
+                                       ALLowerLeftCGRect(TpointF.Create(0-(aSrcRect.Left*aRatio),
+                                                                        0-(aSrcRect.top*aRatio)),
+                                                         w + (aSrcRect.Left*aRatio) + ((aImage.size.Width-aSrcRect.right)*aRatio),
+                                                         h + (aSrcRect.top*aRatio)  + ((aImage.size.Height-aSrcRect.bottom)*aRatio),
+                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                       aImage.CGImage); // image The image to draw.
+                  finally
+                    CGContextRelease(aContext);
+                  end;
+
+                  result := TALTexture.Create(aVolatileTexture);
+                  try
+                    result.assign(aBitmapSurface);
+                  except
+                    AlFreeAndNil(result);
+                    raise;
+                  end;
+
+                end;
+              finally
+                CGColorSpaceRelease(aColorSpace);
+              end;
+            end;
+          finally
+            AlFreeAndNil(aBitmapSurface);
+          end;
+        finally
+          aImage.release;
+        end;
+      end
+    end;
+  finally
+    aData.release;
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := ALResizeAndCropAsRoundRectImageV1(aStream, W, H, XRadius, YRadius, aCropCenter);
+end;
+{$IFEND}
+{$ENDREGION}
+
+{***********************************************************************************************************************************************************************************************************************************************************}
+function ALResizeAndCropAsRoundRectImageV3(const aStream: TCustomMemoryStream; const W, H: single; const XRadius, YRadius: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+begin
+  result := ALResizeAndCropAsRoundRectImageV3(aStream, w, h, XRadius, YRadius, TpointF.Create(-50,-50){$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+end;
+
 {***********************************************************************************************************************************}
 function ALResizeAndCropAsCircleImageV1(const aStream: TCustomMemoryStream; const W, H: single; const aCropCenter: TPointF): Tbitmap;
 var aBitmap: TBitmap;
@@ -7807,6 +8901,78 @@ end;
 function ALResizeAndCropAsCircleImageV3(const aStream: TCustomMemoryStream; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
 begin
   result := ALResizeAndCropAsCircleImageV3(aStream, w, h, TpointF.Create(-50,-50){$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+end;
+
+{************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsCircleImageV1(const aResName: String; const W, H: single; const aCropCenter: TPointF): Tbitmap;
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsCircleImageV1(aStream, W, H, aCropCenter);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{********************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsCircleImageV1(const aResName: String; const W, H: single): Tbitmap;
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsCircleImageV1(aStream, W, H);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{****************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsCircleImageV2(const aResName: String; const W, H: single; const aCropCenter: TPointF): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsCircleImageV2(aStream, W, H, aCropCenter);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsCircleImageV2(const aResName: String; const W, H: single): {$IF defined(ANDROID)}Jbitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$IFEND};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsCircleImageV2(aStream, W, H);
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{*****************************************************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsCircleImageV3(const aResName: String; const W, H: single; const aCropCenter: TPointF{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsCircleImageV3(aStream, W, H, aCropCenter{$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+  finally
+    ALfreeandNil(aStream);
+  end;
+end;
+
+{*************************************************************************************************************************************************************************************************************************}
+function  ALLoadResizeAndCropResourceAsCircleImageV3(const aResName: String; const W, H: single{$IFDEF _USE_TEXTURE}; const aVolatileTexture: boolean = true{$ENDIF}): {$IFDEF _USE_TEXTURE}TTexture{$ELSE}Tbitmap{$ENDIF};
+var aStream: TResourceStream;
+begin
+  aStream := TResourceStream.Create(HInstance, aResName, RT_RCDATA);
+  try
+    result := ALResizeAndCropAsCircleImageV3(aStream, W, H{$IFDEF _USE_TEXTURE}, aVolatileTexture{$ENDIF});
+  finally
+    ALfreeandNil(aStream);
+  end;
 end;
 
 {****************************************************************************************************************************************************************}
@@ -10120,6 +11286,105 @@ begin
     ALfreeandNil(aStream);
   end;
 end;
+
+{**********************************************************************************}
+function  AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
+var aExifInterface: JExifInterface;
+    aOrientation: Integer;
+begin
+  aExifInterface := TJExifInterface.javaclass.init(StringToJString(aFilename));
+  aorientation := aExifInterface.getAttributeInt(TJExifInterface.JavaClass.TAG_ORIENTATION, TJExifInterface.JavaClass.ORIENTATION_NORMAL);
+  if aorientation = TJExifInterface.JavaClass.ORIENTATION_FLIP_HORIZONTAL then result := TalExifOrientationInfo.FLIP_HORIZONTAL
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_FLIP_VERTICAL then result := TalExifOrientationInfo.FLIP_VERTICAL
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_NORMAL then result := TalExifOrientationInfo.NORMAL
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_ROTATE_180 then result := TalExifOrientationInfo.ROTATE_180
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_ROTATE_270 then result := TalExifOrientationInfo.ROTATE_270
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_ROTATE_90 then result := TalExifOrientationInfo.ROTATE_90
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_TRANSPOSE then result := TalExifOrientationInfo.TRANSPOSE
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_TRANSVERSE then result := TalExifOrientationInfo.TRANSVERSE
+  else if aorientation = TJExifInterface.JavaClass.ORIENTATION_UNDEFINED then result := TalExifOrientationInfo.UNDEFINED
+  else result := TalExifOrientationInfo.UNDEFINED;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' IOS'}
+{$IF defined(IOS)}
+var aImgSourceRef: CGImageSourceRef;
+    aPath: CFStringRef;
+    aUrl: CFURLRef;
+    aDictionaryRef: CFDictionaryRef;
+    aOrientation: NSNumber;
+begin
+  result := TalExifOrientationInfo.UNDEFINED;
+  aPath := CFStringCreateWithCString(nil{alloc}, MarshaledAString(UTF8Encode(AFileName)){cStr}, kCFStringEncodingUTF8{encoding});
+  try
+    aUrl := CFURLCreateWithFileSystemPath(nil{allocator}, aPath{filePath}, kCFURLPOSIXPathStyle{pathStyle}, False{isDirectory});
+    try
+      aImgSourceRef := CGImageSourceCreateWithURL(aUrl{url}, nil{options});
+      if aImgSourceRef <> nil then
+      try
+        aDictionaryRef := CGImageSourceCopyPropertiesAtIndex(aImgSourceRef{isrc}, 0{index}, nil{options});
+        if aDictionaryRef <> nil then
+        try
+          aOrientation := TNSNumber.Wrap(CFDictionaryGetValue(aDictionaryRef, NSStringToID(kCGImagePropertyOrientation)));
+          if aOrientation <> nil then begin
+            case aOrientation.integerValue of
+
+              //Top, left
+              1: result := TalExifOrientationInfo.NORMAL;
+
+              //Top, right
+              2: result := TalExifOrientationInfo.FLIP_HORIZONTAL;
+
+              //Bottom, right
+              3: result := TalExifOrientationInfo.ROTATE_180;
+
+              //Bottom, left
+              4: result := TalExifOrientationInfo.FLIP_VERTICAL;
+
+              //Left, top
+              5: result := TalExifOrientationInfo.transpose;
+
+              //Right, top
+              6: result := TalExifOrientationInfo.ROTATE_90;
+
+              //Right, bottom
+              7: result := TalExifOrientationInfo.transverse;
+
+              //Left, bottom
+              8: result := TalExifOrientationInfo.ROTATE_270;
+
+            end;
+          end;
+        finally
+          CGImageRelease(aDictionaryRef);
+        end;
+      finally
+        CFRelease(aimgSourceRef);
+      end;
+    finally
+      CFRelease(aUrl);
+    end;
+  finally
+    CFRelease(aPath);
+  end;
+end;
+{$IFEND}
+{$ENDREGION}
+
+{$REGION ' MSWINDOWS / _MACOS'}
+{$IF defined(MSWINDOWS) or defined(_MACOS)}
+begin
+  result := TalExifOrientationInfo.NORMAL; // << todo - https://stackoverflow.com/questions/18622152/read-exif-gps-info-using-delphi
+                                           // << note: put a function in alcommon as it's will be a generic function not only use for
+                                           // << firemonkey
+end;
+{$IFEND}
+{$ENDREGION}
 
 {**************}
 {$IFDEF ANDROID}

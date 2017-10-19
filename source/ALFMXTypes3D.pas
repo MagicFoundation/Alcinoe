@@ -32,6 +32,9 @@ type
     FBits: Pointer;
     FContextLostId: Integer;
     FContextResetId: Integer;
+    //////////////////// //
+    FContextID: integer; // << this was added by me in a customized version of FMX.Types3D.TTexture - normally no matter to access previous field - https://quality.embarcadero.com/browse/RSP-19160
+    //////////////////// //
   protected
   public
   end;

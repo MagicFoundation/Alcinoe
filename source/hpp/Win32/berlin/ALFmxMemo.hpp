@@ -65,6 +65,7 @@ protected:
 	virtual void __fastcall DoEnter(void);
 	virtual void __fastcall realignScrollBars(void);
 	virtual void __fastcall Resize(void);
+	virtual void __fastcall KeyDown(System::Word &Key, System::WideChar &KeyChar, System::Classes::TShiftState Shift);
 	
 public:
 	__fastcall virtual TALStyledMemo(System::Classes::TComponent* AOwner)/* overload */;

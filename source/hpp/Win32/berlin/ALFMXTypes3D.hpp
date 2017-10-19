@@ -47,6 +47,7 @@ public:
 	void *FBits;
 	int FContextLostId;
 	int FContextResetId;
+	int FContextID;
 public:
 	/* TPersistent.Destroy */ inline __fastcall virtual ~TALTextureAccessPrivate(void) { }
 	

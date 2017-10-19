@@ -45,6 +45,9 @@ class PASCALIMPLEMENTATION TalImage : public Fmx::Controls::TControl
 	typedef Fmx::Controls::TControl inherited;
 	
 private:
+	Alfmxcommon::TalExifOrientationInfo fExifOrientationInfo;
+	bool fRotateAccordingToExifOrientation;
+	System::UnicodeString fFileName;
 	System::UnicodeString fResourceName;
 	TALImageWrapMode FWrapMode;
 	float FScreenScale;
@@ -52,6 +55,7 @@ private:
 	System::Types::TRectF fBufBitmapRect;
 	System::Types::TSizeF fBufSize;
 	void __fastcall SetWrapMode(const TALImageWrapMode Value);
+	void __fastcall setFileName(const System::UnicodeString Value);
 	void __fastcall setResourceName(const System::UnicodeString Value);
 	
 protected:
@@ -84,11 +88,13 @@ __published:
 	__property Position;
 	__property RotationAngle = {default=0};
 	__property RotationCenter;
+	__property bool RotateAccordingToExifOrientation = {read=fRotateAccordingToExifOrientation, write=fRotateAccordingToExifOrientation, default=0};
 	__property Scale;
 	__property Size;
 	__property TouchTargetExpansion;
 	__property Visible = {default=1};
 	__property Width;
+	__property System::UnicodeString FileName = {read=fFileName, write=setFileName};
 	__property System::UnicodeString ResourceName = {read=fResourceName, write=setResourceName};
 	__property TALImageWrapMode WrapMode = {read=FWrapMode, write=SetWrapMode, default=1};
 	__property ParentShowHint = {default=1};

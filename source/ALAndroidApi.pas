@@ -17,11 +17,13 @@ uses Androidapi.JNI.Widget,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.Util,
      Androidapi.JNIBridge,
+     Androidapi.JNI.Net,
      Androidapi.JNI.JavaTypes;
 
 type
 
-  {**************************************}
+  {**********************}
+  JALFileUtil = interface;
   JALDatePickerDialogListener = interface;
   JALDatePickerDialog = interface;
   JALSoftInputListener = interface;
@@ -34,6 +36,19 @@ type
   JPreferenceManager = interface;
   JAsyncTask_Status = interface;
   JAsyncTask = interface;
+
+  {****************************************}
+  JALFileUtilClass = interface(JObjectClass)
+    ['{3448C3D0-1FAD-489B-88F5-329E09FE2CCF}']
+    {class} function createFileFromURI(context: JContext; uri: Jnet_Uri; fileName: Jstring): boolean; cdecl;
+  end;
+
+  {********************************************}
+  [JavaSignature('com/alcinoe/util/ALFileUtil')]
+  JALFileUtil = interface(JObject)
+    ['{5F130085-03D3-4436-87BB-84A3BB9F22E0}']
+  end;
+  TJALFileUtil = class(TJavaGenericImport<JALFileUtilClass, JALFileUtil>) end;
 
   {******************************************************}
   JALDatePickerDialogListenerClass = interface(IJavaClass)
@@ -278,6 +293,7 @@ implementation
 
 procedure RegisterTypes;
 begin
+  TRegTypes.RegisterType('ALAndroidApi.JALFileUtil', TypeInfo(ALAndroidApi.JALFileUtil));
   TRegTypes.RegisterType('ALAndroidApi.JALDatePickerDialogListener', TypeInfo(ALAndroidApi.JALDatePickerDialogListener));
   TRegTypes.RegisterType('ALAndroidApi.JALDatePickerDialog', TypeInfo(ALAndroidApi.JALDatePickerDialog));
   TRegTypes.RegisterType('ALAndroidApi.JALSoftInputListener', TypeInfo(ALAndroidApi.JALSoftInputListener));

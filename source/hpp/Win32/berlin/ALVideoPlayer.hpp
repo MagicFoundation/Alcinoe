@@ -96,6 +96,7 @@ private:
 	__int64 FTag;
 	System::TObject* FTagObject;
 	double FTagFloat;
+	System::UnicodeString FTagString;
 	Fmx::Graphics::TBitmap* __fastcall GetBitmap(void);
 	void __fastcall doOnCompletion(System::TObject* Sender);
 	void __fastcall doOnError(System::TObject* Sender);
@@ -133,6 +134,7 @@ public:
 	__property __int64 Tag = {read=FTag, write=FTag, default=0};
 	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
 	__property double TagFloat = {read=FTagFloat, write=FTagFloat};
+	__property System::UnicodeString TagString = {read=FTagString, write=FTagString};
 };
 
 
@@ -155,6 +157,7 @@ private:
 	__int64 FTag;
 	System::TObject* FTagObject;
 	double FTagFloat;
+	System::UnicodeString FTagString;
 	bool fDoSetDataSource;
 	System::UnicodeString fDoSetDataSourceValue;
 	bool fDoPrepare;
@@ -204,6 +207,7 @@ public:
 	__property __int64 Tag = {read=FTag, write=FTag, default=0};
 	__property System::TObject* TagObject = {read=FTagObject, write=FTagObject};
 	__property double TagFloat = {read=FTagFloat, write=FTagFloat};
+	__property System::UnicodeString TagString = {read=FTagString, write=FTagString};
 };
 
 

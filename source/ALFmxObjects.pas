@@ -102,6 +102,9 @@ type
   //so all of this to say that multi-res bitmap is a fundamentally wrong concept
   TalImage = class(TControl)
   private
+    fExifOrientationInfo: TalExifOrientationInfo;
+    fRotateAccordingToExifOrientation: Boolean;
+    fFileName: String;
     fResourceName: String;
     FWrapMode: TALImageWrapMode;
     FScreenScale: single;
@@ -119,6 +122,7 @@ type
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage); // << because of https://quality.embarcadero.com/browse/RSP-16142
     {$ENDIF}
     procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure setFileName(const Value: String);
     procedure setResourceName(const Value: String);
   protected
     procedure Paint; override;
@@ -156,11 +160,13 @@ type
     property Position;
     property RotationAngle;
     property RotationCenter;
+    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write fRotateAccordingToExifOrientation default false; // << under Android, work only when using filename
     property Scale;
     property Size;
     property TouchTargetExpansion;
     property Visible default True;
     property Width;
+    property FileName: String read fFileName write setFileName;
     property ResourceName: String read fResourceName write setResourceName;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
     property ParentShowHint;
@@ -600,6 +606,9 @@ constructor TALImage.Create(AOwner: TComponent);
 var aScreenSrv: IFMXScreenService;
 begin
   inherited Create(AOwner);
+  fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+  fRotateAccordingToExifOrientation := False;
+  fFileName := '';
   fResourceName := '';
   FWrapMode := TALImageWrapMode.Fit;
   if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, aScreenSrv) then FScreenScale := aScreenSrv.GetScreenScale
@@ -646,8 +655,8 @@ begin
      //--- don't do bufbitmap is size=0
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
-     //--- don't do bufbitmap if fResourceName is empty
-     (fResourceName = '')
+     //--- don't do bufbitmap if fFileName or fResourceName is empty
+     ((fFileName = '') and (fResourceName = ''))
   then begin
     clearBufBitmap;
     exit(nil);
@@ -668,12 +677,29 @@ begin
   {$endif}
 
     {$IFDEF ALDPK}
-    aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
-    if not TFile.Exists(aFileName) then begin
-      aFileName := aFileName + '.png';
-      if not TFile.Exists(aFileName) then aFileName := '';
+    if fresourceName = '' then aFileName := fFileName
+    else begin
+      aFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+      if not TFile.Exists(aFileName) then aFileName := aFileName + '.png';
     end;
+    if not TFile.Exists(aFileName) then aFileName := '';
     {$ENDIF}
+
+    if (fRotateAccordingToExifOrientation) and
+       (fResourceName = '') and
+       (fFileName <> '') then fExifOrientationInfo := AlGetExifOrientationInfo(ffilename)
+    else fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+
+    if fExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
+                                TalExifOrientationInfo.ROTATE_90,
+                                TalExifOrientationInfo.TRANSVERSE,
+                                TalExifOrientationInfo.ROTATE_270] then fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), FScreenScale) // to have the pixel aligned width and height
+    else fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+                                                                                  // TalExifOrientationInfo.FLIP_HORIZONTAL:;
+                                                                                  // TalExifOrientationInfo.FLIP_VERTICAL:;
+                                                                                  // TalExifOrientationInfo.NORMAL:;
+                                                                                  // TalExifOrientationInfo.ROTATE_180:;
+                                                                                  // TalExifOrientationInfo.UNDEFINED:;
 
     case FWrapMode of
 
@@ -696,31 +722,27 @@ begin
       //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
       TALImageWrapMode.Fit:
         begin
-          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
           if aFileName <> '' then fBufBitmap := ALLoadResizeAndFitFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadResizeAndFitResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          if fResourceName <> '' then fBufBitmap := ALLoadResizeAndFitResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := ALLoadResizeAndFitFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
-          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
-                                                    CenterAt(fBufBitmapRect);
         end;
 
       //Stretch the image to fill the entire rectangle of the control.
       TALImageWrapMode.Stretch:
         begin
-          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
           if aFileName <> '' then fBufBitmap := ALLoadResizeAndStretchFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadResizeAndStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          if fResourceName <> '' then fBufBitmap := ALLoadResizeAndStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := ALLoadResizeAndStretchFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
-          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
-                                                    CenterAt(fBufBitmapRect);
         end;
 
       //Tile (multiply) the image to cover the entire rectangle of the control:
@@ -760,22 +782,23 @@ begin
       //  the rectangle of the control. Whole the image should be displayed.
       TALImageWrapMode.FitAndCrop:
         begin
-          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
           {$IFDEF ALDPK}
           if aFileName <> '' then fBufBitmap := ALLoadResizeAndCropFileImageV3(aFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
           else fBufBitmap := nil;
           {$ELSE}
-          fBufBitmap := ALLoadResizeAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+          if fResourceName <> '' then fBufBitmap := ALLoadResizeAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+          else fBufBitmap := ALLoadResizeAndCropFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
           {$ENDIF}
           result := fBufBitmap;
-          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
-                                                    CenterAt(fBufBitmapRect);
         end;
 
       //to hide a stupid warning else
       else Result := nil;
 
     end;
+
+    if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                              CenterAt(LocalRect);
 
   {$IFDEF debug}
   finally
@@ -787,7 +810,9 @@ end;
 
 {***********************}
 procedure TALImage.Paint;
-var R: TRectF;
+var aMatrix: Tmatrix;
+    aMatrixRotationCenter: TpointF;
+    R: TRectF;
 begin
 
   if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
@@ -802,6 +827,69 @@ begin
   if fBufBitmap = nil then begin
     inherited paint;
     exit;
+  end;
+
+  case fExifOrientationInfo of
+    TalExifOrientationInfo.FLIP_HORIZONTAL: begin
+                                              aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                              aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                              aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                              aMatrix := aMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
+                                              aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                              Canvas.SetMatrix(aMatrix);
+                                            end;
+    TalExifOrientationInfo.FLIP_VERTICAL: begin
+                                            aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                            aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                            aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                            aMatrix := aMatrix * TMatrix.CreateScaling(1, -1); // matrix.setRotate(180); matrix.setScale(-1, 1);
+                                            aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                            Canvas.SetMatrix(aMatrix);
+                                          end;
+    TalExifOrientationInfo.NORMAL:;
+    TalExifOrientationInfo.ROTATE_180: begin
+                                         aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                         aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                         aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                         aMatrix := aMatrix * TMatrix.CreateRotation(DegToRad(180)); // matrix.setRotate(180);
+                                         aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                         Canvas.SetMatrix(aMatrix);
+                                       end;
+    TalExifOrientationInfo.ROTATE_270: begin
+                                         aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                         aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                         aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                         aMatrix := aMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
+                                         aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                         Canvas.SetMatrix(aMatrix);
+                                       end;
+    TalExifOrientationInfo.ROTATE_90: begin
+                                        aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                        aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                        aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                        aMatrix := aMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
+                                        aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                        Canvas.SetMatrix(aMatrix);
+                                      end;
+    TalExifOrientationInfo.TRANSPOSE: begin
+                                        aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                        aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                        aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                        aMatrix := aMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
+                                        aMatrix := aMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
+                                        aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                        Canvas.SetMatrix(aMatrix);
+                                      end;
+    TalExifOrientationInfo.TRANSVERSE: begin
+                                         aMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
+                                         aMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
+                                         aMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-aMatrixRotationCenter.X,-aMatrixRotationCenter.Y);
+                                         aMatrix := aMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
+                                         aMatrix := aMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
+                                         aMatrix := aMatrix * TMatrix.CreateTranslation(aMatrixRotationCenter.X,aMatrixRotationCenter.Y);
+                                         Canvas.SetMatrix(aMatrix);
+                                       end;
+    TalExifOrientationInfo.UNDEFINED:;
   end;
 
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
@@ -845,6 +933,16 @@ begin
   if FWrapMode <> Value then begin
     clearBufBitmap;
     FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{**************************************************}
+procedure TalImage.setFileName(const Value: String);
+begin
+  if FFileName <> Value then begin
+    clearBufBitmap;
+    FFileName := Value;
     Repaint;
   end;
 end;

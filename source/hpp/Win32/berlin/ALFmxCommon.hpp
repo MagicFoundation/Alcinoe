@@ -205,6 +205,8 @@ __interface TALResizeImageGetDestSizeFunct  : public System::IInterface
 	virtual System::Types::TPointF __fastcall Invoke(const System::Types::TPointF &aOriginalSize) = 0 ;
 };
 
+enum DECLSPEC_DENUM TalExifOrientationInfo : unsigned char { FLIP_HORIZONTAL, FLIP_VERTICAL, NORMAL, ROTATE_180, ROTATE_270, ROTATE_90, TRANSPOSE, TRANSVERSE, UNDEFINED };
+
 #pragma pack(push,4)
 class PASCALIMPLEMENTATION TALBreakTextItem : public System::TObject
 {
@@ -517,12 +519,38 @@ extern DELPHI_PACKAGE void __fastcall ALCreateDrawingSurface(Fmx::Graphics::TBit
 extern DELPHI_PACKAGE void __fastcall ALFreeDrawingSurface(Fmx::Graphics::TBitmap* &aBitmap);
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
+extern DELPHI_PACKAGE __int64 __fastcall ALGetFileSize(const System::UnicodeString FileName);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtension(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV1(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV1(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV2(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV2(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV3(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV3(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsMaskImageV1(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsMaskImageV1(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsMaskImageV2(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsMaskImageV2(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsMaskImageV3(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsMaskImageV3(const System::UnicodeString aResName, Fmx::Graphics::TBitmap* const aMask)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsCircleImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsCircleImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsCircleImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsCircleImageV2(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsCircleImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsCircleImageV3(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsCircleImageV1(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsCircleImageV1(const System::UnicodeString aResName, const float W, const float H)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsCircleImageV2(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsCircleImageV2(const System::UnicodeString aResName, const float W, const float H)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsCircleImageV3(const System::UnicodeString aResName, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
+extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndCropResourceAsCircleImageV3(const System::UnicodeString aResName, const float W, const float H)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const _di_TALResizeImageGetDestSizeFunct aGetDestSizeFunct, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H)/* overload */;
@@ -568,6 +596,7 @@ extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchR
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchFileImageV1(const System::UnicodeString aFileName, const float W, const float H);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchFileImageV2(const System::UnicodeString aFileName, const float W, const float H);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALLoadResizeAndStretchFileImageV3(const System::UnicodeString aFileName, const float W, const float H);
+extern DELPHI_PACKAGE TalExifOrientationInfo __fastcall AlGetExifOrientationInfo(const System::UnicodeString aFilename);
 }	/* namespace Alfmxcommon */
 #if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_ALFMXCOMMON)
 using namespace Alfmxcommon;

@@ -202,6 +202,7 @@ type
     procedure DoEnter; override;
     procedure realignScrollBars; virtual;
     procedure Resize; override;
+    procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -473,7 +474,7 @@ end;
 procedure TALIosTextViewDelegate.textViewDidChange(textView: UITextView);
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextViewDelegate.textViewDidChange', '', TalLogType.VERBOSE);
+  //ALLog('TALIosTextViewDelegate.textViewDidChange', '', TalLogType.VERBOSE);
   {$ENDIF}
   if assigned(FTextView.fMemoControl.fOnChangeTracking) then
     FTextView.fMemoControl.fOnChangeTracking(FTextView.fMemoControl);
@@ -483,10 +484,16 @@ end;
 procedure TALIosTextViewDelegate.textViewDidChangeSelection(textView: UITextView);
 var aSelectedTextRange: NSRange;
 begin
+  {$IF defined(DEBUG)}
+  //ALLog('TALIosTextViewDelegate.textViewDidChangeSelection', '', TalLogType.VERBOSE);
+  {$ENDIF}
   if FTextView.FMemoControl.fTextPromptVisible then begin
-    aSelectedTextRange.location := 0;
-    aSelectedTextRange.length := 0;
-    textView.setSelectedRange(aSelectedTextRange);
+    aSelectedTextRange := textView.selectedRange;
+    if (aSelectedTextRange.location <> 0) or (aSelectedTextRange.length <> 0) then begin // << else i have a infinite loop when i cut a big text
+      aSelectedTextRange.location := 0;
+      aSelectedTextRange.length := 0;
+      textView.setSelectedRange(aSelectedTextRange);
+    end;
   end;
 end;
 
@@ -504,6 +511,10 @@ end;
 {*************************************************************************************************************************************************************************}
 function TALIosTextViewDelegate.textViewShouldChangeTextInRangeReplacementText(textView: UITextView; shouldChangeTextInRange: NSRange; replacementText: NSString): Boolean;
 begin
+
+  {$IF defined(DEBUG)}
+  //ALLog('TALIosTextViewDelegate.textViewShouldChangeTextInRangeReplacementText', '', TalLogType.VERBOSE);
+  {$ENDIF}
 
   if FTextView.FMemoControl.maxLength > 0 then begin
 
@@ -523,8 +534,18 @@ begin
   else if (shouldChangeTextInRange.location = 0) and
           (shouldChangeTextInRange.length = textView.text.length) and
           (not FTextView.FMemoControl.FtextPromptVisible) then begin
+
     FTextView.FMemoControl.FtextPromptVisible := True;
     FTextView.FMemoControl.DoFontChanged;
+
+    //the problem is that if the memo is empty, if you press the return key
+    //then then textViewDidChange will be fired that will in turn fire fOnChangeTracking
+    //but if after you press the delete key (removing the break line character) then
+    //the textViewDidChange will be not fired (maybe because of textViewDidChangeSelection)
+    //so i fire manually the fOnChangeTracking here
+    if assigned(FTextView.fMemoControl.fOnChangeTracking) then
+      FTextView.fMemoControl.fOnChangeTracking(FTextView.fMemoControl);
+
   end;
 
   Result := True;
@@ -825,7 +846,14 @@ begin
   else if (Value = '') then begin
     fTextPromptVisible := true;
     DoFontChanged;
-  end
+  end;
+
+  //textViewDidChange
+  //The text view calls this method in response to user-initiated
+  //changes to the text. This method is not called in response to
+  //programmatically initiated changes.
+  if assigned(fOnChangeTracking) then
+    fOnChangeTracking(self);
 
 end;
 
@@ -1245,6 +1273,24 @@ end;
 function TALStyledMemo.GetPadding: TBounds;
 begin
   result := FPadding;
+end;
+
+{**********************************************************************}
+// to correct this bug: https://quality.embarcadero.com/browse/RSP-19119
+procedure TALStyledMemo.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
+var aTmpKey: Word;
+    aTmpKeyChar: System.WideChar;
+begin
+  aTmpKey := Key;
+  inherited;
+  if aTmpKey = vkBack then begin
+    aTmpKeyChar := ' ';
+    aTmpKey := ord(aTmpKeyChar);
+    inherited KeyDown(aTmpKey, aTmpKeyChar, []);
+    aTmpKeyChar := #0;
+    aTmpKey := vkBack;
+    inherited KeyDown(aTmpKey, aTmpKeyChar, []);
+  end;
 end;
 
 {*******************************************}

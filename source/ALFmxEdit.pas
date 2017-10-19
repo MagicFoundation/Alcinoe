@@ -792,6 +792,7 @@ begin
       MainActivity.getViewStack.addview(nil);
       aUIMembers.FNativeViewAttached := True;
     end, FUIMembers);
+  realignContent;
 end;
 
 {****************************************}

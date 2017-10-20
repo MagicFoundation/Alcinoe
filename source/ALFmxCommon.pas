@@ -4828,6 +4828,14 @@ var {$IF defined(ANDROID)}
 
 begin
 
+  {$IF defined(_USE_TEXTURE)}
+  i := TContextManager.DefaultContextClass.MaxTextureSize;
+  if i > 0 then begin
+    aRect.Width := min(aRect.Width, i);
+    aRect.height := min(aRect.height, i);
+  end;
+  {$IFEND}
+
   //init out var
   aTextBreaked := false;
   aAllTextDrawed := True;

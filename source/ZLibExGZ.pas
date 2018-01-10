@@ -1020,7 +1020,7 @@ procedure GZCompressFile(const inFileName, outFileName: String;
 var
   fileName: AnsiString;
 begin
-  fileName := ExtractFilename(inFileName);
+  fileName := AnsiString(ExtractFilename(inFileName));
 
   GZCompressFile(inFileName, outFileName, fileName, '');
 end;

@@ -58,149 +58,21 @@ goto FINISHED
 
 :BUILD_DEMOS
 
-SET FileName=demos\*.vlb
-del %FileName% /s
-if exist %FileName% goto ERROR
-
 CHDIR demos\
-FOR /d /R %%J IN (Android) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (iOSSimulator) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (iOSDevice32) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (iOSDevice64) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (Osx32) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (win32) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (win64) DO (	  
-  Echo.%%J | findstr /C:"_source">nul && (
-    REM do not delete inside /_source/
-  ) || (
-    IF EXIST %%J echo rmdir - %%J			
-    IF EXIST %%J rmdir /s /q %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /d /R %%J IN (dcu) DO (	
-  IF EXIST %%J echo rmdir - %%J			
-  IF EXIST %%J (
-    rmdir /s /q %%J
-    mkdir %%J
-  )
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /R %%J IN (*.dproj) DO (	
-  echo %%J			
-  MSBuild %%J /p:Config=Release /p:Platform=Win32 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-  MSBuild %%J /p:Config=Release /p:Platform=Win64 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-)
-CHDIR ..
-
-CHDIR demos\
-FOR /R %%J IN (ALFmx*.dproj) DO (	
-  echo %%J			
-  MSBuild %%J /p:Config=Release /p:Platform=Android /t:Build
-  MSBuild %%J /p:Config=Release /p:Platform=Android /t:Deploy
-  IF ERRORLEVEL 1 PAUSE
-  MSBuild %%J /p:Config=Release /p:Platform=iOSSimulator /t:Build
-  IF ERRORLEVEL 1 PAUSE
-  MSBuild %%J /p:Config=Release /p:Platform=iOSDevice32 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-  MSBuild %%J /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-  MSBuild %%J /p:Config=Release /p:Platform=OSX32 /t:Build
-  IF ERRORLEVEL 1 PAUSE
-)
-CHDIR ..
-
-CHDIR demos\
-MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=Android /t:Build
-MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=Android /t:Deploy
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=Win32 /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=Win64 /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=Android /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=Android /t:Deploy
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFirebaseMessagingDemo\_source\ALFirebaseMessagingDemo.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
 IF ERRORLEVEL 1 PAUSE
-CHDIR ..
-
-CHDIR demos\
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Build
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=Android /t:Deploy
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
 IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=iOSSimulator /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=iOSDevice32 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=iOSDevice64 /t:Build
-IF ERRORLEVEL 1 PAUSE
-MSBuild ALFacebookLogin\_source\ALFacebookLogin.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
+MSBuild ALFmxControls\_source\ALFmxControls_berlin.dproj /p:Config=Release /p:Platform=OSX32 /t:Build
 IF ERRORLEVEL 1 PAUSE
 CHDIR ..
 
@@ -223,13 +95,6 @@ FOR /d /R %%J IN (dcu) DO (
   )
 )
 CHDIR ..
-
-xcopy lib\dll\tbbmalloc\win32\tbbmalloc.dll demos\ALDatabaseBenchmark\win32 /s
-IF ERRORLEVEL 1 goto ERROR
-
-xcopy lib\dll\tbbmalloc\win64\tbbmalloc.dll demos\ALDatabaseBenchmark\win64 /s
-IF ERRORLEVEL 1 goto ERROR
-
 
 :FINISHED
 

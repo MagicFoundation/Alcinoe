@@ -11,7 +11,7 @@ ABOUT SUPPORT OF DELPHI VERSION
 -------------------------------
 
 Actually the source is maintained on last version of 
-Delphi (XE4 - seattle). The modifications to make it 
+Delphi (XE4 - tokyo). The modifications to make it 
 working on lower version of Delphi are little and can 
 be easily handled via define condition. But I have no 
 time and no older delphi compiler to test it. Anyone 

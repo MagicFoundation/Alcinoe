@@ -11,6 +11,8 @@ unit FMX.Graphics;
 
 {$MINENUMSIZE 4}
 {$H+}
+{$Warnings Off}
+{$Hints Off}
 
 interface
 

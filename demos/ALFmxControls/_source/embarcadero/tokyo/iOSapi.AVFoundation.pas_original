@@ -1,0 +1,1788 @@
+{**********************************************************}
+{                                                          }
+{           CodeGear Delphi Runtime Library                }
+{                                                          }
+{ Delphi-Objective-C Bridge                                }
+{ Interfaces for Cocoa framework AVFoundation              }
+{                                                          }
+{ Copyright (c) 2008-2010, Apple Inc. All rights reserved. }
+{                                                          }
+{ Translator: Embarcadero Technologies, Inc.               }
+{   Copyright(c) 2012-2017 Embarcadero Technologies, Inc.  }
+{              All rights reserved                         }
+{                                                          }
+{**********************************************************}
+
+unit iOSapi.AVFoundation;
+
+interface
+
+uses
+  Macapi.ObjectiveC, Macapi.Dispatch, Macapi.CoreFoundation, iOSapi.Foundation,
+  iOSapi.CocoaTypes, iOSapi.CoreGraphics, iOSapi.CoreMedia, iOSapi.QuartzCore,
+  iOSapi.CoreVideo;
+
+const
+  AVAssetExportSessionStatusCancelled = 5;
+  AVAssetExportSessionStatusCompleted = 3;
+  AVAssetExportSessionStatusExporting = 2;
+  AVAssetExportSessionStatusFailed = 4;
+  AVAssetExportSessionStatusUnknown = 0;
+  AVAssetExportSessionStatusWaiting = 1;
+  AVAssetImageGeneratorCancelled = 2;
+  AVAssetImageGeneratorFailed = 1;
+  AVAssetImageGeneratorSucceeded = 0;
+  AVAssetReaderStatusCancelled = 4;
+  AVAssetReaderStatusCompleted = 2;
+  AVAssetReaderStatusFailed = 3;
+  AVAssetReaderStatusReading = 1;
+  AVAssetReaderStatusUnknown = 0;
+  AVAssetReferenceRestrictionForbidAll = 65535;
+  AVAssetReferenceRestrictionForbidCrossSiteReference = 4;
+  AVAssetReferenceRestrictionForbidLocalReferenceToLocal = 8;
+  AVAssetReferenceRestrictionForbidLocalReferenceToRemote = 2;
+  AVAssetReferenceRestrictionForbidNone = 0;
+  AVAssetReferenceRestrictionForbidRemoteReferenceToLocal = 1;
+  AVAssetWriterStatusCancelled = 4;
+  AVAssetWriterStatusCompleted = 2;
+  AVAssetWriterStatusFailed = 3;
+  AVAssetWriterStatusUnknown = 0;
+  AVAssetWriterStatusWriting = 1;
+  AVAudioQualityHigh = 96;
+  AVAudioQualityLow = 32;
+  AVAudioQualityMax = 127;
+  AVAudioQualityMedium = 64;
+  AVAudioQualityMin = 0;
+  AVAudioSessionInterruptionFlags_ShouldResume = 1;
+  AVAudioSessionSetActiveFlags_NotifyOthersOnDeactivation = 1;
+  AVCaptureDevicePositionBack = 1;
+  AVCaptureDevicePositionFront = 2;
+  AVCaptureExposureModeAutoExpose = 1;
+  AVCaptureExposureModeContinuousAutoExposure = 2;
+  AVCaptureExposureModeLocked = 0;
+  AVCaptureFlashModeAuto = 2;
+  AVCaptureFlashModeOff = 0;
+  AVCaptureFlashModeOn = 1;
+  AVCaptureFocusModeAutoFocus = 1;
+  AVCaptureFocusModeContinuousAutoFocus = 2;
+  AVCaptureFocusModeLocked = 0;
+  AVCaptureTorchModeAuto = 2;
+  AVCaptureTorchModeOff = 0;
+  AVCaptureTorchModeOn = 1;
+  AVCaptureVideoOrientationLandscapeLeft = 4;
+  AVCaptureVideoOrientationLandscapeRight = 3;
+  AVCaptureVideoOrientationPortrait = 1;
+  AVCaptureVideoOrientationPortraitUpsideDown = 2;
+  AVCaptureWhiteBalanceModeAutoWhiteBalance = 1;
+  AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance = 2;
+  AVCaptureWhiteBalanceModeLocked = 0;
+  AVErrorApplicationIsNotAuthorized = -11836;
+  AVErrorCompositionTrackSegmentsNotContiguous = -11824;
+  AVErrorContentIsNotAuthorized = -11835;
+  AVErrorContentIsProtected = -11831;
+  AVErrorDecodeFailed = -11821;
+  AVErrorDecoderNotFound = -11833;
+  AVErrorDecoderTemporarilyUnavailable = -11839;
+  AVErrorDeviceAlreadyUsedByAnotherSession = -11804;
+  AVErrorDeviceInUseByAnotherApplication = -11815;
+  AVErrorDeviceIsNotAvailableInBackground = -11837;
+  AVErrorDeviceLockedForConfigurationByAnotherProcess = -11817;
+  AVErrorDeviceNotConnected = -11814;
+  AVErrorDeviceWasDisconnected = -11808;
+  AVErrorDiskFull = -11807;
+  AVErrorEncoderNotFound = -11834;
+  AVErrorEncoderTemporarilyUnavailable = -11840;
+  AVErrorExportFailed = -11820;
+  AVErrorFileAlreadyExists = -11823;
+  AVErrorFileFailedToParse = -11829;
+  AVErrorFileFormatNotRecognized = -11828;
+  AVErrorInvalidCompositionTrackSegmentDuration = -11825;
+  AVErrorInvalidCompositionTrackSegmentSourceDuration = -11827;
+  AVErrorInvalidCompositionTrackSegmentSourceStartTime = -11826;
+  AVErrorInvalidSourceMedia = -11822;
+  AVErrorInvalidVideoComposition = -11841;
+  AVErrorMaximumDurationReached = -11810;
+  AVErrorMaximumFileSizeReached = -11811;
+  AVErrorMaximumNumberOfSamplesForFileFormatReached = -11813;
+  AVErrorMaximumStillImageCaptureRequestsExceeded = -11830;
+  AVErrorMediaChanged = -11809;
+  AVErrorMediaDiscontinuity = -11812;
+  AVErrorMediaServicesWereReset = -11819;
+  AVErrorNoDataCaptured = -11805;
+  AVErrorNoImageAtTime = -11832;
+  AVErrorOperationNotSupportedForAsset = -11838;
+  AVErrorOutOfMemory = -11801;
+  AVErrorReferenceForbiddenByReferencePolicy = -11842;
+  AVErrorSessionConfigurationChanged = -11806;
+  AVErrorSessionNotRunning = -11803;
+  AVErrorSessionWasInterrupted = -11818;
+  AVErrorUnknown = -11800;
+  AVKeyValueStatusCancelled = 4;
+  AVKeyValueStatusFailed = 3;
+  AVKeyValueStatusLoaded = 2;
+  AVKeyValueStatusLoading = 1;
+  AVKeyValueStatusUnknown = 0;
+  AVPlayerActionAtItemEndAdvance = 0;
+  AVPlayerActionAtItemEndNone = 2;
+  AVPlayerActionAtItemEndPause = 1;
+  AVPlayerItemStatusFailed = 2;
+  AVPlayerItemStatusReadyToPlay = 1;
+  AVPlayerItemStatusUnknown = 0;
+  AVPlayerStatusFailed = 2;
+  AVPlayerStatusReadyToPlay = 1;
+  AVPlayerStatusUnknown = 0;
+
+// ===== Typedefs and structs =====
+{$M+}
+type
+  AVAssetExportSessionStatus = NSInteger;
+  AVAssetReaderStatus = NSInteger;
+  AVAssetReferenceRestrictions = NSUInteger;
+  AVAssetWriterStatus = NSInteger;
+  AVCaptureDevicePosition = NSInteger;
+  AVCaptureExposureMode = NSInteger;
+  AVCaptureFocusMode = NSInteger;
+  AVCaptureFlashMode = NSInteger;
+  AVCaptureTorchMode = NSInteger;
+  AVCaptureVideoOrientation = NSInteger;
+  AVCaptureWhiteBalanceMode = NSInteger;
+  AVKeyValueStatus = NSInteger;
+  AVLoadingKeyStatus = NSUInteger;
+  AVPlayerActionAtItemEnd = NSInteger;
+  AVPlayerItemStatus = NSInteger;
+  AVPlayerStatus = NSInteger;
+  TAVFoundationCompletionHandler = procedure of object;
+  TAVFoundationCompletionHandler1 = procedure(param1: Boolean) of object;
+  TAVFoundationHandler = procedure(param1: NSArray) of object;
+  TAVFoundationCompletionHandler2 = procedure(param1: CMTime) of object;
+
+// ===== External functions =====
+
+const
+  libAVFoundation = '/System/Library/Frameworks/AVFoundation.framework/AVFoundation';
+
+function AVMakeRectWithAspectRatioInsideRect(aspectRatio: CGSize; boundingRect: CGRect): CGRect; cdecl; external libAVFoundation name _PU + 'AVMakeRectWithAspectRatioInsideRect';
+(*
+type
+{$M+}
+// ===== Forward declarations =====
+
+  AVAudioPlayerDelegate = interface;
+  AVAudioRecorderDelegate = interface;
+  AVAudioSessionDelegate = interface;
+  AVCaptureAudioDataOutputSampleBufferDelegate = interface;
+  AVCaptureFileOutputRecordingDelegate = interface;
+  AVCaptureVideoDataOutputSampleBufferDelegate = interface;
+  AVVideoCompositionValidationHandling = interface;
+
+// ===== Protocol declarations =====
+
+  AVAsynchronousKeyValueLoading = interface
+    ['{1AD609BF-567E-4B95-9FAA-7CC0F56E98BD}']
+    function statusOfValueForKey(key: NSString; error: NSError): AVKeyValueStatus; cdecl;
+  end;
+  AVAudioPlayerDelegate = interface(IObjectiveC)
+    ['{10A00DF8-BBAA-4A9D-86AE-D5E2ECFA8634}']
+    procedure audioPlayerBeginInterruption(player: AVAudioPlayer); cdecl;
+    procedure audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer; error: NSError); cdecl;
+    procedure audioPlayerDidFinishPlaying(player: AVAudioPlayer; successfully: Boolean); cdecl;
+    procedure audioPlayerEndInterruption(player: AVAudioPlayer); cdecl; overload;
+    procedure audioPlayerEndInterruption(player: AVAudioPlayer; withFlags: NSUInteger); cdecl; overload;
+  end;
+  AVAudioRecorderDelegate = interface(IObjectiveC)
+    ['{736BA3CE-7042-4CD9-9854-CDCFDA8751C6}']
+    procedure audioRecorderBeginInterruption(recorder: AVAudioRecorder); cdecl;
+    procedure audioRecorderDidFinishRecording(recorder: AVAudioRecorder; successfully: Boolean); cdecl;
+    procedure audioRecorderEncodeErrorDidOccur(recorder: AVAudioRecorder; error: NSError); cdecl;
+    procedure audioRecorderEndInterruption(recorder: AVAudioRecorder); cdecl; overload;
+    procedure audioRecorderEndInterruption(recorder: AVAudioRecorder; withFlags: NSUInteger); cdecl; overload;
+  end;
+  AVAudioSessionDelegate = interface(IObjectiveC)
+    ['{7B812A3A-7917-4932-93E3-D8B2A1B4FDE7}']
+    procedure beginInterruption; cdecl;
+    procedure endInterruption; cdecl;
+    procedure endInterruptionWithFlags(flags: NSUInteger); cdecl;
+    procedure inputIsAvailableChanged(isInputAvailable: Boolean); cdecl;
+  end;
+  AVCaptureAudioDataOutputSampleBufferDelegate = interface(IObjectiveC)
+    ['{F5F64FE8-B5DB-4258-A63D-E1463B6B8D29}']
+    procedure captureOutput(captureOutput: AVCaptureOutput; didOutputSampleBuffer: CMSampleBufferRef; fromConnection: AVCaptureConnection); cdecl;
+  end;
+  AVVideoCompositionValidationHandling = interface(IObjectiveC)
+    ['{26772CBC-ED6C-4453-9C8D-21679832C344}']
+    function videoComposition(videoComposition: AVVideoComposition; shouldContinueValidatingAfterFindingEmptyTimeRange: CMTimeRange): Boolean; cdecl; overload;
+    function videoComposition(videoComposition: AVVideoComposition; shouldContinueValidatingAfterFindingInvalidTimeRangeInInstruction: AVVideoCompositionInstruction): Boolean; cdecl; overload;
+    function videoComposition(videoComposition: AVVideoComposition; shouldContinueValidatingAfterFindingInvalidTrackIDInInstruction: AVVideoCompositionInstruction; layerInstruction: AVVideoCompositionLayerInstruction; asset: AVAsset): Boolean; cdecl; overload;
+    function videoComposition(videoComposition: AVVideoComposition; shouldContinueValidatingAfterFindingInvalidValueForKey: NSString): Boolean; cdecl; overload;
+  end;
+*)
+
+type
+{$M+}
+// ===== Forward declarations =====
+
+  AVCaptureSession = interface;
+  AVCaptureOutput = interface;
+  AVTimedMetadataGroup = interface;
+  AVSynchronizedLayer = interface;
+  AVCaptureVideoPreviewLayer = interface;
+  AVVideoCompositionCoreAnimationTool = interface;
+  AVVideoCompositionInstruction = interface;
+  AVCaptureInput = interface;
+  AVVideoComposition = interface;
+  AVCaptureInputPort = interface;
+  AVPlayerLayer = interface;
+  AVPlayerItemAccessLogEvent = interface;
+  AVPlayerItemErrorLog = interface;
+  AVPlayerItemAccessLog = interface;
+  AVPlayer = interface;
+  AVPlayerItem = interface;
+  AVMediaSelectionOption = interface;
+  AVMediaSelectionGroup = interface;
+  AVMetadataItem = interface;
+  AVPlayerItemErrorLogEvent = interface;
+  AVPlayerItemTrack = interface;
+  AVCaptureDevice = interface;
+  AVAssetTrack = interface;
+  AVAssetTrackSegment = interface;
+  AVAsset = interface;
+  AVAssetWriter = interface;
+  AVAssetImageGenerator = interface;
+  AVAssetExportSession = interface;
+  AVAssetReader = interface;
+  AVAssetReaderOutput = interface;
+  AVAudioSession = interface;
+  AVCaptureDeviceFormat = interface;
+  AVAudioRecorder = interface;
+  AVCaptureAudioChannel = interface;
+  AVCaptureConnection = interface;
+  AVVideoCompositionLayerInstruction = interface;
+  AVAudioPlayer = interface;
+  AVAssetWriterInputPixelBufferAdaptor = interface;
+  AVAssetWriterInput = interface;
+  AVAudioMix = interface;
+  AVAudioMixInputParameters = interface;
+  AVMutableVideoCompositionLayerInstruction = interface;
+  AVURLAsset = interface;
+  AVQueuePlayer = interface;
+  AVCaptureStillImageOutput = interface;
+  AVCaptureFileOutput = interface;
+  AVComposition = interface;
+  AVCaptureVideoDataOutput = interface;
+  AVCaptureDeviceInput = interface;
+  AVAssetReaderTrackOutput = interface;
+  AVAssetReaderAudioMixOutput = interface;
+  AVCaptureAudioDataOutput = interface;
+  AVAssetReaderVideoCompositionOutput = interface;
+  AVCompositionTrack = interface;
+  AVMutableVideoComposition = interface;
+  AVMutableTimedMetadataGroup = interface;
+  AVMutableMetadataItem = interface;
+  AVMutableVideoCompositionInstruction = interface;
+  AVCompositionTrackSegment = interface;
+  AVMutableAudioMix = interface;
+  AVMutableAudioMixInputParameters = interface;
+  AVCaptureMovieFileOutput = interface;
+  AVMutableComposition = interface;
+  AVMutableCompositionTrack = interface;
+
+// ===== Interface declarations =====
+
+  AVCaptureSessionClass = interface(NSObjectClass)
+    ['{A47E0D5A-2C30-49E8-98E1-F49B16BB495A}']
+  end;
+  AVCaptureSession = interface(NSObject)
+    ['{F47F9902-C0D4-41B7-92DE-A1F358650199}']
+    procedure addInput(input: AVCaptureInput); cdecl;
+    procedure addOutput(output: AVCaptureOutput); cdecl;
+    procedure beginConfiguration; cdecl;
+    function canAddInput(input: AVCaptureInput): Boolean; cdecl;
+    function canAddOutput(output: AVCaptureOutput): Boolean; cdecl;
+    function canSetSessionPreset(preset: NSString): Boolean; cdecl;
+    procedure commitConfiguration; cdecl;
+    function inputs: NSArray; cdecl;
+    function isInterrupted: Boolean; cdecl;
+    function isRunning: Boolean; cdecl;
+    function outputs: NSArray; cdecl;
+    procedure removeInput(input: AVCaptureInput); cdecl;
+    procedure removeOutput(output: AVCaptureOutput); cdecl;
+    function sessionPreset: NSString; cdecl;
+    procedure setSessionPreset(sessionPreset: NSString); cdecl;
+    procedure startRunning; cdecl;
+    procedure stopRunning; cdecl;
+  end;
+  TAVCaptureSession = class(TOCGenericImport<AVCaptureSessionClass, AVCaptureSession>)  end;
+
+  AVCaptureOutputClass = interface(NSObjectClass)
+    ['{321DC7CF-8DF4-402D-B789-B59B0E6E91CD}']
+  end;
+  AVCaptureOutput = interface(NSObject)
+    ['{89F37BE5-4C30-46C7-85A7-B1445FAA01D7}']
+    function connectionWithMediaType(mediaType: NSString): AVCaptureConnection; cdecl;
+    function connections: NSArray; cdecl;
+  end;
+  TAVCaptureOutput = class(TOCGenericImport<AVCaptureOutputClass, AVCaptureOutput>)  end;
+
+  AVTimedMetadataGroupClass = interface(NSObjectClass)
+    ['{481DE574-FF52-4FC8-BBCE-CC924F8AEF0B}']
+  end;
+  AVTimedMetadataGroup = interface(NSObject)
+    ['{1E7F7812-E586-4DC5-8B19-A44707505E75}']
+    function initWithItems(items: NSArray; timeRange: CMTimeRange): Pointer; cdecl;
+    function items: NSArray; cdecl;
+    function timeRange: CMTimeRange; cdecl;
+  end;
+  TAVTimedMetadataGroup = class(TOCGenericImport<AVTimedMetadataGroupClass, AVTimedMetadataGroup>)  end;
+
+  AVSynchronizedLayerClass = interface(CALayerClass)
+    ['{7108227E-6136-44AD-81A5-F2AA6846DF1B}']
+    {class} function synchronizedLayerWithPlayerItem(playerItem: AVPlayerItem): Pointer; cdecl;
+  end;
+  AVSynchronizedLayer = interface(CALayer)
+    ['{1DD0B3D7-3EFA-4C3E-9C20-6FE0CBD03586}']
+    function playerItem: AVPlayerItem; cdecl;
+    procedure setPlayerItem(playerItem: AVPlayerItem); cdecl;
+  end;
+  TAVSynchronizedLayer = class(TOCGenericImport<AVSynchronizedLayerClass, AVSynchronizedLayer>)  end;
+
+  AVCaptureVideoPreviewLayerClass = interface(CALayerClass)
+    ['{0F570D38-C338-4EAB-926C-8036ABC0E991}']
+    {class} function layerWithSession(session: AVCaptureSession): Pointer; cdecl;
+  end;
+  AVCaptureVideoPreviewLayer = interface(CALayer)
+    ['{ADD0E96E-F021-4C6A-B77F-EFE51BFF777F}']
+    function automaticallyAdjustsMirroring: Boolean; cdecl;
+    function initWithSession(session: AVCaptureSession): Pointer; cdecl;
+    function isMirrored: Boolean; cdecl;
+    function isMirroringSupported: Boolean; cdecl;
+    function isOrientationSupported: Boolean; cdecl;
+    function orientation: AVCaptureVideoOrientation; cdecl;
+    function session: AVCaptureSession; cdecl;
+    procedure setAutomaticallyAdjustsMirroring(automaticallyAdjustsMirroring: Boolean); cdecl;
+    procedure setMirrored(mirrored: Boolean); cdecl;
+    procedure setOrientation(orientation: AVCaptureVideoOrientation); cdecl;
+    procedure setSession(session: AVCaptureSession); cdecl;
+    procedure setVideoGravity(videoGravity: NSString); cdecl;
+    function videoGravity: NSString; cdecl;
+  end;
+  TAVCaptureVideoPreviewLayer = class(TOCGenericImport<AVCaptureVideoPreviewLayerClass, AVCaptureVideoPreviewLayer>)  end;
+
+  AVVideoCompositionCoreAnimationToolClass = interface(NSObjectClass)
+    ['{40C77CD2-2EB8-43D6-97DE-73C58A7A74FE}']
+    {class} function videoCompositionCoreAnimationToolWithAdditionalLayer(layer: CALayer; asTrackID: CMPersistentTrackID): Pointer; cdecl;
+    {class} function videoCompositionCoreAnimationToolWithPostProcessingAsVideoLayer(videoLayer: CALayer; inLayer: CALayer): Pointer; cdecl;
+  end;
+  AVVideoCompositionCoreAnimationTool = interface(NSObject)
+    ['{EE8882B9-1520-4CD4-81FB-AA2D829F3E87}']
+  end;
+  TAVVideoCompositionCoreAnimationTool = class(TOCGenericImport<AVVideoCompositionCoreAnimationToolClass, AVVideoCompositionCoreAnimationTool>)  end;
+
+  AVVideoCompositionInstructionClass = interface(NSObjectClass)
+    ['{5C524476-1E48-4CEC-AACE-CDF5ECA5D517}']
+  end;
+  AVVideoCompositionInstruction = interface(NSObject)
+    ['{4025ED48-498E-4B1F-9557-D1E6BE3926C1}']
+    function backgroundColor: CGColorRef; cdecl;
+    function enablePostProcessing: Boolean; cdecl;
+    function layerInstructions: NSArray; cdecl;
+    procedure setBackgroundColor(backgroundColor: CGColorRef); cdecl;
+    function timeRange: CMTimeRange; cdecl;
+  end;
+  TAVVideoCompositionInstruction = class(TOCGenericImport<AVVideoCompositionInstructionClass, AVVideoCompositionInstruction>)  end;
+
+  AVCaptureInputClass = interface(NSObjectClass)
+    ['{B19E0FF3-BF17-4A64-86B3-2BEF2754B486}']
+  end;
+  AVCaptureInput = interface(NSObject)
+    ['{18C9DEDC-52B5-4719-B8F6-5535AE4AF327}']
+    function ports: NSArray; cdecl;
+  end;
+  TAVCaptureInput = class(TOCGenericImport<AVCaptureInputClass, AVCaptureInput>)  end;
+
+  AVVideoCompositionClass = interface(NSObjectClass)
+    ['{9B25990E-1B68-471F-BC48-B9A73DCE493E}']
+  end;
+  AVVideoComposition = interface(NSObject)
+    ['{7C5FB1E2-81C3-4DD6-9B02-67D24EEF819B}']
+    function animationTool: AVVideoCompositionCoreAnimationTool; cdecl;
+    function frameDuration: CMTime; cdecl;
+    function instructions: NSArray; cdecl;
+    function isValidForAsset(asset: AVAsset; timeRange: CMTimeRange; validationDelegate: Pointer): Boolean; cdecl;
+    function renderScale: Single; cdecl;
+    function renderSize: CGSize; cdecl;
+  end;
+  TAVVideoComposition = class(TOCGenericImport<AVVideoCompositionClass, AVVideoComposition>)  end;
+
+  AVCaptureInputPortClass = interface(NSObjectClass)
+    ['{D471595F-8E3E-4443-97EC-DBC39B278F98}']
+  end;
+  AVCaptureInputPort = interface(NSObject)
+    ['{BDFBC779-6E77-4931-98CF-DFFB76A4BAFE}']
+    function formatDescription: CMFormatDescriptionRef; cdecl;
+    function input: AVCaptureInput; cdecl;
+    function isEnabled: Boolean; cdecl;
+    function mediaType: NSString; cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+  end;
+  TAVCaptureInputPort = class(TOCGenericImport<AVCaptureInputPortClass, AVCaptureInputPort>)  end;
+
+  AVPlayerLayerClass = interface(CALayerClass)
+    ['{4893D945-50D3-40B2-9CF9-F641C7E4AFF2}']
+    {class} function playerLayerWithPlayer(player: AVPlayer): Pointer; cdecl;
+  end;
+  AVPlayerLayer = interface(CALayer)
+    ['{FB68755A-2D9B-4FAE-9F8C-B2E2081D05BC}']
+    function isReadyForDisplay: Boolean; cdecl;
+    function player: AVPlayer; cdecl;
+    procedure setPlayer(player: AVPlayer); cdecl;
+    procedure setVideoGravity(videoGravity: NSString); cdecl;
+    function videoGravity: NSString; cdecl;
+  end;
+  TAVPlayerLayer = class(TOCGenericImport<AVPlayerLayerClass, AVPlayerLayer>)  end;
+
+  AVPlayerItemAccessLogEventClass = interface(NSObjectClass)
+    ['{D255EEA2-8BFD-49BC-92FC-F9C187A0ED69}']
+  end;
+  AVPlayerItemAccessLogEvent = interface(NSObject)
+    ['{E3DBD2FF-A12B-4054-BC21-4F48D342BDEF}']
+    function URI: NSString; cdecl;
+    function durationWatched: NSTimeInterval; cdecl;
+    function indicatedBitrate: double; cdecl;
+    function numberOfBytesTransferred: Int64; cdecl;
+    function numberOfDroppedVideoFrames: NSInteger; cdecl;
+    function numberOfSegmentsDownloaded: NSInteger; cdecl;
+    function numberOfServerAddressChanges: NSInteger; cdecl;
+    function numberOfStalls: NSInteger; cdecl;
+    function observedBitrate: double; cdecl;
+    function playbackSessionID: NSString; cdecl;
+    function playbackStartDate: NSDate; cdecl;
+    function playbackStartOffset: NSTimeInterval; cdecl;
+    function segmentsDownloadedDuration: NSTimeInterval; cdecl;
+    function serverAddress: NSString; cdecl;
+  end;
+  TAVPlayerItemAccessLogEvent = class(TOCGenericImport<AVPlayerItemAccessLogEventClass, AVPlayerItemAccessLogEvent>)  end;
+
+  AVPlayerItemErrorLogClass = interface(NSObjectClass)
+    ['{4EA933AA-4705-47B9-A76C-D9109D63F9D1}']
+  end;
+  AVPlayerItemErrorLog = interface(NSObject)
+    ['{593D59EB-6740-44C0-BEF8-327EAF2F3E92}']
+    function events: NSArray; cdecl;
+    function extendedLogData: NSData; cdecl;
+    function extendedLogDataStringEncoding: NSStringEncoding; cdecl;
+  end;
+  TAVPlayerItemErrorLog = class(TOCGenericImport<AVPlayerItemErrorLogClass, AVPlayerItemErrorLog>)  end;
+
+  AVPlayerItemAccessLogClass = interface(NSObjectClass)
+    ['{986E83A4-4329-4725-A3EB-BCB554EC869C}']
+  end;
+  AVPlayerItemAccessLog = interface(NSObject)
+    ['{25D30981-935C-4912-9136-681D50505D5C}']
+    function events: NSArray; cdecl;
+    function extendedLogData: NSData; cdecl;
+    function extendedLogDataStringEncoding: NSStringEncoding; cdecl;
+  end;
+  TAVPlayerItemAccessLog = class(TOCGenericImport<AVPlayerItemAccessLogClass, AVPlayerItemAccessLog>)  end;
+
+  AVPlayerMediaSelectionCriteriaClass = interface(NSObjectClass)
+    ['{7EA84D4B-DE1D-4167-AD5B-DE9314176D01}']
+  end;
+  AVPlayerMediaSelectionCriteria = interface(NSObject)
+    ['{3C35529D-2E74-434A-BC2B-A95BDFE9CDC9}']
+    function preferredLanguages: NSArray; cdecl;
+    function preferredMediaCharacteristics: NSArray; cdecl;
+    function initWithPreferredLanguages(preferredLanguages: NSArray; preferredMediaCharacteristics: NSArray)
+      : Pointer{instancetype}; cdecl;
+  end;
+
+  TAVPlayerMediaSelectionCriteria = class(TOCGenericImport<AVPlayerMediaSelectionCriteriaClass,
+    AVPlayerMediaSelectionCriteria>)
+  end;
+  PAVPlayerMediaSelectionCriteria = Pointer;
+
+  AVPlayerClass = interface(NSObjectClass)
+    ['{32B0A5BC-2657-43D6-8FFF-A5F4BDD532FC}']
+    {class} function playerWithPlayerItem(item: AVPlayerItem): Pointer; cdecl;
+    {class} function playerWithURL(URL: NSURL): Pointer; cdecl;
+  end;
+  AVPlayer = interface(NSObject)
+    ['{5A085E79-FDDB-4FFA-8663-61EB1EEEC40C}']
+    function actionAtItemEnd: AVPlayerActionAtItemEnd; cdecl;
+    function allowsAirPlayVideo: Boolean; cdecl;
+    function currentItem: AVPlayerItem; cdecl;
+    function currentTime: CMTime; cdecl;
+    function error: NSError; cdecl;
+    function initWithPlayerItem(item: AVPlayerItem): Pointer; cdecl;
+    function initWithURL(URL: NSURL): Pointer; cdecl;
+    function isAirPlayVideoActive: Boolean; cdecl;
+    function isClosedCaptionDisplayEnabled: Boolean; cdecl;
+    procedure pause; cdecl;
+    procedure play; cdecl;
+    function rate: Single; cdecl;
+    procedure removeTimeObserver(observer: Pointer); cdecl;
+    procedure replaceCurrentItemWithPlayerItem(item: AVPlayerItem); cdecl;
+    procedure seekToTime(time: CMTime); cdecl; overload;
+    procedure seekToTime(time: CMTime; toleranceBefore: CMTime; toleranceAfter: CMTime); cdecl; overload;
+    [MethodName('seekToTime:completionHandler:')]
+    procedure seekToTimeCompletionHandler(time: CMTime; completionHandler: TAVFoundationCompletionHandler1); cdecl;
+    procedure setActionAtItemEnd(actionAtItemEnd: AVPlayerActionAtItemEnd); cdecl;
+    procedure setAllowsAirPlayVideo(allowsAirPlayVideo: Boolean); cdecl;
+    procedure setClosedCaptionDisplayEnabled(closedCaptionDisplayEnabled: Boolean); cdecl;
+    procedure setRate(rate: Single); cdecl;
+    procedure setUsesAirPlayVideoWhileAirPlayScreenIsActive(usesAirPlayVideoWhileAirPlayScreenIsActive: Boolean); cdecl;
+    function status: AVPlayerStatus; cdecl;
+    function usesAirPlayVideoWhileAirPlayScreenIsActive: Boolean; cdecl;
+    [MethodName('seekToDate:')]
+    procedure seekToDate(date: NSDate); cdecl;
+    [MethodName('seekToDate:completionHandler:')]
+    procedure seekToDateCompletionHandler(date: NSDate; completionHandler: TAVFoundationCompletionHandler1); cdecl;
+    [MethodName('seekToTime:toleranceBefore:toleranceAfter:completionHandler:')]
+    procedure seekToTimeToleranceBeforeToleranceAfterCompletionHandler(time: CMTime; toleranceBefore: CMTime;
+      toleranceAfter: CMTime; completionHandler: TAVFoundationCompletionHandler1); cdecl;
+    [MethodName('setRate:time:atHostTime:')]
+    procedure setRateTimeAtHostTime(rate: Single; time: CMTime; atHostTime: CMTime); cdecl;
+    procedure prerollAtRate(rate: Single; completionHandler: TAVFoundationCompletionHandler1); cdecl;
+    procedure cancelPendingPrerolls; cdecl;
+    procedure setMasterClock(masterClock: CMClockRef); cdecl;
+    function masterClock: CMClockRef; cdecl;
+    function addPeriodicTimeObserverForInterval(interval: CMTime; queue: dispatch_queue_t;
+      usingBlock: TAVFoundationCompletionHandler2): Pointer; cdecl;
+    function addBoundaryTimeObserverForTimes(times: NSArray; queue: dispatch_queue_t;
+      usingBlock: TAVFoundationCompletionHandler): Pointer; cdecl;
+    procedure setVolume(volume: Single); cdecl;
+    function volume: Single; cdecl;
+    procedure setMuted(muted: Boolean); cdecl;
+    function isMuted: Boolean; cdecl;
+    procedure setAppliesMediaSelectionCriteriaAutomatically(appliesMediaSelectionCriteriaAutomatically: Boolean); cdecl;
+    function appliesMediaSelectionCriteriaAutomatically: Boolean; cdecl;
+    procedure setMediaSelectionCriteria(criteria: AVPlayerMediaSelectionCriteria;
+      forMediaCharacteristic: NSString); cdecl;
+    function mediaSelectionCriteriaForMediaCharacteristic(mediaCharacteristic: NSString)
+      : AVPlayerMediaSelectionCriteria; cdecl;
+    procedure setAudioOutputDeviceUniqueID(audioOutputDeviceUniqueID: NSString); cdecl;
+    function audioOutputDeviceUniqueID: NSString; cdecl;
+    procedure setAllowsExternalPlayback(allowsExternalPlayback: Boolean); cdecl;
+    function allowsExternalPlayback: Boolean; cdecl;
+    function isExternalPlaybackActive: Boolean; cdecl;
+    procedure setUsesExternalPlaybackWhileExternalScreenIsActive(usesExternalPlaybackWhileExternalScreenIsActive
+      : Boolean); cdecl;
+    function usesExternalPlaybackWhileExternalScreenIsActive: Boolean; cdecl;
+    procedure setExternalPlaybackVideoGravity(externalPlaybackVideoGravity: NSString); cdecl;
+    function externalPlaybackVideoGravity: NSString; cdecl;
+    function outputObscuredDueToInsufficientExternalProtection: Boolean; cdecl;
+  end;
+  TAVPlayer = class(TOCGenericImport<AVPlayerClass, AVPlayer>)  end;
+
+  AVQueuePlayerClass = interface(AVPlayerClass)
+    ['{38E2EF5D-D616-4D79-9C51-EE1DBF7448D8}']
+    {class} function queuePlayerWithItems(items: NSArray): Pointer; cdecl;
+  end;
+  AVQueuePlayer = interface(AVPlayer)
+    ['{B7E4AA83-21F9-491C-9049-C10D7A7D363A}']
+    function initWithItems(items: NSArray): Pointer{instancetype}; cdecl;
+    function items: NSArray; cdecl;
+    procedure advanceToNextItem; cdecl;
+    function canInsertItem(item: AVPlayerItem; afterItem: AVPlayerItem): Boolean; cdecl;
+    procedure insertItem(item: AVPlayerItem; afterItem: AVPlayerItem); cdecl;
+    procedure removeItem(item: AVPlayerItem); cdecl;
+    procedure removeAllItems; cdecl;
+  end;
+
+  TAVQueuePlayer = class(TOCGenericImport<AVQueuePlayerClass, AVQueuePlayer>)
+  end;
+  PAVQueuePlayer = Pointer;
+
+  AVPlayerItemOutputClass = interface(NSObjectClass)
+    ['{5A46A428-F1B0-438A-868F-6D556F864153}']
+  end;
+  AVPlayerItemOutput = interface(NSObject)
+    ['{8C4C8554-5006-4E5E-8414-1B0BF5E1468A}']
+    function itemTimeForHostTime(hostTimeInSeconds: CFTimeInterval): CMTime; cdecl;
+    function itemTimeForMachAbsoluteTime(machAbsoluteTime: Int64): CMTime; cdecl;
+    procedure setSuppressesPlayerRendering(suppressesPlayerRendering: Boolean); cdecl;
+    function suppressesPlayerRendering: Boolean; cdecl;
+  end;
+
+  TAVPlayerItemOutput = class(TOCGenericImport<AVPlayerItemOutputClass, AVPlayerItemOutput>)
+  end;
+  PAVPlayerItemOutput = Pointer;
+
+  AVPlayerItemErrorLogEventClass = interface(NSObjectClass)
+    ['{EEFD6908-AE3F-4343-A4E8-E0493B28F750}']
+  end;
+  AVPlayerItemErrorLogEvent = interface(NSObject)
+    ['{DF2F61D3-C2D6-40D1-AA9B-01FB5175D365}']
+    function date: NSDate; cdecl;
+    function URI: NSString; cdecl;
+    function serverAddress: NSString; cdecl;
+    function playbackSessionID: NSString; cdecl;
+    function errorStatusCode: NSInteger; cdecl;
+    function errorDomain: NSString; cdecl;
+    function errorComment: NSString; cdecl;
+  end;
+
+  TAVPlayerItemErrorLogEvent = class(TOCGenericImport<AVPlayerItemErrorLogEventClass, AVPlayerItemErrorLogEvent>)
+  end;
+  PAVPlayerItemErrorLogEvent = Pointer;
+
+  AVPlayerItemVideoOutputClass = interface(AVPlayerItemOutputClass)
+    ['{4266026D-FF43-4194-A66A-B5DCC1CDE919}']
+  end;
+  AVPlayerItemVideoOutput = interface(AVPlayerItemOutput)
+    ['{017135B2-F916-4E73-BED3-24616A4F9689}']
+    function initWithPixelBufferAttributes(pixelBufferAttributes: NSDictionary): Pointer{instancetype}; cdecl;
+    function hasNewPixelBufferForItemTime(itemTime: CMTime): Boolean; cdecl;
+    function copyPixelBufferForItemTime(itemTime: CMTime; itemTimeForDisplay: Pointer): CVPixelBufferRef; cdecl;
+    procedure setDelegate(delegate: Pointer; queue: dispatch_queue_t); cdecl;
+    procedure requestNotificationOfMediaDataChangeWithAdvanceInterval(interval: NSTimeInterval); cdecl;
+    function delegate: Pointer; cdecl;
+    function delegateQueue: dispatch_queue_t; cdecl;
+  end;
+
+  TAVPlayerItemVideoOutput = class(TOCGenericImport<AVPlayerItemVideoOutputClass, AVPlayerItemVideoOutput>)
+  end;
+  PAVPlayerItemVideoOutput = Pointer;
+
+  AVPlayerItemLegibleOutputClass = interface(AVPlayerItemOutputClass)
+    ['{3DA7DBD8-CCB8-43E9-B0BB-2FDB5DB3B9CB}']
+  end;
+  AVPlayerItemLegibleOutput = interface(AVPlayerItemOutput)
+    ['{28CF68C1-0268-46EC-9C70-2069B2EAA416}']
+    procedure setDelegate(delegate: Pointer; queue: dispatch_queue_t); cdecl;
+    function delegate: Pointer; cdecl;
+    function delegateQueue: dispatch_queue_t; cdecl;
+    procedure setAdvanceIntervalForDelegateInvocation(advanceIntervalForDelegateInvocation: NSTimeInterval); cdecl;
+    function advanceIntervalForDelegateInvocation: NSTimeInterval; cdecl;
+    function initWithMediaSubtypesForNativeRepresentation(subtypes: NSArray): Pointer{instancetype}; cdecl;
+    procedure setTextStylingResolution(textStylingResolution: NSString); cdecl;
+    function textStylingResolution: NSString; cdecl;
+  end;
+
+  TAVPlayerItemLegibleOutput = class(TOCGenericImport<AVPlayerItemLegibleOutputClass, AVPlayerItemLegibleOutput>)
+  end;
+  PAVPlayerItemLegibleOutput = Pointer;
+
+  AVPlayerItemMetadataOutputClass = interface(AVPlayerItemOutputClass)
+    ['{5E5A0AF6-561C-4A67-B28C-14552048DBDF}']
+  end;
+  AVPlayerItemMetadataOutput = interface(AVPlayerItemOutput)
+    ['{40F568FA-A02F-4C45-B697-653DF1E2362E}']
+    function initWithIdentifiers(identifiers: NSArray): Pointer{instancetype}; cdecl;
+    procedure setDelegate(delegate: Pointer; queue: dispatch_queue_t); cdecl;
+    function delegate: Pointer; cdecl;
+    function delegateQueue: dispatch_queue_t; cdecl;
+    procedure setAdvanceIntervalForDelegateInvocation(advanceIntervalForDelegateInvocation: NSTimeInterval); cdecl;
+    function advanceIntervalForDelegateInvocation: NSTimeInterval; cdecl;
+  end;
+
+  TAVPlayerItemMetadataOutput = class(TOCGenericImport<AVPlayerItemMetadataOutputClass, AVPlayerItemMetadataOutput>)
+  end;
+  PAVPlayerItemMetadataOutput = Pointer;
+
+
+  AVPlayerItemClass = interface(NSObjectClass)
+    ['{C5BC57A7-59C9-4DAE-9D43-D1FD54A1CC2E}']
+    {class} function playerItemWithAsset(asset: AVAsset): Pointer; cdecl;
+    {class} function playerItemWithURL(URL: NSURL): Pointer; cdecl;
+  end;
+  AVPlayerItem = interface(NSObject)
+    ['{D6330CE2-1082-41E4-8E8E-1E696264180A}']
+    function accessLog: AVPlayerItemAccessLog; cdecl;
+    function asset: AVAsset; cdecl;
+    function audioMix: AVAudioMix; cdecl;
+    function canPlayFastForward: Boolean; cdecl;
+    function canPlayFastReverse: Boolean; cdecl;
+    procedure cancelPendingSeeks; cdecl;
+    function currentDate: NSDate; cdecl;
+    function currentTime: CMTime; cdecl;
+    function duration: CMTime; cdecl;
+    function error: NSError; cdecl;
+    function errorLog: AVPlayerItemErrorLog; cdecl;
+    function forwardPlaybackEndTime: CMTime; cdecl;
+    function initWithAsset(asset: AVAsset): Pointer; cdecl;
+    function initWithURL(URL: NSURL): Pointer; cdecl;
+    function isPlaybackBufferEmpty: Boolean; cdecl;
+    function isPlaybackBufferFull: Boolean; cdecl;
+    function isPlaybackLikelyToKeepUp: Boolean; cdecl;
+    function loadedTimeRanges: NSArray; cdecl;
+    function presentationSize: CGSize; cdecl;
+    function reversePlaybackEndTime: CMTime; cdecl;
+    function seekToDate(date: NSDate): Boolean; cdecl;
+    procedure seekToTime(time: CMTime); cdecl; overload;
+    procedure seekToTime(time: CMTime; toleranceBefore: CMTime; toleranceAfter: CMTime); cdecl; overload;
+    function seekableTimeRanges: NSArray; cdecl;
+    procedure selectMediaOption(mediaSelectionOption: AVMediaSelectionOption; inMediaSelectionGroup: AVMediaSelectionGroup); cdecl;
+    function selectedMediaOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption; cdecl;
+    procedure setAudioMix(audioMix: AVAudioMix); cdecl;
+    procedure setForwardPlaybackEndTime(forwardPlaybackEndTime: CMTime); cdecl;
+    procedure setReversePlaybackEndTime(reversePlaybackEndTime: CMTime); cdecl;
+    procedure setVideoComposition(videoComposition: AVVideoComposition); cdecl;
+    function status: AVPlayerItemStatus; cdecl;
+    procedure stepByCount(stepCount: NSInteger); cdecl;
+    function timedMetadata: NSArray; cdecl;
+    function tracks: NSArray; cdecl;
+    function videoComposition: AVVideoComposition; cdecl;
+  end;
+  TAVPlayerItem = class(TOCGenericImport<AVPlayerItemClass, AVPlayerItem>)  end;
+
+  AVMediaSelectionOptionClass = interface(NSObjectClass)
+    ['{84EDCC78-4B73-4EE4-A38A-1989E8D4C681}']
+  end;
+  AVMediaSelectionOption = interface(NSObject)
+    ['{3B90172E-C137-4EC9-94DB-CB7236698F0D}']
+    function associatedMediaSelectionOptionInMediaSelectionGroup(mediaSelectionGroup: AVMediaSelectionGroup): AVMediaSelectionOption; cdecl;
+    function availableMetadataFormats: NSArray; cdecl;
+    function commonMetadata: NSArray; cdecl;
+    function hasMediaCharacteristic(mediaCharacteristic: NSString): Boolean; cdecl;
+    function isPlayable: Boolean; cdecl;
+    function locale: NSLocale; cdecl;
+    function mediaSubTypes: NSArray; cdecl;
+    function mediaType: NSString; cdecl;
+    function metadataForFormat(format: NSString): NSArray; cdecl;
+    function propertyList: Pointer; cdecl;
+  end;
+  TAVMediaSelectionOption = class(TOCGenericImport<AVMediaSelectionOptionClass, AVMediaSelectionOption>)  end;
+
+  AVMediaSelectionGroupClass = interface(NSObjectClass)
+    ['{A1AB759B-FD5A-42CC-A7D4-8F1A7A97849A}']
+    {class} function mediaSelectionOptionsFromArray(array_: NSArray; withLocale: NSLocale): NSArray; cdecl; overload;
+    {class} function mediaSelectionOptionsFromArray(array_: NSArray; withMediaCharacteristics: NSArray): NSArray; cdecl; overload;
+//    {class} function mediaSelectionOptionsFromArray(array_: NSArray; withoutMediaCharacteristics: NSArray): NSArray; cdecl; overload;
+    {class} function playableMediaSelectionOptionsFromArray(array_: NSArray): NSArray; cdecl;
+  end;
+  AVMediaSelectionGroup = interface(NSObject)
+    ['{92BD2ADE-72E8-44D0-B233-8D7558FD8DE5}']
+    function allowsEmptySelection: Boolean; cdecl;
+    function mediaSelectionOptionWithPropertyList(plist: Pointer): AVMediaSelectionOption; cdecl;
+    function options: NSArray; cdecl;
+  end;
+  TAVMediaSelectionGroup = class(TOCGenericImport<AVMediaSelectionGroupClass, AVMediaSelectionGroup>)  end;
+
+  AVMetadataItemClass = interface(NSObjectClass)
+    ['{130F769A-4ED7-4AC8-8304-94F07E39F173}']
+    {class} function metadataItemsFromArray(array_: NSArray; withKey: Pointer; keySpace: NSString): NSArray; cdecl; overload;
+    {class} function metadataItemsFromArray(array_: NSArray; withLocale: NSLocale): NSArray; cdecl; overload;
+  end;
+  AVMetadataItem = interface(NSObject)
+    ['{A7A40638-4DC7-4A86-A4B2-6C47D3A0BC6D}']
+    function commonKey: NSString; cdecl;
+    function dataValue: NSData; cdecl;
+    function dateValue: NSDate; cdecl;
+    function duration: CMTime; cdecl;
+    function extraAttributes: NSDictionary; cdecl;
+    function key: Pointer; cdecl;
+    function keySpace: NSString; cdecl;
+    function locale: NSLocale; cdecl;
+    function numberValue: NSNumber; cdecl;
+    function statusOfValueForKey(key: NSString; error: NSError): AVKeyValueStatus; cdecl;
+    function stringValue: NSString; cdecl;
+    function time: CMTime; cdecl;
+    function value: Pointer; cdecl;
+  end;
+  TAVMetadataItem = class(TOCGenericImport<AVMetadataItemClass, AVMetadataItem>)  end;
+
+  AVPlayerItemTrackClass = interface(NSObjectClass)
+    ['{93725DB1-C395-43DF-A31B-398760D22150}']
+  end;
+  AVPlayerItemTrack = interface(NSObject)
+    ['{B77509C9-F47E-4CA0-BCE5-D14CA98C8549}']
+    function assetTrack: AVAssetTrack; cdecl;
+    function isEnabled: Boolean; cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+  end;
+  TAVPlayerItemTrack = class(TOCGenericImport<AVPlayerItemTrackClass, AVPlayerItemTrack>)  end;
+
+  AVCaptureDeviceClass = interface(NSObjectClass)
+    ['{D99109B5-EBAB-4DFD-85C5-5FECBDA5D43D}']
+    {class} function defaultDeviceWithMediaType(mediaType: NSString): Pointer; cdecl;
+    {class} function deviceWithUniqueID(deviceUniqueID: NSString): Pointer; cdecl;
+    {class} function devices: NSArray; cdecl;
+    {class} function devicesWithMediaType(mediaType: NSString): NSArray; cdecl;
+  end;
+  AVCaptureDevice = interface(NSObject)
+    ['{A8ECC90F-6016-44A4-BB84-8FB720CF786D}']
+    function exposureMode: AVCaptureExposureMode; cdecl;
+    function exposurePointOfInterest: CGPoint; cdecl;
+    function flashMode: AVCaptureFlashMode; cdecl;
+    function focusMode: AVCaptureFocusMode; cdecl;
+    function focusPointOfInterest: CGPoint; cdecl;
+    function hasFlash: Boolean; cdecl;
+    function hasMediaType(mediaType: NSString): Boolean; cdecl;
+    function hasTorch: Boolean; cdecl;
+    function formats: NSArray; cdecl;
+    procedure setActiveFormat(activeFormat: AVCaptureDeviceFormat); cdecl;
+    function activeFormat: AVCaptureDeviceFormat; cdecl;
+    procedure setActiveVideoMinFrameDuration(activeVideoMinFrameDuration: CMTime); cdecl;
+    function activeVideoMinFrameDuration: CMTime; cdecl;
+    procedure setActiveVideoMaxFrameDuration(activeVideoMaxFrameDuration: CMTime); cdecl;
+    function activeVideoMaxFrameDuration: CMTime; cdecl;
+    function isAdjustingExposure: Boolean; cdecl;
+    function isAdjustingFocus: Boolean; cdecl;
+    function isAdjustingWhiteBalance: Boolean; cdecl;
+    function isConnected: Boolean; cdecl;
+    function isExposureModeSupported(exposureMode: AVCaptureExposureMode): Boolean; cdecl;
+    function isExposurePointOfInterestSupported: Boolean; cdecl;
+    function isFlashActive: Boolean; cdecl;
+    function isFlashAvailable: Boolean; cdecl;
+    function isFlashModeSupported(flashMode: AVCaptureFlashMode): Boolean; cdecl;
+    function isFocusModeSupported(focusMode: AVCaptureFocusMode): Boolean; cdecl;
+    function isFocusPointOfInterestSupported: Boolean; cdecl;
+    function isSubjectAreaChangeMonitoringEnabled: Boolean; cdecl;
+    function isTorchAvailable: Boolean; cdecl;
+    function isTorchModeSupported(torchMode: AVCaptureTorchMode): Boolean; cdecl;
+    function isWhiteBalanceModeSupported(whiteBalanceMode: AVCaptureWhiteBalanceMode): Boolean; cdecl;
+    function localizedName: NSString; cdecl;
+    function lockForConfiguration(outError: NSError): Boolean; cdecl;
+    function modelID: NSString; cdecl;
+    function position: AVCaptureDevicePosition; cdecl;
+    procedure setExposureMode(exposureMode: AVCaptureExposureMode); cdecl;
+    procedure setExposurePointOfInterest(exposurePointOfInterest: CGPoint); cdecl;
+    procedure setFlashMode(flashMode: AVCaptureFlashMode); cdecl;
+    procedure setFocusMode(focusMode: AVCaptureFocusMode); cdecl;
+    procedure setFocusPointOfInterest(focusPointOfInterest: CGPoint); cdecl;
+    procedure setSubjectAreaChangeMonitoringEnabled(subjectAreaChangeMonitoringEnabled: Boolean); cdecl;
+    procedure setTorchMode(torchMode: AVCaptureTorchMode); cdecl;
+    procedure setWhiteBalanceMode(whiteBalanceMode: AVCaptureWhiteBalanceMode); cdecl;
+    function supportsAVCaptureSessionPreset(preset: NSString): Boolean; cdecl;
+    function torchLevel: Single; cdecl;
+    function torchMode: AVCaptureTorchMode; cdecl;
+    function uniqueID: NSString; cdecl;
+    procedure unlockForConfiguration; cdecl;
+    function whiteBalanceMode: AVCaptureWhiteBalanceMode; cdecl;
+  end;
+  TAVCaptureDevice = class(TOCGenericImport<AVCaptureDeviceClass, AVCaptureDevice>)  end;
+
+  AVFrameRateRangeClass = interface(NSObjectClass)
+    ['{681359F1-9D28-49F5-8234-5D6451A52F3C}']
+  end;
+
+  AVFrameRateRange = interface(NSObject)
+    ['{EF3E80FE-3E82-4DAE-B15D-EC9B86F3DCE7}']
+    function minFrameRate: Double; cdecl;
+    function maxFrameRate: Double; cdecl;
+    function maxFrameDuration: CMTime; cdecl;
+    function minFrameDuration: CMTime; cdecl;
+  end;
+
+  TAVFrameRateRange = class(TOCGenericImport<AVFrameRateRangeClass, AVFrameRateRange>)
+  end;
+
+  AVAssetTrackClass = interface(NSObjectClass)
+    ['{3117D5A1-A0E0-4037-B732-71ADCF3FEFA2}']
+  end;
+  AVAssetTrack = interface(NSObject)
+    ['{5FB20151-009C-465B-80F7-E2C90471409A}']
+    function asset: AVAsset; cdecl;
+    function availableMetadataFormats: NSArray; cdecl;
+    function commonMetadata: NSArray; cdecl;
+    function estimatedDataRate: Single; cdecl;
+    function extendedLanguageTag: NSString; cdecl;
+    function formatDescriptions: NSArray; cdecl;
+    function hasMediaCharacteristic(mediaCharacteristic: NSString): Boolean; cdecl;
+    function isEnabled: Boolean; cdecl;
+    function isPlayable: Boolean; cdecl;
+    function isSelfContained: Boolean; cdecl;
+    function languageCode: NSString; cdecl;
+    function mediaType: NSString; cdecl;
+    function metadataForFormat(format: NSString): NSArray; cdecl;
+    function naturalSize: CGSize; cdecl;
+    function naturalTimeScale: CMTimeScale; cdecl;
+    function nominalFrameRate: Single; cdecl;
+    function preferredTransform: CGAffineTransform; cdecl;
+    function preferredVolume: Single; cdecl;
+    function samplePresentationTimeForTrackTime(trackTime: CMTime): CMTime; cdecl;
+    function segmentForTrackTime(trackTime: CMTime): AVAssetTrackSegment; cdecl;
+    function segments: NSArray; cdecl;
+    function timeRange: CMTimeRange; cdecl;
+    function totalSampleDataLength: Int64; cdecl;
+    function trackID: CMPersistentTrackID; cdecl;
+  end;
+  TAVAssetTrack = class(TOCGenericImport<AVAssetTrackClass, AVAssetTrack>)  end;
+
+  AVAssetTrackSegmentClass = interface(NSObjectClass)
+    ['{0F9BDB53-C283-47AA-B733-0B5D7A61DBF0}']
+  end;
+  AVAssetTrackSegment = interface(NSObject)
+    ['{57AC9D4B-F54F-40CB-BF48-4BEA9DFBB6D3}']
+    function isEmpty: Boolean; cdecl;
+    function timeMapping: CMTimeMapping; cdecl;
+  end;
+  TAVAssetTrackSegment = class(TOCGenericImport<AVAssetTrackSegmentClass, AVAssetTrackSegment>)  end;
+
+  AVAssetClass = interface(NSObjectClass)
+    ['{5B1853CA-F40B-418F-9411-19247F629D80}']
+    {class} function assetWithURL(URL: NSURL): Pointer; cdecl;
+  end;
+  AVAsset = interface(NSObject)
+    ['{1762072E-9F4E-478A-B37C-06FCD01ACD36}']
+    function availableChapterLocales: NSArray; cdecl;
+    function availableMediaCharacteristicsWithMediaSelectionOptions: NSArray; cdecl;
+    function availableMetadataFormats: NSArray; cdecl;
+    procedure cancelLoading; cdecl;
+    function chapterMetadataGroupsWithTitleLocale(locale: NSLocale; containingItemsWithCommonKeys: NSArray): NSArray; cdecl;
+    function commonMetadata: NSArray; cdecl;
+    function creationDate: AVMetadataItem; cdecl;
+    function duration: CMTime; cdecl;
+    function hasProtectedContent: Boolean; cdecl;
+    function isCompatibleWithSavedPhotosAlbum: Boolean; cdecl;
+    function isComposable: Boolean; cdecl;
+    function isExportable: Boolean; cdecl;
+    function isPlayable: Boolean; cdecl;
+    function isReadable: Boolean; cdecl;
+    function lyrics: NSString; cdecl;
+    function mediaSelectionGroupForMediaCharacteristic(mediaCharacteristic: NSString): AVMediaSelectionGroup; cdecl;
+    function metadataForFormat(format: NSString): NSArray; cdecl;
+    function naturalSize: CGSize; cdecl;
+    function preferredRate: Single; cdecl;
+    function preferredTransform: CGAffineTransform; cdecl;
+    function preferredVolume: Single; cdecl;
+    function providesPreciseDurationAndTiming: Boolean; cdecl;
+    function referenceRestrictions: AVAssetReferenceRestrictions; cdecl;
+    function trackWithTrackID(trackID: CMPersistentTrackID): AVAssetTrack; cdecl;
+    function tracks: NSArray; cdecl;
+    function tracksWithMediaCharacteristic(mediaCharacteristic: NSString): NSArray; cdecl;
+    function tracksWithMediaType(mediaType: NSString): NSArray; cdecl;
+    function unusedTrackID: CMPersistentTrackID; cdecl;
+  end;
+  TAVAsset = class(TOCGenericImport<AVAssetClass, AVAsset>)  end;
+
+  AVAssetWriterClass = interface(NSObjectClass)
+    ['{6D40766B-E7D4-4AB1-84C0-40854E31DBB1}']
+    {class} function assetWriterWithURL(outputURL: NSURL; fileType: NSString; error: NSError): Pointer; cdecl;
+  end;
+  AVAssetWriter = interface(NSObject)
+    ['{3267019A-FB54-4919-B507-759FF0E92BEF}']
+    procedure addInput(input: AVAssetWriterInput); cdecl;
+    function availableMediaTypes: NSArray; cdecl;
+    function canAddInput(input: AVAssetWriterInput): Boolean; cdecl;
+    function canApplyOutputSettings(outputSettings: NSDictionary; forMediaType: NSString): Boolean; cdecl;
+    procedure cancelWriting; cdecl;
+    procedure endSessionAtSourceTime(endTime: CMTime); cdecl;
+    function error: NSError; cdecl;
+    function finishWriting: Boolean; cdecl;
+    function initWithURL(outputURL: NSURL; fileType: NSString; error: NSError): Pointer; cdecl;
+    function inputs: NSArray; cdecl;
+    function metadata: NSArray; cdecl;
+    function movieFragmentInterval: CMTime; cdecl;
+    function movieTimeScale: CMTimeScale; cdecl;
+    function outputFileType: NSString; cdecl;
+    function outputURL: NSURL; cdecl;
+    procedure setMetadata(metadata: NSArray); cdecl;
+    procedure setMovieFragmentInterval(movieFragmentInterval: CMTime); cdecl;
+    procedure setMovieTimeScale(movieTimeScale: CMTimeScale); cdecl;
+    procedure setShouldOptimizeForNetworkUse(shouldOptimizeForNetworkUse: Boolean); cdecl;
+    function shouldOptimizeForNetworkUse: Boolean; cdecl;
+    procedure startSessionAtSourceTime(startTime: CMTime); cdecl;
+    function startWriting: Boolean; cdecl;
+    function status: AVAssetWriterStatus; cdecl;
+  end;
+  TAVAssetWriter = class(TOCGenericImport<AVAssetWriterClass, AVAssetWriter>)  end;
+
+  AVAssetImageGeneratorClass = interface(NSObjectClass)
+    ['{5C7794F2-361F-4E6C-8C9F-E00CF0246A15}']
+    {class} function assetImageGeneratorWithAsset(asset: AVAsset): Pointer; cdecl;
+  end;
+  AVAssetImageGenerator = interface(NSObject)
+    ['{0B8393D2-55CC-49CE-AB2C-C6B8938CC180}']
+    function apertureMode: NSString; cdecl;
+    function appliesPreferredTrackTransform: Boolean; cdecl;
+    procedure cancelAllCGImageGeneration; cdecl;
+    function copyCGImageAtTime(requestedTime: CMTime; actualTime: CMTime; error: NSError): CGImageRef; cdecl;
+    function initWithAsset(asset: AVAsset): Pointer; cdecl;
+    function maximumSize: CGSize; cdecl;
+    function requestedTimeToleranceAfter: CMTime; cdecl;
+    function requestedTimeToleranceBefore: CMTime; cdecl;
+    procedure setApertureMode(apertureMode: NSString); cdecl;
+    procedure setAppliesPreferredTrackTransform(appliesPreferredTrackTransform: Boolean); cdecl;
+    procedure setMaximumSize(maximumSize: CGSize); cdecl;
+    procedure setRequestedTimeToleranceAfter(requestedTimeToleranceAfter: CMTime); cdecl;
+    procedure setRequestedTimeToleranceBefore(requestedTimeToleranceBefore: CMTime); cdecl;
+    procedure setVideoComposition(videoComposition: AVVideoComposition); cdecl;
+    function videoComposition: AVVideoComposition; cdecl;
+  end;
+  TAVAssetImageGenerator = class(TOCGenericImport<AVAssetImageGeneratorClass, AVAssetImageGenerator>)  end;
+
+  AVAssetExportSessionClass = interface(NSObjectClass)
+    ['{46299F3E-74CC-422A-8133-F0D4D62BDD1D}']
+    {class} function allExportPresets: NSArray; cdecl;
+    {class} function exportPresetsCompatibleWithAsset(asset: AVAsset): NSArray; cdecl;
+    {class} function exportSessionWithAsset(asset: AVAsset; presetName: NSString): Pointer; cdecl;
+  end;
+  AVAssetExportSession = interface(NSObject)
+    ['{3E6C3EAA-A638-4B5C-BE76-231F684EE84F}']
+    function asset: AVAsset; cdecl;
+    function audioMix: AVAudioMix; cdecl;
+    procedure cancelExport; cdecl;
+    function error: NSError; cdecl;
+    function estimatedOutputFileLength: Int64; cdecl;
+    function fileLengthLimit: Int64; cdecl;
+    function initWithAsset(asset: AVAsset; presetName: NSString): Pointer; cdecl;
+    function maxDuration: CMTime; cdecl;
+    function metadata: NSArray; cdecl;
+    function outputFileType: NSString; cdecl;
+    function outputURL: NSURL; cdecl;
+    function presetName: NSString; cdecl;
+    function progress: Single; cdecl;
+    procedure setAudioMix(audioMix: AVAudioMix); cdecl;
+    procedure setFileLengthLimit(fileLengthLimit: Int64); cdecl;
+    procedure setMetadata(metadata: NSArray); cdecl;
+    procedure setOutputFileType(outputFileType: NSString); cdecl;
+    procedure setOutputURL(outputURL: NSURL); cdecl;
+    procedure setShouldOptimizeForNetworkUse(shouldOptimizeForNetworkUse: Boolean); cdecl;
+    procedure setTimeRange(timeRange: CMTimeRange); cdecl;
+    procedure setVideoComposition(videoComposition: AVVideoComposition); cdecl;
+    function shouldOptimizeForNetworkUse: Boolean; cdecl;
+    function status: AVAssetExportSessionStatus; cdecl;
+    function supportedFileTypes: NSArray; cdecl;
+    function timeRange: CMTimeRange; cdecl;
+    function videoComposition: AVVideoComposition; cdecl;
+  end;
+  TAVAssetExportSession = class(TOCGenericImport<AVAssetExportSessionClass, AVAssetExportSession>)  end;
+
+  AVAssetReaderClass = interface(NSObjectClass)
+    ['{9EF367AD-6B43-4496-833F-6D0CEFAC4F85}']
+    {class} function assetReaderWithAsset(asset: AVAsset; error: NSError): Pointer; cdecl;
+  end;
+  AVAssetReader = interface(NSObject)
+    ['{8F7018C5-89C3-47BA-A250-E9F0974F5FDF}']
+    procedure addOutput(output: AVAssetReaderOutput); cdecl;
+    function asset: AVAsset; cdecl;
+    function canAddOutput(output: AVAssetReaderOutput): Boolean; cdecl;
+    procedure cancelReading; cdecl;
+    function error: NSError; cdecl;
+    function initWithAsset(asset: AVAsset; error: NSError): Pointer; cdecl;
+    function outputs: NSArray; cdecl;
+    procedure setTimeRange(timeRange: CMTimeRange); cdecl;
+    function startReading: Boolean; cdecl;
+    function status: AVAssetReaderStatus; cdecl;
+    function timeRange: CMTimeRange; cdecl;
+  end;
+  TAVAssetReader = class(TOCGenericImport<AVAssetReaderClass, AVAssetReader>)  end;
+
+  AVAssetReaderOutputClass = interface(NSObjectClass)
+    ['{A18FC0FD-FB8B-47AA-AE57-A0A563C81353}']
+  end;
+  AVAssetReaderOutput = interface(NSObject)
+    ['{C784D941-58FF-417F-9234-F021DA36D4A7}']
+    function alwaysCopiesSampleData: Boolean; cdecl;
+    function copyNextSampleBuffer: CMSampleBufferRef; cdecl;
+    function mediaType: NSString; cdecl;
+    procedure setAlwaysCopiesSampleData(alwaysCopiesSampleData: Boolean); cdecl;
+  end;
+  TAVAssetReaderOutput = class(TOCGenericImport<AVAssetReaderOutputClass, AVAssetReaderOutput>)  end;
+
+  AVAudioSessionClass = interface(NSObjectClass)
+    ['{27750A0D-F670-4CA2-8D70-93AF033E990D}']
+    {class} function sharedInstance: Pointer; cdecl;
+  end;
+  AVAudioSession = interface(NSObject)
+    ['{C23AE581-031A-4504-A0AF-C40F6482173A}']
+    function category: NSString; cdecl;
+    function currentHardwareInputNumberOfChannels: NSInteger; cdecl;
+    function currentHardwareOutputNumberOfChannels: NSInteger; cdecl;
+    function currentHardwareSampleRate: double; cdecl;
+    function delegate: Pointer; cdecl;
+    function inputIsAvailable: Boolean; cdecl;
+    function mode: NSString; cdecl;
+    function preferredHardwareSampleRate: double; cdecl;
+    function preferredIOBufferDuration: NSTimeInterval; cdecl;
+    function setActive(beActive: Boolean; error: NSError): Boolean; cdecl; overload;
+    function setActive(beActive: Boolean; withFlags: NSInteger; error: NSError): Boolean; cdecl; overload;
+    function setCategory(theCategory: NSString; error: NSError): Boolean; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    function setMode(theMode: NSString; error: NSError): Boolean; cdecl;
+    function setPreferredHardwareSampleRate(sampleRate: double; error: NSError): Boolean; cdecl;
+    function setPreferredIOBufferDuration(duration: NSTimeInterval; error: NSError): Boolean; cdecl;
+  end;
+  TAVAudioSession = class(TOCGenericImport<AVAudioSessionClass, AVAudioSession>)  end;
+
+  AVCaptureDeviceFormatClass = interface(NSObjectClass)
+    ['{01C5ADE2-BE0F-46E2-B5C1-DB18D9861ADC}']
+  end;
+
+  AVCaptureDeviceFormat = interface(NSObject)
+    ['{FE87B684-00B7-467D-A15A-9220534CD5D5}']
+    function mediaType: NSString; cdecl;
+    function formatDescription: CMFormatDescriptionRef; cdecl;
+    function videoSupportedFrameRateRanges: NSArray; cdecl;
+    function videoFieldOfView: Single; cdecl;
+    function isVideoBinned: Boolean; cdecl;
+    function isVideoStabilizationSupported: Boolean; cdecl;
+    function videoMaxZoomFactor: CGFloat; cdecl;
+    function videoZoomFactorUpscaleThreshold: CGFloat; cdecl;
+  end;
+
+  TAVCaptureDeviceFormat = class(TOCGenericImport<AVCaptureDeviceFormatClass,
+    AVCaptureDeviceFormat>)
+  end;
+
+  AVAudioRecorderClass = interface(NSObjectClass)
+    ['{8BB1CEAF-2C49-4093-8A90-0253A9F0AA70}']
+  end;
+  AVAudioRecorder = interface(NSObject)
+    ['{DE27A761-9065-44E4-8F57-6AF044C999E9}']
+    function averagePowerForChannel(channelNumber: NSUInteger): Single; cdecl;
+    function currentTime: NSTimeInterval; cdecl;
+    function delegate: Pointer; cdecl;
+    function deleteRecording: Boolean; cdecl;
+    function initWithURL(url: NSURL; settings: NSDictionary; error: NSError): Pointer; cdecl;
+    function isMeteringEnabled: Boolean; cdecl;
+    function isRecording: Boolean; cdecl;
+    procedure pause; cdecl;
+    function peakPowerForChannel(channelNumber: NSUInteger): Single; cdecl;
+    function prepareToRecord: Boolean; cdecl;
+    function &record: Boolean; cdecl;
+    function recordForDuration(duration: NSTimeInterval): Boolean; cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setMeteringEnabled(meteringEnabled: Boolean); cdecl;
+    function settings: NSDictionary; cdecl;
+    procedure stop; cdecl;
+    procedure updateMeters; cdecl;
+    function url: NSURL; cdecl;
+  end;
+  TAVAudioRecorder = class(TOCGenericImport<AVAudioRecorderClass, AVAudioRecorder>)  end;
+
+  AVCaptureAudioChannelClass = interface(NSObjectClass)
+    ['{E6E22267-6084-470F-A47D-1AD8FCDE3C62}']
+  end;
+  AVCaptureAudioChannel = interface(NSObject)
+    ['{CC725B0B-A5E0-447A-96FB-89ABE201480A}']
+    function averagePowerLevel: Single; cdecl;
+    function peakHoldLevel: Single; cdecl;
+  end;
+  TAVCaptureAudioChannel = class(TOCGenericImport<AVCaptureAudioChannelClass, AVCaptureAudioChannel>)  end;
+
+  AVCaptureConnectionClass = interface(NSObjectClass)
+    ['{084A4608-2F20-4AC0-A31A-C22D95FEC975}']
+  end;
+  AVCaptureConnection = interface(NSObject)
+    ['{0C2188E9-4D0E-4CE0-BBEE-717D9821BB06}']
+    function audioChannels: NSArray; cdecl;
+    function inputPorts: NSArray; cdecl;
+    function isActive: Boolean; cdecl;
+    function isEnabled: Boolean; cdecl;
+    function isVideoMaxFrameDurationSupported: Boolean; cdecl;
+    function isVideoMinFrameDurationSupported: Boolean; cdecl;
+    function isVideoMirrored: Boolean; cdecl;
+    function isVideoMirroringSupported: Boolean; cdecl;
+    function isVideoOrientationSupported: Boolean; cdecl;
+    function output: AVCaptureOutput; cdecl;
+    procedure setEnabled(enabled: Boolean); cdecl;
+    procedure setVideoMaxFrameDuration(videoMaxFrameDuration: CMTime); cdecl;
+    procedure setVideoMinFrameDuration(videoMinFrameDuration: CMTime); cdecl;
+    procedure setVideoMirrored(videoMirrored: Boolean); cdecl;
+    procedure setVideoOrientation(videoOrientation: AVCaptureVideoOrientation); cdecl;
+    procedure setVideoScaleAndCropFactor(videoScaleAndCropFactor: CGFloat); cdecl;
+    function videoMaxFrameDuration: CMTime; cdecl;
+    function videoMaxScaleAndCropFactor: CGFloat; cdecl;
+    function videoMinFrameDuration: CMTime; cdecl;
+    function videoOrientation: AVCaptureVideoOrientation; cdecl;
+    function videoScaleAndCropFactor: CGFloat; cdecl;
+  end;
+  TAVCaptureConnection = class(TOCGenericImport<AVCaptureConnectionClass, AVCaptureConnection>)  end;
+
+  AVVideoCompositionLayerInstructionClass = interface(NSObjectClass)
+    ['{908820FB-6AAE-4C48-8432-8643493942FB}']
+  end;
+  AVVideoCompositionLayerInstruction = interface(NSObject)
+    ['{439E393B-CC03-4D21-93DE-C49E8F1FD44D}']
+    function getOpacityRampForTime(time: CMTime; startOpacity: PSingle; endOpacity: PSingle; timeRange: CMTimeRange): Boolean; cdecl;
+    function getTransformRampForTime(time: CMTime; startTransform: CGAffineTransform; endTransform: CGAffineTransform; timeRange: CMTimeRange): Boolean; cdecl;
+    function trackID: CMPersistentTrackID; cdecl;
+  end;
+  TAVVideoCompositionLayerInstruction = class(TOCGenericImport<AVVideoCompositionLayerInstructionClass, AVVideoCompositionLayerInstruction>)  end;
+
+  AVAudioPlayerClass = interface(NSObjectClass)
+    ['{4FDDB9DA-F4C6-467F-B7A7-53C19D7A8415}']
+  end;
+  AVAudioPlayer = interface(NSObject)
+    ['{682F8E33-4146-45F9-8AF5-368B633C863F}']
+    function averagePowerForChannel(channelNumber: NSUInteger): Single; cdecl;
+    function currentTime: NSTimeInterval; cdecl;
+    function data: NSData; cdecl;
+    function delegate: Pointer; cdecl;
+    function deviceCurrentTime: NSTimeInterval; cdecl;
+    function duration: NSTimeInterval; cdecl;
+    function enableRate: Boolean; cdecl;
+    function initWithContentsOfURL(url: NSURL; error: NSError): Pointer; cdecl;
+    function initWithData(data: NSData; error: NSError): Pointer; cdecl;
+    function isMeteringEnabled: Boolean; cdecl;
+    function isPlaying: Boolean; cdecl;
+    function numberOfChannels: NSUInteger; cdecl;
+    function numberOfLoops: NSInteger; cdecl;
+    function pan: Single; cdecl;
+    procedure pause; cdecl;
+    function peakPowerForChannel(channelNumber: NSUInteger): Single; cdecl;
+    function play: Boolean; cdecl;
+    function playAtTime(time: NSTimeInterval): Boolean; cdecl;
+    function prepareToPlay: Boolean; cdecl;
+    function rate: Single; cdecl;
+    procedure setCurrentTime(currentTime: NSTimeInterval); cdecl;
+    procedure setDelegate(delegate: Pointer); cdecl;
+    procedure setEnableRate(enableRate: Boolean); cdecl;
+    procedure setMeteringEnabled(meteringEnabled: Boolean); cdecl;
+    procedure setNumberOfLoops(numberOfLoops: NSInteger); cdecl;
+    procedure setPan(pan: Single); cdecl;
+    procedure setRate(rate: Single); cdecl;
+    procedure setVolume(volume: Single); cdecl;
+    function settings: NSDictionary; cdecl;
+    procedure stop; cdecl;
+    procedure updateMeters; cdecl;
+    function url: NSURL; cdecl;
+    function volume: Single; cdecl;
+  end;
+  TAVAudioPlayer = class(TOCGenericImport<AVAudioPlayerClass, AVAudioPlayer>)  end;
+
+  AVAssetWriterInputPixelBufferAdaptorClass = interface(NSObjectClass)
+    ['{C0E289AD-73E4-4B73-BC83-38B03D28B500}']
+    {class} function assetWriterInputPixelBufferAdaptorWithAssetWriterInput(input: AVAssetWriterInput; sourcePixelBufferAttributes: NSDictionary): Pointer; cdecl;
+  end;
+  AVAssetWriterInputPixelBufferAdaptor = interface(NSObject)
+    ['{CDC41D77-0DB6-4373-B23F-3E02841E9B0A}']
+    function appendPixelBuffer(pixelBuffer: CVPixelBufferRef; withPresentationTime: CMTime): Boolean; cdecl;
+    function assetWriterInput: AVAssetWriterInput; cdecl;
+    function initWithAssetWriterInput(input: AVAssetWriterInput; sourcePixelBufferAttributes: NSDictionary): Pointer; cdecl;
+    function pixelBufferPool: CVPixelBufferPoolRef; cdecl;
+    function sourcePixelBufferAttributes: NSDictionary; cdecl;
+  end;
+  TAVAssetWriterInputPixelBufferAdaptor = class(TOCGenericImport<AVAssetWriterInputPixelBufferAdaptorClass, AVAssetWriterInputPixelBufferAdaptor>)  end;
+
+  AVAssetWriterInputClass = interface(NSObjectClass)
+    ['{9844CB93-8E9A-463B-97CA-32B3CB3C23B7}']
+    {class} function assetWriterInputWithMediaType(mediaType: NSString; outputSettings: NSDictionary): Pointer; cdecl;
+  end;
+  AVAssetWriterInput = interface(NSObject)
+    ['{AB33CDB6-FB68-4CEB-BA0B-CFEB676F6B61}']
+    function appendSampleBuffer(sampleBuffer: CMSampleBufferRef): Boolean; cdecl;
+    function expectsMediaDataInRealTime: Boolean; cdecl;
+    function initWithMediaType(mediaType: NSString; outputSettings: NSDictionary): Pointer; cdecl;
+    function isReadyForMoreMediaData: Boolean; cdecl;
+    procedure markAsFinished; cdecl;
+    function mediaTimeScale: CMTimeScale; cdecl;
+    function mediaType: NSString; cdecl;
+    function metadata: NSArray; cdecl;
+    function outputSettings: NSDictionary; cdecl;
+    procedure setExpectsMediaDataInRealTime(expectsMediaDataInRealTime: Boolean); cdecl;
+    procedure setMediaTimeScale(mediaTimeScale: CMTimeScale); cdecl;
+    procedure setMetadata(metadata: NSArray); cdecl;
+    procedure setTransform(transform: CGAffineTransform); cdecl;
+    function transform: CGAffineTransform; cdecl;
+  end;
+  TAVAssetWriterInput = class(TOCGenericImport<AVAssetWriterInputClass, AVAssetWriterInput>)  end;
+
+  AVAudioMixClass = interface(NSObjectClass)
+    ['{69AED0FA-3E1F-48C6-9DFA-CDFBC6739A03}']
+  end;
+  AVAudioMix = interface(NSObject)
+    ['{3330D086-B8BD-485F-91A1-DAF6C3A2D66B}']
+    function inputParameters: NSArray; cdecl;
+  end;
+  TAVAudioMix = class(TOCGenericImport<AVAudioMixClass, AVAudioMix>)  end;
+
+  AVAudioMixInputParametersClass = interface(NSObjectClass)
+    ['{E6A5CA72-B920-4BF5-8E48-C6AFAD87CAC2}']
+  end;
+  AVAudioMixInputParameters = interface(NSObject)
+    ['{57A0CC56-0D02-49FD-B584-A448DDA8EB18}']
+    function getVolumeRampForTime(time: CMTime; startVolume: PSingle; endVolume: PSingle; timeRange: CMTimeRange): Boolean; cdecl;
+    function trackID: CMPersistentTrackID; cdecl;
+  end;
+  TAVAudioMixInputParameters = class(TOCGenericImport<AVAudioMixInputParametersClass, AVAudioMixInputParameters>)  end;
+
+  AVMutableVideoCompositionLayerInstructionClass = interface(AVVideoCompositionLayerInstructionClass)
+    ['{9525AF18-DBB3-4B26-B671-B14DD6F34BB8}']
+    {class} function videoCompositionLayerInstruction: Pointer; cdecl;
+    {class} function videoCompositionLayerInstructionWithAssetTrack(track: AVAssetTrack): Pointer; cdecl;
+  end;
+  AVMutableVideoCompositionLayerInstruction = interface(AVVideoCompositionLayerInstruction)
+    ['{E4D14916-427D-48CA-B0F6-FBAD402446D6}']
+    procedure setOpacity(opacity: Single; atTime: CMTime); cdecl;
+    procedure setOpacityRampFromStartOpacity(startOpacity: Single; toEndOpacity: Single; timeRange: CMTimeRange); cdecl;
+    procedure setTrackID(trackID: CMPersistentTrackID); cdecl;
+    procedure setTransform(transform: CGAffineTransform; atTime: CMTime); cdecl;
+    procedure setTransformRampFromStartTransform(startTransform: CGAffineTransform; toEndTransform: CGAffineTransform; timeRange: CMTimeRange); cdecl;
+    function trackID: CMPersistentTrackID; cdecl;
+  end;
+  TAVMutableVideoCompositionLayerInstruction = class(TOCGenericImport<AVMutableVideoCompositionLayerInstructionClass, AVMutableVideoCompositionLayerInstruction>)  end;
+
+  AVURLAssetClass = interface(AVAssetClass)
+    ['{BCD7DCDC-37D7-45D0-B428-49F1ACE35DCE}']
+    {class} function URLAssetWithURL(URL: NSURL; options: NSDictionary): Pointer; cdecl;
+    {class} function audiovisualMIMETypes: NSArray; cdecl;
+    {class} function audiovisualTypes: NSArray; cdecl;
+    {class} function isPlayableExtendedMIMEType(extendedMIMEType: NSString): Boolean; cdecl;
+  end;
+  AVURLAsset = interface(AVAsset)
+    ['{6CEBF29C-C73E-4481-9F37-BA0FD0178F31}']
+    function URL: NSURL; cdecl;
+    function compatibleTrackForCompositionTrack(compositionTrack: AVCompositionTrack): AVAssetTrack; cdecl;
+    function initWithURL(URL: NSURL; options: NSDictionary): Pointer; cdecl;
+  end;
+  TAVURLAsset = class(TOCGenericImport<AVURLAssetClass, AVURLAsset>)  end;
+
+  AVCaptureStillImageOutputClass = interface(AVCaptureOutputClass)
+    ['{0FF39B64-E84C-4A46-A442-20E0E10F8E61}']
+    {class} function jpegStillImageNSDataRepresentation(jpegSampleBuffer: CMSampleBufferRef): NSData; cdecl;
+  end;
+  AVCaptureStillImageOutput = interface(AVCaptureOutput)
+    ['{E0B5F87B-AFA2-4AF2-AA36-AA4E5480A9AC}']
+    function availableImageDataCVPixelFormatTypes: NSArray; cdecl;
+    function availableImageDataCodecTypes: NSArray; cdecl;
+    function isCapturingStillImage: Boolean; cdecl;
+    function outputSettings: NSDictionary; cdecl;
+    procedure setOutputSettings(outputSettings: NSDictionary); cdecl;
+  end;
+  TAVCaptureStillImageOutput = class(TOCGenericImport<AVCaptureStillImageOutputClass, AVCaptureStillImageOutput>)  end;
+
+  AVCaptureFileOutputClass = interface(AVCaptureOutputClass)
+    ['{CF6368B5-6B7C-4BB8-A540-C0DE16272551}']
+  end;
+  AVCaptureFileOutput = interface(AVCaptureOutput)
+    ['{F79864F4-58B8-4F95-9311-C981CD2E6B8D}']
+    function isRecording: Boolean; cdecl;
+    function maxRecordedDuration: CMTime; cdecl;
+    function maxRecordedFileSize: Int64; cdecl;
+    function minFreeDiskSpaceLimit: Int64; cdecl;
+    function outputFileURL: NSURL; cdecl;
+    function recordedDuration: CMTime; cdecl;
+    function recordedFileSize: Int64; cdecl;
+    procedure setMaxRecordedDuration(maxRecordedDuration: CMTime); cdecl;
+    procedure setMaxRecordedFileSize(maxRecordedFileSize: Int64); cdecl;
+    procedure setMinFreeDiskSpaceLimit(minFreeDiskSpaceLimit: Int64); cdecl;
+    procedure startRecordingToOutputFileURL(outputFileURL: NSURL; recordingDelegate: Pointer); cdecl;
+    procedure stopRecording; cdecl;
+  end;
+  TAVCaptureFileOutput = class(TOCGenericImport<AVCaptureFileOutputClass, AVCaptureFileOutput>)  end;
+
+  AVCaptureFileOutputRecordingDelegate = interface(IObjectiveC)
+    ['{AA628061-1E38-49A9-99AE-960C9E9D5647}']
+    procedure captureOutput(captureOutput: AVCaptureFileOutput; didFinishRecordingToOutputFileAtURL: NSURL; fromConnections: NSArray; error: NSError); cdecl; overload;
+//    procedure captureOutput(captureOutput: AVCaptureFileOutput; didStartRecordingToOutputFileAtURL: NSURL; fromConnections: NSArray); cdecl; overload;
+  end;
+
+  AVCompositionClass = interface(AVAssetClass)
+    ['{5DF58937-B6D5-4021-A03A-FF97737C918C}']
+  end;
+  AVComposition = interface(AVAsset)
+    ['{44C3E72F-B677-4B28-A863-C1CF70D6A721}']
+    function naturalSize: CGSize; cdecl;
+    function tracks: NSArray; cdecl;
+  end;
+  TAVComposition = class(TOCGenericImport<AVCompositionClass, AVComposition>)  end;
+
+  AVCaptureVideoDataOutputClass = interface(AVCaptureOutputClass)
+    ['{4CA97D19-AE08-4A6B-B6DE-9DA91E4072C3}']
+  end;
+  AVCaptureVideoDataOutput = interface(AVCaptureOutput)
+    ['{263A3E99-CBF1-4D04-85FB-078B8C7E4670}']
+    function alwaysDiscardsLateVideoFrames: Boolean; cdecl;
+    function availableVideoCVPixelFormatTypes: NSArray; cdecl;
+    function availableVideoCodecTypes: NSArray; cdecl;
+    function minFrameDuration: CMTime; cdecl;
+    function sampleBufferCallbackQueue: dispatch_queue_t; cdecl;
+    function sampleBufferDelegate: Pointer; cdecl;
+    procedure setAlwaysDiscardsLateVideoFrames(alwaysDiscardsLateVideoFrames: Boolean); cdecl;
+    procedure setMinFrameDuration(minFrameDuration: CMTime); cdecl;
+    procedure setSampleBufferDelegate(sampleBufferDelegate: Pointer; queue: dispatch_queue_t); cdecl;
+    procedure setVideoSettings(videoSettings: NSDictionary); cdecl;
+    function videoSettings: NSDictionary; cdecl;
+  end;
+  TAVCaptureVideoDataOutput = class(TOCGenericImport<AVCaptureVideoDataOutputClass, AVCaptureVideoDataOutput>)  end;
+
+  AVCaptureVideoDataOutputSampleBufferDelegate = interface(IObjectiveC)
+    ['{BC4EABBE-F21F-4592-93B0-0C40415E4A9A}']
+    procedure captureOutput(captureOutput: AVCaptureOutput; didOutputSampleBuffer: CMSampleBufferRef; fromConnection: AVCaptureConnection); cdecl;
+  end;
+
+  AVCaptureDeviceInputClass = interface(AVCaptureInputClass)
+    ['{4AFFA0C4-F4AE-42D4-9006-B823E204C3A6}']
+    {class} function deviceInputWithDevice(device: AVCaptureDevice; error: PPointer): Pointer; cdecl;
+  end;
+  AVCaptureDeviceInput = interface(AVCaptureInput)
+    ['{804546D7-499D-4D84-A08C-26D90C78DA42}']
+    function device: AVCaptureDevice; cdecl;
+    function initWithDevice(device: AVCaptureDevice; error: PPointer): Pointer; cdecl;
+  end;
+  TAVCaptureDeviceInput = class(TOCGenericImport<AVCaptureDeviceInputClass, AVCaptureDeviceInput>)  end;
+
+  AVAssetReaderTrackOutputClass = interface(AVAssetReaderOutputClass)
+    ['{9C741E36-FA2A-4298-BE33-FE66359F2034}']
+    {class} function assetReaderTrackOutputWithTrack(track: AVAssetTrack; outputSettings: NSDictionary): Pointer; cdecl;
+  end;
+  AVAssetReaderTrackOutput = interface(AVAssetReaderOutput)
+    ['{2D0B77A9-9AEA-491C-A7FB-AC5CC101DF23}']
+    function initWithTrack(track: AVAssetTrack; outputSettings: NSDictionary): Pointer; cdecl;
+    function outputSettings: NSDictionary; cdecl;
+    function track: AVAssetTrack; cdecl;
+  end;
+  TAVAssetReaderTrackOutput = class(TOCGenericImport<AVAssetReaderTrackOutputClass, AVAssetReaderTrackOutput>)  end;
+
+  AVAssetReaderAudioMixOutputClass = interface(AVAssetReaderOutputClass)
+    ['{8FBC4B55-BDC0-48E1-AA32-17A095A6A386}']
+    {class} function assetReaderAudioMixOutputWithAudioTracks(audioTracks: NSArray; audioSettings: NSDictionary): Pointer; cdecl;
+  end;
+  AVAssetReaderAudioMixOutput = interface(AVAssetReaderOutput)
+    ['{098148DA-AD09-47F6-95F9-B0B0344A7738}']
+    function audioMix: AVAudioMix; cdecl;
+    function audioSettings: NSDictionary; cdecl;
+    function audioTracks: NSArray; cdecl;
+    function initWithAudioTracks(audioTracks: NSArray; audioSettings: NSDictionary): Pointer; cdecl;
+    procedure setAudioMix(audioMix: AVAudioMix); cdecl;
+  end;
+  TAVAssetReaderAudioMixOutput = class(TOCGenericImport<AVAssetReaderAudioMixOutputClass, AVAssetReaderAudioMixOutput>)  end;
+
+  AVCaptureAudioDataOutputClass = interface(AVCaptureOutputClass)
+    ['{9CF6D132-301A-4ADC-B2B6-E5A5EFD3FF9B}']
+  end;
+  AVCaptureAudioDataOutput = interface(AVCaptureOutput)
+    ['{A8EFF619-2C77-4C43-89C1-E5701BF401AE}']
+    function sampleBufferCallbackQueue: dispatch_queue_t; cdecl;
+    function sampleBufferDelegate: Pointer; cdecl;
+    procedure setSampleBufferDelegate(sampleBufferDelegate: Pointer; queue: dispatch_queue_t); cdecl;
+  end;
+  TAVCaptureAudioDataOutput = class(TOCGenericImport<AVCaptureAudioDataOutputClass, AVCaptureAudioDataOutput>)  end;
+
+  AVAssetReaderVideoCompositionOutputClass = interface(AVAssetReaderOutputClass)
+    ['{869452E8-CE75-498B-8941-3379C56C1217}']
+    {class} function assetReaderVideoCompositionOutputWithVideoTracks(videoTracks: NSArray; videoSettings: NSDictionary): Pointer; cdecl;
+  end;
+  AVAssetReaderVideoCompositionOutput = interface(AVAssetReaderOutput)
+    ['{9FB73616-F15C-4F19-8EC3-4AEB837AB6E8}']
+    function initWithVideoTracks(videoTracks: NSArray; videoSettings: NSDictionary): Pointer; cdecl;
+    procedure setVideoComposition(videoComposition: AVVideoComposition); cdecl;
+    function videoComposition: AVVideoComposition; cdecl;
+    function videoSettings: NSDictionary; cdecl;
+    function videoTracks: NSArray; cdecl;
+  end;
+  TAVAssetReaderVideoCompositionOutput = class(TOCGenericImport<AVAssetReaderVideoCompositionOutputClass, AVAssetReaderVideoCompositionOutput>)  end;
+
+  AVCompositionTrackClass = interface(AVAssetTrackClass)
+    ['{8CDE195A-1BE5-42A9-856A-396B2F965E39}']
+  end;
+  AVCompositionTrack = interface(AVAssetTrack)
+    ['{C2EBC4AD-6629-4D45-9DC5-E1A6438FDCA1}']
+    function segments: NSArray; cdecl;
+  end;
+  TAVCompositionTrack = class(TOCGenericImport<AVCompositionTrackClass, AVCompositionTrack>)  end;
+
+  AVMutableVideoCompositionClass = interface(AVVideoCompositionClass)
+    ['{4269E1FD-E566-4305-9E6F-6F00A09B9633}']
+    {class} function videoComposition: Pointer; cdecl;
+  end;
+  AVMutableVideoComposition = interface(AVVideoComposition)
+    ['{3DA3DD19-7D96-4EA8-A568-BB782C9EABE9}']
+    function animationTool: AVVideoCompositionCoreAnimationTool; cdecl;
+    function frameDuration: CMTime; cdecl;
+    function instructions: NSArray; cdecl;
+    function renderScale: Single; cdecl;
+    function renderSize: CGSize; cdecl;
+    procedure setAnimationTool(animationTool: AVVideoCompositionCoreAnimationTool); cdecl;
+    procedure setFrameDuration(frameDuration: CMTime); cdecl;
+    procedure setInstructions(instructions: NSArray); cdecl;
+    procedure setRenderScale(renderScale: Single); cdecl;
+    procedure setRenderSize(renderSize: CGSize); cdecl;
+  end;
+  TAVMutableVideoComposition = class(TOCGenericImport<AVMutableVideoCompositionClass, AVMutableVideoComposition>)  end;
+
+  AVMutableTimedMetadataGroupClass = interface(AVTimedMetadataGroupClass)
+    ['{2D6F6F7A-57FB-4ED3-9846-02C74D90A94C}']
+  end;
+  AVMutableTimedMetadataGroup = interface(AVTimedMetadataGroup)
+    ['{C3F8CA9D-26F4-413B-98C2-4578D3DAC2F1}']
+    function items: NSArray; cdecl;
+    procedure setItems(items: NSArray); cdecl;
+    procedure setTimeRange(timeRange: CMTimeRange); cdecl;
+    function timeRange: CMTimeRange; cdecl;
+  end;
+  TAVMutableTimedMetadataGroup = class(TOCGenericImport<AVMutableTimedMetadataGroupClass, AVMutableTimedMetadataGroup>)  end;
+
+  AVMutableMetadataItemClass = interface(AVMetadataItemClass)
+    ['{1FD2B927-0ED5-40A6-A104-235F0FF9DEDD}']
+    {class} function metadataItem: Pointer; cdecl;
+  end;
+  AVMutableMetadataItem = interface(AVMetadataItem)
+    ['{0B57E0FD-6591-4C6A-A8C4-B9A0A571FCB7}']
+    function duration: CMTime; cdecl;
+    function extraAttributes: NSDictionary; cdecl;
+    function key: Pointer; cdecl;
+    function keySpace: NSString; cdecl;
+    function locale: NSLocale; cdecl;
+    procedure setDuration(duration: CMTime); cdecl;
+    procedure setExtraAttributes(extraAttributes: NSDictionary); cdecl;
+    procedure setKey(key: Pointer); cdecl;
+    procedure setKeySpace(keySpace: NSString); cdecl;
+    procedure setLocale(locale: NSLocale); cdecl;
+    procedure setTime(time: CMTime); cdecl;
+    procedure setValue(value: Pointer); cdecl;
+    function time: CMTime; cdecl;
+    function value: Pointer; cdecl;
+  end;
+  TAVMutableMetadataItem = class(TOCGenericImport<AVMutableMetadataItemClass, AVMutableMetadataItem>)  end;
+
+  AVMutableVideoCompositionInstructionClass = interface(AVVideoCompositionInstructionClass)
+    ['{82B53FB8-7B8D-406F-9AFA-59876114874B}']
+    {class} function videoCompositionInstruction: Pointer; cdecl;
+  end;
+  AVMutableVideoCompositionInstruction = interface(AVVideoCompositionInstruction)
+    ['{EC367C09-914D-484E-9FF4-610A3CC75365}']
+    function backgroundColor: CGColorRef; cdecl;
+    function enablePostProcessing: Boolean; cdecl;
+    function layerInstructions: NSArray; cdecl;
+    procedure setBackgroundColor(backgroundColor: CGColorRef); cdecl;
+    procedure setEnablePostProcessing(enablePostProcessing: Boolean); cdecl;
+    procedure setLayerInstructions(layerInstructions: NSArray); cdecl;
+    procedure setTimeRange(timeRange: CMTimeRange); cdecl;
+    function timeRange: CMTimeRange; cdecl;
+  end;
+  TAVMutableVideoCompositionInstruction = class(TOCGenericImport<AVMutableVideoCompositionInstructionClass, AVMutableVideoCompositionInstruction>)  end;
+
+  AVCompositionTrackSegmentClass = interface(AVAssetTrackSegmentClass)
+    ['{FE0CA707-FE80-407C-AE92-ABED9B818BBA}']
+    {class} function compositionTrackSegmentWithTimeRange(timeRange: CMTimeRange): Pointer; cdecl;
+    {class} function compositionTrackSegmentWithURL(URL: NSURL; trackID: CMPersistentTrackID; sourceTimeRange: CMTimeRange; targetTimeRange: CMTimeRange): Pointer; cdecl;
+  end;
+  AVCompositionTrackSegment = interface(AVAssetTrackSegment)
+    ['{E4E4506A-7AA1-4FB6-8A6D-317516BEC05E}']
+    function initWithTimeRange(timeRange: CMTimeRange): Pointer; cdecl;
+    function initWithURL(URL: NSURL; trackID: CMPersistentTrackID; sourceTimeRange: CMTimeRange; targetTimeRange: CMTimeRange): Pointer; cdecl;
+    function isEmpty: Boolean; cdecl;
+    function sourceTrackID: CMPersistentTrackID; cdecl;
+    function sourceURL: NSURL; cdecl;
+  end;
+  TAVCompositionTrackSegment = class(TOCGenericImport<AVCompositionTrackSegmentClass, AVCompositionTrackSegment>)  end;
+
+  AVMutableAudioMixClass = interface(AVAudioMixClass)
+    ['{0B46ACE2-0232-4EF1-9070-0388CEE7FAFA}']
+    {class} function audioMix: Pointer; cdecl;
+  end;
+  AVMutableAudioMix = interface(AVAudioMix)
+    ['{197E621B-9CD3-4449-9BAB-A0B147677C95}']
+    function inputParameters: NSArray; cdecl;
+    procedure setInputParameters(inputParameters: NSArray); cdecl;
+  end;
+  TAVMutableAudioMix = class(TOCGenericImport<AVMutableAudioMixClass, AVMutableAudioMix>)  end;
+
+  AVMutableAudioMixInputParametersClass = interface(AVAudioMixInputParametersClass)
+    ['{3DD9E0B8-C7B7-43A5-ABBD-9F54C0932569}']
+    {class} function audioMixInputParameters: Pointer; cdecl;
+    {class} function audioMixInputParametersWithTrack(track: AVAssetTrack): Pointer; cdecl;
+  end;
+  AVMutableAudioMixInputParameters = interface(AVAudioMixInputParameters)
+    ['{A2B37032-3C1D-4F9B-B6C2-30235686CFF8}']
+    procedure setTrackID(trackID: CMPersistentTrackID); cdecl;
+    procedure setVolume(volume: Single; atTime: CMTime); cdecl;
+    procedure setVolumeRampFromStartVolume(startVolume: Single; toEndVolume: Single; timeRange: CMTimeRange); cdecl;
+    function trackID: CMPersistentTrackID; cdecl;
+  end;
+  TAVMutableAudioMixInputParameters = class(TOCGenericImport<AVMutableAudioMixInputParametersClass, AVMutableAudioMixInputParameters>)  end;
+
+  AVCaptureMovieFileOutputClass = interface(AVCaptureFileOutputClass)
+    ['{A26188D8-366C-4099-8076-61D74602DCE9}']
+  end;
+  AVCaptureMovieFileOutput = interface(AVCaptureFileOutput)
+    ['{7A06F5FC-3105-4DB1-BC97-D695DFBD250E}']
+    function metadata: NSArray; cdecl;
+    function movieFragmentInterval: CMTime; cdecl;
+    procedure setMetadata(metadata: NSArray); cdecl;
+    procedure setMovieFragmentInterval(movieFragmentInterval: CMTime); cdecl;
+  end;
+  TAVCaptureMovieFileOutput = class(TOCGenericImport<AVCaptureMovieFileOutputClass, AVCaptureMovieFileOutput>)  end;
+
+  AVMutableCompositionClass = interface(AVCompositionClass)
+    ['{0A9AFAE1-587E-4BC3-84B8-628B60730380}']
+    {class} function composition: Pointer; cdecl;
+  end;
+  AVMutableComposition = interface(AVComposition)
+    ['{03396B84-10CF-4070-91F1-5285014F163B}']
+    function addMutableTrackWithMediaType(mediaType: NSString; preferredTrackID: CMPersistentTrackID): AVMutableCompositionTrack; cdecl;
+    procedure insertEmptyTimeRange(timeRange: CMTimeRange); cdecl;
+    function insertTimeRange(timeRange: CMTimeRange; ofAsset: AVAsset; atTime: CMTime; error: NSError): Boolean; cdecl;
+    function mutableTrackCompatibleWithTrack(track: AVAssetTrack): AVMutableCompositionTrack; cdecl;
+    function naturalSize: CGSize; cdecl;
+    procedure removeTimeRange(timeRange: CMTimeRange); cdecl;
+    procedure removeTrack(track: AVCompositionTrack); cdecl;
+    procedure scaleTimeRange(timeRange: CMTimeRange; toDuration: CMTime); cdecl;
+    procedure setNaturalSize(naturalSize: CGSize); cdecl;
+    function tracks: NSArray; cdecl;
+  end;
+  TAVMutableComposition = class(TOCGenericImport<AVMutableCompositionClass, AVMutableComposition>)  end;
+
+  AVMutableCompositionTrackClass = interface(AVCompositionTrackClass)
+    ['{9704C005-4995-4ECE-B575-A380FE22F4F9}']
+  end;
+  AVMutableCompositionTrack = interface(AVCompositionTrack)
+    ['{DA2D82C9-3500-42A5-8B0E-7D892689E227}']
+    function extendedLanguageTag: NSString; cdecl;
+    procedure insertEmptyTimeRange(timeRange: CMTimeRange); cdecl;
+    function insertTimeRange(timeRange: CMTimeRange; ofTrack: AVAssetTrack; atTime: CMTime; error: NSError): Boolean; cdecl;
+    function insertTimeRanges(timeRanges: NSArray; ofTracks: NSArray; atTime: CMTime; error: NSError): Boolean; cdecl;
+    function languageCode: NSString; cdecl;
+    function naturalTimeScale: CMTimeScale; cdecl;
+    function preferredTransform: CGAffineTransform; cdecl;
+    function preferredVolume: Single; cdecl;
+    procedure removeTimeRange(timeRange: CMTimeRange); cdecl;
+    procedure scaleTimeRange(timeRange: CMTimeRange; toDuration: CMTime); cdecl;
+    function segments: NSArray; cdecl;
+    procedure setExtendedLanguageTag(extendedLanguageTag: NSString); cdecl;
+    procedure setLanguageCode(languageCode: NSString); cdecl;
+    procedure setNaturalTimeScale(naturalTimeScale: CMTimeScale); cdecl;
+    procedure setPreferredTransform(preferredTransform: CGAffineTransform); cdecl;
+    procedure setPreferredVolume(preferredVolume: Single); cdecl;
+    procedure setSegments(segments: NSArray); cdecl;
+    function validateTrackSegments(trackSegments: NSArray; error: NSError): Boolean; cdecl;
+  end;
+  TAVMutableCompositionTrack = class(TOCGenericImport<AVMutableCompositionTrackClass, AVMutableCompositionTrack>)  end;
+
+
+// exported string consts
+
+function AVMediaTypeAudio: NSString;
+function AVMediaTypeVideo: NSString;
+
+function AVCaptureSessionPresetPhoto: NSString;
+function AVCaptureSessionPresetHigh: NSString;
+function AVCaptureSessionPresetMedium: NSString;
+function AVCaptureSessionPresetLow: NSString;
+function AVCaptureSessionPreset352x288: NSString;
+function AVCaptureSessionPreset640x480: NSString;
+function AVCaptureSessionPreset1280x720: NSString;
+function AVCaptureSessionPreset1920x1080: NSString;
+function AVCaptureSessionPresetiFrame960x540: NSString;
+function AVCaptureSessionPresetiFrame1280x720: NSString;
+function AVCaptureSessionPresetInputPriority: NSString;
+
+function AVFileTypeWAVE: NSString;
+
+function AVFormatIDKey: NSString;
+function AVSampleRateKey: NSString;
+function AVNumberOfChannelsKey: NSString;
+function AVLinearPCMBitDepthKey: NSString;
+function AVEncoderBitRateKey: NSString;
+
+function AVAudioSessionCategoryRecord: NSString;
+function AVAudioSessionCategoryPlayback: NSString;
+
+implementation
+
+{$IF defined(IOS) and NOT defined(CPUARM)}
+uses
+  Posix.Dlfcn;
+
+var
+  AVModule: THandle;
+{$ENDIF IOS}
+
+function AVMediaTypeAudio: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVMediaTypeAudio');
+end;
+
+function AVMediaTypeVideo: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVMediaTypeVideo');
+end;
+
+function AVCaptureSessionPresetPhoto: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetPhoto');
+end;
+
+function AVCaptureSessionPresetHigh: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetHigh');
+end;
+
+function AVCaptureSessionPresetMedium: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetMedium');
+end;
+
+function AVCaptureSessionPresetLow: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetLow');
+end;
+
+function AVCaptureSessionPreset352x288: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPreset352x288');
+end;
+
+function AVCaptureSessionPreset640x480: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPreset640x480');
+end;
+
+function AVCaptureSessionPreset1280x720: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPreset1280x720');
+end;
+
+function AVCaptureSessionPreset1920x1080: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPreset1920x1080');
+end;
+
+function AVCaptureSessionPresetiFrame960x540: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetiFrame960x540');
+end;
+
+function AVCaptureSessionPresetiFrame1280x720: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetiFrame1280x720');
+end;
+
+function AVCaptureSessionPresetInputPriority: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVCaptureSessionPresetInputPriority');
+end;
+
+function AVFileTypeWAVE: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVFileTypeWAVE');
+end;
+
+function AVFormatIDKey: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVFormatIDKey');
+end;
+
+function AVSampleRateKey: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVSampleRateKey');
+end;
+
+function AVNumberOfChannelsKey: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVNumberOfChannelsKey');
+end;
+
+function AVLinearPCMBitDepthKey: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVLinearPCMBitDepthKey');
+end;
+
+function AVEncoderBitRateKey: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVEncoderBitRateKey');
+end;
+
+function AVAudioSessionCategoryRecord: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVAudioSessionCategoryRecord');
+end;
+
+function AVAudioSessionCategoryPlayback: NSString;
+begin
+  Result := CocoaNSStringConst(libAVFoundation, 'AVAudioSessionCategoryPlayback');
+end;
+
+{$IF defined(IOS) and NOT defined(CPUARM)}
+initialization
+  AVModule := dlopen(MarshaledAString(libAVFoundation), RTLD_LAZY);
+
+finalization
+  dlclose(AVModule);
+{$ENDIF IOS}
+
+end.

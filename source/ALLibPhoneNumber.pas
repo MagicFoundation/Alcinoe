@@ -1,12 +1,6 @@
 (**************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
 Contributors: Igor Ivkin (igor@arkadia.com)
-
 product:      ALLibPhoneNumber
-Version:      1.0
-
 Description:  ALLibPhoneNumber is a wrapper for a several functions that use
               Google's C++ library libphonenumber to parse and format
               phone numbers written in a free form.
@@ -18,14 +12,8 @@ Description:  ALLibPhoneNumber is a wrapper for a several functions that use
               1. To convert a given string phone written in a free form to Int64.
               2. To convert phone given as Int64 to international format defined for its country.
               3. To define a type of the phone (landing line, mobile, toll-free etc).
-
-Known bug :
-
-History :
-
-Link :
-
 **************************************************************)
+
 unit ALLibPhoneNumber;
 
 interface
@@ -34,13 +22,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     system.Classes,
+uses system.Classes,
      system.sysutils;
-     {$ELSE}
-     Classes,
-     sysutils;
-     {$IFEND}
 
 function ALStrPhoneNumberToInt64(const PhoneNumber, CountryCode: AnsiString): Int64; overload;
 function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64; overload;

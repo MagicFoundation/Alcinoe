@@ -1,11 +1,5 @@
 (*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALMongoDBClient
-Version:      4.00
-
 Description:  Delphi Client for MongoDB database.
               A Delphi driver (with connection pool) to access a
               mongoDB server. a connection pool is a cache of database
@@ -84,16 +78,8 @@ Description:  Delphi Client for MongoDB database.
                                                                                     end);
               ....
               aMongoDBTailMonitoringThread.free;
-
-
-
-Know bug :
-
-History :
-
-Link :
-
 **************************************************************)
+
 unit ALMongoDBClient;
 
 interface
@@ -102,19 +88,11 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     winapi.WinSock2,
+uses winapi.WinSock2,
      system.Contnrs,
      system.Classes,
      System.SyncObjs,
      System.SysUtils,
-     {$ELSE}
-     WinSock,
-     Contnrs,
-     Classes,
-     SyncObjs,
-     SysUtils,
-     {$IFEND}
      ALString,
      ALStringList,
      ALJSONDoc;
@@ -837,13 +815,8 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.Diagnostics,
-     {$ELSE}
-     Windows,
-     Diagnostics,
-     {$IFEND}
      ALCipher,
      AlWinsock,
      ALWindows;

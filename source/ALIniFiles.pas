@@ -1,20 +1,7 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      Alcinoe inifiles
-Version:      4.01
-
+{**********************************************************
 Description:  AnsiString version of delphi Unicode Tinifile
+***********************************************************}
 
-Know bug :
-
-History:
-
-Link :
-
-**************************************************************}
 unit ALIniFiles;
 
 {$R-,T-,H+,X+}
@@ -25,13 +12,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
+uses System.SysUtils,
      System.Classes,
-     {$ELSE}
-     SysUtils,
-     Classes,
-     {$IFEND}
      ALString,
      ALStringList;
 
@@ -90,14 +72,9 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.RTLConsts,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     Windows,
-     RTLConsts,
-     {$IFEND}
+     System.Ansistrings,
      ALFiles;
 
 {**************************************************************}

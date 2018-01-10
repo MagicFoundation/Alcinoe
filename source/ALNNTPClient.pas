@@ -1,21 +1,11 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALNNTPClient
-Version:      4.00
-
 Description:  TALNNTPClient class implements the NNTP protocol (RFC-977
               and RFC-850) Support authentification (RFC-977 Extension)
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
 Link :        http://www.w3.org/Protocols/rfc977/rfc977
-
 **************************************************************}
+
 unit ALNNTPClient;
 
 interface
@@ -24,11 +14,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.WinSock2,
-     {$ELSE}
-     WinSock,
-     {$IFEND}
+Uses Winapi.WinSock2,
      ALInternetMessages,
      ALMultiPartParser,
      ALStringList;
@@ -131,15 +117,9 @@ type
 
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+Uses Winapi.Windows,
      System.SysUtils,
      System.Classes,
-     {$ELSE}
-     Windows,
-     SysUtils,
-     Classes,
-     {$IFEND}
      AlWinsock,
      ALString;
 

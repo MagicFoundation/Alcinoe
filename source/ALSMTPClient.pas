@@ -1,26 +1,8 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALSMTPClient
-Version:      4.00
-
 Description:  TALsmtpClient class implements the SMTP protocol (RFC-821)
               Support file attachement using MIME format (RFC-1521, RFC-2045)
               Support authentification (RFC-2104)
-
-Know bug :
-
-History :     02/05/2007: add function :
-                           function AlSMTPClientExtractEmail(FriendlyEmail: String): String;
-                           Function ALSMTPClientmakeFriendlyEmail(aRealName, aEmail: String): String;
-                           Function ALSMTPClientEncodeRealName4FriendlyEmail(aRealName: String): String;
-                          update function:
-                           function AlSMTPClientParseEmail(FriendlyEmail: String; var RealName : String; Const decodeRealName: Boolean=True): String;
-              16/10/2007: Replace TalSMTPClientHeader by TALEmailHeader
-                          minor update;
-              26/06/2012: Add xe2 support
 
 Link :        http://linuxgazette.net/issue45/stumpel.html
               http://www.overbyte.be
@@ -29,8 +11,8 @@ Link :        http://linuxgazette.net/issue45/stumpel.html
               http://www.freesoft.org/CIE/RFC/821/
               http://www.expita.com/header1.html
               http://cr.yp.to/immhf.html
-
 **************************************************************}
+
 unit ALSMTPClient;
 
 interface

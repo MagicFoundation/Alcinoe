@@ -1,20 +1,7 @@
-{*****************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      AlWindows
-Version:      4.00
-
+{**************************************************************
 Description:  Windows API function not (yet) in the windows.pas
+***************************************************************}
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
-Link :
-
-**************************************************************}
 unit ALWindows;
 
 interface

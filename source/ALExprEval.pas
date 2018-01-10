@@ -1,30 +1,16 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Jedi Project - JCL
               Barry Kelly
               Matthias Thoma (mthoma)
               Petr Vones (pvones)
               Robert Marquardt (marquardt)
               Robert Rossmair (rrossmair)
-              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
 
 product:      Alcinoe Expression Evaluator
-Version:      4.01
-
 Description:  This unit contains expression evaluators, each tailored for different usage
               patterns. It also contains the component objects, so that a customized
               expression evaluator can be assembled relatively easily.
-
-Know bug :
-
-History :     25/04/2013: add possibility to compare string 's1' <> 's2'
-                          add IN support. ex: z IN (x, y, z)
-                          add MAX support. ex: max(x,y)
-                          add MIN support. ex: min(x,y)
-
-Link :
-
+              
 Note :        operator priority (as implemented in this unit)
               all binary operators are associated from left to right
               all unary operators are associated from right to left
@@ -38,8 +24,8 @@ Note :        operator priority (as implemented in this unit)
              "1.5 cmp 2.0" returns -1.0 because 1.5 < 2.0
              "1.5 cmp 1.5" returns 0.0 because 1.5 = 1.5
              "1.5 cmp 0.0" returns 1.0 because 1.5 > 0.0
-
 **************************************************************}
+
 unit ALExprEval;
 
 interface
@@ -48,13 +34,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
+uses System.SysUtils,
      System.Classes,
-     {$ELSE}
-     SysUtils,
-     Classes,
-     {$IFEND}
      ALStringList;
 
 type
@@ -880,15 +861,9 @@ resourcestring
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Types,
+uses System.Types,
      System.Math,
      System.Contnrs,
-     {$ELSE}
-     Types,
-     Math,
-     Contnrs,
-     {$IFEND}
      ALString,
      ALCipher;
 

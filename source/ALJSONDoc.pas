@@ -1,11 +1,5 @@
 (**************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALJsonDocument
-Version:      4.01
-
 Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
               format. it's support DOM and SAX parser, support BSON format,
               and use a similar syntax than TALXMLDocument / TXMLDocument.
@@ -135,14 +129,8 @@ Description:  TALJsonDocument is a Delphi parser/writer for JSON / BSON data
                                          end;
                                        end;
               MyJsonDoc.LoadFromJSON(AJsonStr, true{saxMode});
-
-Know bug :
-
-History :
-
-Link :
-
 **************************************************************)
+
 unit ALJSONDoc;
 
 interface

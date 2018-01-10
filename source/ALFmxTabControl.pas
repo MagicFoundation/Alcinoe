@@ -87,7 +87,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
   end;
@@ -214,7 +214,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
@@ -1059,37 +1059,71 @@ end;
 
 {********************************************************************************************}
 function TALTabControl.FindVisibleTab(var Index: Integer; const FindKind: TFindKind): Boolean;
-var I: Integer;
-begin
-  I := Index;
-  if (I < 0) or (FindKind = TFindKind.First) then
-    I := -1
-  else if (I > TabCount) or (FindKind = TFindKind.Last) then
-    I := TabCount;
 
-  if FindKind = TFindKind.Current then
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function FindNextVisibleTab(const AFromIndex: Integer): Integer;
+  var
+    I: Integer;
   begin
-    while (I < TabCount) and (I < 0) or not Tabs[I].Visible do
-      Inc(I);
-    if I >= TabCount then
-    begin
-      I := TabCount - 1;
-      while (I >= 0) and not Tabs[I].Visible do
-        Dec(I);
-    end;
-  end
-  else if FindKind in [TFindKind.Next, TFindKind.First] then
+    I := AFromIndex;
     repeat
       Inc(I);
-    until (I >= TabCount) or Tabs[I].Visible
-  else
+    until (I >= TabCount) or Tabs[I].Visible;
+    Result := I;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function FindPrevVisibleTab(const AFromIndex: Integer): Integer;
+  var
+    I: Integer;
+  begin
+    I := AFromIndex;
     repeat
       Dec(I);
     until (I < 0) or Tabs[I].Visible;
+    Result := I;
+  end;
 
-  Result := (I >= 0) and (I < TabCount);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function FindCurrentVisibleTab(const AFromIndex: Integer): Integer;
+  begin
+    if InRange(AFromIndex, 0, TabCount - 1) and Tabs[AFromIndex].Visible then
+      Result := AFromIndex
+    else
+    begin
+      Result := FindNextVisibleTab(AFromIndex);
+      if Result >= TabCount then
+        Result := FindPrevVisibleTab(AFromIndex);
+    end;
+  end;
+
+var
+  NormalizedTabIndex: Integer;
+  NewIndex: Integer;
+begin
+  NormalizedTabIndex := EnsureRange(Index, -1, TabCount);
+  case FindKind of
+    TFindKind.Next:
+      NewIndex := FindNextVisibleTab(NormalizedTabIndex);
+
+    TFindKind.Back:
+      NewIndex := FindPrevVisibleTab(NormalizedTabIndex);
+
+    TFindKind.First:
+      NewIndex := FindNextVisibleTab(-1);
+
+    TFindKind.Last:
+      NewIndex := FindPrevVisibleTab(TabCount);
+
+    TFindKind.Current:
+      NewIndex := FindCurrentVisibleTab(NormalizedTabIndex);
+  else
+    NewIndex := FindCurrentVisibleTab(NormalizedTabIndex);
+  end;
+
+  Result := InRange(NewIndex, 0, TabCount - 1);
   if Result then
-    Index := I;
+    Index := NewIndex;
 end;
 
 {************************************************************************}

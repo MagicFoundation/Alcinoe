@@ -1,21 +1,8 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      Alcinoe Winsock Functions
-Version:      4.00
-
+{*********************************************************************
 Description:  Misc function that use winsock (for exempple ALHostToIP,
               ALIPAddrToName or ALgetLocalIPs)
+**********************************************************************}
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
-Link :
-
-**************************************************************}
 unit ALWinSock;
 
 interface
@@ -33,16 +20,10 @@ function  ALgetLocalHostName: AnsiString;
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.SysUtils,
      Winapi.WinSock2,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     Windows,
-     SysUtils,
-     WinSock,
-     {$IFEND}
+     System.Ansistrings,
      ALString;
 
 {***************************************************************************}

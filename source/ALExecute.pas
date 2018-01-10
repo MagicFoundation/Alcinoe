@@ -1,27 +1,7 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      Alcinoe WinExec Functions
-Version:      4.00
-
+{*********************************************************************
 Description:  Function to launch executable (and wait for termination)
+**********************************************************************}
 
-Know bug:
-
-History:      04/05/2007: overload the function ALWinExec32;
-              01/01/2010: add ALNTSetPrivilege
-              05/03/2012: Correct a 100% CPU usage in ALWinExec32
-              26/06/2012: Add xe2 support
-              01/09/2013: rename ALWinExec32 and ALWinExecAndWait32 to
-                          ALWinExec and ALWinExecAndWait
-              31/01/2014: Add ALStartService, ALStopService and
-                          ALMakeServiceAutorestarting
-
-Link:
-
-**************************************************************}
 unit ALExecute;
 
 interface
@@ -30,14 +10,9 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     winapi.windows,
+uses winapi.windows,
      system.classes;
-     {$ELSE}
-     windows,
-     classes;
-     {$IFEND}
-
+     
 {$IF CompilerVersion < 18.5}
 Type
   TStartupInfoA = TStartupInfo;
@@ -107,17 +82,10 @@ function ALMakeServiceAutorestarting(const aServiceName: AnsiString;
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     system.sysutils,
+uses system.sysutils,
      winapi.messages,
      winapi.winsvc,
      System.Diagnostics,
-     {$ELSE}
-     sysutils,
-     messages,
-     winsvc,
-     Diagnostics,
-     {$IFEND}
      ALWindows,
      ALString;
 

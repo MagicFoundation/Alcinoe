@@ -1,26 +1,3 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      Alcinoe File Management Routines
-Version:      4.01
-
-Description:  Alcinoe file Management Routines
-
-Know bug :
-
-History :     15/04/2008: Add AlIsEmptyDirectory Function
-              15/06/2012: Add XE2 support
-              01/12/2012: Add ALFileExists function
-
-Note :        I know that most of the function here will be more efficient
-              to be in unicode, but i leave it in AnsiString for the compatiblity
-              with the Alcinoe Framework that is in AnsiString (UTF8)
-
-Link :
-
-**************************************************************}
 unit ALFiles;
 
 interface
@@ -49,6 +26,7 @@ function  ALGetModuleName: ansistring;
 function  ALGetModuleFileNameWithoutExtension: ansistring;
 function  ALGetModulePath: ansiString;
 Function  AlGetFileSize(const AFileName: ansistring): int64;
+function  ALGetFileSizeU(const FileName : string): Int64;
 Function  AlGetFileVersion(const AFileName: ansistring): ansiString;
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
@@ -64,19 +42,12 @@ function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.Classes,
      Winapi.ShLwApi,
      System.Masks,
      System.sysutils,
-     {$ELSE}
-     Windows,
-     Classes,
-     ShLwApi,
-     Masks,
-     sysutils,
-     {$IFEND}
+     ALCommon,
      ALStringList,
      ALString;
 
@@ -214,6 +185,18 @@ begin
     end;
   end;
   Result := -1;
+end;
+
+{*******************************************************}
+function ALGetFileSizeU(const FileName : string) : Int64;
+var aFileStream: TFileStream;
+begin
+  aFileStream := TFileStream.Create(FileName, fmOpenRead);
+  try
+    result := aFileStream.Size;
+  finally
+    alFreeAndNil(aFileStream);
+  end;
 end;
 
 {*****************************************************************}

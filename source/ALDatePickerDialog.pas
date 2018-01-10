@@ -145,6 +145,7 @@ uses system.Classes,
      FMX.Helpers.iOS,
      FMX.Forms,
      {$ENDIF}
+     alstring,
      alcommon;
 
 {$REGION ' ANDROID'}
@@ -159,10 +160,11 @@ end;
 
 {*************************************************************************************************************************************}
 procedure TALDatePickerDialog.TDatePickerDialogListener.onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer);
+var AResult: TModalResult;
 begin
 
   {$IFDEF DEBUG}
-  //i absolutly not understand why on android 6 i receive an error BUS ERROR 10 when i call allog ! this is big misterry
+  //i absolutly not understand why on berlin and android 6 i receive an error BUS ERROR 10 when i call allog ! this is big misterry
   //allog('TALDatePickerDialog.TDatePickerDialogListener.onClick','which: ' + alinttostrU(which) +
   //                                                              ' - year: ' + alinttostrU(year) +
   //                                                              ' - month: ' + alinttostrU(month) +
@@ -170,15 +172,14 @@ begin
   //                                                              ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove TThread.synchronize because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   TThread.queue(nil,
     procedure
-    var AResult: TModalResult;
     begin
-      if assigned(fDatePickerDialog) and
-         assigned(fDatePickerDialog.fOnClose) then begin
+      if not assigned(fDatePickerDialog) then exit;
+  {$ENDIF}
+
+      if assigned(fDatePickerDialog.fOnClose) then begin
 
         if which = TJDialogInterface.javaclass.BUTTON_POSITIVE then AResult := mrOk
         else if which = TJDialogInterface.javaclass.BUTTON_NEGATIVE then AResult := mrCancel
@@ -189,7 +190,10 @@ begin
         fDatePickerDialog.fOnClose(fDatePickerDialog, AResult, year, month+1, dayOfMonth);
 
       end;
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -259,15 +263,23 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   fDatePickerDialogListener := TDatePickerDialogListener.Create(Self);
+
+  {$IF CompilerVersion <= 31} // berlin
   TUIThreadCaller.Call<TDatePickerDialogListener>(
-    procedure (aDatePickerDialogListener: TDatePickerDialogListener)
+    procedure (fDatePickerDialogListener: TDatePickerDialogListener)
     begin
+  {$ENDIF}
+
       fDatePickerDialog := TJALDatePickerDialog.JavaClass.init(TAndroidHelper.Context,
                                                                StrToJCharSequence(aBtnOKCaption),
                                                                StrToJCharSequence(aBtnCancelCaption),
                                                                StrToJCharSequence(aBtnClearCaption));
-      fDatePickerDialog.setListener(aDatePickerDialogListener);
+      fDatePickerDialog.setListener(fDatePickerDialogListener);
+
+  {$IF CompilerVersion <= 31} // berlin
     end, fDatePickerDialogListener);
+  {$ENDIF}
+
   {$ENDIF}
   {$ENDREGION}
 
@@ -401,18 +413,33 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
+
+  {$IF CompilerVersion <= 31} // berlin
   fDatePickerDialogListener.fDatePickerDialog := nil;
   TUIThreadCaller.Call<JALDatePickerDialog, TDatePickerDialogListener>(
-    procedure (aDatePickerDialog: JALDatePickerDialog; aDatePickerDialogListener: TDatePickerDialogListener)
+    procedure (fDatePickerDialog: JALDatePickerDialog; fDatePickerDialogListener: TDatePickerDialogListener)
     begin
-      aDatePickerDialog.setListener(nil);
-      aDatePickerDialog := nil;
+  {$ENDIF}
+
+      fDatePickerDialog.setListener(nil);
+      fDatePickerDialog := nil;
+
+      {$IF CompilerVersion <= 31} // berlin
       TThread.Queue(nil,
         procedure
         begin
-          AlFreeAndNil(aDatePickerDialogListener);
+      {$ENDIF}
+
+          AlFreeAndNil(fDatePickerDialogListener);
+
+      {$IF CompilerVersion <= 31} // berlin
         end);
+      {$ENDIF}
+
+  {$IF CompilerVersion <= 31} // berlin
     end, fDatePickerDialog, fDatePickerDialogListener);
+  {$ENDIF}
+
   {$ENDIF}
   {$ENDREGION}
 
@@ -459,12 +486,20 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
+
+  {$IF CompilerVersion <= 31} // berlin
   CallinUiThread(
     procedure
     begin
+  {$ENDIF}
+
       // Months are indexed starting at 0, so August is month 8, or index 7
       fDatePickerDialog.show(aYear, aMonth - 1, aDayOfMonth);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
+
   {$ENDIF}
   {$ENDREGION}
 

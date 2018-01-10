@@ -1,33 +1,21 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALMemCachedClient
-Version:      4.00
-
 Description:  Delphi Client for memcached database.
-              
-              What is Memcached?  Free & open source, high-performance, 
-              distributed memory object caching system, generic in 
-              nature, but intended for use in speeding up dynamic web 
+
+              What is Memcached?  Free & open source, high-performance,
+              distributed memory object caching system, generic in
+              nature, but intended for use in speeding up dynamic web
               applications by alleviating database load.
-              
-              Memcached is an in-memory key-value store for small chunks 
-              of arbitrary data (strings, objects) from results of 
+
+              Memcached is an in-memory key-value store for small chunks
+              of arbitrary data (strings, objects) from results of
               database calls, API calls, or page rendering.
 
-              Memcached is simple yet powerful. Its simple design promotes 
-              quick deployment, ease of development, and solves many 
-              problems facing large data caches. 
-
-Know bug :
-
-History :
-
-Link :
-
+              Memcached is simple yet powerful. Its simple design promotes
+              quick deployment, ease of development, and solves many
+              problems facing large data caches.
 **************************************************************}
+
 unit ALMemCachedClient;
 
 interface
@@ -36,16 +24,10 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.WinSock2,
+uses Winapi.WinSock2,
      System.Contnrs,
      System.SyncObjs,
      System.Diagnostics,
-     {$ELSE}
-     WinSock,
-     Contnrs,
-     SyncObjs,
-     {$IFEND}
      ALString;
 
 type
@@ -333,15 +315,9 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.Classes,
      System.SysUtils,
-     {$ELSE}
-     Windows,
-     Classes,
-     SysUtils
-     {$IFEND}
      ALStringList,
      AlWinsock,
      ALWindows;

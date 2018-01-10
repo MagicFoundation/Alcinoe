@@ -9,6 +9,7 @@
 { QQ  ：1444386932                           }
 { E-mail：1444386932@qq.com                  }
 { ******************************************}
+
 unit ALFmxTrayicon.Win;
 
 interface

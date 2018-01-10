@@ -1,11 +1,5 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALWinInetHttpClient
-Version:      4.00
-
 Description:  TALWinInetHttpClient is a is easy to use WinInet-based
               HTTP client component which allows to post and get
               any data from the Web via HTTP protocol. TALWinInetHttpClient
@@ -20,15 +14,6 @@ Description:  TALWinInetHttpClient is a is easy to use WinInet-based
               protected directories and supports basic proxy
               authentication scheme.
 
-Know bug :
-
-History :     28/11/2005: add Component in delphi;
-              12/09/2007: rename TALWinInetInternetOpenAccessType in TALWinInetHttpInternetOpenAccessType
-              11/08/2011: add property DisconnectOnError => this to not auto
-                          disconnect on error because if so, we loose the cookies
-                          if any http error are encountered
-              26/06/2012: Add xe2 support
-
 Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.ietf.org/rfc/rfc1867.txt
               http://www.ietf.org/rfc/rfc2388.txt
@@ -37,8 +22,8 @@ Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://support.microsoft.com/kb/q194700/
               http://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
               http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wininet/wininet/about_wininet.asp
-
 **************************************************************}
+
 unit ALWininetHttpClient;
 
 interface
@@ -47,15 +32,9 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.Classes,
      WinApi.WinInet,
-     {$ELSE}
-     Windows,
-     Classes,
-     WinInet,
-     {$IFEND}
      ALHttpClient;
 
 (*$HPPEMIT '#pragma link "wininet.lib"' *)
@@ -290,12 +269,8 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     SysUtils,
-     {$IFEND}
+uses System.SysUtils,
+     System.Ansistrings,
      ALString;
 
 {********************************************************************}

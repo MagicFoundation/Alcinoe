@@ -1,11 +1,4 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
-product:      ALStringList
-Version:      4.01
-
 Description:  TALStringList
               TALStringList Work the same as Delphi TstringList except that it's
               allow to search a name=value using a quicksort algorithm when the
@@ -34,23 +27,8 @@ Description:  TALStringList
               (else if you list don't contain a lot of strings the performance
               is lower than TALStringList because of the cost to calculate the
               hash)
-
-Know bug :
-
-History :     27/10/2007: add ForceValues and ForceValueFromIndex
-                          that do not delete an entry when we do
-                          ForceValue[name] := ''
-              26/01/2009: add TALAVLStringList
-              15/06/2012: update TALStringList to be the 8 bit version
-                          of TstringList. Replace ForceValues and
-                          ForceValueFromIndex by PersistentValues and
-                          PersistentValueFromIndex
-              26/06/2012: Add xe2 support
-              03/12/2012: Add StrictNames property
-
-Link :
-
 **************************************************************}
+
 unit ALStringList;
 
 interface

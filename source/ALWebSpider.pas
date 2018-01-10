@@ -1,11 +1,5 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALWebSpider
-Version:      4.00
-
 Description:  The function in this unit allows you to download a
               World Wide Web site from the Internet to a local directory,
               building recursively all directories, getting HTML, images,
@@ -21,18 +15,8 @@ Know bug :    Link like :
               it's not an valide HTML document but unfortunatly ie work correctly
               with this kind of error... mean that webmaster can make this error
               without seeing it ! so we need to find a way to handle this error
-
-History :     27/10/2005: Replace LstPageDownloaded and LstPageleft
-                          TstringList by binary tree for better performance
-                          when crawl huge site with more than 100.000 Url
-              16/11/2005: Few improuvement;
-              28/11/2005: Move procedure to Component;
-              10/09/2007: Move ALCompactHtmlTagParams in ALFcnHTML
-              26/06/2012: Add xe2 support
-
-Link :
-
 **************************************************************}
+
 unit ALWebSpider;
 
 interface
@@ -41,11 +25,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.classes,
-     {$ELSE}
-     classes,
-     {$IFEND}
+Uses System.classes,
      AlAvlBinaryTree,
      AlHTTPClient,
      AlStringList;
@@ -229,17 +209,10 @@ Type
 
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+Uses Winapi.Windows,
      System.sysutils,
      Winapi.WinInet,
      Winapi.UrlMon,
-     {$ELSE}
-     Windows,
-     sysutils,
-     WinInet,
-     UrlMon,
-     {$IFEND}
      AlHTML,
      AlMime,
      ALString;

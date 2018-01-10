@@ -1,22 +1,11 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      Alcinoe Internet Messages Utilities
-Version:      4.00
-
 Description:  This unit contains utilities to manipulate
               Internet Messages Headers (EMAIL or NEWSNET messages)
 
-Know bug :
-
-History :     05/02/2008: add soft line break in ALDecodeQuotedPrintableString
-              26/06/2012: Add xe2 support
-
 Link :        http://www.faqs.org/rfcs/rfc2047.html
-
 **************************************************************}
+
 unit ALInternetMessages;
 
 interface

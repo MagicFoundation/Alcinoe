@@ -1,6 +1,6 @@
 unit ALIosScrollBox;
 
-{$IF CompilerVersion > 31} // berlin
+{$IF CompilerVersion > 32} // tokyo
   {$MESSAGE WARN 'Check if FMX.ScrollBox.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 

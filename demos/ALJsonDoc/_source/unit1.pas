@@ -49,6 +49,8 @@ implementation
 
 {$R *.dfm}
 
+{$WARNINGS OFF}
+
 {**************************************}
 function GetTotalMemoryAllocated: int64;
 var aMemoryState: TMemoryManagerState;

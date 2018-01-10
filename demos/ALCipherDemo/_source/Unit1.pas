@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, ALZlibExApi, Shellapi,
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, Shellapi,
   System.Generics.Defaults, diagnostics, System.Generics.Collections, dateutils;
 
 type
@@ -74,7 +74,8 @@ uses math,
      ALString,
      alMime,
      alCipher,
-     alZlibEx;
+     ZlibExApi,
+     ZlibEx;
 
 {$R *.dfm}
 

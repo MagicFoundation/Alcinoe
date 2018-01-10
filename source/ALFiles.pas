@@ -6,6 +6,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
+{$IFNDEF NEXTGEN}
 Function  AlEmptyDirectory(Directory: ansiString;
                            SubDirectory: Boolean;
                            const IgnoreFiles: Array of AnsiString;
@@ -26,7 +27,6 @@ function  ALGetModuleName: ansistring;
 function  ALGetModuleFileNameWithoutExtension: ansistring;
 function  ALGetModulePath: ansiString;
 Function  AlGetFileSize(const AFileName: ansistring): int64;
-function  ALGetFileSizeU(const FileName : string): Int64;
 Function  AlGetFileVersion(const AFileName: ansistring): ansiString;
 function  ALGetFileCreationDateTime(const aFileName: Ansistring): TDateTime;
 function  ALGetFileLastWriteDateTime(const aFileName: Ansistring): TDateTime;
@@ -39,17 +39,24 @@ function  ALCreateDir(const Dir: Ansistring): Boolean;
 function  ALRemoveDir(const Dir: Ansistring): Boolean;
 function  ALDeleteFile(const FileName: Ansistring): Boolean;
 function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
+{$ENDIF}
+
+function  ALGetFileSizeU(const FileName : string): Int64;
 
 implementation
 
-uses Winapi.Windows,
-     System.Classes,
+uses System.Classes,
+     System.sysutils,
+     {$IFNDEF NEXTGEN}
+     Winapi.Windows,
      Winapi.ShLwApi,
      System.Masks,
-     System.sysutils,
-     ALCommon,
      ALStringList,
-     ALString;
+     ALString,
+     {$ENDIF}
+     ALCommon;
+
+{$IFNDEF NEXTGEN}
 
 {***********************************************}
 Function  AlEmptyDirectory(Directory: ansiString;
@@ -75,7 +82,7 @@ begin
     for I := 0 to length(IgnoreFiles) - 1 do aIgnoreFilesLst.Add(ALExcludeTrailingPathDelimiter(IgnoreFiles[i]));
     aIgnoreFilesLst.Duplicates := DupIgnore;
     aIgnoreFilesLst.Sorted := True;
-    if FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
+    if System.sysutils.FindFirst(string(Directory) + '*', faAnyFile	, sr) = 0 then begin
       Try
         repeat
           If (sr.Name <> '.') and
@@ -97,11 +104,11 @@ begin
                     and
                     ((MinFileAge<=0) or
                      (FileDateToDateTime(sr.Time) < MinFileAge))
-            then Result := Deletefile(string(Directory) + sr.Name);
+            then Result := System.sysutils.Deletefile(string(Directory) + sr.Name);
           end;
         until (not result) or (FindNext(sr) <> 0);
       finally
-        FindClose(sr);
+        System.sysutils.FindClose(sr);
       end;
     end;
   finally
@@ -142,7 +149,7 @@ begin
     exit;
   end;
 
-  if FindFirst(String(SrcDirectory) + '*', faAnyFile, sr) = 0 then begin
+  if System.sysutils.FindFirst(String(SrcDirectory) + '*', faAnyFile, sr) = 0 then begin
     Try
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
@@ -162,7 +169,7 @@ begin
         end;
       until (not result) or (FindNext(sr) <> 0);
     finally
-      FindClose(sr);
+      System.sysutils.FindClose(sr);
     end;
   end
 end;
@@ -185,18 +192,6 @@ begin
     end;
   end;
   Result := -1;
-end;
-
-{*******************************************************}
-function ALGetFileSizeU(const FileName : string) : Int64;
-var aFileStream: TFileStream;
-begin
-  aFileStream := TFileStream.Create(FileName, fmOpenRead);
-  try
-    result := aFileStream.Size;
-  finally
-    alFreeAndNil(aFileStream);
-  end;
 end;
 
 {*****************************************************************}
@@ -351,6 +346,20 @@ end;
 function  ALRenameFile(const OldName, NewName: ansistring): Boolean;
 begin
   Result := MoveFileA(PansiChar(OldName), PansiChar(NewName));
+end;
+
+{$ENDIF}
+
+{*******************************************************}
+function ALGetFileSizeU(const FileName : string) : Int64;
+var aFileStream: TFileStream;
+begin
+  aFileStream := TFileStream.Create(FileName, fmOpenRead);
+  try
+    result := aFileStream.Size;
+  finally
+    alFreeAndNil(aFileStream);
+  end;
 end;
 
 end.

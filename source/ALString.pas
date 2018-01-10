@@ -8221,7 +8221,7 @@ begin
     //if Unicode then
     //  Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
     //else
-      Result := System.Ansistrings.FloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
+      Result := ALFloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
 {$ELSE NEXTGEN}
     Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
 {$ENDIF !NEXTGEN}

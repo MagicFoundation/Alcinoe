@@ -134,7 +134,7 @@ type
       const ADepthStencil: Boolean); override;
     function GetIndexBufferSupport: TContext3D.TIndexBufferSupport; override;
   public
-    class function IsContextAvailable: Boolean; virtual; abstract;
+    class function IsContextAvailable(const aContextID: integer = 0): Boolean; virtual; abstract; // https://quality.embarcadero.com/browse/RSP-19160
     class function GLHasAnyErrors: Boolean;
     class property Extensions: TExtensions read GetExtensions;
 
@@ -847,7 +847,7 @@ end;
 
 class procedure TCustomContextOpenGL.DoFinalizeTexture(const Texture: TTexture);
 begin
-  if IsContextAvailable then
+  if IsContextAvailable(Texture.ContextID) then // https://quality.embarcadero.com/browse/RSP-19160
   begin
     glDeleteTextures(1, @Texture.Handle);
     if GLHasAnyErrors then

@@ -3706,6 +3706,7 @@ type
   end;
   TUIStoryboardPopoverSegue = class(TOCGenericImport<UIStoryboardPopoverSegueClass, UIStoryboardPopoverSegue>)  end;
 
+  TUIBackgroundTaskExpirationHandler = procedure of object; // https://quality.embarcadero.com/browse/RSP-18656
   UIApplicationClass = interface(UIResponderClass)
     ['{EB8D5CD5-75CA-469F-B1B9-3A32D640B450}']
     {class} function sharedApplication: Pointer; cdecl;
@@ -3725,7 +3726,7 @@ type
     function currentUserNotificationSettings: UIUserNotificationSettings; cdecl;
     function delegate: UIApplicationDelegate; cdecl;
     function enabledRemoteNotificationTypes: Pointer; cdecl;
-    procedure endBackgroundTask(identifier: Pointer); cdecl;
+    procedure endBackgroundTask(identifier: UIBackgroundTaskIdentifier); cdecl; // https://quality.embarcadero.com/browse/RSP-18656
     procedure endIgnoringInteractionEvents; cdecl;
     procedure endReceivingRemoteControlEvents; cdecl;
     function isIdleTimerDisabled: Boolean; cdecl;
@@ -3762,6 +3763,9 @@ type
     procedure unregisterForRemoteNotifications; cdecl;
     function userInterfaceLayoutDirection: NSInteger; cdecl;
     function windows: NSArray; cdecl;
+    procedure setMinimumBackgroundFetchInterval(minimumBackgroundFetchInterval: NSTimeInterval); cdecl; // https://quality.embarcadero.com/browse/RSP-18656
+    function beginBackgroundTaskWithExpirationHandler(handler: TUIBackgroundTaskExpirationHandler): UIBackgroundTaskIdentifier; cdecl; // https://quality.embarcadero.com/browse/RSP-18656
+    function isRegisteredForRemoteNotifications: boolean; cdecl; // https://quality.embarcadero.com/browse/RSP-18670
   end;
   TUIApplication = class(TOCGenericImport<UIApplicationClass, UIApplication>)  end;
 
@@ -7024,7 +7028,11 @@ function UIKeyboardDidChangeFrameNotification: NSString;
 function UIKeyboardCenterBeginUserInfoKey: NSString;
 function UIKeyboardCenterEndUserInfoKey: NSString;
 function UIKeyboardBoundsUserInfoKey: NSString;
-
+function UIApplicationOpenURLOptionsAnnotationKey: NSString;  // https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenURLOptionsSourceApplicationKey: NSString; // https://quality.embarcadero.com/browse/RSP-18013
+function UIBackgroundTaskInvalid: UIBackgroundTaskIdentifier; // https://quality.embarcadero.com/browse/RSP-18656
+function UIApplicationBackgroundFetchIntervalNever: NSTimeInterval; // https://quality.embarcadero.com/browse/RSP-18662
+function UIApplicationBackgroundFetchIntervalMinimum: NSTimeInterval; // https://quality.embarcadero.com/browse/RSP-18662
 
 // ===== External functions =====
 const
@@ -7161,10 +7169,16 @@ implementation
 {$IF defined(IOS) and NOT defined(CPUARM)}
 
 uses
+  System.SysUtils,
   Posix.Dlfcn;
 
 var
   UIKitModule: THandle;
+
+{$ELSE}
+
+uses
+  System.SysUtils;
 
 {$ENDIF IOS}
 
@@ -8342,6 +8356,52 @@ end;
 function UIKeyboardBoundsUserInfoKey: NSString;
 begin
   Result := CocoaNSStringConst(UIKitFwk, 'UIKeyboardBoundsUserInfoKey');
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenURLOptionsAnnotationKey: NSString;
+begin
+  if (TOSVersion.Check(9, 0)) then
+    Result := CocoaNSStringConst(UIKitFwk, 'UIApplicationOpenURLOptionsAnnotationKey')
+  else
+    Result := nil;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18013
+function UIApplicationOpenURLOptionsSourceApplicationKey: NSString;
+begin
+  if (TOSVersion.Check(9, 0)) then
+    Result := CocoaNSStringConst(UIKitFwk, 'UIApplicationOpenURLOptionsSourceApplicationKey')
+  else
+    Result := nil;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18656
+function UIBackgroundTaskInvalid: UIBackgroundTaskIdentifier;
+begin
+  Result := CocoaIntegerConst(UIKitFwk, 'UIBackgroundTaskInvalid');
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18662
+function UIApplicationBackgroundFetchIntervalNever: NSTimeInterval;
+var Obj: Pointer;
+begin
+  Obj := CocoaPointerConst(UIKitFwk, 'UIApplicationBackgroundFetchIntervalNever');
+  if Obj <> nil then
+    Result := double(Obj^)
+  else
+    Result := 0;
+end;
+
+// https://quality.embarcadero.com/browse/RSP-18662
+function UIApplicationBackgroundFetchIntervalMinimum: NSTimeInterval;
+var Obj: Pointer;
+begin
+  Obj := CocoaPointerConst(UIKitFwk, 'UIApplicationBackgroundFetchIntervalMinimum');
+  if Obj <> nil then
+    Result := double(Obj^)
+  else
+    Result := 0;
 end;
 
 {$IF defined(IOS) and NOT defined(CPUARM)}

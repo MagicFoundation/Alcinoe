@@ -77,6 +77,8 @@ type
 procedure RegisterCanvasClasses;
 procedure UnregisterCanvasClasses;
 
+function CanvasHelper: TCanvasHelper; // << https://quality.embarcadero.com/browse/RSP-18797
+
 implementation
 
 uses
@@ -1225,6 +1227,12 @@ end;
 procedure UnregisterCanvasClasses;
 begin
   TCanvasGpu.FreeResources;
+end;
+
+//https://quality.embarcadero.com/browse/RSP-18797
+function CanvasHelper: TCanvasHelper;
+begin
+  result := TCanvasGpu.FCanvasHelper;
 end;
 
 initialization

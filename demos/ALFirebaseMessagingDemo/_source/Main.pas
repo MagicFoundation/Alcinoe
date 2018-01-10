@@ -205,6 +205,14 @@ procedure TForm1.ShowNotification(const aTitle: String;
       aStream: TMemoryStream;
       aHttpClient: THttpClient;
       aHTTPResponse: IHTTPResponse;
+      aNotificationBuilder: JNotificationCompat_Builder;
+      aNotificationManager: JnotificationManager;
+      aNotificationServiceNative: JObject;
+      aintent: Jintent;
+      aPendingIntent: JPendingIntent;
+      aPattern: TJavaArray<Int64>;
+      aDefaults: integer;
+      aTag: String;
   {$ENDIF}
   {$ENDREGION}
 
@@ -255,101 +263,94 @@ begin
 
     end;
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'replace CallInUIThreadAndWaitFinishing by TThread.synchronize because maybe in tokyo under android now UIThtread=MainThreadID'}
-  {$ENDIF}
-  CallInUIThreadAndWaitFinishing(
-    procedure
-    var aNotificationBuilder: JNotificationCompat_Builder;
-        aNotificationManager: JnotificationManager;
-        aNotificationServiceNative: JObject;
-        aintent: Jintent;
-        aPendingIntent: JPendingIntent;
-        aPattern: TJavaArray<Int64>;
-        aDefaults: integer;
-        aTag: String;
-    begin
+    {$IF CompilerVersion <= 31} // berlin
+    CallInUIThreadAndWaitFinishing(
+      procedure
+      begin
+    {$ENDIF}
 
-      //init aDefaults
-      aDefaults := TJNotification.javaclass.DEFAULT_LIGHTS;
+        //init aDefaults
+        aDefaults := TJNotification.javaclass.DEFAULT_LIGHTS;
 
-      //create aPendingIntent
-      aIntent := TJIntent.javaclass.init(TJALFirebaseMessagingService.javaclass.ACTION_MESSAGERECEIVED);
-      //----
-      aIntent.putExtra(StringToJstring('notification'), 1);
-      aIntent.putExtra(StringToJstring('notification.presented'), '1');
-      aIntent.putExtra(StringToJstring('extraData'), StringToJstring('sample of extra data'));
-      //----
-      aIntent.setClass(TAndroidHelper.Context, MainActivity.getclass);
-      aIntent.setFlags(TJIntent.javaclass.FLAG_ACTIVITY_CLEAR_TOP);
-      aPendingIntent := TJPendingIntent.javaclass.getActivity(TAndroidHelper.Context, // context	Context: The Context in which this PendingIntent should start the activity.
-                                                              random(maxint), // requestCode	int: Private request code for the sender
-                                                              aIntent, // intents	Intent: Array of Intents of the activities to be launched.
-                                                              TJPendingIntent.javaclass.FLAG_UPDATE_CURRENT); // flags	int: May be FLAG_ONE_SHOT, - Flag indicating that this PendingIntent can be used only once.
-                                                                                                              //                    FLAG_NO_CREATE, - Flag indicating that if the described PendingIntent does not already exist, then simply return null instead of creating it.
-                                                                                                              //                    FLAG_CANCEL_CURRENT, - Flag indicating that if the described PendingIntent already exists, the current one should be canceled before generating a new one.
-                                                                                                              //                    FLAG_UPDATE_CURRENT, - Flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent.
-                                                                                                              //                    FLAG_IMMUTABLE - Flag indicating that the created PendingIntent should be immutable.
-                                                                                                              // or any of the flags as supported by Intent.fillIn() to
-                                                                                                              // control which unspecified parts of the intent that can
-                                                                                                              // be supplied when the actual send happens. */
+        //create aPendingIntent
+        aIntent := TJIntent.javaclass.init(TJALFirebaseMessagingService.javaclass.ACTION_MESSAGERECEIVED);
+        //----
+        aIntent.putExtra(StringToJstring('notification'), 1);
+        aIntent.putExtra(StringToJstring('notification.presented'), '1');
+        aIntent.putExtra(StringToJstring('extraData'), StringToJstring('sample of extra data'));
+        //----
+        aIntent.setClass(TAndroidHelper.Context, MainActivity.getclass);
+        aIntent.setFlags(TJIntent.javaclass.FLAG_ACTIVITY_CLEAR_TOP);
+        aPendingIntent := TJPendingIntent.javaclass.getActivity(TAndroidHelper.Context, // context	Context: The Context in which this PendingIntent should start the activity.
+                                                                random(maxint), // requestCode	int: Private request code for the sender
+                                                                aIntent, // intents	Intent: Array of Intents of the activities to be launched.
+                                                                TJPendingIntent.javaclass.FLAG_UPDATE_CURRENT); // flags	int: May be FLAG_ONE_SHOT, - Flag indicating that this PendingIntent can be used only once.
+                                                                                                                //                    FLAG_NO_CREATE, - Flag indicating that if the described PendingIntent does not already exist, then simply return null instead of creating it.
+                                                                                                                //                    FLAG_CANCEL_CURRENT, - Flag indicating that if the described PendingIntent already exists, the current one should be canceled before generating a new one.
+                                                                                                                //                    FLAG_UPDATE_CURRENT, - Flag indicating that if the described PendingIntent already exists, then keep it but replace its extra data with what is in this new Intent.
+                                                                                                                //                    FLAG_IMMUTABLE - Flag indicating that the created PendingIntent should be immutable.
+                                                                                                                // or any of the flags as supported by Intent.fillIn() to
+                                                                                                                // control which unspecified parts of the intent that can
+                                                                                                                // be supplied when the actual send happens. */
 
-      //init a Tag
-      aTag := ALInttostrU(random(maxint));
+        //init a Tag
+        aTag := ALInttostrU(random(maxint));
 
-      //create the NotificationBuilder
-      aNotificationBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context);
-      //aNotificationBuilder := aNotificationBuilder.setColor(WinDT_getNotificationIconBGColor(aType));
-      if (atext <> '') then aNotificationBuilder := aNotificationBuilder.setContentText(StrToJCharSequence(atext));
-      if (aTitle <> '') then aNotificationBuilder := aNotificationBuilder.setContentTitle(StrToJCharSequence(atitle));
-      if (aLargeIconBitmap <> nil) then aNotificationBuilder := aNotificationBuilder.setLargeIcon(aLargeIconBitmap);
-      //-----
-      //
-      // finally i prefere to not show the Number, because it's mean we must also need to reset it and this number
-      // is often ignored by the user, so don't complicate my life with it
-      //
-      //aSharedPreferences := TJPreferenceManager.javaclass.getDefaultSharedPreferences(TAndroidHelper.Context.getApplicationContext);
-      //aCurrentCount := aSharedPreferences.getInt(StringToJstring('notification.count_' + aTag), 0);
-      //aPreferenceEditor := aSharedPreferences.edit;
-      //aPreferenceEditor.putInt(StringToJstring('notification.count_' + aTag), aCurrentCount + 1);
-      //aPreferenceEditor.commit;
-      //if (acurrentCount > 0) then aNotificationBuilder := aNotificationBuilder.setNumber(acurrentCount + 1);
-      //-----
-      aNotificationBuilder := aNotificationBuilder.setOnlyAlertOnce(true);
-      aNotificationBuilder := aNotificationBuilder.setSmallIcon(
-        TAndroidHelper.Context.getResources().getIdentifier(
-          StringToJstring('notification_icon'), // name	String: The name of the desired resource.
-          StringToJstring('drawable'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-          TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
-      if (aTicker <> '') then aNotificationBuilder := aNotificationBuilder.setTicker(StrToJCharSequence(aTicker));
+        //create the NotificationBuilder
+        aNotificationBuilder := TJNotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context);
+        //aNotificationBuilder := aNotificationBuilder.setColor(WinDT_getNotificationIconBGColor(aType));
+        if (atext <> '') then aNotificationBuilder := aNotificationBuilder.setContentText(StrToJCharSequence(atext));
+        if (aTitle <> '') then aNotificationBuilder := aNotificationBuilder.setContentTitle(StrToJCharSequence(atitle));
+        if (aLargeIconBitmap <> nil) then aNotificationBuilder := aNotificationBuilder.setLargeIcon(aLargeIconBitmap);
+        //-----
+        //
+        // finally i prefere to not show the Number, because it's mean we must also need to reset it and this number
+        // is often ignored by the user, so don't complicate my life with it
+        //
+        //aSharedPreferences := TJPreferenceManager.javaclass.getDefaultSharedPreferences(TAndroidHelper.Context.getApplicationContext);
+        //aCurrentCount := aSharedPreferences.getInt(StringToJstring('notification.count_' + aTag), 0);
+        //aPreferenceEditor := aSharedPreferences.edit;
+        //aPreferenceEditor.putInt(StringToJstring('notification.count_' + aTag), aCurrentCount + 1);
+        //aPreferenceEditor.commit;
+        //if (acurrentCount > 0) then aNotificationBuilder := aNotificationBuilder.setNumber(acurrentCount + 1);
+        //-----
+        aNotificationBuilder := aNotificationBuilder.setOnlyAlertOnce(true);
+        aNotificationBuilder := aNotificationBuilder.setSmallIcon(
+          TAndroidHelper.Context.getResources().getIdentifier(
+            StringToJstring('notification_icon'), // name	String: The name of the desired resource.
+            StringToJstring('drawable'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+            TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+        if (aTicker <> '') then aNotificationBuilder := aNotificationBuilder.setTicker(StrToJCharSequence(aTicker));
 
-      aDefaults := aDefaults or TJNotification.javaclass.DEFAULT_VIBRATE;
-      aPattern := TJavaArray<Int64>.create(2);
-      try
-        aPattern[0] := 0;
-        aPattern[1] := 1200;
-        aNotificationBuilder := aNotificationBuilder.setVibrate(aPattern);
-      finally
-        AlFreeAndNil(aPattern);
-      end;
+        aDefaults := aDefaults or TJNotification.javaclass.DEFAULT_VIBRATE;
+        aPattern := TJavaArray<Int64>.create(2);
+        try
+          aPattern[0] := 0;
+          aPattern[1] := 1200;
+          aNotificationBuilder := aNotificationBuilder.setVibrate(aPattern);
+        finally
+          AlFreeAndNil(aPattern);
+        end;
 
-      aDefaults := aDefaults or TJNotification.javaclass.DEFAULT_SOUND;
-      aNotificationBuilder := aNotificationBuilder.setsound(TJRingtoneManager.JavaClass.getDefaultUri(TJRingtoneManager.JavaClass.TYPE_NOTIFICATION));
+        aDefaults := aDefaults or TJNotification.javaclass.DEFAULT_SOUND;
+        aNotificationBuilder := aNotificationBuilder.setsound(TJRingtoneManager.JavaClass.getDefaultUri(TJRingtoneManager.JavaClass.TYPE_NOTIFICATION));
 
-      aNotificationBuilder := aNotificationBuilder.setPriority(1{high});
-      aNotificationBuilder := aNotificationBuilder.setDefaults(aDefaults);
-      aNotificationBuilder := aNotificationBuilder.setWhen(TJDate.Create.getTime);
-      //aNotificationBuilder := aNotificationBuilder.setShowWhen(true);
-      aNotificationBuilder := aNotificationBuilder.setAutoCancel(true);
-      aNotificationBuilder := aNotificationBuilder.setContentIntent(aPendingIntent);
+        aNotificationBuilder := aNotificationBuilder.setPriority(1{high});
+        aNotificationBuilder := aNotificationBuilder.setDefaults(aDefaults);
+        aNotificationBuilder := aNotificationBuilder.setWhen(TJDate.Create.getTime);
+        //aNotificationBuilder := aNotificationBuilder.setShowWhen(true);
+        aNotificationBuilder := aNotificationBuilder.setAutoCancel(true);
+        aNotificationBuilder := aNotificationBuilder.setContentIntent(aPendingIntent);
 
-      aNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-      aNotificationManager := TJNotificationManager.Wrap((aNotificationServiceNative as ILocalObject).GetObjectID);
-      aNotificationManager.notify(StringToJstring(aTag), // tag	String: A string identifier for this notification. May be null.
-                                  0, // id	int: An identifier for this notification. The pair (tag, id) must be unique within your application.
-                                  anotificationBuilder.build()); // notification	Notification: A Notification object describing what to show the user. Must not be null.
+        aNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
+        aNotificationManager := TJNotificationManager.Wrap((aNotificationServiceNative as ILocalObject).GetObjectID);
+        aNotificationManager.notify(StringToJstring(aTag), // tag	String: A string identifier for this notification. May be null.
+                                    0, // id	int: An identifier for this notification. The pair (tag, id) must be unique within your application.
+                                    anotificationBuilder.build()); // notification	Notification: A Notification object describing what to show the user. Must not be null.
 
-    end);
+    {$IF CompilerVersion <= 31} // berlin
+      end);
+    {$ENDIF}
 
   finally
     if assigned(aLargeIconBitmap) then aLargeIconBitmap.recycle;

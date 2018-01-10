@@ -17,6 +17,8 @@ unit dwsJSON;
 
 {$I dws.inc}
 
+{$Hints OFF}
+
 interface
 
 uses

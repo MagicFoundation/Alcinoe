@@ -13,6 +13,7 @@ uses system.Classes,
      {$endIF}
      {$IF defined(ANDROID)}
      System.Messaging,
+     Androidapi.JNI.Os,
      Androidapi.JNI.GraphicsContentViewText,
      Androidapi.JNI.Media,
      Androidapi.JNIBridge,
@@ -117,6 +118,7 @@ type
   private
     FMediaPlayer: JMediaPlayer;
     fSurfaceTexture: JSurfaceTexture;
+    fHandler: JHandler;
     fbitmap: TALTexture;
     fOnFrameAvailableEvent: TNotifyEvent;
     FOnFrameAvailableListener: TALFrameAvailableListener;
@@ -132,11 +134,13 @@ type
     fonVideoSizeChangedListener: TALVideoSizeChangedListener;
     fVideoWidth: integer;
     fVideoHeight: integer;
+    {$IF CompilerVersion <= 31} // berlin
     FOpenGLContextLostId: Integer;
     FOpenGLContextResetId: Integer;
     FIsOpenGLContextLost: Boolean;
     procedure OpenGLContextLostHandler(const Sender : TObject; const Msg : TMessage);
     procedure OpenGLContextResetHandler(const Sender : TObject; const Msg : TMessage);
+    {$ENDIF}
   protected
   public
     constructor Create; virtual;
@@ -386,6 +390,7 @@ type
     FTag: int64;
     [Weak] FTagObject: TObject;
     FTagFloat: Double;
+    FTagString: String;
     //-----
     {$IF DEFINED(IOS) or DEFINED(ANDROID)}
     function GetBitmap: TalTexture;
@@ -432,6 +437,7 @@ type
     property Tag: int64 read FTag write FTag default 0;
     property TagObject: TObject read FTagObject write FTagObject;
     property TagFloat: Double read FTagFloat write FTagFloat;
+    property TagString: String read FTagString write FTagString;
   end;
 
   {***********************************}
@@ -463,6 +469,7 @@ type
     FTag: int64;
     [Weak] FTagObject: TObject;
     FTagFloat: Double;
+    FTagString: String;
     //-----
     fDoSetDataSource: Boolean;
     fDoSetDataSourceValue: String;
@@ -536,6 +543,7 @@ type
     property Tag: int64 read FTag write FTag default 0;
     property TagObject: TObject read FTagObject write FTagObject;
     property TagFloat: Double read FTagFloat write FTagFloat;
+    property TagString: String read FTagString write FTagString;
   end;
 
   {*****************************************}
@@ -585,10 +593,6 @@ uses system.SysUtils,
 {$REGION ' ANDROID'}
 {$IF defined(ANDROID)}
 
-{$IF CompilerVersion > 31} // berlin
-  {$MESSAGE WARN 'remove all Thread.queue/CallInUIThread/CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-{$ENDIF}
-
 {*******************************************************************************************************************}
 constructor TALAndroidVideoPlayer.TALFrameAvailableListener.Create(const aVideoPlayerControl: TALAndroidVideoPlayer);
 begin
@@ -602,6 +606,9 @@ end;
 
 {**********************************************************************************************************}
 procedure TALAndroidVideoPlayer.TALFrameAvailableListener.onFrameAvailable(surfaceTexture: JSurfaceTexture);
+{$IF defined(DEBUG)}
+var aStopWatch: TStopWatch;
+{$ENDIF}
 begin
 
   {$IF defined(DEBUG)}
@@ -615,6 +622,7 @@ begin
   inc(fTotalFramesProcessed);
   {$ENDIF}
 
+  //https://developer.android.com/reference/android/graphics/SurfaceTexture.html
   //SurfaceTexture objects may be created on any thread. updateTexImage() may only be called on the
   //thread with the OpenGL ES context that contains the texture object. The frame-available callback
   //is called on an arbitrary thread, so unless special care is taken updateTexImage() should not be
@@ -623,16 +631,18 @@ begin
   // >> seam to be thread safe - i already make opengl multithread however the updateTexImage seam
   // >> seam to take around 1ms only so their is no really purpose to run it in a different thread than
   // >> the main thread (who already have the OpenGL ES context)
+  //
+  //NOTE: as i do setOnFrameAvailableListener(SurfaceTexture.OnFrameAvailableListener listener,Handler handler)
+  //      with handler = TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper()) then this event will be
+  //      always called from the main UI thread
+
+  {$IF CompilerVersion <= 31} // berlin
   tthread.queue(nil,
     procedure
-    {$IF defined(DEBUG)}
-    var aStopWatch: TStopWatch;
-    {$ENDIF}
     begin
-
       if fVideoPlayerControl = nil then exit;
-
       if fVideoPlayerControl.FIsOpenGLContextLost then exit;
+  {$ENDIF}
 
       if (fVideoPlayerControl.fSurfaceTexture <> nil) and
          (fVideoPlayerControl.fbitmap <> nil) then begin
@@ -670,7 +680,9 @@ begin
       if assigned(fVideoPlayerControl.fOnFrameAvailableEvent) then
         fVideoPlayerControl.fOnFrameAvailableEvent(fVideoPlayerControl);
 
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -706,13 +718,19 @@ begin
   result := True; // True if the method handled the error, false if it didn't. Returning false, or not having an
                   // OnErrorListener at all, will cause the OnCompletionListener to be called.
 
+  {$IF CompilerVersion <= 31} // berlin
   tthread.queue(nil,
     procedure
     begin
       if fVideoPlayerControl = nil then exit;
+  {$ENDIF}
+
       if assigned(fVideoPlayerControl.fOnErrorEvent) then
         fVideoPlayerControl.fOnErrorEvent(fVideoPlayerControl);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -731,13 +749,19 @@ begin
   ALLog('TALAndroidVideoPlayer.onPrepared', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
+  {$IF CompilerVersion <= 31} // berlin
   tthread.queue(nil,
     procedure
     begin
       if fVideoPlayerControl = nil then exit;
+  {$ENDIF}
+
       if assigned(fVideoPlayerControl.fOnPreparedEvent) then
         fVideoPlayerControl.fOnPreparedEvent(fVideoPlayerControl);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -758,15 +782,21 @@ begin
                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
+  {$IF CompilerVersion <= 31} // berlin
   tthread.queue(nil,
     procedure
     begin
       if fVideoPlayerControl = nil then exit;
+  {$ENDIF}
+
       fVideoPlayerControl.FVideoWidth := width;
       fVideoPlayerControl.fVideoHeight := height;
       if assigned(fVideoPlayerControl.fonVideoSizeChangedEvent) then
         fVideoPlayerControl.fonVideoSizeChangedEvent(fVideoPlayerControl, width, height);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -792,13 +822,19 @@ begin
   end;
   {$ENDIF}
 
+  {$IF CompilerVersion <= 31} // berlin
   tthread.queue(nil,
     procedure
     begin
       if fVideoPlayerControl = nil then exit;
+  {$ENDIF}
+
       if assigned(fVideoPlayerControl.fOnBufferingUpdateEvent) then
         fVideoPlayerControl.fOnBufferingUpdateEvent(fVideoPlayerControl, percent);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -817,13 +853,19 @@ begin
   ALLog('TALAndroidVideoPlayer.onCompletion', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
+  {$IF CompilerVersion <= 31} // berlin
   tthread.queue(nil,
     procedure
     begin
       if fVideoPlayerControl = nil then exit;
+  {$ENDIF}
+
       if assigned(fVideoPlayerControl.fOnCompletionEvent) then
         fVideoPlayerControl.fOnCompletionEvent(fVideoPlayerControl);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -839,9 +881,6 @@ begin
   inherited create;
 
   //-----
-  FIsOpenGLContextLost := False;
-
-  //-----
   // i use synchronize in case the TALAndroidVideoPlayer was
   // created in a different thread than the main thread because
   // only the main thread have the openGL ES context (except if
@@ -853,49 +892,54 @@ begin
     begin
 
       //----
+      {$IF CompilerVersion <= 31} // berlin
+      FIsOpenGLContextLost := False;
       FOpenGLContextLostId := TMessageManager.DefaultManager.SubscribeToMessage(TContextLostMessage, OpenGLContextLostHandler);
       FOpenGLContextResetId := TMessageManager.DefaultManager.SubscribeToMessage(TContextResetMessage, OpenGLContextResetHandler);
+      {$ENDIF}
 
       //----
       fBitmap := TalTexture.Create(False);
       ALInitializeEXTERNALOESTexture(fBitmap);
 
+      //-----
+      fVideoWidth := 0;
+      fVideoHeight := 0;
+
+      //-----
+      FMediaPlayer := TJMediaPlayer.JavaClass.init;
+      //-----
+      fOnErrorEvent := nil;
+      FOnErrorListener := TALErrorListener.Create(Self);
+      FMediaPlayer.setOnErrorListener(FOnErrorListener);
+      //-----
+      fOnPreparedEvent := nil;
+      FOnPreparedListener := TALPreparedListener.Create(Self);
+      FMediaPlayer.setOnPreparedListener(FOnPreparedListener);
+      //-----
+      fonVideoSizeChangedEvent := nil;
+      fonVideoSizeChangedListener := TALVideoSizeChangedListener.Create(Self);
+      FMediaPlayer.setOnVideoSizeChangedListener(fonVideoSizeChangedListener);
+      //-----
+      fOnBufferingUpdateEvent := nil;
+      fOnBufferingUpdateListener := TALBufferingUpdateListener.Create(Self);
+      FMediaPlayer.setOnBufferingUpdateListener(fOnBufferingUpdateListener);
+      //-----
+      fOnCompletionEvent := nil;
+      fOnCompletionListener := TALCompletionListener.Create(Self);
+      FMediaPlayer.setOnCompletionListener(fOnCompletionListener);
+      //-----
+      fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
+      //-----
+      fHandler := TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper());
+      //-----
+      fOnFrameAvailableEvent := nil;
+      FOnFrameAvailableListener := TALFrameAvailableListener.Create(Self);
+      fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler);
+      //-----
+      FMediaPlayer.setSurface(TJSurface.JavaClass.init((fSurfaceTexture)));
+
     end);
-
-  //-----
-  fVideoWidth := 0;
-  fVideoHeight := 0;
-
-  //-----
-  FMediaPlayer := TJMediaPlayer.JavaClass.init;
-  //-----
-  fOnErrorEvent := nil;
-  FOnErrorListener := TALErrorListener.Create(Self);
-  FMediaPlayer.setOnErrorListener(FOnErrorListener);
-  //-----
-  fOnPreparedEvent := nil;
-  FOnPreparedListener := TALPreparedListener.Create(Self);
-  FMediaPlayer.setOnPreparedListener(FOnPreparedListener);
-  //-----
-  fonVideoSizeChangedEvent := nil;
-  fonVideoSizeChangedListener := TALVideoSizeChangedListener.Create(Self);
-  FMediaPlayer.setOnVideoSizeChangedListener(fonVideoSizeChangedListener);
-  //-----
-  fOnBufferingUpdateEvent := nil;
-  fOnBufferingUpdateListener := TALBufferingUpdateListener.Create(Self);
-  FMediaPlayer.setOnBufferingUpdateListener(fOnBufferingUpdateListener);
-  //-----
-  fOnCompletionEvent := nil;
-  fOnCompletionListener := TALCompletionListener.Create(Self);
-  FMediaPlayer.setOnCompletionListener(fOnCompletionListener);
-  //-----
-  fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
-  //-----
-  fOnFrameAvailableEvent := nil;
-  FOnFrameAvailableListener := TALFrameAvailableListener.Create(Self);
-  fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener);
-  //-----
-  FMediaPlayer.setSurface(TJSurface.JavaClass.init((fSurfaceTexture)));
 
 end;
 
@@ -925,6 +969,7 @@ end;
 // this procedure because of this nasty bug :
 // https://stackoverflow.com/questions/44349397/under-android-why-tthread-synchronize-followed-by-callinuithread-result-in-app?noredirect=1#comment75706313_44349397
 procedure TALAndroidVideoPlayer.synchDestroy;
+{$IF CompilerVersion <= 31} // berlin
 var aMediaPlayer: JMediaPlayer;
     aSurfaceTexture: JSurfaceTexture;
     abitmap: TALTexture;
@@ -934,7 +979,11 @@ var aMediaPlayer: JMediaPlayer;
     aOnBufferingUpdateListener: TALBufferingUpdateListener;
     aOnCompletionListener: TALCompletionListener;
     aOnFrameAvailableListener: TALFrameAvailableListener;
+    aHandler: JHandler;
+{$ENDIF}
 begin
+
+  {$IF CompilerVersion <= 31} // berlin
 
   //-----
   TMessageManager.DefaultManager.Unsubscribe(TContextLostMessage, FOpenGLContextLostId);
@@ -975,47 +1024,79 @@ begin
   aOnBufferingUpdateListener := fOnBufferingUpdateListener;
   aOnCompletionListener := fOnCompletionListener;
   aOnFrameAvailableListener := fOnFrameAvailableListener;
+  aHandler := fHandler;
   CallInUiThread(
     procedure
+    var fMediaPlayer: JMediaPlayer;
+        fSurfaceTexture: JSurfaceTexture;
+        fbitmap: TALTexture;
+        fOnErrorListener: TALErrorListener;
+        fOnPreparedListener: TALPreparedListener;
+        fonVideoSizeChangedListener: TALVideoSizeChangedListener;
+        fOnBufferingUpdateListener: TALBufferingUpdateListener;
+        fOnCompletionListener: TALCompletionListener;
+        fOnFrameAvailableListener: TALFrameAvailableListener;
+        fHandler: JHandler;
     begin
+      fMediaPlayer := aMediaPlayer;
+      fSurfaceTexture := aSurfaceTexture;
+      fbitmap := abitmap;
+      fOnErrorListener := aOnErrorListener;
+      fOnPreparedListener := aOnPreparedListener;
+      fonVideoSizeChangedListener := aonVideoSizeChangedListener;
+      fOnBufferingUpdateListener := aOnBufferingUpdateListener;
+      fOnCompletionListener := aOnCompletionListener;
+      fOnFrameAvailableListener := aOnFrameAvailableListener;
+      fHandler := aHandler;
+  {$ENDIF}
 
       //-----
-      if aMediaPlayer.isPlaying then aMediaPlayer.stop;
-      aMediaPlayer.reset;
-      aMediaPlayer.setOnErrorListener(nil);
-      aMediaPlayer.setOnPreparedListener(nil);
-      aMediaPlayer.setOnVideoSizeChangedListener(nil);
-      aMediaPlayer.setOnBufferingUpdateListener(nil);
-      aMediaPlayer.setOnCompletionListener(nil);
-      aMediaPlayer.setSurface(nil);
-      aMediaPlayer.release;
-      aMediaPlayer := nil;
-      aSurfaceTexture.setOnFrameAvailableListener(nil);
-      aSurfaceTexture.release;
-      aSurfaceTexture := nil;
+      if fMediaPlayer.isPlaying then fMediaPlayer.stop;
+      fMediaPlayer.reset;
+      fMediaPlayer.setOnErrorListener(nil);
+      fMediaPlayer.setOnPreparedListener(nil);
+      fMediaPlayer.setOnVideoSizeChangedListener(nil);
+      fMediaPlayer.setOnBufferingUpdateListener(nil);
+      fMediaPlayer.setOnCompletionListener(nil);
+      fMediaPlayer.setSurface(nil);
+      fMediaPlayer.release;
+      fMediaPlayer := nil;
+      fSurfaceTexture.setOnFrameAvailableListener(nil);
+      fSurfaceTexture.release;
+      fSurfaceTexture := nil;
+      fHandler := nil;
 
       //-----
       // i use Queue in case the TALAndroidVideoPlayer was
       // created in a different thread than the main thread because
       // only the main thread have the openGL ES context (except if
       // you modified the delphi source code to make opengl ES multithread)
+      {$IF CompilerVersion <= 31} // berlin
       TThread.Queue(nil,
         procedure
         begin
-          alFreeandNil(abitmap);
-          alFreeandNil(aOnErrorListener);
-          alFreeandNil(aOnPreparedListener);
-          alFreeandNil(aOnVideoSizeChangedListener);
-          alFreeandNil(aOnBufferingUpdateListener);
-          alFreeandNil(aOnCompletionListener);
-          alFreeandNil(aOnFrameAvailableListener);
-        end);
+      {$ENDIF}
 
+          alFreeandNil(fbitmap);
+          alFreeandNil(fOnErrorListener);
+          alFreeandNil(fOnPreparedListener);
+          alFreeandNil(fOnVideoSizeChangedListener);
+          alFreeandNil(fOnBufferingUpdateListener);
+          alFreeandNil(fOnCompletionListener);
+          alFreeandNil(fOnFrameAvailableListener);
+
+      {$IF CompilerVersion <= 31} // berlin
+        end);
+      {$ENDIF}
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
-{***************************************************************************************************}
+{*************************}
+{$IF CompilerVersion <= 31} // berlin
 procedure TALAndroidVideoPlayer.OpenGLContextLostHandler(const Sender: TObject; const Msg: TMessage);
 begin
   {$IF defined(DEBUG)}
@@ -1023,8 +1104,10 @@ begin
   {$ENDIF}
   FIsOpenGLContextLost := True;
 end;
+{$ENDIF}
 
-{****************************************************************************************************}
+{*************************}
+{$IF CompilerVersion <= 31} // berlin
 procedure TALAndroidVideoPlayer.OpenGLContextResetHandler(const Sender: TObject; const Msg: TMessage);
 begin
   {$IF defined(DEBUG)}
@@ -1034,6 +1117,7 @@ begin
                                    // and in my app i don't need this because on OpenGLContextLostHandler i simply destroy all the videoplayer to
                                    // recreate them on OpenGLContextResetHandler
 end;
+{$ENDIF}
 
 {******************************************************}
 //Gets the current playback position. return the current
@@ -2374,6 +2458,7 @@ begin
   fTag := 0;
   FTagObject := nil;
   FTagFloat := 0.0;
+  FTagString := '';
 
    {$IFDEF DEBUG}
   ALLog('TALVideoPlayer.Create', 'END', TalLogType.VERBOSE);
@@ -2616,6 +2701,7 @@ begin
   fTag := 0;
   FTagObject := nil;
   FTagFloat := 0.0;
+  FTagString := '';
 
   //-----
   fDoSetDataSource := False;

@@ -1,22 +1,12 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Sergey Seroukhov (Zeos Database Objects)
               based on Mysql-direct library by Cristian Nicola
-
-product:      ALMySqlWrapper
-Version:      4.00
-
 Description:  MysQL libmysql.dll Version 5 API Interface Unit
-
-Know bug :
-
-History :     26/06/2012: Add xe2 support
 
 Link :        http://www.sourceforge.net/projects/zeoslib
               http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
-
 **************************************************************}
+
 unit ALMySqlWrapper;
 
 interface
@@ -25,12 +15,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows;
-     {$ELSE}
-     Windows;
-     {$IFEND}
-
+Uses Winapi.Windows;
+     
 {$IF CompilerVersion < 18.5}
   // from http://stackoverflow.com/questions/6378107/how-to-define-an-unsigned-64-bit-integer-in-delphi7
   // their is no way in delphi 7 to have an uint64 (unsigned int64)
@@ -689,11 +675,7 @@ TMYSQL_CLIENT_OPTIONS =
 
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.sysutils;
-     {$ELSE}
-     sysutils;
-     {$IFEND}
+Uses System.sysutils;
 
 {**************************************************************}
 constructor TALMySqlLibrary.Create(ApiVer: TALMySqlVersion_API);

@@ -1,21 +1,9 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALQuickSortList
-Version:      4.00
-
 Description:  TALIntegerList or TALDoubleList that work exactly
               like TstringList but with integer or Double.
-
-Know bug :
-
-History :     16/06/2012: Add xe2 Support
-
-Link :
-
 **************************************************************}
+
 unit ALQuickSortList;
 
 {Exemple of a QuickSort Algorithm :
@@ -307,7 +295,7 @@ Type
 
   {------------------------}
   {$IF CompilerVersion > 32} // tokyo
-    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-13502 is still not yet implemented in System.Generics.Collections.pas'}
+    {$MESSAGE WARN 'Check if System.Generics.Collections.pas was not updated and also if https://quality.embarcadero.com/browse/RSP-13502 is still not yet implemented in System.Generics.Collections.pas'}
   {$IFEND}
   TALDictionary<TKey,TValue> = class(TEnumerable<TPair<TKey,TValue>>)
   private

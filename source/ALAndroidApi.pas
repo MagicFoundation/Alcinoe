@@ -36,6 +36,10 @@ type
   JPreferenceManager = interface;
   JAsyncTask_Status = interface;
   JAsyncTask = interface;
+  JChoreographer = interface;
+  JChoreographer_FrameCallback = interface;
+  JALBroadcastReceiverListener = interface;
+  JALBroadcastReceiver = interface;
 
   {****************************************}
   JALFileUtilClass = interface(JObjectClass)
@@ -148,7 +152,7 @@ type
   end;
   TJALControlHostLayout = class(TJavaGenericImport<JALControlHostLayoutClass, JALControlHostLayout>) end;
 
-  {***********************************}
+  {*********************************}
   JLogClass = interface(JObjectClass)
     ['{E4B8D3E7-409F-41E4-A7A6-9E011CD9B87E}']
     {class} function _GetVERBOSE: Integer; cdecl;
@@ -232,7 +236,7 @@ type
   end;
   TJLocalBroadcastManager = class(TJavaGenericImport<JLocalBroadcastManagerClass, JLocalBroadcastManager>) end;
 
-  {***************************************************}
+  {***********************************************}
   JPreferenceManagerClass = interface(JObjectClass)
     ['{2BCBB8F6-B5EE-441E-B01B-5F7E37A783B5}']
     {class} function getDefaultSharedPreferences(context: JContext): JSharedPreferences; cdecl;
@@ -288,6 +292,61 @@ type
   end;
   TJAsyncTask = class(TJavaGenericImport<JAsyncTaskClass, JAsyncTask>) end;
 
+  {*******************************************}
+  JChoreographerClass = interface(JObjectClass)
+    ['{EEA5A7FB-9148-4A16-A835-50622172A47D}']
+    {class} function getInstance: JChoreographer; cdecl;//Deprecated
+  end;
+
+  {*******************************************}
+  [JavaSignature('android/view/Choreographer')]
+  JChoreographer = interface(JObject)
+    ['{C5D38D1C-AA30-49D7-A98F-E1A4E2AFED4D}']
+    procedure removeFrameCallback(callback: JChoreographer_FrameCallback); cdecl;
+    procedure postFrameCallback(callback: JChoreographer_FrameCallback); cdecl;
+    procedure postFrameCallbackDelayed(callback: JChoreographer_FrameCallback; delayMillis: Int64); cdecl;
+  end;
+  TJChoreographer = class(TJavaGenericImport<JChoreographerClass, JChoreographer>) end;
+
+  {*******************************************************}
+  JChoreographer_FrameCallbackClass = interface(IJavaClass)
+    ['{5E2EB024-1023-47DA-A6D2-606B779E70C2}']
+    procedure doFrame(frameTimeNanos: Int64); cdecl;
+  end;
+
+  {*********************************************************}
+  [JavaSignature('android/view/Choreographer$FrameCallback')]
+  JChoreographer_FrameCallback = interface(IJavaInstance)
+    ['{305C5D2F-8277-401F-A56A-784912F8CF6E}']
+  end;
+  TJChoreographer_FrameCallback = class(TJavaGenericImport<JChoreographer_FrameCallbackClass, JChoreographer_FrameCallback>) end;
+
+  {*******************************************************}
+  JALBroadcastReceiverListenerClass = interface(IJavaClass)
+    ['{64D38904-11AB-4B0E-B9C1-D5038273BC0D}']
+  end;
+
+  {****************************************************************}
+  [JavaSignature('com/alcinoe/content/ALBroadcastReceiverListener')]
+  JALBroadcastReceiverListener = interface(IJavaInstance)
+    ['{8AD95D78-A7FC-4613-8D94-55CC19EB1565}']
+    procedure onReceive(context: JContext; intent: JIntent); cdecl;
+  end;
+  TJALBroadcastReceiverListener = class(TJavaGenericImport<JALBroadcastReceiverListenerClass, JALBroadcastReceiverListener>) end;
+
+  {************************************************************}
+  JALBroadcastReceiverClass = interface(JBroadcastReceiverClass)
+    ['{23BF821F-A433-4564-AD56-7704A58D66C9}']
+    {class} function init: JALBroadcastReceiver; cdecl;
+  end;
+
+  {********************************************************}
+  [JavaSignature('com/alcinoe/content/ALBroadcastReceiver')]
+  JALBroadcastReceiver = interface(JBroadcastReceiver)
+    ['{42427B26-C270-4832-8645-F788FCB549CB}']
+    procedure setListener(listener: JALBroadcastReceiverListener); cdecl;
+  end;
+  TJALBroadcastReceiver = class(TJavaGenericImport<JALBroadcastReceiverClass, JALBroadcastReceiver>) end;
 
 implementation
 
@@ -306,6 +365,10 @@ begin
   TRegTypes.RegisterType('ALAndroidApi.JPreferenceManager', TypeInfo(ALAndroidApi.JPreferenceManager));
   TRegTypes.RegisterType('ALAndroidApi.JAsyncTask_Status', TypeInfo(ALAndroidApi.JAsyncTask_Status));
   TRegTypes.RegisterType('ALAndroidApi.JAsyncTask', TypeInfo(ALAndroidApi.JAsyncTask));
+  TRegTypes.RegisterType('ALAndroidApi.JChoreographer', TypeInfo(ALAndroidApi.JChoreographer));
+  TRegTypes.RegisterType('ALAndroidApi.JChoreographer_FrameCallback', TypeInfo(ALAndroidApi.JChoreographer_FrameCallback));
+  TRegTypes.RegisterType('ALAndroidApi.JALBroadcastReceiverListener', TypeInfo(ALAndroidApi.JALBroadcastReceiverListener));
+  TRegTypes.RegisterType('ALAndroidApi.JALBroadcastReceiver', TypeInfo(ALAndroidApi.JALBroadcastReceiver));
 end;
 
 initialization

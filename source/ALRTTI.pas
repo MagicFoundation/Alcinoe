@@ -1,22 +1,9 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
-product:      ALRTTI
-Version:      4.01
-
+{*********************************************************************
 Description:  i create the TALRttiType object because i found then the
               TRTTI.getfields and/or the TRTTI.getmethods was very slow and
               even call internally some criticalsections :(
+**********************************************************************}
 
-Know bug :
-
-History :
-
-Link :
-
-**************************************************************}
 unit ALRtti;
 
 interface

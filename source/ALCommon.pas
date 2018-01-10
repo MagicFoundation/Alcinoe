@@ -1,24 +1,3 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
-product:      Alcinoe Common functions
-Version:      4.00
-
-Description:  Alcinoe Common Functions
-
-Know bug :
-
-History :     09/01/2005: correct then AlEmptyDirectory function
-              25/05/2006: Move some function to AlFcnFile
-              25/02/2008: Update AlIsValidEmail
-              06/10/3008: Update AlIsValidEmail
-              03/03/2010: add ALIsInt64
-              26/06/2012: Add xe2 support
-Link :
-
-**************************************************************}
 unit ALCommon;
 
 interface

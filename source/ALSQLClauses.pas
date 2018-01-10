@@ -1,24 +1,10 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      SQL Parser Functions
-Version:      4.00
-
 Description:  SQL function to create easily sql string without
               take care if it's an update or insert sql Statement.
               just add the value in a tstringList like
               fieldname=value and at the end contruct the sql string
-
-Know bug :
-
-History :     20/04/2006: Add plan property
-              26/06/2012: Add xe2 support
-
-Link :
-
 **************************************************************}
+
 unit ALSQLClauses;
 
 interface
@@ -27,11 +13,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Contnrs,
-     {$ELSE}
-     Contnrs,
-     {$IFEND}
+uses System.Contnrs,
      AlStringList,
      ALFbxClient;
 
@@ -129,13 +111,8 @@ Type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Classes,
+uses System.Classes,
      System.Types,
-     {$ELSE}
-     Classes,
-     Types,
-     {$IFEND}
      AlString;
 
 {************************************}

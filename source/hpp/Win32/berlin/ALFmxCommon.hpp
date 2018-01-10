@@ -491,8 +491,8 @@ extern DELPHI_PACKAGE TALRectD __fastcall ALRectCenter(TALRectD &R, const TALRec
 extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(System::Types::TRect &R, int DX, int DY)/* overload */;
 extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(System::Types::TRectF &R, float DX, float DY)/* overload */;
 extern DELPHI_PACKAGE bool __fastcall ALOffsetRect(TALRectD &R, double DX, double DY)/* overload */;
-extern DELPHI_PACKAGE bool __fastcall ALIntersectRectD(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
-extern DELPHI_PACKAGE bool __fastcall ALUnionRectD(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
+extern DELPHI_PACKAGE bool __fastcall ALIntersectRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
+extern DELPHI_PACKAGE bool __fastcall ALUnionRect(/* out */ TALRectD &Rect, const TALRectD &R1, const TALRectD &R2);
 extern DELPHI_PACKAGE System::Uitypes::TFontName __fastcall ALConvertFontFamily(const System::Uitypes::TFontName AFamily, const System::Uitypes::TFontStyles aFontStyles);
 extern DELPHI_PACKAGE System::UnicodeString __fastcall ALTranslate(const System::UnicodeString AText);
 extern DELPHI_PACKAGE void __fastcall ALFmxMakeBufBitmaps(Fmx::Controls::TControl* const aControl);
@@ -519,8 +519,7 @@ extern DELPHI_PACKAGE void __fastcall ALCreateDrawingSurface(Fmx::Graphics::TBit
 extern DELPHI_PACKAGE void __fastcall ALFreeDrawingSurface(Fmx::Graphics::TBitmap* &aBitmap);
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt, /* out */ float &Ratio)/* overload */;
 extern DELPHI_PACKAGE System::Types::TRectF __fastcall ALRectFitInto(const System::Types::TRectF &R, const System::Types::TRectF &Bounds, const System::Types::TPointF &CenterAt)/* overload */;
-extern DELPHI_PACKAGE __int64 __fastcall ALGetFileSize(const System::UnicodeString FileName);
-extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtension(const System::UnicodeString aFileName);
+extern DELPHI_PACKAGE System::UnicodeString __fastcall AlDetectImageExtensionU(const System::UnicodeString aFileName);
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsRoundRectImageV1(System::Classes::TCustomMemoryStream* const aStream, const float W, const float H, const float XRadius, const float YRadius, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV1(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask, const System::Types::TPointF &aCropCenter)/* overload */;
 extern DELPHI_PACKAGE Fmx::Graphics::TBitmap* __fastcall ALResizeAndCropAsMaskImageV1(System::Classes::TCustomMemoryStream* const aStream, Fmx::Graphics::TBitmap* const aMask)/* overload */;

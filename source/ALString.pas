@@ -1,55 +1,16 @@
-﻿// <- User With delphi < D2007 must manually delete this UTF8 BOM
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-              John O'Harrow (john@elmcrest.demon.co.uk)
+﻿{*************************************************************
+Author(s):    John O'Harrow (john@elmcrest.demon.co.uk)
               Charalabos Michael (chmichael@creationpower.com)
               Aleksandr Sharahov
               Dennis Kjaer Christensen
-
-product:      Alcinoe String functions
-Version:      3.53
 
 Description:  Powerfull stringreplace, Pos, Move, comparetext,
               uppercase, lowercase function. Also a powerfull
               FastTagReplace function To replace in string tag
               like <#tagname params1="value1" params2="value2">
               by custom value
-
-Know bug :
-
-History:      11/05/2005: Remove the bug in alFastTagReplace that raise
-                          an exception when char % is found in the params
-                          of a tag
-							20/10/2005: Move AlANSICodePage1252UppercaseNoDiacritic to
-							            ALWideUpperCaseNoDiacritic in alFcnUnicode...
-              16/11/2005: minor update in ALFastTagReplace to better
-                          handle the "Handled" property of TALHandleTagfunct
-              02/12/2005: 1/ Correct AlCopyStr;
-                          2/ Move some copy call to AlCopyStr call;
-                          3/ Update AlFastTagReplace to better performance and
-                             low memory usage;
-              08/12/2005: Update AlFastTagReplace to correct a bug that make
-                          rfignorecase wrong in some case
-              16/12/2005: remove ALStringMatches that seam to not work propertly
-                          use MatchesMask insteed !
-              01/04/2007: Update the FastCode Function
-              22/02/2008: Use AlHttpEncode instead that HttpEncode
-              26/12/2008: replace ALGetStringFromFileWithoutUT8BOM by
-                          ALGetStringFromFileWithoutUTF8BOM
-              01/03/2009: Now use the default internal delphi function
-                          for alPos, AlPosEx, AlCompareText, AlLowerCase,
-                          AlUpperCase, AlMove because they are all taken from
-                          the fastcode project
-              01/09/2009: Change ALFastTagReplace to launch again ALFastTagReplace
-                          on the result of FastTagReplaceProc
-              26/06/2012: Add xe2 support
-              15/11/2012: Improve the ALFastTagReplace Functions
-
-Link :
-
 **************************************************************}
+
 unit ALString;
 
 interface
@@ -2477,7 +2438,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.FormatError is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFormatError(ErrorCode: Integer; Format: PChar; FmtLen: Cardinal);
 const
@@ -2496,7 +2457,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.AnsiFormatError is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALAnsiFormatError(ErrorCode: Integer; Format: PAnsiChar; FmtLen: Cardinal);
 var
@@ -2508,7 +2469,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.FormatVarToStr is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFormatVarToStr(var S: AnsiString; const V: TVarData);
 begin
@@ -2520,7 +2481,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.AnsiStrings.FormatClearStr is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFormatClearStr(var S: AnsiString);
 begin
@@ -2529,12 +2490,12 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.GetGOT is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IF not defined(ANDROID) and not defined(LINUX64) and not Defined(CPUARM)}
 {$IFDEF PIC}
 { Do not remove export or the begin block. }
-function ALGetGOT: Pointer; export;
+function ALGetGOT: Pointer;
 begin
   asm
         MOV     Result,EBX
@@ -2549,7 +2510,7 @@ const
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.PutExponent is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF X86ASM}
 procedure ALPutExponent;
@@ -2629,7 +2590,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.InternalFloatToText is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF PUREPASCAL}
 function ALInternalFloatToText(
@@ -2646,7 +2607,7 @@ const
   CMaxExtPrecision = 18;
 {$ELSE !EXTENDEDHAS10BYTES}
   CMaxExtPrecision = 17;
-{$ENDIF EXTENDEDHAS10BYTES}
+{$ENDIF !EXTENDEDHAS10BYTES}
 
   CCurrPrecision = 19;
   CGenExpDigits = 9999;
@@ -2871,8 +2832,8 @@ begin
 {$IFDEF EXTENDEDHAS10BYTES}
   LExponent := UInt16(FloatRec.Exponent) - $7FFF;
 {$ELSE !EXTENDEDHAS10BYTES}
-  LExponent := UInt16(Int16(FloatRec.Exponent) - $7FF);
-{$ENDIF EXTENDEDHAS10BYTES}
+  LExponent := UInt16(FloatRec.Exponent) - $7FF;
+{$ENDIF !EXTENDEDHAS10BYTES}
 
   { Check for INF or NAN}
   if LExponent < 2 then
@@ -3019,7 +2980,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.AnsiStrings.FloatToText is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALFloatToText(BufferArg: PAnsiChar; const Value; ValueType: TFloatValue;
   Format: TFloatFormat; Precision, Digits: Integer;
@@ -3418,7 +3379,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.CvtInt is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF X86ASM}
 procedure ALCvtInt;
@@ -3477,7 +3438,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.SysUtils.CvtInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF X86ASM}
 procedure ALCvtInt64;
@@ -3581,7 +3542,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.AnsiStrings.FormatBuf is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALFormatBuf(var Buffer; BufLen: Cardinal; const Format;
   FmtLen: Cardinal; const Args: array of const;
@@ -4526,7 +4487,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if System.AnsiStrings.FmtStr is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALFmtStr(var Result: AnsiString; const Format: AnsiString;
   const Args: array of const; const AFormatSettings: TALFormatSettings);
@@ -4789,7 +4750,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.DateTimeToString is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALDateTimeToString(var Result: AnsiString; const Format: AnsiString;
   DateTime: TDateTime; const AFormatSettings: TALFormatSettings);
@@ -5354,7 +5315,7 @@ type
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanBlanks is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALScanBlanks(const S: AnsiString; var Pos: Integer);
 var
@@ -5367,7 +5328,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanNumber is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanNumber(const S: AnsiString; var Pos: Integer;
   var Number: Word; var CharCount: Byte): Boolean;
@@ -5396,7 +5357,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanString is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanString(const S: AnsiString; var Pos: Integer;
   const Symbol: AnsiString): Boolean;
@@ -5416,7 +5377,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanChar is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanChar(const S: AnsiString; var Pos: Integer; Ch: AnsiChar): Boolean;
 begin
@@ -5431,7 +5392,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.GetDateOrder is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALGetDateOrder(const DateFormat: AnsiString): TALDateOrder;
 var
@@ -5456,7 +5417,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanToNumber is still the same and adjust the IFDEF'}
 {$IFEND}
 procedure ALScanToNumber(const S: AnsiString; var Pos: Integer);
 begin
@@ -5471,7 +5432,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanDate is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanDate(const S: AnsiString; var Pos: Integer; var Date: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean; overload;
@@ -5566,7 +5527,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.ScanTime is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALScanTime(const S: AnsiString; var Pos: Integer; var Time: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean; overload;
@@ -5650,7 +5611,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
   const AFormatSettings: TALFormatSettings): Boolean;
@@ -5757,7 +5718,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system._ValLong is still the same and adjust the IFDEF'}
 {$IFEND}
 // Hex : ( '$' | 'X' | 'x' | '0X' | '0x' ) [0-9A-Fa-f]*
 // Dec : ( '+' | '-' )? [0-9]*
@@ -5774,7 +5735,7 @@ begin
   I := FirstIndex;
   Sign := False;
   Result := 0;
-  {$IF CompilerVersion < 32} // tokyo
+  {$IF CompilerVersion <= 31} // berlin
     {$IF not (defined(CPUX64) and not defined(EXTERNALLINKER))}
     Dig := 0;
     {$IFEND}
@@ -6005,7 +5966,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system._ValInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALValInt64(const s: AnsiString; var code: Integer): Int64;
 const
@@ -6019,7 +5980,7 @@ begin
   I := FirstIndex;
   Sign := False;
   Result := 0;
-  {$IF CompilerVersion < 32} // tokyo
+  {$IF CompilerVersion <= 31} // berlin
     {$IF not (defined(CPUX64) and not defined(EXTERNALLINKER))}
     Dig := 0;
     {$IFEND}
@@ -6100,7 +6061,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system._ValUInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALValUInt64(const s: ansistring; var code: Integer): UInt64;
 const
@@ -6112,7 +6073,7 @@ var
   empty: Boolean;
 begin
   i := FirstIndex;
-  {$IF CompilerVersion < 32} // tokyo
+  {$IF CompilerVersion <= 31} // berlin
     // avoid E1036: Variable 'dig' might not have been initialized
     {$IF not (defined(CPUX64) and not defined(EXTERNALLINKER))}
     dig := 0;
@@ -6257,7 +6218,7 @@ const
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils._IntToStr32 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALIntToStr32(Value: Cardinal; Negative: Boolean): AnsiString;
 var
@@ -6302,7 +6263,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils._IntToStr64 is still the same and adjust the IFDEF'}
 {$IFEND}
 function _ALIntToStr64(Value: UInt64; Negative: Boolean): AnsiString;
 var
@@ -7017,7 +6978,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if declaration below in system.Sysutils is still the same and adjust the IFDEF'}
 {$IFEND}
 const
 // 8087/SSE status word masks
@@ -7053,7 +7014,7 @@ const
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearFPUExceptions is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF CPUX86}
 function ALTestAndClearFPUExceptions(AExceptionMask: Word): Boolean;
@@ -7077,7 +7038,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearSSEExceptions is still the same and adjust the IFDEF'}
 {$IFEND}
 {$WARN SYMBOL_PLATFORM OFF}
 {$IFDEF CPUX64}
@@ -7094,7 +7055,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToExtended is still the same and adjust the IFDEF'}
 {$IFEND}
 //this function is not threadsafe because of Set8087CW
 //!! this is amazing !!
@@ -7303,7 +7264,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToCurrency is still the same and adjust the IFDEF'}
 {$IFEND}
 //this function is not threadsafe because of Set8087CW
 //!! this is amazing !!
@@ -7601,7 +7562,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.TextToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
 {$WARN SYMBOL_DEPRECATED OFF}
 function ALTextToFloat(Buffer: PAnsiChar; var Value;
@@ -7789,7 +7750,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.SysUtils.InternalFloatToTextFmt is still the same and adjust the IFDEF'}
 {$IFEND}
 {$IFDEF PUREPASCAL}
 function InternalFloatToTextFmt(Buf: PByte; const Value; ValueType: TFloatValue; Format: PByte;
@@ -8258,11 +8219,11 @@ begin
     (FloatValue.Exponent = $7FF) or (FloatValue.Exponent = $800) then
 {$IFNDEF NEXTGEN}
     //if Unicode then
-    //  Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+    //  Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
     //else
-      Result := System.Ansistrings.FloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+      Result := System.Ansistrings.FloatToText(PAnsiChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
 {$ELSE NEXTGEN}
-    Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0)
+    Result := FloatToText(PWideChar(Buf), Value, ValueType, ffGeneral, 15, 0, AFormatSettings)
 {$ENDIF !NEXTGEN}
   else
     ApplyFormat;
@@ -8280,7 +8241,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if function is still the same and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if system.sysUtils.FloatToTextFmt is still the same and adjust the IFDEF'}
 {$IFEND}
 function ALFloatToTextFmt(Buf: PAnsiChar; const Value; ValueType: TFloatValue;
   Format: PAnsiChar; const AFormatSettings: TALFormatSettings): Integer;

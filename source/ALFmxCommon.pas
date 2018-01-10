@@ -79,7 +79,6 @@ type
 
   TALPointDType = array [0..1] of Double;
 
-
   {~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
@@ -335,6 +334,10 @@ type
     1: (TopLeft, BottomRight: TALPointD);
   end;
 
+
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
+{$IFEND}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
 function ALRectWidth(const Rect: TRectF): Single; inline; overload;
 function ALRectWidth(const Rect: TALRectD): Double; inline; overload;
@@ -347,8 +350,8 @@ function ALOffsetRect(var R: TALRectD; DX, DY: double): Boolean; overload;
 function ALRectCenter(var R: TRect; const Bounds: TRect): TRect; inline; overload;
 function ALRectCenter(var R: TRectf; const Bounds: TRectf): TRectf; inline; overload;
 function ALRectCenter(var R: TALRectD; const Bounds: TALRectD): TALRectD; overload;
-function ALIntersectRectD(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
-function ALUnionRectD(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
+function ALIntersectRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
+function ALUnionRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 
 type
 
@@ -373,8 +376,7 @@ function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
 function  ALAlignToPixelRound(const Rect: TRectF): TRectF;
 function  ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF; overload;
 function  ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
-function  ALGetFileSize(const FileName : string): Int64;
-function  AlDetectImageExtension(const aFileName: string): String;
+function  AlDetectImageExtensionU(const aFileName: string): String;
 
 type
 
@@ -878,7 +880,7 @@ Type
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$IFEND}
   TALControlAccessPrivate = class(TFmxObject)
-  {$IF CompilerVersion > 31} // berlin
+  {$IF CompilerVersion >= 32}  // tokyo
   private type
     TDelayedEvent = (Resize, Resized);
   {$IFEND}
@@ -937,7 +939,7 @@ Type
     FRecalcEnabled, FEnabled, FAbsoluteEnabled: Boolean;
     FTabList: TTabList;
     FOnResize: TNotifyEvent;
-    {$IF CompilerVersion > 31}  // berlin
+    {$IF CompilerVersion >= 32}  // tokyo
     FOnResized: TNotifyEvent;
     {$IFEND}
     FDisableEffect: Boolean;
@@ -962,7 +964,7 @@ Type
     FDisableDisappear: Integer;
     FAnchorMove: Boolean;
     FApplyingEffect: Boolean;
-    {$IF CompilerVersion > 31} // berlin
+    {$IF CompilerVersion >= 32}  // tokyo
     FExitingOrEntering: Boolean;
     FDelayedEvents: set of TDelayedEvent;
     {$IFEND}
@@ -1271,8 +1273,8 @@ begin
     Result := False;
 end;
 
-{*****************************************************************************}
-function ALIntersectRectD(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
+{****************************************************************************}
+function ALIntersectRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 var
   tmpRect: TALRectD;
 begin
@@ -1292,8 +1294,8 @@ begin
   Rect := tmpRect;
 end;
 
-{*************************************************************************}
-function ALUnionRectD(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
+{************************************************************************}
+function ALUnionRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 var
   tmpRect: TALRectD;
 begin
@@ -2030,7 +2032,7 @@ end;
 {******************************************************************}
 class function TALRectD.Intersect(const R1, R2: TALRectD): TALRectD;
 begin
-  ALIntersectRectD(Result, R1, R2);
+  ALIntersectRect(Result, R1, R2);
 end;
 
 {**********************************************}
@@ -2042,7 +2044,7 @@ end;
 {**************************************************************}
 class function TALRectD.Union(const R1, R2: TALRectD): TALRectD;
 begin
-  ALUnionRectD(Result, R1, R2);
+  ALUnionRect(Result, R1, R2);
 end;
 
 {******************************************}
@@ -2412,6 +2414,9 @@ end;
 
 {****************}
 {$IF defined(IOS)}
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if  TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
+{$IFEND}
 function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
 
 const
@@ -5651,7 +5656,7 @@ begin
   end
   else begin
 
-    {$IF CompilerVersion > 31} // berlin
+    {$IF CompilerVersion > 32} // tokyo
       {$MESSAGE WARN 'Check if the full flow of TTexture.Assign is still the same as below and adjust the IFDEF'}
     {$IFEND}
     result := TALTexture.Create(aVolatileTexture);
@@ -5660,8 +5665,12 @@ begin
       result.SetSize(aBitmap.getWidth, aBitmap.getHeight);
       if not (result.IsEmpty) then begin
         if result.PixelFormat = TPixelFormat.None then result.PixelFormat := TCustomAndroidContext.PixelFormat;
+        {$IF CompilerVersion <= 31} // berlin
         TCustomAndroidContext.SharedContext; // >> because stupidly CreateSharedContext is protected :(
         if TCustomAndroidContext.IsContextAvailable then
+        {$ELSE} // Tokyo
+        if TCustomAndroidContext.Valid then
+        {$IFEND}
         begin
           glActiveTexture(GL_TEXTURE0);
           glGenTextures(1, @Tex);
@@ -5808,7 +5817,7 @@ end;
 
 {************************}
 {$IF CompilerVersion > 32} // tokyo
-  {$MESSAGE WARN 'Check if ALGetDrawingShapeRectAndSetThickness still has the same implementation and adjust the IFDEF'}
+  {$MESSAGE WARN 'Check if GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
 {$IFEND}
 //duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
 function ALGetDrawingShapeRectAndSetThickness(const Rect: TrectF;
@@ -7493,20 +7502,8 @@ begin
 end;
 
 {******************************************************}
-function ALGetFileSize(const FileName : string) : Int64;
-var aFileStream: TFileStream;
-begin
-  aFileStream := TFileStream.Create(FileName, fmOpenRead);
-  try
-    result := aFileStream.Size;
-  finally
-    alFreeAndNil(aFileStream);
-  end;
-end;
-
-{******************************************************}
 // https://en.wikipedia.org/wiki/List_of_file_signatures
-function  AlDetectImageExtension(const aFileName: string): String;
+function  AlDetectImageExtensionU(const aFileName: string): String;
 var aFileStream: TFileStream;
     aFirstBytes: Tbytes;
 begin
@@ -7546,12 +7543,14 @@ begin
   //init local var
   aTmpCropCenter := aCropCenter;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := ALResizeAndCropImageV1(aStream, W, H, aTmpCropCenter);
     try
@@ -7583,9 +7582,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -7605,15 +7602,17 @@ begin
   w := aMask.Width;
   h := aMask.height;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   var C: TAlphaColor;
       ratio: single;
       I, J: Integer;
   begin
-  {$IFEND}
 
     aBitmap := ALResizeAndCropImageV1(aStream, W, H, aTmpCropCenter);
     try
@@ -7659,9 +7658,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -8535,12 +8532,14 @@ begin
   //init local var
   aTmpCropCenter := aCropCenter;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := ALResizeAndCropImageV1(aStream, W, H, aTmpCropCenter);
     try
@@ -8568,9 +8567,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -8996,12 +8993,14 @@ begin
   //init local var
   aTmpCropCenter := aCropCenter;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -9034,9 +9033,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -9054,12 +9051,14 @@ begin
   //init local var
   aTmpCropCenter := aCropCenter;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -9090,9 +9089,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -9830,12 +9827,14 @@ var aBitmap: TBitmap;
     aTmpResult: Tbitmap;
 begin
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -9871,9 +9870,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -9887,12 +9884,14 @@ var aBitmap: TBitmap;
     aTmpResult: Tbitmap;
 begin
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -9927,9 +9926,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -10576,12 +10573,14 @@ var aBitmap: TBitmap;
     aTmpResult: Tbitmap;
 begin
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -10614,9 +10613,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 
@@ -10630,12 +10627,14 @@ var aBitmap: TBitmap;
     aTmpResult: Tbitmap;
 begin
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
-  //synchronize because Tbitmap is not multithread
+  {$IF CompilerVersion > 32} {Delphi tokyo}
+    check that this bug: https://quality.embarcadero.com/browse/RSP-19673 is now
+    corrected and adjust the IFDEF to remove the Tthread.Synchronize
+  {$IFEND}
+
   Tthread.Synchronize(nil,
   Procedure
   begin
-  {$IFEND}
 
     aBitmap := Tbitmap.CreateFromStream(aStream);
     try
@@ -10667,9 +10666,7 @@ begin
       AlFreeAndNil(aBitmap);
     end;
 
-  {$IF CompilerVersion <= 31} {Delphi berlin}
   end);
-  {$IFEND}
 
   result := aTmpResult;
 

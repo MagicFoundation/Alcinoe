@@ -1,10 +1,11 @@
 {*************************************************************************************************
 *  ZLibEx.inc                                                                                    *
-*  copyright (c) 2006-2012 base2 technologies                                                    *
+*  copyright (c) 2006-2013 base2 technologies                                                    *
 *                                                                                                *
 *  version information for delphi/c++ builder                                                    *
 *                                                                                                *
 *  revision history                                                                              *
+*    2013.05.23  updated for delphi xe3 (2013)                                                   *
 *    2012.05.01  updated for delphi xe2 (2012)                                                   *
 *    2010.09.18  updated for delphi xe (2011)                                                    *
 *    2010.01.27  updated for delphi 2010                                                         *
@@ -168,6 +169,14 @@
     {$endif}
 
     {$define Version2012Plus}
+  {$ifend}
+
+  {$if CompilerVersion >= 24.0}         // bds xe3 (2013)
+    {$ifdef VER240}
+      {$define Version2013}
+    {$endif}
+
+    {$define Version2013Plus}
   {$ifend}
 
 {$endif}

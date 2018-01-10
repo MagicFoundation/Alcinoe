@@ -1,25 +1,9 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
 Author(s):    Jedi Project - JCL
-              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)             
-
-product:      Alcinoe Mime Functions
-Version:      4.00
-
 Description:  Function mime encode and decode from JCL and function
               to get default Mime content type from file extension
-
-Know bug :
-
-History :     04-05-2012:
-              - Non-thread-safe THashedStringList was replaced to
-                TALStringList, before it was crushing sometimes when
-                searching in multi-thread environment.
-              26/06/2012: Add xe2 support
-Link :
-
 **************************************************************}
+
 unit ALMime;
 
 interface

@@ -1,5 +1,9 @@
 unit ALFmxDesignEditors;
 
+{$IF CompilerVersion > 32} // tokyo
+  {$MESSAGE WARN 'Check if FMX.Editor.Items.pas was not updated and adjust the IFDEF'}
+{$ENDIF}
+
 interface
 
 uses System.Classes,

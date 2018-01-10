@@ -246,6 +246,7 @@ public:
 	__property System::Classes::TNotifyEvent OnChanged = {read=FOnChanged, write=FOnChanged};
 	__property System::Classes::TNotifyEvent OnStop = {read=FOnStop, write=FOnStop};
 	__property int DeadZone = {read=FDeadZone, write=FDeadZone, default=8};
+	__property bool mouseEventReceived = {read=fMouseEventReceived, nodefault};
 	
 __published:
 	__property System::Word Interval = {read=FInterval, write=SetInterval, default=10};

@@ -1,22 +1,10 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-              Igor (Igor@arkadia.com)
-
-product:      ALPOP3Client
-Version:      4.00
-
 Description:  TALPOP3Client class implements the POP3 protocol (Post Office
               Protocol - Version 3)
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
 Link :        http://www.ietf.org/rfc/rfc1939.txt
-
 **************************************************************}
+
 unit ALPOP3Client;
 
 interface
@@ -25,11 +13,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.WinSock2,
-     {$ELSE}
-     WinSock,
-     {$IFEND}
+Uses Winapi.WinSock2,
      ALStringList,
      ALInternetMessages;
 
@@ -86,13 +70,8 @@ type
 
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+Uses Winapi.Windows,
      System.SysUtils,
-     {$ELSE}
-     Windows,
-     SysUtils,
-     {$IFEND}
      AlWinsock,
      ALString;
 

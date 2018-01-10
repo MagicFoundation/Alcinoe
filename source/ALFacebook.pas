@@ -1,9 +1,8 @@
-
-//
-//  This unit was (originaly) inspired by
-//  https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
-//  https://blog.grijjy.com/2017/01/30/embed-facebook-sdk-for-android-in-your-delphi-mobile-app-part-2/
-//
+{*****************************************************
+This unit was (originaly) inspired by
+https://blog.grijjy.com/2017/01/23/using-facebook-sdk-native-framework-for-ios-and-android-for-social-login-and-more-part-1/
+https://blog.grijjy.com/2017/01/30/embed-facebook-sdk-for-android-in-your-delphi-mobile-app-part-2/
+*****************************************************}
 
 unit ALFacebook;
 
@@ -171,15 +170,20 @@ begin
 
     TMessageManager.DefaultManager.SubscribeToMessage(TMessageResultNotification, ActivityResultHandler);
     FCallback := TLoginCallback.Create(Self);
-    {$IF CompilerVersion > 31} // berlin
-      {$MESSAGE WARN 'remove CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-    {$ENDIF}
+
+
+    {$IF CompilerVersion <= 31} // berlin
     CallInUIThreadandWaitFinishing(
       procedure
       begin
+    {$ENDIF}
+
         FCallbackManager := TJCallbackManager_Factory.JavaClass.create;
         TJloginManager.JavaClass.getInstance.registerCallback(FCallbackManager, FCallback);
+
+    {$IF CompilerVersion <= 31} // berlin
       end);
+    {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -255,16 +259,19 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThread because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThread(
     procedure
     begin
+  {$ENDIF}
+
       aArrayList := ALStringsToJArrayList(APermissions);
       aCollection := TJCollection.Wrap((aArrayList as ILocalObject).GetObjectID);
       TJloginManager.JavaClass.getInstance.logInWithReadPermissions(TAndroidHelper.Activity, aCollection);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -291,14 +298,17 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadandWaitFinishing(
     procedure
     begin
+  {$ENDIF}
+
       TJloginManager.JavaClass.getInstance.logout;
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -319,7 +329,9 @@ function TALFacebookLogin.CurrentToken: String;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
+      {$IF CompilerVersion <= 31} // berlin
       aTmpResult: String;
+      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -334,17 +346,22 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadandWaitFinishing(
     procedure
+    var Result: String;
     begin
+  {$ENDIF}
+
       aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then aTmpResult := ''
-      else aTmpResult := JStringToString(aToken.GetToken);
+      if aToken = nil then Result := ''
+      else Result := JStringToString(aToken.GetToken);
+
+  {$IF CompilerVersion <= 31} // berlin
+      aTmpResult := Result;
     end);
   result := aTmpResult;
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -367,7 +384,9 @@ function TALFacebookLogin.CurrentUserId: String;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
+      {$IF CompilerVersion <= 31} // berlin
       aTmpResult: String;
+      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -382,17 +401,22 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadandWaitFinishing(
     procedure
+    var Result: String;
     begin
+  {$ENDIF}
+
       aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then aTmpResult := ''
-      else aTmpResult := JStringToString(aToken.getUserId);
+      if aToken = nil then Result := ''
+      else Result := JStringToString(aToken.getUserId);
+
+  {$IF CompilerVersion <= 31} // berlin
+      aTmpResult := Result;
     end);
   result := aTmpResult;
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -415,7 +439,9 @@ function TALFacebookLogin.CurrentGrantedPermissions: TArray<String>;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
+      {$IF CompilerVersion <= 31} // berlin
       aTmpResult: TArray<String>;
+      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -430,17 +456,22 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadandWaitFinishing(
     procedure
+    var Result: TArray<String>;
     begin
+  {$ENDIF}
+
       aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then setlength(aTmpResult, 0)
-      else aTmpResult := ALJsetToStrings(aToken.getPermissions);
+      if aToken = nil then setlength(Result, 0)
+      else Result := ALJsetToStrings(aToken.getPermissions);
+
+  {$IF CompilerVersion <= 31} // berlin
+      aTmpResult := Result;
     end);
   result := aTmpResult;
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -463,7 +494,9 @@ function TALFacebookLogin.CurrentDeniedPermissions: TArray<String>;
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   var aToken: JAccessToken;
+      {$IF CompilerVersion <= 31} // berlin
       aTmpResult: TArray<String>;
+      {$ENDIF}
   {$ENDIF}
   {$ENDREGION}
 
@@ -478,17 +511,22 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadandWaitFinishing(
     procedure
+    var Result: TArray<String>;
     begin
+  {$ENDIF}
+
       aToken := TJAccessToken.JavaClass.getCurrentAccessToken;
-      if aToken = nil then setlength(aTmpResult, 0)
-      else aTmpResult := ALJsetToStrings(aToken.getDeclinedPermissions);
+      if aToken = nil then setlength(Result, 0)
+      else Result := ALJsetToStrings(aToken.getDeclinedPermissions);
+
+  {$IF CompilerVersion <= 31} // berlin
+      aTmpResult := Result;
     end);
   result := aTmpResult;
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -521,14 +559,19 @@ begin
   {$ENDIF}
 
   if M is TMessageResultNotification then begin
-    {$IF CompilerVersion > 31} // berlin
-      {$MESSAGE WARN 'remove CallInUIThread because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-    {$ENDIF}
+
+    {$IF CompilerVersion <= 31} // berlin
     CallInUIThread(
       procedure
       begin
+    {$ENDIF}
+
         FCallbackManager.onActivityResult(TMessageResultNotification(M).RequestCode, TMessageResultNotification(M).ResultCode, TMessageResultNotification(M).Value);
+
+    {$IF CompilerVersion <= 31} // berlin
       end);
+    {$ENDIF}
+
   end;
 
 end;
@@ -553,16 +596,19 @@ begin
   allog('TALFacebookLogin.TLoginCallback.onCancel', 'ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.warn);
   {$ENDIF}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove TThread.queue because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   TThread.queue(nil,
     procedure
     begin
+  {$ENDIF}
+
       fFacebookLogin.fIsRunning := False;
       if assigned(fFacebookLogin.fOnCancel) then
         fFacebookLogin.fOnCancel;
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -580,16 +626,19 @@ begin
                                                    ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.error);
   {$ENDIF}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove TThread.queue because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   TThread.queue(nil,
     procedure
     begin
+  {$ENDIF}
+
       fFacebookLogin.fIsRunning := False;
       if assigned(fFacebookLogin.fOnError) then
         fFacebookLogin.fOnError(aErrorMsg{aMsg});
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -628,16 +677,19 @@ begin
                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.info);
   {$ENDIF}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove TThread.queue because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   TThread.queue(nil,
     procedure
     begin
+  {$ENDIF}
+
       fFacebookLogin.fIsRunning := False;
       if assigned(fFacebookLogin.fOnsuccess) then
         fFacebookLogin.fOnsuccess(aUserIDStr, aTokenStr, aGrantedPermissions, aDeniedPermissions);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 
@@ -791,6 +843,17 @@ procedure TALFacebookGraphRequest.Request(const aGraphPath: String; aParameters:
   {$ENDIF}
   {$ENDREGION}
 
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+  var aBundle: JBundle;
+      aName, aValue: String;
+      aJName, aJValue: JString;
+      aGraphRequest: JGraphRequest;
+      aJHttpMethod: JHttpMethod;
+      i : integer;
+  {$ENDIF}
+  {$ENDREGION}
+
 begin
 
   if fIsRunning then raise Exception.Create('Already Running');
@@ -799,18 +862,12 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove CallInUIThread because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThread(
     procedure
-    var aBundle: JBundle;
-        aName, aValue: String;
-        aJName, aJValue: JString;
-        aGraphRequest: JGraphRequest;
-        aJHttpMethod: JHttpMethod;
-        i : integer;
     begin
+  {$ENDIF}
+
       aBundle := TJBundle.JavaClass.init;
       for i := Low(aparameters) to High(aparameters) do begin
         _ExtractNameValue(aparameters[i], aName, aValue);
@@ -824,7 +881,10 @@ begin
       else aJHttpMethod := TJHttpMethod.JavaClass.GET;
       aGraphRequest := TJGraphRequest.JavaClass.init(TJAccessToken.JavaClass.getCurrentAccessToken, StringToJstring(aGraphPath), aBundle, aJHttpMethod, FCallback);
       aGraphRequest.executeAsync;
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
   {$ENDIF}
   {$ENDREGION}
@@ -888,16 +948,19 @@ begin
                                                                      ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.verbose);
   {$ENDIF}
 
-  {$IF CompilerVersion > 31} // berlin
-    {$MESSAGE WARN 'remove TThread.queue because maybe not anymore needed in tokyo (look if now TThread.Current.ThreadID=MainThreadID)'}
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   TThread.queue(nil,
     procedure
     begin
+  {$ENDIF}
+
       fFacebookGraphRequest.fIsRunning := False;
       if assigned(fFacebookGraphRequest.fOnCompleted) then
         fFacebookGraphRequest.fOnCompleted(aRawResponse, aErrorCode, aErrorMsg);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 
 end;
 

@@ -1,21 +1,9 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      Alcinoe ISAPI Http WebRequest and WebResponse Objects
-Version:      4.00
-
 Description:  Inherited TWebRequest and TWebResponse for better handling
               of ISAPI Request
-
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
-Link :
-
 **************************************************************}
+
 unit ALIsapiHTTP;
 
 interface
@@ -24,15 +12,9 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
+uses System.SysUtils,
      System.Classes,
      Winapi.Isapi2,
-     {$ELSE}
-     SysUtils,
-     Classes,
-     Isapi2,
-     {$IFEND}
      ALMultiPartParser,
      ALHttpClient,
      ALStringList;
@@ -253,14 +235,9 @@ function ALIsapiHttpStatusString(StatusCode: Integer): AnsiString;
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.DateUtils,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     Windows,
-     DateUtils,
-     {$IFEND}
+     System.Ansistrings,
      ALString;
 
 const

@@ -1,24 +1,8 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
-product:      ALWinInetFTPClient
-Version:      4.00
-
+{******************************************************************
 Description:  TALWinInetFTPClient is a is easy to use WinInet-based
               FTP client component.
+*******************************************************************}
 
-Know bug :
-
-History :     11/01/2009: Add wftpIo_No_cache_write in default because if
-                          not by default the downloaded file are store in
-                          the IE cache and it's not very usefull for FTP !
-              26/06/2012: Add xe2 support
-
-Link :
-
-**************************************************************}
 unit ALWinInetFTPClient;
 
 interface
@@ -27,15 +11,9 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     WinApi.Windows,
+uses WinApi.Windows,
      System.Classes,
      Winapi.WinInet,
-     {$ELSE}
-     Windows,
-     Classes,
-     WinInet,
-     {$IFEND}
      ALFTPClient;
 
 {$IF CompilerVersion < 18.5}
@@ -197,12 +175,8 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     SysUtils,
-     {$IFEND}
+uses System.SysUtils,
+     System.Ansistrings,
      ALString;
 
 {********************************************************************}

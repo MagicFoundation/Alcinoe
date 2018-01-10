@@ -1,17 +1,7 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALMultiPartBaseParser
-Version:      4.00
-
 Description:  MultiPart objects to encode or decode stream
               in mime multipart/xxx format.
-
-Know bug :
-
-History :     26/06/2012: Add xe2 support
 
 Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cdosys/html/7a18a98b-3a18-45b2-83a9-28a8f4099970.asp
               http://www.ietf.org/rfc/rfc2646.txt
@@ -19,8 +9,8 @@ Link :        http://msdn.microsoft.com/library/default.asp?url=/library/en-us/c
               http://www.ietf.org/rfc/rfc1867.txt
               http://www.ietf.org/rfc/rfc2388.txt
               http://www.w3.org/MarkUp/html-spec/html-spec_8.html
-
 **************************************************************}
+
 unit ALMultiPartParser;
 
 interface

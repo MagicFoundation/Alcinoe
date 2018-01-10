@@ -1,11 +1,5 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALWinHttpClient
-Version:      4.00
-
 Description:  Description:  TALWinHttpClient is a is easy to use WinHTTP-based
               HTTP client component which allows to post and get
               any data from the Web via HTTP protocol.
@@ -27,18 +21,10 @@ Description:  Description:  TALWinHttpClient is a is easy to use WinHTTP-based
               or downlevel platform support should still consider
               using WinInet.
 
-Know bug :    10/10/2008: UserName and password not work (but you can use
-                          the header instead)
-
-History :     28/11/2005: add Component in delphi;
-              11/08/2011: add property DisconnectOnError => this to not auto
-                          disconnect on error because if so, we loose the cookies
-                          if any http error are encountered
-              26/06/2012: Add xe2 support
-
-Link :
-
+Know bug :    UserName and password not work (but you can use
+              the header instead)
 **************************************************************}
+
 unit ALWinHttpClient;
 
 interface
@@ -47,13 +33,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.Classes,
-     {$ELSE}
-     Windows,
-     Classes,
-     {$IFEND}
      ALHttpClient,
      ALWinHttpWrapper;
 
@@ -230,12 +211,8 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     SysUtils,
-     {$IFEND}
+uses System.SysUtils,
+     System.Ansistrings,
      ALString;
 
 {********************************************************************}

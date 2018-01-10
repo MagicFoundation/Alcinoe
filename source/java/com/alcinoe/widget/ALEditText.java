@@ -132,7 +132,7 @@ public class ALEditText extends EditText {
   }
   
   protected InputMethodManager getInputMethodManager() {
-    return (InputMethodManager) getContext().getSystemService("input_method");
+    return (InputMethodManager) getContext().getSystemService(mContext.INPUT_METHOD_SERVICE);
   }
 
   @Override

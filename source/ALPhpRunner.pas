@@ -1,10 +1,5 @@
 {*****************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALPhpRunner
-Version:      4.00
-
 Description:  ALPHPRunnerEngine is a simple but useful component for
               easily use php (any version) as a scripting language
               in Delphi applications. ALPhpRunnerEngine allows to
@@ -60,20 +55,8 @@ Note :        If you use fastCGI (Socket) interface, you will need to start
               exitting. When one process exits, another will be created. This tuning is
               necessary because several PHP functions are known to have memory leaks. If the
               PHP processes were left around forever, they would be become very inefficient.
-
-Know bug :
-
-History :     29/01/2007: correct status missed in ALPhpRunnerECBServerSupportFunction
-                          Add ALL_HTTP in servervariables object
-              30/01/2007: Add fconnectioncount to not unload bug when action is processing
-              10/10/2009: rename TALPhpRunnerEngine in TALPhpIsapiRunnerEngine
-                          and add also TALPhpFastCgiRunnerEngine
-              26/06/2012: Add xe2 support. Also Retiring the TALPhpIsapiRunnerEngine
-                          http://www.iis-aid.com/articles/iis_aid_news/php_isapi_module_to_be_retired
-
-Link :
-
 **************************************************************}
+
 unit ALPhpRunner;
 
 interface
@@ -82,19 +65,11 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+Uses Winapi.Windows,
      Winapi.WinSock2,
      System.Classes,
      System.Contnrs,
      System.SyncObjs,
-     {$ELSE}
-     Windows,
-     WinSock,
-     Classes,
-     Contnrs,
-     SyncObjs,
-     {$IFEND}
      ALHttpClient,
      ALStringList;
 
@@ -377,11 +352,7 @@ type
 
 implementation
 
-Uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     system.sysutils,
-     {$ELSE}
-     sysutils,
-     {$IFEND}
+Uses system.sysutils,
      ALWinSock,
      ALString,
      AlExecute,
@@ -1150,7 +1121,9 @@ begin
   Try
 
     //for a stupid warning (D2007)
+    {$IF CompilerVersion <= 31} // berlin
     Result := nil;
+    {$IFEND}
 
     //raise an exception if the object is destroying
     if FIsDestroying then raise exception.Create('Manager is destroying!');

@@ -129,7 +129,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
   end;
@@ -351,7 +351,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
   end;
@@ -426,7 +426,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
   end;
@@ -526,7 +526,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
   end;
@@ -645,7 +645,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion > 32} // tokyo
+    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
   end;

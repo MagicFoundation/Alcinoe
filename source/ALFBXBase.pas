@@ -1,10 +1,7 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Henri Gourvest <hgourvest@progdigy.com>
               Olivier Guilbaud <oguilb@free.fr>
               Volkan Ceylan <volkance@hotmail.com>
-              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
               The Original Code is the UIB code (version 2.1)
 
               The Initial Developer of the Original Code is
@@ -13,26 +10,13 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
               by the Initial Developer. All Rights Reserved.
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXBase
-Version:      4.00
-
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
               performance client/server applications based on FireBird
               without the BDE or ODBC.
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
 Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 391)
               http://www.progdigy.com/modules.php?name=UIB
-
-Note :        For the UIB version
-                * remove all the IB support
-                * remove all conditional defines
-                * replace TUIBLibrairy.create by TALFBXLibrairy.Create(ApiVer: TALFBXVersion_Api); virtual;
-                 
-
 **************************************************************}
 
 unit ALFBXBase;
@@ -48,12 +32,8 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     winapi.Windows;
-     {$ELSE}
-     Windows;
-     {$IFEND}
-
+uses winapi.Windows;
+     
 (* Basic data types *)
 type
 
@@ -2991,11 +2971,7 @@ type
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
-     {$ELSE}
-     SysUtils,
-     {$IFEND}
+uses System.SysUtils,
      ALFBXconst;
 
 (*******************************************************************************

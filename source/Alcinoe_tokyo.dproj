@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{7F0A35A8-C14E-44A2-8A22-18E70806D6F6}</ProjectGuid>
         <MainSource>Alcinoe_tokyo.dpk</MainSource>
-        <ProjectVersion>18.2</ProjectVersion>
+        <ProjectVersion>18.3</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Release</Config>
@@ -173,6 +173,7 @@
         <DCCReference Include="ALCipher.pas"/>
         <DCCReference Include="ALAVLBinaryTree.pas"/>
         <DCCReference Include="ALVideoPlayer.pas"/>
+        <DCCReference Include="ALFmxMemo.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -195,6 +196,12 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
+                <DeployFile LocalName="..\lib\bpl\alcinoe\Win32\tokyo\Alcinoe_tokyo.bpl" Configuration="Release" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Alcinoe_tokyo.bpl</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
@@ -212,12 +219,6 @@
                 </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="..\lib\bpl\alcinoe\Win32\tokyo\Alcinoe_tokyo.bpl" Configuration="Release" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>Alcinoe_tokyo.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

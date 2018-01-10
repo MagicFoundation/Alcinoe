@@ -1,26 +1,9 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALFBXClient (Alcinoe FireBird Express Client)
-Version:      4.00
-
 Description:  Retrieving Data as XML from Firebird Server.
-
-Know bug :
-
-History :     02/03/2010: add aNumbuffers: Integer to the connect
-              27/01/2012: add the keyword &> (ex: &>xxx) at the beginning of
-                          the rowtag to update the rowtag by the value of the
-                          field xxx
-              29/01/2012: Add also a way to do Update SQL with params
-              26/06/2012: Add xe2 support
-              03/03/2013: remove TALFBXClientSQLParam.isBlob => useless !
-
 Link :        http://www.progdigy.com/modules.php?name=UIB
-
 **************************************************************}
+
 unit ALFBXClient;
 
 interface
@@ -29,19 +12,11 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.classes,
      System.SysUtils,
      System.Contnrs,
      System.SyncObjs,
-     {$ELSE}
-     Windows,
-     classes,
-     SysUtils,
-     Contnrs,
-     SyncObjs,
-     {$IFEND}
      AlXmlDoc,
      ALAVLBinaryTree,
      ALFBXLib,
@@ -913,11 +888,7 @@ Const  cALFbxClientDefaultReadNOWaitTPB = isc_tpb_version3 + //Transaction versi
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Diagnostics,
-     {$ELSE}
-     Diagnostics,
-     {$IFEND}
+uses System.Diagnostics,
      ALCipher,
      ALWindows,
      alfbxError;

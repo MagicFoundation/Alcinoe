@@ -14,7 +14,7 @@ uses System.Classes,
 
 type
 
-  {*************************}
+  {************************}
   {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
@@ -32,9 +32,9 @@ type
     FBits: Pointer;
     FContextLostId: Integer;
     FContextResetId: Integer;
-    //////////////////// //
-    FContextID: integer; // << this was added by me in a customized version of FMX.Types3D.TTexture - normally no matter to access previous field - https://quality.embarcadero.com/browse/RSP-19160
-    //////////////////// //
+    {$IF CompilerVersion <= 31} // berlin
+    FContextID: integer; // << this was added by me in Berlin in a customized version of FMX.Types3D.TTexture - normally no matter to access previous field - https://quality.embarcadero.com/browse/RSP-19160
+    {$ENDIF}
   protected
   public
   end;
@@ -46,7 +46,7 @@ type
     FisExternalOES: Boolean;
   protected
   public
-    constructor Create(const aVolatile: Boolean = False); reintroduce;
+    constructor Create(const aVolatile: Boolean = {$IF CompilerVersion <= 31}{berlin}False{$ELSE}True{$ENDIF}); reintroduce;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     property isExternalOES: boolean read fisExternalOES;
@@ -94,8 +94,8 @@ uses {$IF defined(ANDROID)}
      AlString
      {$ENDIF};
 
-{**************************************************************}
-constructor TALTexture.Create(const aVolatile: Boolean = False);
+{********************************************************************************************************************}
+constructor TALTexture.Create(const aVolatile: Boolean = {$IF CompilerVersion <= 31}{berlin}False{$ELSE}True{$ENDIF});
 begin
    inherited Create;
    fVolatile := aVolatile;
@@ -147,8 +147,8 @@ begin
 
   if Source is TBitmap then begin
     {$IF CompilerVersion >= 32} // tokyo
-    TMonitor.Enter(Self);
-    try
+    //TMonitor.Enter(Self);
+    //try
     {$ENDIF}
       if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
       PixelFormat := TBitmap(Source).PixelFormat;
@@ -163,16 +163,16 @@ begin
         TBitmap(Source).Unmap(M);
       end;
     {$IF CompilerVersion >= 32} // tokyo
-    finally
-      TMonitor.exit(Self);
-    end;
+    //finally
+    //  TMonitor.exit(Self);
+    //end;
     {$ENDIF}
   end
 
   else if Source is TBitmapSurface then begin
     {$IF CompilerVersion >= 32} // tokyo
-    TMonitor.Enter(Self);
-    try
+    //TMonitor.Enter(Self);
+    //try
     {$ENDIF}
       if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
       Style := [TTextureStyle.Dynamic];
@@ -180,9 +180,9 @@ begin
       SetSize(TBitmapSurface(Source).Width, TBitmapSurface(Source).Height);
       UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
     {$IF CompilerVersion >= 32} // tokyo
-    finally
-      TMonitor.exit(Self);
-    end;
+    //finally
+    //  TMonitor.exit(Self);
+    //end;
     {$ENDIF}
   end
 

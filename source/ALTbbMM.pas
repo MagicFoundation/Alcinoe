@@ -1,11 +1,5 @@
 {*****************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      ALTbbMM
-Version:      4.01
-
 Description:  A simple wrapper around the Intel Threading Building Blocks memory allocation
               library - tbbmalloc.dll. Implements memory manager based on Intel TBB
               memory allocator.
@@ -42,14 +36,8 @@ Usage:        Put this unit to the very first place on your program in section "
               but built with different versions of compiler. it's seam that dll compiled with the last
               version of visual studio are a little more faster than dll compiled with the first
               version but you will need to run adequate vcredist
-
-Known bug :
-
-History :
-
-Link :
-
 **************************************************************}
+
 unit ALTbbMM;
 
 interface

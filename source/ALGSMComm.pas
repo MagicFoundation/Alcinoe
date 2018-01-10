@@ -1,11 +1,5 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-							
 product:      ALGSMComm - SMS Components
-Version:      4.00
-
 Description:  The TAlGSMComm component implements SMS text messaging
               through the text-mode interface defined in the GSM
               Technical Specification 07.05, version 5.1.0, dated
@@ -31,17 +25,11 @@ Description:  The TAlGSMComm component implements SMS text messaging
               If both of these tests pass, then your phone meets the basic
               requirements.
 
-Know bug :
-
-History:      01/01/2006: Add function to retrieve and delete all SMS
-                          stored in the prefered storage in the phone
-              26/06/2012: Add xe2 support
-
 Link :        http://www.nobbi.com/pduspy.htm
               http://rednaxela.net/pdu.php
               http://www.dreamfabric.com/sms/
-
 **************************************************************}
+
 unit ALGSMComm;
 
 interface
@@ -50,11 +38,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
-     {$ELSE}
-     Windows,
-     {$IFEND}
+uses Winapi.Windows,
      AlStringList;
 
 Type
@@ -101,11 +85,7 @@ function  AlGSMComm_GSM7BitDefaultAlphabetToUnicode(const aMessage: AnsiString; 
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
-     {$ELSE}
-     SysUtils,
-     {$IFEND}
+uses System.SysUtils,
      ALString;
 
 {*****************************************************************************************}

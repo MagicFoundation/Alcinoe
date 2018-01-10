@@ -1,10 +1,7 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Henri Gourvest <hgourvest@progdigy.com>
               Olivier Guilbaud <oguilb@free.fr>
               Volkan Ceylan <volkance@hotmail.com>
-              Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
               The Original Code is the UIB code (version 2.1)
 
               The Initial Developer of the Original Code is
@@ -13,24 +10,13 @@ Author(s):    Henri Gourvest <hgourvest@progdigy.com>
               by the Initial Developer. All Rights Reserved.
 
 product:      ALFBX (Alcinoe FireBird Express) - ALFBXLib
-Version:      4.00
-
 Description:  ALFBX (Alcinoe FireBird Express) does for the Firebird
               API what Delphi does for the WINDOWS API! Create high
               performance client/server applications based on FireBird
               without the BDE or ODBC.
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
 Link :        https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 419)
               http://www.progdigy.com/modules.php?name=UIB
-
-NOTE :        Same as the UIB version Except
-                *Remove conditional define
-                *remove FstatusVector from TUIBLibrairy
-
 **************************************************************}
 
 unit ALFBXLib;
@@ -46,15 +32,9 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      System.SysUtils,
      System.Classes,
-     {$ELSE}
-     Windows,
-     SysUtils,
-     Classes,
-     {$IFEND}
      ALFBXbase;
 
 type
@@ -1179,14 +1159,9 @@ const
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.Math,
+uses System.Math,
      System.Variants,
-     {$IF CompilerVersion >= 24}{Delphi XE3}System.Ansistrings,{$IFEND}
-     {$ELSE}
-     Math,
-     Variants,
-     {$IFEND}
+     System.Ansistrings,
      ALFBXerror,
      ALFBXConst,
      ALString;

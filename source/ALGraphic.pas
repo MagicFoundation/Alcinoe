@@ -1,22 +1,10 @@
-{*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
+{**********************************************************
 Author(s):    JWB Software
               Anders Melander & Mike Lischke
-
-product:      Alcinoe Graphic Functions
-Version:      4.00
-
 Description:  Procedure ALStrecth to stretch a bitmap using
               lanczos3 (by exemple)
+***********************************************************}
 
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
-Link :
-
-**************************************************************}
 unit ALGraphic;
 
 interface
@@ -25,14 +13,9 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows,
+uses Winapi.Windows,
      Vcl.Graphics;
-     {$ELSE}
-     Windows,
-     Graphics;
-     {$IFEND}
-
+     
 {$if CompilerVersion<=18.5}
 //http://stackoverflow.com/questions/7630781/delphi-2007-and-xe2-using-nativeint
 type
@@ -72,15 +55,9 @@ procedure ALRotateBMP270(aSrcBmp: TBitmap; aDestBmp: Tbitmap);
 
 implementation
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     System.SysUtils,
+uses System.SysUtils,
      System.Classes,
      System.math;
-     {$ELSE}
-     SysUtils,
-     Classes,
-     math;
-     {$IFEND}
 
 const
 

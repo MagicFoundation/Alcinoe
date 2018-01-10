@@ -1,63 +1,19 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-              Dean Mustakinov (dejanm73@gmail.com)
-							
 product:      ALXmlDocument
-Version:      4.01
-
-Description:  TALXmlDocument is exactly like Delphi TXmlDocument 
-              (Same functions and procedures) but 10 to 100 times more 
+Description:  TALXmlDocument is exactly like Delphi TXmlDocument
+              (Same functions and procedures) but 10 to 100 times more
               faster (see demo) and can work even in sax mode !
 
               Use TAlXMLDocument to represent an XML document.
-              TAlXMLDocument can read an existing XML document from a 
-              file, it can be associated with an in-memory string that is 
-              the contents of an XML document, or it can create a new, 
+              TAlXMLDocument can read an existing XML document from a
+              file, it can be associated with an in-memory string that is
+              the contents of an XML document, or it can create a new,
               empty XML document.
 
-              TALXMLDocument uses it's own internal parser to analyze 
+              TALXMLDocument uses it's own internal parser to analyze
               the XML document.
-
-Know bug :
-
-History :     27/05/2006: Add loadfromstream, loadfromfile,
-                          savetostream and savetofile to TALXmlNode;
-              25/10/2007: Add support for <![CDATA[ ... ]]>
-              24/11/2007: Add CustomSort to TALXMLNodeList
-                          Add Exchange to TALXMLNodeList
-                          Add AttributesAsString property
-              02/11/2008: correct bug in setattribute when
-                          2 attributes have the same name
-              10/11/2008: add poIgnoreXMLReferences in TALXMLParseOption
-              						can decode references like &#39; or &#x20AC;
-              						(and the 5 main reference, &lt; &gt; &apos; &aquot; &amp;
-              27/12/2008: add that isTextElement return true if node have only one
-                          child of type CDATA
-              02/01/2009: don't check if ]]> is present in the text when creating
-                          cdata node
-              12/01/2009: rename loadonlychildnode by streamcontainonlychildnode in
-                          TalXmlNode.loadFromStream to not make any confusion
-              01/03/2009: Correct "parse error" bug
-              20/09/2011: Correct "UTF-8" / "utf-8" detection bug
-              27/01/2012: Add the doNodeAutoCreate option
-                          permit also to update the nodename of a TalXmlNode
-              15/06/2012: during the process of converting the unit to be compatible
-                          with XE2, i notice that the olevariant can not store any
-                          ansistring but instead do a transliteration of ansistring
-                          to WideString
-                          http://docs.embarcadero.com/products/rad_studio/delphiAndcpp2009/HelpUpdate2/EN/html/devcommon/varianttypes_xml.html
-                          Finally the OLE variant is not usefull so i decide to
-                          remove it
-              20/06/2012: Add xe2 support
-              11/11/2012: add the function ALFindXmlNodeByNameAndAttribute
-              01/01/2013: Correct small range check error
-              03/03/2013: add setXML to the TALXmlNode
-
-Link :
-
 **************************************************************}
+
 unit ALXmlDoc;
 
 interface

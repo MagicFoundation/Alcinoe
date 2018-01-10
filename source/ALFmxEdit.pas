@@ -66,6 +66,7 @@ type
   //           https://stackoverflow.com/questions/44231597/how-to-change-the-z-order-of-window-added-via-windowmanager
   //
   // NOTE: it's seam that callinUIThread are called sequentially, so in setter i don't need to wait for finishing
+  //       but under Tokyo this is not anymore important as callinUIThread is deprecated
   //
   // procedure TForm1.Button1Click(Sender: TObject);
   // var i, j, k: integer;
@@ -146,23 +147,15 @@ type
         function onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean; cdecl;
       end;
 
-      {~~~~~~~~~~~~~~~~~~}
-      TALUIMembers = Class
-      public
-        FNativeViewAttached: Boolean;
-        FEditText: JALEditText;
-        FLayout: JALControlHostLayout;
-        FTextWatcher: TALTextWatcher;
-        FEditorActionListener: TALEditorActionListener;
-        FSoftInputListener: TALSoftInputListener;
-        FKeyPreImeListener: TALKeyPreImeListener;
-        FFocusChangeListener: TALFocusChangeListener;
-        constructor Create;
-        destructor Destroy; override;
-      end;
-
   private
-    fUIMembers: TALUIMembers;
+    FNativeViewAttached: Boolean;
+    FEditText: JALEditText;
+    FLayout: JALControlHostLayout;
+    FTextWatcher: TALTextWatcher;
+    FEditorActionListener: TALEditorActionListener;
+    FSoftInputListener: TALSoftInputListener;
+    FKeyPreImeListener: TALKeyPreImeListener;
+    FFocusChangeListener: TALFocusChangeListener;
     fTextPrompt: String;
     FPadding: TBounds;
     fOnChangeTracking: TNotifyEvent;
@@ -561,16 +554,10 @@ end;
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
-{$IF CompilerVersion > 31} // berlin
-  {$MESSAGE WARN 'remove all Thread.queue/CallInUIThread/CallInUIThreadandWaitFinishing because maybe not anymore needed in tokyo (look if UIThreadID=MainThreadID)'}
-{$ENDIF}
-
 {*********************************************************************************************************************************}
 constructor TALAndroidEdit.Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = '');
-var aScreenSrv: IFMXScreenService;
-    aReturnKeyType: TReturnKeyType;
-    aKeyboardType: TVirtualKeyboardType;
-    aPassword: boolean;
+var aLayoutParams: JViewGroup_LayoutParams;
+    aScreenSrv: IFMXScreenService;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.Create', 'start', TalLogType.VERBOSE);
@@ -596,83 +583,73 @@ begin
   fReturnKeyType := tReturnKeyType.Default;
   fKeyboardType := TVirtualKeyboardType.default;
   fPassword := false;
-  fUIMembers := TALUIMembers.Create;
-  fUIMembers.FFocusChangeListener := TALFocusChangeListener.Create(self);
-  fUIMembers.FTextWatcher := TALTextWatcher.Create(self);
-  fUIMembers.FEditorActionListener := TALEditorActionListener.Create(self);
-  fUIMembers.FSoftInputListener := TALSoftInputListener.Create(self);
-  fUIMembers.FKeyPreImeListener := TALKeyPreImeListener.Create(self);
+  FFocusChangeListener := TALFocusChangeListener.Create(self);
+  FTextWatcher := TALTextWatcher.Create(self);
+  FEditorActionListener := TALEditorActionListener.Create(self);
+  FSoftInputListener := TALSoftInputListener.Create(self);
+  FKeyPreImeListener := TALKeyPreImeListener.Create(self);
   //-----
   inc(ALViewStackCount);
   //-----
-  // i replace CallInUIThreadAndWaitFinishing with CallInUIThread to speed the creation
-  // of the Edit. we notice the slow when a form have several TALEdit
-  // always take care in the form that changeTracking can be called when not need
-  // (seam changeTracking is call at initialisation when we don't really need it) because this cause
-  // a call to CallInUIThreadAndWaitFinishing. note: all CallInUIThread are called sequentially so their
-  // will be never any problem. if you want to show the form only when the edit will be fully ready
-  // simply do in the form create an empty CallInUIThreadAndWaitFinishing. this will cause
-  // all the pending CallInUiThread to be run
-  aReturnKeyType := fReturnKeyType;
-  aKeyboardType := fKeyboardType;
-  aPassword := fPassword;
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
-    var aLayoutParams: JViewGroup_LayoutParams;
+  {$IF CompilerVersion <= 31} // berlin
+  CallInUIThreadAndWaitFinishing(
+    procedure
     begin
-      aUIMembers.FLayout := TJALControlHostLayout.JavaClass.init(TAndroidHelper.Activity);
-      aUIMembers.fLayout.setfocusable(true);               // << this is important to remove the focus from the FeditText
-      aUIMembers.fLayout.setfocusableInTouchMode(true);    //    else fedittext will always receive back the focus after we remove it
+  {$ENDIF}
+
+      FLayout := TJALControlHostLayout.JavaClass.init(TAndroidHelper.Activity);
+      fLayout.setfocusable(true);               // << this is important to remove the focus from the FeditText
+      fLayout.setfocusableInTouchMode(true);    //    else fedittext will always receive back the focus after we remove it
       //-----
       {$IF CompilerVersion > 32} // tokyo
-        {$MESSAGE WARN 'Check if viewStack.java in classes.dex is still the same as the version in delphi berlin 10.1 and adjust the IFDEF'}
+        {$MESSAGE WARN 'Check if viewStack.java in classes.dex is still the same and adjust the IFDEF'}
       {$ENDIF}
-      MainActivity.getViewStack.addview(aUIMembers.fLayout); // << this will add the view
-                                                             //
-                                                             //    public class ViewStack {
-                                                             //      public void addView(ViewGroup view) {
-                                                             //        if (view == null || this.mViews.contains(view)) {
-                                                             //          ....
-                                                             //        }
-                                                             //        this.mWindowManager.addView(view, getLayoutParams(view));
-                                                             //        this.mViews.add(view);
-                                                             //      }
-                                                             //    }
-                                                             //
-      aUIMembers.FNativeViewAttached := True;
-      if not aUIMembers.fLayout.disableMoveAnimations then begin
+      MainActivity.getViewStack.addview(fLayout); // << this will add the view
+                                                  //
+                                                  //    public class ViewStack {
+                                                  //      public void addView(ViewGroup view) {
+                                                  //        if (view == null || this.mViews.contains(view)) {
+                                                  //          ....
+                                                  //        }
+                                                  //        this.mWindowManager.addView(view, getLayoutParams(view));
+                                                  //        this.mViews.add(view);
+                                                  //      }
+                                                  //    }
+                                                  //
+      FNativeViewAttached := True;
+      if not fLayout.disableMoveAnimations then begin
         {$IF defined(DEBUG)}
         ALLog('JALControlHostLayout.disableMoveAnimations', 'failed', TalLogType.warn);
         {$ENDIF}
       end;
       //-----
-      if aDefStyleAttr = '' then aUIMembers.FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity)
-      else aUIMembers.FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity, // context: JContext;
-                                                               nil, // attrs: JAttributeSet;
-                                                               TAndroidHelper. // defStyleAttr: Integer
-                                                                 Context.
-                                                                   getResources().
-                                                                     getIdentifier(StringToJstring(aDefStyleAttr), // name	String: The name of the desired resource.
-                                                                                   StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                                                                   TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
-      aUIMembers.fLayout.addview(aUIMembers.fEditText);
+      if aDefStyleAttr = '' then FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity)
+      else FEditText := TJALEditText.JavaClass.init(TAndroidHelper.Activity, // context: JContext;
+                                                    nil, // attrs: JAttributeSet;
+                                                    TAndroidHelper. // defStyleAttr: Integer
+                                                      Context.
+                                                        getResources().
+                                                          getIdentifier(StringToJstring(aDefStyleAttr), // name	String: The name of the desired resource.
+                                                                        StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                                                        TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+      fLayout.addview(fEditText);
       //-----
-      aUIMembers.fEditText.setOnFocusChangeListener(aUIMembers.fFocusChangeListener);
-      aUIMembers.fEditText.addTextChangedListener(aUIMembers.fTextWatcher);
-      aUIMembers.fEditText.setOnEditorActionListener(aUIMembers.fEditorActionListener);
-      aUIMembers.fEditText.SetSoftInputListener(aUIMembers.fSoftInputListener);
-      aUIMembers.fEditText.SetKeyPreImeListener(aUIMembers.fKeyPreImeListener);
+      fEditText.setOnFocusChangeListener(fFocusChangeListener);
+      fEditText.addTextChangedListener(fTextWatcher);
+      fEditText.setOnEditorActionListener(fEditorActionListener);
+      fEditText.SetSoftInputListener(fSoftInputListener);
+      fEditText.SetKeyPreImeListener(fKeyPreImeListener);
       //-----
-      aLayoutParams := aUIMembers.fEditText.getLayoutParams;
+      aLayoutParams := fEditText.getLayoutParams;
       aLayoutParams.width := TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT;
       aLayoutParams.height := TJViewGroup_LayoutParams.JavaClass.MATCH_PARENT;
-      aUIMembers.fEditText.setLayoutParams(aLayoutParams);
+      fEditText.setLayoutParams(aLayoutParams);
       //-----
-      aUIMembers.fEditText.setShowSoftInputOnFocus(false);
-      if aIsMultiline then aUIMembers.fEditText.setSingleLine(False)
-      else aUIMembers.fEditText.setSingleLine(True);
-      DoSetReturnKeyType(aUIMembers.fEditText, aReturnKeyType);
-      DoSetInputType(aUIMembers.fEditText, aKeyboardType, aPassword, aIsMultiline);
+      fEditText.setShowSoftInputOnFocus(false);
+      if fIsMultiline then fEditText.setSingleLine(False)
+      else fEditText.setSingleLine(True);
+      DoSetReturnKeyType(fEditText, fReturnKeyType);
+      DoSetInputType(fEditText, fKeyboardType, fPassword, fIsMultiline);
       //-----
       MainActivity.getViewStack.addView(nil); // << this will "disable" all the view but i m not sure is we really need to do this
                                               //    but as emb team don't write any comments it's hard to know what really mean
@@ -701,7 +678,10 @@ begin
                                               //      }
                                               //    }
                                               //
-    end, FUIMembers);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end);
+  {$ENDIF}
   //-----
   RealignContent;
   {$IF defined(DEBUG)}
@@ -711,6 +691,10 @@ end;
 
 {********************************}
 destructor TALAndroidEdit.Destroy;
+{$IF CompilerVersion <= 31} // berlin
+var aNativeViewAttached: Boolean;
+    aTextWatcher: TALTextWatcher;
+{$ENDIF}
 begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.Destroy', 'start', TalLogType.VERBOSE);
@@ -720,49 +704,67 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TFormDeactivateMessage, fFormDeactivateMessageID);
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, fApplicationEventMessageID);
 
-  fUIMembers.FFocusChangeListener.FEditControl := nil;
-  fUIMembers.FTextWatcher.FEditControl := nil;
-  fUIMembers.fEditorActionListener.FEditControl := nil;
-  fUIMembers.FSoftInputListener.FEditControl := nil;
-  fUIMembers.FKeyPreImeListener.FEditControl := nil;
-
   dec(ALViewStackCount);
 
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  FFocusChangeListener.FEditControl := nil;
+  FTextWatcher.FEditControl := nil;
+  fEditorActionListener.FEditControl := nil;
+  FSoftInputListener.FEditControl := nil;
+  FKeyPreImeListener.FEditControl := nil;
+  aNativeViewAttached := fNativeViewAttached;
+  aTextWatcher := fTextWatcher;
+  TUIThreadCaller.Call<JALEditText,JALControlHostLayout>(
+    procedure (FEditText: JALEditText; FLayout: JALControlHostLayout)
+    var fNativeViewAttached: Boolean;
+        fTextWatcher: TALTextWatcher;
     begin
+      fNativeViewAttached := aNativeViewAttached;
+      fTextWatcher := aTextWatcher;
+  {$ENDIF}
 
-      aUIMembers.fEditText.setVisibility(TJView.JavaClass.INVISIBLE);
-      aUIMembers.fEditText.setOnFocusChangeListener(nil);
-      aUIMembers.fEditText.RemoveTextChangedListener(aUIMembers.FTextWatcher);
-      aUIMembers.fEditText.setOnEditorActionListener(nil);
-      aUIMembers.fEditText.SetSoftInputListener(nil);
-      aUIMembers.fEditText.SetKeyPreImeListener(nil);
+      fEditText.setVisibility(TJView.JavaClass.INVISIBLE);
+      fEditText.setOnFocusChangeListener(nil);
+      fEditText.RemoveTextChangedListener(FTextWatcher);
+      fEditText.setOnEditorActionListener(nil);
+      fEditText.SetSoftInputListener(nil);
+      fEditText.SetKeyPreImeListener(nil);
 
-      aUIMembers.fLayout.removeAllViews();
-      if aUIMembers.FNativeViewAttached then begin
-        MainActivity.getViewStack.removeView(aUIMembers.fLayout);
-        aUIMembers.FNativeViewAttached := False;
+      fLayout.removeAllViews();
+      if FNativeViewAttached then begin
+        MainActivity.getViewStack.removeView(fLayout);
+        FNativeViewAttached := False;
       end;
 
-    end, FUIMembers);
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText, FLayout);
+  {$ENDIF}
 
+  {$IF CompilerVersion <= 31} // berlin
   //unfortunatly i can't make the previous instruction with wait
   //because when the app close, then the wait will never finish :(
   //but doesn't matter we don't need to free the object below, it's
   //we be done automatiquely
-  //alfreeandNil(aUIMembers.FFocusChangeListener);
-  //alfreeandNil(aUIMembers.FTextWatcher);
-  //alfreeandNil(aUIMembers.fEditorActionListener);
-  //alfreeandNil(aUIMembers.FSoftInputListener);
-  //alfreeandNil(aUIMembers.FKeyPreImeListener);
-  //aUIMembers.FEditText := nil;
-  //aUIMembers.FLayout := nil;
-  //AlFreeAndNil(aUIMembers);
-  fUIMembers := nil;
+  //alfreeandNil(FFocusChangeListener);
+  //alfreeandNil(FTextWatcher);
+  //alfreeandNil(fEditorActionListener);
+  //alfreeandNil(FSoftInputListener);
+  //alfreeandNil(FKeyPreImeListener);
+  //FEditText := nil;
+  //FLayout := nil;
+  {$ELSE} //tokyo+
+  alfreeandNil(FFocusChangeListener);
+  alfreeandNil(FTextWatcher);
+  alfreeandNil(fEditorActionListener);
+  alfreeandNil(FSoftInputListener);
+  alfreeandNil(FKeyPreImeListener);
+  FEditText := nil;
+  FLayout := nil;
+  {$ENDIF}
 
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FPadding);
+
   inherited;
 
   {$IF defined(DEBUG)}
@@ -773,38 +775,64 @@ end;
 {*************************************}
 procedure TALAndroidEdit.RecalcOpacity;
 begin
+
   inherited;
-  TUIThreadCaller.Call<TALUIMembers, Single>(
-    procedure (aUIMembers: TALUIMembers; aAbsoluteOpacity: Single)
+
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText, Single>(
+    procedure (FEditText: JALEditText; AbsoluteOpacity: Single)
     begin
-      aUIMembers.fEditText.setAlpha(aAbsoluteOpacity);
-    end, FUIMembers, AbsoluteOpacity);
+  {$ENDIF}
+
+      fEditText.setAlpha(AbsoluteOpacity);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText, AbsoluteOpacity);
+  {$ENDIF}
+
 end;
 
 {*************************************}
 Procedure TALAndroidEdit.AddNativeView;
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALControlHostLayout>(
+    procedure (FLayout: JALControlHostLayout)
     begin
-      if aUIMembers.FNativeViewAttached then exit;
-      MainActivity.getViewStack.addview(aUIMembers.FLayout);
+  {$ENDIF}
+
+      if FNativeViewAttached then exit;
+      MainActivity.getViewStack.addview(FLayout);
       MainActivity.getViewStack.addview(nil);
-      aUIMembers.FNativeViewAttached := True;
-    end, FUIMembers);
+      FNativeViewAttached := True;
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FLayout);
+  {$ENDIF}
+
   realignContent;
+
 end;
 
 {****************************************}
 Procedure TALAndroidEdit.RemoveNativeView;
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALControlHostLayout>(
+    procedure (FLayout: JALControlHostLayout)
     begin
-      if not aUIMembers.FNativeViewAttached then exit;
-      MainActivity.getViewStack.Removeview(aUIMembers.FLayout);
-      aUIMembers.FNativeViewAttached := false;
-    end, FUIMembers);
+  {$ENDIF}
+
+      if not FNativeViewAttached then exit;
+      MainActivity.getViewStack.Removeview(FLayout);
+      FNativeViewAttached := false;
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FLayout);
+  {$ENDIF}
+
 end;
 
 {*********************************************************************}
@@ -827,31 +855,65 @@ procedure TALAndroidEdit.realignContent(const aForce: boolean = False);
   {~~~~~~~~~~~~~~~~~~~~~}
   procedure _showContent;
   var aPos: TPointF;
+      R: TRect;
+      {$IF CompilerVersion <= 31} // berlin
+      aNativeViewAttached: Boolean;
+      {$ENDIF}
   begin
+
     aPos := LocalToAbsolute(TPointF.Zero) * FScreenScale;
-    TUIThreadCaller.Call<TALUIMembers, TRect>(
-      procedure (aUIMembers: TALUIMembers; R: TRect)
+    R := Rect(Round(aPos.X), Round(aPos.Y), Round(Width * FScreenScale), Round(Height * FScreenScale));
+
+    {$IF CompilerVersion <= 31} // berlin
+    aNativeViewAttached := fNativeViewAttached;
+    TUIThreadCaller.Call<JALControlHostLayout, JALEditText>(
+      procedure (FLayout: JALControlHostLayout; FEditText: JALEditText)
+      var fNativeViewAttached: Boolean;
       begin
-        if not aUIMembers.FNativeViewAttached then exit;
-        MainActivity.getViewStack.setPosition(aUIMembers.fLayout, R.Left, R.Top);
-        MainActivity.getViewStack.setSize(aUIMembers.fLayout, R.Right, R.Bottom);
-        if aUIMembers.fEditText.getVisibility <> TJView.JavaClass.VISIBLE then
-          aUIMembers.fEditText.setVisibility(TJView.JavaClass.VISIBLE);
-      end, FUIMembers, Rect(Round(aPos.X), Round(aPos.Y), Round(Width * FScreenScale), Round(Height * FScreenScale)));
+        fNativeViewAttached := aNativeViewAttached;
+    {$ENDIF}
+
+        if not FNativeViewAttached then exit;
+        MainActivity.getViewStack.setPosition(fLayout, R.Left, R.Top);
+        MainActivity.getViewStack.setSize(fLayout, R.Right, R.Bottom);
+        if fEditText.getVisibility <> TJView.JavaClass.VISIBLE then
+          fEditText.setVisibility(TJView.JavaClass.VISIBLE);
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FLayout, FEditText);
+    {$ENDIF}
+
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
   procedure _HideContent;
+  var R: TRect;
+      {$IF CompilerVersion <= 31} // berlin
+      aNativeViewAttached: Boolean;
+      {$ENDIF}
   begin
-    TUIThreadCaller.Call<TALUIMembers, TRect>(
-      procedure (aUIMembers: TALUIMembers; R: TRect)
+
+    R := _GetRealBounds;
+
+    {$IF CompilerVersion <= 31} // berlin
+    aNativeViewAttached := fNativeViewAttached;
+    TUIThreadCaller.Call<JALControlHostLayout, JALEditText>(
+      procedure (FLayout: JALControlHostLayout; FEditText: JALEditText)
+      var fNativeViewAttached: Boolean;
       begin
-        if not aUIMembers.FNativeViewAttached then exit;
-        if aUIMembers.fEditText.getVisibility <> TJView.JavaClass.INVISIBLE then begin
-          aUIMembers.fEditText.setVisibility(TJView.JavaClass.INVISIBLE);
-          MainActivity.getViewStack.setPosition(aUIMembers.fLayout, R.Right * 2 , R.Height * 2);
+        fNativeViewAttached := aNativeViewAttached;
+    {$ENDIF}
+
+        if not FNativeViewAttached then exit;
+        if fEditText.getVisibility <> TJView.JavaClass.INVISIBLE then begin
+          fEditText.setVisibility(TJView.JavaClass.INVISIBLE);
+          MainActivity.getViewStack.setPosition(fLayout, R.Right * 2 , R.Height * 2);
         end;
-      end, FUIMembers, _GetRealBounds);
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FLayout, FEditText);
+    {$ENDIF}
+
   end;
 
 begin
@@ -936,50 +998,64 @@ end;
 
 {*******************************}
 procedure TALAndroidEdit.DoEnter;
-var aTmpViewStackCount: integer;
+{$IF CompilerVersion <= 31} // berlin
+var aALViewStackCount: integer;
+{$ENDIF}
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.DoEnter', 'start', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.DoEnter', 'start' +
+                                  ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
   inherited;
 
-  aTmpViewStackCount := ALViewStackCount; // << because ALViewStackCount can be accessed only from main Thread
+  {$IF CompilerVersion <= 31} // berlin
+  aALViewStackCount := ALViewStackCount; // << because ALViewStackCount can be accessed only from main Thread
   CallInUIThreadAndWaitFinishing(
     procedure
+    var ALViewStackCount: integer;
     begin
-      if not fUIMembers.FNativeViewAttached then exit;
-      if aTmpViewStackCount > 1 then begin
-        MainActivity.getViewStack.Removeview(fUIMembers.FLayout);
-        MainActivity.getViewStack.addview(fUIMembers.FLayout);
+      ALViewStackCount := aALViewStackCount;
+  {$ENDIF}
+
+      if not FNativeViewAttached then exit;
+      if ALViewStackCount > 1 then begin
+        MainActivity.getViewStack.Removeview(FLayout);
+        MainActivity.getViewStack.addview(FLayout);
         MainActivity.getViewStack.addview(nil);
       end;
-      MainActivity.getViewStack.addview(fUIMembers.FLayout); // << this will "activate" the view - important to enable the virtual keyboard
-                                                             //
-                                                             //    public class ViewStack {
-                                                             //      public void addView(ViewGroup view) {
-                                                             //        if (view == null || this.mViews.contains(view)) {
-                                                             //          LayoutParams lp;
-                                                             //          Iterator i$ = this.mViews.iterator();
-                                                             //          while (i$.hasNext()) {
-                                                             //            View v = (View) i$.next();
-                                                             //            lp = getLayoutParams(v);
-                                                             //            lp.flags = NOT_FOCUSABLE_FLAGS;
-                                                             //            this.mWindowManager.updateViewLayout(v, lp);
-                                                             //          }
-                                                             //          if (view != null) {
-                                                             //            lp = getLayoutParams(view);
-                                                             //            lp.flags = FOCUSABLE_FLAGS;
-                                                             //            this.mWindowManager.updateViewLayout(view, lp);
-                                                             //            return;
-                                                             //          }
-                                                             //          return;
-                                                             //        }
-                                                             //        ...
-                                                             //      }
-                                                             //    }
-                                                             //
+      MainActivity.getViewStack.addview(FLayout); // << this will "activate" the view - important to enable the virtual keyboard
+                                                  //
+                                                  //    public class ViewStack {
+                                                  //      public void addView(ViewGroup view) {
+                                                  //        if (view == null || this.mViews.contains(view)) {
+                                                  //          LayoutParams lp;
+                                                  //          Iterator i$ = this.mViews.iterator();
+                                                  //          while (i$.hasNext()) {
+                                                  //            View v = (View) i$.next();
+                                                  //            lp = getLayoutParams(v);
+                                                  //            lp.flags = NOT_FOCUSABLE_FLAGS;
+                                                  //            this.mWindowManager.updateViewLayout(v, lp);
+                                                  //          }
+                                                  //          if (view != null) {
+                                                  //            lp = getLayoutParams(view);
+                                                  //            lp.flags = FOCUSABLE_FLAGS;
+                                                  //            this.mWindowManager.updateViewLayout(view, lp);
+                                                  //            return;
+                                                  //          }
+                                                  //          return;
+                                                  //        }
+                                                  //        ...
+                                                  //      }
+                                                  //    }
+                                                  //
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
+
+
+  {$IF CompilerVersion <= 31} // berlin
 
   sleep(250); // << it's look like we need to wait before the view is fully activated - else the soft keyboard will not work
               // << don't ask me why ! if someone know i would really like to know :)
@@ -987,10 +1063,31 @@ begin
   CallInUIThreadAndWaitFinishing(
     procedure
     begin
-      if not fUIMembers.FNativeViewAttached then exit;
-      if fUIMembers.FEditText.requestFocus then
-        fUIMembers.FEditText.showSoftInput;
+      if not FNativeViewAttached then exit;
+      if FEditText.requestFocus then
+        FEditText.showSoftInput;
     end);
+
+  {$ELSE} // tokyo+
+
+  TThread.createAnonymousThread(
+    Procedure
+    Begin
+
+      sleep(250); // << it's look like we need to wait before the view is fully activated - else the soft keyboard will not work
+                  // << don't ask me why ! if someone know i would really like to know :)
+
+      TThread.Synchronize(nil,
+        procedure
+        begin
+          if not FNativeViewAttached then exit;
+          if FEditText.isfocused then
+            FEditText.showSoftInput;
+        end);
+
+      end).start;
+
+  {$ENDIF}
 
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.DoEnter', 'end', TalLogType.VERBOSE);
@@ -999,19 +1096,29 @@ end;
 
 {******************************}
 procedure TALAndroidEdit.DoExit;
+{$IF CompilerVersion <= 31} // berlin
+var aNativeViewAttached: Boolean;
+{$ENDIF}
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.DoExit', 'start', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.DoExit', 'start' +
+                                 ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
   inherited;
 
-  TUIThreadCaller.Call<TALUIMembers, boolean>( // << when i do CallInUIThreadAndWaitFinishing i have in some situation threadlock :(
-    procedure (aUIMembers: TALUIMembers; aHideSoftInputOnExit: boolean)
+  {$IF CompilerVersion <= 31} // berlin
+  aNativeViewAttached := fNativeViewAttached;
+  TUIThreadCaller.Call<JALEditText, boolean>( // << when i do CallInUIThreadAndWaitFinishing i have in some situation threadlock :(
+    procedure (FEditText: JALEditText; fHideSoftInputOnExit: boolean)
+    var fNativeViewAttached: Boolean;
     begin
-      if not aUIMembers.FNativeViewAttached then exit;
-      if aHideSoftInputOnExit then aUIMembers.fEditText.HideSoftInput;
-      aUIMembers.fEditText.clearfocus; // << this will gave the focus to the fLayout in fact and in this way remove it from the FeditText
+      fNativeViewAttached := aNativeViewAttached;
+  {$ENDIF}
+
+      if not FNativeViewAttached then exit;
+      if fHideSoftInputOnExit then fEditText.HideSoftInput;
+      fEditText.clearfocus; // << this will gave the focus to the fLayout in fact and in this way remove it from the FeditText
       MainActivity.getViewStack.addView(nil); // << this will "disable" all the view - important to fully close the virtual keyboard
                                               //
                                               //    public class ViewStack {
@@ -1037,7 +1144,10 @@ begin
                                               //      }
                                               //    }
                                               //
-    end, FUIMembers, fHideSoftInputOnExit);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText, fHideSoftInputOnExit);
+  {$ENDIF}
 
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.DoExit', 'end', TalLogType.VERBOSE);
@@ -1047,67 +1157,93 @@ end;
 {************************************}
 procedure TALAndroidEdit.RequestFocus;
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText, Boolean>(
+    procedure (FEditText: JALEditText; FNativeViewAttached: Boolean)
     begin
-      if not aUIMembers.FNativeViewAttached then exit;
-      aUIMembers.fEditText.requestFocus;
-    end, FUIMembers);
+  {$ENDIF}
+
+      if not FNativeViewAttached then exit;
+      fEditText.requestFocus;
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText, FNativeViewAttached);
+  {$ENDIF}
 end;
 
 {*********************************************************************************}
 Procedure TALAndroidEdit.setSelection(const aStart: integer; const aStop: Integer);
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
-      aUIMembers.fEditText.setSelection(aStart, aStop);
-    end, FUIMembers);
+  {$ENDIF}
+
+      fEditText.setSelection(aStart, aStop);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
 end;
 
 {***********************************************************}
 Procedure TALAndroidEdit.setSelection(const aindex: integer);
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
-      aUIMembers.fEditText.setSelection(aindex);
-    end, FUIMembers);
+  {$ENDIF}
+
+      fEditText.setSelection(aindex);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
 end;
 
 {********************************************}
 function TALAndroidEdit.getLineHeight: Single;
+{$IF CompilerVersion <= 31} // berlin
 var aLineHeight: single;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.getLineHeight', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: Single;
     begin
-      aLineHeight := fUIMembers.FEditText.getLineHeight / FScreenScale;
+  {$ENDIF}
+
+      result := FEditText.getLineHeight / FScreenScale;
+
+  {$IF CompilerVersion <= 31} // berlin
+      aLineHeight := Result;
     end);
   result := aLineHeight;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.getLineHeight', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {********************************************}
 function TALAndroidEdit.getLineCount: integer;
+{$IF CompilerVersion <= 31} // berlin
 var aLineCount: integer;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.getLineCount', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: integer;
     begin
-      aLineCount := fUIMembers.FEditText.getLineCount;
+  {$ENDIF}
+
+      result := FEditText.getLineCount;
+
+  {$IF CompilerVersion <= 31} // berlin
+      aLineCount := Result;
     end);
   result := aLineCount;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.getLineCount', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1190,18 +1326,33 @@ end;
 
 {**************************************************************************}
 procedure TALAndroidEdit.setKeyboardType(const Value: TVirtualKeyboardType);
+{$IF CompilerVersion <= 31} // berlin
 var aPassword: Boolean;
     aIsMultiLine: Boolean;
+{$ENDIF}
 begin
   if (value <> fKeyboardType) then begin
+
     fKeyboardType := Value;
+
+    {$IF CompilerVersion <= 31} // berlin
     aPassword := fPassword;
     aIsMultiLine := fIsMultiline;
-    TUIThreadCaller.Call<TALUIMembers>(
-      procedure (aUIMembers: TALUIMembers)
+    TUIThreadCaller.Call<JALEditText>(
+      procedure (FEditText: JALEditText)
+      var fPassword: Boolean;
+          fIsMultiLine: Boolean;
       begin
-        DoSetInputType(aUIMembers.fEditText, Value, aPassword, aIsMultiLine);
-      end, FUIMembers);
+        fPassword := aPassword;
+        fIsMultiLine := aIsMultiline;
+    {$ENDIF}
+
+        DoSetInputType(fEditText, Value, fPassword, fIsMultiLine);
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FEditText);
+    {$ENDIF}
+
   end;
 end;
 
@@ -1213,18 +1364,33 @@ end;
 
 {*********************************************************}
 procedure TALAndroidEdit.setPassword(const Value: Boolean);
+{$IF CompilerVersion <= 31} // berlin
 var aKeyboardType: TVirtualKeyboardType;
     aIsMultiLine: Boolean;
+{$ENDIF}
 begin
   if (value <> fPassword) then begin
+
     fPassword := Value;
+
+    {$IF CompilerVersion <= 31} // berlin
     aKeyboardType := fKeyboardType;
     aIsMultiLine := fIsMultiline;
-    TUIThreadCaller.Call<TALUIMembers>(
-      procedure (aUIMembers: TALUIMembers)
+    TUIThreadCaller.Call<JALEditText>(
+      procedure (FEditText: JALEditText)
+      var fKeyboardType: TVirtualKeyboardType;
+          fIsMultiLine: Boolean;
       begin
-        DoSetInputType(aUIMembers.fEditText, aKeyboardType, Value, aIsMultiLine);
-      end, FUIMembers);
+        fKeyboardType := aKeyboardType;
+        fIsMultiLine := aIsMultiline;
+    {$ENDIF}
+
+        DoSetInputType(fEditText, fKeyboardType, Value, fIsMultiLine);
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FEditText);
+    {$ENDIF}
+
   end;
 end;
 
@@ -1265,12 +1431,21 @@ end;
 procedure TALAndroidEdit.setReturnKeyType(const Value: TReturnKeyType);
 begin
   if (value <> fReturnKeyType) then begin
+
     fReturnKeyType := Value;
-    TUIThreadCaller.Call<TALUIMembers>(
-      procedure (aUIMembers: TALUIMembers)
+
+    {$IF CompilerVersion <= 31} // berlin
+    TUIThreadCaller.Call<JALEditText>(
+      procedure (FEditText: JALEditText)
       begin
-        DoSetReturnKeyType(aUIMembers.fEditText, Value);
-      end, FUIMembers);
+    {$ENDIF}
+
+        DoSetReturnKeyType(fEditText, Value);
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FEditText);
+    {$ENDIF}
+
   end;
 end;
 
@@ -1282,69 +1457,98 @@ end;
 
 {*******************************************************}
 function TALAndroidEdit.GetLineSpacingMultiplier: single;
+{$IF CompilerVersion <= 31} // berlin
 var aLineSpacingMultiplier: single;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetLineSpacingMultiplier', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: single;
     begin
-      aLineSpacingMultiplier := fUIMembers.FEditText.getLineSpacingMultiplier
+  {$ENDIF}
+
+      result := FEditText.getLineSpacingMultiplier;
+
+  {$IF CompilerVersion <= 31} // berlin
+      aLineSpacingMultiplier := Result;
     end);
   result := aLineSpacingMultiplier;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetLineSpacingMultiplier', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {*********************************************************************}
 procedure TALAndroidEdit.SetLineSpacingMultiplier(const Value: single);
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
-      aUIMembers.fEditText.setLineSpacing(aUIMembers.fEditText.getLineSpacingExtra, Value);
-    end, FUIMembers);
+  {$ENDIF}
+
+      fEditText.setLineSpacing(fEditText.getLineSpacingExtra, Value);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
 end;
 
 {**************************************************}
 function TALAndroidEdit.GetLineSpacingExtra: single;
+{$IF CompilerVersion <= 31} // berlin
 var aLineSpacingExtra: single;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetLineSpacingExtra', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: single;
     begin
-      aLineSpacingExtra := fUIMembers.FEditText.getLineSpacingExtra
+  {$ENDIF}
+
+      result := FEditText.getLineSpacingExtra;
+
+  {$IF CompilerVersion <= 31} // berlin
+      aLineSpacingExtra := result;
     end);
   result := aLineSpacingExtra;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetLineSpacingExtra', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {****************************************************************}
 procedure TALAndroidEdit.SetLineSpacingExtra(const Value: single);
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
-      aUIMembers.fEditText.setLineSpacing(Value, aUIMembers.fEditText.getLineSpacingMultiplier);
-    end, FUIMembers);
+  {$ENDIF}
+
+      fEditText.setLineSpacing(Value, fEditText.getLineSpacingMultiplier);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
 end;
 
 {********************************************************}
 procedure TALAndroidEdit.SetPadding(const Value: TBounds);
 begin
+
   FPadding.Assign(Value);
-  TUIThreadCaller.Call<TALUIMembers, Single>(
-    procedure (aUIMembers: TALUIMembers; aScreenScale: Single)
+
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText, Single>(
+    procedure (FEditText: JALEditText; fScreenScale: Single)
     begin
-      aUIMembers.fEditText.setPadding(round(Value.Left * aScreenScale), round(Value.Top * aScreenScale), round(Value.Right * aScreenScale), round(Value.Bottom * aScreenScale));
-    end, FUIMembers, FScreenScale);
+  {$ENDIF}
+
+      fEditText.setPadding(round(Value.Left * fScreenScale), round(Value.Top * fScreenScale), round(Value.Right * fScreenScale), round(Value.Bottom * fScreenScale));
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText, FScreenScale);
+  {$ENDIF}
+
 end;
 
 {******************************************}
@@ -1357,11 +1561,19 @@ end;
 procedure TALAndroidEdit.SetMaxLength(const Value: integer);
 begin
   if value <> FMaxLength then begin
-    TUIThreadCaller.Call<TALUIMembers>(
-      procedure (aUIMembers: TALUIMembers)
+
+    {$IF CompilerVersion <= 31} // berlin
+    TUIThreadCaller.Call<JALEditText>(
+      procedure (FEditText: JALEditText)
       begin
-        aUIMembers.fEditText.setMaxLength(Value);
-      end, FUIMembers);
+    {$ENDIF}
+
+        fEditText.setMaxLength(Value);
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FEditText);
+    {$ENDIF}
+
   end;
 end;
 
@@ -1381,51 +1593,73 @@ end;
 procedure TALAndroidEdit.setTextPrompt(const Value: String);
 begin
   if Value <> fTextPrompt then begin
+
     fTextPrompt := Value;
-    TUIThreadCaller.Call<TALUIMembers>(
-      procedure (aUIMembers: TALUIMembers)
+
+    {$IF CompilerVersion <= 31} // berlin
+    TUIThreadCaller.Call<JALEditText>(
+      procedure (FEditText: JALEditText)
       begin
-        aUIMembers.fEditText.setHint(StrToJCharSequence(Value));
-      end, FUIMembers);
+    {$ENDIF}
+
+        fEditText.setHint(StrToJCharSequence(Value));
+
+    {$IF CompilerVersion <= 31} // berlin
+      end, FEditText);
+    {$ENDIF}
+
   end;
 end;
 
 {******************************************************}
 function TALAndroidEdit.GetTextPromptColor: TAlphaColor;
+{$IF CompilerVersion <= 31} // berlin
 var aColor: TAlphaColor;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetTextPromptColor', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: TAlphaColor;
     begin
-      aColor := fUIMembers.FEditText.getCurrentHintTextColor;
+  {$ENDIF}
+
+      result := FEditText.getCurrentHintTextColor;
+
+  {$IF CompilerVersion <= 31} // berlin
+      aColor := result;
     end);
   result := aColor;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetTextPromptColor', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {********************************************************************}
 procedure TALAndroidEdit.setTextPromptColor(const Value: TAlphaColor);
 begin
+
   if Value = TalphaColorRec.null then exit;
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
-      aUIMembers.fEditText.setHintTextColor(Value);
-    end, FUIMembers);
+  {$ENDIF}
+
+      fEditText.setHintTextColor(Value);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
+
 end;
 
 {**************************************}
 function TALAndroidEdit.getText: String;
-var aText: JCharSequence;
+{$IF CompilerVersion <= 31} // berlin
+var aText: string;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.getText', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
+  {$IF CompilerVersion <= 31} // berlin
   // i don't understand why but on some device, just after the app is created
   // and not already fully working then the instruction CallInUIThreadAndWaitFinishing
   // below will never finished :( i see it on a galaxy tab 3 (so low quality device)
@@ -1434,23 +1668,33 @@ begin
   // else i have no solution
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: String;
     begin
-      aText := FUIMembers.FEditText.gettext;
+  {$ENDIF}
+
+      result := JCharSequenceToStr(FEditText.gettext);
+
+  {$IF CompilerVersion <= 31} // berlin
+      aText := result;
     end);
-  result := JCharSequenceToStr(aText);
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.getText', 'end', TalLogType.VERBOSE);
+  result := aText;
   {$ENDIF}
 end;
 
 {****************************************************}
 procedure TALAndroidEdit.SetText(const Value: String);
 begin
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
-      aUIMembers.fEditText.setText(StrToJCharSequence(Value), TJTextView_BufferType.javaClass.EDITABLE);
-    end, FUIMembers);
+  {$ENDIF}
+
+      fEditText.setText(StrToJCharSequence(Value), TJTextView_BufferType.javaClass.EDITABLE);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
 end;
 
 {******************************************************}
@@ -1490,27 +1734,35 @@ begin
     TTextAlign.Center: aGravity := $01; // center_horizontal 0x01
     TTextAlign.Leading: aGravity := $03; // left 0x03
     TTextAlign.Trailing: aGravity := $05; // right 0x05
+    else aGravity := $03; // left 0x03
   end;
   case ftextsettings.VertAlign of
     TTextAlign.Center: aGravity := aGravity or $10; // center_vertical 0x10
     TTextAlign.Leading: aGravity := aGravity or $30; // top 0x30
     TTextAlign.Trailing: aGravity := aGravity or $50; // bottom 0x50
+    else aGravity := aGravity or $10; // center_vertical 0x10
   end;
 
-  TUIThreadCaller.Call<TALUIMembers>(
-    procedure (aUIMembers: TALUIMembers)
+  {$IF CompilerVersion <= 31} // berlin
+  TUIThreadCaller.Call<JALEditText>(
+    procedure (FEditText: JALEditText)
     begin
+  {$ENDIF}
+
       //-----
-      aUIMembers.fEditText.setTextColor(aFontColor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
-      aUIMembers.fEditText.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, aFontSize); // << Set the default text size to a given unit and value.
+      fEditText.setTextColor(aFontColor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
+      fEditText.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, aFontSize); // << Set the default text size to a given unit and value.
       //-----
       aTypeface := TJTypeface.JavaClass.create(StringToJString(aFontFamily), aFontStyle);
-      aUIMembers.fEditText.setTypeface(aTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
-                                                   //    Typeface families actually have bold and italic variants, so you may need to use setTypeface(Typeface, int)
-                                                   //     to get the appearance that you actually want.
+      fEditText.setTypeface(aTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
+                                        //    Typeface families actually have bold and italic variants, so you may need to use setTypeface(Typeface, int)
+                                        //     to get the appearance that you actually want.
       aTypeface := nil;
-      aUIMembers.fEditText.setgravity(aGravity);
-    end, FUIMembers);
+      fEditText.setgravity(aGravity);
+
+  {$IF CompilerVersion <= 31} // berlin
+    end, FEditText);
+  {$ENDIF}
 
 end;
 
@@ -1528,21 +1780,23 @@ end;
 
 {***********************************************}
 function TALAndroidEdit.GetEditText: JALEditText;
+{$IF CompilerVersion <= 31} // berlin
 var aEditText: JALEditText;
+{$ENDIF}
 begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetEditText', 'start', TalLogType.VERBOSE);
-  {$ENDIF}
-  // wee CallInUIThreadAndWaitFinishing to be sure that the FEditText was
-  // created
+  {$IF CompilerVersion <= 31} // berlin
   CallInUIThreadAndWaitFinishing(
     procedure
+    var result: JALEditText;
     begin
-      aEditText := fUIMembers.FEditText;
+  {$ENDIF}
+
+      result := FEditText;
+
+  {$IF CompilerVersion <= 31} // berlin
+      aEditText := result;
     end);
   result := aEditText;
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.GetEditText', 'end', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -1595,18 +1849,21 @@ end;
 
 {*****************************************************************************************}
 procedure TALAndroidEdit.TALFocusChangeListener.onFocusChange(v: JView; hasFocus: Boolean);
+var aCurrentFocusedControl: TALAndroidEdit;
+    aOldHideSoftInputOnExit: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.onFocusChange', 'hasFocus: ' + alBoolToStrU(hasFocus, 'YES', 'NO'), TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.onFocusChange', 'hasFocus: ' + alBoolToStrU(hasFocus, 'YES', 'NO') +
+                                        ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   if hasFocus then begin
+
+    {$IF CompilerVersion <= 31} // berlin
     TThread.Queue(nil,
       procedure
-      var aCurrentFocusedControl: TALAndroidEdit;
-          aOldHideSoftInputOnExit: Boolean;
       begin
-
         if fEditControl = nil then exit;
+    {$ENDIF}
 
         {$IF defined(DEBUG)}
         ALLog('TALAndroidEdit.onFocusChange.queue.hasFocus:YES', 'FEditcontrol.isfocused: ' + alBoolToStrU(FEditcontrol.isfocused, 'YES', 'NO'), TalLogType.VERBOSE);
@@ -1633,14 +1890,19 @@ begin
 
         end;
 
+    {$IF CompilerVersion <= 31} // berlin
       end);
+    {$ENDIF}
+
   end
   else begin
+
+    {$IF CompilerVersion <= 31} // berlin
     TThread.Queue(nil,
       procedure
       begin
-
         if fEditControl = nil then exit;
+    {$ENDIF}
 
         {$IF defined(DEBUG)}
         ALLog('TALAndroidEdit.onFocusChange.queue.hasFocus:NO', 'FEditcontrol.isfocused: ' + alBoolToStrU(FEditcontrol.isfocused, 'YES', 'NO'), TalLogType.VERBOSE);
@@ -1649,7 +1911,10 @@ begin
         if FEditcontrol.isfocused then
           FEditcontrol.resetfocus;
 
+    {$IF CompilerVersion <= 31} // berlin
       end);
+    {$ENDIF}
+
   end;
 end;
 
@@ -1662,31 +1927,52 @@ end;
 
 {*************************************************************}
 procedure TALAndroidEdit.TALSoftInputListener.onSoftInputShown;
+var aBounds: TRect;
 begin
+
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.onSoftInputShown', 'Shown', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.onSoftInputShown', 'Shown' +
+                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
+
+  {$IF CompilerVersion <= 31} // berlin
   TThread.Queue(nil,
     procedure
-    var aBounds: TRect;
     begin
+  {$ENDIF}
+
       ALObtainKeyboardRect(aBounds);
+      {$IF defined(DEBUG)}
       ALLog('TALAndroidEdit.onSoftInputShown', 'Keyboard Rect bounds:('+inttostr(aBounds.Left)+','+inttostr(aBounds.top)+','+inttostr(aBounds.right)+','+inttostr(aBounds.bottom)+') - bounds-height:'+inttostr(aBounds.height)+' - bounds-width:'+inttostr(aBounds.width), TalLogType.VERBOSE);
+      {$ENDIF}
       TMessageManager.DefaultManager.SendMessage(Self, TVKStateChangeMessage.Create(true, aBounds), True);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
 end;
 
 {**************************************************************}
 procedure TALAndroidEdit.TALSoftInputListener.onSoftInputHidden;
 begin
+
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.onSoftInputHidden', 'Hidden', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.onSoftInputHidden', 'Hidden' +
+                                            ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
+
+  {$IF CompilerVersion <= 31} // berlin
   TThread.Queue(nil,
     procedure
     begin
+  {$ENDIF}
+
       TMessageManager.DefaultManager.SendMessage(Self, TVKStateChangeMessage.Create(false, Trect.create(0,0,0,0)), True);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
+
 end;
 
 {*****************************************************************************************}
@@ -1700,22 +1986,29 @@ end;
 function TALAndroidEdit.TALKeyPreImeListener.onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
-  if event <> nil then ALLog('TALAndroidEdit.onKeyPreIme', 'keyCode: ' + inttostr(keyCode) + ' - event: ' + JstringToString(event.toString), TalLogType.VERBOSE)
-  else ALLog('TALAndroidEdit.onKeyPreIme', 'keyCode: ' + inttostr(keyCode), TalLogType.VERBOSE);
+  if event <> nil then ALLog('TALAndroidEdit.onKeyPreIme', 'keyCode: ' + inttostr(keyCode) +
+                                                           ' - event: ' + JstringToString(event.toString) +
+                                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE)
+  else ALLog('TALAndroidEdit.onKeyPreIme', 'keyCode: ' + inttostr(keyCode) +
+                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
-  if ((event = nil) or (event.getAction = AKEY_EVENT_ACTION_DOWN)) and
+  if ((event = nil) or (event.getAction = AKEY_EVENT_ACTION_UP)) and
      (keyCode = AKEYCODE_BACK) then begin
 
     result := true;
 
+    {$IF CompilerVersion <= 31} // berlin
     TThread.Queue(nil,
-     procedure
-     begin
-       if fEditControl = nil then exit;
-       sleep(250); // << the problem is we leave the finger on the back button, then the keyevent is send again and again
-                   //    so leave 250 ms to remove the finger
-       FEditcontrol.resetfocus;
-     end);
+      procedure
+      begin
+        if fEditControl = nil then exit;
+    {$ENDIF}
+
+        FEditcontrol.resetfocus;
+
+    {$IF CompilerVersion <= 31} // berlin
+      end);
+    {$ENDIF}
 
   end
   else result := false;
@@ -1731,16 +2024,26 @@ end;
 {*********************************************************************}
 procedure TALAndroidEdit.TALTextWatcher.afterTextChanged(s: JEditable);
 begin
+
   {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.afterTextChanged', '(Text changed)', TalLogType.VERBOSE);
+  ALLog('TALAndroidEdit.afterTextChanged', '(Text changed)' +
+                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
+
+  {$IF CompilerVersion <= 31} // berlin
   TThread.Queue(nil,
     procedure
     begin
       if fEditControl = nil then exit;
+  {$ENDIF}
+
       if assigned(fEditControl.fOnChangeTracking) then
         fEditControl.fOnChangeTracking(fEditControl);
+
+  {$IF CompilerVersion <= 31} // berlin
     end);
+  {$ENDIF}
+
 end;
 
 {**************************************************************************************************************************}
@@ -1767,8 +2070,11 @@ end;
 function TALAndroidEdit.TALEditorActionListener.onEditorAction(v: JTextView; actionId: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
-   if event <> nil then ALLog('TALAndroidEdit.onEditorAction', 'actionId: ' + inttostr(actionId) + ' - event: ' + JstringToString(event.toString), TalLogType.VERBOSE)
-   else ALLog('TALAndroidEdit.onEditorAction', 'actionId: ' + inttostr(actionId), TalLogType.VERBOSE);
+   if event <> nil then ALLog('TALAndroidEdit.onEditorAction', 'actionId: ' + inttostr(actionId) +
+                                                               ' - event: ' + JstringToString(event.toString) +
+                                                               ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE)
+   else ALLog('TALAndroidEdit.onEditorAction', 'actionId: ' + inttostr(actionId) +
+                                               ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
   //IME_ACTION_DONE: the action key performs a "done" operation, typically meaning there is nothing more to input and the IME will be closed.
   //IME_ACTION_GO: the action key performs a "go" operation to take the user to the target of the text they typed. Typically used, for example, when entering a URL.
@@ -1792,46 +2098,22 @@ begin
 
     result := true;
 
+    {$IF CompilerVersion <= 31} // berlin
     TThread.Queue(nil,
-     procedure
-     begin
-       if fEditControl = nil then exit;
-       if assigned(FEditControl.fOnReturnKey) then FEditControl.fOnReturnKey(fEditControl)
-       else FEditcontrol.resetfocus;
-     end);
+      procedure
+      begin
+        if fEditControl = nil then exit;
+    {$ENDIF}
+
+        if assigned(FEditControl.fOnReturnKey) then FEditControl.fOnReturnKey(fEditControl)
+        else FEditcontrol.resetfocus;
+
+    {$IF CompilerVersion <= 31} // berlin
+      end);
+    {$ENDIF}
 
   end
   else result := false;
-end;
-
-{*********************************************}
-constructor TALAndroidEdit.TALUIMembers.Create;
-begin
-  inherited;
-  FNativeViewAttached := False;
-  FEditText := nil;
-  FLayout := nil;
-  FTextWatcher := nil;
-  FEditorActionListener := nil;
-  FSoftInputListener := nil;
-  FKeyPreImeListener := nil;
-  FFocusChangeListener := nil;
-end;
-
-{*********************************************}
-destructor TALAndroidEdit.TALUIMembers.Destroy;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidEdit.TALUIMembers.Destroy', 'Destroy', TalLogType.VERBOSE);
-  {$ENDIF}
-  FTextWatcher := nil;
-  FEditorActionListener := nil;
-  FSoftInputListener := nil;
-  FKeyPreImeListener := nil;
-  FFocusChangeListener := nil;
-  FEditText := nil;
-  FLayout := nil;
-  inherited Destroy;
 end;
 
 {$endif}

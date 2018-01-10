@@ -1,19 +1,6 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code              
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
-product:      ALHttpClient Base Class
-Version:      4.00
-
 Description:  TALHttpClient is a ancestor of class like
               TALWinInetHttpClient or TALWinHttpClient
-
-Know bug :
-
-History :     28/11/2005: move public procedure to published
-                          in TALHttpClientProxyParams
-              26/06/2012: Add xe2 support
 
 Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.ietf.org/rfc/rfc1867.txt
@@ -22,8 +9,8 @@ Link :        http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.1
               http://www.cs.tut.fi/~jkorpela/forms/methods.html
               http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
               http://wp.netscape.com/newsref/std/cookie_spec.html
-
 **************************************************************}
+
 unit ALHttpClient;
 
 interface

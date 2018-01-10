@@ -1,32 +1,11 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
-Author(s):    Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
-
 product:      Alcinoe HTML Functions
-Version:      4.00
-
 Description:  Functions to work on Html Tag (extract Text, HTML Encode,
               HTML Decode, etc. The function ALHTMLdecode and
               ALHTMLEncode is to encode decode HTML entity
               like &nbsp;
-
-Know bug :
-
-History :     19/10/2005: Make The code independant of the current local
-                          and work with UTF-8 encoding; Also build a most
-                          complete list of HTML entities
-              10/09/2007: create ALCompactHtmlTagParams in ALFcnHTML
-              10/11/2007: move ALXMLTextElementDecode to ALUTF8XMLTextElementDecode and
-              						to ALUTF8XMLTextElementDecode
-              						add support for reference like &#x20AC; and &#39;
-              26/06/2012: Add xe2 support
-              28/01/2013: Add xe2 ALJavascriptEncode / ALUTF8JavascriptDecode
-              05/09/2014: Add ALRunJavascript function
-
-Link :
-
 **************************************************************}
+
 unit ALHTML;
 
 interface

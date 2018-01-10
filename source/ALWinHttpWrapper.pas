@@ -1,11 +1,6 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/              
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    Darin Dimitrov (darin_dimitrov@hotmail.com)
-							
 product:      Alcinoe Windows HTTP Services (WinHTTP) API Interface Unit
-Version:      4.00
-
 Description:  Microsoft® Windows® HTTP Services (WinHTTP) provides
               developers with a server-supported, high-level interface
               to the HTTP/1.1 Internet protocol. WinHTTP is designed
@@ -19,17 +14,9 @@ Description:  Microsoft® Windows® HTTP Services (WinHTTP) provides
               or downlevel platform support should still consider
               using WinInet.
 
-              More info at:
-              http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnanchor/html/winhttp.asp
-
-
-Know bug :
-
-History :     26/06/2012: Add xe2 support
-
-Link :
-
+Link:         http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnanchor/html/winhttp.asp
 **************************************************************}
+
 unit ALWinHttpWrapper;
 
 {$WEAKPACKAGEUNIT}
@@ -40,11 +27,7 @@ interface
   {$LEGACYIFEND ON} // http://docwiki.embarcadero.com/RADStudio/XE4/en/Legacy_IFEND_(Delphi)
 {$IFEND}
 
-uses {$IF CompilerVersion >= 23} {Delphi XE2}
-     Winapi.Windows;
-     {$ELSE}
-     Windows;
-     {$IFEND}
+uses Winapi.Windows;
 
 {$HPPEMIT '#include <winhttp.h>'}
 

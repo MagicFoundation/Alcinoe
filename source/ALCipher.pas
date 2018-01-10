@@ -1,28 +1,12 @@
 {*************************************************************
-www:          http://sourceforge.net/projects/alcinoe/
-svn:          svn checkout svn://svn.code.sf.net/p/alcinoe/code/ alcinoe-code
 Author(s):    TurboPower Software
               Synopse Informatique (http://synopse.info)
-							Stéphane Vander Clock (skype/email: svanderclock@yahoo.fr)
 
 product:      ALCipher (Private Key Encryption/Decryption Primitives)
-Version:      4.00
-
 Description:  Delphi library for cryptography. It provides support for
               AES, Blowfish, SHA, MD5
-
-Know bug :
-
-History :     01/12/2006: add blowFish functions
-              10/10/2009: add AES (Rijndael) function.
-                          also move the ALCipherStringHashxxx to
-                          the unit alcncrypt and rename it in
-                          ALStringHashxxx
-              26/06/2012: Add xe2 support
-
-Link :
-
 **************************************************************}
+
 unit ALCipher;
 
 interface

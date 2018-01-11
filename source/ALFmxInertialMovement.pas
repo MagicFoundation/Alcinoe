@@ -297,6 +297,7 @@ type
     property OnStop: TNotifyEvent read FOnStop write FOnStop;
     property DeadZone: Integer read FDeadZone write FDeadZone default ALDefaultDeadZone;
     property mouseEventReceived: boolean read fmouseEventReceived; // used only internally
+    property TimerActive: boolean read FTimerActive;
   published
     property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;

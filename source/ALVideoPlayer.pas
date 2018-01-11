@@ -902,44 +902,44 @@ begin
       fBitmap := TalTexture.Create(False);
       ALInitializeEXTERNALOESTexture(fBitmap);
 
-      //-----
-      fVideoWidth := 0;
-      fVideoHeight := 0;
-
-      //-----
-      FMediaPlayer := TJMediaPlayer.JavaClass.init;
-      //-----
-      fOnErrorEvent := nil;
-      FOnErrorListener := TALErrorListener.Create(Self);
-      FMediaPlayer.setOnErrorListener(FOnErrorListener);
-      //-----
-      fOnPreparedEvent := nil;
-      FOnPreparedListener := TALPreparedListener.Create(Self);
-      FMediaPlayer.setOnPreparedListener(FOnPreparedListener);
-      //-----
-      fonVideoSizeChangedEvent := nil;
-      fonVideoSizeChangedListener := TALVideoSizeChangedListener.Create(Self);
-      FMediaPlayer.setOnVideoSizeChangedListener(fonVideoSizeChangedListener);
-      //-----
-      fOnBufferingUpdateEvent := nil;
-      fOnBufferingUpdateListener := TALBufferingUpdateListener.Create(Self);
-      FMediaPlayer.setOnBufferingUpdateListener(fOnBufferingUpdateListener);
-      //-----
-      fOnCompletionEvent := nil;
-      fOnCompletionListener := TALCompletionListener.Create(Self);
-      FMediaPlayer.setOnCompletionListener(fOnCompletionListener);
-      //-----
-      fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
-      //-----
-      fHandler := TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper());
-      //-----
-      fOnFrameAvailableEvent := nil;
-      FOnFrameAvailableListener := TALFrameAvailableListener.Create(Self);
-      fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler);
-      //-----
-      FMediaPlayer.setSurface(TJSurface.JavaClass.init((fSurfaceTexture)));
-
     end);
+
+  //-----
+  fVideoWidth := 0;
+  fVideoHeight := 0;
+
+  //-----
+  FMediaPlayer := TJMediaPlayer.JavaClass.init;
+  //-----
+  fOnErrorEvent := nil;
+  FOnErrorListener := TALErrorListener.Create(Self);
+  FMediaPlayer.setOnErrorListener(FOnErrorListener);
+  //-----
+  fOnPreparedEvent := nil;
+  FOnPreparedListener := TALPreparedListener.Create(Self);
+  FMediaPlayer.setOnPreparedListener(FOnPreparedListener);
+  //-----
+  fonVideoSizeChangedEvent := nil;
+  fonVideoSizeChangedListener := TALVideoSizeChangedListener.Create(Self);
+  FMediaPlayer.setOnVideoSizeChangedListener(fonVideoSizeChangedListener);
+  //-----
+  fOnBufferingUpdateEvent := nil;
+  fOnBufferingUpdateListener := TALBufferingUpdateListener.Create(Self);
+  FMediaPlayer.setOnBufferingUpdateListener(fOnBufferingUpdateListener);
+  //-----
+  fOnCompletionEvent := nil;
+  fOnCompletionListener := TALCompletionListener.Create(Self);
+  FMediaPlayer.setOnCompletionListener(fOnCompletionListener);
+  //-----
+  fSurfaceTexture := TJSurfaceTexture.JavaClass.init(fBitmap.Handle);
+  //-----
+  fHandler := TJHandler.JavaClass.init(TJLooper.javaclass.getMainLooper());
+  //-----
+  fOnFrameAvailableEvent := nil;
+  FOnFrameAvailableListener := TALFrameAvailableListener.Create(Self);
+  fSurfaceTexture.setOnFrameAvailableListener(FOnFrameAvailableListener, fHandler);
+  //-----
+  FMediaPlayer.setSurface(TJSurface.JavaClass.init((fSurfaceTexture)));
 
 end;
 
@@ -1536,15 +1536,15 @@ begin
   {$ENDIF}
 
   //-----
-  if FFrameRefreshTimer <> nil then begin
-    FFrameRefreshTimer.Enabled := False;
-    alFreeAndNil(FFrameRefreshTimer);
-  end;
-
-  //-----
   TThread.Synchronize(nil,
     procedure
     begin
+
+      if FFrameRefreshTimer <> nil then begin
+        FFrameRefreshTimer.Enabled := False;
+        alFreeAndNil(FFrameRefreshTimer);
+      end;
+      //-----
       if FNotificationsDelegate <> nil then begin
         TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).removeObserver(FNotificationsDelegate.GetObjectID);
         AlFreeAndNil(FNotificationsDelegate);
@@ -1574,6 +1574,7 @@ begin
         CFrelease(pointer(fvideoTextureCacheRef));
         fvideoTextureCacheRef := 0;
       end;
+
     end);
 
   //-----
@@ -1851,6 +1852,10 @@ begin
                           nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
 
   //-----
+  //if you call setDataSource from a background thread then you are responsible
+  //to handle from this background thread the function doOnFrameRefresh
+  //this because part of this function (doOnFrameRefresh) could be more efficient
+  //to run directly from the background thread instead of the main UI thread used by TTimer
   if TThread.Current.ThreadID = MainThreadID then begin
     FFrameRefreshTimer := TTimer.Create(nil);
     FFrameRefreshTimer.Interval := _FrameRefreshInterval; // equivalent to a fps of 30
@@ -1858,6 +1863,7 @@ begin
     FFrameRefreshTimer.Enabled := False;
   end;
 
+  //-----
   TThread.Synchronize(nil,
   procedure
   begin
@@ -1891,7 +1897,9 @@ begin
   fState := vpsInitialized;
 
   {$IFDEF DEBUG}
-  ALLog('TALIOSVideoPlayer.setDataSource', 'FPlayer.status: ' + alinttostrU(FPlayer.status) + ' - FPlayerItem.status: ' + alinttostrU(FPlayerItem.status), TalLogType.VERBOSE);
+  ALLog('TALIOSVideoPlayer.setDataSource', 'FPlayer.status: ' + alinttostrU(FPlayer.status) +
+                                           ' - FPlayerItem.status: ' + alinttostrU(FPlayerItem.status) +
+                                           ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
@@ -2063,7 +2071,8 @@ begin
       aStopWatch1.Stop;
       fFrameRefreshCounter := 0;
       ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'Total TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch1.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
-                                                     ' - Synchronize TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch2.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU), TalLogType.VERBOSE);
+                                                     ' - Synchronize TimeTaken: ' + ALFormatFloatU('0.00', aStopWatch2.Elapsed.TotalMilliseconds, AlDefaultFormatSettingsU) +
+                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     end;
     {$ENDIF}
 
@@ -2071,7 +2080,8 @@ begin
   else begin
 
     {$IFDEF DEBUG}
-    ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'hasNewPixelBufferForItemTime:NO', TalLogType.VERBOSE);
+    ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'hasNewPixelBufferForItemTime:NO' +
+                                                   ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     {$ENDIF}
 
     //sometime we continusly receive hasNewPixelBufferForItemTime:NO
@@ -2094,7 +2104,8 @@ begin
       {$IFDEF DEBUG}
       ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'hasNewPixelBufferForItemTime:NO '+
                                                      '- Pause and Restart '+
-                                                     '- currentTime: ' + alinttostrU(fPlayer.currentTime.value), TalLogType.VERBOSE);
+                                                     ' - currentTime: ' + alinttostrU(fPlayer.currentTime.value) +
+                                                     ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
       {$ENDIF}
       fPlayer.pause;
       fPlayer.play;
@@ -2134,7 +2145,8 @@ begin
   then begin
 
     {$IFDEF DEBUG}
-    ALLog('TALIOSVideoPlayer.doOnReady', 'Ready', TalLogType.VERBOSE);
+    ALLog('TALIOSVideoPlayer.doOnReady', 'Ready' +
+                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     {$ENDIF}
 
     //i need to do this here because of bug like :
@@ -2169,7 +2181,8 @@ begin
           (FPlayerItem.status = AVPlayerItemStatusFailed) then begin
 
     {$IFDEF DEBUG}
-    ALLog('TALIOSVideoPlayer.doOnReady', 'Failed', TalLogType.Error);
+    ALLog('TALIOSVideoPlayer.doOnReady', 'Failed' +
+                                         ' - ThreadID: ' + alIntToStrU(TThread.Current.ThreadID) + '/' + alIntToStrU(MainThreadID), TalLogType.VERBOSE);
     {$ENDIF}
 
     //fire the fOnErrorEvent

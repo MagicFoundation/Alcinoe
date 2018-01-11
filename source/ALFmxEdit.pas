@@ -1081,7 +1081,7 @@ begin
         procedure
         begin
           if not FNativeViewAttached then exit;
-          if FEditText.isfocused then
+          if IsFocused and FEditText.requestFocus then
             FEditText.showSoftInput;
         end);
 

@@ -134,7 +134,12 @@ procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream; const Key: AnsiStri
 ////////////////////////////
 
 type
-  TALCipherRDLVector = record
+  TALCipherRDLVector = packed record // << without the keyword packed i have under tokyo ios64 compiler this strange error:
+                                     // << Backend error: Function return type does not match operand type of return inst!
+                                     // <<   ret void
+                                     // << i64Function return type does not match operand type of return inst!
+                                     // <<   ret void
+                                     // << i64
     case Byte of
       0 : (dw : DWord);
       1 : (bt : array[0..3] of Byte);

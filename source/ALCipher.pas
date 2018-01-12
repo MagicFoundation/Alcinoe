@@ -137,7 +137,7 @@ type
 
   {$IF CompilerVersion > 32} // tokyo
     {$MESSAGE WARN 'Check if in ios64 we still need the packed keyword and adjust the IFDEF'}
-  {$ENDIF}
+  {$IFEND}
   TALCipherRDLVector = packed record // << without the keyword packed i have under tokyo ios64 compiler this strange error:
                                      // << Backend error: Function return type does not match operand type of return inst!
                                      // <<   ret void

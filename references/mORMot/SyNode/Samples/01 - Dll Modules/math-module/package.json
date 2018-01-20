@@ -1,0 +1,14 @@
+{
+  "name": "math-module",
+  "version": "1.0.0",
+  "description": "Native (dll) module sample for SyNode",
+  "main": "./build/mathModule.dll",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "SyNode"
+  ],
+  "author": "pavel.mash <pavel.mash@gmail.com> (https://unitybase.info)",
+  "license": "MIT"
+}

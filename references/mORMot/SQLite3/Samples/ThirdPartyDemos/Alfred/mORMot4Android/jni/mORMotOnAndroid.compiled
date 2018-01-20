@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\development\laz4android\fpc\3.1.1\bin\i386-win32\fpc.exe" Date="1180273523"/>
+  <Params Value=" -Tandroid -Parm -MDelphi -O3 -vn- -vh- -vewibq -FiC:\development\laz4android\examples\And\mOMRotOnAndroid\mORMot -FlC:\Users\Public\Documents\Embarcadero\Studio\15.0\PlatformSDKs\android-ndk-r9c\platforms\android-18\arch-arm\usr\lib -FlC:\Users\Public\Documents\Embarcadero\Studio\15.0\PlatformSDKs\android-ndk-r9c\toolchains\arm-linux-androideabi-4.6\prebuilt\windows\lib\gcc\arm-linux-androideabi\4.6 -FuC:\development\laz4android\examples\And\mOMRotOnAndroid\jni\And_Controls -FuC:\development\laz4android\examples\And\mOMRotOnAndroid\mORMot -FuC:\development\laz4android\examples\And\mOMRotOnAndroid\mORMot\SQLite3 -FuC:\development\laz4android\examples\And\mOMRotOnAndroid\jni\ -omORMotOnAndroid -MObjFPC -Scghi -CX  -Tandroid -Parm  -O3 -XsdX  -vew -FuAnd_Controls -FUoutput -XParm-linux-androideabi-  -o..\libs\armeabi-v7a\libmain.so mORMotOnAndroid.pas"/>
+</CONFIG>

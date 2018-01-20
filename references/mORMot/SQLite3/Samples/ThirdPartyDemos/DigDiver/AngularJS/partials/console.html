@@ -1,0 +1,67 @@
+<div class="container" style="padding-top: 70px;">
+	<div class="col-md-4 col-sm-4">
+		<div class="form-group">
+			<select class="form-control" ng-model="method">
+				<option value="GET">GET</option>
+				<option value="POST">POST</option>
+				<option value="PUT">PUT</option>
+				<option value="DELETE">DELETE</option>
+			</select>
+			<br>
+			<label for="control-label">Query Params: <button class="btn btn-xs btn-default" ng-click="addParam()"><span class="glyphicon glyphicon-plus"></span></button> <button class="btn btn-xs btn-default" ng-click="toggleRawBody()">{{rawBodyBtn}}</button> </label>
+
+			<table class="table table-fixed" ng-show="!useRawBody">
+				<tbody>
+					<tr ng-repeat="p in params">
+						<td><input type="text" class="form-control input-sm" ng-model="p.name" placeholder="Name"></td>
+						<td><input type="text" class="form-control input-sm" ng-model="p.value" placeholder="Value"></td>
+						<td style="width: 30px;"><button class="btn btn-default" ng-click="delParam($index)"><span class="glyphicon glyphicon-trash"></span></button></td>
+					</tr>					
+				</tbody>
+			</table>
+
+			<textarea class="form-control" ng-show="useRawBody" ng-model="rawBody"></textarea>
+
+			<hr>
+			<label for="control-label">Headers: <button class="btn btn-xs btn-default" ng-click="addHeader()"><span class="glyphicon glyphicon-plus"></span></button></label>
+
+			<div class="control-group">
+				<label class="control-label">Content-Type: </label>
+				<select ng-model="contentType">
+					<option value=""></option>
+					<option value="application/json">application/json</option>
+					<option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+				</select>
+			</div>
+
+			<table class="table table-fixed">				
+				<tbody>
+					<tr ng-repeat="h in headers">
+						<td><input type="text" class="form-control input-sm" ng-model="h.name" placeholder="Name"></td>
+						<td><input type="text" class="form-control input-sm" ng-model="h.value" placeholder="Value"></td>
+						<td style="width: 30px;"><button class="btn btn-default" ng-click="delHeader($index)"><span class="glyphicon glyphicon-trash"></span></button></td>
+					</tr>					
+				</tbody>
+			</table>			
+		</div>
+	</div>
+	<div class="col-md-8 col-sm-8">
+		<div class="row">
+			<div class="col-md-9 col-sm-9">
+				<div class="form-group">
+					<input type="text" class="form-control" placeholder="URI" ng-model="uri">	
+				</div>				
+			</div>
+			<div class="col-md-3 col-sm-3">
+				<button class="btn btn-primary" ng-click="sendRequest()">Send Request</button>
+			</div>
+
+		</div>
+
+		<hr>
+		<label class="control-label">Response</label>
+
+		<textarea ng-model="response" class="form-control" style="width: 100%; height: 300px;"></textarea>
+
+	</div>		
+</div>

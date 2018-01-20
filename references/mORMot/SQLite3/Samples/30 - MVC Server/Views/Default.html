@@ -1,0 +1,18 @@
+{{>header}}
+{{>masthead}}
+      <div class="blog-header">
+        <h1 class="blog-title">{{main.blog.title}}</h1>
+        <p class="lead blog-description">{{main.blog.description}}</p>
+      </div>
+      <div class="row">
+        <div class="col-sm-8 blog-main">
+{{#Scope}}
+{{>articlerow}}
+		{{#lastID}}
+		<p><a href="default?scope={lastID:{{.}},tag:{{tag}}}" class="btn btn-primary btn-sm">Previous Articles</a></p>
+		{{/lastID}}
+		{{#lastrank}}
+		<p><a href="default?scope={lastrank:{{.}},match:{{{JSONQuoteURI match}}}}" class="btn btn-primary btn-sm">Previous Articles</a></p>
+		{{/lastrank}}
+		{{/Scope}}
+{{>footer}}

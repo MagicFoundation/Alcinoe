@@ -1,0 +1,112 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = ' mORMot Client using FireMonkey'
+  ClientHeight = 301
+  ClientWidth = 605
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop, iPhone, iPad]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMobile = False
+  DesignerWidth = 0
+  DesignerHeight = 0
+  DesignerDeviceName = ''
+  DesignerOrientation = 0
+  DesignerOSVersion = ''
+  object lbl1: TLabel
+    AutoSize = True
+    Height = 16.000000000000000000
+    Position.X = 24.000000000000000000
+    Position.Y = 16.000000000000000000
+    Text = 'mORMot Client using FireMonkey'
+    Width = 181.000000000000000000
+  end
+  object edtValue: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 1
+    Position.X = 32.000000000000000000
+    Position.Y = 80.000000000000000000
+    Width = 153.000000000000000000
+    Height = 22.000000000000000000
+    OnChangeTracking = edtValueChange
+  end
+  object lbl2: TLabel
+    AutoSize = True
+    Height = 16.000000000000000000
+    Position.X = 32.000000000000000000
+    Position.Y = 56.000000000000000000
+    Text = 'Enter some text:'
+    Width = 86.000000000000000000
+  end
+  object lbl3: TLabel
+    AutoSize = True
+    Height = 16.000000000000000000
+    Position.X = 32.000000000000000000
+    Position.Y = 112.000000000000000000
+    Text = 'Computed JSON:'
+    Width = 91.000000000000000000
+  end
+  object mmoJSON: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    Height = 137.000000000000000000
+    Position.X = 32.000000000000000000
+    Position.Y = 136.000000000000000000
+    TabOrder = 4
+    Width = 545.000000000000000000
+    TextSettings.WordWrap = True
+  end
+  object grpTable: TGroupBox
+    Height = 89.000000000000000000
+    Position.X = 240.000000000000000000
+    Position.Y = 32.000000000000000000
+    Text = 'Table'
+    Width = 113.000000000000000000
+    TabOrder = 7
+    object btnRewind: TButton
+      Height = 22.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 24.000000000000000000
+      TabOrder = 5
+      Text = 'First'
+      Width = 80.000000000000000000
+      OnClick = btnNextClick
+    end
+    object btnNext: TButton
+      Height = 22.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 54.000000000000000000
+      TabOrder = 6
+      Text = 'Next'
+      Width = 80.000000000000000000
+      OnClick = btnNextClick
+    end
+  end
+  object grpORM: TGroupBox
+    Height = 89.000000000000000000
+    Position.X = 376.000000000000000000
+    Position.Y = 32.000000000000000000
+    Text = 'ORM'
+    Width = 113.000000000000000000
+    TabOrder = 6
+    object btnRewindORM: TButton
+      Height = 22.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 24.000000000000000000
+      TabOrder = 5
+      Text = 'First'
+      Width = 80.000000000000000000
+      OnClick = btnORMClick
+    end
+    object btnNextORM: TButton
+      Height = 22.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 54.000000000000000000
+      TabOrder = 6
+      Text = 'Next'
+      Width = 80.000000000000000000
+      OnClick = btnORMClick
+    end
+  end
+end

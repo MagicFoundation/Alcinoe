@@ -1,0 +1,11 @@
+<div ng-class="{ 'show': $parent.showPreview }" id="preview-container" ng-show="!log"></div>
+<div id="sentlog" ng-show="log">
+	<ul class="list-unstyled" infinite-scroll="log.nextPage()" infinite-scroll-disabled="log.busy" infinite-scroll-distance="1" infinite-scroll-box="sentlog">
+		<li title="{{itm.StatusText}}" ng-repeat="itm in log.items" class="sentlog-item" ng-class="{ 'sentlog-item-success': itm.Status === 1, 'sentlog-item-temperror': itm.Status === 2, 'sentlog-item-error': itm.Status === 3}">
+			<div class="sentlog-item-groupname">{{itm.GroupName}}<span class="sentlog-item-date">{{itm.SendDate | date:'MM/dd/yyyy @ h:mm a'}}</span></div>
+			<div class="sentlog-item-recipient">{{itm.RecipientName}} &lt;{{itm.Email}}&gt;</div>
+			<div class="sentlog-item-response"><span>{{itm.LastResponse}}</span></div>
+		</li>
+		<li class="message-list-info" ng-show="log.busy">Loading data...</li>
+	</ul>
+</div>

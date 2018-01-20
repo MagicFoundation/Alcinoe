@@ -1,0 +1,71 @@
+<div class="container">
+	<div class="row split-view editor">
+
+		<div class="col-md-9 col-sm-9">
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					<label for="subject" class="col-xs-2 control-label">Subject:</label>
+					<div class="col-xs-10">
+						<input type="text" class="form-control" ng-model="item.Subject" id="subject" placeholder="Subject">
+					</div>
+				</div>
+			</form>			
+			
+			<div class="editor-wrap">
+				<textarea class="col" id="editor" data-ck-source="item" data-ck-editor></textarea>
+			</div>
+
+		</div>
+
+		<div class="col-md-3 col-sm-3">
+			<form class="form-horizontal" role="form">
+				<button ng-click="sendNow()" class="btn btn-primary btn-md btn-margin">Send Now</button>
+				<button class="btn btn-default btn-md btn-margin" ng-click="save()">Save</button>
+
+				<div class="form-group">
+					<label for="account" class="col-xs-1 control-label">From:</label>
+					<div class="col-xs-11">
+<!-- 						<select name="from" id="from" class="form-control" ng-model="account">
+							<option value="">Select Account</option>
+							<option ng-selected="account == acc.ID" ng-repeat="acc in accounts" value="{{acc.ID}}">{{acc.AccountName}}</option>
+						</select>
+ -->
+						<gt-select gt-model="account" options="acc.ID as acc.AccountName for acc in accounts"></gt-select>
+
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="to" class="col-xs-1 control-label">To:</label>
+					<div class="col-xs-11">
+						<gt-select multiple="true" gt-model="to" options="g.ID as g.GroupName for g in groups group by g.type" plural="groups"></gt-select>
+					</div>
+				</div>			
+				<label>
+					<input type="checkbox" ng-model="enableTracking"> Track recipients' actions
+				</label>
+				<input ng-disabled="!enableTracking" type="text" class="form-control" placeholder="Campaign Name" ng-model="item.TrackName">
+
+				<div class="radio">
+					<label>
+						<input ng-disabled="!enableTracking" type="radio" ng-model="item.TrackMethod" name="analytics" id="analytics-google" value="1" checked>
+						Google analytics
+					</label>
+				</div>
+
+				<div class="radio">
+					<label>
+						<input ng-disabled="!enableTracking" type="radio" ng-model="item.TrackMethod" name="analytics" id="analytics-piwik" value="2" checked>
+						Piwik
+					</label>
+				</div>
+				<hr>
+				<label>Attachments <button ng-click="addCommonAtt()" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus"></span></button> </label>
+				<ul class="list-unstyled em-file-list">
+					<li ng-repeat="itm in item.AttachList"><i class="glyphicon glyphicon-file"></i><span>{{itm}}</span><span class="em-btn-remove"><i class="glyphicon glyphicon-trash" ng-click="removeAttachment(itm)"></i></span></li>
+				</ul>
+			</form>
+		</div>
+
+	</div>		
+</div>

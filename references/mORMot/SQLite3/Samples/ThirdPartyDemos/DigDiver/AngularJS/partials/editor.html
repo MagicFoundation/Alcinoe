@@ -1,0 +1,83 @@
+<div class="container">
+	<div class="row split-view editor">
+
+		<div class="col-md-9 col-sm-9">
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					<label for="subject" class="col-xs-2 control-label">Subject:</label>
+					<div class="col-xs-10">
+						<input type="text" class="form-control" ng-model="item.Subject" id="subject" placeholder="Subject">
+					</div>
+				</div>
+			</form>			
+			
+			<div class="editor-wrap">
+				<textarea class="col" id="editor" data-ck-source="item" data-ck-editor></textarea>
+			</div>
+
+		</div>
+
+		<div class="col-md-3 col-sm-3">
+			<form class="form-horizontal" role="form">
+
+				<div ng-if="itemType=='template'">
+					<button class="btn btn-primary btn-md" ng-click="save()">Save</button>
+
+					<div class="form-group">
+						<label for="to" class="col-xs-1 control-label">To:</label>
+						<div class="col-xs-11">
+							<gt-select multiple="true" gt-model="$parent.to" options="g.ID as g.GroupName for g in groups group by g.type" plural="groups"></gt-select>
+						</div>
+					</div>			
+
+				</div>
+				<div ng-if="itemType=='draft'">
+					<button ng-click="sendNow()" class="btn btn-primary btn-md btn-margin">Send Now</button>
+					<button class="btn btn-default btn-md btn-margin" ng-click="save()">Save</button>
+				</div>
+
+				<div ng-if="itemType=='draft'">
+					<div class="form-group">
+						<label for="account" class="col-xs-1 control-label">From:</label>
+						<div class="col-xs-11">
+							<select name="from" id="from" class="form-control">
+								<option value="">Select Account</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="to" class="col-xs-1 control-label">To:</label>
+						<div class="col-xs-11">
+							<select class="form-control" id="to">
+								<option value="">Select Group</option>
+							</select>
+						</div>
+					</div>			
+					<label>
+						<input type="checkbox"> Track recipients' actions
+					</label>
+					<input type="text" class="form-control" placeholder="Campaign Name">
+
+					<div class="radio">
+						<label>
+							<input type="radio" name="analytics" id="analytics-google" value="google" checked>
+							Google analytics
+						</label>
+					</div>
+
+					<div class="radio">
+						<label>
+							<input type="radio" name="analytics" id="analytics-piwik" value="piwik" checked>
+							Piwik
+						</label>
+					</div>
+					<hr>
+					<a href="#" ng-click="addAttachment()">Add Attachment</a>
+				</div>
+
+			</form>
+		</div>
+
+	</div>		
+</div>

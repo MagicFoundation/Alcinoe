@@ -1,0 +1,53 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 548
+  ClientWidth = 320
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMobile = True
+  DesignerWidth = 320
+  DesignerHeight = 568
+  DesignerDeviceName = 'iPhone5'
+  DesignerOrientation = 0
+  DesignerOSVersion = '7'
+  object lbl1: TLabel
+    AutoSize = True
+    Height = 23.000000000000000000
+    Position.X = 16.000000000000000000
+    Position.Y = 16.000000000000000000
+    TextSettings.WordWrap = False
+    Text = 'Enter a value:'
+    Width = 101.000000000000000000
+  end
+  object edtValue: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 2
+    Position.X = 16.000000000000000000
+    Position.Y = 40.000000000000000000
+    Width = 233.000000000000000000
+    Height = 30.000000000000000000
+    OnChangeTracking = edtValueChangeTracking
+  end
+  object lbl2: TLabel
+    AutoSize = True
+    Height = 23.000000000000000000
+    Position.X = 16.000000000000000000
+    Position.Y = 96.000000000000000000
+    TextSettings.WordWrap = False
+    Text = 'Computed JSON:'
+    Width = 129.000000000000000000
+  end
+  object mmoJSON: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    Anchors = [akLeft, akTop, akRight]
+    Height = 321.000000000000000000
+    Position.X = 16.000000000000000000
+    Position.Y = 128.000000000000000000
+    TabOrder = 4
+    Width = 273.000000000000000000
+  end
+end

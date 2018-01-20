@@ -1,0 +1,51 @@
+{{>header}}
+{{>masthead}}
+      <div class="blog-header">
+        <h1 class="blog-title">{{article.title}}</h1>
+        <div class="lead blog-description">
+		Written by <a href="authorView?id={{article.Author}}">{{article.AuthorName}}</a> ({{author.FirstName}} {{author.FamilyName}}) on {{TimeLogToText article.CreatedAt}}<br />
+		{{#article.tags}}<a href="default?scope={tag:{{.}}}" class="label label-info">{{TagToText .}}</a> {{/article.tags}}
+		</div>
+      </div>
+      <div class="row">
+        <div class="col-sm-8 blog-main">
+		  {{#article}}
+		  {{#ContentHtml}}{{{abstract}}}{{/ContentHtml}}{{^ContentHtml}}{{{WikiToHtml abstract}}}{{/ContentHtml}}
+		  <hr>
+		  {{#ContentHtml}}{{{content}}}{{/ContentHtml}}{{^ContentHtml}}{{{WikiToHtml content}}}{{/ContentHtml}}
+		  {{/article}}
+		  <hr>
+		  <ul class="pager">
+			<li class="previous"><a href="ArticleView?id={{Article.ID}}&withComments={{withComments}}&direction=1">&larr; Previous</a></li>
+			<li class="next"><a href="ArticleView?id={{Article.ID}}&withComments={{withComments}}&direction=2">Next &rarr;</a></li>
+		  </ul>
+		  <a name="comments"></a>
+		  {{#WithComments}}
+		  {{#Comments}}
+		  <blockquote>
+			<p><strong>{{Title}}</strong></p>
+			<p>{{#ContentHtml}}{{{Content}}}{{/ContentHtml}}{{^ContentHtml}}{{{WikiToHtml Content}}}{{/ContentHtml}}</p>
+			<footer>Commented on {{TimeLogToText CreatedAt}} by <a href="authorView?id={{Author}}">{{AuthorName}}</a></<footer>
+		  </blockquote>
+		  <hr>
+		  {{/Comments}}
+		  {{^Comments}}<blockquote>No comment yet.</blockquote>{{/Comments}}
+		  <p><a href="ArticleView?id={{Article.ID}}#comments" class="btn btn-primary btn-sm">Hide Comments</a></p>
+		  {{#main.session.AuthorRights.Comment}}
+		  <a name="addComment"></a>
+          <form class="form-horizontal" action="ArticleComment#addComment" method="post">
+			<div class="form-group">
+			    {{#Scope}}<div class="alert alert-danger">{{CommentError}}</div>{{/Scope}}
+				<input type="hidden" name="id" value={{Article.ID}}>
+				<input type="text" class="form-control" name="title" placeholder="Title" value="{{Scope.CommentTitle}}">
+				<textarea class="form-control" name="comment" rows="7" placeholder="Enter a new comment here">{{Scope.CommentContent}}</textarea>
+				<button type="submit" class="btn btn-primary btn-sm">Add Comment</a>
+			</div>
+		  </form>
+		  {{/main.session.AuthorRights.Comment}}
+		  </p>
+		  {{/WithComments}}
+		  {{^WithComments}}
+		  <p><a href="ArticleView?id={{Article.ID}}&withComments=true#comments" class="btn btn-primary btn-sm">Show Comments</a></p>
+		  {{/WithComments}}
+{{>footer}}

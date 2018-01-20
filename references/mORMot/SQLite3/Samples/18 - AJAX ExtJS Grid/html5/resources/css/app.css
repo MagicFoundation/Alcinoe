@@ -1,0 +1,52 @@
+.x-fit-item {
+	margin: 0pt; font-size: 40px;
+	font-weight: bold;
+	background-image: url(../images/error.png) !important;
+}
+
+.icon-search {
+     background-image: url(../images/search.gif) !important;
+}
+
+.icon-default {
+     background-image: url(../images/default.gif) !important;
+}
+
+.icon-filter {
+     background-image: url(../images/filter.gif) !important;
+}
+						  
+.icon-user {
+    background-image: url(../images/user.png) !important;
+}
+
+.icon-user-add {
+    background-image: url(../images/user_add.gif) !important;
+}
+
+.icon-save {
+    background-image: url(../images/save.gif) !important;
+}
+
+.icon-reset {
+    background-image: url(../images/stop.png) !important;
+}
+
+.icon-grid {
+    background-image: url(../images/grid.png) !important;
+}
+
+.icon-add {
+    background-image: url(../images/add.png) !important;
+}
+
+.icon-delete {
+    background-image: url(../images/delete.png) !important;
+}
+.x-panel-header-default {
+    background-color: #FFFD3E1F1;
+}
+.x-panel-header-text-default {
+    color: FFFD3E1F1;
+    font-family: tahoma,arial,verdana,sans-serif;
+}

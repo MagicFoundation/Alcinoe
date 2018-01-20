@@ -1,0 +1,231 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>mORMot FishFacts >> by warleyalex</title>
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+	<script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript">
+	function gxr(){var xdr=null;if(window.XDomainRequest){xdr=new XDomainRequest();}else if(window.XMLHttpRequest){xdr=new XMLHttpRequest();} return xdr;}
+	
+	function GetKeys(url) {
+		var xdr = gxr();
+		xdr.onload = function () {
+			jsonData = JSON.parse(request.responseText);
+		}
+		xdr.onerror = function () {
+			alert("Error");
+		}
+		xdr.open("GET", url);
+		xdr.send();
+	}
+
+	function addOption(selectbox, text, value) {
+		var o = document.createElement("OPTION");
+		o.text = text;
+		o.value = value;
+		selectbox.options.add(o);
+	}
+
+	function getL() {
+		return document.getElementById('l');
+	}
+
+	function getUp() {
+		return document.getElementById('up');
+	}
+
+	function getDown() {
+		return document.getElementById('down');
+	}
+
+	function maquina() {
+		refreshFacts();
+	}
+
+	function refreshFacts() {
+		var l = getL();
+		var xdr = gxr();
+		xdr.onload = function () {
+			jsonData = JSON.parse(xdr.responseText);
+			var len = jsonData.length;
+			for (i = 0; i < len; i++) {
+				var o = document.createElement("OPTION");
+				s = jsonData;
+				o.text = s[i].Species_No;
+				o.value = s[i].Species_No;
+				l.options.add(o);
+			}
+			if (l.length > 0) {
+				l.selectedIndex = 0;
+			}
+			selectionChange();
+		}
+		xdr.onerror = function () {
+			alert("Error");
+		}
+		xdr.open('GET', 'http://localhost:8080/root/Biolife');
+		xdr.send();
+	}
+
+	function setInnerText(id, s) {
+		var e = document.getElementById(id);
+		if (e != null) {
+			e.innerHTML = s;
+		}
+	}
+
+	function roundNumber(num, dec) {
+		var result = Math.round(num * Math.pow(10, dec)) / Math.pow(10, dec);
+		return result;
+	}
+
+	function selectionChange() {
+		var l = getL();
+		getUp().disabled = (l.length == 0) || (l.selectedIndex == 0);
+		getDown().disabled = (l.length == 0) || (l.selectedIndex == l.length - 1);
+		var key = l.value;
+		var notas = function () {
+			var xdr = gxr();
+			xdr.onload = function () {
+				jsonData = JSON.parse(xdr.responseText);
+				setInnerText('memo', jsonData.Notes);
+				setInnerText('about', 'About the ' + jsonData.Common_Name);
+				setInnerText('picturecaption', jsonData.Common_Name);
+				setInnerText('category', jsonData.Category);
+				setInnerText('species', jsonData.Species_Name);
+				setInnerText('lengthcm', roundNumber(jsonData.Length_cm, 2));
+				setInnerText('lengthin', roundNumber(jsonData.Length_In, 2));
+				img = document.getElementById('image');
+				if (img != null) {
+					img.src = 'http://localhost:8080/root/Biolife/' + key + '/Graphic';
+				}
+			}
+			xdr.onerror = function () {
+				alert("Error");
+			}
+			xdr.open('GET', 'http://localhost:8080/root/Biolife/' + key);
+			xdr.send();
+		}
+		notas();
+	}
+
+	function onSelectionChange() {
+		selectionChange();
+	}
+
+	function up() {
+		var l = getL();
+		if (l.selectedIndex > 0) {
+			l.selectedIndex--;
+			selectionChange();
+		}
+	}
+
+	function down() {
+		var l = getL();
+		if (l.selectedIndex < l.length - 1) {
+			l.selectedIndex++;
+			selectionChange();
+		}
+	}
+
+	function onUp() {
+		up();
+	}
+
+	function onDown() {
+		down();
+	}
+    </script>
+  </head>
+  <body onload="maquina()">
+	  <img src="images/fishfacts.jpg" width="80%"  /></br></br>
+      <div id="contentdiv" class="contentdiv">
+        <div class="outerTableDiv">
+          <table class="outerTable">
+            <tr>
+              <td class="innertable" style="width:100%">
+                <table class="innerTable">
+                  <tr>
+                    <td class="innertable" style="width: 50%">
+                      <div class="divpadding">
+                        <table id="fishimageandtitle" class="innerTable">
+                          <tr>
+                            <td class="innertable">
+                              <div class="imagediv">
+                              <img id="image" alt="" xstyle="width:100%;background-color:blue"/>
+                              </div></td>
+                          </tr>
+                          <tr>
+                            <td>
+                              <div class="captiondiv"><span id="picturecaption" class="fishname" >Clown Triggerfish</span>
+                              </div></td>
+                          </tr>
+                        </table>
+                      </div></td>
+                    <td class="innertable">
+                      <div class="divpadding">
+                        <table class="innerTable">
+                          <tr>
+                            <td>
+                              <div class="captiondiv"><span id="about" class="aboutText">About goes here</span>
+                              </div></td>
+                          </tr>
+                          <tr>
+                            <td class="innertable">
+                              <div id="memo" class="memoDiv"> Details go here </div></td>
+                          </tr>
+                        </table>
+                      </div></td>
+                  </tr>
+                  <tr>
+                    <td class="innertable" colspan="2">
+                      <table class="innertable">
+                        <tr>
+                          <td>
+                            <table class="innertable">
+                            <tr>
+                            <td>
+                                <table class="detailstable">
+                                <tr>
+                                  <th  class="detailstable">Category</th>
+                                  <th class="detailstable">Species Name</th>
+                                  <th class="detailstable">Length(cm)</th>
+                                  <th class="detailstable" style="width:100%">Length(in)</th>
+                                </tr>
+                                <tr>
+                                <td class="detailstable"><span id="category"></span></td>
+                                <td class="detailstable"><span id="species"></span></td>
+                                <td class="detailstable" style="text-align: right"><span id="lengthcm"></span></td>
+                                <td class="detailstable" style="width:100%; text-align:right"><span id="lengthin"></span></td>
+                                </tr>
+                                </table>
+                            </td>
+                            <td class ="innertable" style="width:3em">
+                              <table class="innertable" >
+                              <tr>
+                                <td><button id="up" class="btnUp" style="width:2em;height:2.5em;padding-top:.1em" onclick="onUp();">^</button></td>
+                              </tr>
+                              <tr>
+                                <td><button id="down" class="btnDown"style="width:2em;height:2.5em" onclick="onDown();">v</button></td>
+                              </tr>
+                              </table>
+                            </td>                            
+                            </table> 
+                          </td>
+                        </tr>
+                      </table></td>
+                  </tr>
+                </table></td>
+              <td class="innertable" style="WIDTH: 0%">
+                <table class="innerTable">
+                  <tr>
+                    <td class="innerTable"><select id="l" onchange="onSelectionChange()" size="4" style="border-style: none; width: 100%; height: 100%"></select></td>
+                  </tr>
+                </table></td>
+            </tr>
+          </table>
+        </div>
+      </div>
+  </body>
+</html>

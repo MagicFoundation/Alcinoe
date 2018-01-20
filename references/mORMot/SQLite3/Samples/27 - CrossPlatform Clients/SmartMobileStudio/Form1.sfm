@@ -1,0 +1,96 @@
+<SMART>
+  <Form version="2" subversion="1">
+    <Created>2014-08-10T14:52:31.247</Created>
+    <Modified>2014-08-10T16:08:54.867</Modified>
+    <object type="TW3Form">
+      <Caption>W3Form</Caption>
+      <Name>Form1</Name>
+      <object type="TW3Panel">
+        <Width>264</Width>
+        <Visible>False</Visible>
+        <Top>96</Top>
+        <Left>40</Left>
+        <Height>264</Height>
+        <Name>PanelCompute</Name>
+        <object type="TW3Label">
+          <Caption>A =</Caption>
+          <Width>32</Width>
+          <Top>32</Top>
+          <Left>56</Left>
+          <Height>32</Height>
+          <Name>W3Label1</Name>
+        </object>
+        <object type="TW3EditBox">
+          <Value></Value>
+          <Text>1</Text>
+          <Range></Range>
+          <Width>128</Width>
+          <Top>32</Top>
+          <Left>88</Left>
+          <Height>32</Height>
+          <Name>EditA</Name>
+        </object>
+        <object type="TW3Label">
+          <Caption>B =</Caption>
+          <Width>32</Width>
+          <Top>72</Top>
+          <Left>56</Left>
+          <Height>32</Height>
+          <Name>W3Label2</Name>
+        </object>
+        <object type="TW3EditBox">
+          <Value></Value>
+          <Text>1</Text>
+          <Range></Range>
+          <Width>128</Width>
+          <Top>72</Top>
+          <Left>88</Left>
+          <Height>32</Height>
+          <Name>EditB</Name>
+        </object>
+        <object type="TW3Button">
+          <Caption>Compute Asynch</Caption>
+          <Width>168</Width>
+          <Top>112</Top>
+          <Left>48</Left>
+          <Height>40</Height>
+          <Name>BtnComputeAsynch</Name>
+          <OnClick>BtnComputeAsynchClick</OnClick>
+        </object>
+        <object type="TW3Label">
+          <Width>152</Width>
+          <Top>208</Top>
+          <Left>64</Left>
+          <Height>32</Height>
+          <Name>LabelResult</Name>
+        </object>
+        <object type="TW3Button">
+          <Caption>Compute Synch</Caption>
+          <Width>168</Width>
+          <Top>160</Top>
+          <Left>48</Left>
+          <Height>40</Height>
+          <Name>BtnComputeSynch</Name>
+          <OnClick>BtnComputeSynchClick</OnClick>
+        </object>
+      </object>
+      <object type="TW3Label">
+        <Caption>&lt;small&gt;Project14ServerHttpWrapper should be running!</Caption>
+        <Width>376</Width>
+        <Top>16</Top>
+        <Left>24</Left>
+        <Height>32</Height>
+        <Name>LabelConnect</Name>
+      </object>
+      <object type="TW3Button">
+        <Caption>Server Connect</Caption>
+        <Width>176</Width>
+        <Top>48</Top>
+        <Left>40</Left>
+        <Height>40</Height>
+        <Name>BtnConnect</Name>
+        <OnClick>BtnConnectClick</OnClick>
+      </object>
+    </object>
+  </Form>
+</SMART>

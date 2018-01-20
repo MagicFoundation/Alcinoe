@@ -1,0 +1,16 @@
+        {{#articles}}
+		  <div class="blog-post">
+            <h2 class="blog-post-title"><a href=articleView?id={{id}}>{{Title}}</a></h2>
+            <p class="blog-post-meta">
+			{{TimeLogToText CreatedAt}} by <a href="authorView?id={{Author}}">{{AuthorName}}</a><br />
+			{{#Tags}}<a href="default?scope={tag:{{.}}}" class="label label-info">{{TagToText .}}</a> {{/Tags}}
+			</p>
+			{{#ContentHtml}}{{{Abstract}}}{{/ContentHtml}}{{^ContentHtml}}{{{WikiToHtml Abstract}}}{{/ContentHtml}}
+			<p><a href=articleView?id={{id}} class="label label-primary">Read More</a></p>
+		  </div>
+        {{/articles}}
+        {{^articles}}
+		  <div class="blog-post">
+		  <p>There is no more article corresponding to this research criteria.</p>
+		  </div>
+        {{/articles}}

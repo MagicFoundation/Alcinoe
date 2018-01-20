@@ -1,0 +1,40 @@
+<div class="container">
+	<div class="row split-view editor">
+
+		<div class="col-md-9 col-sm-9">
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					<label for="subject" class="col-xs-2 control-label">Subject:</label>
+					<div class="col-xs-10">
+						<input type="text" class="form-control" ng-model="item.Subject" id="subject" placeholder="Subject">
+					</div>
+				</div>
+			</form>			
+			
+			<div class="editor-wrap">
+				<textarea class="col" id="editor" data-ck-source="item" data-ck-editor></textarea>
+			</div>
+
+		</div>
+
+		<div class="col-md-3 col-sm-3">
+			<form class="form-horizontal" role="form">
+				<button class="btn btn-primary btn-md" ng-click="save()">Save</button>
+
+				<div class="form-group">
+					<label for="to" class="col-xs-1 control-label">To:</label>
+					<div class="col-xs-11">
+						<gt-select multiple="true" gt-model="to" options="g.ID as g.GroupName for g in groups group by g.type" plural="groups"></gt-select>
+					</div>
+				</div>
+
+				<label>Attachments <button ng-click="addCommonAtt()" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus"></span></button> </label>
+				<ul class="list-unstyled em-file-list">
+					<li ng-repeat="itm in item.AttachList"><i class="glyphicon glyphicon-file"></i> {{itm}} <span class="em-btn-remove"><i class="glyphicon glyphicon-trash"></i></span></li>
+				</ul>				
+
+			</form>
+		</div>
+
+	</div>		
+</div>

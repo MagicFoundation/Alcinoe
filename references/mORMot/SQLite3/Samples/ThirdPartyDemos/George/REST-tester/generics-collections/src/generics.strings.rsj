@@ -1,0 +1,6 @@
+{"version":1,"strings":[
+{"hash":30419045,"name":"generics.strings.sargumentoutofrange","sourcebytes":[65,114,103,117,109,101,110,116,32,111,117,116,32,111,102,32,114,97,110,103,101],"value":"Argument out of range"},
+{"hash":232751305,"name":"generics.strings.sduplicatesnotallowed","sourcebytes":[68,117,112,108,105,99,97,116,101,115,32,110,111,116,32,97,108,108,111,119,101,100,32,105,110,32,100,105,99,116,105,111,110,97,114,121],"value":"Duplicates not allowed in dictionary"},
+{"hash":77292148,"name":"generics.strings.sdictionarykeydoesnotexist","sourcebytes":[68,105,99,116,105,111,110,97,114,121,32,107,101,121,32,100,111,101,115,32,110,111,116,32,101,120,105,115,116],"value":"Dictionary key does not exist"},
+{"hash":215226916,"name":"generics.strings.sitemnotfound","sourcebytes":[73,116,101,109,32,110,111,116,32,102,111,117,110,100],"value":"Item not found"}
+]}

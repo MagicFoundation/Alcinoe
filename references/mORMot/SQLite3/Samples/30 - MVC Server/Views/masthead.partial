@@ -1,0 +1,47 @@
+  </head>
+  <body>
+    <div class="blog-masthead">
+    <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+			<div class="navbar-left">
+              <a class="navbar-brand" href="default">{{main.blog.title}}</a>
+			</div>
+			<div class="navbar-form navbar-right">
+			  <form action="articleMatch" method="post">
+				<div class="form-group">
+				<input type="text" class="form-control" name="match" placeholder="Search Expression">
+				</div>
+			  </form>
+			</div>
+        </div>
+        <center>
+            <div class="navbar-collapse collapse" id="navbar-main">
+				{{#main.session}}
+				<div class="navbar-right">
+					<form class="navbar-form" action="logout">
+					<span class="navbar-text">Signed in as <a href=AuthorView?id={{AuthorID}}>{{AuthorName}}</a></span>
+					<button class="btn" type="submit">Logout</button>
+					</form>
+				</div>
+				{{/main.session}}
+				{{^main.session}}
+                <form class="navbar-form navbar-right" action="login" method="post">
+				  <div class="form-group">
+                  <input type="text" class="form-control" name="LogonName" placeholder="Username">
+                  <input type="password" class="form-control" name="PlainPassword" placeholder="Password">
+				  </div>
+                  <button type="submit" class="btn btn-default">Sign In</button>
+                </form>
+				{{/main.session}}
+            </div>
+        </center>
+    </div>
+    </div>
+    </div>
+    <div class="container">

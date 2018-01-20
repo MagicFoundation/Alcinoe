@@ -1,0 +1,20 @@
+<div class="container" ng-controller="TopToolbarCtrl">
+	<div class="top-toolbar">		
+		<div class="row">
+			<div class="col-md-9 col-sm-9">
+				<h4>
+					<ol class="breadcrumb" ng-show="itemParams">
+						<li><a href="#/workplaces/{{workplace.ID}}/{{itemParams.root}}">{{itemParams.root | capitalize}}</a></li>
+						<li ng-show="itemParams.folder"><a href="#/workplaces/{{workplace.ID}}/{{itemParams.root}}/{{itemParams.folder}}">{{itemParams.folder}}</a></li>
+						<li class="active">{{itemParams.item.Subject}}</li>
+					</ol>
+				</h4>				
+			</div>
+			<div class="col-md-3 col-sm-3">
+				<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+			</div>
+		</div>
+
+	</div>
+</div>
+<hr class="toolbar-hr">	

@@ -1,0 +1,21 @@
+<div ng-controller="ContactsCtrl" class="contacts-view">
+	<div class="row">			
+		<div class="col-xs-12 hide-xs-only" style="text-align: center;" >Please select group from the menu.</div>
+		<!---  mobile menu -->
+		<ul class="contacts-group-menu show-xs-only">
+			<li>		
+				<h5>My Databases</h5>
+				<ul class="nav">
+					<li ng-class="{'active': g.ID == gid}" ng-repeat="g in groups.db"><a href="#/workplaces/{{wpid}}/contacts/{{g.placement}}/{{g.ID}}">{{g.GroupName}}</a></li>
+				</ul>
+			</li>
+			<li>
+				<h5>My Groups</h5>
+				<ul class="nav">
+					<li ng-class="{'active': g.ID == gid}" ng-repeat="g in groups.local"><a href="#/workplaces/{{wpid}}/contacts/{{g.placement}}/{{g.ID}}">{{g.GroupName}}</a></li>
+				</ul>
+			</li>
+		</ul>
+		<!---  /mobile menu -->	
+	</div>		
+</div>		

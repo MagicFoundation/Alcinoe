@@ -1,0 +1,29 @@
+        </div>
+        <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          <div class="sidebar-module sidebar-module-inset">
+            <h4>About</h4>
+            {{{WikiToHtml main.blog.about}}}
+          </div>
+          <div class="sidebar-module">
+            <h4>Archives</h4>
+            <ol class="list-unstyled">
+			  {{#main.archives}}
+              <li><a href="default?scope={lastID:{{FirstID}}}">{{MonthToText PublishedMonth}}</a></li>
+			  {{/main.archives}}
+            </ol>
+          </div>
+          <div class="sidebar-module">
+            <h4>Tags</h4>
+			  {{#main.tags}}
+              <a href="default?scope={tag:{{tagID}}}" class="btn btn-info btn-xs">{{ident}} <span class="badge">{{occurence}}</span></a>
+			  {{/main.tags}}
+          </div>
+		</div>
+    </div><!-- container -->
+    <div class="blog-footer">
+      <p>Proudly using the Open Source <a href="http://mormot.net">mORMot ORM/SOA/MVC Framework</a>.<br>
+      <small>{{{main.blog.copyright}}}</small></p>
+      <p><a href="#">Back to top</a></p>
+    </div>
+  </body>
+</html>

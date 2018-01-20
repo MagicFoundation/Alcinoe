@@ -1,0 +1,49 @@
+<div class="container top-toolbar" ng-controller="TopToolbarCtrl">
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="btn-group btn-page-main">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+					{{uiSection}} <span class="show-xs-only-inline dvdr" > {{section | capitalize}} <span ng-if="subSection" class="dvdr">{{subSection}}</span></span> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li>
+						<a href="#/workplaces/{{workplace.ID}}/outbox">Emails</a>
+						<!---  mobile menu -->
+						<ul class="nav show-xs-only" role="menu">
+							<li>
+								<a href="#/workplaces/{{workplace.ID}}/templates">Templates</a>
+								<ul class="nav">
+									<li ng-repeat="(catId, cat) in templateCats"><a href="#/workplaces/{{workplace.ID}}/templates/folder/{{catId}}"><span class="glyphicon glyphicon-folder-close"></span> {{cat}}</a></li>
+									<li sub="trash"><a href="#/workplaces/{{workplace.ID}}/templates/trash"><span class="glyphicon glyphicon-trash"></span> Trash</a></li>							
+								</ul>
+							</li>
+							<li class="divider"></li>
+							<li>
+								<a href="#/workplaces/{{workplace.ID}}/drafts">Drafts</a>
+								<ul class="nav">
+									<li><a href="#/workplaces/{{workplace.ID}}/drafts/trash"><span class="glyphicon glyphicon-trash"></span> Trash</a></li>	
+								</ul>
+							</li>
+							<li class="divider"></li>						
+							<li>
+								<a href="#/workplaces/{{workplace.ID}}/outbox">Outbox</a>
+								<ul class="nav">
+									<li><a href="#/workplaces/{{workplace.ID}}/outbox/trash"><span class="glyphicon glyphicon-trash"></span> Trash</a></li>	
+								</ul>
+							</li>						
+						</ul>				
+						<!---  /mobile menu -->		
+					</li>
+					<li><a href="#/workplaces/{{workplace.ID}}/contacts">Contacts</a></li>
+				</ul>
+			</div>
+			<div class="toolbar-separator"></div>
+			<button id="gl-btn-compose" type="button" class="hide-xs-only-inline btn btn-success btn-sm" ng-click="compose()">Compose</button>
+			<div class="hide-xxs-only-inline">
+				<button ng-show="emlCanBeSent" type="button" ng-click="startSending()" class="btn btn-primary" ng-click="startSending">Start sending</button>
+				<button ng-show="emlCanBeStopped" ng-click="stopSending()" type="button" class="btn btn-default">Stop</button>				
+			</div>
+		</div>
+	</div>
+</div>
+<hr class="toolbar-hr">	

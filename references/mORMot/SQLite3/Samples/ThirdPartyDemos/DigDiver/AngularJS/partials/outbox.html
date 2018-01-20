@@ -1,0 +1,29 @@
+<div ng-controller="EmailsCtrl">
+	<div class="row split-view">
+		<div class="col-sm-6" id="messages-list-wrap">
+			<ul class="messages-list" infinite-scroll='emails.nextPage()' infinite-scroll-disabled='emails.busy' infinite-scroll-distance='1' infinite-scroll-box="messages-list-wrap">
+				<li ng-repeat="eml in emails.items" ng-click="emlClick(eml)" eml-id="{{eml.ID}}" ng-class="{'active': eml.ID == emails.activeItem}">
+					<table>
+						<tr>
+							<td><span class="message-subject">{{eml.Subject}}</span></td>
+							<td><span class="message-date">{{eml.CreateTime | date:'MM/dd/yyyy @ h:mm a'}}</span></td>
+						</tr>
+						<tr>
+							<td>
+								<span ng-repeat="g in eml.resGroupList" class="message-template">{{g.GroupName}}</span>
+							</td>
+							<td ng-repeat="a in eml.resAccountList">
+								<span class="message-group">{{a.AccountName}}</span>
+							</td>
+						</tr>
+					</table>							
+					<span class="message-links"><a href="#/workplaces/{{wpid}}/outbox/{{eml.ID}}/log" em-nobubble>{{eml.StatusMessage}}</a> | <a href="#" class="text-danger" ng-click="emDelete(eml)" em-nobubble>Delete</a></span>
+					<span class="message-links pull-right"><a href="#/workplaces/{{wpid}}/outbox/{{eml.ID}}/processed" em-nobubble>Processed: {{eml.Processed}}</a> | <a href="#/workplaces/{{wpid}}/outbox/{{eml.ID}}/sent" em-nobubble>Sent: {{eml.Sent}}</a> | <a href="#/workplaces/{{wpid}}/outbox/{{eml.ID}}/failed" em-nobubble>Failed: {{eml.Failed}}</a></span>
+				</li>
+				<li class="message-list-info" ng-show="emails.busy">Loading data...</li>
+				<li class="message-list-info" ng-show="!emails.items.length && emails.noMoreData">No emails here yet</li>
+			</ul>
+		</div>
+		<div class="col-sm-6" id="item-details" ui-view="itemdetails"></div>
+	</div>		
+</div>		

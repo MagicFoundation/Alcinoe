@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{main.blog.language}}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="ROBOTS" content="INDEX, FOLLOW" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{main.blog.description}}">
+    <meta name="copyright" content="{{{main.blog.copyright}}}" />
+    <meta name="author" content="{{#Author}}{{FirstName}}{{FamilyName}}{{/Author}}">
+    <link rel="icon" href=".static/blog.ico">
+    <title>{{pageTitle}}{{^pageTitle}}{{main.blog.title}} {{pageName}}{{/pageTitle}}</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href=".static/blog.css" rel="stylesheet">

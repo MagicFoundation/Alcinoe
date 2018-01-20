@@ -1,0 +1,102 @@
+{ This is an automatically generated lazarus resource file }
+
+LazarusResources.Add('TForm1','FORMDATA',[
+  'TPF0'#6'TForm1'#5'Form1'#4'Left'#2'1'#6'Height'#3'y'#1#3'Top'#2'}'#5'Width'#3
+  +'L'#4#7'Caption'#6#20'SRV.mORMot REST test'#12'ClientHeight'#3'y'#1#11'Clien'
+  +'tWidth'#3'L'#4#5'Color'#7#9'clBtnFace'#21'Constraints.MinHeight'#3'E'#1#20
+  +'Constraints.MinWidth'#3'L'#4#10'Font.Color'#7#12'clWindowText'#11'Font.Heig'
+  +'ht'#2#245#9'Font.Name'#6#6'Tahoma'#8'OnCreate'#7#10'FormCreate'#9'OnDestroy'
+  +#7#11'FormDestroy'#8'Position'#7#14'poScreenCenter'#10'LCLVersion'#6#3'1.7'#0
+  +#6'TLabel'#12'LabelPortCap'#4'Left'#3's'#3#6'Height'#2#13#3'Top'#2#28#5'Widt'
+  +'h'#2#24#7'Anchors'#11#5'akTop'#7'akRight'#0#7'Caption'#6#5'Port:'#11'Parent'
+  +'Color'#8#0#0#6'TLabel'#23'LabelAuthenticationMode'#4'Left'#2'%'#6'Height'#2
+  +#13#3'Top'#2'&'#5'Width'#2'J'#7'Caption'#6#15'Authentication:'#11'ParentColo'
+  +'r'#8#0#0#6'TLabel'#13'LabelProtocol'#4'Left'#2'D'#6'Height'#2#13#3'Top'#2#11
+  +#5'Width'#2'+'#7'Caption'#6#9'Protocol:'#11'ParentColor'#8#0#0#6'TLabel'#14
+  +'LabelHTTPSnote'#4'Left'#3#255#1#6'Height'#2#13#3'Top'#2#11#5'Width'#3#235#0
+  +#7'Caption'#6'1Don''t forget enable https support (check exe dir)'#10'Font.C'
+  +'olor'#3#136#0#11'Font.Height'#2#245#9'Font.Name'#6#6'Tahoma'#11'ParentColor'
+  +#8#10'ParentFont'#8#7'Visible'#8#0#0#5'TEdit'#8'EditPort'#4'Left'#3#145#3#6
+  +'Height'#2#21#3'Top'#2#25#5'Width'#2'<'#7'Anchors'#11#5'akTop'#7'akRight'#0#8
+  +'TabOrder'#2#0#4'Text'#6#3'777'#0#0#7'TButton'#15'ButtonStartStop'#4'Left'#3
+  +#217#3#6'Height'#2'!'#3'Top'#2#19#5'Width'#2'i'#7'Anchors'#11#5'akTop'#7'akR'
+  +'ight'#0#7'Caption'#6#12'Start server'#10'Font.Color'#7#12'clWindowText'#11
+  +'Font.Height'#2#245#9'Font.Name'#6#6'Tahoma'#10'Font.Style'#11#6'fsBold'#0#7
+  +'OnClick'#7#20'ButtonStartStopClick'#10'ParentFont'#8#8'TabOrder'#2#1#0#0#5
+  +'TMemo'#7'MemoLog'#4'Left'#2#8#6'Height'#2'E'#3'Top'#3#16#1#5'Width'#3':'#4#7
+  +'Anchors'#11#5'akTop'#6'akLeft'#7'akRight'#8'akBottom'#0#10'Font.Color'#7#12
+  +'clWindowText'#11'Font.Height'#2#244#9'Font.Name'#6#8'Consolas'#10'ParentFon'
+  +'t'#8#10'ScrollBars'#7#10'ssVertical'#8'TabOrder'#2#2#0#0#7'TButton'#9'Butto'
+  +'nCLS'#4'Left'#2#10#6'Height'#2#22#3'Top'#3'['#1#5'Width'#2'&'#7'Anchors'#11
+  +#6'akLeft'#8'akBottom'#0#7'Caption'#6#3'CLS'#7'OnClick'#7#14'ButtonCLSClick'
+  +#8'TabOrder'#2#3#0#0#9'TCheckBox'#18'CheckBoxAutoScroll'#4'Left'#2'9'#6'Heig'
+  +'ht'#2#19#3'Top'#3'['#1#5'Width'#2'E'#7'Anchors'#11#6'akLeft'#8'akBottom'#0#7
+  +'Caption'#6#11'auto scroll'#7'Checked'#9#5'State'#7#9'cbChecked'#8'TabOrder'
+  +#2#4#0#0#9'TComboBox'#22'ComboBoxAuthentication'#4'Left'#2'u'#6'Height'#2#21
+  +#3'Top'#2'#'#5'Width'#3#132#1#10'ItemHeight'#2#13#9'ItemIndex'#2#1#13'Items.'
+  +'Strings'#1#6#17'No authentication'#6#7'Default'#6#4'None'#6#9'HttpBasic'#6#4
+  +'SSPI'#0#8'OnChange'#7#28'ComboBoxAuthenticationChange'#5'Style'#7#14'csDrop'
+  +'DownList'#8'TabOrder'#2#5#4'Text'#6#7'Default'#0#0#7'TButton'#27'ButtonShow'
+  +'AuthorizationInfo'#4'Left'#3#255#1#6'Height'#2#19#3'Top'#2'$'#5'Width'#2'*'
+  +#7'Caption'#6#4'Info'#7'OnClick'#7' ButtonShowAuthorizationInfoClick'#8'TabO'
+  +'rder'#2#6#0#0#9'TCheckBox'#18'CheckBoxDisableLog'#4'Left'#3#133#0#6'Height'
+  +#2#19#3'Top'#3'['#1#5'Width'#3#204#0#7'Anchors'#11#6'akLeft'#8'akBottom'#0#7
+  +'Caption'#6'&disable log (for max performance test)'#7'OnClick'#7#23'CheckBo'
+  +'xDisableLogClick'#8'TabOrder'#2#7#0#0#9'TComboBox'#16'ComboBoxProtocol'#4'L'
+  +'eft'#2'u'#6'Height'#2#21#3'Top'#2#8#5'Width'#3#132#1#13'DropDownCount'#2#10
+  +#10'ItemHeight'#2#13#9'ItemIndex'#2#7#13'Items.Strings'#1#6#28'HTTP         '
+  +'     ( socket )'#6'I '#226#128#186' HTTP           ( fast http.sys // requi'
+  +'re admin rights else socket )'#6'D '#226#128#186#226#128#186' HTTPS        '
+  +'( fast http.sys + SSL // require admin rights )'#6'K '#226#128#186' HTTP   '
+  +'        ( fast http.sys + AES-CFB 256 // require admin rights )'#6' HTTP   '
+  +'           ( web socket )'#6'& '#226#128#186' WebSocket ( bidirectional, JS'
+  +'ON )'#6'( '#226#128#186' WebSocket ( bidirectional, binary )'#6'5 '#226#128
+  +#186' WebSocket ( bidirectional, binary + AES-CFB 256)'#6#10'Named pipe'#0#8
+  +'OnChange'#7#22'ComboBoxProtocolChange'#5'Style'#7#14'csDropDownList'#8'TabO'
+  +'rder'#2#8#4'Text'#6'5 '#226#128#186' WebSocket ( bidirectional, binary + AE'
+  +'S-CFB 256)'#0#0#9'TGroupBox GroupBoxMethodGroupConfiguration'#4'Left'#3#164
+  +#0#6'Height'#3#203#0#3'Top'#2'>'#5'Width'#3#8#2#7'Caption'#6#28'Method / Gro'
+  +'up configuration'#12'ClientHeight'#3#185#0#11'ClientWidth'#3#4#2#8'TabOrder'
+  +#2#9#0#9'TListView'#20'ListViewMethodGroups'#4'Left'#2#10#6'Height'#3#133#0#3
+  +'Top'#2#16#5'Width'#3#247#1#7'Columns'#14#1#7'Caption'#6#7' Method'#5'Width'
+  +#3#150#0#0#1#7'Caption'#6#20' Allow group by name'#5'Width'#3#160#0#0#1#7'Ca'
+  +'ption'#6#19' Deny group by name'#5'Width'#3#160#0#0#0#13'HideSelection'#8#8
+  +'ReadOnly'#9#9'RowSelect'#9#8'TabOrder'#2#0#9'ViewStyle'#7#8'vsReport'#7'OnC'
+  +'lick'#7#25'ListViewMethodGroupsClick'#12'OnSelectItem'#7#30'ListViewMethodG'
+  +'roupsSelectItem'#0#0#7'TButton'#27'ButtonSaveRoleConfiguration'#4'Left'#3
+  +#207#1#6'Height'#2#25#3'Top'#3#155#0#5'Width'#2'2'#7'Caption'#6#4'Save'#7'On'
+  ,'Click'#7' ButtonSaveRoleConfigurationClick'#8'TabOrder'#2#1#0#0#5'TEdit'#19
+  +'EditAllowGroupNames'#4'Left'#3#136#0#6'Height'#2#21#3'Top'#3#157#0#5'Width'
+  +#3#160#0#8'TabOrder'#2#2#8'TextHint'#6#31'Allow group names  (sep by ",")'#0
+  +#0#5'TEdit'#23'EditDenyAllowGroupNames'#4'Left'#3'*'#1#6'Height'#2#21#3'Top'
+  +#3#157#0#5'Width'#3#159#0#8'TabOrder'#2#3#8'TextHint'#6#29'Deny group names '
+  +'(sep by ",")'#0#0#0#11'TRadioGroup'#29'RadioGroupAuthorizationPolicy'#4'Lef'
+  +'t'#2#8#6'Height'#2'I'#3'Top'#2'>'#5'Width'#3#150#0#8'AutoFill'#9#7'Caption'
+  +#6#20'Authorization policy'#28'ChildSizing.LeftRightSpacing'#2#6#29'ChildSiz'
+  +'ing.EnlargeHorizontal'#7#24'crsHomogenousChildResize'#27'ChildSizing.Enlarg'
+  +'eVertical'#7#24'crsHomogenousChildResize'#28'ChildSizing.ShrinkHorizontal'#7
+  +#14'crsScaleChilds'#26'ChildSizing.ShrinkVertical'#7#14'crsScaleChilds'#18'C'
+  +'hildSizing.Layout'#7#29'cclLeftToRightThenTopToBottom'#27'ChildSizing.Contr'
+  +'olsPerLine'#2#1#12'ClientHeight'#2'7'#11'ClientWidth'#3#146#0#9'ItemIndex'#2
+  +#2#13'Items.Strings'#1#6#9'Allow all'#6#8'Deny all'#6#22'Follow groups setti'
+  +'ngs'#0#7'OnClick'#7'"RadioGroupAuthorizationPolicyClick'#8'TabOrder'#2#10#0
+  +#0#9'TGroupBox'#13'GroupBoxUsers'#4'Left'#3#178#2#6'Height'#3#203#0#3'Top'#2
+  +'>'#5'Width'#3#127#1#7'Caption'#6#5'Users'#12'ClientHeight'#3#185#0#11'Clien'
+  +'tWidth'#3'{'#1#8'TabOrder'#2#11#0#9'TListView'#13'ListViewUsers'#4'Left'#2#9
+  +#6'Height'#3#133#0#3'Top'#2#16#5'Width'#3'm'#1#7'Columns'#14#1#7'Caption'#6#5
+  +' User'#5'Width'#2'n'#0#1#7'Caption'#6#9' Password'#5'Width'#2'n'#0#1#7'Capt'
+  +'ion'#6#6' Group'#5'Width'#2'n'#0#0#13'HideSelection'#8#8'ReadOnly'#9#9'RowS'
+  +'elect'#9#8'TabOrder'#2#0#9'ViewStyle'#7#8'vsReport'#7'OnClick'#7#18'ListVie'
+  +'wUsersClick'#12'OnSelectItem'#7#23'ListViewUsersSelectItem'#0#0#5'TEdit'#13
+  +'EditUserGroup'#4'Left'#3#223#0#6'Height'#2#21#3'Top'#3#157#0#5'Width'#2'S'#8
+  +'TabOrder'#2#1#8'TextHint'#6#5'Group'#0#0#7'TButton'#15'ButtonSaveUsers'#4'L'
+  +'eft'#3'8'#1#6'Height'#2#25#3'Top'#3#155#0#5'Width'#2'>'#7'Caption'#6#8'Save'
+  +'/Add'#7'OnClick'#7#20'ButtonSaveUsersClick'#8'TabOrder'#2#2#0#0#5'TEdit'#12
+  +'EditUserName'#4'Left'#2'5'#6'Height'#2#21#3'Top'#3#157#0#5'Width'#2'S'#8'Ta'
+  +'bOrder'#2#3#8'TextHint'#6#4'User'#0#0#7'TButton'#16'ButtonDeleteUser'#4'Lef'
+  +'t'#2#9#6'Height'#2#25#3'Top'#3#155#0#5'Width'#2'&'#7'Caption'#6#3'DeL'#7'On'
+  +'Click'#7#21'ButtonDeleteUserClick'#8'TabOrder'#2#4#0#0#5'TEdit'#16'EditUser'
+  +'Password'#4'Left'#3#138#0#6'Height'#2#21#3'Top'#3#157#0#5'Width'#2'S'#8'Tab'
+  +'Order'#2#5#8'TextHint'#6#8'Password'#0#0#0#6'TTimer'#19'TimerRefreshLogMemo'
+  +#7'OnTimer'#7#24'TimerRefreshLogMemoTimer'#4'left'#2'8'#3'top'#3#8#1#0#0#0
+]);

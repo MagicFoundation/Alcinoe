@@ -1,0 +1,7 @@
+{
+    "id": "{58455621-E9CB-4DDC-8812-7FF096576B21}",
+    "name": "mORMot",
+    "picture": ".\\SQLite3\\Documentation\\mORMot128.png",
+    "package_compiler_min": 14,
+    "compiler_min": 14
+}

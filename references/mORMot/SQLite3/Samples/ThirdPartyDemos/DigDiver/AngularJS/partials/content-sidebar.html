@@ -1,0 +1,22 @@
+<ul class="nav gs-sidenav">
+	<li ng-class="{'active': section == 'templates'}">
+		<a href="#/workplaces/{{workplace.ID}}/templates">Templates</a>
+		<ul class="nav">
+			<li ng-class="{'active': sub == catId}" ng-repeat="(catId, cat) in templateCats"><a href="#/workplaces/{{workplace.ID}}/templates/folder/{{catId}}"><span class="glyphicon glyphicon-folder-close"></span> {{cat}}</a></li>
+
+			<li ng-class="{'active': sub == 'trash'}" sub="trash"><a href="#/workplaces/{{workplace.ID}}/templates/trash"><span class="glyphicon glyphicon-trash"></span> Trash</a></li>
+		</ul>
+	</li>
+	<li ng-class="{'active': section == 'drafts'}">
+		<a href="#/workplaces/{{workplace.ID}}/drafts">Drafts</a>
+		<ul class="nav">
+			<li ng-class="{'active': subSection == 'trash'}"><a href="#/workplaces/{{workplace.ID}}/drafts/trash"><span class="glyphicon glyphicon-trash"></span> Trash</a></li>
+		</ul>
+	</li>
+	<li ng-class="{'active': section == 'outbox'}">
+		<a href="#/workplaces/{{workplace.ID}}/outbox">Outbox</a>
+		<ul class="nav">
+			<li ng-class="{'active': subSection == 'trash'}"><a href="#/workplaces/{{workplace.ID}}/outbox/trash"><span class="glyphicon glyphicon-trash"></span> Trash</a></li>			
+		</ul>
+	</li>
+</ul>

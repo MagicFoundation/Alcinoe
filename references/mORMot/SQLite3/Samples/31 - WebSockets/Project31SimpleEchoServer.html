@@ -1,0 +1,82 @@
+<html>
+<head>
+<title>WebSockets Echo mORMot Sample 31</title>
+
+<style>
+ html,body{font:normal 0.9em arial,helvetica;}
+ #log {width:440px; height:200px; border:1px solid #7F9DB9; overflow:auto;}
+ #msg {width:330px;}
+</style>
+
+<script>
+var socket;
+
+function init(){
+  try
+  {
+    socket = new WebSocket("ws://localhost:8888/whatever/","meow");
+    // socket = new WebSocket("ws://localhost:8888",""); // will also work
+    log('WebSocket - status '+socket.readyState);
+    socket.onopen    = function(msg){ console.log(msg); log("onopen: Welcome - status "+this.readyState); };
+    socket.onmessage = function(msg){ console.log(msg); log("onmessage: ("+msg.data.length+" bytes): " + (msg.data.length < 5000 ? msg.data : (msg.data.substr(0, 30) + '...'))); };
+    socket.onerror   = function(msg){ console.log(msg); log("onerror - code:" + msg.code + ", reason:" + msg.reason + ", wasClean:" + msg.wasClean + ", status:" + this.readyState); };
+    socket.onclose   = function(msg){ console.log(msg); log("onclose - code:" + msg.code + ", reason:" + msg.reason + ", wasClean:" + msg.wasClean + ", status:" + this.readyState); };
+  }
+  catch(ex)
+  {
+    log(ex);
+  }
+  $("msg").focus();
+}
+
+function send(){
+  var txt,msg;
+  txt = $("msg");
+  msg = txt.value;
+  if(!msg){ alert("Message can not be empty"); return; }
+  txt.value="";
+  txt.focus();
+  try{ socket.send(msg); log('Sent ('+msg.length+" bytes): " + msg.length < 5000 ? msg : (msg.substr(0, 30) + '...')); } catch(ex){ log(ex); }
+}
+
+String.prototype.repeat = function(num)
+{
+  return new Array(num + 1).join(this);
+}
+
+function med(){
+  var msg;
+  msg = "med".repeat(2024);
+  try{ socket.send(msg); log('Sent ('+msg.length+" bytes): "); } catch(ex){ log(ex); }
+}
+
+function big(){
+  var msg;
+  msg = "a".repeat(1024 * 1024);
+  try{ socket.send(msg); log('Sent ('+msg.length+" bytes): "); } catch(ex){ log(ex); }
+}
+
+function quit(){
+  socket.close(1000, 'Bye bye');
+  socket=null;
+}
+
+// Utilities
+function $(id){ return document.getElementById(id); }
+function log(msg){ $("log").innerHTML+="<br>"+msg; }
+function onkey(event){ if(event.keyCode==13){ send(); } }
+</script>
+
+</head>
+<body onload="init()">
+ <h3>WebSocket Test</h3>
+ <p>Please run Project31SimpleEchoServer or Project31WinHTTPEchoServer on this computer!</p>
+ <div id="log"></div>
+ <input id="msg" type="textbox" onkeypress="onkey(event)"/>
+ <button onclick="send()">Send</button>
+ <button onclick="med()">6KB Msg</button>
+ <button onclick="big()">1MB Msg</button>
+ <button onclick="quit()">Quit</button>
+ <div>Server will echo your response!</div>
+</body>
+</html>

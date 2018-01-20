@@ -1,0 +1,26 @@
+{
+    "search_pathes":
+    [
+        {
+            "pathes": ".;.\\SQLite3;.\\CrossPlatform;.\\SynDBDataSet;.\\SQlite3\\DDD\\dom;.\\SQlite3\\DDD\\infra;.\\SQlite3\\DDD\\tools",
+            "platforms": "Win32;Win64"
+        }
+    ],
+
+    "browsing_pathes":
+    [
+        {
+            "pathes": ".;.\\SQLite3;.\\CrossPlatform;.\\SynDBDataSet;.\\SQlite3\\DDD\\dom;.\\SQlite3\\DDD\\infra;.\\SQlite3\\DDD\\tools",
+            "platforms": "Win32;Win64"
+        }
+    ],
+
+    "source_folders":
+    [
+        {
+            "folder": ".",
+            "recursive": true,
+            "filter": "*.*;*"
+        }
+    ]
+}

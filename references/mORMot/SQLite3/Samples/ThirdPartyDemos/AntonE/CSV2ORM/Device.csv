@@ -1,0 +1,16 @@
+Desc,RawUTF8,Edit,50
+Make,RawUTF8,ComboBox,30
+Model,RawUTF8,ComboBox,30
+Highsite,Integer,ComboBox
+IP,RawUTF8,Edit,15
+Software,RawUTF8,Edit,30
+Username,RawUTF8,Edit,30
+SkipMap,Boolean,Checkbox
+Created,TDateTime,DateEdit
+LastLogin,TDateTime,DateEdit
+GPSlat,Double,Edit
+GPSLon,Double,Edit
+Active,Boolean,Checkbox
+SiteType,Integer,RadioGroup
+CapUsed,Int64,Edit
+Throttle,RawUTF8,Edit,30

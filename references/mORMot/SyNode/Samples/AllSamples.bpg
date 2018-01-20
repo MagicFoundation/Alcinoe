@@ -1,0 +1,23 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = SpiderMonkey45Binding.exe mathModule.dll
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+SpiderMonkey45Binding.exe: 02 - Bindings\SpiderMonkey45Binding.dpr
+  $(DCC)
+
+mathModule.dll: 01 - Dll Modules\math-module\src\mathModule.dpr
+  $(DCC)
+
+

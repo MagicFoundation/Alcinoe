@@ -1,0 +1,21 @@
+<div class="container">
+
+  <h3 style="margin-top: 80px;">Select workplace</h3>  
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Workplace name</th>
+        <th>Description</th>
+        <th>Created</th>
+      </tr>  
+    </thead>
+    <tbody>
+      <tr ng-repeat="wp in workplaces">
+        <td><a href="#/workplaces/{{wp.ID}}/outbox">{{wp.WPName}}</a></td>
+        <td>{{wp.Description}}</td>
+        <td>{{wp.Created}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

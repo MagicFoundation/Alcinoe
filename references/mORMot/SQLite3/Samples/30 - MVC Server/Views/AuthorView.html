@@ -1,0 +1,15 @@
+{{>header}}
+{{>masthead}}
+      <div class="blog-header">
+        <h1 class="blog-title">User {{Author.LogonName}}</h1>
+		<div class="lead blog-description">{{Author.FirstName}} {{Author.FamilyName}}
+		</div>
+      </div>
+      <div class="row">
+      <div class="col-sm-8 panel">
+	  <div class="panel-heading">Information about <strong>{{Author.LogonName}}</strong></div>
+	  <div class="panel-body">
+      {{{TSQLAuthor.HtmlTable Author}}}
+	  </div>
+{{>articlerow}}
+{{>footer}}

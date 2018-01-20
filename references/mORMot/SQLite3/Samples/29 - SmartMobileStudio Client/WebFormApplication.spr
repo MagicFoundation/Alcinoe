@@ -1,0 +1,26 @@
+uses MainUnit;
+
+{$IFDEF SMART_INTERNAL_HANDLE_EXCEPTIONS}
+uses W3System;
+{$ENDIF}
+
+{$IFDEF SMART_INTERNAL_AUTO_REFRESH}
+uses W3AutoRefresh;
+TW3AutoRefresh.Create.Start;
+{$ENDIF}
+
+var Application: TApplication;
+
+{$IFDEF SMART_INTERNAL_HANDLE_EXCEPTIONS}
+try
+{$ENDIF}
+
+  Application := TApplication.Create;
+  Application.RunApp;
+
+{$IFDEF SMART_INTERNAL_HANDLE_EXCEPTIONS}
+except
+  on e: Exception do
+    ShowMessage(e.Message);
+end;
+{$ENDIF}

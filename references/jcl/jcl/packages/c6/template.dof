@@ -1,0 +1,11 @@
+[Directories]
+UnitOutputDir=..\..\lib\c6
+SearchPath=..\..\source\include
+Conditionals=%DEFINES%
+<%%% BEGIN LIBRARYONLY %%%>
+[Compiler]
+PackageNoLink=1
+[Linker]
+Packages=%NOLINKPACKAGELIST%
+<%%% END LIBRARYONLY %%%>
+

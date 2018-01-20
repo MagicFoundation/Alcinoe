@@ -1,0 +1,14 @@
+:Base JclHelp.hlp>MAIN
+:Title JEDI Code Library
+:Index Jcl=Jcl.hlp
+:Index JclContainers=JclContainers.hlp
+:Index JclDeveloperTools=JclDeveloperTools.hlp
+:Index JclVcl=JclVcl.hlp
+:Link Jcl.hlp
+:Link JclContainers.hlp
+:Link JclDeveloperTools.hlp
+:Link JclVcl.hlp
+:Include Jcl.cnt
+:Include JclContainers.cnt
+:Include JclDeveloperTools.cnt
+:Include JclVcl.cnt

@@ -1,0 +1,1039 @@
+@@BaseServices.Compatibility
+<GROUP BaseServices>
+<TITLE Compatibility>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@BaseServices.Dynamicarrays
+<GROUP BaseServices>
+<TITLE Dynamic arrays>
+<TOPICORDER 200>
+--------------------------------------------------------------------------------
+@@BaseServices.Dynamicloading
+<GROUP BaseServices>
+<TITLE Dynamic loading>
+<TOPICORDER 300>
+--------------------------------------------------------------------------------
+@@BaseServices.ErrorHandling
+<GROUP BaseServices>
+<TITLE Error Handling>
+<TOPICORDER 400>
+--------------------------------------------------------------------------------
+
+@@BaseServices.Int64support
+<GROUP BaseServices>
+<TITLE Int64 support>
+<TOPICORDER 700>
+--------------------------------------------------------------------------------
+@@BaseServices.Numericformattingroutines
+<GROUP BaseServices>
+<TITLE Numeric formatting routines>
+<TOPICORDER 800>
+--------------------------------------------------------------------------------
+@@BaseServices.Pointermanipulation
+<GROUP BaseServices>
+<TITLE Pointer manipulation>
+<TOPICORDER 900>
+--------------------------------------------------------------------------------
+@@JclVersion
+<GROUP BaseServices>
+Summary:
+  Constants describing the JCL version.
+Description:
+  The JclVersion constants define the version of JCL. Major, Minor, Release and
+  Build are merely placeholders, you can lookup the actual value in JclBase.pas.
+<TABLE>
+Constant           Description:
+-----------------  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+JclVersion         All of the other version values packed into a single integer. The separate values are moved into the individual bytes. From the most significant byte towards the least significant: Major, Minor, Release, Build
+JclVersionMajor    Major version of JCL
+JclVersionMinor    Minor version of JCL. Incremented for each minor release such as when minor additions and/or bug fixes have been made
+JclVersionBuild    Build number of JCL. This is roughly equivalent to the number of days that JCL has been worked on (starting February 2000)
+JclVersionRelease  If set to 1 this is an official release. If 0 this is a preview or beta version.
+</TABLE>
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+
+
+@@EJclError
+<GROUP BaseServices.ErrorHandling>
+Summary:
+  Base exception class for all JCL exceptions.
+Description:
+  EJclError is the base class used for all exception classes in the JCL. It inherits
+  directly from Exception without adding any new functionality. It only exists to
+  provide a distinction between exceptions raised by the JCL and those raised by
+  the RTL/VCL and 3rd parties. It does introduce two constructors, CreateResRec and
+  CreateResRecFmt, which are replacements for the Exception class methods CreateRes
+  and CreateResFmt respectively (to remove the need for overloads and backwards
+  compatibility).
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+
+
+@@EJclInternalError
+<GROUP BaseServices.ErrorHandling>
+Summary:
+  Exception class for JCL internal errors.
+Description:
+  Exceptions of the EJclInternalError exception class are raised if some
+  internal consistency check fails.
+Donator:
+  Anonymous
+--------------------------------------------------------------------------------
+@@EJclWin32Error
+<GROUP BaseServices.ErrorHandling>
+Summary:
+  Base class for exceptions raised in response to Win32 errors.
+Description:
+  The EJclWin32Error exception class is used as the base class for exceptions that
+  are raised in response to the failure of a Win32 API function that sets LastError.
+  The EJclWin32Error constructors automatically call GetLastError, the result of which
+  is made available to the programmer through the LastError property. Additionally it
+  appends a human-readable string to the passed in exception Msg corresponding to
+  the last error. This message is separated from the passed in Msg by a carriage
+  return and is made available through the LastErrorMsg property.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@EJclWin32Error.Create
+Summary:
+  Instantiates an EJclWin32Error with a simple string.
+Description:
+  Create instantiates an EJclWin32Error exception class. The Msg
+  parameter is the string which is displayed in the exception dialog box and is
+  also available through the Message property.
+Parameters:
+  Msg - The string to be associated with the exception. The programmer can query the class for this string using the Message property. If the exception is unhandled the RTL displays this message in the exception dialog box.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@EJclWin32Error.CreateFmt
+Summary:
+  Instantiates an EJclWin32Error with a formatted string.
+Description:
+  CreateFmt instantiates EJclWin32Error exception class. The Msg
+  parameter is the string which is displayed in the exception dialog box and is
+  also available through the Message property. See the Format function for more
+  information about formatting a string.
+Parameters:
+  Msg - String containing format specifiers to be replaced with values from the Args array.
+  Args - Array of constants which are formatted according to the format specifiers in the Msg parameter.
+See also:
+  Create
+  CreateRes
+  CreateResRec
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@EJclWin32Error.CreateRes
+Summary:
+  Instantiates an instance of EJclWin32Error with a string loaded from the application's resource.
+Description:
+  CreateRes instantiates an EJclWin32Error exception class. Ident must be the unique
+  ID of a string resource which is displayed in the exception dialog box and is
+  also available through the Message property.
+Parameters
+  Ident - Unique ID of a string resource.
+See also:
+  Create
+  CreateFmt
+  CreateResRec
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+
+@@EJclWin32Error.LastError
+Summary:
+  Contains the LastError.
+Description:
+  The LastError property returns the error code retrieved by a call to GetLastError
+  at the time the exception was raised.
+See also:
+  LastErrorMsg
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@EJclWin32Error.LastErrorMsg
+Summary:
+  Error string corresponding to LastError.
+Description:
+  The LastErrorMsg property contains the error message string associated with the last
+  error code.
+See also:
+  LastError
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@Float
+<GROUP BaseServices>
+Summary:
+  Generic floating point type.
+Description:
+  Float represents a generic floating point type and is used mostly in JclMath.
+  Float is conditionally defined as either Extended, Double or Single with Extended
+  being the default. You can change the type that Float is defined as globally
+  by using the MATH_PRECISION_X compiler directives.
+  See Compiler Directives for more information.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@LongWord
+<GROUP BaseServices.Compatibility>
+Summary:
+  Alias for Cardinal.
+Description:
+  LongWord is an alias for Cardinal and as such represents an unsigned 32-bit
+  integer. For Delphi 4 and C++ Builder 4 up this type is 'defined' in System.pas,
+  in earlier versions this type didn't exist so it is defined in JclBase.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TSysCharSet
+<GROUP BaseServices.Compatibility>
+Summary:
+  A set of characters.
+Description:
+  TSysCharSet represents a set of characters. For Delphi 4 and C++ Builder 4 up this
+  type is defined in SysUtils, in earlier versions this type didn't exist so it is
+  defined in JclBase.
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@I64Assign
+<GROUP BaseServices.Int64support>
+Summary:
+  Initializes an Int64 to the supplied values.
+Description:
+  I64Assign implements initialization for an Int64 from the supplied long integers.
+Parameters:
+  I - The Int64 to initialize.
+  Low - Low 32 bits for the Int64.
+  High - High 32 bits for the Int64.
+See also:
+  I64Copy
+  I64Compare
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@I64Copy
+<GROUP BaseServices.Int64support>
+Summary:
+  Copies an Int64.
+Description:
+  I64Copy copies the value of Source into Dest. Source is unaffected by this.
+Parameters
+  Dest - Destination Int64.
+  Source - Source Int64.
+See also:
+  I64Assign
+  I64Compare
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@I64Compare
+<GROUP BaseServices.Int64support>
+Summary:
+  Compares two 64 bit integers.
+Description:
+  I64Compares the two supplied 64-bit integers for equality.
+Parameters
+  I1 - First Int64.
+  I2 - Second Int64.
+Returns
+  If I1 equals I2 the result is 0, if I1 is larger than I2 the result is greater than
+  0 (specifically 1) and if I1 is smaller than I2 the result is smaller than 0
+  (specifically -1).
+See also:
+  I64Assign
+  I64Copy
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@CardinalsToI64
+<GROUP BaseServices.Int64support>
+Summary:
+  Packs the supplied 32 bit values in an Int64
+Description:
+  CardinalsToInt64 packs the two supplied 32 bit values into a single Int64. Note
+  that this routine is only available for compilers that natively support Int64.
+Parameters:
+  I - The 64 bit value into which to pack the high and low parts.
+  LowPart - Low 32 bits for the supplied Int64.
+  HighPart - High 32 bits for the supplied Int64.
+See also:
+  I64ToCardinals
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@I64ToCardinals
+<GROUP BaseServices.Int64support>
+Summary:
+  Extracts the high and low 32 bit values from an Int64.
+Description:
+  I64ToCardinals extracts the high and low 32 bit values from the supplied Int64.
+  Note that this routine is only available for compilers that natively support Int64.
+Parameters:
+  I - The 64 bit value from which to extract the high and low parts.
+  LowPart - Low 32 bits of the supplied Int64.
+  HighPart - High 32 bits of the supplied Int64.
+See also:
+  CardinalsToI64
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@TDynArray
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  A dynamic array of some type.
+Description:
+  TDynArray represents a dynamic array. Depending on the compiler version this is an
+  actual dynamic array or a simulated dynamic array. The tables below show the
+  declaration of the dynamic array types. When the compiler natively supports
+  dynamic arrays you can work with types just as if they were declared using the
+  array of Type syntax. If the compiler doesn't support dynamic arrays you
+  must use the various DynArrayXxx routines. Before you can use a TDynArray you
+  must initialize it using DynArrayInitialize.
+  To query or change the length of the array you use DynArrayLength
+  and DynArraySetLength respectively. To
+  reference an element of the array you use MyArray^[Index] where Index is the index
+  of the element between 0 and the length of the array minus 1. When you are done
+  with the array you must release it's memory by calling DynArrayFinalize.
+  Compiler supports dynamic arrays (Note that routines that take a TDynArray
+  as a parameter need an actual TDynArray so you can't declare the parameter using
+  the "array of Type" syntax):
+<TABLE>
+Type               Declaration
+-----------------  -----------------
+TDynByteArray      array of Byte
+TDynShortArray     array of Shortint
+TDynSmallintArray  array of Smallint
+TDynWordArray      array of Word
+TDynIntegerArray   array of Integer
+TDynLongintArray   array of Longint
+TDynCardinalArray  array of Cardinal
+TDynInt64Array     array of Int64
+TDynSizeIntArray   array of SizeInt
+TDynExtendedArray  array of Extended
+TDynDoubleArray    array of Double
+TDynSingleArray    array of Single
+</TABLE>
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArrayHigh
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Upper bound for dynamic array of some type.
+Description:
+  DynArrayHigh contains the upper bound for a dynamic array of some type. The table
+  below shows these values for each supported type. These value are obtained by
+  dividing 2GB (the maximum array size) by the size of the type (in bytes). Note
+  that DynFloatArrayHigh depends on the MATH_PRECISION_X compiler directive and
+  as such equals DynExtendedArrayHigh, DynDoubleArrayHigh or DynSingleArrayHigh.
+<TABLE>
+Constant              Value
+--------------------  ----------
+DynByteArrayHigh      2147483646
+DynShortArrayHigh     2147483646
+DynSmallintArrayHigh  1073741822
+DynWordArrayHigh      1073741822
+DynIntegerArrayHigh   536870908
+DynLongintArrayHigh   536870908
+DynCardinalArrayHigh  536870908
+DynInt64ArrayHigh     268435448
+DynExtendedArrayHigh  214748363
+DynDoubleArrayHigh    536870908
+DynSingleArrayHigh    268435448
+</TABLE>
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArrayAllocSize
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Returns the allocation size for a dynamic array.
+Description:
+  DynArrayAllocSize returns the amount of memory, in bytes, that are allocated for
+  the supplied dynamic array. Since dynamic arrays are allocated with some additional
+  maintenance data the return value will always be at least 12 bytes more than the
+  memory needed to hold the actual elements.
+Parameters:
+  A - The dynamic array for which you want to know the allocation size. This array must have been previously initialized with DynArrayInitialize or the result will be unpredictable.
+Result:
+  Returns the amount of dynamic memory, in bytes, reserved for the dynamic array.
+See also:
+  DynArrayLength
+  DynArrayElemSize
+  DynArrayInitialize
+  DynArrayFinalize
+  DynArraySetLength
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArrayLength
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Returns the length of a dynamic array.
+Description:
+  DynArrayLength returns the length of the supplied dynamic array in terms of the
+  number of elements contained in the array. This is always the value supplied to
+  the last call to DynArraySetLength or DynArrayInitialize.
+  Note that a dynamic array is allowed to have a length of 0.
+Parameters:
+  A - The dynamic array whose length you want.
+Result:
+  Returns the length of the supplied dynamic array in terms of number of elements.
+See also:
+  DynArrayAllocSize
+  DynArrayElemSize
+  DynArrayInitialize
+  DynArrayFinalize
+  DynArraySetLength
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArrayElemSize
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Returns the size of an element in the array.
+Description:
+  DynArrayElemSize returns the size, in bytes, of the elements contained in the
+  dynamic array. This function is not very useful for application programmers but
+  is used internally.
+Parameters:
+  A - The dynamic array you want to query for its element size.
+Result:
+  Returns the size of an individual element, in bytes.
+See also:
+  DynArrayAllocSize
+  DynArrayLength
+  DynArrayInitialize
+  DynArrayFinalize
+  DynArraySetLength
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArrayInitialize
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Initializes a dynamic array for use.
+Description:
+  DynArrayInitialize initializes a dynamic array variable for use. You must call
+  this function before using the dynamic array. The function allocates memory
+  for the maintenance data and initial elements, if directed to do so. Initial
+  elements are initialized to 0 and can be used immediately without having to
+  call DynArraySetLength. When you are done using the array you must
+  release its memory by calling DynArrayFinalize.
+Parameters:
+  A - The dynamic array variable to initialize.
+  ElementSize - Size, in bytes, of the elements contained in the dynamic array. Always use the SizeOf operator for this parameter. For example, if A is declared as a TDynIntegerArray then use SizeOf(Integer) for this parameter.
+  InitialLength - Initial size of the array. That is, the number of elements in the array. The function allocates enough memory to hold at least InitialLength number of elements and initializes them to 0. You can immediately start to use them without the need to call DynArraySetLength. You can pass 0 if you don't want to initialize the length of the array.
+See also:
+  DynArrayAllocSize
+  DynArrayLength
+  DynArrayElemSize
+  DynArrayFinalize
+  DynArraySetLength
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArrayFinalize
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Releases the memory reserved for the dynamic array.
+Description:
+  DynArrayFinalize releases the memory reserved for the dynamic array. You must
+  always call this function when done using the dynamic array. Note that setting
+  the array's length to 0 with DynArraySetLength does not release all
+  memory associated with the dynamic array.
+Parameters:
+  A - The dynamic array variable to finalize.
+See also:
+  DynArrayAllocSize
+  DynArrayLength
+  DynArrayElemSize
+  DynArrayInitialize
+  DynArraySetLength
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+@@DynArraySetLength
+<GROUP BaseServices.Dynamicarrays>
+Summary:
+  Sets the length of the dynamic array.
+Description:
+  DynArraySetLength sets the length of the specified dynamic array. The array
+  must have previously been initialized with DynArrayInitialize. This
+  function maintains the contents of the elements in the array before resizing it
+  and in the situation where the array grows, the new elements are initialized to 0.
+Parameters:
+  A - The dynamic array to resize.
+  NewLength - The new length, in terms of number of elements, of the array. This value must be greater than or equal to 0. Note that setting the array's length to 0 does not release all of it's associated memory. You must call DynArrayFinalize when done using the dynamic array.
+See also:
+  DynArrayAllocSize
+  DynArrayLength
+  DynArrayElemSize
+  DynArrayInitialize
+  DynArrayFinalize
+Donator:
+  Marcel van Brakel
+--------------------------------------------------------------------------------
+
+@@RaiseLastOSError
+<GROUP BaseServices.Compatibility>
+Summary:
+  Raises an exception for the last occurring OS or system library error.
+Description:
+  Call RaiseLastOSError to raise an EWin32Error exception for the last OS API call that
+  failed. RaiseLastOSError retrieves the code for the last occurring API call error,
+  if any. If this belongs to a previously occurring error, RaiseLastOSError raises an
+  EWin32Error exception with the error code and message associated with that error.
+  This routine is provided for backwards compatibility.
+Donator:
+  Team JCL
+--------------------------------------------------------------------------------
+@@IInterface
+<GROUP BaseServices.Compatibility>
+Summary:
+  IInterface is the base class for all Object Pascal interfaces.
+Description:
+  IInterface is the base class for all Object Pascal interfaces. This interface
+  declaration is provided for backwards compatibility. When compiling with a pre
+  Delphi 6 compiler it is declared as an alias for IUnknown. In Delphi 6 and above,
+  this interface is declared in the System.pas unit and IUnknown is declared as an
+  alias for IInterface. For more information see the Delphi for IUnknown or IInterface
+  depending on your Delphi version.
+Donator:
+  Team JCL
+--------------------------------------------------------------------------------
+@@JclVersionBuild
+<COMBINE JclVersion>
+--------------------------------------------------------------------------------
+@@JclVersionMajor
+<COMBINE JclVersion>
+--------------------------------------------------------------------------------
+@@JclVersionMinor
+<COMBINE JclVersion>
+--------------------------------------------------------------------------------
+@@JclVersionRelease
+<COMBINE JclVersion>
+--------------------------------------------------------------------------------
+@@MoveChar@string@SizeInt@string@SizeInt@SizeInt
+Summary:
+  This function copies characters from a Source string to a
+  destination index at different indexes. There are no checks
+  to prevent copies outside the string spaces. The Source
+  string has to contain at least FromIndex + Count - 1
+  characters, the length of the Dest string should be at least
+  ToIndex + Count - 1.
+Parameters:
+  Source - Source string. Its length has to be at least FromIndex + Count - 1.
+  FromIndex - Index of the first character in Source to be copied.
+  Dest - Destination string. Its length has to be at least ToIndex + Count - 1.
+  ToIndex - Index of the first character of Dest to be overriden.
+  Count - Number of chars to be copied.
+Result:
+  This function has no return value.
+--------------------------------------------------------------------------------
+@@TJclULargeInteger
+Summary:
+  Redefinition of TUlargeInteger as defined in Windows.pas.
+Description:
+  This type is an alias of ULARGE_INTEGER.
+@@ULARGE_INTEGER
+Description:
+  The ULARGE_INTEGER structure is used to specify a 64-bit
+  unsigned integer value.
+Notes:
+  The ULARGE_INTEGER structure is actually a union. If your
+  compiler has built-in support for 64-bit integers, use the
+  QuadPart member to store the 64-bit integer. Otherwise, use
+  the LowPart and HighPart members to store the 64-bit integer.
+@@ULARGE_INTEGER.HighPart
+  High-order 32 bits.
+@@ULARGE_INTEGER.LowPart
+  Low-order 32 bits.
+@@ULARGE_INTEGER.QuadPart
+  Unsigned 64-bit integer.
+--------------------------------------------------------------------------------
+@@SizeInt
+Summary:
+  Type for a signed machine-size integer.
+Description:
+  The SizeInt type is an alias to Integer for 32-bit executables and an alias to
+  Int64 for 64-bit executables.
+--------------------------------------------------------------------------------
+@@PSizeInt
+Summary:
+  Pointer to a SizeInt value.
+--------------------------------------------------------------------------------
+@@Int16
+Summary:
+  Type for a signed 16-bit integer.
+--------------------------------------------------------------------------------
+@@Int32
+Summary:
+  Type for a signed 32-bit integer.
+--------------------------------------------------------------------------------
+@@Int8
+Summary:
+  Type for a signed 8-bit integer.
+--------------------------------------------------------------------------------
+@@Largeint
+Summary:
+  Type for a signed 64-bit integer.
+--------------------------------------------------------------------------------
+@@PByte
+Summary:
+  Type for a pointer to an unsigned 8-bit integer.
+--------------------------------------------------------------------------------
+@@PCardinal
+Summary:
+  Type for a pointer to an unsigned 32-bit integer.
+--------------------------------------------------------------------------------
+@@PFloat
+Summary:
+  Type for a pointer to a Float value.
+--------------------------------------------------------------------------------
+@@PPointer
+Summary:
+  Type for a pointer to a pointer value.
+--------------------------------------------------------------------------------
+@@PLargeInteger
+Summary:
+  Type for pointer to a TLargeInteger value.
+--------------------------------------------------------------------------------
+@@PJclULargeInteger
+Summary:
+  Alias of type PULARGE_INTEGER.
+@@PULARGE_INTEGER
+Summary:
+  Type for a pointer to a ULARGE_INTEGER value.
+--------------------------------------------------------------------------------
+@@TLargeInteger
+Summary:
+  Type for a signed 64-bit integer.
+--------------------------------------------------------------------------------
+@@UInt16
+Summary:
+  Type for an unsigned 16-bit integer.
+--------------------------------------------------------------------------------
+@@UInt32
+Summary:
+  Type for an unsigned 32-bit value.
+--------------------------------------------------------------------------------
+@@UInt64
+Summary:
+  Type for an unsigned 64-bit value.
+--------------------------------------------------------------------------------
+@@UInt8
+Summary:
+  Type for an unsigned 8-bit value.
+--------------------------------------------------------------------------------
+@@PJclByteArray
+Summary:
+  Type for a pointer to a TJclByteArray value.
+--------------------------------------------------------------------------------
+@@TDynByteArray
+Summary:
+  Type for a dynamic array of Byte (unsigned 8-bit integer).
+--------------------------------------------------------------------------------
+@@TDynCardinalArray
+Summary:
+  Type for a dynamic array of Cardinal (unsigned 32-bit integer).
+--------------------------------------------------------------------------------
+@@TDynDoubleArray
+Summary:
+  Type for a dynamic array of Double (double precision floating point value stored in 64 bits).
+--------------------------------------------------------------------------------
+@@TDynExtendedArray
+Summary:
+  Type for a dynamic array of Extended (triple precision floating point value stored in 80 bits).
+--------------------------------------------------------------------------------
+@@TDynSingleArray
+Summary:
+  Type for a dynamic array of Single (single precision floating point value stored in 32 bits).
+--------------------------------------------------------------------------------
+@@TDynFloatArray
+Summary:
+  Type for a dynamic array of Float.
+--------------------------------------------------------------------------------
+@@TDynIInterfaceArray
+Summary:
+  Type for a dynamic array of Interfaces.
+--------------------------------------------------------------------------------
+@@TDynInt64Array
+Summary:
+  Type for a dynamic array of Int64 (signed 64-bit integer).
+--------------------------------------------------------------------------------
+@@TDynSizeIntArray
+Summary:
+  Type for a dynamic array of SizeInt (signed machine-size integer).
+--------------------------------------------------------------------------------
+@@TDynIntegerArray
+Summary:
+  Type for a dynamic array of Integer (signed 32-bit integer).
+--------------------------------------------------------------------------------
+@@TDynLongIntArray
+Summary:
+  Type for a dynamic array of Longint (signed 32-bit integer).
+--------------------------------------------------------------------------------
+@@TDynObjectArray
+Summary:
+  Type for a dynamic array of Objects.
+--------------------------------------------------------------------------------
+@@TDynPointerArray
+Summary:
+  Type for a dynamic array of Pointers.
+--------------------------------------------------------------------------------
+@@TDynShortIntArray
+Summary:
+  Type for a dynamic array of ShortInt (signed 8-bit integer).
+--------------------------------------------------------------------------------
+@@TDynSmallIntArray
+Summary:
+  Type for a dynamic array of SmallInt (signed 16-bit integer).
+--------------------------------------------------------------------------------
+@@TDynStringArray
+Summary:
+  Type for a dynamic array of String.
+--------------------------------------------------------------------------------
+@@TDynWordArray
+Summary:
+  Type for a dynamic array of Word (unsigned 16-bit integer).
+
+@@AWSuffix
+\ \ 
+Summary
+Suffix for External string function API
+
+
+Description
+This constant denotes the suffix for imported string
+functions. Windows headers usually have two declarations for
+each string function: one is Ansi-flavoured, the other is
+unicode-enabled. The two functions have different names: the
+names of the Ansi-flavoured functions end with 'A' while
+Unicode-enabled functions end with 'W'.
+
+
+
+Since Delphi/C++Builder 2009, the built-in string type is
+Unicode-enabled. This constant is accordingly set to 'W'
+(stands for Wide) for Delphi/C++Builder and newer while it is
+set to 'A' (stands for Ansi) for older versions.
+
+
+
+This constant is used in various places in the JCL for
+specifying the flavour of the function that is being
+imported.
+
+@@BOM_UTF16_LSB
+Summary
+UTF-16 LSB Text file Byte-Order-Mark (BOM)
+Description
+These 2 bytes are usually inserted to the beginning of UTF-16
+text files where the least significant byte of each character
+is written first.
+
+@@BOM_UTF16_MSB
+Summary
+UTF-16 MSB Text file Byte-Order-Mark (BOM)
+Description
+These 2 bytes are usually inserted to the beginning of UTF-16
+text files where the most significant byte of each character
+is written first.
+
+@@BOM_UTF32_LSB
+Summary
+UTF-32 LSB Text file Byte-Order-Mark (BOM)
+Description
+These 4 bytes are usually inserted to the beginning of UTF-32
+text files where the least significant byte of each character
+is written first.
+
+@@BOM_UTF32_MSB
+Summary
+UTF-32 MSB Text file Byte-Order-Mark (BOM)
+Description
+These 4 bytes are usually inserted to the beginning of UTF-32
+text files where the most significant byte of each character
+is written first.
+
+@@BOM_UTF8
+Summary
+UTF-8 Text file Byte-Order-Mark (BOM)
+Description
+These 3 bytes are usually inserted to the beginning of UTF-8
+text files.
+
+@@HexPrefix
+Summary
+Constants describing the hexadecimal prefix for strings.
+Description
+The HexPrefix constants are the prefix to be added to strings
+denoting hexadecimal values.
+<table>
+Constant          \Description:
+----------------  -----------------------------------------------
+HexPrefixC        Prefix for C/C++ hexadecimal values
+HexPrefixPascal   Prefix for Pascal/Delphi hexadecimal values
+HexPrefix         Language independant prefix, this constant is
+                   automatically set to HexPrefixPascal when the
+                   code is compiled with Delphi and to HexPrefixC
+                   when compiled with C++Builder.
+</table>
+
+@@HexPrefixC
+<combine HexPrefix>
+
+\ \ 
+
+@@HexPrefixPascal
+<combine HexPrefix>
+
+\ \ 
+
+@@MaximumUCS2
+Summary
+Maximum value for an UCS-2 encoded character
+Description
+This constant denotes the maximum value for an UCS-2
+character. Valid UCS-2 characters are included in range
+[#0..MaximumUCS2].
+
+@@MaximumUCS4
+Summary
+Maximum value for an UCS-4 encoded character
+Description
+This constant denotes the maximum value for an UCS-4
+character. Valid UCS-4 characters are included in range
+[#0..MaximumUCS4].
+
+@@MaximumUTF16
+Summary
+Maximum value for an UTF-16 encoded character
+Description
+This constant denotes the maximum value for an UTF-16
+character. Valid UTF-16 characters are included in range
+[#0..MaximumUTF16], with the exclusion of ranges
+[SurrogateLowStart..SurrogateLowEnd] and
+[SurrogateHighStart..SurrogateHighEnd].
+
+
+
+In an UTF-16 stream, characters are read per 16-bit wide
+chunk. Characters are decoded as follow:
+
+A first 16-bit chunk is read, if its value is included in
+[SurrogateLowStart..SurrogateLowEnd], it is an error. If its
+value is not included in
+[SurrogateHighStart..SurrogateHighEnd], then the character
+value is equal to this first chunk.
+
+If the value of the first chunk is included in
+[SurrogateHighStart..SurrogateHighEnd], a second thunk is
+read and its value has to be included in
+[SurrogateLowStart..SurrogateLowEnd], it is an error
+\otherwise. Finally the value of these two thunk are combined
+to make the character value.
+
+@@SurrogateHighEnd
+<combine MaximumUTF16>
+
+\ \ 
+
+@@SurrogateHighStart
+<combine MaximumUTF16>
+
+\ \ 
+
+@@SurrogateLowEnd
+<combine MaximumUTF16>
+
+\ \ 
+
+@@SurrogateLowStart
+<combine MaximumUTF16>
+
+\ \ 
+
+@@UCS4ReplacementCharacter
+Summary
+UTF-8/UTF-16/UCS2/UCS4 replacement character
+Description
+When an UTF-8 or an UTF-16 character fails to be correctly
+decoded, it may be replaced by this constant acting as an
+error flag. Depending on the code, exceptions might be raised
+instead of inserting this constant. See code details.
+
+@@JclBase.pas
+\ \ 
+Summary
+JclBase description
+
+
+Description
+The JclBase file contains basic declarations for the JEDI
+Code Library.
+
+@@GetMem@@Longint
+\ \ 
+Summary
+GetMem function redeclaration for FPC
+Description
+FPC emits a lot of warnings while compiling GetMem calls: it
+complains about the first argument not being initialized.
+This is caused by the declaration of the first parameter as a
+variable parameter. We change it to output in order to avoid
+all these warnings.
+
+@@Addr32ToAddr64@TJclAddr32
+\ \ 
+Summary
+32-bit address to 64-bit address conversion
+Description
+This function converts a 32-bit address to a 64-bit value.
+
+@@Addr64ToAddr32@TJclAddr64
+Summary
+64-bit address to 32-bit address conversion
+Description
+This function converts a 64-bit address to a 32-bit value.
+Exceptions
+If the argument address does not fit in the result, an
+exception of class EJclAddr64Exception is raised.
+
+@@AnsiByteArrayStringLen@TBytes
+Summary
+Computes the length of an AnsiString stored in a TBytes array
+Description
+This functions computes the length of the AnsiString stored
+in the TBytes array. The string ends at the first encountered
+null character.
+Parameters
+Data :  Source byte array
+Returns
+The length of the string, including the ending null
+character.
+See Also
+AnsiByteArrayToString@TBytes@SizeInt
+
+StringToAnsiByteArray@string
+
+@@AnsiByteArrayToString@TBytes@SizeInt
+Summary
+Makes a copy an AnsiString stored in a TBytes array
+Description
+This functions copies Count characters from the AnsiString
+stored in a TBytes array to its result.
+Parameters
+Data :   Source byte array
+Count :  Number of characters to be copied
+Returns
+A string of length Count whose data is initialized by the
+values read from Data.
+See Also
+AnsiByteArrayStringLen@TBytes
+
+StringToAnsiByteArray@string
+
+@@StringToAnsiByteArray@string
+Summary
+Create a byte array from an AnsiString
+Description
+This function serializes all the characters of S to the
+resulting byte array.
+Parameters
+S :  String to convert
+Returns
+Serialized bytes from S.
+See Also
+AnsiByteArrayToString@TBytes@SizeInt
+
+AnsiByteArrayStringLen@TBytes
+
+@@EJclAddr64Exception
+Summary
+Exception class for address conversion failures
+Description
+This exception class is raised when a 64-bit address cannot
+be stored as a 32-bit value.
+See Also
+Addr64ToAddr32@TJclAddr64
+
+@@PInt64
+Summary
+Type for pointers to signed 64-bit integers
+
+@@TDynWideCharArray
+\ \ 
+Summary
+Type for a dynamic array of WideChar.
+
+@@TDynAnsiCharArray
+\ \ 
+Summary
+Type for a dynamic array of AnsiChar.
+
+@@TDynAnsiStringArray
+\ \ 
+Summary
+Type for a dynamic array of AnsiString.
+
+@@TDynCharArray
+\ \ 
+Summary
+Type for a dynamic array of Char.
+
+@@TDynUnicodeStringArray
+\ \ 
+Summary
+Type for a dynamic array of UnicodeString (defined for
+Delphi/C++Builder 2009 and newer).
+
+@@TDynWideStringArray
+\ \ 
+Summary
+Type for a dynamic array of WideString.
+
+@@TJclByteArray
+\ \ 
+Summary
+Type for a dynamic array of Byte.
+
+@@TJclAddr64
+Summary
+Integer type for 64-bit addresses.
+
+@@TJclAddr32
+Summary
+Integer type for 32-bit addresses.
+
+@@TJclAddr
+Summary
+Integer type for addresses.
+
+
+Description
+This type is aliased to TJclAddr32 for 32-bit applications
+and it is aliased to TJclAddr64 for 64-bit applications.
+
+
+@@AnsiReplacementCharacter
+Summary
+ANSI replacement character
+Description
+When an Unicode character does not have representation in the
+current ANSI codepage, it may be replaced by this constant
+acting as an error flag. Depending on the code, exceptions
+might be raised instead of inserting this constant. See code
+details.
+
+@@PJclAddr
+<combine TJclAddr>
+
+\ \ 

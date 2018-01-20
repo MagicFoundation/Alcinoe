@@ -1,0 +1,6 @@
+// Version 1.1, October 2010
+
+1. Extract the source in thirdparty/bzip2/bzip2-X.Y.Z
+2. Set the current directory to jcl/source/windows/obj/bzip2
+3. Update the makefile jcl/source/windows/obj/bzip2/makefile.mak
+4. Execute makefile.mak

@@ -1,0 +1,14 @@
+TJclScheduledTask
+TJclScheduledWorkItem
+TJclTaskSchedule
+TJclTaskTrigger
+TJclTaskTriggers
+TJclScheduledTaskFlag
+TJclScheduledTaskStatus
+TJclScheduleTaskPropertyPage
+TDateTimeArray
+TJclScheduledTaskFlags
+TJclScheduleTaskPropertyPages
+InfiniteTime
+JclScheduleTaskAllPages
+LocalSystemAccount

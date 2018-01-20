@@ -1,0 +1,13 @@
+EJclCompressionError
+TJclCompressionStream
+TJclCompressStream
+TJclDecompressStream
+TJclGZIPCompressionStream
+TJclGZIPDecompressionStream
+TJclRARCompressionStream
+TJclRARDecompressionStream
+TJclTARCompressionStream
+TJclTARDecompressionStream
+TJclZLibCompressStream
+TJclZLibDecompressStream
+TJclCompressionLevel

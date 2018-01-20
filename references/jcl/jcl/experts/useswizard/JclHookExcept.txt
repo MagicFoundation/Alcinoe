@@ -1,0 +1,17 @@
+JclAddExceptNotifier
+JclAddExceptNotifier
+JclBelongsHookedCode
+JclHookedExceptModulesList
+JclHookExceptionsInModule
+JclInitializeLibrariesHookExcept
+JclRemoveExceptNotifier
+JclRemoveExceptNotifier
+JclReplaceExceptObj
+JclUnkookExceptionsInModule
+TJclExceptNotifyPriority
+TJclModuleArray
+TJclExceptNotifyProc
+TJclExceptNotifyMethod
+JclHookExceptions
+JclUnhookExceptions
+JclExceptionsHooked

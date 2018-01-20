@@ -1,0 +1,1405 @@
+@@MathRoutines.Complexnumbers
+<GROUP MathRoutines>
+<TITLE Complex numbers>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@MathRoutines.Complexnumbers.TJclComplex
+<GROUP MathRoutines.Complexnumbers>
+<TITLE TJclComplex>
+<TOPICORDER 100>
+--------------------------------------------------------------------------------
+@@TJclComplex
+<GROUP MathRoutines.Complexnumbers.TJclComplex>
+Summary:
+  TJclComplex implements various operations with complex numbers.
+Description:
+  TJclComplex is designated to provide complex numbers computations for your
+  applications. It supports both rectangular and polar number representations.
+  All the operations are divided into groups as follows:
+    * basic arithmetics;
+    * natural logarithmic and exponential functions;
+    * trigonometric functions;
+    * hyperbolic trigonometric functions;
+    * complex Bessel functions;
+    * various miscellaneous routines.
+  All the methods could be used in two ways. Firstly you can use the methods
+  with the prefix "C", like CAdd or CLn to perform the operation over the
+  object itself, i.e. after using such methods the value of the object itself
+  will be changed. Using these methods gives you the opportunity to use quite a
+  convenient method of coding the sequential calculations like this:
+    MyComplex.Add(4,3).Mul(2,5).Ln.AsString;
+  The other way is two use the subset of methods with "CNew" prefix. They do the
+  same computations but as the result they create a new object of TComplex type.
+  It might be useful in situations when you'd like to remain your object intact
+  and get the result in a separate object. Please note that such an approach
+  requires a very attentive coding style when you need to destroy every object
+  after every "CNew*" method invocation.
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TComplexKind
+<GROUP MathRoutines.Complexnumbers>
+Summary:
+  Enumeration specifies the way of representing a complex number using either rectangular representation or polar coordinates.
+Description:
+  Enumeration specifies the way of representing a complex number using either rectangular representation or polar coordinates.
+Donator:  Alexei Koudinov
+@@TComplexKind.crRectangular
+  The parameters specified in a constructor or any other method are of the rectangular representation.
+@@TComplexKind.crPolar
+  The parameters specified in a constructor or any other method represent the number in polar coordinates.
+--------------------------------------------------------------------------------
+@@TJclComplex.FracLength
+Summary:
+  Determines the precision used in formatting the value of the complex number.
+Description:
+  Use FracLength to set the number of digits beyond the decimal point that
+  the value should be formatted to before rounding begins. FracLength affects
+  the format of the floating-point value when it is displayed using properties AsString or AsPolarString,
+  not the actual floating-point
+  value that is stored in the complex number structures.
+  The default value of FracLength is 8 decimal places.
+Notes:
+  FracLength must be less or equal to 18. Trying to set FracLength to a value greater than 18 changes the value of FracLength to 18.
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.Create
+Summary:
+  Creates a new TComplex object.
+Description:
+  Call Create to construct a complex number object either equal to (0,0) or
+  filled with the values provided in X and Y parameters.
+Parameters:
+  X - The real part in the rectangular representation or radius in polar coordinates.
+  Y - The imaginary part in the rectangular representation or angle (in grads) in polar coordinates.
+  ComplexType - Optional. Represents the type of the complex number to be create.
+Notes:
+  All the calculations with complex numbers are performed with their rectangular representation members, except those that requires polar coordinates instead like exponential functions for instance.
+  The results of the calculations as well as the value of the complex number itself might be obtained in either rectangular or polar representation at any time using AsString or AsPolarString respectively.
+See also:
+  TComplexKind
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.RealPart
+Summary:
+  Specifies the value of the real part of the complex number i.e. X value in the pair of (X;Y).
+Description:
+  Use RealPart property to obtain the value of the real part of the
+  complex number i.e. X value in the pair of (X;Y).
+See also:
+  ImaginaryPart
+  Radius
+  Angle
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.ImaginaryPart
+Summary:
+  Specifies the value of the imaginary part of the complex number i.e. Y value in the pair of (X;Y).
+Description:
+  Use ImaginaryPart property to obtain the value of the imaginary part of the
+  complex number i.e. Y value in the pair of (X;Y).
+See also:
+  RealPart
+  Radius
+  Angle
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.Radius
+Summary:
+  Specifies the value of the radius in polar coordinates representation i.e. r value in the pair of (r;theta).
+Description:
+  Use Radius property to obtain the value of the radius in polar coordinates
+  representation of the complex number, i.e. r value in the pair of (r;theta).
+See also:
+  RealPart
+  ImaginaryPart
+  Angle
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.Angle
+Summary:
+  Specifies the value of the angle in polar coordinates representation of the complex number, i.e. theta value in the pair of (r;theta).
+Description:
+  Use Angle property to obtain the value of the angle in polar coordinates
+  representation of the complex number, i.e. theta value in the pair of (r;theta).
+See also:
+  RealPart
+  ImaginaryPart
+  Radius
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.AsString
+Summary:
+  AsString converts the value of the complex number to a string.
+Description:
+  Use AsString property to obtain a string representation of the complex number
+  formatted according to the canonical form of complex numbers in rectangular
+  representation. FracLength property is used to determine the
+  precision of float parts of the complex number. For example if your complex
+  number is (5.2345355; -3.599) and FracLength=2 you will get the
+  following string as the result of calling AsString: 5.23-3.60i
+  Also you might use this property to assign the value of a
+  string to the complex number object like this:<p align=center>
+  MyComplex.AsString := '-5.3453-3.543i' The string provided should represent
+  a complex number in its canonical rectangular form like this: x+yi, where
+  x and y are either positive or negative or zero floating values and i is the
+  constant text part. If either x or y is equal to zero, the corresponding part
+  of the complex number can be omitted.If the object is unable to parse the
+  string provided then an EJclMathError exception will be raised.
+See also:
+  AsPolarString
+  FracLength
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.AsPolarString
+Summary:
+  AsPolarString converts the value of the complex number to a string with a pair of complex number's polar coordinates.
+Description:
+  Use AsPolarString property to obtain a string representation of the complex number
+  formatted according to the canonical form of complex numbers in polar coordinates
+  representation. FracLength property is used to determine the
+  precision of float parts of the complex number. For example if your complex
+  number is (5.2345355; -3.599) and FracLength=2 you will get the
+  following string as the result of calling AsString: 5.23-CIS(3.60)
+  Here CIS(theta) = COS(theta) + SIN(theta)*i
+  Also you might use this property to assign the value of a
+  string to the complex number object like this:
+  MyComplex.AsPolarString := '-5.3453-CIS(3.543)'
+  The string provided should represent
+  a complex number in its canonical polar coordinates form like this: r+CIS(theta), where
+  r and theta are either positive or negative or zero floating values.
+  If either r or theta is equal to zero, the corresponding part
+  of the complex number can be omitted.If the object is unable to parse the
+  string provided then an EJclMathError exception will be raised.
+See also:
+  AsString
+  FracLength
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.Assign
+Summary:
+  Assign the value of (X;Y) to the complex number object using ComplexType representation.
+Description:
+  Use Assign method to set the value of your complex number object to (X;Y). ComplexType
+  parameter is used to determine whether floating-point parameters represents (X;Y)
+  or (r;theta) pair of values.
+Parameters:
+  X - The real part in the rectangular representation or radius in polar coordinates.
+  Y - The imaginary part in the rectangular representation or angle (in grads) in polar coordinates.
+  ComplexType - Optional. Represents the type of the floating-point parameters above.
+Result:
+  Method Assign returns the complex number object itself.
+Notes:
+  To assign a complex number the value of zero use AssignZero method instead.
+  To assign a complex number the value of 1 ("complex unit") use AssignOne method instead.
+See also:
+  TComplexKind
+  AssignZero
+  AssignOne
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.AssignOne
+Summary:
+  Assign the value of (1;0) to the complex number object.
+Description:
+  Use AssingOne method to set the value of your complex number object to 1
+  ("complex unit"). The call to AssignOne is equal to the following: Assign(1, 0).
+Result:
+  Method AssingOne returns the complex number object itself.
+Notes:
+  To assign a complex number the value of zero use AssignZero method instead.
+  To assign a complex number any value that differs from 1 or 0 use Assign method instead.
+See also:
+  TComplexKind
+  Assign
+  AssignZero
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.AssignZero
+Summary:
+  Assign the value of (0;0) to the complex number object.
+Description:
+  Use AssingOne method to set the value of your complex number object to zero
+  The call to AssignZero is equal to the following: Assign(0, 0). Also if you
+  call the constructor Create omitting the parameters this method
+  will be invoked automatically.
+Result:
+  Method AssingZero returns the complex number object itself.
+Notes:
+  To assign a complex number the value of 1 ("complex unit") use AssignOne method instead.
+  To assign a complex number any value that differs from 1 or 0 use Assign method instead.
+See also:
+  Create
+  TComplexKind
+  Assign
+  AssignOne
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.Duplicate
+Summary:
+  Creates a new object of TJclComplex type and assigns the value of the calling object to it.
+Description:
+  Use Duplicate method to create a new object of TJclComplex type and assign
+  the value of the calling object to it.
+Result:
+  Method Duplicate returns the newly created complex number object.
+Donator:
+  Alexei Koudinov
+--------------------------------------------------------------------------------
+@@TJclComplex.CAdd
+Summary:
+  Adds the value given by AddValue or X and Y parameters to the value of the current complex number object.
+Description:
+  Use CAdd method to add the value of the complex number provided to the
+  value of the calling object itself. The complex number to be added could be
+  set either as an object of TJclComplex type or a pair of its values (X;Y).
+Parameters:
+  AddValue - The complex number that should be added to the value of the object.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that should be added to the value of the object.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that should be added to the value of the object.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CAdd returns the calling object with the changed value.
+Notes:
+  The addition of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) + (X<sub>2</sub>;Y<sub>2</sub>) = (X<sub>1</sub>+X<sub>2</sub>;Y<sub>1</sub>+Y<sub>2</sub>).
+  For leaving the value of the calling object intact use CNewAdd method to create a new resulting object of TJclComplex type.
+See also:
+  CNewAdd
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CDiv
+Summary:
+  Divide the value of the current complex number object by the value given by DivValue or X and Y parameters.
+Description:
+  Use CDiv method to perform a division operation where the current complex
+  number object is a numerator and the value provided through either X and Y
+  or DivValue parameters is a denominator. The complex number to be divided by could be
+  set either as an object of TJclComplex type or a pair of its values (X;Y).
+Parameters:
+  DivValue - The complex number that is the denominator for the operation.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the denominator for the operation.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the denominator for the operation.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CDiv returns the calling object with the changed value.
+Notes:
+  The division of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) / (X<sub>2</sub>;Y<sub>2</sub>) = [(X<sub>1</sub> *X<sub>2</sub>+Y<sub>1</sub>*Y<sub>2</sub>)/(X<sub>2</sub><sup>2</sup>+Y<sub>2</sub><sup>2</sup>); (Y<sub>1</sub>*X<sub>2</sub>-X<sub>1</sub>*Y<sub>2</sub>)/ (X<sub>2</sub><sup>2</sup>+Y<sub>2</sub><sup>2</sup>)].
+  For leaving the value of the calling object intact use CNewDiv method to create a new resulting object of TJclComplex type.
+See also:
+  CNewDiv
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CMul
+Summary:
+  Multiply the value of the current complex number object by the value given by MulValue or X and Y parameters.
+Description:
+  Use CMul method to perform a multiplication operation where the current complex
+  number object is the first and the value provided through either X and Y
+  or DivValue parameters is the second multiplier. The complex number to be
+  multiplied by could be set either as an object of TJclComplex type or a pair
+  of its values (X;Y).
+Parameters:
+  MulValue - The complex number that is the second multiplier.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the second multiplier.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the second multiplier.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CMul returns the calling object with the changed value.
+Notes:
+  The multiplication of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) * (X<sub>2</sub>;Y<sub>2</sub>) = (X<sub>1</sub> *X<sub>2</sub>-Y<sub>1</sub>*Y<sub>2</sub>; X<sub>1</sub>*Y<sub>2</sub>+Y<sub>1</sub>*X<sub>2</sub>).
+  Note that for complex numbers the operations Z<sub>1</sub>*Z<sub>2</sub> and Z<sub>2</sub>*Z<sub>1</sub> give different results and cannot substitute each other.
+  For leaving the value of the calling object intact use CNewMul method to create a new resulting object of TJclComplex type.
+See also:
+  CNewMul
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CSub
+Summary:
+  Subtract the value given by MulValue or X and Y parameters from the value of the current complex number object.
+Description:
+  Use CSub method to perform a subtraction operation where the current complex
+  number object is the minuend and the value provided through either X and Y
+  or DivValue parameters is the subtrahend. The complex number to be
+  subtracted could be set either as an object of TJclComplex type or a pair
+  of its values (X;Y).
+Parameters:
+  SubValue - The complex number that is the subtrahend.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the subtrahend.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the subtrahend.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CSub returns the calling object with the changed value.
+Notes:
+  The subtraction of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) - (X<sub>2</sub>;Y<sub>2</sub>) = (X<sub>1</sub>-X<sub>2</sub>;Y<sub>1</sub>-Y<sub>2</sub>).
+  For leaving the value of the calling object intact use CNewSub method to create a new resulting object of TJclComplex type.
+See also:
+  CNewSub
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewAdd
+Summary:
+  Adds the value given by AddValue or X and Y parameters to the value of the current complex number object and creates a new resulting object of TJclComplex type.
+Description:
+  Use CNewAdd method to add the value of the complex number provided to the
+  value of the calling object and to create a new resulting object of
+  TJclComplex type. The complex number to be added could be
+  set either as an object of TJclComplex type or a pair of its values (X;Y).
+Parameters:
+  AddValue - The complex number that should be added to the value of the object.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that should be added to the value of the object.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that should be added to the value of the object.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CNewAdd returns a newly created object of TJclComplex type that contains
+  the value of the addition.
+Notes:
+  The addition of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) + (X<sub>2</sub>;Y<sub>2</sub>) = (X<sub>1</sub>+X<sub>2</sub>;Y<sub>1</sub>+Y<sub>2</sub>).
+  For changing the value of the calling object instead of creating a new object of TJclComplex type use CAdd method.
+See also:
+  CAdd
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewDiv
+Summary:
+  Divides the value of the current complex number object by the value given by DivValue or X and Y parameters and creates a new resulting object of TJclComplex type.
+Description:
+  Use CNewDiv method to perform a division operation where the current complex
+  number object is a numerator and the value provided through either X and Y
+  or DivValue parameters is a denominator and to create a resulting object of
+  TJclComplex type. The complex number to be divided by could be
+  set either as an object of TJclComplex type or a pair of its values (X;Y).
+Parameters:
+  DivValue - The complex number that is the denominator for the operation.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the denominator for the operation.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the denominator for the operation.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CNewDiv returns a newly created object of TJclComplex type that contains
+  the value of the division.
+Notes:
+  The division of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) / (X<sub>2</sub>;Y<sub>2</sub>) = [(X<sub>1</sub> *X<sub>2</sub>+Y<sub>1</sub>*Y<sub>2</sub>)/(X<sub>2</sub><sup>2</sup>+Y<sub>2</sub><sup>2</sup>); (Y<sub>1</sub>*X<sub>2</sub>-X<sub>1</sub>*Y<sub>2</sub>)/ (X<sub>2</sub><sup>2</sup>+Y<sub>2</sub><sup>2</sup>)].
+  For changing the value of the calling object instead of creating a resulting object of TJclComplex type use CDiv method.
+See also:
+  CDiv
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewMul
+Summary:
+  Multiplies the value of the current complex number object by the value given by MulValue or X and Y parameters and creates a new resulting object of TJclComplex type.
+Description:
+  Use CNewMul method to perform a multiplication operation where the current complex
+  number object is the first and the value provided through either X and Y
+  or DivValue parameters is the second multiplier and to create a resulting object of
+  TJclComplex type. The complex number to be multiplied by could be set either as
+  an object of TJclComplex type or a pair of its values (X;Y).
+Parameters:
+  MulValue - The complex number that is the second multiplier.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the second multiplier.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the second multiplier.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CNewMul returns a newly created object of TJclComplex type that contains
+  the value of the multiplication.
+Notes:
+  The multiplication of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) * (X<sub>2</sub>;Y<sub>2</sub>) = (X<sub>1</sub> *X<sub>2</sub>-Y<sub>1</sub>*Y<sub>2</sub>; X<sub>1</sub>*Y<sub>2</sub>+Y<sub>1</sub>*X<sub>2</sub>).
+  Note that for complex numbers the operations Z<sub>1</sub>*Z<sub>2</sub> and Z<sub>2</sub>*Z<sub>1</sub> give different results and cannot substitute each other.
+  For changing the value of the calling object instead of creating a resulting object of TJclComplex type use CMul method.
+See also:
+  CMul
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewSub
+Summary:
+  Subtracts the value given by MulValue or X and Y parameters from the value of the current complex number object and creates a new resulting object of TJclComplex type.
+Description:
+  Use CNewSub method to perform a subtraction operation where the current complex
+  number object is the minuend and the value provided through either X and Y
+  or DivValue parameters is the subtrahend and to create a resulting object of
+  TJclComplex type. The complex number to be subtracted could be set either as
+  an object of TJclComplex type or a pair of its values (X;Y).
+Parameters:
+  SubValue - The complex number that is the subtrahend.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the subtrahend.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the subtrahend.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CNewSub returns a newly created object of TJclComplex type that contains
+  the value of the subtraction.
+Notes:
+  The subtraction of the complex numbers is performed according to the following formula: (X<sub>1</sub>;Y<sub>1</sub>) - (X<sub>2</sub>;Y<sub>2</sub>) = (X<sub>1</sub>-X<sub>2</sub>;Y<sub>1</sub>-Y<sub>2</sub>).
+  For changing the value of the calling object instead of creating a resulting object of TJclComplex type use CSub method.
+See also:
+  CSub
+  TJclComplex
+  TComplexKind
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNeg
+Summary:
+  Multiply the current value of the complex number object by a complex negative one.
+Description:
+  Use CNeg method to perform a negative transformation of the value of the current complex
+  number object i.e. to multiply it by a complex negative one. The method changes
+  the value of the current object, returning its reference.
+Result:
+  Method CNeg returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewNeg method.
+See also:
+  CNewNeg
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewNeg
+Summary:
+  Multiplies the current value of the complex number object by a complex negative one and creates a new resulting complex number object.
+Description:
+  Use CNewNeg method to perform a negative transformation of the value of the current complex
+  number object i.e. to multiply it by a complex negative one and create a new resulting
+  object of TJclComplex type.
+Result:
+  Method CNewNeg returns a newly created object of TJclComplex type that contains
+  the value of the negation.
+Notes:
+  For changing the value of the calling complex number object instead of creating a new one use CNeg method.
+See also:
+  CNeg
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CConjugate
+Summary:
+  Transform the value of the calling object of TJclComplex type into a conjugated complex number value.
+Description:
+  Use CConjugate method to obtain a conjugate to the current value of the complex number object
+  complex number. The method changes the value of the current object, returning its reference.
+Result:
+  Method CConjugate returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewConjugate method.
+See also:
+  CNewConjugate
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewConjugate
+Summary:
+  Transforms the value of the calling object of TJclComplex type into a conjugated complex number value and creates a new resulting complex number object.
+Description:
+  Use CNewConjugate method to obtain a conjugate to the current value of the complex number object
+  complex number.
+Result:
+  Method CNewConjugate returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling complex number object instead of creating a new one use CNewConjugate method.
+See also:
+  CConjugate
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CLn
+Summary:
+  Evaluates the natural logarithm of the value of the current complex number object.
+Description:
+  Use CLn method to evaluate the natural logarithm of the value of the current
+  complex number object and change the value of the object accordingly.
+Result:
+  Method CLn returns the calling object with the changed value.
+Notes:
+  Complex number natural logarithm is evaluated according to the following formula: Ln(Z) = (Ln(r); theta), where Z = (r; theta). Please note that the calculation is performed using polar coordinates and all the transformations between rectangular and polar coordinates are performed automatically.
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewLn method.
+See also:
+  CNewLn
+  CExp
+  CPwr
+  CIntPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewLn
+Summary:
+  Evaluates the natural logarithm of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewLn method to evaluate the natural logarithm of the value of the current
+  complex number object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewLn returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  Complex number natural logarithm is evaluated according to the following formula: Ln(Z) = (Ln(r); theta), where Z = (r; theta). Please note that the calculation is performed using polar coordinates and all the transformations between rectangular and polar coordinates are performed automatically.
+  For changing the value of the calling object instead of creating a new resulting object use CLn method.
+See also:
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CExp
+Summary:
+  Evaluates the exponential curve for the value of the current complex number object.
+Description:
+  Use CExp method to evaluate the exponential curve for the value of the current
+  complex number object and change the value of the object accordingly.
+Result:
+  Method CExp returns the calling object with the changed value.
+Notes:
+  Complex number exponential curve is evaluated according to the following formula: Exp(Z) = [Exp(x)*Cos(y); Exp(x)*Sin(y)], where Z = (x; y).
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewExp method.
+See also:
+  CNewExp
+  CLn
+  CPwr
+  CIntPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewExp
+Summary:
+  Evaluates the exponential curve for the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewExp method to evaluate the exponential curve for the value of the current
+  complex number object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewExp returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  Complex number exponential curve is evaluated according to the following formula: Exp(Z) = [Exp(x)*Cos(y); Exp(x)*Sin(y)], where Z = (x; y).
+  For changing the value of the calling object instead of creating a new resulting object use CExp method.
+See also:
+  CNewExp
+  CLn
+  CPwr
+  CIntPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CPwr
+Summary:
+  Raise the value of the current complex number object to the PwrValue power.
+Description:
+  Use CPwr method to raise the value of the current complex number object to the
+  PwrValue power and change the value of the object accordingly. The complex number
+  that is the exponent for the operation is set either as an object of TJclComplex
+  type or as a pair of its values (X;Y).
+Parameters:
+  PwrValue - The complex number that is the exponent for the operation.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the exponent for the operation.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the exponent for the operation.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CPwr returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewPwr method.
+See also:
+  CNewPwr
+  CLn
+  CExp
+  CIntPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewPwr
+Summary:
+  Raises the value of the current complex number object to the PwrValue power and creates a new resulting complex number object.
+Description:
+  Use CNewPwr method to raise the value of the current complex number object to the
+  PwrValue power and get a new resulting object of TJclComplex type. The complex number
+  that is the exponent for the operation is set either as an object of TJclComplex
+  type or as a pair of its values (X;Y).
+Parameters:
+  PwrValue - The complex number that is the exponent for the operation.
+  X - The real part in the rectangular representation or radius in polar coordinates of the complex number that is the exponent for the operation.
+  Y - The imaginary part in the rectangular representation or angle in polar coordinates of the complex number that is the exponent for the operation.
+  ComplexType - Optional. Defines whether X and Y parameters are stated in rectangular representation or in polar coordinates.
+Result:
+  Method CNewPwr returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CPwr method.
+See also:
+  CPwr
+  CLn
+  CExp
+  CIntPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CIntPwr
+Summary:
+  Raise the value of the current complex number object to the Pwr power that is represented by an integer value.
+Description:
+  Use CIntPwr method to raise the value of the current complex number object to the
+  Pwr power that is represented by an integer value and change the value of the
+  calling object accordingly.
+Parameters:
+  Pwr - The exponent, that the value of the calling object should be raised to.
+Result:
+  Method CIntPwr returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewIntPwr method.
+See also:
+  CNewIntPwr
+  CLn
+  CExp
+  CPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewIntPwr
+Summary:
+  Raises the value of the current complex number object to the Pwr power that is represented by an integer value and creates a new resulting complex number object.
+Description:
+  Use CNewIntPwr method to raise the value of the current complex number object to the
+  Pwr power that is represented by an integer value and get a new resulting object
+  of TJclComplex type.
+Parameters:
+  Pwr - The exponent, that the value of the calling object should be raised to.
+Result:
+  Method CNewIntPwr returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CIntPwr method.
+See also:
+  CIntPwr
+  CLn
+  CExp
+  CPwr
+  CRealPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CRealPwr
+Summary:
+  Raise the value of the current complex number object to the Pwr power that is represented by a floating-point value.
+Description:
+  Use CRealPwr method to raise the value of the current complex number object to the
+  Pwr power that is represented by a floating-point value and change the value of the
+  calling object accordingly.
+Parameters:
+  Pwr - The exponent, that the value of the calling object should be raised to.
+Result:
+  Method CRealPwr returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewRealPwr method.
+See also:
+  CNewRealPwr
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewRealPwr
+Summary:
+  Raises the value of the current complex number object to the Pwr power that is represented by a floating-point value and creates a new resulting complex number object.
+Description:
+  Use CNewRealPwr method to raise the value of the current complex number object to the
+  Pwr power that is represented by a floating-point value and get a new resulting object
+  of TJclComplex type.
+Parameters:
+  Pwr - The exponent, that the value of the calling object should be raised to.
+Result:
+  Method CNewRealPwr returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CRealPwr method.
+See also:
+  CRealPwr
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRoot
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CRoot
+Summary:
+  Extracts the N-th root and returns the K-th root of the extraction where K is varying from 0 to N-1.
+Description:
+  Use CRoot method to extract the N-th root from the value of the calling complex
+  number object, get the K-th root of the extraction, where K varies from 0 to
+  N-1 and change the value of the calling object accordingly.
+Parameters:
+  K - The number of the root to be returned.
+  N - The value of the root to be extracted.
+Result:
+  Method CRoot returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewRoot method.
+See also:
+  CNewRoot
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRealPwr
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewRoot
+Summary:
+  Extracts the N-th root and returns the K-th root of the extraction where K is varying from 0 to N-1 and creates a new resulting complex number object.
+Description:
+  Use CNewRoot method to extract the N-th root from the value of the calling complex
+  number object, get the K-th root of the extraction, where K varies from 0 to
+  N-1 and get a new resulting object of TJclComplex type.
+Parameters:
+  K - The number of the root to be returned.
+  N - The value of the root to be extracted.
+Result:
+  Method CNewRoot returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CRoot method.
+See also:
+  CRoot
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRealPwr
+  CSqrt
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CSqrt
+Summary:
+  Extracts the second root from the value of the calling complex number object.
+Description:
+  Use CSqrt method to extract the second root from the value of the calling complex
+  number object and change the value of the calling object accordingly.
+Result:
+  Method CSqrt returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewSqrt method.
+See also:
+  CNewSqrt
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRealPwr
+  CRoot
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewSqrt
+Summary:
+  Extracts the second root from the value of the calling complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewSqrt method to extract the second root from the value of the calling complex
+  number object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewSqrt returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CSqrt method.
+See also:
+  CSqrt
+  CLn
+  CExp
+  CPwr
+  CIntPwr
+  CRealPwr
+  CRoot
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CCos
+Summary:
+  Evaluates the cosine of the value of the current complex number object.
+Description:
+  Use CCos method to evaluate the cosine of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CCos returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewCos method.
+See also:
+  CNewCos
+  CSin
+  CTan
+  CCot
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewCos
+Summary:
+  Evaluates the cosine of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewCos method to evaluate the cosine of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewCos returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CCos method.
+See also:
+  CCos
+  CSin
+  CTan
+  CCot
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CSin
+Summary:
+  Evaluates the sine of the value of the current complex number object.
+Description:
+  Use CSin method to evaluate the sine of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CSin returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewSin method.
+See also:
+  CNewSin
+  CCos
+  CTan
+  CCot
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewSin
+Summary:
+  Evaluates the sine of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewSin method to evaluate the sine of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewSin returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CSin method.
+See also:
+  CSin
+  CCos
+  CTan
+  CCot
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CTan
+Summary:
+  Evaluates the tangent of the value of the current complex number object.
+Description:
+  Use CTan method to evaluate the tangent of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CTan returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewTan method.
+See also:
+  CNewTan
+  CSin
+  CCos
+  CCot
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewTan
+Summary:
+  Evaluates the tangent of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewTan method to evaluate the tangent of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewTan returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CTan method.
+See also:
+  CTan
+  CSin
+  CCos
+  CCot
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CCot
+Summary:
+  Evaluates the cotangent of the value of the current complex number object.
+Description:
+  Use CCot method to evaluate the cotangent of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CCot returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewCot method.
+See also:
+  CNewCot
+  CSin
+  CTan
+  CCos
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewCot
+Summary:
+  Evaluates the cotangent of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewCot method to evaluate the cotangent of the value of the calling complex
+  number object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewCot returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CCot method.
+See also:
+  CCot
+  CSin
+  CTan
+  CCos
+  CSec
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CSec
+Summary:
+  Evaluates the secant of the value of the current complex number object.
+Description:
+  Use CSec method to evaluate the secant of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CSec returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewSec method.
+See also:
+  CNewSec
+  CSin
+  CTan
+  CCot
+  CCos
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewSec
+Summary:
+  Evaluates the secant of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewSec method to evaluate the secant of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewSec returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CSec method.
+See also:
+  CSec
+  CSin
+  CTan
+  CCot
+  CCos
+  CCsc
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CCsc
+Summary:
+  Evaluates the cosecant of the value of the current complex number object.
+Description:
+  Use CCsc method to evaluate the cosecant of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CCsc returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewCsc method.
+See also:
+  CNewCsc
+  CSin
+  CTan
+  CCot
+  CSec
+  CCos
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewCsc
+Summary:
+  Evaluates the cosecant of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewCsc method to evaluate the cosecant of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewCsc returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CCsc method.
+See also:
+  CCsc
+  CSin
+  CTan
+  CCot
+  CCos
+  CSec
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CCosH
+Summary:
+  Evaluates the hyperbolic cosine of the value of the current complex number object.
+Description:
+  Use CCosH method to evaluate the hyperbolic cosine of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CCosH returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewCosH method.
+See also:
+  CNewCosH
+  CSinH
+  CTanH
+  CCotH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewCosH
+Summary:
+  Evaluates the hyperbolic cosine of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewCosH method to evaluate the hyperbolic cosine of the value of the
+  calling complex number object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewCosH returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CCosH method.
+See also:
+  CCosH
+  CSinH
+  CTanH
+  CCotH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CSinH
+Summary:
+  Evaluates the hyperbolic sine of the value of the current complex number object.
+Description:
+  Use CSinH method to evaluate the hyperbolic sine of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CSinH returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewSinH method.
+See also:
+  CNewSinH
+  CCosH
+  CTanH
+  CCotH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewSinH
+Summary:
+  Evaluates the hyperbolic sine of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewSinH method to evaluate the hyperbolic sine of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewSinH returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CSinH method.
+See also:
+  CSinH
+  CCosH
+  CTanH
+  CCotH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CTanH
+Summary:
+  Evaluates the hyperbolic tangent of the value of the current complex number object.
+Description:
+  Use CTanH method to evaluate the hyperbolic tangent of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CTanH returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewTanH method.
+See also:
+  CNewTanH
+  CSinH
+  CCosH
+  CCotH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewTanH
+Summary:
+  Evaluates the hyperbolic tangent of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewTanH method to evaluate the hyperbolic tangent of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewTanH returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CTanH method.
+See also:
+  CTanH
+  CSinH
+  CCosH
+  CCotH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CCotH
+Summary:
+  Evaluates the hyperbolic cotangent of the value of the current complex number object.
+Description:
+  Use CCotH method to hyperbolic evaluate the cotangent of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CCotH returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewCotH method.
+See also:
+  CNewCotH
+  CSinH
+  CTanH
+  CCosH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewCotH
+Summary:
+  Evaluates the hyperbolic cotangent of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewCotH method to hyperbolic evaluate the cotangent of the value of the calling complex
+  number object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewCotH returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CCotH method.
+See also:
+  CCotH
+  CSinH
+  CTanH
+  CCosH
+  CSecH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CSecH
+Summary:
+  Evaluates the hyperbolic secant of the value of the current complex number object.
+Description:
+  Use CSecH method to evaluate the hyperbolic secant of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CSecH returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewSecH method.
+See also:
+  CNewSecH
+  CSinH
+  CTanH
+  CCotH
+  CCosH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewSecH
+Summary:
+  Evaluates the hyperbolic secant of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewSecH method to evaluate the hyperbolic secant of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewSecH returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CSecH method.
+See also:
+  CSecH
+  CSinH
+  CTanH
+  CCotH
+  CCosH
+  CCscH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CCscH
+Summary:
+  Evaluates the hyperbolic cosecant of the value of the current complex number object.
+Description:
+  Use CCscH method to evaluate the hyperbolic cosecant of the value of the calling complex number
+  object and change the value of the calling object accordingly.
+Result:
+  Method CCscH returns the calling object with the changed value.
+Notes:
+  For creating a new resulting complex number object instead of changing the value of the current one use CNewCscH method.
+See also:
+  CNewCscH
+  CSinH
+  CTanH
+  CCotH
+  CSecH
+  CCosH
+  TJclComplex
+Donator:
+  Earl F. Glynn
+--------------------------------------------------------------------------------
+@@TJclComplex.CNewCscH
+Summary:
+  Evaluates the hyperbolic cosecant of the value of the current complex number object and creates a new resulting complex number object.
+Description:
+  Use CNewCscH method to evaluate the hyperbolic cosecant of the value of the calling complex number
+  object and get a new resulting object of TJclComplex type.
+Result:
+  Method CNewCscH returns a newly created object of TJclComplex type that contains
+  the value computed.
+Notes:
+  For changing the value of the calling object instead of creating a new resulting object use CCscH method.
+See also:
+  CCscH
+  CSinH
+  CTanH
+  CCotH
+  CCosH
+  CSecH
+  TJclComplex
+Donator:
+  Earl F. Glynn

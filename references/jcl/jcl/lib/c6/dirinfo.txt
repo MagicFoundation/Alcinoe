@@ -1,0 +1,3 @@
+This directory is intended as a common place for .bpi and .lib files of BCB 6 packages.
+
+windows.exc: List of BCB 6 incompatible files in $(JCL)/source/windows; exclude from compilation.

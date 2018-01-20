@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclProjectAnalysisExpertDLL" Type="L">
+  <Description>JCL Project Analyzer</Description>
+  <GUID>{6E22E269-A58C-41B6-BB1C-57670E460887}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58060000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\projectanalyzer\JclProjectAnalyzerFrm.pas" Targets="runtimeIDE" Formname="ProjectAnalyzerForm" Condition=""/>
+    <File Name="..\..\experts\projectanalyzer\JclProjectAnalyzerImpl.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+  </Contains>
+</Package>

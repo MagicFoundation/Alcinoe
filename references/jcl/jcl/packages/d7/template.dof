@@ -1,0 +1,11 @@
+[Directories]
+UnitOutputDir=..\..\lib\d7
+SearchPath=..\..\source\include;..\..\experts\common
+Conditionals=%DEFINES%
+<%%% BEGIN LIBRARYONLY %%%>
+[Compiler]
+PackageNoLink=1
+[Linker]
+Packages=%NOLINKPACKAGELIST%
+<%%% END LIBRARYONLY %%%>
+

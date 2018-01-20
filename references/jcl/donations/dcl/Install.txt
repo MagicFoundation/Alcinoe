@@ -1,0 +1,26 @@
+The Delphi Container Library
+============================
+
+Installation Note
+-----------------
+
+1. Decompress the archive in a directory of your choice. (Ex: D:\DCL)
+2. In Delphi, menu Tools | Environment Options, Library Tab, in Library Path, 
+   Add the path to access to the source of the DCL. (Ex: D:\DCL)
+3. in the file dcl.inc, you can active the switch THREADSAFE.
+4. You can build a runtime package with DCL_D7.dpk.
+5. Open a demo in the demos directory (Ex: D:\DCL\demos\Perf\Perf.dpr), compile it and test it.
+
+Documentation are available in the doc directory (Ex: D:\DCL\doc\index.html)
+
+The DCL is totally free to redistribute.
+
+for any comments, remarks or bugs, mail to: rdm_30@yahoo.com
+
+http://sourceforge.net/projects/dclx
+
+
+
+Jean-Philippe BEMPEL aka RDM.
+
+

@@ -1,0 +1,32 @@
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 2,7,0,5300
+PRODUCTVERSION 2,7,0,5300
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+         BLOCK "040904E4"
+         BEGIN
+              VALUE "CompanyName", "Project JEDI\0"
+              VALUE "FileDescription", "JCL Open and Save IDE dialogs with favorite folders\0"
+              VALUE "FileVersion", "2.7.0.5300\0"
+              VALUE "InternalName", "JclFavoriteFoldersExpertDLL\0"
+              VALUE "LegalCopyright", "Copyright (C) 1999, 2014 Project JEDI\0"
+              VALUE "OriginalFilename", "JclFavoriteFoldersExpertDLL210.dll\0"
+              VALUE "ProductName", "JEDI Code Library\0"
+              VALUE "ProductVersion", "2.7.0.5300\0"
+         END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+         VALUE "Translation", 0x0409, 1252
+    END
+END

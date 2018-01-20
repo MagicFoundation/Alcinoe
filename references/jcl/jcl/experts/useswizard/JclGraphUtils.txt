@@ -1,0 +1,4 @@
+DottedLineTo
+SetBitmapColors
+PPointArray
+TPointArray

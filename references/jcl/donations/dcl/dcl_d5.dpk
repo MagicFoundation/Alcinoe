@@ -1,0 +1,45 @@
+package DCL_D5;
+
+{$R *.RES}
+{$ALIGN ON}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS OFF}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST ON}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  vcl50;
+
+contains
+  JclVector in 'JclVector.pas',
+  JclAbstractContainer in 'JclAbstractContainer.pas',
+  JclAlgorithms in 'JclAlgorithms.pas',
+  JclArrayList in 'JclArrayList.pas',
+  JclArraySet in 'JclArraySet.pas',
+  JclDCL_intf in Jcl'DCL_intf.pas',
+  JclDCLUtil in 'JclDCLUtil.pas',
+  JclHashMap in 'JclHashMap.pas',
+  JclHashSet in 'JclHashSet.pas',
+  JclLinkedList in 'JclLinkedList.pas',
+  JclQueue in 'vQueue.pas',
+  JclStack in 'JclStack.pas';
+
+end.

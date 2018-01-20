@@ -1,0 +1,9 @@
+[Directories]
+UnitOutputDir=..\..\lib\c6
+SearchPath=..\..\source\include
+Conditionals=BCB;WIN32;CONDITIONALEXPRESSIONS;VER140;RELEASE
+[Compiler]
+PackageNoLink=1
+[Linker]
+Packages=rtl;vcl;designide;Jcl;JclVcl;JclBaseExpert
+

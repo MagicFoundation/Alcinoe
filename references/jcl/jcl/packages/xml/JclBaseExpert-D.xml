@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclBaseExpert" Design="-1">
+  <Description>JCL Package containing common units for JCL Experts</Description>
+  <GUID>{587944EE-7D27-4950-95F5-430FFBFC465C}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58000000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vclx" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclDeveloperTools-R" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\install\JediRegInfo.pas" Targets="designtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaUtils.pas" Targets="designtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaResources.pas" Targets="designtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaConsts.pas" Targets="designtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaExceptionForm.pas" Targets="designtimeIDE" Formname="JclExpertExceptionForm" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaConfigurationForm.pas" Targets="designtimeIDE" Formname="JclOtaOptionsForm" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaActionConfigureSheet.pas" Targets="designtimeIDE" Formname="JclOtaActionConfigureFrame: TFrame" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaActions.pas" Targets="designtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaUnitVersioningSheet.pas" Targets="designtimeIDE" Formname="JclOtaUnitVersioningFrame: TFrame" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaUnitVersioning.pas" Targets="designtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaWizardForm.pas" Targets="designtimeIDE" Formname="JclWizardForm" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaWizardFrame.pas" Targets="designtimeIDE" Formname="JclWizardFrame: TFrame" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaAddinOptions.pas" Targets="allv15up" Formname="" Condition=""/>
+    <File Name="..\..\experts\common\JclOtaEmptyAddinOptionsFrame.pas" Targets="allv15up" Formname="JclOtaEmptyAddinOptionsFrm: TFrame" Condition=""/>
+  </Contains>
+</Package>

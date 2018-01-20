@@ -1,0 +1,60 @@
+#------------------------------------------------------------------------------
+VERSION = BWS.01
+#------------------------------------------------------------------------------
+!ifndef ROOT
+ROOT = $(MAKEDIR)\..
+!endif
+#------------------------------------------------------------------------------
+MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$**
+DCC = $(ROOT)\bin\dcc32.exe $**
+BRCC = $(ROOT)\bin\brcc32.exe $**
+#------------------------------------------------------------------------------
+PROJECTS = Jcl70.bpl JclVcl70.bpl JclContainers70.bpl JclDeveloperTools70.bpl \
+  JclBaseExpert70.bpl JclDebugExpert70.bpl JclFavoriteFoldersExpert70.bpl \
+  JclProjectAnalysisExpert70.bpl JclRepositoryExpert70.bpl \
+  JclSIMDViewExpert70.bpl JclStackTraceViewerExpert70.bpl \
+  JclUsesExpert70.bpl JclVersionControlExpert70.bpl
+#------------------------------------------------------------------------------
+default: $(PROJECTS)
+#------------------------------------------------------------------------------
+
+Jcl70.bpl: d7\Jcl.dpk
+  $(DCC)
+
+JclVcl70.bpl: d7\JclVcl.dpk
+  $(DCC)
+
+JclContainers70.bpl: d7\JclContainers.dpk
+  $(DCC)
+
+JclDeveloperTools70.bpl: d7\JclDeveloperTools.dpk
+  $(DCC)
+
+JclBaseExpert70.bpl: d7\JclBaseExpert.dpk
+  $(DCC)
+
+JclDebugExpert70.bpl: d7\JclDebugExpert.dpk
+  $(DCC)
+
+JclFavoriteFoldersExpert70.bpl: d7\JclFavoriteFoldersExpert.dpk
+  $(DCC)
+
+JclProjectAnalysisExpert70.bpl: d7\JclProjectAnalysisExpert.dpk
+  $(DCC)
+
+JclRepositoryExpert70.bpl: d7\JclRepositoryExpert.dpk
+  $(DCC)
+
+JclSIMDViewExpert70.bpl: d7\JclSIMDViewExpert.dpk
+  $(DCC)
+
+JclStackTraceViewerExpert70.bpl: d7\JclStackTraceViewerExpert.dpk
+  $(DCC)
+
+JclUsesExpert70.bpl: d7\JclUsesExpert.dpk
+  $(DCC)
+
+JclVersionControlExpert70.bpl: d7\JclVersionControlExpert.dpk
+  $(DCC)
+
+

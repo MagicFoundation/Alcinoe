@@ -1,0 +1,8 @@
+USEUNIT("..\..\experts\debug\simdview\JclSIMDViewForm.pas");
+USEUNIT("..\..\experts\debug\simdview\JclSIMDView.pas");
+USEUNIT("..\..\experts\debug\simdview\JclSIMDUtils.pas");
+USEUNIT("..\..\experts\debug\simdview\JclSIMDModifyForm.pas");
+USEUNIT("..\..\experts\debug\simdview\JclSIMDCpuInfo.pas");
+USEDEF("JclSIMDViewExpertDLL.def");
+Project file
+DllEntryPoint

@@ -1,0 +1,1 @@
+This directory is intended as a common place for debug library files of BCB 6 packages.

@@ -1,0 +1,50 @@
+package StackTraceViewerFastMM;
+
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO OFF}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES OFF}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESIGNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  designide,
+  Jcl,
+  vcl,
+  JclBaseExpert,
+  xmlrtl,
+  vclactnband,
+  vclx,
+  JclStackTraceViewerExpert;
+
+contains
+  StackTraceViewerFastMMReg in 'StackTraceViewerFastMMReg.pas',
+  StackTraceViewerFastMMUnit in 'StackTraceViewerFastMMUnit.pas',
+  FastMMParser in 'FastMMParser.pas',
+  FastMMLeakFrame in 'FastMMLeakFrame.pas' {frmLeak: TFrame},
+  FastMMLeakGroupFrame in 'FastMMLeakGroupFrame.pas' {frmLeakGroup: TFrame},
+  FastMMFreedObjectFrame in 'FastMMFreedObjectFrame.pas' {frmFreedObject: TFrame},
+  FastMMMemoryFrame in 'FastMMMemoryFrame.pas' {frmMemory: TFrame},
+  FastMMLeakSummaryFrame in 'FastMMLeakSummaryFrame.pas' {frmLeakSummary: TFrame},
+  FastMMMemoryVisualizerFrame in 'FastMMMemoryVisualizerFrame.pas' {frmMemoryVisualizer: TFrame};
+
+end.

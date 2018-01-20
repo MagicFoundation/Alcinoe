@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">Default.Personality</Option>
+			<Option Name="ProjectType"></Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{B8F62478-FB0F-4B4D-9379-F2D244917B58}</Option>
+		</Option>
+	</PersonalityInfo>
+	<Default.Personality>  <Projects>
+      <Projects Name="JclDebugExpert90.bpl">JclDebugExpert.bdsproj</Projects>
+      <Projects Name="JclSIMDViewExpert90.bpl">JclSIMDViewExpert.bdsproj</Projects>
+      <Projects Name="JclProjectAnalysisExpert90.bpl">JclProjectAnalysisExpert.bdsproj</Projects>
+      <Projects Name="JclFavoriteFoldersExpert90.bpl">JclFavoriteFoldersExpert.bdsproj</Projects>
+      <Projects Name="JclUsesExpert90.bpl">JclUsesExpert.bdsproj</Projects>
+      <Projects Name="JclThreadNameExpert90.bpl">JclThreadNameExpert.bdsproj</Projects>
+      <Projects Name="Targets">JclDebugExpert90.bpl JclSIMDViewExpert90.bpl JclProjectAnalysisExpert90.bpl JclFavoriteFoldersExpert90.bpl JclUsesExpert90.bpl JclThreadNameExpert90.bpl</Projects>
+    </Projects>
+    <Dependencies/>
+  </Default.Personality>
+</BorlandProject>

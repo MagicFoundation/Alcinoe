@@ -1,0 +1,20 @@
+<%%% BEGIN PACKAGEONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END PACKAGEONLY %%%>
+<%%% BEGIN RUNONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END RUNONLY %%%>
+<%%% BEGIN DESIGNONLY %%%>
+<%%% DO NOT GENERATE %%%>
+<%%% END DESIGNONLY %%%>
+<%%% START FILES %%%>
+USEUNIT("%FILENAME%");
+<%%% END FILES %%%>
+USEDEF("%NAME%.def");
+Project file
+<%%% BEGIN PROGRAMONLY %%%>
+WinMain
+<%%% END PROGRAMONLY %%%>
+<%%% BEGIN LIBRARYONLY %%%>
+DllEntryPoint
+<%%% END LIBRARYONLY %%%>

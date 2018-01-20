@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclDebugExpertDLL" Type="L">
+  <Description>JCL Debug IDE extension</Description>
+  <GUID>{36195812-0F7A-45E7-BE07-04EABA463169}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58150000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+    <Package Name="JclDeveloperTools-R" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\debug\converter\JclDebugIdeResult.pas" Targets="runtimeIDE" Formname="JclDebugResultForm" Condition=""/>
+    <File Name="..\..\experts\debug\converter\JclDebugIdeImpl.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\debug\converter\JclDebugIdeConfigFrame.pas" Targets="runtimeIDE" Formname="JclDebugIdeConfigFrame: TFrame" Condition=""/>
+  </Contains>
+</Package>

@@ -1,0 +1,41 @@
+@charset "iso-8859-1";
+  body {COLOR: black; FONT-FAMILY: Verdana, Arial, Tahoma; FONT-SIZE: 10pt; BACKGROUND: url(images/background.gif)}
+  td {
+    color: black;
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 10pt }
+  a {COLOR: black; TEXT-DECORATION: none; FONT: bold}
+  a:active {
+    color: red;
+    text-decoration: none}
+  a:visited {
+    color: black;
+    /* font-style: italic; */
+    text-decoration: none}
+  a:hover {
+    color: red;
+    text-decoration: underline}
+  hr {
+    color: white}
+
+  /* Forms */
+  form {
+    margin-top: 4px;
+    margin-bottom: 4px}
+  input {
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 10pt }
+  select {
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 10pt }
+  textarea {
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 10pt }
+
+  .clDescMethod 
+  {
+  	color: black;
+	font-family: Courier New;
+	font-size: 10pt;
+  }
+

@@ -1,0 +1,59 @@
+﻿; This is a Doc-O-Matic version 6.5.1.1382 project file.
+; This file is maintained by Doc-O-Matic, do not edit manually.
+
+[*Control*]
+MasterFile=..\..\..\help\JclTemplate.dox
+
+[Configurations\CHM\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclVclcontents.html
+IndexFile=JclVclidx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclVclcontents.html
+IndexFile=JclVclidx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\HTMLHelp]
+Help2Collection=JclVcl_COL_MASTER.HxC
+Help2ID=JclVcl
+HTMLHelp2Filename=..\..\help\JclVcl.HxS
+
+[Configurations\HLP\{C81B476F-5DE3-416C-A73A-9674B8ECC110}\Basic]
+HLPFilename=..\..\help\JclVcl.hlp
+
+[Configurations\HTML\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclVclcontents.html
+IndexFile=JclVclidx.html
+
+[Project Database Files]
+Count=3
+File0=..\..\..\help\VCL.doxdb
+File1=..\..\..\help\JEDI.doxdb
+File2=Jcl.doxdb
+
+[Source Files]
+Count=17
+File0=..\..\source\vcl\JclPrint.pas
+File1=..\..\source\vcl\JclGraphUtils.pas
+File2=..\..\source\vcl\JclGraphics.pas
+File3=..\..\source\vcl\JclFont.pas
+File4=..\..\source\vcl\JclOpenDialogHooks.pas
+File5=..\..\source\vcl\JclOpenDialogFavorites.pas
+File6=..\..\source\vcl\JclVclResources.pas
+File7=..\..\source\vcl\JclVersionControl.pas
+File8=..\..\source\vcl\JclVersionCtrlCVSImpl.pas
+File9=..\..\source\vcl\JclVersionCtrlGITImpl.pas
+File10=..\..\source\vcl\JclVersionCtrlSVNImpl.pas
+File11=..\..\..\help\Bitmap32.dtx
+File12=..\..\..\help\Common.dtx
+File13=..\..\..\help\Font.dtx
+File14=..\..\..\help\Graphics.dtx
+File15=..\..\..\help\JclVcl.dtx
+File16=..\..\..\help\Regions.dtx
+
+[General]
+Copyright=Copyright (C) 1999, 2014 Project JEDI
+Summary=Documentation of the JEDI Code Library VCL package
+Title=JEDI Code Library VCL package
+VersionBuild=5300
+VersionMajor=2
+VersionMinor=7

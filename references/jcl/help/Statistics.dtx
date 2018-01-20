@@ -1,0 +1,299 @@
+@@ArithmeticMean
+<GROUP MathRoutines.Statistics>
+Summary:
+  Calculates the arithmetic mean of an array of floats.
+Description:
+  ArithmeticMean calculates the arithmetic mean of an array of floats. The arithmetic
+  mean is defined as the sum of the elements divided by the number of elements.
+Parameters:
+  X - The array of floating point values for which to calculate the arithmetic mean.
+Result:
+  The arithmetic mean of the array of floats. If the array is empty the return
+  value is 0.0.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@BinomialCoeff
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns nCr, i.e. Combination of R objects from N.
+Description:
+  BinomialCoeff returns nCr, i.e. Combination of R objects from N, also known as the
+  binomial coefficient. A Combination is the number of non-order specific ways you can
+  organize R items taken from a pool of N items. For example, [Red, Blue, Green] is the
+  same combination as [Green, Blue, Red].
+Parameters:
+  N - N is the total number of possible items from which R items will be selected. N must be greater than or equal to R but cannot exceed the value of the MaxFactorial constant (defined as 1754 if Float is Extended). N must be greater than 0, otherwise 0 is returned.
+  R - R is the number of items taken from N which will be combined in result possible ways. R must be greater than 0 but less than or equal to N or 0 will be returned.
+Result:
+  The binomial coefficient of R objects from N.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@GeometricMean
+<GROUP MathRoutines.Statistics>
+Summary:
+  Calculates the geometric mean of an array of floats.
+Description:
+  GeometricMean calculates the geometric mean of an array of floats. The geometric
+  mean is defined as the N-root (X^(1/N)) of the product of the elements.
+  The array is not allowed to have 0 valued elements and cannot be
+  empty. If either of these constraints are not met the function raises an EMathError
+  exception.
+Parameters:
+  X - The array of floats for which to calculate the geometric mean. The array may not contain elements with a value equal to or smaller than 0. The comparison to 0 is made based on the PrecisionTolerance global variable. If any of the elements do not conform to this constraint the function raises an EMathError exception.
+Result:
+  The geometric mean of the array of floats.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@HarmonicMean
+<GROUP MathRoutines.Statistics>
+Summary:
+  Calculates the harmonic mean of an array of floats.
+Description:
+  HarmonicMean calculates the harmonic mean of an array of floats. The harmonic mean
+  is defined as the number of elements divided by the sum of the reciprocal of the
+  elements. The supplied array may not be empty nor may it contain 0 valued elements. If
+  either of these constraints are not met the function raises an EMathError exception.
+Parameters:
+  X - The array of floats for which to calculate the harmonic mean. The array cannot be empty and must contain only elements with a value greater than zero. The comparison to 0 is made based on the PrecisionTolerance global variable. If any of the elements do not conform to this constraint the function raises an EMathError exception.
+Result:
+  The harmonic mean of the array of floats.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@IsPositiveFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Tests whether an array contains only positive elements.
+Description:
+  IsPositiveFloatArray tests whether or not the supplied array contains only
+  elements with a value greater than 0. The comparison is based on the
+Parameters:
+  X - The array of floats to test.
+Result:
+  If the supplied array contains only elements with a value greater than 0 the
+  function returns True. If one or more elements is smaller than or equal to 0 the
+  function returns False. If the array is empty an EMathError exception is raised.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@MaxFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the maximum value in the array.
+Description:
+  MaxFloatArray returns the maximum value found in the supplied array.
+Parameters:
+  B - The array for which you want to know the value of the maximum. The array cannot be empty or an EMathError exception is raised.
+Result:
+  The maximum value found in the array.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@MaxFloatArrayIndex
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the index of element with the maximum value in the array.
+Description:
+  MaxFloatArrayIndex returns the index of the element that contains the maximum
+  value found in the supplied array.
+Parameters:
+  B - The array for which you want to know the value of the maximum. The array cannot be empty or an EMathError exception is raised.
+Result:
+  The index of the element which contains the maximum value in the array.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@Median
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the median of an (sorted) array of floats.
+Description:
+  Median returns the median (2nd quartiles) of an array of floats. The supplied
+  array must be sorted and cannot be empty. The median of a set of values
+  is the value which evenly separates the set of values so that one half of the
+  set is greater than the median.
+Parameters:
+  X - The array for which you want the median value.
+Result:
+  The median value of the supplied array. If the array is empty an EMathError
+  exception is raised.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@MedianUnsorted
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the median of an (unsorted) array of floats.
+Description:
+  Median returns the median (2nd quartiles) of an array of floats. The supplied
+  array cannot be empty. The median of a set of values is the value which evenly
+  separates the set of values so that one half of the set is greater than the median.
+Parameters:
+  X - The array for which you want the median value.
+Result:
+  The median value of the supplied array. If the array is empty an EMathError
+  exception is raised.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@MinFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the minimum value in the array.
+Description:
+  MinFloatArray returns the minimum value found in the supplied array.
+Parameters:
+  B - The array for which you want to know the value of the minimum. The array cannot be empty or an EMathError exception is raised.
+Result:
+  The minimum value found in the array.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@MinFloatArrayIndex
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the index of element with the minimum value in the array.
+Description:
+  MinFloatArrayIndex returns the index of the element that contains the minimum
+  value found in the supplied array.
+Parameters:
+  B - The array for which you want to know the value of the minimum. The array cannot be empty or an EMathError exception is raised.
+Result:
+  The index of the element which contains the minimum value in the array.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@Permutation
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns nPr. i.e. permutation of R objects from N.
+Description:
+  Permutation returns nPr, i.e. permutation of R objects from N. Note: N must
+  be greater than 0, R must be smaller than or equal to N and N must be smaller
+  than the global constant MaxPermutation (1754 when Float is Extended), otherwise
+  the function returns 0. A permutation is the number of unique ways you can organize R items taken from a pool of N items. For example, [Red, Blue, Green] is not the same permutation as [Green, Blue, Red].
+Parameters:
+  N - N is the total number of available items, from which R items will be taken at a time. N must be greater than R but cannot exceed the value of the MaxFactorial constant or 0 will be returned.
+  R - R is the number of items that will be selected at a time from N total items. R must be smaller than or equal to N.
+Result:
+  If the above mentioned constraints are met the permutation of R objects from N is
+  returned or 1.0 if R = 0.0.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@PopulationVariance
+<GROUP MathRoutines.Statistics>
+Summary:
+  Calculates the variance of the values assuming a population.
+Description:
+  PopulationVariance calculates the variance of the values assuming a population.
+Parameters:
+  X - The array of values for which to calculate the variance. This array cannot be empty or an EMathError exception is raised.
+Result:
+  The variance of the values in X.
+Notes:
+  To calculate the standard deviation take the square root of the result of this function.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@PopulationVarianceAndMean
+<GROUP MathRoutines.Statistics>
+Summary:
+  Calculates the variance and mean of the values assuming a population.
+Description:
+  PopulationVarianceAndMean calculates the variance and mean of the values assuming a population.
+Parameters:
+  X - The array of values for which to calculate the variance. This array cannot be empty or an EMathError exception is raised.
+  Variance - Receives the variance of the values.
+  Mean - Receives the (arithmetic) mean of the values.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@SampleVariance
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the variance of the value assuming a sample.
+Description:
+  SampleVariance returns the variance of the value assuming a sample.
+Parameters:
+  X - The array for which to calculate the sample variance. This array cannot be empty or an EMathError exception is raised.
+Result:
+  The sample variance of the values.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@SampleVarianceAndMean
+<GROUP MathRoutines.Statistics>
+Summary:
+  Calculates the variance and mean of the value assuming a sample.
+Description:
+  SampleVarianceAndMean returns the variance and mean of the value assuming a sample.
+Parameters:
+  X - The array for which to calculate the sample variance. This array cannot be empty or an EMathError exception is raised.
+  Variance - Receives the sample variance of the values.
+  Mean - Receives the (arithmetic) mean of the values.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@SumFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the sum of the array of values.
+Description:
+  SumFloatArray calculates the sum of the elements of the supplied array.
+Parameters:
+  B - The array for which to calculate the sum. The array can be empty in which case the function returns 0.
+Result:
+  The sum of the elements or 0 if the array is empty.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@SumSquareDiffFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the sum of the square of Diff subtracted from each elements value.
+Description:
+  SumSquareDiffFloatArray returns the sum of the square of Diff subtracted from the
+  the elements value. Thus, it calculates
+  Sqr(B[0] - Diff) + Sqr(B[1] - Diff) + .. + Sqr(B[N-1] - Diff).
+Parameters:
+  B - The array for which to calculate the sum of the square of diff subtracted from the elements. The array can be empty in which case 0 is returned.
+Result:
+  The sum of the square of Diff subtracted from the elements value or 0 if the array is empty.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@SumSquareFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the sum of the square of the elements.
+Description:
+  SumSquareFloatArray calculates the sum of the square of the elements.
+Parameters:
+  B - The array for which to calculate the sum of the squares.
+Result:
+  The sum of the squares of the elements or 0 if the array is empty.
+Donator:
+  ESB Consultancy
+--------------------------------------------------------------------------------
+@@SumPairProductFloatArray
+<GROUP MathRoutines.Statistics>
+Summary:
+  Returns the sum of the product of the elements.
+Description:
+  SumPairProductFloatArray returns the sum of the pairwise product of the elements
+  of the two arrays. That is, it calculates: X[0]*Y[0] + X[1]*Y[1] + .. + X[N-1]*Y[N-1].
+  Note that N in the above formula is the highest common element of X and Y. Thus
+  you can supply arrays with a different dimension in which case the function will
+  only sum the product of the elements common to both arrays. For example, if X has
+  a length 10 and Y has a length 20 then the summation will run from 0 to 9 only.
+Parameters:
+  X - The first array.
+  Y - The second array.
+Result:
+  The sum of the pairwise product of the elements or 0 if both arrays are empty.
+Donator:
+  ESB Consultancy

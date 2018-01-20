@@ -1,0 +1,131 @@
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" HREF="..\DclStyle.css">
+<TITLE>MPL FAQ</TITLE>
+</HEAD>
+<BODY>
+<P ALIGN=CENTER>
+  <FONT SIZE="+2"><B>Mozilla Public License FAQ</B></FONT><BR>
+  <B>Draft 1.0, 4/10/2000</B>
+</P>
+<P><HR WIDTH="20%"><P>
+Please email Comments to <A HREF="mailto:mbeck@bigfoot.com">Michael Beck</A><BR>
+For additional information, please also check the <A HREF="http://www.mozilla.org/MPL/mpl-faq.html">Official FAQ from Mozilla</A>
+
+<H3>Author perspective</H3>
+<OL>
+  <LI><B>Q:</B> Do I retain copyright once I publish source under the MPL?<BR>
+      <B>A:</B> Absolutely. You still retain all your copyrights.
+  <LI><B>Q:</B> Can I release the code under a different (possibly commercial type) license?<BR>
+      <B>A:</B> Yes. Since you have the original copyright, you can do it, but you can do
+         it only for your own code, and not for any contributions from others.
+  <LI><B>Q:</B> In two years Acme, Inc. comes with a great new license, which I would love
+         to use. Am I always bound to MPL for my released code?<BR>
+      <B>A:</B> You can use a Dual License approach, i.e. you keep the code under MPL, and
+         you add another license, e.g. GPL. The user will have then the option to use
+         the one s/he prefers.<BR>
+         Or, as the Initial Contributor, with the original copyright, you can release
+         it under the other license. Please note: even if you release the code under
+         new license, users of your original MPL-released code can continue to use
+         under MPL as before.
+  <LI><B>Q:</B> I think, JEDI could benefit from having cryptographic functions. I would
+         like to donate some (DES, Tripple DES etc.), which are covered by patent
+         rights (RSA, for example)? How should I do it?<BR>
+      <B>A:</B> All contributions are "Subject to third party intellectual property (IP)
+         claims." Thus, if you are aware of any patents infringements, before
+         submitting make sure that you:
+         <UL>
+           <LI> secure the rights to use the IP in your contribution (e.g. by paying
+                a fee)
+           <LI> modify the code so it doesn't infringe (in our case, provide other,
+                non-patented cryptographic functions)
+           <LI> in a worst case scenario, if the two above are not possible, do not
+                submit the code
+         </UL>
+         Please note: different countries may have different patents laws. Therefore
+         in some countries it could be legal to use patented IP (e.g. because the
+         patent expired), while in others not. Check with your local Patent Office.
+</OL>
+
+<H3>User perspective</H3>
+<OL>
+  <LI><B>Q:</B> Can I use the MPL code in commercial software? If yes, am I obligated to
+         credit the author?<BR>
+      <B>A:</B> Yes, you can use the MPL code in any commercial software. Since you have
+         to include the MPL code, the credit is included in the license header.
+         While not required, it is also customary to credit the author in "AboutBox".
+  <LI><B>Q:</B> Must I release the source code of used components?<BR>
+      <B>A:</B> Only of those covered by MPL, together with any modifications to them.
+  <LI><B>Q:</B> Must I publish my apps under MPL if I used MPL licensed code (the viral aspect) ?<BR>
+      <B>A:</B> No. That's the big advantage over GPL - you can use different code, mix MPL
+         and commercial code, but you don't have to release either the application,
+         nor the non-MPL code under MPL.  Basically, what is MPL, will stay MPL,
+         but it doesn't have any impact on the non-MPL code.
+  <LI><B>Q:</B> If a bug in MPL licensed code renders my clients machine unbootable, who
+         can I hold responsible for that?<BR>
+      <B>A:</B> Nobody. You use MPL licensed code at your own risk. Since it is provided
+         to you in a source code form, you can inspect it, test it, making sure that
+         it does, what you want it to do.
+  <LI><B>Q:</B> Must I publish modifications to MPL licensed code?<BR>
+      <B>A:</B> Yes. This is one of the MPL requirements. You are getting a free source
+         code, but you have to publish all modifications to the code, unless you
+         have done the changes for your internal use.
+  <LI><B>Q:</B> Must I publish code based on MPL licensed code under MPL?<BR>
+      <B>A:</B> Yes. You cannot change the license terms. Only the Initial Developer can
+         add an additional license (see dual license)
+  <LI><B>Q:</B> If I subclass the MPL code, do I still have to publish the new code? After
+         all I didn't modify the code at all!<BR>
+      <B>A:</B> That's a tricky one. By the letter of the law, since you didn't touch the
+         original code, you might claim that it is a "new" code, therefore no need
+         for MPL. However, by the 'spirit of the law', Inheritance (or subclassing)
+         is a modification of the functionality of a given class, and as such a
+         "derived work", so even if you didn't touch the original code, you are
+         still making changes.
+  <LI><B>Q:</B> I am proposing a modification to a JEDI-VCL component, which has a dual
+         license (MPL and GPL). This new file also needs to include a new class.
+         Should the source files for the new class be put in JEDI-VCL using MPL
+         with GPL dual-license or can it be put in another location and use only
+         the MPL?<BR>
+      <B>A:</B> The license of a file can't be changed without the consent of the copyright
+         owner. And a new file derived from an existing file inherits the licensing
+         from the existing file.  In the case of this component, it has to stay MPL/GPL.
+  <LI>   I am considering using an XML parser that has being covered by the MPL v1.1
+         (or alternatively the GPL) in a commercial product. I will simply use the
+         DLL libraries without modification, including the necessary header files
+         in my own code. When I distribute (sell) my own product I would, of course,
+         need to distribute the DLL libraries as well. My questions are:
+         <OL>
+           <LI><B>Q1:</B> Am I correct in assuming that simply including unmodified header
+                   files and linking with a library covered by the MPL does not
+                   place any legal restrictions or obligations on my commercial
+                   product and its source code?<BR>
+               <B>A1:</B> It places no obligations on the code YOU wrote, but there are
+                   still obligations for the code you included. These include
+                   source distribution (for included MPL code, not YOUR code),
+                   and some notification requirements.
+           <LI><B>Q2:</B> Am I obligated to distribute the (unmodified) source code that
+                   produced the libraries with which I link?<BR>
+               <B>A2:</B> Yes. Since you are shipping the DLL libraries with your product,
+                   you have to make source available for the MPL code you ship.<BR>
+                   <I>Note that the license also allows you to meet the distribution requirement
+                   by making the source available via electronic means rather than having to
+                   physically ship them with your product (as long as you tell your users
+                   where to get it). If you are using unmodified source code you could probably
+                   just point at the code author's server. If you did that you'd have to
+                   specify how users could get the exact version of the source you used,
+                   such as a CVS date stamp or something.<BR>
+                   This might be tricky -- you are responsible to make sure the source is
+                   available for 12 months after you ship, and there's no way of knowing
+                   how long the author will keep old versions around. The CVS repository
+                   is more of a sure bet. You could, of course, host the source on your
+                   own servers to be sure it'll stick around.</I>
+
+           <LI><B>Q3:</B> Am I obligated to make my use of the particular libraries known
+                   to users of my product?<BR>
+               <B>A3:</B> Yes, it's spelled out in the license. You need to credit the
+                    source of copyrighted code that is not yours in both the product
+                    and its documentation.
+         </OL>
+</OL>
+</BODY>
+</HTML>

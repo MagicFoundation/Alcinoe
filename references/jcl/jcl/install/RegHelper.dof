@@ -1,0 +1,4 @@
+[Directories]
+OutputDir=..\bin
+UnitOutputDir=.
+SearchPath=..\source;..\source\common;..\source\windows

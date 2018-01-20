@@ -1,0 +1,16 @@
+EJclPrinterError
+TJclPrintSet
+CharFitsWithinDots
+DirectPrint
+DPGetDefaultPrinter
+DPSetDefaultPrinter
+GetDefaultPrinterName
+GetPrinterResolution
+PrintMemo
+SetPrinterPixelsPerInch
+PWordArray
+TWordArray
+CBinMax
+CCHBinName
+CCHPaperName
+CPaperNames

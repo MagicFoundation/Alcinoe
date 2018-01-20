@@ -1,0 +1,51 @@
+# IDE files
+*.~*~
+*.local
+*.identcache
+__history
+
+# Delphi Compiler output files
+*.drc
+*.map
+*.jdbg
+*.tds
+*.exe
+*.dll
+*.bpl
+*.dcu
+*.dcp
+
+# C++ Builder Compiler output files
+*.bpi
+*.obj
+*.lib
+*.hpp
+*.i
+*.il?
+*.#??
+*.pbi
+
+# 64bit Delphi/C++Builder files
+*.[ao]
+
+# Lib directories
+jcl/lib/*/*.res
+jcl/lib/*/debug/*.res
+jcl/lib/*/win*/*.res
+jcl/lib/*/win*/debug/*.res
+
+# JCL files
+jcl/bin/*
+jcl/install/dcc32_command.cmd
+jcl/install/dcc32.cfg
+
+# Auto generated compiler version include files
+jcl/source/include/jcld*.inc
+jcl/source/include/jclc*.inc
+jcl/source/include/jclfpc.inc
+jcl/source/include/jclwin32.inc
+
+# InnoSetup installer
+thirdparty/InnoSetup/setupbuild/*
+thirdparty/InnoSetup/Settings.iss
+/thirdparty/makedist/*.log

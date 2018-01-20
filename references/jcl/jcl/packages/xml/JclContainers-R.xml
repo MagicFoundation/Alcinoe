@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclContainers" Design="0">
+  <Description>JEDI Code Library Containers package</Description>
+  <GUID>{71D14CDC-6386-44FD-B861-4C4213CFFF08}</GUID>
+  <C6PFlags/>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>48500000</ImageBase>
+  <VersionMajorNumber/>
+  <VersionMinorNumber/>
+  <ReleaseNumber/>
+  <BuildNumber/>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="FCL" Targets="fpc" Condition=""/>
+    <Package Name="..\..\..\help\VCL" Targets="help" Condition=""/>
+    <Package Name="..\..\..\help\JEDI" Targets="help" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+  </Requires>
+  <Platforms>
+    <Platform Name="Win32" Condition=""/>
+    <Platform Name="Win64" Condition=""/>
+  </Platforms>
+  <Contains>
+    <File Name="..\..\source\common\JclAbstractContainers.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclAlgorithms.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclArrayLists.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclArraySets.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclBinaryTrees.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclContainerIntf.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclHashMaps.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclHashSets.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclLinkedLists.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclQueues.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclSortedMaps.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStacks.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclStrHashMap.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclTrees.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\common\JclVectors.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Common.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\ContainerCopies.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Containers.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\JclContainers.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\StrHashMap.dtx" Targets="help" Formname="" Condition=""/>
+  </Contains>
+</Package>

@@ -1,0 +1,73 @@
+﻿; This is a Doc-O-Matic version 6.5.1.1382 project file.
+; This file is maintained by Doc-O-Matic, do not edit manually.
+
+[*Control*]
+MasterFile=JclTemplate.dox
+
+[Configurations]
+Current=3
+
+[Configurations\CHM\Disabled Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\CHM\Non TOC Topics]
+Count=2
+ID1=MergeTopic
+
+[Configurations\H2\Disabled Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\H2\Non TOC Topics]
+Count=2
+ID1=MergeTopic
+
+[Configurations\HLP\{C81B476F-5DE3-416C-A73A-9674B8ECC110}\Help Project]
+CompressHelp=0
+
+[Configurations\HLP\Disabled Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\HLP\Non TOC Topics]
+Count=2
+ID1=MergeTopic
+
+[Configurations\HTML\Disabled Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\HTML\Non TOC Topics]
+Count=2
+ID1=MergeTopic
+
+[Configurations\PDF\Disabled Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\PDF\Non TOC Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\XML\Disabled Topics]
+Count=1
+ID0=MergeTopic
+
+[Configurations\XML\Non TOC Topics]
+Count=2
+ID1=MergeTopic
+
+[External Topic Properties]
+Count=1
+ID0=MergeTopic
+
+[External Topic Properties\MergeTopic]
+Count=1
+ETPCommand0=3
+ETPGroup0=' !'
+
+[Source Files]
+Count=1
+File0=JclHelp.dtx
+

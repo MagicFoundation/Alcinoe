@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclStackTraceViewerExpert" Design="-1">
+  <Description>JCL Stack Trace Viewer</Description>
+  <GUID>{85153A85-6CA4-4CD5-92E6-C39A5C5161E2}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58250000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerImpl.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerExceptInfoFrame.pas" Targets="runtimeIDE" Formname="frmException: TFrame" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerStackFrame.pas" Targets="runtimeIDE" Formname="frmStack: TFrame" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerThreadFrame.pas" Targets="runtimeIDE" Formname="frmThread: TFrame" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerModuleFrame.pas" Targets="runtimeIDE" Formname="frmModule: TFrame" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerMainFormDelphi.pas" Targets="OldStyleIDE" Formname="frmStackView" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerMainFormBDS.pas" Targets="d9,d10,d11,d12" Formname="frmStackView" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerMainFormBDS7.pas" Targets="allv14up" Formname="frmStackView" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerMainFrame.pas" Targets="runtimeIDE" Formname="frmMain: TFrame" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerConfigFrame.pas" Targets="runtimeIDE" Formname="JclStackTraceViewerConfigFrame: TFrame" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerClasses.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerStackCodeUtils.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerOptions.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerAPIImpl.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerAPI.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\stacktraceviewer\JclStackTraceViewerStackUtils.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+  </Contains>
+</Package>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclSIMDViewExpert" Design="-1">
+  <Description>JCL Debug Window of XMM registers</Description>
+  <GUID>{2F16B01B-57C8-4EB1-A0C4-421B3008A4F6}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>58080000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\debug\simdview\JclSIMDViewForm.pas" Targets="runtimeIDE" Formname="JclSIMDViewFrm" Condition=""/>
+    <File Name="..\..\experts\debug\simdview\JclSIMDView.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\debug\simdview\JclSIMDUtils.pas" Targets="runtimeIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\debug\simdview\JclSIMDModifyForm.pas" Targets="runtimeIDE" Formname="JclSIMDModifyFrm" Condition=""/>
+    <File Name="..\..\experts\debug\simdview\JclSIMDCpuInfo.pas" Targets="runtimeIDE" Formname="JclFormCpuInfo" Condition=""/>
+  </Contains>
+</Package>

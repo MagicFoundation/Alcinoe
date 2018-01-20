@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+<Configuration>
+  <!-- These are the values stored by jaxStore -->
+  <pgEdit/>
+  <!--
+    The nodes below are read by the generation process.
+    Packages are generated according to a model. The models are defined
+    below and contain generic informations such as the prefix, the format,
+    the location of packages and the location of the include file that
+    contains conditional directives (only used for BCB)
+    Then each model defines Targets and Aliases as described below:
+
+    First, the targets:
+
+       The format of each target node is:
+          name dir pname pdir env ver defines
+
+       name     The name of the target, compulsory
+       dir      The directory where to generate the packages. Defaults to name
+       pname    The name of the associated Perso target. A perso target
+                is the target that will be considered to allow the generation
+                of a different package for a version of the target that do not
+                support some features (Database generally). Leave empty if there
+                are no reason to use this feature.
+       pdir     The directory for the associated perso target. Defaults to pname
+       env      A character to identify the development environment. Defaults to
+                the first character of name
+       ver      A character to identify the version of the environment. Defaults
+                to the second character of name
+       defines  A comma separated string to indicate which Conditional
+                Compilation symbols are defined as the result of using this
+                target so that your include file can enclose some $DEFINE in
+                $IFDEF that relate to the compiler being used
+       PathSep  Indicates which character is to be used as a path separator for 
+                the target. If not specified, this value defaults to "\"
+       IsClx    If set to 1 (True), then the target is a CLX target
+
+    Then aliases:
+
+       The format for each alias node is:
+          name value
+
+       name   the name of the alias
+       value  the comma separated list of targets this alias will expand to.
+              No recursion is done. You don't have to specify the 'all' alias,
+              it will be derived from the target list. If you defined some Perso
+              target, do not forget to include them in the value for your alias
+              
+    Finally, CLX filename replacements (see accompanying doc for more details)
+       
+       The format for each filename node is:
+          original replacement
+          
+       original     the prefix to be replaced in file names
+       replacement  the value to use as a replacement
+
+    Be careful, all properties of the model node must exist and the targets and
+    aliases children must exist too. If there is no target specified, none will
+    be available.
+  -->
+  <models>
+    <Model format="%p%n" name="JCL" prefix="Jcl" packages="..\packages" incfile="" nolibsuffixformat="%p%n%e%v0" dotnetprefix="Jedi.Jcl">
+      <targets>
+        <target name="help"/>
+        <target name="fpc"/>
+        <target name="c6" defines="BCB"/>
+        <target name="d6"/>
+        <target name="d7"/>
+        <target name="d8" IsBds="1"/>
+        <target name="cs1" IsBds="1"/>
+        <target name="d9" IsBds="1"/>
+        <target name="d10" defines="BCB" IsBds="1"/>
+        <target name="d11" defines="BCB" IsBds="1"/>
+        <target name="d12" defines="BCB" IsBds="1"/>
+        <target name="d14" defines="BCB" IsBds="1"/>
+        <target name="d15" defines="BCB" IsBds="1"/>
+        <target name="d16" defines="BCB" IsBds="1"/>
+        <target name="d17" defines="BCB" IsBds="1"/>
+        <target name="d18" defines="BCB" IsBds="1"/>
+        <target name="d19" defines="BCB" IsBds="1"/>
+        <target name="d20" defines="BCB" IsBds="1"/>
+        <target name="d21" defines="BCB" IsBds="1"/>
+        <target name="d22" defines="BCB" IsBds="1"/>
+        <target name="d23" defines="BCB" IsBds="1"/>
+        <target name="d24" defines="BCB" IsBds="1"/>
+        <target name="d25" defines="BCB" IsBds="1"/>
+      </targets>
+      <aliases>
+        <!-- language aliases -->
+        <alias name="Delphi" value="d6,d7,d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="Bcb" value="c6,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="Pascal" value="fpc,d6,d7,d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <!-- platform aliases -->
+        <alias name="Windows" value="help,fpc,c6,d6,d7,d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="Linux" value="help,fpc"/>
+        <!-- package aliases -->
+        <alias name="allv11up" value="d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="allv14up" value="d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="allv15up" value="d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <!-- GUI aliases -->
+        <alias name="Clx" value="help,c6,d6,d7"/>
+        <alias name="Vcl" value="help,c6,d6,d7,d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <!-- IDE aliases -->
+        <alias name="BDS" value="cs1,d8,d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="runtimeBDS" value="d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="OldStyleIDE" value="c6,d6,d7"/>
+        <alias name="runtimeIDE" value="c6,d6,d7,d9,d10,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+        <alias name="designtimeIDE" value="c6,d6,d7,d8,d9,d10,cs1,d11,d12,d14,d15,d16,d17,d18,d19,d20,d21,d22,d23,d24,d25"/>
+      </aliases>
+      <ProjectProperties>
+        <ProjectProperty name="VersionMajorNumber" value="2"/>
+        <ProjectProperty name="VersionMinorNumber" value="7"/>
+        <ProjectProperty name="ReleaseNumber" value="0"/>
+        <ProjectProperty name="BuildNumber" value="5300"/>
+        <ProjectProperty name="Copyright" value="Copyright (C) 1999, 2014 Project JEDI"/>
+      </ProjectProperties>
+    </Model>
+  </models>
+</Configuration>

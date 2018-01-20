@@ -1,0 +1,703 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="no"?>
+<makedist>
+  <task name="Jcl-common" selected="0">
+    <action classname="TLogCleaner"/>
+    <action classname="TLogSaver">
+      <configuration index="0" caption="File name" value="jcl%SUFFIX%.log"/>
+      <configuration index="1" caption="Append" value="no"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="2"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%GIT%"/>
+      <configuration index="1" caption="Working directory" value="..\..\"/>
+      <configuration index="2" caption="Parameters" value="submodule update --init"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%GIT%"/>
+      <configuration index="1" caption="Working directory" value="..\..\"/>
+      <configuration index="2" caption="Parameters" value="checkout-index -a --prefix=thirdparty\makedist\sandbox\"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%GIT%"/>
+      <configuration index="1" caption="Working directory" value="..\..\jcl\source\include\jedi"/>
+      <configuration index="2" caption="Parameters" value="checkout-index -a --prefix=..\..\..\..\thirdparty\makedist\sandbox\jcl\source\include\jedi\"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TVariableWriter">
+      <configuration index="0" caption="Destination file" value="sandbox\jcl\jcl-revision.txt"/>
+      <configuration index="1" caption="Expression" value="%VersionRevision%"/>
+      <configuration index="2" caption="Append" value="no"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%ComSpec%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\devtools\"/>
+      <configuration index="2" caption="Parameters" value="/C included_files.bat"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TConstantParser">
+      <configuration index="0" caption="Source file" value="sandbox\jcl\source\common\JclBase.pas"/>
+      <configuration index="1" caption="Constant name" value="JclVersionMajor"/>
+      <configuration index="2" caption="Environment variable" value="VersionMajor"/>
+    </action>
+    <action classname="TConstantParser">
+      <configuration index="0" caption="Source file" value="sandbox\jcl\source\common\JclBase.pas"/>
+      <configuration index="1" caption="Constant name" value="JclVersionMinor"/>
+      <configuration index="2" caption="Environment variable" value="VersionMinor"/>
+    </action>
+    <action classname="TConstantParser">
+      <configuration index="0" caption="Source file" value="sandbox\jcl\source\common\JclBase.pas"/>
+      <configuration index="1" caption="Constant name" value="JclVersionRelease"/>
+      <configuration index="2" caption="Environment variable" value="VersionRelease"/>
+    </action>
+    <action classname="TConstantParser">
+      <configuration index="0" caption="Source file" value="sandbox\jcl\source\common\JclBase.pas"/>
+      <configuration index="1" caption="Constant name" value="JclVersionBuild"/>
+      <configuration index="2" caption="Environment variable" value="VersionBuild"/>
+    </action>
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="jcl-%VersionMajor%.%VersionMinor%.%VersionRelease%.%VersionBuild%"/>
+      <configuration index="1" caption="Environment variable" value="PREFIX"/>
+    </action>
+    <action classname="TLogSaver">
+      <configuration index="0" caption="File name" value="%PREFIX%%SUFFIX%.log"/>
+      <configuration index="1" caption="Append" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-win.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-win"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="3"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%.zip"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="3"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="3"/>
+    </action>
+  </task>
+  <task name="Jcl-win.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="Jcl-linux.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-linux"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="%PREFIX%-linux.tar"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value=""/>
+      <configuration index="1" caption="Filter" value="%PREFIX%-linux.tar"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-linux.tar.gz"/>
+    </action>
+    <action classname="TFileRemover">
+      <configuration index="0" caption="Directory" value="."/>
+      <configuration index="1" caption="Filter" value="%PREFIX%-linux.tar"/>
+      <configuration index="2" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-linux.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="Jcl-turbo.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-turbo"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DCC2006%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\install"/>
+      <configuration index="2" caption="Parameters" value="-q -w -dJCLINSTALL -E..\bin -I..\source\include -U..\source\common;..\source\windows JediInstaller.dpr"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\Install turbo delphi.bat"/>
+      <configuration index="1" caption="New file name" value="sandbox\jcl\Install.bat"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-turbo.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-turbo.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="jcl-html.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-html"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help\html"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HTML&quot; -noshow -w3 Jcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HTML&quot; -noshow -w3 JclContainers.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HTML&quot; -noshow -w3 JclDeveloperTools.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HTML&quot; -noshow -w3 JclVcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TFileCopier">
+      <configuration index="0" caption="From directory" value="sandbox\help"/>
+      <configuration index="1" caption="Filter" value="index.html"/>
+      <configuration index="2" caption="To directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="30"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-htmlhelp.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-html.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="jcl-chm.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-chm"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;CHM&quot; -noshow -w3 Jcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;CHM&quot; -noshow -w3 JclContainers.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;CHM&quot; -noshow -w3 JclDeveloperTools.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;CHM&quot; -noshow -w3 JclVcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TFileCopier">
+      <configuration index="0" caption="From directory" value="sandbox\help"/>
+      <configuration index="1" caption="Filter" value="index.html"/>
+      <configuration index="2" caption="To directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="30"/>
+    </action>
+    <action classname="TFileRemover">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="Filter" value="*.html;*.css;*.js;*.gif;*.jpg;*.png;*.c;*.h;*.inc;*.hhc;*.hhk;*.hhp"/>
+      <configuration index="2" caption="Move to recycle bin" value="no"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-chmhelp.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-chm.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="jcl-h2.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-h2"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;H2&quot; -noshow -w3 Jcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;H2&quot; -noshow -w3 JclContainers.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;H2&quot; -noshow -w3 JclDeveloperTools.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;H2&quot; -noshow -w3 JclVcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TFileCopier">
+      <configuration index="0" caption="From directory" value="sandbox\help"/>
+      <configuration index="1" caption="Filter" value="*.HxC;*.HxT;*.HxK"/>
+      <configuration index="2" caption="To directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="30"/>
+    </action>
+    <action classname="TFileRemover">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="Filter" value="*_COL_MASTER.HxC;*_COL_MASTER.HxT;*_COL_MASTER_A.HxK;*_COL_MASTER_F.HxK;*_COL_MASTER_K.HxK;*_COL_MASTER_NamedURL.HxK;*.html;*.css;*.js;*.gif;*.jpg;*.png;*.c;*.h;*.inc;*.log"/>
+      <configuration index="2" caption="Move to recycle bin" value="no"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-htmlhelp2.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-h2.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="jcl-hlp.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-winhelp"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HLP&quot; -noshow -w3 Jcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HLP&quot; -noshow -w3 JclContainers.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HLP&quot; -noshow -w3 JclDeveloperTools.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HLP&quot; -noshow -w3 JclVcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;HLP&quot; -noshow -w3 JclHelp.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TFileCopier">
+      <configuration index="0" caption="From directory" value="sandbox\help"/>
+      <configuration index="1" caption="Filter" value="JclHelp.cnt"/>
+      <configuration index="2" caption="To directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="30"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-winhelp.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-hlp.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="jcl-xml.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-xml"/>
+      <configuration index="1" caption="Environment variable" value="SUFFIX"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;XML&quot; -noshow -w3 Jcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;XML&quot; -noshow -w3 JclContainers.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;XML&quot; -noshow -w3 JclDeveloperTools.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;XML&quot; -noshow -w3 JclVcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="30"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-xml.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-xml.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+  <task name="jcl-pdf.zip" selected="-1">
+    <action classname="TVariableSetter">
+      <configuration index="0" caption="Expression" value="-pdf"/>
+      <configuration index="1" caption="Environment variable" value="%SUFFIX%"/>
+    </action>
+    <action classname="TSubTask">
+      <configuration index="0" caption="Task name" value="Jcl-common"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\jcl\help"/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;PDF&quot; -noshow -w3 Jcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;PDF&quot; -noshow -w3 JclContainers.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;PDF&quot; -noshow -w3 JclDeveloperTools.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%DMCC%"/>
+      <configuration index="1" caption="Working directory" value="sandbox\jcl\packages\help"/>
+      <configuration index="2" caption="Parameters" value="-config &quot;PDF&quot; -noshow -w3 JclVcl.dox"/>
+      <configuration index="3" caption="Valid exit codes" value="0;20;30;-1073741819"/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="sandbox\%PREFIX%"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="30"/>
+    </action>
+    <action classname="TFileMover">
+      <configuration index="0" caption="Old file name" value="sandbox\jcl\help"/>
+      <configuration index="1" caption="New file name" value="sandbox\%PREFIX%\help"/>
+    </action>
+    <action classname="TDelay">
+      <configuration index="0" caption="Delay" value="10"/>
+    </action>
+    <action classname="TDirectoryCreator">
+      <configuration index="0" caption="Directory" value="files"/>
+    </action>
+    <action classname="TArchiveMaker">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Filter" value="%PREFIX%"/>
+      <configuration index="2" caption="Archive name" value="files\%PREFIX%-pdf.zip"/>
+    </action>
+    <action classname="TDirectoryRemover">
+      <configuration index="0" caption="Directory" value="sandbox"/>
+      <configuration index="1" caption="Move to recycle bin" value="no"/>
+    </action>
+  </task>
+  <task name="Jcl-pdf.sync" selected="0">
+    <action classname="TCommandLineCaller">
+      <configuration index="0" caption="Application" value="%WINSCP%"/>
+      <configuration index="1" caption="Working directory" value="."/>
+      <configuration index="2" caption="Parameters" value="/console /script=winscp-jcl-files.txt"/>
+      <configuration index="3" caption="Valid exit codes" value=""/>
+      <configuration index="4" caption="Result file" value=""/>
+    </action>
+  </task>
+</makedist>

@@ -1,0 +1,27 @@
+(*$JPPDEFINEMACRO JCLQUEUEINT(SELFCLASSNAME, BASECONTAINERINTERFACENAME, QUEUEINTERFACENAME, ANCESTORCLASSNAME, DYNARRAYTYPENAME,
+EQUALITYCOMPARERINTERFACENAME, INTERFACEADDITIONAL, SECTIONADDITIONAL, OWNERSHIPDECLARATION, CONSTKEYWORD, PARAMETERNAME, TYPENAME)
+SELFCLASSNAME = class(ANCESTORCLASSNAME, {$IFDEF THREADSAFE} IJclLockable, {$ENDIF THREADSAFE}
+  IJclIntfCloneable, IJclCloneable, IJclPackable, IJclGrowable, IJclBaseContainer,
+  BASECONTAINERINTERFACENAME, EQUALITYCOMPARERINTERFACENAME,INTERFACEADDITIONAL
+  QUEUEINTERFACENAME)SECTIONADDITIONAL
+private
+  FElements: DYNARRAYTYPENAME;
+  FHead: Integer;
+  FTail: Integer;
+protected
+  procedure AssignDataTo(Dest: TJclAbstractContainerBase); override;
+public
+  constructor Create(ACapacity: IntegerOWNERSHIPDECLARATION);
+  destructor Destroy; override;
+  { IJclPackable }
+  procedure Pack; override;
+  procedure SetCapacity(Value: Integer); override;
+  { QUEUEINTERFACENAME }
+  procedure Clear;
+  function Contains(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+  function Dequeue: TYPENAME;
+  function Empty: Boolean;
+  function Enqueue(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+  function Peek: TYPENAME;
+  function Size: Integer;
+end;*)

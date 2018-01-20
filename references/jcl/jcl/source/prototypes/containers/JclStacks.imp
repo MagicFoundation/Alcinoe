@@ -1,0 +1,122 @@
+(*$JPPDEFINEMACRO JCLSTACKIMP(SELFCLASSNAME,
+  OWNERSHIPDECLARATION, OWNERSHIPPARAMETERNAME, CONSTKEYWORD, PARAMETERNAME, TYPENAME, DEFAULTVALUE, RELEASERFUNCTIONNAME)
+//=== { SELFCLASSNAME } =======================================================
+
+constructor SELFCLASSNAME.Create(ACapacity: IntegerOWNERSHIPDECLARATION);
+begin
+  inherited Create(OWNERSHIPPARAMETERNAME);
+  SetCapacity(ACapacity);
+end;
+
+destructor SELFCLASSNAME.Destroy;
+begin
+  FReadOnly := False;
+  Clear;
+  inherited Destroy;
+end;
+
+procedure SELFCLASSNAME.AssignDataTo(Dest: TJclAbstractContainerBase);
+var
+  ADest: SELFCLASSNAME;
+  I: Integer;
+begin
+  inherited AssignDataTo(Dest);
+  if Dest is SELFCLASSNAME then
+  begin
+    ADest := SELFCLASSNAME(Dest);
+    ADest.Clear;
+    ADest.SetCapacity(FSize + 1);
+    for I := 0 to FSize - 1 do
+      ADest.FElements[I] := FElements[I];
+    ADest.FSize := FSize;
+  end;
+end;
+
+procedure SELFCLASSNAME.Clear;
+var
+  I: Integer;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    for I := 0 to FSize - 1 do
+      RELEASERFUNCTIONNAME(FElements[I]);
+    FSize := 0;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Contains(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+var
+  I: Integer;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := False;
+    for I := 0 to FSize - 1 do
+      if ItemsEqual(FElements[I], PARAMETERNAME) then
+      begin
+        Result := True;
+        Break;
+      end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Empty: Boolean;
+begin
+  Result := FSize = 0;
+end;
+
+function SELFCLASSNAME.Peek: TYPENAME;
+begin
+  {$JPPUNDEF WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := DEFAULTVALUE;
+    if FSize > 0 then
+      Result := FElements[FSize - 1]
+    else
+    if not FReturnDefaultElements then
+      raise EJclNoSuchElementError.Create('');
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Pop: TYPENAME;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    Result := DEFAULTVALUE;
+    if FSize > 0 then
+    begin
+      Dec(FSize);
+      Result := FElements[FSize];
+      FElements[FSize] := DEFAULTVALUE;
+    end
+    else
+    if not FReturnDefaultElements then
+      raise EJclNoSuchElementError.Create('');
+    AutoPack;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Push(CONSTKEYWORDPARAMETERNAME: TYPENAME): Boolean;
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    if FSize = FCapacity then
+      AutoGrow;
+    Result := FSize < FCapacity;
+    if Result then
+    begin
+      FElements[FSize] := PARAMETERNAME;
+      Inc(FSize);
+    end;
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+procedure SELFCLASSNAME.SetCapacity(Value: Integer);
+begin
+  {$JPPDEFINE WRITE}{$JPPEXPANDMACRO LOCK}
+    if Value < FSize then
+      raise EJclOutOfBoundsError.Create;
+    SetLength(FElements, Value);
+    inherited SetCapacity(Value);
+  {$JPPEXPANDMACRO UNLOCK}
+end;
+
+function SELFCLASSNAME.Size: Integer;
+begin
+  Result := FSize;
+end;*)

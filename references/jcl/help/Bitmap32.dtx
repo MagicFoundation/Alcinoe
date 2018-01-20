@@ -1,0 +1,2151 @@
+@@TJclThreadPersistent
+<GROUP Graphics.Bitmaps>
+Summary:
+  Ancestor class for TJclBitmap32.
+Description:
+  TJclThreadPersistent extends the standard TPersistent class with the thread-safe locking and
+  declares change notification events.
+
+  The locking provides means of synchronization of simultaneous access to the same resource in
+  applications with multiple threads and it works similar to that in TCanvas class. For additional
+  information, see Delphi documentation on TCanvas.
+
+  This class also declares change notification abilities. That is, it provides methods and events
+  allowing it descendants to issue notification on their changes. For example, TJclBitmap32 uses
+  OnChange to notify its container that it was modified and its data has to be repainted to the
+  screen. TJclThreadPersistent, however, does not use or implement automatic change notification
+  itself. This is done in descendants.
+Platform:
+  VCL
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.LockCount
+Summary:
+  Threading lock count.
+Description:
+  LockCount represents the current nesting level of the
+  threading lock. This is a counter shared by all running
+  threads in the curent process.
+
+  The object is unlocked only when LockCount is 0 and only one
+  thread can lock the object at the time. Call Lock to increase
+  LockCount value and Unlock to decrease it.
+See also:
+  TJclThreadPersistent.Lock
+  TJclThreadPersistent.Unlock
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.UpdateCount
+Summary:
+  Threading lock count.
+Description:
+  The current nesting level of the update lock.
+
+  UpdateCount is increased each time you call the BeginUpdate method and is
+  decreased with EndUpdate calls. The object does not generate OnChange as long
+  as its UpdateCount is greater than 0.
+See also:
+  TJclThreadPersistent.BeginUpdate
+  TJclThreadPersistent.EndUpdate
+  TJclThreadPersistent.OnChange
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.BeginUpdate
+Summary:
+  Disables update notification.
+Description:
+  Call this method in order to temporarily disable the update notification.
+
+  BeginUpdate increases the UpdateCount property, which disables generation of OnChange events. Calls to BeginUpdate must be
+  paired with EndUpdate and they may be safely nested.
+See also:
+  TJclThreadPersistent.EndUpdate
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.EndUpdate
+Summary:
+  Re-enables update notification.
+Description:
+  Re-enables change notification previously disabled with BeginUpdate.
+
+  EndUpdate decreases the UpdateCount property and re-enables generation of OnChange events.
+
+  EndUpdate itself does not generate the OnChange event. You will need to call Changed explicitly,
+  after calling EndUpdate in case the change notification is required.
+See also:
+  TJclThreadPersistent.BeginUpdate
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.Changing
+Summary:
+  Occurs just before a change is made to the object.
+Description:
+  Changing is called every time before a change is about to be made to the object. If the object is
+  being updated Changing does nothing, otherwise it fires the OnChanging event.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.Changed
+Summary:
+  Calls the OnChange event.
+Description:
+  Calls the OnChange event, provided the change notification is not masked with BeginUpdate.
+
+  Descendants of TThreadPersistent call Changed after making changes to their data or properties.
+
+  You will need to call Changed explicitly in your application after leaving the
+  BeginUpdate... EndUpdate block since EndUpdate itself does not internally call Changed.
+See also:
+  TJclThreadPersistent.BeginUpdate
+  TJclThreadPersistent.EndUpdate
+  TJclThreadPersistent.OnChange
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.Lock
+Summary:
+  Prevents other threads from acessing the object.
+Description:
+  Blocks other execution threads from locking the object until the Unlock method is called. If another thread tryes to call the Lock method of an object which is already locked, its execution will be stalled until the lock is released with Unlock method.
+
+  Once a thread has locked the object, it can make additional calls to Lock method without blocking its own execution. This prevents the thread from deadlocking itself while waiting for releasing of a lock that it already owns. LockCount is increased each time Lock is called.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.Unlock
+Summary:
+  Decreases the LockCount property, allowing other threads to execute when LockCount reaches 0.
+Description:
+  Call Unlock at the end of a critical section begun with a call to the Lock method. Every call to Lock must be matched by a call to Unlock.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.OnChanging
+Summary:
+  Occurs just before a change is made to the object.
+Description:
+  Changing is called every time before a change is about to be made to the object. If the object is
+  being updated Changing does nothing, otherwise it fires the OnChanging event.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclThreadPersistent.OnChange
+Summary:
+  Occurs when the image has just changed.
+Description:
+  OnChange is called immediately after the object changes. For example, TJclThreadPersistent’s
+  descendant TJclBitmap32 uses the OnChange event to notify its parent that something was changed
+  in a bitmap, and the screen image must be updated.
+
+  Generation of OnChange events can be prevented by calling BeginUpdate.
+See also:
+  TJclThreadPersistent.BeginUpdate
+  TJclThreadPersistent.Changed
+  TJclThreadPersistent.TJclBitmap32
+  TJclThreadPersistent.TJclThreadPersistent
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@IdentityMatrix
+<GROUP Graphics.Bitmaps>
+Summary:
+  A 3x3 identity matrix.
+Description:
+  Identity matrix to use with TJclLinearTransformation.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap
+<GROUP Graphics.Bitmaps>
+Summary:
+  Ancestor for objects that hold 2D arrays of data.
+Description:
+  TJclCustomMap is a common ancestor for objects that hold 2D arrays of data.
+Platform:
+  VCL
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap.Delete
+Summary:
+  Clears the map.
+Description:
+  By default, Delete calls SetSize(0, 0). In descendants this implies deletion
+  of stored data and freeing of the occupied memory.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap.Empty
+Summary:
+  Specifies whether the map object contains data.
+Description:
+  Returns True if the data set is empty, otherwise False.
+  In general a result of True means that Width or Height is 0.
+Result
+  False, if the instance contains data, True otherwise.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap.SetSize@TPersistent
+Summary:
+  Simultaneously changes both Width and Height of contained data.
+Description:
+  Simultaneously changes both Width and Height of contained data.
+  This overloaded version 'knows' how to get the size from the following objects or their descendants: TJclCustomMap, TGraphic, TControl and nil. Passing objects of other TPersistent descendants will cause TJclCustomMap to generate an exception.
+  The method is overriden in descendants (TJclBitmap32, TJclByteMap) so that bitmap bits are reallocated and byte map data array is resized.
+Parameters::
+  Height - New value for Height.
+  Width - New value for Width.
+See also:
+  TJclCustomMap.SetSize@Integer@Integer
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap.SetSize@Integer@Integer
+Summary:
+  Simultaneously changes both Width and Height of contained data.
+Description:
+  Simultaneously changes both Width and Height of contained data.
+  The method is overriden in descendants (TJclBitmap32, TJclByteMap) so that bitmap bits are reallocated and byte map data array is resized.
+Parameters::
+  Height - New value for Height.
+  Width - New value for Width.
+See also:
+  TJclCustomMap.SetSize@TPersistent
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap.Height
+Summary:
+  Specifies the width of the contained data array.
+Description:
+  Specifies the width of the contained data array.
+  Writing into the Width property will resize the data array.
+  Use the SetSize method to change both width and height simultaneously.
+See also:
+  TJclCustomMap.SetSize@Integer@Integer
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclCustomMap.Width
+Summary:
+  Specifies the height of the contained data array.
+Description:
+  Specifies the height of the contained data array.
+  Use the SetSize method to change both width and height simultaneously.
+See also:
+  TJclCustomMap.SetSize@Integer@Integer
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32
+<GROUP Graphics.Bitmaps>
+Summary:
+  32 bit color depth bitmap class.
+Description:
+  TJclBitmap32 manages a single 32-bit device-independent bitmap (DIB) and
+  provides methods for drawing on it and combining it with other DIBs or other
+  objects with device context (DC).
+
+  TJclBitmap32 overrides Assign and AssignTo methods (inherited from
+  TPersistent) to provide compatibility with standard objects: TBitmap, TPicture
+  and TClipboard in both directions. The design-time streaming to and from *.dfm
+  files, inherited from TPersistent, is supported, but its realization is different
+  from streaming with other stream types (See the source code for details).
+
+  TJclBitmap32 does not implement its own low-level streaming or low-level
+  file loading/saving. Instead, it uses streaming methods of temporal TBitmap or
+  TPicture objects. This is an obvious performance penalty, however such approach
+  allows using third-party libraries, which extend TGraphic class for various image
+  formats support (JPEG, TGA, TIFF, GIF, PNG, etc.). When you install them,
+  TJclBitmap32 will automatically obtain support for new image file formats in
+  design time and in run time.
+
+  Since TJclBitmap32 is a descendant of TJclThreadPersistent, it inherits its
+  locking mechanism and it may be used in multi-threaded applications.
+Category
+  Graphics
+Platform:
+  VCL
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.BitmapHandle
+Summary:
+  The Windows GDI bitmap handle.
+Description:
+  Provides access to the Windows GDI bitmap handle for accessing the GDI bitmap object.
+Notes:
+  This property is not the same as Handle, which returns a device context handle (HDC).
+See also:
+  TJclBitmap32.Handle
+  TJclBitmap32.PixelPtr
+  TJclBitmap32.ScanLine
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.BitmapInfo
+Summary:
+  Bitmap information record.
+Description:
+  Returns a BITMAPINFO record corresponding to a current DIB data. See BITMAPINFO in Windows SDK documentation for more information.
+See also:
+  TJclBitmap32.PixelPtr
+  TJclBitmap32.ScanLine
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Bits
+Summary:
+  Pointer to the pixel data.
+Description:
+  The bits property contains the address of the first
+  (top-left) pixel in a bitmap. If the bitmap is not allocated
+  (width or height is zero), the returned address is nil. Note,
+  that numbering of rows starts from the top-most one. Data is
+  continuously allocated in memory, row by row. You may safely
+  access Width * Height elements, each of them is a 4-byte
+  TColor32 value. For example:
+
+  <CODE>
+  var
+    P: PColor32Array;
+  begin
+    P := Bitmap32.Bits;
+    for I := 0 to Bitmap32.Width * Bitmap32.Height - 1 do
+      P[I] := Gray32(Random(255)); // fill with a random grayscale noise end;
+  </CODE>
+
+  Note, that in this code no size verification is required, if
+  width or height is zero, their product is zero and the loop
+  will never be executed.
+See also:
+  TJclBitmap32.Height
+  TJclBitmap32.Width
+  TJclBitmap32.PixelPtr
+  TJclBitmap32.ScanLine
+  TColor32
+  TColor32Array
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.DrawMode
+Summary:
+  Specifies how the bitmap is displayed.
+Description:
+  Specifies how the bitmap should be combined with a background during pixel
+  transfer and similar operations.
+
+  In dmOpaque mode, new pixels simply replace the background pixels. In dmBlend
+  mode, they are combined using the alpha blending operation. This property is
+  used while copying one bitmap into another, scaling, performing linear
+  transformations etc. The dmCustom mode allows implementation of custom
+  blending functions using the OnPixelCombine call-back event.
+
+  Blending in dmBlend mode, is performed using Blend or BlendEx functions.
+See also:
+  TJclBitmap32.Blend
+  TJclBitmap32.BlendEx
+  TJclBitmap32.Draw
+  TJclBitmap32.DrawTo
+  TJclBitmap32.OnPixelCombine
+  TDrawMode
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Font
+Summary:
+  Specifies the font to use when writing text on the image.
+Description:
+  Set Font to specify the font to use for writing text on the image. The value of Font is a TFont object. Set the properties of the TFont object to specify the font face, color, size, style, and any other aspects of the font.
+Notes:
+  Setting the Font property assigns the specified TFont object, rather than replacing the current TFont object.
+See also:
+  TJclBitmap32.RenderText
+  TJclBitmap32.TextOut
+  TJclBitmap32.UpdateFont
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Handle
+Summary:
+  Provides the device context handle of the contained DIB.
+Description:
+  The Handle property provides the device context handle of the contained DIB.
+
+  This handle may be used in low-level Windows API calls or, for example, to
+  attach a TCanvas object to TJclBitmap32:
+  <CODE>
+  var
+    Canvas: TCanvas;
+  begin
+    Canvas := TCanvas.Create; // create a new independent TCanvas object
+    try
+      Canvas.Handle := Bitmap32.Handle; // attach it to the Bitmap32 object
+      Canvas.Pen.Color := clRed; // use standard TCanvas methods for drawing
+      Canvas.Brush.Color := clGreen;
+      Canvas.Ellipse(10, 10, 60, 40);
+    finally
+      Canvas.Free;
+    end;
+  end;
+  </CODE>
+  Handle contains zero, if the bitmap is empty (width or height is zero), and its value can change after resizing.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.MasterAlpha
+Summary:
+  Specifies an alpha blending factor applied to the bitmap as a whole.
+Description:
+  When blending a bitmap to the screen or to another bitmap, MasterAlpha normally controls the blending factor. The per-pixel opacity, stored in the blended bitmap, is premultiplied with MasterAlpha. If the MasterAlpha property is $00, the bitmap will be fully transparent, if it is equal to $FF, only per-pixel opacity, stored in bitmap’s alpha channel is used. This property is used only for bitmap blending, it does not affect pixel/line drawing and other similar routines.
+  When blending bitmaps in dmCustom draw mode, this property may be used for other purposes. Custom combining routine may use all 32 bits of MasterAlpha.
+  If the bitmap is in dmBlend draw mode and MasterAlpha is not in the [0…255] range, the blending result is not specified, it is your responsibility to keep MasterAlpha consistent with current draw mode.
+See also:
+  TJclBitmap32.DrawMode
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.OuterColor
+Summary:
+  Color to assume for pixels which lie outside the bitmap.
+Description:
+  This property specifies the color returned by PixelS property when reading a
+  pixel with coordinates that lie outside the bitmap. The default value is
+  $00000000, which corresponds to a fully transparent black. It is also used
+  when performing linear transformations of a bitmap.
+See also:
+  TJclBitmap32.Pixel
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.PenColor
+Summary:
+  Specifies the color used to draw lines.
+Description:
+  Use PenColor to specify the color used to draw lines.
+  PenColor is used exclusively in MoveTo/LineTo functions.
+See also:
+  TJclBitmap32.LineToS
+  TJclBitmap32.MoveTo
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Pixel
+Summary:
+  Specifies the color of the pixel at coordinates X, Y.
+Description:
+  Pixel property sets the value of the pixel in the bitmap. Reading it, will
+  return the color value of the pixel located at specified coordinates. This
+  property does not validate the specified coordinates, so use it only then you
+  are completely sure that you are not trying to read from or write to the
+  outside of the bitmap boundary.
+
+  Pixel is declared as default property, you may use it as shown below:
+  <CODE>
+  Bitmap32[10, 20] := Bitmap32[20, 10]; // copy a pixel from (20,10) to (10,20) position
+  </CODE>
+  PixelS is a 'safe' version of the Pixel property. When reading pixels from the
+  outside the bitmap boundary, the value specified by OuterColor is returned.
+  Writing with invalid coordinates will have no effect.
+See also:
+  TJclBitmap32.OuterColor
+  TJclBitmap32.SetPixel
+  TColor32
+Donator:
+  Alex Denissov
+@@TJclBitmap32.PixelS
+<COMBINE TJclBitmap32.Pixel>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.PixelPtr
+Summary:
+  Points to the adress of the pixel at coordinates X, Y.
+Description:
+  Converts coordinates of a pixel to its address in memory. Since TJclBitmap32
+  uses 32-bit DIBs, its memory is allocated as continuous string of 4-byte
+  TColor32 values, starting at the top left corner.
+
+  Pixel with (0, 0) coordinates has the same address as specified in Bits property.
+See also:
+  TJclBitmap32.Bits
+  TJclBitmap32.Pixel
+  TJclBitmap32.ScanLine
+  TJclBitmap32
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.ResetStippleCounter
+Summary:
+  Resets the StippleCounter.
+See also:
+  Line_Patterns
+--------------------------------------------------------------------------------
+@@TJclBitmap32.ScanLine
+Summary:
+  Provides indexed access to each line of pixels.
+Description:
+  The Scanline property provides indexed access to each line of pixels.
+  Returns the same address as PixelPtr[0, Y].
+  This property acts similar to TBitmap.ScanLine.
+See also:
+  TJclBitmap32.Bits
+  TJclBitmap32.PixelPtr
+  TColor32Array
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.StippleCounter
+Summary:
+  The current value of the stipple counter.
+Description:
+  Use StippleCounter property to get the current value of the stipple counter.
+See also:
+  TJclBitmap32.GetStippleColor
+  Line_Patterns
+  TJclBitmap32.SetStipple
+  TJclBitmap32.StippleStep
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.StippleStep
+Summary:
+  The current stipple step value.
+Description:
+  Provides access to stipple step. Default value is 1.0. It is
+  possible to set step to fractional or negative value.
+See also:
+  TJclBitmap32.GetStippleColor
+  Line_Patterns>
+  TJclBitmap32.SetStipple
+  TJclBitmap32.StippleCounter
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.StretchFilter
+Summary:
+  Interpolation filter for image resampling.
+Description:
+  StretchFilter specifies color interpolation method for image stretching as well
+  as for some other operations, like linear transformations. Some functions
+  (transformations, for example) do not distinguish sfSpline filter, even if it
+  is specified, instead they will use sfLinear.
+See also:
+  Draw
+  TStretchFilter
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Clear
+Summary:
+  Clears the bitmap.
+Description:
+  Fills the entire bitmap with clBlack32.
+See also:
+  Clear@TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Clear@TColor32
+Summary:
+  Fills the bitmap with FillColor.
+Description:
+  Clear fills the entire bitmap with FillColor.
+See also:
+  Delete
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Create
+Summary:
+  Creates and initializes an instance of TJclBitmap32.
+Description:
+  After calling the inherited constructor, Create initializes the following
+  properties:
+    *   BitmapInfo> with data corresponding to 32-bit DIBs
+    *   DrawMode> to dmOpaque
+    *   MasterAlpha> to opaque
+    *   OuterColor> to transparent black
+    *   PenColor> to clWhite32
+    *   StippleCounter> to 0
+    *   StippleStep> to 1.0
+    *   StretchFilter> to sfNearest
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Destroy
+Summary:
+  Disposes of the instance of an TJclBitmap32 object.
+Description:
+  Destroys the bitmap object and frees all associated memory.
+  Do not call Destroy directly, use Free method instead.
+See also:
+  Create
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Draw
+Summary:
+  Renders the bitmap.
+Description:
+  Renders the image specified by Src/hSrc parameter at the location given by the
+  coordinates (DstX, DstY) or the DstRect rectangle.
+
+  The method provides both: block transfer (versions with DstX, DstY Parameters)
+  and stretching (versions with DstRect parameter).
+
+  When the source is another TJclBitmap32 object (Src parameter), the method uses
+  Src.DrawMode do determine how it should be blended with the background, and if
+  stretching, Src.StretchFilter specifies how the image should be stretched.
+
+  The version with hSrc parameter, is introduced mainly for compatibility reasons.
+  You may use it to transfer data from bitmaps with other formats, or any other
+  windows objects that have device handle (DC). It is based on StretchDIBits GDI
+  call, it does not support transparency and always uses nearest neighbor
+  interpolation when stretching.
+
+  The Dst parameter must not be necessarily some other bitmap. In fact, it is
+  possible to copy/stretch areas inside the same bitmap that calls the Draw method.
+  However, in this case, if source and destination areas intersect, the result is
+  not specified (this is a limitation of the current version).
+See also:
+  BlockTransfer
+  DrawMode
+  DrawTo
+  StretchFilter
+  StretchTransfer
+  TJclBitmap32
+  TRect
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.DrawTo
+Summary:
+  Renders the bitmap onto another bitmap.
+Description:
+  The DrawTo method renders the bitmap (or part of it specified by SrcRect
+  parameter) onto another bitmap specified by Dst/hDst parameter. It works
+  similar to Draw method but instead of copying data from some other source, the
+  bitmap renders itselt to destination object. See the Draw Description: for
+  details.
+See also:
+  Draw
+  TJclBitmap32
+  TRect
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.Empty
+Summary:
+  Indicates whether the bitmap contains an image.
+Description:
+  Returns True if the bitmap is empty, that is Width or Height is zero.
+
+  If the bitmap is empty, it has no device context (Handle property) allocated.
+Result:
+  True, if the bitmap doesn't contain an image.
+See also:
+  Handle
+  Height
+  Width
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.FillRect
+Summary:
+  Fills the specified rectangle on the bitmap using the specified color.
+Description:
+  Fills the rectangle with a specified color. Methods with 'S' postfix provide
+  necessary clipping to bitmap boundaries, versions without 'S' must be supplied
+  with valid Parameters: and X2 > X1; Y2 > Y1.
+
+  The function fills the rectangle up to, but not including the right column and
+  bottom row. When X2 <= X1 or Y2 <= Y1, nothing is drawn.
+See also:
+  FrameRect
+  Graphics_Naming_Conventions
+  TColor32
+Donator:
+  Alex Denissov
+@@TJclBitmap32.FillRectS
+<COMBINE TJclBitmap32.FillRect>
+@@TJclBitmap32.FillRectT
+<COMBINE TJclBitmap32.FillRect>
+@@TJclBitmap32.FillRectTS
+<COMBINE TJclBitmap32.FillRect>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.FrameRectS
+Summary:
+  Draws a rectangle using the specified color.
+Description:
+  Draws a rectangle frame. Row with X2 coordinate and column with Y2 coordinate
+  are excluded.
+
+  If X2 <= X1 or Y2 <= Y1, the function does not draw the rectangle.
+
+  FrameRectTSP version supports line patterns.
+See also:
+  TJclBitmap32.FillRect
+  TJclBitmap32.LineTo
+  Graphics_Naming_Conventions
+  TColor32
+Donator:
+  Alex Denissov
+@@TJclBitmap32.FrameRectTS
+<COMBINE TJclBitmap32.FrameRectS>
+@@TJclBitmap32.FrameRectTSP
+<COMBINE TJclBitmap32.FrameRectS>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.DrawHorzLine
+Summary:
+  Draws a horizontal line.
+Description:
+  Draws a horizontal line from (X1,Y) to (X2, Y). The last point is always
+  included.
+
+  These functions works faster compared to DrawLine. In versions with 'S'
+  postfix necessary clipping to a bitmap coordinate range is provided. In
+  versions without 'S' postfix, the X1 value should be less than or equal to X2.
+
+  DrawHorzLineTSP uses a stipple pattern to vary the color along the line.
+See also:
+  TJclBitmap32.DrawLine
+  Line_Patterns
+  Graphics_Naming_Conventions
+  TColor32
+  TJclBitmap32.DrawVertLine
+Donator:
+  Alex Denissov
+@@TJclBitmap32.DrawHorzLineS
+<COMBINE TJclBitmap32.DrawHorzLine>
+@@TJclBitmap32.DrawHorzLineT
+<COMBINE TJclBitmap32.DrawHorzLine>
+@@TJclBitmap32.DrawHorzLineTS
+<COMBINE TJclBitmap32.DrawHorzLine>
+@@TJclBitmap32.DrawHorzLineTSP
+<COMBINE TJclBitmap32.DrawHorzLine>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.DrawVertLine
+Summary:
+  Draws a horizontal line.
+Description:
+  Draws a horizontal line from (X1,Y) to (X2, Y). The last point is always
+  included.
+
+  These functions works faster compared to DrawLine. In versions with 'S' postfix
+  necessary clipping to a bitmap coordinate range is provided. In versions
+  without 'S' postfix, the X1 value should be less than or equal to X2.
+
+  DrawVertLineTSP uses a stipple pattern to vary the color along the line.
+See also:
+  TJclBitmap32.DrawLine
+  Line_Patterns
+  Graphics_Naming_Conventions
+  TColor32
+  TJclBitmap32.DrawHorzLine
+Donator:
+  Alex Denissov
+@@TJclBitmap32.DrawVertLineS
+<COMBINE TJclBitmap32.DrawVertLine>
+@@TJclBitmap32.DrawVertLineT
+<COMBINE TJclBitmap32.DrawVertLine>
+@@TJclBitmap32.DrawVertLineTS
+<COMBINE TJclBitmap32.DrawVertLine>
+@@TJclBitmap32.DrawVertLineTSP
+<COMBINE TJclBitmap32.DrawVertLine>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.DrawLine
+Summary:
+  Draws a line.
+Description:
+  Draws a line from (X1,Y1) to (X2,Y2). Methods with 'S' postfix perform
+  necessary clipping to a bitmap boundary.
+
+  LineA and LineAS use modified Bresenham’s algorithm (also known as Wu’s
+  antialiasing), modified to support line transparency and pixel shape/gamma
+  correction.
+
+  LineX/F/XS/FS functions use my own algorithm for antialiasing. Line ends have
+  fixed- or floating-point coordinates. These methods work approximately 2–2.5
+  times slower than LineA and LineAS.
+
+  The last optional parameter (L) determines if the last point (X2,Y2) has to
+  be drawn. It is useful in some cases to leave that point empty, especially
+  when drawing sequences of transparent and/or antialiased lines. By default,
+  DrawLine methods don’t render the last point.
+
+  LineXP/FP/XSP/FXP draw antialiased lines with support for color patterns.
+See also:
+  TJclBitmap32.LineTo
+  TJclBitmap32.MoveTo
+  Graphics_Naming_Conventions
+  TColor32
+  TJclBitmap32.DrawHorzLine
+  TJclBitmap32.DrawVertLine
+Donator:
+  Alex Denissov
+@@TJclBitmap32.DrawLineS
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineT
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineTS
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineA
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineAS
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineF
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineFS
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineFP
+<COMBINE TJclBitmap32.DrawLine>
+@@TJclBitmap32.DrawLineFSP
+<COMBINE TJclBitmap32.DrawLine>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.LineToS
+Summary:
+  Draws a line on the bitmap from current raster position to the point specified
+  by X and Y, and sets the raster position to (X, Y).
+Description:
+  LineTo* methods are similar to TCanvas.LineTo. The line is drawn from the
+  current raster position, to the position specified by X and Y Parameters:
+  excluding the last point. Then raster position is shifted to (X, Y) point.
+
+  The line is drawn with the color specified in PenColor property. 'S', 'TS', and
+  'AS' versions use and update integer integer raster position, while 'FS' and 'XS'
+  versions use and update independent fixed-point raster position.
+
+  LineToXSP and LineToFSP do not use PenColor, instead, they draw a line using
+  currend stipple pattern.
+
+  To start a new line or sequence of lines, use MoveTo methods.
+See also:
+  TJclBitmap32.DrawLine
+  Line Patterns
+  TJclBitmap32.MoveTo
+  Graphics_Naming_Conventions
+  TJclBitmap32.PenColor
+  TFixed
+Donator:
+  Alex Denissov
+@@TJclBitmap32.LineToTS
+<COMBINE TJclBitmap32.LineToS>
+@@TJclBitmap32.LineToAS
+<COMBINE TJclBitmap32.LineToS>
+@@TJclBitmap32.LineToFS
+<COMBINE TJclBitmap32.LineToS>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.LoadFromFile
+Summary:
+  Loads an image from a file.
+Description:
+  Use LoadFromFile to read an image from disk. This method uses a temporary
+  TPicture object to load data and will succeed with any format supported by
+  TPicture.
+See also:
+  LoadFromStream
+  SaveToFile
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.LoadFromStream
+Summary:
+  Loads an image from a stream.
+Description:
+  Use LoadFromStream to load an image from a stream. This method uses a
+  temporary TPicture object to load data and will succeed with any format
+  supported by TPicture.
+See also:
+  LoadFromFile
+  SaveToStream
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.MoveTo
+Summary:
+  Changes the current drawing position to the point (X,Y).
+Description:
+  Shifts current raster to specified position, analogous to MoveTo method of
+  standard TCanvas.
+
+  Each bitmap maintains separate raster positions for integer and fixed point
+  coordinates. MoveTo affects the integer raster position, while MoveToX and
+  MoveToF affect the fixed-point raster position.
+
+  Raster position is applicable only to MoveTo, LineTo methods and some polygon
+  drawing routines, which use it internally, it is not changed neither by
+  DrawLine methods nor by any other method.
+Parameters:
+  X - Specifies the x-coordinate of the new position.
+  Y - Specifies the y-coordinate of the new position.
+See also:
+  DrawLine
+  LineToS
+  LineTo
+  Graphics_Naming_Conventions
+  TFixed
+Donator:
+  Alex Denissov
+@@TJclBitmap32.MoveToF
+<COMBINE TJclBitmap32.MoveTo>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.RaiseRectTS
+Summary:
+  Draws a raised or recessed frame.
+Description:
+  This function draws a raised or recessed frame. The contrast property is an
+  integer value ranging from –100 to +100.
+
+  <IMAGE TJclBitmap32_RaiseRectTS>
+Parameters:
+  X1 - X-coordinate of bounding rectangle's upper-left corner.
+  Y1 - Y-coordinate of bounding rectangle's upper-left corner.
+  X2 - X-coordinate of bounding rectangle's lower-right corner.
+  Y2 - Y-coordinate of bounding rectangle's lower-right corner.
+  Contrast - Specifies how the rectangle shall contrast to the background.
+See also:
+  FrameRect
+  Graphics_Naming_Conventions
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.RenderText
+Summary:
+  Renders text with antialiasing and transparency support.
+Description:
+  The RenderText method draws a string of characters. This method is much slower
+  compared to TextOut functions, however it supports antialiasing and
+  transparency. AALevel specifies how the text is antialiased. If it is zero, no
+  antialiasing is performed, the value of 4 corresponds to a maximum quality.
+
+  Note, that quality of the text is also influenced by the system font
+  antialiasing.
+
+  This method draws a string using current Font, but it ignores the Font.Color
+  property, substituting it with the Color parameter.
+Parameters:
+  X - Specifies the x-coordinate of the reference point to align the string.
+  Y - Specifies the x-coordinate of the reference point to align the string.
+  Text - The string to be drawn.
+  AALevel - level of antialiasing to apply.
+  Color - The color to use when drawing the string.
+See also:
+  Font
+  TColor32
+  TextExtent
+  TextOut
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.GetStippleColor
+Summary:
+  Returns stipple pattern color at position specified by StippleCounter.
+Description:
+  Returns color corresponding to the current counter position in stipple pattern.
+  If the counter step is fractional, returned color will be interpolated. Calling
+  GetStippleColor automatically changes the StippleCounter value by StippleStep.
+Result:
+  Stipple pattern color at position specified by StippleCounter.
+See also:
+  Line Patterns
+  SetStipple
+  StippleCounter
+  StippleStep
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.ResetAlpha
+Summary:
+  Resets the alpha channel.
+Description:
+  Resets the alpha channel of the entire bitmap to complete opacity.
+See also:
+  DrawMode
+  MasterAlpha
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.SaveToFile
+Summary:
+  Saves a bitmap image to a file.
+Description:
+  SaveToFile writes the bitmap image to disk. The image is saved as 32-bit BMP
+  file.
+
+  If you need another pixel format or storage format, create intermediate
+  TBitmap object or other TGraphic descendant, assign it from TJclBitmap32 and
+  save it to a file.
+Parameters:
+  FileName - the name of the file to write to.
+See also:
+  LoadFromFile
+  SaveToStream
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.SaveToStream
+Summary:
+  Stores a bitmap image to a stream.
+Description:
+  SaveToStream stores the bitmap image to a stream specified by the Stream paramter.
+Parameters:
+  Stream - the stream to write the bitmap to.
+See also:
+  TODO
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.SetPixel
+<GROUP Graphics.Bitmaps>
+Summary:
+  Blends the pixel at position (X, Y) using the specified color.
+Description:
+  SetPixelT blends a pixel at specified coordinates using the specified color.
+  The pixel’s alpha channel is used, but the coordinates are not validated.
+
+  The overloaded version of SetPixelT with a pixel pointer argument allows
+  setting pixels addressed with the pointer rather than with coordinates. The
+  pointer is automatically incremented to the next pixel's position after each
+  call to SetPixelT, for example:
+  <CODE>
+  var
+    P: PColor32;
+    I: Integer;
+  begin { Draw a fading white line from (10, 20) to (265, 20) }
+    P := PixelPtr[10, 20];
+    for I := 0 to 255 do SetPixelT(P, Color32(255, 255, 255, 255 - I));
+  end;
+  </CODE>
+  SetPixelTS is the SetPixelT method with added coordinate verification. If
+  pixel coordinates lie outside the bitmap area, SetPixelTS does nothing.
+
+  SetPixelF/SetPixelFS methods provide antialiased rendering of points.
+
+  <IMAGE TJclBitmap32_SetPixel>
+See also:
+  Graphics_Naming_Conventions
+  Pixel
+  TColor32
+  TFixed
+Donator:
+  Alex Denissov
+@@TJclBitmap32.SetPixelT
+<COMBINE TJclBitmap32.SetPixel>
+@@TJclBitmap32.SetPixelTS
+<COMBINE TJclBitmap32.SetPixel>
+@@TJclBitmap32.SetPixelF
+<COMBINE TJclBitmap32.SetPixel>
+@@TJclBitmap32.SetPixelFS
+<COMBINE TJclBitmap32.SetPixel>
+--------------------------------------------------------------------------------
+@@TJclBitmap32.SetSize
+Summary:
+  SetSize sets both Width and Height properties at once.
+Description:
+  Call SetSize to set a new width and height of the bitmap. If one of the
+  arguments is zero, the bitmap is considered empty and its Handle property is
+  set to zero.
+
+  Calling SetSize works faster than consecutive changing of Width and Height
+  properties. If you use another bitmap or control as an argument, the bitmap
+  will be sized to source dimensions.
+
+  If you have an external TCanvas attached, refresh it Handle property after
+  resizing:
+
+  <CODE>
+    Bitmap32.SetSize(100, 200);
+    Canvas.Handle := Bitmap32.Handle;
+  </CODE>
+
+  After calling SetSize the bitmap image should be completely redrawn.
+See also:
+  Handle
+  Height
+  Width
+  TJclCustomMap
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.SetStipple
+Summary:
+  Sets a new stipple pattern.
+Description:
+  Use SetStipple to set a new stipple pattern.
+See also:
+  GetStippleColor
+  Line Patterns
+  TArrayOfColor32
+  TColor32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.TextExtent
+Summary:
+  Returns the width and height, in pixels, of a string rendered in the current
+  Font.
+Description:
+  Use TextExtent to determine the space a string will occupy in the image.
+  Other elements in the image such as lines, boxes, or additional lines of text
+  can be positioned to accommodate the size of the text.
+  TextExtent returns the width and height of the rectangle that bounds the text
+  on the bitmap.
+
+  To check only the height, call TextHeight. To check only the width, call
+  TextWidth.
+Notes:
+  The size returned by this function may differ from the actual width of the text
+  produced by RenderText function, especially when using raster fonts.
+See also:
+  Font
+  RenderText
+  TextHeight
+  TextOut
+  TextWidth
+  TSize
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.TextHeight
+Summary:
+  Returns the height, in pixels, of a string rendered in the current font.
+Description:
+  Use TextHeight to determine the height a string will occupy in the image. Other
+  elements in the image such as lines, boxes, or additional lines of text can be
+  positioned to accommodate the height of the text.
+
+  TextHeight returns the same value as TextExtent(Text).cy.
+See also:
+  Font
+  RenderText
+  TextExtent
+  TextOut
+  TextWidth
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.TextWidth
+Summary:
+  Returns the width, in pixels, of a string rendered in the current font.
+Description:
+  Use TextWidth to determine the length a string will occupy in the image.
+  TextWidth indicates whether a given string will fit in the available space.
+  Other graphical elements in the image such as lines, or additional strings can
+  be positioned to accommodate the width of the text.
+
+  TextWidth returns the same value as TextExtent(Text).cx.
+See also:
+  Font
+  RenderText
+  TextExtent
+  TextHeight
+  TextOut
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.TextOut
+Summary:
+  Writes a string on the canvas, starting at the point (X,Y).
+Description:
+  Use TextOut to write a string onto the bitmap. The string will be written
+  using the current Font.
+
+  Use the TextExtent method to determine the space occupied by the text in the
+  image. TextOut does not support transparent text colors. The second version
+  performs clipping of a text to the ClipRect rectangle. The last version
+  provides the most flexible text formatting. See Description: of DrawText
+  function in 'Win32 Developer Reference' help file for information on Flags and
+  their function.
+See also:
+  Font
+  RenderText
+  TextExtent
+  TextHeight
+  TextWidth
+  TRect
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclBitmap32.UpdateFont
+Summary:
+  Selects the font specified by the Font property into the device context
+  specified by Handle.
+Description:
+  Use this method before calling a Windows API function that handle text output.
+  It will synchronize the device font object with the Font property. You do not
+  have to call UpdateFont when using text output methods of TJclBitmap32 since
+  they call UpdateFont automatically.
+See also:
+  Font
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+
+@@Graphics_Naming_Conventions
+<TITLE Function naming conventions>
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  JclGraphics introduces several routines (as well as some class
+  properties and methods) which have similar action but may
+  have different arguments or other realization details.
+
+  They follow a simple naming convention: 
+<TABLE>
+Postfix      Details                                                      \Example
+-----------  -----------------------------------------------------------  ------------
+none         Property or method does not perform any range checking       DrawLine
+              \of its arguments. All the coordinates should be             
+              valid.                                                       
+S            'Safe' version. Validates coordinates. If necessary,         DrawLineS
+              clipping is performed.
+T            'Transparent' version of the method. Uses the alpha          DrawLineT
+              channel of the provided color to blend the drawn
+              primitive with the background pixels.
+A            Methods with 'A' postfix provide antialiasing of the         DrawLineA
+              drawn primitive.                                             
+F            Methods with 'F' postfix take coordinates as floating        DrawLineF
+              point arguments and perform antialiasing of the drawn        
+              primitive.                                                   
+TS, AS, FS   Valid combinations of postfixes described above.             DrawLineFS
+P            'Pattern' version. Usually combined with TS or FS            DrawLineFSP
+              postfixes, it allows for implementation of various           
+              effects, like gradient or dashed lines (See
+              Line Patterns).
+</TABLE>
+See also:
+  Line Patterns
+--------------------------------------------------------------------------------
+@@Line_Patterns
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  JclGraphics defines several functions to support non-uniform
+  lines. This includes gradient lines, dashed lines etc.
+
+  The idea is pretty simple: TJclBitmap32 holds a dynamic array of colors, and a
+  counter, which 'crawls' along the array and reads colors from its position.
+  The line drawing algorithm queries color value from the
+  current counter position at each point, then the counter is
+  automatically incremented to get ready to supply the next
+  value to line rasterisation routine.
+
+  The counter, accessed through the StippleCounter property, wraps itself
+  automatically at the edges of color
+  array. It can move in both directions depending on stipple
+  step, which in turn can be positive or negative. Its malue
+  may even be fractional in this case resulting color is
+  interpolated. The step is accessed with StippleStep
+  property.
+
+  GetStippleColor returns color from the current
+  counter position and automatically increments counter
+  position by the counter step, so that next GetStippleColor
+  call will return color value from the next position.
+
+  Drawing functions that support line patterns have 'P' in
+  their postfix (as in LineFSP).
+
+  Warning: the counter is not thread-aware, it is shared by all
+  threads accessing the bitmap. Additional care should be taken
+  when multiple threads draw stippled lines in the same bitmap.
+See also:
+  Graphics_Naming_Conventions
+  TJclBitmap32
+  TJclBitmap32.GetStippleColor
+  TJclBitmap32.StippleCounter
+  TJclBitmap32.StippleStep
+--------------------------------------------------------------------------------
+@@TDrawMode
+<GROUP Graphics.Bitmaps>
+Summary:
+  TDrawMode defines how the bitmap is combined with the backgrownd.
+Description:
+  This is the type for DrawMode property of TJclBitmap32 class, and it is also
+  passed as parameter in BlockTransfer and StretchTransfer functions.
+@@TDrawMode.dmOpaque
+  A color information from the foreground image completely
+  replaces the background data.
+@@TDrawMode.dmBlend
+  Foreground and background colors are blended together using
+  per-pixel opacity of the foreground bitmap (stored in its
+  alpha channel), multiplied by its MasterAlpha.
+See also:
+  TJclBitmap32.DrawMode
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TMatrix3d
+<GROUP Graphics.Bitmaps>
+Summary:
+  3 x 3 Matrix as used by TJclLinearTransformation.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TStretchFilter
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  When the bitmap is scaled, three different methods may be employed to
+  interpolate colors in stretched fragment.
+
+  In some functions, however, sfSpline mode may not be supported, if this is the
+  case, sfSpline will be substituted with sfLinear.
+See also:
+  TJclBitmap32.StretchFilter
+  StretchTransfer
+Donator:
+  Alex Denissov
+@@TStretchFilter.sfNearest
+  Nearest neighbor filter.
+@@TStretchFilter.sfLinear
+  Linear interpolation filter.
+@@TStretchFilter.sfSpline
+  Spline interpolation filter.
+--------------------------------------------------------------------------------
+@@TJclByteMap
+Summary:
+  TODO
+Description:
+  The TJclByteMap class may be used to simulate palette-based operations or to
+  access separate color layers in TJclBitmap32.
+
+  TJclByteMap is an descendat of TJclCustomMap and assignment compatible with
+  TJclBitmap32 in both directions.
+See also:
+  TJclBitmap32
+  TJclCustomMap
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.Bytes
+Summary:
+  Provides access to contained data.
+Description:
+  Returns the pointer to the internal array of bytes. Data is stored in row-major
+  order, top-left "pixel" comes first.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.ValPtr
+Summary:
+  Provides access to the data byte at position (X, Y).
+Description:
+  Returns a pointer to a specific byte in the array.
+See also:
+  Byte
+  Bytes
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+
+@@TJclByteMap.Assign
+Summary:
+  TODO
+Description:
+  Copies data from another object, specified by the Source parameter.
+
+  This method supports following classes:
+
+  nil          – Assigns an empty data array;
+  TJclByteMap  – Copies data bytes from another byte map;
+  TJclBitmap32 – Transforms bitmap data using the ReadFrom method with ctWeightedRGB
+                 conversion type.
+
+  TByteMap also overrides the protected AssignTo method, making it possible to
+  assign bitmaps from byte maps, so that both following lines are correct:
+
+  <CODE>
+    ByteMap.Assign(Bitmap32); // an analog to BM := Intensity(B32);
+    Bitmap32.Assign(ByteMap); // an analog to B32 := Gray32(BM);
+  </CODE>
+See also:
+  TJclBitmap32
+  ReadFrom
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.Clear
+Summary:
+  Fills the byte map with the specified value.
+Description:
+  Fills the entire byte map with the specified value.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.Destroy
+Summary:
+  TODO
+Description:
+  Destroys the bytemap object and frees all the associated memory.
+
+  Do not call Destroy directly, use the Free method instead.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.Empty
+Summary:
+  Specifies whether the byte map contains data.
+Description:
+  Returns True if the byte map contains no data, which implies that either Width
+  or Height is 0.
+See also:
+  Height
+  Width
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.ReadFrom
+Summary:
+  TODO
+Description:
+  ReadFrom allows reading and converting data from TJclBitmap32 objects into the
+  byte map.
+
+  First, the byte map is resized to fit the Source bitmap dimensions, then the
+  32-bit RGBA color is transformed to 8-bits depending on the conversion type:
+
+Conversion      Action
+-------------   ----------------------------------------------------
+ctRed           Copies red channel
+ctGreen         Copies green channel
+ctBlue          Copies blue channel
+ctAlpha         Copies alpha channel
+ctUniformRGB    Copies averaged value: (R + G + B) / 3
+ctWeightedRGB   Copies intensity: R * 0.21 + G * 0.71 + B * 0.08
+See also:
+  TJclBitmap32
+  TConversionType
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.SetSize
+Summary:
+  Call SetSize to set the dimensions of the bytemap.
+Description:
+  If one of the arguments is zero, the bytemap is considered empty and its Bytes
+  property is set to nil.
+
+  Calling SetSize works faster than changing both Width and Height properties.
+
+  If you pass another bitmap, byte map or control as an argument, the byte map
+  will be sized to corresponding dimensions.
+See also:
+  Bytes
+  TJclCustomMap
+  Height
+  Width
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclByteMap.WriteTo
+Summary:
+  WriteTo fills the destinatio bitmap using the values stored in the byte map.
+
+Description:
+  If it is necessary, the destination bitmap is resized to fit the byte map
+  dimensions.
+
+  The following table shows how 8-bit data is transformed into 32-bit RGBA
+  color depending on Conversion parameter.
+
+Conversion                       Action
+-------------                    ----------------------------------
+ctRed                            Copies bytes into red channel
+ctGreen                          Copies bytes into green channel
+ctBlue                           Copies bytes into blue channel
+ctAlpha                          Copies bytes into alpha channel
+ctUniformRGB, ctWeightedRGB      Copies the same byte value into red, green and
+                                 blue channels.
+
+  WriteTo does not distinguish between ctUniformRGB and ctWeightedRGB
+  conversion types.
+
+  The second overloaded version with Palette parameter uses TPalette32 array to
+  map byte values into RGBA colors.
+Notes
+  This method alters only the specified color channels, other channels remain
+  intact.
+See also:
+  TJclBitmap32
+  TConversionType
+  TPalette32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TConversionKind
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Specifies how data is converted from 32-bit ARGB bitmap to 8-bit bytemap and
+  back.
+See also:
+  TJclByteMap.ReadFrom
+  TJclByteMap.WriteTo
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclTransformation
+<GROUP Graphics.Bitmaps>
+Summary:
+  TJclTransformation is an abstract ancestor for bitmap transformation classes.
+Description:
+  TJclTransformation objects are passed as parameter in the Transform function,
+  which actually performs the bitmap transformation.
+See also:
+  TJclLinearTransformation
+  Transform
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclTransformation.GetTransformedBounds
+Summary:
+  TODO
+Description:
+  Returns the bounding rectangle that surrounds the destination area affected by
+  the transformation. The coordinates of the rectangle are specified relative to
+  the destination bitmap origin.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  The transformation is defined by a 3x3 homogeneous matrix.
+  <IMAGE TJclLinearTransformation>
+See also:
+  TMatrix3d
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Matrix
+Summary:
+  Stores the transformation matrix.
+Description:
+  The matrix is accessed as a field instead of a property in order to make it
+  C++ Builder compatible.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Clear
+Summary:
+  Resets the transformation to identity.
+Description:
+  Loads IdentityMatrix into the Matrix field.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Create
+Summary:
+  Creates and initializes an instance of TJclLinearTransformation.
+Description:
+  Upon creation, the Matrix field is initialized to IdentityMatrix.
+See also:
+  Clear
+  Matrix
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.GetTransformedBounds
+Summary:
+  TODO
+Description:
+  Returns the bounding rectangle that surrounds the destination area affected by
+  the transformation. The coordinates of the rectangle are specified relative to
+  the destination bitmap origin.
+
+  <IMAGE TJclLinearTransformation_GetTransformedBounds>
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Rotate
+Summary:
+  Rotates a bitmap.
+Description:
+  At first, the origin is translated to (Cx, Cy) point, then the image is rotated
+  around the origin by Alpha degrees
+
+  <IMAGE TJclLinearTransformation_Rotate>
+
+  and finally, the origin is shifted back.
+See also:
+  Translate
+  Rotate
+  Scale
+  Skew
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Scale
+Summary:
+  TODO
+Description:
+  Adds scale to the transformation:
+
+  <IMAGE TJclLinearTransformation_Scale>
+See also:
+  Translate
+  Rotate
+  Scale
+  Skew
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Skew
+Summary:
+  TODO
+Description:
+  Adds the skew to the transformation:
+
+  <IMAGE TJclLinearTransformation_Skew>
+See also:
+  Translate
+  Rotate
+  Scale
+  Skew
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TJclLinearTransformation.Translate
+Summary:
+  TODO
+Description:
+  Translates the image:
+
+  <IMAGE TJclLinearTransformation_Translate>
+See also:
+  Translate
+  Rotate
+  Scale
+  Skew
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@AlphaToGrayscale
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  This function transforms an alpha channel from Src bitmap into grayscale (R=A,
+  G=A, B=A) color in Dst bitmap. If necessary, Dst bitmap is resized to fit Src
+  dimesions.
+
+  It writes only RGB components into Dst. The alpha channel (A) remains intact,
+  provided that dimensions of Dst and Src match before AlphaToGrayScale call.
+
+  This function is useful when it is necessary to visualize the alpha channel, or
+  when you want to store it as standard bitmap into a file.
+Platform:
+  VCL
+See also:
+  IntensityToAlpha
+  TJclBitmap32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@ApplyLUT
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Converts color from Src to Dst using a look-up table (LUT parameter) to map
+  the color components. The alpha channel of the result is automatically set to
+  $FF:
+
+  RDST = LUT[RSRC];
+
+  GDST = LUT[GSRC];
+
+  BDST = LUT[BSRC];
+
+  ADST = $FF;
+
+  This function supports in-place operation, that is Dst may be the same as Src.
+Platform:
+  VCL
+See also:
+  TJclBitmap32
+  TLUT8
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@BlockTransfer
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  BlockTransfer is similar to the BitBlt function from Windows GDI. It
+  performs copying of a bitmap fragment specified by SrcRect into location
+  (DstX, DstY) with optional alpha blending or using user-specified combining
+  function.
+
+  If CombineOp=dmOpaque, the fragment simply replaces destination pixels. In
+  dmBlend mode it is blended to destination using its alpha channel and
+  MasterAlpha property. In dmCusom mode, the function calls CombineCallBack
+  function for pixel combining.
+
+  It is not required for DstRect and SrcRect to lie entirely inside the
+  corresponding bitmap, since the function provides necessary clipping.
+
+  The result is not specified when transferring data inside the same bitmap
+  (Src=Dst) and if in the same time SrcRect intersects with DstRect. In this
+  case it is recommended to use a temporary bitmap buffer.
+
+  Neither Src nor Dst bitmaps may be equal to nil. In this case, function will
+  generate an exception. They may be empty however, in this case no
+  transformation will be performed.
+
+  This routine is used in TJclBitmap32.Draw and TJclBitmap32.DrawTo methods.
+Platform:
+  VCL
+See also:
+  TJclBitmap32.Draw
+  TJclBitmap32.DrawTo
+  TJclBitmap32.MasterAlpha
+  StretchTransfer
+  TJclBitmap32
+  TDrawMode
+  TPixelCombineEvent
+  TRect
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@ColorToGrayscale
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Calculates color intensity from Src and writes it as a grayscale image into
+  Dst. The alpha channel in Dst will be set to $FF.
+
+  This function supports in-place operation, that is Dst may be the same as Src.
+Platform:
+  VCL
+See also:
+  AlphaToGrayscale
+  TJclBitmap32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@IntensityToAlpha
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  This function transforms the color intensity, stored in RGB channels of Src
+  bitmap into the alpha channel in Dst. If necessary, the Dst bitmap is resized
+  to fit Src dimesions.
+
+  The intensity is calculated using the Intensity function.
+
+  The function writes only the alpha component into Dst. Other channels remain
+  intact (provided dimensions of Dst and Src match before IntensityToAlpha call).
+
+  IntensityToAlpha is useful when it is necessary to load an alpha channel stored
+  in as an image.
+
+  The in-place operation is fully supported, that is Dst may be the same as Src.
+Platform:
+  VCL
+See also:
+  AlphaToGrayscale
+  Intensity
+  TJclBitmap32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@Invert
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Inverts all color channels, including the alpha channel.
+
+  This function supports in-place operation, that is Dst may be the same as Src.
+Platform:
+  VCL
+See also:
+  InvertRGB
+  TJclBitmap32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@InvertRGB
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Inverts RGB color channels, and copies the alpha channel without inversion. If
+  necessary, the Dst bitmap is resized to fit Src dimensions.
+
+  This function supports in-place operation, that is Dst may be the same as Src.
+Platform:
+  VCL
+See also:
+  Invert
+  TJclBitmap32
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@Polygon
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Fills the shape defined by the Points parameter with specified color. Unlike
+  GDI polygons, this function allows for transparency and optional antialiasing.
+
+  PolygonTS draws a non-antialiased polygon with optional transparency. When
+  drawing, fixed-point coordinates of vertixes are rounded.
+
+  PolygonAS draws an antialiased polygon, fixed-point coordinates of vertexes
+  are rounded.
+
+  PolygonFS provides full antialiasing and does not perform rounding of vertex
+  coordinates.
+
+  All functions perform clipping.
+Platform:
+  VCL
+See also:
+  Graphics_Naming_Conventions
+  TJclBitmap32
+  TColor32
+  TPolyFillMode
+Donator:
+  Alex Denissov
+@@PolygonAS
+<COMBINE Polygon>
+@@PolygonFS
+<COMBINE Polygon>
+@@PolygonTS
+<COMBINE Polygon>
+--------------------------------------------------------------------------------
+@@PolyLine
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Draws a series of lines, connecting points passed in. If Closed is True, the
+  polygon is closed automatically by drawing a line from the last vertex to the
+  first.
+
+  PolyLineTS draws a non-antialiased line with optional transparency. When
+  drawing, fixed-point coordinates of vertixes are rounded.
+
+  PolyLineAS draws an antialiased line, fixed-point coordinates of vertexes are
+  rounded.
+
+  PolyLineFS provides full antialiasing and does not perform rounding of vertexes'
+  coordinates.
+
+  All functions perform clipping.
+Platform:
+  VCL
+See also:
+  Graphics_Naming_Conventions
+  TJclBitmap32
+  TColor32
+Donator:
+  Alex Denissov
+@@PolyLineAS
+<GROUP Graphics.Bitmaps>
+<COMBINE PolyLine>
+@@PolyLineFS
+<GROUP Graphics.Bitmaps>
+<COMBINE PolyLine>
+@@PolyLineTS
+<GROUP Graphics.Bitmaps>
+<COMBINE PolyLine>
+--------------------------------------------------------------------------------
+@@PolyPolygon
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Fills the shape similar to that done by Polygon function. The shape is
+  constructed from several contours, which are specified in Points parameter.
+  The filling is performed according to Mode parameter.
+Platform:
+  VCL
+See also:
+  Graphics_Naming_Conventions
+  Polygon
+  PolyLine
+  TJclBitmap32
+  TColor32,
+  TPolyFillMode
+Donator:
+  Alex Denissov
+@@PolyPolygonAS
+<COMBINE Polygon>
+@@PolyPolygonFS
+<COMBINE Polygon>
+@@PolyPolygonTS
+<COMBINE Polygon>
+--------------------------------------------------------------------------------
+@@PolyLine
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  PolyLine is the same as Polyline, but takes array of polylines as
+  parameter. The Closed parameter influences all polylines in the array.
+See also:
+  Graphics_Naming_Conventions
+  Polyline
+  PolyPolygon
+  TJclBitmap32
+  TColor32
+Donator:
+  Alex Denissov
+@@PolyLineAS
+<COMBINE PolyLine>
+@@PolyLineFS
+<COMBINE PolyLine>
+@@PolyLineTS
+<COMBINE PolyLine>
+--------------------------------------------------------------------------------
+@@SetBorderTransparent
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  This is an auxiliary function that sets the alpha channel along the edges of
+  specified rectangle to zero. It may be used on a bitmap before passing it to
+  Transform function as a workarownd to the edge antialiasing problem.
+Platform:
+  VCL
+See also:
+  TJclBitmap32
+  Transform
+  TRect
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@SetGamma
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Updates gamma/shape correction table.
+
+  Pixel and line antialiasing produces much better results with correction of
+  opacities for partially covered pixels. This accounts both for monitor gamma
+  and for pixel shape correction.
+
+  Use this function to update the internal gamma-correction table which is used
+  in pixel and line rasterization.
+
+  The default value of 0.7 works fine in most cases.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@StretchTransfer
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  StretchTransfer is similar to StretchBlt or StretchDIBits functions from
+  Windows GDI. This procedure performs copying and, if necessary, stretching of
+  the bitmap fragment specified by SrcRect into location in Dst specified by
+  DstRect.
+
+  StretchFilter defines a color interpolation method for image stretching.
+
+  sfNearest is the fastest fileter, although the quality of the stretched image
+  is fair;
+
+  sfLinear is several times slower, but it produces more decent results in most
+  cases;
+
+  sfSpline is an approximation of spline interpolation.
+
+  Unlike in BlockTransfer function, SrcRect must lie inside the Src bitmap
+  boundaries, otherwise function will generate an exception. The result is not
+  specified when transferring data inside the same bitmap (Src=Dst) and if in
+  the same time SrcRect intersects with DstRect. In this case it is recommended
+  to use a temporary bitmap buffer.
+
+  This routine is used in TJclBitmap32.Draw and TJclBitmap32.DrawTo methods.
+Platform:
+  VCL
+See also:
+  BlockTransfer
+  TJclBitmap32
+  TDrawMode
+  TPixelCombineEvent
+  TRect
+  TStretchFilter
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@Transform
+<GROUP Graphics.Bitmaps>
+Summary:
+  TODO
+Description:
+  Transform is responsible for arbitrary geometrical transformations of bitmaps
+  or their fragments. The current version supports only linear transformations.
+
+  The Transformation parameter is a reference to a descendant of an abstract
+  TTransformation class. It specifies all necessary transformation Parameters:.
+
+  When Src.StretchFilter is different from sfNearest, Transform uses bilinear
+  interpolation for magnification (along any axis) as for minification, it is not
+  as accurate as StretchTransfer function. If you need better quality when
+  minimizing the bitmaps, transform them into the temporary buffer so that there
+  is no minification involved, then StretchTransfer to a final bitmap.
+
+  The function does not support spline interpolation, if Src.StretchFilter is
+  sfSpline, Transform operates as if it were sfLinear.
+
+  There is an issue with antialiasing and edges. How to make them antialiased
+  and still keep the performance? The solution implemented in JclGraphics is
+  similar to the one used in OpenGL. You just have to provide the source bitmap
+  (or its region) with transparent edges. In the original image, you’ll have to
+  force the alpha channel on its edges to zeroes, for example, using the
+  SetBorderTransparent method.
+
+  Remember, that color is interpolated as well, it means that for nice fadeout
+  the color on the border should match the color of pixels lying next to the
+  border.
+
+  In case the bitmap is transformed in dmOpaque mode, it might be better to keep
+  the color on the edge close to the color of the background.
+Platform:
+  VCL
+See also:
+  SetBorderTransparent
+  TJclBitmap32.StretchFilter
+  StretchTransfer
+  TJclLinearTransformation
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TPointF
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  The TPointF type defines a location in pixel space.
+See also:
+  TDynPointArrayF
+  TDynDynPointArrayArrayF
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TDynPointArrayF
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  TDynPointArrayF defines a one-dimensional dynamic array of TPointF.
+See also:
+  TDynDynPointArrayArrayF
+  TDynPointArray
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TDynDynPointArrayArrayF
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  TDynDynPointArrayArrayF defines a two-dimensional dynamic array of TPointF,
+  respectively a one-dimensional array of TDynPointArrayF, which means the same.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TDynPointArray
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  TDynPointArray defines a one-dimensional dynamic array of TPoint.
+See also:
+  TDynPointArrayF
+  TDynDynPointArrayArray
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TDynDynPointArrayArray
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  TDynDynPointArrayArray defines a two-dimensional dynamic array of TPoint,
+  respectively a one-dimensional array of TDynPointArray, which means the same.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TDynDynIntegerArrayArray
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  TDynDynIntegerArrayArray defines a two-dimensional dynamic array of Integer,
+  respectively a one-dimensional array of TDynIntegerArray, which means the same.
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TGamma
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  Internal Gamma bias table type as used for line/pixel antialiasing/shape
+  correction.
+See also:
+  TODO
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TLUT8
+<GROUP Graphics.Types>
+Summary:
+  TODO
+Description:
+  A look-up table of 256 values, each ranging from 0 to 255.
+
+  TLUT8 is used to transform color data with ApplyLUT procedure.
+See also:
+  TODO
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TScanLine
+<GROUP Graphics.Types>
+Summary:
+  TODO
+See also:
+  TScanLines
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------
+@@TScanLines
+<GROUP Graphics.Types>
+Summary:
+  TODO
+See also:
+  TScanLine
+Donator:
+  Alex Denissov
+--------------------------------------------------------------------------------

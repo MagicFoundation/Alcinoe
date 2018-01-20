@@ -1,0 +1,1 @@
+This is the directory where object files of zlib (http://www.zlib.net) for win64 reside.

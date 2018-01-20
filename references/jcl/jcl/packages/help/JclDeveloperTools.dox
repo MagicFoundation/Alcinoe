@@ -1,0 +1,77 @@
+﻿; This is a Doc-O-Matic version 6.5.1.1382 project file.
+; This file is maintained by Doc-O-Matic, do not edit manually.
+
+[*Control*]
+MasterFile=..\..\..\help\JclTemplate.dox
+
+[Configurations\CHM\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclDeveloperToolscontents.html
+IndexFile=JclDeveloperToolsidx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclDeveloperToolscontents.html
+IndexFile=JclDeveloperToolsidx.html
+
+[Configurations\H2\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\HTMLHelp]
+Help2Collection=JclDeveloperTools_COL_MASTER.HxC
+Help2ID=JclDeveloperTools
+HTMLHelp2Filename=..\..\help\JclDeveloperTools.HxS
+
+[Configurations\HLP\{C81B476F-5DE3-416C-A73A-9674B8ECC110}\Basic]
+HLPFilename=..\..\help\JclDeveloperTools.hlp
+
+[Configurations\HTML\{D3A588E0-9472-11D3-BDD1-0080C8BA053D}\Compatibility]
+ContentFile=JclDeveloperToolscontents.html
+IndexFile=JclDeveloperToolsidx.html
+
+[Project Database Files]
+Count=4
+File0=..\..\..\help\VCL.doxdb
+File1=..\..\..\help\JEDI.doxdb
+File2=Jcl.doxdb
+File3=JclContainers.doxdb
+
+[Source Files]
+Count=34
+File0=..\..\source\common\JclCompilerUtils.pas
+File1=..\..\source\common\JclDevToolsResources.pas
+File2=..\..\source\common\JclExprEval.pas
+File3=..\..\source\common\JclIDEUtils.pas
+File4=..\..\source\common\JclPreProcessorAlgorithmsTemplates.pas
+File5=..\..\source\common\JclPreProcessorArrayListsTemplates.pas
+File6=..\..\source\common\JclPreProcessorArraySetsTemplates.pas
+File7=..\..\source\common\JclPreProcessorBinaryTreesTemplates.pas
+File8=..\..\source\common\JclPreProcessorContainer1DTemplates.pas
+File9=..\..\source\common\JclPreProcessorContainer2DTemplates.pas
+File10=..\..\source\common\JclPreProcessorContainerIntfTemplates.pas
+File11=..\..\source\common\JclPreProcessorContainerKnownMaps.pas
+File12=..\..\source\common\JclPreProcessorContainerKnownTypes.pas
+File13=..\..\source\common\JclPreProcessorContainerTemplates.pas
+File14=..\..\source\common\JclPreProcessorContainerTypes.pas
+File15=..\..\source\common\JclPreProcessorExcDlgTemplates.pas
+File16=..\..\source\common\JclPreProcessorHashMapsTemplates.pas
+File17=..\..\source\common\JclPreProcessorHashSetsTemplates.pas
+File18=..\..\source\common\JclPreProcessorLexer.pas
+File19=..\..\source\common\JclPreProcessorLinkedListsTemplates.pas
+File20=..\..\source\common\JclPreProcessorParser.pas
+File21=..\..\source\common\JclPreProcessorQueuesTemplates.pas
+File22=..\..\source\common\JclPreProcessorSortedMapsTemplates.pas
+File23=..\..\source\common\JclPreProcessorStacksTemplates.pas
+File24=..\..\source\common\JclPreProcessorTemplates.pas
+File25=..\..\source\common\JclPreProcessorTreesTemplates.pas
+File26=..\..\source\common\JclPreProcessorVectorsTemplates.pas
+File27=..\..\source\common\JclUsesUtils.pas
+File28=..\..\source\windows\JclHelpUtils.pas
+File29=..\..\source\windows\JclMsBuild.pas
+File30=..\..\source\windows\MSHelpServices_TLB.pas
+File31=..\..\..\help\Common.dtx
+File32=..\..\..\help\ExprEval.dtx
+File33=..\..\..\help\JclDeveloperTools.dtx
+
+[General]
+Copyright=Copyright (C) 1999, 2014 Project JEDI
+Summary=Documentation of the JEDI Code Library Developer Tools package
+Title=JEDI Code Library Developer Tools package
+VersionBuild=5300
+VersionMajor=2
+VersionMinor=7

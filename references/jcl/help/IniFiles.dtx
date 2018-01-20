@@ -1,0 +1,128 @@
+@@IniWriteBool
+<GROUP RegistryandInifiles.Inifiles>
+Summary:
+  Writes a boolean key to an ini file.
+Description:
+  IniWriteBool writes a single boolean key to the specified section in the
+  specified ini file. If the function fails it raises an exception.
+Parameters:
+  FileName - The fully qualified filename of the ini file.
+  Section - The section in the ini file to which to write a value
+  Line - The name of the key to write
+  Value - The value to write
+See also:
+  IniReadBool
+  IniReadInteger
+  IniReadString
+  IniWriteInteger
+  IniWriteString
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@IniWriteInteger
+<GROUP RegistryandInifiles.Inifiles>
+Summary:
+  Writes an integer key to an ini file.
+Description:
+  IniWriteInteger writes a single integer key to the specified section in the
+  specified ini file. If the function fails it raises an exception.
+Parameters:
+  FileName - The fully qualified filename of the ini file.
+  Section - The section in the ini file to which to write a value
+  Line - The name of the key to write
+  Value - The value to write
+See also:
+  IniReadBool
+  IniReadInteger
+  IniReadString
+  IniWriteBool
+  IniWriteString
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@IniWriteString
+<GROUP RegistryandInifiles.Inifiles>
+Summary:
+  Writes a string key to an ini file.
+Description:
+  IniWriteString writes a single string key to the specified section in the
+  specified ini file. If the function fails it raises an exception.
+Parameters:
+  FileName - The fully qualified filename of the ini file.
+  Section - The section in the ini file to which to write a value
+  Line - The name of the key to write
+  Value - The value to write
+See also:
+  IniReadBool
+  IniReadInteger
+  IniReadString
+  IniWriteBool
+  IniWriteInteger
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@IniReadBool
+<GROUP RegistryandInifiles.Inifiles>
+Summary:
+  Reads a boolean key from an ini file.
+Description:
+  IniReadBool reads a single boolean value within the specified section from the
+  specified ini file. If the function fails it returns the default value False.
+Parameters:
+  FileName - The fully qualified filename of the ini file.
+  Section - The section in the ini file from which to read a value
+  Line - The name of the key to read
+Result:
+  The key within section, default value returned on failure is False.
+See also:
+  IniReadInteger
+  IniReadString
+  IniWriteBool
+  IniWriteInteger
+  IniWriteString
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@IniReadInteger
+<GROUP RegistryandInifiles.Inifiles>
+Summary:
+  Reads an integer key from an ini file.
+Description:
+  IniReadInteger reads a single integer value within the specified section from the
+  specified ini file. If the function fails it returns the default value 0.
+Parameters:
+  FileName - The fully qualified filename of the ini file.
+  Section - The section in the ini file from which to read a value
+  Line - The name of the key to read
+Result:
+  The key within section, default value returned on failure is 0.
+See also:
+  IniReadBool
+  IniReadString
+  IniWriteBool
+  IniWriteInteger
+  IniWriteString
+Donator:
+  John C Molyneux
+--------------------------------------------------------------------------------
+@@IniReadString
+<GROUP RegistryandInifiles.Inifiles>
+Summary:
+  Reads a string key from an ini file.
+Description:
+  IniReadString reads a single string value within the specified section from the
+  specified ini file. If the function fails it returns the default value '' (empty string).
+Parameters:
+  FileName - The fully qualified filename of the ini file.
+  Section - The section in the ini file from which to read a value
+  Line - The name of the key to read
+Result:
+  The key within section, default value returned on failure is an empty string.
+See also:
+  IniReadBool
+  IniReadInteger
+  IniWriteBool
+  IniWriteInteger
+  IniWriteString
+Donator:
+  John C Molyneux

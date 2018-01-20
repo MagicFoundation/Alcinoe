@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclVcl" Design="0">
+  <Description>JEDI Code Library VCL package</Description>
+  <GUID>{EB88BAFD-FD11-4F14-A6F6-9036D67B1F8F}</GUID>
+  <C6PFlags/>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>48480000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="FCL" Targets="fpc" Condition=""/>
+    <Package Name="LCL" Targets="fpc" Condition=""/>
+    <Package Name="vcljpg" Targets="c6,d6,d7,d8,d9,d10,cs1,d11" Condition=""/>
+    <Package Name="vclimg" Targets="allv11up" Condition=""/>
+    <Package Name="..\..\..\help\VCL" Targets="help" Condition=""/>
+    <Package Name="..\..\..\help\JEDI" Targets="help" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+  </Requires>
+  <Platforms>
+    <Platform Name="Win32" Condition=""/>
+    <Platform Name="Win64" Condition=""/>
+  </Platforms>
+  <Contains>
+    <File Name="..\..\source\vcl\JclPrint.pas" Targets="Vcl" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclGraphUtils.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclGraphics.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclFont.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclOpenDialogHooks.pas" Targets="Vcl" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclOpenDialogFavorites.pas" Targets="Vcl" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclVclResources.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclVersionControl.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclVersionCtrlCVSImpl.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclVersionCtrlGITImpl.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\source\vcl\JclVersionCtrlSVNImpl.pas" Targets="all" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Bitmap32.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Common.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Font.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Graphics.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\JclVcl.dtx" Targets="help" Formname="" Condition=""/>
+    <File Name="..\..\..\help\Regions.dtx" Targets="help" Formname="" Condition=""/>
+  </Contains>
+</Package>

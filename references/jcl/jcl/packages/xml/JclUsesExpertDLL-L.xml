@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Package Name="JclUsesExpertDLL" Type="L">
+  <Description>JCL Uses Wizard</Description>
+  <GUID>{23E5A735-D70C-4C34-B05C-E847A010077F}</GUID>
+  <C6PFlags>-LUdesignide</C6PFlags>
+  <C6Libs/>
+  <CompilerDefines>RELEASE</CompilerDefines>
+  <ImageBase>580C0000</ImageBase>
+  <Requires>
+    <Package Name="rtl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="vcl" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="designide" Targets="Delphi,Bcb,Bds" Condition=""/>
+    <Package Name="Jcl-R" Targets="all" Condition=""/>
+    <Package Name="JclDeveloperTools-R" Targets="all" Condition=""/>
+    <Package Name="JclBaseExpert-D" Targets="all" Condition=""/>
+  </Requires>
+  <Contains>
+    <File Name="..\..\experts\useswizard\JCLUsesWizard.pas" Targets="OldStyleIDE" Formname="" Condition=""/>
+    <File Name="..\..\experts\useswizard\JCLOptionsFrame.pas" Targets="OldStyleIDE" Formname="FrameJclOptions: TFrame" Condition=""/>
+    <File Name="..\..\experts\useswizard\JclUsesDialog.pas" Targets="OldStyleIDE" Formname="FormUsesConfirm" Condition=""/>
+  </Contains>
+</Package>
